@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<indexer id="index.lucene" label="CONF_MESSAGE[Lucene Search Engine]" description="CONF_MESSAGE[Zend_Search_Lucene implementation to index all files and search a whole repository quickly.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<class_definition filename="plugins/index.lucene/class.AjxpLuceneIndexer.php" classname="AjxpLuceneIndexer"/>
+    <client_settings>
+        <resources>
+            <img_library alias="lucene_images" path="plugins/index.lucene/resources/images"/>
+            <i18n namespace="index.lucene" path="plugins/index.lucene/resources/i18n" />
+        </resources>
+    </client_settings>
+    <server_settings>
+        <param name="index_content" type="boolean" label="CONF_MESSAGE[Index Content]" description="CONF_MESSAGE[Parses the file when possible and index its content (see plugin global options)]" mandatory="true" default="false"/>
+        <param name="index_meta_fields" type="string" label="CONF_MESSAGE[Index Meta Fields]" description="CONF_MESSAGE[Which additionnal fields to index and search]" mandatory="false" default=""/>
+        <param name="repository_specific_keywords" type="string" label="CONF_MESSAGE[Repository keywords]" description="CONF_MESSAGE[If your repository path is defined dynamically by specific keywords like AJXP_USER, or your own, mention them here.]" mandatory="false" default=""/>
+        <global_param name="PARSE_CONTENT_MAX_SIZE" type="string" label="CONF_MESSAGE[Parse Content Until]" description="CONF_MESSAGE[Skip content parsing and indexation for files bigger than this size (must be in Bytes)]" mandatory="true" default="500000"/>
+        <global_param name="PARSE_CONTENT_HTML" type="string" label="CONF_MESSAGE[HTML files]" description="CONF_MESSAGE[List of extensions to consider as HTML file and parse content]" mandatory="true" default="html,htm"/>
+        <global_param name="PARSE_CONTENT_TXT" type="string" label="CONF_MESSAGE[Text files]" description="CONF_MESSAGE[List of extensions to consider as Text file and parse content]" mandatory="true" default="txt"/>
+		<global_param name="UNOCONV" type="string" label="CONF_MESSAGE[Unoconv Path]" description="CONF_MESSAGE[Full path on the server to the 'unoconv' binary]" default="" mandatory="true"/>
+		<global_param name="PDFTOTEXT" type="string" label="CONF_MESSAGE[PdftoText Path]" description="CONF_MESSAGE[Full path on the server to the 'pdftotext' binary]" default="" mandatory="true"/>
+    </server_settings>
+	<registry_contributions>
+		<hooks>
+			<serverCallback hookName="node.change" methodName="updateNodeIndex" defer="true"></serverCallback>
+		</hooks>
+		<actions>
+			<action name="search">
+				<rightsContext noUser="true" userLogged="only" read="true"
+					write="false" adminOnly="false">
+				</rightsContext>
+				<processing>
+					<serverCallback methodName="applyAction"/>
+				</processing>
+			</action>					
+            <action name="check_lock">
+                <rightsContext noUser="true" userLogged="only" read="true"
+                    write="false" adminOnly="false">
+                </rightsContext>
+                <processing>
+                    <serverCallback methodName="applyAction"/>
+                </processing>
+            </action>
+			<action name="index">
+				<gui text="index.lucene.1" title="index.lucene.2" src="lucene_images/ICON_SIZE/ark_view.png" accessKey="folder_access_key">
+					<context selection="false" dir="true" recycle="false"
+						actionBar="false" actionBarGroup="utils" contextMenu="true" infoPanel="false">
+					</context>
+				</gui>			
+				<rightsContext noUser="true" userLogged="only" read="true"
+					write="true" adminOnly="false">
+				</rightsContext>				
+				<processing>
+					<clientCallback prepareModal="false"><![CDATA[
+						var crtDir = ajaxplorer.getContextNode().getPath();
+						var bgManager = ajaxplorer.actionBar.bgManager;
+						bgManager.queueAction("index", new Hash({dir:crtDir}), "Indexing current folder");
+						bgManager.next();
+					]]></clientCallback>				
+					<serverCallback methodName="applyAction"/>
+				</processing>
+			</action>					
+		</actions>		
+	</registry_contributions>
+    <dependencies>
+        <!-- Stream Wrapper Access -->
+        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+    </dependencies>
+</indexer>

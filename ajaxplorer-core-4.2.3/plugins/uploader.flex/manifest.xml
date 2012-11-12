@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uploader id="uploader.flex" text="51" title="162" label="CONF_MESSAGE[Flash uploader]" description="CONF_MESSAGE[Legacy flash uploader, used when the browser does not support HTML5. If you want to force the usage of this uploader, deactivate the uploader.html, and remove the activeCondition tag from the uploader.flex manifest file.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<class_definition filename="plugins/uploader.flex/class.FlexUploadProcessor.php" classname="FlexUploadProcessor"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="flex_uploader" path="plugins/uploader.flex/i18n" />
+        </resources>
+    </client_settings>
+	<server_settings>
+		<global_param name="HTTPS_POLICY_FILE" group="CONF_MESSAGE[Miscalleneous]" type="string" label="CONF_MESSAGE[HTTPS Policy]" description="CONF_MESSAGE[An Https Policy file maybe used to solve Flash upload problems when in Https. Use path relative to the web root.]" mandatory="false" default="true"/>
+	</server_settings>
+	<registry_contributions>
+		<actions>
+			<action name="upload">
+				<pre_processing>					
+					<serverCallback methodName="preProcess"/>
+				</pre_processing>
+				<post_processing>					
+					<serverCallback methodName="postProcess" capture="true"/>
+				</post_processing>
+			</action>
+		</actions>
+	</registry_contributions>
+	<dependencies>
+		<!-- Stream Wrapper Access -->
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+	</dependencies>
+	<processing>
+		<clientForm id="flash_upload_form"><![CDATA[
+			<!-- FLEX UPLOAD FORM -->
+			<div id="flash_upload_form" box_width="470">
+			<div id="flashscreen">
+			<iframe id="flashframe" frameborder="0" src=""></iframe>
+			</div>
+			</div>
+		]]></clientForm>
+		<dialogOnOpen><![CDATA[
+        var src = window.ajxpServerAccessPath + '&get_action=get_template&template_name=flash_tpl.html&pluginName=uploader.flex&encode=false';
+        modal.getForm().down('#flashframe').src = src;
+		]]></dialogOnOpen>
+		<activeCondition><![CDATA[
+            var otherUploadersCount = XPathSelectNodes(ajaxplorer.getXmlRegistry(), 'plugins/uploader[@id!="uploader.flex"]').length;
+            if(otherUploadersCount == 0) return true;
+			var xhrUpload = (typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span') && (window.FileReader || window.FormData) );
+			return (ajaxplorer.actionBar.getFlashVersion() >= 8 && (document.location.href.substring(0,5)!='https' || Prototype.Browser.IE) && ! xhrUpload );
+		]]></activeCondition>
+	</processing>
+</uploader>

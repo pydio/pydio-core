@@ -1,0 +1,50 @@
+<p>Encapsulate the usage of other auth.* drivers, to allow multiple sources of users. Users can choose at login time with wich method to authenticate themselves.</p>
+<p>Here is a sample code that would allow the choice between the standard login (for example for admin user) and a predefined auth.ftp config that queries an FTP server to check if the user credential is recognized or not :
+    <pre>
+        "AUTH_DRIVER" => array(
+        "NAME"      => "multi",
+        "OPTIONS"   => array(
+            "MASTER_DRIVER"         => "serial",
+            "TRANSMIT_CLEAR_PASS"	=> true,
+            "USER_ID_SEPARATOR"     => "_-_",
+            "DRIVERS" => array(
+                "serial" => array(
+                        "LABEL"     => "Local",
+                        "NAME"		=> "serial",
+                        "OPTIONS"	=> array(
+                            "LOGIN_REDIRECT"		=> false,
+                            "USERS_FILEPATH"		=> "AJXP_DATA_PATH/plugins/auth.serial/users.ser",
+                            "AUTOCREATE_AJXPUSER" 	=> false,
+                            "TRANSMIT_CLEAR_PASS"	=> false )
+                    ),
+                "ftp"   => array(
+                    "LABEL"     => "Remote FTP",
+                    "NAME"		=> "ftp",
+                    "OPTIONS"	=> array(
+                        "LOGIN_REDIRECT"		=> false,
+                        "REPOSITORY_ID"		    => "dynamic_ftp",
+                        "ADMIN_USER"		    => "admin",
+                        "FTP_LOGIN_SCREEN"      => false,
+                        "AUTOCREATE_AJXPUSER" 	=> true,
+                        "TRANSMIT_CLEAR_PASS"	=> true,
+                    )
+                )
+            )
+        )
+    ),
+    </pre>
+</p>
+<p>Note the unusual <b>LABEL</b> option added in the sub-drivers definition, that will be used as a display label in the gui login chooser. If it's not set, the selector would simply display the driver name (serial / ftp here). Note also that some options cannot be mixed : <bTRANSMIT_CLEAR_PASS</b> is set as a global option and is overriden for both subdrivers.
+</p>
+<p align="center"><img src="MultiAuthScreenshot.png"></p>
+<p>The <b>USER_ID_SEPARATOR</b> is important, as it is used to store locally the users data with a discrimination on where they come from. Here, once logged, an FTP user "mylogin" would in fact be handled by the system as "ftp_-_mylogin". Thus if the serial driver already has a "mylogin" user, they are not mixed. Be aware that some folders can be created with this complex user name (for example if you use the AJXP_USER keyword for some repositories), and for this reason the separator must be compliant with folder names! The first implementation of this plugin led to a bug because the separator used (::) was making any directory creation fail.
+
+</p>
+        <p><b>New in 4.2.0</b>: the MASTER_SLAVE mode allows you to configure auth.multi in an explicit Master(read only) / Slave (writeable) mode, which is a very common case. Generally, this will be an LDAP + Serial config, allowing to load users from an LDAP/AD directory, and allowing the users to share folders and create temporary users that will be stored locally in the AjaXplorer install.
+            <br>The new options are described below :
+            <ul>
+                <li><b>MODE</b> : Set as MASTER_SLAVE or USER_CHOICE</li>
+                <li><b>MASTER_DRIVER</b> : If mode is MASTER_SLAVE, will consider this as the first driver to test</li>
+                <li><b>USER_BASE_DRIVER</b> : Not mandatory, but if set, will use this driver when listing the users in the administration console. That way, for example if your LDAP has thousands of users and you don't want to list them, you can put the USER_BASE_DRIVER to the "serial" driver and only see the local users.</li>
+            </ul>
+        </p>

@@ -1,0 +1,19 @@
+<IfModule mod_rewrite.c>
+# You must set the correct values here if you want
+# to enable webDAV sharing. The values assume that your 
+# ajaXplorer installation is at http://yourdomain/ajaxplorer 
+# and that you want the webDAV shares to be accessible via 
+# http://yourdomain/ajaxplorer/shares/repository_id/
+RewriteEngine on
+RewriteBase /ajaxplorer
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^shares ./dav.php [L]
+
+#Following lines seem to be necessary if PHP is working
+#with apache as CGI or FCGI. Just remove the #
+#See http://doc.tiki.org/WebDAV#Note_about_Apache_with_PHP_as_fcgi_or_cgi
+
+#RewriteCond %{HTTP:Authorization} ^(.*)
+#RewriteRule ^(.*) - [E=HTTP_AUTHORIZATION:%1]
+</IfModule>

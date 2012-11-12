@@ -1,0 +1,5 @@
+Here are sampled some very common problems encountered when installing AjaXplorer.
+Please check the various points below : 
+	. AjaXplorer requires PHP5 at least to work. On some hosting, many php versions are installed, an you may have to explicitely specify that a given folder (and all it's subfolder) has to use PHP5. This is for example the case on the french host OVH.
+	. AjaXplorer requires that PHP error level is set to something upper than E_NOTICE : since it was developed for php4 at the beginning, AjaXplorer is not E_NOTICE errors free, thus if your PHP error level display these E_NOTICE errors, many features based on ajax calls will not work.
+	. Uploads / Downloads problems : there are a bunch of config that you have to understand in your php.ini : the various variables for memory configuration.

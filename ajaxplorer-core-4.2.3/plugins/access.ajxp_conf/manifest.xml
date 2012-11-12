@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="ajxp_conf" label="CONF_MESSAGE[Admin Driver]" description="CONF_MESSAGE[Access AjaXplorer configuration data.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <core_relation packaged="true" tested_version="4.2.0"/>
+        <plugin_author>Charles du Jeu</plugin_author>
+    </plugin_info>
+	<client_settings icon="plugins/access.ajxp_conf/admin.png">
+		<resources>
+			<i18n namespace="ajxp_conf" path="plugins/access.ajxp_conf/i18n" />		
+			<i18n namespace="ajxp_shared" path="plugins/access.ajxp_shared/i18n" />
+			<js file="plugins/access.ajxp_conf/class.ConfigEditor.js" className="ConfigEditor"/>			
+		</resources>
+	</client_settings>
+	<registry_contributions>
+		<client_configs>
+            <template_part theme="umbra" ajxpId="sidebar_splitter" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'><![CDATA[
+                <div id="folderPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ajxpPaneHeader="165" ajxpPaneIcon="view_tree.png" style="margin:20px;"></div>
+                <style>
+                    #sidebar_splitter{padding-bottom:20px;background-color:#EFD585;}
+                    .webfx-tree-item:first-of-type{
+                        display:none;
+                    }
+                    .webfx-tree-container>.webfx-tree-item:first-of-type{
+                        display:block;
+                    }
+                    .webfx-tree-container.first_container{
+                        margin-left: -19px;
+                    }
+                    .webfx-tree-container > .webfx-tree-item {
+                        font-weight: bold;
+                    }
+                    .webfx-tree-container > .webfx-tree-container > .webfx-tree-item {
+                        font-weight: normal;
+                    }
+                </style>
+            ]]></template_part>
+		</client_configs>
+		<external_file filename="plugins/access.ajxp_conf/ajxp_confActions.xml" include="actions/*"/>
+		<external_file filename="plugins/access.ajxp_shared/manifest.xml" include='registry_contributions/actions/action[@name="clear_expired"]'/>
+		<external_file filename="plugins/access.ajxp_conf/ajxp_confActions.xml" include="client_configs/*"/>
+	</registry_contributions>	
+	<class_definition filename="plugins/access.ajxp_conf/class.ajxp_confAccessDriver.php" classname="ajxp_confAccessDriver"/>
+</ajxpdriver>

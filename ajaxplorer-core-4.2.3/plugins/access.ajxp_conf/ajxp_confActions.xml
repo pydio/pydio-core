@@ -1,0 +1,614 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<registry_contributions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<actions>
+		<action name="ls" dirDefault="true">
+			<gui text="32" title="32" src="fileopen.png"
+				accessKey="folder_access_key">
+				<context selection="true" dir="" recycle="false"
+					actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="false">
+				</context>
+				<selectionContext dir="true" file="false" recycle="false"
+					unique="true" allowedMimes="*">
+				</selectionContext>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true"
+				write="false" adminOnly="false">
+			</rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var path;					
+					if(window.actionArguments && window.actionArguments.length>0){
+						path = window.actionArguments[0];
+						if(Object.isString(path)){path = new AjxpNode(path,false,getBaseName(path));}
+					}else{
+						userSelection = ajaxplorer.getUserSelection();
+						if(userSelection && userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime(["zip"]))){
+							path = userSelection.getUniqueNode();
+						}
+					}
+					if(path){
+						ajaxplorer.updateContextData(path);
+					}						
+					]]></clientCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="stat">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>				
+		<action name="get_plugin_manifest">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+        <action name="create_users_menu">
+            <gui text="ajxp_conf.2" title="ajxp_conf.2" src="yast_user_add.png" hasAccessKey="false">
+                <context selection="false" dir="" recycle="hidden"
+                         actionBar="true" contextMenu="false" infoPanel="false" actionBarGroup="put"/>
+            </gui>
+            <subMenu>
+                <dynamicItems>
+                    <item actionId="create_user"/>
+                    <item actionId="create_role"/>
+                </dynamicItems>
+            </subMenu>
+        </action>
+
+		<action name="create_user">
+			<gui text="297" title="298" src="yast_user_add.png" accessKey="create_user_accesskey" hasAccessKey="true">
+				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
+					actionBar="false" contextMenu="false" infoPanel="false"
+					actionBarGroup="put" inZip="false">
+				</context>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var completeFunc = function(){
+						var oForm = modal.getForm();
+						if(!ajaxplorer.actionBar.configEditor){
+							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+						}
+						ajaxplorer.actionBar.configEditor.setForm(oForm);
+						result = ajaxplorer.actionBar.configEditor.submitCreateUser();
+						if(result) hideLightBox();
+						return false;
+					};
+					var loadFunc = function(oForm){
+						if(!ajaxplorer.actionBar.configEditor){
+							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+						}	
+						ajaxplorer.actionBar.configEditor.setForm(oForm);
+						ajaxplorer.actionBar.configEditor.loadCreateUserForm();
+						
+						new Protopass(oForm.down('input[name="new_user_pwd"]'), {
+							barContainer:$('pwd_strength_container'),
+							barPosition:'bottom'
+						});
+					};
+					modal.showDialogForm('Create User', 'create_user_box', loadFunc, completeFunc);
+					]]></clientCallback>
+				<clientForm id="create_user_box"><![CDATA[
+					<div id="create_user_box" action="create_user" box_width="210">
+						<div class="SF_element">
+							<div class="SF_label" ajxp_message_id="94">AJXP_MESSAGE[94] : </div><input name="new_user_login" type="text" class="dialogFocus SF_input"/>
+						</div>
+						<div class="SF_element">
+							<div class="SF_label" ajxp_message_id="182">AJXP_MESSAGE[182] : </div><input name="new_user_pwd" type="password" class="SF_input"/>
+						</div>
+						<div class="SF_element">						
+							<div class="SF_label" ajxp_message_id="199">AJXP_MESSAGE[199] : </div><input name="new_user_pwd_conf" type="password" class="SF_input"/>
+						</div>
+						<div class="SF_element" id="pwd_strength_container"></div>
+						<div style="clear:both; display:none;" class="dialogLegend" ajxp_message_id="89">AJXP_MESSAGE[ajxp_conf.89]</div>
+						<div id="custom_pane" class="config_subblock" style="display:none;">
+							
+						</div>
+					</div>				
+				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>
+		<action name="create_role">
+			<gui text="ajxp_conf.75" title="ajxp_conf.75" src="user_group_new.png" accessKey="ajxp_conf.role_access" hasAccessKey="true">
+				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
+					actionBar="false" contextMenu="false" infoPanel="false"
+					actionBarGroup="put" inZip="false">
+				</context>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					modal.showDialogForm('Create Role', 'create_role_box');
+					]]></clientCallback>
+				<clientForm id="create_role_box"><![CDATA[
+					<div id="create_role_box" action="create_role" box_width="210">
+						<div class="SF_element">
+							<div class="SF_label" ajxp_message_id="ajxp_conf.76">AJXP_MESSAGE[ajxp_conf.76] : </div><input name="role_id" type="text" class="dialogFocus SF_input"/>
+						</div>
+					</div>
+				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="create_repository">
+			<gui text="299" title="300" src="hdd_external_unmount.png" accessKey="ajxp_conf.repository_access_key" hasAccessKey="true">
+				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
+					actionBar="true" contextMenu="false" infoPanel="false"
+					actionBarGroup="put" inZip="false">
+				</context>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
+			<subMenu>
+				<dynamicBuilder><![CDATA[
+					var context = window.builderContext;
+					context.builderMenuItems = $A([]);
+                    context.builderMenuItems.push({
+                        name:MessageHash['ajxp_conf.90'],
+                        alt:MessageHash[300],
+                        isDefault : true,
+                        image:resolveImageSource('images/actions/22/hdd_external_unmount.png', '',  22),
+                        callback:function(e){
+                            window.createRepoCmd = "repository";
+                            this.options.src = 'hdd_external_unmount.png';
+                            this.options.title = MessageHash[300];
+                            this.apply();
+                        }.bind(context)
+                    } );
+                    context.builderMenuItems.push({
+                        name:MessageHash['ajxp_conf.91'],
+                        alt:MessageHash['ajxp_conf.92'],
+                        isDefault : false,
+                        image:resolveImageSource('images/actions/22/hdd_external_mount.png', '',  22),
+                        callback:function(e){
+                            window.createRepoCmd = "template";
+                            this.options.src = 'hdd_external_mount.png';
+                            this.options.title = MessageHash['ajxp_conf.92'];
+                            this.apply();
+                        }.bind(context)
+                    } );
+				]]></dynamicBuilder>
+			</subMenu>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var loadFunc = function(oForm){
+						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+						if(!ajaxplorer.actionBar.configEditor){
+							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+						}
+						ajaxplorer.actionBar.configEditor.setForm(oForm);
+						ajaxplorer.actionBar.configEditor.initCreateRepoWizard(window.createRepoCmd);
+					};				
+					modal.showDialogForm('Create Repository', 'create_repository_box', loadFunc, null, null, false, true);
+					]]></clientCallback>
+				<clientForm id="create_repository_box"><![CDATA[
+					<div id="create_repository_box" action="create_repository" box_width="320">
+					    <div id="creation_form" style="padding:5px;padding-top:0px;">
+                            <div class="dialogLegend repoCreationString">AJXP_MESSAGE[ajxp_conf.95]</div>
+                            <div class="dialogLegend tplCreationString">AJXP_MESSAGE[ajxp_conf.96]</div>
+                            <div class="SF_element">
+                                <div class="SF_label repoCreationString" ajxp_message_id="ajxp_conf.8">AJXP_MESSAGE[ajxp_conf.8]* : </div>
+                                <div class="SF_label tplCreationString" ajxp_message_id="ajxp_conf.116">AJXP_MESSAGE[ajxp_conf.116]* : </div>
+                                <input name="new_user_login" type="text" class="SF_input dialogFocus"/>
+                            </div>
+                            <div class="SF_element">
+                                <div class="SF_label repoCreationString" ajxp_message_id="ajxp_conf.32">AJXP_MESSAGE[ajxp_conf.32]* : </div>
+                                <div class="SF_label tplCreationString" ajxp_message_id="ajxp_conf.117">AJXP_MESSAGE[ajxp_conf.117]* : </div>
+                                <select class="SF_input"><option>AJXP_MESSAGE[ajxp_conf.33]</option></select>
+                            </div>
+						</div>
+						<div id="driver_form" style="margin-top:32px;"></div>
+						<div class="dialogButtons">
+							<input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" height="22" width="22" class="dialogButton" id="submit_create_repo" value="Next" class="button" onclick="return false;">
+							<input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_close.png" height="22" width="22" class="dialogButton" value="Cancel" class="button" onclick="hideLightBox();return false;">
+						</div>
+					</div>				
+				]]></clientForm>
+				<serverCallback methodName="switchAction"/>
+				</processing>
+		</action>	
+		<action name="rename">
+			<gui text="6" title="158" src="applix.png" accessKey="rename_access_key" hasAccessKey="true">
+				<context selection="true" dir="" recycle="hidden"
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="change" inZip="false">
+				</context>
+				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="repository_editable" behaviour="hidden"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="false"><![CDATA[
+					var callback = function(node, newValue){						
+						var conn = new Connexion();
+						conn.addParameter('get_action', 'edit');
+						conn.addParameter('sub_action', 'edit_repository_label');
+						conn.addParameter('repository_id', node.getMetadata().get('repository_id'));
+						conn.addParameter('newLabel', newValue);
+						conn.onComplete = function(transport){
+							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+						};
+						conn.sendSync();
+					};
+
+					if(ajaxplorer.getUserSelection() && ajaxplorer.getUserSelection().getSelectionSource() && ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition) {ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition(callback);}
+					]]></clientCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>						
+		<action name="batch_users_roles" fileDefault="false">
+			<gui text="ajxp_conf.94" title="ajxp_conf.82" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
+				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
+					actionBar="true" contextMenu="true" infoPanel="true"
+					actionBarGroup="change" inZip="false">
+				</context>
+				<selectionContext dir="false" file="true" recycle="false" unique="false" multipleOnly="true" allowedMimes="user,user_editable" behaviour="hidden"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var userSelection =  ajaxplorer.getUserSelection();
+					var loadFunc = function(oForm){
+						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+						if(!ajaxplorer.actionBar.configEditor){
+							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+						}						
+						ajaxplorer.actionBar.configEditor.setForm(oForm);
+						ajaxplorer.actionBar.configEditor.loadUsers(userSelection);
+					};
+					modal.showDialogForm('Batch Edition', 'edit_config_box', loadFunc, function(){hideLightBox();}, null, true);					
+				]]></clientCallback>
+				<clientListener name="selectionChange"><![CDATA[
+				if(ajaxplorer){
+					var userSelection = ajaxplorer.getUserSelection();
+					var action = ajaxplorer.getActionBar().getActionByName("batch_users_roles");
+					if(action){
+						if(userSelection.isUnique()){
+							action.selectionContext.dir = true;
+							action.selectionContext.file = false;
+						}else{
+							action.selectionContext.dir = false;
+							action.selectionContext.file = true;
+						}					
+					}
+				}
+				]]></clientListener>				
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="edit" fileDefault="true">
+			<gui text="ajxp_conf.93" title="301" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
+				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
+					actionBar="true" contextMenu="true" infoPanel="true"
+					actionBarGroup="change" inZip="false">
+				</context>
+				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="user,user_editable,repository,repository_editable,role,ajxp_plugin" behaviour="hidden"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var userSelection =  ajaxplorer.getUserSelection();
+					var node = userSelection.getUniqueNode();
+					var meta = node.getMetadata();
+					var mime = meta.get("ajxp_mime");
+					if(mime == "user" || mime == "user_editable" || mime == "role"){
+						var loadFunc = function(oForm){
+							ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+							if(!ajaxplorer.actionBar.configEditor){
+								ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+							}						
+							ajaxplorer.actionBar.configEditor.setForm(oForm);
+							if(mime == "role"){
+								ajaxplorer.actionBar.configEditor.loadRole(meta.get("text"));
+							}else{
+								ajaxplorer.actionBar.configEditor.loadUser(meta.get("text"));
+							}
+						};
+						modal.showDialogForm('Edit Online', 'edit_config_box', loadFunc, function(){hideLightBox();}, null, true);
+					}else if(mime == "ajxp_plugin"){
+						var loadFunc = function(oForm){
+							ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+							if(!ajaxplorer.actionBar.configEditor){
+								ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+							}						
+							ajaxplorer.actionBar.configEditor.setForm(oForm);
+							ajaxplorer.actionBar.configEditor.loadPluginConfig(node.getMetadata().get("plugin_id"));							
+						};
+						var closeFunc = function(oForm){
+							var toSubmit = new Hash();
+							var configEditor = ajaxplorer.actionBar.configEditor;
+							toSubmit.set("plugin_id", node.getMetadata().get("plugin_id"));
+							var missing = configEditor.formManager.serializeParametersInputs(oForm, toSubmit, 'DRIVER_OPTION_');
+							if(missing){
+								configEditor.displayMessage("ERROR", MessageHash['ajxp_conf.36']);
+							}else{
+								configEditor.submitForm('edit', 'edit_plugin_options', toSubmit);							
+								hideLightBox();
+							}
+						};
+						modal.showDialogForm('Edit Online', 'edit_repo_box', loadFunc, closeFunc);
+					}else{
+						var loadFunc = function(oForm){
+							ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+							if(!ajaxplorer.actionBar.configEditor){
+								ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+							}						
+							ajaxplorer.actionBar.configEditor.setForm(oForm);
+							ajaxplorer.actionBar.configEditor.loadRepository(meta.get("repository_id"));
+						};
+						var closeFunc = function(){
+							var toSubmit = new Hash();
+							var configEditor = ajaxplorer.actionBar.configEditor;
+							if(!configEditor.currentRepoWriteable){
+								hideLightBox();
+								return;
+							}
+							toSubmit.set("repository_id", configEditor.currentRepoId);
+							var missing = configEditor.formManager.serializeParametersInputs(configEditor.currentForm, toSubmit, 'DRIVER_OPTION_', configEditor.currentRepoIsTemplate);
+							if(missing && !configEditor.currentRepoIsTemplate){
+								configEditor.displayMessage("ERROR", MessageHash['ajxp_conf.36']);
+							}else{
+								configEditor.submitForm('edit_repository', 'edit_repository_data', toSubmit, null, function(){
+									this.loadRepList();
+									this.loadUsers();
+								}.bind(configEditor));							
+								hideLightBox();
+							}
+						};
+						modal.showDialogForm('Edit Online', 'edit_repo_box', loadFunc, closeFunc);
+					}					
+					]]></clientCallback>
+				<clientForm id="edit_config_box"><![CDATA[
+					<div id="edit_config_box" action="edit_user" box_width="420">
+						<fieldset>							
+							<div id="user_acl">
+								<div id="roles_pane">									
+									<div class="dialogLegend" ajxp_message_id="ajxp_conf.72">AJXP_MESSAGE[ajxp_conf.72]</div>
+									<div>
+										<div style="width:44%;float:left;"><span ajxp_message_id="ajxp_conf.71">AJXP_MESSAGE[ajxp_conf.71]</span> : <br><div id="available_roles"></div></div>
+										<div style="width:10%;float:left;text-align:center;vertical-align:middle;"><br>&gt;&gt;<br>&lt;&lt;</div>
+										<div style="width:44%;float:right;"><span ajxp_message_id="ajxp_conf.70">AJXP_MESSAGE[ajxp_conf.70]</span> : <br><div id="user_roles"></div></div>
+									</div>
+								</div>
+								<div class="dialogLegend" id="rights_legend" style="clear:left;padding-top:15px;" ajxp_message_id="80">AJXP_MESSAGE[ajxp_conf.80]</div>
+								<div id="rights_pane">
+									<table class="repository" width="100%" cellspacing="0">
+										<tbody>
+										<tr id="loading_row"><td><span ajxp_message_id="ajxp_conf.33">AJXP_MESSAGE[ajxp_conf.33]</span></td></tr>
+										</tbody>
+									</table>
+								</div>
+								<div id="actions_pane" style="display:none;padding-top:5px;color:#666;">
+								    <div style="border:1px solid #aaa;padding:5px;margin-bottom:5px;"><input type="checkbox" id="default_role_cb" style="float:left;">AJXP_MESSAGE[ajxp_conf.112]</div>
+									<div style="border:1px solid #aaa;padding:5px;"><div style="margin-bottom:5px;"><b>AJXP_MESSAGE[ajxp_conf.85]</b> : AJXP_MESSAGE[ajxp_conf.86]</div>
+                                        <textarea id="disabled_actions" style="width:317px;padding:1px; height:60px;"></textarea>
+                                        <input type="image" value="SAVE" class="dialogButton onclick="return false;" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" id="submit_actions_pane" style="float:right;margin:0px;"/>
+									</div>
+								</div>
+							</div>
+							<div id="user_personal" style="display:none;">
+								<div id="password_pane">
+									<div class="dialogLegend" ajxp_message_id="ajxp_conf.26">AJXP_MESSAGE[ajxp_conf.26]</div>
+									<div class="config_subblock" id="pass_subblock">
+										<input style="float:right;margin-top:0px;" type="image" class="dialogButton" value="OK" name="new_pass_button" onclick="return false;" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png"/>									
+										<span ajxp_message_id="182" style="display: block;float: left;padding-right: 5px;padding-top: 4px;text-align: right;width: 60px;">AJXP_MESSAGE[182]</span> <input type="password" id="new_pass" style="width:70px;margin-right:10px;"/><span ajxp_message_id="199">AJXP_MESSAGE[199]</span> <input type="password" id="new_pass_confirm" style="width:70px;"/>
+										<div style="clear:left;width:240px;" id="strength_container"></div>
+									</div>
+								</div>
+								<div id="admin_right_pane" style="clear:left;">
+									<div class="dialogLegend" ajxp_message_id="ajxp_conf.27">AJXP_MESSAGE[ajxp_conf.27]</div>
+									<div class="config_subblock">
+										<input id="admin_rights" class="user_delete_confirm" type="checkbox" style="width:20px;float:right;" /><span ajxp_message_id="ajpx_conf.28">AJXP_MESSAGE[ajxp_conf.28]</span>
+									</div>
+								</div>
+								<div class="dialogLegend" style="display:none;" ajxp_message_id="89">AJXP_MESSAGE[ajxp_conf.89]</div>
+								<div id="custom_pane" class="config_subblock" style="display:none;">
+									
+								</div>
+								<div class="dialogLegend" ajxp_message_id="81">AJXP_MESSAGE[ajxp_conf.81]</div>
+								<div id="wallets_pane" class="config_subblock" style="margin-bottom:0px;">
+									
+								</div>
+							</div>
+						</fieldset>
+					</div>					
+					<div id="edit_repo_box" action="edit_repository" box_width="320">
+						<fieldset id="options_pane">
+							<span ajxp_message_id="ajxp_conf.33">AJXP_MESSAGE[ajxp_conf.33]</span>
+						</fieldset>
+					</div>													
+				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>
+		<action name="delete_role">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="save_user_preference">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="edit_meta_source">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="add_meta_source">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="delete_meta_source">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="delete">			
+			<gui text="7" title="161" src="editdelete.png" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
+				<context selection="true" dir="" recycle="false"
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="change" inZip="false">
+				</context>
+				<selectionContext dir="false" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable,shared_file,role" image="false" editable="false"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var userSelection =  ajaxplorer.getUserSelection();
+					var node = userSelection.getUniqueNode();
+					var meta = node.getMetadata();
+					var deleteMessage, fieldName, fieldValue;
+					if(meta.get("ajxp_mime") == "user_editable"){
+						deleteMessage = MessageHash['ajxp_conf.34'];
+						fieldName = "user_id";
+						fieldValue = meta.get("text");
+					}else if(meta.get("ajxp_mime") == "role"){
+						deleteMessage = MessageHash['ajxp_shared.11'];
+						fieldName = "role_id";
+						fieldValue = meta.get("text");
+					}else if(meta.get("ajxp_mime") == "shared_file"){
+						deleteMessage = MessageHash['ajxp_shared.11'];
+						fieldName = "shared_file";
+						fieldValue = meta.get("filename");
+					}else{
+						deleteMessage = MessageHash['ajxp_conf.35'];
+						fieldName = "repository_id";
+						fieldValue = meta.get("repository_id");
+					}
+					var onLoad = function(oForm){
+		   		    	$(oForm).select('span[id="delete_message"]')[0].update(deleteMessage);
+		   		    	var hidden = $(oForm).select('input[type="hidden"]')[0];
+		   		    	hidden.setAttribute("name", fieldName);
+		   		    	hidden.setAttribute("value", fieldValue);
+					};
+					modal.showDialogForm('Delete', 'delete_config_form', onLoad, function(){
+						var oForm = modal.getForm();						
+						ajaxplorer.actionBar.submitForm(oForm);
+                        if (userSelection.isMultiple()) {
+                           var i = 1; 
+	   		    	       var hidden = $(oForm).select('input[type="hidden"]')[0];
+                           while (true) {
+                              try {
+                                  var node = userSelection.getNode(i);
+                                  var meta = node.getMetadata();
+                                  var value;
+                                  if(meta.get("ajxp_mime") == "user_editable"){
+                                  	value = meta.get("text");
+                                  }else if(meta.get("ajxp_mime") == "shared_file"){
+                                  	value = meta.get("filename");
+                                  }else{
+                                  	value = meta.get("text");
+                                  }
+                                  hidden.setAttribute("value", value);
+            					  ajaxplorer.actionBar.submitForm(oForm);
+                                  i++;
+                              } catch (e) 
+                              {
+                                  break;
+                              }
+                           }
+                        }
+						hideLightBox(true);
+						return false;
+					});
+					]]></clientCallback>
+				<clientForm id="delete_config_form"><![CDATA[
+				<div id="delete_config_form" action="delete" box_width="280">
+					<span id="delete_message"></span>
+					<input type="hidden" name="" value=""/>
+				</div>
+				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>		
+		<action name="copyAsText">			
+			<gui text="302" title="303" src="editcopy.png" accessKey="" hasAccessKey="false">
+				<context selection="true" dir="" recycle="false"
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="change" inZip="false">
+				</context>
+				<selectionContext dir="false" file="true" recycle="false" unique="false" allowedMimes="log,testResult"  image="false" editable="false"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var onLoad = function(oForm){
+						var userSelection =  ajaxplorer.getUserSelection();
+						var nodes = userSelection.getSelectedNodes();
+						var firstNode = userSelection.getUniqueNode();						
+		   		    	var copyDiv = $(oForm).select('textarea[id="text_copy"]')[0];
+		   		    	var attributes = ['date','ip','level','user','action','params'];
+			   		    var message = attributes.join("\t") + "\n\n";
+		   		    	nodes.each(function(node){	
+		   		    		var meta = node.getMetadata();	   		    		
+		   		    		for(var i=0;i<attributes.length;i++){
+		   		    			var attName = attributes[i];
+		   		    			if(attName == "ajxp_label") attName = "text";
+		   		    			message += meta.get(attName) + '\t';
+		   		    		}
+			   		    	message += '\n';
+		   		    	});
+		   		    	copyDiv.setValue(message);
+		   		    	copyDiv.select();
+					};
+					modal.showDialogForm('Delete', 'copy_as_text', onLoad, function(){
+						hideLightBox(true);
+						return false;
+					},null,true);
+					]]></clientCallback>
+				<clientForm id="copy_as_text"><![CDATA[
+				<div id="copy_as_text" action="copy" box_width="650">
+					<textarea id="text_copy" style="width:630px; height: 350px;"></textarea>
+				</div>
+				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>					
+					
+	</actions>
+	<client_configs>
+		<component_config className="InfoPanel">
+			<infoPanel mime="generic_file" attributes="icon,text">
+				<messages>
+					<message key="name_string" id="133"/>
+					<message key="size_string" id="127"/>
+					<message key="type_string" id="134"/>
+					<message key="modif_string" id="138"/>
+				</messages>
+				<html><![CDATA[
+				<div style="padding:10px;">
+					<div class="folderImage">
+						<img src="AJXP_THEME_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
+					</div>
+					<b>#{name_string}</b> : #{text}
+				</div>
+				]]></html>
+			</infoPanel>
+			<infoPanel mime="generic_dir" attributes="icon,text">
+				<messages>
+					<message key="name_string" id="133"/>
+					<message key="modif_string" id="138"/>
+				</messages>
+				<html><![CDATA[
+					<div style="padding:10px;">
+						<div class="folderImage">
+							<img src="AJXP_THEME_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
+						</div>
+						<b>#{name_string}</b> : #{text}
+					</div>
+				]]></html>
+			</infoPanel>
+			<infoPanel mime="no_selection" attributes="">
+				<messages>
+					<message key="files_string" id="265"/>
+				</messages>
+				<html><![CDATA[
+					<div style="padding:10px;">
+						<div class="folderImage">
+							<img src="AJXP_THEME_FOLDER/images/mimes/64/admin.png" height="64" width="64">
+						</div>
+					</div>
+				]]></html>
+			</infoPanel>		
+		</component_config>
+	</client_configs>
+</registry_contributions>

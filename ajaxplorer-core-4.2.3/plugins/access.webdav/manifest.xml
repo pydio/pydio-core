@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="webdav" label="CONF_MESSAGE[WebDAV (PEAR)]" description="CONF_MESSAGE[Access a WebDAV server. Requires PEAR/HTTP_WebDAVClient installed with the patched found in the plugin folder applied.]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition filename="plugins/access.webdav/class.webdavAccessDriver.php" classname="webdavAccessDriver"/>
+    <client_settings icon="plugins/access.fs/icon.png">
+        <resources>
+            <i18n namespace="webdav_access" path="plugins/access.webdav/i18n"/>
+        </resources>
+    </client_settings>
+
+	<server_settings>
+		<param name="HOST" type="string" label="CONF_MESSAGE[Host]" description="CONF_MESSAGE[Host of the WebDAV server, with http/https and without trailing slash. Can contain user:password too.]" mandatory="true" default="http://webdav.host.com"/>
+		<param name="PATH" type="string" label="CONF_MESSAGE[Uri]" description="CONF_MESSAGE[Path to the root folder on the server]" mandatory="true"/>
+        <param name="CHMOD_VALUE" type="string" label="CONF_MESSAGE[File Creation Mask]" description="CONF_MESSAGE[Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc.]" default="0666"/>
+	</server_settings>
+	<registry_contributions>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
+		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/client_configs/*" exclude=""/>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
+        <external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
+	</registry_contributions>
+    <dependencies>
+        <pluginClass pluginName="access.fs"/>
+    </dependencies>
+    <class_stream_wrapper filename="plugins/access.webdav/class.webdavAccessWrapper.php" classname="webdavAccessWrapper" protocol="ajxp.webdav"/>
+</ajxpdriver>

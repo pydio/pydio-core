@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin label="CONF_MESSAGE[Git-based Versioning]" description="CONF_MESSAGE[Keep tracks of all files modifications using a local Git repository]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <core_relation packaged="true" tested_version="4.2.0"/>
+        <plugin_author>Charles du Jeu</plugin_author>
+    </plugin_info>
+    <class_definition classname="GitManager" filename="plugins/meta.git/class.GitManager.php"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="meta.git" path="plugins/meta.git/i18n"/>
+            <js className="HistoryBrowser" file="plugins/meta.git/class.HistoryBrowser.js" autoload="true"/>
+            <img_library alias="history_images" path="plugins/meta.git/images"/>
+        </resources>
+    </client_settings>
+    <dependencies>
+        <pluginResources pluginName="meta.svn"/>
+    </dependencies>
+    <registry_contributions>
+        <actions>
+            <action name="git_history">
+                <gui text="meta.git.1" title="meta.git.2" src="history_images/actions/ICON_SIZE/system_file_manager.png" hasAccessKey="false">
+                    <context selection="true" dir="false" recycle="false" behaviour="hidden"
+                        actionBar="false" contextMenu="true" infoPanel="false"
+                        actionBarGroup="put">
+                    </context>
+                    <selectionContext dir="false" file="true" recycle="true" unique="true" behaviour="hidden"/></gui>
+                <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                        var loadFunc = function(oForm){
+                            ajaxplorer.actionBar.historyBrowser = new HistoryBrowser($(oForm));
+                            ajaxplorer.actionBar.historyBrowser.open();
+                        };
+                        var closeFunc = function(){
+                            ajaxplorer.actionBar.historyBrowser.close();
+                            hideLightBox();
+                            return false;
+                        };
+                        modal.showDialogForm('SVN', 'history_box', loadFunc, closeFunc, null, true, true);
+                    ]]></clientCallback>
+                    <clientForm id="history_box"><![CDATA[
+                    <div id="history_box" action="git_history" box_width="300" box_height="400">
+                        <div class="action_bar text_only">
+                        <div class="separator"></div>
+                        </div>
+                        <div id="versions_table"></div>
+                    </div>
+                    ]]></clientForm>
+                    <serverCallback methodName="applyActions"/>
+                </processing>
+            </action>
+            <action name="git_getfile" skipSecureToken="true">
+                <processing>
+                    <serverCallback methodName="applyActions"/>
+                </processing>
+            </action>
+            <action name="git_revertfile" skipSecureToken="true">
+                <processing>
+                    <serverCallback methodName="applyActions"/>
+                </processing>
+            </action>
+        </actions>
+        <hooks>
+            <serverCallback hookName="node.change" methodName="changesHook" defer="true" />
+            <serverCallback hookName="version.commit" methodName="changesHook" defer="true" />
+        </hooks>
+    </registry_contributions>
+</ajxp_plugin>

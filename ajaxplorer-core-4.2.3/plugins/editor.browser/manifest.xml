@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor id="editor.browser" openable="true" order="1000" text="openbrowser.1" 
+		title="openbrowser.2" icon="openbrowser_images/actions/ICON_SIZE/project-open.png" 
+		className="BrowserOpener" mimes="*" formId="open_box" label="CONF_MESSAGE[External Window]" description="CONF_MESSAGE[Open file in a new browser window, thus using native browser capabilities.]"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings>
+        <resources>
+            <js file="plugins/editor.browser/class.BrowserOpener.js" className="BrowserOpener"/>
+            <i18n namespace="openbrowser" path="plugins/editor.browser/resources/i18n" />
+            <img_library alias="openbrowser_images" path="plugins/editor.browser/resources/images" />
+        </resources>
+    </client_settings>
+	<clientForm id="open_box"><![CDATA[
+		<div id="open_box" action="editer" box_width="185">
+		AJXP_MESSAGE[openbrowser.3]
+		</div>				
+	]]></clientForm>	
+	<dependencies>
+		<!-- Stream Wrapper Access -->
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+	</dependencies>				
+    <class_definition filename="plugins/editor.browser/class.FileMimeSender.php"
+        classname="FileMimeSender" />
+    <registry_contributions>
+    	<actions>
+    		<action name="open_file" skipSecureToken="true">
+    			<processing>
+    				<serverCallback methodName="switchAction"/>
+    			</processing>
+    		</action>
+    	</actions>
+    </registry_contributions>		
+</editor>

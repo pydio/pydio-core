@@ -1,0 +1,68 @@
+<html xmlns:ajxp>
+<head>
+<title>AjaXplorer</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<link rel="icon" type="image/x-png" href="<?php print(AJXP_THEME_FOLDER);?>/images/html-folder.png">
+<?php
+$list = AJXP_INSTALL_PATH."/".AJXP_THEME_FOLDER."/css/allz_list.txt";
+$lines = file($list);
+foreach ($lines as $line){
+	print("<link rel=\"stylesheet\" type=\"text/css\" href=\"".CLIENT_RESOURCES_FOLDER."/".trim($line)."\">\n");
+}
+?>
+
+<?php
+$list = AJXP_INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/js/ajaxplorer_boot_list.txt";
+if(preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])){
+$list = AJXP_INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/js/ajaxplorer_boot_protolegacy_list.txt";
+}
+$lines = file($list);
+foreach ($lines as $line){
+	print("<script language=\"javascript\" type=\"text/javascript\" src=\"".CLIENT_RESOURCES_FOLDER."/".trim($line)."\"></script>\n");
+}
+?>
+</head>
+<body bgcolor="#FFFFFF" text="#000000" marginheight="0" marginwidth="0" leftmargin="0" topmargin="0" style="overflow:hidden;">
+<div id="ajxp_desktop" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"window","fitMarginBottom":"$(\"optional_bottom_div\").getHeight()"}'></div>
+
+<script type="text/javascript">
+var ajaxplorer, startParameters = {};
+<?php if($JSON_START_PARAMETERS) print "startParameters = ".$JSON_START_PARAMETERS.";"; ?>
+window.ajxpBootstrap = new AjxpBootstrap(startParameters);
+</script>
+<?php
+$list = AJXP_INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/js/ajaxplorer_list.txt";
+$lines = file($list);
+foreach ($lines as $line){
+	print("<script language=\"javascript\" type=\"text/javascript\" src=\"".CLIENT_RESOURCES_FOLDER."/".trim($line)."\"></script>\n");
+}
+?>
+<div id="all_forms">
+	<div id="generic_dialog_box" class="dialogBox"><div class="dialogTitle"></div><div class="dialogContent"></div></div>
+	<div id="hidden_frames" style="display:none;"></div>
+	<div id="hidden_forms" style="position:absolute;left:-1000px;"></div>	
+	
+	<!-- LOGIN SCREEN MUST BE ALREADY IN PAGE TO ENABLE PASSWORD REMEMBERING -->
+	<form id="login_form" action="login" style="display:none;" box_width="230">
+	<input type="hidden" name="get_action" value="login">
+	<input type="hidden" name="login_seed" id="login_seed" value="">
+   	<a style="float:right;" href="javascript:ajaxplorer.actionBar.fireAction('switch_language');" title="<?php print($mess[190]);?>" alt="<?php print($mess[190]);?>"><img src="<?php print(AJXP_THEME_FOLDER); ?>/images/actions/16/flag.png" border="0" height="16" width="16"></a>
+	<div class="dialogLegend" style="margin-bottom: 3px;margin-top:4px;" ajxp_message_id="180"><?php print($mess[180]);?></div>
+	<div style="width:100%;">
+		<div class="SF_element">
+			<div class="SF_label"><ajxp:message ajxp_message_id="181"><?php print($mess[181]);?></ajxp:message></div>
+			<div class="SF_input"><input type="text" name="userid" style="width: 100px; padding:0px;" class="dialogFocus"></div>
+		</div>
+		<div class="SF_element">
+			<div class="SF_label"><ajxp:message ajxp_message_id="182"><?php print($mess[182]);?></ajxp:message></div>
+			<div class="SF_input"><input type="password" name="password"  style="width: 100px; padding:0px;"></div>
+		</div>
+		<div class="SF_element">
+			<input type="checkbox" class="radio" name="remember_me" style="border: none; width:20px !important;"/><ajxp:message ajxp_message_id="261"><?php print($mess[261]);?></ajxp:message>
+		</div>
+	</div>
+	</form>
+</div>
+</body>
+</html>

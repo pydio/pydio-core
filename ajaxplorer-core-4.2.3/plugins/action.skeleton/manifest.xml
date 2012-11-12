@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd" name="skeleton" enabled="false" label="CONF_MESSAGE[Skeleton Plugin]" description="CONF_MESSAGE[This is an empty container to demonstrate the basics of plugins coding.]" >
+    <server_settings>
+        <global_param name="SHOW_CUSTOM_FOOTER" type="boolean" label="CONF_MESSAGE[Custom Footer]" description="CONF_MESSAGE[Show a custom footer div]" mandatory="false" default="false"/>
+        <global_param name="CUSTOM_FOOTER_CONTENT" type="textarea" label="CONF_MESSAGE[Footer Content]" description="CONF_MESSAGE[Display this content in the footer]" mandatory="false" default="Your custom footer content"/>
+        <global_param expose="true" name="CUSTOM_BUTTON_TARGET" type="string" label="CONF_MESSAGE[Button Target Url]" description="CONF_MESSAGE[The target URL of the button that will be added to the application]" mandatory="true" default="http://www.ajaxplorer.info"/>
+    </server_settings>
+
+    <client_settings>
+        <resources>
+            <i18n namespace="skeleton" path="plugins/action.skeleton/res/i18n"/>
+            <img_library alias="skeleton_images" path="plugins/action.skeleton/res/images"/>
+        </resources>
+    </client_settings>
+
+	<registry_contributions>
+		<client_configs uuidAttr="name">
+			<template name="bottom" element="ajxp_desktop" position="after"><![CDATA[
+				<div id="optional_bottom_div" style="font-family:arial;padding:10px;">This CDATA section will be overriden by the PHP part of the plugin</div>
+			]]></template>
+			<template name="head" element="ajxp_desktop" position="top"><![CDATA[
+				<div id="optional_header_div" style="background-color: #999; color: white;font-family:arial;padding:10px;">Your custom header content</div>
+			]]></template>
+		</client_configs>
+        <actions>
+            <action name="my_skeleton_button">
+                <gui text="skeleton.1" title="skeleton.2" src="skeleton_images/ICON_SIZE/url.png" hasAccessKey="false">
+                    <context selection="false" dir="" recycle="hidden" actionBar="true" ajxpWidgets="ActionsToolbar" actionBarGroup="user"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="false"><![CDATA[
+                        var confs = ajaxplorer.getPluginConfigs("ajxp_plugin[@name='skeleton']");
+                        var target = confs.get('CUSTOM_BUTTON_TARGET');
+                        if(window.confirm(MessageHash['skeleton.3'].replace('%s', target))){
+                            window.open(target, "my_popup");
+                        }
+                    ]]></clientCallback>
+                </processing>
+            </action>
+            <action name="my_skeleton_button_frame">
+                <gui text="skeleton.4" title="skeleton.5" src="skeleton_images/ICON_SIZE/user-desktop.png" hasAccessKey="false">
+                    <context selection="false" dir="" recycle="hidden" actionBar="true" ajxpWidgets="ActionsToolbar" actionBarGroup="user"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                        var dialogLoadFunction = function(){
+                            var conn = new Connexion();
+                            conn.addParameter("get_action", "my_skeleton_button_frame");
+                            conn.onComplete = function(transport){
+                                $('loaded_content').update(transport.responseText);
+                            }
+                            conn.sendAsync();
+                        };
+                        modal.showDialogForm("My Link", "my_skeleton_form", dialogLoadFunction);
+                    ]]></clientCallback>
+                    <clientForm id="my_skeleton_form"><![CDATA[
+                        <div id="my_skeleton_form" box_width="450">
+                            <h3>AJXP_MESSAGE[skeleton.6]</h3>
+                            <div id="loaded_content"><p align="center">AJXP_MESSAGE[skeleton.7]</p></div>
+                        </div>
+                    ]]></clientForm>
+                    <serverCallback methodName="receiveAction" pluginId="action.skeleton"/>
+                </processing>
+            </action>
+        </actions>
+	</registry_contributions>
+	<class_definition filename="plugins/action.skeleton/class.PluginSkeleton.php" classname="PluginSkeleton"/>
+    <dependencies>
+        <activePlugin pluginName="gui.ajax"/>
+    </dependencies>
+</ajxp_plugin>

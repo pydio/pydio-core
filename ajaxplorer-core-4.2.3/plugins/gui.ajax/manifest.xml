@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<guidriver name="ajxp_client" label="CONF_MESSAGE[Client Plugin]" description="CONF_MESSAGE[Browser-based rich interface. Contains configurations for theming, custom welcome message, etc.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings>
+        <resources>
+            <i18n namespace="ajax_gui" path="plugins/gui.ajax/res/i18n"/>
+        </resources>
+    </client_settings>
+	<server_settings>
+        <global_param name="GUI_THEME" group="CONF_MESSAGE[Main Options]" type="select" choices="umbra|Umbra (HTML5),oxygen|Oxygen (Legacy)" label="CONF_MESSAGE[Theme]" description="CONF_MESSAGE[Theme used for display]" mandatory="true" default="umbra"/>
+		<global_param name="CUSTOM_FONT_SIZE" group="CONF_MESSAGE[Start Up Screen]" type="string" label="CONF_MESSAGE[Title Font Size]" description="CONF_MESSAGE[Font sized used for the title in the start up screen]" mandatory="false" default=""/>
+		<global_param name="CUSTOM_ICON" group="CONF_MESSAGE[Start Up Screen]" type="string" label="CONF_MESSAGE[Custom Icon]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]" mandatory="false" default="plugins/gui.ajax/AjxpLogo250.png"/>
+		<global_param name="CUSTOM_ICON_WIDTH" group="CONF_MESSAGE[Start Up Screen]" type="string" label="CONF_MESSAGE[Icon Width]" description="CONF_MESSAGE[Width of the custom image (by default 35px)]" mandatory="false" default="250px"/>
+		<global_param name="CUSTOM_ICON_HEIGHT" group="CONF_MESSAGE[Start Up Screen]" type="string" label="CONF_MESSAGE[Icon Height]" description="CONF_MESSAGE[Height of the custom icon (with the px mention)]" mandatory="false" default="50px"/>
+		<global_param name="CUSTOM_ICON_ONLY" group="CONF_MESSAGE[Start Up Screen]" type="boolean" label="CONF_MESSAGE[Icon Only]" description="CONF_MESSAGE[Skip the title, only display an image]" mandatory="false" default="true"/>
+		<global_param name="CUSTOM_WELCOME_MESSAGE" group="CONF_MESSAGE[Start Up Screen]" type="textarea" label="CONF_MESSAGE[Welcome Message]" description="CONF_MESSAGE[An additionnal message displayed in the start up screen]" mandatory="false" default=""/>
+		<global_param name="CLIENT_TIMEOUT_TIME" group="CONF_MESSAGE[Client Session Config]" type="integer" label="CONF_MESSAGE[Client Timeout]" description="CONF_MESSAGE[The length of the client session in SECONDS. By default, it's copying the server session length. In most PHP installation, it will be 1440, ie 24minutes. You can set this value to 0, this will make the client session 'infinite' by pinging the server at regular occasions (thus keeping the PHP session alive). This is not a recommanded setting for evident security reasons.]" mandatory="false"/>
+		<global_param name="CLIENT_TIMEOUT_WARN" group="CONF_MESSAGE[Client Session Config]" type="integer" label="CONF_MESSAGE[Warning Before]" description="CONF_MESSAGE[Number of MINUTES before the session expiration for issuing an alert to the user]" mandatory="false" default="3"/>
+		<global_param name="GOOGLE_ANALYTICS_ID" group="CONF_MESSAGE[Google Analytics]" type="string" label="CONF_MESSAGE[Analytics ID]" description="CONF_MESSAGE[Id of your GA account, something like UE-XXXX-YY]" mandatory="false"/>
+		<global_param name="GOOGLE_ANALYTICS_DOMAIN" group="CONF_MESSAGE[Google Analytics]" type="string" label="CONF_MESSAGE[Analytics Domain]" description="CONF_MESSAGE[Set the domain for yuor analytics reports (not mandatory!)]" mandatory="false"/>
+		<global_param name="GOOGLE_ANALYTICS_EVENT" group="CONF_MESSAGE[Google Analytics]" type="boolean" label="CONF_MESSAGE[Analytics Events]" description="CONF_MESSAGE[Use Events Logging, experimental only implemented on download action in AjaXplorer]" mandatory="false" default="false"/>
+	</server_settings>
+	<class_definition filename="plugins/gui.ajax/class.AJXP_ClientDriver.php" classname="AJXP_ClientDriver"/>
+	<registry_contributions>
+		<actions>
+			<action name="get_boot_gui" skipSecureToken="true">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+			<action name="get_boot_conf" skipSecureToken="true">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+		</actions>
+        <hooks>
+            <serverCallback hookName="node.info" methodName="nodeBookmarkMetadata"></serverCallback>
+        </hooks>
+		<external_file filename="plugins/gui.ajax/ajxpclient_actions.xml" include="actions/*" exclude=""/>
+		<client_configs uuidAttr="name">
+			<template name="main_oxygen" element="ajxp_desktop" position="top" theme="oxygen"><![CDATA[
+				<div id="toolbars">
+					<div id="action_bar">
+						<div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar"></div>
+						<div id="locationbar_cont">
+							<div style="height: 100%;" class="separator"></div>
+							<div style="padding-top : 5px;">
+								<div id="repo_chooser" ajxpClass="RepositorySelect"></div>
+								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions='{"flexTo":"locationbar_cont"}'></div>
+								<div id="logging_string" ajxpClass="UserWidget"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
+					<div id="vertical_splitter" style="background-color: #fff;" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA": 200, "maxA":600, "minA":50,"fit":"height","fitParent":"browser"}'>
+						<div id="sidebar_splitter" style="float:left; overflow:hidden;" ajxpClass="Splitter" ajxpOptions='{"direction":"horizontal","initB":200,"minB":24,"maxB":500}'>
+							<div id="topPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz"}' ajxpPaneHeader="130" style="border: 1px solid #676965;"></div>
+					    	<div id="bottomSplitPane" ajxpClass="AjxpTabulator" style="border: 1px solid #676965;" ajxpOptions='{"defaultTabId": "info","tabInfos" : [{"id":"info","label":"131","icon":"file_info.png","element":"info_panel"},{"id":"search","label":"87","icon":"search.png","element":"search_container"}]}'>
+						    	<div id="search_container" ajxpClass="SearchEngine"></div>
+						    	<div id="info_panel" ajxpClass="InfoPanel"></div>
+					    	</div>
+					    </div>
+						<div id="content_pane" ajxpClass="FilesList" ajxpOptions='"list"' style="border: 1px solid #676965;"></div>
+					</div>
+				</div>
+			]]></template>
+            <template name="main_umbra" element="ajxp_desktop" position="top" theme="umbra"><![CDATA[
+				<div id="toolbars">
+					<div>
+						<div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"skipBubbling":true,"defaultIconSize":16,"defaultStyle":"icon_text","styles":{"icons_only":"Icons Only","icon_text":"Icons and Text","text_only":"Text only"},"stylesImgSizes":{"icons_only":22,"icon_text":16,"text_only":16},"stylesBarSizes":{"icons_only":40,"icon_text":51,"text_only":30}}' class="soft_css_gradient"></div>
+						<div id="locationbar_cont" class="css_gradient">
+							<div style="height: 100%;" class="separator"></div>
+							<div style="padding-top : 5px;">
+								<div id="repo_chooser" ajxpClass="RepositorySelect"></div>
+								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions='{"flexTo":"locationbar_cont","searchButton":"searchbar_splitter","searchIcon":"xmag.png", "searchFocus":"search_txt"}'></div>
+								<div id="logging_string" ajxpClass="UserWidget"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
+					<div id="vertical_splitter" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA": 350, "maxA":600, "minA":0,"fit":"height","fitParent":"browser", "minSize":0, "foldingButton":true}'>
+						<div id="sidebar_splitter" style="float:left; overflow:hidden;" ajxpClass="Splitter" ajxpOptions='{"direction":"horizontal","initB":300,"minB":57}'>
+							<div id="topPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ajxpPaneHeader="130" ajxpPaneIcon="view_tree.png" style="margin:20px;margin-bottom:10px;padding-right: 10px;"></div>
+							<div id="info_panel" ajxpClass="InfoPanel" ajxpPaneHeader="131" ajxpPaneIcon="file_info.png" ajxpOptions='{"replaceScroller":"true"}' style="margin:20px;margin-top:10px;padding-right: 10px;" ></div>
+					    </div>
+						<div id="searchbar_splitter" style="overflow:hidden;" ajxpClass="Splitter" ajxpOptions='{"direction":"horizontal","initA":0, "minSize":0, "startFolded": true}'>
+							<div id="search_container" ajxpClass="SearchEngine" ajxpPaneHeader="87" ajxpPaneIcon="xmag.png" data-globalOptions='{"headerClose":{"icon":"panel_vertical_hide.png","splitter":"searchbar_splitter","title":86}}' style="height: 0px; overflow:hidden;"></div>
+    						<div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"list","replaceScroller":true}' style="border: 1px solid #bbb;"></div>
+					    </div>
+					</div>
+				</div>
+			]]></template>
+			<template name="widget" element="ajxp_widget" position="top"><![CDATA[
+				<div id="toolbars">
+					<div>
+						<div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"skipBubbling":true,"defaultIconSize":16,"defaultStyle":"icon_text","styles":{"icons_only":"Icons Only","icon_text":"Icons and Text","text_only":"Text only"},"stylesImgSizes":{"icons_only":22,"icon_text":16,"text_only":16},"stylesBarSizes":{"icons_only":40,"icon_text":51,"text_only":30}}' class="soft_css_gradient"></div>
+						<div id="locationbar_cont" class="css_gradient">
+							<div style="height: 100%;" class="separator"></div>
+							<div style="padding-top : 5px;">
+								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions='{"flexTo":"locationbar_cont"}'></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_widget"}'>
+					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions='{"fit":"height","fitParent":"browser"}'  style="margin:0px;"></div>
+				</div>				
+			]]></template>
+			<component_config className="FilesList">
+				<property name="thumbSize" value="64"/>
+				<property name="displayMode" value="list"/>
+			</component_config>			
+		</client_configs>
+	</registry_contributions>
+</guidriver>

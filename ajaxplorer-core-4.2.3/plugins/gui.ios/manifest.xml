@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<guidriver name="ajxp_ios" label="CONF_MESSAGE[iOS]" description="CONF_MESSAGE[Template for redirecting to iPhone application]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition filename="plugins/gui.ios/class.IOSGuiPlugin.php" classname="IOSGuiPlugin"/>
+    <server_settings>
+        <global_param description="CONF_MESSAGE[iOS Application URL]" label="CONF_MESSAGE[iOS Application]" name="IOS_URL" type="string" default="http://ajaxplorer.info/support/stores/ios.php" expose="true"/>
+        <global_param description="CONF_MESSAGE[Android Application URL]" label="CONF_MESSAGE[Android App]" name="ANDROID_URL" type="string" default="http://ajaxplorer.info/support/stores/android.php" expose="true"/>
+    </server_settings>
+    <client_settings>
+        <resources>
+            <i18n namespace="ios_gui" path="plugins/gui.ios/i18n"/>
+        </resources>
+    </client_settings>
+	<registry_contributions>
+		<client_configs uuidAttr="name">
+			<template name="mobile_extensions" element="head" position="bottom"><![CDATA[
+				<link type="text/css" rel="stylesheet" href="plugins/gui.mobile/ajxp-mobile.css" media="screen">
+				<style type="text/css">
+				    #toolbars{display:none;}
+				</style>
+				<script type="text/javascript">
+					window.ajxpMobile = true;
+					var conn = new Connexion();
+					conn._libUrl = '';
+					conn.loadLibrary('plugins/gui.ios/ajxp-ios.js');
+				</script>
+			]]></template>
+			<template name="main" element="ajxp_desktop" position="top"><![CDATA[
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}' style="text-align:center;font-size:1.1em; line-height:1.3em; font-family:Helvetica; background-color: white;">
+				
+					<div style="width:90%;padding:10px; margin:0px auto;" id="message-id-1">Do you know that there is a dedicated iPhone/iPad application for AjaXplorer?</div>
+					<a id="ajxpserver-redir" class="m-2" style="width:70%; padding:10px; margin:10px auto; font-size:0.8em;" href="#">Yes I have it already, add this server to my AjaXplorer iOS remote servers</a><br>
+					<a id="appstore-redir" class="m-2" style="width:70%; padding:10px; margin:10px auto; font-size:0.8em;" href="http://ajaxplorer.info/support/stores/ios.php">No I don't have it, send me <br/>to App Store now</a><br>
+					<a id="skipios-redir" class="m-2" style="width:70%; padding:10px; margin:10px auto; font-size:0.8em;" href="#">I don't care, let me use <br/>the web version of AjaXplorer!</a><br>
+				</div>
+			]]></template>
+		</client_configs>
+	<actions>
+	<!-- Override a simple action -->
+		<action name="login">
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[ /* BLOCK LOGIN OPENING */ ]]></clientCallback>
+			</processing>
+		</action>					
+	</actions>
+	</registry_contributions>
+    <dependencies>
+        <activePlugin pluginName="gui.mobile"/>
+    </dependencies>
+</guidriver>

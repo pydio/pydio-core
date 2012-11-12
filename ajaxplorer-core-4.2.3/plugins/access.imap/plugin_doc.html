@@ -1,0 +1,30 @@
+<p>This access drivers use php imap functions to browse a mailbox and retrieve the emails and attachments contained in it. Warning, the php_imap extension must be installed and loaded. And for your info, it's not because it's "imap" that i's limited to imap mailbox, POP3 is also supported.</p>
+<p>Here are some test samples for connecting well-known mailboxes :
+    <ul>
+        <li>Yahoo IMAP :
+            <ul>
+                <li>Host : imap.mail.yahoo.com</li>
+                <li>Port : 993</li>
+                <li>Ssl : true</li>
+                <li>Type : imap</li>
+            </ul>
+        </li>
+        <li>Hotmail via POP3 :
+            <ul>
+                <li>Host : pop3.live.com</li>
+                <li>Port : 995</li>
+                <li>Ssl : true</li>
+                <li>Type : pop3</li>
+            </ul>
+        </li>
+        <li>Gmail via Imap :
+            <ul>
+                <li>Host : imap.gmail.com</li>
+                <li>Port : 993</li>
+                <li>Ssl : true</li>
+                <li>Type : imap</li>
+            </ul>
+        </li>
+    </ul>
+    These are only some examples, you have to check your mail provider to get the right configuration.
+</p>

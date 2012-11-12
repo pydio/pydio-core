@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<authdriver name="multi" label="CONF_MESSAGE[Multiple]" description="CONF_MESSAGE[Encapsulate the use of other drivers]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <plugin_author>Charles du Jeu, Thomas Oettli</plugin_author>
+    </plugin_info>
+    <client_settings>
+        <resources>
+            <i18n namespace="multi_auth" path="plugins/auth.multi/i18n"/>
+        </resources>
+    </client_settings>
+	<server_settings>
+        <param name="MODE" type="select" label="CONF_MESSAGE[Mode]" description="CONF_MESSAGE[Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features.]" mandatory="true" default="MASTER_SLAVE" choices="MASTER_SLAVE|USER_CHOICE"/>
+        <param name="MASTER_DRIVER" type="string" label="CONF_MESSAGE[Master]" description="CONF_MESSAGE[The name of the master driver to use, generally serial.]" mandatory="true"/>
+        <param name="USER_BASE_DRIVER" type="string" label="CONF_MESSAGE[Base]" description="CONF_MESSAGE[In Master_Slave mode, use this option to limit the users listing in the administration to one driver only (leave empty if you want to see all users)]" mandatory="false"/>
+        <param name="USER_ID_SEPARATOR" type="string" label="CONF_MESSAGE[Separator]" description="CONF_MESSAGE[This is necessary to discriminate users data loaded from various sources. Warning, use foldername compliant characters. For example :: does not work!]" mandatory="true" default="_-_"/>
+        <param name="DRIVERS" type="array" label="CONF_MESSAGE[Drivers]" description="CONF_MESSAGE[The auth drivers definition, see detailed documenation for more info.]" mandatory="true"/>
+    </server_settings>
+	<class_definition filename="plugins/auth.multi/class.multiAuthDriver.php" classname="multiAuthDriver"/>
+	<registry_contributions>
+		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude=""/>
+	</registry_contributions>
+</authdriver>

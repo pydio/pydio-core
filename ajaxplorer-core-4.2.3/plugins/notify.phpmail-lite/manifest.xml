@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notify id="notify.phpmail-lite" enabled="false" label="CONF_MESSAGE[Simple Notification]" description="CONF_MESSAGE[Notification system (demonstrative)]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
+        <resources>
+            <js file="plugins/notify.phpmail-lite/class.NotifierFormEnricher.js" className="NotifierFormEnricher" autoload="true"/>
+            <i18n namespace="phpmail_lite" path="plugins/notify.phpmail-lite/i18n"/>
+        </resources>
+    </client_settings>
+    <server_settings>
+        <global_param name="FROM" type="string" label="CONF_MESSAGE[Sender]" description="CONF_MESSAGE[Name and adress of the sender, use Name:mail_address format.]" mandatory="true" default=""/>
+        <global_param name="TO" type="string" label="CONF_MESSAGE[Recipient(s)]" description="CONF_MESSAGE[Comma separated list of permanent recipients, e.g Name1:address1,Name2:address2, etc. Leave empty if you want only the share feature.]" mandatory="false" default=""/>
+        <global_param name="SHARE" type="boolean" label="CONF_MESSAGE[Enrich Shares]" description="CONF_MESSAGE[Add a notification pane to the share mechanism, proposing the user to enter her email to be notified when the shared repository is modified]" mandatory="false" default="false"/>
+        <global_param name="ACTIONS" type="string" label="CONF_MESSAGE[Notify on...]" description="CONF_MESSAGE[Comma-separated list of action on wich the notification should be sent]" mandatory="true" default="upload,download"/>
+        <global_param name="SUBJECT" type="string" label="CONF_MESSAGE[Subject]" description="CONF_MESSAGE[Subject to be displayed in the mail]" mandatory="true" default="AJXP_FILE Modified"/>
+        <global_param name="BODY" type="textarea" label="CONF_MESSAGE[Body]" description="CONF_MESSAGE[Body of the email. You can use AJXP_USER, AJXP_FILE, AJXP_FOLDER and AJXP_ACTION keywords.]" mandatory="true" default="AJXP_ACTION : AJXP_FILE"/>
+        <global_param name="MAILER" type="select" choices="sendmail|sendmail,mail|mail" label="CONF_MESSAGE[Mailer]" description="CONF_MESSAGE[Php mailer to use (see phpmail-lite documentation).'.]" mandatory="true" default="sendmail"/>
+    </server_settings>
+	<registry_contributions>
+		<actions>
+            <!-- Do not remove, will be generated dynamically -->
+		</actions>
+	</registry_contributions>
+	<dependencies>
+		<activePlugin pluginName="access.fs|access.ftp"/>
+	</dependencies>			
+	<class_definition filename="plugins/notify.phpmail-lite/class.PhpMailLiteNotifier.php" classname="PhpMailLiteNotifier"/>
+</notify>

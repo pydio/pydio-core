@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<authdriver name="serial" label="CONF_MESSAGE[Serialized authentication storage]" description="CONF_MESSAGE[Stores the Authentication data as serialized PHP values on the filesystem.]" mixins="authdriver_commons"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings>
+        <resources>
+            <i18n namespace="serial_auth" path="plugins/auth.serial/i18n"/>
+        </resources>
+    </client_settings>
+	<server_settings>
+		<param name="USERS_FILEPATH" type="string" label="CONF_MESSAGE[Users]" description="CONF_MESSAGE[The users list]" mandatory="true"/>
+        <param name="FAST_CHECKS" type="boolean" label="CONF_MESSAGE[Fast Checks]" description="CONF_MESSAGE[When using a custom stream wrapper to read the files, this can increase performances by skipping various is_file,is_dir checks]" mandatory="false" default="false"/>
+	</server_settings>
+	<class_definition filename="plugins/auth.serial/class.serialAuthDriver.php" classname="serialAuthDriver"/>
+	<registry_contributions>
+		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude=""/>
+	</registry_contributions>
+</authdriver>

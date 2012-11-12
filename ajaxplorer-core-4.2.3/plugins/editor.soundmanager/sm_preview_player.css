@@ -1,0 +1,64 @@
+/*
+ * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
+ * This file is part of AjaXplorer.
+ *
+ * AjaXplorer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AjaXplorer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <http://www.ajaxplorer.info/>.
+ */
+#sm2-container{
+    position: absolute;
+    top:-1000px;
+}
+
+.ui360container{
+    background-image: url("player_bg_icon.png");
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.ui360container.nobackground{
+    background-image: none;
+}
+
+.ui360-vis.ui360-vis-retracted, .ui360-vis.ui360-vis-retracted .sm2-360ui, .sm2-inline-list .ui360-vis.ui360-vis-retracted {
+    height: 100px;
+}
+
+.ui360-micro{
+    float:left;
+    margin-left: -20px;
+}
+.ui360-micro, .ui360-micro .sm2-360ui{
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+}
+
+.ui360-micro canvas, .ui360-micro div.sm2-cover{
+    display: none;
+}
+
+.ui360-micro div.sm2-timing{
+    line-height: 16px;
+}
+
+.SMNodePlaying{
+    background-color: #ffffc2;
+}
+
+.volume_slider_active{
+    background-color: rgba(255,255,255,0.7);
+}

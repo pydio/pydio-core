@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="imap" label="CONF_MESSAGE[Mailbox (Imap or POP)]" description="CONF_MESSAGE[This plugin will browse the content of a mailbox (imap or pop) and allow to grab emails attachments and copy them to another repository. Requires the PHP IMAP extension.]" mixins="slug_provider,template_provider"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<client_settings icon="plugins/access.imap/resources/images/16/mail_folder_inbox.png">
+		<resources>
+            <i18n namespace="imap_access" path="plugins/access.imap/resources/i18n"/>
+			<img_library alias="imap_images" path="plugins/access.imap/resources/images"/>	
+			<js file="plugins/editor.eml/class.EmlViewer.js" className="EmlViewer" autoload="true"/>			
+		</resources>
+	</client_settings>
+	<server_settings>
+		<param name="HOST" group="CONF_MESSAGE[Mail Server]" type="string" label="CONF_MESSAGE[Host]" description="CONF_MESSAGE[Server host]" mandatory="true"/>
+		<param name="PORT" group="CONF_MESSAGE[Mail Server]" type="string" label="CONF_MESSAGE[Port]" description="CONF_MESSAGE[Server port]" mandatory="true"/>
+		<param name="SSL" group="CONF_MESSAGE[Mail Server]" type="string" label="CONF_MESSAGE[Ssl]" description="CONF_MESSAGE[Secure?]" mandatory="true"/>
+		<param name="BOX_TYPE" group="CONF_MESSAGE[Mail Server]" type="select" label="CONF_MESSAGE[Type]" choices="imap,pop3" description="CONF_MESSAGE[Imap or Pop Server?]" mandatory="true" default="imap"/>
+		<param name="USER" group="CONF_MESSAGE[Mailbox Definition]" type="string" label="CONF_MESSAGE[User]" description="CONF_MESSAGE[User account]" mandatory="true"/>
+		<param name="PASS" group="CONF_MESSAGE[Mailbox Definition]" type="password" label="CONF_MESSAGE[Password]" description="CONF_MESSAGE[User Password]" mandatory="true"/>
+		<param name="MAILBOX" group="CONF_MESSAGE[Mailbox Definition]" type="string" label="CONF_MESSAGE[Default Mailbox]" description="CONF_MESSAGE[Mailbox to connect by default]" mandatory="false"/>
+        <param name="DEFAULT_RIGHTS" group="CONF_MESSAGE[Repository Options]" type="select" choices="r|Read Only,rw|Read and Write,w|Write Only (upload)" label="CONF_MESSAGE[Default Rights]" description="CONF_MESSAGE[This right pattern (empty, r, or rw) will be applied at user creation for this repository.]" default=""/>
+		<param name="PAGINATION_THRESHOLD" group="CONF_MESSAGE[Repository Options]" type="integer" label="CONF_MESSAGE[Pagination Threshold]" description="CONF_MESSAGE[When a folder will contain more items than this number, display will switch to pagination mode, for better performances.]" default="20"/>
+		<param name="PAGINATION_NUMBER" group="CONF_MESSAGE[Repository Options]" type="integer" label="CONF_MESSAGE[#Items per page]" description="CONF_MESSAGE[Once in pagination mode, number of items to display per page.]" default="20"/>
+	</server_settings>
+	<class_definition filename="plugins/access.imap/class.imapAccessDriver.php" classname="imapAccessDriver"/>
+	<registry_contributions>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/action[@name='ls'] | actions/action[@name='download'] | actions/action[@name='open_with'] | actions/action[@name='stat'] | actions/action[@name='get_content'] | actions/action[@name='copy']" exclude=""/>
+		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/client_configs/*" exclude=""/>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
+        <external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
+		<hooks>
+			<serverCallback hookName="node.info" methodName="enrichMetadata"></serverCallback>
+			<serverCallback hookName="dl.localname" methodName="attachmentDLName"></serverCallback>
+		</hooks>			
+	</registry_contributions>
+    <dependencies>
+        <pluginClass pluginName="access.fs"/>
+    </dependencies>
+    <class_stream_wrapper filename="plugins/access.imap/class.imapAccessWrapper.php" classname="imapAccessWrapper" protocol="ajxp.mailbox"/>
+</ajxpdriver>

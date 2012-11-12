@@ -1,0 +1,92 @@
+/*
+ * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
+ * This file is part of AjaXplorer.
+ *
+ * AjaXplorer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AjaXplorer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <http://www.ajaxplorer.info/>.
+ */
+.hsplitbar {height: 10px !important;}
+a.carousel-control {
+	width: 20px !important;
+	border-radius: 0px !important;
+}
+#browser, .browser_splitter{
+	padding: 0px;
+	border: 0px;
+    /*padding:10px;*/
+    clear:left;
+    background-color:#eee;
+    line-height: 18px;
+    -webkit-box-shadow: inset 1px 1px 5px #999;
+    -moz-box-shadow: inset 1px 1px 5px #999;
+    box-shadow: inset 1px 1px 5px #999;
+}
+.browser_splitter{
+    -webkit-box-shadow: inset 1px 1px 2px #999;
+    -moz-box-shadow: inset 1px 1px 2px #999;
+    box-shadow: inset 1px 1px 2px #999;
+}
+a.m-2 {
+	background: -webkit-gradient(
+			linear,
+			left top,
+			left bottom,
+			from(#64abe6),
+			to(#2b70c4)
+		);
+	border: 1px solid #14528f;
+	-webkit-box-shadow: inset 0 1px 1px rgba(255, 255, 255, .25);
+	color: #fff;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, .25);
+	-webkit-transition: -webkit-box-shadow .1s linear;
+	-webkit-border-radius: 3px;
+	font: bold 11px "Helvetica Neue", Arial, Geneva, sans-serif;
+	padding: 1px 5px;
+	cursor: pointer;
+	display: inline-block;
+	text-decoration: none;
+}
+
+a.m-2:hover {
+	-webkit-box-shadow: 0 0 5px #6496ff;
+}
+
+a.m-2:active {
+	background: -webkit-gradient(
+			linear,
+			left top,
+			left bottom,
+			from(#2b70c4),
+			to(#64abe6)
+		);
+	-webkit-box-shadow: inset 0 0 5px rgba(255, 255, 255, .25);
+}
+
+a.m-2.disabled {
+	background: -webkit-gradient(
+			linear,
+			left top,
+			left bottom,
+			from(#64abe6),
+			to(#2b70c4)
+		);
+	-webkit-box-shadow: inset 0 1px 1px rgba(255, 255, 255, .15);
+	cursor: auto;
+	opacity: .5;
+}
+
+.umbra div#search_panel{
+    margin: 5px;
+}

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="smb" label="CONF_MESSAGE[Samba]" description="CONF_MESSAGE[Browse a Samba Server]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings icon="plugins/access.fs/icon.png">
+        <resources>
+            <i18n namespace="smb_access" path="plugins/access.smb/i18n"/>
+        </resources>
+    </client_settings>
+	<server_settings>
+		<param name="HOST" type="string" label="CONF_MESSAGE[Host]" description="CONF_MESSAGE[Server IP or name, do not use add slashes or backward slashes]" mandatory="true" default="SERVER_IP"/>
+		<param name="PATH" type="string" label="CONF_MESSAGE[Uri]" description="CONF_MESSAGE[Path to the share and complementary URI if necessary]" mandatory="false"/>
+		<param name="DOMAIN" type="string" label="CONF_MESSAGE[Domain]" description="CONF_MESSAGE[Default domain to use with session credentials]" mandatory="false"/>
+		<param name="CHMOD_VALUE" type="string" label="CONF_MESSAGE[File Creation Mask]" description="CONF_MESSAGE[Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc.]" default="0666"/>
+        <global_param name="SMBCLIENT" type="string" label="CONF_MESSAGE[Smbclient]" description="CONF_MESSAGE[Path to smbclient executable, considered to be in the path by default.]" mandatory="true" default="smbclient"/>
+        <global_param name="SMB_ENABLE_ZIP" type="boolean" label="CONF_MESSAGE[Enable Zip]" description="CONF_MESSAGE[Enable zip creation for repositories using Samba access. Make sure that you are using a very fast network, otherwise it will be very long!]" mandatory="false" default="false"/>
+	</server_settings>
+	<class_definition filename="plugins/access.smb/class.smbAccessDriver.php" classname="smbAccessDriver"/>
+	<registry_contributions>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
+		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/client_configs/*" exclude=""/>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
+		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
+	</registry_contributions>
+	<dependencies>
+		<pluginClass pluginName="access.fs"/>
+	</dependencies>
+    <class_stream_wrapper filename="plugins/access.smb/class.smbAccessWrapper.php" classname="smbAccessWrapper" protocol="ajxp.smb"/>
+</ajxpdriver>

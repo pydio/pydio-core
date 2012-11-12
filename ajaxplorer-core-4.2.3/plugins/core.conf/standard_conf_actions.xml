@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<registry_contributions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<actions>
+		<action name="switch_repository">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+        <action name="user_create_repository">
+            <gui text="417" title="418" src="user-create-repository.png" accessKey="" hasAccessKey="false">
+                <context selection="false" dir="" recycle="true" ajxpWidgets="RepositorySelect"></context>
+            </gui>
+            <processing>
+				<clientCallback prepareModal="true" dialogOpenForm="user_create_repository_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
+					<dialogOnOpen><![CDATA[
+                       var conn = new Connexion();
+                       var okButton = oForm.down('.dialogButtons input');
+                       var backButton = new Element('img', {
+                            src:ajxpResourcesFolder+'/images/actions/22/back_22.png',
+                            style:'float: left;margin-top: 7px;margin-left: 4px;cursor: pointer;',
+                            title:'Back'
+                       }).observe('click', function(e){
+                            Event.stop(e);
+                            new Effect.Parallel([
+                                new Effect.Morph('user_templates_selector', {style:'left:0px;'}),
+                                new Effect.Morph('user_template_parameters', {style:'left:250px;'}),
+                                new Effect.Morph('user_tpl_container', {style:'height:'+conn.ORIGINAL_HEIGHT+'px;'}),
+                                new Effect.Opacity(okButton, {sync:true,from:1.0,to:0}),
+                                new Effect.Opacity(backButton, {sync:true,from:1.0,to:0})
+                            ], {
+                                afterFinish:function(){
+                                    $('user_templates_selector').select('div').invoke('removeClassName', 'selected-focus');
+                                }
+                            });
+                       }).setStyle({opacity:0});
+                       okButton.setStyle({opacity:0});
+                       okButton.insert({before:backButton});
+                       conn.addParameter("get_action", "get_user_templates_definition");
+                       conn.parseTplParameters = function(tplDiv){
+                            if(!conn.TPL_XML) return;
+                            if(!conn.FORM_MANAGER) conn.FORM_MANAGER = new FormManager();
+                            var tplId = tplDiv.getAttribute('data-templateId');
+                            var tplLabel = tplDiv.getAttribute('data-templateLabel');
+                            tplDiv.addClassName('selected-focus');
+                            $('user_tpl_params_title').update('<img style="top:3px;left:4px;" src="'+conn._baseUrl+'&get_action=get_user_template_logo&template_id='+tplId+'&icon_format=small'+'" class="panelHeaderIcon"> '+MessageHash[421].replace('%s',tplLabel));
+                            $('user_template_parameters').select('div.SF_element').invoke('remove');
+                            $('user_tpl_params_parameters').update('');
+                            var params = conn.FORM_MANAGER.parseParameters(conn.TPL_XML, '//template[@repository_id="'+tplId+'"]/param');
+                            //params.push(new Hash({name:"DISPLAY", type:"string", label:"Label", mandatory:"true", description:"Label of your repository"}));
+                            conn.FORM_MANAGER.createParametersInputs($('user_tpl_params_parameters'), params, true, null, false, true, false);
+                            $('user_tpl_params_parameters').insert(new Element('input', {type:'hidden',name:'template_id',value:tplId}));
+                            var elements = $('user_tpl_params_parameters').select("div.SF_element");
+                            $('user_template_parameters').down('div.dialogLegend').insert({before:elements[elements.length-1]});
+                            var targetHeight = params.length * 30 + 80;
+                            new Effect.Parallel([
+                                new Effect.Morph('user_templates_selector', {style:'left:-250px;'}),
+                                new Effect.Morph('user_template_parameters', {style:'left:0px;'}),
+                                new Effect.Morph('user_tpl_container', {style:'height:'+targetHeight+'px;'}),
+                                new Effect.Opacity(okButton, {sync:true,from:0,to:1.0}),
+                                new Effect.Opacity(backButton, {sync:true,from:0,to:1.0})
+                            ]);
+                       }
+                       conn.onComplete = function(transport){
+                            conn.TPL_XML = transport.responseXML;
+                            var templates = XPathSelectNodes(conn.TPL_XML, "//template");
+                            conn.ORIGINAL_HEIGHT = (templates.length*31+23);
+                            $('user_tpl_container').setStyle({height:conn.ORIGINAL_HEIGHT+'px'});
+                            $('user_templates_selector').update('<div class="panelHeader">'+MessageHash[420]+'</div>');
+                            for(var i=0;i<templates.length;i++){
+                                var label = templates[i].getAttribute('repository_label');
+                                var tplId = templates[i].getAttribute('repository_id');
+                                var labelDiv = new Element('div').update(label);
+                                labelDiv.setStyle({
+                                    padding:'6px',
+                                    paddingLeft:'32px',
+                                    fontSize:'1.3em',
+                                    cursor:'pointer',
+                                    borderBottom:'1px solid #EEE',
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: '5px 5px',
+                                    backgroundImage:'url('+conn._baseUrl+'&get_action=get_user_template_logo&template_id='+tplId+'&icon_format=big)'
+                                });
+                                var tplDiv = new Element('div', {"data-templateId":tplId,"data-templateLabel":label}).update(labelDiv);
+                                tplDiv.observe('click', function(e){
+                                    conn.parseTplParameters(( e.target.getAttribute("data-templateId")?e.target:e.target.up('div') ));
+                                });
+                                labelDiv.observe('mouseover', function(e){e.target.up('div').addClassName('selected');}).observe('mouseout', function(e){e.target.up('div').removeClassName('selected');});
+                                $('user_templates_selector').insert(tplDiv);
+                            }
+                       };
+                       conn.sendAsync();
+					]]></dialogOnOpen>
+					<dialogOnComplete hideDialog="true"><![CDATA[
+                            var formManager = new FormManager();
+                            var params = $H({get_action:'user_create_repository'});
+                            formManager.serializeParametersInputs($('user_template_parameters'), params, "DRIVER_OPTION_");
+                            $('user_tpl_params_parameters').select('input[type="hidden"]').each(function(el){
+                                params.set(el.name,el.value);
+                            });
+                            params.set("DISPLAY", params.get("DRIVER_OPTION_DISPLAY"));
+                            params.unset("DRIVER_OPTION_DISPLAY");
+                            params.unset("DRIVER_OPTION_DISPLAY_ajxptype");
+                            var conn = new Connexion();
+                            conn.setParameters(params);
+                            conn.onComplete = function(transport){
+                                ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                            }
+                            conn.sendAsync();
+					]]></dialogOnComplete>
+				</clientCallback>
+				<clientForm id="user_create_repository_form"><![CDATA[
+					<div id="user_create_repository_form" action="user_create_repository" box_width="270">
+					    <div id="user_tpl_container" style="position:relative;width:248px;overflow:hidden;height:130px;border:1px solid #ddd; background-color: #f4f4f4;">
+						<div id="user_templates_selector" style="position:absolute;width:250px;"><div class="panelHeader">AJXP_MESSAGE[419]</div></div>
+						<div id="user_template_parameters" style="position:absolute;left:250px;width:250px;">
+						    <div id="user_tpl_params_title" class="panelHeader panelHeaderWithIcon"></div>
+						    <div style="padding:5px;">
+						        <div class="dialogLegend" style="clear:left;">AJXP_MESSAGE[422]</div>
+						        <div id="user_tpl_params_parameters"></div>
+						    </div>
+						</div>
+						</div>
+					</div>
+				]]></clientForm>
+                <serverCallback methodName="switchAction"></serverCallback>
+            </processing>
+        </action>
+		<action name="get_user_templates_definition">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="get_user_template_logo">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="user_delete_repository">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="get_bookmarks">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="save_user_pref">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="switch_language">
+			<gui text="190" title="190" src="flag.png" accessKey="" hasAccessKey="false">
+				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="true" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
+			</gui>
+			<processing>
+				<clientCallback prepareModal="true" dialogOpenForm="switch_language_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
+					<dialogOnOpen><![CDATA[
+					    if(ajaxplorer.user) var userLang = ajaxplorer.user.getPreference("lang");
+						if(!userLang) userLang = window.ajxpBootstrap.parameters.get("currentLanguage");
+						var selector = $(oForm).select('select[id="language_selector"]')[0];
+						var languages = $H(window.ajxpBootstrap.parameters.get("availableLanguages"));
+						languages.each(function(pair){
+							var option = new Element('option', {value:pair.key,id:'lang_'+pair.key});
+							option.update(pair.value);
+							selector.insert(option);
+						});
+						selector.setValue(userLang);		
+						selector.observe("change", function(){
+							var value = selector.getValue();
+							if(ajaxplorer.user){
+    							ajaxplorer.user.setPreference("lang", selector.getValue());
+	    						ajaxplorer.user.savePreference("lang");
+	    					}
+						});
+					]]></dialogOnOpen>
+					<dialogOnComplete hideDialog="true"><![CDATA[
+                        if(ajaxplorer.user){
+                            var oUser = ajaxplorer.user;
+                            if(oUser.getPreference('lang') != null
+                                && oUser.getPreference('lang') != ""
+                                && oUser.getPreference('lang') != ajaxplorer.currentLanguage)
+                            {
+                                ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
+                                ajaxplorer.displayMessage('SUCCESS', MessageHash[241]);
+                            }
+                        }else{
+                            var selector = $(oForm).select('select[id="language_selector"]')[0];
+                            var value = selector.getValue();
+                            ajaxplorer.loadI18NMessages(value);
+                            window.ajxpBootstrap.parameters.set("currentLanguage", value);
+                        }
+					]]></dialogOnComplete>
+					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
+				</clientCallback>
+				<clientForm id="switch_language_form"><![CDATA[
+					<div id="switch_language_form" action="switch_language_form" box_width="202">
+						<select id="language_selector"></select>
+					</div>
+				]]></clientForm>				
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>		
+		</action>
+		<action name="webdav_preferences">
+			<gui text="403" title="403" src="drive_remote.png" accessKey="" hasAccessKey="false">
+				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="true" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
+			</gui>
+            <rightsContext noUser="false" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+			<processing>				
+				<clientCallback prepareModal="true" dialogOpenForm="webdav_pref_form" dialogOkButtonOnly="true" dialogSkipButtons="false">
+					<dialogOnOpen><![CDATA[
+					if(!ajaxplorer.user) return;					
+					var cont = $('webdav_repo_list');
+					cont.update('');
+					var even = false;
+					var conn = new Connexion();
+					conn.setParameters(new Hash({get_action:'webdav_preferences'}));
+					conn.onComplete = function(transport){
+						ajaxplorer.webdavCurrentPreferences = transport.responseJSON;
+						$('webdav_activator').checked = ajaxplorer.webdavCurrentPreferences.webdav_active;
+						if($('webdav_activator').checked) $('webdav_password_form').show(); 
+					};
+					conn.sendSync();
+					ajaxplorer.user.getRepositoriesList().each(function(pair){					
+						if(ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key]){
+							var div = new Element('div', {className:(even?'even':'')});
+							div.update('<span>'+pair.value.label+'</span><input readonly type="text" value="'+ ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key] +'">' );				
+							cont.insert(div);
+							even = !even;
+						}
+					});	
+					modal.getForm().down('input[name="close"]').observe("click", hideLightBox);
+					if(!$('webdav_activator').hasObserver){
+						$('webdav_activator').observe("change", function(e){
+							var checked = $('webdav_activator').checked;
+							var conn = new Connexion();
+							conn.setParameters(new Hash({
+								get_action:'webdav_preferences',
+								activate:(checked?'true':'false')
+							}));
+							conn.onComplete = function(transport){
+								ajaxplorer.webdavCurrentPreferences = transport.responseJSON;
+								if(ajaxplorer.webdavCurrentPreferences.webdav_active) {
+									$('webdav_password_form').show();
+									ajaxplorer.displayMessage("SUCCESS", MessageHash[408]);
+								}else {
+									$('webdav_password_form').hide();
+									ajaxplorer.displayMessage("SUCCESS", MessageHash[409]);									
+								}								
+							};
+							conn.sendAsync();
+						});
+						$('webdav_pass_saver').observe("click", function(){
+							var conn = new Connexion();
+							conn.setMethod('POST');
+							conn.setParameters(new Hash({
+								get_action:'webdav_preferences',
+								webdav_pass: $('webdav_password').value
+							}));
+							conn.onComplete = function(transport){
+								ajaxplorer.displayMessage("SUCCESS", MessageHash[410]);
+							};
+							conn.sendAsync();
+						});
+						
+						$('webdav_activator').hasObserver = true;
+					}
+					]]></dialogOnOpen>
+					<dialogOnComplete hideDialog="false"><![CDATA[
+					]]></dialogOnComplete>
+					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
+				</clientCallback>
+				<clientForm id="webdav_pref_form"><![CDATA[
+					<div id="webdav_pref_form" action="webdav_pref_form" box_width="450">
+						<div>
+							<input type="checkbox" id="webdav_activator" style="width:16px;" name="webdav_activator"> <label for="webdav_activator">AJXP_MESSAGE[406]</label>
+						</div>
+						<div class="dialogButtons" id="webdav_password_form" style="display:none;text-align: left;padding-left: 15px;height: 42px;font-size: 0.9em;padding-top: 5px;">
+							<div style="width: 70%; float: left; padding-right: 5px; text-align: right;">AJXP_MESSAGE[407]</div><input type="password" id="webdav_password" style="float:left;height: 24px;width: 80px;"> <input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" height="22" width="22" title="OK" id="webdav_pass_saver">
+						</div>						
+						<div class="dialogLegend" style="margin-bottom: 2px; padding:5px;" ajxp_message_id="404">AJXP_MESSAGE[404]</div>
+						<div class="dialogLegend" style="margin-bottom: 2px; padding:5px;" ajxp_message_id="405">AJXP_MESSAGE[405]</div>
+						<div id="webdav_repo_list" style="height: 200px; overflow:auto;"></div>
+						<input type="hidden" name="get_action" value="webdav_preferences">									
+					</div>					
+				]]></clientForm>				
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>		
+		</action>		
+	</actions>
+</registry_contributions>

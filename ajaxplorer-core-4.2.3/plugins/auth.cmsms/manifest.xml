@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<authdriver name="cmsms" enabled="false" label="CONF_MESSAGE[DB Storage]" description="Stores the Authentication data in CMSMS FEU."  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <core_relation packaged="false" tested_version="3.5.0"/>
+    <plugin_author>Jean-Christophe Ghio</plugin_author>
+    </plugin_info>
+    <client_settings>
+        <resources>
+            <i18n namespace="cmsms" path="plugins/auth.cmsms/i18n"/>
+        </resources>
+    </client_settings>
+	<server_settings>
+		<param name="LOGIN_URL" type="string" label="CONF_MESSAGE[Login URL]" description="CONF_MESSAGE[if direct access, redirect to the given URL]" mandatory="true" />
+		<param name="LOGOUT_URL" type="string" label="CONF_MESSAGE[Logout URL]" description="CONF_MESSAGE[Redirect to the given URL on loggin out]" mandatory="true" />
+		<param name="SECRET" type="string" label="CONF_MESSAGE[Secret key]" description="CONF_MESSAGE[This key must only be known by remote end]" mandatory="true" />
+		<param name="SQL_DRIVER" type="array" label="CONF_MESSAGE[Connexion]" description="CONF_MESSAGE[The Database Connexion]" mandatory="true"/>
+		<param name="PREFIX_TABLE" type="string" label="CONF_MESSAGE[Prefix tables]" description="CONF_MESSAGE[Prefix of CMSMS tables ]" mandatory="true"/>
+	</server_settings>
+	<class_definition filename="plugins/auth.cmsms/class.cmsmsAuthDriver.php" classname="cmsmsAuthDriver"/>
+	<registry_contributions>
+		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude=""/>
+		<external_file filename="plugins/auth.cmsms/action.xml" include="actions/*"/>		
+	</registry_contributions>
+</authdriver>

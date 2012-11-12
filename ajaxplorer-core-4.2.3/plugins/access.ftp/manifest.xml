@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="ftp" label="CONF_MESSAGE[FTP Server]" description="CONF_MESSAGE[This driver can access a remote FTP server]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings icon="plugins/access.ftp/icon.png">
+        <resources>
+            <i18n namespace="ftp_access" path="plugins/access.ftp/i18n"/>
+        </resources>
+    </client_settings>
+
+	<server_settings>
+		<param group="CONF_MESSAGE[Connexion]" name="FTP_HOST" type="string" label="CONF_MESSAGE[Host]" description="CONF_MESSAGE[Ftp Host to connect to]" mandatory="true"/>
+		<param group="CONF_MESSAGE[Connexion]" name="FTP_PORT" type="string" label="CONF_MESSAGE[Port]" description="CONF_MESSAGE[Ftp Host port]" mandatory="true" default="21"/>
+		<param group="CONF_MESSAGE[Connexion]" name="PATH" type="string" label="CONF_MESSAGE[Path]" description="CONF_MESSAGE[Real path to the root folder on the server]" mandatory="true" default="/"/>
+		<param group="CONF_MESSAGE[Connexion]" name="FTP_SECURE" type="boolean" label="CONF_MESSAGE[Secure]" description="CONF_MESSAGE[Whether to use ftp or ftps protocol]" mandatory="true" default="false"/>
+		<param group="CONF_MESSAGE[Connexion]" name="FTP_DIRECT" type="boolean" label="CONF_MESSAGE[Active]" description="CONF_MESSAGE[Whether to use active or passive]" mandatory="true" default="false"/>
+		<param group="CONF_MESSAGE[FTP Server Tweaks]" name="FIX_PERMISSIONS" type="select" choices="detect_remote_user_id|Detect remote server user,user|Copy user perms to all,group|Copy group perms to all" label="CONF_MESSAGE[Fix Permissions]" description="CONF_MESSAGE[How to handle remote permissions to be used by PHP as local permissions. See manual.]" mandatory="false" default="detect_remote_user_id"/>
+	    <param group="CONF_MESSAGE[FTP Server Tweaks]" name="TMP_UPLOAD" type="string" label="CONF_MESSAGE[Temporary Folder]" description="CONF_MESSAGE[Temporary folder on the local server used for file uploads. For the moment, it must be placed under your ajaxplorer folder and you must create it and set it writeable by Apache.]" default="/tmp" mandatory="true"/>
+        <param group="CONF_MESSAGE[Dynamic FTP]" name="DYNAMIC_FTP" type="boolean" label="CONF_MESSAGE[Pass Ftp data through Auth driver]" description="CONF_MESSAGE[In conjunction with a correctly configured auth.ftp driver, this allow to transform ajaxplorer into a simple netFtp client.]" mandatory="false" default="false"/>
+	</server_settings>
+	<registry_contributions>
+		<client_configs>
+			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>	
+			<component_config className="FilesList">
+				<columns switchGridMode="filelist">
+                    <column messageId="1" attributeName="ajxp_label" sortType="StringDirFile" defaultWidth="48%"/>
+                    <column messageId="2" attributeName="filesize" sortType="CellSorterValue" modifier="FilesList.prototype.partSizeCellRenderer" defaultWidth="9%"/>
+                    <column messageId="3" attributeName="mimestring" sortType="String" defaultWidth="10%"/>
+                    <column messageId="4" attributeName="ajxp_modiftime" sortType="MyDate" defaultWidth="14%"/>
+				</columns>
+			</component_config>			
+			<component_config className="FoldersTree">
+				<property name="display" value="d"/>
+			</component_config>
+		</client_configs>	
+		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*"/>
+		<external_file filename="plugins/access.remote_fs/additionalActions.xml" include="actions/*"/>
+        <external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
+	</registry_contributions>
+	<class_definition filename="plugins/access.ftp/class.ftpAccessDriver.php" classname="ftpAccessDriver"/>
+	<dependencies>
+		<pluginClass pluginName="access.fs"/>
+		<pluginClass pluginName="access.remote_fs"/>
+	</dependencies>
+    <class_stream_wrapper filename="plugins/access.ftp/class.ftpAccessWrapper.php" classname="ftpAccessWrapper" protocol="ajxp.ftp"/>
+</ajxpdriver>

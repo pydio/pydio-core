@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta id="meta.exif" label="CONF_MESSAGE[Exif Metadata]" description="CONF_MESSAGE[Extracts the EXIF metadata of a JPG image. Used in conjunction with editor.exif]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<class_definition filename="plugins/meta.exif/class.ExifMetaManager.php" classname="ExifMetaManager"/>
+	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
+		<resources>
+			<i18n namespace="meta.exif" path="plugins/meta.exif/i18n" />
+			<js file="plugins/meta.exif/class.ExifCellRenderer.js" className="ExifCellRenderer" autoload="true"/>
+		</resources>
+	</client_settings>	
+	<server_settings>
+		<param name="meta_fields" type="string" label="CONF_MESSAGE[Info Panel Fields]" description="CONF_MESSAGE[Comma separated list of fields, use syntax 'EXIF_SECTION.ExifName'.]" mandatory="false" default="COMPUTED_GPS.GPS_Latitude,COMPUTED_GPS.GPS_Longitude"/>
+		<param name="meta_labels" type="string" label="CONF_MESSAGE[Info Panel Labels]" description="CONF_MESSAGE[Associated list of labels, be sure to define as many as fields!]" mandatory="false" default="Latitude,Longitude"/>
+	</server_settings>	
+	<registry_contributions>
+		<hooks>
+			<serverCallback hookName="node.info" methodName="extractMeta" applyCondition="$apply=($args[2]!='minimal');"></serverCallback>
+		</hooks>
+		<client_configs>
+			<component_config className="InfoPanel">			
+				<infoPanelExtension mime="generic_file,generic_dir" attributes="">		
+					<html></html>
+				</infoPanelExtension>
+			</component_config>			
+		</client_configs>
+		<actions>
+			<action name="extract_exif">
+				<processing>
+					<serverCallback methodName="extractExif"/>
+				</processing>
+			</action>
+		</actions>
+	</registry_contributions>
+	<dependencies>
+		<!-- Wrapper type plugins only -->
+		<pluginClass pluginName="access.fs|access.ftp|access.demo|access.remote_fs"/>
+	</dependencies>				
+</meta>

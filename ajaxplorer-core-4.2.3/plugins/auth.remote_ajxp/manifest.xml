@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<authdriver name="remote_ajxp" label="CONF_MESSAGE[Remote AJXP]" description="CONF_MESSAGE[Use another AJXP intall to log in.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings>
+        <resources>
+            <i18n namespace="remote_ajxp_auth" path="plugins/auth.remote_ajxp/i18n"/>
+        </resources>
+    </client_settings>
+	<server_settings>
+		<param name="REMOTE_SERVER" type="string" label="CONF_MESSAGE[Server]" description="CONF_MESSAGE[The host URL]" mandatory="true"/>
+		<param name="REMOTE_PORT" type="string" label="CONF_MESSAGE[Port]" description="CONF_MESSAGE[The host port]" mandatory="true"/>
+		<param name="REMOTE_USER" type="string" label="CONF_MESSAGE[User name]" description="CONF_MESSAGE[User on the remote host]" mandatory="false"/>
+		<param name="REMOTE_PASSWORD" type="string" label="CONF_MESSAGE[Password]" description="CONF_MESSAGE[Password on the remote host]" mandatory="false"/>
+		<param name="REMOTE_SESSION_NAME" type="string" label="CONF_MESSAGE[Session Name]" description="CONF_MESSAGE[Parameter name to pass the session id]" mandatory="false"/>
+		<param name="REMOTE_URL" type="string" label="CONF_MESSAGE[URI]" description="CONF_MESSAGE[Script URI on the remote server]" mandatory="true"/>
+	</server_settings>
+	<class_definition filename="plugins/auth.remote_ajxp/class.remote_ajxpAuthDriver.php" classname="remote_ajxpAuthDriver"/>
+	<registry_contributions>
+		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude=""/>
+	</registry_contributions>
+	<dependencies>
+		<pluginClass pluginName="auth.serial"/>
+	</dependencies>	
+</authdriver>

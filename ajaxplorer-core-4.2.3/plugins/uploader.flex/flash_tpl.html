@@ -1,0 +1,137 @@
+<?php 
+    $confMaxSize = AJXP_Utils::convertBytes(ConfService::getCoreConf("UPLOAD_MAX_SIZE", "uploader"));
+	$UploadMaxSize = min(AJXP_Utils::convertBytes(ini_get('upload_max_filesize')), AJXP_Utils::convertBytes(ini_get('post_max_size')));
+	if($confMaxSize != 0) $UploadMaxSize = min ($UploadMaxSize, $confMaxSize);
+	$confTotalNumber = ConfService::getCoreConf("UPLOAD_MAX_NUMBER", "uploader");
+    $confTotalSize = ConfService::getCoreConf("UPLOAD_MAX_SIZE_TOTAL", "uploader");
+    $confTotalNumber = ConfService::getCoreConf("UPLOAD_MAX_NUMBER", "uploader");
+    $maxLength = ConfService::getCoreConf("NODENAME_MAX_LENGTH");
+    
+	$FlashVar = '&totalUploadSize='.$confTotalSize.'&fileSizeLimit='.$UploadMaxSize.'&maxFileNumber='.$confTotalNumber.'&maxFilenameLength='.$maxLength;
+	$pluginConfigs = AJXP_PluginsService::getInstance()->findPlugin("uploader", "flex")->getConfigs();
+?>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">	
+</head>
+<body bgcolor="ffffff" onload="setReady();" style="overflow:hidden; padding: 0px; padding-left: 0px; margin: 0px;">
+<script language="javascript" type="text/javascript">
+var jsReady = false;
+
+function isReady(){
+	return jsReady;
+}
+function setReady(){
+	jsReady = true;
+}
+var messages = 
+{
+	MaxFileSizeLimit:252, 
+	MaxFileSize:211, 
+	MaxFilesNumber:365,
+	HTTPError:253, 
+	IOError:254, 
+	SecurityError:255,
+	Uploaded:256,
+	Remove:257,
+	Add:214,
+	Clear:216,
+	Upload:77,
+	Cancel:232,
+	TotalFile:258,
+	SizeText:259,
+	Byte:260, 
+	existingFilesFound:262, 
+	overwrite:263, 
+	skip:264, 
+	rename:6, 
+	UploadLimitsTitle:281, 
+	UploadLimitsSizePerFile:282, 
+	UploadLimitsTotalSize:283, 
+	UploadLimitsFilesNumber:284,
+	FilenamesMaxLengthWarning:393,
+	
+	UploaderOptionsLabel:312,
+	UploaderLimitLabel:281,
+	AutoUploadLabel:311,
+	CloseText:86,
+	OptionsText:310
+};
+
+function triggerFlashEvent(){
+	if(arguments.length < 1) return;
+	var eventType = arguments[0];
+	try{
+		switch(eventType){
+			case "currentFiles":
+                parent.document.fire("ajaxplorer:longtask_starting");
+				return parent.ajaxplorer.getUserSelection().getContextFileNames("__AJXP_SEP__");
+			break;
+			case "currentFolder":
+				var folder = parent.base64_encode(parent.ajaxplorer.getUserSelection().getContextNode().getPath());
+				return folder.replace("+", "%2B");
+			break;	
+			case "uploadComplete":
+                parent.document.fire("ajaxplorer:longtask_finished");
+				parent.ajaxplorer.fireContextRefresh();
+			break;
+			case "getMessage":
+				var messageId = arguments[1];
+				if(parent && parent.window.MessageHash && messages){
+					var message = parent.window.MessageHash[messages[messageId]];
+					if(messages[messageId] == 365){
+						message = message.replace("%s","<?php print($confTotalNumber)?>");
+					}
+					return message;
+				}
+				return messageId;			
+			break;
+			case "closeModal":
+				parent.hideLightBox(true);
+			break;
+			case "getProperty":
+				var pName = arguments[1];
+				var value = parent.getAjxpCookie(pName);
+				if(!value) return null;
+				return (value == "true"?true:false);
+			break;
+			case "storeProperty":
+				var pName = arguments[1];
+				var pValue = arguments[2];
+				return parent.setAjxpCookie(pName, pValue);
+			break;
+			default: 
+			break;
+		}
+	}catch(e){
+		alert('Error during communication with flash : call ('+eventType+'):'+ e.message);
+	}
+}
+
+var flashVarExt = '&fileTypes=*.*&fileTypeDescription=All%20files';
+var configs = parent.ajaxplorer.getPluginConfigs("uploader");
+if(configs.get("ALLOWED_EXTENSIONS") && configs.get("ALLOWED_EXTENSIONS_READABLE")){
+	var exts = [];
+	parent.$A(configs.get("ALLOWED_EXTENSIONS").split(",")).each(function(el){exts.push("*."+el); });
+	flashVarExt = '&fileTypes='+exts.join(";")+'&fileTypeDescription='+escape(configs.get("ALLOWED_EXTENSIONS_READABLE"));
+}
+
+var url = '<?php print($_SERVER['SCRIPT_NAME']);?>?get_action=upload&secure_token='+parent.Connexion.SECURE_TOKEN+'&ajxp_sessid=<?php echo session_id(); ?>';
+
+var FlashObject = "plugins/uploader.flex/FlashFileUpload.swf";
+var FlashVarValue = "<?php echo $FlashVar; ?>" + flashVarExt + "&uploadPage=" + escape(url) + "<?php echo (!empty($pluginConfigs['HTTPS_POLICY_FILE']) ? "&policyFile=".$pluginConfigs['HTTPS_POLICY_FILE'] : ""); ?>";
+
+document.write('<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="' + window.location.protocol + '//fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="450" height="310" id="fileUpload" align="middle">\
+<param name="allowScriptAccess" value="sameDomain" /> \
+<param name="movie" value="'+FlashObject+'" /> \
+<param name="quality" value="high" /> \
+<param name="wmode" value="opaque"> \
+<param name="FlashVars" value="' + FlashVarValue +'">\
+<embed src="'+FlashObject+'" \
+FlashVars="' + FlashVarValue + '" \
+quality="high" wmode="transparent" width="450" height="310" name="fileUpload" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash"\
+pluginspage="http://www.macromedia.com/go/getflashplayer" />\
+</object>');
+</script>
+</body>
+</html>

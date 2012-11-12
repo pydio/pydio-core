@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<driver name="remote_fs">
+	<actions uuidAttr="name">
+		<action name="next_to_remote">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="trigger_remote_copy">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+	</actions>
+</driver>

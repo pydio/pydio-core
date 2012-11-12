@@ -1,0 +1,56 @@
+<img src="plugins/gui.ajax/AjxpLogo250.png"/>
+<div style="padding-left:10px;">Version __AJXP_VERSION__ - __AJXP_VERSION_DATE__
+
+Copyright 2007-2011 Charles du Jeu
+The latest code can be found at http://www.ajaxplorer.info/.
+
+++ LICENSE ++
+AjaXplorer is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+AjaXplorer is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+
+
+++ CONTRIBUTORS ++
+Cyril Russo
+Panni, 2011/03/14:
+- added support for folder upload using jumploader
+- added support for contextmenu in Opera >10.5X by patching proto.menu.js
+Translators : see mention in translation files
+
+
+++ THIRD PARTY LIBRARIES ++
+[Amazon S3]
+    S3 Stream Wrapper is released under the BSD license, Copyright 2011 P'unk Avenue LLC http://punkave.com/
+
+[JavaScript] 
+	Prototype, Scriptaculous http://www.prototypejs.org/, http://script.aculo.us/ (MIT)
+	Modernizr 	http://modernizr.com (BSD / MIT)
+	Webfx widgets (selectable, sortable, xtree) : http://webfx.eae.net/ (Apache 2)
+
+[Icons Pack]
+	Oxygen : http://www.oxygen-icons.org/ (Creative Common SA 3.0 / LGPL)
+	
+[Core PHP Classes]
+	EZC WebDAV Backend http://www.ezcomponents.org/ (New BSD)
+	SECURIMAGE http://www.phpcaptcha.org/ (LGPL)
+	Pclzip : http://www.phpconcept.net/pclzip/ (LGPL)
+
+[Plugins]
+	PThumb.php http://www.phpclasses.org (LPGL)
+	OpenLayers http://www.openlayers.org (BSD)
+	Video-js http://www.videojs.com/ (LGPL)
+	Zend Lucene http://www.zend.com/ (New BSD)
+	svn_lib.inc (LGPL)
+	PhpMailer-Lite http://phpmailer.sourceforge.net (LGPL)
+	Mp3 Player : http://www.alsacreations.fr/mp3-dewplayer.html
+	SoundManager : http://www.schillmania.com/projects/soundmanager2/ (BSD)
+</div>

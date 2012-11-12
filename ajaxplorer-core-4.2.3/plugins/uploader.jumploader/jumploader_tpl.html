@@ -1,0 +1,116 @@
+<?php 
+    $confMaxSize = AJXP_Utils::convertBytes(ConfService::getCoreConf("UPLOAD_MAX_SIZE", "uploader"));
+	$UploadMaxSize = min(AJXP_Utils::convertBytes(ini_get('upload_max_filesize')), AJXP_Utils::convertBytes(ini_get('post_max_size')));
+	if($confMaxSize != 0) $UploadMaxSize = min ($UploadMaxSize, $confMaxSize);
+    $confTotalSize = ConfService::getCoreConf("UPLOAD_MAX_SIZE_TOTAL", "uploader");
+    $confTotalNumber = ConfService::getCoreConf("UPLOAD_MAX_NUMBER", "uploader");
+    
+	$repository = ConfService::getRepository();
+	$accessType = $repository->getAccessType();
+	if($accessType == "fs"){
+		$partitionLength = $UploadMaxSize - 1000;	
+	}else if($accessType == "remotefs"){
+		$maxFileLength = $UploadMaxSize;
+	}else if($accessType == "ftp"){
+		$maxFileLength = $UploadMaxSize;
+		/*
+		// Here we could switch to FTP, but that would mean, by a way or another,
+		// to display in clear the ftp credentials... 
+		// Also, beware the ftp_z.jar is needed for this to work.
+		$ftpWrapper = new ftpAccessWrapper();
+		$plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
+		$streamData = $plugin->detectStreamWrapper(true);		
+    	$destStreamURL = $streamData["protocol"]."://".$repository->getId()."/";
+    	// Not working now, as ftpAccessWrapper::buildRealUrl is in fact protected
+    	$ftpURL = $ftpWrapper->buildRealUrl($destStreamURL);
+    	// Then pass this URL to the javascript uploadUrl => to the applet.
+    	*/
+	}
+	
+
+?>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">	
+</head>
+<body bgcolor="ffffff" style="overflow:hidden; padding: 0px; padding-left: 0px; margin: 0px;">
+<script language="javascript" type="text/javascript">
+
+var clientId = '<?php echo session_id(); ?>';
+
+var partitionLength = <?php echo ($partitionLength?$partitionLength:-1); ?>;
+var maxFileLength = <?php echo ($maxFileLength?$maxFileLength:-1); ?>;
+var ftpUrl = '<?php echo ($ftpURL?$ftpURL:""); ?>';
+
+function appletInitialized(uploader){
+	var origUrl = uploader.getUploaderConfig().getUploadUrl();
+	var currentFolder = parent.base64_encode(parent.ajaxplorer.getUserSelection().getContextNode().getPath());
+    uploader.getUploaderConfig().setUploadUrl(origUrl + "&dir=" + currentFolder + "&ajxp_sessid=" + clientId);
+    uploader.getUploaderConfig().setPartitionLength(partitionLength);
+    uploader.getUploaderConfig().setMaxFileLength(maxFileLength);
+    parent.document.fire("ajaxplorer:longtask_starting");
+}
+
+function uploaderStatusChanged(uploader){
+	// 1 = uploading, 0 is back to normal => we assume "uploaded"
+	if(uploader.getStatus() == 0){
+		parent.ajaxplorer.fireContextRefresh();
+        parent.document.fire("ajaxplorer:longtask_finished");
+	}
+}
+
+
+/*
+var messages = 
+{
+	MaxFileSizeLimit:252, 
+	MaxFileSize:211, 
+	HTTPError:253, 
+	IOError:254, 
+	SecurityError:255,
+	Uploaded:256,
+	Remove:257,
+	Add:214,
+	Clear:216,
+	Upload:77,
+	Cancel:232,
+	TotalFile:258,
+	SizeText:259,
+	Byte:260, 
+	existingFilesFound:262, 
+	overwrite:263, 
+	skip:264, 
+	rename:6, 
+	UploadLimitsTitle:281, 
+	UploadLimitsSizePerFile:282, 
+	UploadLimitsTotalSize:283, 
+	UploadLimitsFilesNumber:284,
+	
+	UploaderOptionsLabel:312,
+	UploaderLimitLabel:281,
+	AutoUploadLabel:311,
+	CloseText:86,
+	OptionsText:310
+};
+*/
+
+document.write('<applet name="jumpLoaderApplet" id="jumpLoaderApplet" \
+						code="jmaster.jumploader.app.JumpLoaderApplet.class" \
+						archive="plugins/uploader.jumploader/jumploader_z.jar" \
+						width="600" \
+						height="400" \
+						mayscript> \
+					<param name="gc_loggingLevel" value="ERROR"/> \
+					<param name="uc_uploadUrl" value="'+parent.ajxpServerAccessPath+'&get_action=upload"/> \
+					<param name="uc_fileParameterName" value="userfile_0"/> \
+					<param name="ac_fireUploaderStatusChanged" value="true"/> \
+					<param name="ac_fireAppletInitialized" value="true"/> \
+					<param name="uc_preserveRelativePath" value="true"/> \
+					<param name="uc_directoriesEnabled" value="true"/> \
+					<param name="ac_mode" value="FRAMED"/> \
+					<param name="uc_ignoreFileAddErrors" value="false"/> \
+					<param name="uc_urlEncodeParameters" value="true"/> \
+				</applet>');
+</script>
+</body>
+</html>

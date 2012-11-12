@@ -1,0 +1,19 @@
+<p>This plugin is an empty container for demonstrating how to create a simple plugin. It is disabled by default. If enabled, will simply add a button to the application toolbar that opens an external URL.</p>
+<p>It covers standard features of plugins, included internationalisation and embedded images libraries. You should naturally read the developer doc in conjunction with the study of this plugin code to understand how it works!</p>
+<p>It could be used in a middle term to automatically generate a new empty plugin, but for the moment if you duplicate this plugin to write your own, you'll have to grep the file names and plugin ids to make sure not to mess up with the original plugin.. For example, let's say your plugin is "action.gotomysite" :
+<ul>
+    <li>Rename the plugin folder</li>
+    <li>Edit the manifest.xml file and replace <b>skeleton</b> by to <b>gotomysite</b> everywhere.</li>
+    <li>Rename the javascript and PHP classes with names and filenames more adequate to your new plugin, and update the manifest.xml file accordingly</li>
+    <li>Etc</li>
+</ul>
+</p>
+<p>
+    You can note the various way to use the i18n libraries depending on where you are in the application. Note that the "id" key of the message is prefixed by your i18n namespace, here we use 'skeleton.1', 'skeleton.2' because the i18n namespace is defined like that in the manifest.xml.
+<ul>
+        <li>In specific XML atributes, use simply the id of the message.</li>
+        <li>Inside XML CDATA, use AJXP_MESSAGE[id] (will be replaced before the XML is output)</li>
+        <li>In javascript, use MessageHash[id] (it's a hash available as a global variable)</li>
+        <li>In PHP, use the array provided by ConfService::getMessages()</li>
+    </ul>
+</p>

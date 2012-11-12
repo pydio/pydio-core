@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin id="action.scheduler" enabled="false" label="CONF_MESSAGE[Tasks Scheduler]" description="CONF_MESSAGE[Register tasks to be run on a regular basis instead of writing them one by one in cron tab.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings>
+        <resources>
+            <i18n namespace="action.scheduler" path="plugins/action.scheduler/i18n"/>
+            <img_library alias="scheduler" path="plugins/action.scheduler/icons"/>
+        </resources>
+    </client_settings>
+    <registry_contributions>
+        <actions>
+            <action name="scheduler_menu">
+                <gui text="action.scheduler.18" title="action.scheduler.18d" src="scheduler/ICON_SIZE/player_time.png" hasAccessKey="false">
+                    <context selection="false" dir="" recycle="hidden"
+                             actionBar="true" contextMenu="false" infoPanel="false" actionBarGroup="put"/>
+                </gui>
+                <subMenu>
+                    <dynamicItems>
+                        <item actionId="scheduler_addTask"></item>
+                        <item actionId="scheduler_runAll"></item>
+                        <item actionId="scheduler_generateCronExpression"></item>
+                    </dynamicItems>
+                </subMenu>
+            </action>
+            <action name="scheduler_generateCronExpression">
+                <gui text="action.scheduler.20" title="action.scheduler.20d" src="scheduler/22/shellscript.png" hasAccessKey="false">
+                    <context selection="false" dir="" recycle="hidden"
+                             actionBar="false" contextMenu="true" infoPanel="true"
+                             actionBarGroup="user"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true" dialogOpenForm="scheduler_cronExpression" dialogOkButtonOnly="true" dialogSkipButtons="false">
+                        <dialogOnOpen><![CDATA[
+                            var connexion = new Connexion();
+                            connexion.setParameters(new Hash({get_action:'scheduler_generateCronExpression'}));
+                            connexion.onComplete = function(transport){
+                                $("cron_expression").setValue(transport.responseText);
+                                $("cron_expression").select();
+                            };
+                            connexion.sendAsync();
+                        ]]></dialogOnOpen>
+                    </clientCallback>
+                    <clientForm id="scheduler_cronExpression"><![CDATA[
+                         <div id="scheduler_cronExpression" box_width="330">
+                             <div class="dialogLegend" ajxp_message_id="action.scheduler.21">AJXP_MESSAGE[action.scheduler.21]</div>
+                             <textarea class="dialogFocus" style="width:300px;height:80px; margin-top: 5px;" id="cron_expression"></textarea>
+                         </div>
+                    ]]></clientForm>
+                    <serverCallback methodName="switchAction"/>
+                </processing>
+            </action>
+            <action name="scheduler_runAll">
+                <gui text="action.scheduler.16" title="action.scheduler.16d" src="scheduler/22/media_playback_start.png" hasAccessKey="false">
+                    <context selection="false" dir="" recycle="hidden"
+                             actionBar="false" contextMenu="true" infoPanel="true"
+                             actionBarGroup="user"/>
+                </gui>
+                <processing>
+                    <clientCallback><![CDATA[
+                        var connexion = new Connexion();
+                        connexion.setParameters(new Hash({get_action:'scheduler_runAll'}));
+                        connexion.onComplete = function(transport){
+                            ajaxplorer.getActionBar().parseXmlMessage(transport.responseXML);
+                        };
+                        connexion.sendAsync();
+                    ]]></clientCallback>
+                    <serverCallback methodName="switchAction"/>
+                </processing>
+            </action>
+            <action name="scheduler_runTask">
+                <gui text="action.scheduler.15" title="action.scheduler.15d" src="scheduler/22/task_run.png" hasAccessKey="false">
+                    <context selection="true" dir="" recycle="hidden"
+                             actionBar="true" contextMenu="true" infoPanel="true"
+                             actionBarGroup="change"/>
+                    <selectionContext dir="false" behaviour="hidden" file="true" recycle="false" unique="true" allowedMimes="scheduler_task"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                        var u = ajaxplorer.getUserSelection();
+                        var taskId = getBaseName(u.getUniqueNode().getPath());
+                        var connexion = new Connexion();
+                        connexion.setParameters(new Hash({
+                            get_action:'scheduler_runTask',
+                            task_id:taskId
+                        }));
+                        connexion.onComplete = function(transport){
+                            ajaxplorer.getActionBar().parseXmlMessage(transport.responseXML);
+                        };
+                        connexion.sendAsync();
+                    ]]></clientCallback>
+                    <serverCallback methodName="switchAction"/>
+                    </processing>
+            </action>
+            <action name="scheduler_loadTask">
+                <processing>
+                    <serverCallback methodName="handleTasks"/>
+                </processing>
+            </action>
+            <action name="scheduler_addTask">
+                <gui text="action.scheduler.8" title="action.scheduler.9" src="scheduler/22/task_add.png" hasAccessKey="false">
+                    <context selection="false" dir="" recycle="hidden"
+                             actionBar="false" contextMenu="true" infoPanel="true"
+                             actionBarGroup="put">
+                    </context>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true" dialogOpenForm="scheduler-task-form" dialogOkButtonOnly="false" dialogSkipButtons="false">
+                       <dialogOnOpen><![CDATA[
+                           this.currentFormManager = new FormManager();
+                           var xmlDefinition = ajaxplorer.getXmlRegistry();
+                           var node = XPathSelectSingleNode(xmlDefinition, 'actions/action[@name="scheduler_addTask"]/processing/standardFormDefinition');
+
+                           this.currentFormManager.params = this.currentFormManager.parseParameters(node, "param");
+
+                           if(window.actionArguments && window.actionArguments[0]){
+                               var tId = window.actionArguments[0].getPath();
+                               tId = getBaseName(tId);
+                               this.currentFormManager.task_id = tId;
+                               var conn = new Connexion();
+                               conn.setParameters(new Hash({get_action:'scheduler_loadTask',task_id:tId}));
+                               var values;
+                               conn.onComplete = function(transport){
+                                    values = $H(transport.responseJSON);
+                                   this.currentFormManager.createParametersInputs(
+                                        $('scheduler-task-form'),
+                                        this.currentFormManager.params,
+                                        true,
+                                        values
+                                   );
+                               }.bind(this);
+                               conn.sendAsync();
+                           }else{
+                               this.currentFormManager.createParametersInputs(
+                                    $('scheduler-task-form'),
+                                    this.currentFormManager.params,
+                                    true
+                               );
+                           }
+                       ]]></dialogOnOpen>
+                        <dialogOnComplete><![CDATA[
+                            var values = new Hash({});
+                            this.currentFormManager.serializeParametersInputs(
+                                $('scheduler-task-form'),
+                                values,
+                                '');
+
+                            var conn = new Connexion();
+                            values.set('get_action', 'scheduler_addTask');
+                            if(this.currentFormManager.task_id){
+                                values.set('task_id',this.currentFormManager.task_id);
+                            }
+                            conn.setParameters(values);
+                            conn.sendAsync();
+                            conn.onComplete = function(transport){
+                                var res = ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                                if(res) hideLightBox();
+                            };
+                       ]]></dialogOnComplete>
+                    </clientCallback>
+                    <clientForm id="scheduler-task-form"><![CDATA[
+                        <div id="scheduler-task-form" box_width="300"></div>
+                    ]]></clientForm>
+                    <standardFormDefinition>
+                        <param name="label" group="Execution Context" label="action.scheduler.12" description="action.scheduler.12d" type="string" mandatory="true"/>
+                        <param name="schedule" group="Execution Context" label="action.scheduler.2" description="action.scheduler.2d" type="string" mandatory="true"/>
+                        <param name="user_id" group="Execution Context" label="action.scheduler.17" description="action.scheduler.17d" type="string" mandatory="true" default=""/>
+                        <param name="repository_id" group="Execution Context" replicationGroup="group2" label="action.scheduler.4" description="action.scheduler.4d" type="select" choices="" mandatory="true"/>
+                        <param name="action_name" group="Parameters" label="action.scheduler.1" description="action.scheduler.1d" type="string" mandatory="true"/>
+                        <param name="param_name" group="Parameters" replicationGroup="group1" label="action.scheduler.6" description="action.scheduler.6d" type="string" mandatory="false"/>
+                        <param name="param_value" group="Parameters" replicationGroup="group1" label="action.scheduler.7" description="action.scheduler.7d" type="string" mandatory="false"/>
+                    </standardFormDefinition>
+                    <serverCallback methodName="handleTasks"/>
+                </processing>
+            </action>
+            <action name="scheduler_editTask">
+                <gui text="action.scheduler.10" title="action.scheduler.11" src="scheduler/ICON_SIZE/task.png" hasAccessKey="false">
+                    <context selection="true" dir="" recycle="hidden"
+                             actionBar="true" contextMenu="true" infoPanel="true"
+                             actionBarGroup="change"/>
+                    <selectionContext dir="false" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="scheduler_task"/>
+                </gui>
+                <processing>
+                    <clientCallback><![CDATA[
+                        var u = ajaxplorer.getUserSelection();
+                        ajaxplorer.getActionBar().fireAction('scheduler_addTask', u.getUniqueNode());
+                    ]]></clientCallback>
+                </processing>
+            </action>
+            <action name="scheduler_removeTask">
+                <gui text="action.scheduler.19" title="action.scheduler.12" src="scheduler/22/task_delete.png" hasAccessKey="false">
+                    <context selection="true" dir="" recycle="hidden"
+                             actionBar="true" contextMenu="true" infoPanel="true"
+                             actionBarGroup="change"/>
+                    <selectionContext dir="false" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="scheduler_task"/>
+                </gui>
+                <processing>
+                    <clientCallback><![CDATA[
+                        var u = ajaxplorer.getUserSelection();
+                        var conn = new Connexion();
+                        conn.setParameters($H({ get_action : 'scheduler_removeTask', task_id: getBaseName(u.getUniqueNode().getPath()) }));
+                        conn.onComplete = function(transport){
+                            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                         };
+                        conn.sendAsync();
+
+                    ]]></clientCallback>
+                    <serverCallback methodName="handleTasks"/>
+                </processing>
+            </action>
+            <action name="scheduler_fakeLongTask">
+                <processing>
+                    <serverCallback methodName="fakeLongTask"/>
+                </processing>
+            </action>
+        </actions>
+        <hooks>
+            <serverCallback methodName="placeConfigNode" hookName="ajxp_conf.list_config_nodes"/>
+        </hooks>
+    </registry_contributions>
+    <class_definition filename="plugins/action.scheduler/class.AjxpScheduler.php" classname="AjxpScheduler"/>
+    <dependencies>
+        <activePlugin pluginName="access.ajxp_conf"/>
+    </dependencies>
+</ajxp_plugin>

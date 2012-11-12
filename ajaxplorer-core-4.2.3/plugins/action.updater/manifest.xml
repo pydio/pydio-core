@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin name="updater" label="CONF_MESSAGE[Update Engine]" description="CONF_MESSAGE[Automatic update of AjaXplorer. Since version 3.3.3]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <server_settings>
+        <global_param name="UPDATE_SITE" type="string" label="CONF_MESSAGE[Update Site]" description="CONF_MESSAGE[Where to update]" default="http://www.ajaxplorer.info/update/"/>
+        <global_param name="UPDATE_CHANNEL" type="select" choices="stable|Stable,dev|Development" label="CONF_MESSAGE[Update Channel]" description="CONF_MESSAGE[Check stable or dev channel]" default="stable" mandatory="true"/>
+        <global_param name="PRESERVE_FILES" type="textarea" label="CONF_MESSAGE[Preserve Files]" description="CONF_MESSAGE[Files declared here (enter pathes from the root of Ajxp installation, comma-separated) will be backed up and restored before and after upgrade.]" default=""/>
+        <global_param name="ENABLE_324_IMPORT" type="boolean" label="CONF_MESSAGE[Enable Import From v3.2.4]" description="CONF_MESSAGE[Enable the migration action, available in the Settings repository]" default="false"/>
+        <global_param name="PROXY_HOST" group="Proxy configuration" type="string" label="CONF_MESSAGE[Proxy Host]" description="CONF_MESSAGE[Use a predefined proxy to establish connexion]" default="" mandatory="false"/>
+        <global_param name="PROXY_USER" group="Proxy configuration" type="string" label="CONF_MESSAGE[Proxy User]" description="CONF_MESSAGE[Predefined proxy user name]" default="" mandatory="false"/>
+        <global_param name="PROXY_PASS" group="Proxy configuration" type="password" label="CONF_MESSAGE[Proxy Pass]" description="CONF_MESSAGE[Predefined proxy password]" default="" mandatory="false"/>
+    </server_settings>
+	<client_settings icon="plugins/access.ajxp_conf/admin.png">
+		<resources>
+			<i18n namespace="updater" path="plugins/action.updater/i18n" />
+		</resources>
+	</client_settings>
+	<registry_contributions>
+        <actions>
+            <action name="get_upgrade_path">
+                <processing><serverCallback methodName="switchAction"></serverCallback></processing>
+            </action>
+            <action name="perform_upgrade">
+                <gui text="updater.1" title="updater.2" src="download_manager.png" hasAccessKey="false">
+                    <context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
+                        actionBar="true" contextMenu="false" infoPanel="false"
+                        actionBarGroup="user" inZip="false">
+                    </context>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true" dialogOpenForm="upgrade_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
+                        <dialogOnOpen><![CDATA[
+                            var conn = new Connexion();
+                            $(oForm).down('div[id="upgrade_checking"]').show();
+                            $(oForm).down('div[id="upgrade_checking"]').update('Checking for available upgrades');
+                            conn.addParameter("get_action", "get_upgrade_path");
+                            conn.onComplete = function(transport){
+                                var response = transport.responseJSON;
+                                if(response && response.packages.length){
+                                    for(var i=0;i<response.packages.length;i++){
+                                        response.packages[i] = '<li>'+getBaseName(response.packages[i])+'</li>';
+                                    }
+                                    var pList = response.packages.join(" ");
+                                    $(oForm).down('div[id="upgrade_status"]').show();
+                                    $(oForm).down('div[id="upgrade_status"]').insert({top:'The following packages will be downloaded and installed : <ul style="margin-top:4px;">'+ pList+'</ul> <br>'});
+                                    var startButton = $(oForm).down('div[id="start_upgrade_button"]');
+                                    var stepsContainer = $(oForm).down('iframe[id="upgrade_steps"]');
+                                    startButton.observe("click", function(){
+                                        if(window.confirm('Are you sure you want to perform the upgrade?')){
+                                            var conn = new Connexion();
+                                            stepsContainer.src = conn._baseUrl + "&get_action=perform_upgrade";
+                                        }
+                                    });
+                                    $(oForm).down('div[id="upgrade_checking"]').hide();
+                                    modal.refreshDialogPosition();
+                                }else{
+                                    $(oForm).down('div[id="upgrade_checking"]').update('No necessary upgrade detected');
+                                }
+                            };
+                            conn.sendAsync();
+                        ]]></dialogOnOpen>
+                        <dialogOnComplete hideDialog="true"><![CDATA[
+                            var startButton = $(oForm).down('div[id="start_upgrade_button"]');
+                            startButton.stopObserving("click");
+                            $(oForm).down('div[id="upgrade_status"]').hide();
+                        ]]></dialogOnComplete>
+                        <dialogOnCancel><![CDATA[]]></dialogOnCancel>
+                    </clientCallback>
+                    <clientForm id="upgrade_form"><![CDATA[
+                        <div id="upgrade_form" action="perform_upgrade" box_width="500">
+                            <div id="upgrade_checking"></div>
+                            <div id="upgrade_status" style="display:none;">
+                                <p><div id="start_upgrade_button" style="float: right;border: 1px solid #BBB;padding: 7px;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius: 5px;background-color: #EEE;color: #333;margin-left: 5px;border-image: initial;box-shadow: 1px 1px 7px #ddd;cursor: pointer;font-weight: bold;"> AJXP_MESSAGE[updater.4] </div>AJXP_MESSAGE[updater.3]</p>
+                                <iframe id="upgrade_steps" style="height:250px;width:100%;overflow:auto;border:1px solid #ccc;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;"></iframe>
+                            </div>
+                        </div>
+                    ]]></clientForm>
+                    <serverCallback methodName="switchAction"></serverCallback>
+                </processing>
+            </action>
+            <action name="import_from_324">
+                <gui text="updater.5" title="updater.6" src="download_manager.png" hasAccessKey="false">
+                    <context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
+                        actionBar="true" contextMenu="false" infoPanel="false"
+                        actionBarGroup="user" inZip="false">
+                    </context>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true" dialogOpenForm="import_324_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
+                        <dialogOnOpen><![CDATA[
+                            var startButton = $(oForm).down('div[id="start_upgrade_button"]');
+                            startButton.observe("click", function(){
+                                var conn = new Connexion();
+                                conn.addParameter("get_action", "import_from_324");
+                                conn.addParameter("previous_location", $(oForm).down('input[name="previous_location"]').value);
+                                if($(oForm).down('div[id="start_upgrade_button"]').RUN_NOW){
+                                    conn.addParameter("real_run", "true");
+                                }
+                                conn.onComplete = function(transport){
+                                    $(oForm).down('div[id="upgrade_steps"]').update(transport.responseText);
+                                    $(oForm).down('div[id="start_upgrade_button"]').update(MessageHash['updater.9']);
+                                    $(oForm).down('div[id="start_upgrade_button"]').RUN_NOW = true;
+                                };
+                                conn.sendAsync();
+                            });
+                        ]]></dialogOnOpen>
+                        <dialogOnComplete hideDialog="true"><![CDATA[
+                            $(oForm).down('div[id="start_upgrade_button"]').stopObserving("click");
+                        ]]></dialogOnComplete>
+                        <dialogOnCancel><![CDATA[]]></dialogOnCancel>
+                    </clientCallback>
+                    <clientForm id="import_324_form"><![CDATA[
+                        <div id="import_324_form" action="import_from_324" box_width="500">
+                            <div id="upgrade_status">
+                                <p><div id="start_upgrade_button" style="float: right;border: 1px solid #BBB;padding: 7px;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius: 5px;background-color: #EEE;color: #333;margin-left: 5px;border-image: initial;box-shadow: 1px 1px 7px #ddd;cursor: pointer;font-weight: bold;width: 80px;text-align: center;margin-bottom:10px;"> AJXP_MESSAGE[updater.7] </div>
+                                AJXP_MESSAGE[updater.8] <input name="previous_location" placeholder="Your previous install location"></p>
+                                <div id="upgrade_steps" style="height:250px;width:100%;overflow:auto;border:1px solid #ccc;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;"></div>
+                            </div>
+                        </div>
+                    ]]></clientForm>
+                    <serverCallback methodName="switchAction"></serverCallback>
+                </processing>
+            </action>
+            <action name="migrate_metaserial">
+                <gui text="updater.11" title="updater.12" src="download_manager.png" hasAccessKey="false">
+                    <context selection="true" dir="false" recycle="hidden"  behaviour="hidden"
+                        actionBar="false" contextMenu="true" actionBarGroup="user" inZip="false">
+                    </context>
+                    <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="repository,repository_editable" image="false" editable="false"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true" dialogOpenForm="migrate_metaserial" dialogOkButtonOnly="false" dialogSkipButtons="false">
+                        <dialogOnOpen><![CDATA[
+                            var startButton = $(oForm).down('div[id="start_upgrade_button"]');
+                            startButton.observe("click", function(){
+                                var conn = new Connexion();
+                                conn.addParameter("get_action", "migrate_metaserial");
+                                conn.addParameter("repository_id", getBaseName(ajaxplorer.getUserSelection().getUniqueNode().getPath()));
+                                if($(oForm).down('div[id="start_upgrade_button"]').RUN_NOW){
+                                    conn.addParameter("real_run", "true");
+                                }
+                                conn.onComplete = function(transport){
+                                    $(oForm).down('div[id="upgrade_steps"]').update(transport.responseText);
+                                    $(oForm).down('div[id="start_upgrade_button"]').update(MessageHash['updater.14']);
+                                    $(oForm).down('div[id="start_upgrade_button"]').RUN_NOW = true;
+                                };
+                                conn.sendAsync();
+                            });
+                        ]]></dialogOnOpen>
+                        <dialogOnComplete hideDialog="true"><![CDATA[
+                            $(oForm).down('div[id="start_upgrade_button"]').stopObserving("click");
+                            $(oForm).down('div[id="start_upgrade_button"]').RUN_NOW = false;
+                        ]]></dialogOnComplete>
+                        <dialogOnCancel><![CDATA[]]></dialogOnCancel>
+                    </clientCallback>
+                    <clientForm id="migrate_metaserial"><![CDATA[
+                        <div id="migrate_metaserial" action="migrate_metaserial" box_width="500">
+                            <div id="upgrade_status">
+                                <p><div id="start_upgrade_button" style="float: right;border: 1px solid #BBB;padding: 7px;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius: 5px;background-color: #EEE;color: #333;margin-left: 5px;border-image: initial;box-shadow: 1px 1px 7px #ddd;cursor: pointer;font-weight: bold;width: 80px;text-align: center;margin-bottom:10px;"> AJXP_MESSAGE[updater.13] </div>
+                                Upgrade old <b>meta.serial</b> plugin to <b>metastore.serial</b> + <b>meta.user</b> plugins, and upgrade the options so that the metadata files will be upgraded when you visit the folders.</p>
+                                <div id="upgrade_steps" style="height:250px;width:100%;overflow:auto;border:1px solid #ccc;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;"></div>
+                            </div>
+                        </div>
+                    ]]></clientForm>
+                    <serverCallback methodName="switchAction"></serverCallback>
+                </processing>
+            </action>
+        </actions>
+	</registry_contributions>
+	<class_definition filename="plugins/action.updater/class.UpdateController.php" classname="UpdateController"/>
+    <dependencies>
+        <!-- Image proxy must be implemented -->
+        <activePlugin pluginName="access.ajxp_conf"/>
+    </dependencies>
+</ajxp_plugin>

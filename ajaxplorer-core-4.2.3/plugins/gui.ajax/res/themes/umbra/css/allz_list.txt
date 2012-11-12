@@ -1,0 +1,3 @@
+themes/umbra/css/xtree.css
+themes/umbra/css/screen.css
+themes/umbra/css/ajaxplorer.css

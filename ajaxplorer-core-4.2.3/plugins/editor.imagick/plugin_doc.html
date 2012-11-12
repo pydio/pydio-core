@@ -1,0 +1,18 @@
+<p>Makes use of a server installation of Image Magick and GhostScript to generate thumbnails for various formats : PDF, SVG, TIFF and PSD.</p>
+
+<p>It cannot work if Image Magick and GhostScripts are not installed on your server, thus you won’t probably be able to use this editor on a shared host (unfortunately, I agree). Ghostscript fonts must be present on server too. When activated, PDF documents can also be viewed directly online, page by page.</p>
+
+<p>The main configuration option will be the full path to the <b>convert</b> tool on the server. Test your server before posting some "it's not working" in the forum!! <br>
+    In a commandline, change to a directory containing a pdf file, let's say myFile.pdf, and execute the following command :
+    <ul>
+    <li> &gt; [PATH TO convert] myFile.pdf[0] preview.jpg </li>
+    <li> For example on windows : &gt; C:\PROGRA~1\ImageMagick\convert.exe myFile.pdf[0] preview.jpg</li>
+    <li> For example on linux : &gt; /opt/bin/convert myFile.pdf[0] preview.jpg</li>
+    </ul>
+</p>
+
+        <p><b>UNICONV INTEGRATION</b></p>
+        <p>If you can install the uniconv utilitary on your server, along with the openoffice or libreoffice headless suite, the plugin can also display preview for a wide range of office documents (Word,Excel,Powerpoint and all their closed or open-source variants). </p>
+        <p>Examples to install the packages on CentOS : yum install unoconv openoffice.org-headless openoffice.org-writer openoffice.org-calc openoffice.org-impress<br>
+        Or on Debian : apt-get install unoconv openoffice.org-headless openoffice.org-writer openoffice.org-calc openoffice.org-impress</p>
+        <p>Remark : once installed, you can check the index.lucene plugin that can also make use of UNOCONV to extract textual information from office files into PDF, and the use PDF2TXT to extract and index this information for search.</p>

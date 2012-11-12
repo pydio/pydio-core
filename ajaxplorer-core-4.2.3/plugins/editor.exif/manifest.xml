@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor id="editor.exif" openable="true" text="editor.exif.1" title="editor.exif.2" icon="exif_images/actions/ICON_SIZE/camera_photo.png" className="ExifEditor" mimes="jpg,jpeg" formId="exif_box" label="CONF_MESSAGE[EXIF Extractor]" description="CONF_MESSAGE[Display the Exif metadata contained inside the JPG files. Can locate the image on a map if it contains geolocation data.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings>
+        <resources>
+            <js file="plugins/editor.diaporama/class.Diaporama.js" className="Diaporama"/>
+            <js file="plugins/editor.exif/class.ExifEditor.js" className="ExifEditor"/>
+            <i18n namespace="editor.exif" path="plugins/editor.exif/i18n" />
+            <img_library alias="exif_images" path="plugins/editor.exif/images"/>
+        </resources>
+    </client_settings>
+	<clientForm id="exif_box"><![CDATA[
+		<div id="exif_box" action="editer" box_width="60%" box_height="60%" box_padding="0">
+			<div class="action_bar">
+				<a href="#" onclick="return false;" id="gpsLocateButton"><img width="22" height="22" src="plugins/meta.exif/world.png" alt="AJXP_MESSAGE[meta.exif.2]" border="0"><br><span message_id="meta.exif.2">AJXP_MESSAGE[meta.exif.2]</span></a>
+				<a href="#" onclick="return false;" id="downloadFileButton"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/download_manager.png" alt="AJXP_MESSAGE[88]" border="0"><br><span message_id="88">AJXP_MESSAGE[88]</span></a>
+			</div>			
+		</div>				
+	]]></clientForm>	
+	<dependencies>
+		<!-- Stream Wrapper Access -->
+		<activePlugin pluginName="meta.exif|image.diaporama"/>
+	</dependencies>					
+</editor>

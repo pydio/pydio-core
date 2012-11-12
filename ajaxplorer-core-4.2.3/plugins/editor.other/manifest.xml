@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor id="editor.other" openable="true" order="2000" text="openother.1" title="openother.2" 
+		icon="openother_images/actions/ICON_SIZE/unknown.png" className="OtherEditorChooser" 
+		mimes="*" formId="other_editor_box" label="CONF_MESSAGE[Open in...]" description="CONF_MESSAGE[Simple Picker to open any type of file in any available editor.]"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd"
+        >
+	<client_settings>
+        <resources>
+            <js file="plugins/editor.other/class.OtherEditorChooser.js" className="OtherEditorChooser"/>
+            <i18n namespace="openother" path="plugins/editor.other/resources/i18n" />
+            <img_library alias="openother_images" path="plugins/editor.other/resources/images" />
+            <css file="plugins/editor.other/resources/other_chooser.css"/>
+        </resources>
+	</client_settings>
+	<clientForm id="other_editor_box"><![CDATA[
+		<div id="other_editor_box" action="editer" box_width="340">
+			<div class="editor_selector_title">AJXP_MESSAGE[openother.3]</div>
+			<div class="dialogLegend">AJXP_MESSAGE[openother.4]</div>
+			<div id="editor_selector"></div>
+			<div class="dialogButtons">
+			    <div id="clear_assoc_link">AJXP_MESSAGE[openother.5]</div>
+				<input type="image" name="close" src="AJXP_THEME_FOLDER/images/actions/22/dialog_close.png" height="22" width="22" title="OK" class="dialogButton"/>
+			</div>
+		</div>				
+	]]></clientForm>
+    <processing>
+        <activeCondition><![CDATA[
+            var original = ajaxplorer.__proto__.findEditorsForMime;
+            ajaxplorer.__proto__.findEditorsForMime = function(mime, restrictToPreviewProviders){
+                if(this.user && this.user.getPreference("gui_preferences", true) && this.user.getPreference("gui_preferences", true)["other_editor_extensions"]){
+                    $H(this.user.getPreference("gui_preferences", true)["other_editor_extensions"]).each(function(pair){
+                        var editor = this.getActiveExtensionByType("editor").detect(function(ed){
+                            return ed.editorClass == pair.value;
+                        });
+                        if(editor && !$A(editor.mimes).include(pair.key)){
+                            editor.mimes.push(pair.key);
+                        }
+                    }.bind(this));
+                }
+                return original.apply(this, [mime, restrictToPreviewProviders]);
+            };
+            return true;
+        ]]></activeCondition>
+    </processing>
+	<dependencies>
+		<!-- Stream Wrapper Access -->
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+	</dependencies>					
+</editor>

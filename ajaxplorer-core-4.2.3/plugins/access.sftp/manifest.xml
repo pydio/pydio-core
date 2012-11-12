@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="sftp" label="CONF_MESSAGE[FTP over SSH]" description="CONF_MESSAGE[Access a remote server filesystem using FTP via SSH server. Handy for working around permissions problems.]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings icon="plugins/access.sftp/icon.png">
+        <resources>
+            <i18n namespace="sftp_access" path="plugins/access.sftp/i18n"/>
+        </resources>
+    </client_settings>
+
+	<server_settings>
+		<param name="SERV" type="string" label="CONF_MESSAGE[Server URL]" description="CONF_MESSAGE[Path to remote sftp server]" mandatory="true"/>
+		<param name="PORT" type="string" label="CONF_MESSAGE[Port number]" description="CONF_MESSAGE[Port to SSH server]" mandatory="true" default="22"/>
+		<param name="PATH" type="string" label="CONF_MESSAGE[Path]" description="CONF_MESSAGE[Real path to the folder on the server]" mandatory="true"/>
+		<param name="FIX_PERMISSIONS" type="string" label="CONF_MESSAGE[Fix Permissions]" description="CONF_MESSAGE[How to handle remote permissions to be used by PHP as local permissions. See manual.]" mandatory="false" default="detect_remote_user_id"/>
+	</server_settings>
+	<class_definition filename="plugins/access.sftp/class.sftpAccessDriver.php" classname="sftpAccessDriver"/>
+	<registry_contributions>
+		<client_configs>
+			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>
+			<component_config className="FilesList">
+				<columns switchGridMode="filelist">
+					<column messageId="1" attributeName="ajxp_label" sortType="StringDirFile"/>
+					<column messageId="2" attributeName="filesize" sortType="NumberKo"/>
+					<column messageId="3" attributeName="mimestring" sortType="String"/>
+					<column messageId="4" attributeName="ajxp_modiftime" sortType="MyDate"/>
+				</columns>
+			</component_config>
+			<component_config className="FoldersTree">
+				<property name="display" value="d"/>
+			</component_config>			
+		</client_configs>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
+        <external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
+	</registry_contributions>
+	<dependencies>
+		<pluginClass pluginName="access.fs"/>
+	</dependencies>	
+    <class_stream_wrapper filename="plugins/access.sftp/class.sftpAccessWrapper.php" classname="sftpAccessWrapper" protocol="ajxp.sftp"/>
+</ajxpdriver>

@@ -1,0 +1,94 @@
+/*
+ * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
+ * This file is part of AjaXplorer.
+ *
+ * AjaXplorer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AjaXplorer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <http://www.ajaxplorer.info/>.
+ */
+div#emlHeaderContainer{
+	background-color: #EEE;
+	border: 1px solid #BBB;
+	border-right-width: 0px;
+	font-family: Trebuchet MS,sans-serif;
+	font-size: 11px;		
+}
+
+div#emlHeaderContainer #attachments_container{
+	height: 67px;
+	width: 255px;
+	padding: 1px;	
+}
+
+div.emlHeader{
+clear:left;		
+}
+
+div.emlHeaderLabel{
+	float:left;
+	width: 60px;
+	font-weight: bold;	
+	padding: 2px 5px;
+}
+
+div.emlHeaderContent{
+	padding: 2px 5px;	
+}
+
+div.emlBody{
+	
+}
+
+div.emlAttachCont{
+	float: right;
+	margin: 5px;
+	border: 1px solid #BBB;
+	background-color: white;
+	overflow: auto;		
+	width: 202px;
+}
+
+div.emlAttachment{
+    padding: 2px 5px 4px 5px;
+    background-image: url('attach.png');
+    background-repeat: no-repeat;
+    background-position: 2px 2px;
+    padding-left: 23px;
+    cursor: pointer;
+}
+
+div.emlAttachment.active,
+div.emlAttachment.ieHover,
+div.emlAttachment:hover{
+	background-color: #73A2D7;
+	color: white; 
+}
+
+a.emlAttachmentAction{
+	display:block;
+	float:right;
+	cursor: pointer;
+	margin-left: 2px;
+}
+
+div#treeSelectorCpContainer{
+	position: absolute;
+	right: 10px;
+	border: 1px solid #BBB;
+	padding: 5px;
+	background-color: white;
+	top: 156px;
+	box-shadow: 1px 1px 4px #BBB;	
+}
+}

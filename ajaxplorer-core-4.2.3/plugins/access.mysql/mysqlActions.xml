@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<driver name="mysql" className="class.mysqlDriver.php">
+	<actions>
+		<action name="ls" dirDefault="true">			
+			<gui text="32" title="32" src="fileopen.png"
+				accessKey="folder_access_key">
+				<context selection="true" dir="" recycle="false"
+					actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="false">
+				</context>
+				<selectionContext dir="true" file="false" recycle="false"
+					unique="true" allowedMimes="">
+				</selectionContext>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true"
+				write="false" adminOnly="false">
+			</rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var path;					
+					if(window.actionArguments && window.actionArguments.length>0){
+						path = window.actionArguments[0];
+						if(Object.isString(path)){path = new AjxpNode(path,false,getBaseName(path));}
+					}else{
+						userSelection = ajaxplorer.getUserSelection();
+						if(userSelection && userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime(["zip"]))){
+							path = userSelection.getUniqueNode();
+						}
+					}
+					if(path){
+						ajaxplorer.updateContextData(path);
+					}						
+					]]></clientCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="set_query">
+			<gui text="32" title="32" src="fileopen.png"
+				accessKey="folder_access_key">
+				<context selection="false" dir="" recycle="false"
+					actionBar="false" actionBarGroup="get" contextMenu="false" infoPanel="false">
+				</context>
+				<selectionContext dir="true" file="true" recycle="false"
+					unique="true" allowedMimes="">
+				</selectionContext>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true"
+				write="false" adminOnly="false">
+			</rightsContext>
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="mkdir">			
+			<gui text="sql.1" title="sql.1" src="sql_images/actions/ICON_SIZE/table_new.png" accessKey="folder_access_key" hasAccessKey="false">
+				<context selection="false" dir="true" recycle="hidden" actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="put" inZip="false"></context>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[					
+					var sTitle = MessageHash[187];
+					var loadFunc = function(oForm){
+						ajaxplorer.actionBar.sqlEditor = new SQLEditor(oForm);
+						ajaxplorer.actionBar.sqlEditor.createTableEditor();
+					};
+					modal.showDialogForm('Create Table', 'mysql_edit_table', loadFunc, null, null, true, true);
+					]]></clientCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>
+		<action name="mkfile">
+			<gui text="273" title="274" src="sql_images/actions/ICON_SIZE/table_record_new.png" accessKey="file_access_key" hasAccessKey="false">
+				<context selection="false" dir="true" recycle="hidden"
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="change" inZip="false" root="false">
+				</context></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var loadFunc = function(oForm){
+						ajaxplorer.actionBar.sqlEditor = new SQLEditor(oForm);
+						ajaxplorer.actionBar.sqlEditor.createRecordEditor();
+					};
+					var completeFunc = function(){
+						ajaxplorer.actionBar.sqlEditor.submitRecordForm();
+						return false;
+					};
+					modal.showDialogForm('Add Record', 'mysql_edit_record', loadFunc, completeFunc, null);
+					]]></clientCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>
+		<action name="edit_table">
+			<gui text="269" title="270" src="sql_images/actions/ICON_SIZE/table_edit.png" accessKey="edit_access_key" hasAccessKey="false">
+				<context selection="false" dir="true" recycle="hidden" 
+					actionBar="true" contextMenu="true" infoPanel="true"
+					actionBarGroup="put" inZip="false" root="false">
+				</context>
+				<selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="pk" behaviour="hidden"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var currentTable = ajaxplorer.getContextNode().getPath();
+					var sTitle = MessageHash[187]+currentTable;
+					var loadFunc = function(oForm){
+						ajaxplorer.actionBar.sqlEditor = new SQLEditor(oForm);
+						ajaxplorer.actionBar.sqlEditor.createTableEditor(currentTable);
+					};
+					modal.showDialogForm('Edit Table Columns', 'mysql_edit_table', loadFunc, null, null, true, true);
+					]]></clientCallback>
+				<clientForm id="mysql_edit_table"><![CDATA[
+					<div id="mysql_edit_table" action="edit_table" box_width="800">
+					</div>
+					<div id="create_table_template" class="sqlForm">
+						<table>
+							<thead>
+							<tr>
+								<td new="false"></td>
+								<td>Field Name</td>
+								<td>Type</td>
+								<td>Size or Set</td>
+								<td>NULL</td>
+								<td>Default</td>
+								<td>Other Flags</td>
+								<td edit="false">PK</td>
+								<td edit="false">IDX</td>
+								<td edit="false">UNIQ</td>
+							</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td new="false"></td>
+									<td><input name="field_name" type="text"/><input type="hidden" name="field_origname"/></td>
+									<td><select name="field_type">
+											<option value="tinyint">TINYINT</option>
+											<option value="smallint">SMALLINT</option>
+											<option value="mediumint">MEDIUMINT</option>
+											<option value="int">INT</option>
+											<option value="integer">INTEGER</option>
+											<option value="bigint">BIGINT</option>
+											<option value="real">REAL</option>
+											<option value="double">DOUBLE</option>
+											<option value="float">FLOAT</option>
+											<option value="decimal">DECIMAL</option>
+											<option value="numeric">NUMERIC</option>
+											<option value="date">DATE</option>
+											<option value="time">TIME</option>
+											<option value="timestamp">TIMESTAMP</option>
+											<option value="datetime">DATETIME</option>
+											<option value="char">CHAR</option>
+											<option value="varchar">VARCHAR</option>
+											<option value="tinyblob">TINYBLOB</option>
+											<option value="blob">BLOB</option>
+											<option value="mediumblob">MEDIUMBLOB</option>
+											<option value="longblob">LONGBLOB</option>
+											<option value="tinytext">TINYTEXT</option>
+											<option value="text">TEXT</option>
+											<option value="mediumtext">MEDIUMTEXT</option>
+											<option value="longtext">LONGTEXT</option>
+											<option value="enum">ENUM</option>
+											<option value="set">SET</option>
+										</select>
+									</td>
+									<td><input name="field_size" type="text"/></td>
+									<td>
+										<select name="field_null">
+											<option/>
+											<option value="NULL">Yes</option>
+											<option value="NOT NULL">No</option>
+										</select>
+									</td>
+									<td><input name="field_default" type="text"/></td>
+									<td><input name="field_flags" type="text"/></td>
+									<td edit="false"><input name="field_pk" type="checkbox" value="1" class="checkbox"/></td>
+									<td edit="false"><input name="field_index" type="checkbox" value="1" class="checkbox"/></td>
+									<td edit="false"><input name="field_uniq" type="checkbox" value="1" class="checkbox"/></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div id="replication_chooser">
+					<fieldset>
+						<legend>Step 1: Choose a number of fields</legend>
+					<table class="sqlRecordForm">
+						<tr>
+						<td class="sqlLabelTd">Name of the table : </td><td class="sqlFieldTd"><input type="text" id="table_name"/></td>
+						</tr>
+						<tr>
+						<td class="sqlLabelTd">Number of fields : </td><td class="sqlFieldTd"><input style="width:30px !important;" type="text" id="fields_number"/></td>
+						</tr>
+					</table>
+					<div class="dialogButtons">					
+						<input type="button" id="can" value="Cancel" class="dialogButton"/>
+						<input type="button" id="toNext" value="Next &gt;&gt;" class="dialogButton"/>
+					</div>
+					</fieldset>
+					</div>
+				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>
+		<action name="edit_record">
+			<gui text="51" title="276" src="sql_images/actions/ICON_SIZE/table_record_edit.png" accessKey="edit_access_key" hasAccessKey="false">
+				<context selection="true" dir="" recycle="hidden" 
+					actionBar="true" contextMenu="true" infoPanel="true"
+					actionBarGroup="change" inZip="false" root="false">
+				</context>
+				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="pk" behaviour="hidden"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var userSelection =  ajaxplorer.getUserSelection();					
+					var loadFunc = function(oForm){
+						ajaxplorer.actionBar.sqlEditor = new SQLEditor(oForm);
+						ajaxplorer.actionBar.sqlEditor.createRecordEditor(userSelection);
+					};
+					var completeFunc = function(){
+						ajaxplorer.actionBar.sqlEditor.submitRecordForm();
+						return false;
+					};					
+					modal.showDialogForm('Edit Online', 'mysql_edit_record', loadFunc, completeFunc, null);
+					]]></clientCallback>
+				<clientForm id="mysql_edit_record"><![CDATA[
+					<div id="mysql_edit_record" action="edit_record" box_width="600">					
+					</div>
+				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>
+		<action name="delete_table">
+			<gui text="271" title="272" src="sql_images/actions/ICON_SIZE/table_delete.png" accessKey="delete_access_key" hasAccessKey="false" specialAccessKey="delete">
+				<context selection="true" dir="true" recycle="false"
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="put" inZip="false">
+				</context>
+				<selectionContext dir="true" file="false" recycle="false" unique="false" allowedMimes="*" behaviour="hidden"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var onLoad = function(oForm){
+				    	var message = MessageHash[275];
+		   		    	$(oForm).getElementsBySelector('span[id="delete_message"]')[0].innerHTML = message;
+					};
+					modal.showDialogForm('Delete', 'delete_form', onLoad, function(){
+						var oForm = modal.getForm();
+						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+						ajaxplorer.actionBar.submitForm(oForm);
+						hideLightBox(true);
+						return false;
+					});
+					]]></clientCallback>
+				<clientForm id="delete_form"><![CDATA[
+				<div id="delete_form" action="delete_table" box_width="280">
+<span id="delete_message"></span>
+</div>				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>
+		<action name="delete_record">
+			<gui text="7" title="277" src="sql_images/actions/ICON_SIZE/table_record_delete.png" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
+				<context selection="true" dir="true" recycle="false"
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="change" inZip="false">
+				</context>
+				<selectionContext dir="false" file="true" recycle="false" unique="false" allowedMimes="pk" behaviour="hidden"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var onLoad = function(oForm){
+				    	var message = MessageHash[278];
+		   		    	$(oForm).getElementsBySelector('span[id="delete_message"]')[0].innerHTML = message;
+					};
+					modal.showDialogForm('Delete', 'delete_record_form', onLoad, function(){
+						var oForm = modal.getForm();
+						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+						ajaxplorer.actionBar.submitForm(oForm);
+						hideLightBox(true);
+						return false;
+					});
+					]]></clientCallback>
+				<clientForm id="delete_record_form"><![CDATA[
+				<div id="delete_record_form" action="delete_record" box_width="280">
+<span id="delete_message"></span>
+</div>				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>
+	</actions>
+</driver>

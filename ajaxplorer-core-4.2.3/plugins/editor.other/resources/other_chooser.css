@@ -1,0 +1,50 @@
+#editor_selector{
+	border:1px solid #bbb;
+	margin-top: 5px;
+	max-height: 150px;
+	overflow-x: hidden;
+	overflow-y: auto;
+	border-radius: 3px;
+}
+
+#other_editor_box a {
+	display:block;
+	background-repeat: no-repeat;
+	background-position: 5px;
+	padding: 7px 10px 7px 34px;
+	cursor: pointer;
+	border-top: 1px solid #ddd;
+}
+
+#other_editor_box a:first-child{
+	border-top:0px;
+}
+
+#other_editor_box a span{
+	float:right;
+	opacity:0.7;
+	-moz-opacity:0.7;
+	font-style:italic;
+	display:none;
+}
+
+#other_editor_box a.even {
+	background-color: #eee;
+}
+
+#other_editor_box a:hover{
+	font-weight:bold;
+}
+
+#other_editor_box a:hover span{
+	font-weight: normal;
+	display:inline;
+}
+
+#clear_assoc_link{
+    float: left;
+    color: #999;
+    cursor: pointer;
+    padding-top: 10px;
+    padding-left: 5px;
+}

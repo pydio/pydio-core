@@ -1,0 +1,13 @@
+<p>Stores all data inside a database. It is database generic, the connexion to the database must be described in an array, see <a href="http://dibiphp.com/cs/">http://dibiphp.com/cs/</a> for more info on databases supported and configurations. A create.sql file is included to generate the necessary tables for storing users data.</p>
+<p>
+   The SQL_DRIVER option defined in the bootstrap_plugins.php file must be set with a "dibi" configuration that is PHP array like this :
+    <pre>
+    "SQL_DRIVER"	=> array(
+        "driver" => "mysql",
+        "host"   => "localhost",
+        "database"   => "ajxp",
+        "user"   => "user",
+        "password"   => "pass",
+    ),
+    </pre>
+</p>

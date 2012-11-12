@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpcore id="core.auth" label="AuthDrivers Configs" description="Options applied to all auth drivers" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<class_definition filename="plugins/core.auth/class.CoreAuthLoader.php" classname="CoreAuthLoader"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="core_auth" path="plugins/core.auth/i18n"/>
+        </resources>
+    </client_settings>
+	<server_settings>
+		<global_param name="ENABLE_USERS" group="CONF_MESSAGE[Generic Auth Features]"  type="boolean" label="CONF_MESSAGE[Enable Users]" description="CONF_MESSAGE[Activate the users management system to protect your AjaXplorer installation.]" mandatory="true" default="true"/>
+		<global_param name="CASE_SENSITIVE" group="CONF_MESSAGE[Generic Auth Features]"  type="boolean" label="CONF_MESSAGE[Case Sensitive]" description="CONF_MESSAGE[Whether the users identifiers should be case sensitive or not]" mandatory="true" default="true"/>
+		<global_param name="ALLOW_GUEST_BROWSING" group="CONF_MESSAGE[Generic Auth Features]"  type="boolean" label="CONF_MESSAGE[Guest Browsing]" description="CONF_MESSAGE[Enable the 'guest' user, who does not need to log in.]" mandatory="true" default="false"/>
+		<global_param name="PASSWORD_MINLENGTH" group="CONF_MESSAGE[Generic Auth Features]" type="string" label="CONF_MESSAGE[Password length]" description="CONF_MESSAGE[Minimum number of characters required for passwords in the application]" mandatory="true" default="8"/>
+		<global_param name="SESSION_SET_CREDENTIALS" group="CONF_MESSAGE[Generic Auth Features]"  type="boolean" label="CONF_MESSAGE[Store Credentials in Session]" description="CONF_MESSAGE[Set the users credentials in the session after a successful login, this can be necessary when bridging specific auth and access plugins.]" mandatory="true" default="false"/>
+	</server_settings>
+</ajxpcore>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uploader id="uploader.jumploader" enabled="false" text="51" title="162" label="CONF_MESSAGE[Jumploader]" description="CONF_MESSAGE[Third-party JumpLoader JAVA applet allowing to upload folders, chunk big files, etc.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<class_definition filename="plugins/uploader.jumploader/class.JumploaderProcessor.php" classname="JumploaderProcessor"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="jumploader" path="plugins/uploader.jumploader/i18n"/>
+        </resources>
+    </client_settings>
+	<registry_contributions>
+		<actions>
+			<action name="upload">
+				<pre_processing>					
+					<serverCallback methodName="preProcess"/>
+				</pre_processing>
+				<post_processing>					
+					<serverCallback methodName="postProcess" capture="true"/>
+				</post_processing>
+			</action>
+		</actions>
+	</registry_contributions>
+	<dependencies>
+		<!-- Stream Wrapper Access -->
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+	</dependencies>
+	<processing>
+		<clientForm id="jumploader_form"><![CDATA[
+			<!-- FLEX UPLOAD FORM -->
+			<div id="jumploader_form" box_width="600" box_padding="0">
+			<div id="jumpscreen">
+			<iframe id="jumpframe" style="width:600px;height:400px;border:0px none;" frameborder="0" src=""></iframe>
+			</div>
+			</div>
+		]]></clientForm>
+		<dialogOnOpen><![CDATA[
+        var src = window.ajxpServerAccessPath + '&get_action=get_template&template_name=jumploader_tpl.html&pluginName=uploader.jumploader&encode=false';
+        modal.getForm().down('#jumpframe').src = src;
+		]]></dialogOnOpen>
+	</processing>
+</uploader>

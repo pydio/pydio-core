@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<clientCallback prepareModal="true"><![CDATA[
+	var loginRedirect = AJXP_LOGIN_REDIRECT;
+	var authSources = AJXP_MULTIAUTH_SOURCES;
+	var masterAuthSource = 'AJXP_MULTIAUTH_MASTER';
+	var userIdSeparator = 'AJXP_USER_ID_SEPARATOR';
+	if(loginRedirect){
+		document.location.href=loginRedirect;
+	}else{
+		modal.showDialogForm('Log In', ($('login_form')?'login_form':'login_form_dynamic'), 
+		function(oForm){
+			if(!$('auth_source')){
+				var auth_chooser = '<div class="SF_element"> \
+					<div class="SF_label"><ajxp:message ajxp_message_id="396">'+MessageHash[396]+'</ajxp:message></div> \
+					<div class="SF_input"><select id="auth_source" name="auth_source" style="width: 100px; padding:0px;" class="dialogFocus"></select></div> \
+				</div>';
+				oForm.down('div.SF_element').insert({before:auth_chooser});
+				$H(authSources).each(function(pair){
+					$('auth_source').insert(new Element("option", {value:pair.key}).update(pair.value));
+				});
+			}
+			ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
+			if(Prototype.Browser.IE && !oForm.down('input[type="text"]').key_enter_attached){
+				oForm.select('input').invoke("observe", "keydown", function(event){
+					if(event.keyCode == Event.KEY_RETURN){
+						var el = Event.findElement(event);
+						if(el.hasClassName('dialogButton')){
+							el.click();
+						}else{
+							el.form.down('input.dialogButton').click();
+						}
+					}
+				});
+				oForm.down('input[type="text"]').key_enter_attached = true;
+			}
+		}, 
+		function(){
+			var oForm = modal.getForm();
+			var connexion = new Connexion();
+			connexion.addParameter('get_action', 'login');
+			var selectedSource = oForm.auth_source.value;
+			if(selectedSource == masterAuthSource){
+				connexion.addParameter('userid', oForm.userid.value);
+			}else{
+				connexion.addParameter('userid', selectedSource+userIdSeparator+oForm.userid.value);
+			}
+			connexion.addParameter('login_seed', oForm.login_seed.value);
+			connexion.addParameter('auth_source', selectedSource);
+			connexion.addParameter('remember_me', (oForm.remember_me.checked?"true":"false"));
+			if(oForm.login_seed.value != '-1'){
+				connexion.addParameter('password', hex_md5(hex_md5(oForm.password.value)+oForm.login_seed.value));
+			}else{
+				connexion.addParameter('password', oForm.password.value);
+			}
+			if(oForm.captcha_code){
+				connexion.addParameter('captcha_code', oForm.captcha_code.value);
+			}
+			connexion.onComplete = function(transport){
+				ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+				if(XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
+					ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
+				}
+			};
+			connexion.setMethod('put');
+			document.observeOnce("ajaxplorer:user_logged", function(){
+		        if($('logging_string') && $('logging_string').down('i')){
+		            var ht = $('logging_string').down('i').innerHTML;
+		            var exp = ht.split(userIdSeparator);
+		            if(exp.length > 1){
+                		$('logging_string').down('i').update(exp[1]);
+		            }
+		        }
+			});
+			connexion.sendAsync();
+			oForm.userid.value = '';
+			oForm.password.value = '';
+			return false;				
+		});
+	}
+]]></clientCallback>

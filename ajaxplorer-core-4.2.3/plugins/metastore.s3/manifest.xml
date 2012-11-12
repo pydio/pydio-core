@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metastore id="s3" label="CONF_MESSAGE[S3 MetaStore]" description="CONF_MESSAGE[Stores metadata s3 metadata]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<class_definition filename="plugins/metastore.s3/class.s3MetaStore.php" classname="s3MetaStore"/>
+    <client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
+        <resources>
+            <i18n namespace="metastore_s3" path="plugins/metastore.s3/i18n" />
+        </resources>
+    </client_settings>
+</metastore>

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<guidriver name="ajxpclient">
+	<actions>
+	<!-- 
+		<action name="get_boot_conf" skipSecureToken="true">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+	-->
+		<action name="get_xml_registry">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="get_template">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="get_i18n_messages">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="get_editors_registry">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="display_doc">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="up_dir">
+			<gui text="148" title="24" src="up.png" hasAccessKey="true"
+				accessKey="parent_access_key">
+				<context selection="false" dir="false" recycle="false"
+					actionBar="false" contextMenu="false" infoPanel="false" actionBarGroup="default">
+				</context>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>			
+			<processing>
+				<clientCallback prepareModal="false"><![CDATA[
+					ajaxplorer.fireContextUp();
+					]]></clientCallback>
+			</processing>
+		</action>		
+		<action name="refresh">
+			<gui text="149" title="149" src="reload.png" hasAccessKey="true"
+				accessKey="refresh_access_key">
+				<context selection="false" dir="true" recycle="false"
+					actionBar="false" contextMenu="true" infoPanel="false">
+				</context>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="false"><![CDATA[
+					ajaxplorer.fireContextRefresh();
+					]]></clientCallback>
+			</processing>
+		</action>
+		<action name="ext_select">
+			<gui text="321" title="322" src="download_manager.png" accessKey="" hasAccessKey="false">
+				<context selection="true" dir="" recycle="false"
+					actionBar="true" contextMenu="true" infoPanel="true"
+					actionBarGroup="put" inZip="false">
+				</context>
+				<selectionContext dir="true" file="true" recycle="false" unique="false"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="false"><![CDATA[
+					var userSelection = ajaxplorer.getUserSelection();
+					if((userSelection.isUnique() && !userSelection.hasDir()))
+					{
+						var fileName = userSelection.getUniqueFileName();
+						var selectorData = ajaxplorer.actionBar.selectorData;
+						if(selectorData.get('type') == "ckeditor"){
+							var ckData = selectorData.get('data');
+							if (ckData['CKEditorFuncNum']) {
+								var imagePath = fileName;
+								if(ckData['relative_path']){
+									imagePath = ckData['relative_path'] + fileName;
+								}
+								window.opener.CKEDITOR.tools.callFunction(ckData['CKEditorFuncNum'], imagePath);
+								window.close();
+							}
+						}
+					}
+					]]></clientCallback>
+				</processing>
+		</action>		
+		<action name="bookmark">
+			<gui text="152" title="153" src="bookmark.png" hasAccessKey="true"
+				accessKey="bookmarks_access_key">
+				<context selection="false" dir="true" recycle="hidden"
+					actionBar="false" contextMenu="true" infoPanel="false"
+					actionBarGroup="default">
+				</context>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="false"><![CDATA[
+					document.fire("ajaxplorer:add_bookmark");
+					]]></clientCallback>
+			</processing>
+		</action>		
+		<action name="delete_bookmark">
+			<gui text="154" title="155" src="folder_new.png"
+				accessKey="folder_access_key">
+				<context selection="false" dir="" recycle="false"
+					actionBar="false" contextMenu="false" infoPanel="false">
+				</context>
+			</gui>
+			<processing>
+				<clientCallback prepareModal="false"><![CDATA[
+					// TO DO
+					]]></clientCallback>
+			</processing>
+		</action>		
+		<action name="rename_bookmark">
+			<gui text="154" title="155" src="folder_new.png"
+				accessKey="folder_access_key">
+				<context selection="false" dir="" recycle="false"
+					actionBar="false" contextMenu="false" infoPanel="false">
+				</context>
+			</gui>
+			<processing>
+				<clientCallback prepareModal="false"><![CDATA[]]></clientCallback>
+				<clientForm id="rename_bookmark"><![CDATA[
+				<div id="rename_bookmark" action="get_bookmarks" box_width="200">
+				<input type="text" name="bm_title" value="" id="bm_title" class="dialogFocus">
+				<input type="hidden" name="bm_path" value="">
+				</div>				
+				]]></clientForm>
+			</processing>
+		</action>		
+		<action name="splash">
+			<gui text="166" title="167" src="info.png" hasAccessKey="true"
+				accessKey="about_access_key">
+				<context selection="false" dir="" recycle="false"
+					actionBar="true" contextMenu="false" infoPanel="false"
+					actionBarGroup="user">
+				</context>
+			</gui>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+				modal.showDialogForm(
+					'Ajaxplorer', 
+					'splash_form', 
+					function(oForm){						
+						var docDiv = $(oForm).down('#docDiv');
+						if(!docDiv.isLoaded){
+							var conn = new Connexion(window.ajxpServerAccessPath + '&get_action=display_doc&doc_file=CREDITS');
+							conn.onComplete = function(transport){
+								docDiv.insert({top:transport.responseText});
+								docDiv.isLoaded = true;
+								var updateLink = docDiv.down('#software_update');
+							};
+							conn.sendAsync();													
+						}
+					}, 
+					function(){hideLightBox();return false;}, 
+					null, 
+					true, true);		
+					]]></clientCallback>
+				<clientForm id="splash_form"><![CDATA[
+					<div id="splash_form" box_width="455" box_padding="0">						
+						<div id="docDiv" style="padding:5px;overflow:auto;height:300px;">
+							<div class="dialogButtons" style="text-align:right;padding-right:6px;"><input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_close.png" width="16" height="16" class="dialogButton"/></div>
+						</div>
+					</div>				
+				]]></clientForm>
+			</processing>
+		</action>		
+	</actions>
+</guidriver>

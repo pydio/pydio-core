@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<driver name="cmsmsAuth">
+	<actions>
+		<action name="login_cmsms">
+			<processing>
+				<serverCallback methodName="login_cmsms"></serverCallback>
+			</processing>
+		</action>
+	</actions>
+</driver>

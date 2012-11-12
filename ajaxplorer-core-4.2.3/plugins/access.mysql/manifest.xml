@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="mysql" label="CONF_MESSAGE[Mysql Database]" description="CONF_MESSAGE[This driver can browse and update tables and records in a MySQL database, kind of phpMyAdmin.]" mixins="slug_provider,template_provider"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
+		<resources>
+			<js file="plugins/access.mysql/resources/js/class.SQLEditor.js" className="SQLEditor"/>
+			<js file="plugins/access.mysql/resources/js/class.SQLSearchEngine.js" className="SQLSearchEngine"/>
+			<css file="plugins/access.mysql/resources/css/sqlEditor.css"/>
+			<img_library alias="sql_images" path="plugins/access.mysql/resources/images"/>
+			<i18n namespace="sql" path="plugins/access.mysql/resources/i18n" />
+		</resources>
+	</client_settings>
+	<server_settings>
+		<param name="DB_HOST" type="string" label="CONF_MESSAGE[Host]" description="CONF_MESSAGE[Host to the MySQL Server]" mandatory="true"/>
+		<param name="DB_NAME" type="string" label="CONF_MESSAGE[Database]" description="CONF_MESSAGE[Database name]" mandatory="true"/>
+		<param name="DB_USER" type="string" label="CONF_MESSAGE[User]" description="CONF_MESSAGE[User name (must have privileges to access this db)]" mandatory="true"/>
+		<param name="DB_PASS" type="string" label="CONF_MESSAGE[Password]" description="CONF_MESSAGE[User password]" mandatory="false"/>
+		<param name="DB_PTRN" type="string" label="CONF_MESSAGE[Pattern]" description="CONF_MESSAGE[If not empty, only tables beginning with such a prefix will be displayed.]" mandatory="false"/>
+        <param group="CONF_MESSAGE[Repository Commons]" name="DEFAULT_RIGHTS" type="select" choices="r|Read Only,rw|Read and Write,w|Write Only (upload)" label="CONF_MESSAGE[Default Rights]" description="MIXIN_MESSAGE[This right pattern (empty, r, or rw) will be applied at user creation for this repository.]" default=""/>
+	</server_settings>
+	<registry_contributions>
+		<external_file filename="plugins/access.mysql/mysqlActions.xml" include="actions/*"/>
+		<client_configs>
+			<template_part ajxpId="search_container" ajxpClass="SQLSearchEngine" ajxpOptions="{}"/>
+			<component_config className="InfoPanel">
+				<infoPanel mime="no_selection" attributes="">
+					<messages>
+						<message key="folders_string" id="279"/>
+						<message key="files_string" id="280"/>
+						<message key="totalsize_string" id="259"/>
+					</messages>
+					<html><![CDATA[
+						<div style="padding:10px;">
+							<big style="font-weight: bold; font-size: 14px; color:#79f;display: block; text-align:center; padding-bottom:20px;">#{current_folder}</big>
+							<div id="filelist_folders_count"><b>#{folders_string}</b> : #{filelist_folders_count}</div>
+							<div id="filelist_files_count"><b>#{files_string}</b> : #{filelist_files_count}</div>
+							<div id="filelist_totalsize"><b>#{totalsize_string}</b> #{filelist_totalsize}</div>
+						</div>
+					]]></html>
+				</infoPanel>
+				<infoPanel mime="table" attributes="count,text">
+					<messages>
+						<message key="files_string" id="280"/>
+					</messages>
+					<html><![CDATA[
+						<div style="padding:10px;">
+							<big style="font-weight: bold; font-size: 14px; color:#79f;display: block; text-align:center; padding-bottom:20px;">#{text}</big>
+							<div><b>#{files_string}</b> : #{count}</div>
+						</div>
+					]]></html>
+				</infoPanel>
+			</component_config>
+		</client_configs>
+	</registry_contributions>
+	<class_definition filename="plugins/access.mysql/class.mysqlAccessDriver.php" classname="mysqlAccessDriver"/>	
+</ajxpdriver>

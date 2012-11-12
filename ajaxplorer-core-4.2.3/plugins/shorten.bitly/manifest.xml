@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin id="shorten.bitly" enabled="false" label="CONF_MESSAGE[Bit.ly URL Shortener]" description="CONF_MESSAGE[Shorten Download Links before sending them back to the user. Requires a Bit.ly account.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings>
+        <resources>
+            <i18n namespace="bitly_shortener" path="plugins/shorten.bitly/i18n" />
+        </resources>
+    </client_settings>
+    <server_settings>
+        <global_param name="BITLY_USER" type="string" label="CONF_MESSAGE[User Name]" description="CONF_MESSAGE[Bit.ly account user name]" mandatory="true"/>
+        <global_param name="BITLY_APIKEY" type="string" label="CONF_MESSAGE[API Key]" description="CONF_MESSAGE[Bit.ly account API Key]" mandatory="true"/>
+    </server_settings>
+	<registry_contributions>
+        <actions>
+        <!-- Override a simple action -->
+            <action name="share">
+                <post_processing>
+                    <serverCallback methodName="postProcess" capture="true" applyCondition="$apply=!isSet($httpVars['sub_action']);"/>
+                </post_processing>
+            </action>
+        </actions>
+	</registry_contributions>
+	<class_definition filename="plugins/shorten.bitly/class.BitlyShortener.php" classname="BitlyShortener"/>
+    <dependencies>
+        <activePlugin pluginName="action.share"/>
+    </dependencies>
+</ajxp_plugin>

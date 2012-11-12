@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="fs" label="CONF_MESSAGE[File System (Standard)]" description="CONF_MESSAGE[The most standard access to a filesystem located on the server.]" mixins="filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings icon="plugins/access.fs/icon.png">
+        <resources>
+            <i18n namespace="access_fs" path="plugins/access.fs/i18n"/>
+        </resources>
+    </client_settings>
+	<server_settings>
+		<param name="PATH" type="string" label="CONF_MESSAGE[Path]" description="CONF_MESSAGE[Real path to the root folder on the server]" mandatory="true"/>
+		<param name="CREATE" type="boolean" label="CONF_MESSAGE[Create]" description="CONF_MESSAGE[Create folder if it does not exists]" default="true" mandatory="true"/>
+        <param name="CHMOD_VALUE" type="string" label="CONF_MESSAGE[File Creation Mask]" description="CONF_MESSAGE[Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc.]" default="0666"/>
+        <param name="PURGE_AFTER" type="integer" label="CONF_MESSAGE[Purge Days]" description="CONF_MESSAGE[Option to purge documents after a given number of days. This require a manual set up of a CRON task. Leave to 0 if you don't wan't to use this feature.]" default="0"/>
+        <param name="DATA_TEMPLATE" type="string" label="CONF_MESSAGE[Data template]" description="CONF_MESSAGE[Path to a directory on the filesystem whose content will be copied to the repository the first time it is loaded.]" default=""/>
+        <global_param name="PROBE_REAL_SIZE" type="boolean" label="CONF_MESSAGE[Real Size Probing]" description="CONF_MESSAGE[Use system command line to get the filesize instead of php built-in function (fixes the 2Go limitation)]" default="false"/>
+        <global_param name="USE_XSENDFILE" type="boolean" label="CONF_MESSAGE[X-SendFile Active]" description="CONF_MESSAGE[Delegates all download operations to the webserver using the X-SendFile header. Warning, this is an external module to install for Apache. Module is active by default in Lighttpd. Warning, you have to manually add the folders where files will be downloaded in the module configuration (XSendFilePath directive)]" default="false"/>
+        <global_param group="MIXIN_MESSAGE[Metadata and indexation]" name="DEFAULT_METASOURCES" type="string" label="MIXIN_MESSAGE[Default Metasources]" description="MIXIN_MESSAGE[Comma separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver]" mandatory="false" default="metastore.serial,meta.filehasher,index.lucene"/>
+	</server_settings>
+	<class_definition filename="plugins/access.fs/class.fsAccessDriver.php" classname="fsAccessDriver"/>
+	<registry_contributions>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
+		<client_configs>
+			<component_config className="FilesList">
+				<columns switchGridMode="filelist">
+					<column messageId="1" attributeName="ajxp_label" sortType="StringDirFile" defaultWidth="48%"/>
+					<column messageId="2" attributeName="filesize" sortType="CellSorterValue" modifier="FilesList.prototype.partSizeCellRenderer" defaultWidth="9%"/>
+					<column messageId="3" attributeName="mimestring" sortType="String" defaultWidth="10%"/>
+					<column messageId="4" attributeName="ajxp_modiftime" sortType="MyDate" defaultWidth="14%"/>
+				</columns>
+			</component_config>
+			<component_config className="FoldersTree">
+				<property name="display" value="dz"/>
+			</component_config>			
+		</client_configs>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
+        <hooks>
+            <serverCallback hookName="node.info" methodName="loadNodeInfo"/>
+        </hooks>
+	</registry_contributions>
+    <class_stream_wrapper filename="plugins/access.fs/class.fsAccessWrapper.php" classname="fsAccessWrapper" protocol="ajxp.fs"/>
+</ajxpdriver>

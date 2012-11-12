@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<registry_contributions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<actions>
+		<action name="login">
+			<gui text="163" title="168" src="encrypted.png"
+				accessKey="" hasAccessKey="false">
+				<context selection="false" dir="" recycle="false"
+					actionBar="true" contextMenu="false" infoPanel="false"
+					actionBarGroup="user">
+				</context>
+			</gui>
+			<rightsContext noUser="false" userLogged="hidden" guestLogged="show" read="false" write="false" adminOnly=""></rightsContext>			
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var loginRedirect = AJXP_LOGIN_REDIRECT;
+					if(loginRedirect){
+						document.location.href=loginRedirect;
+					}else{
+						modal.showDialogForm('Log In', ($('login_form')?'login_form':'login_form_dynamic'), 
+						function(oForm){
+						    if(ajxpBootstrap.parameters.get("customWording")){
+                                var ttSt = $("generic_dialog_box").down("span.titleString");
+                                ttSt.innerHTML = ttSt.innerHTML.replace("AjaXplorer", ajxpBootstrap.parameters.get("customWording").title );
+						    }
+							ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
+							if(Prototype.Browser.IE && !Modernizr.borderradius && !oForm.down('input[type="text"]').key_enter_attached){
+								oForm.select('input').invoke("observe", "keydown", function(event){
+									if(event.keyCode == Event.KEY_RETURN){
+										var el = Event.findElement(event);
+										if(el.hasClassName('dialogButton')){
+											el.click();
+										}else{
+											el.form.down('input.dialogButton').click();
+										}
+									}
+								});
+								oForm.down('input[type="text"]').key_enter_attached = true;
+							}
+						}, 
+						function(){
+							var oForm = modal.getForm();
+							var connexion = new Connexion();
+							connexion.addParameter('get_action', 'login');
+							connexion.addParameter('userid', oForm.userid.value);
+							connexion.addParameter('login_seed', oForm.login_seed.value);
+							connexion.addParameter('remember_me', (oForm.remember_me.checked?"true":"false"));
+							if(oForm.login_seed.value != '-1'){
+								connexion.addParameter('password', hex_md5(hex_md5(oForm.password.value)+oForm.login_seed.value));
+							}else{
+								connexion.addParameter('password', oForm.password.value);
+							}
+							if(oForm.captcha_code){
+								connexion.addParameter('captcha_code', oForm.captcha_code.value);
+							}
+							connexion.onComplete = function(transport){
+								ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+								if(transport.responseXML && XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
+									ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
+								}
+							};
+							connexion.setMethod('put');
+							connexion.sendAsync();
+							oForm.userid.value = '';
+							oForm.password.value = '';
+							return false;				
+						});
+					}
+					]]></clientCallback>
+					<clientForm id="login_form_dynamic"><![CDATA[						
+						<div id="login_form_dynamic" action="login" box_width="230">
+						<input type="hidden" name="get_action" value="login">
+						<input type="hidden" name="login_seed" id="login_seed" value="">
+						<a style="float:right;" href="javascript:ajaxplorer.actionBar.fireAction('switch_language');" title="AJXP_MESSAGE[190]" alt="AJXP_MESSAGE[190]"/><img src="AJXP_THEME_FOLDER/images/actions/16/flag.png" border="0" height="16" width="16"></a>
+						<div class="dialogLegend" style="margin-bottom: 3px;margin-top:4px;" ajxp_message_id="180">AJXP_MESSAGE[180]</div>
+						<div style="width:100%;">
+							<div class="SF_element">
+								<div class="SF_label"><ajxp:message ajxp_message_id="181">AJXP_MESSAGE[181]</ajxp:message></div>
+								<div class="SF_input"><input type="text" name="userid" style="width: 100px; padding:0px;" class="dialogFocus"></div>
+							</div>
+							<div class="SF_element">
+								<div class="SF_label"><ajxp:message ajxp_message_id="182">AJXP_MESSAGE[182]</ajxp:message></div>
+								<div class="SF_input"><input type="password" name="password"  style="width: 100px; padding:0px;"></div>
+							</div>
+							<div class="SF_element">
+								<input type="checkbox" class="radio" name="remember_me" style="border: none; width:20px !important;"/><ajxp:message ajxp_message_id="261">AJXP_MESSAGE[261]</ajxp:message>
+							</div>
+						</div>
+						</div>					
+					]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>		
+		<action name="pass_change">
+			<gui text="194" title="194" src="yast_security.png" accessKey="" hasAccessKey="false">
+				<context selection="false" dir="" recycle="true" ajxpWidgets="UserWidget::logging_string"></context>
+			</gui>
+			<processing>				
+				<clientCallback prepareModal="true" dialogOpenForm="pass_change_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
+					<dialogOnOpen><![CDATA[
+						$('user_change_ownpass_old').value = $('user_change_ownpass1').value = $('user_change_ownpass2').value = '';
+						// Update pass_seed
+						var connexion = new Connexion();
+						connexion.addParameter("get_action", "get_seed");
+						connexion.onComplete = function(transport){
+							$('pass_seed').value = transport.responseText;
+						};
+						connexion.sendSync();			
+						new Protopass($('user_change_ownpass1'), {
+							barContainer:$('pwd_strength_container'),
+							barPosition:'bottom'
+						});
+					]]></dialogOnOpen>
+					<dialogOnComplete hideDialog="false"><![CDATA[
+						var userOldPass = null;
+						var userPass = null;
+						var passSeed = null;
+						if($('user_change_ownpass1') && $('user_change_ownpass1').value && $('user_change_ownpass2').value)
+						{
+							if($('user_change_ownpass1').value.length < window.ajxpBootstrap.parameters.get("password_min_length")){
+								alert(MessageHash[378]);
+								return false;
+							}
+							if($('user_change_ownpass1').value != $('user_change_ownpass2').value){
+								alert(MessageHash[238]);
+								return false;
+							}
+							if($('user_change_ownpass_old').value == ''){
+								alert(MessageHash[239]);
+								return false;					
+							}
+							passSeed = $('pass_seed').value;
+							if(passSeed == '-1'){
+								userPass = $('user_change_ownpass1').value;
+								userOldPass = $('user_change_ownpass_old').value;
+							}else{
+								userPass = hex_md5($('user_change_ownpass1').value);
+								userOldPass = hex_md5( hex_md5($('user_change_ownpass_old').value)+$('pass_seed').value);
+							}				
+							var onComplete = function(transport){								
+								if(userPass != null){
+									if(transport.responseText == 'PASS_ERROR'){
+										alert(MessageHash[240]);
+									}else if(transport.responseText == 'SUCCESS'){
+										ajaxplorer.displayMessage('SUCCESS', MessageHash[197]);
+										hideLightBox(true);
+									}
+								}else{
+									ajaxplorer.displayMessage('SUCCESS', MessageHash[241]);
+									hideLightBox(true);
+								}
+							};
+							var conn = new Connexion();
+							conn.addParameter("get_action", "pass_change");
+							conn.addParameter("old_pass", userOldPass);
+							conn.addParameter("new_pass", userPass);
+							conn.addParameter("pass_seed", passSeed);
+							conn.onComplete = onComplete;
+							conn.sendAsync();
+						}
+					]]></dialogOnComplete>
+					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
+				</clientCallback>
+				<clientForm id="pass_change_form"><![CDATA[
+					<div id="pass_change_form" action="pass_change_form" box_width="210">					
+						<input type="hidden" name="pass_seed" id="pass_seed" value="">
+						<div class="SF_element">
+							<div class="SF_label" ajxp_message_id="237">AJXP_MESSAGE[237] : </div><input id="user_change_ownpass_old" type="password" class="dialogFocus SF_input"/>
+						</div>
+						<div class="SF_element">
+							<div class="SF_label" ajxp_message_id="198">AJXP_MESSAGE[198] : </div><input id="user_change_ownpass1" value="" type="password" class="SF_input"/>
+						</div>
+						<div class="SF_element">						
+							<div class="SF_label" ajxp_message_id="199">AJXP_MESSAGE[199] : </div><input id="user_change_ownpass2" value="" type="password" class="SF_input"/>
+						</div>
+						<div class="SF_element" id="pwd_strength_container"></div>						
+					</div>
+				]]></clientForm>				
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>				
+		</action>		
+		<action name="logout" expireDefault="true">
+			<gui text="164" title="169" src="decrypted.png"
+				accessKey="" hasAccessKey="false">
+				<context selection="false" dir="" recycle="false"
+					contextMenu="false" actionBarGroup="user" ajxpWidgets="UserWidget::logging_string">
+				</context>
+			</gui>
+			<rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""></rightsContext>			
+			<processing>
+				<clientCallback prepareModal="false"><![CDATA[
+					clearRememberData();
+					var connexion = new Connexion();
+					connexion.addParameter('get_action', 'logout');
+					connexion.onComplete = function(transport){
+						ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+						};
+					connexion.sendAsync();
+					]]></clientCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+        <action name="get_seed">
+            <processing>
+                <serverCallback methodName="switchAction"/>
+            </processing>
+        </action>
+        <action name="get_secure_token">
+            <processing>
+                <serverCallback methodName="switchAction"/>
+            </processing>
+        </action>
+        <action name="get_captcha">
+            <processing>
+                <serverCallback methodName="switchAction"/>
+            </processing>
+        </action>
+        <action name="back">
+            <processing>
+                <serverCallback methodName="switchAction"/>
+            </processing>
+        </action>
+	</actions>
+</registry_contributions>

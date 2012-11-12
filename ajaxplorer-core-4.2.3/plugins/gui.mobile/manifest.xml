@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<guidriver name="ajxp_mobile" label="CONF_MESSAGE[Mobile]" description="CONF_MESSAGE[Template extending gui.ajax for small screen terminals.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition filename="plugins/gui.mobile/class.MobileGuiPlugin.php" classname="MobileGuiPlugin"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="mobile_gui" path="plugins/gui.mobile/i18n"/>
+        </resources>
+    </client_settings>
+	<registry_contributions>
+		<client_configs uuidAttr="name">
+			<template name="mobile_extensions" element="head" position="bottom"><![CDATA[
+				<link type="text/css" rel="stylesheet" href="plugins/gui.mobile/ajxp-mobile.css" media="screen">
+				<script type="text/javascript">
+					window.ajxpMobile = true;
+					var conn = new Connexion();
+					conn._libUrl = '';
+					conn.loadLibrary('plugins/gui.mobile/ajxp-mobile.js');
+				</script>
+			]]></template>
+			<template name="main_oxygen" element="ajxp_desktop" position="top" theme="oxygen"><![CDATA[
+				<div id="toolbars">
+					<div id="action_bar">
+						<div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar"></div>
+						<div id="locationbar_cont">
+							<div style="height: 100%;" class="separator"></div>
+							<div style="padding-top : 5px;">
+								<div id="repo_chooser" ajxpClass="RepositorySelect"></div>
+								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions='{"flexTo":"locationbar_cont"}'></div>
+								<div id="logging_string" ajxpClass="UserWidget"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
+						<div id="content_pane" ajxpClass="FilesList" ajxpOptions='"list"' style="border: 1px solid #676965;"></div>
+				</div>
+				<div id="info_container" class="css_boxshadow" ajxpClass="AjxpPane" style="position:absolute;top:4%;left:2%;width:95%;height:91%;display:none;z-index:20001; border-radius: 5px 5px 5px 5px; background-color: #F1F1EF; border: 3px solid #2b70c4;">
+					<div id="info_panel_header" class="panelHeader" style="font-weight:bold;color:#2b70c4;font-size:14px;"><a class="m-2" style="float:right;" href="javascript:$('info_container').hide();">Close</a><span class="info_panel_title_span">Title</span></div>
+					<div id="info_panel" ajxpClass="InfoPanel" ajxpOptions='{"fit":"height"}' class="ajxp_simple_container"></div>
+				</div>
+				<div id="mobile_actions" style="display:none"><a class="m-2" href="#">Info</a> <a class="m-2" href="#">Explore</a></div>
+			]]></template>
+            <template name="main_umbra" element="ajxp_desktop" position="top" theme="umbra"><![CDATA[
+				<div id="toolbars">
+					<div>
+						<div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"skipBubbling":true,"defaultIconSize":16,"defaultStyle":"icon_text","styles":{"icons_only":"Icons Only","icon_text":"Icons and Text","text_only":"Text only"},"stylesImgSizes":{"icons_only":22,"icon_text":16,"text_only":16},"stylesBarSizes":{"icons_only":40,"icon_text":51,"text_only":30}}' class="soft_css_gradient"></div>
+						<div id="locationbar_cont" class="css_gradient">
+							<div style="height: 100%;" class="separator"></div>
+							<div style="padding-top : 5px;">
+								<div id="repo_chooser" ajxpClass="RepositorySelect"></div>
+								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions='{"flexTo":"locationbar_cont","searchButton":"searchbar_splitter","searchIcon":"xmag.png", "searchFocus":"search_txt"}'></div>
+								<div id="logging_string" ajxpClass="UserWidget"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+                <div id="searchbar_splitter" class="browser_splitter umbra" style="overflow:hidden;" ajxpClass="Splitter" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop","direction":"horizontal","initA":0, "minSize":0, "startFolded": true}'>
+                    <div id="search_container" ajxpClass="SearchEngine" ajxpPaneHeader="87" ajxpPaneIcon="xmag.png" data-globalOptions='{"headerClose":{"icon":"panel_vertical_hide.png","splitter":"searchbar_splitter","title":86}}' style="height: 0px; overflow:hidden;"></div>
+                    <div id="content_pane" ajxpClass="FilesList" ajxpOptions='"list"' style="border: 1px solid #bbb;margin:3px;margin-top:1px;"></div>
+                </div>
+				<div id="info_container" class="css_boxshadow umbra" ajxpClass="AjxpPane" style="position:absolute;top:4%;left:2%;width:95%;height:91%;display:none;z-index:20001; border-radius: 5px 5px 5px 5px; background-color: #F1F1EF; border: 3px solid #2b70c4;">
+					<div id="info_panel_header" class="panelHeader" style="font-weight:bold;color:#2b70c4;font-size:14px;"><a class="m-2" style="float:right;" href="javascript:$('info_container').hide();">Close</a><span class="info_panel_title_span">Title</span></div>
+					<div id="info_panel" ajxpClass="InfoPanel" ajxpOptions='{"fit":"height"}' class="ajxp_simple_container"></div>
+				</div>
+				<div id="mobile_actions" style="display:none"><a class="m-2" href="#">Info</a> <a class="m-2" href="#">Explore</a></div>
+			]]></template>
+			<component_config className="FilesList">
+				<property name="fixedThumbSize" value="40"/>
+				<columns switchGridMode="filelist">
+					<column messageId="1" attributeName="ajxp_label" fixedWidth="60%"/>
+					<column messageId="2" attributeName="filesize" fixedWidth="40%"/>
+				</columns>				
+			</component_config>			
+		</client_configs>
+	</registry_contributions>
+    <dependencies>
+        <activePlugin pluginName="gui.ajax"/>
+    </dependencies>
+</guidriver>

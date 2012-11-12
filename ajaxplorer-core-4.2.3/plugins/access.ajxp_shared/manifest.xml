@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="ajxp_shared" label="CONF_MESSAGE[Shared Elements]" description="CONF_MESSAGE[Browse user shared elements.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<client_settings icon="plugins/access.ajxp_shared/share.png">
+		<resources>
+			<i18n namespace="ajxp_shared" path="plugins/access.ajxp_shared/i18n" />		
+		</resources>
+	</client_settings>
+	<registry_contributions>
+		<client_configs>
+            <template_part theme="umbra" ajxpId="sidebar_splitter" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fake":"option"}'><![CDATA[
+                <div id="folderPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ajxpPaneHeader="363" ajxpPaneIcon="view_tree.png" style="margin:20px;"></div>
+                <style>#sidebar_splitter{padding-bottom:20px;background-color:#A0C0A4;}</style>
+            ]]></template_part>
+		</client_configs>	
+		<actions>
+			<action name="ls" dirDefault="true">			
+				<gui text="32" title="32" src="fileopen.png"
+					accessKey="folder_access_key">
+					<context selection="true" dir="" recycle="false"
+						actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="false">
+					</context>
+					<selectionContext dir="true" file="false" recycle="false"
+						unique="true" allowedMimes="*">
+					</selectionContext>
+				</gui>
+				<rightsContext noUser="true" userLogged="only" read="true"
+					write="false" adminOnly="false">
+				</rightsContext>
+				<processing>
+					<clientCallback prepareModal="true"><![CDATA[
+						var path;					
+						if(window.actionArguments && window.actionArguments.length>0){
+							path = window.actionArguments[0];
+							if(Object.isString(path)){path = new AjxpNode(path,false,getBaseName(path));}
+						}else{
+							userSelection = ajaxplorer.getUserSelection();
+							if(userSelection && userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime(["zip"]))){
+								path = userSelection.getUniqueNode();
+							}
+						}
+						if(path){
+							ajaxplorer.updateContextData(path);
+						}						
+						]]></clientCallback>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+			<action name="stat">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>			
+			
+			<action name="copyUrl">			
+				<gui text="ajxp_shared.18" title="ajxp_shared.19" src="editcopy.png" accessKey="" hasAccessKey="false">
+					<context selection="true" dir="" recycle="false"
+						actionBar="true" contextMenu="true" infoPanel="true"
+						actionBarGroup="change" inZip="false">
+					</context>
+					<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="shared_file"></selectionContext></gui>
+				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+				<processing>
+					<clientCallback prepareModal="true"><![CDATA[
+						var onLoad = function(oForm){
+							var userSelection =  ajaxplorer.getUserSelection();
+							var firstNode = userSelection.getUniqueNode();						
+			   		    	var copyDiv = $(oForm).down('input[id="text_copy"]');
+			   		    	copyDiv.setValue(firstNode.getMetadata().get('download_url'));
+			   		    	copyDiv.select();
+						};
+						modal.showDialogForm('Delete', 'copy_as_text', onLoad, function(){
+							hideLightBox(true);
+							return false;
+						},null,true);
+						]]></clientCallback>
+					<clientForm id="copy_as_text"><![CDATA[
+					<div id="copy_as_text" action="copy" box_width="280">
+						<input id="text_copy" style="width:260px;" class="dialogFocus"/>
+					</div>
+					]]></clientForm>
+					<serverCallback methodName="switchAction"></serverCallback>
+					</processing>
+			</action>
+			<action name="reset_download_counter">
+				<gui text="ajxp_shared.32" title="ajxp_shared.33" src="eraser.png" accessKey="" hasAccessKey="false">
+					<context selection="true" dir="" recycle="false"
+						actionBar="true" contextMenu="true" infoPanel="true"
+						actionBarGroup="change" inZip="false">
+					</context>
+					<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="shared_file"></selectionContext></gui>
+				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+				<processing>
+					<clientCallback prepareModal="true"><![CDATA[
+						var baseUrl = ajxpServerAccessPath + "&get_action=reset_download_counter";
+						baseUrl = ajaxplorer.getUserSelection().updateFormOrUrl(null, baseUrl);
+						var conn = new Connexion(baseUrl);
+						conn.addParameter("get_action", "reset_download_counter");
+						conn.onComplete = function(transport){
+							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+						};
+						conn.sendAsync();						
+						]]></clientCallback>
+					<serverCallback methodName="switchAction"></serverCallback>
+					</processing>
+			</action>
+			<action name="clear_expired">
+				<gui text="ajxp_shared.25" title="ajxp_shared.26" src="edit_clear_history.png" accessKey="" hasAccessKey="false">
+					<context selection="true" dir="true" recycle="false"  behaviour="hidden"
+						actionBar="true" contextMenu="true" infoPanel="false"
+						actionBarGroup="change" inZip="false">
+					</context>
+					<selectionContext dir="false" file="true" recycle="false" behaviour="hidden" unique="true" allowedMimes="shared_file"></selectionContext></gui>
+				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+				<processing>
+					<clientCallback prepareModal="true"><![CDATA[
+						var conn = new Connexion();
+						conn.addParameter("get_action", "clear_expired");
+						conn.onComplete = function(transport){
+							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+						};
+						conn.sendAsync();
+					]]></clientCallback>
+					<serverCallback methodName="switchAction"></serverCallback>
+					</processing>
+			</action>
+			
+			<action name="delete">			
+				<gui text="7" title="161" src="editdelete.png" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
+					<context selection="true" dir="" recycle="false"
+						actionBar="true" contextMenu="true" infoPanel="true"
+						actionBarGroup="change" inZip="false">
+					</context>
+					<selectionContext dir="false" file="true" recycle="false" unique="false"></selectionContext>
+				</gui>
+				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+				<processing>
+					<clientCallback prepareModal="true"><![CDATA[
+						var onLoad = function(oForm){
+			   		    	$(oForm).down('span[id="delete_message"]').update(MessageHash['ajxp_shared.11']);
+			   		    	$(oForm).down('input[name="ajxp_mime"]').value = ajaxplorer.getUserSelection().getUniqueNode().getAjxpMime();
+						};
+						modal.showDialogForm('Delete', 'delete_shared_form', onLoad, function(){
+							var oForm = modal.getForm();
+							ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+							ajaxplorer.actionBar.submitForm(oForm);
+							hideLightBox(true);
+							return false;
+						});
+						]]></clientCallback>
+					<clientForm id="delete_shared_form"><![CDATA[
+					<div id="delete_shared_form" action="delete" box_width="200">
+					<span id="delete_message"></span>
+					<input type="hidden" name="ajxp_mime" value="">
+					</div>				]]></clientForm>
+					<serverCallback methodName="switchAction"></serverCallback>
+					</processing>
+			</action>				
+		</actions>
+	</registry_contributions>	
+	<class_definition filename="plugins/access.ajxp_shared/class.ajxpSharedAccessDriver.php" classname="ajxpSharedAccessDriver"/>
+</ajxpdriver>

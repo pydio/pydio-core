@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta id="meta.svn" label="CONF_MESSAGE[Subversion Repository]" description="CONF_MESSAGE[Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<class_definition filename="plugins/meta.svn/class.SvnManager.php" classname="SvnManager"/>
+	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
+		<resources>
+			<i18n namespace="meta.svn" path="plugins/meta.svn/i18n" />
+			<js file="plugins/meta.svn/class.SVNLogger.js" className="SVNLogger" autoload="true"/>
+			<img_library alias="svn_images" path="plugins/meta.svn/images"/>			
+		</resources>
+	</client_settings>		
+	<registry_contributions>
+		<hooks>
+			<serverCallback hookName="version.commit_file" methodName="commitFile"></serverCallback>
+		</hooks>
+		<client_configs>
+			<component_config className="FilesList">
+				<columns>
+					<additional_column messageId="243" attributeName="last_revision" sortType="String"/>
+				</columns>
+			</component_config>
+			<component_config className="InfoPanel">			
+				<infoPanelExtension mime="generic_file,generic_dir" attributes="last_revision,last_revision_author,last_revision_date">
+					<messages>
+						<message key="type_string" id="134"/>				
+						<message key="dim_string" id="135"/>
+						<message key="header_string" id="343"/>
+					</messages>
+					<html><![CDATA[
+						<div style="">
+							<div class="panelHeader infoPanelGroup" colspan="2">Versioning</div>
+							<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
+								<tr>
+									<td class="infoPanelLabel">Last Revision</td>
+									<td class="infoPanelValue">#{last_revision}</td>
+								</tr>
+								<tr class="even">
+									<td class="infoPanelLabel">Revision Date</td>
+									<td class="infoPanelValue">#{last_revision_date}</td>
+								</tr>
+								<tr>
+									<td class="infoPanelLabel">Revision Author</td>
+									<td class="infoPanelValue">#{last_revision_author}</td>
+								</tr>
+							</table>
+						</div>
+					]]></html>
+				</infoPanelExtension>
+			</component_config>
+		</client_configs>					
+		<actions>
+			<action name="svnlog">
+				<gui text="meta.svn.2" title="meta.svn.21" src="svn_images/actions/ICON_SIZE/system_file_manager.png" hasAccessKey="false">
+					<context selection="true" dir="false" recycle="false" behaviour="hidden"
+						actionBar="true" contextMenu="true" infoPanel="false"
+						actionBarGroup="put">
+					</context>
+					<selectionContext dir="true" file="true" recycle="true" unique="true" behaviour="hidden"></selectionContext></gui>
+				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+				<processing>
+					<clientCallback prepareModal="true"><![CDATA[
+							var loadFunc = function(oForm){
+								ajaxplorer.actionBar.svnLogger = new SVNLogger($(oForm));
+								ajaxplorer.actionBar.svnLogger.open();
+							};
+							var closeFunc = function(){
+								ajaxplorer.actionBar.svnLogger.close();
+								hideLightBox();
+								return false;
+							};
+							modal.showDialogForm('SVN', 'svnlog_box', loadFunc, closeFunc, null, true, true);
+						]]></clientCallback>
+					<clientForm id="svnlog_box"><![CDATA[
+					<div id="svnlog_box" action="svnlog" box_width="80%" box_height="340"></div>
+					]]></clientForm>
+					<serverCallback methodName="switchAction"></serverCallback>
+					</processing>
+			</action>			
+			<action name="svnlog2">
+				<gui text="meta.svn.1" title="meta.svn.11" src="svn_images/actions/ICON_SIZE/system_file_manager.png" hasAccessKey="false">
+					<context selection="false" dir="true" recycle="true" actionBar="false" contextMenu="true" infoPanel="false" actionBarGroup="change"></context>
+				</gui>
+				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+				<processing>
+					<clientCallback prepareModal="true"><![CDATA[
+						var loadFunc = function(oForm){
+							ajaxplorer.actionBar.svnLogger = new SVNLogger($(oForm));
+							ajaxplorer.actionBar.svnLogger.open(true);
+						};
+						var closeFunc = function(){
+							ajaxplorer.actionBar.svnLogger.close();
+							hideLightBox();
+							return false;
+						};
+						modal.showDialogForm('SVN', 'svnlog_box', loadFunc, closeFunc, null, true, true);
+					]]></clientCallback>
+					</processing>
+			</action>			
+			<action name="svndownload">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>		
+			<action name="revert_file">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+			<action name="svnswitch">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>		
+			<!-- Totally override delete action (svn performs the real deletion) -->
+			<action name="delete">
+				<processing>
+					<serverCallback methodName="deleteSelection"></serverCallback>
+				</processing>			
+			</action>
+			<action name="restore">
+				<processing>
+					<serverCallback methodName="deleteSelection"></serverCallback>
+				</processing>			
+			</action>
+			<action name="copy">
+				<processing>
+					<serverCallback methodName="copyOrMoveSelection"></serverCallback>
+				</processing>			
+			</action>
+			<action name="move">
+				<processing>
+					<serverCallback methodName="copyOrMoveSelection"></serverCallback>
+				</processing>			
+			</action>
+			<action name="rename">
+				<processing>
+					<serverCallback methodName="copyOrMoveSelection"></serverCallback>
+				</processing>			
+			</action>
+			<!-- Trigger commit after changes -->
+			<action name="put_content">
+				<post_processing>
+					<serverCallback methodName="commitChanges"></serverCallback>
+				</post_processing>			
+			</action>
+			<!-- Trigger add -->
+			<action name="mkdir">
+				<post_processing>
+					<serverCallback methodName="addSelection"></serverCallback>
+				</post_processing>			
+			</action>
+			<action name="mkfile">
+				<post_processing>
+					<serverCallback methodName="addSelection"></serverCallback>
+				</post_processing>			
+			</action>
+			<action name="upload">
+				<post_processing>
+					<serverCallback methodName="addSelection"></serverCallback>
+				</post_processing>			
+			</action>
+		</actions>
+		<hooks>
+			<serverCallback hookName="node.info" methodName="extractMeta"></serverCallback>
+		</hooks>		
+	</registry_contributions>
+	<dependencies>
+		<!-- Wrapper type plugins only -->
+		<pluginClass pluginName="access.fs|access.demo|access.remote_fs"/>
+	</dependencies>				
+</meta>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<authdriver name="sql" label="CONF_MESSAGE[DB Storage]" description="CONF_MESSAGE[Stores the Authentication data in an SQL database.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings>
+        <resources>
+            <i18n namespace="sql_auth" path="plugins/auth.sql/i18n"/>
+        </resources>
+    </client_settings>
+	<server_settings>
+		<param name="SQL_DRIVER" type="array" label="CONF_MESSAGE[Connexion]" description="CONF_MESSAGE[The Database Connexion]" mandatory="true"/>
+	</server_settings>
+	<class_definition filename="plugins/auth.sql/class.sqlAuthDriver.php" classname="sqlAuthDriver"/>
+	<registry_contributions>
+		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude=""/>
+	</registry_contributions>
+</authdriver>

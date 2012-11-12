@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_mixins>
+	<credentials_consumer>
+		<server_settings uuidAttr="name">
+			<param group="MIXIN_MESSAGE[User Credentials]" name="USER" type="string" label="MIXIN_MESSAGE[User]" description="MIXIN_MESSAGE[User name - Can be overriden on a per-user basis (see users 'Personal Data' tab)]" mandatory="false"/>
+			<param group="MIXIN_MESSAGE[User Credentials]" name="PASS" type="password" label="MIXIN_MESSAGE[Password]" description="MIXIN_MESSAGE[User password - Can be overriden on a per-user basis.]" mandatory="false"/>
+			<param group="MIXIN_MESSAGE[User Credentials]" name="USE_SESSION_CREDENTIALS" type="boolean" label="MIXIN_MESSAGE[Session credentials]" description="MIXIN_MESSAGE[Try to use the current AjaXplorer user credentials for connecting. Warning, the AJXP_SESSION_SET_CREDENTIALS config must be set to true!]" mandatory="false" default="false"/>
+			<user_param name="USER" type="string" label="MIXIN_MESSAGE[User]" description="MIXIN_MESSAGE[User name]" mandatory="false"/>
+			<user_param name="PASS" type="password" label="MIXIN_MESSAGE[Password]" description="MIXIN_MESSAGE[User password]" mandatory="false"/>
+		</server_settings>
+	</credentials_consumer>
+	<slug_provider>
+		<server_settings uuidAttr="name">
+			<param group="MIXIN_MESSAGE[Repository Slug]" name="AJXP_SLUG" type="string" label="MIXIN_MESSAGE[Alias]" description="MIXIN_MESSAGE[Alias for replacing the generated unique id of the repository]" mandatory="false" no_templates="true"/>
+		</server_settings>
+	</slug_provider>
+	<template_provider>
+		<server_settings uuidAttr="name">
+			<param group="MIXIN_MESSAGE[Template Options]" name="TPL_USER_CAN_CREATE" type="boolean" label="MIXIN_MESSAGE[Allow to user]" description="MIXIN_MESSAGE[Allow non-admin users to create a repository from this template.]" mandatory="true" default="false" templates_only="true"/>
+			<param group="MIXIN_MESSAGE[Template Options]" name="TPL_DEFAULT_LABEL" type="string" label="MIXIN_MESSAGE[Default Label]" description="MIXIN_MESSAGE[Prefilled label for the new repository, you can use the AJXP_USER keyworkd in it.]" mandatory="true" templates_only="true"/>
+            <param group="MIXIN_MESSAGE[Template Options]" name="TPL_ICON_SMALL" type="string" label="MIXIN_MESSAGE[Small Icon]" description="MIXIN_MESSAGE[16X16 Icon for representing the template]" mandatory="false" templates_only="true"/>
+            <param group="MIXIN_MESSAGE[Template Options]" name="TPL_ICON_BIG" type="string" label="MIXIN_MESSAGE[Big Icon]" description="MIXIN_MESSAGE[Big Icon for representing the template]" mandatory="false" templates_only="true"/>
+		</server_settings>
+	</template_provider>
+    <filesystem_commons>
+        <server_settings uuidAttr="name">
+            <param group="MIXIN_MESSAGE[Filesystem Commons]" name="RECYCLE_BIN" type="string" label="MIXIN_MESSAGE[Recycle Bin Folder]" description="MIXIN_MESSAGE[Leave empty if you do not want to use a recycle bin.]" default="recycle_bin"/>
+            <param group="MIXIN_MESSAGE[Filesystem Commons]" name="DEFAULT_RIGHTS" type="select" choices="r|Read Only,rw|Read and Write,w|Write Only (upload)" label="MIXIN_MESSAGE[Default Rights]" description="MIXIN_MESSAGE[This right pattern (empty, r, or rw) will be applied at user creation for this repository.]" default=""/>
+            <param group="MIXIN_MESSAGE[Filesystem Commons]" name="CHARSET" type="string" label="MIXIN_MESSAGE[Character Encoding]" description="MIXIN_MESSAGE[If your server does not set correctly its charset, it can be good to specify it here manually.]" mandatory="false"/>
+            <param group="MIXIN_MESSAGE[Filesystem Commons]" name="PAGINATION_THRESHOLD" type="integer" label="MIXIN_MESSAGE[Pagination Threshold]" description="MIXIN_MESSAGE[When a folder will contain more items than this number, display will switch to pagination mode, for better performances.]" default="500"/>
+            <param group="MIXIN_MESSAGE[Filesystem Commons]" name="PAGINATION_NUMBER" type="integer" label="MIXIN_MESSAGE[#Items per page]" description="MIXIN_MESSAGE[Once in pagination mode, number of items to display per page.]" default="200"/>
+            <global_param group="MIXIN_MESSAGE[Filesystem Commons]" name="SHOW_HIDDEN_FILES" type="boolean" label="MIXIN_MESSAGE[Show hidden files]" description="MIXIN_MESSAGE[Show files beginning with a .]" default="false"/>
+            <global_param group="MIXIN_MESSAGE[Filesystem Commons]" name="HIDE_RECYCLE" type="boolean" label="MIXIN_MESSAGE[Hide recycle bin]" description="MIXIN_MESSAGE[Whether to show the recycle bin folder. Unlike in the following options, the folder will be hidden but still writeable.]" default="false"/>
+            <global_param group="MIXIN_MESSAGE[Filesystem Commons]" name="HIDE_EXTENSIONS" type="string" label="MIXIN_MESSAGE[Hide extensions]" description="MIXIN_MESSAGE[Comma-separated list of extensions to hide. Extensions, files and folders that are hidden are also access forbidden.]" default="ser"/>
+            <global_param group="MIXIN_MESSAGE[Filesystem Commons]" name="HIDE_FOLDERS" type="textarea" label="MIXIN_MESSAGE[Hide folders]" description="MIXIN_MESSAGE[Comma-separated list of specific folders to hide]"/>
+            <global_param group="MIXIN_MESSAGE[Filesystem Commons]" name="HIDE_FILENAMES" type="textarea" label="MIXIN_MESSAGE[Hide files]" description="MIXIN_MESSAGE[Comma-separated list of specific files to hide]"/>
+            <global_param group="MIXIN_MESSAGE[Metadata and indexation]" name="DEFAULT_METASOURCES" type="string" label="MIXIN_MESSAGE[Default Metasources]" description="MIXIN_MESSAGE[Comma separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver]" mandatory="false"/>
+        </server_settings>
+    </filesystem_commons>
+    <authdriver_commons>
+        <server_settings uuidAttr="name">
+            <param group="MIXIN_MESSAGE[Auth Driver Commons]" name="TRANSMIT_CLEAR_PASS" type="boolean" label="MIXIN_MESSAGE[Transmit Clear Pass]" description="MIXIN_MESSAGE[Whether the password will be transmitted clear or encoded between the client and the server]" default="true"/>
+            <param group="MIXIN_MESSAGE[Auth Driver Commons]" name="AUTOCREATE_AJXPUSER" type="boolean" label="MIXIN_MESSAGE[Auto Create User]" description="MIXIN_MESSAGE[When set to true, the user object is created automatically if the authentication succeed. Used by remote authentication systems.]" mandatory="false" default="false"/>
+            <param group="MIXIN_MESSAGE[Auth Driver Commons]" name="LOGIN_REDIRECT" type="string" label="MIXIN_MESSAGE[Login Redirect]" description="MIXIN_MESSAGE[If set to a given URL, the login action will not trigger the display of login screen but redirect to this URL.]" mandatory="false"/>
+            <param group="MIXIN_MESSAGE[Auth Driver Commons]" name="AJXP_ADMIN_LOGIN" type="string" label="MIXIN_MESSAGE[Admin Login]" description="MIXIN_MESSAGE[For exotic auth drivers, an user ID that must be considered as admin by default.]" mandatory="false"/>
+        </server_settings>
+    </authdriver_commons>
+</ajxp_mixins>

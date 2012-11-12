@@ -1,0 +1,102 @@
+.flexbox div.webfx-tree-container.first_container{
+	background-image:url('../images/tree-even-odd-bg.png');
+}
+
+.no-flexbox div#tree_container{
+	background-image:url('../images/tree-odd-even-bg.png');
+	background-attachment:scroll;
+}
+
+
+.webfx-tree-container {
+	margin: 0px;
+	padding: 0px;
+	font-family: Trebuchet MS, sans-serif;
+	white-space: nowrap;
+	font-size: 11px;
+}
+
+.webfx-tree-item
+{
+	padding: 0px;
+	margin: 0px;
+	font-family: Trebuchet MS, sans-serif;
+	font-size: 11px;
+	white-space: nowrap;
+	height: 25px;
+}
+
+.webfx-tree-item:hover{
+	background-color: #eee;
+}
+
+.selected-webfx-tree-item {
+	color : white;
+}
+
+.selected-webfx-tree-item-inactive 
+{
+	text-decoration: none;
+}
+
+.webfx-tree-item a, .webfx-tree-item a:active, .webfx-tree-item a:hover, .webfx-tree-item a:link {
+	margin-left: 0px;
+	outline:0;
+	cursor: default;
+}
+
+.webfx-tree-item a {	
+	text-decoration: none;
+}
+
+.webfx-tree-item a:hover {
+	text-decoration: none;
+}
+
+.webfx-tree-item a {
+	outline:0;
+}
+
+.webfx-tree-item a span{
+	display:inline-block;
+	height: 19px;
+	line-height: 19px;
+	margin-top:4px;
+	
+	padding-left: 24px;
+	background-position: 4px 1px;
+	background-repeat:no-repeat;
+}
+
+*::-moz-focus-inner { 
+	border: none; 
+}
+
+.selected-webfx-tree-item a {
+	color: white !important;
+	text-decoration: none;
+}
+
+
+.webfx-tree-item a.selected-focus{
+      color: white;
+}
+
+.webfx-tree-item img {
+	vertical-align: middle;
+	border: 0px;
+	float:left;
+}
+
+.webfx-tree-icon {
+	width: 16px;
+	height: 16px;
+	margin-right:3px;
+}
+
+.selected
+{
+	background: #ddd;
+	color: white;
+	text-decoration: none;
+}

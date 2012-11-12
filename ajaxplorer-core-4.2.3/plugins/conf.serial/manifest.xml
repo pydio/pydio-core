@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<confdriver name="serial" label="CONF_MESSAGE[Serialized Configuration Storage]" description="CONF_MESSAGE[Stores the conf data as serialized PHP values on the filesystem.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings>
+        <resources>
+            <i18n namespace="serial_conf" path="plugins/conf.serial/i18n"/>
+        </resources>
+    </client_settings>
+	<server_settings>
+		<param name="REPOSITORIES_FILEPATH" type="string" label="CONF_MESSAGE[Repositories]" description="CONF_MESSAGE[The file in which the repositories are stored]" mandatory="true"/>
+		<param name="USERS_DIRPATH" type="string" label="CONF_MESSAGE[Users]" description="CONF_MESSAGE[The folder in which all users files will be stored]" mandatory="true"/>
+		<param name="ROLES_FILEPATH" type="string" label="CONF_MESSAGE[Roles]" description="CONF_MESSAGE[The file in which all roles definitions will be stored]" mandatory="true"/>
+		<param name="FAST_CHECKS" type="boolean" label="CONF_MESSAGE[Fast Checks]" description="CONF_MESSAGE[When using a custom stream wrapper to read the files, this can increase performances by skipping various is_file,is_dir checks]" mandatory="false" default="false"/>
+	</server_settings>
+	<class_definition filename="plugins/conf.serial/class.serialConfDriver.php" classname="serialConfDriver"/>
+	<registry_contributions>
+		<external_file filename="plugins/core.conf/standard_conf_actions.xml" include="actions/*" exclude=""/>
+	</registry_contributions>
+</confdriver>

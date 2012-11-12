@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor id="editor.ckeditor" enabled="false" openable="true" order="-1" text="319" title="320" icon="ckeditor_images/html_edit.png" className="AjxpCkEditor" mimes="html,htm" formId="edit_box" write="true" label="CONF_MESSAGE[CKEditor]" description="CONF_MESSAGE[Wysiwyg HTML Editor, requires separate library to be downloaded.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<dependencies>
+		<pluginResources pluginName="editor.text"/>
+		<!-- Stream Wrapper Access -->
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>		
+	</dependencies>
+    <client_settings>
+        <resources>
+            <js file="plugins/editor.ckeditor/ckeditor/ckeditor.js" className="CKEDITOR"/>
+            <js file="plugins/editor.ckeditor/class.AjxpCkEditor.js" className="AjxpCkEditor"/>
+            <img_library alias="ckeditor_images" path="plugins/editor.ckeditor"/>
+            <i18n namespace="ckeditor" path="plugins/editor.ckeditor/resources/i18n" />
+        </resources>
+    </client_settings>
+	<clientForm id="ck_box"><![CDATA[
+		<script type="text/javascript">window.CKEDITOR_BASEPATH = 'plugins/editor.ckeditor/ckeditor/';</script>
+	]]></clientForm>		
+</editor>

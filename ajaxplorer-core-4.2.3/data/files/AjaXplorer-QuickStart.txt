@@ -1,0 +1,112 @@
+ ------------------------------------------------
+|      AjaXplorer Quick Start                   |
+ ------------------------------------------------
+ 
+ 1 SYSTEM REQUIREMENTS & QUICK INSTALL
+ 
+ To be able to run this system on your webserver, it must have PHP 5.1 or higher
+ running, and you must have an FTP access to upload the files on the server. 
+ Just make sure that the "data" folder is (recursively) writeable by the webserver.
+
+ That's all! For the default configuration, no database is needed. But if you want to
+ store data in a database, it's possible, see the *.sql plugins.
+
+ 2 CONFIGURATION
+
+    The very basic configurations are to be found in the conf/ folder :
+
+    + You should not have to tweak the bootstrap_context.php, unless you want to customize
+      heavily your installation.
+    + The bootstrap_plugins.php file contains the configurations for the Authentification
+      plugin, the Config plugin (how to save ajaxplorer config data) and the Logger.
+    + The bootstrap_repositories.php contains the default repositories definition. The preferred
+      way of creating new repositories is by using the GUI (switch to the "Settings"), but you
+      can also define them manually in this file if it's more handy for you
+
+ 2.1 REPOSITORIES 
+    
+    In AjaXplorer, a repository is a folder that you want to browse/modify with 
+    the application. A repository does not have to be inside the ajaxplorer installation 
+    folder, since you set it with an absolute path on your server.
+    
+    You can set as many repositories as you want : you will be able to switch from one to 
+    another when logged to AjaXplorer, and you can precisely set rights for each users (see 
+    paragraph 2.2) on each repository. 
+    
+    By default, the basic repository is set to the "data/files" folder inside the ajaxplorer
+    installation folder. You can change it to whatever you want, using absolute path 
+    like : /home/login/www/location, or /C:/myfolder/ on windows.
+    
+    Note that a repository does not have to be accessible to the internet, AjaXplorer will 
+    work as a "proxy" between your files and the web.
+    
+ 2.2 USERS MANAGEMENT
+    
+    An evoluted users management system has been developed in AjaXplorer. You are encouraged 
+    to use it to secure your data, but it's up to you, you can disable it totally (for example 
+    if you are already working in a very secure zone, and don't need any users profiles).
+    
+    If you are a beginner, just change the ADMIN_PASSWORD variable before uploading on your 
+    server everything should be fine. If you do not change it, you will be reminded to change 
+    the first time you log in, because otherwise anybody knowing AjaXplorer could login with 
+    the standard initial password "admin"...
+    
+    You can add / modify / delete users by logging in AjaXplorer as "admin" and switching to the
+    "Settings" repository. For each user, you will be able to give read and/or right access separately
+    on each repository. Note that a user that has no rights on any repository cannot log in.
+    
+    For a better integration in existing systems, AjaXplorer can "prelog" a user from external 
+    data or logging system. Users must still be created in AjaXplorer, since their rights on 
+    repositories and preferences are stored by the application. But they will not be able to 
+    change their password, since they are in that case managed by an external application.
+    
+    2.2.1 BASIC USERS CONFIGURATION
+    	
+    	ENABLE_USERS => 1 	Users management is enabled
+    					0 	Users management is totally disabled. No logging required and all 
+    						users share the same preferences.
+    					
+    	ALLOW_GUEST_BROWSING => 1 	In the "Settings" console accessed by admin user, 
+    								a "guest" user is created on which you can set 
+    								rights on repositories like any other user. This 
+    								user will be automatically logged in if no user 
+    								is identified.
+    							0 	When no user is identified, the login screen appears 
+    								and no repository is loaded.
+
+	2.2.2 AUTHENTICATION METHOD
+	
+	In ajaXplorer, Authentication is (like the repositories as access and the configuration ) plugin-based.
+	By default, in the conf/boostrap_plugins.php file you can see that the basic auth.serial plugin
+	is used to manage your users. This means that the users and their rights and personnal data 
+	will be stored on the filesystem, in a specific ajaxplorer format. This plugin is the most
+	performant, but may not be suited for managing a huge amount of users, or when managing users
+	already created in an external system like a CMS. In that case, you should have a look at the auth.ldap
+	or auth.remote plugins, or even auth.mysql, each of these plugin giving you more features for 
+	managing plugin.
+    								
+    				 			
+ 2.3 FURTHER CONFIGURATION   
+ 
+	Switch to the "Settings" repository, and browse the various "Global Configurations" : particularly,
+	you should have a look at the "Core" options, as well as the Plugins > Gui > Client Plugin (gui.ajax)
+	where you can do some basic customization for your interface.
+
+---------------------------------------------------------------------------
+ * Copyright 2007-2011 Charles du Jeu <charles (at) ajaxplorer.info>
+ * This file is part of AjaXplorer.
+ *
+ * AjaXplorer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AjaXplorer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <http://www.ajaxplorer.info/>.

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpcore id="core.conf" label="Core config" description="Core description" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings>
+        <resources>
+            <i18n namespace="core_conf" path="plugins/core.conf/i18n"/>
+        </resources>
+    </client_settings>
+	<server_settings>
+        <global_param name="USER_CREATE_REPOSITORY" group="CONF_MESSAGE[Generic Conf Features]"  type="boolean" label="CONF_MESSAGE[Let user create repositories]" description="Whether users can create their own repositories, based on predefined templates."  mandatory="false" default="false"/>
+        <global_param name="SKIP_USER_HISTORY" group="CONF_MESSAGE[Generic Conf Features]"  type="boolean" label="CONF_MESSAGE[Skip user history]" description="Use this option if you want to avoid the automatic opening of the last visited folder at login."  mandatory="false" default="false"/>
+        <global_param name="SAVE_GUEST_PREFERENCES" group="CONF_MESSAGE[Generic Conf Features]"  type="boolean" label="CONF_MESSAGE[Remember guest preferences]" description="If the 'guest' user is enabled, remember her preferences accross sessions."  mandatory="true" default="false"/>
+	</server_settings>
+</ajxpcore>

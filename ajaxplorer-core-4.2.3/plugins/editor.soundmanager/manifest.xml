@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor id="editor.soundmanager" icon="" mimes="mp3" openable="false" previewProvider="true" text="186" title="136" className="SMPlayer"  label="CONF_MESSAGE[Sound Player]" description="CONF_MESSAGE[Uses HTML5 or Flash to play a sound]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition classname="AudioPreviewer" filename="plugins/editor.audio/class.AudioPreviewer.php"/>
+    <client_settings>
+        <resources>
+            <js className="SMPlayer" file="plugins/editor.soundmanager/class.SMPlayer.js" autoload="true"/>
+            <i18n namespace="sm_editor" path="plugins/editor.soundmanager/i18n"/>
+            <css file="plugins/editor.soundmanager/sm/360-player/360player.css"/>
+            <css file="plugins/editor.soundmanager/sm/360-player/360player-visualization.css"/>
+            <css file="plugins/editor.soundmanager/sm_preview_player.css"/>
+        </resources>
+    </client_settings>
+    <processing>
+        <activeCondition><![CDATA[
+                return (document.createElement("canvas").getContext?true:false);
+        ]]> </activeCondition>
+    </processing>
+    <registry_contributions>
+        <external_file filename="plugins/editor.audio/manifest.xml" include="registry_contributions/actions[id='audio_proxy']" exclude=""/>
+    </registry_contributions>
+    <dependencies>
+        <pluginClass pluginName="editor.audio"/>
+        <activePlugin pluginName="editor.audio"/>
+    </dependencies>
+</editor>

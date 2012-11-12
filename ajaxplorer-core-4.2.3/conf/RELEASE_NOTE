@@ -1,0 +1,466 @@
+AjaXplorer ##VERSION_NUMBER## Release Note
+
+License : Affero GPL
+Copyright : Charles du Jeu 2012
+Demo : http://ajaxplorer.info/demo
+Date : ##VERSION_DATE##
+Rev Number : ##REVISION##
+
+This is a final release for the 4.2.X stable branch. Thus it only includes bugfixes.
+
+CORE
+
+[Core] Make sure to re-order plugins by dependency before activating them
+[Core] Link AJXP_SKIP_CACHE to i18n cache as well
+[Core] CONF WebFTP Template
+[Core] If recursive errors, use php error_log function
+[Core] PHPCLI on windows, fix by @rmeske
+[Core] Put Word, Excel and Presentation files in the core, not only in Zoho plugin
+[Core] Follow @ultreia suggestion to trim only NULL character after decrypt operation.
+[Core] Perform an ordering when activating plugins, to ensure a consistent order. Fixes the header of action.skeleton being
+misplaced.
+[Core] Logger : fix no IP when called through PHP_CLI
+GUI : Fix Safari iOS6 Touch events broken
+[Core] Simple getRemoteContent() function detecting allow_url_fopen, CURL extension, or using HttpClient
+[action.updater] Use new getRemoteContent() function in action.updater, editor.zoho and shorten.bitly plugins. Shoudl prevent
+people to miss updates!
+
+
+Conf & Auth
+
+[core.conf] New option in core.conf plugin to avoid autoloading last visited folder at login.
+[auth.multi] trigger createUserObject() when creating local copy of the user, to make sure the default roles are applied
+[auth.ldap] turn USER_LDAPATTR to lowercase / Fix the case sensitive userExists() test.
+[auth.multi] fix getUsersCount() if no USER_BASE is set.
+[auth.ftp] Disable remember box for auth.ftp, as we cannot store the credentials.
+[conf.serial] Serial AJXP_USER : catch exception in __destruct() function
+
+
+Access & Meta plugins
+
+[access.ftp] Missing sortType in columns definition prevented sorting
+[access.ftp] Trigger remote copy (ftp & remote_fs) if USER-AGENT is IOS or Apache-Http (=java)
+[access.fs] Fix AJXP_LINK on dynamic repositories
+[access.ajxp_conf] XML Entities on the roleID before sending.
+[access.fs] Escape chmod to avoid error if operation is not authorized on server.
+[meta.filehasher] (rsync) filling tmp dir with delta files.
+[meta.filehasher] Remove rsync actions if extension is not found. Should be interpreted by the client.
+[meta.git] Fix error when entering Plugins > Meta if VersionControl_Git is not installed
+[index.lucene] Change default Analyser to be able to search for numbers.
+[meta.mount] Escape password in Filesystem Mounter (@didier)
+[meta.quota] For shared folder, a new parameter to skip caching.
+
+
+Editors & Gui plugins
+
+[gui.ajax] JS and css micro fixes (connexion does not display error correctly)
+[editor.imagick] Fix IMagickPreviewer for remote wrappers.
+[editor.imagick] Correct headers for pdf thumbs
+[editor.diaporama] PThumb still had deprecated join() calls
+[editor.soundmanager] Disable soundmanager if no Canvas
+[gui.ajax] Apply a style similar to the iconset to the image thumbnails (white border and dropshadow)
+[editor.pixlr] Node_change not triggered after Pixlr Modif (>git not commited)
+
+
+
+-----------
+AjaXplorer 4.2.2 Release Note
+
+License : Affero GPL
+Copyright : Charles du Jeu 2012
+Demo : http://ajaxplorer.info/demo
+Date : 2012-07-23
+Rev Number : 3033
+
+This is a bug fix release, and introduce two new features : simple but efficient documents automatic-versionning based on GIT,
+and Amazon S3 driver. Other clouds drivers will come soon (Swift from Open Stack among others).
+
+[NEW FEATURES]
+Meta.git    : Git based versioning, way more simple than with svn, simply install GIT on the server and install the PEAR/VersionControl_Git library. Open in browser, revert to a given revision, cosmetics.
+Access.S3   : Based on Pun'k Avenue s3 "better stream wrapper" implementation, and the aws-sdk from AWS (not packaged by default).
+
+[BUG FIXES]
+gui.mobile : open/info menu had disappeared (FilesList refactoring).
+Auth.ftp & Auth.smb were broken
+Notify.phpmail-lite : Base64_decode when necessary
+Disable scheduler if not able to create db folder
+Do not catch errors and exception at the very first boot
+[core] Factorise generateAttachmentHeaders and generateInlineHeaders inside HTMLWriter, and use them in fsAccessDriver and in FileMimeSendSender.
+[gui.ajax] Fix various things in JS files for FilesList class impermeability.
+[access.smb] Make sure to register smb:// wrapper (bug in cross-repository copy)
+[access.smb] Apply Thomas Oettli tweaks (new DOMAIN parameter).
+[access.ajxp_confDriver] Not very nice, but working, make sure to register meta.svn & meta.git after the others (will trigger the hooks accordingly) @todo : generic reflexion on the hooks/plugins ordering.
+[action.scheduler] Missing xmlEntities call on repositories list, could break the interface.
+[action.scheduler] Make sure the folder is also initialize on unserialization
+[meta.quota] Fix shell epression used for computing quota on Darwin
+[core.auth] Wrong ajax response on pass-change error, reported by @ultreia
+[AJXP_Utils] Fix from @mattlef : avoid exception on empty extension filename
+
+[CLI & ASSOCIATED TEST]
+CLI : detect / configure / use COM WScript.Shell to enable command line on IIS. Require giving correct rights to the cmd.exe executable.
+Typo error totally breaking the PHPCLI test.
+Test CLI : more tests on safe_mode & exec detection to be sure it will not crash
+
+[WebDAV]
+Disable locking for the moment, triggering too much random upload problem
+[Quotas] webDAV and quota checking
+[WebDAV] Fix error if a repository has no metastore
+Conf.sql :  getRepositoryByAlias was simply broken, making webDAV fail when using conf.sql
+GoodReader WebDAV client : do not urlEncode
+
+-------------
+AjaXplorer 4.2.0 Release Note
+
+License : Affero GPL
+Copyright : Charles du Jeu 2012
+Demo : http://ajaxplorer.info/demo
+Date : 2012-06-24
+Rev Number : 2976
+
+This is a major stable release that includes numerous bugfixes from the 4.1.0 and a lot of new features.
+
+[NEW FEATURES]
+Auth.multi driver       : Implement an alternative MODE, instead of proposing the various drivers to the user, consider one is the master (typically ldap) and the other is the local alternative (typically serial) to allow creating shared users.
+Action.scheduler        : a generic CRON-LIKE scheduler triggering AjaXplorer actions in background. Only one call needs to be added to the cron to trigger the scheduler
+Share engine            : Add an optional Downloads Limit on generated links to auto-expire after x downloads.
+Default repository      : Add an option for forcing default repository at login.
+Quota implementation    : New hook before_create / Pass new size when possible in before_change and before_create
+meta.file_hasher        : Store md5_mtime to make sure some changes were not missed, recompute if not sure
+meta.mount              : Automount any filesystem (Linux only) automatically
+log.syslog              : Send logs to System Logger (Linux only)
+Core.auth / Core.conf   : New mechanisms to list users in a paginated way, to avoid overflowing GUI. Implemented by auth.sql, auth.conf and auth.ldap for now on.
+-- 4.1.0
+PHP 5.4 Support         : Call-time pass by reference are deprecated, replace static calls to DOMDocument::loadXML
+
+
+[CORE]
+XSD Schema          : missing dynamicItems element definition, missing user_param element
+Encoding            : XmlEntities before sending in triggerBgAction.
+Encoding            : Preg_quote before using as regexp
+New Cache           : I18n Messages caching mechanism, one file cache per language
+Automated build     : exclude some under-used or very specific plugins from the standard build : access.demo, access.jsapi, access.wms, auth.cmsms, auth.phpbb, editor.codepress (deprecated), log.syslog
+Replication         : Ability to replicate groups of fields in the standard form kit.
+Config files        : New (optional) way of encoding serial files using JSON formatting. We may switch massively to this format, as it's much more easy to hack manually (but would have to check performances before).
+Refactoring         : Deport login/logout and related actions inside AbstractAuthDriver instead of root index.php file
+Autoloader          : search interfaces defined in core plugins
+Refactoring         : New core.metastore plugin, defining the MetaStoreProvider interface & the AJXP_METADATA_ constants
+Performances        : New skipCheck parameter added to AJXP_Utils::loadSerialFile
+Distributed Env     : New variable AJXP_SHARED_CACHE_DIR / Shared cache can be a stream, which have implications at many levels
+-- 4.1.0
+Cross-Repo copy     : Two successive node expand changed the current repository to the destination repository (switch back replaced twice).
+Core                : Fix mkdir() call for the cmd_outputs folder
+Performance         : cache slow processing data when possible (registered extensions, messages, etc), either in memory (static var) or in cache files.
+
+
+[GUI BUGFIXES]
+IE10 Ready          : Prototypejs & Css fixes for forthcoming IE10 version (does not support filter: anymore)
+Typo                : Error prevented the updateIcon in xTree
+Diaporama           : Do not display splitter and info panel if no toggleButton action is passed
+IFRAME uploader     : use closeValidation instead of closeFunction to avoid override
+Error catching      : Catch error 500
+Refactoring         : ParseXMLMessage Return false on error
+Refactoring         : Set action_instance_ID on buttons referring to actions, to dynamically update their label if necessary.
+Performances        : ActivityMonitor sends get_action=ping to avoid triggering default action.
+HeaderResizer       : decorellate from table_rows_container, fix columns width, fix typo that was preventing Opera from working.
+Refactoring         : Deep FilesList refactoring to attach a different data model
+User Experience     : Repository configs Update the Meta Sources tab for better UX.
+Bug                 : Avoid shadower error / Do not call activate() on accordion if already showing.
+ConfigEditor        : Do not close window on repository creation error / Form Manager : use tab to navigate inside the accordion.
+-- 4.1.0
+Client Session timer: hook to "ajaxplorer:longtask_xxx" events to avoid disconnecting during very long task (namely uploads for the moment)
+Remember me         : reported from 4.0.3 branch
+Tpl Logo image      : Wrong content type header
+Massive deletion    : POST instead of GET
+Error Message       : Restyle message box (max height), fixed broken carriage return
+JSPacker            : rtrim windows line feed
+
+-- USERS & CONFIGS MANAGEMENT
+Actions             : Group new user / new role actions under a same submenu.
+Hooks               : New hook for adding section to the Settings console from other plugins
+UX                  : User pagination if auth driver supports it in access.ajxp_conf
+Bug                 : In the few cases where the user now can upgrade its own rights, make sure to load() it before, if an admin has changed the rights during the session.
+User case           : Disable case sensitivity (in core.auth config)
+Auth Schemes        : Auth driver can provide AuthSchemes (displayed in the admin interface). Should be used by conf.serial to differentiate the storages by folder and avoid using ugly ID_SEPARATOR.
+Performances        : Implement __wakeup() function on Ajxp_user to make sure to clear the registerForSave array.
+Performances        : [conf.serial] Delegate the user files saving to the __destruct method for better performances.
+Performances        : New FAST_CHECKS parameter for conf and auth serial plugins
+
+-- WEBDAV
+Performances        : Performance improvement, applyActions() instead of directly calling driver methods, so that pre/post process are applied.
+Refactoring         : Detect if there is a metastore, and use it for storing webdav properties. Should implement locking.
+Refactoring         : Check interface AjxpWebdavProvider instead of hardcoded access types
+Bug                 : Fix repository alias / id problems
+
+-- PLUGINS
+access.fs           : Preconfigure a folder whose content will be automatically copied to the repository at first load.
+access.fs           : optional arguments to use rename as  move
+access.fs           : Upload : pass accented characters in the urlencoded_filename POST parameter
+access.ftp          : Fix FTP listing when multiple groups
+access.ftp          : Fix autorenaming on upload not working.
+editor.browser      : Classic header fixes for IE8
+editor.imagick      : Unoconv integration for both previews of office files and indexation of their textual content.
+editor.imagick      : Autodetection of thumbs ratios for pdf thumbnails.
+editor.imagick      : Threshold for generating all pdf pages at onces or on-demand.
+index.lucene        : Lucene and office documents : silently tries to index, avoid throwing errors
+editor.video        : Fix m4v support
+action.updater      : Connect to update site through a proxy.
+http.downloader     : Trigger before_create before downloading!
+http.downloader     : Fix  progress bar for remote downloads
+shorten.bitly       : Re-display shorten form when showing shared link url
+editor.pixlr        : Add IfModule instruction in htaccess otherwise it can prevent from accessing the content of the folder.
+meta.filehasher     : rsync actions (requires PECL rsync extension)
+uploader.jumploader : skip pre/post processors if xhr_uploader passed in the url
+auth.sql            : Override the clearRights() method, changes must be saved directly in the DB.
+auth.sql            : Fix double bookmarks loading
+Jumploader          : use uploader passed as argument, may solve FF random problems?
+action.share        : Change share action rights : allow readonly users to share links (but not folders).
+action.share        : Do not allow re-creating a temporary user
+action.share        : Handle SessionCredentials case along with folder sharing by saving an encoded version of the credentials in the options.
+meta.svn            : Usability & improvements, more documents oriented than source control. To be generalized. Todo : how to grab old versions metadata?
+meta.svn            : pass the LC_ALL environnent variable to proc_open if AJXP_LOCALE is defined
+meta.svn            : pass array if multiple arguments (will be shell escaped) /  Auto-commit metafile changes
+unoconv             : How to guess the encoding of pdfs of docs for extracting text?  / TODO : report documentation
+-- 4.1.0
+Metadata loading    : Set a "hidden" metadata to a passed node
+Access.fs           : handle symlinks more properly
+Access.fs           : Filter files and folders when creating Zips, using PCLZIP_CB_PRE_ADD callback
+Access.smb          : Clean URL everywhere, pass the Locale as environnement variable when defined
+Access.fs           : Big typo error making the "nodeName" resetting useless
+Access.smb          : override makeZip and allow its usage (by plugin configuration), as it can be an option when on a very fast network connection.
+Access.smb          : fix "+" in folder name, use rawurldecode() instead of urldecode()
+Open_basedir        : Multiple files downloads broken, do not "patch path" in readFile function when on the realFileSystem.
+Core.conf           : Add a $context parameter to the user save() method, to avoid "over saving" data : if context is "superuser", save preferences and rights, where as in context "user" save only preferences.
+Core.uploader       : should solve the problems of setting the upload limit.
+WebDAV Server       : detect MiniRedir user agent
+Synchro             : Recursive listing implementation & hooks applyCondition for better performances. Testing synchro tool
+Synchro             : Various tricks to trigger the metadata updates from outside, and webdav optims
+Conf.sql            : Auto detect "objects" preferences and serialize them in the DB, adding the $phpserial$ prefix. Fixes AJXP_WEBDAV_DATA of users, as well as PLUGINS_DATA used by notify.phpmail
+Editor.diaporama    : fix the "navigator" when the is a marginTop on the thumbnail, encodeURIComponent before triggering download action, otherwise breaks (e.g. & in file name)
+Editor.zoho         : as reported by zoho support team, the Secret Key is in fact deprecated and no more necessary, apply node.before_change hook before saving
+Editor.pixlr        : apply node.before_change hook before saving
+Editor.imagick      : do not inverse slashes if not necessary!
+Editor.video        : Pass alternate videos versions in the metadata, and set them as HTML5 video source (require an external pre-encoding)
+Index.lucene        : ignore case for determining content-indexed extensions
+Uploader.*          : trigger events ajaxplorer:longtask_starting / ajaxplorer:longtask_finished
+Auth.ftp            : Force call to getServerFeatures() when coming from the login operation.
+Auth.ldap           : Jon Peck ldap contrib : ability to configure DN as an array and iterate through them
+Meta.svn            : manually set a library path to access the SVN commands.
+Meta.filehasher     : new utility for accelerating synchronization, compute and store file md5 in metadata (if metastore active) and delete on file change.
+Action.powerfs      : Fix zip delegation : do not sleep for one second, change the download mechanism, and place the zip inside the temporary folder, otherwise it makes problems for read-only folders. Allow compression when using powerfs in read mode, Todo : exclude hidden files from zip operation using an exclude list,
+Action.share        : AjxpSharedDriver avoid error on empty glob(), fix typo error
+
+
+-- TESTS & INSTALL
+Test PHPCLI         : Catch Errors on popen() to avoid IIS crash.
+testPHPSession      : Skip test if save_handler is not file based
+CLI                 : Change the way the CLI is detected.
+--FROM 4.1.0
+New config file     : New optional config file to set the configs that must be set before anything else : LOCALE, TMP_DIR, INI_SET
+Test.gpc            : Totally commenting magic_quote_gpc breaks JSON if magic_quote is active!
+Test.writeability   : Call is_dir silently to avoid error triggering and let the diagnostic tool run
+Tests failed        : Suggest changes (in the new bootstrap_conf.php file)
+Documentation       : Plugin Info XML, ability to browse many plugins folders (experimental)
+Security            : Reported from 4.0.4 branch
+
+
+
+
+---------------------------
+PREVIOUS RELEASES FROM 4.X
+---------------------------
+
+
+AjaXplorer 4.0.4 Release Note
+
+A vulnerability was discovered that could allow a non-logged user to access other files on the server
+file system. The « remember me » mechanism was also improved to lower the session hacking probability
+in case of « cookie stealing ».
+
+AjaXplorer 4.0.3 Release Note
+
+License : Affero GPL
+Copyright : Charles du Jeu 2012
+Version number : 4.0.3
+Demo : http://ajaxplorer.info/demo
+Rev Number : 2748
+
+[Fix side effects of previous release]
+Revert bootstrap_context commited once again with setlocale uncommented.
+PHPCLI test : detect the disabled functions to avoid ugly error at startup!
+The open_basedir fix for zip browsing was breaking the zip extension on download.
+Test glob result in upgrader
+Locked file could save content even if hook node.before_change returned an exception.
+
+[Access Samba]
+Make smb access more robust : configure smbclient path, blur credential in debug, get the procopen error stream, etc...
+Access.smb : handle Windows case for smbclient+cygwin install. Nice!
+Fix a couple of samba tweaks, plus shared links when using auth.smb/access.smb, may impact other auth.** drivers
+Update access.smb documentation
+
+[Users number scalability]
+New options for the ShareCenter : Ability to pass a regexp pattern to AuthService::listUsers()
+Touch a file in the cache to avoid triggering countAdminUser() if not necessary (ie do it only the very first time). Can be very long when a lot of users!
+
+[Android client redirection]
+Adapt iOS GUI Plugin for Android as well, ability to set the app url via the configurations.
+Handle the skipANDROID parameter & cookie
+
+[Other]
+Editor.diaporama : defer cache cleaning hook
+Editor.diaporam : allow the client to ask a specific thumbnail dimension => useful for mobile devices!
+Make joomla_auth_remote function more robust, when the HTML cannot be correctly parsed by a DOMDocument.
+Auth.remote MASTER_XXX variable documentation update, along with the website How-To.
+
+-------------------------------------------------------------------------
+AjaXplorer 4.0.2
+Rev Number : 2728
+[Security]
+Fix a potential XSS via the doc feature
+
+[Hooks]
+Ability to apply callbacks in a "deferred" way, i.e. after the output is sent to the client. Drastically increasing user experience.
+New hook "node.before_change", to be used by locking plugins
+
+[Access drivers]
+Moved global parameters "hide folder, show hidden files, etc" to the filesystem_commons mixin.
+Test HIDE_XXX is not empty, otherwise there are false-negatives
+Try to chmod 755 publiclets to make sure they are executable.
+Typo error in the fixPermissions() routine
+Access.fs : Deploy various strategies to go around open_basedir php inconsistencies.
+Access.fs : Use copy() when driver is not remote, it's much more efficient
+Access.fs : X-Sendfile needs UTF8
+Action.powerfs : Do not sleep() at the end of the archive creation, otherwise the zip_operation file is created again
+Access.fs : "Purge" action was commited commented
+
+[Gui]
+Place the window.opener tentative inside a try/catch to avoid permission error
+Adapt tree scrolling when focusing on a given node, + compile
+Fix dragndrop & scrolling problems.
+NL2BR for line feeds in the notification body
+Editor.browser : url broken if there are paremeters in the current url
+Editor.browser : Filehandle left open, was breaking download on CentOS
+
+[Plugins]
+Meta.simple_lock : Simple "locking" implementation : manually lock/unlock files to other users.
+Action.skeleton: custom_target_url typo error
+Auth.ftp  : Translate FTP dynamic login screen / Translate yes/no options
+Uploader.flex : FlexUploadProcessor, double utf8 decoding was breaking special chars!
+Uploader.html : Make sure no to close the uploader if some file is still loading
+Uploader.html : Fix the allowed extension mechanism
+Access.ajxp_conf : fix MIXIN_MESSAGE appearance in Wallet data
+german translation for action.share
+Fix uploaders ALLOWED_EXTENSIONS usage (comma separated list), and text for other uploaders to enable flex if it's the only one.
+
+[Core & Language]
+Add a new test for detecting the CLI php
+Catch exception in webdav backend and encapsulate in a webdav error.
+Fix compat version of json_decode, and make sure to expect the "assoc" version of the function, as the compat version only support this (not the stdClass). Was breaking upgrade for php5.1.X
+Weirdness in serializations with the inferOptionsFromParent property, seem to be fixed by setting it private with getter/setter. Was breaking share metadata in templates children...
+For php 5.1, the protected nature of the properties fail, do not call them directly, use the getter() instead.
+
+
+
+AjaXplorer 4.0.1 Release Note
+------------------------------------------------------
+This is a bugfix release.
+
+[New]
++ "Default Role" implementation : like "Default Rights", all newly created users will have this
+role.
++ Command-line delegation for both "compress" and multiple "download" actions, using the server
+"zip" command.
++ Option for delegating the dowloads to the server, using the X-SendFile server module
+(external module to install, available for Apache, Lighttpd & Nginx).
+
+[GUI]
+Fix IE7 double click for opening in external window : closing the lightbox too fast was
+creating error with the shadower script.
+Default double click switch to "download" if no openable editor available.
+Typo error onCancel / onComplete function
+
+[Plugins]
+[access.fs] Error in readFile was breaking multiple files download in any other browser than
+Chrome (wrong headers sent)
+[access.dropbox] Missing columns definitions for dropbox plugin / Update dropbox-php for API
+1.0, plus patch to skip SSL certificate, plus OAuth negociation at repository initiation.
+[conf.sql] Fix conf.sql for templates children
+[downloader.http] Move upload>subMenu as a downloader.http override, thus no submenu if this
+plugin is not active.
+[editor.audio] Wrong tooltip for Volume Button
+[access.mysql] Add DEFAULT_RIGHTS option for Mysql driver
+[editor.diaporama] Handle "array" config case during serial/deserialization (only applicable in
+editor.diaporama until now, was breaking its configuration)
+[editor.jumploader] Jumploader old doc was not correctly reported
+[log.sql] Forgotten DIBI Require
+
+
+[Core Auth]
+ALLOW_CROSSUSER_SHARING : Do not compare to === true
+"guest" user handling when ALLOW_GUEST_BROWSING is not active. Better check for delegate
+repository creation, check for errors before creating anything. New method
+AuthServide::isReservedUserId() for a future modularization of the "guest" concept.
+
+[Misc]
+Fix background action when users are not enabled.
+Fix metastore & meta plugin when no user enabled!
+Rename default text file and update the content
+Fix backgroundPanel style
+Ability to transmit directly a javascript instruction to the backgroundManager
+
+
+-------------------------------------------------------------
+AjaXplorer 4.0 Release Note
+
+This is a major version release. Check ajaxplorer.info for complete description.
+Below are described the changes introduced since v3.3.5
+
+[GUI]
+
+Fix scrolling overlay in FilesList
+DisableNavigation when search input text is focused
+Correctly resolve icon source in Search Engine
+Remove google API alert, as it’s now commercial
+Avoid full gui blocking if referencing a wrong message ID for action text
+Clean destroyElement() if method exists
+Fire events before/after rows initialization and rows clearing
+Various hacks : go through modifiers even is column is hidden, passing a fourth argument in that case. ChooseOther now implements a full mechanism to remember mimes to editors for the user. Clean destroy of SliderInput. SoundManager : display currently playing with specific class.
+Fix InfoPanel currentPreviewElement destruction
+Scroll overflowX in gridMode
+Fix CodeEditor resize
+Fix various issues with drag’n'drop, particularly polluting IE
+Fix Share Users autocompleter not appearing in IE (insert the box in the body for good positionning)
+Detect Modernizr.multiplebgs and disable overlay icons if not present, otherwise it makes an empty icon.
+
+[CORE]
+
+New method getUniqueActivePluginForType() and application in the metastore users
+Silently test library searching, to avoid open_basedir errors, will return false anyway
+Silently catch meta sources error
+Implementation of editor.soundmanager
+Filter the registry actions before outputting
+ALLOW_GUEST_BROWSING broken
+AJXP_FORCE_LOGPATH optional constant for easing RPM packaging
+Fix : do not load extensions contribution of inactive plugins.
+Various fixes for widget case (when SERVER_PREFIX_URI is set)
+Create a separate template for the tests results…
+Skip brute force login with a log when server is in Debug mode
+AUTH_DRIVER drupal sample included
+Ignore Disabled access plugins, either in the new driver list, or in the current repository list
+silently set_time_limit
+
+[DOCUMENTATION]
+
+Display plugin doc if presentAdd a note to explain how to force the flash uploader usage
+Re-organize Settings data
+Massive PhpDocs comments
+Massive Plugin_doc files & screenshots
+Remove old README from webdav plugin, now the role of plugin_doc.html
+
+[PLUGINS]
+
+Editor.SoundManager : add an active condition to limit to browsers that support canvas, otherwise it’s buggy.
+Gui.ios : Fix # in IOS URL parsing
+access.ajxp_conf : Fix filenames again
+auth.basic_http : Daniel Berteaud patch for configuring logout URL for basic http.
+Index.lucene : Auto-remove false indexes at search time, does not seem to impact the timing
+access.ftp : Fix « permission fixing » losing the folder nature, and remove the fix from ftp wrapper.

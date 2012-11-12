@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta id="quota" label="CONF_MESSAGE[User quota]" description="CONF_MESSAGE[Maintain the size of a given directory for each user]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition filename="plugins/meta.quota/class.QuotaComputer.php" classname="QuotaComputer"/>
+    <server_settings>
+        <param description="Authorized quota. Use php.ini like values (20M, 2G), etc." label="Default Quota" name="DEFAULT_QUOTA" type="string"/>
+        <param description="Store computed quota value in the user preferences, to avoid triggering computation each time it is requested. This may introduce some lag if the repository is shared by many users." label="Cache value" name="CACHE_QUOTA" type="boolean" default="true"/>
+        <param description="If you want to define quotas for each user, define a custom field in the CUSTOM_DATA parameter of the conf plugin, and declare this field name here." label="Custom Quota Field" name="CUSTOM_DATA_FIELD" type="string"/>
+        <global_param description="Define if usage must be computed for this repository only, or cumulated on all the repositories of the user" label="Usage scope" name="USAGE_SCOPE" type="select" choices="local|Repository,global|Cumulate repositories" default="local"/>
+    </server_settings>
+    <client_settings>
+        <resources>
+            <img_library alias="meta_quota" path="plugins/meta.quota/img"/>
+            <i18n namespace="meta.quota" path="plugins/meta.quota/i18n"/>
+        </resources>
+    </client_settings>
+   	<registry_contributions>
+   		<hooks>
+   			<serverCallback hookName="node.change" methodName="recomputeQuotaUsage" defer="false"/>
+   			<serverCallback hookName="node.before_change" methodName="precheckQuotaUsage"/>
+   			<serverCallback hookName="node.before_create" methodName="precheckQuotaUsage"/>
+   		</hooks>
+        <actions>
+            <action name="monitor_quota">
+                <gui src="meta_quota/ICON_SIZE/progressbar.png" text="meta.quota.1" title="meta.quota.2" hasAccessKey="false">
+                    <context dir="true" recycle="true" selection="false" ajxpWidgets="UserWidget::logging_string"/>
+                </gui>
+                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="true" write="false"/>
+                <processing>
+                    <clientCallback><![CDATA[
+                        var c = new Connexion();
+                        c.setParameters(new Hash({get_action:'monitor_quota'}));
+                        c.onComplete = function(transport){
+                            var action = ajaxplorer.getActionBar().getActionByName("monitor_quota");
+                            if(!action) return;
+                            var data = transport.responseJSON;
+                            action.options.text = roundSize(data.USAGE, MessageHash["byte_unit_symbol"]) + "/" + roundSize(data.TOTAL, MessageHash["byte_unit_symbol"]);
+                            action.refreshInstances();
+                        };
+                        c.sendAsync();
+                    ]]></clientCallback>
+                    <clientListener name="contextChange"><![CDATA[
+                        if(ajaxplorer && !ajaxplorer.meta_quota_pe_created){
+                            new PeriodicalExecuter(function(pe){
+                                var action = ajaxplorer.getActionBar().getActionByName("monitor_quota");
+                                if(!action) {
+                                    pe.stop();
+                                    ajaxplorer.meta_quota_pe_created = false;
+                                    return;
+                                }
+                                ajaxplorer.getActionBar().fireAction('monitor_quota');
+                            }, 20);
+                            ajaxplorer.meta_quota_pe_created = true;
+                        }
+                        ]]></clientListener>
+                    <serverCallback methodName="getCurrentQuota"/>
+                </processing>
+            </action>
+        </actions>
+    </registry_contributions>
+</meta>

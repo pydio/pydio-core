@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta id="filehasher" label="CONF_MESSAGE[FS Mount]" description="CONF_MESSAGE[Mount a remote location on the file system before accessing the repository]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd" mixins="credentials_consumer">
+    <class_definition filename="plugins/meta.mount/class.FilesystemMounter.php" classname="FilesystemMounter"/>
+    <server_settings>
+   		<param name="FILESYSTEM_TYPE" type="string" label="CONF_MESSAGE[FS Type]" description="CONF_MESSAGE[Filesystem Type, will be used for the -t option of the mount command]" mandatory="true" default="cifs"/>
+   		<param name="MOUNT_SUDO" type="boolean" label="CONF_MESSAGE[Sudo]" description="CONF_MESSAGE[Call the mount/umount commands through sudo, must be configured on the server]" mandatory="true" default="yes"/>
+   		<param name="UNC_PATH" type="string" label="CONF_MESSAGE[Remote Path]" description="CONF_MESSAGE[Path to the remote share to mount, use //123.456.789.654/path you can use AJXP_USER]" mandatory="true" default=""/>
+   		<param name="MOUNT_POINT" type="string" label="CONF_MESSAGE[Mount Point]" description="CONF_MESSAGE[Mount Path, use AJXP_USER]" mandatory="true" default=""/>
+   		<param name="MOUNT_OPTIONS" type="string" label="CONF_MESSAGE[Mount Options]" description="CONF_MESSAGE[Used with the -o command option, use AJXP_USER, AJXP_PASS, AJXP_SERVER_UID, AJXP_SERVER_GID]" mandatory="false" default="user=AJXP_USER,pass=AJXP_PASS,uid=AJXP_SERVER_UID,gid=AJXP_SERVER_GID"/>
+    </server_settings>
+   	<client_settings>
+   		<resources>
+   			<i18n namespace="meta.mount" path="plugins/meta.mount/i18n" />
+   		</resources>
+   	</client_settings>
+   	<registry_contributions>
+           <actions>
+               <action name="logout">
+                   <pre_processing>
+                       <serverCallback methodName="umountFS"/>
+                   </pre_processing>
+               </action>
+               <action name="switch_repository">
+                   <pre_processing>
+                       <serverCallback methodName="umountFS"/>
+                   </pre_processing>
+               </action>
+           </actions>
+    </registry_contributions>
+</meta>

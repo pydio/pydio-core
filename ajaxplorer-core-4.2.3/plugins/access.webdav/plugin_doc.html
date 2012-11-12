@@ -1,0 +1,6 @@
+<p>Browse a remote WebDAV server. To be able to use the access.webdav driver, you must make sure that you have PEAR installed, and the
+latest HTTP_WebDAV_Client package installed ( https://pear.php.net/package/HTTP_WebDAV_Client, version 1.0.1 ).
+Then you have to patch the PEAR class HTTP/WebDAV/Client/Stream.php with the patch file contained in this plugin (PEAR_HTTP_WebDAV_Client_Path.diff).
+</p>
+<p>Please not that this Webdav client only support "Basic" Http authentication, not "Digest", so make sure your
+server is using this kind of authentication.</p>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor id="editor.openlayer" openable="true" mimes="wms_layer,ol_layer" text="openlayer.1" title="openlayer.1" icon="frame_image.png" className="OLViewer" formId="openlayer_box" label="CONF_MESSAGE[Map viewer]" description="CONF_MESSAGE[Geolocation feature to either display a WMS layer or simply place an exif-localized photo. Requires OpenLayers]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings>
+        <resources>
+            <js file="plugins/editor.openlayer/class.OLViewer.js" className="OLViewer"/>
+            <css file="plugins/editor.openlayer/openlayer/theme/default/style.css"/>
+            <i18n namespace="openlayer" path="plugins/editor.openlayer/i18n"/>
+        </resources>
+    </client_settings>
+	<processing>
+		<!-- Hack : use activeCondition as an extension starter, we should enable extensionOnInit instead
+			Cannot use the standard library mechanism for OpenLayer otherwise it cannot find the images and styles.
+		 -->
+		<activeCondition><![CDATA[
+			if(!window.OpenLayers && !window.OpenLayersLoading){
+				window.OpenLayersLoading = true;
+				if(Prototype.Browser.IE) window.originalEvent = window.Event;
+				var script = new Element('script', {
+					src:(ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')?ajxpBootstrap.parameters.get('SERVER_PREFIX_URI'):'')+"plugins/editor.openlayer/openlayer/OpenLayers.js",
+					type:"text/javascript"}
+				);
+				if(Prototype.Browser.IE){
+					script.attachEvent("onreadystatechange", function(){
+						 if(script.readyState == "loaded"){
+						  window.Event = window.originalEvent;
+						 }
+					}, false);
+				}
+				$(document.body).insert(script);
+			}
+			return true;
+		]]></activeCondition>
+	</processing>	
+	<clientForm id="openlayer_box"><![CDATA[
+		<div id="openlayer_box" action="ol_view" box_width="80%" box_height="90%" box_padding="0">
+			<div class="action_bar" style="border-bottom:1px solid #DDDDDD;position:relative;">
+				<div id="filterButton" style="cursor:pointer;-moz-border-radius:3px 3px 0 0;border-radius:3px 3px 0 0;background-color:#FFF8D1;border:1px solid #CCCCCC;padding:1px 5px;border-bottom:0px;position: absolute;right: 8px;bottom: 0px;"><b>AJXP_MESSAGE[openlayer.2]</b> <img width="10" height="6" border="0" src="AJXP_THEME_FOLDER/images/arrow_down.png" align="top" style="margin-left:3px;margin-top:5px"></div>
+				<div style="padding-top: 1px; padding-right: 5px; font-size:11px;position: absolute;bottom: 1px;right: 77px;height: 16px;">
+					<b>AJXP_MESSAGE[openlayer.3] :</b> <span id="location"></span>
+				</div>
+				<a href="#" onclick="return false;" id="downloadFileButton"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/download_manager.png" alt="AJXP_MESSAGE[88]" border="0"><br><span message_id="88">AJXP_MESSAGE[88]</span></a>
+			</div>
+			<div class="filter" style="background-color:#FFF8D1;border-bottom:1px solid #CCCCCC;padding:3px 5px;font-size:11px; font-family:Trebuchet MS;">
+                <a>AJXP_MESSAGE[openlayer.4]:</a>
+                <select id="layerSelector" style="width:110px !important;"></select>
+                <span id="wms_filters">
+                <a>AJXP_MESSAGE[openlayer.5]:</a>
+                <select id="antialiasSelector">
+                    <option value="full" selected="true">Full</option>
+                    <option value="text">Text only</option>
+                    <option value="none">Disabled</option>
+                </select>
+                <a>AJXP_MESSAGE[openlayer.6]:</a>
+                <select id="imageFormatSelector">
+                    <option value="image/png">PNG 24bit</option>
+                    <option value="image/png8">PNG 8bit</option>
+                    <option value="image/gif">GIF</option>
+                    <option id="jpeg" value="image/jpeg">JPEG</option>
+
+                </select>
+                <a>AJXP_MESSAGE[openlayer.7]:</a>
+                <select id="imageStyleSelector">
+                    <option value="">Default</option>
+                </select>
+                <a>AJXP_MESSAGE[openlayer.8]:</a>
+                <select id="filterType">
+                    <option value="cql">CQL</option>
+                    <option value="ogc">OGC</option>
+                    <option value="fid">FeatureID</option>
+                </select>
+                <input type="text" size="80" id="filter"/>
+                <img width="16" id="submitFilter" height="16" border="0" align="absmiddle" src="AJXP_THEME_FOLDER/images/actions/16/search.png" title="AJXP_MESSAGE[openlayer.9]">
+                <img width="16" id="resetFilter" height="16" border="0" align="absmiddle" src="AJXP_THEME_FOLDER/images/actions/16/fileclose.png" title="AJXP_MESSAGE[openlayer.10]">
+                </span>
+			</div>
+		</div>				
+	]]></clientForm>
+	<dependencies>
+		<!-- Stream Wrapper must be implemented -->
+		<activePlugin pluginName="access.wms|meta.exif"/>
+	</dependencies>				
+</editor>

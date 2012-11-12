@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver enabled="false" name="dropbox" label="CONF_MESSAGE[Dropbox]" description="CONF_MESSAGE[This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension.]" mixins="filesystem_commons,slug_provider,template_provider"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<client_settings icon="plugins/access.dropbox/dropboxLogo.png">
+        <resources>
+            <i18n namespace="access_dropbox" path="plugins/access.dropbox/i18n"/>
+        </resources>
+    </client_settings>
+	<server_settings>
+		<param name="CONSUMER_KEY" type="string" label="CONF_MESSAGE[Consumer Key]" description="CONF_MESSAGE[Key]" mandatory="true"/>
+		<param name="CONSUMER_SECRET" type="string" label="CONF_MESSAGE[Consumer Secret]" description="CONF_MESSAGE[Secret]" mandatory="true"/>
+		<param name="USER" type="string" label="CONF_MESSAGE[User Mail]" description="CONF_MESSAGE[User account]" mandatory="true"/>
+		<param name="PASS" type="password" label="CONF_MESSAGE[Password]" description="CONF_MESSAGE[User Password]" mandatory="true"/>						
+	</server_settings>
+	<class_definition filename="plugins/access.dropbox/class.dropboxAccessDriver.php" classname="dropboxAccessDriver"/>
+	<registry_contributions>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*"/>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*"/>
+		<external_file filename="plugins/access.fs/manifest.xml" include="client_configs/*"/>
+        <external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
+	</registry_contributions>
+	<dependencies>
+		<pluginClass pluginName="access.fs"/>
+		<pluginClass pluginName="access.remote_fs"/>
+	</dependencies>	
+    <class_stream_wrapper filename="plugins/access.dropbox/class.dropboxWrapper.php" classname="dropboxWrapper" protocol="ajxp.dropbox"/>
+</ajxpdriver>

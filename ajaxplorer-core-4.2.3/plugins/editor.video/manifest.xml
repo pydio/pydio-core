@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor id="editor.video" openable="false" mimes="flv,mov,mp4,m4v,m4a,aac,ogv,webm" previewProvider="true" text="186" title="136" icon="frame_image.png" className="VideoPreviewer" label="CONF_MESSAGE[Video Player]" description="CONF_MESSAGE[Inserts a video player in the info panel, either HTML5 or Flash depending on the format.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<class_definition filename="plugins/editor.video/class.VideoReader.php" classname="VideoReader"/>
+    <client_settings>
+        <resources>
+            <js file="plugins/editor.video/class.VideoPreviewer.js" className="VideoPreviewer"/>
+            <js file="plugins/editor.video/video-js/video.js" className="VideoJS"/>
+            <css file="plugins/editor.video/video-js/video-js.css"/>
+            <i18n path="plugins/editor.video/i18n" namespace="video_editor"/>
+        </resources>
+    </client_settings>
+	<registry_contributions>
+		<actions>
+			<action name="read_video_data">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+			<action name="get_sess_id">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+		</actions>
+        <!--
+        Sample hook for registering pre-encoded alternative versions of the videos. Still experimental.
+        <hooks>
+            <serverCallback methodName="videoAlternateVersions" hookName="node.info"/>
+        </hooks>
+        -->
+	</registry_contributions>
+	<dependencies>
+		<!-- Stream Wrapper must be implemented -->
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+	</dependencies>				
+</editor>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor id="editor.eml" openable="true" text="editor.eml.name" title="editor.eml.title" icon="mail_generic.png" className="EmlViewer" mimes="eml" formId="emlviewer_box" label="CONF_MESSAGE[Email Viewer]" description="CONF_MESSAGE[Email reader, supports eml format and eml mimetypes. Detects if a folder contains only email and display columns accordingly.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<class_definition filename="plugins/editor.eml/class.EmlParser.php" classname="EmlParser"/>
+    <client_settings>
+        <resources>
+            <js file="plugins/editor.eml/class.EmlViewer.js" className="EmlViewer" autoload="true"/>
+            <css file="plugins/editor.eml/emlViewer.css"/>
+            <img_library alias="eml_images" path="plugins/editor.eml/img"/>
+            <i18n namespace="editor.eml" path="plugins/editor.eml/i18n" />
+        </resources>
+    </client_settings>
+	<clientForm id="emlviewer_box"><![CDATA[
+		<div id="emlviewer_box" action="view_eml" box_width="80%" box_height="80%" box_padding="0">
+			<div class="action_bar" style="width: 100%;">			
+				<a href="#" id="downloadFileButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/download_manager.png" alt="" border="0"><br><span message_id="editor.eml.6">AJXP_MESSAGE[editor.eml.6]</span></a>
+			</div>
+			<div id="emlHeaderContainer">
+			</div>
+			<div id="treeSelectorCpContainer" style="position:absolute; right:10px;display:none;width:247px;">
+				<input type="hidden" name="dest_node" value=""/>
+				<div class="dialogLegend" style="font-family: Trebuchet MS;font-size: 10px;">AJXP_MESSAGE[175]</div>					
+				<select id="external_repository" name="dest_repository_id" style="width: 248px; font-size: 12px; height: 21px; margin-top:5px; margin-bottom:7px; border: 1px solid #ccc;"></select>
+				<div style="height:200px; width:246px; padding: 0px 0px; border: 1px solid #ccc;">
+					<div id="treeCopy" style="height:194px; padding: 3px 2px; overflow:auto; text-align:left;" class="treeCopyContainer"></div>							
+				</div>
+				<input type="text" name="dest" value="/" readonly  style="width:248px; margin-left: 0px; border: 1px solid #ccc; margin-top:7px; margin-bottom:2px;background-image:none;"/>
+				<div class="dialogButtons">
+					<input type="image" id="eml_cp_ok" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" height="22" width="22" title="OK" class="dialogButton dialogFocus">
+					<input type="image" id="eml_cp_can" height="22" width="22" src="AJXP_THEME_FOLDER/images/actions/22/dialog_close.png" title="CANCEL" class="dialogButton">
+				</div>							
+			</div>
+			<form id="emlDownloadAttachmentForm" style="display:none" target="download_iframe" method="GET" action="index.php">			
+			</form>
+		</div>				
+	]]></clientForm>
+	<registry_contributions>
+		<actions>
+			<action name="eml_get_xml_structure">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+			<action name="eml_get_bodies">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+			<action name="eml_dl_attachment">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+			<action name="eml_cp_attachment">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+			<action name="ls">
+				<post_processing>
+					<serverCallback methodName="lsPostProcess" capture="true"></serverCallback>
+				</post_processing>
+			</action>
+		</actions>
+		<hooks>
+			<serverCallback hookName="node.info" methodName="extractMimeHeaders"></serverCallback>
+		</hooks>	
+	</registry_contributions>
+	<dependencies>
+		<!-- Image proxy must be implemented -->
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+	</dependencies>				
+</editor>

@@ -1,0 +1,23 @@
+<p><em>Warning, if you are using this plugin in slave mode with Drupal, Joomla or Wordpress, and encounter problems for connecting to AjaXplorer with the REST clients (iPhone/iPad, webDav), you have to upgrade the plugin. <a href="http://www.ajaxplorer.info/wordpress/2011/06/auth-remote-plugin-upgrade-for-ios-client-users/">More info can be found here</a></em><br>
+<br>
+Generic plugin used for integration with various CMS. In master mode, when you login, AjaXplorer will silently call a predefined URL to also log you on the external application. In slave mode, the plugin is not straightforward to implement, you should check the wordpress and joomla implementation for more examples.&nbsp;Basically, in slave mode, it works as follow :<br>
+<ul><br>
+	<li>Install AjaXplorer with a "&nbsp;standard&nbsp;" authentification plugin, and update your "&nbsp;admin&nbsp;" user with your own password.</li><br>
+	<li>Then switch to this auth.remote plugin in the server/conf/conf.php file.</li><br>
+	<li>In the config, set a secret key (can be anything, not necessary your admin password, beware of "&nbsp;anti-slashing&nbsp;" $ symbol).</li><br>
+	<li>It's ready to use on the AjaXplorer part</li><br>
+	<li>In your CMS, create an authentification mechanism (generally there is also a plugin system) that can be configured with the secret key.</li><br>
+	<li>This mechanism must, at login time, include the plugins/auth.remote/glueCode.php file, the secret key being set as GLOBAL before the inclusion, as well as the $plugInAction variable, and other variable depending on the action (login, logout, addUser, etc).. See the glueCode file to check the implemented actions.</li><br>
+	<li>This way, the glueCode file switches dynamically the session to an AjaXplorer session, logs in a user, then give back the hand to the CMS.</li><br>
+	<li>Once logged in your CMS, you should be able to access AjaXplorer logged in as the same user.</li><br>
+</ul>
+</p>
+<p>
+    In order to make the mobile clients working with this auth.remote plugin, you have to carefully configure the MASTER_XX options. Please see a brief description below, but above all read the dedicated description in the documentation on the website <a href="http://ajaxplorer.info/documentation/administration/chapter-howtos/configuring-auth-remote-for-the-mobile-clients/" target="_blank">configuring-auth-remote-for-the-mobile-clients</a>
+<ul>
+<li><strong>MASTER_AUTH_FUNCTION</strong> will be «&nbsp;<strong>drupal_remote_auth</strong>«&nbsp;, «&nbsp;<strong>joomla_remote_auth</strong>&nbsp;» or «&nbsp;<strong>wordpress_remote_auth</strong>&nbsp;» depending on the bridge you are using. See below on how to add your own custom function if your CMS is different.</li>
+<li><strong>MASTER_HOST</strong> can be detected automatically, but otherwise set to the host of your cms installation (so it can be <strong>192.168.0.25</strong>, or <strong>localhost</strong>, or <strong>www.mycms.com</strong>). Most generally for shared hosts it will be your real domain name, not a local adress. Warning, no trailing slahs.</li>
+<li><strong>MASTER_URI</strong> will be the path on your host to your CMS, beginning with a slash. Can be something like «&nbsp;/wordpress&nbsp;» or «&nbsp;/wordpress/&nbsp;» … The combination of MASTER_HOST and MASTER_URI should lead to the page containing the login form.</li>
+<li><strong>MASTER_AUTH_FORM_ID</strong> : (useless for WP) The HTML identifier of the login form as it appear in the login page. You can use F12 (developer tools) in most modern browser, to inspect the HTML and find the corresponding &lt;form&gt; tag and it’s id attribute &nbsp;: &lt;form id=&nbsp;»login-form&nbsp;»&gt; bla …. &lt;/form&gt;</li>
+</ul>
+</p>

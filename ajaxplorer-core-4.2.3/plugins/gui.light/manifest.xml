@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<guidriver name="light" label="CONF_MESSAGE[Light]" description="CONF_MESSAGE[Simple Template for Bookmarklets]">
+    <class_definition filename="plugins/gui.light/class.LightGuiPlugin.php" classname="LightGuiPlugin"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="light_gui" path="plugins/gui.light/i18n"/>
+        </resources>
+    </client_settings>
+	<registry_contributions>
+		<client_configs uuidAttr="name">
+			<template name="mobile_extensions" element="head" position="bottom"><![CDATA[
+				<script type="text/javascript">
+					window.ajxpLight = true; var conn = new Connexion(); conn._libUrl = '';
+					conn.loadLibrary('plugins/gui.light/ajxp-dl-later.js');
+				</script>
+				<style type="text/css">
+				    #browser{background-color: #fff !important;box-shadow:none;}
+				    #progressBox{display:none !important;}
+				    #overlay, #loading_overlay{
+                        background-color: #fff;
+                        -moz-opacity: 1;
+                        opacity: 1;
+                        filter: alpha(opacity=100);
+				    }
+				    #message_div{display:none!important;}
+				    .ajxp_bm_log_action{
+                        padding: 10px;
+                        color: #999;
+                        border-radius: 5px;
+                        margin-bottom: 4px;
+                        font-weight: bold;
+				    }
+				    #generic_dialog_box{
+                        width: 256px !important;
+                        left: -12px !important;
+                        top: -34px !important;
+				    }
+				</style>
+			]]></template>
+			<template name="main_oxygen" element="ajxp_desktop" position="top" theme="oxygen"><![CDATA[
+				<div id="browser" style="background: white;color: #676965;font-family: Arial, Helvetica;" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
+					<div id="actions_log" style="overflow: hidden;font-size: 17px;height: 128px;border-radius: 5px;background-color: #BBB;padding: 3px;">
+					</div>																				
+				</div>				
+			]]></template>
+			<template name="main_umbra" element="ajxp_desktop" position="top" theme="umbra"><![CDATA[
+				<div id="browser" style="background: white;color: #676965;font-family: Arial, Helvetica;" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
+					<div id="actions_log" style="overflow: hidden;font-size: 17px;height: 128px;border-radius: 5px;background-color: #BBB;padding: 3px;">
+					</div>
+				</div>
+			]]></template>
+		</client_configs>
+	</registry_contributions>
+    <dependencies>
+        <activePlugin pluginName="gui.ajax"/>
+    </dependencies>
+</guidriver>

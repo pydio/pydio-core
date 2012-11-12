@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<authdriver name="remote" label="CONF_MESSAGE[Remote authentication]" description="CONF_MESSAGE[Authentication is done remotely (useful in CMS system).]" mixins="authdriver_commons"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings>
+        <resources>
+            <i18n namespace="remote_auth" path="plugins/auth.remote/i18n"/>
+        </resources>
+    </client_settings>
+	<server_settings>
+		<param name="SLAVE_MODE" type="boolean" label="CONF_MESSAGE[Authentication mode]" description="CONF_MESSAGE[If set, the remote end calls us to register upon login, else, we will be calling the remote end when login is required]" default="true" mandatory="true" />
+		<param name="LOGIN_URL" type="string" label="CONF_MESSAGE[Login URL]" description="CONF_MESSAGE[When not in slave mode, AJXP calls the given URL as URL?name=XXX&amp;pass=XXX&amp;key=XXX. Else it redirect to the given URL]" mandatory="true" />
+		<param name="LOGOUT_URL" type="string" label="CONF_MESSAGE[Logout URL]" description="CONF_MESSAGE[Redirect to the given URL on loggin out]" mandatory="false" />
+		<param name="SECRET" type="string" label="CONF_MESSAGE[Secret key]" description="CONF_MESSAGE[This key must only be known by remote end]" mandatory="false" />
+	    <param name="USERS_FILEPATH" type="string" label="CONF_MESSAGE[Users]" description="CONF_MESSAGE[The users list]" mandatory="true"/>
+	    <!-- These will be necessary if you want to use the AjaXplorer iOS client -->
+	    <param name="MASTER_AUTH_FUNCTION" type="string" label="CONF_MESSAGE[Master Auth Function]" description="CONF_MESSAGE[User-defined function for performing real password check, necessary for REST API (including iOS client)]" mandatory="false"/>
+	    <param name="MASTER_HOST" type="string" label="CONF_MESSAGE[Master Host]" description="CONF_MESSAGE[Host used to negociated the master authentication, if not set will be detected]" mandatory="false"/>
+	    <param name="MASTER_URI" type="string" label="CONF_MESSAGE[Master Base URI]" description="CONF_MESSAGE[URI to access the base of the CMS installation. Used by the master auth function, this page must contain the login form!]" mandatory="false"/>
+	    <param name="MASTER_AUTH_FORM_ID" type="string" label="CONF_MESSAGE[Auth Form ID]" description="CONF_MESSAGE[The HTML ID of the form tag displayed for login on the page defined previously. Not necessary for WP, login-form by default for Joomla, and user-login-form for Drupal]" mandatory="false"/>
+	</server_settings>
+	<class_definition filename="plugins/auth.remote/class.remoteAuthDriver.php" classname="remoteAuthDriver"/>
+	<registry_contributions>
+		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude="actions/action[@name='logout']"/>
+		<external_file filename="plugins/auth.remote/remoteAuthActions.xml" include="actions/*"/>		
+	</registry_contributions>
+</authdriver>

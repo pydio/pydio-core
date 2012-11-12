@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor id="editor.imagick" enabled="false" openable="true" previewProvider="true" formId="diaporama_box" text="328" title="329" icon="frame_image.png" className="IMagickPreviewer" mimes="pdf,svg,tif,tiff,psd,xcf,eps,xls,xlsx,ods,doc,docx,odt,ppt,pptx,odp,rtf" label="CONF_MESSAGE[Image Magick]" description="CONF_MESSAGE[Image Magick viewer supports PDF and various images formats preview. Requires external library to be installed on the server.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition filename="plugins/editor.imagick/class.IMagickPreviewer.php" classname="IMagickPreviewer"/>
+    <client_settings>
+        <resources>
+            <js file="plugins/editor.imagick/class.IMagickPreviewer.js" className="IMagickPreviewer"/>
+            <i18n namespace="imagick_editor" path="plugins/editor.imagick/i18n"/>
+        </resources>
+    </client_settings>
+	<server_settings>
+		<global_param name="IMAGE_MAGICK_CONVERT" type="string" label="CONF_MESSAGE[Convert Path]" description="CONF_MESSAGE[Full path on the server to the 'convert' binary]" default="" mandatory="true"/>
+		<global_param name="IM_THUMB_QUALITY" type="string" label="CONF_MESSAGE[Thumbs Quality]" description="CONF_MESSAGE[Quality used for generating the thumbnails]" default="65"/>
+		<global_param name="IM_VIEWER_QUALITY" type="string" label="CONF_MESSAGE[Viewer Quality]" description="CONF_MESSAGE[Quality used for generation the high scale images]" default="90"/>
+		<global_param name="IM_CUSTOM_OPTIONS" type="string" label="CONF_MESSAGE[IMagick Options]" description="CONF_MESSAGE[You can add any Image Magick options you want here]" default="-strip"/>
+		<global_param name="ONTHEFLY_THRESHOLD" type="integer" label="CONF_MESSAGE[Pregeneration Threshold]" description="CONF_MESSAGE[Threshold (in MegaByte) under which the pages are all generated when opening the document, and over which pages are generated on-demand only]" default="5"/>
+		<global_param name="UNOCONV" type="string" label="CONF_MESSAGE[Unoconv Path]" description="CONF_MESSAGE[Full path on the server to the 'unoconv' binary (see docs)]" default="" mandatory="false"/>
+	</server_settings>
+	<registry_contributions>
+		<hooks>
+			<serverCallback hookName="node.change" methodName="deleteImagickCache"></serverCallback>
+		</hooks>			
+		<actions>
+			<action name="imagick_data_proxy">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+			<action name="delete_imagick_data">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+			<action name="get_extracted_page">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+		</actions>
+	</registry_contributions>
+	<dependencies>
+		<pluginResources pluginName="editor.diaporama"/>
+		<!-- Stream Wrapper must be implemented -->
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+	</dependencies>				
+</editor>

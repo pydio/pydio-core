@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<authdriver name="basic_http" label="CONF_MESSAGE[Basic HTTP]" description="CONF_MESSAGE[Use the standard http authentication.]" mixins="authdriver_commons" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings>
+        <resources>
+            <i18n namespace="basic_http_auth" path="plugins/auth.basic_http/i18n"/>
+        </resources>
+    </client_settings>
+    <server_settings>
+        <param name="USERS_FILEPATH" type="string" label="CONF_MESSAGE[Users]" description="CONF_MESSAGE[The users list]" mandatory="true"/>
+        <param name="LOGOUT_URL" type="string" label="CONF_MESSAGE[Logout URL]" description="CONF_MESSAGE[Redirect to the given URL on loggin out]" mandatory="false" />
+    </server_settings>
+	<class_definition filename="plugins/auth.basic_http/class.basic_httpAuthDriver.php" classname="basic_httpAuthDriver"/>
+	<registry_contributions>
+		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude="actions/action[@name='logout']"/>
+        <actions>
+            <action name="logout" expireDefault="true">
+                <gui text="164" title="169" src="decrypted.png" accessKey="" hasAccessKey="false">
+                    <context selection="false" dir="" recycle="false"
+                            actionBar="true" contextMenu="false" infoPanel="false"
+                            actionBarGroup="user" ajxpWidgets="UserWidget::logging_string">
+                    </context>
+                </gui>
+                <rightsContext noUser="false" userLogged="only" guestLogged="show" read="false" write="false" adminOnly=""></rightsContext>
+                <processing>
+                    <clientCallback prepareModal="false"><![CDATA[
+                        clearRememberData();
+                        var connexion = new Connexion();
+                        connexion.addParameter('get_action', 'back');
+                        connexion.onComplete = function(transport){
+                                var child = transport.responseXML.documentElement.childNodes;
+                                try{
+                                    document.location.href = child[0].nodeValue;
+                                }catch(e){}
+                        };
+                        connexion.sendAsync();
+                        ]]></clientCallback>
+                    <serverCallback methodName="switchAction"></serverCallback>
+                </processing>
+            </action>
+        </actions>
+
+	</registry_contributions>
+	<dependencies>
+		<pluginClass pluginName="auth.serial"/>
+	</dependencies>		
+</authdriver>

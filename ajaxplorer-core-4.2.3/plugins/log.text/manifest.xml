@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<logdriver name="text" label="CONF_MESSAGE[Text logger]" description="CONF_MESSAGE[Stores the logs as readable tab delimited text.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition filename="plugins/log.text/class.textLogDriver.php" classname="textLogDriver"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="text_logger" path="plugins/log.text/i18n"/>
+        </resources>
+    </client_settings>
+    <server_settings>
+        <param name="LOG_PATH" type="string" label="CONF_MESSAGE[Logpath]" description="CONF_MESSAGE[The path to where the logs are kept.]" mandatory="true"/>
+        <param name="LOG_FILE_NAME" type="string" label="CONF_MESSAGE[Logfile]" description="CONF_MESSAGE[The name of the log file]" mandatory="true"/>
+        <param name="LOG_CHMOD" type="integer" label="CONF_MESSAGE[Files Permissions]" description="CONF_MESSAGE[]" default="0770" mandatory="true"/>
+    </server_settings>
+</logdriver>

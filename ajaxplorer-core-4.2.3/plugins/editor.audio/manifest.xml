@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor id="editor.audio" order="1000" enabled="true" openable="false" previewProvider="true" text="186" title="136" icon="frame_image.png" className="AudioPreviewer" mimes="mp3" label="CONF_MESSAGE[Audio Player]" description="CONF_MESSAGE[Inserts a flash player for reading mp3 files online, and playing a whole folder in a separate window.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<class_definition filename="plugins/editor.audio/class.AudioPreviewer.php" classname="AudioPreviewer"/>
+    <client_settings>
+        <resources>
+            <js file="plugins/editor.audio/class.AudioPreviewer.js" className="AudioPreviewer"/>
+            <i18n namespace="audio_editor" path="plugins/editor.audio/i18n"/>
+        </resources>
+    </client_settings>
+	<registry_contributions>
+		<actions>
+			<action name="audio_proxy">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+			<action name="play_whole_folder">
+				<gui text="140" title="140" src="player_play.png" accessKey=""><context selection="true" dir="" recycle="false" actionBar="false" contextMenu="false" infoPanel="true"></context><selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_AUDIO"></selectionContext></gui>
+				<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+				<processing>
+					<clientCallback><![CDATA[
+					var editor = ajaxplorer.findEditorById('editor.audio');
+					if(editor){
+						ajaxplorer.loadEditorResources(editor.resourcesManager);
+						var editorClass = Class.getByName(editor.editorClass);
+						if(editorClass){
+							editorClass.prototype.createFolderPlayer(ajaxplorer.getContextNode());
+						}					
+					}
+					]]></clientCallback>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+			<!-- This one will happen a post-processing filter when ls is called with parameter playlist=true -->
+			<action name="ls">
+				<pre_processing>					
+					<serverCallback methodName="preProcessAction" applyCondition="$apply=isSet($httpVars['playlist']);"/>
+				</pre_processing>
+				<post_processing>					
+					<serverCallback methodName="switchAction" applyCondition="$apply=isSet($httpVars['playlist']);" capture="true"/>
+				</post_processing>
+			</action>
+		</actions>
+	</registry_contributions>
+	<dependencies>
+		<!-- Stream Wrapper must be implemented -->
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+	</dependencies>				
+</editor>
