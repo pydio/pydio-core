@@ -2,7 +2,7 @@ CREATE TABLE ajxp_user_rights (
 	rid INTEGER PRIMARY KEY AUTO_INCREMENT, 
 	login VARCHAR(255) NOT NULL, 
 	repo_uuid VARCHAR(33) NOT NULL, 
-	rights VARCHAR(255) NOT NULL
+	rights MEDIUMTEXT NOT NULL
 );
 
 CREATE TABLE ajxp_user_prefs ( 
@@ -45,7 +45,7 @@ CREATE TABLE ajxp_repo_options (
 );
 
 CREATE TABLE ajxp_roles (
-	role_id VARCHAR(50) PRIMARY KEY,
+	role_id VARCHAR(255) PRIMARY KEY,
 	serial_role TEXT(500) NOT NULL
 );
 

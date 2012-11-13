@@ -191,7 +191,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 						}
 					}
                     $node = $selection->getUniqueNode($this);
-                    AJXP_Controller::applyHook("node.read", array(&$node));
 				}else{
 					$zip = true;
 				}
@@ -209,8 +208,12 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 					AJXP_Controller::applyHook("dl.localname", array($this->urlBase.$selection->getUniqueFile(), &$localName, $this->wrapperClassName));
 					$this->readFile($this->urlBase.$selection->getUniqueFile(), "force-download", $localName);
 				}
-				
-			break;
+                if(isSet($node)){
+                    AJXP_Controller::applyHook("node.read", array(&$node));
+                }
+
+
+                break;
 
 			case "prepare_chunk_dl" : 
 
