@@ -7,6 +7,7 @@
     <script type="text/javascript" src="underscore.js"></script>
     <script type="text/javascript" src="backbone.js"></script>
     <script type="text/javascript" src="backbone.localStorage.js"></script>
+    <script type="text/javascript" src="backbone.layoutmanager.js"></script>
     <script type="text/javascript" src="jath.js"></script>
     <script type="text/javascript" src="application.js"></script>
     <style type="text/css">
@@ -39,16 +40,21 @@ ul.node-tree li.dummy-item
     margin-bottom: -0.75em;
 }
 
-li.TreeView{
+div.left{
 	float:left;
 	width: 30%;
 }
 
-table.ListView{
+div.right{
 	float: right;
 	width: 70%;
 }
     </style>
+
+    <script id="main-layout" type="layout">
+        <div class="left"></div>
+        <div class="right"></div>
+    </script>
 </head>
 <body>
 
