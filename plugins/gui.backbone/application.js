@@ -116,12 +116,20 @@ jQuery(function($) {
     
     var ListView = Backbone.View.extend({
         tagName: 'table', // required, but defaults to 'div' if not set
-        className: 'container', // optional, you can assign multiple classes to this property like id: 'todos', // optional
+        className: 'ListView', // optional, you can assign multiple classes to this property like id: 'todos', // optional
         initialize: function(){
+        },
+        setCollection:function(collection){
+        	if(this.collection){
+	        	this.collection.off('all');
+        	}
+	      	this.collection = collection;  
             this.collection.on('all', this.render, this );
+            this.render();
         },
         render: function(){
             this.$el.html('');
+            if(!this.collection) return;
             this.collection.each(function(todo){
                 var view = new ListEntryView({model:todo});
                 this.$el.append(view.render().el);
@@ -153,11 +161,12 @@ TreeView = Backbone.View.extend({
     setupEvents: function() {
         // Hack to get around event delegation not supporting ">" selector
         var that = this;
-        this.$('> .node-collapse').click(function() { return that.toggleCollapse(); });
+        this.$('> .node-collapse').click(function() { that.toggleCollapse(); return false; });
     },
 
     toggleCollapse: function() {
         this.collapsed = !this.collapsed;
+        todosView.setCollection(this.model.childNodes);        
         if(!this.model.get('loaded')){
 	        this.model.fetchChildren();
 	        this.collapsed = true;
@@ -170,7 +179,6 @@ TreeView = Backbone.View.extend({
         }
         else
         {        	
-            this.model.fetchChildren();
             this.$('> .node-collapse i').attr('class', 'icon-minus');
             this.$('> .node-tree').slideDown(COLLAPSE_SPEED);	            
         }
@@ -217,11 +225,13 @@ TreeView = Backbone.View.extend({
 
 	var rootNode = new Node({id:"/", title:"Root"});
 	var treeView = new TreeView({model:rootNode});
-    //var todosView = new ListView({collection:todos});
-    //$('body').html(todosView.render().el);
     $('body').html(treeView.render().el);
+    treeView.render().$el.addClass('TreeView');
+    
+    var todosView = new ListView({collection:todos});
+    $('body').append(todosView.render().el);
 
-    Backbone.history.start({silent:true, pushState: false, root: "/ajaxplorer/plugins/gui.backbone/"});
+    //Backbone.history.start({silent:true, pushState: false, root: "/ajaxplorer/plugins/gui.backbone/"});
 
 
 });
