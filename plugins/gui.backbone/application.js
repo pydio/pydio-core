@@ -2,6 +2,9 @@
 jQuery(function($) {
 
 	var BASE_URL = '/ajaxplorer/index.php?get_action=ls&options=al&dir=';
+    Backbone.LayoutManager.configure({
+        manage: true
+    });
 
     // Keep track of the original sync method so we can
     // delegate to it at the end of our new sync.
@@ -39,6 +42,7 @@ jQuery(function($) {
         },
         initialize: function(){
         	this.childNodes = new NodesCollection();
+            this.childNodes.meta('parent', this.id);
             console.log('This model has been initialized.');
             this.on('change:title', function(){
                 console.log('- Values for this model have changed.');
@@ -63,7 +67,21 @@ jQuery(function($) {
 
     var NodesCollection = Backbone.Collection.extend({
         model: Node,
-        url:BASE_URL,
+        url:function(){
+            if(this._meta && this._meta['parent']){
+                return BASE_URL + encodeURIComponent(this._meta['parent']);
+            }else{
+                return BASE_URL;
+            }
+        },
+        meta: function(prop, value) {
+            if (value === undefined && this._meta) {
+                return this._meta[prop]
+            } else {
+                if(!this._meta) this._meta = {};
+                this._meta[prop] = value;
+            }
+        },
         parse: function( response ) {
             var parsed = Jath.parse(
                 [ '//tree', {
@@ -94,7 +112,7 @@ jQuery(function($) {
             this.model.on( 'change', this.render, this ); 
         },        
         // Re-render the titles of the todo item.
-        render: function() {
+        afterRender: function() {
             this.$el.html( this.todoTpl( this.model.toJSON() ) ); this.input = this.$('.edit');
             return this;
         },
@@ -111,14 +129,9 @@ jQuery(function($) {
         } });
 
 
-    var todos = new NodesCollection();
-    todos.fetch();
-    
     var ListView = Backbone.View.extend({
         tagName: 'table', // required, but defaults to 'div' if not set
         className: 'ListView', // optional, you can assign multiple classes to this property like id: 'todos', // optional
-        initialize: function(){
-        },
         setCollection:function(collection){
         	if(this.collection){
 	        	this.collection.off('all');
@@ -127,8 +140,8 @@ jQuery(function($) {
             this.collection.on('all', this.render, this );
             this.render();
         },
-        render: function(){
-            this.$el.html('');
+        afterRender: function(){
+            this.$el.empty();
             if(!this.collection) return;
             this.collection.each(function(todo){
                 var view = new ListEntryView({model:todo});
@@ -189,7 +202,7 @@ TreeView = Backbone.View.extend({
         this.collapsed ? this.$('> .node-tree').slideUp(COLLAPSE_SPEED) : this.$('> .node-tree').slideDown(COLLAPSE_SPEED);
     },
 
-    render: function() {
+    afterRender: function() {
         // Load HTML template and setup events
         this.$el.html(this.template);
         this.setupEvents();
@@ -201,7 +214,7 @@ TreeView = Backbone.View.extend({
         var tree = this.$('> .node-tree'), childView = null;
         _.each(this.model.getChildren(), function(model) {
             childView = new TreeView({
-                model: model,
+                model: model
             });
             childView.$el.hide();
             tree.append(childView.$el);            
@@ -220,17 +233,27 @@ TreeView = Backbone.View.extend({
         }
 
         return this;
-    },
+    }
 });
 
-	var rootNode = new Node({id:"/", title:"Root"});
+    var todos = new NodesCollection();
+    var rootNode = new Node({id:"/", title:"Root"});
 	var treeView = new TreeView({model:rootNode});
-    $('body').html(treeView.render().el);
-    treeView.render().$el.addClass('TreeView');
+    //$('body').html(treeView.render().el);
+    //treeView.render().$el.addClass('TreeView');
     
     var todosView = new ListView({collection:todos});
-    $('body').append(todosView.render().el);
+    //$('body').append(todosView.render().el);
 
+    var mainLayout = new Backbone.Layout({
+        template:'#main-layout',
+        views:{
+            ".left" : treeView,
+            ".right": todosView
+        }
+    });
+    $("body").empty().append(mainLayout.el);
+    mainLayout.render();
     //Backbone.history.start({silent:true, pushState: false, root: "/ajaxplorer/plugins/gui.backbone/"});
 
 
