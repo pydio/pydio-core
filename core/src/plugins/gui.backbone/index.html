@@ -9,6 +9,46 @@
     <script type="text/javascript" src="backbone.localStorage.js"></script>
     <script type="text/javascript" src="jath.js"></script>
     <script type="text/javascript" src="application.js"></script>
+    <style type="text/css">
+	    li
+{
+    list-style-type: none;
+}
+
+ul.node-tree
+{
+    padding-left: 5px;
+}
+
+ul.node-tree li
+{
+    border-left: 1px solid gray;
+    padding-left: 20px;
+}
+
+
+/* This combination enables a border that extends to the correct location
+   and looks nice */
+ul.node-tree li.last-item
+{
+    border-left-color: transparent;
+}
+ul.node-tree li.dummy-item
+{
+    height: 0.75em;
+    margin-bottom: -0.75em;
+}
+
+li.TreeView{
+	float:left;
+	width: 30%;
+}
+
+table.ListView{
+	float: right;
+	width: 70%;
+}
+    </style>
 </head>
 <body>
 
