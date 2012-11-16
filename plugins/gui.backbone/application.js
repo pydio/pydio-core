@@ -1,4 +1,3 @@
-
 jQuery(function($) {
 
 	var BASE_URL = '/ajaxplorer/index.php?get_action=ls&options=al&dir=';
@@ -103,8 +102,8 @@ jQuery(function($) {
         tagName: 'tr',
         // Cache the template function for a single item.
         todoTpl: _.template( '<td><div class="edit" ><img src="/ajaxplorer/plugins/gui.ajax/res/themes/umbra/images/mimes/16/<%= icon %>"><%= title %></div></td><td><%= id %></td><td><%= mimestring %></td><td><%= filesize %></td>' ),
+        parentTpl : 'table',
         events: {
-            'click .edit': 'edit',
             'mouseover .edit': 'hover',
             'mouseout .edit':   'hout'
         },
@@ -126,12 +125,43 @@ jQuery(function($) {
         hover: function( e ) {
             // executed on each keypress when in todo edit mode, // but we'll wait for enter to get in action
             this.$el.css({textDecoration:'underline'});
-        } });
+        } 
+    });
 
+    var ThumbEntryView = Backbone.View.extend({
+        tagName: 'div',
+        // Cache the template function for a single item.
+        todoTpl: _.template( '<div class="edit" ><img src="/ajaxplorer/plugins/gui.ajax/res/themes/umbra/images/mimes/64/<%= icon %>"><div><%= title %></div><div><%= mimestring %> - <%= filesize %></div></div>' ),
+        parentTpl : 'div',
+        events: {
+            'mouseover .edit': 'hover',
+            'mouseout .edit':   'hout'
+        },
+        initialize: function() {
+            this.model.on( 'change', this.render, this ); 
+        },        
+        // Re-render the titles of the todo item.
+        afterRender: function() {
+            this.$el.html( this.todoTpl( this.model.toJSON() ) ); this.input = this.$('.edit');
+            return this;
+        },
+        edit: function() {
+            myRouter.navigate(this.model.id, true);
+        },
+        hout: function() {
+            // executed when todo loses focus
+            this.$el.css({textDecoration:'none'});
+        },
+        hover: function( e ) {
+            // executed on each keypress when in todo edit mode, // but we'll wait for enter to get in action
+            this.$el.css({textDecoration:'underline'});
+        } 
+    });
 
     var ListView = Backbone.View.extend({
-        tagName: 'table', // required, but defaults to 'div' if not set
+        tagName: 'div', // required, but defaults to 'div' if not set
         className: 'ListView', // optional, you can assign multiple classes to this property like id: 'todos', // optional
+        subViewName:'ThumbEntryView',
         setCollection:function(collection){
         	if(this.collection){
 	        	this.collection.off('all');
@@ -140,12 +170,17 @@ jQuery(function($) {
             this.collection.on('all', this.render, this );
             this.render();
         },
+        setDisplayType:function(rendererViewName){
+	        this.subViewName = rendererViewName;
+	        this.render();
+        },
         afterRender: function(){
             this.$el.empty();
+            this.$el.append('<'+eval(this.subViewName+'.parentTpl')+' class="listcontainer">');
             if(!this.collection) return;
             this.collection.each(function(todo){
-                var view = new ListEntryView({model:todo});
-                this.$el.append(view.render().el);
+                var view = eval('new '+this.subViewName+'({model:todo})');
+                this.$('.listcontainer').append(view.afterRender().el);
             }, this);
             return this;
         }
@@ -254,6 +289,10 @@ TreeView = Backbone.View.extend({
     });
     $("body").empty().append(mainLayout.el);
     mainLayout.render();
+    mainLayout.$('.actions a').click(function(a){
+	    console.log(a.srcElement.getAttribute('data-viewname'));
+	    todosView.setDisplayType(a.srcElement.getAttribute('data-viewname'));
+    });
     //Backbone.history.start({silent:true, pushState: false, root: "/ajaxplorer/plugins/gui.backbone/"});
 
 
