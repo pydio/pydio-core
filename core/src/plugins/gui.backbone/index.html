@@ -49,11 +49,21 @@ div.right{
 	float: right;
 	width: 70%;
 }
+div.edit{
+	width: 250px;
+	float: left;	
+}
+.edit img {
+	float: left;
+}
     </style>
 
     <script id="main-layout" type="layout">
-        <div class="left"></div>
-        <div class="right"></div>
+	    <div class="actions"><a data-viewName="ThumbEntryView">Thumbs</a> | <a data-viewName="ListEntryView">List</a></div>
+	    <div>
+	        <div class="left"></div>
+	        <div class="right"></div>
+        </div>
     </script>
 </head>
 <body>
