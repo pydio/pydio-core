@@ -56,7 +56,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
             $this->ldapFilter = "(objectClass=person)";
         }
         if ($options["LDAP_USERATTR"]){
-			$this->ldapUserAttr = $options["LDAP_USERATTR"]; 
+			$this->ldapUserAttr = strtolower($options["LDAP_USERATTR"]);
 		}else{ 
 			$this->ldapUserAttr = 'uid' ; 
 		}
