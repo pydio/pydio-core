@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<guidriver enabled="true" name="backbone" label="CONF_MESSAGE[Backbone]" description="CONF_MESSAGE[Backbone]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<guidriver enabled="false" name="backbone" label="CONF_MESSAGE[Backbone]" description="CONF_MESSAGE[Backbone]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <!--
+    TO ADD IN HTML TEMPLATE DIRECTLY
+<script id="main-layout" type="layout">
+    <div class="actions"><a data-viewName="ThumbEntryView">Thumbs</a> | <a data-viewName="ListEntryView">List</a></div>
+    <div>
+        <div class="left"></div>
+        <div class="right"></div>
+    </div>
+    <div class="viewer"></div>
+</script>
+
+    -->
     <plugin_info>
         <plugin_author>Charles du Jeu</plugin_author>
         <plugin_version>0.2</plugin_version>
@@ -20,7 +32,7 @@
 	<registry_contributions>
 		<client_configs uuidAttr="name">
 			<template name="scripts" element="head" position="bottom"><![CDATA[
-			<link type="text/css" rel="stylesheet" href="plugins/gui.backbone/css/ui-lightness/jquery-ui-1.9.1.custom.css"></link>
+			<link type="text/css" rel="stylesheet" href="plugins/gui.backbone/css/smoothness/jquery-ui-1.9.1.custom.css"></link>
             <style type="text/css">
             body{
             overflow:auto !important;

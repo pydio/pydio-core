@@ -37,12 +37,12 @@ jQuery(function($) {
     var Node = Backbone.Model.extend({
 
         defaults:{
-            loaded: false
+            loaded: false,
+            selected: false
         },
         initialize: function(){
         	this.childNodes = new NodesCollection();
             this.childNodes.meta('parent', this.id);
-            console.log('This model has been initialized.');
             this.on('change:title', function(){
                 console.log('- Values for this model have changed.');
             });
@@ -51,7 +51,7 @@ jQuery(function($) {
             });
             this.childNodes.on('all', function(){
 	            this.set('loaded', true);
-	            this.trigger('loaded', true);	            
+	            this.trigger('loaded', true);
             }, this);
         },
         fetchChildren : function(){
@@ -63,6 +63,26 @@ jQuery(function($) {
         }
 
     });
+
+    Class.create("AjxpProxy", {
+        initialize:function(){},
+        getPreview:function(bbModel, rich){
+            var node = new AjxpNode(bbModel.id, (bbModel.get('isLeaf') == "true"));
+            node.getMetadata().set('filename', bbModel.id);
+            var editors = ajaxplorer.findEditorsForMime((node.isLeaf()?node.getAjxpMime():"mime_folder"), true);
+            //console.log(node, editors);
+            if(!editors || !editors.length) return false;
+            ajaxplorer.loadEditorResources(editors[0].resourcesManager);
+         	var editorClass = Class.getByName(editors[0].editorClass);
+            if(rich){
+                return editorClass.prototype.getPreview(node, true);
+            }else{
+                var src = editorClass.prototype.getThumbnailSource(node);
+                return src;
+            }
+        }
+    });
+    var ajxpProxy = new AjxpProxy();
 
     var NodesCollection = Backbone.Collection.extend({
         model: Node,
@@ -85,6 +105,7 @@ jQuery(function($) {
             var parsed = Jath.parse(
                 [ '//tree', {
                     id: '@filename',
+                    filename: '@filename',
                     title: '@text',
                     isLeaf:'@is_file',
                     icon:'@icon', 
@@ -98,11 +119,23 @@ jQuery(function($) {
         }
     });
 
+    var SelectionModel = Backbone.Collection.extend({
+        model:Node,
+        meta: function(prop, value) {
+            if (value === undefined && this._meta) {
+                return this._meta[prop]
+            } else {
+                if(!this._meta) this._meta = {};
+                this._meta[prop] = value;
+            }
+        }
+    });
+
     var ListEntryView = Backbone.View.extend({
         tagName: 'tr',
+        className: 'selectable',
         // Cache the template function for a single item.
         todoTpl: _.template( '<td><div class="edit" ><img src="/ajaxplorer/plugins/gui.ajax/res/themes/umbra/images/mimes/16/<%= icon %>"><%= title %></div></td><td><%= id %></td><td><%= mimestring %></td><td><%= filesize %></td>' ),
-        parentTpl : 'table',
         events: {
             'mouseover .edit': 'hover',
             'mouseout .edit':   'hout'
@@ -126,16 +159,16 @@ jQuery(function($) {
             // executed on each keypress when in todo edit mode, // but we'll wait for enter to get in action
             this.$el.css({textDecoration:'underline'});
         } 
-    });
+    }, {parentTpl:'table'});
 
     var ThumbEntryView = Backbone.View.extend({
         tagName: 'div',
         // Cache the template function for a single item.
-        todoTpl: _.template( '<div class="edit" ><img src="/ajaxplorer/plugins/gui.ajax/res/themes/umbra/images/mimes/64/<%= icon %>"><div><%= title %></div><div><%= mimestring %> - <%= filesize %></div></div>' ),
-        parentTpl : 'div',
+        todoTpl: _.template( '<div class="edit selectable<% print(selected ? " selected":""); %>" ><img src="/ajaxplorer/plugins/gui.ajax/res/themes/umbra/images/mimes/64/<%= icon %>"><div><%= title %></div><div><%= mimestring %> - <%= filesize %></div></div>' ),
         events: {
             'mouseover .edit': 'hover',
-            'mouseout .edit':   'hout'
+            'mouseout .edit':   'hout',
+            'click .selectable' : 'clicked'
         },
         initialize: function() {
             this.model.on( 'change', this.render, this ); 
@@ -143,31 +176,61 @@ jQuery(function($) {
         // Re-render the titles of the todo item.
         afterRender: function() {
             this.$el.html( this.todoTpl( this.model.toJSON() ) ); this.input = this.$('.edit');
+            var src = ajxpProxy.getPreview(this.model);
+            if(src) this.$('img').attr("src", src).css("maxWidth", "64px");
+            if(this.model.get('selected')) this.$('.selectable').addClass("selected");
             return this;
         },
-        edit: function() {
-            myRouter.navigate(this.model.id, true);
-        },
         hout: function() {
-            // executed when todo loses focus
             this.$el.css({textDecoration:'none'});
         },
         hover: function( e ) {
-            // executed on each keypress when in todo edit mode, // but we'll wait for enter to get in action
             this.$el.css({textDecoration:'underline'});
-        } 
+        },
+        clicked: function(e){
+            this.model.set('selected', !this.model.get('selected'));
+        }
+    }, {parentTpl:'div'});
+
+    var RichPreviewerView = Backbone.View.extend({
+        tagName: 'div',
+        className:'richPreview',
+        events: {
+        },
+        setModel: function(model){
+            this.model = model;
+            this.render();
+        },
+        initialize: function() {
+            if(this.model) this.model.on( 'change', this.render, this );
+        },
+        // Re-render the titles of the todo item.
+        afterRender: function() {
+            if(!this.model) return this;
+            var element = ajxpProxy.getPreview(this.model, true);
+            if(element) {
+                this.$el.html(element);
+                this.$el.parent(".viewer").dialog("open");
+            }
+            return this;
+        }
     });
 
     var ListView = Backbone.View.extend({
         tagName: 'div', // required, but defaults to 'div' if not set
         className: 'ListView', // optional, you can assign multiple classes to this property like id: 'todos', // optional
         subViewName:'ThumbEntryView',
-        setCollection:function(collection){
-        	if(this.collection){
-	        	this.collection.off('all');
+        selectionModel:null,
+        initialize: function(){
+            this.selectionModel = new SelectionModel();
+        },
+        setModel:function(node){
+        	if(this.node){
+	        	this.node.off('change:loaded');
         	}
-	      	this.collection = collection;  
-            this.collection.on('all', this.render, this );
+            this.node = node;
+	      	this.collection = node.childNodes;
+            this.node.on('change:loaded', this.render, this );
             this.render();
         },
         setDisplayType:function(rendererViewName){
@@ -180,119 +243,123 @@ jQuery(function($) {
             if(!this.collection) return;
             this.collection.each(function(todo){
                 var view = eval('new '+this.subViewName+'({model:todo})');
-                this.$('.listcontainer').append(view.afterRender().el);
+                var cont = this.$('.listcontainer');
+                cont.append(view.afterRender().el);
+                view.$el.on("click", function(){
+                    previewerView.setModel(todo);
+                });
             }, this);
             return this;
         }
     });
 
-var COLLAPSE_SPEED = 200;
-TreeView = Backbone.View.extend({
-    tagName: 'li',
-    template: '<a class="node-collapse" href="#"><span class="node-label"></span></a><ul class="nav nav-list node-tree"></ul>',
+    var COLLAPSE_SPEED = 200;
+    TreeView = Backbone.View.extend({
+        tagName: 'li',
+        template: '<a class="node-collapse" href="#"><span class="node-label"></span></a><ul class="nav nav-list node-tree"></ul>',
 
-    initialize: function() {
- 
-        // Listen to model changes for updating view
-        this.model.bind('loaded', function(value){
-        	if(!this.collapsed) return;
-        	this.collapsed = false;        	
-        	this.render();
-        }, this);
+        initialize: function() {
 
-        this.model.bind('change', this.update, this);
+            // Listen to model changes for updating view
+            this.model.bind('loaded', function(value){
+                if(!this.collapsed) return;
+                this.collapsed = false;
+                this.render();
+            }, this);
 
-        // Collapse state
-        this.collapsed = true;
-    },
+            this.model.bind('change', this.update, this);
 
-    setupEvents: function() {
-        // Hack to get around event delegation not supporting ">" selector
-        var that = this;
-        this.$('> .node-collapse').click(function() { that.toggleCollapse(); return false; });
-    },
+            // Collapse state
+            this.collapsed = true;
+        },
 
-    toggleCollapse: function() {
-        this.collapsed = !this.collapsed;
-        todosView.setCollection(this.model.childNodes);        
-        if(!this.model.get('loaded')){
-	        this.model.fetchChildren();
-	        this.collapsed = true;
-	        return;
-        }
-        if (this.collapsed)
-        {
-            this.$('> .node-collapse i').attr('class', 'icon-plus');
-            this.$('> .node-tree').slideUp(COLLAPSE_SPEED);
-        }
-        else
-        {        	
-            this.$('> .node-collapse i').attr('class', 'icon-minus');
-            this.$('> .node-tree').slideDown(COLLAPSE_SPEED);	            
-        }
-    },
+        setupEvents: function() {
+            // Hack to get around event delegation not supporting ">" selector
+            var that = this;
+            this.$('> .node-collapse').click(function() { that.toggleCollapse(); return false; });
+        },
 
-    update: function() {
-        this.$('> a span.node-label').html(this.model.get('title'));
-        this.collapsed ? this.$('> .node-tree').slideUp(COLLAPSE_SPEED) : this.$('> .node-tree').slideDown(COLLAPSE_SPEED);
-    },
+        toggleCollapse: function() {
+            this.collapsed = !this.collapsed;
+            todosView.setModel(this.model);
+            if(!this.model.get('loaded')){
+                this.model.fetchChildren();
+                this.collapsed = true;
+                return;
+            }
+            if (this.collapsed)
+            {
+                this.$('> .node-collapse i').attr('class', 'icon-plus');
+                this.$('> .node-tree').slideUp(COLLAPSE_SPEED);
+            }
+            else
+            {
+                this.$('> .node-collapse i').attr('class', 'icon-minus');
+                this.$('> .node-tree').slideDown(COLLAPSE_SPEED);
+            }
+        },
 
-    afterRender: function() {
-        // Load HTML template and setup events
-        this.$el.html(this.template);
-        this.setupEvents();
+        update: function() {
+            this.$('> a span.node-label').html(this.model.get('title'));
+            this.collapsed ? this.$('> .node-tree').slideUp(COLLAPSE_SPEED) : this.$('> .node-tree').slideDown(COLLAPSE_SPEED);
+        },
 
-        // Render this node
-        this.update();
+        afterRender: function() {
+            // Load HTML template and setup events
+            this.$el.html(this.template);
+            this.setupEvents();
 
-        // Build child views, insert and render each
-        var tree = this.$('> .node-tree'), childView = null;
-        _.each(this.model.getChildren(), function(model) {
-            childView = new TreeView({
-                model: model
+            // Render this node
+            this.update();
+
+            // Build child views, insert and render each
+            var tree = this.$('> .node-tree'), childView = null;
+            _.each(this.model.getChildren(), function(model) {
+                childView = new TreeView({
+                    model: model
+                });
+                childView.$el.hide();
+                tree.append(childView.$el);
+                childView.render();
+                childView.$el.slideDown(COLLAPSE_SPEED);
             });
-            childView.$el.hide();
-            tree.append(childView.$el);            
-            childView.render();
-            childView.$el.slideDown(COLLAPSE_SPEED);
-        });
 
-        /* Apply some extra styling to views with children */
-        if (childView)
-        {
-            // Add bootstrap plus/minus icon
-            this.$('> .node-collapse').prepend($('<i class="icon-plus"/>'));
+            /* Apply some extra styling to views with children */
+            if (childView)
+            {
+                // Add bootstrap plus/minus icon
+                this.$('> .node-collapse').prepend($('<i class="icon-plus"/>'));
 
-            // Fixup css on last item to improve look of tree
-            childView.$el.addClass('last-item').before($('<li/>').addClass('dummy-item'));   
+                // Fixup css on last item to improve look of tree
+                childView.$el.addClass('last-item').before($('<li/>').addClass('dummy-item'));
+            }
+
+            return this;
         }
-
-        return this;
-    }
-});
+    });
 
     var todos = new NodesCollection();
     var rootNode = new Node({id:"/", title:"Root"});
 	var treeView = new TreeView({model:rootNode});
-    //$('body').html(treeView.render().el);
-    //treeView.render().$el.addClass('TreeView');
-    
+
     var todosView = new ListView({collection:todos});
-    //$('body').append(todosView.render().el);
+    var previewerView = new RichPreviewerView();
 
     var mainLayout = new Backbone.Layout({
         template:'#main-layout',
         views:{
             ".left" : treeView,
-            ".right": todosView
+            ".right": todosView,
+            ".viewer":previewerView
         }
     });
-    $("body").empty().append(mainLayout.el);
+    $("#ajxp_desktop").empty().append(mainLayout.el);
     mainLayout.render();
     mainLayout.$('.actions a').click(function(a){
 	    console.log(a.srcElement.getAttribute('data-viewname'));
 	    todosView.setDisplayType(a.srcElement.getAttribute('data-viewname'));
     });
+    mainLayout.$(".viewer").dialog({autoOpen:false, modal:true, closeOnEscape:true});
     //Backbone.history.start({silent:true, pushState: false, root: "/ajaxplorer/plugins/gui.backbone/"});
 
 
