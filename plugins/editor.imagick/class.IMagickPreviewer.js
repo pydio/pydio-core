@@ -101,7 +101,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 						
 	getPreview : function(ajxpNode){		
 		var img = new Element('img', {			
-			style:'border:1px solid #676965;',
+            className:'thumbnail_iconlike_shadow',
             align:'absmiddle',
             src:IMagickPreviewer.prototype.getThumbnailSource(ajxpNode)
 		});		
