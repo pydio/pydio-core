@@ -108,7 +108,8 @@ function parseItem( template, xmldoc, node ) {
 	if( m_browser == 'msie' ) {
 		xmldoc.setProperty("SelectionLanguage", "XPath");
 		if( typeOf( template ) == 'string' && template.substring( 0, 1 ) != Jath.literalChar ) {
-			return node.selectSingleNode( template ).text;
+			var res = node.selectSingleNode( template );//
+			if(res) return res.text;
 		}
 		else {
 			return template.substring( 1 );
