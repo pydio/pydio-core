@@ -162,9 +162,9 @@ jQuery(function($) {
     }, {parentTpl:'table', parentClassName:'table table-striped'});
 
     var ThumbEntryView = Backbone.View.extend({
-        tagName: 'div',
+        tagName: 'li',
         // Cache the template function for a single item.
-        todoTpl: _.template( '<div class="edit selectable<% print(selected ? " selected":""); %>" ><img src="/ajaxplorer/plugins/gui.ajax/res/themes/umbra/images/mimes/64/<%= icon %>"><div><%= title %></div><div><%= mimestring %> - <%= filesize %></div></div>' ),
+        todoTpl: _.template( '<div class="span4 thumbnail edit selectable<% print(selected ? " selected":""); %>" ><img src="/ajaxplorer/plugins/gui.ajax/res/themes/umbra/images/mimes/64/<%= icon %>"><div><%= title %></div><div><%= mimestring %> - <%= filesize %></div></div>' ),
         events: {
             'mouseover .edit': 'hover',
             'mouseout .edit':   'hout',
@@ -190,7 +190,7 @@ jQuery(function($) {
         clicked: function(e){
             this.model.set('selected', !this.model.get('selected'));
         }
-    }, {parentTpl:'div', parentClassName:''});
+    }, {parentTpl:'ul', parentClassName:'thumbnails'});
 
     var RichPreviewerView = Backbone.View.extend({
         tagName: 'div',
