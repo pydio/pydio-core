@@ -159,7 +159,7 @@ jQuery(function($) {
             // executed on each keypress when in todo edit mode, // but we'll wait for enter to get in action
             this.$el.css({textDecoration:'underline'});
         } 
-    }, {parentTpl:'table'});
+    }, {parentTpl:'table', parentClassName:'table table-striped'});
 
     var ThumbEntryView = Backbone.View.extend({
         tagName: 'div',
@@ -190,7 +190,7 @@ jQuery(function($) {
         clicked: function(e){
             this.model.set('selected', !this.model.get('selected'));
         }
-    }, {parentTpl:'div'});
+    }, {parentTpl:'div', parentClassName:''});
 
     var RichPreviewerView = Backbone.View.extend({
         tagName: 'div',
@@ -239,7 +239,7 @@ jQuery(function($) {
         },
         afterRender: function(){
             this.$el.empty();
-            this.$el.append('<'+eval(this.subViewName+'.parentTpl')+' class="listcontainer">');
+            this.$el.append('<'+eval(this.subViewName+'.parentTpl')+' class="listcontainer '+eval(this.subViewName+'.parentClassName')+'">');
             if(!this.collection) return;
             this.collection.each(function(todo){
                 var view = eval('new '+this.subViewName+'({model:todo})');
