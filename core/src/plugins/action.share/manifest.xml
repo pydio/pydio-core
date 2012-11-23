@@ -35,8 +35,8 @@
                         ajaxplorer.actionBar.shareCenter.performShareAction();
                     ]]></clientCallback>
                         <clientForm id="share_form"><![CDATA[
-                        <div id="share_form" title="AJXP_MESSAGE[293]"  box_width="320" action="share">
-                            <div class="dialogContentMainTitle">Share file</div>
+                        <div id="share_form" box_width="320" action="share">
+                            <div class="dialogContentMainTitle" ajxp_message_id="share_center.27">AJXP_MESSAGE[share_center.27]</div>
                             <div class="dialogLegend" ajxp_message_id="share_center.24">AJXP_MESSAGE[share_center.24]</div>
                             <div id="share_optional_fields" class="oneFieldForm" style="margin: 10px;">
                                 <div class="SF_element SF_largeLabel">
@@ -64,17 +64,16 @@
                                 </div>
                             </div>
                             <div style="display:none;position:relative;margin-bottom:0;" id="share_result">
-                                <div class="dialogContentMainTitle">Public Link</div>
+                                <div class="dialogContentMainTitle" ajxp_message_id="share_center.29">AJXP_MESSAGE[share_center.29]</div>
                                 <div id="generate_indicator" style="position:absolute;top:2px;right:4px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
                                 <textarea id="share_container" style="padding: 4px;width: 266px;height: 47px;margin:0 10px;"></textarea>
-                                <!--<a id="email" title="AJXP_MESSAGE[323]"><img style="border:none;" align="absmiddle" src="AJXP_THEME_FOLDER/images/actions/22/mail_generic.png" height="22" width="22"/></a>-->
                             </div>
                         </div>
-                        <div id="share_folder_form" title="Share Folder"  box_width="320" action="share">
-                            <div class="dialogContentMainTitle">Share folder</div>
-                            <div class="dialogLegend" ajxp_message_id="share_center.26">The folder appears to the selected users as a repository with the following label.</div>
+                        <div id="share_folder_form" box_width="320" action="share">
+                            <div class="dialogContentMainTitle" ajxp_message_id="share_center.28">AJXP_MESSAGE[share_center.28]</div>
+                            <div class="dialogLegend" ajxp_message_id="share_center.36">AJXP_MESSAGE[share_center.36]</div>
                             <div id="target_repository" class="SF_element oneFieldForm" style="margin: 5px 10px 15px;">
-                                <div class="SF_label" ajxp_message_id="358" style="font-size:12px;">Repository Label</div>
+                                <div class="SF_label" style="font-size:12px;" ajxp_message_id="share_center.35">AJXP_MESSAGE[share_center.35]</div>
                                 <input type="text" value="" id="repo_label" name="repo_label" class="SF_input" style="float:right;font-size:12px;"/>
                                 <br style="clear:both;"/>
                                 <div style="display:none;margin: 4px 0;text-align:center;" id="share_unshare">
@@ -83,25 +82,25 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="dialogContentMainTitle">User Access</div>
+                            <div class="dialogContentMainTitle" ajxp_message_id="share_center.30">AJXP_MESSAGE[share_center.30]</div>
                             <div class="dialogLegend" ajxp_message_id="share_center.26">AJXP_MESSAGE[share_center.26]</div>
                             <div id="target_user" style="margin:0 10px;">
                                 <div class="editable_users_header">
-                                    <span id="header_read">Read</span>
-                                    <span id="header_write">Write</span>
-                                    <span id="header_watch">Watch</span>
+                                    <span id="header_read" ajxp_message_id="share_center.31">AJXP_MESSAGE[share_center.31]</span>
+                                    <span id="header_write" ajxp_message_id="share_center.32">AJXP_MESSAGE[share_center.32]</span>
+                                    <span id="header_watch" ajxp_message_id="share_center.33">AJXP_MESSAGE[share_center.33]</span>
                                 </div>
-                                <input type="text" class="dialogFocus" value="" style="width:98%;" placeholder="Existing or new user" name="shared_user" id="shared_user"/>
+                                <input type="text" class="dialogFocus" value="" style="width:98%;" placeholder="AJXP_MESSAGE[share_center.34]" name="shared_user" id="shared_user"/>
                                 <div id="complete_indicator" style="position:absolute;top:8px;right:8px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
                                 <div id="shared_users_autocomplete_choices" class="autocomplete" style="margin-top:0px !important;z-index:20000 !important;"></div>
                                 <div class="editable_users_list grey_gradient_light_inputs" id="shared_users_summary" style="margin-bottom:7px;">
                                     <div style="display:none;" id="create_shared_user" class="soft_css_gradient">
                                         <div class="SF_element">
-                                            <div ajxp_message_id="355" class="SF_label">User password : </div>
+                                            <div ajxp_message_id="share_center.12" class="SF_label">AJXP_MESSAGE[share_center.12]</div>
                                             <input type="password" class="SF_input" value="" name="shared_pass" id="shared_pass">
                                         </div>
                                         <div class="SF_element" id="shared_pass_div">
-                                            <div class="SF_label" ajxp_message_id="356">Confirm : </div>
+                                            <div class="SF_label" ajxp_message_id="share_center.37">AJXP_MESSAGE[share_center.37]</div>
                                             <input type="password" autocomplete="off" value="" name="shared_pass_confirm" id="shared_pass_confirm" class="SF_input"/>
                                         </div>
                                         <div class="SF_element" id="pass_strength_container"></div>
