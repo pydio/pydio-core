@@ -351,7 +351,8 @@ Class.create("ShareCenter", {
 
     updateDialogButtons : function(dialogButtons, shareType){
         if(ajaxplorer.hasPluginOfType("meta", "watch")){
-            dialogButtons.insert("<div class='dialogButtonsCheckbox'><input type='checkbox' id='watch_folder'><label for='watch_folder'>Watch this "+(shareType=="folder"?"folder":"file activity")+"</label></div>");
+            var st = (shareType == "folder" ? MessageHash["share_center.38"] : MessageHash["share_center.39"]);
+            dialogButtons.insert("<div class='dialogButtonsCheckbox'><input type='checkbox' id='watch_folder'><label for='watch_folder'>"+st+"</label></div>");
             if(shareType == "file"){
                 dialogButtons.down("#watch_folder").observe("change", function(event){
                     var conn = new Connexion();
