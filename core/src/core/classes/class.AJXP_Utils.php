@@ -1221,7 +1221,7 @@ class AJXP_Utils
     public static function parseStandardFormParameters(&$repDef, &$options, $userId = null, $prefix = "DRIVER_OPTION_", $binariesContext = null){
 
         if($binariesContext == null){
-            $binariesContext = array("USER" => AuthService::getLoggedUser()->getId());
+            $binariesContext = array("USER" => (AuthService::getLoggedUser()!= null)?AuthService::getLoggedUser()->getId():"shared");
         }
         $replicationGroups = array();
         foreach ($repDef as $key => $value)
