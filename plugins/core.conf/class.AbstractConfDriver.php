@@ -543,6 +543,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				$userObject = AuthService::getLoggedUser();
 				$webdavActive = false;
 				$passSet = false;
+                $digestSet = false;
 				// Detect http/https and host
 				if(ConfService::getCoreConf("WEBDAV_BASEHOST") != ""){
 					$baseURL = ConfService::getCoreConf("WEBDAV_BASEHOST");
@@ -550,8 +551,9 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 					$baseURL = AJXP_Utils::detectServerURL();
 				}
 				$webdavBaseUrl = $baseURL.ConfService::getCoreConf("WEBDAV_BASEURI")."/";
-				if(isSet($httpVars["activate"]) || isSet($httpVars["webdav_pass"])){
-					$davData = $userObject->getPref("AJXP_WEBDAV_DATA");
+                $davData = $userObject->getPref("AJXP_WEBDAV_DATA");
+                $digestSet = isSet($davData["HA1"]);
+                if(isSet($httpVars["activate"]) || isSet($httpVars["webdav_pass"])){
 					if(!empty($httpVars["activate"])){
 						$activate = ($httpVars["activate"]=="true" ? true:false);
 						if(empty($davData)){
@@ -573,7 +575,6 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 					$userObject->setPref("AJXP_WEBDAV_DATA", $davData);
 					$userObject->save("user");
 				}
-				$davData = $userObject->getPref("AJXP_WEBDAV_DATA");				
 				if(!empty($davData)){
 					$webdavActive = (isSet($davData["ACTIVE"]) && $davData["ACTIVE"]===true); 
 					$passSet = (isSet($davData["PASS"])); 
@@ -591,6 +592,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				$prefs = array(
 					"webdav_active"  => $webdavActive,
 					"password_set"   => $passSet,
+                    "digest_set"    => $digestSet,
 					"webdav_base_url"  => $webdavBaseUrl, 
 					"webdav_repositories" => $davRepos
 				);

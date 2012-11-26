@@ -274,7 +274,9 @@
 					conn.onComplete = function(transport){
 						ajaxplorer.webdavCurrentPreferences = transport.responseJSON;
 						$('webdav_activator').checked = ajaxplorer.webdavCurrentPreferences.webdav_active;
-						if($('webdav_activator').checked) $('webdav_password_form').show(); 
+						if($('webdav_activator').checked && !ajaxplorer.webdavCurrentPreferences.digestSet) {
+						    $('webdav_password_form').show();
+						}
 					};
 					conn.sendSync();
 					ajaxplorer.user.getRepositoriesList().each(function(pair){					
@@ -296,7 +298,7 @@
 							}));
 							conn.onComplete = function(transport){
 								ajaxplorer.webdavCurrentPreferences = transport.responseJSON;
-								if(ajaxplorer.webdavCurrentPreferences.webdav_active) {
+								if(ajaxplorer.webdavCurrentPreferences.webdav_active && !ajaxplorer.webdavCurrentPreferences.digestSet) {
 									$('webdav_password_form').show();
 									ajaxplorer.displayMessage("SUCCESS", MessageHash[408]);
 								}else {
@@ -306,19 +308,20 @@
 							};
 							conn.sendAsync();
 						});
-						$('webdav_pass_saver').observe("click", function(){
-							var conn = new Connexion();
-							conn.setMethod('POST');
-							conn.setParameters(new Hash({
-								get_action:'webdav_preferences',
-								webdav_pass: $('webdav_password').value
-							}));
-							conn.onComplete = function(transport){
-								ajaxplorer.displayMessage("SUCCESS", MessageHash[410]);
-							};
-							conn.sendAsync();
-						});
-						
+						if(!ajaxplorer.webdavCurrentPreferences.digestSet){
+                            $('webdav_pass_saver').observe("click", function(){
+                                var conn = new Connexion();
+                                conn.setMethod('POST');
+                                conn.setParameters(new Hash({
+                                    get_action:'webdav_preferences',
+                                    webdav_pass: $('webdav_password').value
+                                }));
+                                conn.onComplete = function(transport){
+                                    ajaxplorer.displayMessage("SUCCESS", MessageHash[410]);
+                                };
+                                conn.sendAsync();
+                            });
+						}
 						$('webdav_activator').hasObserver = true;
 					}
 					]]></dialogOnOpen>

@@ -59,9 +59,6 @@ class FileMimeSender extends AJXP_Plugin {
                 return false;
             }
 
-            $node = new AJXP_Node($destStreamURL.$file);
-            AJXP_Controller::applyHook("node.read", array($node));
-
             $filesize = filesize($destStreamURL . $file);
             $fp = fopen($destStreamURL . $file, "rb");
             
@@ -105,7 +102,10 @@ class FileMimeSender extends AJXP_Plugin {
             call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL . $file, $stream);
             fflush($stream);
             fclose($stream);
-            exit(1);
+
+            $node = new AJXP_Node($destStreamURL.$file);
+            AJXP_Controller::applyHook("node.read", array($node));
+
         }
     }
 }

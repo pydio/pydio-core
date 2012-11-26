@@ -69,7 +69,6 @@ class ImagePreviewer extends AJXP_Plugin {
 	 			//$filesize = filesize($destStreamURL.$file);
 
                 $node = new AJXP_Node($destStreamURL.$file);
-                AJXP_Controller::applyHook("node.read", array($node));
 
                 $fp = fopen($destStreamURL.$file, "r");
                 $stat = fstat($fp);
@@ -86,7 +85,7 @@ class ImagePreviewer extends AJXP_Plugin {
 				call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL.$file, $stream);
 				fflush($stream);
 				fclose($stream);
-				//exit(1);
+                AJXP_Controller::applyHook("node.read", array($node));
 			}
 		}
 	}
