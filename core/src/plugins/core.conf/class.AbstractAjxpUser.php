@@ -223,6 +223,13 @@ abstract class AbstractAjxpUser
 	}
 
 	function getPref($prefName){
+        if($prefName == "lang"){
+            // Migration path
+            if(isSet($this->mergedRole)){
+                $l = $this->mergedRole->filterParameterValue("core.conf", "lang", AJXP_REPO_SCOPE_ALL, "");
+                if($l != "") return $l;
+            }
+        }
 		if(isSet($this->prefs[$prefName])) return $this->prefs[$prefName];
 		return "";
 	}
