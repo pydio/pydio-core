@@ -15,5 +15,13 @@ $mess = array(
     "6" => "Watch this file for changes",
     "7" => "Stop watching",
     "8" => "Stop watching this file for changes",
-
+    "9" => "Consultation",
+    "10"=> "Anyone is opening the file",
+    "10b"=> "Anyone is exploring the folder",
+    "11"=> "Modification",
+    "12"=> "Anyone is modifying the file",
+    "12b"=> "Anyone is modifying a file inside this folder",
+    "13"=> "Both",
+    "14"=> "Anyone opening or writing into the file",
+    "14b"=> "Anyone exploring or modifying the folder content",
 );
