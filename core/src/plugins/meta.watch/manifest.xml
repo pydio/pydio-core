@@ -25,8 +25,8 @@
                             var metaValue = n.getMetadata().get("meta_watched");
                         }
                         context.builderMenuItems.push({
-                            name:'Modifications',
-                            alt:'Watch for modifications',
+                            name:MessageHash["meta.watch.11"],
+                            alt:MessageHash["meta.watch." + (n.isLeaf()?"12":"12b")],
                             isDefault : (metaValue && metaValue == "META_WATCH_CHANGE"),
                             image:resolveImageSource('meta.watch/ICON_SIZE/watch'+((metaValue && metaValue == "META_WATCH_CHANGE")?'':'_faded')+'.png', '',  22),
                             callback:function(e){
@@ -35,8 +35,8 @@
                             }.bind(context)
                         });
                         context.builderMenuItems.push({
-                            name:'Consultation',
-                            alt:'Watch for consultation',
+                            name:MessageHash["meta.watch.9"],
+                            alt:MessageHash["meta.watch." + (n.isLeaf()?"10":"10b")],
                             isDefault : (metaValue && metaValue == "META_WATCH_READ"),
                             image:resolveImageSource('meta.watch/ICON_SIZE/watch'+((metaValue && metaValue == "META_WATCH_READ")?'':'_faded')+'.png', '',  22),
                             callback:function(e){
@@ -45,8 +45,8 @@
                             }.bind(context)
                         });
                         context.builderMenuItems.push({
-                            name:'Both',
-                            alt:'Watch for consultation and modifications',
+                            name:MessageHash["meta.watch.13"],
+                            alt:MessageHash["meta.watch." + (n.isLeaf()?"14":"14b")],
                             isDefault : (metaValue && metaValue == "META_WATCH_BOTH"),
                             image:resolveImageSource('meta.watch/ICON_SIZE/watch'+((metaValue && metaValue == "META_WATCH_BOTH")?'':'_faded')+'.png', '',  22),
                             callback:function(e){
