@@ -69,7 +69,11 @@ class AJXP_Notification
 
     }
 
-    protected function replaceVars($tplString, $mess){
+    protected function getRoot($string){
+        if(empty($string)) return "/";
+    }
+
+    protected function replaceVars($tplString, $mess, $rich = true){
         $repoId = $this->getNode()->getRepositoryId();
         if(ConfService::getRepositoryById($repoId) != null){
             $repoLabel = ConfService::getRepositoryById($repoId)->getDisplay();
@@ -84,15 +88,17 @@ class AJXP_Notification
         if(empty($uLabel)){
             $uLabel = $this->getAuthor();
         }
+        $em = ($rich ? "<em>" : "");
+        $me = ($rich ? "</em>" : "");
 
         $replaces = array(
-            "AJXP_NODE_PATH"        => $this->getNode()->getPath(),
-            "AJXP_NODE_LABEL"       => $this->getNode()->getLabel(),
-            "AJXP_PARENT_PATH"      => dirname($this->getNode()->getPath()),
-            "AJXP_PARENT_LABEL"     => basename(dirname($this->getNode()->getPath())),
-            "AJXP_REPOSITORY_ID"    => $repoId,
-            "AJXP_REPOSITORY_LABEL" => $repoLabel,
-            "AJXP_LINK"             => AJXP_Utils::detectServerURL(true)."/?repository_id=$repoId&folder=".$this->node->getPath(),
+            "AJXP_NODE_PATH"        => $em.$this->getRoot($this->getNode()->getPath()).$me,
+            "AJXP_NODE_LABEL"       => $em.$this->getRoot($this->getNode()->getLabel()).$me,
+            "AJXP_PARENT_PATH"      => $em.$this->getRoot(dirname($this->getNode()->getPath())).$me,
+            "AJXP_PARENT_LABEL"     => $em.$this->getRoot(basename(dirname($this->getNode()->getPath()))).$me,
+            "AJXP_REPOSITORY_ID"    => $em.$repoId.$me,
+            "AJXP_REPOSITORY_LABEL" => $em.$repoLabel.$me,
+            "AJXP_LINK"             => AJXP_Utils::detectServerURL(true)."/?goto=".$repoId.$this->node->getPath(),
             "AJXP_USER"             => $uLabel,
             "AJXP_DATE"             => date($mess["date_format"], $this->getDate()),
         );
@@ -112,7 +118,7 @@ class AJXP_Notification
     public function getDescriptionShort(){
         $mess = ConfService::getMessages();
         $tpl = $mess["notification.tpl.short.".($this->getNode()->isLeaf()?"file":"folder").".".$this->action];
-        return $this->replaceVars($tpl, $mess);
+        return $this->replaceVars($tpl, $mess, false);
     }
 
 
