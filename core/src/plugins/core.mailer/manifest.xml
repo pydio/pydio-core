@@ -7,6 +7,7 @@
     </server_settings>
     <client_settings>
         <resources>
+            <i18n namespace="core.mailer" path="plugins/core.mailer/i18n"/>
             <js className="AjxpMailer" file="plugins/core.mailer/class.AjxpMailer.js" autoload="true"/>
         </resources>
     </client_settings>
