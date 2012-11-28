@@ -42,4 +42,11 @@ $mess = array(
     "37"=> "Confirm",
     "38"=> "Watch this folder content",
     "39"=> "Watch this file activity",
+    "40"=> "Invitations",
+    "41"=> "Send invitations by email to the users you have shared this item with.",
+    "42"=> "A user of %s is sharing a link with you",
+    "43"=> "A user of %s is sharing a folder with you",
+    "44"=> "%s Share",
+    "45"=> "Send Invitation",
+    "46"=> "Open repository %s1 directly in %s2",
 );

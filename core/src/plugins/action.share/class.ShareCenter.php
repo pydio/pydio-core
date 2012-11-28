@@ -300,7 +300,8 @@ class ShareCenter extends AJXP_Plugin{
                             "repositoryId"  => $repoId,
                             "label"         => $repo->getDisplay(),
                             "entries"       => $sharedEntries,
-                            "element_watch" => $elementWatch
+                            "element_watch" => $elementWatch,
+                            "repository_url"=> AJXP_Utils::detectServerURL(true)."?goto=". $repo->getSlug() ."/"
                         );
                     }
                     echo json_encode($jsonData);
@@ -637,11 +638,13 @@ class ShareCenter extends AJXP_Plugin{
         foreach ($users as $userId => $userObject) {
             if($userObject->getId() == $loggedUser->getId()) continue;
             $ri = $userObject->personalRole->getAcl($repoId);
+            $uLabel = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
+            if(empty($uLabel)) $uLabel = $userId;
             if(!empty($ri)){
                 $entry =  array(
                     "ID"    => $userId,
                     "TYPE"  => $userObject->hasParent()?"tmp_user":"user",
-                    "LABEL" => $userId,
+                    "LABEL" => $uLabel,
                     "RIGHT" => $userObject->personalRole->getAcl($repoId)
                 );
                 if($this->watcher !== false){

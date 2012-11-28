@@ -42,4 +42,11 @@ $mess = array(
     "37"=> "Confirmer",
     "38"=> "Surveiller le contenu du répertoire",
     "39"=> "Surveiller l'activité sur ce fichier",
+    "40"=> "Invitations",
+    "41"=> "Envoyer des invitations par email aux utilisateurs avec qui vous partagez",
+    "42"=> "Un utilisateur de %s partage un lien avec vous",
+    "43"=> "Un utilisateur de %s vous invite à partager un dossier",
+    "44"=> "Partage %s",
+    "45"=> "Envoyer l'invitation",
+    "46"=> "Ouvrir le dépôt %s1 directement dans %s2",
 );
