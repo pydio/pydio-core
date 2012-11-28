@@ -35,9 +35,16 @@ class AjxpMailer extends AJXP_Plugin
 
     public function sendMail($recipients, $subject, $body, $from = null){
         if(AJXP_SERVER_DEBUG){
-            $rec = implode(",", $recipients);
             $line = "------------------------------------------------------------------------\n";
-            file_put_contents($this->mailCache, "Sending mail from $from to $rec\n\n$subject\n\n$body\n".$line, FILE_APPEND);
+            file_put_contents($this->mailCache, "Sending mail from ".print_r($from, true)." to ".print_r($recipients, true)."\n\n$subject\n\n$body\n".$line, FILE_APPEND);
+        }
+        $prepend = ConfService::getCoreConf("SUBJECT_PREPEND", "mailer");
+        $append = ConfService::getCoreConf("SUBJECT_APPEND", "mailer");
+        $layout = ConfService::getCoreConf("BODY_LAYOUT", "mailer");
+        if(!empty($prepend)) $subject = $prepend ." ". $subject;
+        if(!empty($append)) $subject .= " ".$append;
+        if(strpos($layout, "AJXP_MAIL_BODY") !== false){
+            $body = str_replace("AJXP_MAIL_BODY", $body, $layout);
         }
         $this->sendMailImpl($recipients, $subject, $body, $from = null);
     }
@@ -47,7 +54,7 @@ class AjxpMailer extends AJXP_Plugin
     }
 
     public function sendMailAction($actionName, $httpVars, $fileVars){
-        AJXP_Logger::debug("Send email", $httpVars);
+
         $mess = ConfService::getMessages();
         $mailers = AJXP_PluginsService::getInstance()->getActivePluginsForType("mailer");
         if(!count($mailers)){

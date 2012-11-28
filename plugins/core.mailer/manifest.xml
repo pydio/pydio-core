@@ -4,6 +4,9 @@
     <server_settings>
         <global_param name="FROM" type="string" label="CONF_MESSAGE[Sender email]" description="CONF_MESSAGE[Adress of the sender]" mandatory="true" default=""/>
         <global_param name="FROM_NAME" type="string" label="CONF_MESSAGE[Sender name]" description="CONF_MESSAGE[Name of the sender]" mandatory="true" default=""/>
+        <global_param name="SUBJECT_PREPEND" label="CONF_MESSAGE[Subject Prepend]" description="CONF_MESSAGE[String automatically added at the beginning of the mail subject]" type="string" mandatory="false" default=""/>
+        <global_param name="SUBJECT_APPEND" label="CONF_MESSAGE[Subject Append]" description="CONF_MESSAGE[String automatically added at the end of the mail subject]" type="string" mandatory="false" default=""/>
+        <global_param name="BODY_LAYOUT" label="CONF_MESSAGE[Body Layout]" description="CONF_MESSAGE[Main Layout for the email body, use HTML for send nice emails, and use the AJXP_MAIL_BODY keyword for the real content.]" type="textarea" mandatory="true" default="AJXP_MAIL_BODY"/>
     </server_settings>
     <client_settings>
         <resources>

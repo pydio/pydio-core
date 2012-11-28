@@ -52,6 +52,7 @@ class PhpMailLiteMailer extends AjxpMailer {
 		}
 		$mail->WordWrap = 50;                                 // set word wrap to 50 characters
 		$mail->IsHTML(true);                                  // set email format to HTML
+        $mail->CharSet = "utf-8";
 
         $mail->Subject = $subject;
 		$mail->Body = nl2br($body);

@@ -1200,14 +1200,20 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if(!is_array($values)) $values = array();
                 echo("<plugin_settings_values>");
                 foreach($values as $key => $value){
+                    $attribute = true;
                     if($definitions[$key]["type"] == "array" && is_array($value)){
                         $value = implode(",", $value);
                     }else if($definitions[$key]["type"] == "boolean"){
                         $value = ($value === true || $value === "true" || $value == 1?"true":"false");
                     }else if($definitions[$key]["type"] == "textarea"){
                         //$value = str_replace("\\n", "\n", $value);
+                        $attribute = false;
                     }
-                    echo("<param name=\"$key\" value=\"".AJXP_Utils::xmlEntities($value)."\"/>");
+                    if($attribute){
+                        echo("<param name=\"$key\" value=\"".AJXP_Utils::xmlEntities($value)."\"/>");
+                    }else{
+                        echo("<param name=\"$key\" cdatavalue=\"true\"><![CDATA[".$value."]]></param>");
+                    }
                 }
                 if($ajxpPlugin->getType() != "core"){
                     echo("<param name=\"AJXP_PLUGIN_ENABLED\" value=\"".($ajxpPlugin->isEnabled()?"true":"false")."\"/>");

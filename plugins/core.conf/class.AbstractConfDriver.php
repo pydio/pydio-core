@@ -746,14 +746,17 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                     if($regexp == null) $users .= "<li class='complete_group_entry' data-group='/' data-label='My Group'><span class='user_entry_label'>My Group</span></li>";
                     foreach($allGroups as $groupId => $groupLabel){
                         if($regexp == null ||  preg_match("/$regexp/i", $groupLabel)){
-                            $users .= "<li class='complete_group_entry' data-group='$groupId' data-label='$groupLabel'><span class='user_entry_label'>".$groupLabel."</span></li>";
+                            $users .= "<li class='complete_group_entry' data-group='$groupId' data-label='$groupLabel' data-entry_id='$groupId'><span class='user_entry_label'>".$groupLabel."</span></li>";
                         }
                     }
                 }
                 foreach ($allUsers as $userId => $userObject){
                     if( ( !$userObject->hasParent() &&  ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf")) || $userObject->getParent() == $loggedUser->getId() ){
                         if($regexp != null && !preg_match("/$regexp/i", $userId)) continue;
-                        $users .= "<li class='complete_user_entry' data-label='$userId'><span class='user_entry_label'>".$userId."</span></li>";
+                        $userLabel = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $userId);
+                        if(empty($userLabel)) $userLabel = $userId;
+                        $userDisplay = ($userLabel == $userId ? $userId : $userLabel . " ($userId)");
+                        $users .= "<li class='complete_user_entry' data-label='$userLabel' data-entry_id='$userId'><span class='user_entry_label'>".$userDisplay."</span></li>";
                         $index ++;
                     }
                     if($index == $limit) break;
