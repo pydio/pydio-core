@@ -235,6 +235,7 @@ class AuthService
         $parentUser = $confDriver->createUserObject($parentUserId);
         $temporaryUser = $confDriver->createUserObject($temporaryUserId);
         $temporaryUser->mergedRole = $parentUser->mergedRole;
+        $temporaryUser->rights = $parentUser->rights;
         $temporaryUser->setGroupPath($parentUser->getGroupPath());
         $temporaryUser->setParent($parentUserId);
         $temporaryUser->setResolveAsParent(true);
@@ -610,6 +611,17 @@ class AuthService
         $userId = AuthService::filterUserSensitivity($userId);
 		$authDriver = ConfService::getAuthDriverImpl();
 		$authDriver->changePassword($userId, $userPass);
+        if($authDriver->getOption("TRANSMIT_CLEAR_PASS") === true){
+            // We can directly update the HA1 version of the WEBDAV Digest
+            $realm = ConfService::getCoreConf("WEBDAV_DIGESTREALM");
+            AJXP_Logger::debug(("{$userId}:{$realm}:{$userPass}"));
+            $ha1 = md5("{$userId}:{$realm}:{$userPass}");
+            $zObj = ConfService::getConfStorageImpl()->createUserObject($userId);
+            $wData = $zObj->getPref("AJXP_WEBDAV_DATA");
+            $wData["HA1"] = $ha1;
+            $zObj->setPref("AJXP_WEBDAV_DATA", $wData);
+            $zObj->save();
+        }
 		AJXP_Logger::logAction("Update Password", array("user_id"=>$userId));
 		return true;
 	}
