@@ -49,4 +49,6 @@ $mess = array(
     "44"=> "%s Share",
     "45"=> "Send Invitation",
     "46"=> "Open repository %s1 directly in %s2",
+    "47"=> "Successfully updated watch status",
+    "48"=> "You are not allowed to access this data",
 );

@@ -49,4 +49,6 @@ $mess = array(
     "44"=> "Partage %s",
     "45"=> "Envoyer l'invitation",
     "46"=> "Ouvrir le dépôt %s1 directement dans %s2",
+    "47"=> "Le statut de surveillance a été changé",
+    "48"=> "Vous n'êtes pas autorisé à accéder à cette donnée.",
 );
