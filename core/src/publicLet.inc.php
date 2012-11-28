@@ -40,5 +40,3 @@ class AJXP_Exception extends Exception
 }';
 
 eval($fakes);
-
-?>
