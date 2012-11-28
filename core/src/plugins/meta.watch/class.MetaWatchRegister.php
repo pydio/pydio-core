@@ -28,7 +28,8 @@ class MetaWatchRegister extends AJXP_Plugin{
     public static $META_WATCH_BOTH = "META_WATCH_BOTH";
     public static $META_WATCH_NAMESPACE = "META_WATCH";
 
-    public static $META_WATCH_USERS = "META_WATCH_USERS";
+    public static $META_WATCH_USERS_READ = "META_WATCH_USERS_READ";
+    public static $META_WATCH_USERS_CHANGE = "META_WATCH_USERS_CHANGE";
     public static $META_WATCH_USERS_NAMESPACE = "META_WATCH_USERS";
 
     /**
@@ -65,13 +66,14 @@ class MetaWatchRegister extends AJXP_Plugin{
      */
     public function setWatchOnFolder($node, $userId, $watchType, $targetUsers = array()){
 
-        if($watchType == self::$META_WATCH_USERS && count($targetUsers)){
+        if( ($watchType == self::$META_WATCH_USERS_READ || $watchType == self::$META_WATCH_USERS_CHANGE ) && count($targetUsers)){
             $usersMeta = $this->metaStore->retrieveMetadata($node, self::$META_WATCH_USERS_NAMESPACE);
-            if(is_array($usersMeta) && is_array($usersMeta[$userId])){
-                $usersMeta[$userId] = array_merge($usersMeta[$userId], $targetUsers);
+            if(is_array($usersMeta) && is_array($usersMeta[$watchType]) && is_array($usersMeta[$watchType][$userId])){
+                $usersMeta[$watchType][$userId] = array_merge($usersMeta[$watchType][$userId], $targetUsers);
             }else{
                 if(!is_array($usersMeta)) $usersMeta = array();
-                $usersMeta[$userId] = $targetUsers;
+                if(!is_array($usersMeta[$watchType])) $usersMeta[$watchType] = array();
+                $usersMeta[$watchType][$userId] = $targetUsers;
             }
             $this->metaStore->setMetadata(
                 $node,
@@ -123,7 +125,8 @@ class MetaWatchRegister extends AJXP_Plugin{
                 false,
                 AJXP_METADATA_SCOPE_REPOSITORY
             );
-            if(isSet($usersMeta) && isSet($usersMeta[$userId])){
+            // WEIRD / WILL IT REMOVE OTHER PEOPLE WATCHES??
+            if(isSet($usersMeta) && (isSet($usersMeta[self::$META_WATCH_USERS_CHANGE][$userId]) || isSet($usersMeta[self::$META_WATCH_USERS_READ][$userId]))){
                 $this->metaStore->removeMetadata(
                     $node,
                     self::$META_WATCH_USERS_NAMESPACE,
@@ -165,7 +168,15 @@ class MetaWatchRegister extends AJXP_Plugin{
             false,
             AJXP_METADATA_SCOPE_REPOSITORY
         );
-        if(isSet($meta) && isSet($meta[$userId])){
+        if($ns == self::$META_WATCH_USERS_NAMESPACE){
+            if(isSet($meta[self::$META_WATCH_USERS_READ]) && isSet($meta[self::$META_WATCH_USERS_READ][$userId])) {
+                return self::$META_WATCH_USERS_READ;
+            }
+            if(isSet($meta[self::$META_WATCH_USERS_CHANGE]) && isSet($meta[self::$META_WATCH_USERS_CHANGE][$userId])) {
+                return self::$META_WATCH_USERS_CHANGE;
+            }
+            return false;
+        }else if(isSet($meta) && isSet($meta[$userId])){
             return $meta[$userId];
         }else{
             return false;
@@ -186,13 +197,20 @@ class MetaWatchRegister extends AJXP_Plugin{
             false,
             AJXP_METADATA_SCOPE_REPOSITORY
         );
-        if($watchType == self::$META_WATCH_CHANGE && AuthService::getLoggedUser() != null){
+        if(AuthService::getLoggedUser() != null){
             $usersMeta = $this->metaStore->retrieveMetadata(
                 $node,
                 self::$META_WATCH_USERS_NAMESPACE,
                 false,
                 AJXP_METADATA_SCOPE_REPOSITORY
             );
+            if($watchType == self::$META_WATCH_CHANGE && isSet($usersMeta[self::$META_WATCH_USERS_CHANGE])){
+                $usersMeta = $usersMeta[self::$META_WATCH_USERS_CHANGE];
+            }else if($watchType == self::$META_WATCH_READ && isSet($usersMeta[self::$META_WATCH_USERS_READ])){
+                $usersMeta = $usersMeta[self::$META_WATCH_USERS_READ];
+            }else{
+                $usersMeta = null;
+            }
         }
         if(isSet($meta) && is_array($meta)){
             foreach($meta as $id => $type){

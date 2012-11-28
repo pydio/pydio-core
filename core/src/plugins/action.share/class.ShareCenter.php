@@ -220,7 +220,7 @@ class ShareCenter extends AJXP_Plugin{
                         $this->watcher->setWatchOnFolder(
                             $node,
                             AuthService::getLoggedUser()->getId(),
-                            MetaWatchRegister::$META_WATCH_USERS,
+                            MetaWatchRegister::$META_WATCH_USERS_READ,
                             array($elementId)
                         );
                     }else{
@@ -271,7 +271,7 @@ class ShareCenter extends AJXP_Plugin{
                             $elementWatch = $this->watcher->hasWatchOnNode(
                                 $node,
                                 AuthService::getLoggedUser()->getId(),
-                                MetaWatchRegister::$META_WATCH_USERS
+                                MetaWatchRegister::$META_WATCH_USERS_NAMESPACE
                             );
                         }
                         $jsonData = array(
@@ -652,7 +652,7 @@ class ShareCenter extends AJXP_Plugin{
                     $entry["WATCH"] = $this->watcher->hasWatchOnNode(
                         new AJXP_Node($currentFileUrl),
                         $userId,
-                        MetaWatchRegister::$META_WATCH_USERS
+                        MetaWatchRegister::$META_WATCH_USERS_NAMESPACE
                     );
                 }
                 if(!$mixUsersAndGroups){
@@ -855,7 +855,7 @@ class ShareCenter extends AJXP_Plugin{
                     $this->watcher->setWatchOnFolder(
                         new AJXP_Node($this->urlBase.$file),
                         $userName,
-                        MetaWatchRegister::$META_WATCH_USERS,
+                        MetaWatchRegister::$META_WATCH_USERS_CHANGE,
                         array(AuthService::getLoggedUser()->getId())
                     );
                 }else{
@@ -874,7 +874,7 @@ class ShareCenter extends AJXP_Plugin{
                 $this->watcher->setWatchOnFolder(
                     new AJXP_Node($this->baseProtocol."://".$newRepo->getUniqueId()."/"),
                     AuthService::getLoggedUser()->getId(),
-                    MetaWatchRegister::$META_WATCH_BOTH);
+                    MetaWatchRegister::$META_WATCH_CHANGE);
             }else{
                 $this->watcher->removeWatchFromFolder(
                     new AJXP_Node($this->baseProtocol."://".$newRepo->getUniqueId()."/"),
