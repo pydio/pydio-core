@@ -47,8 +47,12 @@ class AJXP_Sabre_AuthBackend extends Sabre_DAV_Auth_Backend_AbstractDigest{
         if(empty($webdavData) || !isset($webdavData["ACTIVE"]) || $webdavData["ACTIVE"] !== true || !isSet($webdavData["PASS"])){
             return false;
         }
-        $pass = $this->_decodePassword($webdavData["PASS"], $username);
-        return md5("{$username}:{$realm}:{$pass}");
+        if(isSet($webdavData["HA1"])){
+            return $webdavData["HA1"];
+        }else{
+            $pass = $this->_decodePassword($webdavData["PASS"], $username);
+            return md5("{$username}:{$realm}:{$pass}");
+        }
 
     }
 
