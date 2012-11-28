@@ -231,8 +231,9 @@ class ShareCenter extends AJXP_Plugin{
                         );
                     }
                 }
+                $mess = ConfService::getMessages();
                 AJXP_XMLWriter::header();
-                AJXP_XMLWriter::sendMessage("Successfully updated watch status", null);
+                AJXP_XMLWriter::sendMessage($mess["share_center.47"], null);
                 AJXP_XMLWriter::close();
 
             break;
@@ -259,7 +260,7 @@ class ShareCenter extends AJXP_Plugin{
                     if($elementType == "file"){
                         $pData = self::loadPublicletData($metadata["element"]);
                         if($pData["OWNER_ID"] != AuthService::getLoggedUser()->getId()){
-                            throw new Exception("You are not allowed to access this data");
+                            throw new Exception($messages["share_center.48"]);
                         }
                         if(isSet($metadata["short_form_url"])){
                             $link = $metadata["short_form_url"];
@@ -285,7 +286,7 @@ class ShareCenter extends AJXP_Plugin{
                         $repoId = $metadata["element"];
                         $repo = ConfService::getRepositoryById($repoId);
                         if($repo->getOwner() != AuthService::getLoggedUser()->getId()){
-                            throw new Exception("You are not allowed to access this data");
+                            throw new Exception($messages["share_center.48"]);
                         }
                         if($this->watcher != false){
                             $elementWatch = $this->watcher->hasWatchOnNode(
