@@ -48,9 +48,10 @@ class AjxpMailer extends AJXP_Plugin
 
     public function sendMailAction($actionName, $httpVars, $fileVars){
         AJXP_Logger::debug("Send email", $httpVars);
+        $mess = ConfService::getMessages();
         $mailers = AJXP_PluginsService::getInstance()->getActivePluginsForType("mailer");
         if(!count($mailers)){
-            throw new Exception("No mailer found");
+            throw new Exception($mess["core.mailer.3"]);
         }
 
         $mailer = array_pop($mailers);
@@ -67,11 +68,11 @@ class AjxpMailer extends AJXP_Plugin
         if(count($emails)){
             $mailer->sendMail($emails, $subject, $body, $from);
             AJXP_XMLWriter::header();
-            AJXP_XMLWriter::sendMessage("Email sent succsesfully to ".count($emails)." users", null);
+            AJXP_XMLWriter::sendMessage(str_replace("%s", count($emails), $mess["core.mailer.1"]), null);
             AJXP_XMLWriter::close();
         }else{
             AJXP_XMLWriter::header();
-            AJXP_XMLWriter::sendMessage(null, "No email adresses fonud to send the email!");
+            AJXP_XMLWriter::sendMessage(null, $mess["core.mailer.2"]);
             AJXP_XMLWriter::close();
         }
     }
