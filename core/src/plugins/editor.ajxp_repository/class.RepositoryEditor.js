@@ -149,7 +149,13 @@ Class.create("RepositoryEditor", AbstractEditor, {
         var paramsValues = new Hash();
         $A(repo.childNodes).each(function(child){
             if(child.nodeName != 'param') return;
-            paramsValues.set(child.getAttribute('name'), child.getAttribute('value'));
+            if(child.getAttribute("cdatavalue")){
+                console.log(child);
+                console.log(child.firstChild.nodeValue);
+                paramsValues.set(child.getAttribute("name"), child.firstChild.nodeValue);
+            }else{
+                paramsValues.set(child.getAttribute('name'), child.getAttribute('value'));
+            }
         });
         this.currentRepoWriteable = (repo.getAttribute("writeable")?(repo.getAttribute("writeable")=="true"):false);
         this.formManager.createParametersInputs(

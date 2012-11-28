@@ -115,7 +115,11 @@ Class.create("PluginEditor", AbstractEditor, {
             var paramsValues = new Hash();
             $A(values).each(function(child){
                 if(child.nodeName != 'param') return;
-                paramsValues.set(child.getAttribute('name'), child.getAttribute('value'));
+                if(child.getAttribute("cdatavalue")){
+                    paramsValues.set(child.getAttribute("name"), child.firstChild.nodeValue);
+                }else{
+                    paramsValues.set(child.getAttribute('name'), child.getAttribute('value'));
+                }
             });
 
 

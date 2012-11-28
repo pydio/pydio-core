@@ -1226,7 +1226,7 @@ class AJXP_Utils
         $replicationGroups = array();
         foreach ($repDef as $key => $value)
         {
-            $value = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($value));
+            $value = SystemTextEncoding::magicDequote($value);
             if( ( ( !empty($prefix) &&  strpos($key, $prefix)!== false && strpos($key, $prefix)==0 ) || empty($prefix) )
                 && strpos($key, "ajxptype") === false
                 && strpos($key, "_original_binary") === false
@@ -1259,6 +1259,9 @@ class AJXP_Utils
                         }else if(!empty($repDef[$key."_original_binary"])){
                             $value = $repDef[$key."_original_binary"];
                         }
+                    }
+                    if($repDef[$key."_ajxptype"] != "textarea"){
+                        $value = AJXP_Utils::sanitize($value, AJXP_SANITIZE_HTML);
                     }
                     unset($repDef[$key."_ajxptype"]);
                 }
