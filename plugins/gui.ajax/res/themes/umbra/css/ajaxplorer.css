@@ -481,6 +481,7 @@ textarea#myCode
     position: relative;
     top: -2px;
     margin-right: 5px;
+    margin-top: 3px;
 }
 
 .dialogArrow

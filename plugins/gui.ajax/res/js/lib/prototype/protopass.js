@@ -56,7 +56,7 @@ var Protopass = Class.create({
         }
         Object.extend(this.options, options || { });
         var ins = {};
-        var string = "<div class=\"password-strength-info\" style=\"float:left;width:"+this.options.labelWidth+"%;text-align:right;\" id=\""+this.field_name+"_text\"></div>";
+        var string = "<div class=\"password-strength-info\" style=\"float:left; padding-top: 2px; width:"+this.options.labelWidth+"%;text-align:right;\" id=\""+this.field_name+"_text\"></div>";
         string += "<div style=\"float:left;width:"+(100-this.options.labelWidth - (Prototype.Browser.IE?7:0))+"%;\"><div class=\"password-strength-bar\" id=\""+this.field_name+"_bar\" style=\""+(Prototype.Browser.IE?"":"margin-top:5px;")+"height:0px; width: 0px;\"></div></div>";
         ins[this.options.barPosition] = string;
         this.options.barContainer.insert(ins);
@@ -109,6 +109,7 @@ var Protopass = Class.create({
     displayPasswordStrengthFeedback: function(setting_index, percent_rate){
         this.feedback_text.innerHTML = "<span style='color: " + this.options.colors[setting_index] + ";'>" + this.options.messages[setting_index] + " &nbsp;&nbsp; </span>";
         this.bar.setStyle('height: '+(Prototype.Browser.IE?"5px":"8px;")+'; width:'+percent_rate+'%;background-color:'+this.options.colors[setting_index]);
+        this.options.barContainer.show();
     },
     
     getPasswordScore: function (value, options) {

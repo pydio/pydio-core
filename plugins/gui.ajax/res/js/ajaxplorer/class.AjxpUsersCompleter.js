@@ -81,12 +81,13 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
             afterUpdateElement: function(element, selectedLi){
                 var id = Math.random();
                 var label = selectedLi.getAttribute("data-label");
+                var entryId = selectedLi.getAttribute("data-entry_id");
                 if(selectedLi.getAttribute("data-temporary") && pref && ! label.startsWith(pref)){
                     label = pref + label;
                 }
                 var li = entryTplGenerator(selectedLi.getAttribute("data-group")?true:false,
                     selectedLi.getAttribute("data-temporary")?true:false,
-                    selectedLi.getAttribute("data-group")?selectedLi.getAttribute("data-group"):label,
+                    selectedLi.getAttribute("data-group")?selectedLi.getAttribute("data-group"):(entryId ? entryId : label),
                     label
                 );
 
@@ -152,6 +153,6 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
         }
         textElement.observe("click", function(){
             this.activate();
-        });
+        }.bind(this));
     }
 });
