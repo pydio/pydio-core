@@ -40,14 +40,22 @@ Class.create("FormManager", {
 	parameterNodeToHash : function(paramNode){
         var paramsAtts = paramNode.attributes;
 		var paramsHash = new Hash();
+        var collectCdata = false;
         for(var i=0; i<paramsAtts.length; i++){
             var attName = paramsAtts.item(i).nodeName;
             var value = paramsAtts.item(i).nodeValue;
             if( (attName == "label" || attName == "description" || attName == "group") && MessageHash[value] ){
                 value = MessageHash[value];
             }
+            if( attName == "cdatavalue" ){
+                collectCdata = true;
+                continue;
+            }
 			paramsHash.set(attName, value);
 		}
+        if(collectCdata){
+            paramsHash.set("value", paramNode.firstChild.nodeValue);
+        }
         paramsHash.set("xmlNode", paramNode);
 		return paramsHash;
 	},
