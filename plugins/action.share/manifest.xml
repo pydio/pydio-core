@@ -51,7 +51,7 @@
                                     <div class="SF_label" ajxp_message_id="share_center.23">AJXP_MESSAGE[share_center.23]</div>
                                     <input type="password" name="password" value="" autocomplete="off" class="SF_input">
                                 </div>
-                                <div class="SF_element" id="public_pass_container"></div>
+                                <div class="SF_element" id="public_pass_container" style="display:none;height:20px;"></div>
                                 <div id="share_generate">
                                     <div align="center" style="margin: 4px 0;text-align:center;">
                                         <div align="center" id="generate_publiclet" class="largeButton"><img id="generate_image" src="AJXP_THEME_FOLDER/images/actions/16/share.png" height="16" width="16"/><span>AJXP_MESSAGE[309]</span></div>
