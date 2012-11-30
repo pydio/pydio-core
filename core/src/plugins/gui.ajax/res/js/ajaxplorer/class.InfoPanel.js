@@ -382,7 +382,7 @@ Class.create("InfoPanel", AjxpPane, {
 						messages.set(messagesList[k].getAttribute("key"), parseInt(messagesList[k].getAttribute("id")));
 					}
 				}
-				else if(panelChilds[j].nodeName == 'html'){
+				else if(panelChilds[j].nodeName == 'html' && panelChilds[j].firstChild){
 					htmlContent = panelChilds[j].firstChild.nodeValue;
 				}
 			}
