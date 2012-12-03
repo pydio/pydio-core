@@ -481,6 +481,8 @@ $mess=array(
 "443" => "Update your personal information",
 "444" => "Please update your password, you will not be able to log in otherwise.",
 "445" => "You will now be logged out, please log back using your new password, thank you!",
+"446" => "Presentation",
+"447" => "My group",
 /* END SENTENCE */
 );
 ?>
