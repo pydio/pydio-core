@@ -490,7 +490,9 @@ Class.create("HeaderResizer", {
                 $(this.scroller.parentNode).insert({top:this.element});
             }
 			body.stopObserving("scroll", this.scroller.observer);
-			this.scroller.remove();
+            if($(this.scroller.parentNode)){
+			    this.scroller.remove();
+            }
 			this.scroller = null;			
 			this.resizeHeaders();
 		}
