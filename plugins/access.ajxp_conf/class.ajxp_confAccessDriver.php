@@ -243,6 +243,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $parentName = "/";
                     $nodes = $rootNodes;
                 }
+                if(isSet($httpVars["file"])){
+                    $parentName = dirname($httpVars["file"])."/";
+                    $nodes = array(basename($httpVars["file"]) =>  array("LABEL" => basename($httpVars["file"])));
+                }
                 if(isSet($nodes)){
                     AJXP_XMLWriter::header();
                     AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.1" attributeName="ajxp_label" sortType="String"/></columns>');
