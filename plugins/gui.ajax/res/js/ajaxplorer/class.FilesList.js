@@ -1018,7 +1018,7 @@ Class.create("FilesList", SelectableElements, {
 			this._sortableTable.updateHeaderArrows();
 		}
         var dm = (this._dataModel?this._dataModel:ajaxplorer.getContextHolder());
-		if(dm.getSelectedNodes())
+		if(dm.getSelectedNodes() && dm.getSelectedNodes().length)
 		{
 			var selectedNodes = dm.getSelectedNodes();
             for(var f=0;f<selectedNodes.length; f++){
