@@ -42,7 +42,7 @@ jQuery(function($) {
         },
         initialize: function(){
         	this.childNodes = new NodesCollection();
-            this.childNodes.meta('parent', this.id);
+            this.childNodes.meta('parent', this);
             this.on('change:title', function(){
                 console.log('- Values for this model have changed.');
             });
@@ -59,6 +59,7 @@ jQuery(function($) {
 	        this.childNodes.fetch();
         },
         getChildren : function(){
+            console.log(this.childNodes.models);
 	        return this.childNodes.models;
         }
 
@@ -88,7 +89,7 @@ jQuery(function($) {
         model: Node,
         url:function(){
             if(this._meta && this._meta['parent']){
-                return BASE_URL + encodeURIComponent(this._meta['parent']);
+                return BASE_URL + encodeURIComponent(this._meta['parent'].id);
             }else{
                 return BASE_URL;
             }
@@ -135,7 +136,7 @@ jQuery(function($) {
         tagName: 'tr',
         className: 'selectable',
         // Cache the template function for a single item.
-        todoTpl: _.template( '<td><div class="edit" ><img src="/ajaxplorer/plugins/gui.ajax/res/themes/umbra/images/mimes/16/<%= icon %>"><%= title %></div></td><td><%= id %></td><td><%= mimestring %></td><td><%= filesize %></td>' ),
+        todoTpl: _.template( '<td><div class="edit" ><img src="/ajaxplorer/plugins/gui.ajax/res/themes/umbra/images/mimes/16/<%= icon %>"><span class="title"><%= title %></span></div></td><td><%= id %></td><td><%= mimestring %></td><td><%= filesize %></td>' ),
         events: {
             'mouseover .edit': 'hover',
             'mouseout .edit':   'hout'
@@ -164,7 +165,7 @@ jQuery(function($) {
     var ThumbEntryView = Backbone.View.extend({
         tagName: 'li',
         // Cache the template function for a single item.
-        todoTpl: _.template( '<div class="span4 thumbnail edit selectable<% print(selected ? " selected":""); %>" ><img src="/ajaxplorer/plugins/gui.ajax/res/themes/umbra/images/mimes/64/<%= icon %>"><div><%= title %></div><div><%= mimestring %> - <%= filesize %></div></div>' ),
+        todoTpl: _.template( '<div class="span4 thumbnail edit selectable<% print(selected ? " selected":""); %>" ><img src="/ajaxplorer/plugins/gui.ajax/res/themes/umbra/images/mimes/64/<%= icon %>"><div class="title"><%= title %></div><div><%= mimestring %> - <%= filesize %></div></div>' ),
         events: {
             'mouseover .edit': 'hover',
             'mouseout .edit':   'hout',
@@ -223,6 +224,7 @@ jQuery(function($) {
         selectionModel:null,
         initialize: function(){
             this.selectionModel = new SelectionModel();
+            this.setModel(this.model);
         },
         setModel:function(node){
         	if(this.node){
@@ -241,12 +243,18 @@ jQuery(function($) {
             this.$el.empty();
             this.$el.append('<'+eval(this.subViewName+'.parentTpl')+' class="listcontainer '+eval(this.subViewName+'.parentClassName')+'">');
             if(!this.collection) return;
-            this.collection.each(function(todo){
-                var view = eval('new '+this.subViewName+'({model:todo})');
+            this.collection.each(function(listItem){
+                var view = eval('new '+this.subViewName+'({model:listItem})');
                 var cont = this.$('.listcontainer');
                 cont.append(view.afterRender().el);
                 view.$el.on("click", function(){
-                    previewerView.setModel(todo);
+                    if(listItem.get('isLeaf') == "true"){
+                        previewerView.setModel(listItem);
+                    }else{
+                        todosView.setModel(listItem);
+                        currentNode = listItem;
+                        listItem.fetchChildren();
+                    }
                 });
             }, this);
             return this;
@@ -340,15 +348,16 @@ jQuery(function($) {
 
     var todos = new NodesCollection();
     var rootNode = new Node({id:"/", title:"Root"});
+    var currentNode = rootNode;
 	var treeView = new TreeView({model:rootNode});
 
-    var todosView = new ListView({collection:todos});
+    var todosView = new ListView({model:rootNode});
     var previewerView = new RichPreviewerView();
 
     var mainLayout = new Backbone.Layout({
         template:'#main-layout',
         views:{
-            ".left" : treeView,
+            /*".left" : treeView,*/
             ".right": todosView,
             ".viewer":previewerView
         }
@@ -356,10 +365,19 @@ jQuery(function($) {
     $("#ajxp_desktop").empty().append(mainLayout.el);
     mainLayout.render();
     mainLayout.$('.actions a').click(function(a){
-	    console.log(a.srcElement.getAttribute('data-viewname'));
-	    todosView.setDisplayType(a.srcElement.getAttribute('data-viewname'));
+	    var action = a.srcElement.getAttribute('data-viewname');
+        if(action == "up") {
+            if(currentNode != rootNode){
+                currentNode = currentNode.collection.meta('parent');
+                todosView.setModel(currentNode);
+                currentNode.fetchChildren();
+            }
+        }else{
+            todosView.setDisplayType(a.srcElement.getAttribute('data-viewname'));
+        }
     });
     mainLayout.$(".viewer").dialog({autoOpen:false, modal:true, closeOnEscape:true});
+    rootNode.fetchChildren();
     //Backbone.history.start({silent:true, pushState: false, root: "/ajaxplorer/plugins/gui.backbone/"});
 
 

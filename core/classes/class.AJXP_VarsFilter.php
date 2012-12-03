@@ -78,4 +78,3 @@ class AJXP_VarsFilter {
 		return $value;
 	}
 }
-?>

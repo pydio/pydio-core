@@ -73,7 +73,6 @@ Class.create("RemoteNodeProvider", {
    	 * Load a node
    	 * @param node AjxpNode
    	 * @param nodeCallback Function On node loaded
-   	 * @param childCallback Function On child added
    	 */
    	loadLeafNodeSync : function(node, nodeCallback){
    		var conn = new Connexion();
