@@ -742,8 +742,9 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                 if($regexp != null && !count($allUsers)){
                     $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue'><span class='user_entry_label'>$crtValue (create user)</span></li>";
                 }
+                $mess = ConfService::getMessages();
+                if($regexp == null) $users .= "<li class='complete_group_entry' data-group='/' data-label='".$mess["447"]."'><span class='user_entry_label'>".$mess["447"]."</span></li>";
                 if(count($allGroups)){
-                    if($regexp == null) $users .= "<li class='complete_group_entry' data-group='/' data-label='My Group'><span class='user_entry_label'>My Group</span></li>";
                     foreach($allGroups as $groupId => $groupLabel){
                         if($regexp == null ||  preg_match("/$regexp/i", $groupLabel)){
                             $users .= "<li class='complete_group_entry' data-group='$groupId' data-label='$groupLabel' data-entry_id='$groupId'><span class='user_entry_label'>".$groupLabel."</span></li>";

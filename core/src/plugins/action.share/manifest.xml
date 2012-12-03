@@ -35,8 +35,7 @@
                         ajaxplorer.actionBar.shareCenter.performShareAction();
                     ]]></clientCallback>
                         <clientForm id="share_form"><![CDATA[
-                        <div id="share_form" box_width="320" action="share">
-                            <div class="dialogContentMainTitle" ajxp_message_id="share_center.27">AJXP_MESSAGE[share_center.27]</div>
+                        <div id="share_form" box_width="320" action="share"><div class="dialogContentMainTitle" ajxp_message_id="share_center.27">AJXP_MESSAGE[share_center.27]</div>
                             <div class="dialogLegend" ajxp_message_id="share_center.24">AJXP_MESSAGE[share_center.24]</div>
                             <div id="share_optional_fields" class="oneFieldForm" style="margin: 10px;">
                                 <div class="SF_element SF_largeLabel">

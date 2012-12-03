@@ -611,7 +611,10 @@ class ShareCenter extends AJXP_Plugin{
 
         $loggedUser = AuthService::getLoggedUser();
         $users = AuthService::listUsers();
-        $groups = AuthService::listChildrenGroups("/");
+        $baseGroup = "/";
+        $groups = AuthService::listChildrenGroups($baseGroup);
+        $mess = ConfService::getMessages();
+        $groups[$baseGroup] = $mess["447"];
         $sharedEntries = array();
         if(!$mixUsersAndGroups){
             $sharedGroups = array();
