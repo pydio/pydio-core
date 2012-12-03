@@ -43,7 +43,6 @@ class VideoReader extends AJXP_Plugin {
 			AJXP_Logger::debug("Reading video");
             $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
             $node = new AJXP_Node($destStreamURL.$file);
-            AJXP_Controller::applyHook("node.read", array($node));
             session_write_close();
             $filesize = filesize($destStreamURL.$file);
  			$filename = $destStreamURL.$file;
@@ -108,7 +107,7 @@ class VideoReader extends AJXP_Plugin {
 				fflush($stream);
 				fclose($stream);
 			}
-            //exit(1);
+            AJXP_Controller::applyHook("node.read", array($node));
 		}else if($action == "get_sess_id"){
 			HTMLWriter::charsetHeader("text/plain");
 			print(session_id());
