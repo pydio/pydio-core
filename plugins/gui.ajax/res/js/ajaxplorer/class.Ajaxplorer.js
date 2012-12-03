@@ -624,7 +624,7 @@ Class.create("Ajaxplorer", {
         this._contextHolder.loadPathInfoSync(path, function(foundNode){
             if(foundNode.isLeaf()) {
                 this._contextHolder.setPendingSelection(getBaseName(path));
-                gotoNode = new AjxpNode(getRepName(foundNode));
+                gotoNode = new AjxpNode(getRepName(path));
             }else{
                 gotoNode = foundNode;
             }
