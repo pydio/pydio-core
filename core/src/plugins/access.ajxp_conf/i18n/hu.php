@@ -139,6 +139,7 @@ $mess=array(
 "116" => "Template Label",
 "117" => "Template Driver",
 "118" => "New group",
+    "group_access" => "g",
+
 /* END SENTENCE */
 );
-?>

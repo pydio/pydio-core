@@ -138,6 +138,7 @@ $mess=array(
 "116" => "Nom du modèle",
 "117" => "Plugin d'accès",
 "118" => "Nouveau Groupe",
+"group_access" => "G",
 /* END SENTENCE */
 );
 ?>

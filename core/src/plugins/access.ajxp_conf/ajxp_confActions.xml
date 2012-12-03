@@ -159,7 +159,7 @@
 			</processing>
 		</action>
 		<action name="create_group">
-			<gui text="ajxp_conf.118" title="ajxp_conf.118" src="user_group_new.png" accessKey="ajxp_conf.role_access" hasAccessKey="true">
+			<gui text="ajxp_conf.118" title="ajxp_conf.118" src="user_group_new.png" accessKey="ajxp_conf.group_access" hasAccessKey="true">
 				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
 					actionBar="false" contextMenu="false" infoPanel="false"
 					actionBarGroup="put" inZip="false">
