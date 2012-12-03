@@ -216,13 +216,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 AJXP_Controller::applyHook("ajxp_conf.list_config_nodes", array(&$rootNodes));
 				$dir = trim(AJXP_Utils::decodeSecureMagic((isset($httpVars["dir"])?$httpVars["dir"]:"")), " /");
                 if($dir != ""){
+                    $hash = null;
+                    if(strstr(urldecode($dir), "#") !== false){
+                        list($dir, $hash) = explode("#", urldecode($dir));
+                    }
     				$splits = explode("/", $dir);
                     $root = array_shift($splits);
                     if(count($splits)){
                         $child = $splits[0];
-                        if(strstr(urldecode($child), "#") !== false){
-                            list($child, $hash) = explode("#", urldecode($child));
-                        }
                         if(isSet($rootNodes[$root]["CHILDREN"][$child])){
                             $callback = $rootNodes[$root]["CHILDREN"][$child]["LIST"];
                             if(is_string($callback) && method_exists($this, $callback)){
@@ -1363,6 +1364,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $users = AuthService::listUsers($baseGroup, "", $offset, $USER_PER_PAGE);
             if($hashValue == 1){
                 $groups = AuthService::listChildrenGroups($baseGroup);
+            }else{
+                $groups = array();
             }
         }else{
             $users = AuthService::listUsers($baseGroup);
