@@ -347,6 +347,17 @@ class ConfService
         $result = array();
         foreach (ConfService::getRepositoriesList() as $repositoryId => $repositoryObject)
         {
+            if(!ConfService::repositoryIsAccessible($repositoryId, $repositoryObject, $userObject, $details, $skipShared)){
+                continue;
+            }
+
+            if($labelOnly){
+                $result[$repositoryId] = $repositoryObject->getDisplay();
+            }else{
+                $result[$repositoryId] = $repositoryObject;
+            }
+
+            /*
             if(!AuthService::canAssign($repositoryObject, $userObject)) {
                 continue;
             }
@@ -374,23 +385,79 @@ class ConfService
                 }
                 if($userObject != null && $repositoryObject->hasOwner() && !$userObject->hasParent()){
                     // Display the repositories if allow_crossusers is ok
-                    if(ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf") !== true) continue;
+                    if(ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf") !== true) {
+                        continue;
+                    }
                     // But still do not display its own shared repositories!
-                    if($repositoryObject->getOwner() == $userObject->getId()) continue;
+                    if($repositoryObject->getOwner() == $userObject->getId()) {
+                        continue;
+                    }
                 }
                 if($repositoryObject->hasOwner() && $userObject != null &&  $details && !($userObject->canRead($repositoryId) || $userObject->canWrite($repositoryId) ) ){
                     continue;
                 }
 
-                if($labelOnly){
-                    $result[$repositoryId] = $repositoryObject->getDisplay();
-                }else{
-                    $result[$repositoryId] = $repositoryObject;
-                }
 
             }
+            */
         }
         return $result;
+    }
+
+    /**
+     * @param String $repositoryId
+     * @param Repository $repositoryObject
+     * @param AbstractAjxpUser $userObject
+     * @param bool $details
+     * @param bool $skipShared
+     *
+     * @return bool
+     */
+    public static function repositoryIsAccessible($repositoryId, $repositoryObject, $userObject, $details=false, $skipShared=false){
+        if(!AuthService::canAssign($repositoryObject, $userObject)) {
+            return false;
+        }
+        if($repositoryObject->isTemplate) {
+            return false;
+        }
+        if($repositoryObject->getAccessType()=="ajxp_conf" && $userObject != null){
+            if(AuthService::usersEnabled() && !$userObject->isAdmin()){
+                return false;
+            }
+        }
+        if($repositoryObject->getAccessType() == "ajxp_shared" && !AuthService::usersEnabled()){
+            return false;
+        }
+        if($repositoryObject->getUniqueUser() && (!AuthService::usersEnabled() || $userObject == null  || $userObject->getId() == "shared" || $userObject->getId() != $repositoryObject->getUniqueUser() )){
+            return false;
+        }
+        if( $userObject != null && !($userObject->canRead($repositoryId) || $userObject->canWrite($repositoryId)) && !$details){
+            return false;
+        }
+        if($userObject == null || $userObject->canRead($repositoryId) || $userObject->canWrite($repositoryId) || $details) {
+            // Do not display standard repositories even in details mode for "sub"users
+            if($userObject != null && $userObject->hasParent() && !($userObject->canRead($repositoryId) || $userObject->canWrite($repositoryId) )) {
+                return false;
+            }
+            // Do not display shared repositories otherwise.
+            if($repositoryObject->hasOwner() && $skipShared){
+                return false;
+            }
+            if($userObject != null && $repositoryObject->hasOwner() && !$userObject->hasParent()){
+                // Display the repositories if allow_crossusers is ok
+                if(ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf") !== true) {
+                    return false;
+                }
+                // But still do not display its own shared repositories!
+                if($repositoryObject->getOwner() == $userObject->getId()) {
+                    return false;
+                }
+            }
+            if($repositoryObject->hasOwner() && $userObject != null &&  $details && !($userObject->canRead($repositoryId) || $userObject->canWrite($repositoryId) ) ){
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
