@@ -212,10 +212,13 @@ abstract class AbstractAjxpUser
 	 */
 	function canSwitchTo($repositoryId){
 		$repositoryObject = ConfService::getRepositoryById($repositoryId);
-		if($repositoryObject == null) return false;
+        if($repositoryObject == null) return false;
+        return ConfService::repositoryIsAccessible($repositoryId, $repositoryObject, $this, false, false);
+        /*
 		if($repositoryObject->getAccessType() == "ajxp_conf" && !$this->isAdmin()) return false;
         if($repositoryObject->getUniqueUser() && $this->id != $repositoryObject->getUniqueUser()) return false;
 		return ($this->mergedRole->canRead($repositoryId) || $this->mergedRole->canWrite($repositoryId)) ;
+        */
 	}
 	
 	function getRight($rootDirId){
