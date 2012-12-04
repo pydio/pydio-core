@@ -610,7 +610,7 @@ class ShareCenter extends AJXP_Plugin{
     function computeSharedRepositoryAccessRights($repoId, $mixUsersAndGroups, $currentFileUrl){
 
         $loggedUser = AuthService::getLoggedUser();
-        $users = AuthService::listUsers();
+        $users = AuthService::getUsersForRepository($repoId);
         $baseGroup = "/";
         $groups = AuthService::listChildrenGroups($baseGroup);
         $mess = ConfService::getMessages();

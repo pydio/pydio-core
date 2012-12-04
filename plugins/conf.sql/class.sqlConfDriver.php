@@ -344,15 +344,27 @@ class sqlConfDriver extends AbstractConfDriver {
      */
     function getUsersForRepository($repositoryId){
         $result = array();
+        // OLD METHOD
         $children_results = dibi::query('SELECT [login] FROM [ajxp_user_rights] WHERE [repo_uuid] = %s GROUP BY [login]', $repositoryId);
         $all = $children_results->fetchAll();
         foreach ($all as $item){
-            $result[] = $this->createUserObject($item["login"]);
+            $result[$item["login"]] = $this->createUserObject($item["login"]);
         }
+        // NEW METHOD : SEARCH PERSONAL ROLE
+        $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [serial_role] LIKE %s GROUP BY [role_id]', '%"'.$repositoryId.'";s:%');
+        $all = $children_results->fetchAll();
+        foreach ($all as $item){
+            $rId = $item["role_id"];
+            if(strpos($rId, "AJXP_USR/") == 0){
+                $id = substr($rId, strlen("AJXP_USR/")+1);
+                $result[$id] = $this->createUserObject($id);
+            }
+        }
+
         return $result;
     }
 
-	// SAVE / EDIT / CREATE / DELETE USER OBJECT (except password)
+    // SAVE / EDIT / CREATE / DELETE USER OBJECT (except password)
 	/**
 	 * Instantiate the right class
 	 *

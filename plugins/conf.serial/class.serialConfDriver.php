@@ -273,7 +273,7 @@ class serialConfDriver extends AbstractConfDriver {
         foreach (array_keys($users) as $id){
             $object = $confDriver->createUserObject($id);
             if($object->canSwitchTo($repositoryId)){
-                $result[] = $object;
+                $result[$id] = $object;
             }
         }
         return $result;
@@ -447,9 +447,10 @@ class serialConfDriver extends AbstractConfDriver {
         if(is_file($this->getBinaryPathStorage($context)."/".$ID)){
             if($outputStream == null){
                 header("Content-Type: ".AJXP_Utils::getImageMimeType($ID));
+                // PROBLEM AT STARTUP
                 readfile($this->getBinaryPathStorage($context)."/".$ID);
             }else if(is_resource($outputStream)) {
-                fwrite($outputStream, $this->getBinaryPathStorage($context)."/".$ID);
+                fwrite($outputStream, file_get_contents($this->getBinaryPathStorage($context)."/".$ID));
             }
         }
     }

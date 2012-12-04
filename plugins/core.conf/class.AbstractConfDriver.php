@@ -757,6 +757,9 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                         $userLabel = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $userId);
                         if(empty($userLabel)) $userLabel = $userId;
                         $userDisplay = ($userLabel == $userId ? $userId : $userLabel . " ($userId)");
+                        if(ConfService::getCoreConf("USERS_LIST_HIDE_LOGIN", "conf") == true && $userLabel != $userId){
+                            $userDisplay = $userLabel;
+                        }
                         $users .= "<li class='complete_user_entry' data-label='$userLabel' data-entry_id='$userId'><span class='user_entry_label'>".$userDisplay."</span></li>";
                         $index ++;
                     }
