@@ -1418,6 +1418,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$rightsString = implode(", ", $r);
 			}
             $nodeLabel = $userId;
+            $test = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
+            if(!empty($test)) $nodeLabel = $test;
             $scheme = AuthService::getAuthScheme($userId);
 			AJXP_XMLWriter::renderNode("/users/".$userId, $nodeLabel, true, array(
 				"isAdmin" => $mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")], 
