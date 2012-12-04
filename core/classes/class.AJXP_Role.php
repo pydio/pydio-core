@@ -164,7 +164,7 @@ class AJXP_Role implements AjxpGroupPathProvider
      * @param string|null $repositoryId
      */
     public function setParameterValue($pluginId, $parameterName, $parameterValue, $repositoryId = null){
-        if($repositoryId == null) $repositoryId = AJXP_REPO_SCOPE_ALL;
+        if($repositoryId === null) $repositoryId = AJXP_REPO_SCOPE_ALL;
         if(empty($parameterValue) && $parameterValue !== false){
             if(isSet($this->parameters[$repositoryId][$pluginId][$parameterName])){
                 unset($this->parameters[$repositoryId][$pluginId][$parameterName]);
