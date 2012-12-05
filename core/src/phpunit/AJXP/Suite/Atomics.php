@@ -19,17 +19,20 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
 
-include("../base.conf.php");
+class AJXP_Suite_Atomics extends PHPUnit_Framework_TestSuite{
 
-class AjxpBaseTest extends PHPUnit_Framework_TestCase
-{
-    public function testPHPUnitIsWorking()
+    public static function suite()
     {
-        $this->assertTrue(true);
+        $s =  new AJXP_Suite_Atomics();
+        $s->addTestFile("AJXP/Atomics/RolesTest.php");
+        return $s;
     }
 
-    public function testFrameworkLoads(){
-        $this->assertEquals(AJXP_Utils::convertBytes("2M"), 2097152);
+    protected function setUp(){
+    }
+
+    protected function tearDown(){
+
     }
 
 }

@@ -18,9 +18,9 @@
  *
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
-include("../base.conf.php");
 
-class AjxpRolesTest extends PHPUnit_Framework_TestCase
+
+class AJXP_Atomics_RolesTest extends PHPUnit_Framework_TestCase
 {
 
     public function testRolesNumericKeys(){
