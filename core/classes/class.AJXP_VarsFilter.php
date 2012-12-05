@@ -58,14 +58,15 @@ class AJXP_VarsFilter {
 			if(AuthService::usersEnabled()){
 				$loggedUser = AuthService::getLoggedUser();
 				if($loggedUser != null){
-					$loggedUser = $loggedUser->getGroupPath();
-					$value = str_replace("AJXP_GROUP_PATH", $loggedUser, $value);
+					$gPath = $loggedUser->getGroupPath();
+                    $value = str_replace("AJXP_GROUP_PATH_FLAT", str_replace("/", "_", trim($gPath, "/")), $value);
+                    $value = str_replace("AJXP_GROUP_PATH", $gPath, $value);
 				}else{
 					return "";
 				}
 			}else{
-				$value = str_replace("AJXP_GROUP_PATH", "shared", $value);
-			}
+                $value = str_replace(array("AJXP_GROUP_PATH", "AJXP_GROUP_PATH_FLAT"), "shared", $value);
+            }
 		}
 		if(is_string($value) && strpos($value, "AJXP_INSTALL_PATH") !== false){
 			$value = str_replace("AJXP_INSTALL_PATH", AJXP_INSTALL_PATH, $value);
