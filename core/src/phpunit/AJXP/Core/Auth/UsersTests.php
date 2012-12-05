@@ -19,26 +19,29 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
 
-class AJXP_Suite_CoreStorages extends PHPUnit_Framework_TestSuite{
+class AJXP_Core_Auth_UsersTests extends PHPUnit_Framework_TestCase
+{
 
-    public static function suite()
-    {
-        $s =  new AJXP_Suite_CoreStorages();
-        $s->addTestFile("AJXP/Core/Conf/StoragesTest.php");
-        return $s;
+    public function testUsersStorage(){
+        $this->markTestIncomplete('Not implemented');
     }
 
-    protected function setUp(){
-        $pServ = AJXP_PluginsService::getInstance();
-        ConfService::init();
-        $confPlugin = ConfService::getInstance()->confPluginSoftLoad($pServ);
-        $pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", $confPlugin);
-        ConfService::start();
+    public function testPassChange(){
+        $this->markTestIncomplete('Not implemented');
+    }
+
+    public function testUsersForRepositories(){
+        $this->markTestIncomplete('Not implemented');
+    }
+
+    public function testGroupsStorage(){
+        $this->markTestIncomplete('Not implemented');
+    }
+
+    public function testGroupsRights(){
+        $this->markTestIncomplete('Not implemented');
     }
 
 
-    protected function tearDown(){
-
-    }
 
 }

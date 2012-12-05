@@ -19,20 +19,11 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
 
-class AJXP_Core_Conf_RolesStorageTest extends PHPUnit_Framework_TestCase
+class AJXP_Atomics_MemStoresTest extends PHPUnit_Framework_TestCase
 {
-
-    public function testRolesStorage(){
-
-        $r = new AJXP_Role("phpunit_temporary_role");
-        $r->setAcl(0, "rw");
-        AuthService::updateRole($r);
-        $r1 = AuthService::getRole("phpunit_temporary_role");
-        $this->assertTrue(is_a($r1, "AJXP_Role"));
-        $this->assertEquals("rw", $r1->getAcl(0));
-        AuthService::deleteRole("phpunit_temporary_role");
-        $r2 = AuthService::getRole("phpunit_temporary_role");
-        $this->assertFalse($r2);
+    public function testAjxpSafe()
+    {
+        $this->markTestIncomplete('not impl');
     }
 
 }
