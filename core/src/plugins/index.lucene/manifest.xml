@@ -14,8 +14,8 @@
         <global_param name="PARSE_CONTENT_MAX_SIZE" type="string" label="CONF_MESSAGE[Parse Content Until]" description="CONF_MESSAGE[Skip content parsing and indexation for files bigger than this size (must be in Bytes)]" mandatory="true" default="500000"/>
         <global_param name="PARSE_CONTENT_HTML" type="string" label="CONF_MESSAGE[HTML files]" description="CONF_MESSAGE[List of extensions to consider as HTML file and parse content]" mandatory="true" default="html,htm"/>
         <global_param name="PARSE_CONTENT_TXT" type="string" label="CONF_MESSAGE[Text files]" description="CONF_MESSAGE[List of extensions to consider as Text file and parse content]" mandatory="true" default="txt"/>
-		<global_param name="UNOCONV" type="string" label="CONF_MESSAGE[Unoconv Path]" description="CONF_MESSAGE[Full path on the server to the 'unoconv' binary]" default="" mandatory="true"/>
-		<global_param name="PDFTOTEXT" type="string" label="CONF_MESSAGE[PdftoText Path]" description="CONF_MESSAGE[Full path on the server to the 'pdftotext' binary]" default="" mandatory="true"/>
+		<global_param name="UNOCONV" type="string" label="CONF_MESSAGE[Unoconv Path]" description="CONF_MESSAGE[Full path on the server to the 'unoconv' binary]" default="" mandatory="false"/>
+		<global_param name="PDFTOTEXT" type="string" label="CONF_MESSAGE[PdftoText Path]" description="CONF_MESSAGE[Full path on the server to the 'pdftotext' binary]" default="" mandatory="false"/>
     </server_settings>
 	<registry_contributions>
 		<hooks>
