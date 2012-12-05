@@ -65,12 +65,13 @@ class PowerFSController extends AJXP_Plugin
                             $('download_form').action = window.ajxpServerAccessPath;
                             $('download_form').secure_token.value = window.Connexion.SECURE_TOKEN;
                             $('download_form').select('input').each(function(input){
-                                if(input.name!='get_action' && input.name!='secure_token') input.remove();
+                                if(input.name!='secure_token') input.remove();
                             });
                             $('download_form').insert(new Element('input', {type:'hidden', name:'ope_id', value:'".$httpVars["ope_id"]."'}));
                             $('download_form').insert(new Element('input', {type:'hidden', name:'archive_name', value:'".$archiveName."'}));
                             $('download_form').insert(new Element('input', {type:'hidden', name:'get_action', value:'postcompress_download'}));
                             $('download_form').submit();
+                            $('download_form').get_action.value = 'download';
                         ";
                         AJXP_XMLWriter::triggerBgJsAction($jsCode, "powerfs.3", true);
                         AJXP_XMLWriter::triggerBgAction("reload_node", array(), "powerfs.2", true, 2);
@@ -83,9 +84,13 @@ class PowerFSController extends AJXP_Plugin
             case "postcompress_download":
 
                 $archive = AJXP_Utils::getAjxpTmpDir()."/".$httpVars["ope_id"]."_".$httpVars["archive_name"];
-                //$fsDriver = new fsAccessDriver("fake", "");
                 $fsDriver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
-                $fsDriver->readFile($archive, "force-download", $httpVars["archive_name"], false, null, true);
+                if(is_file($archive)){
+                    register_shutdown_function("unlink", $archive);
+                    $fsDriver->readFile($archive, "force-download", $httpVars["archive_name"], false, null, true);
+                }else{
+                    echo("<script>alert('Cannot find archive! Is ZIP correctly installed?');</script>");
+                }
                 break;
 
             case "compress" :
