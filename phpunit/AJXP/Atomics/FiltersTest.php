@@ -19,26 +19,26 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
 
-class AJXP_Suite_CoreStorages extends PHPUnit_Framework_TestSuite{
-
-    public static function suite()
+class AJXP_Atomics_FiltersTest extends PHPUnit_Framework_TestCase
+{
+    public function testAjxpXMLFilter()
     {
-        $s =  new AJXP_Suite_CoreStorages();
-        $s->addTestFile("AJXP/Core/Conf/StoragesTest.php");
-        return $s;
+        $this->markTestIncomplete('not impl');
     }
 
-    protected function setUp(){
-        $pServ = AJXP_PluginsService::getInstance();
-        ConfService::init();
-        $confPlugin = ConfService::getInstance()->confPluginSoftLoad($pServ);
-        $pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", $confPlugin);
-        ConfService::start();
+    public function testAjxpVarsFilter()
+    {
+        $this->markTestIncomplete('not impl');
     }
 
+    public function testAjxpXMLWriter()
+    {
+        $this->markTestIncomplete('not impl');
+    }
 
-    protected function tearDown(){
-
+    public function testAjxpHTMLWriter()
+    {
+        $this->markTestIncomplete('not impl');
     }
 
 }
