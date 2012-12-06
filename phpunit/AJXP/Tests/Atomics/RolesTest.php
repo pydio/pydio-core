@@ -19,14 +19,15 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
 
+namespace AJXP\Atomics;
 
-class AJXP_Atomics_RolesTest extends PHPUnit_Framework_TestCase
+class RolesTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testRolesNumericKeys(){
 
-        $r1 = new AJXP_Role("role1");
-        $r2 = new AJXP_Role("role2");
+        $r1 = new \AJXP_Role("role1");
+        $r2 = new \AJXP_Role("role2");
 
         $r1->setAcl(1, "rw");
         $r3 = $r2->override($r1);
@@ -36,8 +37,8 @@ class AJXP_Atomics_RolesTest extends PHPUnit_Framework_TestCase
 
     public function testRolesAclAdditivity(){
 
-        $r1 = new AJXP_Role("role1");
-        $r2 = new AJXP_Role("role2");
+        $r1 = new \AJXP_Role("role1");
+        $r2 = new \AJXP_Role("role2");
 
         $r1->setAcl("repository_id", "");
         $r2->setAcl("repository_id", "w");
@@ -63,8 +64,8 @@ class AJXP_Atomics_RolesTest extends PHPUnit_Framework_TestCase
 
     public function testRolesParametersAdditivity(){
 
-        $r1 = new AJXP_Role("role1");
-        $r2 = new AJXP_Role("role2");
+        $r1 = new \AJXP_Role("role1");
+        $r2 = new \AJXP_Role("role2");
 
         $r1->setParameterValue("type.id", "param_name", "param_value1", "repository_id");
         $this->assertEquals("param_value1", $r1->filterParameterValue("type.id", "param_name", "repository_id", "anyvalue1"));
@@ -87,8 +88,8 @@ class AJXP_Atomics_RolesTest extends PHPUnit_Framework_TestCase
 
     public function testRolesActionsAdditivity(){
 
-        $r1 = new AJXP_Role("role1");
-        $r2 = new AJXP_Role("role2");
+        $r1 = new \AJXP_Role("role1");
+        $r2 = new \AJXP_Role("role2");
 
         $r1->setActionState("type.id", "action_name", "repository_id", "disabled");
         $this->assertFalse($r1->actionEnabled("type.id", "action_name", "repository_id", true));
@@ -99,25 +100,6 @@ class AJXP_Atomics_RolesTest extends PHPUnit_Framework_TestCase
         $r3 = $r2->override($r1);
         $this->assertTrue($r3->actionEnabled("type.id", "action_name", "repository_id", true));
 
-    }
-
-    public function testRolesStorage(){
-
-        $pServ = AJXP_PluginsService::getInstance();
-        ConfService::init();
-        $confPlugin = ConfService::getInstance()->confPluginSoftLoad($pServ);
-        $pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", $confPlugin);
-        ConfService::start();
-
-        $r = new AJXP_Role("phpunit_temporary_role");
-        $r->setAcl(0, "rw");
-        AuthService::updateRole($r);
-        $r1 = AuthService::getRole("phpunit_temporary_role");
-        $this->assertTrue(is_a($r1, "AJXP_Role"));
-        $this->assertEquals("rw", $r1->getAcl(0));
-        AuthService::deleteRole("phpunit_temporary_role");
-        $r2 = AuthService::getRole("phpunit_temporary_role");
-        $this->assertFalse($r2);
     }
 
 }

@@ -18,8 +18,9 @@
  *
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
+namespace AJXP\Tests\Atomics;
 
-class AJXP_Atomics_FiltersTest extends PHPUnit_Framework_TestCase
+class FiltersTest extends \PHPUnit_Framework_TestCase
 {
     public function testAjxpXMLFilter()
     {
