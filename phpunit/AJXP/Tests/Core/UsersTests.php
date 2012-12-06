@@ -18,52 +18,28 @@
  *
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
+namespace AJXP\Tests\Core;
 
-class AJXP_Core_Conf_StoragesTest extends PHPUnit_Framework_TestCase
+class UsersTests extends \PHPUnit_Framework_TestCase
 {
 
-    public function testRolesStorage(){
-
-        $r = new AJXP_Role("phpunit_temporary_role");
-        $r->setAcl(0, "rw");
-        AuthService::updateRole($r);
-        $r1 = AuthService::getRole("phpunit_temporary_role");
-        $this->assertTrue(is_a($r1, "AJXP_Role"));
-        $this->assertEquals("rw", $r1->getAcl(0));
-        AuthService::deleteRole("phpunit_temporary_role");
-        $r2 = AuthService::getRole("phpunit_temporary_role");
-        $this->assertFalse($r2);
-    }
-
-    public function testPluginsActivation(){
+    public function testUsersStorage(){
         $this->markTestIncomplete('Not implemented');
     }
 
-    public function testPluginsConfigs(){
+    public function testPassChange(){
         $this->markTestIncomplete('Not implemented');
     }
 
-    public function testRepositoriesStorage(){
+    public function testUsersForRepositories(){
         $this->markTestIncomplete('Not implemented');
     }
 
-    public function testCacheItem(){
+    public function testGroupsStorage(){
         $this->markTestIncomplete('Not implemented');
     }
 
-    public function testBinariesStorage(){
-        $this->markTestIncomplete('Not implemented');
-    }
-
-    public function testQueuesStorage(){
-        $this->markTestIncomplete('Not implemented');
-    }
-
-    public function testI18NMessages(){
-        $this->markTestIncomplete('Not implemented');
-    }
-
-    public function testRegisteredExtensions(){
+    public function testGroupsRights(){
         $this->markTestIncomplete('Not implemented');
     }
 

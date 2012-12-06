@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
+namespace AJXP\Tests\Suite;
 
 class AJXP_Suite_CoreStorages extends PHPUnit_Framework_TestSuite{
 

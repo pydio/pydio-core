@@ -18,14 +18,19 @@
  *
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
+namespace AJXP\Tests\Suite;
 
-class AJXP_Suite_Atomics extends PHPUnit_Framework_TestSuite{
+class Atomics extends \PHPUnit_Framework_TestSuite{
 
     public static function suite()
     {
-        $s =  new AJXP_Suite_Atomics();
-        $s->addTestFile("AJXP/Atomics/RolesTest.php");
+        $s =  new Atomics();
+        $s->addTestFile("AJXP/Tests/Atomics/RolesTest.php");
+        $s->addTestFile("AJXP/Tests/Atomics/UtilsTest.php");
+        $s->addTestFile("AJXP/Tests/Atomics/MemStoresTest.php");
+        $s->addTestFile("AJXP/Tests/Atomics/FiltersTest.php");
         return $s;
+
     }
 
     protected function setUp(){
