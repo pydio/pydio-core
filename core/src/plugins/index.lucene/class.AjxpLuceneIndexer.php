@@ -98,7 +98,13 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 				$index->setDefaultSearchField("basename");
 				$query = $httpVars["query"];
 			}
-			$hits = $index->find($query);
+            if($query == "*"){
+                $index->setDefaultSearchField("ajxp_node");
+                $query = "yes";
+                $hits = $index->find($query, "node_url", SORT_STRING);
+            }else{
+                $hits = $index->find($query);
+            }
             $commitIndex = false;
 
 			AJXP_XMLWriter::header();
@@ -300,6 +306,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
         $doc->addField(Zend_Search_Lucene_Field::Keyword("node_url", $ajxpNode->getUrl()), SystemTextEncoding::getEncoding());
         $doc->addField(Zend_Search_Lucene_Field::Keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath())), SystemTextEncoding::getEncoding());
         $doc->addField(Zend_Search_Lucene_Field::Text("basename", basename($ajxpNode->getPath())), SystemTextEncoding::getEncoding());
+        $doc->addField(Zend_Search_Lucene_Field::Text("ajxp_node", "yes"), SystemTextEncoding::getEncoding());
         foreach ($this->metaFields as $field){
             if($ajxpNode->$field != null){
                 $doc->addField(Zend_Search_Lucene_Field::Text("ajxp_meta_$field", $ajxpNode->$field), SystemTextEncoding::getEncoding());
