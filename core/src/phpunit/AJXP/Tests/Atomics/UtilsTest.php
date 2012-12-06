@@ -18,8 +18,9 @@
  *
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
+namespace AJXP\Tests\Atomics;
 
-class AJXP_Atomics_UtilsTest extends PHPUnit_Framework_TestCase
+class UtilsTest extends \PHPUnit_Framework_TestCase
 {
     public function testPHPUnitIsWorking()
     {
@@ -27,7 +28,7 @@ class AJXP_Atomics_UtilsTest extends PHPUnit_Framework_TestCase
     }
 
     public function testFrameworkLoads(){
-        $this->assertEquals(AJXP_Utils::convertBytes("2M"), 2097152);
+        $this->assertEquals(\AJXP_Utils::convertBytes("2M"), 2097152);
     }
 
 }

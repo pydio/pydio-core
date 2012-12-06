@@ -18,8 +18,9 @@
  *
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
+namespace AJXP\Tests\Atomics;
 
-class AJXP_Atomics_MemStoresTest extends PHPUnit_Framework_TestCase
+class MemStoresTest extends \PHPUnit_Framework_TestCase
 {
     public function testAjxpSafe()
     {
