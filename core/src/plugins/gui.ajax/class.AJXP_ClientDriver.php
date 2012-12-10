@@ -142,9 +142,9 @@ class AJXP_ClientDriver extends AJXP_Plugin
 			//	GET BOOT GUI
 			//------------------------------------
 			case "get_boot_gui":
-				
-				header("X-UA-Compatible: chrome=1");			
-				HTMLWriter::charsetHeader();
+
+                header("X-UA-Compatible: IE=9");
+                HTMLWriter::charsetHeader();
 				
 				if(!is_file(TESTS_RESULT_FILE)){
 					$outputArray = array();
