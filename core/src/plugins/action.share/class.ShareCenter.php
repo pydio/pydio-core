@@ -777,7 +777,7 @@ class ShareCenter extends AJXP_Plugin{
         if(isSet($editingRepo)){
             $newRepo = $editingRepo;
             $newRepo->setDisplay($label);
-            $newRepo->options = array_merge($newRepo->options, $options);
+            //$newRepo->options = array_merge($newRepo->options, $options);
             ConfService::replaceRepository($httpVars["repository_id"], $newRepo);
         }else{
             if($repository->getOption("META_SOURCES")){
@@ -877,7 +877,7 @@ class ShareCenter extends AJXP_Plugin{
                 $this->watcher->setWatchOnFolder(
                     new AJXP_Node($this->baseProtocol."://".$newRepo->getUniqueId()."/"),
                     AuthService::getLoggedUser()->getId(),
-                    MetaWatchRegister::$META_WATCH_CHANGE);
+                    MetaWatchRegister::$META_WATCH_BOTH);
             }else{
                 $this->watcher->removeWatchFromFolder(
                     new AJXP_Node($this->baseProtocol."://".$newRepo->getUniqueId()."/"),
