@@ -509,9 +509,9 @@ class AuthService
             foreach(AuthService::getRolesList(array(), true) as $roleId => $roleObject){
                 if(!self::allowedForCurrentGroup($roleObject, $userObject)) continue;
                 if($userObject->getProfile() == "shared" && $roleObject->autoAppliesTo("shared")){
-                    $userObject->addRole($roleId);
+                    $userObject->addRole($roleObject);
                 }else if($roleObject->autoAppliesTo("standard")){
-                    $userObject->addRole($roleId);
+                    $userObject->addRole($roleObject);
                 }
             }
 		}
@@ -525,7 +525,7 @@ class AuthService
         foreach(AuthService::getRolesList(array(), true) as $roleId => $roleObject){
             if(!self::allowedForCurrentGroup($roleObject, $userObject)) continue;
             if($roleObject->autoAppliesTo($userObject->getProfile()) || $roleObject->autoAppliesTo("all")){
-                $userObject->addRole($roleId);
+                $userObject->addRole($roleObject);
             }
         }
     }
