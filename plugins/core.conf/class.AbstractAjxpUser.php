@@ -120,11 +120,15 @@ abstract class AbstractAjxpUser
 	function setVersion($v){
 		$this->version = $v;
 	}
-	
-	function addRole($roleId){
+
+    /**
+     * @param AJXP_Role $roleObject
+     */
+    function addRole($roleObject){
 		if(!isSet($this->rights["ajxp.roles"])) $this->rights["ajxp.roles"] = array();
-		$this->rights["ajxp.roles"][$roleId] = true;
+		$this->rights["ajxp.roles"][$roleObject->getId()] = true;
         uksort($this->rights["ajxp.roles"], array($this, "orderRoles"));
+        $this->roles[$roleObject->getId()] = $roleObject;
         $this->recomputeMergedRole();
 	}
 	
@@ -132,6 +136,7 @@ abstract class AbstractAjxpUser
 		if(isSet($this->rights["ajxp.roles"]) && isSet($this->rights["ajxp.roles"][$roleId])){
 			unset($this->rights["ajxp.roles"][$roleId]);
             uksort($this->rights["ajxp.roles"], array($this, "orderRoles"));
+            if(isSet($this->roles[$roleId])) unset($this->roles[$roleId]);
         }
         $this->recomputeMergedRole();
 	}

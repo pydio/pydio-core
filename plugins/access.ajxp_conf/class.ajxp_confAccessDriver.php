@@ -1670,7 +1670,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$user = $confStorage->createUserObject($userId);
 		//if($user->hasParent()) return $user;
 		if($addOrRemove == "add"){
-			$user->addRole($roleId);
+            $roleObject = AuthService::getRole($roleId);
+			$user->addRole($roleObject);
 		}else{
 			$user->removeRole($roleId);
 		}
