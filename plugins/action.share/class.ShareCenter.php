@@ -847,11 +847,11 @@ class ShareCenter extends AJXP_Plugin{
                 $userObject->personalRole->clearAcls();
                 $userObject->setParent($loggedUser->id);
                 $userObject->setGroupPath($loggedUser->getGroupPath());
+                $userObject->setProfile("shared");
                 AJXP_Controller::applyHook("user.after_create", array($userObject));
             }
             // CREATE USER WITH NEW REPO RIGHTS
             $userObject->personalRole->setAcl($newRepo->getUniqueId(), $uRights[$userName]);
-            $userObject->setProfile("shared");
             $userObject->save("superuser");
             if($this->watcher !== false){
                 // Register a watch on the current folder for shared user
