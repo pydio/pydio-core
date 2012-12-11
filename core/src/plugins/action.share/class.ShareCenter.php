@@ -149,7 +149,10 @@ class ShareCenter extends AJXP_Plugin{
                     $users = "";
                     $index = 0;
                     if($regexp != null && !count($allUsers)){
-                        $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue'><span class='user_entry_label'>$crtValue (create user)</span></li>";
+                    	if(!isSet($mess)){
+                    		$mess = ConfService::getMessages();
+                    	}
+                        $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue'><span class='user_entry_label'>$crtValue (" . $mess["share_center.49"] . ")</span></li>";
                     }
                     if(count($allGroups)){
                         if($regexp == null) $users .= "<li class='complete_group_entry' data-group='/' data-label='My Group'><span class='user_entry_label'>My Group</span></li>";
