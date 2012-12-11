@@ -361,6 +361,12 @@ abstract class AbstractAjxpUser
             }
             $index ++;
         }
+        if($this->hasParent() && isSet($this->parentRole)){
+            // It's a shared user, we don't want it to inherit the rights
+            $this->parentRole->clearAcls();
+            $this->mergedRole = $this->parentRole->override($this->personalRole);
+            //$this->mergedRole
+        }
     }
 
     protected function migrateRightsToPersonalRole(){
