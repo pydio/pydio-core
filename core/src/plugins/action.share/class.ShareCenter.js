@@ -80,6 +80,7 @@ Class.create("ShareCenter", {
                             pass  : $("shared_pass"),
                             confirmPass: $("shared_pass_confirm")
                         },
+                        indicator: $("complete_indicator"),
                         minChars:parseInt(ajaxplorer.getPluginConfigs("ajxp_plugin[@name='share']").get("SHARED_USERS_LIST_MINIMUM"))
                     }
                 );
@@ -137,7 +138,9 @@ Class.create("ShareCenter", {
         }.bind(this);
         var closeFunc = function (oForm){
             if(Prototype.Browser.IE){
-                $(document.body).down("#shared_users_autocomplete_choices").remove();
+                if($(document.body).down("#shared_users_autocomplete_choices")){
+                    $(document.body).down("#shared_users_autocomplete_choices").remove();
+                }
                 if($(document.body).down("#shared_users_autocomplete_choices_iefix")){
                     $(document.body).down("#shared_users_autocomplete_choices_iefix").remove();
                 }

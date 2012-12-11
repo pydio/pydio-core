@@ -83,14 +83,14 @@
                             </div>
                             <div class="dialogContentMainTitle" ajxp_message_id="share_center.30">AJXP_MESSAGE[share_center.30]</div>
                             <div class="dialogLegend" ajxp_message_id="share_center.26">AJXP_MESSAGE[share_center.26]</div>
-                            <div id="target_user" style="margin:0 10px;">
+                            <div id="target_user" style="margin:0 10px;position:relative;">
                                 <div class="editable_users_header">
                                     <span id="header_read" ajxp_message_id="share_center.31">AJXP_MESSAGE[share_center.31]</span>
                                     <span id="header_write" ajxp_message_id="share_center.32">AJXP_MESSAGE[share_center.32]</span>
                                     <span id="header_watch" ajxp_message_id="share_center.33">AJXP_MESSAGE[share_center.33]</span>
                                 </div>
                                 <input type="text" class="dialogFocus" value="" style="width:98%;" placeholder="AJXP_MESSAGE[share_center.34]" name="shared_user" id="shared_user"/>
-                                <div id="complete_indicator" style="position:absolute;top:8px;right:8px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
+                                <div id="complete_indicator" style="position:absolute;top:25px;right:4px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
                                 <div id="shared_users_autocomplete_choices" class="autocomplete" style="margin-top:0px !important;z-index:20000 !important;"></div>
                                 <div class="editable_users_list grey_gradient_light_inputs" id="shared_users_summary" style="margin-bottom:7px;">
                                     <div style="display:none;" id="create_shared_user" class="soft_css_gradient">
