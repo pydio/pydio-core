@@ -485,6 +485,7 @@ class AuthService
 		foreach (ConfService::getRepositoriesList() as $repoId => $repoObject)
 		{
             if(!self::allowedForCurrentGroup($repoObject, $adminUser)) continue;
+            if($repoObject->hasParent() && $repoObject->getParentId() != $adminUser->getId()) continue;
 			$adminUser->personalRole->setAcl($repoId, "rw");
 		}
 		$adminUser->save("superuser");
