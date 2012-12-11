@@ -269,7 +269,7 @@ class serialConfDriver extends AbstractConfDriver {
         $result = array();
         $authDriver = ConfService::getAuthDriverImpl();
         $confDriver = ConfService::getConfStorageImpl();
-        $users = $authDriver->listUsers();
+        $users = $authDriver->listUsers(AuthService::filterBaseGroup("/"));
         foreach (array_keys($users) as $id){
             $object = $confDriver->createUserObject($id);
             if($object->canSwitchTo($repositoryId)){
