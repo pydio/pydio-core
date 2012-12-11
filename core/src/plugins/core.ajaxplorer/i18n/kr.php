@@ -499,6 +499,8 @@ $mess=array(
 "445" => "You will now be logged out, please log back using your new password, thank you!",
 "446" => "Presentation",
 "447" => "My group",
+"448" => "create user",
+"449" => "Creating %s, choose a password",
 /* END SENTENCE */
 );
 ?>

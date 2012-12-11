@@ -494,6 +494,8 @@ $mess=array(
 "445" => "Sie wurden ausgeloggt, bitte mit dem neuen Passwort erneut anmelden, danke!",
 "446" => "Presentation",
 "447" => "My group",
+"448" => "create user",
+"449" => "Creating %s, choose a password",
 /* END SENTENCE */
 );
 ?>

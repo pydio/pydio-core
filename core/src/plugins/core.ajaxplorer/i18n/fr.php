@@ -492,5 +492,7 @@ $mess=array(
 "445" => "Merci de maintenant vous relogger en utilisant votre nouveau mot de passe.",
 "446" => "Présentation",
 "447" => "Mon groupe",
+"448" => "Créer l'utilisateur",
+"449" => "Création de %s, choisir un mot de passe",
 /* END SENTENCE */
 );

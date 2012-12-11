@@ -740,7 +740,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                 $users = "";
                 $index = 0;
                 if($regexp != null && !count($allUsers)){
-                    $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue'><span class='user_entry_label'>$crtValue (create user)</span></li>";
+                    $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue'><span class='user_entry_label'>$crtValue (".$mess["448"].")</span></li>";
                 }
                 $mess = ConfService::getMessages();
                 if($regexp == null) $users .= "<li class='complete_group_entry' data-group='/' data-label='".$mess["447"]."'><span class='user_entry_label'>".$mess["447"]."</span></li>";
