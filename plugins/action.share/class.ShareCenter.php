@@ -134,7 +134,7 @@ class ShareCenter extends AJXP_Plugin{
 					header("Content-type:text/plain");
 					$result = $this->createSharedRepository($httpVars, $this->repository, $this->accessDriver);
 					print($result);
-            	}else if($subAction == "list_shared_users"){
+            	}/*else if($subAction == "list_shared_users"){
             		header("Content-type:text/html");
             		if(!ConfService::getAuthDriverImpl()->usersEditable()){
             			break;
@@ -149,10 +149,8 @@ class ShareCenter extends AJXP_Plugin{
                     $users = "";
                     $index = 0;
                     if($regexp != null && !count($allUsers)){
-                    	if(!isSet($mess)){
-                    		$mess = ConfService::getMessages();
-                    	}
-                        $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue'><span class='user_entry_label'>$crtValue (" . $mess["share_center.49"] . ")</span></li>";
+                        $mess = ConfService::getMessages();
+                        $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue'><span class='user_entry_label'>$crtValue (".$mess["share_center.49"].")</span></li>";
                     }
                     if(count($allGroups)){
                         if($regexp == null) $users .= "<li class='complete_group_entry' data-group='/' data-label='My Group'><span class='user_entry_label'>My Group</span></li>";
@@ -173,7 +171,7 @@ class ShareCenter extends AJXP_Plugin{
             		if(strlen($users)) {
             			print("<ul>".$users."</ul>");
             		}
-            	}else{
+            	}*/else{
 					$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                     if(!isSet($httpVars["downloadlimit"])){
                         $httpVars["downloadlimit"] = 0;
@@ -780,7 +778,7 @@ class ShareCenter extends AJXP_Plugin{
         if(isSet($editingRepo)){
             $newRepo = $editingRepo;
             $newRepo->setDisplay($label);
-            //$newRepo->options = array_merge($newRepo->options, $options);
+            $newRepo->options = array_merge($newRepo->options, $options);
             ConfService::replaceRepository($httpVars["repository_id"], $newRepo);
         }else{
             if($repository->getOption("META_SOURCES")){
@@ -880,7 +878,7 @@ class ShareCenter extends AJXP_Plugin{
                 $this->watcher->setWatchOnFolder(
                     new AJXP_Node($this->baseProtocol."://".$newRepo->getUniqueId()."/"),
                     AuthService::getLoggedUser()->getId(),
-                    MetaWatchRegister::$META_WATCH_BOTH);
+                    MetaWatchRegister::$META_WATCH_CHANGE);
             }else{
                 $this->watcher->removeWatchFromFolder(
                     new AJXP_Node($this->baseProtocol."://".$newRepo->getUniqueId()."/"),

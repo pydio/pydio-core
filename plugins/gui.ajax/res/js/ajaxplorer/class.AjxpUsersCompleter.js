@@ -98,7 +98,7 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
                 if(selectedLi.getAttribute("data-temporary") && createUserPanel != null){
                     element.readOnly = true;
                     createUserPass.setValue(""); createUserConfirmPass.setValue("");
-                    element.setValue("Creating "+ label + " : choose a password");
+                    element.setValue(MessageHash["449"].replace("%s", label));
                     createUserPanel.select('div.dialogButtons>input').invoke("addClassName", "dialogButtons");
                     createUserPanel.select('div.dialogButtons>input').invoke("stopObserving", "click");
                     createUserPanel.select('div.dialogButtons>input').invoke("observe", "click", function(event){
