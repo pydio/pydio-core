@@ -45,6 +45,8 @@ class QuotaComputer extends AJXP_Plugin
         if($repo->hasParent()){
             $repo = ConfService::getRepositoryById($repo->getParentId());
         }
+        $loggedUser = &AuthService::getLoggedUser();
+        $loggedUser->setResolveAsParent(true);
         $path = $repo->getOption("PATH");
         return $path;
     }
