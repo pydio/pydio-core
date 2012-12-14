@@ -3333,3 +3333,8 @@ td.ip_geo_cell{
 .tabrow li.selected:after {
     box-shadow: -2px 2px 0 #FFF;
 }
+
+#sm2-container{
+    position: absolute;
+    top: -1000px;
+}
