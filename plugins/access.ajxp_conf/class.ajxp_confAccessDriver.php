@@ -244,7 +244,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $nodes = $rootNodes;
                 }
                 if(isSet($httpVars["file"])){
-                    $parentName = dirname($httpVars["file"])."/";
+                    $parentName = $httpVars["dir"]."/";
                     $nodes = array(basename($httpVars["file"]) =>  array("LABEL" => basename($httpVars["file"])));
                 }
                 if(isSet($nodes)){
@@ -256,6 +256,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     AJXP_XMLWriter::close();
 
                 }
+
 			break;
 			
 			case "stat" :

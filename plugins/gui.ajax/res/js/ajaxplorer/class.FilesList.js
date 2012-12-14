@@ -952,6 +952,36 @@ Class.create("FilesList", SelectableElements, {
       		this.removeCurrentLines(skipFireChange);
     },
 
+    makeItemRefreshObserver: function (ajxpNode, item, renderer){
+        return function(){
+            try{
+                var newItem = renderer(ajxpNode, item);
+                item.insert({before: newItem});
+                item.remove();
+                newItem.ajxpNode = ajxpNode;
+                this.initRows();
+                item.ajxpNode = null;
+                delete item;
+                ajxpNode.observeOnce("node_replaced", this.makeItemRefreshObserver(ajxpNode, newItem, renderer));
+                var dm = (this._dataModel?this._dataModel:ajaxplorer.getContextHolder());
+                if(dm.getSelectedNodes() && dm.getSelectedNodes().length)
+                {
+                    var selectedNodes = dm.getSelectedNodes();
+                    for(var f=0;f<selectedNodes.length; f++){
+                        if(Object.isString(selectedNodes[f])){
+                            this.selectFile(selectedNodes[f], true);
+                        }else{
+                            this.selectFile(selectedNodes[f].getPath(), true);
+                        }
+                    }
+                    this.hasFocus = true;
+                }
+            }catch(e){
+
+            }
+        }.bind(this);
+    },
+
 	/**
 	 * Populates the list with the children of the passed contextNode
 	 * @param contextNode AjxpNode
@@ -992,18 +1022,16 @@ Class.create("FilesList", SelectableElements, {
 		// NOW PARSE LINES
 		this.parsingCache = new Hash();		
 		var children = contextNode.getChildren();
+        var renderer = (this._displayMode == "list"?this.ajxpNodeToTableRow.bind(this):this.ajxpNodeToDiv.bind(this));
 		for (var i = 0; i < children.length ; i++) 
 		{
 			var child = children[i];
 			var newItem;
-			if(this._displayMode == "list") {
-				newItem = this.ajxpNodeToTableRow(child);
-			}else {
-				newItem = this.ajxpNodeToDiv(child);
-			}
+            newItem = renderer(child);
 			newItem.ajxpNode = child;
             newItem.addClassName("ajxpNodeProvider");
-		}	
+            child.observeOnce("node_replaced", this.makeItemRefreshObserver(child, newItem, renderer));
+		}
 		this.initRows();
 		
 		if(this._displayMode == "list" && (!this.paginationData || !this.paginationData.get('remote_order')))
@@ -1142,9 +1170,10 @@ Class.create("FilesList", SelectableElements, {
 	/**
 	 * Populate a node as a TR element
 	 * @param ajxpNode AjxpNode
+     * @param HTMLElement replaceItem
 	 * @returns HTMLElement
 	 */
-	ajxpNodeToTableRow: function(ajxpNode){		
+	ajxpNodeToTableRow: function(ajxpNode, replaceItem){
 		var metaData = ajxpNode.getMetadata();
 		var newRow = new Element("tr");
 		var tBody = this.parsingCache.get('tBody') || $(this._htmlElement).select("tbody")[0];
@@ -1296,10 +1325,14 @@ Class.create("FilesList", SelectableElements, {
             mod(null,ajxpNode,'row', newRow);
         });
 		tBody.appendChild(newRow);
-		if(this.even){
-			$(newRow).addClassName('even');
-		}
-		this.even = !this.even;
+        if(!replaceItem){
+            if(this.even){
+                $(newRow).addClassName('even');
+            }
+            this.even = !this.even;
+        }else{
+            if(replaceItem.hasClassName('even')) $(newRow).addClassName('even');
+        }
 		return newRow;
 	},
 	
