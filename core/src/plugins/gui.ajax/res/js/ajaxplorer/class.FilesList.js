@@ -916,40 +916,40 @@ Class.create("FilesList", SelectableElements, {
 
     empty : function(skipFireChange){
         this.imagesHash = new Hash();
-      		if(this.protoMenu){
-      			this.protoMenu.removeElements('.ajxp_draggable');
-      			this.protoMenu.removeElements('.selectable_div');
-      		}
-      		for(var i = 0; i< AllAjxpDroppables.length;i++){
-      			var el = AllAjxpDroppables[i];
-      			if(this.isItem(el)){
-      				Droppables.remove(AllAjxpDroppables[i]);
-      				delete(AllAjxpDroppables[i]);
-      			}
-      		}
-      		for(i = 0;i< AllAjxpDraggables.length;i++){
-      			if(AllAjxpDraggables[i] && AllAjxpDraggables[i].element && this.isItem(AllAjxpDraggables[i].element)){
-                      if(AllAjxpDraggables[i].element.IMAGE_ELEMENT){
-                          try{
-                              if(AllAjxpDraggables[i].element.IMAGE_ELEMENT.destroyElement){
-                                  AllAjxpDraggables[i].element.IMAGE_ELEMENT.destroyElement();
-                              }
-                              AllAjxpDraggables[i].element.IMAGE_ELEMENT = null;
-                              delete AllAjxpDraggables[i].element.IMAGE_ELEMENT;
-                          }catch(e){}
-                      }
-      				Element.remove(AllAjxpDraggables[i].element);
-      			}
-      		}
-      		AllAjxpDraggables = $A([]);
+        if(this.protoMenu){
+            this.protoMenu.removeElements('.ajxp_draggable');
+            this.protoMenu.removeElements('.selectable_div');
+        }
+        for(var i = 0; i< AllAjxpDroppables.length;i++){
+            var el = AllAjxpDroppables[i];
+            if(this.isItem(el)){
+                Droppables.remove(AllAjxpDroppables[i]);
+                delete(AllAjxpDroppables[i]);
+            }
+        }
+        for(i = 0;i< AllAjxpDraggables.length;i++){
+            if(AllAjxpDraggables[i] && AllAjxpDraggables[i].element && this.isItem(AllAjxpDraggables[i].element)){
+                  if(AllAjxpDraggables[i].element.IMAGE_ELEMENT){
+                      try{
+                          if(AllAjxpDraggables[i].element.IMAGE_ELEMENT.destroyElement){
+                              AllAjxpDraggables[i].element.IMAGE_ELEMENT.destroyElement();
+                          }
+                          AllAjxpDraggables[i].element.IMAGE_ELEMENT = null;
+                          delete AllAjxpDraggables[i].element.IMAGE_ELEMENT;
+                      }catch(e){}
+                  }
+                Element.remove(AllAjxpDraggables[i].element);
+            }
+        }
+        AllAjxpDraggables = $A([]);
 
-      		var items = this.getSelectedItems();
-      		var setItemSelected = this.setItemSelected.bind(this);
-      		for(var i=0; i<items.length; i++)
-      		{
-      			setItemSelected(items[i], false);
-      		}
-      		this.removeCurrentLines(skipFireChange);
+        var items = this.getSelectedItems();
+        var setItemSelected = this.setItemSelected.bind(this);
+        for(var i=0; i<items.length; i++)
+        {
+            setItemSelected(items[i], false);
+        }
+        this.removeCurrentLines(skipFireChange);
     },
 
     makeItemRefreshObserver: function (ajxpNode, item, renderer){
@@ -958,11 +958,15 @@ Class.create("FilesList", SelectableElements, {
                 var newItem = renderer(ajxpNode, item);
                 item.insert({before: newItem});
                 item.remove();
+                if(item.ajxpNode && item.ajxpNode.REPLACE_OBS) {
+                    item.ajxpNode.stopObserving("node_replaced", item.ajxpNode.REPLACE_OBS);
+                }
                 newItem.ajxpNode = ajxpNode;
                 this.initRows();
                 item.ajxpNode = null;
                 delete item;
-                ajxpNode.observeOnce("node_replaced", this.makeItemRefreshObserver(ajxpNode, newItem, renderer));
+                ajxpNode.REPLACE_OBS = this.makeItemRefreshObserver(ajxpNode, newItem, renderer);
+                ajxpNode.observe("node_replaced", ajxpNode.REPLACE_OBS);
                 var dm = (this._dataModel?this._dataModel:ajaxplorer.getContextHolder());
                 if(dm.getSelectedNodes() && dm.getSelectedNodes().length)
                 {
@@ -1030,7 +1034,8 @@ Class.create("FilesList", SelectableElements, {
             newItem = renderer(child);
 			newItem.ajxpNode = child;
             newItem.addClassName("ajxpNodeProvider");
-            child.observeOnce("node_replaced", this.makeItemRefreshObserver(child, newItem, renderer));
+            child.REPLACE_OBS = this.makeItemRefreshObserver(child, newItem, renderer);
+            child.observe("node_replaced", child.REPLACE_OBS);
 		}
 		this.initRows();
 		
@@ -1593,7 +1598,10 @@ Class.create("FilesList", SelectableElements, {
 		for(i=0; i<rows.length;i++)
 		{
 			try{
-				rows[i].innerHTML = '';
+                if(rows[i].ajxpNode && rows[i].ajxpNode.REPLACE_OBS){
+                    rows[i].ajxpNode.stopObserving("node_replaced", rows[i].ajxpNode.REPLACE_OBS);
+                }
+                rows[i].innerHTML = '';
 				if(rows[i].IMAGE_ELEMENT){
                     if(rows[i].IMAGE_ELEMENT.destroyElement){
                         rows[i].IMAGE_ELEMENT.destroyElement();
@@ -1602,7 +1610,8 @@ Class.create("FilesList", SelectableElements, {
 					// Does not work on IE, silently catch exception
 					delete(rows[i].IMAGE_ELEMENT);
 				}
-			}catch(e){
+
+            }catch(e){
 			}			
 			if(rows[i].parentNode){
 				rows[i].remove();
