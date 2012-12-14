@@ -163,6 +163,9 @@ Class.create("AjxpNode", {
 	 */
 	replaceBy : function(ajxpNode){
 		this._isLeaf = ajxpNode._isLeaf;
+        if(ajxpNode.getPath() && this._path != ajxpNode.getPath()){
+            this._path = ajxpNode.getPath();
+        }
 		if(ajxpNode._label){
 			this._label = ajxpNode._label;
 		}

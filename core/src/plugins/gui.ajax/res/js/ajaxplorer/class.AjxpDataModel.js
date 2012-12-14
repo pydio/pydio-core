@@ -138,6 +138,13 @@ Class.create("AjxpDataModel", {
 		}
 	},
 
+    requireNodeReload: function(nodeOrPath){
+        if(Object.isString(nodeOrPath)){
+            nodeOrPath = new AjxpNode(nodeOrPath);
+        }
+        this._iAjxpNodeProvider.refreshNodeAndReplace(nodeOrPath);
+    },
+
     loadPathInfoSync: function (path, callback){
         this._iAjxpNodeProvider.loadLeafNodeSync(new AjxpNode(path), callback);
     },

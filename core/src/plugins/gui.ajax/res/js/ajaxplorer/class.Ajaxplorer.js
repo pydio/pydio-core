@@ -575,6 +575,7 @@ Class.create("Ajaxplorer", {
 				this._initLoadRep = null;
 				rootNode.observeOnce("first_load", function(){
 						setTimeout(function(){
+                            console.log(copy);
                             this.goTo(copy);
                             this.skipLsHistory = false;
 						}.bind(this), 1000);
