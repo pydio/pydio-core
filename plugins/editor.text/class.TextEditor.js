@@ -64,7 +64,10 @@ Class.create("TextEditor", AbstractEditor, {
 		if(window.ajxpMobile){
 			this.setFullScreen();
 			attachMobileScroll(this.textarea, "vertical");
-		}		
+		}
+        this.element.observeOnce("editor:close", function(){
+            ajaxplorer.fireNodeRefresh(nodeOrNodes);
+        });
 	},
 	
 	loadFileContent : function(fileName){

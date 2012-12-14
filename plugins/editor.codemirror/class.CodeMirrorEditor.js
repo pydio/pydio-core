@@ -227,7 +227,12 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
             fitHeightToBottom($(this.element), $(modal.elementName));
             fitHeightToBottom(this.codeMirror.wrapping);
         }.bind(this));
-	},
+
+        this.element.observeOnce("editor:close", function(){
+            ajaxplorer.fireNodeRefresh(nodeOrNodes);
+        });
+
+    },
 	
 	updateHistoryButtons: function(){
 		var sizes = $H({undo:0,redo:0});
