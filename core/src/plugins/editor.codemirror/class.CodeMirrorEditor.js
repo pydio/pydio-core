@@ -228,10 +228,6 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
             fitHeightToBottom(this.codeMirror.wrapping);
         }.bind(this));
 
-        this.element.observeOnce("editor:close", function(){
-            ajaxplorer.fireNodeRefresh(nodeOrNodes);
-        });
-
     },
 	
 	updateHistoryButtons: function(){
@@ -301,7 +297,8 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 		connexion.addParameter('get_action', 'put_content');
         connexion.addParameter('file', this.inputNode.getPath());
         connexion.onComplete = function(transp){
-			this.parseXml(transp);			
+			this.parseXml(transp);
+            ajaxplorer.fireNodeRefresh(this.inputNode);
 		}.bind(this);
 		this.setOnLoad(this.contentMainContainer);
 		connexion.setMethod('put');		

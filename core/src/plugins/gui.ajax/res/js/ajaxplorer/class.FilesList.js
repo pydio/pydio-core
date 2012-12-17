@@ -82,6 +82,7 @@ Class.create("FilesList", SelectableElements, {
 		
 		
 		var loadObserver = this.contextObserver.bind(this);
+		var childAddedObserver = this.childAddedToContext.bind(this);
 		var loadingObs = this.setOnLoad.bind(this);
 		var loadEndObs = this.removeOnLoad.bind(this);
         var contextChangedObserver = function(event){
@@ -90,6 +91,7 @@ Class.create("FilesList", SelectableElements, {
 			if(previous){
 				previous.stopObserving("loaded", loadEndObs);
 				previous.stopObserving("loading", loadingObs);
+				previous.stopObserving("child_added", childAddedObserver);
 			}
 			this.crtContext = newContext;
 			if(this.crtContext.isLoaded()) {
@@ -103,6 +105,7 @@ Class.create("FilesList", SelectableElements, {
 			}
 			this.crtContext.observe("loaded",loadEndObs);
 			this.crtContext.observe("loading",loadingObs);
+			this.crtContext.observe("child_added",childAddedObserver);
 
 		}.bind(this);
         var componentConfigObserver = function(event){
@@ -958,15 +961,15 @@ Class.create("FilesList", SelectableElements, {
                 var newItem = renderer(ajxpNode, item);
                 item.insert({before: newItem});
                 item.remove();
-                if(item.ajxpNode && item.ajxpNode.REPLACE_OBS) {
-                    item.ajxpNode.stopObserving("node_replaced", item.ajxpNode.REPLACE_OBS);
+                if(item.ajxpNode && item.REPLACE_OBS) {
+                    item.ajxpNode.stopObserving("node_replaced", item.REPLACE_OBS);
                 }
                 newItem.ajxpNode = ajxpNode;
                 this.initRows();
                 item.ajxpNode = null;
                 delete item;
-                ajxpNode.REPLACE_OBS = this.makeItemRefreshObserver(ajxpNode, newItem, renderer);
-                ajxpNode.observe("node_replaced", ajxpNode.REPLACE_OBS);
+                newItem.REPLACE_OBS = this.makeItemRefreshObserver(ajxpNode, newItem, renderer);
+                ajxpNode.observe("node_replaced", newItem.REPLACE_OBS);
                 var dm = (this._dataModel?this._dataModel:ajaxplorer.getContextHolder());
                 if(dm.getSelectedNodes() && dm.getSelectedNodes().length)
                 {
@@ -984,6 +987,47 @@ Class.create("FilesList", SelectableElements, {
 
             }
         }.bind(this);
+    },
+
+    makeItemRemovedObserver: function (ajxpNode, item){
+        return function(){
+            try{
+                if(this.loading) return;
+                this.setItemSelected(item, false);
+                if(item.ajxpNode && item.REMOVE_OBS) {
+                    item.ajxpNode.stopObserving("node_removed", item.REMOVE_OBS);
+                }
+                item.ajxpNode = null;
+                new Effect.Shrink(item, {afterFinish:function(){
+                    try{item.remove();}catch(e){}
+                    delete item;
+                    this.initRows();
+                }.bind(this)});
+                //item.remove();
+                //delete item;
+                //this.initRows();
+            }catch(e){
+
+            }
+        }.bind(this);
+    },
+
+    childAddedToContext : function(childPath){
+
+        if(this.loading) return;
+        var renderer = (this._displayMode == "list"?this.ajxpNodeToTableRow.bind(this):this.ajxpNodeToDiv.bind(this));
+        var child = this.crtContext.findChildByPath(childPath);
+        if(!child) return;
+        var newItem;
+        newItem = renderer(child);
+        newItem.ajxpNode = child;
+        newItem.addClassName("ajxpNodeProvider");
+        newItem.REPLACE_OBS = this.makeItemRefreshObserver(child, newItem, renderer);
+        newItem.REMOVE_OBS = this.makeItemRemovedObserver(child, newItem);
+        child.observe("node_replaced", newItem.REPLACE_OBS);
+        child.observe("node_removed", newItem.REMOVE_OBS);
+        this.initRows();
+
     },
 
 	/**
@@ -1034,8 +1078,10 @@ Class.create("FilesList", SelectableElements, {
             newItem = renderer(child);
 			newItem.ajxpNode = child;
             newItem.addClassName("ajxpNodeProvider");
-            child.REPLACE_OBS = this.makeItemRefreshObserver(child, newItem, renderer);
-            child.observe("node_replaced", child.REPLACE_OBS);
+            newItem.REPLACE_OBS = this.makeItemRefreshObserver(child, newItem, renderer);
+            newItem.REMOVE_OBS = this.makeItemRemovedObserver(child, newItem);
+            child.observe("node_replaced", newItem.REPLACE_OBS);
+            child.observe("node_removed", newItem.REMOVE_OBS);
 		}
 		this.initRows();
 		
@@ -1598,8 +1644,9 @@ Class.create("FilesList", SelectableElements, {
 		for(i=0; i<rows.length;i++)
 		{
 			try{
-                if(rows[i].ajxpNode && rows[i].ajxpNode.REPLACE_OBS){
-                    rows[i].ajxpNode.stopObserving("node_replaced", rows[i].ajxpNode.REPLACE_OBS);
+                if(rows[i].ajxpNode){
+                    if(rows[i].REPLACE_OBS) rows[i].ajxpNode.stopObserving("node_replaced", rows[i].REPLACE_OBS);
+                    if(rows[i].REMOVE_OBS) rows[i].ajxpNode.stopObserving("node_removed", rows[i].REMOVE_OBS);
                 }
                 rows[i].innerHTML = '';
 				if(rows[i].IMAGE_ELEMENT){
