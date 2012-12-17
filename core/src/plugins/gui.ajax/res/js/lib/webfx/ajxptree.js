@@ -116,10 +116,14 @@ AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){
 		}
 		if(jsNode.updateLabel) jsNode.updateLabel(ajxpNode.getLabel());
 	}.bind(jsNode));
-	ajxpNode.observeOnce("node_removed", function(e){
-		jsNode.remove();
-	});
-	ajxpNode.observe("loading", function(){		
+    var remover = function(e){
+        jsNode.remove();
+        window.setTimeout(function(){
+            ajxpNode.stopObserving("node_removed", remover);
+        }, 200);
+    };
+	ajxpNode.observe("node_removed", remover);
+	ajxpNode.observe("loading", function(){
 		//this.add(this._loadingItem);
 	}.bind(jsNode) );
 	ajxpNode.observe("loaded", function(){

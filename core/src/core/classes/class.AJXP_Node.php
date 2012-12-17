@@ -211,7 +211,8 @@ class AJXP_Node{
 			$this->_metadata = $metaValue;
 			return;
 		}
-		$this->_metadata[$metaName] = $metaValue;
+        if($metaValue == null) unset($this->_metadata[$metaName]);
+        else $this->_metadata[$metaName] = $metaValue;
 	}
 
     /**

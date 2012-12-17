@@ -178,6 +178,23 @@ class UserSelection
 
     }
 
+    /**
+     * @param AbstractAccessDriver $accessDriver
+     * @return AJXP_Node[]
+     * @throws Exception
+     */
+    function buildNodes(AbstractAccessDriver $accessDriver){
+
+        $wrapperData = $accessDriver->detectStreamWrapper(false);
+        $urlBase = $wrapperData["protocol"]."://".$accessDriver->repository->getId();
+        $nodes = array();
+        foreach($this->files as $file){
+            $nodes[] = new AJXP_Node($urlBase.$file);
+        }
+        return $nodes;
+
+    }
+
 	/**
      * Is this selection empty?
      * @return bool

@@ -183,7 +183,8 @@ class UserMetaManager extends AJXP_Plugin {
         $this->metaStore->setMetadata($ajxpNode, "users_meta", $newValues, false, AJXP_METADATA_SCOPE_GLOBAL);
         AJXP_Controller::applyHook("node.change", array(null, &$ajxpNode));
 		AJXP_XMLWriter::header();
-		AJXP_XMLWriter::reloadDataNode("", SystemTextEncoding::toUTF8($currentFile), true);	
+		//AJXP_XMLWriter::reloadDataNode("", SystemTextEncoding::toUTF8($currentFile), true);
+        AJXP_XMLWriter::writeNodesDiff(array("UPDATE" => array($ajxpNode->getPath() => $ajxpNode)), true);
 		AJXP_XMLWriter::close();
 	}
 	

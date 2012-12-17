@@ -760,11 +760,6 @@
 						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
 						ajaxplorer.actionBar.submitForm(oForm, true, function(transport){
 						    var result = this.parseXmlMessage(transport.responseXML);
-						    if(result){
-						        var nodes = ajaxplorer.getUserSelection().getSelectedNodes().each(function(n){
-						            n._parentNode.removeChild(n);
-						        });
-						    }
 						}.bind(ajaxplorer.actionBar));
 						hideLightBox(true);
 						return false;

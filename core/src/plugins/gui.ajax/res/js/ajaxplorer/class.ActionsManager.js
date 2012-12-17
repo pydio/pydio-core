@@ -429,6 +429,49 @@ Class.create("ActionsManager", {
 					ajaxplorer.reloadRepositoriesList();
 				}
 			}
+            else if(childs[i].nodeName == 'nodes_diff'){
+                var dm = ajaxplorer.getContextHolder();
+                var removes = XPathSelectNodes(childs[i], "remove/tree");
+                var adds = XPathSelectNodes(childs[i], "add/tree");
+                var updates = XPathSelectNodes(childs[i], "update/tree");
+                if(removes && removes.length){
+                    removes.each(function(r){
+                        var p = r.getAttribute("filename");
+                        var fake = new AjxpNode(p);
+                        var n = fake.findInArbo(dm.getRootNode(), undefined);
+                        if(n){
+                            n.getParent().removeChild(n);
+                        }
+                    });
+                }
+                if(adds && adds.length && dm.getAjxpNodeProvider().parseAjxpNode){
+                    adds.each(function(tree){
+                        var newNode = dm.getAjxpNodeProvider().parseAjxpNode(tree);
+                        var parentFake = new AjxpNode(getRepName(newNode.getPath()));
+                        var parent = parentFake.findInArbo(dm.getRootNode(), undefined);
+                        if(!parent && getRepName(newNode.getPath()) == "") parent = dm.getRootNode();
+                        if(parent){
+                            parent.addChild(newNode);
+                            dm.setSelectedNodes([newNode], {});
+                        }
+                    });
+                }
+                if(updates && updates.length && dm.getAjxpNodeProvider().parseAjxpNode){
+                    updates.each(function(tree){
+                        var newNode = dm.getAjxpNodeProvider().parseAjxpNode(tree);
+                        var original = newNode.getMetadata().get("original_path");
+                        if(!original) original = newNode.getPath();
+                        var fake = new AjxpNode(original);
+                        var n = fake.findInArbo(dm.getRootNode(), undefined);
+                        if(n){
+                            dm.setSelectedNodes([], {});
+                            newNode.getMetadata().set("original_path", undefined);
+                            n.replaceBy(newNode, "override");
+                            dm.setSelectedNodes([n], {});
+                        }
+                    });
+                }
+            }
 			else if(childs[i].tagName == "logging_result")
 			{
 				if(childs[i].getAttribute("secure_token")){

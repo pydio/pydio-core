@@ -266,7 +266,6 @@ class MetaWatchRegister extends AJXP_Plugin{
                 $node = $us->getUniqueNode($this->accessDriver);
                 $node->loadNodeInfo();
                 $cmd = $httpVars["watch_action"];
-                $stopWatch = false;
 
                 $meta = $this->metaStore->retrieveMetadata(
                     $node,
@@ -302,7 +301,10 @@ class MetaWatchRegister extends AJXP_Plugin{
                 }
 
                 AJXP_XMLWriter::header();
-                AJXP_XMLWriter::reloadDataNode();
+                $node->metadata = array();
+                $node->loadNodeInfo(true, false, "all");
+                $this->enrichNode($node);
+                AJXP_XMLWriter::writeNodesDiff(array("UPDATE" => array( $node->getPath() => $node )), true);
                 AJXP_XMLWriter::close();
 
                 break;
