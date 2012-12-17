@@ -66,7 +66,7 @@ Class.create("TextEditor", AbstractEditor, {
 			attachMobileScroll(this.textarea, "vertical");
 		}
         this.element.observeOnce("editor:close", function(){
-            ajaxplorer.fireNodeRefresh(nodeOrNodes);
+            //ajaxplorer.fireNodeRefresh(nodeOrNodes);
         });
 	},
 	

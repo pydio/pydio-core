@@ -96,7 +96,7 @@ Class.create("RemoteNodeProvider", {
    		conn.sendSync();
    	},
 
-    refreshNodeAndReplace : function(node){
+    refreshNodeAndReplace : function(node, onComplete){
 
         var conn = new Connexion();
         conn.addParameter("get_action", "ls");
@@ -108,8 +108,10 @@ Class.create("RemoteNodeProvider", {
                 conn.addParameter(pair.key, pair.value);
             });
         }
+
         var nodeCallback = function(newNode){
-            node.replaceBy(newNode);
+            node.replaceBy(newNode, "override");
+            if(onComplete) onComplete(node);
         };
         conn.onComplete = function (transport){
             try{
@@ -136,7 +138,7 @@ Class.create("RemoteNodeProvider", {
 		var children = rootNode.childNodes;
         if(!childrenOnly){
             var contextNode = this.parseAjxpNode(rootNode);
-            origNode.replaceBy(contextNode);
+            origNode.replaceBy(contextNode, "merge");
         }
 
 		// CHECK FOR MESSAGE OR ERRORS

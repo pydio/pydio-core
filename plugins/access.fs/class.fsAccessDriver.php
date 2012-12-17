@@ -136,6 +136,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			}
 		}		
 	}
+
+    protected  function getNodesDiffArray(){
+        return array("REMOVE" => array(), "ADD" => array(), "UPDATE" => array());
+    }
 	
 	function switchAction($action, $httpVars, $fileVars){
 		if(!isSet($this->actions[$action])) return;
@@ -169,7 +173,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		$pendingSelection = "";
 		$logMessage = null;
 		$reloadContextNode = false;
-		
+
 		switch($action)
 		{			
 			//------------------------------------
@@ -283,8 +287,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
                     }
 					@rename($tmpFNAME, $this->urlBase.$dir."/".$localName);
                     AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($this->urlBase.$dir."/".$localName), false));
-					$reloadContextNode = true;
-					$pendingSelection = $localName;					
+					//$reloadContextNode = true;
+					//$pendingSelection = $localName;
+                    $newNode = new AJXP_Node($this->urlBase.$dir."/".$localName);
+                    if(!isset($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
+                    $nodesDiffs["ADD"][] = $newNode;
 			break;
 			
 			case "stat" :
@@ -392,9 +399,17 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
                     }
                     $logMessage = join("\n", $success);
 				}
-				$reloadContextNode = true;
+                if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
+                // Assume new nodes are correctly created
+                $selectedItems = $selection->getFiles();
+                foreach($selectedItems as $selectedPath){
+                    $newPath = $this->urlBase.$dest ."/". basename($selectedPath);
+                    $newNode = new AJXP_Node($newPath);
+                    $nodesDiffs["ADD"][] = $newNode;
+                    if($action == "move") $nodesDiffs["REMOVE"][] = $selectedPath;
+                }
                 if(!(RecycleBinManager::getRelativeRecycle() ==$dest && $this->driverConf["HIDE_RECYCLE"] == true)){
-                    $reloadDataNode = $dest;
+                    //$reloadDataNode = $dest;
                 }
 
 			break;
@@ -416,7 +431,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				}
 				if($errorMessage) throw new AJXP_Exception(SystemTextEncoding::toUTF8($errorMessage));
 				AJXP_Logger::logAction("Delete", array("files"=>$selection));
-				//$reloadContextNode = true;
+                if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
+                $nodesDiffs["REMOVE"] = array_merge($nodesDiffs["REMOVE"], $selection->getFiles());
 				
 			break;
 
@@ -447,8 +463,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				$this->filterUserSelectionToHidden(array($filename_new));
 				$this->rename($file, $filename_new, $dest);
 				$logMessage= SystemTextEncoding::toUTF8($file)." $mess[41] ".SystemTextEncoding::toUTF8($filename_new);
-				$reloadContextNode = true;
-				$pendingSelection = $filename_new;
+				//$reloadContextNode = true;
+				//$pendingSelection = $filename_new;
+                if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
+                if($dest == null) $dest = dirname($file);
+                $nodesDiffs["UPDATE"][$file] = new AJXP_Node($this->urlBase.$dest."/".$filename_new);
 				AJXP_Logger::logAction("Rename", array("original"=>$file, "new"=>$filename_new));
 				
 			break;
@@ -470,8 +489,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				$messtmp.="$mess[38] ".SystemTextEncoding::toUTF8($dirname)." $mess[39] ";
 				if($dir=="") {$messtmp.="/";} else {$messtmp.= SystemTextEncoding::toUTF8($dir);}
 				$logMessage = $messtmp;
-				$pendingSelection = $dirname;
-				$reloadContextNode = true;
+				//$pendingSelection = $dirname;
+				//$reloadContextNode = true;
+                $newNode = new AJXP_Node($this->urlBase.$dir."/".$dirname);
+                if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
+                array_push($nodesDiffs["ADD"], $newNode);
                 AJXP_Logger::logAction("Create Dir", array("dir"=>$dir."/".$dirname));
 
 			break;
@@ -496,12 +518,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				$messtmp.="$mess[34] ".SystemTextEncoding::toUTF8($filename)." $mess[39] ";
 				if($dir=="") {$messtmp.="/";} else {$messtmp.=SystemTextEncoding::toUTF8($dir);}
 				$logMessage = $messtmp;
-				$reloadContextNode = true;
-				$pendingSelection = $dir."/".$filename;
+				//$reloadContextNode = true;
+				//$pendingSelection = $dir."/".$filename;
 				AJXP_Logger::logAction("Create File", array("file"=>$dir."/".$filename));
-				//$newNode = new AJXP_Node($this->urlBase.$dir."/".$filename);
-				//AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
-		
+				$newNode = new AJXP_Node($this->urlBase.$dir."/".$filename);
+                if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
+                array_push($nodesDiffs["ADD"], $newNode);
+
 			break;
 			
 			//------------------------------------
@@ -523,9 +546,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				}
 				//$messtmp.="$mess[34] ".SystemTextEncoding::toUTF8($filename)." $mess[39] ";
 				$logMessage="Successfully changed permission to ".$chmod_value." for ".count($changedFiles)." files or folders";
-				$reloadContextNode = true;
-				AJXP_Logger::logAction("Chmod", array("dir"=>$dir, "filesCount"=>count($changedFiles)));
-		
+                AJXP_Logger::logAction("Chmod", array("dir"=>$dir, "filesCount"=>count($changedFiles)));
+                if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
+                $nodesDiffs["UPDATE"] = array_merge($nodesDiffs["UPDATE"], $selection->buildNodes($this));
+
 			break;
 			
 			//------------------------------------
@@ -852,6 +876,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		if(isSet($reloadDataNode)){
 			$xmlBuffer .= AJXP_XMLWriter::reloadDataNode($reloadDataNode, "", false);
 		}
+        if(isSet($nodesDiffs)){
+            $xmlBuffer .= AJXP_XMLWriter::writeNodesDiff($nodesDiffs, false);
+        }
 					
 		return $xmlBuffer;
 	}

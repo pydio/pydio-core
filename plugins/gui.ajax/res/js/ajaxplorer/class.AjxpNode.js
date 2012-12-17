@@ -141,7 +141,7 @@ Class.create("AjxpNode", {
 		if(this._iNodeProvider) ajxpNode._iNodeProvider = this._iNodeProvider;
         var existingNode = this.findChildByPath(ajxpNode.getPath());
 		if(existingNode && !Object.isString(existingNode)){
-			existingNode.replaceBy(ajxpNode);
+			existingNode.replaceBy(ajxpNode, "override");
 		}else{			
 			this._children.push(ajxpNode);
 			this.notify("child_added", ajxpNode.getPath());
@@ -161,7 +161,7 @@ Class.create("AjxpNode", {
 	 * Replaces the current node by a new one. Copy all properties deeply
 	 * @param ajxpNode AjxpNode
 	 */
-	replaceBy : function(ajxpNode){
+	replaceBy : function(ajxpNode, metaMerge){
 		this._isLeaf = ajxpNode._isLeaf;
         if(ajxpNode.getPath() && this._path != ajxpNode.getPath()){
             this._path = ajxpNode.getPath();
@@ -181,12 +181,17 @@ Class.create("AjxpNode", {
 		ajxpNode.getChildren().each(function(child){
 			this.addChild(child);
 		}.bind(this) );		
-		var meta = ajxpNode.getMetadata();		
+		var meta = ajxpNode.getMetadata();
+        if(metaMerge == "override") this._metadata = $H();
 		meta.each(function(pair){
-			if(this._metadata.get(pair.key) && pair.value === ""){
-				return;
-			}
-			this._metadata.set(pair.key, pair.value);
+            if(metaMerge == "override"){
+                this._metadata.set(pair.key, pair.value);
+            }else{
+                if(this._metadata.get(pair.key) && pair.value === ""){
+                    return;
+                }
+                this._metadata.set(pair.key, pair.value);
+            }
 		}.bind(this) );
 		this.notify("node_replaced", this);		
 	},
@@ -297,6 +302,7 @@ Class.create("AjxpNode", {
 			if(node && !Object.isString(node)){
 				crtNode = node;
 			}else{
+                if(fakeNodes === undefined) return false;
 				crtNode = new AjxpNode(crtPath, false, getBaseName(crtPath));
 				crtNode.fake = true;				
 				fakeNodes.push(crtNode);

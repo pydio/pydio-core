@@ -130,9 +130,10 @@ class AJXP_XMLWriter
      * @param bool $isLeaf
      * @param array $metaData
      * @param bool $close
-     * @return void
+     * @param bool $print
+     * @return void|string
      */
-	static function renderNode($nodeName, $nodeLabel, $isLeaf, $metaData = array(), $close=true){
+	static function renderNode($nodeName, $nodeLabel, $isLeaf, $metaData = array(), $close=true, $print = true){
 		$string = "<tree";
 		$metaData["filename"] = $nodeName;
 		if(!isSet($metaData["text"])){
@@ -149,22 +150,24 @@ class AJXP_XMLWriter
 		}else{
 			$string .= ">";
 		}
-		AJXP_XMLWriter::write($string, true);
+		return AJXP_XMLWriter::write($string, $print);
 	}
 
     /**
      * @static
      * @param AJXP_Node $ajxpNode
      * @param bool $close
-     * @return void
+     * @param bool $print
+     * @return void|string
      */
-    static function renderAjxpNode($ajxpNode, $close = true){
-        AJXP_XMLWriter::renderNode(
+    static function renderAjxpNode($ajxpNode, $close = true, $print = true){
+        return AJXP_XMLWriter::renderNode(
             $ajxpNode->getPath(),
             $ajxpNode->getLabel(),
             $ajxpNode->isLeaf(),
             $ajxpNode->metadata,
-            $close);
+            $close,
+            $print);
     }
 
     /**
@@ -298,6 +301,61 @@ class AJXP_XMLWriter
 		$pendingSelection = AJXP_Utils::xmlEntities($pendingSelection, true);
 		return AJXP_XMLWriter::write("<reload_instruction object=\"data\" node=\"$nodePath\" file=\"$pendingSelection\"/>", $print);
 	}
+
+
+	/**
+     * Send a <reload> XML instruction for refreshing the list
+     * @static
+     * @param string $nodePath
+     * @param string $pendingSelection
+     * @param bool $print
+     * @return string
+     */
+	static function writeNodesDiff($diffNodes, $print = false){
+        $mess = ConfService::getMessages();
+        $buffer = "<nodes_diff>";
+        if(isSet($diffNodes["REMOVE"]) && count($diffNodes["REMOVE"])){
+            $buffer .= "<remove>";
+            foreach($diffNodes["REMOVE"] as $nodePath){
+                $nodePath = AJXP_Utils::xmlEntities($nodePath, true);
+                $buffer .= "<tree filename='$nodePath'/>";
+            }
+            $buffer .= "</remove>";
+        }
+        if(isSet($diffNodes["ADD"]) && count($diffNodes["ADD"])){
+            $buffer .= "<add>";
+            foreach($diffNodes["ADD"] as $ajxpNode){
+                $ajxpNode->loadNodeInfo(false, false, "all");
+                if(!empty($ajxpNode->metaData["mimestring_id"]) && array_key_exists($ajxpNode->metaData["mimestring_id"], $mess)){
+                    $ajxpNode->mergeMetadata(array("mimestring" =>  $mess[$ajxpNode->metaData["mimestring_id"]]));
+                }
+                $buffer .=  self::renderAjxpNode($ajxpNode, true, false);
+            }
+            $buffer .= "</add>";
+        }
+        if(isSet($diffNodes["UPDATE"]) && count($diffNodes["UPDATE"])){
+            $buffer .= "<update>";
+            foreach($diffNodes["UPDATE"] as $originalPath => $ajxpNode){
+                $ajxpNode->loadNodeInfo(false, false, "all");
+                if(!empty($ajxpNode->metaData["mimestring_id"]) && array_key_exists($ajxpNode->metaData["mimestring_id"], $mess)){
+                    $ajxpNode->mergeMetadata(array("mimestring" =>  $mess[$ajxpNode->metaData["mimestring_id"]]));
+                }
+                $ajxpNode->original_path = $originalPath;
+                $buffer .= self::renderAjxpNode($ajxpNode, true, false);
+            }
+            $buffer .= "</update>";
+        }
+        $buffer .= "</nodes_diff>";
+        return AJXP_XMLWriter::write($buffer, $print);
+
+        /*
+		$nodePath = AJXP_Utils::xmlEntities($nodePath, true);
+		$pendingSelection = AJXP_Utils::xmlEntities($pendingSelection, true);
+		return AJXP_XMLWriter::write("<reload_instruction object=\"data\" node=\"$nodePath\" file=\"$pendingSelection\"/>", $print);
+        */
+	}
+
+
 	/**
      * Send a <reload> XML instruction for refreshing the repositories list
      * @static
