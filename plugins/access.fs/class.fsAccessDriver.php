@@ -416,7 +416,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				}
 				if($errorMessage) throw new AJXP_Exception(SystemTextEncoding::toUTF8($errorMessage));
 				AJXP_Logger::logAction("Delete", array("files"=>$selection));
-				$reloadContextNode = true;
+				//$reloadContextNode = true;
 				
 			break;
 
