@@ -592,7 +592,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 					if(isSet($httpVars["auto_rename"])){
 						$userfile_name = self::autoRenameForDest($destination, $userfile_name);
 					}
-                    AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($this->urlBase.$dir."/".$userfile_name), $boxData["size"]));
+                    try {
+                        AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($this->urlBase.$dir."/".$userfile_name), $boxData["size"]));
+                    }catch (Exception $e){
+                        $errorCode=507;
+                        $errorMessage = $e->getMessage();
+                        break;
+                    }
 					if(isSet($boxData["input_upload"])){
 						try{
 							AJXP_Logger::debug("Begining reading INPUT stream");
