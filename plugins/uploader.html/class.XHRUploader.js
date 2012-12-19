@@ -479,7 +479,7 @@ Class.create("XHRUploader", {
 			this.sendFileMultipart(item);
 		}else{
             if(this.hasLoadingItem()) return;
-			ajaxplorer.fireContextRefresh();
+			//ajaxplorer.fireContextRefresh();
 			if(this.optionPane.autoCloseCheck.checked){
 				hideLightBox(true);
 			}
@@ -525,7 +525,10 @@ Class.create("XHRUploader", {
 				item.updateProgress(null, 100);
 				item.updateStatus('loaded');
 
-				if (xhr.responseText && xhr.responseText != 'OK') {
+                if (xhr.responseXML){
+                    var result = ajaxplorer.actionBar.parseXmlMessage(xhr.responseXML);
+                    if(!result) item.updateStatus("error");
+                }else if (xhr.responseText && xhr.responseText != 'OK') {
 					alert(xhr.responseText); // display response.
 					item.updateStatus('error');
 				}

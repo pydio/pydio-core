@@ -249,7 +249,7 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
         if(Prototype.Browser.IE || Prototype.Browser.Opera){
             window.setTimeout(function(){
                 var sum = 0;
-                $(node.id).childElements().each(function(el){sum += el.getWidth();});
+                if($(node.id)) $(node.id).childElements().each(function(el){sum += el.getWidth();});
                 if(sum) $(node.id).setStyle({width:Math.max(sum+50,$(node.id).parentNode.getWidth())+'px'});
             }, 100);
         }

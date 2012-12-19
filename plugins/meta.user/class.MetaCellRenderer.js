@@ -188,8 +188,7 @@ Class.create("MetaCellRenderer", {
             conn.onComplete = function(){
                 div.saver.remove();
                 ajaxplorer.enableAllKeyBindings();
-                ajaxplorer.getContextHolder().setPendingSelection(selectedNode.getPath());
-                ajaxplorer.fireContextRefresh();
+                ajaxplorer.fireNodeRefresh(selectedNode);
             };
             conn.sendAsync();
         });
@@ -263,8 +262,8 @@ Class.create("MetaCellRenderer", {
 					});
 				}
 				conn.onComplete = function(){
-					ajaxplorer.getContextHolder().setPendingSelection(selectedNode.getPath());
-					ajaxplorer.fireContextRefresh();
+					//ajaxplorer.getContextHolder().setPendingSelection(selectedNode.getPath());
+					ajaxplorer.fireNodeRefresh(selectedNode);
 					if(containingForm){
 						hideLightBox(true);
 					}

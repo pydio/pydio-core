@@ -81,8 +81,15 @@ class SimpleUploadProcessor extends AJXP_Plugin {
 			if(isSet($result["ERROR"])){
 				$message = $result["ERROR"]["MESSAGE"]." (".$result["ERROR"]["CODE"].")";
 				print("\n if(parent.ajaxplorer.actionBar.multi_selector) parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $message)."');");		
-			}else{		
+			}else{
 				print("\n if(parent.ajaxplorer.actionBar.multi_selector) parent.ajaxplorer.actionBar.multi_selector.submitNext();");
+                if($result["CREATED_NODE"]){
+                    $s = '<tree>';
+                    $s .= AJXP_XMLWriter::writeNodesDiff(array("ADD"=> array($result["CREATED_NODE"])), false);
+                    $s.= '</tree>';
+                    print("\n var resultString = '".$s."'; var resultXML = parent.parseXml(resultString);");
+                    print("\n parent.ajaxplorer.actionBar.parseXmlMessage(resultXML);");
+                }
 			}
 			print("</script></html>");
 		}else{
@@ -90,7 +97,12 @@ class SimpleUploadProcessor extends AJXP_Plugin {
 				$message = $result["ERROR"]["MESSAGE"]." (".$result["ERROR"]["CODE"].")";
 				exit($message);
 			}else{
-				exit("OK");
+                AJXP_XMLWriter::header();
+                if(isSet($result["CREATED_NODE"])){
+                    AJXP_XMLWriter::writeNodesDiff(array("ADD" => array($result["CREATED_NODE"])), true);
+                }
+                AJXP_XMLWriter::close();
+				//exit("OK");
 			}
 		}
 		
