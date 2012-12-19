@@ -708,22 +708,12 @@
 							var subAction = new Element('input', {type:'hidden',name:'moving_files',value:'true'});
 							oForm.insert(subAction);
 							this.submitForm(oForm, false, function(transport){
-								var message = XPathSelectSingleNode(transport.responseXML, "//message");
-								if(message.getAttribute("type") == "ERROR"){
-									ajaxplorer.displayMessage("ERROR", message.firstChild.nodeValue);
-									return;
-								}
+							    var res = this.parseXmlMessage(transport.responseXML);
+							    if(!res) return;
 								getAction.value = "delete";
 								subAction.name = "force_deletion"; 								
 								this.submitForm(oForm, false, function(transport2){
-									var deleteMessage = XPathSelectSingleNode(transport2.responseXML, "//message");
-									if(deleteMessage.getAttribute("type") == "ERROR"){
-										ajaxplorer.displayMessage("ERROR", message.firstChild.nodeValue + '\n\n' + deleteMessage.firstChild.nodeValue);
-										return;								
-									}else{
-										ajaxplorer.displayMessage("SUCCESS", message.firstChild.nodeValue);
-										ajaxplorer.fireContextRefresh();
-									}
+								    this.parseXmlMessage(transport2.responseXML);
 								}.bind(this));
 							}.bind(this));
 						}else{

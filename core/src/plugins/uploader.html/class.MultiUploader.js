@@ -364,7 +364,7 @@ Class.create("MultiUploader", {
 		else
 		{
             document.fire("ajaxplorer:longtask_finished");
-			ajaxplorer.fireContextRefresh();
+			//ajaxplorer.fireContextRefresh();
 		}
 		
 	}

@@ -108,7 +108,7 @@ Class.create("ShareCenter", {
                     }
                     if(reload){
                         removeLightboxFromElement(oForm.up(".dialogContent"));
-                        ajaxplorer.fireContextRefresh();
+                        ajaxplorer.fireNodeRefresh(this.currentNode);
                     }
                 }.bind(this));
             }else{
@@ -295,8 +295,8 @@ Class.create("ShareCenter", {
             }
             oForm.down('div#unshare_button').stopObserving("click");
             hideLightBox(true);
-            ajaxplorer.fireContextRefresh();
-        };
+            ajaxplorer.fireNodeRefresh(this.currentNode);
+        }.bind(this);
         conn.sendAsync();
     },
 
@@ -347,7 +347,7 @@ Class.create("ShareCenter", {
                             cont.select();
                             modal.refreshDialogAppearance();
                             modal.setCloseAction(function(){
-                                ajaxplorer.fireContextRefresh();
+                                ajaxplorer.fireNodeRefresh(oThis.currentNode);
                             });
                         }
                     });
