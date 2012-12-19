@@ -19,7 +19,7 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"1" => "Quota usage...",
-"2" => "Click to reload quota usage",
-"3" => "You are exceeding your quota",
+"1" => "Quota (en cours...)",
+"2" => "Cliquer pour recharger l'utilisation du quota",
+"3" => "Vous dépassez votre quota",
 );
