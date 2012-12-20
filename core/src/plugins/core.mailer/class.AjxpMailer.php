@@ -92,7 +92,8 @@ class AjxpMailer extends AJXP_Plugin
         }else if(AuthService::getLoggedUser() != null){
             $arr = $this->resolveAdresses(array(AuthService::getLoggedUser()));
             if(count($arr)) $fromResult = $arr[0];
-        }else{
+        }
+        if(!count($fromResult)){
             $f = ConfService::getCoreConf("FROM", "mailer");
             $fName = ConfService::getCoreConf("FROM_NAME", "mailer");
             $fromResult = array("adress" => $f, "name" => $fName );
