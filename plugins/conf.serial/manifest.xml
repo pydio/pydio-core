@@ -14,5 +14,25 @@
 	<class_definition filename="plugins/conf.serial/class.serialConfDriver.php" classname="serialConfDriver"/>
 	<registry_contributions>
 		<external_file filename="plugins/core.conf/standard_conf_actions.xml" include="actions/*" exclude=""/>
+        <hooks>
+            <serverCallback methodName="publishNodeChange" hookName="node.change" defer="false"/>
+        </hooks>
+        <actions>
+            <action skipSecureToken="true" name="client_register_channel">
+                <processing>
+                    <serverCallback methodName="clientChannelMethod"/>
+                </processing>
+            </action>
+            <action skipSecureToken="true" name="client_unregister_channel">
+                <processing>
+                    <serverCallback methodName="clientChannelMethod"/>
+                </processing>
+            </action>
+            <action skipSecureToken="true" name="client_consume_channel">
+                <processing>
+                    <serverCallback methodName="clientChannelMethod"/>
+                </processing>
+            </action>
+        </actions>
 	</registry_contributions>
 </confdriver>
