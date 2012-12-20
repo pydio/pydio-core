@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin label="CONF_MESSAGE[Message Queuing]" description="CONF_MESSAGE[MQ Abstraction for dynamic dispatching]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings>
+        <resources>
+            <js className="AjxpMqObserver" file="plugins/core.mq/class.AjxpMqObserver.js" autoload="true"/>
+        </resources>
+    </client_settings>
+    <class_definition classname="BasicMqManager" filename="plugins/core.mq/class.BasicMqManager.php"/>
+    <registry_contributions>
+        <actions>
+            <action name="client_register_channel">
+                <processing>
+                    <serverCallback methodName="clientChannelMethod"/>
+                </processing>
+            </action>
+            <action name="client_unregister_channel">
+                <processing>
+                    <serverCallback methodName="clientChannelMethod"/>
+                </processing>
+            </action>
+            <action name="client_consume_channel">
+                <processing>
+                    <serverCallback methodName="clientChannelMethod"/>
+                </processing>
+            </action>
+        </actions>
+        <hooks>
+            <serverCallback methodName="publishNodeChange" hookName="node.change" defer="true"/>
+        </hooks>
+    </registry_contributions>
+</ajxp_plugin>
