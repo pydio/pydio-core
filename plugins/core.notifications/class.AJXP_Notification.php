@@ -71,6 +71,7 @@ class AJXP_Notification
 
     protected function getRoot($string){
         if(empty($string)) return "/";
+        return $string;
     }
 
     protected function replaceVars($tplString, $mess, $rich = true){
