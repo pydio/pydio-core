@@ -23,6 +23,8 @@
  */
 Class.create("Connexion", {
 
+    discrete : false,
+
 	/**
 	 * Constructor
 	 * @param baseUrl String The base url for services
@@ -74,6 +76,7 @@ Class.create("Connexion", {
      * Show a small loader
      */
     showLoader : function(){
+        if(this.discrete) return;
         if(!$('AjxpConnexion-loader') && window.ajxpBootstrap.parameters.get("theme")){
             var img = new Element("img", {
                 src:ajxpResourcesFolder+"/images/ajxp-connexion-loader.gif",
@@ -88,6 +91,7 @@ Class.create("Connexion", {
      * Hide a small loader
      */
     hideLoader : function(){
+        if(this.discrete) return;
         if($('AjxpConnexion-loader'))$('AjxpConnexion-loader').hide();
     },
 
