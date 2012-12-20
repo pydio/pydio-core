@@ -530,7 +530,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 
 
 				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage("Successfully updated your account", null);
+				AJXP_XMLWriter::sendMessage($mess["241"], null);
                 AJXP_XMLWriter::close();
 
 			break;
