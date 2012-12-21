@@ -21,9 +21,21 @@
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+// DL and install install vendor (composer?) https://github.com/Devristo/phpws
 
 
-class BasicMqManager extends AJXP_Plugin
+require_once(AJXP_INSTALL_PATH."/vendor/phpws/websocket.client.php");
+
+/**
+ * Websocket JS Sample
+ *
+ * var websocket = new WebSocket("ws://serverURL:8090/echo");
+websocket.onmessage = function(event){console.log(event.data);};
+ *
+ * @todo : HOW TO AUTHENTICATE USER???
+ */
+
+class WsMqManager extends AJXP_Plugin
 {
 
     private $clientsGCTime = 10;
@@ -69,6 +81,7 @@ class BasicMqManager extends AJXP_Plugin
      * @param bool bool $copy
      */
     public function publishNodeChange($origNode = null, $newNode = null, $copy = false){
+        $content = "";$repo = "";
         if($newNode != null) {
             $repo = $newNode->getRepositoryId();
             $message = new stdClass();
@@ -80,15 +93,24 @@ class BasicMqManager extends AJXP_Plugin
             }else{
                 $data[] = $newNode;
             }
-            $message->content = AJXP_XMLWriter::writeNodesDiff(array(($update?"UPDATE":"ADD") => $data));
-            $this->publishToChannel("nodes:$repo", $message);
-            if($update) return;
+            $content = AJXP_XMLWriter::writeNodesDiff(array(($update?"UPDATE":"ADD") => $data));
+            //$this->publishToChannel("nodes:$repo", $message);
         }
-        if($origNode != null){
+        if($origNode != null && ! $update){
             $repo = $origNode->getRepositoryId();
             $message = new stdClass();
-            $message->content = AJXP_XMLWriter::writeNodesDiff(array("REMOVE" => array($origNode->getPath())));
-            $this->publishToChannel("nodes:$repo", $message);
+            $content = AJXP_XMLWriter::writeNodesDiff(array("REMOVE" => array($origNode->getPath())));
+            //$this->publishToChannel("nodes:$repo", $message);
+        }
+        if(!empty($content) && !empty($repo)){
+
+            $input = serialize(array("REPO_ID" => $repo, "CONTENT" => $content));
+            $msg = WebSocketMessage::create($input);
+            $client = new WebSocket("ws://192.168.1.119:8090/echo/");
+            $client->open();
+            $client->sendMessage($msg);
+            $client->close();
+
         }
 
     }
@@ -107,9 +129,14 @@ class BasicMqManager extends AJXP_Plugin
     conn.sendAsync();
     }, 5);
      *
+     * W
+     *
+     *
+     *
      */
 
     public function clientChannelMethod($action, $httpVars, $fileVars){
+        return;
         switch($action){
             case "client_register_channel":
                 $this->suscribeToChannel($httpVars["channel"], $httpVars["client_id"]);
