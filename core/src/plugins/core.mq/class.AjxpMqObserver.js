@@ -24,6 +24,7 @@ Class.create("AjxpMqObserver", {
     pe:null,
     currentRepo:null,
     clientId:null,
+    ws: null,
 
     initialize : function(){
         "use strict";
@@ -64,17 +65,33 @@ Class.create("AjxpMqObserver", {
             conn.discrete = true;
             conn.sendAsync();
 
-            this.pe = new PeriodicalExecuter(function(pe){
-                var conn = new Connexion();
-                conn.setParameters($H({
-                    get_action:'client_consume_channel',
-                    channel:'nodes:' + this.currentRepo,
-                    client_id:this.clientId
-                }));
-                conn.discrete = true;
-                conn.onComplete = function(transport){ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);};
-                conn.sendAsync();
-            }.bind(this), 5);
+            if(window.WebSocket){
+
+                if(this.ws) this.ws.close();
+                this.ws = new WebSocket("ws://192.168.0.18:8090/echo");
+                this.ws.onmessage = function(event){
+                    var obj = parseXml(event.data);
+                    if(obj){
+                        ajaxplorer.actionBar.parseXmlMessage(obj);
+                    }
+                };
+
+            }else{
+
+                this.pe = new PeriodicalExecuter(function(pe){
+                    var conn = new Connexion();
+                    conn.setParameters($H({
+                        get_action:'client_consume_channel',
+                        channel:'nodes:' + this.currentRepo,
+                        client_id:this.clientId
+                    }));
+                    conn.discrete = true;
+                    conn.onComplete = function(transport){ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);};
+                    conn.sendAsync();
+                }.bind(this), 10);
+
+            }
+
 
         }.bind(this));
 
