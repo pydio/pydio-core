@@ -6,7 +6,8 @@
             <js className="AjxpMqObserver" file="plugins/core.mq/class.AjxpMqObserver.js" autoload="true"/>
         </resources>
     </client_settings>
-    <class_definition classname="BasicMqManager" filename="plugins/core.mq/class.BasicMqManager.php"/>
+    <!--<class_definition classname="BasicMqManager" filename="plugins/core.mq/class.BasicMqManager.php"/>-->
+    <class_definition classname="WsMqManager" filename="plugins/core.mq/class.WsMqManager.php"/>
     <registry_contributions>
         <actions>
             <action name="client_register_channel">

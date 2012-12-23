@@ -104,9 +104,9 @@ class WsMqManager extends AJXP_Plugin
         }
         if(!empty($content) && !empty($repo)){
 
-            $input = serialize(array("REPO_ID" => $repo, "CONTENT" => $content));
+            $input = serialize(array("REPO_ID" => $repo, "CONTENT" => "<tree>".$content."</tree>"));
             $msg = WebSocketMessage::create($input);
-            $client = new WebSocket("ws://192.168.1.119:8090/echo/");
+            $client = new WebSocket("ws://192.168.0.18:8090/echo/");
             $client->open();
             $client->sendMessage($msg);
             $client->close();
