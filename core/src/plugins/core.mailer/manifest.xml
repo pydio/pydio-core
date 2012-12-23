@@ -22,5 +22,8 @@
                 </processing>
             </action>
         </actions>
+        <hooks>
+            <serverCallback methodName="processNotification" hookName="msg.notification"/>
+        </hooks>
     </registry_contributions>
 </ajxp_plugin>
