@@ -33,6 +33,23 @@ class AjxpMailer extends AJXP_Plugin
         }
     }
 
+    public function processNotification(AJXP_Notification &$notification){
+        $mailers = AJXP_PluginsService::getInstance()->getPluginsByType("mailer");
+        if(count($mailers)){
+            $mailer = array_pop($mailers);
+            try{
+                $mailer->sendMail(
+                    array($notification->getTarget()),
+                    $notification->getDescriptionShort(),
+                    $notification->getDescriptionLong(),
+                    $notification->getAuthor()
+                );
+            }catch (Exception $e){
+                AJXP_Logger::logAction("ERROR : ".$e->getMessage());
+            }
+        }
+    }
+
     public function sendMail($recipients, $subject, $body, $from = null){
         if(AJXP_SERVER_DEBUG){
             $line = "------------------------------------------------------------------------\n";

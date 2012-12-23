@@ -121,6 +121,8 @@ class AJXP_NotificationCenter extends AJXP_Plugin
     }
 
     public function dispatch(AJXP_Notification $notification){
+        AJXP_Controller::applyHook("msg.notification", array(&$notification));
+        return;
         $mailers = AJXP_PluginsService::getInstance()->getPluginsByType("mailer");
         if(count($mailers)){
             $mailer = array_pop($mailers);
