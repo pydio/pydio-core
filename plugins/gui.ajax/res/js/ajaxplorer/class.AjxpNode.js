@@ -154,6 +154,7 @@ Class.create("AjxpNode", {
 	removeChild : function(ajxpNode){
 		var removePath = ajxpNode.getPath();
 		ajxpNode.notify("node_removed");
+        ajxpNode._parentNode = null;
 		this._children = this._children.without(ajxpNode);
 		this.notify("child_removed", removePath);
 	},

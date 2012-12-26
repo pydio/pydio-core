@@ -460,14 +460,28 @@ Class.create("ActionsManager", {
                     updates.each(function(tree){
                         var newNode = dm.getAjxpNodeProvider().parseAjxpNode(tree);
                         var original = newNode.getMetadata().get("original_path");
-                        if(!original) original = newNode.getPath();
-                        var fake = new AjxpNode(original);
-                        var n = fake.findInArbo(dm.getRootNode(), undefined);
-                        if(n){
-                            dm.setSelectedNodes([], {});
-                            newNode.getMetadata().set("original_path", undefined);
-                            n.replaceBy(newNode, "override");
-                            dm.setSelectedNodes([n], {});
+                        if(original && original != newNode.getPath()
+                            && getRepName(original) != getRepName(newNode.getPath())){
+                            // Node was really moved to another folder
+                            var fake = new AjxpNode(original);
+                            var n = fake.findInArbo(dm.getRootNode(), undefined);
+                            if(n){
+                                n.getParent().removeChild(n);
+                            }
+                            var parentFake = new AjxpNode(getRepName(newNode.getPath()));
+                            var parent = parentFake.findInArbo(dm.getRootNode(), undefined);
+                            if(!parent && getRepName(newNode.getPath()) == "") parent = dm.getRootNode();
+                            if(parent){
+                                newNode.getMetadata().set("original_path", undefined);
+                                parent.addChild(newNode);
+                            }
+                        }else{
+                            var fake = new AjxpNode(original);
+                            var n = fake.findInArbo(dm.getRootNode(), undefined);
+                            if(n){
+                                n.replaceBy(newNode, "override");
+                                dm.setSelectedNodes([n], {});
+                            }
                         }
                     });
                 }
