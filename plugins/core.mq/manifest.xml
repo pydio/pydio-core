@@ -6,7 +6,13 @@
             <js className="AjxpMqObserver" file="plugins/core.mq/class.AjxpMqObserver.js" autoload="true"/>
         </resources>
     </client_settings>
-    <!--<class_definition classname="BasicMqManager" filename="plugins/core.mq/class.BasicMqManager.php"/>-->
+    <server_settings>
+        <global_param description="WebSocket server is running" label="WebSocket" name="WS_SERVER_ACTIVE" type="boolean" expose="true"/>
+        <global_param description="WebSocket server host" label="WS Host" name="WS_SERVER_HOST" type="string" expose="true"/>
+        <global_param description="WebSocket server port" label="WS Port" name="WS_SERVER_PORT" type="string" expose="true" default="8090"/>
+        <global_param description="WebSocket handler path" label="WS Path" name="WS_SERVER_PATH" type="string" expose="true"/>
+        <global_param description="WebSocket admin key" label="WS Key" name="WS_SERVER_ADMIN" type="string"/>
+    </server_settings>
     <class_definition classname="WsMqManager" filename="plugins/core.mq/class.WsMqManager.php"/>
     <registry_contributions>
         <actions>
