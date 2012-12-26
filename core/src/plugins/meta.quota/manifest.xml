@@ -33,6 +33,7 @@
                     <clientCallback><![CDATA[
                         var c = new Connexion();
                         c.setParameters(new Hash({get_action:'monitor_quota'}));
+                        c.discrete = true;
                         c.onComplete = function(transport){
                             var action = ajaxplorer.getActionBar().getActionByName("monitor_quota");
                             if(!action) return;
