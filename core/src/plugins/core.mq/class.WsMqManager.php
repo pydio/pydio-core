@@ -32,6 +32,14 @@ require_once(AJXP_INSTALL_PATH."/vendor/phpws/websocket.client.php");
  * var websocket = new WebSocket("ws://serverURL:8090/echo");
 websocket.onmessage = function(event){console.log(event.data);};
  *
+ *     new PeriodicalExecuter(function(pe){
+     var conn = new Connexion();
+     conn.setParameters($H({get_action:'client_consume_channel',channel:'nodes:0',client_id:'toto'}));
+     conn.onComplete = function(transport){ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);};
+     conn.sendAsync();
+     }, 5);
+
+ *
  * @todo : HOW TO AUTHENTICATE USER???
  */
 
@@ -84,7 +92,6 @@ class WsMqManager extends AJXP_Plugin
         $content = "";$repo = "";
         if($newNode != null) {
             $repo = $newNode->getRepositoryId();
-            $message = new stdClass();
             $update = false;
             $data = array();
             if($origNode != null){
@@ -94,22 +101,29 @@ class WsMqManager extends AJXP_Plugin
                 $data[] = $newNode;
             }
             $content = AJXP_XMLWriter::writeNodesDiff(array(($update?"UPDATE":"ADD") => $data));
-            //$this->publishToChannel("nodes:$repo", $message);
         }
         if($origNode != null && ! $update){
             $repo = $origNode->getRepositoryId();
-            $message = new stdClass();
             $content = AJXP_XMLWriter::writeNodesDiff(array("REMOVE" => array($origNode->getPath())));
-            //$this->publishToChannel("nodes:$repo", $message);
         }
         if(!empty($content) && !empty($repo)){
 
-            $input = serialize(array("REPO_ID" => $repo, "CONTENT" => "<tree>".$content."</tree>"));
-            $msg = WebSocketMessage::create($input);
-            $client = new WebSocket("ws://192.168.0.18:8090/echo/");
-            $client->open();
-            $client->sendMessage($msg);
-            $client->close();
+            // Publish for pollers
+            $message = new stdClass();
+            $message->content = $content;
+            $this->publishToChannel("nodes:$repo", $message);
+
+            $configs = $this->getConfigs();
+            if($configs["WS_SERVER_ACTIVE"] === true){
+                // Publish for websockets
+                $input = serialize(array("REPO_ID" => $repo, "CONTENT" => "<tree>".$content."</tree>"));
+                $msg = WebSocketMessage::create($input);
+                $client = new WebSocket("ws://".$configs["WS_SERVER_HOST"].":".$configs["WS_SERVER_PORT"].$configs["WS_SERVER_PATH"]);
+                $client->addHeader("Admin-Key", $configs["WS_SERVER_KEY"]);
+                @$client->open();
+                @$client->sendMessage($msg);
+                @$client->close();
+            }
 
         }
 
@@ -120,23 +134,9 @@ class WsMqManager extends AJXP_Plugin
      * @param $httpVars
      * @param $fileVars
      *
-     * JS SAMPLE
-     *
-    new PeriodicalExecuter(function(pe){
-    var conn = new Connexion();
-    conn.setParameters($H({get_action:'client_consume_channel',channel:'nodes:0',client_id:'toto'}));
-    conn.onComplete = function(transport){ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);};
-    conn.sendAsync();
-    }, 5);
-     *
-     * W
-     *
-     *
-     *
      */
 
     public function clientChannelMethod($action, $httpVars, $fileVars){
-        return;
         switch($action){
             case "client_register_channel":
                 $this->suscribeToChannel($httpVars["channel"], $httpVars["client_id"]);
