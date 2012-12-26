@@ -36,7 +36,7 @@ Class.create("AjxpSortable", SortableTable, {
 		this.addSortType( "NumberKo", this.replace8oa8 );
 		this.addSortType( "MyDate", null, false, this.sortTimes);
 		this.addSortType( "CellSorterValue", null, false, this.cellSorterValue);
-		this.addSortType( "StringDirFile", this.toUpperCase, false, this.splitDirsAndFiles.bind(this) );		
+		this.addSortType( "StringDirFile", this.toUpperCase, false, this.splitDirsAndFiles.bind(this), this.splitDirsAndFilesNodes.bind(this) );
 	},
 		
 	/**
@@ -176,8 +176,26 @@ Class.create("AjxpSortable", SortableTable, {
 			s = c.innerText;
 		else
 			s = this.getInnerText(c);
+
 		if(s[0] == ' ') s = s.substr(1, (s.length-1));	
 		if(!oRow.ajxpNode.isLeaf()){
+			s = '000'+s;
+		}
+		return s.toUpperCase();
+	},
+
+	/**
+	 * Sort dirs and files each on their side
+	 * @param oRow HTMLElement Row
+	 * @param nColumn Integer
+	 * @returns String
+	 */
+	splitDirsAndFilesNodes: function(oNode, attName) {
+		var s;
+        if(attName == "ajxp_label") attName = "text";
+        s = oNode.getMetadata().get(attName);
+		if(s[0] == ' ') s = s.substr(1, (s.length-1));
+		if(!oNode.isLeaf()){
 			s = '000'+s;
 		}
 		return s.toUpperCase();
@@ -207,5 +225,5 @@ Class.create("AjxpSortable", SortableTable, {
             return oRow.ajxpNode.getMetadata().get("ajxp_modiftime");
         }
 	}
-	
+
 });

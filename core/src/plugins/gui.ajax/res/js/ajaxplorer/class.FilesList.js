@@ -624,7 +624,47 @@ Class.create("FilesList", SelectableElements, {
 				this._thumbSize = parseInt(this._fixedThumbSize);
 			}
 
-			
+            this._sortableTable = new AjxpSortable(scrollElement, null, null);
+            this._sortableTable.setMetaSortType(this.columnsDef);
+            this._sortableTable.onsort = function(){
+                var ctxt = this.getCurrentContextNode();
+                ctxt.getMetadata().set("filesList.sortColumn", ''+this._sortableTable.sortColumn);
+                ctxt.getMetadata().set("filesList.descending", this._sortableTable.descending);
+            }.bind(this);
+            if(this.headerMenu){
+                this.headerMenu.destroy();
+                delete this.headerMenu;
+            }
+            this.headerMenu = new Proto.Menu({
+                selector: '#content_pane div.panelHeader',
+                className: 'menu desktop',
+                menuItems: [],
+                fade:true,
+                zIndex:2000,
+                beforeShow : function(){
+                    var items = $A([]);
+                    var index = 0;
+                    this.columnsDef.each(function(column){
+                        var isSorted = this._sortableTable.sortColumn == index;
+                        items.push({
+                            name:(column.messageId?MessageHash[column.messageId]:column.messageString),
+                            alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
+                            image:resolveImageSource((isSorted?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
+                            isDefault:false,
+                            callback:function(e){
+                                var clickIndex = this.columnsDef.indexOf(column);
+                                var sorted = (this._sortableTable.sortColumn == clickIndex);
+                                if(sorted) this._sortableTable.descending = !this._sortableTable.descending;
+                                this._sortableTable.sort(clickIndex, this._sortableTable.descending);
+                            }.bind(this)
+                        });
+                        index++;
+                    }.bind(this) );
+                    this.headerMenu.options.menuItems = items;
+                    this.headerMenu.refreshList();
+                }.bind(this)
+            });
+
 			this.slider = new SliderInput($("slider-input-1"), {
 				range : $R(30, 250),
 				sliderValue : this._thumbSize,
@@ -1002,7 +1042,7 @@ Class.create("FilesList", SelectableElements, {
                     try{item.remove();}catch(e){}
                     delete item;
                     this.initRows();
-                }.bind(this)});
+                }.bind(this), duration:0.4});
                 //item.remove();
                 //delete item;
                 //this.initRows();
@@ -1026,7 +1066,24 @@ Class.create("FilesList", SelectableElements, {
         newItem.REMOVE_OBS = this.makeItemRemovedObserver(child, newItem);
         child.observe("node_replaced", newItem.REPLACE_OBS);
         child.observe("node_removed", newItem.REMOVE_OBS);
+
+        if(this._sortableTable){
+            var sortColumn = parseInt(this.crtContext.getMetadata().get("filesList.sortColumn"));
+         	var descending = this.crtContext.getMetadata().get("filesList.descending");
+            var sortFunction = this._sortableTable.getSortFunction(this._sortableTable.getSortType(sortColumn), sortColumn);
+            var sortCache = this._sortableTable.getCache(this._sortableTable.getSortType(sortColumn), sortColumn);
+            sortCache.sort(sortFunction);
+            for(var i=0;i<sortCache.length;i++){
+                if(sortCache[i].element == newItem){
+                    if(i == 0) $(newItem.parentNode).insert({top:newItem});
+                    else sortCache[i-1].element.insert({after:newItem});
+                    break;
+                }
+            }
+            this._sortableTable.destroyCache(sortCache);
+        }
         this.initRows();
+
 
     },
 
@@ -1085,12 +1142,12 @@ Class.create("FilesList", SelectableElements, {
 		}
 		this.initRows();
 		
-		if(this._displayMode == "list" && (!this.paginationData || !this.paginationData.get('remote_order')))
+		if((!this.paginationData || !this.paginationData.get('remote_order')))
 		{
 			this._sortableTable.sortColumn = -1;
 			this._sortableTable.updateHeaderArrows();
 		}
-		if(this._displayMode == "list" && contextNode.getMetadata().get("filesList.sortColumn")){
+		if(contextNode.getMetadata().get("filesList.sortColumn")){
 			var sortColumn = parseInt(contextNode.getMetadata().get("filesList.sortColumn"));
 			var descending = contextNode.getMetadata().get("filesList.descending");
 			this._sortableTable.sort(sortColumn, descending);
