@@ -1068,19 +1068,22 @@ Class.create("FilesList", SelectableElements, {
         child.observe("node_removed", newItem.REMOVE_OBS);
 
         if(this._sortableTable){
-            var sortColumn = parseInt(this.crtContext.getMetadata().get("filesList.sortColumn"));
+            var sortColumn = this.crtContext.getMetadata().get("filesList.sortColumn");
          	var descending = this.crtContext.getMetadata().get("filesList.descending");
-            var sortFunction = this._sortableTable.getSortFunction(this._sortableTable.getSortType(sortColumn), sortColumn);
-            var sortCache = this._sortableTable.getCache(this._sortableTable.getSortType(sortColumn), sortColumn);
-            sortCache.sort(sortFunction);
-            for(var i=0;i<sortCache.length;i++){
-                if(sortCache[i].element == newItem){
-                    if(i == 0) $(newItem.parentNode).insert({top:newItem});
-                    else sortCache[i-1].element.insert({after:newItem});
-                    break;
+            if(sortColumn != undefined){
+                sortColumn = parseInt(sortColumn);
+                var sortFunction = this._sortableTable.getSortFunction(this._sortableTable.getSortType(sortColumn), sortColumn);
+                var sortCache = this._sortableTable.getCache(this._sortableTable.getSortType(sortColumn), sortColumn);
+                sortCache.sort(sortFunction);
+                for(var i=0;i<sortCache.length;i++){
+                    if(sortCache[i].element == newItem){
+                        if(i == 0) $(newItem.parentNode).insert({top:newItem});
+                        else sortCache[i-1].element.insert({after:newItem});
+                        break;
+                    }
                 }
+                this._sortableTable.destroyCache(sortCache);
             }
-            this._sortableTable.destroyCache(sortCache);
         }
         this.initRows();
 
