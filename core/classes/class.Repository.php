@@ -446,4 +446,18 @@ class Repository implements AjxpGroupPathProvider {
         return $this->groupPath;
     }
 
+    /**
+     * Infer a security scope for this repository. Will determine to whome the messages
+     * will be broadcasted.
+     * @return bool|string
+     */
+    public function securityScope(){
+        $path = $this->getOption("PATH", true);
+        if($this->accessType == "ajxp_conf") return "USER";
+        if(empty($path)) return false;
+        if(strpos($path, "AJXP_USER") !== false) return "USER";
+        if(strpos($path, "AJXP_GROUP_PATH") !== false) return "GROUP";
+        return false;
+    }
+
 }
