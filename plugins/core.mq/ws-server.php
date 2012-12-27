@@ -33,13 +33,25 @@ class DemoEchoHandler extends WebSocketUriHandler {
         // $user->sendMessage($msg);
         $data = unserialize($msg->getData());
         $repoId = $data["REPO_ID"];
+        $userId = isSet($data["USER_ID"]) ? $data["USER_ID"] : false;
+        $userGroupPath = isSet($data["GROUP_PATH"]) ? $data["GROUP_PATH"] : false;
         $msg->setData($data["CONTENT"]);
         foreach($this->getConnections() as $conn){
             if($conn == $user) continue;
-            if(isSet($conn->currentRepository) && $conn->currentRepository == $repoId){
-                $this->say("Should dispatch to user ".$conn->getId());
-                $conn->sendMessage($msg);
+            if(!isSet($conn->currentRepository) || $conn->currentRepository != $repoId) {
+                $this->say("Skipping, not the same repository");
+                continue;
             }
+            if($userId !== false && $conn->ajxpId != $userId) {
+                $this->say("Skipping, not the same userId");
+                continue;
+            }
+            if($userGroupPath != false && (!isSet($conn->ajxpGroupPath) || $conn->ajxpGroupPath!=$userGroupPath)) {
+                $this->say("Skipping, not the same groupPath");
+                continue;
+            }
+            $this->say("Should dispatch to user ".$conn->ajxpId);
+            $conn->sendMessage($msg);
         }
 
 
@@ -60,9 +72,10 @@ class DemoSocketServer implements IWebSocketServerObserver {
 
     protected $debug = true;
     protected $server;
+    static $ADMIN_KEY = "adminsecretkey";
 
     public function __construct() {
-        $this->server = new WebSocketServer("tcp://192.168.0.18:8090", 'adminsecretkey');
+        $this->server = new WebSocketServer("tcp://192.168.0.18:8090", self::$ADMIN_KEY);
         $this->server->addObserver($this);
 
         $this->server->addUriHandler("ajaxplorer", new DemoEchoHandler());
@@ -70,7 +83,7 @@ class DemoSocketServer implements IWebSocketServerObserver {
 
     public function onConnect(IWebSocketConnection $user) {
 
-        if($user->getAdminKey() == 'adminsecretkey'){
+        if($user->getAdminKey() == self::$ADMIN_KEY){
             $this->say("[ECHO] Admin user connected");
             return;
         }
@@ -80,7 +93,7 @@ class DemoSocketServer implements IWebSocketServerObserver {
 
         $client = new HttpClient("192.168.0.18");
         $client->cookies = $c;
-        $client->get("/ajaxplorer/?get_action=get_xml_registry");
+        $client->get("/ajaxplorer/?get_action=ws_authenticate&key=".self::$ADMIN_KEY);
         $registry = $client->getContent();
         $xml = new DOMDocument();
         $xml->loadXML($registry);
@@ -91,12 +104,15 @@ class DemoSocketServer implements IWebSocketServerObserver {
             $user->disconnect();
         }else{
             $userRepositories = array();
-            $repos = $xPath->query("/ajxp_registry/user/repositories/repo");
+            $repos = $xPath->query("/tree/user/repositories/repo");
             foreach($repos as $repo){
                 $repoId = $repo->attributes->getNamedItem("id")->nodeValue;
                 $userRepositories[] = $repoId;
             }
             $user->ajxpRepositories = $userRepositories;
+            $user->ajxpId = $xPath->query("/tree/user/@id")->item(0)->nodeValue;
+            $groupPath = $xPath->query("/tree/user/@groupPath")->item(0)->nodeValue;
+            if(!empty($groupPath)) $user->ajxpGroupPath = $groupPath;
         }
         $this->say("[ECHO] User connected with registered repositories : ". print_r($user->ajxpRepositories, true));
     }

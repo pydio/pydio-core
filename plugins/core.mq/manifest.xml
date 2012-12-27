@@ -31,6 +31,11 @@
                     <serverCallback methodName="clientChannelMethod"/>
                 </processing>
             </action>
+            <action name="ws_authenticate" skipSecureToken="true">
+                <processing>
+                    <serverCallback methodName="wsAuthenticate"/>
+                </processing>
+            </action>
         </actions>
         <hooks>
             <serverCallback methodName="publishNodeChange" hookName="node.change" defer="true"/>

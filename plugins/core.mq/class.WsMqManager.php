@@ -123,9 +123,10 @@ class WsMqManager extends AJXP_Plugin
             $configs = $this->getConfigs();
             if($configs["WS_SERVER_ACTIVE"]){
                 // Publish for websockets
-                $input = serialize(array("REPO_ID" => $repo, "CONTENT" => "<tree>".$content."</tree>"));
+                $input = array("REPO_ID" => $repo, "CONTENT" => "<tree>".$content."</tree>");
                 if(isSet($userId)) $input["USER_ID"] = $userId;
                 else if(isSet($gPath)) $input["GROUP_PATH"] = $gPath;
+                $input = serialize($input);
                 $msg = WebSocketMessage::create($input);
                 $client = new WebSocket("ws://".$configs["WS_SERVER_HOST"].":".$configs["WS_SERVER_PORT"].$configs["WS_SERVER_PATH"]);
                 $client->addHeader("Admin-Key", $configs["WS_SERVER_ADMIN"]);
@@ -144,7 +145,6 @@ class WsMqManager extends AJXP_Plugin
      * @param $fileVars
      *
      */
-
     public function clientChannelMethod($action, $httpVars, $fileVars){
         switch($action){
             case "client_register_channel":
@@ -167,6 +167,28 @@ class WsMqManager extends AJXP_Plugin
             default:
                 break;
         }
+    }
+
+    public function wsAuthenticate($action, $httpVars, $fileVars){
+
+        $configs = $this->getConfigs();
+        if(!isSet($httpVars["key"]) || $httpVars["key"] != $configs["WS_SERVER_ADMIN"]){
+            throw new Exception("Cannot authentify admin key");
+        }
+        $user = AuthService::getLoggedUser();
+        if($user == null){
+            throw new Exception("You must be logged in");
+        }
+        $xml = AJXP_XMLWriter::getUserXML($user);
+        // add groupPath
+        if($user->getGroupPath() != null){
+            $groupString = "groupPath=\"".AJXP_Utils::xmlEntities($user->getGroupPath())."\"";
+            $xml = str_replace("<user id=", "<user {$groupString} id=", $xml);
+        }
+        AJXP_XMLWriter::header();
+        echo $xml;
+        AJXP_XMLWriter::close();
+
     }
 
     function suscribeToChannel($channelName, $clientId){
