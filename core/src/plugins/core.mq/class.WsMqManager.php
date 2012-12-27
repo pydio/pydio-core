@@ -108,21 +108,30 @@ class WsMqManager extends AJXP_Plugin
         }
         if(!empty($content) && !empty($repo)){
 
+            $scope = ConfService::getRepositoryById($repo)->securityScope();
+            if($scope == "USER"){
+                $userId = AuthService::getLoggedUser()->getId();
+            }else if($scope == "GROUP"){
+                $gPath = AuthService::getLoggedUser()->getGroupPath();
+            }
+
             // Publish for pollers
             $message = new stdClass();
             $message->content = $content;
             $this->publishToChannel("nodes:$repo", $message);
 
             $configs = $this->getConfigs();
-            if($configs["WS_SERVER_ACTIVE"] === true){
+            if($configs["WS_SERVER_ACTIVE"]){
                 // Publish for websockets
                 $input = serialize(array("REPO_ID" => $repo, "CONTENT" => "<tree>".$content."</tree>"));
+                if(isSet($userId)) $input["USER_ID"] = $userId;
+                else if(isSet($gPath)) $input["GROUP_PATH"] = $gPath;
                 $msg = WebSocketMessage::create($input);
                 $client = new WebSocket("ws://".$configs["WS_SERVER_HOST"].":".$configs["WS_SERVER_PORT"].$configs["WS_SERVER_PATH"]);
-                $client->addHeader("Admin-Key", $configs["WS_SERVER_KEY"]);
-                @$client->open();
-                @$client->sendMessage($msg);
-                @$client->close();
+                $client->addHeader("Admin-Key", $configs["WS_SERVER_ADMIN"]);
+                $client->open();
+                $client->sendMessage($msg);
+                $client->close();
             }
 
         }

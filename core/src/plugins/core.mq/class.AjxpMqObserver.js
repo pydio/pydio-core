@@ -35,7 +35,6 @@ Class.create("AjxpMqObserver", {
 
         document.observe("ajaxplorer:repository_list_refreshed", function(event){
 
-            console.log("repository_list_refreshed", event.memo);
             var repoId;
             var data = event.memo;
             if(data.active) repoId = data.active;
@@ -62,7 +61,6 @@ Class.create("AjxpMqObserver", {
                             ajaxplorer.actionBar.parseXmlMessage(obj);
                         }
                     };
-                    //console.log("Sending " + "register:" + repoId);
                     this.ws.onopen = function(){
                         this.ws.send("register:" + repoId);
                     }.bind(this);
