@@ -23,7 +23,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 define('AJXP_NOTIF_NODE_ADD', "add");
 define('AJXP_NOTIF_NODE_DEL', "delete");
 define('AJXP_NOTIF_NODE_CHANGE', "change");
+define('AJXP_NOTIF_NODE_RENAME', "rename");
 define('AJXP_NOTIF_NODE_VIEW', "view");
+define('AJXP_NOTIF_NODE_COPY', "copy");
+define('AJXP_NOTIF_NODE_MOVE', "move");
 define('AJXP_NOTIF_NODE_COPY_TO', "copy_to");
 define('AJXP_NOTIF_NODE_MOVE_TO', "move_to");
 define('AJXP_NOTIF_NODE_COPY_FROM', "copy_from");
@@ -107,7 +110,13 @@ class AJXP_Notification
         if((strstr($tplString, "AJXP_TARGET_FOLDER") !== false || strstr($tplString, "AJXP_SOURCE_FOLDER")) &&
             isSet($this->secondaryNode)
         ){
-            $replaces["AJXP_TARGET_FOLDER"] = $replaces["AJXP_SOURCE_FOLDER"] = $this->secondaryNode->getPath();
+            $p = $this->secondaryNode->getPath();
+            if($this->secondaryNode->isLeaf()) $p = $this->getRoot(dirname($p));
+            $replaces["AJXP_TARGET_FOLDER"] = $replaces["AJXP_SOURCE_FOLDER"] =  $em.$p.$me;
+        }
+
+        if((strstr($tplString, "AJXP_TARGET_LABEL") !== false || strstr($tplString, "AJXP_SOURCE_LABEL") !== false ) && isSet($this->secondaryNode) ){
+            $replaces["AJXP_TARGET_LABEL"] = $replaces["AJXP_SOURCE_LABEL"] = $em.$this->secondaryNode->getLabel().$me;
         }
 
         return str_replace(array_keys($replaces), array_values($replaces), $tplString);
