@@ -24,8 +24,6 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 // DL and install install vendor (composer?) https://github.com/Devristo/phpws
 
 
-require_once(AJXP_INSTALL_PATH."/vendor/phpws/websocket.client.php");
-
 /**
  * Websocket JS Sample
  *
@@ -118,10 +116,15 @@ class WsMqManager extends AJXP_Plugin
             // Publish for pollers
             $message = new stdClass();
             $message->content = $content;
+            if(isSet($userId)) $message->userId = $userId;
+            if(isSet($gPath)) $message->groupPath = $gPath;
             $this->publishToChannel("nodes:$repo", $message);
 
+            // Publish for WebSockets
             $configs = $this->getConfigs();
             if($configs["WS_SERVER_ACTIVE"]){
+
+                require_once(AJXP_INSTALL_PATH."/vendor/phpws/websocket.client.php");
                 // Publish for websockets
                 $input = array("REPO_ID" => $repo, "CONTENT" => "<tree>".$content."</tree>");
                 if(isSet($userId)) $input["USER_ID"] = $userId;
@@ -193,7 +196,17 @@ class WsMqManager extends AJXP_Plugin
 
     function suscribeToChannel($channelName, $clientId){
         $this->loadChannel($channelName, true);
-        $this->channels[$channelName]["CLIENTS"][$clientId] = time();
+        $user = AuthService::getLoggedUser();
+        if($user == null){
+            throw new Exception("You must be logged in");
+        }
+        $GROUP_PATH = $user->getGroupPath();
+        if($GROUP_PATH == null) $GROUP_PATH = false;
+        $this->channels[$channelName]["CLIENTS"][$clientId] = array(
+            "ALIVE" => time(),
+            "USER_ID" => $user->getId(),
+            "GROUP_PATH" => $GROUP_PATH
+        );
         foreach($this->channels[$channelName]["MESSAGES"] as &$object){
             $object->messageRC[$clientId] = $clientId;
         }
@@ -216,7 +229,8 @@ class WsMqManager extends AJXP_Plugin
         $this->loadChannel($channelName);
         if(!isSet($this->channels) || !isSet($this->channels[$channelName])) return;
         if(!count($this->channels[$channelName]["CLIENTS"])) return;
-        $messageObject->messageRC = $this->channels[$channelName]["CLIENTS"];
+        $clientIds = array_keys($this->channels[$channelName]["CLIENTS"]);
+        $messageObject->messageRC = array_combine($clientIds, $clientIds);
         $messageObject->messageTS = microtime();
         $this->channels[$channelName]["MESSAGES"][] = $messageObject;
     }
@@ -227,7 +241,8 @@ class WsMqManager extends AJXP_Plugin
         // Check dead clients
         if(is_array($this->channels[$channelName]["CLIENTS"])){
             $toRemove = array();
-            foreach($this->channels[$channelName]["CLIENTS"] as $cId => $cAlive){
+            foreach($this->channels[$channelName]["CLIENTS"] as $cId => $cData){
+                $cAlive = $cData["ALIVE"];
                 if( $cId != $clientId &&  time() - $cAlive > $this->clientsGCTime * 60) $toRemove[] = $cId;
             }
             if(count($toRemove)) foreach($toRemove as $c) $this->unsuscribeFromChannel($channelName, $c);
@@ -236,10 +251,28 @@ class WsMqManager extends AJXP_Plugin
             // Auto Suscribe
             $this->suscribeToChannel($channelName, $clientId);
         }
-        $this->channels[$channelName]["CLIENTS"][$clientId] = time();
+        $this->channels[$channelName]["CLIENTS"][$clientId]["ALIVE"] = time();
+
+        $user = AuthService::getLoggedUser();
+        if($user == null){
+            throw new Exception("You must be logged in");
+        }
+        $GROUP_PATH = $user->getGroupPath();
+        if($GROUP_PATH == null) $GROUP_PATH = false;
+
         $result = array();
         foreach($this->channels[$channelName]["MESSAGES"] as $index => $object){
-            if(!isSet($object->messageRC[$clientId])) continue;
+            if(!isSet($object->messageRC[$clientId])){
+                continue;
+            }
+            if(isSet($object->userId) && $object->userId != $user->getId()){
+                // Skipping, restricted to userId
+                continue;
+            }
+            if(isSet($object->groupPath) && $object->groupPath != $GROUP_PATH){
+                // Skipping, restricted to groupPath
+                continue;
+            }
             $result[] = $object;
             unset($object->messageRC[$clientId]);
             if(count($object->messageRC) <= 0){
