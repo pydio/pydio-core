@@ -93,7 +93,8 @@ $REPOSITORIES[1] = array(
                 "meta_labels" => "Latitude,Longitude"
             ),
             "index.lucene" => array(
-                "index_meta_fields" => "comment"
+                "index_meta_fields" => "comment",
+                "repository_specific_keywords" => "AJXP_USER",
             )
 		)
 	),
