@@ -68,8 +68,17 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 
         // PERSONAL INFORMATIONS
         $hasExposed = false;
-        $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
-        if(is_array($paramNodes) && count($paramNodes)) $hasExposed = true;
+        $cacheHasExposed = AJXP_PluginsService::getInstance()->loadFromPluginQueriesCache("/ajxp_plugin/server_settings/param[contains(@scope,'user') and @expose='true']");
+        if($cacheHasExposed !== null){
+            $hasExposed = $cacheHasExposed;
+        }else{
+            $paramNodes = AJXP_PluginsService::searchAllManifests("/ajxp_plugin/server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
+            if(is_array($paramNodes) && count($paramNodes)) {
+                $hasExposed = true;
+            }
+            AJXP_PluginsService::getInstance()->storeToPluginQueriesCache("/ajxp_plugin/server_settings/param[contains(@scope,'user') and @expose='true']", $hasExposed);
+        }
+
 
         if(!$hasExposed){
             unset($this->actions["custom_data_edit"]);
