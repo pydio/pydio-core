@@ -31,11 +31,96 @@ class AJXP_NotificationCenter extends AJXP_Plugin
     static private $instance;
     private $userId;
     private $useQueue = false ;
+    private $sqlDriver =  array(
+        "driver"        => "mysql",
+        "host"          => "localhost",
+        "database"      => "ajaxplorer",
+        "user"          => "XXXX",
+        "password"      => "XXXX",
+    );
+
 
     public function init($options){
         parent::init($options);
         $this->userId = AuthService::getLoggedUser() !== null ? AuthService::getLoggedUser()->getId() : "shared";
         $this->useQueue = $this->pluginConf["USE_QUEUE"];
+    }
+
+    public function persistChangeHookToFeed(AJXP_Node $oldNode = null, AJXP_Node $newNode = null, $copy = false, $targetNotif = "new"){
+        $n = ($oldNode == null ? $newNode : $oldNode);
+        $repoId = $n->getRepositoryId();
+        $userId = AuthService::getLoggedUser()->getId();
+        $userGroup = AuthService::getLoggedUser()->getGroupPath();
+        $repository = ConfService::getRepositoryById($repoId);
+        $repositoryScope = $repository->securityScope();
+        $content = serialize(func_get_args());
+        $value = array(
+            "edate" => time(),
+            "type"  => "node.change",
+            "user_id" => $userId,
+            "repository_id" => $repoId,
+            "user_group" => $userGroup,
+            "repository_scope" => $repositoryScope,
+            "content" => $content
+        );
+        if($this->sqlDriver["password"] == "XXXX") return;
+
+        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
+        dibi::connect($this->sqlDriver);
+        dibi::query("INSERT INTO [ajxp_feed]", $value);
+
+    }
+
+    public function loadUserFeed($actionName, $httpVars, $fileVars){
+
+        if($this->sqlDriver["password"] == "XXXX") return;
+
+        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
+        dibi::connect($this->sqlDriver);
+        $u = AuthService::getLoggedUser();
+        $userId = $u->getId();
+        $userGroup = $u->getGroupPath();
+        $authRepos = array();
+        if(isSet($httpVars["repository_id"]) && $u->mergedRole->canRead($httpVars["repository_id"])){
+            $authRepos[] = $httpVars["repository_id"];
+        }else{
+            $acls = AuthService::getLoggedUser()->mergedRole->listAcls();
+            foreach($acls as $repoId => $rightString){
+                if($rightString == "r" | $rightString == "rw") $authRepos[] = $repoId;
+            }
+        }
+        $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [repository_id] IN (%s) AND ([repository_scope] = 'O' OR  ([repository_scope] = 'USER' AND [user_id] = %s  ) OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )) ORDER BY [edate] DESC LIMIT 0,10 ", $authRepos, $userId, $userGroup);
+
+        echo("<ul>");
+        foreach($res as $n => $row){
+            $args = unserialize($row->content);
+            $oldNode = (isSet($args[0]) ? $args[0] : null);
+            $newNode = (isSet($args[1]) ? $args[1] : null);
+            $copy = (isSet($args[2]) && $args[2] === true ? true : null);
+            $notif = $this->generateNotificationFromChangeHook($oldNode, $newNode, $copy, "unify");
+            if($notif !== false && $notif->getNode() !== false){
+                //var_dump($notif);
+                $notif->setAuthor($row->user_id);
+                $notif->setDate(intval($row->edate));
+                echo("<li>");
+                echo($notif->getDescriptionLong(true));
+                echo("</li>");
+            }else{
+                continue;
+                if($oldNode != null && $newNode != null && $oldNode->getUrl() == $newNode->getUrl()) continue;
+                $oldNotif =  $this->generateNotificationFromChangeHook($oldNode, $newNode, $copy, "old");
+                if($oldNotif !== false && $oldNotif->getNode() !== false){
+                    //var_dump($notif);
+                    $oldNotif->setAuthor($row->user_id);
+                    $oldNotif->setDate(intval($row->edate));
+                    echo("<li>");
+                    echo($oldNotif->getDescriptionLong(true));
+                    echo("</li>");
+                }
+            }
+        }
+        echo("</ul>");
+
     }
 
     /**
@@ -62,6 +147,10 @@ class AJXP_NotificationCenter extends AJXP_Plugin
             if($oldNode->getUrl() == $newNode->getUrl()){
                 $type = AJXP_NOTIF_NODE_CHANGE;
                 $primaryNode = $newNode;
+            }else if(dirname($oldNode->getPath()) == dirname($newNode->getPath())){
+                $type = AJXP_NOTIF_NODE_RENAME;
+                $primaryNode = $newNode;
+                $secondNode = $oldNode;
             }else if($targetNotif == "new"){
                 $type = $copy ? AJXP_NOTIF_NODE_COPY_FROM : AJXP_NOTIF_NODE_MOVE_FROM;
                 $primaryNode = $newNode;
@@ -70,6 +159,10 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                 $type = $copy ? AJXP_NOTIF_NODE_COPY_TO : AJXP_NOTIF_NODE_MOVE_TO;
                 $primaryNode = $oldNode;
                 $secondNode = $newNode;
+            }else if($targetNotif == "unify"){
+                $type = $copy ? AJXP_NOTIF_NODE_COPY : AJXP_NOTIF_NODE_MOVE;
+                $primaryNode = $newNode;
+                $secondNode = $oldNode;
             }
         }
         $notif->setNode($primaryNode);
@@ -123,20 +216,6 @@ class AJXP_NotificationCenter extends AJXP_Plugin
     public function dispatch(AJXP_Notification $notification){
         AJXP_Controller::applyHook("msg.notification", array(&$notification));
         return;
-        $mailers = AJXP_PluginsService::getInstance()->getPluginsByType("mailer");
-        if(count($mailers)){
-            $mailer = array_pop($mailers);
-            try{
-                $mailer->sendMail(
-                    array($notification->getTarget()),
-                    $notification->getDescriptionShort(),
-                    $notification->getDescriptionLong(),
-                    $notification->getAuthor()
-                );
-            }catch (Exception $e){
-                AJXP_Logger::logAction("ERROR : ".$e->getMessage());
-            }
-        }
     }
 
 }

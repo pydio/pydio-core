@@ -19,6 +19,14 @@
                     <serverCallback methodName="consumeQueue"/>
                 </processing>
             </action>
+            <action name="get_my_feed">
+                <processing>
+                    <serverCallback methodName="loadUserFeed"/>
+                </processing>
+            </action>
         </actions>
+        <hooks>
+            <serverCallback methodName="persistChangeHookToFeed" hookName="node.change" defer="true"/>
+        </hooks>
     </registry_contributions>
 </ajxp_plugin>

@@ -68,16 +68,17 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 
         // PERSONAL INFORMATIONS
         $hasExposed = false;
-        $cacheHasExposed = AJXP_PluginsService::getInstance()->loadFromPluginQueriesCache("/ajxp_plugin/server_settings/param[contains(@scope,'user') and @expose='true']");
+        $cacheHasExposed = AJXP_PluginsService::getInstance()->loadFromPluginQueriesCache("//server_settings/param[contains(@scope,'user') and @expose='true']");
         if($cacheHasExposed !== null){
             $hasExposed = $cacheHasExposed;
         }else{
-            $paramNodes = AJXP_PluginsService::searchAllManifests("/ajxp_plugin/server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
+            $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
             if(is_array($paramNodes) && count($paramNodes)) {
                 $hasExposed = true;
             }
-            AJXP_PluginsService::getInstance()->storeToPluginQueriesCache("/ajxp_plugin/server_settings/param[contains(@scope,'user') and @expose='true']", $hasExposed);
+            AJXP_PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[contains(@scope,'user') and @expose='true']", $hasExposed);
         }
+        //$hasExposed = true;
 
 
         if(!$hasExposed){
