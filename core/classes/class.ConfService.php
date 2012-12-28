@@ -889,13 +889,20 @@ class ConfService
      * @return array
      */
 	public static function getDeclaredUnsecureActions(){
-		$nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//action[@skipSecureToken]", "nodes");
-		$res = array();
-		foreach($nodes as $node){
-			$res[] = $node->getAttribute("name");
-		}
-		return $res;
-	}
+        $test = AJXP_PluginsService::getInstance()->loadFromPluginQueriesCache("//action[@skipSecureToken]");
+        if(!empty($test) && is_array($test)) {
+            return $test;
+        }else{
+            $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//action[@skipSecureToken]", "nodes");
+            $res = array();
+            foreach($nodes as $node){
+                $res[] = $node->getAttribute("name");
+            }
+            AJXP_PluginsService::getInstance()->storeToPluginQueriesCache("//action[@skipSecureToken]", $res);
+            return $res;
+        }
+
+    }
 	/**
      * Detect available languages from the core i18n library
      * @static

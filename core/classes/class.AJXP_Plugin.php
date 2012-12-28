@@ -300,6 +300,11 @@ class AJXP_Plugin implements Serializable{
 			$actionXpath=new DOMXPath($contribNode->ownerDocument);
 			foreach($contribNode->childNodes as $actionNode){
 				if($actionNode->nodeType!=XML_ELEMENT_NODE) continue;
+                $names = $actionXpath->query("@name", $actionNode);
+            	$name = $names->item(0)->value;
+                $this->actions[$name] = $name;
+                continue;
+                /*
 				$actionData=array();
 				$actionData["XML"] = $contribNode->ownerDocument->saveXML($actionNode);			
 				$names = $actionXpath->query("@name", $actionNode);
@@ -313,9 +318,8 @@ class AJXP_Plugin implements Serializable{
 					$actionData["rights"] = $this->nodeAttrToHash($rightContext);
 				}
 				$actionData["node"] = $actionNode;
-				$names = $actionXpath->query("@name", $actionNode);
-				$name = $names->item(0)->value;
 				$this->actions[$name] = $actionData;
+                */
 			}
 		}
 	}

@@ -105,8 +105,11 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  			}
  		}
  		if(!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false){
-	 		AJXP_Utils::saveSerialFile(AJXP_PLUGINS_REQUIRES_FILE, $this->required_files, false, false);
-	 		AJXP_Utils::saveSerialFile(AJXP_PLUGINS_CACHE_FILE, $this->registry, false, false);
+            AJXP_Utils::saveSerialFile(AJXP_PLUGINS_REQUIRES_FILE, $this->required_files, false, false);
+            AJXP_Utils::saveSerialFile(AJXP_PLUGINS_CACHE_FILE, $this->registry, false, false);
+            if(is_file(AJXP_PLUGINS_QUERIES_CACHE)){
+                @unlink(AJXP_PLUGINS_QUERIES_CACHE);
+            }
  		}
  	}
  	
@@ -185,7 +188,24 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		} 		
  		return $sorted;
  	}
- 	
+
+     public function loadFromPluginQueriesCache($key){
+         if(AJXP_SKIP_CACHE) return null;
+         $test = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_QUERIES_CACHE);
+         if(!empty($test) && is_array($test) && isset($test[$key])){
+             return $test[$key];
+         }
+         return null;
+     }
+
+     public function storeToPluginQueriesCache($key, $value){
+         if(AJXP_SKIP_CACHE) return;
+         $test = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_QUERIES_CACHE);
+         if(!is_array($test)) $test = array();
+         $test[$key] = $value;
+         AJXP_Utils::saveSerialFile(AJXP_PLUGINS_QUERIES_CACHE, $test);
+     }
+
  	/**
       * Simply load a plugin class, without the whole dependencies et.all
       * @param string $pluginId
