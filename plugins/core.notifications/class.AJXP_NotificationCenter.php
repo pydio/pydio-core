@@ -35,6 +35,10 @@ class AJXP_NotificationCenter extends AJXP_Plugin
      * @var AJXP_FeedStore|bool
      */
     private $eventStore = false;
+    /**
+     * @var bool|AJXP_MessageExchanger
+     */
+    private $msgExchanger = false;
 
     public function init($options){
         parent::init($options);
@@ -44,6 +48,11 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         if(is_a($eStore, "AJXP_FeedStore")){
             $this->eventStore = $eStore;
         }
+        $msgBroker = ConfService::getInstance()->getUniquePluginImplInst("MQ_DRIVER", "mq");
+        if(is_a($msgBroker, "AJXP_MessageExchanger")){
+            $this->msgExchanger = $msgBroker;
+        }
+
     }
 
     public function persistChangeHookToFeed(AJXP_Node $oldNode = null, AJXP_Node $newNode = null, $copy = false, $targetNotif = "new"){
@@ -149,8 +158,8 @@ class AJXP_NotificationCenter extends AJXP_Plugin
     }
 
     public function consumeQueue($action, $httpVars, $fileVars){
-        if($action != "consume_notification_queue") return;
-        $queueObjects = ConfService::getConfStorageImpl()->consumeQueue("user_notifications");
+        if($action != "consume_notification_queue" || $this->msgExchanger === false) return;
+        $queueObjects = $this->msgExchanger->consumeWorkerChannel("user_notifications");
         if(is_array($queueObjects)){
             AJXP_Logger::debug("Processing notification queue, ".count($queueObjects)." notifs to handle");
             foreach($queueObjects as $notification){
@@ -179,11 +188,11 @@ class AJXP_NotificationCenter extends AJXP_Plugin
     }
 
     protected function sendToQueue(AJXP_Notification $notification){
-        if(!$this->useQueue){
+        if(!$this->useQueue && $this->msgExchanger){
             AJXP_Logger::debug("SHOULD DISPATCH NOTIFICATION ON ".$notification->getNode()->getUrl()." ACTION ".$notification->getAction());
             $this->dispatch($notification);
         }else{
-            ConfService::getConfStorageImpl()->storeObjectToQueue("user_notifications", $notification);
+            $this->msgExchanger->publishWorkerMessage("user_notifications", $notification);
         }
     }
 
