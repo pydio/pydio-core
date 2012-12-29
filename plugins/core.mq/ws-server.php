@@ -10,7 +10,7 @@ require_once("../../core/classes/class.HttpClient.php");
  * @author Chris
  *
  */
-class DemoEchoHandler extends WebSocketUriHandler {
+class AjaXplorerHandler extends WebSocketUriHandler {
 
     public function onMessage(IWebSocketConnection $user, IWebSocketMessage $msg) {
         $this->say("[DEMO] " . strlen($msg->getData()) . " bytes");
@@ -68,17 +68,23 @@ class DemoEchoHandler extends WebSocketUriHandler {
  * @author Chris
  *
  */
-class DemoSocketServer implements IWebSocketServerObserver {
+class AjaxplorerSocketServer implements IWebSocketServerObserver {
 
     protected $debug = true;
     protected $server;
     static $ADMIN_KEY = "adminsecretkey";
+    protected $host;
+    protected $port;
+    protected $path;
 
-    public function __construct() {
-        $this->server = new WebSocketServer("tcp://192.168.0.18:8090", self::$ADMIN_KEY);
+    public function __construct($host, $port, $path) {
+        $this->host = $host;
+        $this->port = $port;
+        $this->path = $path;
+        $this->server = new WebSocketServer("tcp://{$host}:{$port}", self::$ADMIN_KEY);
         $this->server->addObserver($this);
 
-        $this->server->addUriHandler("ajaxplorer", new DemoEchoHandler());
+        $this->server->addUriHandler($path, new AjaXplorerHandler());
     }
 
     public function onConnect(IWebSocketConnection $user) {
@@ -91,9 +97,9 @@ class DemoSocketServer implements IWebSocketServerObserver {
         $h = $user->getHeaders();
         $c = WebSocketFunctions::cookie_parse($h["Cookie"]);
 
-        $client = new HttpClient("192.168.0.18");
+        $client = new HttpClient($this->host);
         $client->cookies = $c;
-        $client->get("/ajaxplorer/?get_action=ws_authenticate&key=".self::$ADMIN_KEY);
+        $client->get("/{$this->path}/?get_action=ws_authenticate&key=".self::$ADMIN_KEY);
         $registry = $client->getContent();
         $xml = new DOMDocument();
         $xml->loadXML($registry);
@@ -118,15 +124,15 @@ class DemoSocketServer implements IWebSocketServerObserver {
     }
 
     public function onMessage(IWebSocketConnection $user, IWebSocketMessage $msg) {
-        $this->say("[DEMO] {$user->getId()} says '{$msg->getData()}'");
+        //$this->say("[DEMO] {$user->getId()} says '{$msg->getData()}'");
     }
 
     public function onDisconnect(IWebSocketConnection $user) {
-        $this->say("[DEMO] {$user->getId()} disconnected");
+        //$this->say("[DEMO] {$user->getId()} disconnected");
     }
 
     public function onAdminMessage(IWebSocketConnection $user, IWebSocketMessage $msg) {
-        $this->say("[DEMO] Admin Message received!");
+        //$this->say("[DEMO] Admin Message received!");
 
         $frame = WebSocketFrame::create(WebSocketOpcode::PongFrame);
         $user->sendFrame($frame);
@@ -142,6 +148,28 @@ class DemoSocketServer implements IWebSocketServerObserver {
 
 }
 
+function usage(){
+    echo "You must use the following command: \n > php ws-server.php -host=HOST_IP -port=HOST_PORT [-path=PATH]\n\n";
+}
+
+$optArgs = array();
+$options = array();
+$regex = '/^-(-?)([a-zA-z0-9_]*)=(.*)/';
+foreach ($argv as $key => $argument){
+    //echo("$key => $argument \n");
+	if(preg_match($regex, $argument, $matches)){
+		if($matches[1] == "-"){
+			$optArgs[trim($matches[2])] = trim($matches[3]);
+		}else{
+			$options[trim($matches[2])] = trim($matches[3]);
+		}
+	}
+}
+
+if(!isSet($options["host"]) || !isSet($options["port"])){
+    usage();
+    exit(0);
+}
 // Start server
-$server = new DemoSocketServer();
+$server = new AjaxplorerSocketServer($options["host"], $options["port"], $options["path"]);
 $server->run();
