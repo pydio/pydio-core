@@ -59,6 +59,7 @@ Class.create("AjxpMqObserver", {
                         var obj = parseXml(event.data);
                         if(obj){
                             ajaxplorer.actionBar.parseXmlMessage(obj);
+                            ajaxplorer.notify("server_message", obj);
                         }
                     };
                     this.ws.onopen = function(){
@@ -104,7 +105,10 @@ Class.create("AjxpMqObserver", {
                         client_id:this.clientId
                     }));
                     conn.discrete = true;
-                    conn.onComplete = function(transport){ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);};
+                    conn.onComplete = function(transport){
+                        ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                        ajaxplorer.notify("server_message", transport.responseXML);
+                    };
                     conn.sendAsync();
                 }.bind(this), 10);
 

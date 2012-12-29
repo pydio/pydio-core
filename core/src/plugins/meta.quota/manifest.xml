@@ -45,15 +45,29 @@
                     ]]></clientCallback>
                     <clientListener name="contextChange"><![CDATA[
                         if(ajaxplorer && !ajaxplorer.meta_quota_pe_created){
-                            new PeriodicalExecuter(function(pe){
-                                var action = ajaxplorer.getActionBar().getActionByName("monitor_quota");
-                                if(!action) {
-                                    pe.stop();
-                                    ajaxplorer.meta_quota_pe_created = false;
-                                    return;
-                                }
+                            var configs = ajaxplorer.getPluginConfigs("mq");
+                            if(configs){
+                                ajaxplorer.observe("server_message", function(event){
+                                    var newValue = XPathSelectSingleNode(event, "/tree/metaquota");
+                                    if(newValue){
+                                        var action = ajaxplorer.getActionBar().getActionByName("monitor_quota");
+                                        if(!action) return;
+                                        action.options.text = roundSize(newValue.getAttribute("usage"), MessageHash["byte_unit_symbol"]) + "/" + roundSize(newValue.getAttribute("total"), MessageHash["byte_unit_symbol"]);
+                                        action.refreshInstances();
+                                    }
+                                });
                                 ajaxplorer.getActionBar().fireAction('monitor_quota');
-                            }, 20);
+                            }else{
+                                new PeriodicalExecuter(function(pe){
+                                    var action = ajaxplorer.getActionBar().getActionByName("monitor_quota");
+                                    if(!action) {
+                                        pe.stop();
+                                        ajaxplorer.meta_quota_pe_created = false;
+                                        return;
+                                    }
+                                    ajaxplorer.getActionBar().fireAction('monitor_quota');
+                                }, 20);
+                            }
                             ajaxplorer.meta_quota_pe_created = true;
                         }
                         ]]></clientListener>
