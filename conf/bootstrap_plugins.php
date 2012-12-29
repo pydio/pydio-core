@@ -74,5 +74,23 @@ $PLUGINS = array(
              "LOG_FILE_NAME" => 'log_' . date('m-d-y') . '.txt',
              "LOG_CHMOD" => 0770
          )
+    ),
+    /*
+    "FEED_DRIVER" => array(
+        "NAME" => "sql",
+        "OPTIONS" => array(
+            "SQL_DRIVER" =>  array(
+                "driver"        => "mysql",
+                "host"          => "localhost",
+                "database"      => "ajaxplorer",
+                "user"          => "XXXX",
+                "password"      => "XXXX",
+            )
+        )
+    ),
+    "MQ_DRIVER" => array(
+        "NAME" => "serial",
+        "OPTIONS" => array()
     )
+    */
 );
