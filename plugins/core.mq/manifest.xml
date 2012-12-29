@@ -39,6 +39,7 @@
         </actions>
         <hooks>
             <serverCallback methodName="publishNodeChange" hookName="node.change" defer="true"/>
+            <serverCallback methodName="sendInstantMessage" hookName="msg.instant" />
         </hooks>
     </registry_contributions>
 </ajxp_plugin>

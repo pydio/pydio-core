@@ -60,7 +60,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
             "user_id" => $userId,
             "repository_id" => $repoId,
             "user_group" => $userGroup,
-            "repository_scope" => $repositoryScope,
+            "repository_scope" => ($repositoryScope !== false ? $repositoryScope : "ALL"),
             "content" => $content
         );
         if($this->sqlDriver["password"] == "XXXX") return;
@@ -89,7 +89,9 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                 if($rightString == "r" | $rightString == "rw") $authRepos[] = $repoId;
             }
         }
-        $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [repository_id] IN (%s) AND ([repository_scope] = 'O' OR  ([repository_scope] = 'USER' AND [user_id] = %s  ) OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )) ORDER BY [edate] DESC LIMIT 0,10 ", $authRepos, $userId, $userGroup);
+        //var_dump($authRepos);
+        $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [repository_id] IN (%s) AND ([repository_scope] = 'ALL' OR  ([repository_scope] = 'USER' AND [user_id] = %s  ) OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )) ORDER BY [edate] DESC LIMIT 0,100 ", $authRepos, $userId, $userGroup);
+        //$res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [repository_id] IN (%s)  AND ([repository_scope] = 'ALL') ORDER BY [edate] DESC LIMIT 0,100 ", $authRepos);
 
         echo("<ul>");
         foreach($res as $n => $row){

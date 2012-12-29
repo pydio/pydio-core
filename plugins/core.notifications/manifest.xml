@@ -20,7 +20,26 @@
                 </processing>
             </action>
             <action name="get_my_feed">
+                <gui text="442" title="443" src="edit_user.png" accessKey="" hasAccessKey="false">
+             		<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false" ajxpWidgets="UserWidget::logging_string"/>
+                </gui>
                 <processing>
+                    <clientCallback dialogOpenForm="user_feed" dialogOkButtonOnly="true" prepareModal="true">
+                        <dialogOnOpen><![CDATA[
+                             var conn = new Connexion();
+                             conn.setParameters({get_action:"get_my_feed"});
+                             conn.onComplete = function(transport){
+                                modal.getForm().down("div#feed_content").update(transport.responseText);
+                             };
+                             conn.sendAsync();
+                        ]]></dialogOnOpen>
+                    </clientCallback>
+                    <clientForm id="user_feed"><![CDATA[
+                        <div id="user_feed" box_padding="0" box_width="320">
+                            <div class="dialogLegend" style="padding:10px;">Your activity feed</div>
+                            <div id="feed_content" style="width: 300px;height: 320px;overflow: auto;"></div>
+                        </div>
+                    ]]></clientForm>
                     <serverCallback methodName="loadUserFeed"/>
                 </processing>
             </action>

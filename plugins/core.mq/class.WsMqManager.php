@@ -45,6 +45,7 @@ class WsMqManager extends AJXP_Plugin
 {
 
     private $clientsGCTime = 10;
+    private static $wsClient;
     /**
      * @var Array
      */
@@ -106,38 +107,48 @@ class WsMqManager extends AJXP_Plugin
         }
         if(!empty($content) && !empty($repo)){
 
-            $scope = ConfService::getRepositoryById($repo)->securityScope();
-            if($scope == "USER"){
-                $userId = AuthService::getLoggedUser()->getId();
-            }else if($scope == "GROUP"){
-                $gPath = AuthService::getLoggedUser()->getGroupPath();
+            $this->sendInstantMessage($content, $repo);
+
+        }
+
+    }
+
+    public function sendInstantMessage($xmlContent, $repositoryId){
+
+        $scope = ConfService::getRepositoryById($repositoryId)->securityScope();
+        if($scope == "USER"){
+            $userId = AuthService::getLoggedUser()->getId();
+        }else if($scope == "GROUP"){
+            $gPath = AuthService::getLoggedUser()->getGroupPath();
+        }
+
+        // Publish for pollers
+        $message = new stdClass();
+        $message->content = $xmlContent;
+        if(isSet($userId)) $message->userId = $userId;
+        if(isSet($gPath)) $message->groupPath = $gPath;
+        $this->publishToChannel("nodes:$repositoryId", $message);
+
+        // Publish for WebSockets
+        $configs = $this->getConfigs();
+        if($configs["WS_SERVER_ACTIVE"]){
+
+            require_once(AJXP_INSTALL_PATH."/vendor/phpws/websocket.client.php");
+            // Publish for websockets
+            $input = array("REPO_ID" => $repositoryId, "CONTENT" => "<tree>".$xmlContent."</tree>");
+            if(isSet($userId)) $input["USER_ID"] = $userId;
+            else if(isSet($gPath)) $input["GROUP_PATH"] = $gPath;
+            $input = serialize($input);
+            $msg = WebSocketMessage::create($input);
+            if(!isset(self::$wsClient)){
+                $ws = new WebSocket("ws://".$configs["WS_SERVER_HOST"].":".$configs["WS_SERVER_PORT"].$configs["WS_SERVER_PATH"]);
+                self::$wsClient = $ws;
+                self::$wsClient->addHeader("Admin-Key", $configs["WS_SERVER_ADMIN"]);
+                self::$wsClient->open();
+                //AJXP_ShutdownScheduler::getInstance()->registerShutdownEvent(array($ws, "close"));
             }
-
-            // Publish for pollers
-            $message = new stdClass();
-            $message->content = $content;
-            if(isSet($userId)) $message->userId = $userId;
-            if(isSet($gPath)) $message->groupPath = $gPath;
-            $this->publishToChannel("nodes:$repo", $message);
-
-            // Publish for WebSockets
-            $configs = $this->getConfigs();
-            if($configs["WS_SERVER_ACTIVE"]){
-
-                require_once(AJXP_INSTALL_PATH."/vendor/phpws/websocket.client.php");
-                // Publish for websockets
-                $input = array("REPO_ID" => $repo, "CONTENT" => "<tree>".$content."</tree>");
-                if(isSet($userId)) $input["USER_ID"] = $userId;
-                else if(isSet($gPath)) $input["GROUP_PATH"] = $gPath;
-                $input = serialize($input);
-                $msg = WebSocketMessage::create($input);
-                $client = new WebSocket("ws://".$configs["WS_SERVER_HOST"].":".$configs["WS_SERVER_PORT"].$configs["WS_SERVER_PATH"]);
-                $client->addHeader("Admin-Key", $configs["WS_SERVER_ADMIN"]);
-                $client->open();
-                $client->sendMessage($msg);
-                $client->close();
-            }
-
+            self::$wsClient->sendMessage($msg);
+            //self::$wsClient->close();
         }
 
     }

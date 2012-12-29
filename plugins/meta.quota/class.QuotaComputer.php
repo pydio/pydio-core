@@ -115,7 +115,8 @@ class QuotaComputer extends AJXP_Plugin
         $path = $this->getWorkingPath();
         $q = $this->computeDirSpace($path);
         $this->storeUsage($path, $q);
-        AJXP_Logger::debug("QUOTA : New usage is $q - it took ".(microtime(true) - $mtime)."ms");
+        $t = $this->getAuthorized();
+        AJXP_Controller::applyHook("msg.instant", array("<metaquota usage='{$q}' total='{$t}'/>", ConfService::getRepository()->getUniqueId()));
     }
 
     protected function storeUsage($dir, $quota){
