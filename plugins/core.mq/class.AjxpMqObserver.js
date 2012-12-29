@@ -53,18 +53,20 @@ Class.create("AjxpMqObserver", {
                         this.ws.send("register:" + repoId);
                     }
                 }else{
-                    var url = "ws"+(parseInt(configs.get("WS_SERVER_SECURE"))?"s":"")+"://"+configs.get("WS_SERVER_HOST")+":"+configs.get("WS_SERVER_PORT")+configs.get("WS_SERVER_PATH");
-                    this.ws = new WebSocket(url);
-                    this.ws.onmessage = function(event){
-                        var obj = parseXml(event.data);
-                        if(obj){
-                            ajaxplorer.actionBar.parseXmlMessage(obj);
-                            ajaxplorer.notify("server_message", obj);
-                        }
-                    };
-                    this.ws.onopen = function(){
-                        this.ws.send("register:" + repoId);
-                    }.bind(this);
+                    if(repoId){
+                        var url = "ws"+(parseInt(configs.get("WS_SERVER_SECURE"))?"s":"")+"://"+configs.get("WS_SERVER_HOST")+":"+configs.get("WS_SERVER_PORT")+configs.get("WS_SERVER_PATH");
+                        this.ws = new WebSocket(url);
+                        this.ws.onmessage = function(event){
+                            var obj = parseXml(event.data);
+                            if(obj){
+                                ajaxplorer.actionBar.parseXmlMessage(obj);
+                                ajaxplorer.notify("server_message", obj);
+                            }
+                        };
+                        this.ws.onopen = function(){
+                            this.ws.send("register:" + repoId);
+                        }.bind(this);
+                    }
                 }
 
             }else{
