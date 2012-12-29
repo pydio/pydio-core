@@ -321,21 +321,6 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	}
 
     /**
-     * @abstract
-     * @param string $queueName
-     * @param Object $object
-     * @return bool
-     */
-    abstract function storeObjectToQueue($queueName, $object);
-
-    /**
-     * @abstract
-     * @param string $queueName Name of the queue
-     * @return array An array of arbitrary objects, understood by the caller
-     */
-    abstract function consumeQueue($queueName);
-
-    /**
      * @param AbstractAjxpUser $userObject
      * @return array()
      */

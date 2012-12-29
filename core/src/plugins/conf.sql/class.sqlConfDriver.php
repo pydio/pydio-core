@@ -616,43 +616,4 @@ class sqlConfDriver extends AbstractConfDriver {
         }
     }
 
-    /**
-     * @param string $queueName
-     * @param Object $object
-     * @return bool
-     */
-    function storeObjectToQueue($queueName, $object)
-    {
-        $r = dibi::query("SELECT MAX( [object_id] ) FROM [ajxp_simple_store] WHERE [store_id]=%s", "queues.$queueName");
-        $index = $r->fetchSingle();
-        if($index == null) $index = 1;
-        else $index = intval($index)+1;
-        $values = array(
-            "store_id" => "queues.$queueName",
-            "object_id" => $index,
-            "serialized_data" => serialize($object)
-        );
-        dibi::query("INSERT INTO [ajxp_simple_store]", $values);
-    }
-
-    /**
-     * @param string $queueName Name of the queue
-     * @return array An array of arbitrary objects, understood by the caller
-     */
-    function consumeQueue($queueName)
-    {
-        $results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE [store_id]=%s ORDER BY [object_id] ASC", "queues.$queueName");
-        $rows = $results->fetchAll();
-        $arr = array();
-        $deleted = array();
-        foreach($rows as $row){
-            $arr[] = unserialize($row["serialized_data"]);
-            $deleted[] = $row["object_id"];
-        }
-        if(count($deleted)){
-            dibi::query("DELETE FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id] IN (%s)", "queues.$queueName", $deleted);
-        }
-        return $arr;
-    }
 }
-?>
