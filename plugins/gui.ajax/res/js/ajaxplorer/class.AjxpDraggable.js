@@ -421,7 +421,8 @@ var AjxpDroppables = {
                     if(droppable.id && webFXTreeHandler.all[droppable.id]){
                         nodeId = droppable.id;
                     }
-					ajaxplorer.actionBar.applyDragMove(srcName, targetName, nodeId, event['ctrlKey']);
+                    var copy = draggable.hasClassName("selection_ctrl_key");
+					ajaxplorer.actionBar.applyDragMove(srcName, targetName, nodeId, copy);
 				},
 		onHover:function(draggable, droppable, event)
 				{
@@ -441,7 +442,10 @@ var AjxpDroppables = {
 				}
 	},
 
-	add: function(element){
+	add: function(element, ajxpNode){
+        if(ajxpNode && ajxpNode.hasMetadataInBranch("ajxp_readonly", "true")){
+            return;
+        }
 		Droppables.add(element, this.options);
 		AllAjxpDroppables.push($(element));
 	}	

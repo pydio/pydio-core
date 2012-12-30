@@ -1379,7 +1379,7 @@ Class.create("FilesList", SelectableElements, {
                         }
                         if(!ajxpNode.isLeaf())
                         {
-                            AjxpDroppables.add(innerSpan);
+                            AjxpDroppables.add(innerSpan, ajxpNode);
                         }
                     }.bind(this), 500);
                 }
@@ -1552,7 +1552,7 @@ Class.create("FilesList", SelectableElements, {
 		}
 		if(!ajxpNode.isLeaf())
 		{
-			AjxpDroppables.add(newRow);
+			AjxpDroppables.add(newRow, ajxpNode);
 		}		
 		return newRow;
 	},

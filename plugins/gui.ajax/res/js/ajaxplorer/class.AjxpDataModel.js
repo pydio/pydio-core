@@ -396,7 +396,18 @@ Class.create("AjxpDataModel", {
 	isEmpty : function (){
 		return (this._selectedNodes?(this._selectedNodes.length==0):true);
 	},
-	
+
+    hasReadOnly : function(){
+        var test = false;
+        this._selectedNodes.each(function(node){
+            if(node.hasMetadataInBranch("ajxp_readonly", "true")) {
+                test = true;
+                throw $break;
+            }
+        });
+        return test;
+    },
+
 	/**
 	 * Whether the selection is unique
 	 * @returns Boolean

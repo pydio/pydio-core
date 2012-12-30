@@ -190,13 +190,25 @@ Class.create("Action", {
 	 * @returns void
 	 */
 	fireContextChange: function(){
-		if(arguments.length < 4) return;
+		if(arguments.length < 3) return;
 		var usersEnabled = arguments[0];
 		var crtUser = arguments[1];
-		var crtIsRecycle = arguments[2];
-		var crtInZip = arguments[3];
-		var crtIsRoot = arguments[4];
-		var crtAjxpMime = arguments[5] || '';
+
+        var crtIsRecycle = false;
+        var crtInZip = false;
+        var crtIsRoot = false;
+        var crtAjxpMime = '';
+        var crtIsReadOnly = false;
+
+        var crtNode = arguments[2];
+        if(crtNode){
+            crtIsRecycle = (crtNode.getAjxpMime() == "ajxp_recycle");
+            crtInZip = crtNode.hasAjxpMimeInBranch("ajxp_browsable_archive");
+            crtIsRoot = crtNode.isRoot();
+            crtAjxpMime = crtNode.getAjxpMime();
+            crtIsReadOnly = crtNode.hasMetadataInBranch("ajxp_readonly", "true");
+        }
+
 		if(this.options.listeners["contextChange"]){
 			window.listenerContext = this;
 			this.options.listeners["contextChange"].evalScripts();			
@@ -215,12 +227,15 @@ Class.create("Action", {
 		if(rightsContext.adminOnly && (crtUser == null || !crtUser.isAdmin)){
 			return this.hideForContext();
 		}
-		if(rightsContext.read && crtUser != null && !crtUser.canRead()){
+		if(rightsContext.read && crtUser != null && !crtUser.canRead() ){
 			return this.hideForContext();
 		}
 		if(rightsContext.write && crtUser != null && !crtUser.canWrite()){
 			return this.hideForContext();
 		}
+        if(rightsContext.write && crtIsReadOnly){
+            return this.hideForContext();
+        }
 		if(this.context.allowedMimes.length){
 			if( !this.context.allowedMimes.include("*") && !this.context.allowedMimes.include(crtAjxpMime)){
 				return this.hideForContext();
@@ -294,6 +309,9 @@ Class.create("Action", {
 		if(!selectionContext.recycle && bRecycle){
 			return this.disable();
 		}
+        if(this.rightsContext.write && userSelection.hasReadOnly()){
+            return this.disable();
+        }
 		if(selectionContext.allowedMimes.size() && userSelection  && !selectionContext.allowedMimes.include('*')
             &&  !userSelection.hasMime(selectionContext.allowedMimes)){
 			if(selectionContext.behaviour == 'hidden') return this.hide();
