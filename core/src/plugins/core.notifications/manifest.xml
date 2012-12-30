@@ -36,6 +36,9 @@
                              };
                              conn.sendAsync();
                         ]]></dialogOnOpen>
+                        <dialogOnComplete><![CDATA[
+                             hideLightBox();
+                        ]]></dialogOnComplete>
                     </clientCallback>
                     <clientForm id="user_feed"><![CDATA[
                         <div id="user_feed" box_padding="0" box_width="320">
