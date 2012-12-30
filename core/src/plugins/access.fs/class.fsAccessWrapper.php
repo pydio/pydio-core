@@ -64,6 +64,8 @@ class fsAccessWrapper implements AjxpWrapper {
         $path = self::unPatchPathForBaseDir($path);
     	$url = parse_url($path);
     	$repoId = $url["host"];
+        $test = trim($url["path"], "/");
+        $atRoot = empty($test);
     	if(isSet($url["fragment"]) && strlen($url["fragment"]) > 0){
     		$url["path"] .= "#".$url["fragment"];
     	}
@@ -89,7 +91,7 @@ class fsAccessWrapper implements AjxpWrapper {
 		   			$tmpFileName = $tmpDir.DIRECTORY_SEPARATOR.basename($localPath);
 		   			AJXP_Logger::debug("Tmp file $tmpFileName");
 		   			register_shutdown_function(array("fsAccessWrapper", "removeTmpFile"), $tmpDir, $tmpFileName);
-					$crtZip = new PclZip(AJXP_Utils::securePath(realpath($repoObject->getOption("PATH")).$zipPath));
+					$crtZip = new PclZip(AJXP_Utils::securePath(realpath($repoObject->getOption("PATH")).$repoObject->resolveVirtualRoots($zipPath)));
 					$content = $crtZip->listContent();
 					foreach ($content as $item){
 						$fName = AJXP_Utils::securePath($item["stored_filename"]);
@@ -112,7 +114,7 @@ class fsAccessWrapper implements AjxpWrapper {
 		   			}
 		   		}
 		   	}else{
-				$crtZip = new PclZip(AJXP_Utils::securePath(realpath($repoObject->getOption("PATH")).$zipPath));
+				$crtZip = new PclZip(AJXP_Utils::securePath(realpath($repoObject->getOption("PATH")).$repoObject->resolveVirtualRoots(zipPath)));
 				$liste = $crtZip->listContent();				
 				if($storeOpenContext) self::$crtZip = $crtZip;
 				$folders = array(); $files = array();$builtFolders = array();
@@ -159,8 +161,22 @@ class fsAccessWrapper implements AjxpWrapper {
 				self::$currentListingIndex = 0;
 				return -1;
 		   	}
-		}else{			
-			return realpath($repoObject->getOption("PATH")).$url["path"];
+		}else{
+            if($atRoot){
+                $virtual = $repoObject->listVirtualRoots();
+                if(count($virtual)){
+                    self::$currentListing = array();
+                    foreach($virtual as $rootKey => $rootValue){
+                        $statValue = array();
+                        $statValue[2] = $statValue["mode"] = 00040000;//($rootValue["right"] == "rw" ? "00040000" : "00070000");
+                        self::$currentListing[$rootKey] = $statValue;
+                    }
+                    self::$currentListingKeys = array_keys(self::$currentListing);
+                    self::$currentListingIndex = 0;
+                    return -1;
+                }
+            }
+			return realpath($repoObject->getOption("PATH")).$repoObject->resolveVirtualRoots($url["path"]);
 		}    	
     }
 
@@ -292,7 +308,7 @@ class fsAccessWrapper implements AjxpWrapper {
                 }
             }
         }
-    	if($fp = @fopen($path, "r")){    		
+    	if($fp = @fopen($path, "r")){
 	    	$stat = fstat($fp);
     		fclose($fp);
     		return $stat;

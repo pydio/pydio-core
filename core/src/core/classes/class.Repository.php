@@ -287,6 +287,37 @@ class Repository implements AjxpGroupPathProvider {
 		}
 		return "";
 	}
+
+    function resolveVirtualRoots($path){
+
+        // Gathered from the current role
+        $roots = $this->listVirtualRoots();
+        if(!count($roots)) return $path;
+        foreach($roots as $rootKey => $rootValue){
+            if(strpos($path, "/".ltrim($rootKey, "/")) === 0){
+                return preg_replace("/^\/{$rootKey}/", $rootValue["path"], $path, 1);
+            }
+        }
+        return $path;
+
+    }
+
+    function listVirtualRoots(){
+
+        return array();
+        /* TEST STUB
+        $roots = array(
+            "root1" => array(
+                "right" => "rw",
+                "path" => "/Test"),
+            "root2" => array(
+                "right" => "r",
+                "path" => "/Retoto/sub"
+            ));
+        return $roots;
+        */
+    }
+
 	/**
      * Get the options that already have a value
      * @return array
