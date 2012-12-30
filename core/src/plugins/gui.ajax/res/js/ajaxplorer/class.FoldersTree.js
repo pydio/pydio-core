@@ -77,7 +77,7 @@ Class.create("FoldersTree", AjxpPane, {
 			Event.stop(e);
 		}.bind(this.tree));
 
-		AjxpDroppables.add(this.tree.id);
+		AjxpDroppables.add(this.tree.id, this.tree.ajxpNode);
 		if(!this.tree.open && !this.tree.loading) {
 			this.tree.toggle();		
 		}

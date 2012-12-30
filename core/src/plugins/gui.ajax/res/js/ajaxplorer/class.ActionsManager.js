@@ -273,7 +273,7 @@ Class.create("ActionsManager", {
 	 */
 	applyDragMove: function(fileName, destDir, destNodeName, copy)
 	{
-		if((!copy && !this.defaultActions.get('dragndrop')) || 
+		if((!copy && (!this.defaultActions.get('dragndrop') || this.getDefaultAction('dragndrop').deny)) ||
 			(copy && (!this.defaultActions.get('ctrldragndrop')||this.getDefaultAction('ctrldragndrop').deny))){
 			return;
 		}
@@ -581,25 +581,14 @@ Class.create("ActionsManager", {
 	 * by triggering ajaxplorer:actions_refreshed event.
 	 */
 	fireContextChange: function(){
-		var crtRecycle = false;
-		var crtInZip = false;
-		var crtIsRoot = false;
-		var crtMime;
-		
+		var crtNode;
 		if(ajaxplorer && ajaxplorer.getContextNode()){ 
 			var crtNode = ajaxplorer.getContextNode();
-			crtRecycle = (crtNode.getAjxpMime() == "ajxp_recycle");
-			crtInZip = crtNode.hasAjxpMimeInBranch("ajxp_browsable_archive");
-			crtIsRoot = crtNode.isRoot();
-			crtMime = crtNode.getAjxpMime();			
-		}	
+		}
 		this.actions.each(function(pair){			
 			pair.value.fireContextChange(this.usersEnabled, 
 									 this.oUser, 									 
-									 crtRecycle, 
-									 crtInZip, 
-									 crtIsRoot,
-									 crtMime);
+									 crtNode);
 		}.bind(this));
 		document.fire("ajaxplorer:actions_refreshed");
 	},

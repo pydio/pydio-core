@@ -33,7 +33,10 @@ Class.create("TreeSelector", {
 			filterSelectorId : 'select[id="external_repository"]',
 			targetField : 'input[name="dest"]',
 			targetNode: 'input[name="dest_node"]',
-			treeContainer : '.treeCopyContainer'
+			treeContainer : '.treeCopyContainer',
+            nodeFilter : function(ajxpNode){
+                return (!ajxpNode.isLeaf());
+            }
 		}, options || {});
 	},
 	/**
@@ -55,13 +58,10 @@ Class.create("TreeSelector", {
 			targetNode.value = this.ajxpNode.getPath();
  			this.select();			
 		};
-		this._nodeFilter = function(ajxpNode){
-			return (!ajxpNode.isLeaf());
-		};
 		if(!rootNode){
 			rootNode = new AjxpNode("/", false, MessageHash[373], "folder.png");
 		}
-		this.treeCopy = new AJXPTree(rootNode, this._nodeActionCallback, this._nodeFilter);							
+		this.treeCopy = new AJXPTree(rootNode, this._nodeActionCallback, this.options.nodeFilter);
 		this.treeContainer.update(this.treeCopy.toString());
 		$(this.treeCopy.id).observe("click", function(e){
 			this.action();

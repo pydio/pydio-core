@@ -210,7 +210,7 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 		$(this.id + '-cont').insert(node.toString());
 		$(node.id).ajxpNode = node.ajxpNode;
 		if(!node.inZip){
-			AjxpDroppables.add(node.id);
+			AjxpDroppables.add(node.id, node.ajxpNode);
 		}		
 		//new Draggable(node.id, {revert:true,ghosting:true,constraint:'vertical'});
 		if(webFXTreeHandler.contextMenu){

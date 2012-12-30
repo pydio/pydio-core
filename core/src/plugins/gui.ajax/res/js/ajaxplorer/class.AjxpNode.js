@@ -272,6 +272,24 @@ Class.create("AjxpNode", {
 		return false;
 	},	
 	/**
+	 * Search the mime type in the parent branch
+	 * @param ajxpMime String
+	 * @returns Boolean
+	 */
+	hasMetadataInBranch: function(metadataKey, metadataValue){
+		if(this.getMetadata().get(metadataKey) && this.getMetadata().get(metadataKey) == metadataValue) {
+            return true;
+        }
+		var parent, crt = this;
+		while(parent =crt._parentNode){
+			if(parent.getMetadata().get(metadataKey) && parent.getMetadata().get(metadataKey) == metadataValue){
+                return true;
+            }
+			crt = parent;
+		}
+		return false;
+	},
+	/**
 	 * Sets a reference to the parent node
 	 * @param parentNode AjxpNode
 	 */
