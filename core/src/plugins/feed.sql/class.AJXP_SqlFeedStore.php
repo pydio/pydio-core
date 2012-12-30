@@ -44,7 +44,8 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
     {
         $value = array(
             "edate" => time(),
-            "type"  => "node.change",
+            "etype"  => "event",
+            "htype"  => "node.change",
             "user_id" => $userId,
             "repository_id" => $repositoryId,
             "user_group" => $userGroup,
@@ -70,11 +71,11 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         if($this->sqlDriver["password"] == "XXXX") return array();
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
-        $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [repository_id] IN (%s) AND ([repository_scope] = 'ALL' OR  ([repository_scope] = 'USER' AND [user_id] = %s  ) OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )) ORDER BY [edate] DESC LIMIT 0,100 ", $filterByRepositories, $userId, $userGroup);
+        $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND [repository_id] IN (%s) AND ([repository_scope] = 'ALL' OR  ([repository_scope] = 'USER' AND [user_id] = %s  ) OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )) ORDER BY [edate] DESC LIMIT 0,100 ", "event", $filterByRepositories, $userId, $userGroup);
         $data = array();
         foreach($res as $n => $row){
             $object = new stdClass();
-            $object->hookname = $row->type;
+            $object->hookname = $row->htype;
             $object->arguments = unserialize($row->content);
             $object->author = $row->user_id;
             $object->date = $row->edate;
@@ -83,4 +84,53 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         }
         return $data;
     }
+
+    /**
+     * @abstract
+     * @param AJXP_Notification $notif
+     * @return mixed
+     */
+    public function persistAlert(AJXP_Notification $notif){
+        if(!$notif->getNode()) return;
+        $repositoryId = $notif->getNode()->getRepositoryId();
+        $userId = $notif->getTarget();
+        $value = array(
+            "edate" => time(),
+            "etype"  => "alert",
+            "htype"  => "notification",
+            "user_id" => $userId,
+            "repository_id" => $repositoryId,
+            "content" => serialize($notif)
+        );
+        if($this->sqlDriver["password"] == "XXXX") return;
+        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
+        dibi::connect($this->sqlDriver);
+        dibi::query("INSERT INTO [ajxp_feed]", $value);
+    }
+
+    /**
+     * @abstract
+     * @param $userId
+     * @param null $repositoryIdFilter
+     * @return mixed
+     */
+    public function loadAlerts($userId, $repositoryIdFilter = null){
+        if($this->sqlDriver["password"] == "XXXX") return array();
+        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
+        dibi::connect($this->sqlDriver);
+        if($repositoryIdFilter != null){
+            $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND [repository_id] = %s AND [user_id] = %s ORDER BY [edate] DESC LIMIT 0,100 ", "alert", $repositoryIdFilter, $userId);
+        }else{
+            $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND [user_id] = %s ORDER BY [edate] DESC LIMIT 0,100 ", "alert", $userId);
+        }
+        $data = array();
+        foreach($res as $n => $row){
+            $test = unserialize($row->content);
+            if(is_a($test, "AJXP_Notification")){
+                $data[] = $test;
+            }
+        }
+        return $data;
+    }
+
 }

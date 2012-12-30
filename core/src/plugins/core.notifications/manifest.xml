@@ -7,6 +7,9 @@
             <i18n namespace="notification.tpl.short" path="plugins/core.notifications/templates/short"/>
             <i18n namespace="notification.tpl.long" path="plugins/core.notifications/templates/long"/>
             <i18n namespace="notification.tpl.group" path="plugins/core.notifications/templates/group"/>
+            <i18n namespace="notification_center" path="plugins/core.notifications/res/i18n"/>
+            <css file="plugins/core.notifications/res/css/notification_center.css"/>
+            <img_library alias="notification_center" path="plugins/core.notifications/res/img"/>
         </resources>
     </client_settings>
     <server_settings>
@@ -20,7 +23,7 @@
                 </processing>
             </action>
             <action name="get_my_feed">
-                <gui text="442" title="443" src="edit_user.png" accessKey="" hasAccessKey="false">
+                <gui text="notification_center.1" title="notification_center.2" src="notification_center/ICON_SIZE/feed.png" accessKey="" hasAccessKey="false">
              		<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false" ajxpWidgets="UserWidget::logging_string"/>
                 </gui>
                 <processing>
@@ -36,8 +39,7 @@
                     </clientCallback>
                     <clientForm id="user_feed"><![CDATA[
                         <div id="user_feed" box_padding="0" box_width="320">
-                            <div class="dialogLegend" style="padding:10px;">Your activity feed</div>
-                            <div id="feed_content" style="width: 300px;height: 320px;overflow: auto;"></div>
+                            <div id="feed_content" style="width: 320px;height: 320px;overflow: auto;"></div>
                         </div>
                     ]]></clientForm>
                     <serverCallback methodName="loadUserFeed"/>
