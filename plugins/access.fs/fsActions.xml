@@ -554,7 +554,7 @@
 					actionBarGroup="change">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" editable="false"></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					if(ajaxplorer.user){
@@ -568,7 +568,11 @@
 					var onLoad = function(oForm){
 						var getAction = oForm.select('input[name="get_action"]')[0];
 						getAction.value = 'copy';					
-						this.treeSelector = new TreeSelector(oForm);
+						this.treeSelector = new TreeSelector(oForm, {
+                            nodeFilter : function(ajxpNode){
+                                return (!ajxpNode.isLeaf() && !ajxpNode.hasMetadataInBranch("ajxp_readonly", "true"));
+                            }
+                        });
 						if(!ajaxplorer.getUserSelection().hasDir() && user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
 							var firstKey ;
 							var reposList = new Hash();
@@ -633,10 +637,10 @@
 				if(ajaxplorer){
 					var action = ajaxplorer.getActionBar().getActionByName("copy");
 					if(action){
-						action.rightsContext.write = true;
+						//action.rightsContext.write = true;
 						var ajxpUser = ajaxplorer.user;
 						if(ajxpUser && !ajxpUser.canWrite() && ajxpUser.canCrossRepositoryCopy() && ajxpUser.hasCrossRepositories()){
-							action.rightsContext.write = false;
+							//action.rightsContext.write = false;
 							action.selectionContext.dir = false;
 							ajaxplorer.actionBar.defaultActions.unset('ctrldragndrop');
 							ajaxplorer.actionBar.defaultActions.unset('dragndrop');
@@ -673,7 +677,11 @@
 					var onLoad = function(oForm){
 						var getAction = oForm.select('input[name="get_action"]')[0];
 						getAction.value = 'move';
-						this.treeSelector = new TreeSelector(oForm);
+						this.treeSelector = new TreeSelector(oForm, {
+						    nodeFilter : function(ajxpNode){
+                                return (!ajxpNode.isLeaf() && !ajxpNode.hasMetadataInBranch("ajxp_readonly", "true"));
+                            }
+						});
 						this.treeSelector.load();
 						if(!ajaxplorer.getUserSelection().hasDir() && user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
 							this.treeSelector.setFilterShow(true);

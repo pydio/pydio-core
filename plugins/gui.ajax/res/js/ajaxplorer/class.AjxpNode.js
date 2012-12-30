@@ -277,13 +277,21 @@ Class.create("AjxpNode", {
 	 * @returns Boolean
 	 */
 	hasMetadataInBranch: function(metadataKey, metadataValue){
-		if(this.getMetadata().get(metadataKey) && this.getMetadata().get(metadataKey) == metadataValue) {
-            return true;
+		if(this.getMetadata().get(metadataKey)) {
+            if(metadataValue) {
+                return this.getMetadata().get(metadataKey) == metadataValue;
+            }else {
+                return true;
+            }
         }
 		var parent, crt = this;
 		while(parent =crt._parentNode){
-			if(parent.getMetadata().get(metadataKey) && parent.getMetadata().get(metadataKey) == metadataValue){
-                return true;
+			if(parent.getMetadata().get(metadataKey)){
+                if(metadataValue){
+                    return (parent.getMetadata().get(metadataKey) == metadataValue);
+                }else{
+                    return true;
+                }
             }
 			crt = parent;
 		}

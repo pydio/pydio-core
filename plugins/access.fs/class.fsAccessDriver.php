@@ -944,6 +944,20 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 
         $metaData["file_group"] = @filegroup($ajxpNode->getUrl()) || "unknown";
         $metaData["file_owner"] = @fileowner($ajxpNode->getUrl()) || "unknown";
+        $crtPath = $ajxpNode->getPath();
+        $vRoots = $this->repository->listVirtualRoots();
+        if(!empty($crtPath)){
+            if(!@is_writable($ajxpNode->getUrl())){
+                $metaData["ajxp_readonly"] = "true";
+            }
+            if(isSet($vRoots[ltrim($crtPath, "/")])){
+                $metaData["ajxp_readonly"] = $vRoots[ltrim($crtPath, "/")]["right"] == "r" ? "true" : "false";
+            }
+        }else{
+            if(count($vRoots)) {
+                $metaData["ajxp_readonly"] = "true";
+            }
+        }
         $fPerms = @fileperms($ajxpNode->getUrl());
         if($fPerms !== false){
             $fPerms = substr(decoct( $fPerms ), ($isLeaf?2:1));
