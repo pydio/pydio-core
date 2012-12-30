@@ -87,7 +87,12 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         }
         $res = $this->eventStore->loadEvents($authRepos, $userId, $userGroup, 0, 10);
 
-        echo("<ul>");
+        // APPEND USER ALERT IN THE SAME QUERY FOR NOW
+        $this->loadUserAlerts("", $httpVars, $fileVars);
+        if(!count($res)) return;
+        $mess = ConfService::getMessages();
+        echo("<h2>".$mess["notification_center.4"]."</h2>");
+        echo("<ul class='notification_list'>");
         foreach($res as $n => $object){
             $args = $object->arguments;
             $oldNode = (isSet($args[0]) ? $args[0] : null);
@@ -106,6 +111,30 @@ class AJXP_NotificationCenter extends AJXP_Plugin
 
     }
 
+
+    public function loadUserAlerts($actionName, $httpVars, $fileVars){
+
+        if(!$this->eventStore) return;
+        $u = AuthService::getLoggedUser();
+        $userId = $u->getId();
+        $repositoryFilter = null;
+        if(isSet($httpVars["repository_id"]) && $u->mergedRole->canRead($httpVars["repository_id"])){
+            $repositoryFilter = $httpVars["repository_id"];
+        }
+        $res = $this->eventStore->loadAlerts($userId, $repositoryFilter);
+        if(!count($res)) return;
+
+        $mess = ConfService::getMessages();
+        echo("<h2>".$mess["notification_center.3"]."</h2>");
+        echo("<ul class='notification_list'>");
+        foreach ($res as $notification){
+            echo("<li>");
+            echo($notification->getDescriptionLong(true));
+            echo("</li>");
+        }
+        echo("</ul>");
+
+    }
     /**
      * @param AJXP_Node $oldNode
      * @param AJXP_Node $newNode
@@ -197,6 +226,9 @@ class AJXP_NotificationCenter extends AJXP_Plugin
     }
 
     public function dispatch(AJXP_Notification $notification){
+        if($this->eventStore){
+            $this->eventStore->persistAlert($notification);
+        }
         AJXP_Controller::applyHook("msg.notification", array(&$notification));
         return;
     }

@@ -46,4 +46,19 @@ interface AJXP_FeedStore{
      */
     public function loadEvents($filterByRepositories, $userId, $userGroup, $offset = 0, $limit = 10);
 
+    /**
+     * @abstract
+     * @param AJXP_Notification $notif
+     * @return mixed
+     */
+    public function persistAlert(AJXP_Notification $notif);
+
+    /**
+     * @abstract
+     * @param $userId
+     * @param null $repositoryIdFilter
+     * @return mixed
+     */
+    public function loadAlerts($userId, $repositoryIdFilter = null);
+
 }
