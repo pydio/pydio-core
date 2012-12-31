@@ -129,7 +129,23 @@ class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider {
         $ajxpNode->mergeMetadata($allMeta);
 	}
 	
+    protected function updateSecurityScope($metaFile, $repositoryId){
 
+        $repo = ConfService::getRepositoryById($repositoryId);
+        $securityScope = $repo->securityScope();
+        if($securityScope == false) return $metaFile;
+
+        if(AuthService::getLoggedUser() != null){
+            if($securityScope == "USER"){
+                $metaFile .= "_".AuthService::getLoggedUser()->getId();
+            }else if($securityScope == "GROUP"){
+                $u = AuthService::getLoggedUser()->getGroupPath();
+                $u = str_replace("/", "__", $u);
+                $metaFile .= "_".$u;
+            }
+        }
+        return $metaFile;
+    }
     
     /**
      * @param AJXP_Node $ajxpNode
@@ -155,6 +171,7 @@ class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider {
             $fileKey = basename($fileKey);
         }else{
             $metaFile = $this->globalMetaFile."_".$ajxpNode->getRepositoryId();
+            $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId());
         }
         self::$metaCache = array();
 		if(!isSet(self::$fullMetaCache[$metaFile])){
@@ -204,18 +221,30 @@ class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider {
                 mkdir(dirname($this->globalMetaFile), 0755, true);
             }
             $metaFile = $this->globalMetaFile."_".$repositoryId;
+            $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId());
         }
 		if((@is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metaFile)) || call_user_func(array($this->accessDriver, "isWriteable"), dirname($metaFile)) || ($scope=="repository") ){
-            if(!isset(self::$fullMetaCache[$metaFile])){
-                self::$fullMetaCache[$metaFile] = array();
+            if(is_array(self::$metaCache) && count(self::$metaCache)){
+                if(!isset(self::$fullMetaCache[$metaFile])){
+                    self::$fullMetaCache[$metaFile] = array();
+                }
+                if(!isset(self::$fullMetaCache[$metaFile][$fileKey])){
+                    self::$fullMetaCache[$metaFile][$fileKey] = array();
+                }
+                if(!isset(self::$fullMetaCache[$metaFile][$fileKey][$userId])){
+                    self::$fullMetaCache[$metaFile][$fileKey][$userId] = array();
+                }
+                self::$fullMetaCache[$metaFile][$fileKey][$userId] = self::$metaCache;
+            }else{
+                // CLEAN
+                if(isset(self::$fullMetaCache[$metaFile][$fileKey][$userId])){
+                    unset(self::$fullMetaCache[$metaFile][$fileKey][$userId]);
+                }
+                if(isset(self::$fullMetaCache[$metaFile][$fileKey])
+                    && !count(self::$fullMetaCache[$metaFile][$fileKey])){
+                    unset(self::$fullMetaCache[$metaFile][$fileKey]);
+                }
             }
-            if(!isset(self::$fullMetaCache[$metaFile][$fileKey])){
-                self::$fullMetaCache[$metaFile][$fileKey] = array();
-            }
-            if(!isset(self::$fullMetaCache[$metaFile][$fileKey][$userId])){
-                self::$fullMetaCache[$metaFile][$fileKey][$userId] = array();
-            }
-            self::$fullMetaCache[$metaFile][$fileKey][$userId] = self::$metaCache;
 			$fp = fopen($metaFile, "w");
             if($fp !== false){
                 @fwrite($fp, serialize(self::$fullMetaCache[$metaFile]), strlen(serialize(self::$fullMetaCache[$metaFile])));
