@@ -111,7 +111,6 @@ class QuotaComputer extends AJXP_Plugin
     }
 
     public function recomputeQuotaUsage($oldNode = null, $newNode = null, $copy = false){
-        $mtime = microtime(true);
         $path = $this->getWorkingPath();
         $q = $this->computeDirSpace($path);
         $this->storeUsage($path, $q);
