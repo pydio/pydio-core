@@ -19,7 +19,7 @@
     </client_settings>
    	<registry_contributions>
    		<hooks>
-   			<serverCallback hookName="node.change" methodName="recomputeQuotaUsage" defer="false"/>
+   			<serverCallback hookName="node.change" methodName="recomputeQuotaUsage" defer="true"/>
    			<serverCallback hookName="node.before_change" methodName="precheckQuotaUsage"/>
    			<serverCallback hookName="node.before_create" methodName="precheckQuotaUsage"/>
    		</hooks>
