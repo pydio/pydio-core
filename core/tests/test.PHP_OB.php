@@ -39,6 +39,7 @@ class PHP_OB extends AbstractTest
             $this->failedInfo = "Unable to detect the output_buffering value, please make sure that it is disabled (Off) in your php.ini or your virtual host.";
             return FALSE;
         }
+        $this->failedInfo = "PHP Output Buffering is disabled, this is good for better performances";
         $this->testedParams["PHP Output Buffer disabled"] = "Yes";
         return TRUE;
     }
