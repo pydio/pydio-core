@@ -145,15 +145,38 @@ class MqManager extends AJXP_Plugin
                 $this->msgExchanger->unsuscribeFromChannel($httpVars["channel"], $httpVars["client_id"]);
                 break;
             case "client_consume_channel":
-                $data = $this->msgExchanger->consumeInstantChannel($httpVars["channel"], $httpVars["client_id"]);
-                if(count($data)){
-                    AJXP_XMLWriter::header();
-                    ksort($data);
-                    foreach($data as $messageObject){
-                        echo $messageObject->content;
-                    }
-                    AJXP_XMLWriter::close();
-                }
+               $user = AuthService::getLoggedUser();
+               if($user == null){
+                   throw new Exception("You must be logged in");
+               }
+               $GROUP_PATH = $user->getGroupPath();
+               if($GROUP_PATH == null) $GROUP_PATH = false;
+               $uId = $user->getId();
+               //session_write_close();
+
+               $startTime = time();
+               $maxTime = $startTime + (30 - 3);
+
+//               while(true){
+
+                   $data = $this->msgExchanger->consumeInstantChannel($httpVars["channel"], $httpVars["client_id"], $uId, $GROUP_PATH);
+                   if(count($data)){
+                       AJXP_XMLWriter::header();
+                       ksort($data);
+                       foreach($data as $messageObject){
+                           echo $messageObject->content;
+                       }
+                       AJXP_XMLWriter::close();
+                   }
+//                       break;
+//                   }else if(time() >= $maxTime){
+//                       break;
+//                   }
+//
+//                   sleep(3);
+//               }
+
+
                 break;
             default:
                 break;

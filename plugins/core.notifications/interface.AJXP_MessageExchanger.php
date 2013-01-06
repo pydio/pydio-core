@@ -43,9 +43,11 @@ interface AJXP_MessageExchanger{
      * @abstract
      * @param $channelName
      * @param $clientId
+     * @param $userId
+     * @param $userGroup
      * @return mixed
      */
-    public function consumeInstantChannel($channelName, $clientId);
+    public function consumeInstantChannel($channelName, $clientId, $userId, $userGroup);
 
     /**
      * @abstract

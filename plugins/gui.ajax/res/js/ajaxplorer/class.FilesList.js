@@ -879,8 +879,20 @@ Class.create("FilesList", SelectableElements, {
 	getDisplayMode: function(){
 		return this._displayMode;
 	},
-	
+
+    initRowsBuffered : function(){
+        if(this.iRBTimer){
+            window.clearTimeout(this.iRBTimer);
+            this.iRBTimer = null;
+        }
+        this.iRBTimer = window.setTimeout(function(){
+            this.initRows();
+            this.iRBTimer = null;
+        }.bind(this), 200);
+    },
+
 	/**
+     *
 	 * Called after the rows/thumbs are populated
 	 */
 	initRows: function(){
@@ -1001,8 +1013,9 @@ Class.create("FilesList", SelectableElements, {
                 var newItem = renderer(ajxpNode, item);
                 item.insert({before: newItem});
                 item.remove();
-                if(item.ajxpNode && item.REPLACE_OBS) {
-                    item.ajxpNode.stopObserving("node_replaced", item.REPLACE_OBS);
+                if(item.ajxpNode) {
+                    if(item.REMOVE_OBS) item.ajxpNode.stopObserving("node_removed", item.REMOVE_OBS);
+                    if(item.REPLACE_OBS) item.ajxpNode.stopObserving("node_replaced", item.REPLACE_OBS);
                 }
                 newItem.ajxpNode = ajxpNode;
                 this.initRows();
@@ -1034,18 +1047,25 @@ Class.create("FilesList", SelectableElements, {
             try{
                 if(this.loading) return;
                 this.setItemSelected(item, false);
-                if(item.ajxpNode && item.REMOVE_OBS) {
-                    item.ajxpNode.stopObserving("node_removed", item.REMOVE_OBS);
+                if(item.ajxpNode) {
+                    if(item.REMOVE_OBS) item.ajxpNode.stopObserving("node_removed", item.REMOVE_OBS);
+                    if(item.REPLACE_OBS) item.ajxpNode.stopObserving("node_replaced", item.REPLACE_OBS);
+                    if(!item.parentNode){
+                        item =  this.htmlElement.down('[id="'+item.ajxpNode.getPath()+'"]');
+                    }
                 }
                 item.ajxpNode = null;
                 new Effect.Shrink(item, {afterFinish:function(){
                     try{item.remove();}catch(e){}
                     delete item;
-                    this.initRows();
-                }.bind(this), duration:0.4});
-                //item.remove();
-                //delete item;
-                //this.initRows();
+                    this.initRowsBuffered();
+                    //this.initRows();
+                }.bind(this), duration:0.2});
+                /*
+                item.remove();
+                delete item;
+                this.initRowsBuffered();
+                */
             }catch(e){
 
             }
@@ -1070,6 +1090,9 @@ Class.create("FilesList", SelectableElements, {
         if(this._sortableTable){
             var sortColumn = this.crtContext.getMetadata().get("filesList.sortColumn");
          	var descending = this.crtContext.getMetadata().get("filesList.descending");
+            if(sortColumn == undefined) {
+                sortColumn = 0;
+            }
             if(sortColumn != undefined){
                 sortColumn = parseInt(sortColumn);
                 var sortFunction = this._sortableTable.getSortFunction(this._sortableTable.getSortType(sortColumn), sortColumn);
@@ -1078,7 +1101,13 @@ Class.create("FilesList", SelectableElements, {
                 for(var i=0;i<sortCache.length;i++){
                     if(sortCache[i].element == newItem){
                         if(i == 0) $(newItem.parentNode).insert({top:newItem});
-                        else sortCache[i-1].element.insert({after:newItem});
+                        else {
+                            if(sortCache[i-1].element.ajxpNode.getPath() == newItem.ajxpNode.getPath()){
+                                $(newItem.parentNode).remove(newItem);
+                                break;
+                            }
+                            sortCache[i-1].element.insert({after:newItem});
+                        }
                         break;
                     }
                 }
@@ -1286,7 +1315,7 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	ajxpNodeToTableRow: function(ajxpNode, replaceItem){
 		var metaData = ajxpNode.getMetadata();
-		var newRow = new Element("tr");
+		var newRow = new Element("tr", {id:ajxpNode.getPath()});
 		var tBody = this.parsingCache.get('tBody') || $(this._htmlElement).select("tbody")[0];
 		this.parsingCache.set('tBody', tBody);
 		metaData.each(function(pair){
@@ -1453,7 +1482,7 @@ Class.create("FilesList", SelectableElements, {
 	 * @returns HTMLElement
 	 */
 	ajxpNodeToDiv: function(ajxpNode){
-		var newRow = new Element('div', {className:"thumbnail_selectable_cell"});
+		var newRow = new Element('div', {className:"thumbnail_selectable_cell", id:ajxpNode.getPath()});
 		var metadata = ajxpNode.getMetadata();
 				
 		var innerSpan = new Element('span', {style:"cursor:default;"});
