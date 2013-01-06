@@ -115,9 +115,13 @@ class AJXP_SerialMessageExchanger extends AJXP_Plugin implements AJXP_MessageExc
     /**
      * @param $channelName
      * @param $clientId
+     * @param $userId
+     * @param $userGroup
      * @return mixed
      */
-    function consumeInstantChannel($channelName, $clientId){
+    function consumeInstantChannel($channelName, $clientId, $userId, $userGroup){
+        // Force refresh
+        //$this->channels = null;
         $this->loadChannel($channelName);
         if(!isSet($this->channels) || !isSet($this->channels[$channelName])) return;
         // Check dead clients
@@ -135,23 +139,23 @@ class AJXP_SerialMessageExchanger extends AJXP_Plugin implements AJXP_MessageExc
         }
         $this->channels[$channelName]["CLIENTS"][$clientId]["ALIVE"] = time();
 
-        $user = AuthService::getLoggedUser();
-        if($user == null){
-            throw new Exception("You must be logged in");
-        }
-        $GROUP_PATH = $user->getGroupPath();
-        if($GROUP_PATH == null) $GROUP_PATH = false;
+        //$user = AuthService::getLoggedUser();
+       // if($user == null){
+       //     throw new Exception("You must be logged in");
+       // }
+        //$GROUP_PATH = $user->getGroupPath();
+       // if($GROUP_PATH == null) $GROUP_PATH = false;
 
         $result = array();
         foreach($this->channels[$channelName]["MESSAGES"] as $index => $object){
             if(!isSet($object->messageRC[$clientId])){
                 continue;
             }
-            if(isSet($object->userId) && $object->userId != $user->getId()){
+            if(isSet($object->userId) && $object->userId != $userId){
                 // Skipping, restricted to userId
                 continue;
             }
-            if(isSet($object->groupPath) && $object->groupPath != $GROUP_PATH){
+            if(isSet($object->groupPath) && $object->groupPath != $userGroup){
                 // Skipping, restricted to groupPath
                 continue;
             }

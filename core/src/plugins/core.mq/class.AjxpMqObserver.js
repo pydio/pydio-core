@@ -99,26 +99,28 @@ Class.create("AjxpMqObserver", {
                 conn.discrete = true;
                 conn.sendAsync();
 
-                this.pe = new PeriodicalExecuter(function(pe){
-                    var conn = new Connexion();
-                    conn.setParameters($H({
-                        get_action:'client_consume_channel',
-                        channel:'nodes:' + this.currentRepo,
-                        client_id:this.clientId
-                    }));
-                    conn.discrete = true;
-                    conn.onComplete = function(transport){
-                        ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
-                        ajaxplorer.notify("server_message", transport.responseXML);
-                    };
-                    conn.sendAsync();
-                }.bind(this), 10);
+                this.pe = new PeriodicalExecuter(this.consumeChannel.bind(this), 5);
 
             }
 
 
         }.bind(this));
 
+    },
+
+    consumeChannel : function(){
+        var conn = new Connexion();
+        conn.setParameters($H({
+            get_action:'client_consume_channel',
+            channel:'nodes:' + this.currentRepo,
+            client_id:this.clientId
+        }));
+        conn.discrete = true;
+        conn.onComplete = function(transport){
+            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+            ajaxplorer.notify("server_message", transport.responseXML);
+        };
+        conn.sendAsync();
     }
 
 });
