@@ -7,3 +7,23 @@ ul.notification_list li{
 
 
 }
+
+#feed_content {
+    background-color: #DDD;
+}
+
+#feed_content div {
+    clear: left;
+    padding: 5px;
+    border: 1px solid #DDD;
+    border-radius: 5px;
+    margin: 2px;
+    background-color: white;
+}
+
+#feed_content img {
+    float: left;
+    height: 32px;
+    width: 32px;
+    margin: 5px;
+}

@@ -8,7 +8,7 @@
             <i18n namespace="notification.tpl.long" path="plugins/core.notifications/templates/long"/>
             <i18n namespace="notification.tpl.group" path="plugins/core.notifications/templates/group"/>
             <i18n namespace="notification_center" path="plugins/core.notifications/res/i18n"/>
-            <css file="plugins/core.notifications/res/css/notification_center.css"/>
+            <css file="plugins/core.notifications/res/css/notification_center.css" autoload="true"/>
             <img_library alias="notification_center" path="plugins/core.notifications/res/img"/>
         </resources>
     </client_settings>
@@ -29,12 +29,27 @@
                 <processing>
                     <clientCallback dialogOpenForm="user_feed" dialogOkButtonOnly="true" prepareModal="true">
                         <dialogOnOpen><![CDATA[
-                             var conn = new Connexion();
-                             conn.setParameters({get_action:"get_my_feed"});
-                             conn.onComplete = function(transport){
-                                modal.getForm().down("div#feed_content").update(transport.responseText);
-                             };
-                             conn.sendAsync();
+                             var dm = new AjxpDataModel(true);
+                             var rP = new RemoteNodeProvider();
+                             rP.initProvider({get_action:'get_my_feed', format:'xml'});
+                             var root = new AjxpNode("/");
+                             root._iNodeProvider = rP;
+                             var container = modal.getForm().down("div#feed_content");
+                             var pFactory = new PreviewFactory();
+                             pFactory.setThumbSize(32);
+                             root.observeOnce("loaded", function(){
+                                 root.getChildren().each(function(el){
+                                    var div = new Element('div');
+                                    var img = pFactory.generateBasePreview(el);
+                                    div.IMAGE_ELEMENT = img;
+                                    div.insert(img);
+                                    div.insert(el.getMetadata().get("event_description"));
+                                    container.insert(div);
+                                    pFactory.enrichBasePreview(el, div);
+                                 });
+                                 pFactory.loadNextImage();
+                             });
+                             root.load();
                         ]]></dialogOnOpen>
                         <dialogOnComplete><![CDATA[
                              hideLightBox();
@@ -42,7 +57,8 @@
                     </clientCallback>
                     <clientForm id="user_feed"><![CDATA[
                         <div id="user_feed" box_padding="0" box_width="320">
-                            <div id="feed_content" style="width: 320px;height: 320px;overflow: auto;"></div>
+                            <link type="text/css" rel="stylesheet" href="plugins/core.notifications/res/css/notification_center.css"/>
+                            <div id="feed_content" style="width: 320px;height: 400px;overflow: auto;"></div>
                         </div>
                     ]]></clientForm>
                     <serverCallback methodName="loadUserFeed"/>

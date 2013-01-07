@@ -114,7 +114,7 @@ class fsAccessWrapper implements AjxpWrapper {
 		   			}
 		   		}
 		   	}else{
-				$crtZip = new PclZip(AJXP_Utils::securePath(realpath($repoObject->getOption("PATH")).$repoObject->resolveVirtualRoots(zipPath)));
+				$crtZip = new PclZip(AJXP_Utils::securePath(realpath($repoObject->getOption("PATH")).$repoObject->resolveVirtualRoots($zipPath)));
 				$liste = $crtZip->listContent();				
 				if($storeOpenContext) self::$crtZip = $crtZip;
 				$folders = array(); $files = array();$builtFolders = array();

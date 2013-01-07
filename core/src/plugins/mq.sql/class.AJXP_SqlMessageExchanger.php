@@ -36,6 +36,8 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
      * @var Array
      */
     private $channels;
+    private $clientsGCTime = 10;
+    private $sqlDriver;
 
     function loadChannel($channelName, $create = false){
         if(isSet($this->channels) && is_array($this->channels[$channelName])) {
