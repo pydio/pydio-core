@@ -43,7 +43,6 @@ websocket.onmessage = function(event){console.log(event.data);};
 class MqManager extends AJXP_Plugin
 {
 
-    private $clientsGCTime = 10;
     private $wsClient;
 
     /**
@@ -123,9 +122,9 @@ class MqManager extends AJXP_Plugin
             if(!isset($this->wsClient)){
                 $this->wsClient = new WebSocket("ws://".$configs["WS_SERVER_HOST"].":".$configs["WS_SERVER_PORT"].$configs["WS_SERVER_PATH"]);
                 $this->wsClient->addHeader("Admin-Key", $configs["WS_SERVER_ADMIN"]);
-                $this->wsClient->open();
+                @$this->wsClient->open();
             }
-            $this->wsClient->sendMessage($msg);
+            @$this->wsClient->sendMessage($msg);
         }
 
     }
