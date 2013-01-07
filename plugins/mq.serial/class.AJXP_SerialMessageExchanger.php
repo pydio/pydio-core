@@ -28,6 +28,7 @@ class AJXP_SerialMessageExchanger extends AJXP_Plugin implements AJXP_MessageExc
      * @var Array
      */
     private $channels;
+    private $clientsGCTime = 10;
 
     function loadChannel($channelName, $create = false){
         if(isSet($this->channels) && is_array($this->channels[$channelName])) {
@@ -64,6 +65,7 @@ class AJXP_SerialMessageExchanger extends AJXP_Plugin implements AJXP_MessageExc
     /**
      * @param $channelName
      * @param $clientId
+     * @throws Exception
      * @return mixed
      */
     function suscribeToChannel($channelName, $clientId){

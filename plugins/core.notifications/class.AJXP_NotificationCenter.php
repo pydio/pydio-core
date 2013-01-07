@@ -86,13 +86,22 @@ class AJXP_NotificationCenter extends AJXP_Plugin
             }
         }
         $res = $this->eventStore->loadEvents($authRepos, $userId, $userGroup, 0, 10);
-
-        // APPEND USER ALERT IN THE SAME QUERY FOR NOW
-        $this->loadUserAlerts("", $httpVars, $fileVars);
         if(!count($res)) return;
         $mess = ConfService::getMessages();
-        echo("<h2>".$mess["notification_center.4"]."</h2>");
-        echo("<ul class='notification_list'>");
+        $format = "html";
+        if(isSet($httpVars["format"])){
+            $format = $httpVars["format"];
+        }
+        if($format == "html"){
+            echo("<h2>".$mess["notification_center.4"]."</h2>");
+            echo("<ul class='notification_list'>");
+        }else{
+            AJXP_XMLWriter::header();
+        }
+
+        // APPEND USER ALERT IN THE SAME QUERY FOR NOW
+        //$this->loadUserAlerts("", $httpVars, $fileVars);
+
         foreach($res as $n => $object){
             $args = $object->arguments;
             $oldNode = (isSet($args[0]) ? $args[0] : null);
@@ -102,12 +111,24 @@ class AJXP_NotificationCenter extends AJXP_Plugin
             if($notif !== false && $notif->getNode() !== false){
                 $notif->setAuthor($object->author);
                 $notif->setDate(intval($object->date));
-                echo("<li>");
-                echo($notif->getDescriptionLong(true));
-                echo("</li>");
+                if($format == "html"){
+                    $p = $notif->getNode()->getPath();
+                    echo("<li data-ajxpNode='$p'>");
+                    echo($notif->getDescriptionLong(true));
+                    echo("</li>");
+                }else{
+                    $node = $notif->getNode();
+                    $node->loadNodeInfo();
+                    $node->event_description = $notif->getDescriptionLong();
+                    AJXP_XMLWriter::renderAjxpNode($node);
+                }
             }
         }
-        echo("</ul>");
+        if($format == "html"){
+            echo("</ul>");
+        }else{
+                    AJXP_XMLWriter::close();
+        }
 
     }
 
