@@ -40,7 +40,7 @@
 					actionBar="false" contextMenu="false" infoPanel="false" actionBarGroup="default">
 				</context>
 			</gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>			
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
 					ajaxplorer.fireContextUp();
@@ -54,7 +54,7 @@
 					actionBar="false" contextMenu="true" infoPanel="false">
 				</context>
 			</gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
 					ajaxplorer.fireContextRefresh();
@@ -67,8 +67,8 @@
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="put" inZip="false">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="false"></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+				<selectionContext dir="true" file="true" recycle="false" unique="false"/></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
 					var userSelection = ajaxplorer.getUserSelection();
@@ -94,10 +94,11 @@
 		<action name="bookmark">
 			<gui text="152" title="153" src="bookmark.png" hasAccessKey="true"
 				accessKey="bookmarks_access_key">
-				<context selection="false" dir="true" recycle="hidden"
+				<context selection="true" dir="false" recycle="hidden"
 					actionBar="false" contextMenu="true" infoPanel="false"
 					actionBarGroup="default">
 				</context>
+                <selectionContext dir="true" file="false" recycle="false" unique="true"/>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>

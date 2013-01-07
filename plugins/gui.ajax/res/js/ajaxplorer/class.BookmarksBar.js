@@ -49,7 +49,7 @@
 			};		
 		}.bind(this));
 		document.observe("ajaxplorer:add_bookmark", function(){
-			var node = ajaxplorer.getContextNode();
+			var node = ajaxplorer.getUserSelection().getUniqueNode();
 			this.addBookmark(node.getPath(), node.getLabel());
             node.getMetadata().set('ajxp_bookmarked', 'true');
             node.getMetadata().set('overlay_icon', 'bookmark.png');
