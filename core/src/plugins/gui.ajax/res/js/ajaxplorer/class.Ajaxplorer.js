@@ -158,7 +158,7 @@ Class.create("Ajaxplorer", {
 		  selector: '', // context menu will be shown when element with class name of "contextmenu" is clicked
 		  className: 'menu desktop', // this is a class which will be attached to menu container (used for css styling)
 		  menuItems: [],
-		  fade:true,
+		  fade:false,
 		  zIndex:2000
 		});
 		var protoMenu = this.contextMenu;		

@@ -89,10 +89,10 @@ Class.create("ActionsManager", {
 		{
 			actionsSelectorAtt = 'genericContext';
 		}
-		else if(srcElement.id.substring(0,5)=='webfx')
-		{
-			actionsSelectorAtt = 'directoryContext';
-		}
+		//else if(srcElement.id.substring(0,5)=='webfx')
+		//{
+		//	actionsSelectorAtt = 'directoryContext';
+		//}
 		var contextActions = new Array();
 		var defaultGroup;
         var contextActionsGroup = {};

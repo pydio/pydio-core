@@ -30,6 +30,7 @@ Class.create("FilesList", SelectableElements, {
     __currentInstanceIndex:1,
     _dataModel:null,
     _doubleClickListener:null,
+    _previewFactory : null,
 	/**
 	 * Constructor
 	 * @param $super klass Reference to the constructor
@@ -41,6 +42,9 @@ Class.create("FilesList", SelectableElements, {
 		$super(null, true);
 		$(oElement).ajxpPaneObject = this;
 		this.htmlElement = $(oElement);
+        this._previewFactory = new PreviewFactory();
+        this._previewFactory.sequencialLoading = true;
+
 		if(typeof initDefaultDispOrOptions == "string"){
 			this.options = {};
 			this._displayMode = initDefaultDispOrOptions;
@@ -119,7 +123,10 @@ Class.create("FilesList", SelectableElements, {
         var selectionChangedObserver = function(event){
 			if(event.memo._selectionSource == null || event.memo._selectionSource == this) return;
             var dm = (this._dataModel?this._dataModel:ajaxplorer.getContextHolder());
-			this.setSelectedNodes(dm.getSelectedNodes());
+            var origFC = this._fireChange;
+			this._fireChange = false;
+            this.setSelectedNodes(dm.getSelectedNodes());
+            this._fireChange = origFC;
 		}.bind(this);
 
         if(this._dataModel){
@@ -599,7 +606,7 @@ Class.create("FilesList", SelectableElements, {
 			});
 		}
 		else if(this._displayMode == "thumb")
-		{			
+		{
 			if(this.headerMenu){
 				this.headerMenu.destroy();
 				delete this.headerMenu;
@@ -902,7 +909,10 @@ Class.create("FilesList", SelectableElements, {
 		{
 			this.resizeThumbnails();		
 			if(this.protoMenu) this.protoMenu.addElements('#selectable_div-'+this.__currentInstanceIndex);
-			window.setTimeout(this.loadNextImage.bind(this),10);		
+			window.setTimeout(function(){
+                this._previewFactory.setThumbSize(this._thumbSize);
+                this._previewFactory.loadNextImage();
+            }.bind(this),10);
 		}
 		else
 		{
@@ -920,37 +930,8 @@ Class.create("FilesList", SelectableElements, {
         this.notify("resize");
         this.notify("rows:didInitialize");
 	},
-	/**
-	 * Queue processor for thumbnail async loading
-	 */
-	loadNextImage: function(){
-		if(this.imagesHash && this.imagesHash.size())
-		{
-			if(this.loading) return;
-			var oImageToLoad = this.imagesHash.unset(this.imagesHash.keys()[0]);		
-			window.loader = new Image();
-			window.loader.editorClass = oImageToLoad.editorClass;
-            window.loader.onerror = this.loadNextImage.bind(this);
-			window.loader.src = window.loader.editorClass.prototype.getThumbnailSource(oImageToLoad.ajxpNode);
-			var loader = function(){
-				var img = oImageToLoad.rowObject.IMAGE_ELEMENT || $(oImageToLoad.index);
-				if(img == null || window.loader == null) return;
-				var newImg = window.loader.editorClass.prototype.getPreview(oImageToLoad.ajxpNode);
-				newImg.setAttribute("data-is_loaded", "true");
-				img.parentNode.replaceChild(newImg, img);
-				oImageToLoad.rowObject.IMAGE_ELEMENT = newImg;
-				this.resizeThumbnails(oImageToLoad.rowObject);
-				this.loadNextImage();				
-			}.bind(this);
-			if(window.loader.readyState && window.loader.readyState == "complete"){
-				loader();
-			}else{
-				window.loader.onload = loader;
-			}
-		}else{
-			if(window.loader) window.loader = null;
-		}	
-	},
+
+
 	/**
 	 * Triggers a reload of the rows/thumbs
 	 * @param additionnalParameters Object
@@ -970,7 +951,7 @@ Class.create("FilesList", SelectableElements, {
      */
 
     empty : function(skipFireChange){
-        this.imagesHash = new Hash();
+        this._previewFactory.clear();
         if(this.protoMenu){
             this.protoMenu.removeElements('.ajxp_draggable');
             this.protoMenu.removeElements('.selectable_div');
@@ -1486,9 +1467,10 @@ Class.create("FilesList", SelectableElements, {
 		var metadata = ajxpNode.getMetadata();
 				
 		var innerSpan = new Element('span', {style:"cursor:default;"});
-		var editors = ajaxplorer.findEditorsForMime((ajxpNode.isLeaf()?ajxpNode.getAjxpMime():"mime_folder"), true);
-		var textNode = ajxpNode.getLabel();
-		var img = AbstractEditor.prototype.getPreview(ajxpNode);
+
+        var img = this._previewFactory.generateBasePreview(ajxpNode);
+
+        var textNode = ajxpNode.getLabel();
 		var label = new Element('div', {
 			className:"thumbLabel",
 			title:textNode
@@ -1547,26 +1529,7 @@ Class.create("FilesList", SelectableElements, {
 			el(newRow, ajxpNode, 'thumb');
 		});
 
-		if(editors && editors.length)
-		{
-			this._crtImageIndex ++;
-			var imgIndex = this._crtImageIndex;
-			img.writeAttribute("data-is_loaded", "false");
-			img.writeAttribute("id", "ajxp_image_"+imgIndex);
-			var crtIndex = this._crtImageIndex;
-			
-			ajaxplorer.loadEditorResources(editors[0].resourcesManager);
-			var editorClass = Class.getByName(editors[0].editorClass);
-			if(editorClass){
-				var oImageToLoad = {
-					index:"ajxp_image_"+crtIndex,
-					ajxpNode:ajxpNode,
-					editorClass:editorClass, 
-					rowObject:newRow
-				};
-				this.imagesHash.set(oImageToLoad.index, oImageToLoad);
-			}
-		}			
+        this._previewFactory.enrichBasePreview(ajxpNode, newRow);
 		
 		// Defer Drag'n'drop assignation for performances
 		if(!ajxpNode.isRecycle()){
@@ -1672,30 +1635,12 @@ Class.create("FilesList", SelectableElements, {
 			var node = element.ajxpNode;
 			var image_element = element.IMAGE_ELEMENT || element.select('img')[0];		
 			var label_element = element.LABEL_ELEMENT || element.select('.thumbLabel')[0];
-			var tSize = this._thumbSize;
-			var tW, tH, mT, mB;
-			if(image_element.resizePreviewElement && image_element.getAttribute("data-is_loaded") == "true")
-			{
-				image_element.resizePreviewElement({width:tSize, height:tSize, margin:defaultMargin});
-			}
-			else
-			{
-				if(tSize >= 64)
-				{
-					tW = tH = 64;
-					mT = parseInt((tSize - 64)/2) + defaultMargin;
-					mB = tSize+(defaultMargin*2)-tH-mT-1;
-				}
-				else
-				{
-					tW = tH = tSize;
-					mT = mB = defaultMargin;
-				}
-				image_element.setStyle({width:tW+'px', height:tH+'px', marginTop:mT+'px', marginBottom:mB+'px'});
-			}
-			element.setStyle({width:tSize+25+'px', height:tSize+30+'px'});
-			
-			//var el_width = element.getWidth();
+            var tSize = this._thumbSize;
+            element.setStyle({width:tSize+25+'px', height:tSize+30+'px'});
+            this._previewFactory.setThumbSize(tSize);
+            this._previewFactory.resizeThumbnail(image_element);
+
+            // RESIZE LABEL
 			var el_width = tSize + 25;
 			var charRatio = 6;
 			var nbChar = parseInt(el_width/charRatio);

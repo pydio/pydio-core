@@ -61,7 +61,10 @@ Class.create("FoldersTree", AjxpPane, {
 			if(!ajaxplorer) return;
 			ajaxplorer.focusOn(thisObject);
 			if(this.ajxpNode){
-				ajaxplorer.actionBar.fireDefaultAction("dir", this.ajxpNode);
+                if(ajaxplorer.getUserSelection().getContextNode() != this.ajxpNode){
+                    ajaxplorer.actionBar.fireDefaultAction("dir", this.ajxpNode);
+                }
+                ajaxplorer.getUserSelection().setSelectedNodes([this.ajxpNode], thisObject);
 			}
 		};
 		
@@ -159,6 +162,9 @@ Class.create("FoldersTree", AjxpPane, {
 		if(webFXTreeHandler.selected)
 		{
 			webFXTreeHandler.selected.focus();
+            if(webFXTreeHandler.selected.ajxpNode){
+                ajaxplorer.getUserSelection().setSelectedNodes([webFXTreeHandler.selected.ajxpNode], this);
+            }
 		}
 		webFXTreeHandler.setFocus(true);
 		this.hasFocus = true;
@@ -287,5 +293,106 @@ Class.create("FoldersTree", AjxpPane, {
 			realNode.icon = newIcon;
 			realNode.openIcon = newIcon;
 		}
-	}
+	},
+
+
+    /**
+   	 * Inline Editing of label
+   	 * @param callback Function Callback after the label is edited.
+   	 */
+   	switchCurrentLabelToEdition : function(callback){
+   		var sel = webFXTreeHandler.selected;
+        if(!sel) return;
+        var nodeId = webFXTreeHandler.selected.id;
+   		var item = this.treeContainer.down('#' + nodeId); // We assume this action was triggered with a single-selection active.
+   		var offset = {top:0,left:0};
+   		var scrollTop = 0;
+
+        var span = item.down('a');
+        var posSpan = item;
+        offset.top=1;
+        offset.left=43;
+        scrollTop = this.treeContainer.scrollTop;
+
+   		var pos = posSpan.cumulativeOffset();
+   		var text = span.innerHTML;
+   		var edit = new Element('input', {value:item.ajxpNode.getLabel('text'), id:'editbox'}).setStyle({
+   			zIndex:5000,
+   			position:'absolute',
+   			marginLeft:'0px',
+   			marginTop:'0px',
+   			height:'24px',
+               padding: 0
+   		});
+   		$(document.getElementsByTagName('body')[0]).insert({bottom:edit});
+   		modal.showContent('editbox', (posSpan.getWidth()-offset.left)+'', '20', true);
+   		edit.setStyle({left:(pos.left+offset.left)+'px', top:(pos.top+offset.top-scrollTop)+'px'});
+   		window.setTimeout(function(){
+   			edit.focus();
+   			var end = edit.getValue().lastIndexOf("\.");
+   			if(end == -1){
+   				edit.select();
+   			}else{
+   				var start = 0;
+   				if(edit.setSelectionRange)
+   				{
+   					edit.setSelectionRange(start,end);
+   				}
+   				else if (edit.createTextRange) {
+   					var range = edit.createTextRange();
+   					range.collapse(true);
+   					range.moveStart('character', start);
+   					range.moveEnd('character', end);
+   					range.select();
+   				}
+   			}
+
+   		}, 300);
+   		var onOkAction = function(){
+   			var newValue = edit.getValue();
+   			hideLightBox();
+   			modal.close();
+   			callback(item.ajxpNode, newValue);
+   		};
+   		edit.observe("keydown", function(event){
+   			if(event.keyCode == Event.KEY_RETURN){
+   				Event.stop(event);
+   				onOkAction();
+   			}
+   		}.bind(this));
+   		// Add ok / cancel button, for mobile devices among others
+   		var buttons = modal.addSubmitCancel(edit, null, false, "after");
+   		var ok = buttons.select('input[name="ok"]')[0];
+   		ok.observe("click", onOkAction);
+   		var origWidth = edit.getWidth()-44;
+   		var newWidth = origWidth;
+   		if(origWidth < 70){
+   			// Offset edit box to be sure it's always big enough.
+   			edit.setStyle({left:pos.left+offset.left - 70 + origWidth});
+   			newWidth = 70;
+   		}
+   		edit.setStyle({width:newWidth+'px'});
+
+   		buttons.select('input').invoke('setStyle', {
+   			margin:0,
+   			width:'22px',
+   			border:0,
+   			backgroundColor:'transparent'
+   		});
+   		buttons.setStyle({
+   			position:'absolute',
+   			width:'46px',
+   			zIndex:2500,
+   			left:(pos.left+offset.left+origWidth)+'px',
+   			top:((pos.top+offset.top-scrollTop)-1)+'px'
+   		});
+   		var closeFunc = function(){
+   			span.setStyle({color:''});
+   			edit.remove();
+   			buttons.remove();
+   		};
+   		span.setStyle({color:'#ddd'});
+   		modal.setCloseAction(closeFunc);
+   	}
+
 });
