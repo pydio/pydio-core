@@ -219,7 +219,7 @@ class AJXP_Controller{
         $logFile = $logDir."/".$token.".out";
 		$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
         if(empty($user)){
-            if(AuthService::usersEnabled()) $user = AuthService::getLoggedUser()->getId();
+            if(AuthService::usersEnabled() && AuthService::getLoggedUser() !== null) $user = AuthService::getLoggedUser()->getId();
             else $user = "shared";
         }
         if(AuthService::usersEnabled()){

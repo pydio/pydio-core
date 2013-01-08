@@ -427,7 +427,7 @@ class ShareCenter extends AJXP_Plugin{
         $this->initPublicFolder($downloadFolder);
         $data["PLUGIN_ID"] = $accessDriver->getId();
         $data["BASE_DIR"] = $accessDriver->getBaseDir();
-        $data["REPOSITORY"] = $repository;
+        //$data["REPOSITORY"] = $repository;
         if(AuthService::usersEnabled()){
         	$data["OWNER_ID"] = AuthService::getLoggedUser()->getId();
         }
@@ -439,7 +439,9 @@ class ShareCenter extends AJXP_Plugin{
         	}
         }
         // Force expanded path in publiclet
-        $data["REPOSITORY"]->addOption("PATH", $repository->getOption("PATH"));
+        $copy = clone $repository;
+        $copy->addOption("PATH", $repository->getOption("PATH"));
+        $data["REPOSITORY"] = $copy;
         if ($data["ACTION"] == "") $data["ACTION"] = "download";
         // Create a random key
         $data["FINAL_KEY"] = md5(mt_rand().time());
