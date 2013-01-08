@@ -191,7 +191,6 @@ if(AuthService::usersEnabled())
         if($optStatusFile){
             file_put_contents($optStatusFile, "ERROR:No user logged");
         }
-		exit(1);
 	}
 }else{
 	AJXP_Logger::debug(ConfService::getCurrentRootDirIndex());	

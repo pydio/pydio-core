@@ -140,7 +140,10 @@ class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider {
 
         if(AuthService::getLoggedUser() != null){
             if($securityScope == "USER"){
-                $metaFile .= "_".AuthService::getLoggedUser()->getId();
+                $u = AuthService::getLoggedUser();
+                if($u->getResolveAsParent()) $id = $u->getParent();
+                else $id = $u->getId();
+                $metaFile .= "_".$id;
             }else if($securityScope == "GROUP"){
                 $u = AuthService::getLoggedUser()->getGroupPath();
                 $u = str_replace("/", "__", $u);
