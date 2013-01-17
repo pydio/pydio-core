@@ -53,7 +53,7 @@ class Ajxp {
 		$AJXP_GLUE_GLOBALS["secret"] = $this->secret;
 		$AJXP_GLUE_GLOBALS["autoCreate"] = $this->autoCreate;
 		$AJXP_GLUE_GLOBALS["plugInAction"] = "login";
-		$AJXP_GLUE_GLOBALS["login"] = array("name"=>$username, "password"=>$userdata->user_pass);  		
+		$AJXP_GLUE_GLOBALS["login"] = array("name"=>$username, "password"=>$userdata->user_pass, "roles" => $userdata->roles);
 	   	include($this->glueCode);
 	}	
 	function logout(){
@@ -82,6 +82,7 @@ class Ajxp {
 		$AJXP_GLUE_GLOBALS["user"]['name']	= $userData->user_login;
 		$AJXP_GLUE_GLOBALS["user"]['password']	= $userData->user_pass;
 		$AJXP_GLUE_GLOBALS["user"]['right'] = (is_super_admin($userId)?'admin':'');	
+		$AJXP_GLUE_GLOBALS["user"]['roles'] = $userData->roles;
 		$AJXP_GLUE_GLOBALS["plugInAction"] = ($isNew?"addUser":"updateUser");
 		
 		include($this->glueCode);
