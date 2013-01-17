@@ -67,6 +67,29 @@ if ($authPlug->getOption("SECRET") == "")
     $plugInAction = "WRONG_SECRET";
 }
 
+if(!function_exists('ajxp_gluecode_updateRole')){
+    /**
+     * @param array $loginData
+     * @param AbstractAjxpUser $userObject
+     */
+    function ajxp_gluecode_updateRole($loginData, &$userObject){
+        $authPlug = ConfService::getAuthDriverImpl();
+        $rolesMap = $authPlug->getOption("ROLES_MAP");
+        if(!isSet($rolesMap) || !is_array($rolesMap)) return;
+
+        foreach($rolesMap as $cmsRole => $ajxpRole){
+            $userObject->removeRole($ajxpRole);
+        }
+        if(isset($loginData["roles"]) && is_array($loginData["roles"])){
+            foreach($loginData["roles"] as $role){
+                if(isSet($rolesMap[$role])) {
+                    $userObject->addRole($rolesMap[$role]);
+                }
+            }
+        }
+    }
+}
+
 switch($plugInAction)
 {
 	case 'login':
@@ -74,7 +97,9 @@ switch($plugInAction)
 	    if (is_array($login))
 	    {
 	        $newSession = new SessionSwitcher("AjaXplorer");
+            $creation = false;
 	        if($autoCreate && !AuthService::userExists($login["name"])){
+                $creation = true;
 		        $isAdmin = (isSet($login["right"]) && $login["right"] == "admin");
 	        	AuthService::createUser($login["name"], $login["password"], $isAdmin);
 	        }
@@ -91,6 +116,7 @@ switch($plugInAction)
 			   	}else{
 					AuthService::updateDefaultRights($userObject);
 			   	}
+                if($creation) ajxp_gluecode_updateRole($login, $userObject);
 				$userObject->save("superuser");
 		   	}	        
 	    }
@@ -107,6 +133,12 @@ switch($plugInAction)
 	    {
 	        $isAdmin = (isSet($user["right"]) && $user["right"] == "admin");
 	        AuthService::createUser($user["name"], $user["password"], $isAdmin);
+            if(isSet($user["roles"])){
+                $confDriver = ConfService::getConfStorageImpl();
+                $userObject = $confDriver->createUserObject($user["name"]);
+                ajxp_gluecode_updateRole($user, $userObject);
+                $userObject->save("superuser");
+            }
 	        $result = TRUE;
 	    }
 	    break;
@@ -126,9 +158,10 @@ switch($plugInAction)
 	        {
 	        	$isAdmin =  (isSet($user["right"]) && $user["right"] == "admin");
 				$confDriver = ConfService::getConfStorageImpl();
-				$user = $confDriver->createUserObject($user["name"]);
-				$user->setAdmin($isAdmin);
-				$user->save("superuser");
+				$userObject = $confDriver->createUserObject($user["name"]);
+				$userObject->setAdmin($isAdmin);
+                ajxp_gluecode_updateRole($user, $userObject);
+				$userObject->save("superuser");
 	            $result = TRUE;
 	        }
 	        else $result = FALSE;

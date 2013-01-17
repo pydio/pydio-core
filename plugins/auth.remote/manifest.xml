@@ -11,6 +11,8 @@
 		<param name="LOGOUT_URL" type="string" label="CONF_MESSAGE[Logout URL]" description="CONF_MESSAGE[Redirect to the given URL on loggin out]" mandatory="false" />
 		<param name="SECRET" type="string" label="CONF_MESSAGE[Secret key]" description="CONF_MESSAGE[This key must only be known by remote end]" mandatory="false" />
 	    <param name="USERS_FILEPATH" type="string" label="CONF_MESSAGE[Users]" description="CONF_MESSAGE[The users list]" mandatory="true"/>
+        <param name="LOCAL_PREFIX" label="CONF_MESSAGE[Local Prefix]" description="CONF_MESSAGE[The users created with this prefix in their identifier will be stored and handled in the local filesystem. This can be handy for managing the temporary users.]" type="string"/>
+        <param name="ROLES_MAP" label="CONF_MESSAGE[Roles Map]" description="CONF_MESSAGE[Define a map of key/values for automatically mapping roles from the CMS to AjaXplorer.]" type="array"/>
 	    <!-- These will be necessary if you want to use the AjaXplorer iOS client -->
 	    <param name="MASTER_AUTH_FUNCTION" type="string" label="CONF_MESSAGE[Master Auth Function]" description="CONF_MESSAGE[User-defined function for performing real password check, necessary for REST API (including iOS client)]" mandatory="false"/>
 	    <param name="MASTER_HOST" type="string" label="CONF_MESSAGE[Master Host]" description="CONF_MESSAGE[Host used to negociated the master authentication, if not set will be detected]" mandatory="false"/>

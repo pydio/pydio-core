@@ -55,18 +55,17 @@ class remoteAuthDriver extends AbstractAuthDriver {
 	
 	function init($options){
         $this->slaveMode = $options["SLAVE_MODE"] == "true";
-        if($this->slaveMode && ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")){
-        	// Make sure "login" is disabled, or it will re-appear if GUEST browsing is enabled!
-        	// OLD WAY : unset($this->actions["login"]);
-        	// NEW WAY : Modify manifest dynamically (more coplicated...)
-        	$contribs = $this->xPath->query("registry_contributions/external_file");
-        	foreach ($contribs as $contribNode){        		
-        		if($contribNode->getAttribute('filename') == 'plugins/core.auth/standard_auth_actions.xml'){
-        			$contribNode->parentNode->removeChild($contribNode);
-        		}
-        	}
+        $contribs = $this->xPath->query("registry_contributions/external_file");
+        foreach ($contribs as $contribNode){
+            if($contribNode->getAttribute('filename') == 'plugins/core.auth/standard_auth_actions.xml'){
+                if($this->slaveMode && ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")){
+                    $contribNode->parentNode->removeChild($contribNode);
+                }else{
+                    $contribNode->removeAttribute('exclude');
+                }
+            }
         }
-		parent::init($options);		
+		parent::init($options);
 		$this->usersSerFile = $options["USERS_FILEPATH"];
         $this->secret = $options["SECRET"];
         $this->urls = array($options["LOGIN_URL"], $options["LOGOUT_URL"]);
@@ -91,7 +90,7 @@ class remoteAuthDriver extends AbstractAuthDriver {
 
         if(AuthService::ignoreUserCase()) $login = strtolower($login);
 		global $AJXP_GLUE_GLOBALS;
-		if(isSet($AJXP_GLUE_GLOBALS)){
+		if(isSet($AJXP_GLUE_GLOBALS) || (isSet($this->options["LOCAL_PREFIX"]) && strpos($login, $this->options["LOCAL_PREFIX"]) === 0) ){
 			$userStoredPass = $this->getUserPass($login);
 			if(!$userStoredPass) return false;
 			if($seed == "-1"){ // Seed = -1 means that password is not encoded.
@@ -115,11 +114,23 @@ class remoteAuthDriver extends AbstractAuthDriver {
 			$funcName = $this->options["MASTER_AUTH_FUNCTION"];
 			require_once 'cms_auth_functions.php';
 			if(function_exists($funcName)){
-				$sessid = call_user_func($funcName, $host, $uri, $login, $pass, $formId);
-				if($sessid != ""){
-					session_id($sessid);
-					session_start();
-					return true;					
+				$sessCookies = call_user_func($funcName, $host, $uri, $login, $pass, $formId);
+				if($sessCookies != ""){
+                    if(is_array($sessCookies)){
+                        $sessid = $sessCookies["AjaXplorer"];
+                        session_id($sessid);
+                        session_start();
+                        if(!$this->slaveMode){
+                            foreach($sessCookies as $k => $v){
+                                if($k == "AjaXplorer") continue;
+                                setcookie($k, urldecode($v), 0, $uri);
+                            }
+                        }
+                    }else if(is_string($sessCookies)){
+                        session_id($sessCookies);
+                        session_start();
+                    }
+					return true;
 				}
 			}
 			return  false;
@@ -186,7 +197,7 @@ class remoteAuthDriver extends AbstractAuthDriver {
     }
     
 	function getLogoutRedirect(){
-        if ($this->slaveMode) {
+        if ($this->slaveMode || isSet($this->options["LOGOUT_URL"])) {
             return $this->urls[1];
         } 
         return false;

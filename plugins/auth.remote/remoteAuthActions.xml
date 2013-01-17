@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <registry_contributions  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<actions>
-        <action name="logout" expireDefault="true">
+        <action name="go_back" expireDefault="true">
 			<gui text="304" title="305" src="go_back.png" accessKey="" hasAccessKey="false">
 				<context selection="false" dir="" recycle="false"
 					actionBar="true" contextMenu="false" infoPanel="false"
