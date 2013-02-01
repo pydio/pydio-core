@@ -83,14 +83,14 @@ $PLUGINS = array(
                 "driver"        => "mysql",
                 "host"          => "localhost",
                 "database"      => "ajaxplorer",
-                "user"          => "XXXX",
-                "password"      => "XXXX",
+                "user"          => "XXXXXX",
+                "password"      => "XXXXXX",
             )
         )
     ),
+    */
     "MQ_DRIVER" => array(
         "NAME" => "serial",
         "OPTIONS" => array()
     )
-    */
 );
