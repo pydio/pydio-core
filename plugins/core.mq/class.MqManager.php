@@ -52,10 +52,12 @@ class MqManager extends AJXP_Plugin
 
     function init($options){
         parent::init($options);
-        $msgExchanger = ConfService::getInstance()->getUniquePluginImplInst("MQ_DRIVER", "mq");
-        if($msgExchanger !== false){
-            $this->msgExchanger = $msgExchanger;
-        }
+        try{
+            $msgExchanger = ConfService::getInstance()->getUniquePluginImplInst("MQ_DRIVER", "mq");
+            if($msgExchanger !== false){
+                $this->msgExchanger = $msgExchanger;
+            }
+        }catch (Exception $e){}
     }
 
     /**
@@ -136,6 +138,7 @@ class MqManager extends AJXP_Plugin
      *
      */
     public function clientChannelMethod($action, $httpVars, $fileVars){
+        if(!$this->msgExchanger) return;
         switch($action){
             case "client_register_channel":
                 $this->msgExchanger->suscribeToChannel($httpVars["channel"], $httpVars["client_id"]);
