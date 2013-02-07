@@ -18,7 +18,7 @@ table.sort-table tr:nth-child(even)
     background: linear-gradient(top, rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%); /* W3C */
 }
 
-.css_gradient, .infoPanelGroup, .panelHeader, .dialogBox, .action_bar.floatingBar, .largeButton, .fakeUploadButton{
+.css_gradient, .dialogBox, .action_bar.floatingBar, .largeButton, .fakeUploadButton{
     background: rgb(247,247,247); /* Old browsers */
     background: -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(227,227,227,1) 50%, rgba(216,216,216,1) 51%, rgba(242,242,242,1) 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(247,247,247,1)), color-stop(50%,rgba(227,227,227,1)), color-stop(51%,rgba(216,216,216,1)), color-stop(100%,rgba(242,242,242,1))); /* Chrome,Safari4+ */
@@ -827,12 +827,12 @@ input.SF_input.SF_number{
 }
 
 #global_toolbar{
-    background-color: rgb(80, 80, 100);
+    background-color: #2B4E72;
     height: 35px;
 }
 
 #workspace_toolbar{
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid rgb(172, 178, 184);
     padding-top: 15px;
 }
 
@@ -862,29 +862,23 @@ input.SF_input.SF_number{
 
 #tree_container{
     background-color: #ebedf0;
-    border-radius: 2px;
-    -webkit-box-shadow: 0px 0px 2px #aaa;
-    -moz-box-shadow: 0px 0px 2px #aaa;
-    box-shadow: 0px 0px 2px #aaa;
 }
 
 .panelHeader{
     border: none;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-size: 12px;
-	padding: 4px 2px 4px 7px;
-	color: #676965;
+    font-size: 11px;
+	
+    padding: 4px 2px 4px 7px;
+	
+    color: rgb(255, 255, 255);
 	vertical-align: middle;
-	background-color: #fff;
-	height: 18px;
+	
+	
+    background-color: rgb(172, 178, 184);
     margin-bottom: 1px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px 2px 2px 2px;
-	text-shadow : 1px 1px 1px #FFFFFF;
-    -webkit-box-shadow: 0px 0px 2px #aaa;
-    -moz-box-shadow: 0px 0px 2px #aaa;
-    box-shadow: 0px 0px 2px #aaa;
+	
+    font-weight: bold; /* Old browsers */   /* FF3.6+ */   /* Chrome,Safari4+ */   /* Chrome10+,Safari5.1+ */   /* Opera 11.10+ */   /* IE10+ */   /* W3C */   /* IE6-9 */; /* Old browsers */   /* FF3.6+ */   /* Chrome,Safari4+ */   /* Chrome10+,Safari5.1+ */   /* Opera 11.10+ */   /* IE10+ */   /* W3C */   /* IE6-9 */;
 }
 
 #sidebar_splitter div.panelHeader,
@@ -899,7 +893,6 @@ input.SF_input.SF_number{
     font-size: 12px;
     padding: 0px;
     line-height: 15px;
-    height:51px;
 }
 .action_bar.editor_action_bar{
     height:55px;
@@ -968,6 +961,7 @@ div.editor_header > span.header_label{
     display: block;
     min-width: 35px;
     padding: 0 1px;
+    float: left;
 }
 
 div.action_bar.icons_only  span.actionbar_button_label{
@@ -980,8 +974,8 @@ div.action_bar.text_only  span.actionbar_button_label{
 
 .action_bar div.actionbar_arrow_div{
     position: absolute;
-    top: 19px;
-    right: 11px;
+    top: 10px;
+    right: -3px;
 }
 .action_bar.icons_only div.actionbar_arrow_div{
     position: absolute;
@@ -996,24 +990,23 @@ div.action_bar.text_only  span.actionbar_button_label{
 #buttons_bar
 {
 	padding-left:0px;
-	padding-top:0;
+	padding-top: 7px;
 	overflow:hidden;
 }
 
 .action_bar a
 {
-    display: block;
-    float: left;
-    font-size: 9px;
-    padding: 4px;
+    display: inline-block;
+    font-size: 11px;
+    padding: 7px 12px 7px 10px;
     text-align: center;
     overflow: visible;
-    color: #333;
+    color: #fff;
     outline: none;
-    border-radius: 3px;
-    text-shadow: 1px 1px 1px white;
-    margin: 5px 2px 0px 1px;
-    padding-bottom: 1px;
+    border-radius: 2px;
+    margin: 5px 0px 0px 1px;
+    font-weight: bold;
+    background: #ec8a87; /* Old browsers */  background: -moz-linear-gradient(top,  #ec8a87 0%, #e08382 100%); /* FF3.6+ */  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ec8a87), color-stop(100%,#e08382)); /* Chrome,Safari4+ */  background: -webkit-linear-gradient(top,  #ec8a87 0%,#e08382 100%); /* Chrome10+,Safari5.1+ */  background: -o-linear-gradient(top,  #ec8a87 0%,#e08382 100%); /* Opera 11.10+ */  background: -ms-linear-gradient(top,  #ec8a87 0%,#e08382 100%); /* IE10+ */  background: linear-gradient(to bottom,  #ec8a87 0%,#e08382 100%); /* W3C */  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ec8a87', endColorstr='#e08382',GradientType=0 ); /* IE6-9 */;
 }
 
 .action_bar.icons_only a{
@@ -1030,9 +1023,6 @@ div.action_bar.text_only  span.actionbar_button_label{
 .action_bar a.menuAnchorSelected,
 .action_bar a:hover
 {
-   background:white;
-   border: 1px solid #ccc;
-   margin: 4px 1px 0px 0px;
 }
 
 .action_bar.text_only a.menuAnchorSelected,
@@ -1050,13 +1040,11 @@ div.action_bar.text_only  span.actionbar_button_label{
 .action_bar a.disabled:hover
 {
     color: expression('#c4c7c1');
-    border:  0px;
-    margin: 5px 3px 1px 0px;
 }
 
 .action_bar a img
 {
-    margin: 2px 0px 0px 0px;
+    margin: 2px 5px 2px 0px;
 }
 
 div.action_bar.icons_only img.actionbar_button_icon{
@@ -1065,8 +1053,9 @@ div.action_bar.icons_only img.actionbar_button_icon{
 }
 
 div.action_bar.icon_text img.actionbar_button_icon{
-    height: 16px;
-    width: 16px;
+    height: 12px;
+    width: 12px;
+    float: left;
 }
 
 div.action_bar.text_only a img{
@@ -1116,7 +1105,7 @@ a.carousel-control img{
     background-color: #fff;
 }
 #topPane, #bottomSplitPane{
-    border:  0px !important;
+    border: 0px !important;
 }
 
 #locationbar_cont
@@ -1407,7 +1396,8 @@ div.header_resizer div.header_cell{
 div.header_resizer div.header_label{
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size: 12px;
-	padding:5px 5px 4px;
+	
+    padding: 5px 5px 2px;
 }
 div.header_resizer div.resizer{
 	float:left;
@@ -1945,14 +1935,11 @@ div.tabulatorContainer{
 
 .panelHeader.panelHeaderWithIcon{
     position: relative;
-    padding-left: 26px;
 }
 
 .panelHeader img
 {
-    position: absolute;
-    top: 6px;
-    left: 6px;
+    display: none;
 }
 
 .panelHeader img.panelHeaderCloseIcon{
@@ -2113,14 +2100,14 @@ meta_opt.checked {
 
 #info_panel div.panelContent
 {
-	overflow:auto;
+	overflow: hidden;
     background-color: #f7f7f7;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-size: 12px;
-    border-radius: 2px;
-    -webkit-box-shadow: 0px 0px 2px #aaa;
-    -moz-box-shadow: 0px 0px 2px #aaa;
-    box-shadow: 0px 0px 2px #aaa;
+    
+    
+    
+    
+    
 }
 
 #info_panel a

@@ -128,7 +128,7 @@ Carousel = Class.create(Abstract, {
 		var scrollerOffset = this.scroller.cumulativeOffset();
 		var elementOffset  = this.current.cumulativeOffset();
 		var previousNode = this.current.previous();
-		if(previousNode.hasClassName('separator')){
+		if(previousNode && previousNode.hasClassName('separator')){
 			elementOffset  = previousNode.cumulativeOffset();
 		}
 
