@@ -77,11 +77,10 @@ Class.create("HeaderResizer", {
 	generateHeader : function(){
 		var data = this.options.headerData;
 		this.element.addClassName('header_resizer');
-		this.element.addClassName('css_gradient');
 		var initSizes;
 		var index=0;
 		data.each(function(el){
-			this.element.insert('<div class="header_cell"><div class="header_label css_gradient">'+el.label+'</div></div>');
+			this.element.insert('<div class="header_cell"><div class="header_label">'+el.label+'</div></div>');
 			if(el  != data.last()){
 				this.element.insert('<div class="resizer">&nbsp;</div>');
 			}
