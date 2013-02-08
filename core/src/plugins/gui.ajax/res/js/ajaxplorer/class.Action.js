@@ -35,6 +35,7 @@ Class.create("Action", {
 		this.options = Object.extend({
 			name:'',
 			src:'',
+            icon_class:'',
 			text:'',
 			title:'',
 			text_id:'',
@@ -369,6 +370,7 @@ Class.create("Action", {
 				this.options.text = MessageHash[node.getAttribute('text')] || 'not_found';
 				this.options.title = MessageHash[node.getAttribute('title')] || 'not_found';
 				this.options.src = node.getAttribute('src');								
+				this.options.icon_class = node.getAttribute('iconClass');
 				if(node.getAttribute('hasAccessKey') && node.getAttribute('hasAccessKey') == "true"){
 					this.options.accessKey = node.getAttribute('accessKey');
 					this.options.hasAccessKey = true;

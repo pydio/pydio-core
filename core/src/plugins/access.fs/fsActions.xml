@@ -34,7 +34,7 @@
 			</processing>
 		</action>
 		<action name="upload">
-			<gui text="27" title="27" src="yast_backup.png" accessKey="upload_access_key" hasAccessKey="true">
+			<gui text="27" title="27" src="yast_backup.png" iconClass="icon-upload" accessKey="upload_access_key" hasAccessKey="true">
 				<context selection="false" dir="true" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="put" inZip="false">
@@ -84,7 +84,7 @@
 				</processing>
 		</action>
 		<action name="download" fileDefault="false">
-			<gui text="88" title="88" src="download_manager.png" accessKey="download_access_key" hasAccessKey="true">
+			<gui text="88" title="88" src="download_manager.png" iconClass="icon-download" accessKey="download_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="put">
@@ -228,7 +228,7 @@
 				</processing>
 		</action>
 		<action name="download_chunk">
-			<gui text="397" title="398" src="download_manager.png" hasAccessKey="false">
+			<gui text="397" title="398" src="download_manager.png" iconClass="icon-cloud-download" hasAccessKey="false">
 				<context selection="true" dir="" recycle="false"
 					actionBar="false" contextMenu="true" infoPanel="true" actionBarGroup="get">
 				</context>
@@ -297,7 +297,7 @@
 			</processing>
 		</action>
         <action name="open_with" fileDefault="true">
-            <gui text="316" title="316" src="fileopen.png" accessKey="open_with_access" hasAccessKey="true">
+            <gui text="316" title="316" src="fileopen.png" iconClass="icon-folder-open" accessKey="open_with_access" hasAccessKey="true">
                 <context selection="true" dir="" recycle="hidden"  behaviour="hidden"
                     actionBar="true" contextMenu="true" infoPanel="false"
                     actionBarGroup="put" inZip="false">
@@ -462,7 +462,7 @@
 				</processing>
 		</action>
         <action name="mkdir">
-            <gui text="154" title="155" src="folder_new.png" accessKey="folder_access_key" hasAccessKey="true">
+            <gui text="154" title="155" src="folder_new.png" iconClass="icon-plus-sign" accessKey="folder_access_key" hasAccessKey="true">
                 <context selection="false" dir="true" recycle="hidden" actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="change" inZip="false"></context>
             </gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
@@ -491,7 +491,7 @@
                 </processing>
         </action>
         <action name="mkfile">
-            <gui text="156" title="157" src="filenew.png" accessKey="file_access_key" hasAccessKey="true">
+            <gui text="156" title="157" src="filenew.png" accessKey="file_access_key" iconClass="icon-plus" hasAccessKey="true">
                 <context selection="false" dir="true" recycle="hidden"
                     actionBar="false" contextMenu="true" infoPanel="false"
                     actionBarGroup="change" inZip="false">
@@ -522,7 +522,7 @@
                 </processing>
         </action>
 		<action name="rename">
-			<gui text="6" title="158" src="applix.png" accessKey="rename_access_key" hasAccessKey="true">
+			<gui text="6" title="158" src="applix.png" accessKey="rename_access_key" iconClass="icon-pencil" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change" inZip="false">
@@ -548,7 +548,7 @@
 				</processing>
 		</action>
 		<action name="copy" ctrlDragndropDefault="true">
-			<gui text="66" title="159" src="editcopy.png" accessKey="copy_access_key" hasAccessKey="true">
+			<gui text="66" title="159" src="editcopy.png" iconClass="icon-copy" accessKey="copy_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change">
@@ -659,7 +659,7 @@
 				</processing>
 		</action>
 		<action name="move" dragndropDefault="true">
-			<gui text="70" title="160" src="editpaste.png" accessKey="move_access_key" hasAccessKey="true">
+			<gui text="70" title="160" src="editpaste.png" iconClass="icon-paste" accessKey="move_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change" inZip="false">
@@ -736,7 +736,7 @@
 				</processing>
 		</action>
 		<action name="delete">			
-			<gui text="7" title="161" src="editdelete.png" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
+			<gui text="7" title="161" src="editdelete.png" iconClass="icon-delete" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change" inZip="false">
