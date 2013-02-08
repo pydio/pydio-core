@@ -20,7 +20,7 @@
         </hooks>
         <actions>
             <action name="share">
-                <gui text="292" title="292" src="share.png" hasAccessKey="false">
+                <gui text="292" title="292" src="share.png" iconClass="icon-share" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden"
                         actionBar="true" contextMenu="true" infoPanel="true"
                         actionBarGroup="put">

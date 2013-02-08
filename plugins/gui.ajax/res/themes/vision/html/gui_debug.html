@@ -1,2 +1,8 @@
 <!DOCTYPE html>
 <?php include(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/html/gui_debug.html"); ?>
+<link rel="stylesheet" href="plugins/gui.ajax/res/themes/vision/css/font-awesome.css"/>
+<script type="text/javascript">
+    document.observe("ajaxplorer:before_gui_load", function(e){
+        ajaxplorer.currentThemeUsesIconFonts = true;
+    });
+</script>

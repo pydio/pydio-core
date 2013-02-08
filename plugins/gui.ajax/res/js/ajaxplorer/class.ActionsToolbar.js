@@ -243,28 +243,43 @@ Class.create("ActionsToolbar", {
         if(this.options.stylesImgSizes && this.style && this.options.stylesImgSizes[this.style]){
             icSize = this.options.stylesImgSizes[this.style];
         }
-		var imgPath = resolveImageSource(action.options.src,action.__DEFAULT_ICON_PATH, icSize);
-		var img = new Element('img', {
-			id:action.options.name +'_button_icon',
-            className:'actionbar_button_icon',
-			src:imgPath,
-			width:icSize,
-			height:icSize,
-			border:0,
-			alt:action.options.title,
-			title:action.options.title,
-            'data-action-src':action.options.src
-		});
+        var img;
+        if(action.options.icon_class && window.ajaxplorer.currentThemeUsesIconFonts){
+            img = new Element('span', {
+                className:action.options.icon_class + ' ajxp_icon_span',
+                title:action.options.title
+            });
+        }else{
+            var imgPath = resolveImageSource(action.options.src,action.__DEFAULT_ICON_PATH, icSize);
+            img = new Element('img', {
+                id:action.options.name +'_button_icon',
+                className:'actionbar_button_icon',
+                src:imgPath,
+                width:icSize,
+                height:icSize,
+                border:0,
+                alt:action.options.title,
+                title:action.options.title,
+                'data-action-src':action.options.src
+            });
+        }
 		var titleSpan = new Element('span', {id:action.options.name+'_button_label',className:'actionbar_button_label'});
 		button.insert(img).insert(titleSpan.update(action.getKeyedText()));
 		//this.elements.push(this.button);
 		if(action.options.subMenu){
 			this.buildActionBarSubMenu(button, action);// TODO
-            button.setStyle({position:'relative'});
-			var arrowDiv = new Element('div', {className:'actionbar_arrow_div'});
-			arrowDiv.insert(new Element('img',{src:ajxpResourcesFolder+'/images/arrow_down.png',height:6,width:10,border:0}));
-			arrowDiv.imgRef = img;
-            button.insert(arrowDiv);
+            if(window.ajaxplorer.currentThemeUsesIconFonts){
+
+                button.insert(new Element('span', {className:'icon-caret-down ajxp_icon_arrow'}));
+
+            }else{
+                button.setStyle({position:'relative'});
+                var arrowDiv = new Element('div', {className:'actionbar_arrow_div'});
+                arrowDiv.insert(new Element('img',{src:ajxpResourcesFolder+'/images/arrow_down.png',height:6,width:10,border:0}));
+                arrowDiv.imgRef = img;
+                button.insert(arrowDiv);
+            }
+
 		}else if(!this.options.skipBubbling) {
 			button.observe("mouseover", function(){
 				this.buttonStateHover(button, action);
