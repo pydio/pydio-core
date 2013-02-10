@@ -133,6 +133,9 @@ Class.create("ActionsManager", {
 				isDefault:isDefault,
 				callback:function(e){this.apply();}.bind(action)
 			};
+            if(action.options.icon_class){
+                menuItem.icon_class = action.options.icon_class;
+            }
 			if(action.options.subMenu){
 				menuItem.subMenu = [];
 				if(action.subMenuItems.staticOptions){

@@ -2,7 +2,7 @@
 <registry_contributions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<actions>
 		<action name="ls" dirDefault="true">			
-			<gui text="32" title="32" src="fileopen.png"
+			<gui text="32" title="32" src="fileopen.png" iconClass="icon-folder-open-alt"
 				accessKey="folder_access_key">
 				<context selection="true" dir="" recycle="false"
 					actionBar="false" actionBarGroup="put" contextMenu="true" infoPanel="true">
@@ -326,6 +326,7 @@
                                 alt:el.title,
                                 isDefault : (index == 0),
                                 image:resolveImageSource(el.icon, '/images/actions/ICON_SIZE', 22),
+                                icon_class: el.icon_class,
                                 callback:function(e){this.apply([el]);}.bind(context)
                             } );
                             index++;
@@ -364,7 +365,7 @@
                 </processing>
         </action>
 		<action name="ajxp_link">
-			<gui text="369" title="369" src="ajxp-link.png" hasAccessKey="false">
+			<gui text="369" title="369" src="ajxp-link.png" iconClass="icon-link" hasAccessKey="false">
 				<context selection="true" dir="" recycle="false" actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="true"/>
 				<selectionContext dir="true" file="true" recycle="false" unique="true"/>
 			</gui>
@@ -736,7 +737,7 @@
 				</processing>
 		</action>
 		<action name="delete">			
-			<gui text="7" title="161" src="editdelete.png" iconClass="icon-delete" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
+			<gui text="7" title="161" src="editdelete.png" iconClass="icon-trash" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change" inZip="false">
@@ -771,7 +772,7 @@
 				</processing>
 		</action>
         <action name="chmod">
-            <gui text="287" title="287" src="ksysv.png" accessKey="" hasAccessKey="false">
+            <gui text="287" title="287" src="ksysv.png" iconClass="icon-th" accessKey="" hasAccessKey="false">
                 <context selection="true" dir="true" recycle="hidden"  behaviour="hidden"
                     actionBar="false" contextMenu="true" infoPanel="true"
                     actionBarGroup="change" inZip="false">

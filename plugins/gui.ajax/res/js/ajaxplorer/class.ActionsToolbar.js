@@ -34,7 +34,8 @@ Class.create("ActionsToolbar", {
 		this.options = Object.extend({
 			buttonRenderer : 'this',
             skipBubbling: false,
-			toolbarsList : $A(['default', 'put', 'get', 'change', 'user', 'remote'])
+			toolbarsList : $A(['default', 'put', 'get', 'change', 'user', 'remote']),
+            skipCarousel : false
 		}, options || {});
 		var renderer = this.options.buttonRenderer;
 		if(renderer == 'this'){
@@ -43,7 +44,9 @@ Class.create("ActionsToolbar", {
 			this.options.buttonRenderer = new renderer();
 		}
 		this.toolbars = $H();
-		this.initCarousel();
+        if(!this.options.skipCarousel){
+            this.initCarousel();
+        }
         if(this.options.styles){
             this.buildActionBarStylingMenu();
             this.style = this.options.defaultStyle;
@@ -147,7 +150,9 @@ Class.create("ActionsToolbar", {
 			if(hasVisibleActions) sep.show();
 			else sep.hide();
 		}.bind(this) );
-		this.refreshSlides();
+        if(!this.options.skipCarousel){
+		    this.refreshSlides();
+        }
 	},
 	
 	/**
@@ -218,8 +223,8 @@ Class.create("ActionsToolbar", {
 		this.inner.select('a').each(function(a){
 			if(a.visible()) allSlides.push(a);
 		});
-		this.carousel.refreshSlides(allSlides);
-		this.resize();		
+        this.carousel.refreshSlides(allSlides);
+		this.resize();
 	},
 	
 	/**
@@ -499,6 +504,9 @@ Class.create("ActionsToolbar", {
 	 * Resize the widget. May trigger the apparition/disparition of the Carousel buttons.
 	 */
 	resize : function(){
+        if(this.options.skipCarousel) {
+            return;
+        }
 		var innerSize = 0;
 		var parentWidth = $(this.outer).parentNode.getWidth();
 		if(Prototype.Browser.IE){
