@@ -163,7 +163,10 @@ Proto.Menu = Class.create({
 			var newItem = new Element('li', {className: item.separator ? 'separator' : ''});
 			
 			if(item.moreActions){
-				var actionsContainer = new Element('div', {className:'menuActions',style:'padding-top:4px;'});
+				var actionsContainer = new Element('div', {
+                    className:'menuActions' + (window.ajaxplorer.currentThemeUsesIconFonts?' icon-caret-right':''),
+                    style:'padding-top:4px;'
+                });
 				item.moreActions.each(function(action){
 					actionsContainer.insert(
 						new Element('a', {
@@ -181,7 +184,10 @@ Proto.Menu = Class.create({
 				actionsContainer.observe("mouseout", function(){newItem.select('a.enabled')[0].removeClassName("hovered");});
 			}
 			if(item.subMenu){
-				var arrowContainer = new Element('div', {className:'menuActions',style:'padding-right:7px;'});
+				var arrowContainer = new Element('div', {
+                    className:'menuActions' + (window.ajaxplorer.currentThemeUsesIconFonts?' icon-caret-right':''),
+                    style:'padding-right:7px;'
+                });
 				arrowContainer.insert(new Element('img', {src:this.options.submenuArrow, width:6,height:10}));
 				newItem.insert(arrowContainer);
                 newItem.setStyle({position:"relative"});
@@ -190,6 +196,16 @@ Proto.Menu = Class.create({
                 item.name = ajaxplorer.getActionBar().getActionByName(item.action_id).getKeyedText();
                 item.title = ajaxplorer.getActionBar().getActionByName(item.action_id).options.title;
             }
+            var img;
+            if(item.icon_class && window.ajaxplorer.currentThemeUsesIconFonts){
+                img = new Element('span', {
+                    className:item.icon_class + ' ajxp_icon_span',
+                    title:item.alt
+                });
+            }else{
+                img = new Element('img', {src:item.image,border:'0',height:16,width:16,align:'absmiddle'});
+            }
+
 			newItem.insert(
 					item.separator 
 						? '' 
@@ -203,7 +219,7 @@ Proto.Menu = Class.create({
 						.writeAttribute('onclick', 'return false;')
 						.observe('click', this.onClick.bind(this))
 						.observe('contextmenu', Event.stop)
-						.update(Object.extend(new Element('img', {src:item.image,border:'0',height:16,width:16,align:'absmiddle'}), {_callback:item.callback} ))
+						.update(Object.extend(img, {_callback:item.callback} ))
 						.insert(item.name)
 				);
             if(newItem.down('u')){

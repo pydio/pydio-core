@@ -227,11 +227,11 @@ Class.create("AjxpBootstrap", {
             var titleDivSize = (customWording.iconHeight ? 'height:' + customWording.iconHeight + ';' : '');
 			html+=' <div style="margin-bottom:0px; font-size:'+fontSize+';font-weight:bold; background-image:url(\''+icon+'\');background-position:left center;background-repeat:no-repeat;padding-left:'+iconWidth+';'+titleDivSize+'color:#0077b3;">'+(customWording.iconOnly?'':title)+'</div>';
 			if(customWording.title.toLowerCase() != "ajaxplorer"){
-				html+='	<div style="padding:4px 7px;position: relative;"><div>Powered by AjaXplorer<span id="version_span"></span></div>';
+				html+='	<div style="padding:4px 7px;position: relative;"><div>AjaXplorer Community Edition<span id="version_span"></span></div>';
 			}else{
 				html+='	<div style="padding:4px 7px;position: relative;"><div>The web data-browser<span id="version_span"></span></div>';
 			}
-			html+='	Written by Charles du Jeu - AGPL License. <div id="progressCustomMessage" style="margin-top: 35px;font-weight: bold;padding-bottom: 5px;">';
+			html+='	Copyright C. du Jeu 2008-2012 - AGPL License. <div id="progressCustomMessage" style="margin-top: 35px;font-weight: bold;padding-bottom: 5px;">';
 			if(customWording.welcomeMessage){
 				html+= customWording.welcomeMessage.replace(new RegExp("\n", "g"), "<br>");
 			}

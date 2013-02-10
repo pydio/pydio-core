@@ -832,7 +832,7 @@ input.SF_input.SF_number{
     float: left;
     width: 23%;
     padding: 0px 1%;
-    height: 33px;
+    height: 53px;
     font-size: 25px;
     color: rgb(111, 121, 131);
 }
@@ -959,8 +959,8 @@ div.editor_header > span.header_label{
 .action_bar span.actionbar_button_label {
     cursor: pointer;
     display: inline-block;
-    padding: 4px 3px;
-    font-size: 14px;
+    padding: 4px 3px 3px;
+    font-size: 13px;
 }
 
 div.action_bar.icons_only  span.actionbar_button_label{
@@ -989,15 +989,16 @@ div.action_bar.text_only  span.actionbar_button_label{
 #buttons_bar
 {
     padding-left:0px;
-    padding-top: 6px;
+    padding-top: 5px;
     overflow:hidden;
+    padding-bottom: 6px;
 }
 
 .action_bar a
 {
     display: inline-block;
     font-size: 11px;
-    padding: 6px 12px 8px 10px;
+    padding: 5px 12px 7px 10px;
     text-align: center;
     overflow: visible;
     color: #fff;
@@ -2112,13 +2113,13 @@ meta_opt.checked {
     overflow: hidden;
     background-color: #ebedf0;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-
-
-
-
-
     border-left: 1px solid rgb(172, 178, 184);
     border-right: 1px solid rgb(172, 178, 184);
+}
+
+#info_panel div.panelHeader.panelHeaderWithIcon{
+    background-color: #5599FF !important;
+    border-bottom: 2px solid rgb(66, 126, 214);
 }
 
 #info_panel a
@@ -2192,10 +2193,10 @@ td.infoPanelLabel
     padding: 6px 7px;
 
 
-    background-color: rgba(138, 149, 160, 0.65);
+    background-color: rgba(138, 149, 160, 0.65) !important;
 
 
-    border-bottom: 0;
+    border-bottom: 0 !important;
 
 
 }
@@ -2899,15 +2900,14 @@ div.menu a {
 }
 .menu li {
     list-style-position: outside;
-    height: 24px;
 }
 
 .menu.desktop {
     width: 10em;
-    border: 1px solid #D1D2D0;
     padding: 0;
     padding-top: 0px;
     padding-bottom: 1px;
+    letter-spacing: 1px;
 }
 
 .menu.desktop.toolbarmenu {
@@ -2939,8 +2939,9 @@ div.menu a {
 }
 
 .menu.desktop li{
-    padding: 4px;
+    padding: 0px;
     overflow-y: hidden;
+    color: rgb(123, 134, 145);
 }
 
 .menu.desktop.toolbarmenu li {
@@ -2973,13 +2974,19 @@ div.menu a {
     margin-top: -5px;
 }
 
+.menu.desktop span.ajxp_icon_span{
+    font-size: 1.3em;
+    padding-right: 5px;
+}
+
 .menu.desktop a {
-    color: #000;
-    padding: 6px 0 2px 5px;
+    color: rgb(123, 134, 145);
+    padding: 5px 8px 3px;
     margin: 0;
-    height: 17px;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-size:11px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    line-height: 20px;
 }
 
 .menu.desktop.toolbarmenu a img{
@@ -3000,7 +3007,7 @@ div.menu a {
     zoom: 1;
 }
 .menu.desktop li.separator {
-    border-bottom: 1px solid #fff;
+    border-bottom: 1px solid #ebedf0;
     margin: 1px 1px 0 1px;
     line-height: 1px !important;
 }
@@ -3125,7 +3132,8 @@ div.menu a {
     right: 0px;
     top: 1px;
     text-align: right;
-    padding-top:2px !important;
+    padding-right: 3px !important;
+    margin-top: 5px !important;
 }
 
 .menuActions a{
@@ -3146,6 +3154,9 @@ div.menu a {
     -moz-opacity:1.0;
 }
 
+div.menuActions img{
+    display: none;
+}
 .backgroundPanel{
     position:absolute;
     right:0;

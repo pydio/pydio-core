@@ -92,7 +92,7 @@
 				</processing>
 		</action>		
 		<action name="bookmark">
-			<gui text="152" title="153" src="bookmark.png" hasAccessKey="true"
+			<gui text="152" title="153" src="bookmark.png" iconClass="icon-star-empty" hasAccessKey="true"
 				accessKey="bookmarks_access_key">
 				<context selection="true" dir="false" recycle="hidden"
 					actionBar="false" contextMenu="true" infoPanel="false"
@@ -142,7 +142,7 @@
 				accessKey="about_access_key">
 				<context selection="false" dir="" recycle="false"
 					actionBar="true" contextMenu="false" infoPanel="false"
-					actionBarGroup="user">
+					actionBarGroup="utils">
 				</context>
 			</gui>
 			<processing>

@@ -678,6 +678,7 @@ Class.create("Ajaxplorer", {
 				text : MessageHash[xmlNode.getAttribute("text")],
 				title : MessageHash[xmlNode.getAttribute("title")],
 				icon : xmlNode.getAttribute("icon"),
+				icon_class : xmlNode.getAttribute("iconClass"),
 				editorClass : xmlNode.getAttribute("className"),
 				mimes : $A(xmlNode.getAttribute("mimes").split(",")),
 				write : (xmlNode.getAttribute("write") && xmlNode.getAttribute("write")=="true"?true:false)

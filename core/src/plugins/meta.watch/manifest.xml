@@ -10,7 +10,7 @@
     <registry_contributions>
         <actions>
             <action name="toggle_watch">
-                <gui src="meta.watch/ICON_SIZE/watch.png" text="meta.watch.1" title="meta.watch.2">
+                <gui src="meta.watch/ICON_SIZE/watch.png" text="meta.watch.1" title="meta.watch.2" iconClass="icon-rss">
                     <context dir="true" recycle="false" selection="true" actionBar="false" actionBarGroup="put" contextMenu="true"></context>
                     <selectionContext dir="true" file="true" recycle="false" unique="true"/>
                 </gui>
