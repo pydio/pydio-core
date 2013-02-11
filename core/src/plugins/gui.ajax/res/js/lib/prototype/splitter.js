@@ -207,6 +207,7 @@ Class.create("Splitter", AjxpPane, {
         var options = {
             name:'folding_action',
             src:'view_left_close.png',
+            icon_class:'icon-columns',
             text_id:416,
             title_id:415,
             text:MessageHash[416],

@@ -452,6 +452,7 @@ Class.create("Action", {
 					name:itemText,
 					alt:MessageHash[item.title],
 					image:resolveImageSource(item.src, '/images/actions/ICON_SIZE', 22),
+                    icon_class:item.icon_class,
 					isDefault:(item.isDefault?true:false),
 					callback:function(e){this.apply([item]);}.bind(this)
 				});

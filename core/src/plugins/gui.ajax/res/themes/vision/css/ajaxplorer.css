@@ -228,7 +228,7 @@ textarea{
     float: left;
 }
 
-#table_rows_container-1 td:nth-child(1) .text_label{
+#table_rows_container-1 td:nth-child(1) span.text_label{
     font-size: 12px;
     padding-left: 27px !important;
     background-position: 5px 4px !important;
@@ -1104,6 +1104,11 @@ a.carousel-control img{
     background-color: #fff;
     border-radius: 2px 2px 0 0;
 }
+
+#content_pane div.panelHeader {
+    display: none;
+}
+
 #topPane, #bottomSplitPane{
     border: 0px !important;
 }
@@ -1406,6 +1411,8 @@ img.user_widget_mini{
 /******************************/
 div.header_resizer{
     overflow:hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    opacity: 0.8;
 }
 
 div.header_resizer div.header_cell{
@@ -1421,11 +1428,11 @@ div.header_resizer div.header_label{
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size: 12px;
 
-    padding: 5px 5px 5px;
-    background-color: rgb(138, 149, 160);
-    color: #fff;
+    padding: 4px 5px 3px;
+    background-color: rgb(255, 255, 255);
+    color: rgb(104, 120, 136);
     letter-spacing: 1px;
-    border-bottom: 2px solid rgb(117, 128, 139);
+    border-bottom: 1px solid rgb(194, 196, 199);
 }
 div.header_resizer div.resizer{
     float:left;
@@ -2939,6 +2946,10 @@ div.menu a {
     border-radius: 0px 2px 2px 2px;
 }
 
+.menu.desktop.toolbarmenu.panelHeaderMenu {
+    background: rgb(138, 149, 160);
+}
+
 .menu.desktop.toolbarmenu img {
     width: 22px;
     height:22px;
@@ -3015,6 +3026,14 @@ div.menu a {
 .menu.desktop.toolbarmenu a {
     color: #fff;
     padding: 11px 20px 5px 8px;
+    margin: 0;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-size:11px;
+}
+
+.menu.desktop.toolbarmenu.panelHeaderMenu a {
+    color: #fff;
+    padding: 7px 8px 4px 8px;
     margin: 0;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size:11px;
@@ -3396,3 +3415,32 @@ td.ip_geo_cell{
     position: absolute;
     top: -1000px;
 }
+
+#display_toolbar {
+    float: right;
+    display: inline-block;
+}
+
+#display_toolbar a {
+    color: #fff;
+    display: inline-block;
+    padding: 0 3px;
+}
+
+#display_toolbar span.actionbar_button_label {
+    display: none;
+}
+
+/*
+@media only screen
+and (max-width : 420px) {
+
+    .ws-label{
+        display: none !important;
+    }
+
+    .action_bar span.actionbar_button_label{
+        display: none;
+    }
+}
+*/

@@ -412,6 +412,7 @@ Class.create("FilesList", SelectableElements, {
 		var options = {
 			name:'multi_display',
 			src:'view_icon.png',
+            icon_class:'icon-th-list',
 			text_id:150,
 			title_id:151,
 			text:MessageHash[150],
@@ -448,8 +449,8 @@ Class.create("FilesList", SelectableElements, {
 			};
 		var subMenuItems = {
 			staticItems:[
-				{text:228,title:229,src:'view_icon.png',command:'thumb',hasAccessKey:true,accessKey:'thumbs_access_key'},
-				{text:226,title:227,src:'view_text.png',command:'list',hasAccessKey:true,accessKey:'list_access_key'}
+				{text:228,title:229,src:'view_icon.png',icon_class:'icon-th',command:'thumb',hasAccessKey:true,accessKey:'thumbs_access_key'},
+				{text:226,title:227,src:'view_text.png',icon_class:'icon-list',command:'list',hasAccessKey:true,accessKey:'list_access_key'}
 				]
 		};
 		// Create an action from these options!
