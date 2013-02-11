@@ -1202,7 +1202,7 @@ a.carousel-control img{
     font-size: 12px;
     font-weight: normal;
     letter-spacing: 1px;
-    margin-top: -5px;
+    margin-top: -4px;
     margin-right: 13px;
     cursor: pointer;
 }
@@ -3431,7 +3431,29 @@ td.ip_geo_cell{
     display: none;
 }
 
-/*
+#cpane_header{
+    padding-bottom: 4px;
+}
+
+#breadcrumb{
+    display: inline-block;
+    overflow: hidden;
+}
+
+#breadcrumb div.inner_bread{
+    width: 2000px;
+}
+
+#breadcrumb span.icon-home{
+    display: inline-block;
+    font-size: 1.3em;
+}
+
+#breadcrumb span.icon-chevron-right{
+    display: inline-block;
+    padding: 0 2px;
+}
+
 @media only screen
 and (max-width : 420px) {
 
@@ -3443,4 +3465,3 @@ and (max-width : 420px) {
         display: none;
     }
 }
-*/
