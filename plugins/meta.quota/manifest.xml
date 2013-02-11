@@ -25,7 +25,7 @@
    		</hooks>
         <actions>
             <action name="monitor_quota">
-                <gui src="meta_quota/ICON_SIZE/progressbar.png" text="meta.quota.1" title="meta.quota.2" hasAccessKey="false">
+                <gui src="meta_quota/ICON_SIZE/progressbar.png" iconClass="icon-tasks" text="meta.quota.1" title="meta.quota.2" hasAccessKey="false">
                     <context dir="true" recycle="true" selection="false" actionBarGroup="utils" ajxpWidgets="UserWidget::logging_string"/>
                 </gui>
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="true" write="false"/>

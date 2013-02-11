@@ -7,7 +7,7 @@ table.sort-table tr:nth-child(even)
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 }
 
-.soft_css_gradient, .menu.rootDirChooser, .menu.bookmarksMenu, .slider-pane{
+.soft_css_gradient, .menu.bookmarksMenu, .slider-pane{
     background: rgb(255,255,255); /* Old browsers */
     background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(229,229,229,1) 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(229,229,229,1))); /* Chrome,Safari4+ */
@@ -817,7 +817,7 @@ input.SF_input.SF_number{
 #global_toolbar{
     background-color: #666;
     height: 29px;
-    padding: 10px 5px 0;
+    padding: 10px 0 0 5px;
     background-image: url("../images/white_logo.png");
     background-repeat: no-repeat;
     background-position: 9px 7px;
@@ -1041,12 +1041,6 @@ div.action_bar.text_only  span.actionbar_button_label{
     border-radius: 3px 3px 0px 0px;
 }
 
-.action_bar a.disabled,
-.action_bar a.disabled:hover
-{
-    color: expression('#c4c7c1');
-}
-
 .action_bar a img
 {
     margin: 2px 5px 2px 0px;
@@ -1187,6 +1181,7 @@ a.carousel-control img{
 #repository_form img#repo_icon{
     float: left;
     vertical-align:top;
+    display: none;
 }
 #repository_form input
 {
@@ -1198,6 +1193,31 @@ a.carousel-control img{
 
 #repo_chooser{
     float:right;
+    color: #fff;
+    font-size: 12px;
+    font-weight: normal;
+    letter-spacing: 1px;
+    margin-top: -5px;
+    margin-right: 13px;
+    cursor: pointer;
+}
+
+#repo_chooser span.icon-sitemap {
+    font-size: 1.5em;
+    padding-right: 5px;
+    padding-top: 4px;
+    display: inline-block;
+}
+
+#repo_chooser span.ws-label {
+    display: inline-block;
+    padding-top: 0px;
+    line-height: 20px;
+}
+
+#repo_chooser span.icon-caret-down {
+    display: inline-block;
+    padding-left: 3px;
 }
 
 .inlineBarButton,
@@ -1230,12 +1250,11 @@ a.carousel-control img{
 .inline_hover_light,
 .user_widget_hover
 {
-    background-color: rgba(255, 255, 255, 0.5);
+    /*background-color: rgba(255, 255, 255, 0.5);*/
 }
 
 .inline_hover
 {
-    background-color: rgba(255, 255, 255, 0.7);
 }
 
 .inline_disabled img,
@@ -1265,9 +1284,13 @@ img.simple_button_arrow{
 #logging_string {
     color:#fff;
     font-size:11px;
-    padding-right: 5px;
     float: right;
 }
+
+#logging_string div.inlineBarButtonLeft{
+    display:none;
+}
+
 #logging_string i
 {
     font-style: normal;
@@ -1278,8 +1301,9 @@ img.simple_button_arrow{
 {
     font-style: normal;
     cursor: pointer;
-    margin-right:7px;
-    margin-top:-4px;
+    margin-top: -10px;
+    float: right;
+    margin-left: 10px;
 }
 .user_widget_label{
     float: left;
@@ -1300,7 +1324,7 @@ img.simple_button_arrow{
     font-weight: bold;
     line-height: 22px;
     display: inline-block;
-    padding: 0 4px 0 8px;
+    padding: 0 0 0 8px;
 }
 
 .user_widget_label.withImage i img{
@@ -1308,11 +1332,7 @@ img.simple_button_arrow{
 
 img.user_widget_mini{
     vertical-align: middle;
-    height: 16px;
-    border: 1px solid white;
-    top: 5px;
-    left: 2px;
-    box-shadow: 1px 1px 0px #666;
+    height: 39px;
 }
 
 .locationbar_title
@@ -1616,7 +1636,6 @@ a.enabled
 
 .action_bar a.disabled:hover
 {
-    background-color: transparent;
     cursor: default;
 }
 
@@ -2876,7 +2895,6 @@ div.menu {
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     -moz-border-radius:5px;
     border-radius: 2px;
-    background-color: #fff;
 }
 div.menu a {
     display: block;
@@ -2908,6 +2926,7 @@ div.menu a {
     padding-top: 0px;
     padding-bottom: 1px;
     letter-spacing: 1px;
+    background-color: #ffffff;
 }
 
 .menu.desktop.toolbarmenu {
@@ -3040,10 +3059,10 @@ div.menu a {
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     position:absolute;
     z-index: 1500;
-    min-width: 150px;
+    min-width: 180px;
     /* IE */
     width:expression("250px");
-    border: 1px solid #D1D2D0;
+    background-color: #666;
 }
 
 .rootDirChooser img
@@ -3055,10 +3074,11 @@ div.menu a {
 .bookmarksMenu a
 {
     display: block;
-    padding: 2px;
+    padding: 6px;
     padding-right: 20px;
     padding-left: 5px;
     padding-top: 4px;
+    color: #fff;
 }
 
 .rootDirChooser a img,
@@ -3116,15 +3136,25 @@ div.menu a {
 }
 
 .rightAlignMenu a{
-    padding: 4px 5px 2px 20px;
+    padding: 6px 5px 5px 20px;
     text-align:right;
     height: 16px;
+    letter-spacing: 1px;
 }
 
 .rightAlignMenu a img{
     margin-right:0px;
     margin-left:5px;
     float: right;
+}
+
+.rightAlignMenu a img,
+.rightAlignMenu span.ajxp_icon_span
+{
+    margin-right:0px;
+    margin-left:5px;
+    float: right;
+    font-size: 1.4em;
 }
 
 .menuActions {
@@ -3195,9 +3225,9 @@ div.menuActions img{
 /* Generally applied after a Modernizr test */
 /********************************************/
 .css_boxshadow{
-    -moz-box-shadow : 5px 5px 20px rgba(100, 100, 100, 0.5);
-    -webkit-box-shadow : 5px 5px 20px rgba(100, 100, 100, 0.5);
-    box-shadow : 5px 5px 20px rgba(100, 100, 100, 0.5);
+    -moz-box-shadow : 5px 5px 40px rgba(100, 100, 100, 0.5);
+    -webkit-box-shadow : 5px 5px 40px rgba(100, 100, 100, 0.5);
+    box-shadow : 5px 5px 40px rgba(100, 100, 100, 0.5);
 }
 
 .dialogBox.css_boxshadow{

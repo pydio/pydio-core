@@ -166,7 +166,7 @@
             </processing>
         </action>
         <action name="custom_data_edit">
-      			<gui text="442" title="443" src="edit_user.png" accessKey="" hasAccessKey="false">
+      			<gui text="442" title="443" src="edit_user.png" iconClass="icon-reorder" accessKey="" hasAccessKey="false">
       				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
       			</gui>
       			<processing>
@@ -258,7 +258,7 @@
 		</action>
 		-->
 		<action name="webdav_preferences">
-			<gui text="403" title="403" src="drive_remote.png" accessKey="" hasAccessKey="false">
+			<gui text="403" title="403" src="drive_remote.png" iconClass="icon-cog" accessKey="" hasAccessKey="false">
 				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
 			</gui>
             <rightsContext noUser="false" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
