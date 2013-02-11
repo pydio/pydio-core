@@ -34,10 +34,10 @@
 			</processing>
 		</action>
 		<action name="up_dir">
-			<gui text="148" title="24" src="up.png" hasAccessKey="true"
+			<gui text="148" title="24" src="up.png" iconClass="icon-chevron-up" hasAccessKey="true"
 				accessKey="parent_access_key">
 				<context selection="false" dir="false" recycle="false"
-					actionBar="false" contextMenu="false" infoPanel="false" actionBarGroup="default">
+					actionBar="true" contextMenu="false" infoPanel="false" actionBarGroup="default">
 				</context>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
@@ -48,10 +48,10 @@
 			</processing>
 		</action>		
 		<action name="refresh">
-			<gui text="149" title="149" src="reload.png" hasAccessKey="true"
+			<gui text="149" title="149" iconClass="icon-refresh" src="reload.png" hasAccessKey="true"
 				accessKey="refresh_access_key">
 				<context selection="false" dir="true" recycle="false"
-					actionBar="false" contextMenu="true" infoPanel="false">
+					actionBar="true" actionBarGroup="default" contextMenu="true" infoPanel="false">
 				</context>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>

@@ -342,13 +342,14 @@ Class.create("ActionsToolbar", {
 		var subMenu = new Proto.Menu({
 		  mouseClick:"over",
 		  anchor: button, // context menu will be shown when element with class name of "contextmenu" is clicked
-		  className: 'menu desktop toolbarmenu', // this is a class which will be attached to menu container (used for css styling)
+		  className: 'menu desktop toolbarmenu' + (this.options.submenuClassName ? ' ' + this.options.submenuClassName : ''), // this is a class which will be attached to menu container (used for css styling)
 		  topOffset : (this.options.submenuOffsetTop ? this.options.submenuOffsetTop : 0),
 		  leftOffset : (this.options.submenuOffsetLeft ? this.options.submenuOffsetLeft : 0),
 		  parent : this.element,	 
 		  menuItems: action.subMenuItems.staticOptions || [],
 		  fade:true,
-		  zIndex:2000		  
+		  zIndex:2000,
+          position : (this.options.submenuPosition ? this.options.submenuPosition : "bottom")
 		});	
 		var titleSpan = button.select('span')[0];	
 		subMenu.options.beforeShow = function(e){
