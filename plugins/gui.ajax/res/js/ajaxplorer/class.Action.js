@@ -479,6 +479,7 @@ Class.create("Action", {
 						menuItems.push({
 							name:action.getKeyedText(),
 							alt:action.options.title,
+                            icon_class:action.options.icon_class,
 							image:resolveImageSource(action.options.src, '/images/actions/ICON_SIZE', 16),						
 							callback:function(e){this.apply();}.bind(action)
 						});

@@ -35,6 +35,7 @@ Class.create("ActionsToolbar", {
 			buttonRenderer : 'this',
             skipBubbling: false,
 			toolbarsList : $A(['default', 'put', 'get', 'change', 'user', 'remote']),
+            groupOtherToolbars : $A([]),
             skipCarousel : false
 		}, options || {});
 		var renderer = this.options.buttonRenderer;
@@ -118,6 +119,45 @@ Class.create("ActionsToolbar", {
 				this.toolbars.get(action.context.actionBarGroup).push(actionName);
 			}			
 		}.bind(this));
+
+        // Regroup actions artificially
+        if(this.options.groupOtherToolbars.length){
+            var submenuItems = [];
+            this.options.groupOtherToolbars.each(function(otherToolbar){
+
+                var otherActions = this.toolbars.get(otherToolbar);
+                if(!otherActions) return;
+                otherActions.each(function(act){
+                    submenuItems.push({actionId:act});
+                });
+
+            }.bind(this) );
+            var moreAction = new Action({
+                name:'group_more_action',
+                src:'view_icon.png',
+                icon_class:'icon-th-list',
+                text_id:150,
+                title_id:151,
+                text:MessageHash[150],
+                title:MessageHash[151],
+                hasAccessKey:false,
+                subMenu:true,
+                callback:function(){}
+            }, {
+                selection:false,
+                dir:true,
+                actionBar:true,
+                actionBarGroup:'put',
+                contextMenu:true,
+                infoPanel:false
+
+            }, {}, {}, {dynamicItems: submenuItems});
+            moreAction.setManager(ajaxplorer.actionBar);
+            this.actions.set("group_more_action", moreAction);
+            this.toolbars.get('put').push("group_more_action");
+
+        }
+
 		var crtCount = 0;
 		var toolbarsList = this.options.toolbarsList;
 		toolbarsList.each(function(toolbar){			

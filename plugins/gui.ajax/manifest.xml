@@ -104,7 +104,7 @@
                             <div class="repository_title" id="repository_title" ajxpClass="RepositorySimpleLabel"></div>
                         </div>
 					    <div style="float:left;width:75%;">
-						    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+						    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put"],"groupOtherToolbars":["get", "change", "user", "remote"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
 						</div>
 						<div style="clear:left;"/>
 					</div>
@@ -114,7 +114,10 @@
     					<div id="vertical_splitter2" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA": 350, "minA":0,"fit":"height","fitParent":"browser", "minSize":0, "foldingButton":true}'>
 							<div id="topPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ajxpPaneHeader="130" ajxpPaneIcon="view_tree.png"></div>
 							<div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
-							    <div id="cpane_header" class="panelHeader">Files <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div></div>
+							    <div id="cpane_header" class="panelHeader">
+							        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+							        <div id="breadcrumb" ajxpClass="Breadcrumb" ajxpOptions='{"flexTo":"cpane_header"}'></div>
+							    </div>
         						<div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"list","replaceScroller":true, "fit":"height", "fitParent":"cpane_container"}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
 							</div>
                         </div>
