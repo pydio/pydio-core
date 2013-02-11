@@ -35,6 +35,7 @@ js/ajaxplorer/class.AjxpTabulator.js
 js/ajaxplorer/class.AjxpSimpleTabs.js
 js/ajaxplorer/class.RepositorySelect.js
 js/ajaxplorer/class.RepositorySimpleLabel.js
+js/ajaxplorer/class.Breadcrumb.js
 js/ajaxplorer/class.LocationBar.js
 js/ajaxplorer/class.UserWidget.js
 js/ajaxplorer/class.AjxpAutoCompleter.js
