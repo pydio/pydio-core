@@ -95,9 +95,8 @@
             <template name="main_vision" element="ajxp_desktop" position="top" theme="vision"><![CDATA[
 				<div id="toolbars">
 					<div id="global_toolbar">
-					    <div id="logging_string" ajxpClass="UserWidget"></div>
-						<div id="repo_chooser" ajxpClass="RepositorySelect"></div>
-						<span class="icon-envelope" style="float:right;color: white;"> My Workspace</span>
+					    <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over"}'></div>
+						<div id="repo_chooser" ajxpClass="RepositorySelect" ajxpOptions='{"menuPosition": "bottom right", "menuOffsetTop":11, "menuOffsetLeft":20, "menuEvent":"over", "simpleLabel":"<span class=\"icon-sitemap\"></span><span class=\"ws-label\">My Workspaces</span><span class=\"icon-caret-down\"></span>"}'></div>
 					</div>
 					<div id="workspace_toolbar">
                         <div id="simple_repository_label">
@@ -105,7 +104,7 @@
                             <div class="repository_title">Mes Documents</div>
                         </div>
 					    <div style="float:left;width:75%;">
-						    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put"],"skipBubbling":true, "skipCarousel":true,"defaultIconSize":16,"defaultStyle":"text_only","styles":{"icons_only":"Icons Only","icon_text":"Icons and Text","text_only":"Text only"},"stylesImgSizes":{"icons_only":22,"icon_text":16,"text_only":16},"stylesBarSizes":{"icons_only":40,"icon_text":51,"text_only":30}}'></div>
+						    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
 						</div>
 						<div style="clear:left;"/>
 					</div>

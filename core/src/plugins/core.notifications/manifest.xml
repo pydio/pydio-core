@@ -23,7 +23,7 @@
                 </processing>
             </action>
             <action name="get_my_feed">
-                <gui text="notification_center.1" title="notification_center.2" src="notification_center/ICON_SIZE/feed.png" accessKey="" hasAccessKey="false">
+                <gui text="notification_center.1" title="notification_center.2" iconClass="icon-rss" src="notification_center/ICON_SIZE/feed.png" accessKey="" hasAccessKey="false">
              		<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false" ajxpWidgets="UserWidget::logging_string"/>
                 </gui>
                 <processing>

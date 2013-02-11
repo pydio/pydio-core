@@ -19,7 +19,7 @@
     <registry_contributions>
         <actions>
             <action name="git_history">
-                <gui text="meta.git.1" title="meta.git.2" src="history_images/actions/ICON_SIZE/system_file_manager.png" hasAccessKey="false">
+                <gui text="meta.git.1" title="meta.git.2" iconClass="icon-undo" src="history_images/actions/ICON_SIZE/system_file_manager.png" hasAccessKey="false">
                     <context selection="true" dir="false" recycle="false" behaviour="hidden"
                         actionBar="false" contextMenu="true" infoPanel="false"
                         actionBarGroup="put">
