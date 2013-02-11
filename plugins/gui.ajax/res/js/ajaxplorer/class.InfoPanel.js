@@ -124,7 +124,7 @@ Class.create("InfoPanel", AjxpPane, {
 			if(userSelection.getContextNode()){
 				currentRep = getBaseName(userSelection.getContextNode().getPath());
 			}
-			if(currentRep == ""){
+			if(currentRep == "" && $('repo_path')){
 				currentRep = $('repo_path').value;
 			}
 			
