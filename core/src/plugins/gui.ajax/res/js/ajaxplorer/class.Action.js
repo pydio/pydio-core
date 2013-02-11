@@ -493,11 +493,14 @@ Class.create("Action", {
 	 * Refresh icon image source
 	 * @param newSrc String The image source. Can reference an image library
 	 */
-	setIconSrc : function(newSrc){
+	setIconSrc : function(newSrc, iconClass){
 		this.options.src = newSrc;
 		if($(this.options.name +'_button_icon')){
 			$(this.options.name +'_button_icon').src = resolveImageSource(this.options.src,this.__DEFAULT_ICON_PATH, 22);
-		}		
+		}
+        if(iconClass){
+            this.options.icon_class = iconClass;
+        }
 	},
 	
 	/**

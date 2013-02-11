@@ -343,8 +343,8 @@ Class.create("ActionsToolbar", {
 		  mouseClick:"over",
 		  anchor: button, // context menu will be shown when element with class name of "contextmenu" is clicked
 		  className: 'menu desktop toolbarmenu', // this is a class which will be attached to menu container (used for css styling)
-		  topOffset : 0,
-		  leftOffset : 0,	
+		  topOffset : (this.options.submenuOffsetTop ? this.options.submenuOffsetTop : 0),
+		  leftOffset : (this.options.submenuOffsetLeft ? this.options.submenuOffsetLeft : 0),
 		  parent : this.element,	 
 		  menuItems: action.subMenuItems.staticOptions || [],
 		  fade:true,

@@ -25,18 +25,23 @@ Class.create("RepositorySelect", {
 	__implements : "IAjxpWidget",
 	_defaultString:'No Repository',
 	_defaultIcon : 'network-wired.png',
+    options : {},
 	/**
 	 * Constructor
 	 * @param oElement HTMLElement Anchor
 	 */
-	initialize : function(oElement){
+	initialize : function(oElement, options){
 		this.element = oElement;
 		this.element.ajxpPaneObject = this;
 		this.show = true;
+        if(options){
+            this.options = options;
+        }
 		this.createGui();
 		document.observe("ajaxplorer:repository_list_refreshed", function(e){
 			this.refreshRepositoriesMenu(e.memo.list,e.memo.active);
 		}.bind(this) );
+
 	},
 	
 	/**
@@ -60,7 +65,12 @@ Class.create("RepositorySelect", {
 		if(MessageHash){
 			this._defaultString = MessageHash[391];
 		}		
-		
+
+        if(this.options.simpleLabel){
+            this.element.insert(this.options.simpleLabel);
+            return;
+        }
+
 		this.icon = new Element('img', {
 			id:'repo_icon',
 			src:resolveImageSource(this._defaultIcon,'/images/actions/ICON_SIZE', 16),
@@ -96,7 +106,15 @@ Class.create("RepositorySelect", {
 	 * @param repositoryId String
 	 */
 	refreshRepositoriesMenu: function(repositoryList, repositoryId){
-		this.button.addClassName('disabled');
+
+        var button;
+        if(this.options.simpleLabel){
+            button = this.element;
+        }else{
+            button = this.button;
+        }
+
+		button.addClassName('disabled');
 		var actions = $A([]);
 		var lastActions = $A([]);
         var sharedActions = $A([]);
@@ -128,13 +146,13 @@ Class.create("RepositorySelect", {
 					actions.push(actionData);
 				}				
 				if(key == repositoryId){
-					this.label.setValue(repoObject.getLabel());
-					this.icon.src = repoObject.getIcon();
+					if(this.label) this.label.setValue(repoObject.getLabel());
+                    if(this.icon) this.icon.src = repoObject.getIcon();
 				}
 			}.bind(this));
 		}else{
-			this.label.setValue(this._defaultString);
-			this.icon.src = resolveImageSource(this._defaultIcon,'/images/actions/ICON_SIZE', 16);
+            if(this.label) this.label.setValue(this._defaultString);
+            if(this.icon) this.icon.src = resolveImageSource(this._defaultIcon,'/images/actions/ICON_SIZE', 16);
 		}
 		
 		var fonc = function(a,b){
@@ -176,14 +194,15 @@ Class.create("RepositorySelect", {
 		}else{
 			this.repoMenu = new Proto.Menu({			
 				className: 'menu rootDirChooser',
-				mouseClick:'left',
-				anchor:this.button,
+				mouseClick:(this.options.menuEvent? this.options.menuEvent : 'left'),
+				anchor:button,
+                position: (this.options.menuPosition? this.options.menuPosition : 'left'),
 				createAnchor:false,
 				anchorContainer:$('dir_chooser'),
 				anchorSrc:ajxpResourcesFolder+'/images/arrow_down.png',
 				anchorTitle:MessageHash[200],
-				topOffset:2,
-				leftOffset:-127,
+				topOffset:(this.options.menuOffsetTop !== undefined ? this.options.menuOffsetTop: 2),
+				leftOffset:(this.options.menuOffsetLeft !== undefined ? this.options.menuOffsetLeft: -127),
 				menuTitle:MessageHash[200],
 				menuItems: actions,
 				fade:true,
@@ -191,7 +210,7 @@ Class.create("RepositorySelect", {
 			});		
 			this.notify("createMenu");
 		}
-		if(actions.length) this.button.removeClassName('disabled');
+		if(actions.length) button.removeClassName('disabled');
 	},
 	/**
 	 * Listener for repository selection 
@@ -204,6 +223,7 @@ Class.create("RepositorySelect", {
 	 * Resize widget
 	 */
 	resize : function(){
+        if(!this.currentRepositoryLabel) return;
 		var parent = this.element.getOffsetParent();
 		if(parent.getWidth() < this.currentRepositoryLabel.getWidth()*3.5){
 			this.showElement(false);
@@ -262,6 +282,7 @@ Class.create("RepositorySelect", {
 	 * @returns Integer
 	 */
 	getActualWidth : function(){
+        if(this.options.simpleLabel) return this.element.getWidth();
 		if(this.currentRepositoryLabel.visible()) return this.element.getWidth();
 		else return this.button.getWidth() + 10;
 	}

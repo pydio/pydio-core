@@ -23,13 +23,17 @@
  */
 Class.create("UserWidget", {
 	__implements : ["IAjxpWidget"],
+    options : {},
 	/**
 	 * Constructor
 	 * @param element HTMLElement
 	 */
-	initialize: function(element){
+	initialize: function(element, options){
 		this.element = element;
 		this.element.ajxpPaneObject = this;
+        if(options){
+            this.options = options;
+        }
 		
 		this.mObs1 = function(){
             this.element.select('div').invoke('addClassName', 'user_widget_hover');
@@ -114,6 +118,7 @@ Class.create("UserWidget", {
                 action_id:action.options.name,
 				alt:action.options.title,
 				image:resolveImageSource(action.options.src, '/images/actions/ICON_SIZE', 16),
+                icon_class:action.options.icon_class,
 				callback:function(e){this.apply();}.bind(action)
 			});
 		});
@@ -128,7 +133,7 @@ Class.create("UserWidget", {
 		}else{			
 			this.menu = new Proto.Menu({			
 				className: 'menu rootDirChooser rightAlignMenu',
-				mouseClick:'left',
+				mouseClick:(this.options.menuEvent?this.options.menuEvent:"left"),
 				position: 'bottom right',
 				anchor:this.element,
 				createAnchor:false,
