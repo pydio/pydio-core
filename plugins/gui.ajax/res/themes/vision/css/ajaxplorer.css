@@ -18,7 +18,7 @@ table.sort-table tr:nth-child(even)
     background: linear-gradient(top, rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%); /* W3C */
 }
 
-.css_gradient, .dialogBox, .action_bar.floatingBar, .largeButton, .fakeUploadButton{
+.css_gradient, .dialogBox, .largeButton, .fakeUploadButton{
     background: rgb(247,247,247); /* Old browsers */
     background: -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(227,227,227,1) 50%, rgba(216,216,216,1) 51%, rgba(242,242,242,1) 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(247,247,247,1)), color-stop(50%,rgba(227,227,227,1)), color-stop(51%,rgba(216,216,216,1)), color-stop(100%,rgba(242,242,242,1))); /* Chrome,Safari4+ */
@@ -321,7 +321,7 @@ div.shadow_class
     border: 1px solid #aaa;
     background-repeat: no-repeat;
     background-position: top left;
-    height: 16px;
+    height: 20px;
     border-radius: 2px;
     -moz-border-radius: 2px;
     -webkit-border-radius: 2px;
@@ -693,7 +693,7 @@ div.oneFieldForm input.SF_input{
 /* SF like "Standard Form" DATA : try to make a "standard"...
 /*************************/
 div.SF_element{
-    padding-top:5px;
+    padding-top: 9px;
     clear:left;
 }
 
@@ -706,7 +706,7 @@ div.SF_label{
     float: left;
     width: 39%;
     text-align: right;
-    padding: 3px;
+    padding: 7px;
     padding-right:1%;
     padding-left:0;
     line-height: 18px;
@@ -720,8 +720,8 @@ div.SF_label{
 
 .SF_input{
     float:left;
-    padding:1px !important;
-    width: 57% !important;
+    padding: 2px 3px !important;
+    width: 54% !important;
     _width:54% !important; /*IE*/
 }
 
@@ -836,6 +836,7 @@ input.SF_input.SF_number{
     background-repeat: no-repeat;
     background-position: 9px 7px;
     background-size: 138px;
+    box-shadow: 0px 0px 8px rgba(0,0,0,0.4);
 }
 
 #workspace_toolbar{
@@ -907,7 +908,9 @@ input.SF_input.SF_number{
     line-height: 15px;
 }
 .action_bar.editor_action_bar{
-    height:55px;
+    height: 43px;
+    background-color: #ebedf0;
+    border-bottom: 1px solid rgb(138, 149, 160);
 }
 
 div.editor_header{
@@ -958,21 +961,20 @@ div.editor_header > span.header_label{
 
 .action_bar.floatingBar{
     position: absolute;
-    border-radius: 8px;
+    border-radius: 3px;
     padding-right: 10px;
     padding-left: 10px;
     cursor: move;
-    -webkit-box-shadow: rgba(0, 0, 0, 0.398438) 2px 2px 6px;
-    -moz-box-shadow: rgba(0, 0, 0, 0.398438) 2px 2px 6px;
-    box-shadow: rgba(0, 0, 0, 0.398438) 2px 2px 6px;
     opacity: 0.95;
+    background-color: rgb(138, 149, 160);
+    box-shadow: 1px 1px 3px #000;
 }
 
 .action_bar span.actionbar_button_label {
     cursor: pointer;
     display: inline-block;
     padding: 4px 3px 3px;
-    font-size: 13px;
+    font-size: 12px;
 }
 
 div.action_bar.icons_only  span.actionbar_button_label{
@@ -1019,11 +1021,21 @@ div.action_bar.text_only  span.actionbar_button_label{
     margin: 5px 3px 0px 1px;
     background: #4dc5c3; /* Old browsers */   /* FF3.6+ */   /* Chrome,Safari4+ */   /* Chrome10+,Safari5.1+ */   /* Opera 11.10+ */   /* IE10+ */   /* W3C */   /* IE6-9 */;
     letter-spacing: 1px;
+    float: left;
 }
 
 .action_bar.icons_only a{
     padding-bottom: 2px;
     padding-top: 3px;
+    padding-left: 6px;
+    padding-right: 6px;
+    margin-right: 0;
+    float: left;
+    background-color: transparent;
+    font-size: 1.5em;
+    display: inline-block;
+    cursor: pointer;
+    margin-left: 0;
 }
 
 .action_bar.text_only a{
@@ -1033,7 +1045,7 @@ div.action_bar.text_only  span.actionbar_button_label{
 }
 
 .action_bar span.ajxp_icon_span {
-    font-size: 1.6em;
+    font-size: 1.3em;
     float: left;
     padding-top: 3px;
 }
@@ -1056,11 +1068,13 @@ div.action_bar.text_only  span.actionbar_button_label{
 .action_bar a img
 {
     margin: 2px 5px 2px 0px;
+    display: none;
 }
 
 div.action_bar.icons_only img.actionbar_button_icon{
     height: 22px;
     width: 22px;
+    display: none;
 }
 
 div.action_bar.icon_text img.actionbar_button_icon{
@@ -1214,7 +1228,7 @@ a.carousel-control img{
     font-size: 12px;
     font-weight: normal;
     letter-spacing: 1px;
-    margin-top: -4px;
+    margin-top: -5px;
     margin-right: 13px;
     cursor: pointer;
 }
@@ -1937,12 +1951,10 @@ div#upload_files_list div, div#multiple_download_container div
     right: 0px;
     z-index: 1000;
     opacity: 0.7;
-    border-radius: 0px 2px 2px 0px;
     border-left: 1px solid #CCC;
 }
 .scroller_handle{
     -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
     border-radius: 5px;
 }
 
@@ -2846,11 +2858,7 @@ textarea.editor
 }
 
 #diaporamaMetadataContainer div.panelContent{
-    margin-top: 6px;
-    margin-bottom: 6px;
-    margin-left: 6px;
-    background-color: white;
-    border-radius: 7px;
+    background-color: #ebedf0;
     margin-right: 3px;
 }
 #diaporamaMetadataContainer div.infoPanelImagePreview{
@@ -2860,12 +2868,10 @@ textarea.editor
     background-color: #757575;
 }
 #diaporamaMetadataContainer div.scroller_track{
-    right: 2px;
-    top: 6px;
+    right: 3px;
 }
 #diaporamaMetadataContainer div.scroller_track,
 #diaporamaMetadataContainer div.scroller_handle{
-    border-radius: 0 7px 7px 0;
 }
 #diaporamaMetadataContainer div.imagePreviewOverlay{
     background-color:rgba(0, 0, 0, 0.2) !important;
@@ -2873,14 +2879,14 @@ textarea.editor
 }
 
 div.icons_only.diaporama_toolbar{
-    height: 40px !important;
+    height: 33px !important;
     width: 470px;
 }
 div.diaporama_toolbar div#diaporama_legend{
     display: none;
 }
 div.diaporama_toolbar div#diaporama_input_boxes{
-    margin-top: 10px !important;
+    margin-top: 6px !important;
 }
 
 /***********************/
@@ -3053,7 +3059,7 @@ div.menu a {
 
 .menu.desktop.toolbarmenu a {
     color: #fff;
-    padding: 11px 20px 5px 8px;
+    padding: 8px 20px 5px 8px;
     margin: 0;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size:11px;
@@ -3209,7 +3215,7 @@ div.menu a {
     margin-right:0px;
     margin-left:5px;
     float: right;
-    font-size: 1.4em;
+    font-size: 1.3em;
 }
 
 .menuActions {

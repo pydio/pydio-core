@@ -294,7 +294,7 @@ Class.create("Modal", {
 			return;
 		}
 		var editorKlass = editorData.editorClass;
-		modal.prepareHeader(editorData.text, resolveImageSource(editorData.icon, '/images/actions/ICON_SIZE', 16));
+		modal.prepareHeader(editorData.text, resolveImageSource(editorData.icon, '/images/actions/ICON_SIZE', 16), editorData.icon_class);
 		var loadFunc = function(oForm){			
 			if(typeof(editorKlass) == "string"){
 				ajaxplorer.actionBar.editor = eval('new '+editorKlass+'(oForm)');
