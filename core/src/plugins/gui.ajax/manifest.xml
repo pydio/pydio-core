@@ -104,7 +104,7 @@
                             <div class="repository_title" id="repository_title" ajxpClass="RepositorySimpleLabel"></div>
                         </div>
 					    <div style="float:left;width:75%;">
-						    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put"],"groupOtherToolbars":["get", "change", "user", "remote"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+						    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put"],"groupOtherToolbars":["get", "change", "user", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
 						</div>
 						<div style="clear:left;"/>
 					</div>
