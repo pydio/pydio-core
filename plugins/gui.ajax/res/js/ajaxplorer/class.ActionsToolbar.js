@@ -135,7 +135,7 @@ Class.create("ActionsToolbar", {
             var moreAction = new Action({
                 name:'group_more_action',
                 src:'view_icon.png',
-                icon_class:'icon-plus-sign',
+                icon_class:'icon-none',
                 /*
                 text_id:150,
                 title_id:151,
@@ -156,7 +156,9 @@ Class.create("ActionsToolbar", {
             }, {}, {}, {dynamicItems: submenuItems});
             moreAction.setManager(ajaxplorer.actionBar);
             this.actions.set("group_more_action", moreAction);
-            this.toolbars.get('put').push("group_more_action");
+            try{
+                this.toolbars.get(this.toolbarsList[0]).push("group_more_action");
+            }catch (e){}
 
         }
 
@@ -314,7 +316,7 @@ Class.create("ActionsToolbar", {
 		button.insert(img).insert(titleSpan.update(action.getKeyedText()));
 		//this.elements.push(this.button);
 		if(action.options.subMenu){
-			this.buildActionBarSubMenu(button, action);// TODO
+			this.buildActionBarSubMenu(button, action);
             if(window.ajaxplorer.currentThemeUsesIconFonts){
 
                 button.insert(new Element('span', {className:'icon-caret-down ajxp_icon_arrow'}));

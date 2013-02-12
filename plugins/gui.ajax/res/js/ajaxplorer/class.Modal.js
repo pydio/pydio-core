@@ -60,11 +60,20 @@ Class.create("Modal", {
 	 * @param sTitle String Title of the popup
 	 * @param sIconSrc String Source icon
 	 */
-	prepareHeader: function(sTitle, sIconSrc){
+	prepareHeader: function(sTitle, sIconSrc, sIconClass){
 		var hString = "<span class=\"titleString\">";
 		if(sIconSrc != "") hString = "<span class=\"titleString\"><img src=\""+sIconSrc.replace('22', '16')+"\" width=\"16\" height=\"16\" align=\"top\"/>&nbsp;";
-		var closeBtn = '<img id="modalCloseBtn" style="cursor:pointer;float:right;margin-top:2px;" src="'+ajxpResourcesFolder+'/images/actions/16/window_close.png" />';  
-		hString += sTitle + '</span>';
+        var closeBtn;
+        if(window.ajaxplorer.currentThemeUsesIconFonts){
+            if(sIconClass){
+                hString = "<span class=\"titleString\"><span class='"+sIconClass+" ajxp_icon_span'></span>";
+            }
+            closeBtn = '<span id="modalCloseBtn" class="icon-remove-sign" style="cursor:pointer;float:right;"></span>';
+        }else{
+            closeBtn = '<img id="modalCloseBtn" style="cursor:pointer;float:right;margin-top:2px;" src="'+ajxpResourcesFolder+'/images/actions/16/window_close.png" />';
+        }
+
+        hString += sTitle + '</span>';
 		this.dialogTitle.update(closeBtn + hString);
 	},
 	

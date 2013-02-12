@@ -107,7 +107,11 @@ Proto.Menu = Class.create({
 			window.clearTimeout(this.timer);
 			this.timer = null;
 		}
-	},
+        if(this.options.parent && this.options.parent.timer){
+            window.clearTimeout(this.options.parent.timer);
+            this.options.parent.timer = null;
+        }
+    },
 	
 	mouseoutFunction:function(e){
 		this.timer = window.setTimeout(function(){
@@ -226,7 +230,8 @@ Proto.Menu = Class.create({
                 newItem.down('u')._callback = item.callback;
             }
             if(item.overlay){
-                newItem.down('img').insert({after:Object.extend(new Element('img', {src:item.overlay, style:'position:relative;margin-left:-12px;top:5px;'}), {_callback:item.callback})});
+                if(newItem.down('img')) newItem.down('img').insert({after:Object.extend(new Element('img', {src:item.overlay, style:'position:relative;margin-left:-12px;top:5px;'}), {_callback:item.callback})});
+                if(newItem.down('span')) newItem.down('span').insert({after:Object.extend(new Element('img', {src:item.overlay, style:'position:relative;margin-left:-12px;top:5px;'}), {_callback:item.callback})});
             }
 			newItem._callback = item.callback;
 			if(item.subMenu){
@@ -239,7 +244,7 @@ Proto.Menu = Class.create({
 				newItem.subMenu = new Proto.Menu({
 				  mouseClick:"over",
 				  anchor: newItem, 
-				  className: 'menu desktop', 
+				  className: this.options.className,
 				  topOffset : 0,
 				  leftOffset : -1,		 
 				  menuItems: item.subMenu,
