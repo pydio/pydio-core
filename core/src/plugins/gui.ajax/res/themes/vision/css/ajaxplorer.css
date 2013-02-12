@@ -267,9 +267,9 @@ div.shadow_class
     z-index: 1002;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size: 11px;
-    padding:5px;
+    padding: 0px;
     -moz-border-radius:5px;
-    border-radius:5px;
+    border-radius: 3px;
 }
 
 .editBox
@@ -282,10 +282,23 @@ div.shadow_class
 
 .dialogTitle
 {
-    color:#333333;
     cursor:move;
-    padding:0px 4px 4px;
+    font-size: 13px !important;
 }
+
+.dialogTitle span.ajxp_icon_span,
+.dialogTitle span#modalCloseBtn
+{
+    display: inline-block;
+    font-size: 15px;
+    padding-right: 5px
+}
+
+.dialogTitle span#modalCloseBtn{
+    font-size: 13px;
+    margin-top:2px
+}
+
 
 .dialogContent
 {
@@ -294,6 +307,7 @@ div.shadow_class
     border: 1px solid #dddddd;
     -moz-border-radius:0px 0px 3px 3px;
     border-radius:0px 0px 3px 3px;
+    border-top: 0;
 }
 
 .dialogContent input,
@@ -615,10 +629,10 @@ div.accordion_content{
 }
 
 div.dialogContentMainTitle{
-    color: #2B70BE;
+    color: rgb(117, 128, 139);
     font-size: 20px;
     margin-bottom: 10px;
-    border-bottom: 1px solid #2B70BE;
+    border-bottom: 1px solid rgb(117, 128, 139);
     padding-bottom: 0px;
 }
 
@@ -863,7 +877,7 @@ input.SF_input.SF_number{
     border-right: 1px solid rgb(172, 178, 184);
 }
 
-.panelHeader{
+.panelHeader, .dialogTitle{
     border: none;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue-Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size: 12px;
@@ -883,8 +897,6 @@ input.SF_input.SF_number{
 
 #sidebar_splitter div.panelHeader,
 #search_panel div.panelHeader{
-    padding-top: 5px;
-    padding-bottom: 4px;
 }
 
 .action_bar
@@ -2000,10 +2012,6 @@ div.tabulatorContainer{
 }
 
 #search_panel{
-    margin: 20px;
-    -webkit-box-shadow: 0px 0px 6px #aaa;
-    -moz-box-shadow: 0px 0px 6px #aaa;
-    box-shadow: 0px 0px 6px #aaa;
 }
 
 #search_div
@@ -2029,44 +2037,58 @@ div.tabulatorContainer{
 #search_form, #search_state
 {
     padding-left: 10px;
-    padding-top:5px;
-    text-align: center;
-    height: 25px;
+    padding-top: 13px;
 }
 #search_form
 {
-    border-bottom: 1px solid #ddd;
-    background-color: #eee;
+    float: right;
 }
 #search_form a
 {
     display:block;
-    float:left;
+    float: left;
     width:18px;
     cursor: pointer;
     margin-right: 0px;
     margin-left: 5px;
     padding: 1px;
+    font-size: 1.4em;
+    padding-top: 3px;
+    color: rgb(138, 149, 160);
+}
+
+#search_form a.disabled {
+    display: none;
 }
 
 #search_form a img{
     margin-top: 2px;
     vertical-align: top;
+    display: none;
 }
 
 #search_form input
 {
     margin: 0px;
+    float: left;
+    height: 25px;
+    border-color: rgb(138, 149, 160);
+    background: #fff;
+    font-size: 1.2em;
+    color: rgb(138, 149, 160);
+    padding-left: 6px;
+    border-width: 1px;
+    width: 206px;
 }
 
 #search_meta {
-    font-family:"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size: 11px;
-    float: right;
-    text-align: left;
-    padding-left: 10px;
-    padding-right: 18px;
-    padding-top:2px;
+    padding: 5px 5px 7px;
+    background-color: rgb(255, 255, 255);
+    color: rgb(143, 162, 182);
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgb(194, 196, 199);
 }
 
 .searchScore{
@@ -2085,16 +2107,34 @@ meta_opt {
 }
 
 meta_opt.checked {
-    text-decoration: underline;
-    font-weight: bold;
+}
+
+#search_results_cont{
+    display: none;
+    position: absolute;
+    top: 96px;
+    right: 4px;
+    z-index: 1010;
+    border: 1px solid rgb(138, 149, 160);
+    border-radius: 4px;
+    box-shadow: 1px 10px 40px rgba(0,0,0,0.5);
+    background-color: #ebedf0;
 }
 
 #search_results
 {
     margin-left:0px;
-    width: 100%;
+    width: 250px;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size: 11px;
+    background-color: #ebedf0;
+}
+
+.close_results.icon-remove-sign {
+    float: right;
+    display: inline-block;
+    padding: 2px 5px;
+    cursor:pointer;
 }
 
 #search_results em {
@@ -2104,27 +2144,15 @@ meta_opt.checked {
 
 #search_results div
 {
-    border-bottom: 1px solid #f1f1ef;
-    padding: 4px;
+    border-bottom: 1px solid #fff;
+    padding: 7px;
     cursor: pointer;
+    color: rgb(111, 121, 131);
 }
 
 #search_results div:hover
 {
-    background-color:#73a2d7 !important;
-    background-image: -webkit-gradient(
-        linear,
-        left bottom,
-        left top,
-        color-stop(0, rgb(66,128,199)),
-        color-stop(0.54, rgb(115,161,215))
-    );
-    background-image: -moz-linear-gradient(
-        center bottom,
-        rgb(52,111,179) 0%,
-        rgb(115,161,215) 54%
-    );
-    color: white;
+    background-color: rgb(252, 250, 207) !important
 }
 
 .infoPanelActions
@@ -3084,6 +3112,14 @@ div.menu a {
     background-color: #666;
 }
 
+.rootDirChooser span.ajxp_icon_span{
+
+    display:inline-block;
+    padding-right: 5px;
+    font-size: 1.4em;
+
+}
+
 .rootDirChooser img
 {
     border: 0px;
@@ -3250,9 +3286,9 @@ div.menuActions img{
 }
 
 .dialogBox.css_boxshadow{
-    -moz-box-shadow : 5px 5px 60px #303030;
-    -webkit-box-shadow : 5px 5px 60px #303030;
-    box-shadow : 5px 5px 60px #303030;
+    -moz-box-shadow: 5px 5px 100px #222;
+    -webkit-box-shadow: 5px 5px 100px #222;
+    box-shadow: 5px 5px 100px #222;
 }
 
 div.dialogBox div.dialogBox.css_boxshadow{

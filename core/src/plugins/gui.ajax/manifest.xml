@@ -96,15 +96,18 @@
 				<div id="toolbars">
 					<div id="global_toolbar">
 					    <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over"}'></div>
-						<div id="repo_chooser" ajxpClass="RepositorySelect" ajxpOptions='{"menuPosition": "bottom right", "menuOffsetTop":11, "menuOffsetLeft":20, "menuEvent":"over", "simpleLabel":"<span class=\"icon-sitemap\"></span><span class=\"ws-label\">My Workspaces</span><span class=\"icon-caret-down\"></span>"}'></div>
+						<div id="repo_chooser" ajxpClass="RepositorySelect" ajxpOptions='{"menuPosition": "bottom right", "menuOffsetTop":11, "menuOffsetLeft":40, "menuEvent":"over", "simpleLabel":"<span class=\"icon-sitemap\"></span><span class=\"ws-label\">My Workspaces</span><span class=\"icon-caret-down\"></span>"}'></div>
 					</div>
 					<div id="workspace_toolbar">
                         <div id="simple_repository_label">
                             <div class="repository_legend">Workspace</div>
                             <div class="repository_title" id="repository_title" ajxpClass="RepositorySimpleLabel"></div>
                         </div>
-					    <div style="float:left;width:75%;">
-						    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put"],"groupOtherToolbars":["get", "change", "user", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+					    <div style="float:left;width:55%;">
+						    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put"],"groupOtherToolbars":["get", "change", "more", "user", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+						</div>
+						<div style="float:left; width:19%">
+						    <div id="search_engine" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":10}'></div>
 						</div>
 						<div style="clear:left;"/>
 					</div>

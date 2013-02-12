@@ -140,7 +140,8 @@ Class.create("Action", {
 		if(this.options.prepareModal){
 			modal.prepareHeader(
 				this.options.title, 
-				resolveImageSource(this.options.src,this.__DEFAULT_ICON_PATH, 16)
+				resolveImageSource(this.options.src,this.__DEFAULT_ICON_PATH, 16),
+                this.options.icon_class
 			);
 		}
 		window.actionArguments = $A([]);
@@ -476,13 +477,23 @@ Class.create("Action", {
 			  		this.subMenuItems.dynamicItems.each(function(item){
 			  			var action = this.manager.actions.get(item['actionId']);
 			  			if(action.deny) return;
-						menuItems.push({
+						var itemData = {
 							name:action.getKeyedText(),
 							alt:action.options.title,
                             icon_class:action.options.icon_class,
 							image:resolveImageSource(action.options.src, '/images/actions/ICON_SIZE', 16),						
 							callback:function(e){this.apply();}.bind(action)
-						});
+						};
+                        if(action.options.subMenu){
+                            itemData.subMenu = [];
+                            if(action.subMenuItems.staticOptions){
+                                itemData.subMenu = action.subMenuItems.staticOptions;
+                            }
+                            if(action.subMenuItems.dynamicBuilder){
+                                itemData.subMenuBeforeShow = action.subMenuItems.dynamicBuilder;
+                            }
+                        }
+                        menuItems.push(itemData);
 			  		}, this);
 				}
 			  	protoMenu.options.menuItems = menuItems;

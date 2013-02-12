@@ -99,7 +99,11 @@ Class.create("SearchEngine", AjxpPane, {
 		
 		if(!this.htmlElement) return;
 		
-		this.htmlElement.insert('<div id="search_panel"><div id="search_form"><input style="float:left;" type="text" id="search_txt" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="" id="search_button" ajxp_message_title_id="184" title="'+MessageHash[184]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/search.png" border="0"/></a><a href="" id="stop_search_button" ajxp_message_title_id="185" title="'+MessageHash[185]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div></div>');
+		this.htmlElement.insert('<div id="search_panel"><div id="search_form"><input style="float:left;" type="text" id="search_txt" placeholder="'+ MessageHash[87] +'" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="" id="search_button" class="icon-search" ajxp_message_title_id="184" title="'+MessageHash[184]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/search.png" border="0"/></a><a class="icon-remove" href="" id="stop_search_button" ajxp_message_title_id="185" title="'+MessageHash[185]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div></div>');
+        if(this._ajxpOptions.toggleResultsVisibility){
+            this.htmlElement.down("#search_results").insert({before:"<div id='"+this._ajxpOptions.toggleResultsVisibility+"'></div>"});
+            this.htmlElement.down("#" + this._ajxpOptions.toggleResultsVisibility).insert(this.htmlElement.down("#search_results"));
+        }
         if(this.htmlElement.down('div.panelHeader')){
             this.htmlElement.down('div#search_panel').insert({top:this.htmlElement.down('div.panelHeader')});
         }
@@ -107,7 +111,11 @@ Class.create("SearchEngine", AjxpPane, {
 		this.metaOptions = [];
 		if(this._ajxpOptions && this._ajxpOptions.metaColumns){
             var cols = this._ajxpOptions.metaColumns;
-			$('search_form').insert({bottom:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});
+            if(this._ajxpOptions.toggleResultsVisibility){
+                this.htmlElement.down("#" + this._ajxpOptions.toggleResultsVisibility).insert({top:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});
+            }else{
+                $('search_form').insert({bottom:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});
+            }
 			this.initMetaOption($('search_meta_options'), 'filename', MessageHash[1], true);
 			for(var key in cols){
                 if(this.indexedFields && !this.indexedFields.include(key)) continue;
@@ -143,6 +151,9 @@ Class.create("SearchEngine", AjxpPane, {
 			ajaxplorer.disableNavigation();
 			this.hasFocus = true;
 			this._inputBox.select();
+            if(this.hasResults && this._ajxpOptions.toggleResultsVisibility){
+                $(this._ajxpOptions.toggleResultsVisibility).setStyle({display:'block'});
+            }
 			return false;
 		}.bind(this));
 			
@@ -177,7 +188,12 @@ Class.create("SearchEngine", AjxpPane, {
 	 * Resize the widget
 	 */
 	resize: function(){
-		fitHeightToBottom($(this._resultsBoxId));
+        if(this._ajxpOptions.toggleResultsVisibility){
+            fitHeightToBottom($(this._ajxpOptions.toggleResultsVisibility), null, (this._ajxpOptions.fitMarginBottom?this._ajxpOptions.fitMarginBottom:0));
+            fitHeightToBottom($(this._resultsBoxId));
+        }else{
+            fitHeightToBottom($(this._resultsBoxId), null, (this._ajxpOptions.fitMarginBottom?this._ajxpOptions.fitMarginBottom:0));
+        }
 		if(this.htmlElement && this.htmlElement.visible()){
 			//this._inputBox.setStyle({width:Math.max((this.htmlElement.getWidth() - this.htmlElement.getStyle("paddingLeft")- this.htmlElement.getStyle("paddingRight") -70),70) + "px"});
 		}
@@ -202,11 +218,12 @@ Class.create("SearchEngine", AjxpPane, {
 	 */
 	initMetaOption : function(element, optionValue, optionLabel, checked){
 		var option = new Element('meta_opt', {value:optionValue}).update(optionLabel);
-		if(checked) option.addClassName('checked');
+		if(checked) option.addClassName('checked icon-ok');
 		if(element.childElements().length) element.insert(', ');
 		element.insert(option);
 		option.observe('click', function(event){
 			option.toggleClassName('checked');
+			option.toggleClassName('icon-ok');
 		});
 		this.metaOptions.push(option);
 	},
@@ -279,9 +296,19 @@ Class.create("SearchEngine", AjxpPane, {
 	 */
 	updateStateSearching : function (){
 		this._state = 'searching';
-		//try{this._inputBox.disabled = true;}catch(e){}
 		$(this._searchButtonName).addClassName("disabled");
 		$('stop_'+this._searchButtonName).removeClassName("disabled");
+        if(this._ajxpOptions.toggleResultsVisibility){
+            if(!$(this._ajxpOptions.toggleResultsVisibility).down("div.panelHeader")){
+                $(this._ajxpOptions.toggleResultsVisibility).insert({top:"<div class='panelHeader'>Results<span class='close_results icon-remove-sign'></span></div>"});
+            }
+            $(this._ajxpOptions.toggleResultsVisibility).down("span.close_results").observe("click", function(){
+                $(this._ajxpOptions.toggleResultsVisibility).setStyle({display:"none"});
+            }.bind(this));
+
+            $(this._ajxpOptions.toggleResultsVisibility).setStyle({display:"block"});
+            this.resize();
+        }
 	},
 	/**
 	 * Search is finished
@@ -306,7 +333,8 @@ Class.create("SearchEngine", AjxpPane, {
 	 * Clear all results
 	 */
 	clearResults : function(){
-		// Clear the results	
+		// Clear the results
+        this.hasResults = false;
 		while($(this._resultsBoxId).childNodes.length)
 		{
 			$(this._resultsBoxId).removeChild($(this._resultsBoxId).childNodes[0]);
@@ -363,6 +391,7 @@ Class.create("SearchEngine", AjxpPane, {
 				ajaxplorer.goTo(folderName+"/"+fileName);
 			});
 		}
+        this.hasResults = true;
 	},
     addNoResultString : function(){
         $(this._resultsBoxId).insert(new Element('div').update("No results found."));
