@@ -207,7 +207,7 @@ Proto.Menu = Class.create({
                     title:item.alt
                 });
             }else{
-                img = new Element('img', {src:item.image,border:'0',height:16,width:16,align:'absmiddle'});
+                if(!item.separator) img = new Element('img', {src:item.image,border:'0',height:16,width:16,align:'absmiddle'});
             }
 
 			newItem.insert(

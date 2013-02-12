@@ -60,9 +60,9 @@ Class.create("AbstractEditor" , {
 		}, options || { });		
 		this.element =  $(oContainer);
 		this.defaultActions = new Hash({
-			'fs' : '<a id="fsButton"><img src="'+ajxpResourcesFolder+'/images/actions/22/window_fullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="235"></span></a>',
-			'nofs' : '<a id="nofsButton" style="display:none;"><img src="'+ajxpResourcesFolder+'/images/actions/22/window_nofullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="236"></span></a>',
-			'close':'<a id="closeButton"><img src="'+ajxpResourcesFolder+'/images/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br><span message_id="86"></span></a>'
+			'fs' : '<a id="fsButton" class="icon-resize-full"><img src="'+ajxpResourcesFolder+'/images/actions/22/window_fullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="235"></span></a>',
+			'nofs' : '<a id="nofsButton" class="icon-resize-small" style="display:none;"><img src="'+ajxpResourcesFolder+'/images/actions/22/window_nofullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="236"></span></a>',
+			'close':'<a id="closeButton" class="icon-remove-sign"><img src="'+ajxpResourcesFolder+'/images/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br><span message_id="86"></span></a>'
 		});
         if(this.editorOptions.actions){
             this.defaultActions = $H(Object.extend(this.defaultActions._object, this.editorOptions.actions));
