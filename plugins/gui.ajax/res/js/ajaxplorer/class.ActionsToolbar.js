@@ -135,11 +135,13 @@ Class.create("ActionsToolbar", {
             var moreAction = new Action({
                 name:'group_more_action',
                 src:'view_icon.png',
-                icon_class:'icon-th-list',
+                icon_class:'icon-plus-sign',
+                /*
                 text_id:150,
                 title_id:151,
-                text:MessageHash[150],
-                title:MessageHash[151],
+                */
+                text:"More",
+                title:"More actions",
                 hasAccessKey:false,
                 subMenu:true,
                 callback:function(){}
