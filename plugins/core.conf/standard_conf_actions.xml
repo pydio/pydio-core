@@ -142,8 +142,40 @@
 			</processing>
 		</action>
 		<action name="get_bookmarks">
-			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+            <gui text="145" title="145" src="edit_user.png" iconClass="icon-star" accessKey="" hasAccessKey="false">
+                <context selection="false" dir="" recycle="true" actionBar="true" actionBarGroup="filter" contextMenu="false" infoPanel="false"/>
+            </gui>
+            <rightsContext adminOnly="false" noUser="true" read="false" userLogged="only" write="false"/>
+            <processing>
+                <clientCallback><![CDATA[
+
+                ]]></clientCallback>
+                <clientListener name="init"><![CDATA[
+                window.setTimeout(function(){
+                    var bmBar = new BookmarksBar($('get_bookmarks_button'), {bookmarksMenuOptions:{
+                        className: 'menu desktop toolbarmenu panelHeaderMenu bmbarMenu',
+                        mouseClick:'over',
+                        topOffset:2,
+                        leftOffset:0,
+                        position:'bottom right'
+                    }});
+                    var bmAction = ajaxplorer.actionBar.actions.get('bookmark');
+                    bmBar.addBookmarkObject = {
+                        name:bmAction.getKeyedText(),
+                        alt:bmAction.options.title,
+                        image:ajxpResourcesFolder+'/images/actions/16/bookmark_add.png',
+                        icon_class:'icon-plus-sign',
+                        callback:function(e){
+                            var node = ajaxplorer.getContextNode();
+                            node.getMetadata().set('ajxp_bookmarked', 'true');
+                            node.getMetadata().set('overlay_icon', 'bookmark.png');
+                            bmBar.addBookmark(node.getPath(), node.getLabel());
+                        }.bind(this)
+                    };
+                    bmBar.load($H(), true);
+                }, 500);
+                ]]></clientListener>
+                <serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
 		<action name="save_user_pref">

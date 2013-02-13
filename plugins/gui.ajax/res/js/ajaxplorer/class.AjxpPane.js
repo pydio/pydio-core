@@ -179,7 +179,15 @@ Class.create("AjxpPane", {
         }
 		this.htmlElement.insert({top : header});
 		disableTextSelection(header);
-	},
+
+        if(this.options.headerToolbarOptions){
+            var tbD = new Element('div', {id:"display_toolbar"});
+            header.insert({top:tbD});
+            var tb = new ActionsToolbar(tbD, this.options.headerToolbarOptions);
+        }
+
+
+    },
 	
 	/**
 	 * Sets a listener when the htmlElement is focused to notify ajaxplorer object

@@ -122,7 +122,7 @@ Class.create("FoldersTree", AjxpPane, {
 		}.bind(this);
 		document.observe("ajaxplorer:component_config_changed",  compConfChanged);
         this.registeredObservers.set("ajaxplorer:component_config_changed", compConfChanged);
-		
+
 	},
 
     destroy : function(){
