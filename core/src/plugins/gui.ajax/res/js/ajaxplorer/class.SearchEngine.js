@@ -51,7 +51,9 @@ Class.create("SearchEngine", AjxpPane, {
 	 */
 	initialize: function($super, mainElementName, ajxpOptions)
 	{
-        this._ajxpOptions = {};
+        this._ajxpOptions = {
+            toggleResultsVisibility : false
+        };
         if($(mainElementName).getAttribute("data-globalOptions")){
             this._ajxpOptions = $(mainElementName).getAttribute("data-globalOptions").evalJSON();
         }
@@ -151,8 +153,12 @@ Class.create("SearchEngine", AjxpPane, {
 			ajaxplorer.disableNavigation();
 			this.hasFocus = true;
 			this._inputBox.select();
-            if(this.hasResults && this._ajxpOptions.toggleResultsVisibility){
-                $(this._ajxpOptions.toggleResultsVisibility).setStyle({display:'block'});
+            if(this.hasResults && this._ajxpOptions.toggleResultsVisibility && !$(this._ajxpOptions.toggleResultsVisibility).visible()){
+                $(this._ajxpOptions.toggleResultsVisibility).setStyle({
+                    display:'block',
+                    top: (this._inputBox.cumulativeOffset().top + this._inputBox.getHeight() + 3) + 'px',
+                    left: (this._inputBox.cumulativeOffset().left) + 'px'
+                });
             }
 			return false;
 		}.bind(this));
@@ -172,8 +178,17 @@ Class.create("SearchEngine", AjxpPane, {
 			this.interrupt();
 			return false;
 		}.bind(this);
-		
-		this.resize();
+
+        document.observe("ajaxplorer:repository_list_refreshed", function(e){
+            "use strict";
+            this._inputBox.setValue("");
+            this.clearResults();
+            if(this.options.toggleResultsVisibility){
+                $(this._ajxpOptions.toggleResultsVisibility).setStyle({display:'none'});
+            }
+        }.bind(this) );
+
+        this.resize();
 	},
 	/**
 	 * Show/Hide the widget
@@ -301,12 +316,41 @@ Class.create("SearchEngine", AjxpPane, {
         if(this._ajxpOptions.toggleResultsVisibility){
             if(!$(this._ajxpOptions.toggleResultsVisibility).down("div.panelHeader")){
                 $(this._ajxpOptions.toggleResultsVisibility).insert({top:"<div class='panelHeader'>Results<span class='close_results icon-remove-sign'></span></div>"});
+                this.resultsDraggable = new Draggable(this._ajxpOptions.toggleResultsVisibility, {
+                    handle:"panelHeader",
+                    zindex:999,
+                    starteffect : function(element){
+                        if(element.shadows) {
+                            Shadower.deshadow(element);
+                            element.hadShadow = true;
+                        }
+                    },
+                    endeffect : function(element){
+                        if(element.hadShadow){
+                            Shadower.shadow(element,{
+                                distance: 4,
+                                angle: 130,
+                                opacity: 0.5,
+                                nestedShadows: 3,
+                                color: '#000000',
+                                shadowStyle:{display:'block'}
+                            });
+                        }
+                    }
+                });
             }
             $(this._ajxpOptions.toggleResultsVisibility).down("span.close_results").observe("click", function(){
                 $(this._ajxpOptions.toggleResultsVisibility).setStyle({display:"none"});
             }.bind(this));
 
-            $(this._ajxpOptions.toggleResultsVisibility).setStyle({display:"block"});
+            if(!$(this._ajxpOptions.toggleResultsVisibility).visible()){
+                $(this._ajxpOptions.toggleResultsVisibility).setStyle({
+                    display:"block",
+                    position: "absolute",
+                    top: (this._inputBox.cumulativeOffset().top + this._inputBox.getHeight() + 3) + 'px',
+                    left: (this._inputBox.cumulativeOffset().left) + 'px'
+                });
+            }
             this.resize();
         }
 	},

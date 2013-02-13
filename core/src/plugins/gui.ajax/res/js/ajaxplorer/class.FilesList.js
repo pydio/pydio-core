@@ -409,7 +409,7 @@ Class.create("FilesList", SelectableElements, {
 	getActions : function(){
 		// function may be bound to another context
 		var oThis = this;
-		var options = {
+		var options1 = {
 			name:'multi_display',
 			src:'view_icon.png',
             icon_class:'icon-th-list',
@@ -438,24 +438,63 @@ Class.create("FilesList", SelectableElements, {
 					}.bind(window.listenerContext), 500);								
 				}
 			}
-			};
-		var context = {
+	    };
+		var context1 = {
 			selection:false,
 			dir:true,
 			actionBar:true,
 			actionBarGroup:'default',
-			contextMenu:true,
+			contextMenu:false,
 			infoPanel:false			
 			};
-		var subMenuItems = {
+		var subMenuItems1 = {
 			staticItems:[
 				{text:228,title:229,src:'view_icon.png',icon_class:'icon-th',command:'thumb',hasAccessKey:true,accessKey:'thumbs_access_key'},
 				{text:226,title:227,src:'view_text.png',icon_class:'icon-list',command:'list',hasAccessKey:true,accessKey:'list_access_key'}
 				]
 		};
 		// Create an action from these options!
-		var multiAction = new Action(options, context, {}, {}, subMenuItems);		
-		return $H({multi_display:multiAction});
+		var multiAction = new Action(options1, context1, {}, {}, subMenuItems1);
+
+        var options2 = {
+			name:'thumb_size',
+			src:'view_icon.png',
+            icon_class:'icon-resize-full',
+			text_id:150,
+			title_id:151,
+			text:MessageHash[150],
+			title:MessageHash[151],
+			hasAccessKey:false,
+			subMenu:false,
+			subMenuUpdateImage:false,
+			callback: function(){
+                oThis.slider.show($('thumb_size_button'));
+			},
+			listeners : {
+				init:function(){
+                    oThis.observe('switch-display-mode', function(e){
+                        if(oThis._displayMode != 'thumb') $('thumb_size_button').hide();
+                        else $('thumb_size_button').show();
+                    });
+                    window.setTimeout(function(){
+                        if(oThis._displayMode != 'thumb') $('thumb_size_button').hide();
+                        else $('thumb_size_button').show();
+                    }.bind(window.listenerContext), 500);
+                }
+			}
+	    };
+		var context2 = {
+			selection:false,
+			dir:true,
+			actionBar:true,
+			actionBarGroup:'default',
+			contextMenu:false,
+			infoPanel:false
+		};
+		// Create an action from these options!
+		var thumbsizeAction = new Action(options2, context2, {}, {});
+
+		return $H({thumb_size:thumbsizeAction, multi_display:multiAction});
 	},
 	
 	/**
@@ -869,7 +908,7 @@ Class.create("FilesList", SelectableElements, {
         }else{
             this._displayMode = (this._displayMode == "thumb"?"list":"thumb");
         }
-
+        this.notify('switch-display-mode');
 		this.initGUI();
         this.empty(true);
 		this.fill(this.getCurrentContextNode());

@@ -8,8 +8,9 @@
 		</action>
         <action name="user_create_repository">
             <gui text="417" title="418" src="user-create-repository.png" accessKey="" hasAccessKey="false">
-                <context selection="false" dir="" recycle="true" ajxpWidgets="RepositorySelect"></context>
+                <context selection="false" dir="" recycle="true" ajxpWidgets="RepositorySelect"/>
             </gui>
+            <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
 				<clientCallback prepareModal="true" dialogOpenForm="user_create_repository_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
 					<dialogOnOpen><![CDATA[
@@ -169,7 +170,8 @@
       			<gui text="442" title="443" src="edit_user.png" iconClass="icon-reorder" accessKey="" hasAccessKey="false">
       				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
       			</gui>
-      			<processing>
+                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
+            <processing>
       				<clientCallback prepareModal="true" dialogOpenForm="custom_data_edit" dialogOkButtonOnly="false" dialogSkipButtons="false">
       					<dialogOnOpen><![CDATA[
       					    var f = new FormManager();

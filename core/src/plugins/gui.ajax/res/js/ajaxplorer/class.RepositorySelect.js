@@ -173,6 +173,14 @@ Class.create("RepositorySelect", {
 	        actions = actions.concat(lastActions);
         }
 
+        if(!actions.length){
+            if(this.repoMenu){
+                this.repoMenu.options.menuItems = actions;
+                this.repoMenu.refreshList();
+            }
+            return;
+        }
+
         var menuItems = $A();
         var otherActions = ajaxplorer.actionBar.getActionsForAjxpWidget("RepositorySelect", this.element.id).each(function(otherAction){
             menuItems.push({
