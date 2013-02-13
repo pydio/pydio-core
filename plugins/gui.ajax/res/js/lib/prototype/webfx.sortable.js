@@ -153,6 +153,9 @@ SortableTable = Class.create({
 				if( prev && prev.hasClassName('resizer')){
 					cell.resizer = prev;
 				}
+                if(!cell.down('span.ajxp-order-icon')){
+                    cell.down('div.header_label').insert('<span class="ajxp-order-icon icon-caret-up"></span><span class="ajxp-order-icon icon-caret-down"></span>');
+                }
 			});
 		}
 		return this.headerCells;

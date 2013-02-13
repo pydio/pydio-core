@@ -119,7 +119,7 @@
 							        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
 							        <div id="breadcrumb" ajxpClass="Breadcrumb" ajxpOptions='{"flexTo":"cpane_header"}'></div>
 							    </div>
-        						<div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"list","replaceScroller":true, "fit":"height", "fitParent":"cpane_container"}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
+        						<div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"list","replaceScroller":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
 							</div>
                         </div>
                         <div id="info_panel" ajxpClass="InfoPanel" ajxpPaneHeader="131" ajxpPaneIcon="file_info.png" ajxpOptions='{"replaceScroller":"true", "skipActions":true}'></div>
