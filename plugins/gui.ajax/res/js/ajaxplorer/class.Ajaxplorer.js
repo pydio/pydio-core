@@ -621,6 +621,12 @@ Class.create("Ajaxplorer", {
 		}
 
         var gotoNode;
+        if(path == "" || path == "/") {
+            gotoNode = new AjxpNode("/");
+            this._contextHolder.requireContextChange(gotoNode);
+            return;
+        }
+
         this._contextHolder.loadPathInfoSync(path, function(foundNode){
             if(foundNode.isLeaf()) {
                 this._contextHolder.setPendingSelection(getBaseName(path));
