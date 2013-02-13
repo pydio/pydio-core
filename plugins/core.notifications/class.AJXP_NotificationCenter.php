@@ -118,12 +118,12 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                 if($format == "html"){
                     $p = $notif->getNode()->getPath();
                     echo("<li data-ajxpNode='$p'>");
-                    echo($notif->getDescriptionLong(true));
+                    echo($notif->getDescriptionShort(true));
                     echo("</li>");
                 }else{
                     $node = $notif->getNode();
                     $node->loadNodeInfo();
-                    $node->event_description = $notif->getDescriptionLong();
+                    $node->event_description = $notif->getDescriptionShort();
                     AJXP_XMLWriter::renderAjxpNode($node);
                 }
             }

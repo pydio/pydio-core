@@ -403,6 +403,14 @@ fieldSet input.dialogButton
 
 }
 
+span.ajxp-caret-up{
+    position: absolute;
+    top: -21px;
+    left: 118px;
+    font-size: 30px;
+    color: #666;
+}
+
 .dialogButtonsCheckbox label{
     cursor: pointer;
 }

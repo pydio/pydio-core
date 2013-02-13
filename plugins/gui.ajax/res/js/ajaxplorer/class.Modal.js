@@ -369,6 +369,15 @@ Class.create("Modal", {
     },
 
 
+    createTopCaret:function(element){
+        "use strict";
+        element.insert({top:'<span class="icon-caret-up ajxp-caret-up"></span>'});
+        var caret = element.down('span.ajxp-caret-up');
+        caret.setStyle({
+            left: (element.getWidth() -  caret.getWidth()) / 2 + 'px'
+        });
+    },
+
 	/**
 	 * Returns the current form, the real one.
 	 * @returns HTMLForm

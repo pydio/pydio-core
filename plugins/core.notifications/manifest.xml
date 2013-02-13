@@ -29,38 +29,49 @@
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
 
                 <processing>
-                    <clientCallback dialogOpenForm="user_feed" dialogSkipButtons="true" prepareModal="true">
-                        <dialogOnOpen><![CDATA[
-                             var dm = new AjxpDataModel(true);
-                             var rP = new RemoteNodeProvider();
-                             rP.initProvider({get_action:'get_my_feed', format:'xml'});
-                             var root = new AjxpNode("/");
-                             root._iNodeProvider = rP;
-                             var container = modal.getForm().down("div#feed_content");
-                             var pFactory = new PreviewFactory();
-                             pFactory.setThumbSize(32);
-                             root.observeOnce("loaded", function(){
-                                 root.getChildren().each(function(el){
-                                    var div = new Element('div');
-                                    var img = pFactory.generateBasePreview(el);
-                                    div.IMAGE_ELEMENT = img;
-                                    div.insert(img);
-                                    div.insert(el.getMetadata().get("event_description"));
-                                    container.insert(div);
-                                    pFactory.enrichBasePreview(el, div);
-                                 });
-                                 pFactory.loadNextImage();
+                    <clientCallback><![CDATA[
+
+                         $$('body')[0].insert($('user_feed'));
+                         $('user_feed').setStyle({
+                            display:'block',
+                            position:'absolute',
+                            top:($('get_my_feed_button').cumulativeOffset().top + $('get_my_feed_button').getHeight() + 13) + 'px',
+                            left:($('get_my_feed_button').cumulativeOffset().left - $('get_my_feed_button').getWidth()/2) + 'px'
+                         });
+                         modal.createTopCaret($('user_feed'));
+                         $('ajxp_desktop').observeOnce("click", function(){
+                            $('user_feed').fade({duration:0.3});
+                         });
+
+
+                         var dm = new AjxpDataModel(true);
+                         var rP = new RemoteNodeProvider();
+                         rP.initProvider({get_action:'get_my_feed', format:'xml'});
+                         var root = new AjxpNode("/");
+                         root._iNodeProvider = rP;
+                         var pFactory = new PreviewFactory();
+                         var container = $("feed_content");
+                         pFactory.setThumbSize(32);
+                         root.observeOnce("loaded", function(){
+                             container.update('');
+                             root.getChildren().each(function(el){
+                                var div = new Element('div');
+                                var img = pFactory.generateBasePreview(el);
+                                div.IMAGE_ELEMENT = img;
+                                div.insert(img);
+                                div.insert(el.getMetadata().get("event_description"));
+                                container.insert(div);
+                                pFactory.enrichBasePreview(el, div);
                              });
-                             root.load();
-                        ]]></dialogOnOpen>
-                        <dialogOnComplete><![CDATA[
-                             hideLightBox();
-                        ]]></dialogOnComplete>
-                    </clientCallback>
+                             pFactory.loadNextImage();
+                         });
+                         root.load();
+
+                    ]]></clientCallback>
                     <clientForm id="user_feed"><![CDATA[
-                        <div id="user_feed" box_padding="0" box_width="320">
+                        <div id="user_feed" box_padding="0" class="dialogBox css_boxshadow">
                             <link type="text/css" rel="stylesheet" href="plugins/core.notifications/res/css/notification_center.css"/>
-                            <div id="feed_content" style="width: 320px;height: 400px;overflow: auto;"></div>
+                            <div id="feed_content" style="width: 250px;height: 350px;overflow: auto;"></div>
                         </div>
                     ]]></clientForm>
                     <serverCallback methodName="loadUserFeed"/>
