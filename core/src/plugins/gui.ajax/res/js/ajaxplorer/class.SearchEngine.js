@@ -187,7 +187,7 @@ Class.create("SearchEngine", AjxpPane, {
 	/**
 	 * Resize the widget
 	 */
-	resize: function(){
+	resize: function($super){
         if(this._ajxpOptions.toggleResultsVisibility){
             fitHeightToBottom($(this._ajxpOptions.toggleResultsVisibility), null, (this._ajxpOptions.fitMarginBottom?this._ajxpOptions.fitMarginBottom:0));
             fitHeightToBottom($(this._resultsBoxId));

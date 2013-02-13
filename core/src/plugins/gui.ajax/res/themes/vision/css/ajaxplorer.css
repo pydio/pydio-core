@@ -846,7 +846,7 @@ input.SF_input.SF_number{
 #simple_repository_label{
     float: left;
     width: 23%;
-    padding: 0px 1%;
+    padding: 0 0 0 17px;
     height: 53px;
     font-size: 25px;
     color: rgb(111, 121, 131);
@@ -2049,7 +2049,8 @@ div.tabulatorContainer{
 #search_form, #search_state
 {
     padding-left: 10px;
-    padding-top: 13px;
+    padding-top: 11px;
+    width: 100%;
 }
 #search_form
 {
@@ -2090,7 +2091,7 @@ div.tabulatorContainer{
     color: rgb(138, 149, 160);
     padding-left: 6px;
     border-width: 1px;
-    width: 206px;
+    width: 70%;
 }
 
 #search_meta {
@@ -3494,6 +3495,10 @@ td.ip_geo_cell{
 #breadcrumb span.icon-chevron-right{
     display: inline-block;
     padding: 0 2px;
+}
+
+#breadcrumb span.ajxp-goto{
+    cursor: pointer;
 }
 
 @media only screen

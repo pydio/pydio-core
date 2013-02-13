@@ -47,8 +47,50 @@ Class.create("AjxpPane", {
         }
 		this.childrenPanes = $A([]);
 		this.scanChildrenPanes(this.htmlElement);
-	},
-	
+        if(this.options.bindSizeTo){
+            if(this.options.bindSizeTo.width){
+                this.options.bindSizeTo.width.events.each(function(eventName){
+                    document.observe("ajaxplorer:resize-" + eventName, this.resizeBound.bind(this));
+                }.bind(this) );
+
+            }
+        }
+
+    },
+
+    resizeBound : function(event){
+        "use strict";
+        var min = this.options.bindSizeTo.width.min;
+        if(Object.isString(min) && min.indexOf("%") != false) min = this.htmlElement.parentNode.getWidth() * min / 100;
+        var w = Math.max($(this.options.bindSizeTo.width.id).getWidth() + this.options.bindSizeTo.width.offset, min);
+        if(this.options.bindSizeTo.width.max) {
+            var max = this.options.bindSizeTo.width.max;
+            if(Object.isString(max) && max.indexOf("%") != false) max = this.htmlElement.parentNode.getWidth() * max / 100;
+            w = Math.min(max, w);
+        }
+        if(this.options.bindSizeTo.width.checkSiblings){
+            w = this.filterWidthFromSiblings(w);
+        }
+        this.htmlElement.setStyle({width: w + "px"});
+
+    },
+
+    filterWidthFromSiblings : function(original){
+        "use strict";
+        var parentWidth = this.htmlElement.parentNode.getWidth();
+        var siblingWidth = 0;
+        this.htmlElement.siblings().each(function(s){
+            if(s.hasClassName('skipSibling')) return;
+            if(s.ajxpPaneObject && s.ajxpPaneObject.getActualWidth){
+                siblingWidth+=s.ajxpPaneObject.getActualWidth();
+            }else{
+                siblingWidth+=s.getWidth();
+            }
+        });
+        original = Math.min(original, parentWidth - siblingWidth - 20);
+        return original;
+    },
+
 	/**
 	 * Called when the pane is resized
 	 */
