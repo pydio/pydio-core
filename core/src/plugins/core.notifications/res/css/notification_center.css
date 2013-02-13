@@ -9,21 +9,26 @@ ul.notification_list li{
 }
 
 #feed_content {
-    background-color: #DDD;
+    background-color: #666;
+    color: #fff;
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 7px;
+    border-radius: 2px;
 }
 
 #feed_content div {
     clear: left;
-    padding: 5px;
-    border: 1px solid #DDD;
-    border-radius: 5px;
+    padding: 1px;
     margin: 2px;
-    background-color: white;
+    border-bottom: 1px solid #fff;
+    padding-bottom: 17px;
+    padding-top: 8px;
 }
 
 #feed_content img {
     float: left;
     height: 32px;
     width: 32px;
-    margin: 5px;
+    margin: 0px 15px 6px 4px;
 }
