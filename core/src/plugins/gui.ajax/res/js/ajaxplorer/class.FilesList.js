@@ -546,7 +546,7 @@ Class.create("FilesList", SelectableElements, {
 					userWidth = column.fixedWidth;
 				}
 				var label = (column.messageId?MessageHash[column.messageId]:column.messageString);
-				var leftPadding = 0;
+				var leftPadding = this.options.cellPaddingCorrection || 0 ;
 				if(column.attributeName == "ajxp_label"){// Will contain an icon
 					leftPadding = 24;
 				}
