@@ -23,7 +23,7 @@
  */
 Class.create("RepositorySimpleLabel", AjxpPane, {
 
-    _defaultString:'No Repository',
+    _defaultString:'',
     _defaultIcon : 'network-wired.png',
     options : {},
 
@@ -35,6 +35,7 @@ Class.create("RepositorySimpleLabel", AjxpPane, {
         this.htmlElement.insert('<div class="repository_title"></div>');
         document.observe("ajaxplorer:repository_list_refreshed", function(e){
 
+            this.htmlElement.down("div.repository_title").update(this._defaultString);
             var repositoryList = e.memo.list;
             var repositoryId = e.memo.active;
             if(repositoryList && repositoryList.size()){

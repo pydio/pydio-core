@@ -94,7 +94,8 @@
 			<gui text="194" title="194" src="yast_security.png" iconClass="icon-key" accessKey="" hasAccessKey="false">
 				<context selection="false" dir="" recycle="true" actionBarGroup="utils" ajxpWidgets="UserWidget::logging_string"></context>
 			</gui>
-			<processing>				
+            <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
+            <processing>
 				<clientCallback prepareModal="true" dialogOpenForm="pass_change_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
 					<dialogOnOpen><![CDATA[
 					    if(ajaxplorer.user.lock){

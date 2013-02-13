@@ -24,10 +24,12 @@
             </action>
             <action name="get_my_feed">
                 <gui text="notification_center.1" title="notification_center.2" iconClass="icon-rss" src="notification_center/ICON_SIZE/feed.png" accessKey="" hasAccessKey="false">
-             		<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false" ajxpWidgets="UserWidget::logging_string"/>
+             		<context selection="false" dir="" recycle="true" actionBar="true" actionBarGroup="user" contextMenu="false" infoPanel="false"/>
                 </gui>
+                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
+
                 <processing>
-                    <clientCallback dialogOpenForm="user_feed" dialogOkButtonOnly="true" prepareModal="true">
+                    <clientCallback dialogOpenForm="user_feed" dialogSkipButtons="true" prepareModal="true">
                         <dialogOnOpen><![CDATA[
                              var dm = new AjxpDataModel(true);
                              var rP = new RemoteNodeProvider();

@@ -97,14 +97,15 @@
 					<div id="global_toolbar">
 					    <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over"}'></div>
 						<div id="repo_chooser" ajxpClass="RepositorySelect" ajxpOptions='{"menuPosition": "bottom right", "menuOffsetTop":11, "menuOffsetLeft":40, "menuEvent":"over", "simpleLabel":"<span class=\"icon-sitemap\"></span><span class=\"ws-label\">My Workspaces</span><span class=\"icon-caret-down\"></span>"}'></div>
+						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["user"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
 					</div>
 					<div id="workspace_toolbar">
                         <div id="simple_repository_label" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"bindSizeTo":{"width":{"id":"topPane", "events":["FoldersTree-topPane"], "min":150,"offset":-5}}}'></div>
 					    <div style="float:left;" ajxpClass="AjxpPane"  id="buttons_bar_cont">
-						    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put"],"groupOtherToolbars":["get", "change", "more", "user", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+						    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put"],"groupOtherToolbars":["get", "change", "more", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
 						</div>
 						<div style="float:right;" ajxpClass="AjxpPane" ajxpOptions='{"bindSizeTo":{"width":{"id":"info_panel", "events":["InfoPanel-info_panel", "FoldersTree-topPane"], "min":120, "offset":-20, "checkSiblings":true}}}' id="search_engine_cont">
-						    <div id="search_engine" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":10}'></div>
+						    <div id="search_engine" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}'></div>
 						</div>
 						<div style="clear:both;" class="skipSibling"/>
 					</div>

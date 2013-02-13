@@ -116,13 +116,19 @@ Class.create("SliderInput", {
 	/**
 	 * Show the sub pane
 	 */
-	show : function(){
-		var pos = this.computeAnchorPosition(this.input);
+	show : function(anchor){
+        var pos = this.computeAnchorPosition(this.input);
+        if(anchor){
+            pos = this.computeAnchorPosition(anchor);
+        }
 		this.holder.setStyle(pos);
 		this.slider.setValue(parseFloat(this.input.value));
 		this.holder.show();
         this.input.addClassName(this.options.anchorActiveClass);
-		this.delay();
+        if(anchor){
+            anchor.addClassName(this.options.anchorActiveClass);
+        }
+        this.delay();
 	},
 	
 	/**
