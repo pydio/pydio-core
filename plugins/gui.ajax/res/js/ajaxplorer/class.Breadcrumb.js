@@ -40,12 +40,29 @@ Class.create("Breadcrumb", {
                 newNode = new AjxpNode(newNode);
             }
             var newPath = newNode.getPath();
+            var parts = $H();
+            var crtPath = "";
+            $A(newPath.split("/")).each(function(element){
+                if(!element) return;
+                crtPath += "/" + element;
+                parts.set(crtPath, element);
+            });
             if(getBaseName(newPath) != newNode.getLabel()){
-                this.currentLabel = getRepName(newPath) + '/' + newNode.getLabel();
+                parts.set(newPath, newNode.getLabel());
             }
-            this.currentPath = newPath;
-            newPath = "<span class='icon-home'></span>" + newPath.split("/").join("<span class='icon-chevron-right'></span>")
-            this.element.update("<div class='inner_bread'>" + newPath + "</div>");
+
+            var clickPath = "<span class='icon-home ajxp-goto' data-goTo='/'></span>";
+            parts.each(function(pair){
+                clickPath += "<span class='icon-chevron-right'></span>" + "<span class='ajxp-goto' data-goTo='"+pair.key+"'>"+pair.value+"</span>";
+            });
+            this.element.update("<div class='inner_bread'>" + clickPath + "</div>");
+
+            this.element.select("span.ajxp-goto").invoke("observe", "click", function(event){
+                "use strict";
+                var target = event.target.getAttribute("data-goTo");
+                event.target.setAttribute("title", "Go to " + target);
+                window.ajaxplorer.goTo(target);
+            });
 
         }.bind(this) );
 	},

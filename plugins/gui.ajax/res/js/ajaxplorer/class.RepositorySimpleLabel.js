@@ -21,17 +21,18 @@
 /**
  * A selector for displaying repository list. Will hook to ajaxplorer:repository_list_refreshed.
  */
-Class.create("RepositorySimpleLabel", {
-    __implements : "IAjxpWidget",
+Class.create("RepositorySimpleLabel", AjxpPane, {
+
     _defaultString:'No Repository',
     _defaultIcon : 'network-wired.png',
     options : {},
 
-    initialize : function(oElement, options){
-        if(options) this.options = options;
-        this.element = oElement;
+    initialize : function($super, oElement, options){
 
-        this.element.update(this._defaultString);
+        $super(oElement, options);
+
+        this.htmlElement.update('<div class="repository_legend">Workspace</div>');
+        this.htmlElement.insert('<div class="repository_title"></div>');
         document.observe("ajaxplorer:repository_list_refreshed", function(e){
 
             var repositoryList = e.memo.list;
@@ -42,16 +43,11 @@ Class.create("RepositorySimpleLabel", {
                     var key = pair.key;
                     var selected = (key == repositoryId ? true:false);
                     if(selected){
-                        this.element.update(repoObject.getLabel());
+                        this.htmlElement.down("div.repository_title").update(repoObject.getLabel());
                     }
                 }.bind(this) );
             }
         }.bind(this));
-    },
-
-    resize : function(){},
-    showElement : function(){},
-    getDomNode : function(){},
-    destroy : function(){}
+    }
 
 });

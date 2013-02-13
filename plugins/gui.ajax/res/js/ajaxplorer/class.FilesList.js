@@ -832,7 +832,8 @@ Class.create("FilesList", SelectableElements, {
             this.htmlElement.down('.table_rows_container').setStyle({width:'100%'});
     	}
 		this.notify("resize");
-	},
+        document.fire("ajaxplorer:resize-FilesList-" + this.htmlElement.id, this.htmlElement.getDimensions());
+    },
 	
 	/**
 	 * Link focusing to ajaxplorer main
