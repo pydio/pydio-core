@@ -22,14 +22,30 @@
  * Manages the display of the bookmarks menus. Was a "bookmark bar" but is now a Bookmark button and menu
  */
  Class.create("BookmarksBar", {
+
+     bookmarksMenuOptions: {
+         className: 'menu bookmarksMenu',
+         mouseClick:'left',
+         createAnchor:false,
+         topOffset:2,
+         leftOffset:0,
+         fade:true,
+         zIndex:2000
+     },
+
 	/**
 	 * Constructor
 	 * @param oElement HTMLElement The main element 
 	 */
-	initialize: function(oElement){
+	initialize: function(oElement, options){
 		this.element = $(oElement);
 		this.currentCount = 0;	
 		this.bookmarks = $A([]);
+        if(options.bookmarksMenuOptions){
+
+            this.bookmarksMenuOptions = Object.extend(this.bookmarksMenuOptions, options.bookmarksMenuOptions);
+
+        }
 		this.createMenu();
 		document.observe("ajaxplorer:registry_loaded", function(event){
 			this.parseXml(event.memo);
@@ -67,7 +83,8 @@
 			var bookmark = {
 				name:childNodes[i].getAttribute('title'),
 				alt:childNodes[i].getAttribute('path'),
-				image:ajxpResourcesFolder+'/images/mimes/16/folder.png'
+				image:ajxpResourcesFolder+'/images/mimes/16/folder.png',
+                icon_class:'icon-star-empty'
 			};
 			bookmark.callback = function(e){ajaxplorer.goTo(this.alt);}.bind(bookmark);
 			bookmark.moreActions = this.getContextActions(bookmark.alt, bookmark.name);
@@ -82,17 +99,10 @@
 	 * Creates the sub menu
 	 */
 	createMenu : function(){
-		this.bmMenu = new Proto.Menu({			
-			className: 'menu bookmarksMenu',
-			mouseClick:'left',
-			anchor:this.element,
-			createAnchor:false,
-			topOffset:2,
-			leftOffset:0,
-			menuItems: this.bookmarks,
-			fade:true,
-			zIndex:2000
-		});
+		this.bmMenu = new Proto.Menu(Object.extend(this.bookmarksMenuOptions, {
+            anchor:this.element,
+            menuItems: this.bookmarks
+        }));
 	},
 		
 	/**
@@ -121,6 +131,7 @@
 				name:MessageHash[146],
 				alt:MessageHash[146],
 				image:ajxpResourcesFolder+'/images/actions/16/delete_bookmark.png',
+                icon_class:'icon-remove',
 				disabled:false,
 				className:"edit",
 				callback:function(e){
@@ -132,6 +143,7 @@
 				name:MessageHash[6],
 				alt:MessageHash[6],
 				image:ajxpResourcesFolder+'/images/actions/16/applix.png',
+                icon_class:'icon-edit',
 				disabled:false,
 				className:"edit",
 				callback:function(e){
@@ -167,7 +179,7 @@
 	 * Reload the bookmarks via the registry loading
 	 * @param actionsParameters Hash
 	 */
-	load: function(actionsParameters){
+	load: function(actionsParameters, silently){
 		var connexion = new Connexion();
 		if(!actionsParameters) actionsParameters = new Hash();
 		actionsParameters.set('get_action', 'get_bookmarks');
@@ -179,7 +191,7 @@
 			}.bind(this) );			
 			ajaxplorer.loadXmlRegistry(false, "user/bookmarks");
 			this.bmMenu.refreshList();
-			this.bmMenu.show();
+			if(!silently) this.bmMenu.show();
 		}.bind(this);
 		connexion.sendAsync();
 	},

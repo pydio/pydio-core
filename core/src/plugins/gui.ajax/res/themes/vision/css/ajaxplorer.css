@@ -3040,6 +3040,22 @@ div.menu a {
     background: rgb(138, 149, 160);
 }
 
+.menu.desktop.toolbarmenu.panelHeaderMenu {
+    background: rgb(138, 149, 160);
+}
+
+.menu.desktop.toolbarmenu.panelHeaderMenu.bmbarMenu {
+    width:150px;
+}
+
+.bmbarMenu div.moreActions {
+    font-size: 11px;
+}
+
+.bmbarMenu div.moreActions span{
+    cursor:pointer;
+}
+
 .menu.desktop.toolbarmenu img {
     width: 22px;
     height:22px;
@@ -3095,7 +3111,7 @@ div.menu a {
 }
 
 .menu.desktop span.ajxp_icon_span{
-    font-size: 1.3em;
+    font-size: 1.1em;
     padding-right: 5px;
 }
 
@@ -3123,7 +3139,7 @@ div.menu a {
 
 .menu.desktop.toolbarmenu.panelHeaderMenu a {
     color: #fff;
-    padding: 7px 8px 4px 8px;
+    padding: 7px 11px 4px 8px;
     margin: 0;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size:11px;

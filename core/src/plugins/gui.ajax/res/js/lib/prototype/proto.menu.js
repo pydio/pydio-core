@@ -168,19 +168,27 @@ Proto.Menu = Class.create({
 			
 			if(item.moreActions){
 				var actionsContainer = new Element('div', {
-                    className:'menuActions' + (window.ajaxplorer.currentThemeUsesIconFonts?' icon-caret-right':''),
+                    className:'menuActions moreActions',
                     style:'padding-top:4px;'
                 });
 				item.moreActions.each(function(action){
-					actionsContainer.insert(
-						new Element('a', {
-							title:action.name,
-							href:'#'
-						})
-						.writeAttribute('onclick', 'return false;')
-						.observe('click', action.callback)
-						.insert('<img src="'+action.image+'" width="16" height="16" border="0">')
-					);
+                    if(action.icon_class){
+                        actionsContainer.insert(
+                            new Element('span', {
+                                title:action.name,
+                                className:action.icon_class
+                            }).observe('click', action.callback));
+                    }else{
+                        actionsContainer.insert(
+                            new Element('a', {
+                                title:action.name,
+                                href:'#'
+                            })
+                                .writeAttribute('onclick', 'return false;')
+                                .observe('click', action.callback)
+                                .insert('<img src="'+action.image+'" width="16" height="16" border="0">')
+                        );
+                    }
 				});
 				newItem.insert(actionsContainer);
                 newItem.setStyle({position:"relative"});

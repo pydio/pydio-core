@@ -113,7 +113,7 @@
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
 					<div id="vertical_splitter" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initB": 300, "minA":0,"fit":"height","fitParent":"browser", "minSize":0}'>
     					<div id="vertical_splitter2" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA": 350, "minA":0,"fit":"height","fitParent":"browser", "minSize":0, "foldingButton":true}'>
-							<div id="topPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ajxpPaneHeader="130" ajxpPaneIcon="view_tree.png"></div>
+							<div id="topPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true, "headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["filter"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}' ajxpPaneHeader="130" ajxpPaneIcon="view_tree.png"></div>
 							<div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
 							    <div id="cpane_header" class="panelHeader">
 							        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
