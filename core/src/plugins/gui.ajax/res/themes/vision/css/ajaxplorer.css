@@ -3528,6 +3528,8 @@ td.ip_geo_cell{
 #display_toolbar {
     float: right;
     display: inline-block;
+    min-width: 40px;
+    text-align: right;
 }
 
 #display_toolbar a,
@@ -3563,11 +3565,13 @@ td.ip_geo_cell{
 
 #cpane_header{
     padding-bottom: 4px;
+    height: 19px;
 }
 
 #breadcrumb{
     display: inline-block;
     overflow: hidden;
+    float: left;
 }
 
 #breadcrumb div.inner_bread{
