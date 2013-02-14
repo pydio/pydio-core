@@ -72,7 +72,15 @@ Class.create("AjxpPane", {
             w = this.filterWidthFromSiblings(w);
         }
         this.htmlElement.setStyle({width: w + "px"});
+        this.resize();
 
+        if(this.options.bindSizeTo.width.checkSiblings){
+            this.htmlElement.siblings().each(function(s){
+                if(s.ajxpPaneObject){
+                    s.ajxpPaneObject.resize();
+                }
+            });
+        }
     },
 
     filterWidthFromSiblings : function(original){
