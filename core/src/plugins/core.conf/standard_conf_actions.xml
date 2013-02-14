@@ -152,6 +152,7 @@
                 ]]></clientCallback>
                 <clientListener name="init"><![CDATA[
                 window.setTimeout(function(){
+                    if(!$('get_bookmarks_button')) return;
                     var bmBar = new BookmarksBar($('get_bookmarks_button'), {bookmarksMenuOptions:{
                         className: 'menu desktop toolbarmenu panelHeaderMenu bmbarMenu',
                         mouseClick:'over',
@@ -237,10 +238,9 @@
       				<serverCallback methodName="switchAction"></serverCallback>
       			</processing>
       		</action>
-        <!--
 		<action name="switch_language">
 			<gui text="190" title="190" src="flag.png" accessKey="" hasAccessKey="false">
-				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
+				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false"></context>
 			</gui>
 			<processing>
 				<clientCallback prepareModal="true" dialogOpenForm="switch_language_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
@@ -290,7 +290,6 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>		
 		</action>
-		-->
 		<action name="webdav_preferences">
 			<gui text="403" title="403" src="drive_remote.png" iconClass="icon-cog" accessKey="" hasAccessKey="false">
 				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>

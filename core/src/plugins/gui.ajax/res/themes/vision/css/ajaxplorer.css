@@ -231,7 +231,7 @@ textarea{
     float: left;
 }
 
-#table_rows_container-1 td:nth-child(1) span.text_label{
+.table_rows_container span.list_selectable_span span.text_label{
     font-size: 12px;
     padding-left: 27px !important;
     background-position: 5px 4px !important;
@@ -530,15 +530,16 @@ textarea#myCode
     position: absolute;
     z-index: 1500;
     cursor: pointer;
-    border-radius: 5px;
-    color:#fff;
+    border-radius: 3px;
+    box-shadow: 3px 3px 11px rgba(0,0,0,0.25);
 }
 #message_content
 {
-    font-size: 11px;
+    font-size: 13px;
     margin: 8px;
     overflow-y: auto;
     max-height: 120px;
+    letter-spacing: 0px;
 }
 
 .errorMessage
@@ -559,23 +560,15 @@ textarea#myCode
 }
 
 html.boxshadow div.logMessage{
-    border:  1px solid #009600;
-    -webkit-box-shadow: 0px 0px 7px #009600;
-    -moz-box-shadow: 0px 0px 7px #009600;
-    box-shadow: 0px 0px 7px #009600;
-    color : #060 !important;
-    opacity: 1;
-    background-color: #fff;
+    border: 1px solid #009600;
+    color: #009600 !important;
+    background-color: rgb(173, 224, 173);
 }
 
 html.boxshadow div.errorMessage{
-    border:  1px solid #960000;
-    -webkit-box-shadow: 0px 0px 7px #960000;
-    -moz-box-shadow: 0px 0px 7px #960000;
-    box-shadow: 0px 0px 7px #960000;
-    color : #600 !important;
-    opacity: 1;
-    background-color: #fff;
+    border: 1px solid #960001;
+    color: #960000 !important;
+    background-color: rgb(241, 174, 174);
 }
 
 
@@ -1839,7 +1832,8 @@ div#upload_files_list, div#multiple_download_container
 }
 
 .droparea {
-    background:url("../../../../../../index.php?get_action=get_drop_bg") no-repeat scroll right bottom transparent;
+    background: url("../../../../../../index.php?get_action=get_drop_bg") no-repeat scroll left bottom transparent;
+    background-position: 10px 100%;
 }
 
 .dropareaHover {
@@ -2384,6 +2378,11 @@ div.selectable_div, .table_rows_container, #tree_container, #bottomSplitPane, .a
 .table_rows_container tr.selected-focus td,
 .infoPanelTable tr.selected-focus td
 {
+}
+.table_rows_container tr:hover,
+.table_rows_container tr.even:hover
+{
+    background-color: rgb(253, 252, 228);
 }
 
 .no_select_bg::selection {
@@ -3589,16 +3588,4 @@ td.ip_geo_cell{
 
 #breadcrumb span.ajxp-goto{
     cursor: pointer;
-}
-
-@media only screen
-and (max-width : 420px) {
-
-    .ws-label{
-        display: none !important;
-    }
-
-    .action_bar span.actionbar_button_label{
-        display: none;
-    }
 }
