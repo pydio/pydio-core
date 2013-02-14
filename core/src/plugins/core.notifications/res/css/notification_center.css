@@ -26,9 +26,19 @@ ul.notification_list li{
     font-size: 11px;
 }
 
+#feed_content span.event_image {
+display: inline-block;
+float: left;
+}
+
+eed_content span.event_label {
+display: inline-block;
+width: 150px;
+}
+
 #feed_content img {
     float: left;
-    height: 32px;
-    width: 32px;
-    margin: 0px 15px 6px 4px;
+    height: 16px;
+    width: 16px;
+    margin: 0px 14px 3px 6px;
 }
