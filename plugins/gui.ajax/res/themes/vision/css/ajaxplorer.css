@@ -892,7 +892,7 @@ input.SF_input.SF_number{
     background-color: rgb(138, 149, 160);
     letter-spacing: 1px; /* Old browsers */   /* FF3.6+ */   /* Chrome,Safari4+ */   /* Chrome10+,Safari5.1+ */   /* Opera 11.10+ */   /* IE10+ */   /* W3C */   /* IE6-9 */; /* Old browsers */   /* FF3.6+ */   /* Chrome,Safari4+ */   /* Chrome10+,Safari5.1+ */   /* Opera 11.10+ */   /* IE10+ */   /* W3C */   /* IE6-9 */;
     border-radius: 2px 2px 0 0;
-    border-bottom: 2px solid rgb(117, 128, 139);
+    border-bottom: 2px solid rgb(111, 123, 136);
 }
 
 .dialogTitle{
@@ -2101,6 +2101,8 @@ div.tabulatorContainer{
     float: right;
     text-align: right;
     padding-right: 11px;
+    height: 35px;
+    overflow: hidden;
 }
 #search_form a
 {
@@ -2229,7 +2231,7 @@ meta_opt.checked {
 
 #info_panel div.panelHeader.panelHeaderWithIcon{
     background-color: #5599FF !important;
-    border-bottom: 2px solid rgb(66, 126, 214);
+    border-bottom: 2px solid rgb(65, 117, 194);
 }
 
 #info_panel a

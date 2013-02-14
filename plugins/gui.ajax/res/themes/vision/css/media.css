@@ -1,9 +1,50 @@
 @media only screen
-and (max-width : 420px) {
+and (max-width : 620px) {
     .ws-label{
         display: none !important;
     }
-    .action_bar span.actionbar_button_label{
+    .action_bar span.actionbar_button_label,
+    #get_my_feed_button_label,
+    #search_form a,
+    #topPane
+    {
         display: none;
     }
+    #simple_repository_label{
+        font-size: 16px;
+        width: 100px !important;
+    }
+    #group_more_action_button{
+        height:17px;
+    }
+    .user_widget_label.withImage i{
+        width: 30px;
+    }
+}
+
+@media only screen
+and (max-width : 400px){
+    #simple_repository_label{
+        display:none;
+        font-size: 12px;
+        width: 100% !important;
+        padding:0 20px;
+        height:auto;
+    }
+    
+    div.repository_legend{
+        display:none;
+    }
+    #global_toolbar {
+        background-color: #666;
+        height: 30px;
+        padding: 9px 0 0 5px;
+        background-image: url("../images/white_logo.png");
+        background-repeat: no-repeat;
+        background-position: 10px 7px;
+        background-size: 35%;
+    } 
+    #search_engine_cont{
+        width:15% !important;
+    }   
 }
