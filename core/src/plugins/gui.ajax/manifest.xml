@@ -96,8 +96,8 @@
 				<div id="toolbars">
 					<div id="global_toolbar">
 					    <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over"}'></div>
-						<div id="repo_chooser" ajxpClass="RepositorySelect" ajxpOptions='{"menuPosition": "bottom right", "menuOffsetTop":11, "menuOffsetLeft":40, "menuEvent":"over", "simpleLabel":"<span class=\"icon-sitemap\"></span><span class=\"ws-label\">My Workspaces</span><span class=\"icon-caret-down\"></span>"}'></div>
 						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["user"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+						<div id="repo_chooser" ajxpClass="RepositorySelect" ajxpOptions='{"menuPosition": "bottom middle", "menuOffsetTop":11, "menuOffsetLeft":0, "menuMaxHeight":350, "menuEvent":"over", "simpleLabel":"<span class=\"icon-sitemap\"></span><span class=\"ws-label\">My Workspaces</span><span class=\"icon-caret-down\"></span>"}'></div>
 					</div>
 					<div id="workspace_toolbar">
                         <div id="simple_repository_label" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"bindSizeTo":{"width":{"id":"topPane", "events":["FoldersTree-topPane"], "min":150,"offset":-5}}}'></div>

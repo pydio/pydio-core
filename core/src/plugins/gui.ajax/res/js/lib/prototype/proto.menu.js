@@ -312,6 +312,7 @@ Proto.Menu = Class.create({
 			this.shim.setStyle(Object.extend(Object.extend(elDim, elOff), {zIndex: this.options.zIndex - 1})).show();
 		}				
 		if(this.options.fade){
+            this.checkHeight(elOff.top);
 			Effect.Appear(this.container, {
 				duration: this.options.fadeTime || 0.15, 
 				afterFinish : function(e){
@@ -328,12 +329,16 @@ Proto.Menu = Class.create({
 	},
 	
 	checkHeight : function(offsetTop){
+        offsetTop = parseInt(offsetTop);
 		if(this.options.anchor == 'mouse') return;
-		var vpHeight = getViewPortHeight();
+		var vpHeight = getViewPortHeight()-10;
+        if(this.options.menuMaxHeight){
+            vpHeight = Math.min(this.options.menuMaxHeight, vpHeight);
+        }
 		var vpOff = document.viewport.getScrollOffsets();
 		var elDim = this.container.getDimensions();
 		var y = parseInt(offsetTop);
-		if((y - vpOff.top + elDim.height) > vpHeight){			
+		if((y - vpOff.top + elDim.height) >= vpHeight){
 			this.container.setStyle({height:(vpHeight-(y - vpOff.top))+'px',overflowY:'scroll'}); 
 			if(!this.containerShrinked) this.container.setStyle({width:elDim.width+16+'px'});
 			this.containerShrinked = true;
@@ -362,12 +367,15 @@ Proto.Menu = Class.create({
 		var anchorPosition = Position.cumulativeOffset($(this.options.anchor));
 		var anchorScroll = this.options.anchor.cumulativeScrollOffset();
 		
-		if(this.options.position == 'bottom' || this.options.position == 'bottom right'){
+		if(this.options.position == 'bottom' || this.options.position == 'bottom right' || this.options.position == 'bottom middle'){
 			var topPos = anchorPosition[1] + $(this.options.anchor).getHeight() + this.options.topOffset - anchorScroll[1];
 			var leftPos = anchorPosition[0] + this.options.leftOffset - anchorScroll[0];
 			if(this.options.position == 'bottom right'){
 				leftPos = anchorPosition[0] + $(this.options.anchor).getWidth() + this.options.leftOffset - anchorScroll[0];
 				leftPos -= this.container.getWidth();
+			}else if(this.options.position == 'bottom middle'){
+				leftPos = anchorPosition[0] + $(this.options.anchor).getWidth()/2 + this.options.leftOffset - anchorScroll[0];
+				leftPos -= this.container.getWidth()/2;
 			}
 		}else if(this.options.position == 'right'){
 			var vpDim = document.viewport.getDimensions();

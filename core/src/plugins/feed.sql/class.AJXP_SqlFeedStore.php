@@ -71,7 +71,7 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         if($this->sqlDriver["password"] == "XXXX") return array();
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
-        $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND [repository_id] IN (%s) AND ([repository_scope] = 'ALL' OR  ([repository_scope] = 'USER' AND [user_id] = %s  ) OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )) ORDER BY [edate] DESC LIMIT 0,100 ", "event", $filterByRepositories, $userId, $userGroup);
+        $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND [repository_id] IN (%s) AND ([repository_scope] = 'ALL' OR  ([repository_scope] = 'USER' AND [user_id] = %s  ) OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )) ORDER BY [edate] DESC LIMIT $offset,$limit ", "event", $filterByRepositories, $userId, $userGroup);
         $data = array();
         foreach($res as $n => $row){
             $object = new stdClass();

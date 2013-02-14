@@ -470,6 +470,7 @@ Class.create("Action", {
 			setTimeout(function(){
 				if(this.subMenuItems.dynamicBuilderCode){
 					window.builderContext = this;
+                    window.builderProtoMenu = protoMenu;
 					this.subMenuItems.dynamicBuilderCode.evalScripts();
 					var menuItems = this.builderMenuItems || [];					
 				}else{
