@@ -437,6 +437,18 @@ class serialConfDriver extends AbstractConfDriver {
     }
 
     /**
+     * @abstract
+     * @param array $context
+     * @param String $ID
+     * @return boolean
+     */
+    function deleteBinary($context, $ID){
+        if(is_file($this->getBinaryPathStorage($context)."/".$ID)){
+            unlink($this->getBinaryPathStorage($context)."/".$ID);
+        }
+    }
+
+    /**
      * @param array $context
      * @param String $ID
      * @param Resource $outputStream
