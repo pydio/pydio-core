@@ -154,10 +154,9 @@ Class.create("SearchEngine", AjxpPane, {
 			this.hasFocus = true;
 			this._inputBox.select();
             if(this.hasResults && this._ajxpOptions.toggleResultsVisibility && !$(this._ajxpOptions.toggleResultsVisibility).visible()){
+                this.updateSearchResultPosition($(this._ajxpOptions.toggleResultsVisibility));
                 $(this._ajxpOptions.toggleResultsVisibility).setStyle({
-                    display:'block',
-                    top: (this._inputBox.cumulativeOffset().top + this._inputBox.getHeight() + 3) + 'px',
-                    left: (this._inputBox.cumulativeOffset().left) + 'px'
+                    display:'block'
                 });
             }
 			return false;
@@ -344,16 +343,25 @@ Class.create("SearchEngine", AjxpPane, {
             }.bind(this));
 
             if(!$(this._ajxpOptions.toggleResultsVisibility).visible()){
+                this.updateSearchResultPosition($(this._ajxpOptions.toggleResultsVisibility));
                 $(this._ajxpOptions.toggleResultsVisibility).setStyle({
                     display:"block",
-                    position: "absolute",
-                    top: (this._inputBox.cumulativeOffset().top + this._inputBox.getHeight() + 3) + 'px',
-                    left: (this._inputBox.cumulativeOffset().left) + 'px'
+                    position: "absolute"
                 });
             }
             this.resize();
         }
 	},
+
+    updateSearchResultPosition:function(panel){
+        var top = (this._inputBox.cumulativeOffset().top + this._inputBox.getHeight() + 3);
+        var left = (this._inputBox.cumulativeOffset().left);
+        if((left + panel.getWidth()) > document.viewport.getWidth() + 10){
+            left = document.viewport.getWidth() - panel.getWidth() - 10;
+        }
+        panel.setStyle({top: top + 'px', left: left + 'px'});
+    },
+
 	/**
 	 * Search is finished
 	 * @param interrupt Boolean
