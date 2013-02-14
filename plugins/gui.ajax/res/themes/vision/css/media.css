@@ -1,0 +1,9 @@
+@media only screen
+and (max-width : 420px) {
+    .ws-label{
+        display: none !important;
+    }
+    .action_bar span.actionbar_button_label{
+        display: none;
+    }
+}
