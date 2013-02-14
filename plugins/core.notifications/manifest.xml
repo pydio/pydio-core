@@ -56,15 +56,18 @@
                              var root = new AjxpNode("/");
                              root._iNodeProvider = rP;
                              var pFactory = new PreviewFactory();
-                             pFactory.setThumbSize(32);
+                             pFactory.setThumbSize(16);
                              root.observeOnce("loaded", function(){
                                  menuContainer.update('');
                                  root.getChildren().each(function(el){
                                     var div = new Element('a');
+                                    var imgSpan = new Element('span', {className:'event_image'});
+                                    var labelSpan = new Element('span', {className:'event_label'});
                                     var img = pFactory.generateBasePreview(el);
                                     div.IMAGE_ELEMENT = img;
-                                    div.insert(img);
-                                    div.insert(el.getMetadata().get("event_description"));
+                                    imgSpan.insert(img);
+                                    labelSpan.insert(el.getMetadata().get("event_description"));
+                                    div.insert(imgSpan); div.insert(labelSpan);
                                     menuContainer.insert(div);
                                     pFactory.enrichBasePreview(el, div);
                                  });
