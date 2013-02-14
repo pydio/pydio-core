@@ -1347,7 +1347,7 @@ img.simple_button_arrow{
 {
     font-style: normal;
     cursor: pointer;
-    margin-top: -13px;
+    margin-top: -12px;
     float: right;
     margin-left: 10px;
 }
@@ -1366,7 +1366,7 @@ img.simple_button_arrow{
 .user_widget_label.withImage i{
     font-weight: bold;
     display: inline-block;
-    padding: 4px 0 0 8px;
+    padding: 3px 0 0 8px;
     font-size: 12px;
 }
 
@@ -3539,11 +3539,13 @@ td.ip_geo_cell{
 #top_toolbar a
 {
     font-size:12px;
-    padding: 0 30px;
+    padding: 0 10px;
     letter-spacing: 1px;
 }
 
-#top_toolbar a span.ajxp_icon_span{
+#top_toolbar a span.ajxp_icon_span,
+#top_toolbar a span.ajxp_icon_arrow
+{
     font-size: 1.0em;
     display:inline-block;
     padding: 0 4px;

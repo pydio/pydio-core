@@ -161,8 +161,9 @@ Class.create("FormManager", {
                 }else if(param.get("defaultImage")){
                     imgSrc = param.get("defaultImage");
                 }
-                element = "<div class='SF_image_block'><img src='"+imgSrc+"' class='SF_image small'><span class='SF_image_link'>"+
-                    (param.get("uploadLegend")?param.get("uploadLegend"):"update")+"</span>" +
+                element = "<div class='SF_image_block'><img src='"+imgSrc+"' class='SF_image small'><span class='SF_image_link image_update'>"+
+                    (param.get("uploadLegend")?param.get("uploadLegend"):"update")+"</span><span class='SF_image_link image_remove'>"+
+                    (param.get("removeLegend")?param.get("removeLegend"):"remove")+"</span>" +
                     "<input type='hidden' name='"+param.get("name")+"' data-ajxp_type='binary'>" +
                     "<input type='hidden' name='"+param.get("name")+"_original_binary' value='"+ defaultValue +"' data-ajxp_type='string'></div>";
             }
@@ -180,9 +181,11 @@ Class.create("FormManager", {
             // INSERT ELEMENT
             div.insert(element);
             if(type == "image"){
-                var imgLink = div.down("span.SF_image_link");
-                imgLink.observe("click", function(){
+                div.down("span.SF_image_link.image_update").observe("click", function(){
                     this.createUploadForm(form, div.down('img'), param);
+                }.bind(this));
+                div.down("span.SF_image_link.image_remove").observe("click", function(){
+                    this.confirmExistingImageDelete(form, div.down('img'), div.down('input[name="'+param.get("name")+'"]'), param);
                 }.bind(this));
             }
 			if(desc){
@@ -344,6 +347,13 @@ Class.create("FormManager", {
             return true;
         }.bind(this) );
 
+    },
+
+    confirmExistingImageDelete : function(modalParent, imgSrc, hiddenInput, param){
+        if(window.confirm('Do you want to remove the current image?')){
+            hiddenInput.setValue("ajxp-remove-original");
+            imgSrc.src = "";
+        }
     },
 
 	serializeParametersInputs : function(form, parametersHash, prefix, skipMandatoryWarning){
