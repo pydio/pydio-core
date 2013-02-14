@@ -226,6 +226,14 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
      */
     abstract function loadBinary($context, $ID, $outputStream = null);
 
+    /**
+     * @abstract
+     * @param array $context
+     * @param String $ID
+     * @return boolean
+     */
+    abstract function deleteBinary($context, $ID);
+
 
 
 	/**
@@ -508,8 +516,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                                 $pluginId = $parentNode->nodeName.".".$parentNode->getAttribute("name");
                             }
                             $name = $xmlNode->getAttribute("name");
-                            if(isSet($data[$name])){
-                                if($userObject->parentRole == null || $userObject->parentRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name]){
+                            if(isSet($data[$name]) || $data[$name] == ""){
+                                if($data[$name] == "" || $userObject->parentRole == null || $userObject->parentRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name]){
                                     $userObject->personalRole->setParameterValue($pluginId, $name, $data[$name]);
                                     $rChanges = true;
                                 }

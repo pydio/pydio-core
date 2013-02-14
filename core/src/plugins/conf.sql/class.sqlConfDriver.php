@@ -552,6 +552,10 @@ class sqlConfDriver extends AbstractConfDriver {
         dibi::query("INSERT INTO [ajxp_simple_store]", $values);
     }
 
+    protected function simpleStoreClear($storeID, $dataID){
+        dibi::query("DELETE FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id]=%s", $storeID, $dataID);
+    }
+
     protected function simpleStoreGet($storeID, $dataID, $dataType = "serial", &$data){
         $children_results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id]=%s", $storeID, $dataID);
         $value = $children_results->fetchAll();
@@ -596,6 +600,18 @@ class sqlConfDriver extends AbstractConfDriver {
         $this->simpleStoreSet($store, $ID, file_get_contents($fileName), "binary");
         return $ID;
     }
+
+    /**
+     * @abstract
+     * @param array $context
+     * @param String $ID
+     * @return boolean
+     */
+    function deleteBinary($context, $ID){
+        $store = $this->binaryContextToStoreID($context);
+        $this->simpleStoreClear($store, $ID);
+    }
+
 
     /**
      * @param array $context
