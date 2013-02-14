@@ -101,8 +101,8 @@ a:focus{
 
 body, html
 {
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 }
 
 input, textarea, select
@@ -119,9 +119,9 @@ input, textarea, select
 }
 
 textarea{
-    margin-top: 0px;
-    margin-left: 0px;
-    padding:0px;
+    margin-top: 0;
+    margin-left: 0;
+    padding: 0;
     background-color: #fff;
 }
 
@@ -135,8 +135,8 @@ textarea{
 }
 
 .titre input, .backImage{
-    margin-top: 0px;
-    margin-left: 0px;
+    margin-top: 0;
+    margin-left: 0;
     padding: 2px;
     border: 1px solid #5E7C90;
 }
@@ -269,7 +269,7 @@ div.shadow_class
     z-index: 1002;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size: 11px;
-    padding: 0px;
+    padding: 0;
     -moz-border-radius:5px;
     border-radius: 3px;
 }
@@ -278,8 +278,8 @@ div.shadow_class
 {
     top:5%;
     left:5%;
-    padding: 0px;
-    margin:0px;
+    padding: 0;
+    margin: 0;
 }
 
 .dialogTitle
@@ -307,8 +307,8 @@ div.shadow_class
     background-color: #fff;
     padding: 10px 10px;
     border: 1px solid #dddddd;
-    -moz-border-radius:0px 0px 3px 3px;
-    border-radius:0px 0px 3px 3px;
+    -moz-border-radius: 0 0 3px 3px;
+    border-radius: 0 0 3px 3px;
     border-top: 0;
 }
 
@@ -318,7 +318,7 @@ div.shadow_class
 .dialogContent select,
 #search_txt
 {
-    margin-left:0px;
+    margin-left: 0;
     width: 174px;
     border: 1px solid #aaa;
     background-repeat: no-repeat;
@@ -361,7 +361,7 @@ div.shadow_class
 {
     height: auto;
     width: auto;
-    border-radius : 0px;
+    border-radius : 0;
     border:none;
     filter: none;
     background: none;
@@ -386,7 +386,7 @@ fieldSet input.dialogButton
     margin-left: 6px;
     width: 22px;
     height: 22px;
-    padding:0px;
+    padding: 0;
     background-image: none;
     background-color: #f1f1ef;
     border-radius: 3px;
@@ -419,10 +419,10 @@ span.ajxp-caret-up{
 
 .editContent textarea, textarea#myCode, .editContent iframe
 {
-    border:0px;
+    border: 0;
     border-left:1px solid #5E7C90;
-    padding:0px;
-    margin:0px;
+    padding: 0;
+    margin: 0;
 }
 
 #activity_monitor_warning{
@@ -459,7 +459,7 @@ textarea#myCode
 .dialogContent form, .editContent form
 {
     display: inline;
-    margin: 0px;
+    margin: 0;
 }
 
 .dialogButton
@@ -468,10 +468,7 @@ textarea#myCode
     border-right: 1px solid buttonshadow;
     border-top: 1px solid #fff;
     border-left: 1px solid #fff;
-    padding-left: 8px;
-    padding-right: 8px;
-    padding-top: 1px;
-    padding-bottom: 1px;
+    padding: 1px 8px;
     margin-top: 5px;
 }
 
@@ -508,14 +505,14 @@ textarea#myCode
 
 #fancyframe
 {
-    border:0px;
+    border: 0;
     width: 410px;
     height: 385px;
 }
 
 #flashframe
 {
-    border:0px;
+    border: 0;
     width: 450px;
     height: 300px;
     overflow:hidden;
@@ -539,7 +536,7 @@ textarea#myCode
     margin: 8px;
     overflow-y: auto;
     max-height: 120px;
-    letter-spacing: 0px;
+    letter-spacing: 0;
 }
 
 .errorMessage
@@ -596,7 +593,7 @@ html.boxshadow div.errorMessage{
     background-color: #fff;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size: 11px;
-    padding: 0px 10px 5px 10px;
+    padding: 0 10px 5px 10px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
@@ -636,7 +633,7 @@ div.dialogContentMainTitle{
     font-size: 20px;
     margin-bottom: 10px;
     border-bottom: 1px solid rgb(117, 128, 139);
-    padding-bottom: 0px;
+    padding-bottom: 0;
 }
 
 div.oneFieldForm{
@@ -839,7 +836,7 @@ input.SF_input.SF_number{
     background-repeat: no-repeat;
     background-position: 9px 7px;
     background-size: 138px;
-    box-shadow: 0px 0px 8px rgba(0,0,0,0.4);
+    box-shadow: 0 0 8px rgba(0,0,0,0.4);
 }
 
 #top_toolbar{
@@ -915,7 +912,7 @@ input.SF_input.SF_number{
 {
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size: 12px;
-    padding: 0px;
+    padding: 0;
     line-height: 15px;
 }
 .action_bar.editor_action_bar{
@@ -962,7 +959,7 @@ div.editor_header > span.header_label{
 
 .action_bar.icons_only{
     height:40px;
-    line-height: 0px;
+    line-height: 0;
 }
 
 .action_bar
@@ -1013,7 +1010,7 @@ div.action_bar.text_only  span.actionbar_button_label{
 
 #buttons_bar
 {
-    padding-left:0px;
+    padding-left: 0;
     padding-top: 5px;
     overflow:hidden;
     padding-bottom: 6px;
@@ -1029,7 +1026,7 @@ div.action_bar.text_only  span.actionbar_button_label{
     color: #fff;
     outline: none;
     border-radius: 2px;
-    margin: 5px 3px 0px 1px;
+    margin: 5px 3px 0 1px;
     background: #4dc5c3; /* Old browsers */   /* FF3.6+ */   /* Chrome,Safari4+ */   /* Chrome10+,Safari5.1+ */   /* Opera 11.10+ */   /* IE10+ */   /* W3C */   /* IE6-9 */;
     letter-spacing: 1px;
     float: left;
@@ -1073,12 +1070,12 @@ div.action_bar.text_only  span.actionbar_button_label{
 
 
 .action_bar a.menuAnchorSelected{
-    border-radius: 3px 3px 0px 0px;
+    border-radius: 3px 3px 0 0;
 }
 
 .action_bar a img
 {
-    margin: 2px 5px 2px 0px;
+    margin: 2px 5px 2px 0;
     display: none;
 }
 
@@ -1111,7 +1108,7 @@ div.separator
     margin-right: 2px;
     padding-top: 0;
     text-align: center;
-    width: 0px;
+    width: 0;
 }
 
 a.carousel-control{
@@ -1125,7 +1122,7 @@ a.carousel-control{
     padding-top:0;
     text-align:center;
     width:8px!important;
-    margin:0px !important;
+    margin: 0 !important;
     cursor:pointer;
     background-color: #fff;
 }
@@ -1147,7 +1144,7 @@ a.carousel-control img{
 }
 
 #topPane, #bottomSplitPane{
-    border: 0px !important;
+    border: 0 !important;
 }
 
 #locationbar_cont
@@ -1158,9 +1155,9 @@ a.carousel-control img{
     height:33px;
     _height:32px;
     width:100%;
-    -webkit-box-shadow:0 0px 5px #bbb;
-    -moz-box-shadow:0 0px 5px #bbb;
-    box-shadow:0 0px 5px #bbb;
+    -webkit-box-shadow:0 0 5px #bbb;
+    -moz-box-shadow:0 0 5px #bbb;
+    box-shadow:0 0 5px #bbb;
     clear:left;
 }
 
@@ -1171,10 +1168,10 @@ a.carousel-control img{
 #location_form,
 #repository_form
 {
-    border-right-width:0px;
+    border-right-width: 0;
     float:left;
     height:20px;
-    padding:2px 0px 0px 4px;
+    padding:2px 0 0 4px;
 }
 
 #location_form input,
@@ -1186,19 +1183,19 @@ a.carousel-control img{
 
 #repository_form, #goto_parent
 {
-    -moz-border-radius : 5px 0px 0px 5px;
-    border-radius : 5px 0px 0px 5px;
+    -moz-border-radius : 5px 0 0 5px;
+    border-radius : 5px 0 0 5px;
 }
 
 #repository_goto, #bookmarks_goto
 {
-    -moz-border-radius : 0px 5px 5px 0px;
-    border-radius : 0px 5px 5px 0px;
+    -moz-border-radius : 0 5px 5px 0;
+    border-radius : 0 5px 5px 0;
 }
 
 #location_form
 {
-    margin-left: 0px;
+    margin-left: 0;
 }
 #location_form div.location_bar_label{
     line-height: 18px;
@@ -1212,8 +1209,8 @@ a.carousel-control img{
 #location_form input,
 #repository_form input
 {
-    margin:1px 0px 0px 0px;
-    _margin: 0px 0px 1px 0px;
+    margin:1px 0 0 0;
+    _margin: 0 0 1px 0;
     border:none;
     height: 15px;
     width: 325px;
@@ -1256,7 +1253,7 @@ a.carousel-control img{
 
 #repo_chooser span.ws-label {
     display: inline-block;
-    padding-top: 0px;
+    padding-top: 0;
     line-height: 20px;
 }
 
@@ -1277,10 +1274,10 @@ a.carousel-control img{
 }
 
 .inlineBarButtonLeft{
-    border-left-width:0px;
+    border-left-width: 0;
 }
 .inlineBarButtonRight{
-    border-right-width:0px;
+    border-right-width: 0;
 }
 
 .inlineBarButton img,
@@ -1289,7 +1286,7 @@ a.carousel-control img{
 {
     margin-top:3px;
     display:inline;
-    border:0px;
+    border: 0;
 }
 
 .inline_hover_light,
@@ -1313,7 +1310,7 @@ a.carousel-control img{
 
 img.simple_button_arrow{
     position:absolute;
-    right:0px;
+    right: 0;
     bottom:1px;
     display:none;
 }
@@ -1356,12 +1353,9 @@ img.simple_button_arrow{
 }
 .user_widget_label{
     float: left;
-    line-height: 16px;
-    -moz-border-radius: 5px 0pt 0pt 5px;
-    border-radius: 5px 0pt 0pt 5px;
-    padding: 3px 0px 3px 7px;
-    _padding: 3px 0px 1px 7px;
+    padding: 3px 10px 3px 7px;
     cursor: pointer;
+    font-size: 12px;
 }
 
 .user_widget_label.withImage{
@@ -1399,14 +1393,14 @@ img.user_widget_mini{
     /*width: 455px;*/
     border:none;
     height: 20px;
-    padding:0px;
+    padding: 0;
     padding-left:3px;
-    padding-top:0px;
+    padding-top: 0;
     font-size: 11px;
 }
 
 #current_path{
-    padding-left:0px;
+    padding-left: 0;
 }
 #current_path:focus, #repo_path:focus{
     outline: none;
@@ -1462,7 +1456,7 @@ div.header_resizer div.header_cell{
     overflow:hidden;
     width:90px;
     white-space:nowrap;
-    border: 0px !important;
+    border: 0 !important;
     cursor: pointer;
 }
 
@@ -1507,7 +1501,7 @@ div.header_resizer div.resizer{
     background-color: #fff;
     height: 26px;
     cursor:e-resize;
-    border: 0px;
+    border: 0;
 
 }
 
@@ -1558,11 +1552,11 @@ div.header_resizer div.ascending {
 }
 
 .sort-table td {
-    padding: 4px 0px;
+    padding: 4px 0;
 }
 
 .no-flexbox .sort-table td{
-    padding: 3px 0px;
+    padding: 3px 0;
 }
 
 .sort-table thead td {
@@ -1578,7 +1572,7 @@ div.header_resizer div.ascending {
     border-right: 	1px solid buttonhighlight;
     font-size:12px;
     color: #676965;
-    padding: 0px;
+    padding: 0;
     background-color: #f1f1ef;
     border-bottom : 1px solid #676965;
 }
@@ -1622,7 +1616,7 @@ div.header_resizer div.ascending {
     width: 3px;
     float:right;
     height: 23px;
-    font-size: 0px;
+    font-size: 0;
     cursor:e-resize;
 }
 
@@ -1665,7 +1659,7 @@ div.header_resizer div.ascending {
 .paginatorInput
 {
     width:21px;
-    padding: 0px 2px;
+    padding: 0 2px;
     height: 14px;
     text-align: right;
     border: 1px solid #CCCCCC;
@@ -1679,7 +1673,7 @@ div.multiple_selection_draggable
     color: #000;
     background-color: #fff;
     padding: 5px;
-    padding-bottom:0px;
+    padding-bottom: 0;
     border: 1px dashed #999;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif , sans-serif;
     font-size: 11px;
@@ -1753,7 +1747,7 @@ BOOKMARKS BAR
     width:86%;
     left:7%;
     height: 25px;
-    padding: 0px;
+    padding: 0;
     padding-left:10px;
 }
 
@@ -1860,8 +1854,8 @@ div#uploader_options_pane {
 
 div#uploader_options_pane input {
     width: 15px;
-    margin-right: 0px;
-    margin-left: 0px;
+    margin-right: 0;
+    margin-left: 0;
     margin-top: 5px;
 }
 
@@ -1916,7 +1910,7 @@ div#upload_files_list div, div#multiple_download_container div
     filter:alpha(opacity:0); opacity:0; moz-opacity:0;
     position: absolute;
     font-size: 60px; /* causes it to fill the containing div */
-    top:0px; right:0px;
+    top: 0; right: 0;
     z-index: 10000;
     height: 56px;
 }
@@ -1925,7 +1919,7 @@ div#upload_files_list div, div#multiple_download_container div
     height: 60px;
     width: 60px;
     position: absolute;
-    top: 0px; right: 0px;
+    top: 0; right: 0;
     overflow: hidden;
     z-index: 9999; /* this was needed to work in IE */
 }
@@ -1967,7 +1961,7 @@ div#upload_files_list div, div#multiple_download_container div
 .fakeOptionButton {
     padding-top: 3px;
     padding-bottom: 3px;
-    margin-bottom: 0px;
+    margin-bottom: 0;
     margin-top: 5px;
     background-position : center;
     -moz-border-radius : 5px;
@@ -1976,12 +1970,12 @@ div#upload_files_list div, div#multiple_download_container div
 
 #uploadBrowseButton {
     position: absolute;
-    top: 0px; right: 0px;
+    top: 0; right: 0;
     margin:0;
 }
 #uploadSendButton {
     position: absolute;
-    top: 63px; right: 0px;
+    top: 63px; right: 0;
     margin:0;
 }
 
@@ -1998,7 +1992,7 @@ div#upload_files_list div, div#multiple_download_container div
     width: 10px;
     background-color: #F1F1F1;
     cursor: ns-resize;
-    right: 0px;
+    right: 0;
     z-index: 1000;
     opacity: 0.7;
     border-left: 1px solid #CCC;
@@ -2020,7 +2014,7 @@ div#upload_files_list div, div#multiple_download_container div
 
 div.tabulatorContainer{
     padding: 3px;
-    padding-bottom: 0px;
+    padding-bottom: 0;
     height: 24px;
     border-bottom: 1px solid #676965;
 }
@@ -2031,10 +2025,10 @@ div.tabulatorContainer{
     cursor: pointer;
     padding-right: 2px;
     border: 1px solid #676965;
-    border-bottom: 0px;
-    border-radius: 4px 4px 0px 0px;
-    -moz-border-radius: 4px 4px 0px 0px;
-    -webkit-border-radius: 4px 4px 0px 0px;
+    border-bottom: 0;
+    border-radius: 4px 4px 0 0;
+    -moz-border-radius: 4px 4px 0 0;
+    -webkit-border-radius: 4px 4px 0 0;
 }
 
 .toggleHeader a, .toggleHeader a, .toggleHeader a:link, .toggleHeader a:visited, .toggleHeader a:hover , .toggleHeader a:active
@@ -2093,7 +2087,7 @@ div.tabulatorContainer{
 
 #search_container
 {
-    /*padding:0px;*/
+    /*padding: 0;*/
 }
 
 #search_form, #search_state
@@ -2113,7 +2107,7 @@ div.tabulatorContainer{
     display: inline-block;
     width:18px;
     cursor: pointer;
-    margin-right: 0px;
+    margin-right: 0;
     margin-left: 5px;
     padding: 1px;
     font-size: 1.4em;
@@ -2134,7 +2128,7 @@ div.tabulatorContainer{
 #search_form input
 {
     float: none !important;
-    margin: 0px;
+    margin: 0;
     height: 25px;
     border-color: rgb(138, 149, 160);
     background: #fff;
@@ -2185,7 +2179,7 @@ meta_opt.checked {
 
 #search_results
 {
-    margin-left:0px;
+    margin-left: 0;
     width: 250px;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size: 11px;
@@ -2295,7 +2289,7 @@ td.infoPanelLabel
 
 .infoPanelGroup
 {
-    border-radius: 0px;
+    border-radius: 0;
     padding: 1px;
 }
 
@@ -2357,13 +2351,13 @@ div.selectable_div, .table_rows_container, #tree_container, #bottomSplitPane, .a
 }
 .table_rows_container tr.even td
 {
-    border-top: 0px;
-    border-bottom:0px;
+    border-top: 0;
+    border-bottom: 0;
 }
 .table_rows_container tr:first-child td,
 .infoPanelTable tr:first-child td
 {
-    border-top:0px;
+    border-top: 0;
 }
 
 .table_rows_container tr:last-child td
@@ -2638,8 +2632,8 @@ legend a.active {
 {
     border: none;
     margin-left: 1px;
-    margin-top: 0px;
-    padding: 0px;
+    margin-top: 0;
+    padding: 0;
 }
 
 .user_data
@@ -2662,7 +2656,7 @@ legend a.active {
 {
     padding: 15px;
     font-size: 12px;
-    border: 0px solid #ddd;
+    border: 0 solid #ddd;
     background-color: #ddd;
     border-bottom: 1px solid #bbb;
 }
@@ -2672,8 +2666,8 @@ legend a.active {
     height: 18px;
     width: 90px;
     font-size: 12px;
-    padding: 0px;
-    margin-left: 0px;
+    padding: 0;
+    margin-left: 0;
     margin-right: 5px;
 }
 
@@ -2694,14 +2688,14 @@ legend a.active {
 #user_pref_form input
 {
     width: 65px;
-    padding: 0px;
+    padding: 0;
     margin-right: 5px;
 }
 
 #user_pref_form input.radio
 {
     width: 20px;
-    border: 0px;
+    border: 0;
     background-image: none;
 }
 
@@ -2713,7 +2707,7 @@ legend a.active {
 }
 
 div#available_roles, div#user_roles{
-    padding: 0px;
+    padding: 0;
     border: 1px solid #aaa;
     width: 100%;
     height: 80px;
@@ -2851,9 +2845,9 @@ span.user_entry_check{
     width: 84%;
     background-color: #EEE;
     margin: 0 6%;
-    box-shadow: 0px 0px 7px #666;
+    box-shadow: 0 0 7px #666;
     padding: 1px 4px;
-    border-radius: 0px 0px 7px 7px;
+    border-radius: 0 0 7px 7px;
 
     position: absolute;
     top: -1px;
@@ -2955,8 +2949,8 @@ div.autocomplete
     width:250px;
     background-color:white;
     border:1px solid #bbb;
-    margin:8px 0px 0px;
-    padding:0px;
+    margin:8px 0 0;
+    padding: 0;
     box-shadow: 2px 2px 3px #cccccc;
     border-radius: 0 0 2px 2px;
     max-height: 200px;
@@ -2965,8 +2959,8 @@ div.autocomplete
 div.autocomplete ul
 {
     list-style-type:none;
-    margin:0px;
-    padding:0px;
+    margin: 0;
+    padding: 0;
 }
 div.autocomplete ul li.selected
 {
@@ -3019,7 +3013,7 @@ div.menu a {
 .menu.desktop {
     width: 10em;
     padding: 0;
-    padding-top: 0px;
+    padding-top: 0;
     padding-bottom: 1px;
     letter-spacing: 1px;
     background-color: #ffffff;
@@ -3027,12 +3021,12 @@ div.menu a {
 
 .menu.desktop.toolbarmenu {
     background: #4dc5c3;
-    padding-bottom: 0px;
+    padding-bottom: 0;
     width: auto;
     /* IE */
     width:expression("150px");
-    -moz-border-radius : 0px 5px 5px 5px;
-    border-radius: 0px 2px 2px 2px;
+    -moz-border-radius : 0 5px 5px 5px;
+    border-radius: 0 2px 2px 2px;
 }
 
 .menu.desktop.toolbarmenu.panelHeaderMenu {
@@ -3074,7 +3068,7 @@ div.menu a {
 }
 
 .menu.desktop li{
-    padding: 0px;
+    padding: 0;
     overflow-y: hidden;
     color: rgb(123, 134, 145);
 }
@@ -3082,7 +3076,7 @@ div.menu a {
 .menu.desktop.toolbarmenu li {
     height: auto;
     padding-top: 1px;
-    padding-bottom: 0px;
+    padding-bottom: 0;
     color: white;
 }
 
@@ -3094,14 +3088,14 @@ div.menu a {
     padding-right: 25px;
     padding-bottom: 5px;
     color: #ccc;
-    border-bottom: 0px solid #ddd;
+    border-bottom: 0 solid #ddd;
     text-align: left;
     font-style: italic;
     display: none;
 }
 
 .menu.desktop li.separator {
-    padding: 0px;
+    padding: 0;
     height: 1px;
 }
 .menu.desktop a img{
@@ -3162,7 +3156,7 @@ div.menu a {
     border-bottom: 1px solid #fff;
     margin: 1px 1px 0 1px;
     line-height: 1px !important;
-    padding: 0px;
+    padding: 0;
     height: 1px !important;
 }
 /* we need explicit enabled class to overcome css deficiences (without creating unnecessary markup) */
@@ -3199,7 +3193,7 @@ div.menu a {
 
 .rootDirChooser img
 {
-    border: 0px;
+    border: 0;
 }
 
 .rootDirChooser a,
@@ -3233,7 +3227,7 @@ div.menu a {
     padding-left: 5px;
     padding-right: 50px;
     color: #ccc;
-    border-bottom: 0px solid #ddd;
+    border-bottom: 0 solid #ddd;
     text-align: left;
     font-style: italic;
 }
@@ -3251,7 +3245,7 @@ div.menu a {
     border-bottom: 1px solid #fff;
     margin: 1px 1px 0 1px;
     line-height: 1px !important;
-    padding: 0px;
+    padding: 0;
     height: 1px !important;
 }
 
@@ -3275,7 +3269,7 @@ div.menu a {
 }
 
 .rightAlignMenu a img{
-    margin-right:0px;
+    margin-right: 0;
     margin-left:5px;
     float: right;
 }
@@ -3283,7 +3277,7 @@ div.menu a {
 .rightAlignMenu a img,
 .rightAlignMenu span.ajxp_icon_span
 {
-    margin-right:0px;
+    margin-right: 0;
     margin-left:5px;
     float: right;
     font-size: 1.3em;
@@ -3291,7 +3285,7 @@ div.menu a {
 
 .menuActions {
     position: absolute;
-    right: 0px;
+    right: 0;
     top: 1px;
     text-align: right;
     padding-right: 3px !important;
@@ -3406,7 +3400,7 @@ input#webdav_password{
 }
 
 .video-js-box.vjs-fullscreen{
-    margin-left: 0px !important;
+    margin-left: 0 !important;
 }
 
 #video_container{
@@ -3419,7 +3413,7 @@ td.ip_geo_cell{
 
 
 .pluginfo_list {
-    padding-left: 0px;
+    padding-left: 0;
 }
 
 .pluginfo_list li:nth-child(2n+1) {
@@ -3444,7 +3438,7 @@ td.ip_geo_cell{
 /************************************************/
 .tabrow {
     list-style: none;
-    margin: 10px 0 0px;
+    margin: 10px 0 0;
     padding: 0 20px;
     line-height: 24px;
     height: 26px;
@@ -3588,4 +3582,9 @@ td.ip_geo_cell{
 
 #breadcrumb span.ajxp-goto{
     cursor: pointer;
+}
+
+#AjxpConnexion-loader{
+    left:50% !important;
+    top: 10px !important;
 }
