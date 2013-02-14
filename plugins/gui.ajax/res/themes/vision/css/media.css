@@ -46,5 +46,12 @@ and (max-width : 400px){
     } 
     #search_engine_cont{
         width:15% !important;
-    }   
+    }
+    #buttons_bar_cont{
+        margin-left: 15px;
+    }
+    #workspace_toolbar{
+        padding-top:0;
+    }
+
 }

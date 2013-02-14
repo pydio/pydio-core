@@ -1259,7 +1259,7 @@ Class.create("FilesList", SelectableElements, {
             padding: 0
 		});
 		$(document.getElementsByTagName('body')[0]).insert({bottom:edit});				
-		modal.showContent('editbox', (posSpan.getWidth()-offset.left)+'', '20', true);		
+		modal.showContent('editbox', (posSpan.getWidth()-offset.left)+'', '20', true, false, {opacity:0.25, backgroundColor:'#fff'});
 		edit.setStyle({left:(pos.left+offset.left)+'px', top:(pos.top+offset.top-scrollTop)+'px'});
 		window.setTimeout(function(){
 			edit.focus();

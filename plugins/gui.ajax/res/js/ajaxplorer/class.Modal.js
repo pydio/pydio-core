@@ -152,11 +152,17 @@ Class.create("Modal", {
 				return false;
 			};
 		}
+        var overlayStyle = undefined;
+        if($(sFormId).getAttribute("overlayStyle")){
+            overlayStyle = $(sFormId).getAttribute("overlayStyle").evalJSON();
+        }
 		this.showContent(this.elementName, 
 				$(sFormId).getAttribute("box_width"), 
 				$(sFormId).getAttribute("box_height"),
 				null,
-				($(sFormId).getAttribute("box_resize") && $(sFormId).getAttribute("box_resize") == "true"));
+				($(sFormId).getAttribute("box_resize") && $(sFormId).getAttribute("box_resize") == "true"),
+                overlayStyle
+        );
 		if($(newForm).select(".dialogFocus").length)
 		{
 			objToFocus = $(newForm).select(".dialogFocus")[0];
@@ -200,7 +206,7 @@ Class.create("Modal", {
 	 * @param boxHeight String Height in pixel or in percent
 	 * @param skipShadow Boolean Do not add a shadow
 	 */
-	showContent: function(elementName, boxWidth, boxHeight, skipShadow, boxAutoResize){
+	showContent: function(elementName, boxWidth, boxHeight, skipShadow, boxAutoResize, overlayStyle){
 		ajaxplorer.disableShortcuts();
 		ajaxplorer.disableNavigation();
 		ajaxplorer.blurAll();
@@ -258,7 +264,7 @@ Class.create("Modal", {
             Event.observe(window, "resize", this.currentResizeListener);
         }
 			
-		displayLightBoxById(elementName);
+		displayLightBoxById(elementName, overlayStyle);
 		
 		// FORCE ABSOLUTE FOR SAFARI
 		$(elementName).style.position = 'absolute';

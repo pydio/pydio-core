@@ -128,9 +128,23 @@ lightbox.prototype = {
 			addLightboxMarkup();
 		}
 		if(display == 'none'){
-			$('overlay').fade({duration:0.5});
+			$('overlay').fade({
+                duration:0.5,
+                afterFinish : function(){
+                    if(this.originalStyle){
+                        $('overlay').setStyle(this.originalStyle);
+                    }
+                }.bind(this)
+            });
 		}else{
 			$('overlay').style.display = display;
+            if(this.overlayStyle){
+                this.originalStyle = {};
+                for(var key in this.overlayStyle){
+                    this.originalStyle[key] = $('overlay').getStyle(key);
+                }
+                $('overlay').setStyle(this.overlayStyle);
+            }
 		}
 		if(this.content != null)
 		{
@@ -219,9 +233,10 @@ function initialize(){
 	
 }
 
-function displayLightBoxById(id)
+function displayLightBoxById(id, overlayStyle)
 {
 	valid = new lightbox(id);
+    if(overlayStyle) valid.overlayStyle = overlayStyle;
 	valid.activate();
 	currentLightBox = valid;	
 	if(id != 'copymove_div')
