@@ -214,6 +214,7 @@ Class.create("RepositorySelect", {
 				leftOffset:(this.options.menuOffsetLeft !== undefined ? this.options.menuOffsetLeft: -127),
 				menuTitle:MessageHash[200],
 				menuItems: actions,
+                menuMaxHeight:this.options.menuMaxHeight,
 				fade:true,
 				zIndex:1500
 			});		

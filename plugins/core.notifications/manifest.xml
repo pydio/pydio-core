@@ -27,45 +27,76 @@
              		<context selection="false" dir="" recycle="true" actionBar="true" actionBarGroup="user" contextMenu="false" infoPanel="false"/>
                 </gui>
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
+                <subMenu>
+                    <dynamicBuilder><![CDATA[
+                        var context = window.builderContext;
+                        var protoMenu = window.builderProtoMenu;
+                        context.builderMenuItems = $A([]);
+                        context.builderMenuItems.push({
+                            id:'event_loading',
+                            name:'Loading ...',
+                            alt:'',
+                            isDefault : false,
+                            image:resolveImageSource('images/actions/22/hdd_external_unmount.png', '',  22),
+                            icon_class:'icon-spinner event_loading',
+                            callback:function(e){
+                                this.apply();
+                            }.bind(context)
+                        } );
+                        var loaderFunc = function(){
+                            try{
+                                var menuContainer = protoMenu.container;
+                            }catch(e){}
+                            if(!menuContainer) {
+                                return;
+                            }
+                             var dm = new AjxpDataModel(true);
+                             var rP = new RemoteNodeProvider();
+                             rP.initProvider({get_action:'get_my_feed', format:'xml'});
+                             var root = new AjxpNode("/");
+                             root._iNodeProvider = rP;
+                             var pFactory = new PreviewFactory();
+                             pFactory.setThumbSize(32);
+                             root.observeOnce("loaded", function(){
+                                 menuContainer.update('');
+                                 root.getChildren().each(function(el){
+                                    var div = new Element('a');
+                                    var img = pFactory.generateBasePreview(el);
+                                    div.IMAGE_ELEMENT = img;
+                                    div.insert(img);
+                                    div.insert(el.getMetadata().get("event_description"));
+                                    menuContainer.insert(div);
+                                    pFactory.enrichBasePreview(el, div);
+                                 });
+                                 pFactory.loadNextImage();
+                                elOff = protoMenu.computeAnchorOffset();
+                                protoMenu.container.setStyle(elOff);
+                             });
+                             root.load();
 
+                        };
+                        protoMenu.options = Object.extend(protoMenu.options, {
+                            position: "bottom middle",
+                            menuMaxHeight: 350,
+                            topOffset: 14,
+                            beforeShow: function(){
+                                protoMenu.container.removeClassName('panelHeaderMenu');
+                                protoMenu.container.removeClassName('toolbarmenu');
+                                protoMenu.container.removeClassName('desktop');
+                                protoMenu.container.addClassName('rootDirChooser');
+                                protoMenu.container.addClassName('events_menu');
+                                protoMenu.container.id = "feed_content";
+                                window.ajxp_feed_timer = window.setTimeout(loaderFunc, 500);
+                            },
+                            beforeHide: function(){
+                                if(window.ajxp_feed_timer) window.clearTimeout(window.ajxp_feed_timer);
+                            }
+                        });
+                    ]]></dynamicBuilder>
+                </subMenu>
                 <processing>
                     <clientCallback><![CDATA[
 
-                         $$('body')[0].insert($('user_feed'));
-                         $('user_feed').setStyle({
-                            display:'block',
-                            position:'absolute',
-                            top:($('get_my_feed_button').cumulativeOffset().top + $('get_my_feed_button').getHeight() + 13) + 'px',
-                            left:($('get_my_feed_button').cumulativeOffset().left - $('get_my_feed_button').getWidth()/2) + 'px'
-                         });
-                         modal.createTopCaret($('user_feed'));
-                         $('ajxp_desktop').observeOnce("click", function(){
-                            $('user_feed').fade({duration:0.3});
-                         });
-
-
-                         var dm = new AjxpDataModel(true);
-                         var rP = new RemoteNodeProvider();
-                         rP.initProvider({get_action:'get_my_feed', format:'xml'});
-                         var root = new AjxpNode("/");
-                         root._iNodeProvider = rP;
-                         var pFactory = new PreviewFactory();
-                         var container = $("feed_content");
-                         pFactory.setThumbSize(32);
-                         root.observeOnce("loaded", function(){
-                             container.update('');
-                             root.getChildren().each(function(el){
-                                var div = new Element('div');
-                                var img = pFactory.generateBasePreview(el);
-                                div.IMAGE_ELEMENT = img;
-                                div.insert(img);
-                                div.insert(el.getMetadata().get("event_description"));
-                                container.insert(div);
-                                pFactory.enrichBasePreview(el, div);
-                             });
-                             pFactory.loadNextImage();
-                         });
-                         root.load();
 
                     ]]></clientCallback>
                     <clientForm id="user_feed"><![CDATA[

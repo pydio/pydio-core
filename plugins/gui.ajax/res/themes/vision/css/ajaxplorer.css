@@ -3556,6 +3556,9 @@ td.ip_geo_cell{
     padding: 0 4px;
 }
 
+#top_toolbar a img{
+    display:none;
+}
 
 #display_toolbar span.actionbar_button_label {
     display: none;

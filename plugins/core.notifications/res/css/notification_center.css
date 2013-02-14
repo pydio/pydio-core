@@ -11,19 +11,19 @@ ul.notification_list li{
 #feed_content {
     background-color: #666;
     color: #fff;
-    font-size: 10px;
     letter-spacing: 1px;
-    padding: 7px;
+    padding: 0px;
     border-radius: 2px;
+    width:220px !important;
+    max-height: 350px !important;
+    overflow-y: auto !important;
 }
 
-#feed_content div {
+#feed_content a{
     clear: left;
-    padding: 1px;
+    padding: 5px;
     margin: 2px;
-    border-bottom: 1px solid #fff;
-    padding-bottom: 17px;
-    padding-top: 8px;
+    font-size: 11px;
 }
 
 #feed_content img {
