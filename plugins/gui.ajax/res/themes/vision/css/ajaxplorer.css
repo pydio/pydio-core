@@ -1449,6 +1449,7 @@ div.header_resizer{
     overflow:hidden;
     box-shadow: 0 1px 4px rgba(0,0,0,0.3);
     opacity: 0.8;
+    max-height: 26px;
 }
 
 div.header_resizer div.header_cell{
@@ -2220,6 +2221,13 @@ meta_opt.checked {
     text-align: right;
 }
 
+#info_panel span[data-ajxpAction]{
+    float: right;
+    display: inline-block;
+    padding: 3px;
+    cursor: pointer;
+}
+
 #info_panel div.panelContent
 {
     overflow: hidden;
@@ -2279,13 +2287,12 @@ td.infoPanelValue
     border-bottom: 1px solid #fff;
 }
 
-td.infoPanelLabel
-{
+td.infoPanelLabel {
     padding: 6px 6px;
     width: 35%;
     border-bottom: 1px solid #fff;
     text-align: right;
-    font-weight: bold;
+    color: #555;
     vertical-align: top;
 }
 
@@ -2601,8 +2608,7 @@ fieldset
 
 legend
 {
-    color: #A6A8A4;
-    font-weight: bold;
+    color: #666;
 }
 
 legend a{
@@ -3359,9 +3365,9 @@ div.menuActions img{
 }
 
 .dialogBox.css_boxshadow{
-    -moz-box-shadow: 5px 5px 100px #222;
-    -webkit-box-shadow: 5px 5px 100px #222;
-    box-shadow: 5px 5px 100px #222;
+    -moz-box-shadow: 5px 5px 60px #222;
+    -webkit-box-shadow: 5px 5px 60px #222;
+    box-shadow: 5px 5px 60px #222;
 }
 
 div.dialogBox div.dialogBox.css_boxshadow{
@@ -3595,4 +3601,34 @@ td.ip_geo_cell{
 #AjxpConnexion-loader{
     left:50% !important;
     top: 10px !important;
+}
+
+#ajxp_link_form span.icon-envelope-alt {
+    font-size: 1.3em;
+}
+
+#ajxp_link_form img {
+    display: none;
+}
+
+.ipanel_no_selection_select {
+    color: rgb(180, 184, 190);
+    text-shadow: 1px 1px 0 #ffffff;
+}
+
+.ipanel_no_selection_select span.icon-info-sign {
+    display: block;
+    text-align: center;
+    font-size: 150px;
+    padding: 50px 0 20px;
+}
+
+.ipanel_no_selection_select span.label {
+    display: block;
+    text-align: center;
+    font-size: 13px;
+}
+
+.ipanel_no_selection_data {
+    display: none;
 }

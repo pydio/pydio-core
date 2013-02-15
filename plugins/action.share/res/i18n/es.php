@@ -52,4 +52,10 @@ $mess = array(
     "47"=> "Successfully updated watch status",
     "48"=> "You are not allowed to access this data",
     "49"=> "create user",
+    "50"=> "Shared element",
+    "51"=> "Downloaded",
+    "52"=> "Configuration",
+    "53"=> "none",
+    "54"=> "With...",
+    "55"=> "Shared...",
 );
