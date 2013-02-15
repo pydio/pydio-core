@@ -143,6 +143,21 @@
                 </processing>
             </action>
         </actions>
+        <client_configs>
+            <component_config className="InfoPanel">
+                <infoPanelExtension mime="meta:ajxp_shared" attributes="" modifier="ShareCenter.prototype.loadInfoPanel">
+                    <messages>
+                        <message key="type_string" id="share_center.50"/>
+                    </messages>
+                    <html><![CDATA[
+                        <div id="ajxp_shared_info_panel">
+                            <div class="panelHeader infoPanelGroup" colspan="2"><span class="icon-share" data-ajxpAction="share" title="More..."></span>#{type_string}</div>
+                            <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0"></table>
+                        </div>
+                    ]]></html>
+                </infoPanelExtension>
+            </component_config>
+        </client_configs>
     </registry_contributions>
     <class_definition filename="plugins/action.share/class.ShareCenter.php" classname="ShareCenter"/>
     <dependencies>

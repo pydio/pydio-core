@@ -163,7 +163,8 @@ Class.create("InfoPanel", AjxpPane, {
 			}catch(e){}
 			this.addActions('empty');
             if(this.scrollbar) this.scrollbar.recalculateLayout();
-			return;
+            this.updateTitle();
+            return;
 		}
 		if(!passedNode && !userSelection.isUnique())
 		{
@@ -178,16 +179,29 @@ Class.create("InfoPanel", AjxpPane, {
         }else{
             uniqNode = passedNode;
         }
+
+        this.updateTitle(uniqNode.getLabel());
 		var isFile = false;
 		if(uniqNode) isFile = uniqNode.isLeaf();
 		this.evalTemplateForMime((isFile?'generic_file':'generic_dir'), uniqNode);
 		
 		var extension = getAjxpMimeType(uniqNode);
-		if(extension != "" && this.registeredMimes.get(extension)){
-			this.evalTemplateForMime(extension, uniqNode);
-		}
-		
-		this.addActions('unique');
+        var metadata = uniqNode.getMetadata();
+        this.registeredMimes.each(function(pair){
+            "use strict";
+            if(pair.key == extension){
+                this.evalTemplateForMime(extension, uniqNode);
+            }
+            if(pair.key.indexOf('meta:') === 0 && metadata.get(pair.key.replace('meta:',''))){
+                this.evalTemplateForMime(pair.key, uniqNode);
+            }
+        }.bind(this));
+        this.contentContainer.select('[data-ajxpAction]').each(function(act){
+            act.observe('click', function(event){
+                window.ajaxplorer.actionBar.fireAction(event.target.getAttribute('data-ajxpAction'));
+            });
+        });
+        this.addActions('unique');
 		var fakes = this.contentContainer.select('div[id="preview_rich_fake_element"]');
 		if(fakes && fakes.length){
 			this.currentPreviewElement = this.getPreviewElement(uniqNode, false);
@@ -204,6 +218,13 @@ Class.create("InfoPanel", AjxpPane, {
 		if(!this.htmlElement) return;
 		this.contentContainer.update(sHtml);
 	},
+
+    updateTitle : function(title){
+        if(!this.htmlElement) return;
+        if(!title) title = MessageHash[131];
+        this.htmlElement.down('div.panelHeader').update(title);
+    },
+
 	/**
 	 * Show/Hide the panel
 	 * @param show Boolean
@@ -311,7 +332,7 @@ Class.create("InfoPanel", AjxpPane, {
 			this.contentContainer.insert(template.evaluate(tArgs));
 			if(tModifier){
 				var modifierFunc = eval(tModifier);
-				modifierFunc(this.contentContainer);
+				modifierFunc(this.contentContainer, fileNode);
 			}
 		}
 	},
@@ -380,7 +401,7 @@ Class.create("InfoPanel", AjxpPane, {
 					var messagesList = panelChilds[j].childNodes;					
 					for(k=0;k<messagesList.length;k++){
 						if(messagesList[k].nodeName != 'message') continue;
-						messages.set(messagesList[k].getAttribute("key"), parseInt(messagesList[k].getAttribute("id")));
+						messages.set(messagesList[k].getAttribute("key"), messagesList[k].getAttribute("id"));
 					}
 				}
 				else if(panelChilds[j].nodeName == 'html' && panelChilds[j].firstChild){

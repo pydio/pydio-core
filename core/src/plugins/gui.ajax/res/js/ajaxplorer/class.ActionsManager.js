@@ -504,6 +504,7 @@ Class.create("ActionsManager", {
                 var errorId = false;
 				if(result == '1')
 				{
+                    modal.setCloseValidation(null);
 					hideLightBox(true);
 					if(childs[i].getAttribute('remember_login') && childs[i].getAttribute('remember_pass')){
 						var login = childs[i].getAttribute('remember_login');

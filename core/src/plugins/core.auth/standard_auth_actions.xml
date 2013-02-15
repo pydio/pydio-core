@@ -16,6 +16,9 @@
 					if(loginRedirect){
 						document.location.href=loginRedirect;
 					}else{
+					    modal.setCloseValidation(function(){
+					        return false;
+					    });
 						modal.showDialogForm('Log In', ($('login_form')?'login_form':'login_form_dynamic'), 
 						function(oForm){
 						    if(ajxpBootstrap.parameters.get("customWording")){
@@ -63,7 +66,7 @@
 							oForm.userid.value = '';
 							oForm.password.value = '';
 							return false;				
-						});
+						}, function(){}, true);
 					}
 					]]></clientCallback>
 					<clientForm id="login_form_dynamic"><![CDATA[						

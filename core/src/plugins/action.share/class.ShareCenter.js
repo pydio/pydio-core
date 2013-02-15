@@ -282,6 +282,53 @@ Class.create("ShareCenter", {
         conn.sendAsync();
     },
 
+    loadInfoPanel : function(container, node){
+        container.down('#ajxp_shared_info_panel table').update('<tr>\
+            <td class="infoPanelLabel">'+MessageHash['share_center.55']+'</td>\
+            <td class="infoPanelValue"><span class="icon-spinner"></span></td>\
+            </tr>\
+        ');
+        ShareCenter.prototype.loadSharedElementData(node, function(jsonData){
+            "use strict";
+            if(node.isLeaf()){
+
+                container.down('#ajxp_shared_info_panel table').update('\
+                    <tr>\
+                        <td class="infoPanelLabel">'+MessageHash['share_center.50']+'</td>\
+                        <td class="infoPanelValue"><textarea style="width:100%;height: 45px;">'+ jsonData.publiclet_link +'</textarea></td>\
+                    </tr>\
+                    <tr>\
+                        <td class="infoPanelLabel">'+MessageHash['share_center.51']+'</td>\
+                        <td class="infoPanelValue">'+ jsonData.download_counter +' times</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="infoPanelLabel">'+MessageHash['share_center.52']+'</td>\
+                        <td class="infoPanelValue">'+MessageHash['share_center.22']+' : '+ (jsonData.download_limit?jsonData.download_limit:MessageHash['share_center.53'])
+                                +', '+MessageHash['share_center.11']+':'+ (jsonData.expiration_time?jsonData.expiration_time:MessageHash['share_center.53'])
+                                +', '+MessageHash['share_center.12']+':'+ (jsonData.hasPassword?MessageHash['share_center.13']:MessageHash['share_center.14']) +'</td>\
+                    </tr>\
+                ');
+
+
+            }else{
+                var entries = [];
+                $A(jsonData.entries).each(function(entry){
+                    entries.push(entry.LABEL + ' ('+ entry.RIGHT +')');
+                });
+                container.down('#ajxp_shared_info_panel table').update('\
+                    <tr>\
+                        <td class="infoPanelLabel">'+MessageHash['share_center.35']+'</td>\
+                        <td class="infoPanelValue">'+ jsonData.label +'</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="infoPanelLabel">'+MessageHash['share_center.54']+'</td>\
+                        <td class="infoPanelValue">'+ entries.join(', ') +'</td>\
+                    </tr>\
+                ');
+            }
+        });
+    },
+
     performUnshareAction : function(){
         modal.getForm().down("img#stop_sharing_indicator").src=window.ajxpResourcesFolder+"/images/autocompleter-loader.gif";
         var conn = new Connexion();

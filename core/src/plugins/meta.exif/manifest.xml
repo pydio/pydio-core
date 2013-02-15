@@ -17,7 +17,7 @@
 		</hooks>
 		<client_configs>
 			<component_config className="InfoPanel">			
-				<infoPanelExtension mime="generic_file,generic_dir" attributes="">		
+				<infoPanelExtension mime="jpg,jpeg,tiff,riff" attributes="">
 					<html></html>
 				</infoPanelExtension>
 			</component_config>			

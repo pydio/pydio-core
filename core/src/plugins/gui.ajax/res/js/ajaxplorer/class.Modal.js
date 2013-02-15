@@ -479,8 +479,8 @@ Class.create("Modal", {
         }
 		var okButton = new Element('input', {
 			type:'image',
-			name:(bOkButtonOnly?'close':'ok'),
-			src:ajxpResourcesFolder+'/images/actions/22/'+(bOkButtonOnly?'dialog_close':(useNextButton?'forward':'dialog_ok_apply'))+'.png',
+			name:(bOkButtonOnly?'ok':'ok'),
+			src:ajxpResourcesFolder+'/images/actions/22/'+(bOkButtonOnly?'dialog_ok_apply':(useNextButton?'forward':'dialog_ok_apply'))+'.png',
 			height:22,
 			width:22,
 			title:MessageHash[48]});

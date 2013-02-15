@@ -52,4 +52,10 @@ $mess = array(
     "47"=> "Le statut de surveillance a été changé",
     "48"=> "Vous n'êtes pas autorisé à accéder à cette donnée.",
     "49"=> "créer l'utilisateur",
+    "50"=> "Element partagé",
+    "51"=> "Téléchargé",
+    "52"=> "Configuration",
+    "53"=> "non",
+    "54"=> "Avec...",
+    "55"=> "Partagé...",
 );
