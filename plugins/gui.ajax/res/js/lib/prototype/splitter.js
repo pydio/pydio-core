@@ -156,8 +156,14 @@ Class.create("Splitter", AjxpPane, {
                 var folded = XPathSelectSingleNode(node, 'property[@name="folded"]');
                 if(size){
                     var sizeValue = parseInt(size.getAttribute("value"));
+                    if(size.getAttribute("value").indexOf("%")){
+                        sizeValue = this.htmlElement.getWidth() * sizeValue / 100;
+                    }
                     if(folded && folded.getAttribute("value") == "true") this.moveSplitter(sizeValue);
-                    else this.resizeAnimated(sizeValue);
+                    else {
+                        this.effectWorking = false;
+                        this.resizeAnimated(sizeValue);
+                    }
                 }
                 if(folded && folded.getAttribute("value") == "true"){
                     this.foldWithoutAnim();
