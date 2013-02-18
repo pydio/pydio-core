@@ -205,7 +205,7 @@ Class.create("RepositorySelect", {
 				className: 'menu rootDirChooser',
 				mouseClick:(this.options.menuEvent? this.options.menuEvent : 'left'),
 				anchor:button,
-                position: (this.options.menuPosition? this.options.menuPosition : 'left'),
+                position: (this.options.menuPosition? this.options.menuPosition : 'bottom'),
 				createAnchor:false,
 				anchorContainer:$('dir_chooser'),
 				anchorSrc:ajxpResourcesFolder+'/images/arrow_down.png',

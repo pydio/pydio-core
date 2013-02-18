@@ -3321,6 +3321,11 @@ div.menu a {
 div.menuActions img{
     display: none;
 }
+
+.menuActions.icon-caret-right {
+    padding-top: 2px;
+}
+
 .backgroundPanel{
     position:absolute;
     right:0;

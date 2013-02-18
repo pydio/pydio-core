@@ -41,7 +41,7 @@
 		this.element = $(oElement);
 		this.currentCount = 0;	
 		this.bookmarks = $A([]);
-        if(options.bookmarksMenuOptions){
+        if(options && options.bookmarksMenuOptions){
 
             this.bookmarksMenuOptions = Object.extend(this.bookmarksMenuOptions, options.bookmarksMenuOptions);
 
