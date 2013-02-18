@@ -124,6 +124,10 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     $node = $notif->getNode();
                     $node->loadNodeInfo();
                     $node->event_description = $notif->getDescriptionShort();
+                    if(empty($node->event_description)) {
+                        $node->event_description = $notif->getDescriptionLong(true);
+                    }
+                    $node->repository_id = $node->getRepositoryId();
                     AJXP_XMLWriter::renderAjxpNode($node);
                 }
             }

@@ -24,6 +24,7 @@
  */
 Class.create("RemoteNodeProvider", {
 	__implements : "IAjxpNodeProvider",
+    discrete : false,
 	/**
 	 * Constructor
 	 */
@@ -35,7 +36,11 @@ Class.create("RemoteNodeProvider", {
 	 * @param properties Object
 	 */
 	initProvider : function(properties){
-		this.properties = properties;
+		this.properties = $H(properties);
+        if(this.properties && this.properties.get('connexion_discrete')){
+            this.discrete = true;
+            this.properties.unset('connexion_discrete');
+        }
 	},
 	/**
 	 * Load a node
@@ -45,6 +50,7 @@ Class.create("RemoteNodeProvider", {
 	 */
 	loadNode : function(node, nodeCallback, childCallback){
 		var conn = new Connexion();
+        if(this.discrete) conn.discrete = true;
 		conn.addParameter("get_action", "ls");
 		conn.addParameter("options", "al");
 		var path = node.getPath();

@@ -2,27 +2,27 @@ ul.notification_list{
 
 
 }
-
-ul.notification_list li{
-
-
-}
-
 #feed_content {
     background-color: #666;
     color: #fff;
     letter-spacing: 1px;
     padding: 0px;
     border-radius: 2px;
-    width:220px !important;
+    width:250px !important;
     max-height: 350px !important;
     overflow-y: auto !important;
 }
 
+
+#feed_content li:nth-child(2n){
+    background-color: #888888;
+}
+
+
 #feed_content a{
     clear: left;
     padding: 5px;
-    margin: 2px;
+    /*margin: 2px;*/
     font-size: 11px;
 }
 
@@ -40,5 +40,5 @@ width: 150px;
     float: left;
     height: 16px;
     width: 16px;
-    margin: 0px 14px 3px 6px;
+    margin: 4px 14px 3px 6px;
 }

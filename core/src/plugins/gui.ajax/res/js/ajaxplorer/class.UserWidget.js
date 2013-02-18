@@ -138,7 +138,7 @@ Class.create("UserWidget", {
 				anchor:this.element,
 				createAnchor:false,
 				topOffset:2,
-				leftOffset:-5,
+				leftOffset:-3,
 				menuTitle:MessageHash[200],
 				menuItems: menuItems,
 				fade:true,

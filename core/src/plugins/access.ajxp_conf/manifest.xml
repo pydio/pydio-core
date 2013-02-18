@@ -34,6 +34,9 @@
                     }
                 </style>
             ]]></template_part>
+            <component_config className="Splitter::vertical_splitter">
+                <property name="resize" value="100%"/>
+            </component_config>
 		</client_configs>
 		<external_file filename="plugins/access.ajxp_conf/ajxp_confActions.xml" include="actions/*"/>
 		<external_file filename="plugins/access.ajxp_shared/manifest.xml" include='registry_contributions/actions/action[@name="clear_expired"]'/>
