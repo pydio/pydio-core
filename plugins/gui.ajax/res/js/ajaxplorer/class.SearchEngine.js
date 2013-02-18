@@ -93,8 +93,11 @@ Class.create("SearchEngine", AjxpPane, {
             this._searchMode = "local";
         }
 
-        if(this.htmlElement.down('#search_meta')) {
+        if(this.htmlElement && this.htmlElement.down('#search_meta')) {
             this.htmlElement.down('#search_meta').remove();
+        }
+        if($('search_form') && $('search_form').down('#search_meta')) {
+            $('search_form').down('#search_meta').remove();
         }
         if(this._ajxpOptions && this._ajxpOptions.metaColumns){
             var cols = this._ajxpOptions.metaColumns;

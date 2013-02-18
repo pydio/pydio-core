@@ -14,7 +14,7 @@ table.sort-table tr:nth-child(even)
     background: linear-gradient(top, rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%); /* W3C */
 }
 
-.css_gradient, .infoPanelGroup, .panelHeader, .dialogBox, .action_bar.floatingBar, .largeButton, .fakeUploadButton{
+.css_gradient, .infoPanelGroup, .panelHeader, .dialogBox, .action_bar.floatingBar, .largeButton, .fakeUploadButton, .header_label, .header_resizer{
     background: rgb(247,247,247); /* Old browsers */
     background: -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(227,227,227,1) 50%, rgba(216,216,216,1) 51%, rgba(242,242,242,1) 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(247,247,247,1)), color-stop(50%,rgba(227,227,227,1)), color-stop(51%,rgba(216,216,216,1)), color-stop(100%,rgba(242,242,242,1))); /* Chrome,Safari4+ */
@@ -25,7 +25,7 @@ table.sort-table tr:nth-child(even)
     background: linear-gradient(top, rgba(247,247,247,1) 0%,rgba(227,227,227,1) 50%,rgba(216,216,216,1) 51%,rgba(242,242,242,1) 100%); /* W3C */
 }
 
-div.ascending > .css_gradient{
+div.ascending > .header_label{
     background: url("../images/arrow_up_margin.png") right center no-repeat; /* Old browsers */
     background: url("../images/arrow_up_margin.png") right center no-repeat, -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(227,227,227,1) 50%, rgba(216,216,216,1) 51%, rgba(242,242,242,1) 100%); /* FF3.6+ */
     background: url("../images/arrow_up_margin.png") right center no-repeat, -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(247,247,247,1)), color-stop(50%,rgba(227,227,227,1)), color-stop(51%,rgba(216,216,216,1)), color-stop(100%,rgba(242,242,242,1))); /* Chrome,Safari4+ */
@@ -36,7 +36,7 @@ div.ascending > .css_gradient{
     background: url("../images/arrow_up_margin.png") right center no-repeat, linear-gradient(top, rgba(247,247,247,1) 0%,rgba(227,227,227,1) 50%,rgba(216,216,216,1) 51%,rgba(242,242,242,1) 100%); /* W3C */
 }
 
-div.descending > .css_gradient{
+div.descending > .header_label{
     background: url("../images/arrow_down_margin.png") right center no-repeat; /* Old browsers */
     background: url("../images/arrow_down_margin.png") right center no-repeat, -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(227,227,227,1) 50%, rgba(216,216,216,1) 51%, rgba(242,242,242,1) 100%); /* FF3.6+ */
     background: url("../images/arrow_down_margin.png") right center no-repeat, -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(247,247,247,1)), color-stop(50%,rgba(227,227,227,1)), color-stop(51%,rgba(216,216,216,1)), color-stop(100%,rgba(242,242,242,1))); /* Chrome,Safari4+ */
@@ -3337,4 +3337,8 @@ td.ip_geo_cell{
 #sm2-container{
     position: absolute;
     top: -1000px;
+}
+
+#refresh_button, #thumb_size_button{
+    display:none;
 }

@@ -118,14 +118,14 @@ Class.create("SliderInput", {
 	 */
 	show : function(anchor){
         var pos = this.computeAnchorPosition(this.input);
-        if(anchor){
+        if(anchor && !anchor.target){
             pos = this.computeAnchorPosition(anchor);
         }
 		this.holder.setStyle(pos);
 		this.slider.setValue(parseFloat(this.input.value));
 		this.holder.show();
         this.input.addClassName(this.options.anchorActiveClass);
-        if(anchor){
+        if(anchor && !anchor.target){
             anchor.addClassName(this.options.anchorActiveClass);
         }
         this.delay();
@@ -160,8 +160,8 @@ Class.create("SliderInput", {
 	 */
 	computeAnchorPosition : function(anchor){
 		var anchorPosition = Position.cumulativeOffset($(anchor));
-		var anchorScroll = anchor.cumulativeScrollOffset();		
-		
+        var anchorScroll = anchor.cumulativeScrollOffset();
+
 		var topPos = anchorPosition[1] + anchor.getHeight() + this.options.topOffset - anchorScroll[1];
 		var leftPos = anchorPosition[0] + this.options.leftOffset - anchorScroll[0];
 		

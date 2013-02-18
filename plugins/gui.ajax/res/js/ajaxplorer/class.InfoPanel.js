@@ -222,7 +222,11 @@ Class.create("InfoPanel", AjxpPane, {
     updateTitle : function(title){
         if(!this.htmlElement) return;
         if(!title) title = MessageHash[131];
-        this.htmlElement.down('div.panelHeader').update(title);
+        var panelTitle = this.htmlElement.down('div.panelHeader');
+        if(panelTitle) {
+            if(panelTitle.down('span')) panelTitle.down('span').update(title);
+            else panelTitle.update(title);
+        }
     },
 
 	/**
@@ -247,7 +251,9 @@ Class.create("InfoPanel", AjxpPane, {
 			var squareDim = Math.min(parseInt(this.htmlElement.getWidth()-40));
 			this.currentPreviewElement.resizePreviewElement({width:squareDim,height:squareDim, maxHeight:150});
 		}
-        document.fire("ajaxplorer:resize-InfoPanel-" + this.htmlElement.id, this.htmlElement.getDimensions());
+        if(this.htmlElement){
+            document.fire("ajaxplorer:resize-InfoPanel-" + this.htmlElement.id, this.htmlElement.getDimensions());
+        }
     },
 	/**
 	 * Find template and evaluate it
