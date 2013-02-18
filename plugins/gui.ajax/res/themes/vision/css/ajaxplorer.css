@@ -1353,7 +1353,7 @@ img.simple_button_arrow{
 }
 .user_widget_label{
     float: left;
-    padding: 3px 10px 3px 7px;
+    padding: 3px 10px 12px 7px;
     cursor: pointer;
     font-size: 12px;
 }
@@ -3604,8 +3604,13 @@ td.ip_geo_cell{
 }
 
 #AjxpConnexion-loader{
-    left:50% !important;
-    top: 10px !important;
+    left:49% !important;
+    top: 7px !important;
+    width:30px;
+}
+
+#AjxpConnexion-loader img{
+    height:6px;
 }
 
 #ajxp_link_form span.icon-envelope-alt {

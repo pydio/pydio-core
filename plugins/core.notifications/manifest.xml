@@ -31,81 +31,16 @@
                     <dynamicBuilder><![CDATA[
                         var context = window.builderContext;
                         var protoMenu = window.builderProtoMenu;
-                        context.builderMenuItems = $A([]);
-                        context.builderMenuItems.push({
-                            id:'event_loading',
-                            name:'Loading ...',
-                            alt:'',
-                            isDefault : false,
-                            image:resolveImageSource('images/actions/22/hdd_external_unmount.png', '',  22),
-                            icon_class:'icon-spinner event_loading',
-                            callback:function(e){
-                                this.apply();
-                            }.bind(context)
-                        } );
-                        var loaderFunc = function(){
-                            try{
-                                var menuContainer = protoMenu.container;
-                            }catch(e){}
-                            if(!menuContainer) {
-                                return;
-                            }
-                             var dm = new AjxpDataModel(true);
-                             var rP = new RemoteNodeProvider();
-                             rP.initProvider({get_action:'get_my_feed', format:'xml'});
-                             var root = new AjxpNode("/");
-                             root._iNodeProvider = rP;
-                             var pFactory = new PreviewFactory();
-                             pFactory.setThumbSize(16);
-                             root.observeOnce("loaded", function(){
-                                 menuContainer.update('');
-                                 root.getChildren().each(function(el){
-                                    var div = new Element('a');
-                                    var imgSpan = new Element('span', {className:'event_image'});
-                                    var labelSpan = new Element('span', {className:'event_label'});
-                                    var img = pFactory.generateBasePreview(el);
-                                    div.IMAGE_ELEMENT = img;
-                                    imgSpan.insert(img);
-                                    labelSpan.insert(el.getMetadata().get("event_description"));
-                                    div.insert(imgSpan); div.insert(labelSpan);
-                                    menuContainer.insert(div);
-                                    pFactory.enrichBasePreview(el, div);
-                                 });
-                                 pFactory.loadNextImage();
-                                elOff = protoMenu.computeAnchorOffset();
-                                protoMenu.container.setStyle(elOff);
-                             });
-                             root.load();
-
-                        };
-                        protoMenu.options = Object.extend(protoMenu.options, {
-                            position: "bottom middle",
-                            menuMaxHeight: 350,
-                            topOffset: 14,
-                            beforeShow: function(){
-                                protoMenu.container.removeClassName('panelHeaderMenu');
-                                protoMenu.container.removeClassName('toolbarmenu');
-                                protoMenu.container.removeClassName('desktop');
-                                protoMenu.container.addClassName('rootDirChooser');
-                                protoMenu.container.addClassName('events_menu');
-                                protoMenu.container.id = "feed_content";
-                                window.ajxp_feed_timer = window.setTimeout(loaderFunc, 500);
-                            },
-                            beforeHide: function(){
-                                if(window.ajxp_feed_timer) window.clearTimeout(window.ajxp_feed_timer);
-                            }
-                        });
+                        ResourcesManager.prototype.loadJSResource('plugins/core.notifications/class.NotificationLoader.js', 'NotificationLoader');
+                        NotificationLoader.getInstance().dynamicBuilderLoader(context, protoMenu);
                     ]]></dynamicBuilder>
                 </subMenu>
                 <processing>
                     <clientCallback><![CDATA[
-
-
                     ]]></clientCallback>
                     <clientForm id="user_feed"><![CDATA[
                         <div id="user_feed" box_padding="0" class="dialogBox css_boxshadow">
                             <link type="text/css" rel="stylesheet" href="plugins/core.notifications/res/css/notification_center.css"/>
-                            <div id="feed_content" style="width: 250px;height: 350px;overflow: auto;"></div>
                         </div>
                     ]]></clientForm>
                     <serverCallback methodName="loadUserFeed"/>

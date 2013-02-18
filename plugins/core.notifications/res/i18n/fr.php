@@ -19,8 +19,8 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"1" => "Mon flux",
-"2" => "Notifications & Alertes",
+"1" => "Notifications & Alertes",
+"2" => "Flux",
 "3" => "Alertes",
 "4" => "Notifications",
 );

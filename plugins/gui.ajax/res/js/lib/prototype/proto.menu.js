@@ -208,14 +208,16 @@ Proto.Menu = Class.create({
                 item.name = ajaxplorer.getActionBar().getActionByName(item.action_id).getKeyedText();
                 item.title = ajaxplorer.getActionBar().getActionByName(item.action_id).options.title;
             }
-            var img;
+            var img = '';
             if(item.icon_class && window.ajaxplorer.currentThemeUsesIconFonts){
                 img = new Element('span', {
                     className:item.icon_class + ' ajxp_icon_span',
                     title:item.alt
                 });
-            }else{
+            }else if(item.image){
                 if(!item.separator) img = new Element('img', {src:item.image,border:'0',height:16,width:16,align:'absmiddle'});
+            }else if(item.pFactory && item.ajxpNode){
+                img = item.pFactory.generateBasePreview(item.ajxpNode);
             }
 
 			newItem.insert(
@@ -282,6 +284,10 @@ Proto.Menu = Class.create({
 				this.subMenus.push(newItem.subMenu);
 			}			
 			list.insert(newItem);
+            if(item.pFactory && item.ajxpNode && img){
+                newItem.IMAGE_ELEMENT = img;
+                item.pFactory.enrichBasePreview(item.ajxpNode, newItem);
+            }
 		}.bind(this));
 		this.container.insert(list);		
 		try{
