@@ -717,7 +717,11 @@ Class.create("Diaporama", AbstractEditor, {
 	},
 	
 	getThumbnailSource : function(ajxpNode){
-		var source = ajxpServerAccessPath+"&get_action=preview_data_proxy&get_thumb=true&file="+encodeURIComponent(ajxpNode.getPath());
+        var repoString = "";
+        if(ajaxplorer.repositoryId && ajxpNode.getMetadata().get("repository_id") && ajxpNode.getMetadata().get("repository_id") != ajaxplorer.repositoryId){
+            repoString = "&tmp_repository_id=" + ajxpNode.getMetadata().get("repository_id");
+        }
+		var source = ajxpServerAccessPath + repoString + "&get_action=preview_data_proxy&get_thumb=true&file="+encodeURIComponent(ajxpNode.getPath());
 		if(ajxpNode.getParent()){
             var preview_seed = ajxpNode.getParent().getMetadata().get('preview_seed');
     		if(preview_seed){

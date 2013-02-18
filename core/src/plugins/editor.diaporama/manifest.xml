@@ -84,7 +84,7 @@
 		<client_configs>
 			<component_config className="FilesList">
 				<columns>
-					<additional_column messageId="135" attributeName="readable_dimension" sortType="String"/>
+					<additional_column messageId="135" attributeName="readable_dimension" sortType="String" defaultVisibilty="hidden"/>
 				</columns>
 			</component_config>
 			<component_config className="InfoPanel">			
