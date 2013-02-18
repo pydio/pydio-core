@@ -97,7 +97,6 @@ Class.create("NotificationLoader", {
                 this.ajxpNode.load();
             }
         }.bind(this);
-        console.log("set options");
         protoMenu.options = Object.extend(protoMenu.options, {
             position: "bottom middle",
             menuMaxHeight: 350,
