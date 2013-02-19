@@ -476,6 +476,10 @@ Class.create("Action", {
 				}else{
 			  		var menuItems = [];
 			  		this.subMenuItems.dynamicItems.each(function(item){
+                        if(item.separator){
+                            menuItems.push(item);
+                            return;
+                        }
 			  			var action = this.manager.actions.get(item['actionId']);
 			  			if(action.deny) return;
 						var itemData = {
