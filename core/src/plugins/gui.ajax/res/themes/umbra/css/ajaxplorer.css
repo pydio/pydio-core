@@ -839,6 +839,10 @@ input.SF_input.SF_number{
     color: #ddd;
 }
 
+.toolbarGroup {
+    display: inline;
+}
+
 #tree_container{
     background-color: #fff;
     border-radius: 2px;
@@ -2148,6 +2152,10 @@ meta_opt.checked {
 {
    text-align:center;
    padding-bottom: 10px;
+}
+
+div.ipanel_no_selection_select {
+    display: none;
 }
 
 .infoPanelTable
