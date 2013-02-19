@@ -505,9 +505,9 @@ class ShareCenter extends AJXP_Plugin{
         $sTitle = sprintf($messages[1], ConfService::getCoreConf("APPLICATION_TITLE"));
         $sLegend = $messages[20];
 
-        @copy($pDir."/res/down.png", $downloadFolder."/down.png");
+        @copy($pDir."/res/down.png", $downloadFolder."/dl.png");
+        @copy($pDir."/res/down.png", $downloadFolder."/grid_t.png");
         @copy($pDir."/res/button_cancel.png", $downloadFolder."/button_cancel.png");
-        @copy($pDir."/res/drive_harddisk.png", $downloadFolder."/drive_harddisk.png");
         @copy(AJXP_INSTALL_PATH."/server/index.html", $downloadFolder."/index.html");
         file_put_contents($downloadFolder."/.htaccess", "ErrorDocument 404 ".$this->buildPublicDlURL()."/404.html\n<Files \".ajxp_*\">\ndeny from all\n</Files>");
         $content404 = file_get_contents($pDir."/res/404.html");
@@ -562,11 +562,13 @@ class ShareCenter extends AJXP_Plugin{
                 $AJXP_LINK_HAS_PASSWORD = true;
                 $AJXP_LINK_WRONG_PASSWORD = (isSet($_POST['password']) && ($_POST['password'] != $data["PASSWORD"]));
                 include (AJXP_INSTALL_PATH."/plugins/action.share/res/public_links.php");
+                echo('<div style="position: absolute;z-index: 10000; bottom: 0; right: 0; color: #666;font-family: HelveticaNeue-Light,Helvetica Neue Light,Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;font-size: 13px;text-align: right;padding: 6px; line-height: 20px;text-shadow: 0px 1px 0px white;" class="no_select_bg"><br>Build your own box with AjaXplorer : <a style="color: #000000;" target="_blank" href="http://ajaxplorer.info/">http://ajaxplorer.info/</a><br/>Community - Free non supported version © C. du Jeu 2008-2013 </div>');
                 return;
             }
         }else{
             if (!isSet($_GET["dl"])){
                 include (AJXP_INSTALL_PATH."/plugins/action.share/res/public_links.php");
+                echo('<div style="position: absolute;z-index: 10000; bottom: 0; right: 0; color: #666;font-family: HelveticaNeue-Light,Helvetica Neue Light,Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;font-size: 13px;text-align: right;padding: 6px; line-height: 20px;text-shadow: 0px 1px 0px white;" class="no_select_bg"><br>Build your own box with AjaXplorer : <a style="color: #000000;" target="_blank" href="http://ajaxplorer.info/">http://ajaxplorer.info/</a><br/>Community - Free non supported version © C. du Jeu 2008-2013 </div>');
                 return;
             }
         }
