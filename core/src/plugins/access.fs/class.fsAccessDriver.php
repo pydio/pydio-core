@@ -1282,7 +1282,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 	}
 
     function filesystemFileSize($filePath){
-        $bytesize = filesize($filePath);
+        $bytesize = "-";
+        $bytesize = @filesize($filePath);
         if(method_exists($this->wrapperClassName, "getLastRealSize")){
             $last = call_user_func(array($this->wrapperClassName, "getLastRealSize"));
             if($last !== false){

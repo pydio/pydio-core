@@ -59,6 +59,21 @@ class AJXP_NotificationCenter extends AJXP_Plugin
 
     }
 
+    protected function parseSpecificContributions(&$contribNode){
+   		parent::parseSpecificContributions($contribNode);
+           if($contribNode->nodeName != "actions") return;
+
+           // WEBDAV ACTION
+   		if(empty($this->pluginConf["USER_EVENTS"])){
+   			unset($this->actions["get_my_feed"]);
+   			$actionXpath=new DOMXPath($contribNode->ownerDocument);
+   			$publicUrlNodeList = $actionXpath->query('action[@name="get_my_feed"]', $contribNode);
+   			$publicUrlNode = $publicUrlNodeList->item(0);
+   			$contribNode->removeChild($publicUrlNode);
+   		}
+    }
+
+
     public function persistChangeHookToFeed(AJXP_Node $oldNode = null, AJXP_Node $newNode = null, $copy = false, $targetNotif = "new"){
         if(!$this->eventStore) return;
 
@@ -122,7 +137,11 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     echo("</li>");
                 }else{
                     $node = $notif->getNode();
-                    $node->loadNodeInfo();
+                    try{
+                        $node->loadNodeInfo();
+                    }catch (Exception $e){
+                        continue;
+                    }
                     $node->event_description = $notif->getDescriptionShort();
                     if(empty($node->event_description)) {
                         $node->event_description = $notif->getDescriptionLong(true);

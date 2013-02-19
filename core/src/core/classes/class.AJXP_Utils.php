@@ -1250,11 +1250,18 @@ class AJXP_Utils
                         }
                     }else if($type == "binary" && $binariesContext != null){
                         if(!empty($value)){
-                            $file = AJXP_Utils::getAjxpTmpDir()."/".$value;
-                            if(file_exists($file)){
-                                $id=empty($repDef[$key."_original_binary"]) ? $repDef[$key."_original_binary"] : null;
-                                $id=ConfService::getConfStorageImpl()->saveBinary($binariesContext, $file, $id);
-                                $value = $id;
+                            if($value == "ajxp-remove-original"){
+                                if(!empty($repDef[$key."_original_binary"])){
+                                    ConfService::getConfStorageImpl()->deleteBinary($binariesContext, $repDef[$key."_original_binary"]);
+                                }
+                                $value = "";
+                            }else{
+                                $file = AJXP_Utils::getAjxpTmpDir()."/".$value;
+                                if(file_exists($file)){
+                                    $id= !empty($repDef[$key."_original_binary"]) ? $repDef[$key."_original_binary"] : null;
+                                    $id=ConfService::getConfStorageImpl()->saveBinary($binariesContext, $file, $id);
+                                    $value = $id;
+                                }
                             }
                         }else if(!empty($repDef[$key."_original_binary"])){
                             $value = $repDef[$key."_original_binary"];

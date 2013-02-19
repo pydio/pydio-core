@@ -56,7 +56,7 @@ class UserMetaManager extends AJXP_Plugin {
         if(!isSet($this->options["meta_visibility"])) $visibilities = array("visible");
         else $visibilities = explode(",", $this->options["meta_visibility"]);
 		$cdataHead = '<div>
-						<div class="panelHeader infoPanelGroup" colspan="2">AJXP_MESSAGE[meta.user.1]</div>
+						<div class="panelHeader infoPanelGroup" colspan="2"><span class="icon-edit" data-ajxpAction="edit_user_meta" title="Edit"></span>AJXP_MESSAGE[meta.user.1]</div>
 						<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">';
 		$cdataFoot = '</table></div>';
 		$cdataParts = "";
