@@ -755,6 +755,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                     }
                 }
                 foreach ($allUsers as $userId => $userObject){
+                    if($userObject->getId() == $loggedUser->getId()) continue;
                     if( ( !$userObject->hasParent() &&  ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf")) || $userObject->getParent() == $loggedUser->getId() ){
                         if($regexp != null && !preg_match("/$regexp/i", $userId)) continue;
                         $userLabel = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $userId);
