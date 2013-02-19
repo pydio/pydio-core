@@ -23,8 +23,8 @@
     <registry_contributions>
         <actions>
             <action name="encfs.cypher_folder_create">
-                <gui src="cypher.encfs/ICON_SIZE/encrypted.png" text="encfs.5" title="encfs.6" hasAccessKey="false">
-                    <context dir="false" recycle="false" selection="true" actionBar="false" contextMenu="true"/>
+                <gui src="cypher.encfs/ICON_SIZE/encrypted.png" iconClass="icon-credit-card" text="encfs.5" title="encfs.6" hasAccessKey="false">
+                    <context dir="false" recycle="false" selection="true" actionBar="true" actionBarGroup="more" contextMenu="true"/>
                     <selectionContext dir="true" file="false" recycle="false" unique="true" evalMetadata="!metadata.get('ENCFS_clear_folder')"/>
                 </gui>
                 <processing>

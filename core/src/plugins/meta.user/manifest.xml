@@ -34,8 +34,8 @@
 			<action name="edit_user_meta">
 				<gui text="meta.user.1" title="meta.user.1" src="meta_user/ICON_SIZE/tag.png" iconClass="icon-tags" hasAccessKey="false">
 					<context selection="true" dir="" recycle="hidden"
-						actionBar="false" contextMenu="true" infoPanel="false"
-						actionBarGroup="put" inZip="false">
+						actionBar="true" contextMenu="true" infoPanel="false"
+						actionBarGroup="more" inZip="false">
 					</context>
 					<selectionContext dir="true" file="file" recycle="false" unique="true"></selectionContext>
 					</gui>

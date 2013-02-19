@@ -39,17 +39,18 @@
                 </processing>
             </action>
 			<action name="index">
-				<gui text="index.lucene.1" title="index.lucene.2" src="lucene_images/ICON_SIZE/ark_view.png" accessKey="folder_access_key">
-					<context selection="false" dir="true" recycle="false"
-						actionBar="false" actionBarGroup="utils" contextMenu="true" infoPanel="false">
+				<gui text="index.lucene.1" title="index.lucene.2" iconClass="icon-book" src="lucene_images/ICON_SIZE/ark_view.png" accessKey="folder_access_key">
+					<context selection="true" dir="true" recycle="false"
+						actionBar="true" actionBarGroup="more" contextMenu="true" infoPanel="false">
 					</context>
+                    <selectionContext dir="true" file="false" recycle="false" unique="true"/>
 				</gui>			
 				<rightsContext noUser="true" userLogged="only" read="true"
 					write="true" adminOnly="false">
 				</rightsContext>				
 				<processing>
 					<clientCallback prepareModal="false"><![CDATA[
-						var crtDir = ajaxplorer.getContextNode().getPath();
+						var crtDir = ajaxplorer.getUserSelection().getUniqueNode();
 						var bgManager = ajaxplorer.actionBar.bgManager;
 						bgManager.queueAction("index", new Hash({dir:crtDir}), "Indexing current folder");
 						bgManager.next();

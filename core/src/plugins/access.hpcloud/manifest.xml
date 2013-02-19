@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="hpcloud" label="CONF_MESSAGE[HPCloud (HPCloud Driver)]" description="CONF_MESSAGE[Access HPCloud (Open Stack) Object Storage]" mixins="filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<ajxpdriver name="hpcloud" enabled="false" label="CONF_MESSAGE[HPCloud (HPCloud Driver)]" description="CONF_MESSAGE[Access HPCloud (Open Stack) Object Storage]" mixins="filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition filename="plugins/access.hpcloud/class.hpcAccessDriver.php" classname="hpcAccessDriver"/>
     <client_settings icon="plugins/access.fs/icon.png">
         <resources>
