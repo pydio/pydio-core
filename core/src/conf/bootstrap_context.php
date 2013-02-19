@@ -27,7 +27,7 @@ if(function_exists("date_default_timezone_set") and function_exists("date_defaul
 if(function_exists("xdebug_disable")){
 	xdebug_disable();
 }
-@error_reporting(E_ALL & ~E_NOTICE);
+@error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT);
 //Windows users may have to uncomment this
 //setlocale(LC_ALL, '');
 
