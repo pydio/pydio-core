@@ -1020,13 +1020,13 @@ div.action_bar.text_only  span.actionbar_button_label{
 {
     display: inline-block;
     font-size: 11px;
-    padding: 5px 12px 7px 10px;
+    padding: 5px 10px 7px 9px;
     text-align: center;
     overflow: visible;
     color: #fff;
     outline: none;
     border-radius: 2px;
-    margin: 5px 3px 0 1px;
+    margin: 5px 2px 0 1px;
     background: #4dc5c3; /* Old browsers */   /* FF3.6+ */   /* Chrome,Safari4+ */   /* Chrome10+,Safari5.1+ */   /* Opera 11.10+ */   /* IE10+ */   /* W3C */   /* IE6-9 */;
     letter-spacing: 1px;
     float: left;
@@ -1070,7 +1070,7 @@ div.action_bar.text_only  span.actionbar_button_label{
 
 
 .action_bar a.menuAnchorSelected{
-    border-radius: 3px 3px 0 0;
+   /* border-radius: 3px 3px 0 0;*/
 }
 
 .action_bar a img
@@ -3157,12 +3157,12 @@ div.menu a {
     line-height: 1px !important;
 }
 .menu.desktop.toolbarmenu li.separator{
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #ffffff;
 }
 
 .bookmarksMenu li.separator {
     border-bottom: 1px solid #fff;
-    margin: 1px 1px 0 1px;
+    margin: 0 1px 0 1px;
     line-height: 1px !important;
     padding: 0;
     height: 1px !important;
@@ -3534,6 +3534,14 @@ td.ip_geo_cell{
 #sm2-container{
     position: absolute;
     top: -1000px;
+}
+
+.toolbarGroup{
+    display:inline-block;
+}
+
+#put_toolbar div.separator{
+    margin-right: 10px;
 }
 
 #display_toolbar {

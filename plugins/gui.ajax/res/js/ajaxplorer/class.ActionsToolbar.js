@@ -130,6 +130,9 @@ Class.create("ActionsToolbar", {
                 otherActions.each(function(act){
                     submenuItems.push({actionId:act});
                 });
+                if(otherToolbar != this.options.groupOtherToolbars.last()){
+                    submenuItems.push({separator:true});
+                }
 
             }.bind(this) );
             var moreAction = new Action({
@@ -157,7 +160,7 @@ Class.create("ActionsToolbar", {
             moreAction.setManager(ajaxplorer.actionBar);
             this.actions.set("group_more_action", moreAction);
             try{
-                this.toolbars.get(this.options.toolbarsList[0]).push("group_more_action");
+                this.toolbars.get($A(this.options.toolbarsList).last()).push("group_more_action");
             }catch (e){}
 
         }
@@ -212,7 +215,7 @@ Class.create("ActionsToolbar", {
 		if(!toolEl){ 
 			var toolEl = new Element('div', {
 				id: toolbar+'_toolbar',
-				style: 'display:inline;'
+                className:'toolbarGroup'
 			});
 		}
 		toolEl.actionsCount = 0;

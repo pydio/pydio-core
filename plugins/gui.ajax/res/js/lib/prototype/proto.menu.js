@@ -289,7 +289,12 @@ Proto.Menu = Class.create({
                 item.pFactory.enrichBasePreview(item.ajxpNode, newItem);
             }
 		}.bind(this));
-		this.container.insert(list);		
+		this.container.insert(list);
+        // Clean separators
+        list.select("li.separator").each(function(sep){
+            var next = sep.next("li");
+            if(!next || next.hasClassName('separator')) sep.remove();
+        });
 		try{
 			Shadower.shadow(this.container,this.options.shadowOptions, true);
 		}catch(e){}
