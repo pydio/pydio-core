@@ -4,15 +4,14 @@
 		<link rel='stylesheet' type='text/css' href='allz.css'/>
         <style type="text/css">
             * {
-            font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
+                font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
+                text-shadow: 0 1px 0 white;
+                color: rgb(100, 119, 124);
             }
             body{
                 background-image: url("grid_t.png");
             }
             h1 {
-                color: rgb(100, 119, 124);
-                text-shadow: 0 0 2px white;
-                font-family: Helvetica, Arial, sans-serif;
                 margin-bottom: 0;
             }
             input{
