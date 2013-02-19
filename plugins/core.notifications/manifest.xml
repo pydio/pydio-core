@@ -14,6 +14,7 @@
     </client_settings>
     <server_settings>
         <global_param description="CONF_MESSAGE[Post the notification in a temporary queue. You must set up the scheduler accordingly to make sure the queue is then consumed on a regularly basis.]" label="CONF_MESSAGE[Queue notifications]" name="USE_QUEUE" type="boolean" default="false"/>
+        <global_param description="CONF_MESSAGE[Display a new entry with all events happening on a user workspaces, and alerts. An SQL database must be setup for the FEED_DRIVER configuration.]" label="CONF_MESSAGE[User events and alerts]" name="USER_EVENTS" type="boolean" default="false"/>
     </server_settings>
     <registry_contributions>
         <actions>

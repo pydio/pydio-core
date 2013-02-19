@@ -10,16 +10,19 @@
    	<registry_contributions>
            <actions>
                <action name="filehasher_signature">
+                   <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="false"/>
                    <processing>
                        <serverCallback methodName="switchActions"/>
                    </processing>
                </action>
                <action name="filehasher_delta">
+                   <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="false"/>
                    <processing>
                        <serverCallback methodName="switchActions"/>
                    </processing>
                </action>
                <action name="filehasher_patch">
+                   <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="true"/>
                    <processing>
                        <serverCallback methodName="switchActions"/>
                    </processing>

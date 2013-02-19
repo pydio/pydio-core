@@ -19,7 +19,7 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
 $mess=array(
-"1" => "File Meta Data",
+"1" => "Meta Data",
 "2" => "No Label",
 "3" => "Remove Rating",
 "4" => "Low",

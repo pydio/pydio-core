@@ -23,7 +23,7 @@
                 <gui text="292" title="292" src="share.png" iconClass="icon-share" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden"
                         actionBar="true" contextMenu="true" infoPanel="true"
-                        actionBarGroup="put">
+                        actionBarGroup="get">
                     </context>
                     <selectionContext dir="true" file="true" recycle="false" unique="true"></selectionContext></gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
