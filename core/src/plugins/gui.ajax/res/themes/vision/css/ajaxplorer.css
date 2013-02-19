@@ -22,7 +22,7 @@ table.sort-table tr:nth-child(even)
     background: linear-gradient(top, rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%); /* W3C */
 }
 
-.css_gradient, .largeButton{
+.css_gradient{
     background: rgb(247,247,247); /* Old browsers */
     background: -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(227,227,227,1) 50%, rgba(216,216,216,1) 51%, rgba(242,242,242,1) 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(247,247,247,1)), color-stop(50%,rgba(227,227,227,1)), color-stop(51%,rgba(216,216,216,1)), color-stop(100%,rgba(242,242,242,1))); /* Chrome,Safari4+ */
@@ -63,7 +63,7 @@ div.descending > .css_gradient{
     background: #5599ff !important; /* Old browsers */ /* FF3.6+ */ /* Chrome,Safari4+ */ /* Chrome10+,Safari5.1+ */ /* Opera11.10+ */ /* IE10+ */ /* IE6-9 */ /* W3C */
 }
 
-.grey_gradient_light_inputs, .dialogContent input, .dialogContent input[type="text"], .dialogContent input[type="password"], .dialogContent select, #search_txt, #location_form
+.grey_gradient_light_inputs, .dialogContent input, .dialogContent input[type="text"], .dialogContent input[type="password"], .dialogContent select, #search_txt, #location_form,#treeCopy
 {
     background: rgb(243,243,243); /* Old browsers */
     background: rgb(243,243,243); /* Old browsers */
@@ -309,7 +309,9 @@ div.shadow_class
     border: 1px solid #dddddd;
     -moz-border-radius: 0 0 3px 3px;
     border-radius: 0 0 3px 3px;
+    background-image: url('../images/grid_tl.png');
     border-top: 0;
+    color: #666666;
 }
 
 .dialogContent input,
@@ -344,7 +346,7 @@ div.shadow_class
 .dialogContent select:focus
 {
     background: white;
-    border: 1px solid #5d83ae;
+    border: 1px solid #5599ff;
 }
 
 .dialogContent input:disabled,
@@ -386,11 +388,12 @@ fieldSet input.dialogButton
     margin-left: 6px;
     width: 22px;
     height: 22px;
-    padding: 0;
+    padding: 2px;
     background-image: none;
-    background-color: #f1f1ef;
-    border-radius: 3px;
+    background-color: #eee;
+    border-radius: 2px;
     -moz-border-radius: 3px;
+    box-shadow: inset 1px 1px 1px white;
 }
 
 .dialogButtonsCheckbox{
@@ -472,21 +475,22 @@ textarea#myCode
     margin-top: 5px;
 }
 
-.largeButton{
-    padding: 2px 4px 1px;
+.largeButton {
+    padding: 4px 5px 3px;
     font-size: 12px;
     text-align: center;
     border: 1px solid #A7A7A7;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
     cursor: pointer;
     text-shadow: 1px 1px 1px white;
     box-shadow: inset 1px 1px 1px white;
     width: 95px;
     display: inline-block !important;
-    margin: 0 6px;
+    margin: 6px 6px;
 }
+
 .largeButton img{
     width:16px;
     height:16px;
@@ -693,7 +697,7 @@ div.oneFieldForm input.SF_input{
 /* SF like "Standard Form" DATA : try to make a "standard"...
 /*************************/
 div.SF_element{
-    padding-top: 9px;
+    padding-top: 5px;
     clear:left;
 }
 
@@ -916,9 +920,13 @@ input.SF_input.SF_number{
     line-height: 15px;
 }
 .action_bar.editor_action_bar{
-    height: 43px;
+    height: 37px;
     background-color: #ebedf0;
     border-bottom: 1px solid rgb(138, 149, 160);
+}
+
+span[message_id="Text Search"] {
+    display: none;
 }
 
 div.editor_header{
@@ -937,6 +945,14 @@ div.editor_header > div.editor_action_bar {
 
 div.editor_header > div.editor_action_bar > div.separator{
     display: none !important;
+}
+
+.editor_action_bar a {
+padding: 3px 5px !important;
+}
+
+.editor_action_bar span.actionbar_button_label {
+font-size: 11px !important;
 }
 
 div.editor_header > span.header_label{
@@ -3649,4 +3665,8 @@ td.ip_geo_cell{
 
 .ipanel_no_selection_data {
     display: none;
+}
+
+#webdav_password_form {
+    padding-left: 0 !important;
 }
