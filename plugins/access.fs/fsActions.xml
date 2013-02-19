@@ -86,7 +86,7 @@
 		<action name="download" fileDefault="false">
 			<gui text="88" title="88" src="download_manager.png" iconClass="icon-download-alt" accessKey="download_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="false"
-					actionBar="true" contextMenu="true" infoPanel="true"
+					actionBar="true" contextMenu="false" infoPanel="true"
 					actionBarGroup="get">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="false"></selectionContext></gui>
