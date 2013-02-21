@@ -412,7 +412,7 @@ Class.create("FilesList", SelectableElements, {
 		var options1 = {
 			name:'multi_display',
 			src:'view_icon.png',
-            icon_class:'icon-th-list',
+            icon_class:'icon-th-large',
 			text_id:150,
 			title_id:151,
 			text:MessageHash[150],
@@ -479,7 +479,7 @@ Class.create("FilesList", SelectableElements, {
                     window.setTimeout(function(){
                         if(oThis._displayMode != 'thumb') $('thumb_size_button').hide();
                         else $('thumb_size_button').show();
-                    }.bind(window.listenerContext), 500);
+                    }.bind(window.listenerContext), 800);
                 }
 			}
 	    };
@@ -494,7 +494,72 @@ Class.create("FilesList", SelectableElements, {
 		// Create an action from these options!
 		var thumbsizeAction = new Action(options2, context2, {}, {});
 
-		return $H({thumb_size:thumbsizeAction, multi_display:multiAction});
+        var options3 = {
+			name:'thumbs_sortby',
+			src:'view_icon.png',
+            icon_class:'icon-sort',
+			text_id:150,
+			title_id:151,
+			text:MessageHash[150],
+			title:MessageHash[151],
+			hasAccessKey:false,
+			subMenu:true,
+			subMenuUpdateImage:false,
+			callback: function(){
+                //oThis.slider.show($('thumb_size_button'));
+			},
+			listeners : {
+				init:function(){
+                    oThis.observe('switch-display-mode', function(e){
+                        if(oThis._displayMode != 'thumb') $('thumbs_sortby_button').hide();
+                        else $('thumbs_sortby_button').show();
+                    });
+                    window.setTimeout(function(){
+                        if(oThis._displayMode != 'thumb') $('thumbs_sortby_button').hide();
+                        else $('thumbs_sortby_button').show();
+                    }.bind(window.listenerContext), 800);
+                }
+			}
+	    };
+		var context3 = {
+			selection:false,
+			dir:true,
+			actionBar:true,
+			actionBarGroup:'default',
+			contextMenu:false,
+			infoPanel:false
+		};
+        var submenuItems3 = {
+            dynamicBuilder : function(protoMenu){
+                "use strict";
+                console.log(protoMenu);
+                var items = $A([]);
+                var index = 0;
+                oThis.columnsDef.each(function(column){
+                    var isSorted = this._sortableTable.sortColumn == index;
+                    items.push({
+                        name:(column.messageId?MessageHash[column.messageId]:column.messageString),
+                        alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
+                        image:resolveImageSource((isSorted?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
+                        icon_class:(isSorted?'icon-sort-'+(this._sortableTable.descending?'up':'down'):''),
+                        isDefault:false,
+                        callback:function(e){
+                            var clickIndex = this.columnsDef.indexOf(column);
+                            var sorted = (this._sortableTable.sortColumn == clickIndex);
+                            if(sorted) this._sortableTable.descending = !this._sortableTable.descending;
+                            this._sortableTable.sort(clickIndex, this._sortableTable.descending);
+                        }.bind(this)
+                    });
+                    index++;
+                    protoMenu.options.menuItems = items;
+                    protoMenu.refreshList();
+                }.bind(oThis) );
+            }
+        };
+		// Create an action from these options!
+		var thumbSortAction = new Action(options3, context3, {}, {}, submenuItems3);
+
+		return $H({thumb_sort:thumbSortAction, thumb_size:thumbsizeAction, multi_display:multiAction});
 	},
 	
 	/**

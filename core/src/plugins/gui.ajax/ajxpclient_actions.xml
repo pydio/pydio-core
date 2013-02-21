@@ -51,7 +51,7 @@
 			<gui text="149" title="149" iconClass="icon-refresh" src="reload.png" hasAccessKey="true"
 				accessKey="refresh_access_key">
 				<context selection="false" dir="true" recycle="false"
-					actionBar="true" actionBarGroup="default" contextMenu="true" infoPanel="false">
+					actionBar="false" actionBarGroup="default" contextMenu="true" infoPanel="false">
 				</context>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
