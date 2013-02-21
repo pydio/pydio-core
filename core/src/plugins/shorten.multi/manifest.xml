@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin id="shorten.multi" enabled="false" label="CONF_MESSAGE[multi URL Shortener]" description="CONF_MESSAGE[Shorten Download Links before sending them back to the user.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <plugin_author>Miguelon</plugin_author>
+        <core_relation packaged="true" tested_version="4.3"/>
+    </plugin_info>
+    <client_settings>
+        <resources>
+            <i18n namespace="multi_shortener" path="plugins/shorten.multi/i18n" />
+        </resources>
+    </client_settings>
+    <server_settings>
+		<global_param name="SHORTEN_TYPE" type="select" choices="0|adF.ly,1|bit.ly,2|goog.gl,3|po.st" label="CONF_MESSAGE[Shorten type]" description="CONF_MESSAGE[Shorten type]" mandatory="true"/>
+        <global_param group="adF.ly" name="ADFLY_UID" type="string" label="CONF_MESSAGE[User ID]" description="CONF_MESSAGE[adF.ly account user ID.\nThe numbers after -= ?id= =- in of your referral program's URL]" mandatory="false"/>
+        <global_param group="adF.ly" name="ADFLY_APIKEY" type="string" label="CONF_MESSAGE[API Key]" description="CONF_MESSAGE[adF.ly account API Key]" mandatory="false"/>
+        <global_param group="adF.ly" name="ADFLY_TYPE" type="select" choices="int|CONF_MESSAGE[FullScreen],banner|CONF_MESSAGE[Banner]" label="CONF_MESSAGE[Type of ADS]" description="CONF_MESSAGE[Type of AD you like to show.\n Select Fullscreen AD or Top banner AD]" mandatory="false"/>
+        <global_param group="adF.ly" name="ADFLY_DOMAIN" type="select" choices="adf.ly|adF.ly,q.gs|q.Gs" label="CONF_MESSAGE[Short domain]" description="CONF_MESSAGE[adF.ly or q.gs domains, select wich you like]" mandatory="false"/>
+        <global_param group="bit.ly" name="BITLY_USER" type="string" label="CONF_MESSAGE[User Name]" description="CONF_MESSAGE[Bit.ly account user name]" mandatory="false"/>
+        <global_param group="bit.ly" name="BITLY_APIKEY" type="string" label="CONF_MESSAGE[API Key]" description="CONF_MESSAGE[Bit.ly account API Key]" mandatory="false"/>
+        <global_param group="goo.gl" name="GOOGL_APIKEY" type="string" label="CONF_MESSAGE[API Key]" description="CONF_MESSAGE[API Key]" mandatory="false"/>
+        <global_param group="po.st" name="POST_APIKEY" type="string" label="CONF_MESSAGE[API Key]" description="CONF_MESSAGE[API Key]" mandatory="false"/>
+    </server_settings>
+	<registry_contributions>
+        <actions>
+        <!-- Override a simple action -->
+            <action name="share">
+                <post_processing>
+                    <serverCallback methodName="postProcess" capture="true" applyCondition="$apply=!isSet($httpVars['sub_action']);"/>
+                </post_processing>
+            </action>
+        </actions>
+	</registry_contributions>
+	<class_definition filename="plugins/shorten.multi/class.multiShortener.php" classname="multiShortener"/>
+    <dependencies>
+        <activePlugin pluginName="action.share"/>
+    </dependencies>
+</ajxp_plugin>
