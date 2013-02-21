@@ -505,8 +505,8 @@ class ShareCenter extends AJXP_Plugin{
         $sTitle = sprintf($messages[1], ConfService::getCoreConf("APPLICATION_TITLE"));
         $sLegend = $messages[20];
 
-        @copy($pDir."/res/down.png", $downloadFolder."/dl.png");
-        @copy($pDir."/res/down.png", $downloadFolder."/grid_t.png");
+        @copy($pDir."/res/dl.png", $downloadFolder."/dl.png");
+        @copy($pDir."/res/grid_t.png", $downloadFolder."/grid_t.png");
         @copy($pDir."/res/button_cancel.png", $downloadFolder."/button_cancel.png");
         @copy(AJXP_INSTALL_PATH."/server/index.html", $downloadFolder."/index.html");
         file_put_contents($downloadFolder."/.htaccess", "ErrorDocument 404 ".$this->buildPublicDlURL()."/404.html\n<Files \".ajxp_*\">\ndeny from all\n</Files>");
