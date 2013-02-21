@@ -12,6 +12,7 @@
    		<hooks>
    			<serverCallback hookName="node.info" methodName="processLockMeta"></serverCallback>
    			<serverCallback hookName="node.before_change" methodName="checkFileLock"></serverCallback>
+   			<serverCallback hookName="node.before_path_change" methodName="checkFileLock"></serverCallback>
    		</hooks>
         <actions>
             <action name="sl_lock">
