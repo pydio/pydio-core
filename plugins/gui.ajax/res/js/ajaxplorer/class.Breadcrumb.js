@@ -52,8 +52,13 @@ Class.create("Breadcrumb", {
             }
 
             var clickPath = "<span class='icon-home ajxp-goto' data-goTo='/'></span>";
+            var lastValue = parts.values().last();
             parts.each(function(pair){
-                clickPath += "<span class='icon-chevron-right'></span>" + "<span class='ajxp-goto' data-goTo='"+pair.key+"'>"+pair.value+"</span>";
+                var refresh = '';
+                if(pair.value == lastValue){
+                    refresh = '<span class="icon-refresh ajxp-goto-refresh"></span>';
+                }
+                clickPath += "<span class='icon-chevron-right'></span>" + "<span class='ajxp-goto' data-goTo='"+pair.key+"'>"+pair.value+refresh+"</span>";
             });
             this.element.update("<div class='inner_bread'>" + clickPath + "</div>");
 

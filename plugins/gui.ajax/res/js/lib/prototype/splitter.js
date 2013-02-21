@@ -48,6 +48,7 @@ Class.create("Splitter", AjxpPane, {
 			fit			:	null,
             minSize     :   16,
             foldingButton:  null,
+            foldingAlternateClose : null,
 			onDrag 		:	Prototype.EmptyFunction,
 			endDrag 	:	Prototype.EmptyFunction,
 			startDrag 	:	Prototype.EmptyFunction
@@ -206,8 +207,8 @@ Class.create("Splitter", AjxpPane, {
      */
     getActions : function(){
         if(!this.options.foldingButton) return $H();
-        var foldingButtonOptions = this.options.foldingButton;
 
+        var butts = $H();
         // function may be bound to another context
         var oThis = this;
         var options = {
@@ -223,7 +224,11 @@ Class.create("Splitter", AjxpPane, {
             subMenuUpdateImage:false,
             callback: function(){
                 var state = oThis.toggleFolding();
-                ajaxplorer.actionBar.getActionByName("folding_action").setIconSrc('view_left_'+ (state?'right':'close') + '.png');
+                if(oThis.options.foldingAlternateClose){
+                    ajaxplorer.actionBar.getActionByName("folding_action").hide();
+                }else{
+                    ajaxplorer.actionBar.getActionByName("folding_action").setIconSrc('view_left_'+ (state?'right':'close') + '.png');
+                }
             },
             listeners : {
                 init:function(){
@@ -240,7 +245,57 @@ Class.create("Splitter", AjxpPane, {
             };
         // Create an action from these options!
         var foldingAction = new Action(options, context);
-        return $H({folding_button:foldingAction});
+        butts.set("folding_button", foldingAction);
+
+        if(this.options.foldingAlternateClose){
+            var options2 = {
+                name:'folding_close_action',
+                src:'view_left_close.png',
+                icon_class:'icon-remove-sign',
+                text_id:416,
+                title_id:415,
+                text:MessageHash[416],
+                title:MessageHash[415],
+                hasAccessKey:false,
+                subMenu:false,
+                subMenuUpdateImage:false,
+                callback: function(){
+                    var state = oThis.toggleFolding();
+                    ajaxplorer.actionBar.getActionByName("folding_action").show();
+                },
+                listeners : {
+                    init:function(){
+                        "use strict";
+                        window.setTimeout(function(){
+                            if(!oThis.splitbar.hasClassName("folded")) {
+                                try{$("folding_action_button").hide();}catch(e){}
+                            }
+                        }, 1500);
+                    }
+                }
+            };
+            var context2 = {
+                selection:false,
+                dir:true,
+                actionBar:true,
+                actionBarGroup:this.options.foldingAlternateClose,
+                contextMenu:true,
+                infoPanel:false
+            };
+            // Create an action from these options!
+            var foldingCloseAction = new Action(options2, context2);
+            butts.set("folding_close_button", foldingCloseAction);
+            if(!this.splitbar.hasClassName("folded")) {
+                foldingAction.deny = true;
+                foldingAction.disable();
+            }else {
+                foldingAction.deny = true;
+            }
+        }
+
+
+
+        return butts;
     },
 
 	/**

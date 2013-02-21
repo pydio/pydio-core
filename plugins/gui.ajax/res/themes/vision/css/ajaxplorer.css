@@ -3575,6 +3575,11 @@ td.ip_geo_cell{
     padding: 0 3px;
 }
 
+#display_toolbar a:hover{
+    color: rgb(253, 252, 228);
+}
+
+
 #top_toolbar a
 {
     font-size:12px;
@@ -3625,6 +3630,20 @@ td.ip_geo_cell{
 
 #breadcrumb span.ajxp-goto{
     cursor: pointer;
+}
+
+#breadcrumb span.ajxp-goto-refresh {
+    display: none;
+}
+
+#breadcrumb span.ajxp-goto:hover {
+    color: rgb(253, 252, 228);
+}
+
+#breadcrumb span.ajxp-goto:hover span.ajxp-goto-refresh {
+    display: inline-block;
+    margin-left: 3px;
+    font-size: 10px;
 }
 
 #AjxpConnexion-loader{
