@@ -1395,7 +1395,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			throw new AJXP_Exception($mess[100]." $nom_fic");
 		}
         $oldNode = new AJXP_Node($old);
-        AJXP_Controller::applyHook("node.before_change", array(&$oldNode));
+        AJXP_Controller::applyHook("node.before_path_change", array(&$oldNode));
 		rename($old,$new);
         AJXP_Controller::applyHook("node.change", array($oldNode, new AJXP_Node($new), false));
 	}
@@ -1570,7 +1570,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			$errors = array();
 			$succFiles = array();
 			if($move){
-                AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($realSrcFile)));
+                AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($realSrcFile)));
 				if(file_exists($destFile)) $this->deldir($destFile);
 				$res = rename($realSrcFile, $destFile);
 			}else{				
@@ -1587,7 +1587,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		else 
 		{			
 			if($move){
-                AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($realSrcFile)));
+                AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($realSrcFile)));
 				if(file_exists($destFile)) unlink($destFile);				
 				$res = rename($realSrcFile, $destFile);
 				AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), false));
@@ -1713,7 +1713,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 	{
 		if(is_dir($location))
 		{
-            AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($location)));
+            AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($location)));
 			$all=opendir($location);
 			while ($file=readdir($all))
 			{
@@ -1739,7 +1739,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		else
 		{
 			if(file_exists("$location")) {
-                AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($location)));
+                AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($location)));
 				$test = @unlink("$location");
 				if(!$test) throw new Exception("Cannot delete file ".$location);
 			}
@@ -1803,7 +1803,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
         if($newSize != null){
             AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($this->urlBase.$node), $newSize));
         }else{
-            AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($this->urlBase.$node)));
+            AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($this->urlBase.$node)));
         }
     }
 
@@ -1854,7 +1854,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
                 $docAge = time() - $time;
                 if( $docAge > $purgeTime){
                     $node = new AJXP_Node($dirName."/".$file);
-                    AJXP_Controller::applyHook("node.before_change", array($node));
+                    AJXP_Controller::applyHook("node.before_path_change", array($node));
                     unlink($dirName."/".$file);
                     AJXP_Controller::applyHook("node.change", array($node));
                     AJXP_Logger::logAction("Purge", array("file" => $dirName."/".$file));
