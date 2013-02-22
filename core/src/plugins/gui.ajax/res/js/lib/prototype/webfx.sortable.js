@@ -420,7 +420,7 @@ SortableTable = Class.create({
 
 		var s;
 		var c = oRow.cells[nColumn];
-		if (typeof c.innerText != "undefined")
+		if (c && typeof c.innerText != "undefined")
 			s = c.innerText;
 		else
 			s = this.getInnerText(c);

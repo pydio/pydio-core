@@ -102,7 +102,7 @@
 					<div id="workspace_toolbar">
                         <div id="simple_repository_label" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"bindSizeTo":{"width":{"id":"topPane", "events":["resize-FoldersTree-topPane","actions_refreshed"], "min":150,"offset":-5}}}'></div>
 					    <div style="float:left;" ajxpClass="AjxpPane"  id="buttons_bar_cont">
-						    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put", "get"],"groupOtherToolbars":["create", "more", "change", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+						    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put", "get"],"groupOtherToolbars":["more", "change", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
 						</div>
 						<div style="float:right;" ajxpClass="AjxpPane" ajxpOptions='{"bindSizeTo":{"width":{"id":"info_panel", "events":["resize-InfoPanel-info_panel", "resize-FoldersTree-topPane","actions_refreshed"], "min":120, "offset":-20, "checkSiblings":true}}}' id="search_engine_cont">
 						    <div id="search_engine" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}'></div>

@@ -394,6 +394,7 @@ Class.create("ActionsToolbar", {
 		  leftOffset : (this.options.submenuOffsetLeft ? this.options.submenuOffsetLeft : 0),
 		  parent : this.element,	 
 		  menuItems: action.subMenuItems.staticOptions || [],
+          menuTitle : action.options.text,
 		  fade:true,
 		  zIndex:2000,
           position : (this.options.submenuPosition ? this.options.submenuPosition : "bottom")

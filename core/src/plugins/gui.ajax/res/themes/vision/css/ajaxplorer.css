@@ -3074,8 +3074,8 @@ div.menu a {
 }
 
 .menu.desktop.toolbarmenu img {
-    width: 22px;
-    height:22px;
+    width: 16px;
+    height:16px;
 }
 
 .menu.desktop.textual{
@@ -3116,6 +3116,19 @@ div.menu a {
     text-align: left;
     font-style: italic;
     display: none;
+}
+
+.menu li.menuTitle{
+    display: none;
+}
+
+.menu.desktop.panelHeaderMenu li.menuTitle {
+    display: block;
+    font-size: 12px;
+    border-bottom: 1px solid #ffffff;
+    padding: 7px;
+    text-align: left;
+    background-color: rgba(255,255,255,0.2);
 }
 
 .menu.desktop li.separator {
@@ -3575,10 +3588,17 @@ td.ip_geo_cell{
     padding: 0 3px;
 }
 
+#default_toolbar a span.ajxp_icon_span {
+    margin-right: 1px;
+}
+
 #display_toolbar a:hover{
     color: rgb(253, 252, 228);
 }
 
+#display_toolbar a.disabled{
+    display:none;
+}
 
 #top_toolbar a
 {
@@ -3688,4 +3708,22 @@ td.ip_geo_cell{
 
 #webdav_password_form {
     padding-left: 0 !important;
+}
+
+#create_button {
+    padding: 7px 10px 10px 10px;
+    margin-right: 0;
+    border-radius: 2px 0 0 2px;
+}
+
+#create_button_label {
+    display: none;
+}
+
+#create_button span.ajxp_icon_arrow {
+    display: none;
+}
+
+#upload_button {
+    border-radius: 0 2px 2px 0;
 }
