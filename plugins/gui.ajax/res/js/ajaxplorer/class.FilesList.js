@@ -460,10 +460,10 @@ Class.create("FilesList", SelectableElements, {
 			name:'thumb_size',
 			src:'view_icon.png',
             icon_class:'icon-resize-full',
-			text_id:150,
-			title_id:151,
-			text:MessageHash[150],
-			title:MessageHash[151],
+			text_id:452,
+			title_id:453,
+			text:MessageHash[452],
+			title:MessageHash[453],
 			hasAccessKey:false,
 			subMenu:false,
 			subMenuUpdateImage:false,
@@ -472,13 +472,14 @@ Class.create("FilesList", SelectableElements, {
 			},
 			listeners : {
 				init:function(){
+                    var actBar = window.ajaxplorer.actionBar;
                     oThis.observe('switch-display-mode', function(e){
-                        if(oThis._displayMode != 'thumb') $('thumb_size_button').hide();
-                        else $('thumb_size_button').show();
+                        if(oThis._displayMode != 'thumb') actBar.getActionByName("thumb_size").disable();
+                        else actBar.getActionByName("thumb_size").enable();
                     });
                     window.setTimeout(function(){
-                        if(oThis._displayMode != 'thumb') $('thumb_size_button').hide();
-                        else $('thumb_size_button').show();
+                        if(oThis._displayMode != 'thumb') actBar.getActionByName("thumb_size").disable();
+                        else actBar.getActionByName("thumb_size").enable();
                     }.bind(window.listenerContext), 800);
                 }
 			}
@@ -498,10 +499,10 @@ Class.create("FilesList", SelectableElements, {
 			name:'thumbs_sortby',
 			src:'view_icon.png',
             icon_class:'icon-sort',
-			text_id:150,
-			title_id:151,
-			text:MessageHash[150],
-			title:MessageHash[151],
+			text_id:450,
+			title_id:451,
+			text:MessageHash[450],
+			title:MessageHash[451],
 			hasAccessKey:false,
 			subMenu:true,
 			subMenuUpdateImage:false,
@@ -510,13 +511,14 @@ Class.create("FilesList", SelectableElements, {
 			},
 			listeners : {
 				init:function(){
+                    var actBar = window.ajaxplorer.actionBar;
                     oThis.observe('switch-display-mode', function(e){
-                        if(oThis._displayMode != 'thumb') $('thumbs_sortby_button').hide();
-                        else $('thumbs_sortby_button').show();
+                        if(oThis._displayMode != 'thumb') actBar.getActionByName("thumbs_sortby").disable();
+                        else actBar.getActionByName("thumbs_sortby").enable();
                     });
                     window.setTimeout(function(){
-                        if(oThis._displayMode != 'thumb') $('thumbs_sortby_button').hide();
-                        else $('thumbs_sortby_button').show();
+                        if(oThis._displayMode != 'thumb') actBar.getActionByName("thumbs_sortby").disable();
+                        else actBar.getActionByName("thumbs_sortby").enable();
                     }.bind(window.listenerContext), 800);
                 }
 			}
@@ -532,7 +534,6 @@ Class.create("FilesList", SelectableElements, {
         var submenuItems3 = {
             dynamicBuilder : function(protoMenu){
                 "use strict";
-                console.log(protoMenu);
                 var items = $A([]);
                 var index = 0;
                 oThis.columnsDef.each(function(column){
@@ -541,7 +542,7 @@ Class.create("FilesList", SelectableElements, {
                         name:(column.messageId?MessageHash[column.messageId]:column.messageString),
                         alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
                         image:resolveImageSource((isSorted?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
-                        icon_class:(isSorted?'icon-sort-'+(this._sortableTable.descending?'up':'down'):''),
+                        icon_class:(isSorted?'icon-caret-'+(this._sortableTable.descending?'down':'up'):''),
                         isDefault:false,
                         callback:function(e){
                             var clickIndex = this.columnsDef.indexOf(column);
@@ -559,7 +560,7 @@ Class.create("FilesList", SelectableElements, {
 		// Create an action from these options!
 		var thumbSortAction = new Action(options3, context3, {}, {}, submenuItems3);
 
-		return $H({thumb_sort:thumbSortAction, thumb_size:thumbsizeAction, multi_display:multiAction});
+		return $H({thumb_size:thumbsizeAction, thumb_sort:thumbSortAction, multi_display:multiAction});
 	},
 	
 	/**

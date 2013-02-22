@@ -225,7 +225,7 @@ Class.create("Splitter", AjxpPane, {
             callback: function(){
                 var state = oThis.toggleFolding();
                 if(oThis.options.foldingAlternateClose){
-                    ajaxplorer.actionBar.getActionByName("folding_action").hide();
+                    ajaxplorer.actionBar.getActionByName("folding_action")[(state?"enable":"disable")]();
                 }else{
                     ajaxplorer.actionBar.getActionByName("folding_action").setIconSrc('view_left_'+ (state?'right':'close') + '.png');
                 }
@@ -240,7 +240,7 @@ Class.create("Splitter", AjxpPane, {
             dir:true,
             actionBar:true,
             actionBarGroup:'default',
-            contextMenu:true,
+            contextMenu:false,
             infoPanel:false
             };
         // Create an action from these options!
@@ -261,14 +261,14 @@ Class.create("Splitter", AjxpPane, {
                 subMenuUpdateImage:false,
                 callback: function(){
                     var state = oThis.toggleFolding();
-                    ajaxplorer.actionBar.getActionByName("folding_action").show();
+                    ajaxplorer.actionBar.getActionByName("folding_action").enable();
                 },
                 listeners : {
                     init:function(){
                         "use strict";
                         window.setTimeout(function(){
                             if(!oThis.splitbar.hasClassName("folded")) {
-                                try{$("folding_action_button").hide();}catch(e){}
+                                try{ajaxplorer.actionBar.getActionByName("folding_action").disable();}catch(e){}
                             }
                         }, 1500);
                     }
@@ -279,7 +279,7 @@ Class.create("Splitter", AjxpPane, {
                 dir:true,
                 actionBar:true,
                 actionBarGroup:this.options.foldingAlternateClose,
-                contextMenu:true,
+                contextMenu:false,
                 infoPanel:false
             };
             // Create an action from these options!

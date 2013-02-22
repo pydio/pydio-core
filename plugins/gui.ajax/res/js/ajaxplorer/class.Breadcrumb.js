@@ -66,7 +66,11 @@ Class.create("Breadcrumb", {
                 "use strict";
                 var target = event.target.getAttribute("data-goTo");
                 event.target.setAttribute("title", "Go to " + target);
-                window.ajaxplorer.goTo(target);
+                if(event.target.down('span.ajxp-goto-refresh')){
+                    window.ajaxplorer.fireContextRefresh();
+                }else{
+                    window.ajaxplorer.goTo(target);
+                }
             });
 
         }.bind(this) );

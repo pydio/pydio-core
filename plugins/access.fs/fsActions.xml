@@ -33,6 +33,19 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
+        <action name="create">
+            <gui text="154" title="155" src="folder_new.png" iconClass="icon-plus" accessKey="folder_access_key" hasAccessKey="true">
+                <context selection="false" dir="true" recycle="hidden" actionBar="true"
+                         contextMenu="true" infoPanel="false" actionBarGroup="put" inZip="false"></context>
+            </gui>
+            <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+            <subMenu>
+                <dynamicItems>
+                    <item1 actionId="mkdir"/>
+                    <item2 actionId="mkfile"/>
+                </dynamicItems>
+            </subMenu>
+        </action>
 		<action name="upload">
 			<gui text="27" title="27" src="yast_backup.png" iconClass="icon-upload-alt" accessKey="upload_access_key" hasAccessKey="true">
 				<context selection="false" dir="true" recycle="hidden"
@@ -464,7 +477,7 @@
 				</processing>
 		</action>
         <action name="mkdir">
-            <gui text="154" title="155" src="folder_new.png" iconClass="icon-plus" accessKey="folder_access_key" hasAccessKey="true">
+            <gui text="154" title="155" src="folder_new.png" iconClass="icon-folder-close" accessKey="folder_access_key" hasAccessKey="true">
                 <context selection="false" dir="true" recycle="hidden" actionBar="true"
                          contextMenu="true" infoPanel="false" actionBarGroup="create" inZip="false"></context>
             </gui>
@@ -494,11 +507,10 @@
                 </processing>
         </action>
         <action name="mkfile">
-            <gui text="156" title="157" src="filenew.png" accessKey="file_access_key" iconClass="icon-plus" hasAccessKey="true">
-                <context selection="false" dir="true" recycle="hidden"
-                    actionBar="false" contextMenu="true" infoPanel="false"
-                    actionBarGroup="create" inZip="false">
-                </context></gui>
+            <gui text="156" title="157" src="filenew.png" accessKey="file_access_key" iconClass="icon-file-alt" hasAccessKey="false">
+                <context selection="false" dir="true" recycle="hidden" actionBar="true"
+                         contextMenu="true" infoPanel="false" actionBarGroup="create" inZip="false"></context>
+            </gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
             <processing>
                 <clientCallback prepareModal="true"><![CDATA[

@@ -42,7 +42,7 @@
 		this.currentCount = 0;	
 		this.bookmarks = $A([]);
         if(options && options.bookmarksMenuOptions){
-
+            this.bookmarksMenuOptions.menuTitle = MessageHash[145];
             this.bookmarksMenuOptions = Object.extend(this.bookmarksMenuOptions, options.bookmarksMenuOptions);
 
         }
