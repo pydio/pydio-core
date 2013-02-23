@@ -710,12 +710,17 @@ div.SF_label{
     float: left;
     width: 39%;
     text-align: right;
-    padding: 7px;
     padding-right:1%;
     padding-left:0;
+    padding-top: 5px;
+    padding-bottom: 8px;
     line-height: 18px;
     /*white-space: nowrap; /* css-3 */
     /*word-wrap: no break-word; /* Internet Explorer 5.5+ */
+}
+
+input.SF_fieldCheckBox{
+    margin-top: 7px !important;
 }
 
 .no-flexbox div.SF_label{
@@ -754,7 +759,7 @@ input.SF_input.SF_number{
 }
 
 .SF_elementWithCheckbox > .SF_input{
-    width: 51% !important;
+    width: 50% !important;
     _width:46% !important; /*IE*/
 }
 
@@ -943,6 +948,11 @@ div.editor_header > div.editor_action_bar {
     padding-left: 10px;
 }
 
+.ajxp_theme_vision div.editor_header > div.editor_action_bar{
+    border-bottom:0;
+}
+
+
 div.editor_header > div.editor_action_bar > div.separator{
     display: none !important;
 }
@@ -966,6 +976,10 @@ div.editor_header > span.header_label{
     background-position: 14px 9px;
     text-shadow: 1px 1px 5px black;
     overflow: visible;
+}
+
+.ajxp_theme_vision div.editor_header > span.header_label{
+    text-shadow: none;
 }
 
 .action_bar.text_only{
@@ -3518,7 +3532,7 @@ td.ip_geo_cell{
     cursor: pointer;
 }
 .tabrow li.selected {
-    background: #FFF;
+    background: #FFFFFF !important;
     color: #333;
     z-index: 2;
     border-bottom-color: #FFF;

@@ -234,8 +234,8 @@ Class.create("FormManager", {
                 var ref = parseInt(form.getWidth()) + (Prototype.Browser.IE?40:0);
                 lab.setStyle({fontSize:'11px'});
                 lab.setStyle({width:parseInt(39*ref/100)+'px'});
-                if( parseInt(lab.getHeight()) > 30){
-                    lab.next().setStyle({marginTop:'20px'});
+                if( parseInt(lab.getHeight()) > (parseInt(lab.getStyle('lineHeight')) + parseInt(lab.getStyle('paddingTop')) + parseInt(lab.getStyle('paddingBottom')))){
+                    lab.next().setStyle({marginTop:lab.getStyle('lineHeight')});
                 }
                 lab.setStyle({width:'39%'});
                 gDiv.insert(div);
