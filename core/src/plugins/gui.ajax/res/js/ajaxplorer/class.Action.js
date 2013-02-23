@@ -346,13 +346,15 @@ Class.create("Action", {
 				}
 			}.bind(this));
 			if(node.nodeName == "processing"){
+                var clientFormData = {};
 				for(var j=0; j<node.childNodes.length; j++){
 					var processNode = node.childNodes[j];
 					if(processNode.nodeName == "clientForm"){
-						this.options.formId = processNode.getAttribute("id");
-						this.options.formCode = processNode.firstChild.nodeValue;
-						this.insertForm();
-					}else if(processNode.nodeName == "clientCallback"){						
+                        if(!processNode.getAttribute("theme") || window.ajxpBootstrap.parameters.get('theme') == processNode.getAttribute("theme") ){
+                            clientFormData.formId = processNode.getAttribute("id");
+                            clientFormData.formCode = processNode.firstChild.nodeValue;
+                        }
+					}else if(processNode.nodeName == "clientCallback"){
 						if(processNode.getAttribute('prepareModal') && processNode.getAttribute('prepareModal') == "true"){
 							this.options.prepareModal = true;						
 						}
@@ -365,6 +367,11 @@ Class.create("Action", {
 						this.options.listeners[processNode.getAttribute('name')] = '<script>'+processNode.firstChild.nodeValue+'</script>';
 					}
 				}
+                if(clientFormData.formId){
+                    this.options.formId = clientFormData.formId;
+                    this.options.formCode = clientFormData.formCode;
+                    this.insertForm();
+                }
 			}else if(node.nodeName == "gui"){
 				this.options.text_id = node.getAttribute('text');
 				this.options.title_id = node.getAttribute('title');

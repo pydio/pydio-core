@@ -498,4 +498,5 @@ $mess=array(
 "451" => "Sort thumbnails by ...",
 "452" => "Thumbs size",
 "453" => "Set thumbnails size",
+"454" => "Select files on your computer",
 );

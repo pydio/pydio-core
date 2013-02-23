@@ -21,6 +21,10 @@
 Class.create("XHRUploader", {
 	
 	_globalConfigs:null,
+    listTarget : null,
+    mainForm: null,
+    id : null,
+    rowAsProgressBar: false,
 
 	initialize : function( formObject, mask ){
 
@@ -29,7 +33,10 @@ Class.create("XHRUploader", {
 		this.mainForm = formObject;
 		
 		// Where to write the list
-		this.listTarget = formObject.select('div.uploadFilesList')[0];
+		this.listTarget = formObject.down('div.uploadFilesList');
+
+        this.rowAsProgressBar = this.listTarget.hasClassName('rowAsProgressBar');
+
 		// How many elements?
 		this.count = 0;
 		// Current index
@@ -53,10 +60,12 @@ Class.create("XHRUploader", {
 		this.clearList();
 		
 		// INITIALIZE GUI, IF NOT ALREADY!
-		this.sendButton = formObject.select('div[id="uploadSendButton"]')[0];
+		this.sendButton = formObject.down('#uploadSendButton');
         this.sendButton.addClassName("disabled");
 		if(this.sendButton.observerSet){
-			this.totalProgressBar = this.mainForm.PROGRESSBAR;
+            if(this.mainForm.PROGRESSBAR){
+                this.totalProgressBar = this.mainForm.PROGRESSBAR;
+            }
 			this.totalStrings = $('totalStrings');
 			this.uploadedString = $('uploadedString');			
 			this.optionPane = this.mainForm.down('#uploader_options_pane');
@@ -75,14 +84,14 @@ Class.create("XHRUploader", {
 			return;		
 		}
 		
-		var optionsButton = formObject.select('div[id="uploadOptionsButton"]')[0];
-		var closeButton = formObject.select('div[id="uploadCloseButton"]')[0];
-		this.sendButton.observerSet = true;
+		var optionsButton = formObject.down('#uploadOptionsButton');
+		var closeButton = formObject.down('#uploadCloseButton');
 		this.sendButton.observe("click", function(){
             if(!this.hasClassName("disabled")){
 			    ajaxplorer.actionBar.multi_selector.submit();
             }
 		}.bind(this.sendButton) );
+        this.sendButton.observerSet = true;
 		optionsButton.observe("click", function(){
 			var optionPane = this.mainForm.down('#uploader_options_pane');
 			var closeSpan = optionsButton.down('span');
@@ -95,10 +104,12 @@ Class.create("XHRUploader", {
 				closeSpan.show();
 			}
 		}.bind(this));
-		closeButton.observe("click", function(){
-            if(this.hasLoadingItem()) return;
-			hideLightBox();
-		}.bind(this));
+        if(closeButton){
+            closeButton.observe("click", function(){
+                if(this.hasLoadingItem()) return;
+                hideLightBox();
+            }.bind(this));
+        }
 
 		this.initElement(formObject.select('.dialogFocus')[0]);		
 		
@@ -126,16 +137,20 @@ Class.create("XHRUploader", {
 		}.bind(this) , true);
 		
 		
-		this.mainForm.down('#uploadFilesListContainer').setAttribute("rowspan", "1");
-		var totalDiv = new Element('div', {id:'total_files_list'});
-		this.mainForm.down('#optClosButtonsContainer').insert({after:new Element('td', {style:'vertical-align:bottom'}).update(totalDiv)});
-		totalDiv.insert('<img src="'+ajxpResourcesFolder+'/images/actions/22/trashcan_empty.png" class="fakeUploadButton fakeOptionButton" id="clear_list_button"\
+		if(this.mainForm.down('#uploadFilesListContainer')) {
+            this.mainForm.down('#uploadFilesListContainer').setAttribute("rowspan", "1");
+        }
+        if(this.mainForm.down('#optClosButtonsContainer')){
+            var totalDiv = new Element('div', {id:'total_files_list'});
+            this.mainForm.down('#optClosButtonsContainer').insert({after:new Element('td', {style:'vertical-align:bottom'}).update(totalDiv)});
+            totalDiv.insert('<img src="'+ajxpResourcesFolder+'/images/actions/22/trashcan_empty.png" class="fakeUploadButton fakeOptionButton" id="clear_list_button"\
 			width="22" height="22" style="float:right;margin-top:3px;padding:4px;width:22px;" title="'+MessageHash[216]+'"/>\
 			<span id="totalStrings">'+MessageHash[258]+' : 0 '+MessageHash[259]+' : 0Kb</span>\
 			<div style="padding-top:3px;">\
 			<div id="pgBar_total" style="width:154px; height: 4px;border: 1px solid #ccc;float:left;margin-top: 6px;"></div>\
 			<span style="float:left;margin-left:10px;" id="uploadedString">'+MessageHash[256]+' : 0%</span>\
 			</div>');
+        }
 		var options = {
 			animate		: false,									// Animate the progress? - default: true
 			showText	: false,									// show text with percentage in next to the progressbar? - default : true
@@ -144,18 +159,20 @@ Class.create("XHRUploader", {
 			barImage	: ajxpResourcesFolder+'/images/progress_bar.gif',	// Image to use in the progressbar. Can be an array of images too.
 			height		: 4										// Height of the progressbar - don't forget to adjust your image too!!!
 		};
-		$('clear_list_button').observe("click", function(e){
+		this.mainForm.down('#clear_list_button').observe("click", function(e){
 			ajaxplorer.actionBar.multi_selector.clearList();
 			ajaxplorer.actionBar.multi_selector.updateTotalData();			
 		});
 		this.optionPane = this.createOptionsPane();
 		this.optionPane.loadData();
-		
-		this.totalProgressBar = new JS_BRAMUS.jsProgressBar($('pgBar_total'), 0, options);
-		this.mainForm.PROGRESSBAR = this.totalProgressBar;
-		this.totalStrings = $('totalStrings');
-		this.uploadedString = $('uploadedString');
-		
+
+        if(this.mainForm.down('#phBar_total')){
+            this.totalProgressBar = new JS_BRAMUS.jsProgressBar($('pgBar_total'), 0, options);
+            this.mainForm.PROGRESSBAR = this.totalProgressBar;
+        }
+        this.totalStrings = $('totalStrings');
+        this.uploadedString = $('uploadedString');
+
 		if(window.UploaderDroppedFiles){
 			var files = window.UploaderDroppedFiles;
 			for(var i=0;i<files.length;i++){
@@ -170,7 +187,12 @@ Class.create("XHRUploader", {
 	},
 	
 	createOptionsPane : function(){
-		var optionPane = new Element('div', {id:'uploader_options_pane'});
+        var optionPane = this.mainForm.down("#uploader_options_pane");
+        var totalPane = this.mainForm.down('#total_files_list');
+        if(!optionPane){
+            optionPane = new Element('div', {id:'uploader_options_pane'});
+            totalPane.insert({after:optionPane});
+        }
 		optionPane.update('<div id="uploader_options_strings"></div>');
 		optionPane.insert('<div id="uploader_options_checks">\
 			<b>'+MessageHash[339]+'</b> <input type="radio" name="uploader_existing" id="uploader_existing_overwrite" value="overwrite"> '+MessageHash[263]+' \
@@ -184,8 +206,6 @@ Class.create("XHRUploader", {
 		optionPane.autoCloseCheck = optionPane.down('#uploader_auto_close');
 		optionPane.optionsStrings = optionPane.down('#uploader_options_strings');
 		optionPane.existingRadio = optionPane.select('input[name="uploader_existing"]');
-		var totalPane = this.mainForm.down('#total_files_list');
-		totalPane.insert({after:optionPane});
 		optionPane.showPane = function(){
 			totalPane.hide();optionPane.show();
 			modal.refreshDialogAppearance();
@@ -285,6 +305,9 @@ Class.create("XHRUploader", {
 			for(var i=0;i<files.length;i++){
 				this.addListRow(files[i]);
 			}
+            if(this.optionPane.autoSendCheck.checked){
+                this.submit();
+            }
 			this.clearElement();
 		}.bind(this) );
 	},
@@ -358,6 +381,7 @@ Class.create("XHRUploader", {
 			style : '-moz-border-radius:3px;border-radius:3px;float:left;margin:1px 7px 2px 0px;padding:3px;width:16px;background-position:center top;',
 			title : MessageHash[257]
 		});
+        delButton = new Element("span", {className:"icon-remove-sign"}).update(delButton);
 		delButton.observe("click", function(e){
 			if(item.xhr){
 				try{
@@ -375,7 +399,11 @@ Class.create("XHRUploader", {
 		this.listTarget.insert( item );
 		
 		var id = 'pgBar_' + (this.listTarget.childNodes.length + 1);
-		this.createProgressBar(item, id);
+        if(this.rowAsProgressBar){
+            this.createInnerProgressBar(item, id);
+        }else{
+            this.createProgressBar(item, id);
+        }
 		item.file = file;
 		item.updateStatus('new');
 		this.updateTotalData();
@@ -436,6 +464,44 @@ Class.create("XHRUploader", {
 		}.bind(item);
 	},
 	
+	createInnerProgressBar : function(item, id){
+		var statusText = new Element('span', {className:"statusText"});
+		var percentText = new Element('span', {className:"percentText"});
+		item.insert(statusText);
+		item.insert(percentText);
+		item.statusText = statusText;
+		item.percentText = percentText;
+		item.updateProgress = function(computableEvent, percentage){
+			if(percentage == null){
+				percentage = Math.round((computableEvent.loaded * 100) / computableEvent.total);
+	        	this.bytesLoaded = computableEvent.loaded;
+			}
+			if(!this.percentValue || this.percentValue != percentage){
+				this.percentText.innerHTML = percentage + '%';
+                this.setStyle({backgroundSize:percentage+'% 100%'});
+			}
+			this.percentValue = percentage;
+		}.bind(item);
+		item.updateStatus = function(status){
+			this.status = status;
+            var messageIds = {
+                "new" : 433,
+                "loading":434,
+                "loaded":435,
+                "error":436
+            };
+            try{
+                status = window.MessageHash[messageIds[status]];
+            }catch(e){};
+			this.statusText.innerHTML = "["+status+"]";
+            this.statusText.removeClassName('new');
+            this.statusText.removeClassName('loading');
+            this.statusText.removeClassName('loaded');
+            this.statusText.removeClassName('error');
+            this.statusText.addClassName(this.status);
+		}.bind(item);
+	},
+
 	updateTotalData : function(){
 		var count = 0;
 		var size = 0;
@@ -462,9 +528,11 @@ Class.create("XHRUploader", {
 		if(size){
 			var percentage = Math.round(100*uploaded/size);
 		}
-		this.totalProgressBar.setPercentage(percentage, true);
-		this.totalStrings.update(MessageHash[258]+' ' + count + ' '+MessageHash[259]+' ' +roundSize(size, 'b'));
-		this.uploadedString.update(MessageHash[256]+' : ' + percentage + '%');
+        if(this.totalProgressBar){
+            this.totalProgressBar.setPercentage(percentage, true);
+        }
+		if(this.totalStrings) this.totalStrings.update(MessageHash[258]+' ' + count + ' '+MessageHash[259]+' ' +roundSize(size, 'b'));
+		if(this.uploadedString) this.uploadedString.update(MessageHash[256]+' : ' + percentage + '%');
 		
 	},
 	

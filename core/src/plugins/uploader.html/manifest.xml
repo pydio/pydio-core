@@ -66,6 +66,28 @@
 			</form>
 			<script language="javascript">$('originalUploadForm').hide();</script>
 		]]></clientForm>
+        <clientForm id="originalUploadForm" theme="vision"><![CDATA[
+			<!-- UPLOAD FORM -->
+			<form action="AJXP_SERVER_ACCESS" target="hidden_iframe" enctype="multipart/form-data" method="POST" id="originalUploadForm" style="text-align:left; display:none;" box_width="420">
+			<div id="fileInputContainer">
+			    <div id="uploaderTextActions">
+                    <span id="uploadSendButton">AJXP_MESSAGE[77] |</span>
+                    <span id="clear_list_button">AJXP_MESSAGE[216] |</span>
+                    <span id="uploadOptionsButton">AJXP_MESSAGE[310] <span style="display:none;">[x]</span></span>
+			    </div>
+                <div id="fileInputContainerDiv">
+                        <div id="fileInputPos"><input type="file" name="userfile_1" class="dialogFocus"></div>
+                        <div id="uploadBrowseButton" class="fakeUploadButton"><span class="icon-desktop"></span>AJXP_MESSAGE[454]</div>
+                </div>
+            </div>
+			<div id="uploader_options_pane"></div>
+            <div id="upload_files_list" class="uploadFilesList rowAsProgressBar"></div>
+            <div id="total_files_list"></div>
+			<input type="hidden" name="get_action" value="upload">
+			<input type="hidden" name="simple_uploader" value="true">
+			</form>
+			<script language="javascript">$('originalUploadForm').hide();</script>
+		]]></clientForm>
 		<dialogOnOpen><![CDATA[ 
 			if(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span')){
 				ajaxplorer.actionBar.multi_selector = new XHRUploader(oForm);
