@@ -333,6 +333,8 @@ Class.create("XHRUploader", {
 	 */
 	addListRow : function( file ){
 
+        this.listTarget.removeClassName('dropareaHover');
+
 		if(file.size==0 && file.type == ""){
 			// FOLDER!
 			alert(MessageHash[336]);
