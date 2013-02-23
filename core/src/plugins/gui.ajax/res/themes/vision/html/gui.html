@@ -18,6 +18,7 @@
 		//AJXP_JSON_START_PARAMETERS
         document.observe("ajaxplorer:before_gui_load", function(e){
             ajaxplorer.currentThemeUsesIconFonts = true;
+            document.documentElement.className += " ajxp_theme_vision";
         });
         window.ajxpBootstrap = new AjxpBootstrap(startParameters);
 		</script>

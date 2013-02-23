@@ -302,7 +302,7 @@
 			<gui text="ajxp_conf.94" title="ajxp_conf.82" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
 					actionBar="true" contextMenu="true" infoPanel="true"
-					actionBarGroup="change" inZip="false">
+					actionBarGroup="get" inZip="false">
 				</context>
 				<selectionContext dir="false" file="true" recycle="false" unique="false" multipleOnly="true" allowedMimes="user,user_editable" behaviour="hidden"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
@@ -341,7 +341,7 @@
 			<gui text="ajxp_conf.93" title="301" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
 					actionBar="true" contextMenu="true" infoPanel="true"
-					actionBarGroup="change" inZip="false">
+					actionBarGroup="get" inZip="false">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="role,group,user,user_editable,repository,repository_editable,ajxp_plugin" behaviour="hidden"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
