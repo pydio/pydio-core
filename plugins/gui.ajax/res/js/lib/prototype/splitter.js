@@ -310,7 +310,7 @@ Class.create("Splitter", AjxpPane, {
 		this.group._fixed = this.options.getFixed(this.group) - this.group._borderFixed;
 		this.group._adjust = this.group[this.options.offsetAdjust] - this.group._borderAdjust;
 		
-		if(this.group._fixed <= 0 || this.group._adjust <= 0) return;
+		//if(this.group._fixed <= 0 || this.group._adjust <= 0) return;
 		
 		// Recompute fixed
 		var optName = this.options.fixed;

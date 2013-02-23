@@ -162,6 +162,7 @@ Class.create("ResourcesManager", {
 	 * @param node XMLNode
 	 */
 	loadFromXmlNode : function(node){
+        var clForm = {};
 		if(node.nodeName == "resources"){
 			for(var k=0;k<node.childNodes.length;k++){
 				if(node.childNodes[k].nodeName == 'js'){
@@ -179,9 +180,13 @@ Class.create("ResourcesManager", {
 				}
 			}
 		}else if(node.nodeName == "clientForm"){
-			this.addGuiForm(node.getAttribute("id"), node.firstChild.nodeValue);
+            if(!node.getAttribute("theme") || node.getAttribute("theme") == ajxpBootstrap.parameters.get("theme")){
+                clForm = {formId:node.getAttribute("id"), formCode:node.firstChild.nodeValue};
+            }
 		}
-
+        if(clForm.formId){
+            this.addGuiForm(clForm.formId, clForm.formCode);
+        }
 	},
 	/**
 	 * Check if resources are tagged autoload and load them

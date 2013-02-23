@@ -690,7 +690,11 @@ Class.create("Ajaxplorer", {
 				write : (xmlNode.getAttribute("write") && xmlNode.getAttribute("write")=="true"?true:false)
 			});
 		}else if(xmlNode.nodeName == 'uploader'){
-			var clientForm = XPathSelectSingleNode(xmlNode, 'processing/clientForm');
+            var th = ajxpBootstrap.parameters.get('theme');
+			var clientForm = XPathSelectSingleNode(xmlNode, 'processing/clientForm[@theme="'+th+'"]');
+            if(!clientForm){
+                clientForm = XPathSelectSingleNode(xmlNode, 'processing/clientForm');
+            }
 			if(clientForm && clientForm.firstChild && clientForm.getAttribute('id'))
 			{
 				extensionDefinition.formId = clientForm.getAttribute('id');
