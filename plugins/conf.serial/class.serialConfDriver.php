@@ -231,6 +231,12 @@ class serialConfDriver extends AbstractConfDriver {
 			}
 		}
 		AJXP_Utils::saveSerialFile($this->repoSerialFile, $newList);
+        $this->updateAliasesIndex($repositoryId, null);
+        $us = $this->getUsersForRepository($repositoryId);
+        foreach($us as $user){
+            $user->personalRole->setAcl($repositoryId, "");
+            $user->save("superuser");
+        }
 	}
 	/**
 	 * Serial specific method : indexes repositories by slugs, for better performances
@@ -238,8 +244,15 @@ class serialConfDriver extends AbstractConfDriver {
 	function updateAliasesIndex($repositoryId, $repositorySlug){
 		$data = AJXP_Utils::loadSerialFile($this->aliasesIndexFile);
 		$byId = array_flip($data);
-		$byId[$repositoryId] = $repositorySlug;
-		AJXP_Utils::saveSerialFile($this->aliasesIndexFile, array_flip($byId));
+        if($repositorySlug == null){
+            if(isSet($byId[$repositoryId])) {
+                unset($byId[$repositoryId]);
+                AJXP_Utils::saveSerialFile($this->aliasesIndexFile, array_flip($byId));
+            }
+        }else{
+            $byId[$repositoryId] = $repositorySlug;
+            AJXP_Utils::saveSerialFile($this->aliasesIndexFile, array_flip($byId));
+        }
 	}
 
     /**
@@ -263,7 +276,7 @@ class serialConfDriver extends AbstractConfDriver {
 
     /**
      * @param string $repositoryId
-     * @return array()
+     * @return AbstractAjxpUser[]
      */
     function getUsersForRepository($repositoryId){
         $result = array();
