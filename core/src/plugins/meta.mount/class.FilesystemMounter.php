@@ -69,6 +69,7 @@ class FilesystemMounter extends AJXP_Plugin
             $path = $repo->getOption("PATH");
             $opt = str_replace("AJXP_REPOSITORY_PATH", $path, $opt);
         }
+        $opt = AJXP_VarsFilter::filter($opt);
         return $opt;
     }
 
