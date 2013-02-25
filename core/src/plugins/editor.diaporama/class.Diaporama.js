@@ -131,11 +131,15 @@ Class.create("Diaporama", AbstractEditor, {
 			this.updateButtons();
 			return false;
 		}.bind(this);
-		this.downloadButton.onclick = function(){
-			if(!this.currentFile) return;
-			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+encodeURIComponent(this.currentFile));
-			return false;
-		}.bind(this);
+        if(window.ajaxplorer.actionBar.getActionByName("download")){
+            this.downloadButton.onclick = function(){
+                if(!this.currentFile) return;
+                ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+encodeURIComponent(this.currentFile));
+                return false;
+            }.bind(this);
+        }else{
+            this.downloadButton.hide();
+        }
 		this.actualSizeButton.onclick = function(){
 			this.setZoomValue(100);
 			this.resizeImage(true);
