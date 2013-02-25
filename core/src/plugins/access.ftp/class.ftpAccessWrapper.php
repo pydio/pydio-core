@@ -430,7 +430,18 @@ class ftpAccessWrapper implements AjxpWrapper {
      */ 
     protected function getServerFeatures(){
     	$link = $this->createFTPLink();
-        $features = @ftp_raw($link, "FEAT");        
+
+        if(ConfService::getRepositoryById($this->repositoryId)->getOption("CREATE") == true){
+            // Test if root exists and create it otherwise
+            $serverPath = AJXP_Utils::securePath($this->path."/");
+            $testCd = @ftp_chdir($link, $serverPath);
+            if($testCd !== true){
+                $res = @ftp_mkdir($link, $serverPath);
+                if(!$res) throw new Exception("Cannot create path on remote server!");
+            }
+        }
+
+        $features = @ftp_raw($link, "FEAT");
         // Check the answer code
         if (isSet($features[0]) && $features[0][0] != "2"){
         	//ftp_close($link);

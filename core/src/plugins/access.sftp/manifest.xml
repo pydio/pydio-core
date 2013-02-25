@@ -11,7 +11,8 @@
 		<param name="PORT" type="string" label="CONF_MESSAGE[Port number]" description="CONF_MESSAGE[Port to SSH server]" mandatory="true" default="22"/>
 		<param name="PATH" type="string" label="CONF_MESSAGE[Path]" description="CONF_MESSAGE[Real path to the folder on the server]" mandatory="true"/>
 		<param name="FIX_PERMISSIONS" type="string" label="CONF_MESSAGE[Fix Permissions]" description="CONF_MESSAGE[How to handle remote permissions to be used by PHP as local permissions. See manual.]" mandatory="false" default="detect_remote_user_id"/>
-	</server_settings>
+        <param name="CREATE" type="boolean" label="CONF_MESSAGE[Create]" description="CONF_MESSAGE[Create folder if it does not exists]" default="false" mandatory="false"/>
+    </server_settings>
 	<class_definition filename="plugins/access.sftp/class.sftpAccessDriver.php" classname="sftpAccessDriver"/>
 	<registry_contributions>
 		<client_configs>

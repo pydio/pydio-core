@@ -52,7 +52,14 @@ class sftpAccessDriver extends fsAccessDriver
 		$this->wrapperClassName = $wrapperData["classname"];
 		$this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
 		if(!file_exists($this->urlBase)){
-			throw new AJXP_Exception("Cannot find base path ($path) for your repository! Please check the configuration!");
+            if($this->repository->getOption("CREATE")){
+                $test = @mkdir($this->urlBase);
+                if(!$test){
+                    throw new AJXP_Exception("Cannot create path ($path) for your repository! Please check the configuration.");
+                }
+            }else{
+                throw new AJXP_Exception("Cannot find base path ($path) for your repository! Please check the configuration!");
+            }
 		}
 		if($recycle != ""){
 			RecycleBinManager::init($this->urlBase, "/".$recycle);
