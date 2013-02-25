@@ -109,10 +109,16 @@ Class.create("MultiUploader", {
             };
         }
 		// ATTACH LISTENERS ON BUTTONS (once only, that for the "observerSet")
-		var sendButton = formObject.down('div[id="uploadSendButton"]');
+		var sendButton = formObject.down('#uploadSendButton');
 		if(sendButton.observerSet) return;		
-		var optionsButton = formObject.down('div[id="uploadOptionsButton"]');
-		var closeButton = formObject.down('div[id="uploadCloseButton"]');
+		var optionsButton = formObject.down('#uploadOptionsButton');
+		var closeButton = formObject.down('#uploadCloseButton');
+        if(formObject.down('#uploader_options_pane')){
+            formObject.down('#uploader_options_pane').hide();
+        }
+        if(formObject.down('#clear_list_button')){
+            formObject.down('#clear_list_button').hide();
+        }
 		sendButton.observerSet = true;
 		sendButton.observe("click", function(){
 			ajaxplorer.actionBar.multi_selector.submitMainForm();
@@ -123,10 +129,12 @@ Class.create("MultiUploader", {
             message += '   '+ MessageHash[284] + ':' + this.max;
             alert(message);
 		}.bind(this));
-		closeButton.observe("click", function(){			
-			hideLightBox();
-		}.bind(this));
-		
+        if(closeButton){
+            closeButton.observe("click", function(){
+                hideLightBox();
+            }.bind(this));
+        }
+
 	},
 	
 	/**
@@ -335,7 +343,7 @@ Class.create("MultiUploader", {
 		}
 		this.submitNext();		
 	},
-	
+
 	submitNext : function(error)
 	{
 		this.nextToUpload ++;
