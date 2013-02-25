@@ -1606,6 +1606,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
                     }else{
                         copy($realSrcFile, $destFile);
                     }
+                    $this->changeMode($destFile);
 					AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), true));
 				}catch (Exception $e){
 					$error[] = $e->getMessage();
@@ -1682,6 +1683,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 								copy($tmpPath, $dstfile);
 								$success[] = $srcfile;
 								$num ++;
+                                $this->changeMode($dstfile);
 							}catch (Exception $e){
 								$errors[] = $srcfile;
 							}
