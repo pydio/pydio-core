@@ -289,7 +289,7 @@ class AuthService
 				AuthService::logUser("guest", null);
 				return 1;
 			}
-			return 0;
+			return -1;
 		}
 		$authDriver = ConfService::getAuthDriverImpl();
 		// CHECK USER PASSWORD HERE!
@@ -301,7 +301,7 @@ class AuthService
 	        if ($bruteForceLogin === FALSE){
 	            return -4;    
 	        }else{
-				return 0;
+				return -1;
 	        }
         }
 		if(!$bypass_pwd){
