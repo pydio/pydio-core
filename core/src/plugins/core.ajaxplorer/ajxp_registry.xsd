@@ -274,7 +274,7 @@
                             <xs:element minOccurs="0" ref="server_settings"/>
                             <xs:element minOccurs="0" ref="plugin_configs"/>
                             <xs:element minOccurs="0" ref="registry_contributions"/>
-                            <xs:element minOccurs="0" ref="clientForm"/>
+                            <xs:element minOccurs="0" maxOccurs="100" ref="clientForm"/>
                             <xs:element minOccurs="0" ref="processing"/>
                             <xs:element minOccurs="0" ref="dependencies"/>
                         </xs:choice>
@@ -501,7 +501,7 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element minOccurs="0" ref="clientCallback"/>
-                <xs:element minOccurs="0" ref="clientForm"/>
+                <xs:element minOccurs="0" maxOccurs="100" ref="clientForm"/>
                 <xs:element minOccurs="0" ref="dialogOnOpen"/>
                 <xs:element minOccurs="0" ref="extensionOnInit"/>
                 <xs:element minOccurs="0" ref="clientListener"/>
@@ -729,6 +729,7 @@
     <xs:element name="clientForm">
         <xs:complexType mixed="true">
             <xs:attribute name="id" use="required" type="xs:NCName"/>
+            <xs:attribute name="theme" use="optional" type="xs:NCName"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="plugin_configs">
