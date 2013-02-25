@@ -184,7 +184,7 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
-		<action name="get_binary_param">
+		<action name="get_binary_param" skipSecureToken="true">
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>

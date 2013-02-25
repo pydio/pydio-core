@@ -640,6 +640,10 @@
             <xs:attribute name="type" use="required" type="xs:NCName"/>
             <xs:attribute name="scope"/>
             <xs:attribute name="repoScope"/>
+            <xs:attribute name="editable" type="xs:boolean" use="optional"/>
+            <xs:attribute name="uploadAction" use="optional"/>
+            <xs:attribute name="loadAction" use="optional"/>
+            <xs:attribute name="defaultImage" use="optional"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="param">
@@ -658,6 +662,10 @@
             <xs:attribute name="type" use="required" type="xs:NCName"/>
             <xs:attribute name="scope"/>
             <xs:attribute name="repoScope"/>
+            <xs:attribute name="editable" type="xs:boolean" use="optional"/>
+            <xs:attribute name="uploadAction" use="optional"/>
+            <xs:attribute name="loadAction" use="optional"/>
+            <xs:attribute name="defaultImage" use="optional"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="user_param">
@@ -676,6 +684,10 @@
             <xs:attribute name="type" use="required" type="xs:NCName"/>
             <xs:attribute name="scope"/>
             <xs:attribute name="repoScope"/>
+            <xs:attribute name="editable" type="xs:boolean" use="optional"/>
+            <xs:attribute name="uploadAction" use="optional"/>
+            <xs:attribute name="loadAction" use="optional"/>
+            <xs:attribute name="defaultImage" use="optional"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="plugin_info">

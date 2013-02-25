@@ -580,7 +580,9 @@ class sqlConfDriver extends AbstractConfDriver {
         }else if(isSet($context["REPO"])){
             $storage ="repos_binaries.".$context["REPO"];
         }else if(isSet($context["ROLE"])){
-            $storage ="roles_binaries.".$context["REPO"];
+            $storage ="roles_binaries.".$context["ROLE"];
+        }else if(isSet($context["PLUGIN"])){
+            $storage ="plugins_binaries.".$context["PLUGIN"];
         }
         return $storage;
     }

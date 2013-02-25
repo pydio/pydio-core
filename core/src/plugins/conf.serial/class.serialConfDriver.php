@@ -424,7 +424,9 @@ class serialConfDriver extends AbstractConfDriver {
         }else if(isSet($context["REPO"])){
             $storage.="/repos/".$context["REPO"];
         }else if(isSet($context["ROLE"])){
-            $storage.="/roles/".$context["REPO"];
+            $storage.="/roles/".$context["ROLE"];
+        }else if(isSet($context["PLUGIN"])){
+            $storage.="/plugins/".$context["PLUGIN"];
         }
         if(!isSet($this->options["FAST_CHECKS"]) || $this->options["FAST_CHECKS"] !== true){
             if(!is_dir($storage)) @mkdir($storage, 0755, true);
