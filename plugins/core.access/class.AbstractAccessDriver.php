@@ -143,12 +143,18 @@ class AbstractAccessDriver extends AJXP_Plugin {
     		$origFile = $origStreamURL.$file;
     		$localName = "";
     		AJXP_Controller::applyHook("dl.localname", array($origFile, &$localName, $origWrapperData["classname"]));
+            if(isSet($httpVars["moving_files"])){
+                AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($origFile)));
+            }
     		$bName = basename($file);
     		if($localName != ""){
     			$bName = $localName;
-    		}    		
-    		$destFile = $destStreamURL.SystemTextEncoding::fromUTF8($httpVars["dest"])."/".$bName;    		
-    		AJXP_Logger::debug("Copying $origFile to $destFile");    		
+    		}
+            if(isSet($httpVars["moving_files"])){
+                $touch = filemtime($origFile);
+            }
+    		$destFile = $destStreamURL.SystemTextEncoding::fromUTF8($httpVars["dest"])."/".$bName;
+            AJXP_Controller::applyHook("node.before_create", array($destFile));
     		if(!is_file($origFile)){
     			throw new Exception("Cannot find $origFile");
     		}
@@ -163,8 +169,18 @@ class AbstractAccessDriver extends AJXP_Plugin {
 			}
 			fflush($destHandler);
 			fclose($origHandler); 
-			fclose($destHandler);			
-			$messages[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($origFile))." ".(isSet($httpVars["moving_files"])?$mess[74]:$mess[73])." ".SystemTextEncoding::toUTF8($destFile);
+			fclose($destHandler);
+            AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($destFile)));
+            if(isSet($httpVars["moving_files"])){
+                $wrapName = $destWrapperData["classname"];
+                if(!call_user_func(array($wrapName, "isRemote"))){
+                    $real = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $destFile, true);
+                    $r = @touch($real, $touch, $touch);
+
+                }
+                AJXP_Controller::applyHook("node.change", array(new AJXP_Node($origFile), null));
+            }
+            $messages[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($origFile))." ".(isSet($httpVars["moving_files"])?$mess[74]:$mess[73])." ".SystemTextEncoding::toUTF8($destFile);
     	}
     	AJXP_XMLWriter::header();    	
     	if(count($errorMessages)){
