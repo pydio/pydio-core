@@ -618,7 +618,20 @@ Class.create("XHRUploader", {
 	
 	sendFileMultipart : function(item){
     	var auto_rename = false;
-		if(this.crtContext.fileNameExists(item.file.name))
+
+        var newNode = new AjxpNode(this.crtContext.getContextNode().getPath()+"/"+getBaseName(item.file.name));
+        if(item.file.size){
+            newNode.getMetadata().set("filesize", item.file.size);
+        }
+        try{
+            this.crtContext.applyCheckHook(newNode);
+        }catch(e){
+            item.updateStatus('error');
+            this.submitNext();
+            return;
+        }
+
+        if(this.crtContext.fileNameExists(item.file.name))
 		{
 			var behaviour = this.optionPane.getExistingBehaviour();
 			if(behaviour == 'rename'){

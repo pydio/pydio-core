@@ -438,6 +438,12 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
+		<action name="apply_check_hook">
+            <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="false"></rightsContext>
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
 		<action name="get_content">
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly="false"></rightsContext>
 			<processing>
