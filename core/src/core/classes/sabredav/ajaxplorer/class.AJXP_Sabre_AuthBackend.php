@@ -57,6 +57,8 @@ class AJXP_Sabre_AuthBackend extends Sabre_DAV_Auth_Backend_AbstractDigest{
     }
 
     public function authenticate(Sabre_DAV_Server $server, $realm){
+        //AJXP_Logger::debug("Try authentication on $realm", $server);
+
         $success = parent::authenticate($server, $realm);
         if($success){
             $res = AuthService::logUser($this->currentUser, null, true);
