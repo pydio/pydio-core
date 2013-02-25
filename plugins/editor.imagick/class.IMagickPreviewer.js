@@ -48,19 +48,19 @@ Class.create("IMagickPreviewer", Diaporama, {
 			var text = this.currentIM + ' ('+MessageHash[331]+' '+i+' '+MessageHash[332]+' '+this.items.length+')';
 			this.updateTitle(text);
 		}.bind(this);
-
         this.resize();
 	},
 	
 	open : function($super, node)
 	{
 		this.src_file = node.getPath();
-		this.downloadButton.onclick = function(){
-			if(!this.currentFile) return;		
-			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.src_file);
-			return false;
-		}.bind(this);
-				
+        if(window.ajaxplorer.actionBar.getActionByName("download")){
+            this.downloadButton.onclick = function(){
+                if(!this.currentFile) return;
+                ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.src_file);
+                return false;
+            }.bind(this);
+        }
 		this.currentIM = getBaseName(this.src_file);
 		// Extract the pages and load result!
 		var connexion = new Connexion();
