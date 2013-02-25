@@ -145,8 +145,8 @@ class sftpAccessWrapper extends fsAccessWrapper {
      * @param mixed $flags
      * @return array
      */
-    public function url_stat($path, $flags){    
-    	$realPath = self::initPath($path);    	
+    public function url_stat($path, $flags){
+    	$realPath = self::initPath($path);
     	$stat = @stat($realPath);
     	$parts = parse_url($path);
     	$repoObject = ConfService::getRepositoryById($parts["host"]);
@@ -297,7 +297,7 @@ class sftpAccessWrapper extends fsAccessWrapper {
     						'debug' 	=> "debugSftp",
     						'macerror'	=> "macerrorSftp");
 		$connection = ssh2_connect($remote_serv, intval($remote_port), array(), $callbacks);
-		ssh2_auth_password($connection, $remote_user, $remote_pass);    	
+		ssh2_auth_password($connection, $remote_user, $remote_pass);
 		return array($connection, $remote_base_path);
 	}
 	

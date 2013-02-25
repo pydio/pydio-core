@@ -58,7 +58,6 @@ class ftpAccessDriver extends fsAccessDriver {
 		}else{
 			$this->driverConf = array();
 		}
-		$create = $this->repository->getOption("CREATE");
 		$wrapperData = $this->detectStreamWrapper(true);
 		$this->wrapperClassName = $wrapperData["classname"];
 		$this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
