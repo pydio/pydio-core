@@ -1220,7 +1220,7 @@ class AJXP_Utils
 
     public static function parseStandardFormParameters(&$repDef, &$options, $userId = null, $prefix = "DRIVER_OPTION_", $binariesContext = null){
 
-        if($binariesContext == null){
+        if($binariesContext === null){
             $binariesContext = array("USER" => (AuthService::getLoggedUser()!= null)?AuthService::getLoggedUser()->getId():"shared");
         }
         $replicationGroups = array();
@@ -1248,7 +1248,7 @@ class AJXP_Utils
                             // We encode as base64 so if we need to store the result in a database, it can be stored in text column
                             $value = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($userId."\1CDAFx¨op#"), $value, MCRYPT_MODE_ECB, $iv));
                         }
-                    }else if($type == "binary" && $binariesContext != null){
+                    }else if($type == "binary" && $binariesContext !== null){
                         if(!empty($value)){
                             if($value == "ajxp-remove-original"){
                                 if(!empty($repDef[$key."_original_binary"])){
