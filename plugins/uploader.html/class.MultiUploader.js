@@ -355,19 +355,20 @@ Class.create("MultiUploader", {
 		var nextToSubmit = $('pendingform_'+this.nextToUpload);
 		if(nextToSubmit)
 		{
-            document.fire("ajaxplorer:longtask_starting");
+
 			this.currentFileUploading = nextToSubmit.multi_index;
 			this.updateRowByIndex(this.currentFileUploading, 'loading');
 			var crtValue = $(nextToSubmit).getElementsBySelector('input[type="file"]')[0].value;
-			if(this.crtContext.fileNameExists(crtValue))
+            if(this.crtContext.fileNameExists(crtValue))
 			{
 				overwrite = confirm(MessageHash[124]);
 				if(!overwrite){
 					this.submitNext(true);
 					return;
 				}
-			}			
-			$(nextToSubmit).submit();
+			}
+            document.fire("ajaxplorer:longtask_starting");
+            $(nextToSubmit).submit();
 		}
 		else
 		{

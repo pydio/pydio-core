@@ -46,10 +46,15 @@ class AbstractAccessDriver extends AJXP_Plugin {
 	
 	function accessPreprocess($actionName, &$httpVars, &$filesVar)
 	{
-		if($actionName == "cross_copy"){
-			$this->crossRepositoryCopy($httpVars);
-			return ;
-		}
+        if($actionName == "apply_check_hook"){
+            if(!in_array($httpVars["hook_name"], array("before_create", "before_path_change", "before_change"))){
+                return;
+            }
+            $selection = new UserSelection();
+            $selection->initFromHttpVars($httpVars);
+            $node = $selection->getUniqueNode($this);
+            AJXP_Controller::applyHook("node.".$httpVars["hook_name"], array($node, $httpVars["hook_arg"]));
+        }
 		if($actionName == "ls"){
 			// UPWARD COMPATIBILTY
 			if(isSet($httpVars["options"])){
@@ -58,23 +63,11 @@ class AbstractAccessDriver extends AJXP_Plugin {
 				else if($httpVars["options"] == "d") $httpVars["skipZip"] = "true";
 				// skip "complete" mode that was in fact quite the same as standard tree listing (dz)
 			}
-			/*
-			if(!isSet($httpVars["skip_history"])){
-				if(AuthService::usersEnabled() && AuthService::getLoggedUser()!=null){
-					$user = AuthService::getLoggedUser();
-					$user->setArrayPref("history", $this->repository->getId(), ((isSet($httpVars["dir"])&&trim($httpVars["dir"])!="")?$httpVars["dir"]:"/"));
-					$user->save();
-				}
-			}
-			*/
 		}
 	}
 
 	protected function parseSpecificContributions(&$contribNode){
 		parent::parseSpecificContributions($contribNode);
-		if($this->detectStreamWrapper() !== false){
-			$this->actions["cross_copy"] = array();
-		}
 	}
 
 

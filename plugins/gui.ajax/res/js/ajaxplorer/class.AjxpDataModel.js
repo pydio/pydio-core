@@ -527,21 +527,32 @@ Class.create("AjxpDataModel", {
 	 * @returns Boolean
 	 */
 	fileNameExists: function(newFileName) 
-	{	
-		var allItems = this._contextNode.getChildren();
-		if(!allItems.length)
-		{		
-			return false;
-		}
-		for(i=0;i<allItems.length;i++)
-		{
-			var meta = allItems[i].getMetadata();
-			var crtFileName = getBaseName(meta.get('filename'));
-			if(crtFileName && crtFileName.toLowerCase() == getBaseName(newFileName).toLowerCase()) 
-				return true;
-		}
-		return false;
-	},	
+	{
+        var nodeExists = false;
+        this.loadPathInfoSync(this._contextNode.getPath() + "/" + newFileName, function(foundNode){
+            nodeExists = true;
+        });
+        return nodeExists;
+	},
+
+    applyCheckHook : function(node){
+        "use strict";
+        var conn = new Connexion();
+        conn.setParameters(new Hash({
+            get_action : "apply_check_hook",
+            file       : node.getPath(),
+            hook_name  : "before_create",
+            hook_arg   : node.getMetadata().get("filesize") || -1
+        }));
+        var result;
+        conn.onComplete = function(transport){
+            result = ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+        };
+        conn.sendSync();
+        if(result === false){
+            throw new Error("Check failed" + error);
+        }
+    },
 	
 	/**
 	 * Gets the first name of the current selection
