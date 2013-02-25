@@ -1409,7 +1409,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		if(count($split) > 1){
 			$ext = ".".$split[count($split)-1];
 			array_pop($split);
-			$name = join("\.", $split);
+			$name = join(".", $split);
 		}else{
 			$name = $fileName;
 		}
