@@ -82,27 +82,27 @@ Class.create("PreviewFactory", {
    		{
    			if(this.loading) return;
    			var oImageToLoad = this.imagesHash.unset(this.imagesHash.keys()[0]);
-   			ajaxplorer.PFacLoader = new Image();
-   			ajaxplorer.PFacLoader.editorClass = oImageToLoad.editorClass;
-            ajaxplorer.PFacLoader.onerror = this.loadNextImage.bind(this);
-   			ajaxplorer.PFacLoader.src = ajaxplorer.PFacLoader.editorClass.prototype.getThumbnailSource(oImageToLoad.ajxpNode);
+   			oImageToLoad.PFacLoader = new Image();
+            oImageToLoad.PFacLoader.onerror = this.loadNextImage.bind(this);
    			var loader = function(){
    				var img = oImageToLoad.mainObject.IMAGE_ELEMENT || $(oImageToLoad.index);
-   				if(img == null || ajaxplorer.PFacLoader == null) return;
-   				var newImg = ajaxplorer.PFacLoader.editorClass.prototype.getPreview(oImageToLoad.ajxpNode);
+   				if(img == null || oImageToLoad.PFacLoader == null) return;
+   				var newImg = oImageToLoad.editorClass.prototype.getPreview(oImageToLoad.ajxpNode);
    				newImg.setAttribute("data-is_loaded", "true");
    				img.parentNode.replaceChild(newImg, img);
    				oImageToLoad.mainObject.IMAGE_ELEMENT = newImg;
    				this.resizeThumbnail(newImg);
+                oImageToLoad.PFacLoader = null;
    				this.loadNextImage();
    			}.bind(this);
-   			if(ajaxplorer.PFacLoader.readyState && ajaxplorer.PFacLoader.readyState == "complete"){
+            oImageToLoad.PFacLoader.src = oImageToLoad.editorClass.prototype.getThumbnailSource(oImageToLoad.ajxpNode);
+   			if(oImageToLoad.PFacLoader.readyState && oImageToLoad.PFacLoader.readyState == "complete"){
    				loader();
    			}else{
-   				ajaxplorer.PFacLoader.onload = loader;
+   				oImageToLoad.PFacLoader.onload = loader;
    			}
    		}else{
-   			if(ajaxplorer.PFacLoader) ajaxplorer.PFacLoader = null;
+   			//if(oImageToLoad.PFacLoader) oImageToLoad.PFacLoader = null;
    		}
    	},
 

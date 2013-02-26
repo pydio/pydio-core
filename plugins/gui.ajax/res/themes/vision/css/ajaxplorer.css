@@ -3780,6 +3780,13 @@ td.ip_geo_cell{
     font-size: 13px;
 }
 
+.panelContent i {
+    font-size: 13px;
+    font-style: normal;
+    color: rgb(180, 184, 190);
+    text-shadow: 1px 1px 0 #ffffff;
+}
+
 .ipanel_no_selection_data {
     display: none;
 }
