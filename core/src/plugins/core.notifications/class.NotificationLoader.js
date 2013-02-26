@@ -63,7 +63,7 @@ Class.create("NotificationLoader", {
             menuItems.push({
                 id: "event_" + eventIndex,
                 name:el.getMetadata().get("event_description"),
-                alt:el.getMetadata().get("event_description"),
+                alt:el.getMetadata().get("event_description").stripTags(),
                 pFactory : this.pFactory,
                 ajxpNode:el,
                 callback:function(e){}
