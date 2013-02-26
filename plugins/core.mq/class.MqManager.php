@@ -83,7 +83,7 @@ class MqManager extends AJXP_Plugin
             $repo = $origNode->getRepositoryId();
             $content = AJXP_XMLWriter::writeNodesDiff(array("REMOVE" => array($origNode->getPath())));
         }
-        if(!empty($content) && !empty($repo)){
+        if(!empty($content) && $repo != ""){
 
             $this->sendInstantMessage($content, $repo);
 
