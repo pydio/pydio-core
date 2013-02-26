@@ -374,7 +374,15 @@ Class.create("AjxpDataModel", {
 	getSelectionSource : function(){
 		return this._selectionSource;
 	},
-	
+
+    /**
+     * Manually sets the source of the selection
+     * @param object
+     */
+    setSelectionSource : function(object){
+        this._selectionSource = object;
+    },
+
 	/**
 	 * DEPRECATED
 	 */
