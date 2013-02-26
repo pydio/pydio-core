@@ -1097,14 +1097,17 @@ Class.create("FilesList", SelectableElements, {
 
     makeItemRefreshObserver: function (ajxpNode, item, renderer){
         return function(){
-            try{
-                var newItem = renderer(ajxpNode, item);
-                item.insert({before: newItem});
-                item.remove();
+            //try{
                 if(item.ajxpNode) {
                     if(item.REMOVE_OBS) item.ajxpNode.stopObserving("node_removed", item.REMOVE_OBS);
                     if(item.REPLACE_OBS) item.ajxpNode.stopObserving("node_replaced", item.REPLACE_OBS);
                 }
+                if(!item.parentNode){
+                    return;
+                }
+                var newItem = renderer(ajxpNode, item);
+                item.insert({before: newItem});
+                item.remove();
                 newItem.ajxpNode = ajxpNode;
                 this.initRows();
                 item.ajxpNode = null;
@@ -1115,6 +1118,7 @@ Class.create("FilesList", SelectableElements, {
                 if(dm.getSelectedNodes() && dm.getSelectedNodes().length)
                 {
                     var selectedNodes = dm.getSelectedNodes();
+                    this._selectedItems = [];
                     for(var f=0;f<selectedNodes.length; f++){
                         if(Object.isString(selectedNodes[f])){
                             this.selectFile(selectedNodes[f], true);
@@ -1124,9 +1128,9 @@ Class.create("FilesList", SelectableElements, {
                     }
                     this.hasFocus = true;
                 }
-            }catch(e){
+            //}catch(e){
 
-            }
+            //}
         }.bind(this);
     },
 
@@ -1362,6 +1366,7 @@ Class.create("FilesList", SelectableElements, {
 		}.bind(this));
 		// Add ok / cancel button, for mobile devices among others
 		var buttons = modal.addSubmitCancel(edit, null, false, "after");
+        buttons.addClassName("inlineEdition");
 		var ok = buttons.select('input[name="ok"]')[0];
 		ok.observe("click", onOkAction);
 		var origWidth = edit.getWidth()-44;
@@ -1782,7 +1787,7 @@ Class.create("FilesList", SelectableElements, {
 		var rows;		
 		if(this._displayMode == "list") rows = $(this._htmlElement).select('tr');
 		else if(this._displayMode == "thumb") rows = $(this._htmlElement).select('div.thumbnail_selectable_cell');
-		for(i=0; i<rows.length;i++)
+		for(var i=0; i<rows.length;i++)
 		{
 			try{
                 if(rows[i].ajxpNode){

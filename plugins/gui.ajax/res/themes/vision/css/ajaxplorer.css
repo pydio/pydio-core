@@ -396,6 +396,15 @@ fieldSet input.dialogButton
     box-shadow: inset 1px 1px 1px white;
 }
 
+.dialogButtons.inlineEdition input
+{
+    margin-left: 6px;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    box-shadow: none;
+}
+
 .dialogButtonsCheckbox{
 
     float: left;
@@ -3645,7 +3654,7 @@ td.ip_geo_cell{
 #display_toolbar {
     float: right;
     display: inline-block;
-    min-width: 40px;
+    min-width: 60px;
     text-align: right;
 }
 

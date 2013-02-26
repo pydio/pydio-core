@@ -363,6 +363,7 @@ Class.create("FoldersTree", AjxpPane, {
    		}.bind(this));
    		// Add ok / cancel button, for mobile devices among others
    		var buttons = modal.addSubmitCancel(edit, null, false, "after");
+        buttons.addClassName("inlineEdition");
    		var ok = buttons.select('input[name="ok"]')[0];
    		ok.observe("click", onOkAction);
    		var origWidth = edit.getWidth()-44;

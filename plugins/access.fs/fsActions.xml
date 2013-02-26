@@ -81,7 +81,7 @@
 				</processing>
 		</action>
 		<action name="empty_recycle">
-			<gui text="220" title="221" src="trashcan_empty.png" accessKey="empty_recycle_access_key" hasAccessKey="true">
+			<gui text="220" title="221" src="trashcan_empty.png" iconClass="icon-ban-circle" accessKey="empty_recycle_access_key" hasAccessKey="true">
 				<context selection="false" dir="true" recycle="only" actionBar="true"
                          contextMenu="true" infoPanel="false" actionBarGroup="change"></context>
 			</gui>
@@ -457,7 +457,7 @@
 			</processing>
 		</action>		
 		<action name="restore">
-			<gui text="222" title="223" src="folder1_important.png" accessKey="restore_access_key" hasAccessKey="true">
+			<gui text="222" title="223" src="folder1_important.png" iconClass="icon-undo" accessKey="restore_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="only"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change">
@@ -552,6 +552,9 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
+				    if(ajaxplorer.getUserSelection()){
+				        var orig = ajaxplorer.getUserSelection().getSelectionSource();
+				    }
 					var callback = function(node, newValue){
 						var filename = node.getPath();
 						var conn = new Connexion();
@@ -562,6 +565,9 @@
 							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
 						};
 						conn.sendSync();
+						if(orig && ajaxplorer.getUserSelection()){
+						    ajaxplorer.getUserSelection().setSelectionSource(orig);
+						}
 					};
 					if(ajaxplorer.getUserSelection() && ajaxplorer.getUserSelection().getSelectionSource() && ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition) {ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition(callback);}
 				]]></clientCallback>

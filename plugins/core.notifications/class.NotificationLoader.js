@@ -22,6 +22,8 @@ Class.create("NotificationLoader", {
 
     ajxpNode : null,
     pFactory : null,
+    timer   : 30,
+    pe  : null,
 
     initialize: function(){
         var rP = new RemoteNodeProvider();
@@ -31,9 +33,11 @@ Class.create("NotificationLoader", {
         this.pFactory = new PreviewFactory();
         this.pFactory.sequencialLoading = false;
         this.pFactory.setThumbSize(16);
-        var pe = new PeriodicalExecuter(function(){
-            this.ajxpNode.reload();
-        }.bind(this), 20);
+        this.pe = new PeriodicalExecuter(function(){
+            if(window.ajaxplorer.user){
+                this.ajxpNode.reload();
+            }
+        }.bind(this), this.timer);
     },
 
     childrenToMenu: function(menuContainer){

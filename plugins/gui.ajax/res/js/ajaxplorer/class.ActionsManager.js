@@ -482,6 +482,7 @@ Class.create("ActionsManager", {
                             var fake = new AjxpNode(original);
                             var n = fake.findInArbo(dm.getRootNode(), undefined);
                             if(n){
+                                newNode._isLoaded = n._isLoaded;
                                 n.replaceBy(newNode, "override");
                                 dm.setSelectedNodes([n], {});
                             }
