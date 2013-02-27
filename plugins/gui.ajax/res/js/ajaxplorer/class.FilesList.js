@@ -1443,26 +1443,26 @@ Class.create("FilesList", SelectableElements, {
                     className   :'text_label'+fullview
                 }).update(metaData.get('text'));
 
-                var backgroundPosition = '4px 2px';
+                var backgroundPosition = this.options.iconBgPosition || '4px 2px';
                 var backgroundImage = 'url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
                 if(metaData.get('overlay_icon') && Modernizr.multiplebgs){
                     var ovIcs = metaData.get('overlay_icon').split(',');
                     switch(ovIcs.length){
                         case 1:
-                            backgroundPosition = '14px 11px, 4px 2px';
+                            backgroundPosition = '14px 11px, ' + backgroundPosition;
                             backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
                         break;
                         case 2:
-                            backgroundPosition = '2px 11px, 14px 11px, 4px 2px';
+                            backgroundPosition = '2px 11px, 14px 11px, ' + backgroundPosition;
                             backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
                         break;
                         case 3:
-                            backgroundPosition = '14px 2px, 2px 11px, 14px 11px, 4px 2px';
+                            backgroundPosition = '14px 2px, 2px 11px, 14px 11px, ' + backgroundPosition;
                             backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[2], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
                         break;
                         case 4:
                         default:
-                            backgroundPosition = '2px 2px, 14px 2px, 2px 11px, 14px 11px, 4px 2px';
+                            backgroundPosition = '2px 2px, 14px 2px, 2px 11px, 14px 11px, ' + backgroundPosition;
                             backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[2], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[3], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
                         break;
                     }
