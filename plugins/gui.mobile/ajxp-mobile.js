@@ -27,10 +27,12 @@ function getAjxpMobileActions(){
 	var act = mobileActions.select('a');
 	act[0].observe('click', function(e){
 		Event.stop(e);
-		$('info_container').down('.info_panel_title_span').update(ajaxplorer.getContextHolder().getUniqueNode().getLabel());
+        if($('info_container').down('.info_panel_title_span')){
+            $('info_container').down('.info_panel_title_span').update(ajaxplorer.getContextHolder().getUniqueNode().getLabel());
+        }
 		$('info_container').show();
 		$('info_container').ajxpPaneObject.resize();
-		$('info_panel').select('.infoPanelActions a').each(function(action){
+		$('info_container').select('.infoPanelActions a').each(function(action){
 			action.observe("click", function(){$('info_container').hide();});
 		});
 	});
