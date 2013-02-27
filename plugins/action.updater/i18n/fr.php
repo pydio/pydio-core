@@ -22,7 +22,7 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 $mess = array(
-"1" => "Mise à jour...",
+"1" => "Mise à jour",
 "2" => "Mise à jour automatique",
 "3" => "Cliquez sur le bouton pour démarrer la mise à jour. Veuillez vérifier que le répertoire de l'application est accessible en écriture avant de démarrer.",
 "4" => "Démarrer",

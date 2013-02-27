@@ -161,6 +161,9 @@ Class.create("AjxpBootstrap", {
 			connexion.loadLibrary("ajaxplorer.js?v="+this.parameters.get("ajxpVersion"));
 		}
 		window.MessageHash = this.parameters.get("i18nMessages");
+        if(!Object.keys(MessageHash).length){
+            alert('Ooups, this should not happen, your message file is empty!');
+        }
 		for(var key in MessageHash){
 			MessageHash[key] = MessageHash[key].replace("\\n", "\n");
 		}

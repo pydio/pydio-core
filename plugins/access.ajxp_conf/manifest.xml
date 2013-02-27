@@ -34,6 +34,38 @@
                     }
                 </style>
             ]]></template_part>
+            <template_part ajxpClass="AjxpPane" ajxpId="info_panel" ajxpOptions='{}'><![CDATA[
+                    <style>
+                        .webfx-tree-item:first-of-type{
+                            display:none;
+                        }
+                        .webfx-tree-container>.webfx-tree-item:first-of-type{
+                            display:block;
+                        }
+                        .webfx-tree-container.first_container{
+                            margin-left: -19px;
+                        }
+                        .action_bar a, .menu.desktop.toolbarmenu{
+                            background-color: rgb(78, 154, 179);
+                        }
+                        #switch_to_settings_button span{
+                            font-size : 1.2em !important;
+                        }
+                    </style>
+                    <script>
+                        $("vertical_splitter").ajxpPaneObject.paneB._max = 1;
+                        $("vertical_splitter").ajxpPaneObject.options.maxB = 1;
+                        document.observe("ajaxplorer:user_logged", function(){
+                            if(ajaxplorer.repositoryId == "ajxp_conf"){
+                                $("vertical_splitter").ajxpPaneObject.paneB._max = 1;
+                                $("vertical_splitter").ajxpPaneObject.options.maxB = 1;
+                            }else{
+                                $("vertical_splitter").ajxpPaneObject.paneB._max = 0;
+                                $("vertical_splitter").ajxpPaneObject.options.maxB = 0;
+                            }
+                        });
+                    </script>
+                    ]]></template_part>
             <component_config className="Splitter::vertical_splitter">
                 <property name="resize" value="100%"/>
             </component_config>

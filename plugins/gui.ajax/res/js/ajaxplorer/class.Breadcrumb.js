@@ -80,6 +80,7 @@ Class.create("Breadcrumb", {
 	 * Resize widget
 	 */
 	resize : function(){
+        if(!this.element) return;
 		if(this.options.flexTo){
 			var parentWidth = $(this.options.flexTo).getWidth();
 			var siblingWidth = 0;

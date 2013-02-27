@@ -9,7 +9,7 @@
     <registry_contributions>
         <actions>
             <action name="scheduler_menu">
-                <gui text="action.scheduler.18" title="action.scheduler.18d" src="scheduler/ICON_SIZE/player_time.png" hasAccessKey="false">
+                <gui text="action.scheduler.18" iconClass="icon-time" title="action.scheduler.18d" src="scheduler/ICON_SIZE/player_time.png" hasAccessKey="false">
                     <context selection="false" dir="" recycle="hidden"
                              actionBar="true" contextMenu="false" infoPanel="false" actionBarGroup="put"/>
                 </gui>

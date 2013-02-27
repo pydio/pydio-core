@@ -22,7 +22,7 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
  
 $mess = array(
-    "1" => "Upgrade...",
+    "1" => "Upgrade",
     "2" => "Automatic version upgrade",
     "3" => "Click on the button to start automatic upgrade procedure. Please check that the application folder is writeable before launching upgrade.",
     "4" => "Start Upgrade",
