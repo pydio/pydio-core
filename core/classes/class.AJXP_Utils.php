@@ -1267,7 +1267,7 @@ class AJXP_Utils
                             $value = $repDef[$key."_original_binary"];
                         }
                     }
-                    if($repDef[$key."_ajxptype"] != "textarea"){
+                    if($repDef[$key."_ajxptype"] != "textarea" && $repDef[$key."_ajxptype"] != "boolean"){
                         $value = AJXP_Utils::sanitize($value, AJXP_SANITIZE_HTML);
                     }
                     unset($repDef[$key."_ajxptype"]);

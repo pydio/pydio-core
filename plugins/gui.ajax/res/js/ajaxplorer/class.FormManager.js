@@ -82,7 +82,7 @@ Class.create("FormManager", {
 			var mandatory = false;
 			if(param.get('mandatory') && param.get('mandatory')=='true') mandatory = true;
 			var defaultValue = (values?'':(param.get('default') || ""));
-			if(values && values.get(name)){
+			if(values && values.index(name) !== false){
 				defaultValue = values.get(name);
 			}
 			var element;
@@ -105,9 +105,9 @@ Class.create("FormManager", {
 				element = '<input type="password" autocomplete="off" data-ajxp_type="'+type+'" data-ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" value="'+defaultValue+'"'+disabledString+' class="SF_input">';
 			}else if(type == 'boolean'){
 				var selectTrue, selectFalse;
-				if(defaultValue){
-					if(defaultValue == "true" || defaultValue == "1") selectTrue = true;
-					if(defaultValue == "false" || defaultValue == "0") selectFalse = true;
+				if(defaultValue !== undefined){
+					if(defaultValue == "true" || defaultValue == "1" || defaultValue === true ) selectTrue = true;
+					if(defaultValue == "false" || defaultValue == "0" || defaultValue === false) selectFalse = true;
 				}
 				element = '<input type="radio" data-ajxp_type="'+type+'" class="SF_box" name="'+name+'" value="true" '+(selectTrue?'checked':'')+''+disabledString+'> '+MessageHash[440];
 				element = element + '<input type="radio" data-ajxp_type="'+type+'" class="SF_box" name="'+name+'" '+(selectFalse?'checked':'')+' value="false"'+disabledString+'> '+MessageHash[441];
