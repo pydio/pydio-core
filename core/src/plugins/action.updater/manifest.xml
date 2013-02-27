@@ -20,7 +20,7 @@
                 <processing><serverCallback methodName="switchAction"></serverCallback></processing>
             </action>
             <action name="perform_upgrade">
-                <gui text="updater.1" title="updater.2" src="download_manager.png" hasAccessKey="false">
+                <gui text="updater.1" title="updater.2" iconClass="icon-lightbulb" src="download_manager.png" hasAccessKey="false">
                     <context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
                         actionBar="true" contextMenu="false" infoPanel="false"
                         actionBarGroup="user" inZip="false">
