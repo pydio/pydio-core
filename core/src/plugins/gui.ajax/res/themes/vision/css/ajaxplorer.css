@@ -3796,9 +3796,11 @@ td.ip_geo_cell{
 }
 
 #create_button {
-    padding: 7px 10px 10px 10px;
+    /*padding: 7px 10px 10px 10px;*/
     margin-right: 0;
     border-radius: 2px 0 0 2px;
+    padding: 0;
+    height: 33px;
 }
 
 #create_button_label {
@@ -3807,6 +3809,10 @@ td.ip_geo_cell{
 
 #create_button span.ajxp_icon_arrow {
     display: none;
+}
+
+#create_button span.icon-plus{
+    padding: 8px;
 }
 
 #upload_button {

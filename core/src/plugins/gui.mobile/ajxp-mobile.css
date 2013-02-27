@@ -90,3 +90,9 @@ a.m-2.disabled {
 .umbra div#search_panel{
     margin: 5px;
 }
+
+.ajxp_theme_vision a.m-2{
+    margin: 3px 1px;
+    padding: 3px 5px;
+    background-color:rgb(77, 197, 195) !important;
+}
