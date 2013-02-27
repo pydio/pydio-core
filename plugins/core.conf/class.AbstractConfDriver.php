@@ -729,7 +729,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 
                 $defaultFormat = "html";
 
-                header("Content-type:text/html");
+                HTMLWriter::charsetHeader();
                 if(!ConfService::getAuthDriverImpl()->usersEditable()){
                     break;
                 }

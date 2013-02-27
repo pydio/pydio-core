@@ -791,7 +791,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $isTemplate = isSet($httpVars["sf_checkboxes_active"]);
                 unset($repDef["get_action"]);
                 unset($repDef["sf_checkboxes_active"]);
-				$this->parseParameters($repDef, $options);
+				$this->parseParameters($repDef, $options, null, true);
 				if(count($options)){
 					$repDef["DRIVER_OPTIONS"] = $options;
 				}
@@ -996,7 +996,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					$res = ConfService::replaceRepository($repId, $repo);
 				}else{
 					$options = array();
-					$this->parseParameters($httpVars, $options);
+					$this->parseParameters($httpVars, $options, null, true);
 					if(count($options)){
 						foreach ($options as $key=>$value) {
 							if($key == "AJXP_SLUG"){
@@ -1062,7 +1062,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}
 				$metaSourceType = AJXP_Utils::sanitize($httpVars["new_meta_source"], AJXP_SANITIZE_ALPHANUM);
 				$options = array();
-				$this->parseParameters($httpVars, $options);
+				$this->parseParameters($httpVars, $options, null, true);
 				$repoOptions = $repo->getOption("META_SOURCES");
 				if(is_array($repoOptions) && isSet($repoOptions[$metaSourceType])){
 					throw new Exception($mess["ajxp_conf.55"]);
@@ -1108,7 +1108,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}				
 				$metaSourceId = $httpVars["plugId"];
 				$options = array();
-				$this->parseParameters($httpVars, $options);
+				$this->parseParameters($httpVars, $options, null, true);
 				$repoOptions = $repo->getOption("META_SOURCES");
 				if(!is_array($repoOptions)){
 					$repoOptions = array();
@@ -1237,7 +1237,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			case "edit_plugin_options":
 				
 				$options = array();
-				$this->parseParameters($httpVars, $options);
+				$this->parseParameters($httpVars, $options, null, true);
 				$confStorage = ConfService::getConfStorageImpl();
 				$confStorage->savePluginConfig($httpVars["plugin_id"], $options);
 				@unlink(AJXP_PLUGINS_CACHE_FILE);
@@ -1686,9 +1686,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	}
 	
 	
-	function parseParameters(&$repDef, &$options, $userId = null){
+	function parseParameters(&$repDef, &$options, $userId = null, $globalBinaries = false){
 
-        AJXP_Utils::parseStandardFormParameters($repDef, $options, $userId);
+        AJXP_Utils::parseStandardFormParameters($repDef, $options, $userId, "DRIVER_OPTION_", ($globalBinaries?array():null));
 
 	}
 

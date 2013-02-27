@@ -498,6 +498,11 @@ $mess=array(
 "447" => "My group",
 "448" => "create user",
 "449" => "Creating %s, choose a password",
+"450" => "Sort by ...",
+"451" => "Sort thumbnails by ...",
+"452" => "Thumbs size",
+"453" => "Set thumbnails size",
+"454" => "Select files on your computer",
 /* END SENTENCE */
 );
 ?>

@@ -51,12 +51,12 @@ Class.create("Breadcrumb", {
                 parts.set(newPath, newNode.getLabel());
             }
 
-            var clickPath = "<span class='icon-home ajxp-goto' data-goTo='/'></span>";
+            var clickPath = "<span class='icon-home ajxp-goto' data-goTo='/' title='"+MessageHash[459]+"'></span>";
             var lastValue = parts.values().last();
             parts.each(function(pair){
                 var refresh = '';
                 if(pair.value == lastValue){
-                    refresh = '<span class="icon-refresh ajxp-goto-refresh"></span>';
+                    refresh = '<span class="icon-refresh ajxp-goto-refresh" title="'+MessageHash[149]+'"></span>';
                 }
                 clickPath += "<span class='icon-chevron-right'></span>" + "<span class='ajxp-goto' data-goTo='"+pair.key+"'>"+pair.value+refresh+"</span>";
             });
