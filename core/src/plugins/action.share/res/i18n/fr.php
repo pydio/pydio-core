@@ -58,4 +58,6 @@ $mess = array(
     "53"=> "non",
     "54"=> "Avec...",
     "55"=> "Partagé...",
+    "56"=> "Configurer le partage...",
+    "57"=> "fois",
 );

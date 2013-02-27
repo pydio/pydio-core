@@ -502,6 +502,11 @@ $mess=array(
 "452" => "Thumbs size",
 "453" => "Set thumbnails size",
 "454" => "Select files on your computer",
+"455" => "My Workspaces",
+"456" => "More",
+"457" => "update",
+"458" => "remove",
+"459" => "Top folder",
 /* 文章はここまで */
 /* 文章終了 */
 );

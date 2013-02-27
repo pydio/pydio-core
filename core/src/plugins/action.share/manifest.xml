@@ -151,7 +151,7 @@
                     </messages>
                     <html><![CDATA[
                         <div id="ajxp_shared_info_panel">
-                            <div class="panelHeader infoPanelGroup" colspan="2"><span class="icon-share" data-ajxpAction="share" title="More..."></span>#{type_string}</div>
+                            <div class="panelHeader infoPanelGroup" colspan="2"><span class="icon-share" data-ajxpAction="share" title="AJXP_MESSAGE[share_center.55]"></span>#{type_string}</div>
                             <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0"></table>
                         </div>
                     ]]></html>

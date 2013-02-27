@@ -299,7 +299,7 @@ Class.create("ShareCenter", {
                     </tr>\
                     <tr>\
                         <td class="infoPanelLabel">'+MessageHash['share_center.51']+'</td>\
-                        <td class="infoPanelValue">'+ jsonData.download_counter +' times</td>\
+                        <td class="infoPanelValue">'+ jsonData.download_counter +' ' +  MessageHash['share_center.57'] + '</td>\
                     </tr>\
                     <tr>\
                         <td class="infoPanelLabel">'+MessageHash['share_center.52']+'</td>\

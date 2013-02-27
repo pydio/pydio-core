@@ -57,5 +57,7 @@ $mess = array(
 "53" => "none",
 "54" => "With...",
 "55" => "Shared...",
+"56" => "Configure sharing...",
+"57" => "times",
 // will be replaced by the filename to download
 );
