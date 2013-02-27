@@ -486,6 +486,19 @@ $mess=array(
 "439" => "Opcions pricipals",
 "440" => "Si",
 "441" => "No",
+"442" => "My Account",
+"443" => "Update your personal information",
+"444" => "Please update your password, you will not be able to log in otherwise.",
+"445" => "You will now be logged out, please log back using your new password, thank you!",
+"446" => "Presentation",
+"447" => "My group",
+"448" => "create user",
+"449" => "Creating %s, choose a password",
+"450" => "Sort by ...",
+"451" => "Sort thumbnails by ...",
+"452" => "Thumbs size",
+"453" => "Set thumbnails size",
+"454" => "Select files on your computer",
 /* END SENTENCE */
 );
 ?>

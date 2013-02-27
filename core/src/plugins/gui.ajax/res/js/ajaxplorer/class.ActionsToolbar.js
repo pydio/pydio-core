@@ -143,8 +143,8 @@ Class.create("ActionsToolbar", {
                 text_id:150,
                 title_id:151,
                 */
-                text:"More",
-                title:"More actions",
+                text:MessageHash[456],
+                title:MessageHash[456],
                 hasAccessKey:false,
                 subMenu:true,
                 callback:function(){}

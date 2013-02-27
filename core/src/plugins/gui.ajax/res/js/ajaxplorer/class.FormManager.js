@@ -162,8 +162,8 @@ Class.create("FormManager", {
                     imgSrc = param.get("defaultImage");
                 }
                 element = "<div class='SF_image_block'><img src='"+imgSrc+"' class='SF_image small'><span class='SF_image_link image_update'>"+
-                    (param.get("uploadLegend")?param.get("uploadLegend"):"update")+"</span><span class='SF_image_link image_remove'>"+
-                    (param.get("removeLegend")?param.get("removeLegend"):"remove")+"</span>" +
+                    (param.get("uploadLegend")?param.get("uploadLegend"):MessageHash[457])+"</span><span class='SF_image_link image_remove'>"+
+                    (param.get("removeLegend")?param.get("removeLegend"):MessageHash[458])+"</span>" +
                     "<input type='hidden' name='"+param.get("name")+"' data-ajxp_type='binary'>" +
                     "<input type='hidden' name='"+param.get("name")+"_original_binary' value='"+ defaultValue +"' data-ajxp_type='string'></div>";
             }
