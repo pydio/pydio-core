@@ -234,7 +234,7 @@ textarea{
 .table_rows_container span.list_selectable_span span.text_label{
     font-size: 12px;
     padding-left: 27px !important;
-    background-position: 5px 4px !important;
+    background-position: 5px 4px;
     color: rgb(80, 82, 83);
     letter-spacing: 1px;
 }
