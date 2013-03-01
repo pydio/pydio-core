@@ -320,7 +320,7 @@
 							even = !even;
 						}
 					});	
-					modal.getForm().down('input[name="close"]').observe("click", hideLightBox);
+					modal.getForm().down('input[name="ok"]').observe("click", hideLightBox);
 					if(!$('webdav_activator').hasObserver){
 						$('webdav_activator').observe("change", function(e){
 							var checked = $('webdav_activator').checked;
