@@ -487,6 +487,7 @@ class AuthService
             if(!self::allowedForCurrentGroup($repoObject, $adminUser)) continue;
             if($repoObject->hasParent() && $repoObject->getParentId() != $adminUser->getId()) continue;
 			$adminUser->personalRole->setAcl($repoId, "rw");
+            $adminUser->recomputeMergedRole();
 		}
 		$adminUser->save("superuser");
 		return $adminUser;
@@ -499,14 +500,19 @@ class AuthService
 	 */
 	static function updateDefaultRights(&$userObject){
 		if(!$userObject->hasParent()){
+            $changes = false;
 			foreach (ConfService::getRepositoriesList() as $repositoryId => $repoObject)
 			{
                 if(!self::allowedForCurrentGroup($repoObject, $userObject)) continue;
                 if($repoObject->isTemplate) continue;
 				if($repoObject->getDefaultRight() != ""){
+                    $changes = true;
 					$userObject->personalRole->setAcl($repositoryId, $repoObject->getDefaultRight());
 				}
 			}
+            if($changes) {
+                $userObject->recomputeMergedRole();
+            }
             foreach(AuthService::getRolesList(array(), true) as $roleId => $roleObject){
                 if(!self::allowedForCurrentGroup($roleObject, $userObject)) continue;
                 if($userObject->getProfile() == "shared" && $roleObject->autoAppliesTo("shared")){

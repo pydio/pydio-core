@@ -317,7 +317,7 @@ class AJXP_XMLWriter
             $buffer .= "<remove>";
             foreach($diffNodes["REMOVE"] as $nodePath){
                 $nodePath = AJXP_Utils::xmlEntities($nodePath, true);
-                $buffer .= "<tree filename='$nodePath'/>";
+                $buffer .= "<tree filename=\"$nodePath\"/>";
             }
             $buffer .= "</remove>";
         }
