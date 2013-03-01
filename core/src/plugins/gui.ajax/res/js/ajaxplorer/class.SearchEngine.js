@@ -101,7 +101,7 @@ Class.create("SearchEngine", AjxpPane, {
         }
         if(this._ajxpOptions && this._ajxpOptions.metaColumns){
             var cols = this._ajxpOptions.metaColumns;
-            if(this._ajxpOptions.toggleResultsVisibility && $(this._ajxpOptions.toggleResultsVisibility)){
+            if(this._ajxpOptions.toggleResultsVisibility && $(this._ajxpOptions.toggleResultsVisibility) && this.htmlElement){
                 this.htmlElement.down("#" + this._ajxpOptions.toggleResultsVisibility).insert({top:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});
             }else if($('search_form')){
                 $('search_form').insert({bottom:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});
@@ -126,7 +126,7 @@ Class.create("SearchEngine", AjxpPane, {
 		
 		this.htmlElement.insert('<div id="search_panel"><div id="search_form"><input style="float:left;" type="text" id="search_txt" placeholder="'+ MessageHash[87] +'" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="" id="search_button" class="icon-search" ajxp_message_title_id="184" title="'+MessageHash[184]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/search.png" border="0"/></a><a class="icon-remove" href="" id="stop_search_button" ajxp_message_title_id="185" title="'+MessageHash[185]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div></div>');
         if(this._ajxpOptions.toggleResultsVisibility){
-            this.htmlElement.down("#search_results").insert({before:"<div id='"+this._ajxpOptions.toggleResultsVisibility+"'></div>"});
+            this.htmlElement.down("#search_results").insert({before:"<div style='display: none;' id='"+this._ajxpOptions.toggleResultsVisibility+"'></div>"});
             this.htmlElement.down("#" + this._ajxpOptions.toggleResultsVisibility).insert(this.htmlElement.down("#search_results"));
         }
         if(this.htmlElement.down('div.panelHeader')){
@@ -204,14 +204,16 @@ Class.create("SearchEngine", AjxpPane, {
 			return false;
 		}.bind(this);
 
-        document.observe("ajaxplorer:repository_list_refreshed", function(e){
+        this.refreshObserver = function(e){
             "use strict";
             this._inputBox.setValue("");
             this.clearResults();
-            if(this.options.toggleResultsVisibility){
+            if($(this.options.toggleResultsVisibility)){
                 $(this._ajxpOptions.toggleResultsVisibility).setStyle({display:'none'});
             }
-        }.bind(this) );
+        }.bind(this);
+
+        document.observe("ajaxplorer:repository_list_refreshed", this.refreshObserver );
 
         this.resize();
 	},
@@ -244,6 +246,7 @@ Class.create("SearchEngine", AjxpPane, {
             var ajxpId = this.htmlElement.id;
             this.htmlElement.update('');
         }
+        document.stopObserving("ajaxplorer:repository_list_refreshed", this.refreshObserver);
 		this.htmlElement = null;
         if(ajxpId && window[ajxpId]){
             try {delete window[ajxpId];}catch(e){}

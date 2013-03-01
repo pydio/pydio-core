@@ -123,8 +123,12 @@ Class.create("RepositorySelect", {
 				var repoObject = pair.value;
 				var key = pair.key;
 				var selected = (key == repositoryId ? true:false);
-				
-				var actionData = {
+
+                if(repoObject.getAccessType() == "ajxp_conf"){
+                    return;
+                }
+
+                var actionData = {
 					name:repoObject.getLabel(),
 					alt:repoObject.getLabel() + (repoObject.getOwner() ? " ("+MessageHash[413]+" " + repoObject.getOwner()+ ")":""),
 					image:repoObject.getIcon(),
@@ -139,7 +143,7 @@ Class.create("RepositorySelect", {
                 if(repoObject.userEditable){
                     actionData.moreActions = this.getContextActions(key);
                 }
-				if(repoObject.getAccessType() == "ajxp_shared" || repoObject.getAccessType() == "ajxp_conf"){
+				if(repoObject.getAccessType() == "ajxp_shared"){
 					lastActions.push(actionData);
                 }else if(repoObject.getOwner()){
                     sharedActions.push(actionData);

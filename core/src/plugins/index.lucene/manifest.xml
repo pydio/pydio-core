@@ -19,7 +19,8 @@
     </server_settings>
 	<registry_contributions>
 		<hooks>
-			<serverCallback hookName="node.change" methodName="updateNodeIndex" defer="true"></serverCallback>
+			<serverCallback hookName="node.change" methodName="updateNodeIndex" defer="true"/>
+			<serverCallback hookName="node.meta_change" methodName="updateNodeIndexMeta" defer="true"/>
 		</hooks>
 		<actions>
 			<action name="search">

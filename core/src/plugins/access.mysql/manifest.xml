@@ -21,7 +21,8 @@
 		<external_file filename="plugins/access.mysql/mysqlActions.xml" include="actions/*"/>
 		<client_configs>
 			<template_part ajxpId="search_container" ajxpClass="SQLSearchEngine" ajxpOptions="{}"/>
-			<component_config className="InfoPanel">
+            <template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}' theme="vision"/>
+            <component_config className="InfoPanel">
 				<infoPanel mime="no_selection" attributes="">
 					<messages>
 						<message key="folders_string" id="279"/>

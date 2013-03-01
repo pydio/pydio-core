@@ -16,7 +16,8 @@
 	<registry_contributions>
 		<client_configs>
 			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>
-			<component_config className="InfoPanel">
+            <template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}' theme="vision"/>
+            <component_config className="InfoPanel">
 				<infoPanel mime="generic_file" attributes="icon,text,preview_rich">
 					<messages>
 						<message key="name_string" id="133"/>
