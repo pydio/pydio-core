@@ -19,7 +19,7 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-    "Files MetaStore" => "MetaStore S3",
+    "S3 MetaStore" => "MetaStore S3",
     "Stores metadata s3 metadata" => "Stockage des métadonnées dans les objets S3.",
 );
 ?>

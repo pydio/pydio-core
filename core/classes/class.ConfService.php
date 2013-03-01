@@ -357,49 +357,6 @@ class ConfService
                 $result[$repositoryId] = $repositoryObject;
             }
 
-            /*
-            if(!AuthService::canAssign($repositoryObject, $userObject)) {
-                continue;
-            }
-            if($repositoryObject->isTemplate) continue;
-            $toLast = false;
-            if($repositoryObject->getAccessType()=="ajxp_conf" && $userObject != null){
-                if(AuthService::usersEnabled() && !$userObject->isAdmin()){
-                    continue;
-                }else{
-                    $toLast = true;
-                }
-            }
-            if($repositoryObject->getAccessType() == "ajxp_shared" && !AuthService::usersEnabled()){
-                continue;
-            }
-            if($repositoryObject->getUniqueUser() && (!AuthService::usersEnabled() || $userObject == null  || $userObject->getId() == "shared" || $userObject->getId() != $repositoryObject->getUniqueUser() )){
-                continue;
-            }
-            if($userObject == null || $userObject->canRead($repositoryId) || $userObject->canWrite($repositoryId) || $details) {
-                // Do not display standard repositories even in details mode for "sub"users
-                if($userObject != null && $userObject->hasParent() && !($userObject->canRead($repositoryId) || $userObject->canWrite($repositoryId) )) continue;
-                // Do not display shared repositories otherwise.
-                if($repositoryObject->hasOwner() && $skipShared){
-                    continue;
-                }
-                if($userObject != null && $repositoryObject->hasOwner() && !$userObject->hasParent()){
-                    // Display the repositories if allow_crossusers is ok
-                    if(ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf") !== true) {
-                        continue;
-                    }
-                    // But still do not display its own shared repositories!
-                    if($repositoryObject->getOwner() == $userObject->getId()) {
-                        continue;
-                    }
-                }
-                if($repositoryObject->hasOwner() && $userObject != null &&  $details && !($userObject->canRead($repositoryId) || $userObject->canWrite($repositoryId) ) ){
-                    continue;
-                }
-
-
-            }
-            */
         }
         return $result;
     }

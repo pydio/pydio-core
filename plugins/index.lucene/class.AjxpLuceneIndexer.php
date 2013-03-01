@@ -210,7 +210,17 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
         }
     }
 
-	/**
+    /**
+     *
+     * Hooked to node.meta_change, this will update the index
+     *
+     * @param AJXP_Node $node
+     */
+    public function updateNodeIndexMeta($node){
+        $this->updateNodeIndex(null, $node, false);
+    }
+
+        /**
 	 * 
 	 * Hooked to node.change, this will update the index
 	 * if $oldNode = null => create node $newNode
@@ -248,6 +258,10 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
             $newDocId = $this->getIndexedDocumentId($index, $newNode);
             if($newDocId != null){
                 $index->delete($newDocId);
+                $childrenHits = $this->getIndexedChildrenDocuments($index, $newNode);
+                foreach ($childrenHits as $hit){
+                    $index->delete($hit->id);
+                }
             }
             $doc = $this->createIndexedDocument($newNode);
             $index->addDocument($doc);

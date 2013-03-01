@@ -111,9 +111,17 @@ class UserMetaManager extends AJXP_Plugin {
 		$html->appendChild($cdata);
 		
 		$selection = $this->xPath->query('registry_contributions/client_configs/template_part[@ajxpClass="SearchEngine"]');
-		$tag = $selection->item(0);
-		$tag->setAttribute("ajxpOptions", json_encode((count($searchables)?array("metaColumns"=>$searchables):array())));
-		
+        foreach($selection as $tag){
+            $v = $tag->attributes->getNamedItem("ajxpOptions")->nodeValue;
+            $metaV = count($searchables)? '"metaColumns":'.json_encode($searchables): "";
+            if(!empty($v) && trim($v) != "{}"){
+                $v = str_replace("}", ", ".$metaV."}", $v);
+            }else{
+                $v = "{".$metaV."}";
+            }
+            $tag->setAttribute("ajxpOptions", $v);
+        }
+
 		parent::init($this->options);
 	
 	}
