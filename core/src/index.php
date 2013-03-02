@@ -51,7 +51,11 @@ if(is_file(TESTS_RESULT_FILE)){
 $pServ = AJXP_PluginsService::getInstance();
 ConfService::init();
 $confPlugin = ConfService::getInstance()->confPluginSoftLoad($pServ);
-$pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", $confPlugin);
+try{
+    $pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", $confPlugin);
+}catch (Exception $e){
+    die("Severe error while loading plugins registry : ".$e->getMessage());
+}
 ConfService::start();
 
 $confStorageDriver = ConfService::getConfStorageImpl();
