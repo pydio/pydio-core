@@ -92,7 +92,7 @@ $mess=array(
 "#Items per page" => "#Items per page",
 "Once in pagination mode, number of items to display per page." => "Once in pagination mode, number of items to display per page.",
 "Default Metasources" => "Default Metasources",
-"Comma separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver" => "Comma separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver",
+"Comma separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver" => "Comma separated list of metastore and meta plugins, that will be automatically applied to all workspaces created with this driver",
 "Auth Driver Commons" => "Auth Driver Commons",
 "Transmit Clear Pass" => "Transmit Clear Pass",
 "Whether the password will be transmitted clear or encoded between the client and the server" => "Whether the password will be transmitted clear or encoded between the client and the server",
@@ -114,6 +114,6 @@ $mess=array(
 "Comma-separated list of specific files to hide" => "Comma-separated list of specific files to hide",
 "Metadata and indexation" => "Metadata and indexation",
 "Default Metasources" => "Default Metasources",
-"Comma-separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver" => "Comma-separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver",
+"Comma-separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver" => "Comma-separated list of metastore and meta plugins, that will be automatically applied to all workspaces created with this driver",
 );
 ?>
