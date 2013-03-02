@@ -48,9 +48,6 @@
                         .action_bar a, .menu.desktop.toolbarmenu{
                             background-color: rgb(78, 154, 179);
                         }
-                        #switch_to_settings_button span{
-                            font-size : 1.2em !important;
-                        }
                     </style>
                     <script>
                         $("vertical_splitter").ajxpPaneObject.paneB._max = 1;
