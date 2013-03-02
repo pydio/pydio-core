@@ -24,7 +24,7 @@ $mess=array(
 "FTP Login Screen" => "FTP Login Screen",
 "Whether to display a generic 'FTP connexion' dialog at startup (allowing the user to enter his own host/port data) or the standard login dialog." => "Whether to display a generic 'FTP connexion' dialog at startup (allowing the user to enter his own host/port data) or the standard login dialog.",
 "Repository" => "Repository",
-"Id of the repository to use for testing connexion" => "Id of the repository to use for testing connexion",
+"Id of the repository to use for testing connexion" => "Id of the workspace to use for testing connexion",
 "Admin user" => "Admin user",
 "The ID of an existing admin for Ajaxplorer (using conf.serial)" => "The ID of an existing admin for Ajaxplorer (using conf.serial)",
 );

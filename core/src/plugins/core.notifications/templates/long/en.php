@@ -19,7 +19,7 @@
     * The latest code can be found at <http://www.ajaxplorer.info/>.
     */
 $mess=array(
-    "file.add" => "Inside the repository AJXP_REPOSITORY_LABEL, the file AJXP_NODE_LABEL was created inside AJXP_PARENT_PATH on AJXP_DATE by AJXP_USER.",
+    "file.add" => "Inside the workspace AJXP_REPOSITORY_LABEL, the file AJXP_NODE_LABEL was created inside AJXP_PARENT_PATH on AJXP_DATE by AJXP_USER.",
     "file.delete" => "The file AJXP_NODE_LABEL was deleted from AJXP_PARENT_PATH on AJXP_DATE, by AJXP_USER.",
     "file.change" => "The file AJXP_NODE_LABEL was modified on AJXP_DATE, by AJXP_USER.",
     "file.rename" => "The file AJXP_SOURCE_LABEL was renamed to AJXP_NODE_LABEL on AJXP_DATE, by AJXP_USER.",
@@ -33,7 +33,7 @@ $mess=array(
     "folder.add" => "The folder AJXP_NODE_LABEL was created in AJXP_PARENT_PATH on AJXP_DATE, by AJXP_USER.",
     "folder.delete" => "The folder AJXP_NODE_LABEL was deleted from AJXP_PARENT_PATH on AJXP_DATE, by AJXP_USER.",
     "folder.rename" => "The folder AJXP_SOURCE_LABEL was renamed to AJXP_NODE_LABEL on AJXP_DATE, by AJXP_USER.",
-    "folder.change" => "Inside the repository AJXP_REPOSITORY_LABEL, the content of folder AJXP_NODE_LABEL was modified on AJXP_DATE by AJXP_USER.",
+    "folder.change" => "Inside the workspace AJXP_REPOSITORY_LABEL, the content of folder AJXP_NODE_LABEL was modified on AJXP_DATE by AJXP_USER.",
     "folder.view" => "The folder AJXP_NODE_LABEL was opened by AJXP_USER on AJXP_DATE, by AJXP_USER",
     "folder.copy" => "The folder AJXP_NODE_LABEL was copied from AJXP_SOURCE_FOLDER to AJXP_PARENT_PATH on AJXP_DATE, by AJXP_USER.",
     "folder.copy_to" => "The folder AJXP_NODE_LABEL was copied to AJXP_TARGET_FOLDER on AJXP_DATE, by AJXP_USER.",

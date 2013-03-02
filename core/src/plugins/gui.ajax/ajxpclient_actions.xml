@@ -138,11 +138,11 @@
 			</processing>
 		</action>		
 		<action name="splash">
-			<gui text="166" title="167" src="info.png" hasAccessKey="true"
+			<gui text="166" title="167" src="info.png" iconClass="icon-question-sign" hasAccessKey="true"
 				accessKey="about_access_key">
 				<context selection="false" dir="" recycle="false"
-					actionBar="true" contextMenu="false" infoPanel="false"
-					actionBarGroup="utils">
+					actionBar="false" contextMenu="false" infoPanel="false"
+					actionBarGroup="utils" ajxpWidgets="UserWidget::logging_string">
 				</context>
 			</gui>
 			<processing>
