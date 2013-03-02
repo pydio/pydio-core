@@ -1,8 +1,8 @@
 <img src="plugins/gui.ajax/AjxpLogo250.png"/>
 <div style="padding-left:10px;">Version __AJXP_VERSION__ - __AJXP_VERSION_DATE__
 
-Copyright 2007-2011 Charles du Jeu
-The latest code can be found at http://www.ajaxplorer.info/.
+Copyright 2007-2013 Charles du Jeu
+The latest code can be found at http://ajaxplorer.info/.
 
 ++ LICENSE ++
 AjaXplorer is free software: you can redistribute it and/or modify
@@ -20,12 +20,13 @@ along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ++ CONTRIBUTORS ++
-Cyril Russo
-Panni, 2011/03/14:
-- added support for folder upload using jumploader
-- added support for contextmenu in Opera >10.5X by patching proto.menu.js
-Translators : see mention in translation files
-
+Cyril Russo : public links generation
+Panni (support for folder upload using jumploader, support for contextmenu in Opera)
+German : panzaeron
+Catalon : Joan
+Other translators : see mention in translation files
+Shorten.multi plugin by Miguelon
+Ultreia many fixes
 
 ++ THIRD PARTY LIBRARIES ++
 [Amazon S3]
@@ -36,8 +37,9 @@ Translators : see mention in translation files
 	Modernizr 	http://modernizr.com (BSD / MIT)
 	Webfx widgets (selectable, sortable, xtree) : http://webfx.eae.net/ (Apache 2)
 
-[Icons Pack]
+[Images]
 	Oxygen : http://www.oxygen-icons.org/ (Creative Common SA 3.0 / LGPL)
+	Font Awesome by Dave Gandy : http://fortawesome.github.com/Font-Awesome/ (SIL Open Font License)
 	
 [Core PHP Classes]
 	SabreDAV Library http://code.google.com/p/sabredav (New BSD)
