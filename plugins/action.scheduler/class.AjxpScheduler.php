@@ -27,12 +27,18 @@ class AjxpScheduler extends AJXP_Plugin{
 
     function __construct($id, $baseDir){
         parent::__construct($id, $baseDir);
-        $this->db = $this->getPluginWorkDir(true). "/calendar.json" ;
+
+    }
+
+    function getDbFile(){
+        if(!isSet($this->db)){
+            $this->db = $this->getPluginWorkDir(true). "/calendar.json" ;
+        }
+        return $this->db;
     }
 
     function unserialize($serialized){
         parent::unserialize($serialized);
-        $this->db = $this->getPluginWorkDir(true). "/calendar.json" ;
     }
 
 
@@ -40,7 +46,7 @@ class AjxpScheduler extends AJXP_Plugin{
         if(!ConfService::backgroundActionsSupported()) {
             throw new Exception("The command line must be supported. See 'AjaXplorer Core Options'.");
         }
-        if(!is_dir(dirname($this->db))) {
+        if(!is_dir(dirname($this->getDbFile()))) {
             throw new Exception("Could not create the db folder!");
         }
     }
@@ -68,7 +74,7 @@ class AjxpScheduler extends AJXP_Plugin{
     }
 
     function getTaskById($tId){
-        $tasks = AJXP_Utils::loadSerialFile($this->db, false, "json");
+        $tasks = AJXP_Utils::loadSerialFile($this->getDbFile(), false, "json");
         foreach($tasks as $task){
             if( !empty($task["task_id"]) && $task["task_id"] == $tId) {
                 return $task;
@@ -104,7 +110,7 @@ class AjxpScheduler extends AJXP_Plugin{
     }
 
     function countCurrentlyRunning(){
-        $tasks = AJXP_Utils::loadSerialFile($this->db, false, "json");
+        $tasks = AJXP_Utils::loadSerialFile($this->getDbFile(), false, "json");
         $count = 0;
         foreach($tasks as $task){
             $s = $this->getTaskStatus($task["task_id"]);
@@ -202,7 +208,7 @@ class AjxpScheduler extends AJXP_Plugin{
             //------------------------------------
             case "scheduler_runAll":
 
-                $tasks = AJXP_Utils::loadSerialFile($this->db, false, "json");
+                $tasks = AJXP_Utils::loadSerialFile($this->getDbFile(), false, "json");
                 $message = "";
                 $startRunning = $this->countCurrentlyRunning();
                 $statuses = array();
@@ -281,7 +287,7 @@ class AjxpScheduler extends AJXP_Plugin{
      			<column messageId="action.scheduler.14" attributeName="LAST_EXECUTION" sortType="String"/>
      			<column messageId="action.scheduler.13" attributeName="STATUS" sortType="String"/>
         </columns>');
-        $tasks = AJXP_Utils::loadSerialFile($this->db, false, "json");
+        $tasks = AJXP_Utils::loadSerialFile($this->getDbFile(), false, "json");
         foreach ($tasks as $task){
 
             $timeArray = $this->getTimeArray($task["schedule"]);
@@ -323,7 +329,7 @@ class AjxpScheduler extends AJXP_Plugin{
 
 
     public function addOrUpdateTask($taskId, $label, $schedule, $actionName, $repositoryIds, $userId, $paramsArray){
-        $tasks = AJXP_Utils::loadSerialFile($this->db, false, "json");
+        $tasks = AJXP_Utils::loadSerialFile($this->getDbFile(), false, "json");
         if(isSet($taskId)){
             foreach($tasks as $index => $task){
                 if($task["task_id"] == $taskId){
@@ -344,24 +350,24 @@ class AjxpScheduler extends AJXP_Plugin{
         $data["PARAMS"] = $paramsArray;
         if(isSet($theIndex)) $tasks[$theIndex] = $data;
         else $tasks[] = $data;
-        AJXP_Utils::saveSerialFile($this->db, $tasks, true, false, "json");
+        AJXP_Utils::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
 
     }
 
     public function removeTask($taskId){
-        $tasks = AJXP_Utils::loadSerialFile($this->db, false, "json");
+        $tasks = AJXP_Utils::loadSerialFile($this->getDbFile(), false, "json");
         foreach($tasks as $index => $task){
             if($task["task_id"] == $taskId){
                 unset($tasks[$index]);
                 break;
             }
         }
-        AJXP_Utils::saveSerialFile($this->db, $tasks, true, false, "json");
+        AJXP_Utils::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
     }
 
     function handleTasks($action, $httpVars, $fileVars){
 
-        $tasks = AJXP_Utils::loadSerialFile($this->db, false, "json");
+        $tasks = AJXP_Utils::loadSerialFile($this->getDbFile(), false, "json");
         switch ($action){
             case "scheduler_addTask":
                 if(isSet($httpVars["task_id"])){
@@ -402,7 +408,7 @@ class AjxpScheduler extends AJXP_Plugin{
                 }
                 if(isSet($theIndex)) $tasks[$theIndex] = $data;
                 else $tasks[] = $data;
-                AJXP_Utils::saveSerialFile($this->db, $tasks, true, false, "json");
+                AJXP_Utils::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
 
                 AJXP_XMLWriter::header();
                 AJXP_XMLWriter::sendMessage("Successfully added/edited task", null);

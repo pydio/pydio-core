@@ -45,8 +45,12 @@
                         .webfx-tree-container.first_container{
                             margin-left: -19px;
                         }
-                        .action_bar a, .menu.desktop.toolbarmenu{
-                            background-color: rgb(78, 154, 179);
+                        .action_bar a, .menu.desktop.toolbarmenu, div.editor_header a{
+                            background-color: rgb(78, 154, 179) !important;
+                        }
+                        .dialogTitle {
+                            background-color: rgb(78, 154, 179) !important;
+                            border-bottom: 1px solid rgb(50, 102, 119) !important;
                         }
                     </style>
                     <script>
