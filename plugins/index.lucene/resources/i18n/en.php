@@ -25,8 +25,8 @@ $mess = array(
     "3" => "Running indexation in background",
     "4" => "The index seems to be locked, an indexation processs may be running. If not, please remove the .ajxp_lock file located in cache/indexes.",
     "5" => "Indexation finished",
-    "6" => "Warning, the repository is currently being indexed, please retry later.",
-    "7" => "First indexing of this repository, please wait and retry your search",
+    "6" => "Warning, the workspace is currently being indexed, please retry later.",
+    "7" => "First indexing of this workspace, please wait and retry your search",
     "8" => "Indexing %s in background",
-    "9" => "Cannot find index for current repository! You should trigger the indexation of the data first!",
+    "9" => "Cannot find index for current workspace! You should trigger the indexation of the data first!",
 );

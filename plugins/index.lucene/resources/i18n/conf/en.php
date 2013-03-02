@@ -20,13 +20,13 @@
 */
 $mess=array(
 "Lucene Search Engine" => "Lucene Search Engine",
-"Zend_Search_Lucene implementation to index all files and search a whole repository quickly." => "Zend_Search_Lucene implementation to index all files and search a whole repository quickly.",
+"Zend_Search_Lucene implementation to index all files and search a whole repository quickly." => "Zend_Search_Lucene implementation to index all files and search a whole workspace quickly.",
 "Index Content" => "Index Content",
 "Parses the file when possible and index its content (see plugin global options)" => "Parses the file when possible and index its content (see plugin global options)",
 "Index Meta Fields" => "Index Meta Fields",
 "Which additionnal fields to index and search" => "Which additionnal fields to index and search",
 "Repository keywords" => "Repository keywords",
-"If your repository path is defined dynamically by specific keywords like AJXP_USER, or your own, mention them here." => "If your repository path is defined dynamically by specific keywords like AJXP_USER, or your own, mention them here.",
+"If your repository path is defined dynamically by specific keywords like AJXP_USER, or your own, mention them here." => "If your workspace path is defined dynamically by specific keywords like AJXP_USER, or your own, mention them here.",
 "Parse Content Until" => "Parse Content Until",
 "Skip content parsing and indexation for files bigger than this size (must be in Bytes)" => "Skip content parsing and indexation for files bigger than this size (must be in Bytes)",
 "HTML files" => "HTML files",

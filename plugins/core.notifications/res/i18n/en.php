@@ -19,7 +19,7 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"1" => "Notifications & Alerts",
+"1" => "Notifications",
 "2" => "Notifications feed",
 "3" => "Alerts",
 "4" => "Notifications",
