@@ -2414,10 +2414,6 @@ td.infoPanelLabel {
 
 }
 
-tr.even td.infoPanelLabel
-{
-}
-
 tr td.infoPanelLabel
 {
 }
@@ -2452,7 +2448,7 @@ div.selectable_div, .table_rows_container, #tree_container, #bottomSplitPane, .a
     border-bottom: 1px solid #eee;
     border-right: 1px solid #eee;
 }
-.table_rows_container tr.even td
+.table_rows_container tr:nth-child(even)>td
 {
     border-top: 0;
     border-bottom: 0;
