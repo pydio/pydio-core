@@ -863,6 +863,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}else{
 					$loggedUser = AuthService::getLoggedUser();
 					$loggedUser->personalRole->setAcl($newRep->getUniqueId(), "rw");
+                    $loggedUser->recomputeMergedRole();
 					$loggedUser->save("superuser");
 					AuthService::updateUser($loggedUser);
 					
