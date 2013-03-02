@@ -20,7 +20,7 @@
 */
 $mess=array(
 "Generic Conf Features" => "Generic Conf Features",
-"Let user create repositories" => "Let user create repositories",
+"Let user create repositories" => "Let user create workspaces",
 "Remember guest preferences" => "Remember guest preferences",
 );
 ?>

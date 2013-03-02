@@ -21,8 +21,8 @@
 $mess=array(
 "Serialized Configuration Storage" => "Serialized Configuration Storage",
 "Stores the conf data as serialized PHP values on the filesystem." => "Stores the conf data as serialized PHP values on the filesystem.",
-"Repositories" => "Repositories",
-"The file in which the repositories are stored" => "The file in which the repositories are stored",
+"Repositories" => "Workspaces",
+"The file in which the repositories are stored" => "The file in which the workspaces are stored",
 "Users" => "Users",
 "The folder in which all users files will be stored" => "The folder in which all users files will be stored",
 "Roles" => "Roles",
