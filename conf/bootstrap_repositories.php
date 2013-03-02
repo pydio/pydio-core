@@ -45,8 +45,8 @@ $REPOSITORIES[0] = array(
                 "METADATA_FILE_LOCATION" => "infolders"
             ),
             "meta.user"     => array(
-				"meta_fields"		=> "comment",
-				"meta_labels"		=> "Comment",
+				"meta_fields"		=> "tags",
+				"meta_labels"		=> "Tags",
                 "meta_visibility"   => "hidden"
 			),
             "meta.filehasher"   => array(),
@@ -56,7 +56,7 @@ $REPOSITORIES[0] = array(
                 "meta_labels" => "Latitude,Longitude"
             ),
             "index.lucene" => array(
-                "index_meta_fields" => "comment"
+                "index_meta_fields" => "tags"
             ),
 		)
 	),
@@ -82,8 +82,8 @@ $REPOSITORIES[1] = array(
                 "METADATA_FILE_LOCATION" => "infolders"
             ),
             "meta.user"     => array(
-				"meta_fields"		=> "comment",
-				"meta_labels"		=> "Comment",
+				"meta_fields"		=> "tags",
+				"meta_labels"		=> "Tags",
                 "meta_visibility"   => "hidden"
 			),
             "meta.filehasher"   => array(),
@@ -93,7 +93,7 @@ $REPOSITORIES[1] = array(
                 "meta_labels" => "Latitude,Longitude"
             ),
             "index.lucene" => array(
-                "index_meta_fields" => "comment",
+                "index_meta_fields" => "tags",
                 "repository_specific_keywords" => "AJXP_USER",
             )
 		)
@@ -139,8 +139,8 @@ $REPOSITORIES["fs_template"] = array(
                 "METADATA_FILE_LOCATION" => "infolders"
             ),
             "meta.user"     => array(
-				"meta_fields"		=> "comment",
-				"meta_labels"		=> "Comment",
+				"meta_fields"		=> "tags",
+				"meta_labels"		=> "Tags",
                 "meta_visibility"   => "hidden"
 			),
             "meta.filehasher"   => array(),
@@ -150,7 +150,7 @@ $REPOSITORIES["fs_template"] = array(
                 "meta_labels" => "Latitude,Longitude"
             ),
             "index.lucene" => array(
-                "index_meta_fields" => "comment"
+                "index_meta_fields" => "tags"
             )
 		)
 	),
