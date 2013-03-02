@@ -744,7 +744,7 @@ input.SF_fieldCheckBox{
 }
 
 div.SF_element.SF_largeLabel > div.SF_label{
-    width: 57% !important;
+    width: 56% !important;
     _width:54% !important; /*IE*/
 }
 

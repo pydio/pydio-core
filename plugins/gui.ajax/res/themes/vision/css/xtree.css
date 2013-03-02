@@ -3,8 +3,8 @@
 }
 
 .no-flexbox div#tree_container{
-	background-image:url('../images/tree-odd-even-bg.png');
-	background-attachment:scroll;
+	/*background-image:url('../images/tree-odd-even-bg.png');
+	background-attachment:scroll;*/
 }
 
 
