@@ -1,12 +1,123 @@
 AjaXplorer ##VERSION_NUMBER## Release Note
 
 License : Affero GPL
-Copyright : Charles du Jeu 2012
+Copyright : Charles du Jeu 2013
 Demo : http://ajaxplorer.info/demo
 Date : ##VERSION_DATE##
 Rev Number : ##REVISION##
 
 This is a DEVELOPMENT version that should not be used in a production environement.
+
+BUG FIXES
+[standard forms] Fix false value for standard form
+[access.fs] Wrong anti-slash inside autoRename function
+[index.lucene] Indexation : cleanIndexedChildren to make sure to avoid duplicates
+[gui.ajax] Catch a problem in bootstrap if messages sent in bootstrap_conf are empty.
+[access.fs] Apply CHMOD_VALUE on file copy
+[meta.mount] Filter plugin options
+[security] Make sure the auth result does not differ on user test
+[editor.diaporama] Disable download button in Diaporama and ImagickPreviewer if download action is not registered.
+[cross-copy] Cross repository move : try to touch the destination file to make sure the date is kept. Also trigger the various hooks.
+[pclzip] Upgrade pclzip to latest version (2.8.2)
+[access.ftp, access.sftp] FIX : Implement CREATE option
+[conf.serial] Fix deleteRepository bug : delete aliases.ser entry and remove ACL from attributed users. TODO : check performance issue (check the limit to swtich from serial to sql)
+[uploader] Remove dropareaHover after drop
+[action.share] Skip current user when sharing a folder
+[php 5.4] Exclude E_STRICT from error_reporting to avoid php 5.4 errors
+
+MASSIVE GUI IMPROVEMENT
+Brand new vision theme, comes with FontAwesome for monocolor icons.
+Rework Settings layout : close InfoPanel, dedicated Parameters button, etc.
+Rework public DL page
+Interface responsiveness using css media-queries
+Add image attributes in form grammar. TODO : parse image parameters AFTER the elements creation (e.g. repository)
+Enabling selection in left panel.
+Panel Header actions, use the disable state with CSS instead of manually show/hide buttons
+Custom "create" action for Fix background for share page
+Improve infoPanel: register panels based on metadata presence, Limit exif data to images, Use modifier to add a dynamic infoPanel for Share data
+Improve Login Box add texture to overlay, prevent box from closing until user is correctly logged
+Recompute the header toolbar widget sizes when the splitters are moving (generic binding to a given widget
+resize event).
+New groupOtherToolbars options for ActionsToolbars
+Simple breadcrumb class
+Adapt sortable to work on non-table rendering
+Connexion JS : discrete attribute to avoid showing loader Fix click/touch event for iOS 6
+
+
+REAL-TIME NOTIFICATIONS / MAILER
+Most "reload" actions are now replaced by dynamic loading of modified nodes. Concurrent modification by another user will appear automatically in real time.
+This is implemented by default with Polling, an alternative WebSocket implementation is still in experimentation.
+Mailer is now part of the core (using phpmail-lite)
+User feed : store events and alerts as a feed : this requires SQL and is not enabled by default for the moment.
+Pass host & port to ws-server.php
+Extract the queues management into specific plugins mq.*  (remove the worker queues from conf plugins, remove the instant queues from core.mq)
+Meta.quota uses instant message (hook msg.instant) if active.
+Still todo : implement various drivers to store the events feed / alerts (persisting queues) / Unify non persisting queues (worker queues like email, instant messages).
+Reuse opened WsSocketClient to send multiple messages during request lifecycle.
+Auto switch between websocket and polling
+Use hook for mailer instead of dispatching directly
+Subject append / prepend and body layout for emails
+Localization of mails templates in french.
+
+PLUGINS MISC
+[core.conf] New option in core.conf to avoid autoloading of last visited folder.
+[uploaders] Server-side checks before upload, for both triggering before_create hook and checking filename.
+[shorten.multi] New shorten.multi plugin (contributed by Miguelon), should replace shorten.bitly
+[meta.quota] Set quota recompute deferred
+[action.share] Do NOT override sharing options if re-editing
+[action.share] Try displaying USER_DISPLAY_NAME whenever possible
+[action.share] Set the resolveAsParent flag on user before getting the PATH option, to make sure it's correctly resolved for computing
+[action.share] Make sure to avoid // in public link
+[action.share] Make sure we don't read a non existing file (seems to hog CPU)
+[action.share] Use getUsersForRepository() instead of listUsers() in ShareCenter, and update this method in serial & sql drivers.
+[action.share] Option HIDE_REAL_LOGIN for autocomplete list.
+[auth.ldap] strtolower ldap attr directly
+[editor.imagick] Fix Imagick Previewer for remote viewers / Add option for setting own custom Imagick parameters
+[index.lucene] Set Numeric Zend Analyser
+[meta.mount] Escape password in FSMounter
+[editor.imagick] IMagickPreviewer send correct cache data to avoid reloading thumb during the session.
+[auth.ftp] Hide remember me for auth.ftp
+[meta.quota] Fix meta.quota : shared folder / new parameter to skip caching.
+[action.scheduler] use queue to pass huge number of users
+[access.hpcloud] Force usage of object-store and not CDN, otherwise it can create errors (if CDN is not up-to-date probably)
+
+INTERNATIONALIZATION
+Catalan update by Joan
+German translations added (panzaeron)
+
+CORE
+Generate direct Ajxp link to files ( = shortcuts )
+Node.meta_change hook, triggers reindexation.
+Assign a clientForm to a given theme
+Finally discriminate before_change ( = content) and before_path_change ( = path) hooks, to fix disappearing
+shared metadata on content update.
+XSD Accept special chars in component_config className attribute (className::ajxpPaneId)
+Send Content-Encoding:none header to force closing connection
+Add a start test for Output Buffering
+Fix metastore security scope and metadata cleaning
+First pass on virtual roots (should be provided by user roles)
+Fix Lucene Indexer if repository is group-scope
+Clear stat cache before sending node.change event.
+Make sure to force IE9 in standard mode
+[phpunit] Organize PHPUnit Tests
+[index.lucene] Special * query to send whole arborescence (performances test)
+New variable AJXP_GROUP_PATH_FLAT to avoid seeing subgroups folders
+Save digest HA1 on password update (if TRANSMIT_CLEAR_PASS is set to true), to avoid having to re-enter a
+password for WebDAV >> To validate
+Utils : do not sanitize HTML for textarea fields / Pass these fields value as CDATA, not attribute.
+Make sure to send node.change event AFTER download (otherwise it triggers an output_buffer).
+Set doc/ppt/xls mimes in core, not only zoho
+Apply ultreia suggestion to trim only null characters (ultreia)
+Trigger upload directly when ios-client / apache
+
+PERFORMANCES
+Perf hunting : introduce an accessible cache for full registry queries
+Perf hunting : fullMetaCache broken by alternating global and local cache. Always use ajxpNode->isLeaf()
+instead of is_file / is_dir.
+The getTrueSizeOnFileSystem is VERY time consuming, we could maybe use a cache. The long part is now located in renderAjxpNode() and xmlEntities() function...
+
+
+------ 4.3.0 Release note
 
 AUTH/CONF COMPONENTS MASSIVE REWRITE
 . Groups implementation : users can now be part of “groups“, and a user can be administrator of a sub-group only. Repositories and roles can be marked with a given group as well, making them accessible only to the users of the group and below. This is a good step toward multi-tenancy. Groups are also accessible for sharing : ability to share with a whole group at once.
