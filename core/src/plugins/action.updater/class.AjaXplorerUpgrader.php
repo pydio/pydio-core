@@ -277,6 +277,12 @@ class AjaXplorerUpgrader {
         @unlink(AJXP_PLUGINS_CACHE_FILE);
         @unlink(AJXP_PLUGINS_REQUIRES_FILE);
         @unlink(AJXP_PLUGINS_MESSAGES_FILE);
+        $i18nFiles = glob(dirname(AJXP_PLUGINS_MESSAGES_FILE)."/i18n/*.ser");
+        if(is_array($i18nFiles)){
+            foreach($i18nFiles as $file){
+                @unlink($file);
+            }
+        }
         return "Ok";
     }
 
