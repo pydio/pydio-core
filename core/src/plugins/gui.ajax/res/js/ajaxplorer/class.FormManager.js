@@ -44,7 +44,7 @@ Class.create("FormManager", {
         for(var i=0; i<paramsAtts.length; i++){
             var attName = paramsAtts.item(i).nodeName;
             var value = paramsAtts.item(i).nodeValue;
-            if( (attName == "label" || attName == "description" || attName == "group") && MessageHash[value] ){
+            if( (attName == "label" || attName == "description" || attName == "group" || attName.indexOf("group_switch_") === 0) && MessageHash[value] ){
                 value = MessageHash[value];
             }
             if( attName == "cdatavalue" ){
@@ -69,6 +69,9 @@ Class.create("FormManager", {
 			if(param.get('labelId')){
 				label = MessageHash[param.get('labelId')];
 			}
+            if(param.get('group_switch_name')) {
+                return;
+            }
 			var name = param.get('name');
 			var type = param.get('type');
 			var desc = param.get('description');
@@ -82,7 +85,7 @@ Class.create("FormManager", {
 			var mandatory = false;
 			if(param.get('mandatory') && param.get('mandatory')=='true') mandatory = true;
 			var defaultValue = (values?'':(param.get('default') || ""));
-			if(values && values.index(name) !== false){
+			if(values && values.get(name) !== undefined){
 				defaultValue = values.get(name);
 			}
 			var element;
@@ -95,9 +98,8 @@ Class.create("FormManager", {
             if(disabled || param.get('readonly')){
                 commonAttributes['disabled'] = 'true';
             }
-			if(type == 'string' || type == 'integer' || type == 'array'){
-                element = new Element('input', Object.extend({type:'text', className:'SF_input', value:defaultValue}, commonAttributes));
-				//element = '<input type="text" data-ajxp_type="'+type+'" data-ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" value="'+defaultValue+'"'+disabledString+' class="SF_input">';
+			if(type == 'string' || type == 'integer' || type == 'array' || type == "hidden"){
+                element = new Element('input', Object.extend({type: (type == "hidden" ? 'hidden' : 'text'), className:'SF_input', value:defaultValue}, commonAttributes));
             }else if(type == 'textarea'){
                 if(defaultValue) defaultValue = defaultValue.replace(new RegExp("__LBR__", "g"), "\n");
                 element = '<textarea class="SF_input" style="height:70px;" data-ajxp_type="'+type+'" data-ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'"'+disabledString+'>'+defaultValue+'</textarea>'
@@ -109,8 +111,8 @@ Class.create("FormManager", {
 					if(defaultValue == "true" || defaultValue == "1" || defaultValue === true ) selectTrue = true;
 					if(defaultValue == "false" || defaultValue == "0" || defaultValue === false) selectFalse = true;
 				}
-				element = '<input type="radio" data-ajxp_type="'+type+'" class="SF_box" name="'+name+'" value="true" '+(selectTrue?'checked':'')+''+disabledString+'> '+MessageHash[440];
-				element = element + '<input type="radio" data-ajxp_type="'+type+'" class="SF_box" name="'+name+'" '+(selectFalse?'checked':'')+' value="false"'+disabledString+'> '+MessageHash[441];
+				element = '<input type="radio" data-ajxp_type="'+type+'" class="SF_box" name="'+name+'" id="'+name+'-true" value="true" '+(selectTrue?'checked':'')+''+disabledString+'><label for="'+name+'-true">'+MessageHash[440]+'</label>';
+				element = element + '<input type="radio" data-ajxp_type="'+type+'" class="SF_box" name="'+name+'" id="'+name+'-false"  '+(selectFalse?'checked':'')+' value="false"'+disabledString+'><label for="'+name+'-false">'+MessageHash[441] + '</label>';
 				element = '<div class="SF_input">'+element+'</div>';
 			}else if(type == 'select'){
                 var choices, json_list;
@@ -166,8 +168,75 @@ Class.create("FormManager", {
                     (param.get("removeLegend")?param.get("removeLegend"):MessageHash[458])+"</span>" +
                     "<input type='hidden' name='"+param.get("name")+"' data-ajxp_type='binary'>" +
                     "<input type='hidden' name='"+param.get("name")+"_original_binary' value='"+ defaultValue +"' data-ajxp_type='string'></div>";
+            }else if(type.indexOf("group_switch:") === 0){
+
+                // Get all values
+                var switchName = type.split(":")[1];
+                var switchValues = {};
+                defaultValue = "";
+                if(values && values.get(name+"_group_switch")){
+                    defaultValue = values.get(name+"_group_switch");
+                }
+                parametersDefinitions.each(function(p){
+                    "use strict";
+                    if(p.get('group_switch_name') != switchName) return;
+                    if(! switchValues[p.get('group_switch_value')] ){
+                        switchValues[p.get('group_switch_value')] = {label :p.get('group_switch_label'), fields : [], values : $H()};
+                    }
+                    p = new Hash(p._object);
+                    p.unset('group_switch_name');
+                    switchValues[p.get('group_switch_value')].fields.push(p);
+                    var vKey = p.get("name");
+                    if(values && values.get(vKey)){
+                        switchValues[p.get('group_switch_value')].values.set(vKey, values.get(vKey));
+                    }
+                });
+                var selector = new Element('select', {className:'SF_input', name:name, "data-ajxp_mandatory":(mandatory?'true':'false'), "data-ajxp_type":type});
+                if(!mandatory){
+                    selector.insert(new Element('option'));
+                }
+                $H(switchValues).each(function(pair){
+                    "use strict";
+                    var options = {value:pair.key};
+                    if(defaultValue && defaultValue == pair.key) options.selected = "true";
+                    selector.insert(new Element('option', options).update(pair.value.label));
+                });
+                selector.SWITCH_VALUES = $H(switchValues);
+                element = new Element("div").update(selector);
+                var subFields = new Element("div");
+                element.insert(subFields);
+                selector.FIELDS_CONTAINER = subFields;
+
+                selector.observe("change", function(e){
+                    "use strict";
+                    var target = e.target;
+                    target.FIELDS_CONTAINER.update("");
+                    if(!target.getValue()) return;
+                    var data = target.SWITCH_VALUES.get(target.getValue());
+                    this.createParametersInputs(
+                        target.FIELDS_CONTAINER,
+                        data.fields,
+                        true,
+                        data.values,
+                        false,
+                        true);
+                }.bind(this));
+
+                if(selector.getValue()){
+                    var data = selector.SWITCH_VALUES.get(selector.getValue());
+                    this.createParametersInputs(
+                        selector.FIELDS_CONTAINER,
+                        data.fields,
+                        true,
+                        data.values,
+                        false,
+                        true
+                    );
+                }
+
             }
 			var div = new Element('div', {className:"SF_element" + (addFieldCheckbox?" SF_elementWithCheckbox":"")});
+            if(type == "hidden") div.setStyle({display:"none"});
 
             // INSERT LABEL
             div.insert(new Element('div', {className:"SF_label"}).update(label+(mandatory?'*':'')+' :'));
@@ -234,7 +303,7 @@ Class.create("FormManager", {
                 var ref = parseInt(form.getWidth()) + (Prototype.Browser.IE?40:0);
                 lab.setStyle({fontSize:'11px'});
                 lab.setStyle({width:parseInt(39*ref/100)+'px'});
-                if( parseInt(lab.getHeight()) > (parseInt(lab.getStyle('lineHeight')) + parseInt(lab.getStyle('paddingTop')) + parseInt(lab.getStyle('paddingBottom')))){
+                if( parseInt(lab.getHeight()) > Math.round(parseFloat(lab.getStyle('lineHeight')) + Math.round(parseFloat(lab.getStyle('paddingTop'))) + Math.round(parseFloat(lab.getStyle('paddingBottom')))) ){
                     lab.next().setStyle({marginTop:lab.getStyle('lineHeight')});
                 }
                 lab.setStyle({width:'39%'});
@@ -385,7 +454,10 @@ Class.create("FormManager", {
 			if(el.getAttribute("data-ajxp_mandatory") == 'true' && el.getValue() == '' && !el.disabled){
 				missingMandatory.push(el);
 			}
-			parametersHash.set(prefix+el.name, el.getValue());
+            if(el.getAttribute('data-ajxp_type')){
+                parametersHash.set(prefix+el.name+'_ajxptype', el.getAttribute('data-ajxp_type'));
+            }
+            parametersHash.set(prefix+el.name, el.getValue());
             if(form.down('[name="SFCB_'+el.name+'"]')){
                 checkboxesActive = true;
                 parametersHash.set(prefix+el.name+'_checkbox', form.down('[name="SFCB_'+el.name+'"]').checked?'checked':'unchecked');
@@ -400,7 +472,7 @@ Class.create("FormManager", {
         if(!skipMandatoryWarning){
 	        missingMandatory.each(function(el){
 	        	el.addClassName("SF_failed");
-	        	if(form.SF_accordion){
+	        	if(form.SF_accordion && el.up('div.accordion_content').previous('div.accordion_toggle')){
 	        		el.up('div.accordion_content').previous('div.accordion_toggle').addClassName('accordion_toggle_failed');
 	        	}
 	        });

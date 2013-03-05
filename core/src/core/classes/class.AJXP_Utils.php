@@ -1224,6 +1224,7 @@ class AJXP_Utils
             $binariesContext = array("USER" => (AuthService::getLoggedUser()!= null)?AuthService::getLoggedUser()->getId():"shared");
         }
         $replicationGroups = array();
+        $switchesGroups = array();
         foreach ($repDef as $key => $value)
         {
             $value = SystemTextEncoding::magicDequote($value);
@@ -1266,6 +1267,10 @@ class AJXP_Utils
                         }else if(!empty($repDef[$key."_original_binary"])){
                             $value = $repDef[$key."_original_binary"];
                         }
+                    }else if(strpos($type,"group_switch:") === 0){
+                        $tmp = explode(":", $type);
+                        $gSwitchName = $tmp[1];
+                        $switchesGroups[substr($key, strlen($prefix))] = $gSwitchName;
                     }
                     if($repDef[$key."_ajxptype"] != "textarea" && $repDef[$key."_ajxptype"] != "boolean"){
                         $value = AJXP_Utils::sanitize($value, AJXP_SANITIZE_HTML);
@@ -1292,9 +1297,23 @@ class AJXP_Utils
             }
         }
         // DO SOMETHING WITH REPLICATED PARAMETERS?
-        if(count($replicationGroups)){
-
+        if(count($switchesGroups)){
+            foreach($switchesGroups as $fieldName => $groupName){
+                if(isSet($options[$fieldName])){
+                    $gValues = array();
+                    $radic = $groupName."_".$options[$fieldName]."_";
+                    foreach($options as $optN => $optV){
+                        if(strpos($optN, $radic) === 0){
+                            $newName = substr($optN, strlen($radic));
+                            $gValues[$newName] = $optV;
+                        }
+                    }
+                }
+                $options[$fieldName."_group_switch"] = $options[$fieldName];
+                $options[$fieldName] = $gValues;
+            }
         }
+
     }
 
 }

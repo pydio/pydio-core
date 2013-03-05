@@ -47,4 +47,17 @@
             <param group="MIXIN_MESSAGE[Auth Driver Commons]" name="AJXP_ADMIN_LOGIN" type="string" label="MIXIN_MESSAGE[Admin Login]" description="MIXIN_MESSAGE[For exotic auth drivers, an user ID that must be considered as admin by default.]" mandatory="false"/>
         </server_settings>
     </authdriver_commons>
+    <dibidriver_provider>
+        <server_settings uuidAttr="name">
+            <global_param group_switch_name="dibi" group_switch_label="MySQL" group_switch_value="mysql" name="dibi_mysql_driver" default="mysql" label="Driver" description="Driver type (do not touch)" type="hidden" mandatory="true"/>
+            <global_param group_switch_name="dibi" group_switch_label="MySQL" group_switch_value="mysql" name="dibi_mysql_host" default="localhost" label="Host" description="Database server" type="string" mandatory="true"/>
+            <global_param group_switch_name="dibi" group_switch_label="MySQL" group_switch_value="mysql" name="dibi_mysql_database" default="" label="Database" description="Database name" type="string" mandatory="true"/>
+            <global_param group_switch_name="dibi" group_switch_label="MySQL" group_switch_value="mysql" name="dibi_mysql_username" default="" label="User" description="User name" type="string" mandatory="true"/>
+            <global_param group_switch_name="dibi" group_switch_label="MySQL" group_switch_value="mysql" name="dibi_mysql_password" default="" label="Password" description="User password" type="password" mandatory="true"/>
+            <global_param group_switch_name="dibi" group_switch_label="Sqlite" group_switch_value="sqlite" name="dibi_sqlite_driver" default="sqlite" label="Driver" description="Driver type (do not touch)" type="hidden" mandatory="true"/>
+            <global_param group_switch_name="dibi" group_switch_label="Sqlite" group_switch_value="sqlite" name="dibi_sqlite_database" default="" label="File" description="Database file" type="string" mandatory="true"/>
+            <global_param group_switch_name="dibi" group_switch_label="Sqlite" group_switch_value="sqlite" name="dibi_sqlite_username" default="" label="User" description="User name" type="string" mandatory="true"/>
+            <global_param group_switch_name="dibi" group_switch_label="Sqlite" group_switch_value="sqlite" name="dibi_sqlite_password" default="" label="Password" description="User password" type="password" mandatory="true"/>
+        </server_settings>
+    </dibidriver_provider>
 </ajxp_mixins>
