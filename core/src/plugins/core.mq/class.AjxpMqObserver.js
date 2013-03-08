@@ -40,7 +40,7 @@ Class.create("AjxpMqObserver", {
             if(data.active) repoId = data.active;
             else if(ajaxplorer.repositoryId) repoId = ajaxplorer.repositoryId;
 
-            if(window.WebSocket && parseInt(configs.get("WS_SERVER_ACTIVE"))){
+            if(window.WebSocket && configs.get("WS_SERVER_ACTIVE")){
 
                 if(this.ws) {
                     if(!repoId){
@@ -54,7 +54,7 @@ Class.create("AjxpMqObserver", {
                     }
                 }else{
                     if(repoId){
-                        var url = "ws"+(parseInt(configs.get("WS_SERVER_SECURE"))?"s":"")+"://"+configs.get("WS_SERVER_HOST")+":"+configs.get("WS_SERVER_PORT")+configs.get("WS_SERVER_PATH");
+                        var url = "ws"+(configs.get("WS_SERVER_SECURE")?"s":"")+"://"+configs.get("WS_SERVER_HOST")+":"+configs.get("WS_SERVER_PORT")+configs.get("WS_SERVER_PATH");
                         this.ws = new WebSocket(url);
                         this.ws.onmessage = function(event){
                             var obj = parseXml(event.data);

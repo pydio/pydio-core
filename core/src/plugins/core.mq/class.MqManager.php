@@ -126,7 +126,7 @@ class MqManager extends AJXP_Plugin
                 $this->wsClient->addHeader("Admin-Key", $configs["WS_SERVER_ADMIN"]);
                 @$this->wsClient->open();
             }
-            @$this->wsClient->sendMessage($msg);
+            $this->wsClient->sendMessage($msg);
         }
 
     }
@@ -187,12 +187,14 @@ class MqManager extends AJXP_Plugin
 
     public function wsAuthenticate($action, $httpVars, $fileVars){
 
+        AJXP_Logger::debug("Entering wsAuthenticate");
         $configs = $this->getConfigs();
         if(!isSet($httpVars["key"]) || $httpVars["key"] != $configs["WS_SERVER_ADMIN"]){
             throw new Exception("Cannot authentify admin key");
         }
         $user = AuthService::getLoggedUser();
         if($user == null){
+            AJXP_Logger::debug("Error Authenticating through WebSocket (not logged)");
             throw new Exception("You must be logged in");
         }
         $xml = AJXP_XMLWriter::getUserXML($user);
@@ -201,6 +203,7 @@ class MqManager extends AJXP_Plugin
             $groupString = "groupPath=\"".AJXP_Utils::xmlEntities($user->getGroupPath())."\"";
             $xml = str_replace("<user id=", "<user {$groupString} id=", $xml);
         }
+        AJXP_Logger::debug("Authenticating user ".$user->id." through WebSocket");
         AJXP_XMLWriter::header();
         echo $xml;
         AJXP_XMLWriter::close();

@@ -13,7 +13,7 @@ require_once("../../core/classes/class.HttpClient.php");
 class AjaXplorerHandler extends WebSocketUriHandler {
 
     public function onMessage(IWebSocketConnection $user, IWebSocketMessage $msg) {
-        $this->say("[DEMO] " . strlen($msg->getData()) . " bytes");
+        $this->say("[AJXP] " . strlen($msg->getData()) . " bytes");
         $data = $msg->getData();
         if(strpos($data, "register:") === 0){
             $regId = substr($data, strlen("register:"));
@@ -27,7 +27,7 @@ class AjaXplorerHandler extends WebSocketUriHandler {
     }
 
     public function onAdminMessage(IWebSocketConnection $user, IWebSocketMessage $msg) {
-        $this->say("[DEMO] Admin message received!");
+        $this->say("[AJXP] Admin message received!");
 
         // Echo
         // $user->sendMessage($msg);
@@ -80,11 +80,10 @@ class AjaxplorerSocketServer implements IWebSocketServerObserver {
     public function __construct($host, $port, $path) {
         $this->host = $host;
         $this->port = $port;
-        $this->path = $path;
+        $this->path =  trim($path, "/");
         $this->server = new WebSocketServer("tcp://{$host}:{$port}", self::$ADMIN_KEY);
         $this->server->addObserver($this);
-
-        $this->server->addUriHandler($path, new AjaXplorerHandler());
+        $this->server->addUriHandler($this->path, new AjaXplorerHandler());
     }
 
     public function onConnect(IWebSocketConnection $user) {
@@ -101,6 +100,7 @@ class AjaxplorerSocketServer implements IWebSocketServerObserver {
         $client->cookies = $c;
         $client->get("/{$this->path}/?get_action=ws_authenticate&key=".self::$ADMIN_KEY);
         $registry = $client->getContent();
+        //$this->say("[ECHO] Registry loaded".$registry);
         $xml = new DOMDocument();
         $xml->loadXML($registry);
         $xPath = new DOMXPath($xml);
@@ -117,25 +117,24 @@ class AjaxplorerSocketServer implements IWebSocketServerObserver {
             }
             $user->ajxpRepositories = $userRepositories;
             $user->ajxpId = $xPath->query("/tree/user/@id")->item(0)->nodeValue;
-            $groupPath = $xPath->query("/tree/user/@groupPath")->item(0)->nodeValue;
-            if(!empty($groupPath)) $user->ajxpGroupPath = $groupPath;
+            if($xPath->query("/tree/user/@groupPath")->length){
+                $groupPath = $xPath->query("/tree/user/@groupPath")->item(0)->nodeValue;
+                if(!empty($groupPath)) $user->ajxpGroupPath = $groupPath;
+            }
         }
-        $this->say("[ECHO] User connected with registered repositories : ". print_r($user->ajxpRepositories, true));
+        $this->say("[ECHO] User '".$user->ajxpId."' connected with ".count($user->ajxpRepositories)." registered repositories "/*. print_r($user->ajxpRepositories, true)*/);
     }
 
     public function onMessage(IWebSocketConnection $user, IWebSocketMessage $msg) {
-        //$this->say("[DEMO] {$user->getId()} says '{$msg->getData()}'");
+        //$this->say("[ECHO] {$user->getId()} says '{$msg->getData()}'");
     }
 
     public function onDisconnect(IWebSocketConnection $user) {
-        //$this->say("[DEMO] {$user->getId()} disconnected");
+        //$this->say("[ECHO] {$user->getId()} disconnected");
     }
 
     public function onAdminMessage(IWebSocketConnection $user, IWebSocketMessage $msg) {
-        //$this->say("[DEMO] Admin Message received!");
-
-        $frame = WebSocketFrame::create(WebSocketOpcode::PongFrame);
-        $user->sendFrame($frame);
+        //$this->say("[ECHO] Admin Message received!");
     }
 
     public function say($msg) {
