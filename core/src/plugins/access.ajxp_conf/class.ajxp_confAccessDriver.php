@@ -1203,7 +1203,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				AJXP_XMLWriter::header("admin_data");
 				$baseParams = AJXP_XMLWriter::replaceAjxpXmlKeywords($ajxpPlugin->getManifestRawContent());
                 if(strpos($baseParams, 'type="plugin_instance:') !== false){
-                    $instType = "conf";
+                    $instType = substr($baseParams, strpos($baseParams, 'type="plugin_instance:')+strlen('type="plugin_instance:'));
+                    $instType = substr($instType, 0, strpos($instType, '"'));
                     $typePlugs = AJXP_PluginsService::getInstance()->getPluginsByType($instType);
                     $addParams = "";
                     foreach($typePlugs as $typePlug){
