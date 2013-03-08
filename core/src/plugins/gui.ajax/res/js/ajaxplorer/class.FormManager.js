@@ -177,9 +177,15 @@ Class.create("FormManager", {
                 if(values && values.get(name+"_group_switch")){
                     defaultValue = values.get(name+"_group_switch");
                 }
+                var potentialSubSwitches = $A();
                 parametersDefinitions.each(function(p){
                     "use strict";
-                    if(p.get('group_switch_name') != switchName) return;
+                    if(!p.get('group_switch_name')) return;
+                    if(p.get('group_switch_name') != switchName){
+                        p = new Hash(p._object);
+                        potentialSubSwitches.push(p);
+                        return;
+                    }
                     if(! switchValues[p.get('group_switch_value')] ){
                         switchValues[p.get('group_switch_value')] = {label :p.get('group_switch_label'), fields : [], values : $H()};
                     }
@@ -200,6 +206,9 @@ Class.create("FormManager", {
                     var options = {value:pair.key};
                     if(defaultValue && defaultValue == pair.key) options.selected = "true";
                     selector.insert(new Element('option', options).update(pair.value.label));
+                    if(potentialSubSwitches.length){
+                        potentialSubSwitches.each(function(sub){pair.value.fields.push(sub);});
+                    }
                 });
                 selector.SWITCH_VALUES = $H(switchValues);
                 element = new Element("div").update(selector);

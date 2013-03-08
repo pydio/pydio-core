@@ -659,7 +659,7 @@
             <xs:attribute name="name" use="required" type="xs:NCName"/>
             <xs:attribute name="no_templates" type="xs:boolean"/>
             <xs:attribute name="templates_only" type="xs:boolean"/>
-            <xs:attribute name="type" use="required" type="xs:NCName"/>
+            <xs:attribute name="type" use="required" type="xs:Name"/>
             <xs:attribute name="scope"/>
             <xs:attribute name="repoScope"/>
             <xs:attribute name="editable" type="xs:boolean" use="optional"/>
@@ -681,7 +681,7 @@
             <xs:attribute name="name" use="required" type="xs:NCName"/>
             <xs:attribute name="no_templates" type="xs:boolean"/>
             <xs:attribute name="templates_only" type="xs:boolean"/>
-            <xs:attribute name="type" use="required" type="xs:NCName"/>
+            <xs:attribute name="type" use="required" type="xs:Name"/>
             <xs:attribute name="scope"/>
             <xs:attribute name="repoScope"/>
             <xs:attribute name="editable" type="xs:boolean" use="optional"/>

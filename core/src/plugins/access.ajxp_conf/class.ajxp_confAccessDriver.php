@@ -1201,7 +1201,21 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
 				$ajxpPlugin = AJXP_PluginsService::getInstance()->getPluginById($httpVars["plugin_id"]);
 				AJXP_XMLWriter::header("admin_data");
-				echo(AJXP_XMLWriter::replaceAjxpXmlKeywords($ajxpPlugin->getManifestRawContent()));
+				$baseParams = AJXP_XMLWriter::replaceAjxpXmlKeywords($ajxpPlugin->getManifestRawContent());
+                if(strpos($baseParams, 'type="plugin_instance:') !== false){
+                    $instType = "conf";
+                    $typePlugs = AJXP_PluginsService::getInstance()->getPluginsByType($instType);
+                    $addParams = "";
+                    foreach($typePlugs as $typePlug){
+                        $tParams = AJXP_XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/param"));
+                        $addParams .= str_replace("<param", "<global_param group_switch_name=\"${instType}\" group_switch_label=\"".$typePlug->getName()."\" group_switch_value=\"".$typePlug->getId()."\" ", $tParams);
+                        $addParams .= AJXP_XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/global_param"));
+                    }
+                    $baseParams = str_replace('type="plugin_instance:', 'type="group_switch:', $baseParams);
+                    $baseParams = str_replace("</server_settings>", $addParams."</server_settings>", $baseParams);
+                }
+
+                echo($baseParams);
 				$definitions = $ajxpPlugin->getConfigsDefinitions();
 				$values = $ajxpPlugin->getConfigs();
                 if(!is_array($values)) $values = array();
