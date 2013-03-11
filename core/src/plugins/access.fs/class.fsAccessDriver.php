@@ -1663,9 +1663,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		$num = 0;
 		//$verbose = true;
 		if(!is_dir($dstdir)) mkdir($dstdir);
-		if($curdir = opendir($srcdir)) 
-		{
-			while($file = readdir($curdir)) 
+		foreach(scandir($srcdir) as $file)
 			{
 				if($file != '.' && $file != '..') 
 				{
@@ -1673,12 +1671,14 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 					$dstfile = $dstdir . "/" . $file;
 					if(is_file($srcfile)) 
 					{
+					$srcfile = $srcdir . "/" . $file;
+					$dstfile = $dstdir . "/" . $file;
+					if(is_file($srcfile)) 
 						if(is_file($dstfile)) $ow = filemtime($srcfile) - filemtime($dstfile); else $ow = 1;
 						if($ow > 0) 
 						{
 							try {
-                                if($convertSrcFile) $tmpPath = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $srcfile);
-                                else $tmpPath = $srcfile;
+							$tmpPath = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $srcfile);
 								if($verbose) echo "Copying '$tmpPath' to '$dstfile'...";
 								copy($tmpPath, $dstfile);
 								$success[] = $srcfile;
@@ -1688,15 +1688,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 								$errors[] = $srcfile;
 							}
 						}
-					}
 					else
 					{
 						if($verbose) echo "Dircopy $srcfile";
-						$num += $this->dircopy($srcfile, $dstfile, $errors, $success, $verbose, $convertSrcFile);
+						$num += $this->dircopy($srcfile, $dstfile, $errors, $success, $verbose);
 					}
 				}
 			}
-			closedir($curdir);
 		}
 		return $num;
 	}
