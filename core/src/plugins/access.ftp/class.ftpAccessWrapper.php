@@ -285,7 +285,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 		else 
 		{			
 			ftp_chdir($link, $serverPath);
-			$contents = ftp_rawlist($link, ".");
+			$contents = ftp_rawlist($link, "-a .");
         	//AJXP_Logger::debug("RAW LIST RESULT ".print_r($contents, true));			
 		}
 		
