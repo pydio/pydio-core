@@ -1,0 +1,8 @@
+.idea/*
+data/cache/*
+data/files/*
+data/logs/*
+data/personal/*
+data/plugins/*
+data/public/*
+data/tmp
