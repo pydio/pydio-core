@@ -29,7 +29,7 @@
 		        </if>
         	</then>
         	<else>
-        	     <phingcall target="prepare"/>
+        	     <phingcall target="prepare_git"/>
         	</else>
         </if>
         <phingcall target="zip"/>
@@ -86,7 +86,68 @@
         </phingcall>
     </target>
         
+    <!-- GIT VERSION -->
+    <target name="git_update" description="Clone or Pull depending on local repository presence.">
+        <if>
+            <available type="dir" file="${git.local_repository}"/>
+            <then>
+            	<!-- GIT PULL -->
+                <gitpull
+                        repository="${git.local_repository}"
+                        all="true"
+                />
+            </then>
+            <else>
+            	<!-- GIT CLONE -->
+            	<exec command="git clone ${git.remote_repository} ${git.local_repository}" passthru="true" />
+            </else>
+        </if>
+    </target>
 
+    <target name="prepare_git" description="Fetch Git Master, prepare VERSION and discriminate plugins">
+        <phingcall target="git_update"/>
+        <if>
+            <not><available type="dir" file="${build.source_folder}"/></not>
+            <then><mkdir dir="${build.source_folder}"/></then>
+        </if>
+        <tstamp>
+            <format property="VERSION_DATE" pattern="%Y-%m-%d"/>
+        </tstamp>
+        <!-- TODO GET LAST COMMIT ID -->
+        <exec command="git rev-parse --short HEAD" dir="${git.local_repository}" outputProperty="LASTREVISION"/>
+        <if>
+        	<equals arg1="${env}" arg2="testing"/>        	
+        	<then>
+        		<property name="package_name" value="ajaxplorer-${DSTAMP}-${LASTREVISION}"/>
+        	</then>
+        	<else>
+        		<property name="package_name" value="ajaxplorer-core-${new_version}"/>
+        	</else>
+        </if>
+        <property name="INNER_DIRECTORY" value="${build.source_folder}/${package_name}"/>
+        <if>
+            <available type="dir" file="${INNER_DIRECTORY}"/>
+            <then>
+                <delete dir="${INNER_DIRECTORY}"/>
+            </then>
+        </if>
+        <!-- EXPORT GIT CONTENT FROM core/src/ -->
+        <copy todir="${INNER_DIRECTORY}">
+        	<fileset dir="${git.local_repository}/core/src">
+        		<include name="*/**"/>
+        	</fileset>
+        </copy>        	                
+        <!-- PREPARE VERSION FILE -->
+        <phingcall target="replace_variables">
+        	<property name="passed_directory" value="${INNER_DIRECTORY}"/>
+        </phingcall>
+        
+        <!-- DISCRIMINATE PLUGINS -->
+        <mkdir dir="${build.working_folder}/ext_plugins" />
+        <plugindiscriminate all="${INNER_DIRECTORY}/plugins" ext="${build.working_folder}/ext_plugins"/>		
+    </target>
+    
+    <!-- SVN VERSION -->        
     <target name="svn_update" description="Checkout or update depending on working-copy presence.">
         <if>
             <available type="dir" file="${svn.local_folder}"/>
@@ -107,7 +168,7 @@
             </else>
         </if>
     </target>
-
+    
     <target name="prepare" description="Export SVN, prepare VERSION and discriminate plugins">
         <if>
             <not><available type="dir" file="${svn.local_folder}"/></not>
@@ -122,11 +183,11 @@
         <tstamp>
             <format property="VERSION_DATE" pattern="%Y-%m-%d"/>
         </tstamp>
-        <svnlastrevision workingcopy="${svn.local_folder}" propertyname="SVN_LASTREVISION"/>
+        <svnlastrevision workingcopy="${svn.local_folder}" propertyname="LASTREVISION"/>
         <if>
         	<equals arg1="${env}" arg2="testing"/>        	
         	<then>
-        		<property name="package_name" value="ajaxplorer-${DSTAMP}-${SVN_LASTREVISION}"/>
+        		<property name="package_name" value="ajaxplorer-${DSTAMP}-${LASTREVISION}"/>
         	</then>
         	<else>
         		<property name="package_name" value="ajaxplorer-core-${new_version}"/>
@@ -165,7 +226,7 @@
     	<mkdir dir="${upgrade_export}/UPGRADE"/>
     	<svn_summarize
     	 revision1="${previous_revision}"
-    	 revision2="${SVN_LASTREVISION}"
+    	 revision2="${LASTREVISION}"
     	 summarizeFile="${build.working_folder}/upgrade/svn_summarize"
     	 repositoryurl="${svn.local_folder}"
     	 />
@@ -186,7 +247,7 @@
         	        <replacetokens begintoken="##" endtoken="##">
                 	    <token key="VERSION_NUMBER" value="${build.version}"/>
   	                  <token key="VERSION_DATE" value="${VERSION_DATE}"/>
-        	            <token key="REVISION" value="${SVN_LASTREVISION}"/>
+        	            <token key="REVISION" value="${LASTREVISION}"/>
                 	</replacetokens>
           	    </filterchain>
 		</copy>
@@ -211,11 +272,19 @@
         <mkdir dir="${build.working_folder}/build" />
         <mkdir dir="${build.working_folder}/build/plugins" />
         <tstamp/>
-        <svnlastrevision workingcopy="${svn.local_folder}" propertyname="SVN_LASTREVISION"/>
+        <if>
+        	<available type="dir" file="${svn.local_folder}"/>
+        	<then>
+		        <svnlastrevision workingcopy="${svn.local_folder}" propertyname="LASTREVISION"/>
+        	</then>
+        	<else>
+		        <exec command="git rev-parse --short HEAD" dir="${git.local_repository}" outputProperty="LASTREVISION"/>
+        	</else>
+        </if>
         <if>
         	<equals arg1="${env}" arg2="testing"/>        	
         	<then>
-        		<property name="package_name" value="ajaxplorer-${DSTAMP}-${SVN_LASTREVISION}"/>
+        		<property name="package_name" value="ajaxplorer-${DSTAMP}-${LASTREVISION}"/>
         	</then>
         	<else>
         		<property name="package_name" value="ajaxplorer-core-${new_version}"/>
@@ -403,7 +472,7 @@
     </target>
     
     <target name="clean" description="Clean all working folders">
-        <foreach list="${build.source_folder},${svn.local_folder},${build.working_folder}/build,${build.working_folder}/ext_plugins,${build.working_folder}/upgrade,${build.working_folder}/dist,${build.working_folder}/deb,${build.working_folder}/rpm" param="filename" absparam="absfilename" target="delete_me">
+        <foreach list="${build.source_folder},${svn.local_folder},${git.local_repository},${build.working_folder}/build,${build.working_folder}/ext_plugins,${build.working_folder}/upgrade,${build.working_folder}/dist,${build.working_folder}/deb,${build.working_folder}/rpm" param="filename" absparam="absfilename" target="delete_me">
         </foreach>
     </target>
     <target name="delete_me">
@@ -433,7 +502,7 @@
                 <replacetokens begintoken="##" endtoken="##">
                     <token key="VERSION_NUMBER" value="${build.version}"/>
                     <token key="VERSION_DATE" value="${VERSION_DATE}"/>
-                    <token key="REVISION" value="${SVN_LASTREVISION}"/>
+                    <token key="REVISION" value="${LASTREVISION}"/>
                 </replacetokens>
             </filterchain>        	
         </reflexive>    
