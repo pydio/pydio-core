@@ -136,12 +136,22 @@ class ftpAccessWrapper implements AjxpWrapper {
     	}
     }
     
+    // PHP bug #62035
+    public static function fput_quota_hack($errno, $errstr, $errfile, $errline, $errcontext)
+    {
+      if (strpos($errstr, "Opening BINARY mode data connection") !== false)
+        $errstr = "Transfer failed. Please check available disk space (quota)";
+      AJXP_XMLWriter::catchError($errno, $errstr, $errfile, $errline, $errcontext);
+    }
+    
     public function stream_flush(){
     	if(isSet($this->fp) && $this->fp!=-1 && $this->fp!==false){
     		if($this->crtMode == 'write'){
     			rewind($this->fp);
     			AJXP_Logger::debug("Ftp_fput", array("target"=>$this->crtTarget));
+    			set_error_handler(array("ftpAccessWrapper", "fput_quota_hack"), E_ALL & ~E_NOTICE );
     			ftp_fput($this->crtLink, $this->crtTarget, $this->fp, FTP_BINARY);
+    			restore_error_handler();
     			AJXP_Logger::debug("Ftp_fput end", array("target"=>$this->crtTarget));
     		}else{
 		    	fflush($this->fp);
