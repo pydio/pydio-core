@@ -34,8 +34,9 @@ include_once 'phing/Task.php';
       private $summarizeFile;
       private $sourceDir;
       private $upgradeDir;
+      private $prefixPath;
       private $extPluginsFolder;
-      private $ignores = array();
+      private $ignores = array("/.gitignore");
 
       public function setSummarizeFile($summarizeFile){
           $this->summarizeFile = $summarizeFile;
@@ -56,19 +57,38 @@ include_once 'phing/Task.php';
       public function setExtPluginsFolder($extPluginsFolder){
       	  $this->extPluginsFolder = $extPluginsFolder;
       }
+      
+      public function setPrefixPath($prefixPath){
+      	$this->prefixPath = $prefixPath;
+      }
+      
+      public function getPrefixPath(){
+      	return $this->prefixPath;
+      }
 
       public function main() {
 
       	$summarizeLines = file($this->summarizeFile);
       	$toDelete = array();
-
+      	if(isSet($this->prefixPath)) $this->sourceDir .= "/" . $this->prefixPath;
+      		
       	foreach($summarizeLines as $line){
       		list($letter, $path) = preg_split('/[\s]+/', trim($line), 2);
-      		$end = str_replace($this->sourceDir, '', $path);
+      		if(isSet($this->prefixPath)){
+      			if(strpos($path, $this->prefixPath) !== 0){
+      				$this->log("-- Skipping ".$path, Project::MSG_INFO);
+      				continue;
+      			}
+      			$end = str_replace($this->prefixPath, "", $path);
+      		}else{
+	      		$end = str_replace($this->sourceDir, '', $path);      			
+      		}
       		if(in_array($end, $this->ignores)) {
       			continue;
       		}
-      		if($letter == "D"){
+  			//$this->log("-- Parsing ".$line, Project::MSG_INFO);
+  			
+          	if($letter == "D"){
       			$toDelete[] = $end;
       			continue;
       		}      		

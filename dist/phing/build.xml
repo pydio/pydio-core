@@ -12,7 +12,8 @@
     <property name="svn.local_folder" value="${build.working_folder}/svnwc"/>
     <taskdef classname="lib.AjxpPluginDiscriminate" name="plugindiscriminate"/>
     <taskdef classname="lib.AjxpSvnSummarizeTask" name="svn_summarize"/>
-    <taskdef classname="lib.AjxpParseSvnSummarize" name="parse_svn_summarize"/>
+    <taskdef classname="lib.AjxpGitSummarizeTask" name="git_summarize"/>
+    <taskdef classname="lib.AjxpParseSvnSummarize" name="parse_diff_summarize"/>
 
 
     <target name="build" description="Main sequence">
@@ -29,7 +30,7 @@
 		        </if>
         	</then>
         	<else>
-        	     <phingcall target="prepare"/>
+        	     <phingcall target="prepare_git"/>
         	</else>
         </if>
         <phingcall target="zip"/>
@@ -43,14 +44,11 @@
     </target>
     
     <target name="tag_version" description="Tag svn with the version, and upgrade version number for future builds to next_version">
-	    <svncopy
-	       message="${version} tag"	
-		   username="${svn.username}"
-		   password="${svn.password}"
-		   force="true"
-		   nocache="true"
-		   repositoryurl="${svn.repository_url}${svn.trunk_root}"
-		   todir="${svn.repository_url}${svn.tags}/ajaxplorer-core-${version}"/>
+		<gittag 
+		    repository="${git.local_repository}" 
+		    name="${version}"
+		    message="${version} tag"
+		/>
 		<reflexive>
 		    <fileset dir=".">
 		        <include pattern="build.properties" />
@@ -61,6 +59,9 @@
 		        </replaceregexp>
 		    </filterchain>
 		</reflexive>
+		<gitpush
+			repository="${git.local_repository}"			
+		/>
     </target>
 
     <target name="usage" description="Describe this script usage">
@@ -86,35 +87,26 @@
         </phingcall>
     </target>
         
-
-    <target name="svn_update" description="Checkout or update depending on working-copy presence.">
+    <!-- GIT VERSION -->
+    <target name="git_update" description="Clone or Pull depending on local repository presence.">
         <if>
-            <available type="dir" file="${svn.local_folder}"/>
+            <available type="dir" file="${git.local_repository}"/>
             <then>
-                <svnupdate
-                        revision="HEAD"
-                        repositoryurl="${svn.repository_url}/${svn.trunk_root}"
-                        todir="${svn.local_folder}"
+            	<!-- GIT PULL -->
+                <gitpull
+                        repository="${git.local_repository}"
+                        all="true"
                 />
             </then>
             <else>
-                <mkdir dir="${svn.local_folder}"/>
-                <svncheckout
-                        revision="HEAD"
-                        repositoryurl="${svn.repository_url}/${svn.trunk_root}"
-                        todir="${svn.local_folder}"
-                />
+            	<!-- GIT CLONE -->
+            	<exec command="git clone ${git.remote_repository} ${git.local_repository}" passthru="true" />
             </else>
         </if>
     </target>
 
-    <target name="prepare" description="Export SVN, prepare VERSION and discriminate plugins">
-        <if>
-            <not><available type="dir" file="${svn.local_folder}"/></not>
-            <then>
-                <phingcall target="svn_update"/>
-            </then>
-        </if>
+    <target name="prepare_git" description="Fetch Git Master, prepare VERSION and discriminate plugins">
+        <phingcall target="git_update"/>
         <if>
             <not><available type="dir" file="${build.source_folder}"/></not>
             <then><mkdir dir="${build.source_folder}"/></then>
@@ -122,11 +114,12 @@
         <tstamp>
             <format property="VERSION_DATE" pattern="%Y-%m-%d"/>
         </tstamp>
-        <svnlastrevision workingcopy="${svn.local_folder}" propertyname="SVN_LASTREVISION"/>
+        <!-- TODO GET LAST COMMIT ID -->
+        <exec command="git rev-parse --short HEAD" dir="${git.local_repository}" outputProperty="LASTREVISION"/>
         <if>
         	<equals arg1="${env}" arg2="testing"/>        	
         	<then>
-        		<property name="package_name" value="ajaxplorer-${DSTAMP}-${SVN_LASTREVISION}"/>
+        		<property name="package_name" value="ajaxplorer-${DSTAMP}-${LASTREVISION}"/>
         	</then>
         	<else>
         		<property name="package_name" value="ajaxplorer-core-${new_version}"/>
@@ -139,12 +132,12 @@
                 <delete dir="${INNER_DIRECTORY}"/>
             </then>
         </if>
-        <!-- EXPORT SVN -->
-        <svnexport
-                repositoryurl="${svn.local_folder}"
-                todir="${INNER_DIRECTORY}"
-                revision=""
-                />
+        <!-- EXPORT GIT CONTENT FROM core/src/ -->
+        <copy todir="${INNER_DIRECTORY}">
+        	<fileset dir="${git.local_repository}/core/src">
+        		<include name="*/**"/>
+        	</fileset>
+        </copy>        	                
         <!-- PREPARE VERSION FILE -->
         <phingcall target="replace_variables">
         	<property name="passed_directory" value="${INNER_DIRECTORY}"/>
@@ -153,9 +146,9 @@
         <!-- DISCRIMINATE PLUGINS -->
         <mkdir dir="${build.working_folder}/ext_plugins" />
         <plugindiscriminate all="${INNER_DIRECTORY}/plugins" ext="${build.working_folder}/ext_plugins"/>		
-    </target>
+    </target>    
     
-    <target name="prepare_upgrade" description="Building upgrade package" depends="prepare">
+    <target name="prepare_upgrade" description="Building upgrade package" depends="prepare_git">
         <if>
             <not><available type="dir" file="${build.working_folder}/upgrade"/></not>
             <then><mkdir dir="${build.working_folder}/upgrade"/></then>
@@ -163,15 +156,16 @@
     	<property name="upgrade_export" value="${build.working_folder}/upgrade/export/ajaxplorer-core-upgrade-${previous_version}-${new_version}"/>
     	<mkdir dir="${upgrade_export}"/>
     	<mkdir dir="${upgrade_export}/UPGRADE"/>
-    	<svn_summarize
-    	 revision1="${previous_revision}"
-    	 revision2="${SVN_LASTREVISION}"
+    	<git_summarize
+    	 commit1="${previous_revision}"
+    	 commit2="${LASTREVISION}"
     	 summarizeFile="${build.working_folder}/upgrade/svn_summarize"
-    	 repositoryurl="${svn.local_folder}"
+    	 repository="${git.local_repository}"
     	 />
-    	 <parse_svn_summarize
+    	 <parse_diff_summarize
     	 	summarizeFile="${build.working_folder}/upgrade/svn_summarize"
-    	 	sourceDir="${svn.local_folder}"
+    	 	sourceDir="${git.local_repository}"
+    	 	prefixPath="core/src"
     	 	upgradeDir="${upgrade_export}"
     	 	extPluginsFolder="${build.working_folder}/ext_plugins"
     	 />
@@ -181,27 +175,21 @@
         
         <!-- COPY RELEASE NOTE -->
 		<copy file="${upgrade_export}/conf/RELEASE_NOTE" toFile="${upgrade_export}/UPGRADE/NOTE"/>
-		<copy file="${svn.local_folder}/conf/VERSION" toFile="${upgrade_export}/conf/VERSION">
+		<copy file="${git.local_repository}/core/src/conf/VERSION" toFile="${upgrade_export}/conf/VERSION">
 	            <filterchain>
         	        <replacetokens begintoken="##" endtoken="##">
                 	    <token key="VERSION_NUMBER" value="${build.version}"/>
   	                  <token key="VERSION_DATE" value="${VERSION_DATE}"/>
-        	            <token key="REVISION" value="${SVN_LASTREVISION}"/>
+        	            <token key="REVISION" value="${LASTREVISION}"/>
                 	</replacetokens>
           	    </filterchain>
 		</copy>
 		
 		<!-- ADDITIONAL UPGRADE SCRIPT -->
-		<mkdir dir="${build.working_folder}/upgrade/additional_scripts"/>
-        <svncheckout
-                revision="HEAD"
-                repositoryurl="${svn.repository_url}${svn.upgrade_scripts}"
-                todir="${build.working_folder}/upgrade/additional_scripts"
-        />        
 		<if>
-			<available type="file" file="${build.working_folder}/upgrade/additional_scripts/${new_version}.php"/>
+			<available type="file" file="${git.local_repository}/dist/php/${new_version}.php"/>
 			<then>
-				<copy file="${build.working_folder}/upgrade/additional_scripts/${new_version}.php" toFile="${upgrade_export}/UPGRADE/PHP-SCRIPT"/>
+				<copy file="${git.local_repository}/dist/php/${new_version}.php" toFile="${upgrade_export}/UPGRADE/PHP-SCRIPT"/>
 			</then>
 		</if>
 		
@@ -211,11 +199,19 @@
         <mkdir dir="${build.working_folder}/build" />
         <mkdir dir="${build.working_folder}/build/plugins" />
         <tstamp/>
-        <svnlastrevision workingcopy="${svn.local_folder}" propertyname="SVN_LASTREVISION"/>
+        <if>
+        	<available type="dir" file="${svn.local_folder}"/>
+        	<then>
+		        <svnlastrevision workingcopy="${svn.local_folder}" propertyname="LASTREVISION"/>
+        	</then>
+        	<else>
+		        <exec command="git rev-parse --short HEAD" dir="${git.local_repository}" outputProperty="LASTREVISION"/>
+        	</else>
+        </if>
         <if>
         	<equals arg1="${env}" arg2="testing"/>        	
         	<then>
-        		<property name="package_name" value="ajaxplorer-${DSTAMP}-${SVN_LASTREVISION}"/>
+        		<property name="package_name" value="ajaxplorer-${DSTAMP}-${LASTREVISION}"/>
         	</then>
         	<else>
         		<property name="package_name" value="ajaxplorer-core-${new_version}"/>
@@ -403,7 +399,7 @@
     </target>
     
     <target name="clean" description="Clean all working folders">
-        <foreach list="${build.source_folder},${svn.local_folder},${build.working_folder}/build,${build.working_folder}/ext_plugins,${build.working_folder}/upgrade,${build.working_folder}/dist,${build.working_folder}/deb,${build.working_folder}/rpm" param="filename" absparam="absfilename" target="delete_me">
+        <foreach list="${build.source_folder},${svn.local_folder},${git.local_repository},${build.working_folder}/build,${build.working_folder}/ext_plugins,${build.working_folder}/upgrade,${build.working_folder}/dist,${build.working_folder}/deb,${build.working_folder}/rpm" param="filename" absparam="absfilename" target="delete_me">
         </foreach>
     </target>
     <target name="delete_me">
@@ -433,7 +429,7 @@
                 <replacetokens begintoken="##" endtoken="##">
                     <token key="VERSION_NUMBER" value="${build.version}"/>
                     <token key="VERSION_DATE" value="${VERSION_DATE}"/>
-                    <token key="REVISION" value="${SVN_LASTREVISION}"/>
+                    <token key="REVISION" value="${LASTREVISION}"/>
                 </replacetokens>
             </filterchain>        	
         </reflexive>    
