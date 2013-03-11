@@ -44,14 +44,11 @@
     </target>
     
     <target name="tag_version" description="Tag svn with the version, and upgrade version number for future builds to next_version">
-	    <svncopy
-	       message="${version} tag"	
-		   username="${svn.username}"
-		   password="${svn.password}"
-		   force="true"
-		   nocache="true"
-		   repositoryurl="${svn.repository_url}${svn.trunk_root}"
-		   todir="${svn.repository_url}${svn.tags}/ajaxplorer-core-${version}"/>
+		<gittag 
+		    repository="${git.local_repository}" 
+		    name="${version}"
+		    message="${version} tag"
+		/>
 		<reflexive>
 		    <fileset dir=".">
 		        <include pattern="build.properties" />
@@ -62,6 +59,9 @@
 		        </replaceregexp>
 		    </filterchain>
 		</reflexive>
+		<gitpush
+			repository="${git.local_repository}"			
+		/>
     </target>
 
     <target name="usage" description="Describe this script usage">
@@ -146,126 +146,7 @@
         <!-- DISCRIMINATE PLUGINS -->
         <mkdir dir="${build.working_folder}/ext_plugins" />
         <plugindiscriminate all="${INNER_DIRECTORY}/plugins" ext="${build.working_folder}/ext_plugins"/>		
-    </target>
-    
-    <!-- SVN VERSION -->   
-    <!--     
-    <target name="svn_update" description="Checkout or update depending on working-copy presence.">
-        <if>
-            <available type="dir" file="${svn.local_folder}"/>
-            <then>
-                <svnupdate
-                        revision="HEAD"
-                        repositoryurl="${svn.repository_url}/${svn.trunk_root}"
-                        todir="${svn.local_folder}"
-                />
-            </then>
-            <else>
-                <mkdir dir="${svn.local_folder}"/>
-                <svncheckout
-                        revision="HEAD"
-                        repositoryurl="${svn.repository_url}/${svn.trunk_root}"
-                        todir="${svn.local_folder}"
-                />
-            </else>
-        </if>
-    </target>
-    
-    <target name="prepare" description="Export SVN, prepare VERSION and discriminate plugins">
-        <if>
-            <not><available type="dir" file="${svn.local_folder}"/></not>
-            <then>
-                <phingcall target="svn_update"/>
-            </then>
-        </if>
-        <if>
-            <not><available type="dir" file="${build.source_folder}"/></not>
-            <then><mkdir dir="${build.source_folder}"/></then>
-        </if>
-        <tstamp>
-            <format property="VERSION_DATE" pattern="%Y-%m-%d"/>
-        </tstamp>
-        <svnlastrevision workingcopy="${svn.local_folder}" propertyname="LASTREVISION"/>
-        <if>
-        	<equals arg1="${env}" arg2="testing"/>        	
-        	<then>
-        		<property name="package_name" value="ajaxplorer-${DSTAMP}-${LASTREVISION}"/>
-        	</then>
-        	<else>
-        		<property name="package_name" value="ajaxplorer-core-${new_version}"/>
-        	</else>
-        </if>
-        <property name="INNER_DIRECTORY" value="${build.source_folder}/${package_name}"/>
-        <if>
-            <available type="dir" file="${INNER_DIRECTORY}"/>
-            <then>
-                <delete dir="${INNER_DIRECTORY}"/>
-            </then>
-        </if>
-        <svnexport
-                repositoryurl="${svn.local_folder}"
-                todir="${INNER_DIRECTORY}"
-                revision=""
-                />
-        <phingcall target="replace_variables">
-        	<property name="passed_directory" value="${INNER_DIRECTORY}"/>
-        </phingcall>
-        
-        <mkdir dir="${build.working_folder}/ext_plugins" />
-        <plugindiscriminate all="${INNER_DIRECTORY}/plugins" ext="${build.working_folder}/ext_plugins"/>		
-    </target>
-        
-    <target name="prepare_upgrade" description="Building upgrade package" depends="prepare">
-        <if>
-            <not><available type="dir" file="${build.working_folder}/upgrade"/></not>
-            <then><mkdir dir="${build.working_folder}/upgrade"/></then>
-        </if>
-    	<property name="upgrade_export" value="${build.working_folder}/upgrade/export/ajaxplorer-core-upgrade-${previous_version}-${new_version}"/>
-    	<mkdir dir="${upgrade_export}"/>
-    	<mkdir dir="${upgrade_export}/UPGRADE"/>
-    	<svn_summarize
-    	 revision1="${previous_revision}"
-    	 revision2="${LASTREVISION}"
-    	 summarizeFile="${build.working_folder}/upgrade/svn_summarize"
-    	 repositoryurl="${svn.local_folder}"
-    	 />
-    	 <parse_diff_summarize
-    	 	summarizeFile="${build.working_folder}/upgrade/svn_summarize"
-    	 	sourceDir="${svn.local_folder}"
-    	 	upgradeDir="${upgrade_export}"
-    	 	extPluginsFolder="${build.working_folder}/ext_plugins"
-    	 />
-        <phingcall target="replace_variables">
-        	<property name="passed_directory" value="${upgrade_export}"/>
-        </phingcall>
-        
-		<copy file="${upgrade_export}/conf/RELEASE_NOTE" toFile="${upgrade_export}/UPGRADE/NOTE"/>
-		<copy file="${svn.local_folder}/conf/VERSION" toFile="${upgrade_export}/conf/VERSION">
-	            <filterchain>
-        	        <replacetokens begintoken="##" endtoken="##">
-                	    <token key="VERSION_NUMBER" value="${build.version}"/>
-  	                  <token key="VERSION_DATE" value="${VERSION_DATE}"/>
-        	            <token key="REVISION" value="${LASTREVISION}"/>
-                	</replacetokens>
-          	    </filterchain>
-		</copy>
-		
-		<mkdir dir="${build.working_folder}/upgrade/additional_scripts"/>
-        <svncheckout
-                revision="HEAD"
-                repositoryurl="${svn.repository_url}${svn.upgrade_scripts}"
-                todir="${build.working_folder}/upgrade/additional_scripts"
-        />        
-		<if>
-			<available type="file" file="${build.working_folder}/upgrade/additional_scripts/${new_version}.php"/>
-			<then>
-				<copy file="${build.working_folder}/upgrade/additional_scripts/${new_version}.php" toFile="${upgrade_export}/UPGRADE/PHP-SCRIPT"/>
-			</then>
-		</if>
-		
-    </target>
-    
-    -->
+    </target>    
     
     <target name="prepare_upgrade" description="Building upgrade package" depends="prepare_git">
         <if>
