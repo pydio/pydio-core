@@ -12,7 +12,8 @@
     <property name="svn.local_folder" value="${build.working_folder}/svnwc"/>
     <taskdef classname="lib.AjxpPluginDiscriminate" name="plugindiscriminate"/>
     <taskdef classname="lib.AjxpSvnSummarizeTask" name="svn_summarize"/>
-    <taskdef classname="lib.AjxpParseSvnSummarize" name="parse_svn_summarize"/>
+    <taskdef classname="lib.AjxpGitSummarizeTask" name="git_summarize"/>
+    <taskdef classname="lib.AjxpParseSvnSummarize" name="parse_diff_summarize"/>
 
 
     <target name="build" description="Main sequence">
@@ -147,7 +148,8 @@
         <plugindiscriminate all="${INNER_DIRECTORY}/plugins" ext="${build.working_folder}/ext_plugins"/>		
     </target>
     
-    <!-- SVN VERSION -->        
+    <!-- SVN VERSION -->   
+    <!--     
     <target name="svn_update" description="Checkout or update depending on working-copy presence.">
         <if>
             <available type="dir" file="${svn.local_folder}"/>
@@ -200,22 +202,19 @@
                 <delete dir="${INNER_DIRECTORY}"/>
             </then>
         </if>
-        <!-- EXPORT SVN -->
         <svnexport
                 repositoryurl="${svn.local_folder}"
                 todir="${INNER_DIRECTORY}"
                 revision=""
                 />
-        <!-- PREPARE VERSION FILE -->
         <phingcall target="replace_variables">
         	<property name="passed_directory" value="${INNER_DIRECTORY}"/>
         </phingcall>
         
-        <!-- DISCRIMINATE PLUGINS -->
         <mkdir dir="${build.working_folder}/ext_plugins" />
         <plugindiscriminate all="${INNER_DIRECTORY}/plugins" ext="${build.working_folder}/ext_plugins"/>		
     </target>
-    
+        
     <target name="prepare_upgrade" description="Building upgrade package" depends="prepare">
         <if>
             <not><available type="dir" file="${build.working_folder}/upgrade"/></not>
@@ -230,7 +229,7 @@
     	 summarizeFile="${build.working_folder}/upgrade/svn_summarize"
     	 repositoryurl="${svn.local_folder}"
     	 />
-    	 <parse_svn_summarize
+    	 <parse_diff_summarize
     	 	summarizeFile="${build.working_folder}/upgrade/svn_summarize"
     	 	sourceDir="${svn.local_folder}"
     	 	upgradeDir="${upgrade_export}"
@@ -240,7 +239,6 @@
         	<property name="passed_directory" value="${upgrade_export}"/>
         </phingcall>
         
-        <!-- COPY RELEASE NOTE -->
 		<copy file="${upgrade_export}/conf/RELEASE_NOTE" toFile="${upgrade_export}/UPGRADE/NOTE"/>
 		<copy file="${svn.local_folder}/conf/VERSION" toFile="${upgrade_export}/conf/VERSION">
 	            <filterchain>
@@ -252,7 +250,6 @@
           	    </filterchain>
 		</copy>
 		
-		<!-- ADDITIONAL UPGRADE SCRIPT -->
 		<mkdir dir="${build.working_folder}/upgrade/additional_scripts"/>
         <svncheckout
                 revision="HEAD"
@@ -263,6 +260,55 @@
 			<available type="file" file="${build.working_folder}/upgrade/additional_scripts/${new_version}.php"/>
 			<then>
 				<copy file="${build.working_folder}/upgrade/additional_scripts/${new_version}.php" toFile="${upgrade_export}/UPGRADE/PHP-SCRIPT"/>
+			</then>
+		</if>
+		
+    </target>
+    
+    -->
+    
+    <target name="prepare_upgrade" description="Building upgrade package" depends="prepare_git">
+        <if>
+            <not><available type="dir" file="${build.working_folder}/upgrade"/></not>
+            <then><mkdir dir="${build.working_folder}/upgrade"/></then>
+        </if>
+    	<property name="upgrade_export" value="${build.working_folder}/upgrade/export/ajaxplorer-core-upgrade-${previous_version}-${new_version}"/>
+    	<mkdir dir="${upgrade_export}"/>
+    	<mkdir dir="${upgrade_export}/UPGRADE"/>
+    	<git_summarize
+    	 commit1="${previous_revision}"
+    	 commit2="${LASTREVISION}"
+    	 summarizeFile="${build.working_folder}/upgrade/svn_summarize"
+    	 repository="${git.local_repository}"
+    	 />
+    	 <parse_diff_summarize
+    	 	summarizeFile="${build.working_folder}/upgrade/svn_summarize"
+    	 	sourceDir="${git.local_repository}"
+    	 	prefixPath="core/src"
+    	 	upgradeDir="${upgrade_export}"
+    	 	extPluginsFolder="${build.working_folder}/ext_plugins"
+    	 />
+        <phingcall target="replace_variables">
+        	<property name="passed_directory" value="${upgrade_export}"/>
+        </phingcall>
+        
+        <!-- COPY RELEASE NOTE -->
+		<copy file="${upgrade_export}/conf/RELEASE_NOTE" toFile="${upgrade_export}/UPGRADE/NOTE"/>
+		<copy file="${git.local_repository}/core/src/conf/VERSION" toFile="${upgrade_export}/conf/VERSION">
+	            <filterchain>
+        	        <replacetokens begintoken="##" endtoken="##">
+                	    <token key="VERSION_NUMBER" value="${build.version}"/>
+  	                  <token key="VERSION_DATE" value="${VERSION_DATE}"/>
+        	            <token key="REVISION" value="${LASTREVISION}"/>
+                	</replacetokens>
+          	    </filterchain>
+		</copy>
+		
+		<!-- ADDITIONAL UPGRADE SCRIPT -->
+		<if>
+			<available type="file" file="${git.local_repository}/dist/php/${new_version}.php"/>
+			<then>
+				<copy file="${git.local_repository}/dist/php/${new_version}.php" toFile="${upgrade_export}/UPGRADE/PHP-SCRIPT"/>
 			</then>
 		</if>
 		
