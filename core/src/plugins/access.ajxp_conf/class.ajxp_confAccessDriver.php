@@ -1326,11 +1326,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						"plugin_description" => $pObject->getManifestDescription()
 					);
 					if($type == "core"){
-						if($pObject->getId() == "core.ajaxplorer"){
-							$label = "AjaXplorer Core";
-						}else{
-							$label =  sprintf($mess["ajxp_conf.100"], $pObject->getName());
-						}
+					    $label =  $pObject->getManifestLabel();//sprintf($mess["ajxp_conf.100"], $pObject->getName());
 					}else{
 						if($activePlugins[$pObject->getId()] !== true) continue;
 						$label = $pObject->getManifestLabel();

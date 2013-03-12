@@ -19,7 +19,7 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"Generic Auth Features" => "Generic Auth Features",
+"Generic Auth Features" => "Generic Features",
 "Enable Users" => "Enable Users",
 "Guest Browsing" => "Guest Browsing",
 "Password length" => "Password length",

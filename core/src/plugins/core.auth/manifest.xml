@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpcore id="core.auth" label="AuthDrivers Configs" description="Options applied to all auth drivers" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<ajxpcore id="core.auth" label="CONF_MESSAGE[Authentification]" description="CONF_MESSAGE[Options applied to all auth drivers]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/core.auth/class.CoreAuthLoader.php" classname="CoreAuthLoader"/>
     <client_settings>
         <resources>
@@ -13,6 +13,6 @@
 		<global_param name="PASSWORD_MINLENGTH" group="CONF_MESSAGE[Generic Auth Features]" type="string" label="CONF_MESSAGE[Password length]" description="CONF_MESSAGE[Minimum number of characters required for passwords in the application]" mandatory="true" default="8"/>
 		<global_param name="SESSION_SET_CREDENTIALS" group="CONF_MESSAGE[Generic Auth Features]"  type="boolean" label="CONF_MESSAGE[Store Credentials in Session]" description="CONF_MESSAGE[Set the users credentials in the session after a successful login, this can be necessary when bridging specific auth and access plugins.]" mandatory="true" default="false"/>
         <global_param type="plugin_instance:auth" name="MASTER_INSTANCE_CONFIG" group="CONF_MESSAGE[Main Instance]" label="CONF_MESSAGE[Instance Type]" description="CONF_MESSAGE[Choose the configuration plugin]" mandatory="true" default="serial"/>
-        <global_param type="plugin_instance:auth" name="SLAVE_INSTANCE_CONFIG" group="CONF_MESSAGE[Secondary Instance (optional)]" label="CONF_MESSAGE[Instance Type]" description="CONF_MESSAGE[Choose the configuration plugin]" mandatory="false" default="serial"/>
+        <global_param type="plugin_instance:auth" name="SLAVE_INSTANCE_CONFIG" group="CONF_MESSAGE[Secondary Instance (optional)]" label="CONF_MESSAGE[Instance Type]" description="CONF_MESSAGE[Choose the configuration plugin]" mandatory="false" default=""/>
     </server_settings>
 </ajxpcore>

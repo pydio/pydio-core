@@ -19,7 +19,7 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"Serialized Configuration Storage" => "Configuration sérialisées",
+"Serialized Configuration Storage" => "Fichiers sérialisés",
 "Stores the conf data as serialized PHP values on the filesystem." => "Les configurations sont stockées sous forme de données sérialisées dans des fichiers",
 "Repositories" => "Dépôts",
 "The file in which the repositories are stored" => "Fichier pour stocker les données de dépôts",
