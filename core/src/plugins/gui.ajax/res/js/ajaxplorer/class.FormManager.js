@@ -75,6 +75,9 @@ Class.create("FormManager", {
 			var name = param.get('name');
 			var type = param.get('type');
 			var desc = param.get('description');
+            // deduplicate
+            if(form.down('[name="'+name+'"]')) return;
+
 			if(param.get('descriptionId')){
 				desc = MessageHash[param.get('descriptionId')];
 			}
@@ -88,6 +91,9 @@ Class.create("FormManager", {
 			if(values && values.get(name) !== undefined){
 				defaultValue = values.get(name);
 			}
+            if(!defaultValue && type == "hidden" && param.get("default")){
+                defaultValue = param.get("default");
+            }
 			var element;
 			var disabledString = (disabled || param.get('readonly')?' disabled="true" ':'');
             var commonAttributes = {
@@ -174,8 +180,8 @@ Class.create("FormManager", {
                 var switchName = type.split(":")[1];
                 var switchValues = {};
                 defaultValue = "";
-                if(values && values.get(name+"_group_switch")){
-                    defaultValue = values.get(name+"_group_switch");
+                if(values && values.get(name)){
+                    defaultValue = values.get(name);
                 }
                 var potentialSubSwitches = $A();
                 parametersDefinitions.each(function(p){
@@ -191,6 +197,7 @@ Class.create("FormManager", {
                     }
                     p = new Hash(p._object);
                     p.unset('group_switch_name');
+                    p.set('name', name + '/' + p.get('name'));
                     switchValues[p.get('group_switch_value')].fields.push(p);
                     var vKey = p.get("name");
                     if(values && values.get(vKey)){
@@ -207,7 +214,9 @@ Class.create("FormManager", {
                     if(defaultValue && defaultValue == pair.key) options.selected = "true";
                     selector.insert(new Element('option', options).update(pair.value.label));
                     if(potentialSubSwitches.length){
-                        potentialSubSwitches.each(function(sub){pair.value.fields.push(sub);});
+                        potentialSubSwitches.each(function(sub){
+                            pair.value.fields.push(sub);
+                        });
                     }
                 });
                 selector.SWITCH_VALUES = $H(switchValues);
@@ -226,7 +235,7 @@ Class.create("FormManager", {
                         target.FIELDS_CONTAINER,
                         data.fields,
                         true,
-                        data.values,
+                        values,
                         false,
                         true);
                 }.bind(this));
@@ -237,7 +246,7 @@ Class.create("FormManager", {
                         selector.FIELDS_CONTAINER,
                         data.fields,
                         true,
-                        data.values,
+                        values,
                         false,
                         true
                     );
@@ -458,7 +467,7 @@ Class.create("FormManager", {
             if(el.up('.SF_replicableGroup')){
                 parametersHash.set(prefix+el.name+'_replication', el.up('.SF_replicableGroup').id);
             }
-		});		
+		});
 		form.select('select').each(function(el){
 			if(el.getAttribute("data-ajxp_mandatory") == 'true' && el.getValue() == '' && !el.disabled){
 				missingMandatory.push(el);
@@ -486,6 +495,48 @@ Class.create("FormManager", {
 	        	}
 	        });
         }
+        // Reorder keys
+        var allKeys = parametersHash.keys();
+        allKeys.sort();
+        allKeys.reverse();
+        var treeKeys = {};
+        allKeys.each(function(key){
+            if(key.indexOf("/") === -1) return;
+            if(key.endsWith("_ajxptype")) return;
+            var typeKey = key + "_ajxptype";
+            var parts = key.split("/");
+            var parentName = parts.shift();
+            var parentKey;
+            while(parts.length > 0){
+                if(!parentKey){
+                    parentKey = treeKeys;
+                }
+                if(!parentKey[parentName]) {
+                    parentKey[parentName] = {};
+                }
+                parentKey = parentKey[parentName];
+                parentName = parts.shift();
+            }
+            var type = parametersHash.unset(typeKey);
+            if(parentKey && !parentKey[parentName]) {
+                if(type == "boolean"){
+                    var v = parametersHash.get(key);
+                    parentKey[parentName] = (v == "true" || v == 1 || v === true );
+                }else if(type == "integer"){
+                    parentKey[parentName] = parseInt(parametersHash.get(key));
+                }else{
+                    parentKey[parentName] = parametersHash.get(key);
+                }
+            }else if(parentKey && type.startsWith('group_switch:')){
+                parentKey[parentName]["group_switch_value"] = parametersHash.get(key);
+            }
+            parametersHash.unset(key);
+        });
+        $H(treeKeys).each(function(pair){
+            parametersHash.set(pair.key, Object.toJSON(pair.value));
+            parametersHash.set(pair.key+"_ajxptype", "text/json");
+        });
+
 		return missingMandatory.size();
 	},		
 	

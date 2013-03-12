@@ -1201,34 +1201,48 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
 				$ajxpPlugin = AJXP_PluginsService::getInstance()->getPluginById($httpVars["plugin_id"]);
 				AJXP_XMLWriter::header("admin_data");
-				$baseParams = AJXP_XMLWriter::replaceAjxpXmlKeywords($ajxpPlugin->getManifestRawContent());
-                if(strpos($baseParams, 'type="plugin_instance:') !== false){
-                    $instType = substr($baseParams, strpos($baseParams, 'type="plugin_instance:')+strlen('type="plugin_instance:'));
-                    $instType = substr($instType, 0, strpos($instType, '"'));
+
+                $fullManifest = $ajxpPlugin->getManifestRawContent("", "xml");
+                $xPath = new DOMXPath($fullManifest->ownerDocument);
+                $addParams = "";
+                $pInstNodes = $xPath->query("server_settings/global_param[contains(@type, 'plugin_instance:')]");
+                foreach($pInstNodes as $pInstNode){
+                    $type = $pInstNode->getAttribute("type");
+                    $instType = str_replace("plugin_instance:", "", $type);
+                    $fieldName = $pInstNode->getAttribute("name");
+                    $pInstNode->setAttribute("type", "group_switch:".$fieldName);
                     $typePlugs = AJXP_PluginsService::getInstance()->getPluginsByType($instType);
-                    $addParams = "";
                     foreach($typePlugs as $typePlug){
                         $tParams = AJXP_XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/param"));
-                        $addParams .= str_replace("<param", "<global_param group_switch_name=\"${instType}\" group_switch_label=\"".$typePlug->getName()."\" group_switch_value=\"".$typePlug->getId()."\" ", $tParams);
+                        $addParams .= '<global_param group_switch_name="'.$fieldName.'" name="instance_name" group_switch_label="'.$typePlug->getManifestLabel().'" group_switch_value="'.$typePlug->getId().'" default="'.$typePlug->getId().'" type="hidden"/>';
+                        $addParams .= str_replace("<param", "<global_param group_switch_name=\"${fieldName}\" group_switch_label=\"".$typePlug->getManifestLabel()."\" group_switch_value=\"".$typePlug->getId()."\" ", $tParams);
                         $addParams .= AJXP_XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/global_param"));
                     }
-                    $baseParams = str_replace('type="plugin_instance:', 'type="group_switch:', $baseParams);
-                    $baseParams = str_replace("</server_settings>", $addParams."</server_settings>", $baseParams);
                 }
+                $allParams = AJXP_XMLWriter::replaceAjxpXmlKeywords($fullManifest->ownerDocument->saveXML($fullManifest));
+                $allParams = str_replace('type="plugin_instance:', 'type="group_switch:', $allParams);
+                $allParams = str_replace("</server_settings>", $addParams."</server_settings>", $allParams);
 
-                echo($baseParams);
+                echo($allParams);
 				$definitions = $ajxpPlugin->getConfigsDefinitions();
 				$values = $ajxpPlugin->getConfigs();
                 if(!is_array($values)) $values = array();
                 echo("<plugin_settings_values>");
                 foreach($values as $key => $value){
                     $attribute = true;
-                    if($definitions[$key]["type"] == "array" && is_array($value)){
+                    $type = $definitions[$key]["type"];
+                    if($type == "array" && is_array($value)){
                         $value = implode(",", $value);
-                    }else if($definitions[$key]["type"] == "boolean"){
+                    }else if((strpos($type, "group_switch:") === 0 || strpos($type, "plugin_instance:") === 0 ) && is_array($value)){
+                        $res = array();
+                        $this->flattenKeyValues($res, $value, $key);
+                        foreach($res as $newKey => $newVal){
+                            echo("<param name=\"$newKey\" value=\"".AJXP_Utils::xmlEntities($newVal)."\"/>");
+                        }
+                        continue;
+                    }else if($type == "boolean"){
                         $value = ($value === true || $value === "true" || $value == 1?"true":"false");
-                    }else if($definitions[$key]["type"] == "textarea"){
-                        //$value = str_replace("\\n", "\n", $value);
+                    }else if($type == "textarea"){
                         $attribute = false;
                     }
                     if($attribute){
@@ -1707,5 +1721,19 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         AJXP_Utils::parseStandardFormParameters($repDef, $options, $userId, "DRIVER_OPTION_", ($globalBinaries?array():null));
 
 	}
+
+    function flattenKeyValues(&$result, $values, $parent = ""){
+        foreach($values as $key => $value){
+            if(is_array($value)){
+                $this->flattenKeyValues($result, $value, $parent."/".$key);
+            }else{
+                if($key == "group_switch_value" || $key == "instance_name"){
+                    $result[$parent] = $value;
+                }else{
+                    $result[$parent.'/'.$key] = $value;
+                }
+            }
+        }
+    }
 
 }

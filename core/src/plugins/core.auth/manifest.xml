@@ -12,6 +12,7 @@
 		<global_param name="ALLOW_GUEST_BROWSING" group="CONF_MESSAGE[Generic Auth Features]"  type="boolean" label="CONF_MESSAGE[Guest Browsing]" description="CONF_MESSAGE[Enable the 'guest' user, who does not need to log in.]" mandatory="true" default="false"/>
 		<global_param name="PASSWORD_MINLENGTH" group="CONF_MESSAGE[Generic Auth Features]" type="string" label="CONF_MESSAGE[Password length]" description="CONF_MESSAGE[Minimum number of characters required for passwords in the application]" mandatory="true" default="8"/>
 		<global_param name="SESSION_SET_CREDENTIALS" group="CONF_MESSAGE[Generic Auth Features]"  type="boolean" label="CONF_MESSAGE[Store Credentials in Session]" description="CONF_MESSAGE[Set the users credentials in the session after a successful login, this can be necessary when bridging specific auth and access plugins.]" mandatory="true" default="false"/>
-        <global_param type="plugin_instance:auth" name="MASTER_INSTANCE_CONFIG" group="CONF_MESSAGE[Instance Params]" label="CONF_MESSAGE[Master Instance]" description="CONF_MESSAGE[Choose the configuration plugin]" mandatory="false" default="serial"/>
+        <global_param type="plugin_instance:auth" name="MASTER_INSTANCE_CONFIG" group="CONF_MESSAGE[Main Instance]" label="CONF_MESSAGE[Instance Type]" description="CONF_MESSAGE[Choose the configuration plugin]" mandatory="true" default="serial"/>
+        <global_param type="plugin_instance:auth" name="SLAVE_INSTANCE_CONFIG" group="CONF_MESSAGE[Secondary Instance (optional)]" label="CONF_MESSAGE[Instance Type]" description="CONF_MESSAGE[Choose the configuration plugin]" mandatory="false" default="serial"/>
     </server_settings>
 </ajxpcore>

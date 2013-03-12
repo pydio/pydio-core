@@ -1271,8 +1271,10 @@ class AJXP_Utils
                         $tmp = explode(":", $type);
                         $gSwitchName = $tmp[1];
                         $switchesGroups[substr($key, strlen($prefix))] = $gSwitchName;
+                    }else if($type == "text/json"){
+                        $value = json_decode($value, true);
                     }
-                    if($repDef[$key."_ajxptype"] != "textarea" && $repDef[$key."_ajxptype"] != "boolean"){
+                    if(!in_array($type, array("textarea", "boolean", "text/json"))){
                         $value = AJXP_Utils::sanitize($value, AJXP_SANITIZE_HTML);
                     }
                     unset($repDef[$key."_ajxptype"]);
