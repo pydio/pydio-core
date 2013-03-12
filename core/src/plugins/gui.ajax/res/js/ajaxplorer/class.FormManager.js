@@ -87,12 +87,11 @@ Class.create("FormManager", {
             }
 			var mandatory = false;
 			if(param.get('mandatory') && param.get('mandatory')=='true') mandatory = true;
-			var defaultValue = (values?'':(param.get('default') || ""));
-			if(values && values.get(name) !== undefined){
-				defaultValue = values.get(name);
-			}
-            if(!defaultValue && type == "hidden" && param.get("default")){
-                defaultValue = param.get("default");
+            var defaultValue = '';
+            if(values && values.get(name) !== undefined){
+                defaultValue = values.get(name);
+            }else if(param.get('default') !== undefined){
+                defaultValue = param.get('default');
             }
 			var element;
 			var disabledString = (disabled || param.get('readonly')?' disabled="true" ':'');
