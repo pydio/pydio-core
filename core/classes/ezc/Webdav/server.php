@@ -181,7 +181,9 @@ class ezcWebdavServer
         $this->properties['backend'] = $backend;
         if ( !isset( $_SERVER['HTTP_USER_AGENT'] ) )
         {
-            throw new ezcWebdavMissingHeaderException( 'User-Agent' );
+            // Fake User-Agent for empty User-Agents in order to support Netdrive
+            $_SERVER['HTTP_USER_AGENT'] = "Unknown";
+            //throw new ezcWebdavMissingHeaderException( 'User-Agent' );
         }
         // Configure the server according to the requesting client
         $this->configurations->configure( $this, $_SERVER['HTTP_USER_AGENT'] );
