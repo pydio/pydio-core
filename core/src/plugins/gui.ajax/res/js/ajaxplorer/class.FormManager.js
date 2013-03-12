@@ -117,6 +117,7 @@ Class.create("FormManager", {
 					if(defaultValue == "true" || defaultValue == "1" || defaultValue === true ) selectTrue = true;
 					if(defaultValue == "false" || defaultValue == "0" || defaultValue === false) selectFalse = true;
 				}
+                if(!selectTrue && !selectFalse) selectFalse = true;
 				element = '<input type="radio" data-ajxp_type="'+type+'" class="SF_box" name="'+name+'" id="'+name+'-true" value="true" '+(selectTrue?'checked':'')+''+disabledString+'><label for="'+name+'-true">'+MessageHash[440]+'</label>';
 				element = element + '<input type="radio" data-ajxp_type="'+type+'" class="SF_box" name="'+name+'" id="'+name+'-false"  '+(selectFalse?'checked':'')+' value="false"'+disabledString+'><label for="'+name+'-false">'+MessageHash[441] + '</label>';
 				element = '<div class="SF_input">'+element+'</div>';
