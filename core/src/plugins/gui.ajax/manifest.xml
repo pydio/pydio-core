@@ -126,7 +126,7 @@
                     </div>
 				</div>
 			]]></template>
-            <template name="widget" element="ajxp_widget" position="top"><![CDATA[
+            <template name="widget_umbra" element="ajxp_widget" position="top" theme="umbra"><![CDATA[
 				<div id="toolbars">
 					<div>
 						<div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"skipBubbling":true,"defaultIconSize":16,"defaultStyle":"icon_text","styles":{"icons_only":"Icons Only","icon_text":"Icons and Text","text_only":"Text only"},"stylesImgSizes":{"icons_only":22,"icon_text":16,"text_only":16},"stylesBarSizes":{"icons_only":40,"icon_text":51,"text_only":30}}' class="soft_css_gradient"></div>
@@ -142,6 +142,21 @@
 					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions='{"fit":"height","fitParent":"browser"}'  style="margin:0px;"></div>
 				</div>				
 			]]></template>
+            <template name="widget_vision" element="ajxp_widget" position="top" theme="vision"><![CDATA[
+				<div id="toolbars">
+    			    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put", "get"],"groupOtherToolbars":["more", "change", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+				</div>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
+                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
+                        <div id="cpane_header" class="panelHeader">
+                            <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                            <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header"}'></div>
+                        </div>
+                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"list","replaceScroller":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
+                    </div>
+				</div>
+			]]></template>
+
 			<component_config className="FilesList">
 				<property name="thumbSize" value="64"/>
 				<property name="displayMode" value="list"/>
