@@ -367,6 +367,11 @@ div.shadow_class
     border:none;
     filter: none;
     background: none;
+    margin-right: 0;
+}
+
+label{
+    margin-right: 8px;
 }
 
 .dialogLegend
@@ -3412,6 +3417,14 @@ div.menu a {
     -moz-opacity:0.3;
     cursor: pointer !important;
     height: 16px;
+}
+
+.menuActions.moreActions{
+    margin-top: 0 !important;
+}
+.menuActions.moreActions span{
+    color: #ffffff;
+    cursor: pointer;
 }
 
 .menuActions a:hover

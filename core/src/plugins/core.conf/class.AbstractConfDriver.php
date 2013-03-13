@@ -689,6 +689,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                     $loggedUser->load();
                     $loggedUser->personalRole->setAcl($newRep->getUniqueId(), "rw");
                     $loggedUser->save("superuser");
+                    $loggedUser->recomputeMergedRole();
                     AuthService::updateUser($loggedUser);
 
                     AJXP_XMLWriter::sendMessage($mess[425], null);

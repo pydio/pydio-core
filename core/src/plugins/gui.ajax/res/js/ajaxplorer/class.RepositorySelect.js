@@ -257,6 +257,7 @@ Class.create("RepositorySelect", {
 				name:MessageHash[423],
 				alt:MessageHash[423],
 				image:ajxpResourcesFolder+'/images/actions/16/delete_bookmark.png',
+                icon_class:'icon-remove',
 				disabled:false,
 				className:"edit",
 				callback:function(e){
