@@ -52,6 +52,9 @@
                             background-color: rgb(78, 154, 179) !important;
                             border-bottom: 1px solid rgb(50, 102, 119) !important;
                         }
+                        #switch_to_settings_button {
+                            display: none !important;
+                        }
                     </style>
                     <script>
                         $("vertical_splitter").ajxpPaneObject.paneB._max = 1;

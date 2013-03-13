@@ -230,10 +230,11 @@ Class.create("User", {
 		if(!this.preferences.get(prefName)) return;
 		var conn = new Connexion();
         conn.setMethod('post');
+        conn.discrete = true;
 		conn.addParameter("get_action", "save_user_pref");
 		conn.addParameter("pref_name_" + 0, prefName);
 		conn.addParameter("pref_value_" + 0, this.preferences.get(prefName));
-		conn.sendAsync();
+        window.setTimeout( conn.sendAsync.bind(conn), 250 );
 	},
 	/**
 	 * Send all preferences to the server. If oldPass, newPass and seed are set, also save pass.

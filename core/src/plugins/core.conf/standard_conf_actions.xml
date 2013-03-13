@@ -7,7 +7,7 @@
 			</processing>
 		</action>
         <action name="user_create_repository">
-            <gui text="417" title="418" src="user-create-repository.png" accessKey="" hasAccessKey="false">
+            <gui text="417" title="418" src="user-create-repository.png" accessKey="" hasAccessKey="false" iconClass="icon-plus-sign">
                 <context selection="false" dir="" recycle="true" ajxpWidgets="RepositorySelect"/>
             </gui>
             <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
@@ -239,7 +239,7 @@
       			</processing>
       		</action>
 		<action name="switch_language">
-			<gui text="190" title="190" src="flag.png" accessKey="" hasAccessKey="false">
+			<gui text="190" title="190" src="flag.png" accessKey="" hasAccessKey="false" iconClass="icon-flag">
 				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false"></context>
 			</gui>
 			<processing>

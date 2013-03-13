@@ -51,6 +51,7 @@ class sftpAccessDriver extends fsAccessDriver
 		$wrapperData = $this->detectStreamWrapper(true);
 		$this->wrapperClassName = $wrapperData["classname"];
 		$this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+        restore_error_handler();
 		if(!file_exists($this->urlBase)){
             if($this->repository->getOption("CREATE")){
                 $test = @mkdir($this->urlBase);
