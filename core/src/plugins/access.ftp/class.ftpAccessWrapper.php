@@ -325,7 +325,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 	protected function rawListEntryToStat($entry, $filterStatPerms = false)
     {
         $info = array();
-        $monthes = array_flip($this->monthes);
+        $monthes = array_flip( $this->monthes );
 		$vinfo = preg_split("/[\s]+/", $entry);
 		AJXP_Logger::debug("RAW LIST", $entry);
 		$statValue = array();
