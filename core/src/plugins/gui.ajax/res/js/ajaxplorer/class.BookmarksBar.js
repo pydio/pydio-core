@@ -180,6 +180,7 @@
 	 * @param actionsParameters Hash
 	 */
 	load: function(actionsParameters, silently){
+        if(!ajaxplorer || !ajaxplorer.user) return;
 		var connexion = new Connexion();
 		if(!actionsParameters) actionsParameters = new Hash();
 		actionsParameters.set('get_action', 'get_bookmarks');

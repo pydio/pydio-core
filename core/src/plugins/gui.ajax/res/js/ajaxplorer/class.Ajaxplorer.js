@@ -77,7 +77,12 @@ Class.create("Ajaxplorer", {
 		}.bind(this));
 
 		modal.setLoadingStepCounts(5);
-		this.loadXmlRegistry(true);		
+        if(ajxpBootstrap.parameters.get("PRELOADED_REGISTRY")){
+            this._registry = parseXml(ajxpBootstrap.parameters.unset("PRELOADED_REGISTRY")).documentElement;
+            modal.updateLoadingProgress('XML Registry loaded');
+        }else{
+            this.loadXmlRegistry(true);
+        }
 		this.initTemplates();
 		modal.initForms();
 		this.initObjects();

@@ -94,6 +94,21 @@ Class.create("AjxpBootstrap", {
 	 * Real loading action
 	 */
 	loadBootConfig : function(){
+        if(this.parameters.get('PRELOADED_BOOT_CONF')){
+            this.parameters.update(this.parameters.get('PRELOADED_BOOT_CONF'));
+            if(this.parameters.get('SECURE_TOKEN')){
+                Connexion.SECURE_TOKEN = this.parameters.get('SECURE_TOKEN');
+            }
+            if(this.parameters.get('SERVER_PREFIX_URI')){
+                this.parameters.set('ajxpResourcesFolder', this.parameters.get('SERVER_PREFIX_URI') + this.parameters.get('ajxpResourcesFolder'));
+                this.parameters.set('ajxpServerAccess', this.parameters.get('SERVER_PREFIX_URI') + this.parameters.get('ajxpServerAccess') + '?' + (Connexion.SECURE_TOKEN? 'secure_token='+Connexion.SECURE_TOKEN:''));
+            }else{
+                this.parameters.set('ajxpServerAccess', this.parameters.get('ajxpServerAccess') + '?' + (Connexion.SECURE_TOKEN? 'secure_token='+Connexion.SECURE_TOKEN:''));
+            }
+            this.refreshContextVariablesAndInit(new Connexion());
+            return;
+        }
+
 		var url = this.parameters.get('BOOTER_URL')+(this.parameters.get("debugMode")?'&debug=true':'');
 		if(this.parameters.get('SERVER_PREFIX_URI')){
 			url += '&server_prefix_uri=' + this.parameters.get('SERVER_PREFIX_URI');
@@ -261,8 +276,8 @@ Class.create("AjxpBootstrap", {
 			onTick		: function(pbObj) { 
 				if(pbObj.getPercentage() == 100){
                     new Effect.Parallel([
-                            new Effect.Opacity($('loading_overlay'),{sync:true,from:0.2,to:0,duration:0.8}),
-                            new Effect.Opacity($('progressBox'),{sync:true,from:1,to:0,duration:0.8})
+                            new Effect.Opacity($('loading_overlay'),{sync:true,from:0.2,to:0,duration:0.3}),
+                            new Effect.Opacity($('progressBox'),{sync:true,from:1,to:0,duration:0.3})
                         ],
                         {afterFinish : function(){
                             $('loading_overlay').remove();

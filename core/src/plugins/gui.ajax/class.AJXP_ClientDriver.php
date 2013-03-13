@@ -159,7 +159,10 @@ class AJXP_ClientDriver extends AJXP_Plugin
 					}
 				}
 				
-				$START_PARAMETERS = array("BOOTER_URL"=>"index.php?get_action=get_boot_conf", "MAIN_ELEMENT" => "ajxp_desktop");
+				$START_PARAMETERS = array(
+                    "BOOTER_URL"=>"index.php?get_action=get_boot_conf",
+                    "MAIN_ELEMENT" => "ajxp_desktop"
+                );
 				if(AuthService::usersEnabled())
 				{
 					AuthService::preLogUser((isSet($httpVars["remote_session"])?$httpVars["remote_session"]:""));
@@ -185,7 +188,14 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				if(count($confErrors)){
 					$START_PARAMETERS["ALERT"] = implode(", ", array_values($confErrors));
 				}
+                // PRECOMPUTE BOOT CONF
+                $START_PARAMETERS["PRELOADED_BOOT_CONF"] = $this->computeBootConf();
 
+                // PRECOMPUTE REGISTRY
+                $regDoc = AJXP_PluginsService::getXmlRegistry();
+                $changes = AJXP_Controller::filterActionsRegistry($regDoc);
+                if($changes) AJXP_PluginsService::updateXmlRegistry($regDoc);
+                $START_PARAMETERS["PRELOADED_REGISTRY"] = AJXP_XMLWriter::replaceAjxpXmlKeywords($regDoc->saveXML());
 				$JSON_START_PARAMETERS = json_encode($START_PARAMETERS);
                 $crtTheme = $this->pluginConf["GUI_THEME"];
 				if(ConfService::getConf("JS_DEBUG")){
@@ -218,52 +228,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 			//------------------------------------
 			case "get_boot_conf":
 				
-				if(isSet($_GET["server_prefix_uri"])){
-					$_SESSION["AJXP_SERVER_PREFIX_URI"] = $_GET["server_prefix_uri"];
-				}
-				$config = array();
-				$config["ajxpResourcesFolder"] = "plugins/gui.ajax/res";
-				$config["ajxpServerAccess"] = AJXP_SERVER_ACCESS;
-				$config["zipEnabled"] = ConfService::zipEnabled();
-				$config["multipleFilesDownloadEnabled"] = ConfService::getCoreConf("ZIP_CREATION");
-				$config["customWording"] = array(
-		        	"welcomeMessage" => $this->pluginConf["CUSTOM_WELCOME_MESSAGE"],
-		        	"title"			 => ConfService::getCoreConf("APPLICATION_TITLE"),
-		        	"icon"			 => $this->pluginConf["CUSTOM_ICON"],
-		        	"iconWidth"		 => $this->pluginConf["CUSTOM_ICON_WIDTH"],
-		        	"iconHeight"     => $this->pluginConf["CUSTOM_ICON_HEIGHT"],
-                    "iconOnly"       => $this->pluginConf["CUSTOM_ICON_ONLY"],
-		        	"titleFontSize"	 => $this->pluginConf["CUSTOM_FONT_SIZE"]
-		        );
-				$config["usersEnabled"] = AuthService::usersEnabled();
-				$config["loggedUser"] = (AuthService::getLoggedUser()!=null);
-				$config["currentLanguage"] = ConfService::getLanguage();
-				$config["session_timeout"] = intval(ini_get("session.gc_maxlifetime"));				
-				if(!isSet($this->pluginConf["CLIENT_TIMEOUT_TIME"]) || $this->pluginConf["CLIENT_TIMEOUT_TIME"] == ""){
-					$to = $config["session_timeout"]; 
-				}else{
-					$to = $this->pluginConf["CLIENT_TIMEOUT_TIME"];
-				}
-				$config["client_timeout"] = $to;
-				$config["client_timeout_warning"] = $this->pluginConf["CLIENT_TIMEOUT_WARN"];
-				$config["availableLanguages"] = ConfService::getConf("AVAILABLE_LANG");
-				$config["usersEditable"] = ConfService::getAuthDriverImpl()->usersEditable();
-				$config["ajxpVersion"] = AJXP_VERSION;
-				$config["ajxpVersionDate"] = AJXP_VERSION_DATE;				
-				if(stristr($_SERVER["HTTP_USER_AGENT"], "msie 6")){
-					$config["cssResources"] = array("css/pngHack/pngHack.css");
-				}
-				if(!empty($this->pluginConf['GOOGLE_ANALYTICS_ID'])) {
-					$config["googleAnalyticsData"] = array(
-						"id"=> 		$this->pluginConf['GOOGLE_ANALYTICS_ID'],
-						"domain" => $this->pluginConf['GOOGLE_ANALYTICS_DOMAIN'],
-						"event" => 	$this->pluginConf['GOOGLE_ANALYTICS_EVENT']);
-				}
-				$config["i18nMessages"] = ConfService::getMessages();
-				$config["password_min_length"] = ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth");
-				$config["SECURE_TOKEN"] = AuthService::generateSecureToken();
-				$config["streaming_supported"] = "true";
-                $config["theme"] = $this->pluginConf["GUI_THEME"];
+                $config = $this->computeBootConf();
 				header("Content-type:application/json;charset=UTF-8");
 				print(json_encode($config));
 				
@@ -276,9 +241,59 @@ class AJXP_ClientDriver extends AJXP_Plugin
 		return false;		
 	}
 
+    function computeBootConf(){
+        if(isSet($_GET["server_prefix_uri"])){
+            $_SESSION["AJXP_SERVER_PREFIX_URI"] = $_GET["server_prefix_uri"];
+        }
+        $config = array();
+        $config["ajxpResourcesFolder"] = "plugins/gui.ajax/res";
+        $config["ajxpServerAccess"] = AJXP_SERVER_ACCESS;
+        $config["zipEnabled"] = ConfService::zipEnabled();
+        $config["multipleFilesDownloadEnabled"] = ConfService::getCoreConf("ZIP_CREATION");
+        $config["customWording"] = array(
+            "welcomeMessage" => $this->pluginConf["CUSTOM_WELCOME_MESSAGE"],
+            "title"			 => ConfService::getCoreConf("APPLICATION_TITLE"),
+            "icon"			 => $this->pluginConf["CUSTOM_ICON"],
+            "iconWidth"		 => $this->pluginConf["CUSTOM_ICON_WIDTH"],
+            "iconHeight"     => $this->pluginConf["CUSTOM_ICON_HEIGHT"],
+            "iconOnly"       => $this->pluginConf["CUSTOM_ICON_ONLY"],
+            "titleFontSize"	 => $this->pluginConf["CUSTOM_FONT_SIZE"]
+        );
+        $config["usersEnabled"] = AuthService::usersEnabled();
+        $config["loggedUser"] = (AuthService::getLoggedUser()!=null);
+        $config["currentLanguage"] = ConfService::getLanguage();
+        $config["session_timeout"] = intval(ini_get("session.gc_maxlifetime"));
+        if(!isSet($this->pluginConf["CLIENT_TIMEOUT_TIME"]) || $this->pluginConf["CLIENT_TIMEOUT_TIME"] == ""){
+            $to = $config["session_timeout"];
+        }else{
+            $to = $this->pluginConf["CLIENT_TIMEOUT_TIME"];
+        }
+        $config["client_timeout"] = $to;
+        $config["client_timeout_warning"] = $this->pluginConf["CLIENT_TIMEOUT_WARN"];
+        $config["availableLanguages"] = ConfService::getConf("AVAILABLE_LANG");
+        $config["usersEditable"] = ConfService::getAuthDriverImpl()->usersEditable();
+        $config["ajxpVersion"] = AJXP_VERSION;
+        $config["ajxpVersionDate"] = AJXP_VERSION_DATE;
+        if(stristr($_SERVER["HTTP_USER_AGENT"], "msie 6")){
+            $config["cssResources"] = array("css/pngHack/pngHack.css");
+        }
+        if(!empty($this->pluginConf['GOOGLE_ANALYTICS_ID'])) {
+            $config["googleAnalyticsData"] = array(
+                "id"=> 		$this->pluginConf['GOOGLE_ANALYTICS_ID'],
+                "domain" => $this->pluginConf['GOOGLE_ANALYTICS_DOMAIN'],
+                "event" => 	$this->pluginConf['GOOGLE_ANALYTICS_EVENT']);
+        }
+        $config["i18nMessages"] = ConfService::getMessages();
+        $config["password_min_length"] = ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth");
+        $config["SECURE_TOKEN"] = AuthService::generateSecureToken();
+        $config["streaming_supported"] = "true";
+        $config["theme"] = $this->pluginConf["GUI_THEME"];
+        return $config;
+    }
+
     /**
      * @param AJXP_Node $ajxpNode
-     * @return
+     * @return void
      */
     function nodeBookmarkMetadata(&$ajxpNode){
         $user = AuthService::getLoggedUser();
