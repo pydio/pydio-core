@@ -119,7 +119,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
 
         // APPEND USER ALERT IN THE SAME QUERY FOR NOW
         //$this->loadUserAlerts("", $httpVars, $fileVars);
-
+        restore_error_handler();
         foreach($res as $n => $object){
             $args = $object->arguments;
             $oldNode = (isSet($args[0]) ? $args[0] : null);
