@@ -48,7 +48,9 @@ class ftpAccessWrapper implements AjxpWrapper {
 	// Shared vars self::
 	private static $dirContent;
 	private static $dirContentKeys;
-	private static $dirContentIndex;	
+	private static $dirContentIndex;
+
+    private $monthes = array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Juil", "Aug", "Sep", "Oct", "Nov", "Dec");
 	
     public static function getRealFSReference($path, $persistent = false){
     	$tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time());
@@ -322,7 +324,8 @@ class ftpAccessWrapper implements AjxpWrapper {
 	
 	protected function rawListEntryToStat($entry, $filterStatPerms = false)
     {
-        $info = array();    
+        $info = array();
+        $monthes = array_flip($this->monthes);
 		$vinfo = preg_split("/[\s]+/", $entry);
 		AJXP_Logger::debug("RAW LIST", $entry);
 		$statValue = array();
@@ -350,7 +353,12 @@ class ftpAccessWrapper implements AjxpWrapper {
 		 $statValue[7] = $statValue["size"] = trim($info['size']);
 		 if(strstr($info["timeOrYear"], ":")){
 		 	$info["time"] = $info["timeOrYear"];
-		 	$info["year"] = date("Y");
+            $monthKey = $monthes[$info['month']] + 1;
+             if(intval(date('m')) < $monthKey){
+                 $info['year'] = date("Y") -1;
+             }else{
+                 $info["year"] = date("Y");
+             }
 		 }else{
 		 	$info["time"] = '09:00';
 		 	$info["year"] = $info["timeOrYear"];
