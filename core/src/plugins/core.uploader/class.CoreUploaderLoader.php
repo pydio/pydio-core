@@ -27,6 +27,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class CoreUploaderLoader extends AJXP_Plugin{
 
+    public $AUTO_LOAD_TYPE = true;
+
     public function getConfigs(){
         $data = parent::getConfigs();
         $this->filterData($data);
@@ -50,4 +52,3 @@ class CoreUploaderLoader extends AJXP_Plugin{
 
     }
 }
-?>

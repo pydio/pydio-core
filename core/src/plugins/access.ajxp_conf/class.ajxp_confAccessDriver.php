@@ -1268,8 +1268,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				
 				$options = array();
 				$this->parseParameters($httpVars, $options, null, true);
-				$confStorage = ConfService::getConfStorageImpl();
-				$confStorage->savePluginConfig($httpVars["plugin_id"], $options);
+                $confStorage = ConfService::getConfStorageImpl();
+                $confStorage->savePluginConfig($httpVars["plugin_id"], $options);
 				@unlink(AJXP_PLUGINS_CACHE_FILE);
 				@unlink(AJXP_PLUGINS_REQUIRES_FILE);				
 				@unlink(AJXP_PLUGINS_MESSAGES_FILE);

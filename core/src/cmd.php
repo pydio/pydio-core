@@ -210,7 +210,7 @@ if(!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSIN
 	$confDriver = ConfService::getConfStorageImpl();
 	$Driver = ConfService::loadRepositoryDriver();
 }
-ConfService::initActivePlugins();
+AJXP_PluginsService::getInstance()->initActivePlugins();
 require_once(AJXP_BIN_FOLDER."/class.AJXP_Controller.php");
 $xmlResult = AJXP_Controller::findActionAndApply($optAction, $optArgs, array());
 if($xmlResult !== false && $xmlResult != ""){

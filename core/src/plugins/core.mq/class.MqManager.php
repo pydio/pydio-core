@@ -53,10 +53,7 @@ class MqManager extends AJXP_Plugin
     function init($options){
         parent::init($options);
         try{
-            $msgExchanger = ConfService::getInstance()->getUniquePluginImplInst("MQ_DRIVER", "mq");
-            if($msgExchanger !== false){
-                $this->msgExchanger = $msgExchanger;
-            }
+            $this->msgExchanger = AJXP_PluginsService::findPlugin("core", "notifications")->getExchanger();
         }catch (Exception $e){}
     }
 

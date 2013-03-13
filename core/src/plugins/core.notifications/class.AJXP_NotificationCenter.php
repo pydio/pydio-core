@@ -53,6 +53,9 @@ class AJXP_NotificationCenter extends AJXP_Plugin
 
     }
 
+    public function getExchanger(){
+        return $this->msgExchanger;
+    }
 
 
     protected function parseSpecificContributions(&$contribNode){

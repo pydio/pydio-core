@@ -322,5 +322,3 @@ class AJXP_ClientDriver extends AJXP_Plugin
 }
 
 AJXP_Controller::registerIncludeHook("xml.filter", array("AJXP_ClientDriver", "filterXml"));
-
-?>

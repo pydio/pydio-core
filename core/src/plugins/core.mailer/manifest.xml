@@ -2,6 +2,7 @@
 <ajxp_plugin id="core.mailer" label="CONF_MESSAGE[Mailers]" description="CONF_MESSAGE[Core configs for sending emails]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition classname="AjxpMailer" filename="plugins/core.mailer/class.AjxpMailer.php"/>
     <server_settings>
+        <global_param name="UNIQUE_MAILER_INSTANCE" type="plugin_instance:mailer" label="CONF_MESSAGE[Mailer Plugin]" description="CONF_MESSAGE[Select the plugin to activate for concretely sending emails]" mandatory="true" default="mailer.phpmailer-lite"/>
         <global_param name="FROM" type="string" label="CONF_MESSAGE[Sender email]" description="CONF_MESSAGE[Adress of the sender]" mandatory="true" default=""/>
         <global_param name="FROM_NAME" type="string" label="CONF_MESSAGE[Sender name]" description="CONF_MESSAGE[Name of the sender]" mandatory="true" default=""/>
         <global_param name="SUBJECT_PREPEND" label="CONF_MESSAGE[Subject Prepend]" description="CONF_MESSAGE[String automatically added at the beginning of the mail subject]" type="string" mandatory="false" default=""/>

@@ -120,8 +120,7 @@ class AJXP_Plugin implements Serializable{
      * @return void
      */
 	public function init($options){
-		$this->options = $options;
-		//$this->loadRegistryContributions();
+        $this->options = array_merge($this->loadOptionsDefaults(), $options);
 	}
 
     protected function getFilteredOption($optionName, $repositoryScope = AJXP_REPO_SCOPE_ALL){
@@ -528,6 +527,24 @@ class AJXP_Plugin implements Serializable{
 				$this->pluginConf[$paramNode["name"]] = $paramNode["default"];
 			}
 		}					
+	}
+	/**
+     * Load the default values for this plugin options
+     * @return array
+     */
+	protected function loadOptionsDefaults(){
+        $optionsDefaults = array();
+        $params = $this->xPath->query("//server_settings/param[@default]");
+		foreach ($params as $xmlNode){
+            $default = $xmlNode->getAttribute("default");
+            if($xmlNode->getAttribute("type") == "boolean"){
+                $default = ($default === "true" ? true: false);
+            }else if($xmlNode->getAttribute("type") == "integer"){
+                $default = intval($default);
+            }
+            $optionsDefaults[$xmlNode->getAttribute("name")] = $default;
+		}
+        return $optionsDefaults;
 	}
 	/**
      * @return array

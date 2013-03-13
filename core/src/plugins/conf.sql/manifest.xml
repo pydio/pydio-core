@@ -9,7 +9,6 @@
     </client_settings>
 	<server_settings>
 		<param name="SQL_DRIVER" type="group_switch:dibi" label="CONF_MESSAGE[Connexion]" description="CONF_MESSAGE[The Database Connexion]" mandatory="false"/>
-		<param name="USERS_DIRPATH" type="string" label="CONF_MESSAGE[Users Tmp Folder]" description="CONF_MESSAGE[The folder in which all temporary files will be stored]" mandatory="true" default="AJXP_INSTALL_PATH/data/plugins/conf.sql/users"/>
 	</server_settings>
 	<class_definition filename="plugins/conf.sql/class.sqlConfDriver.php" classname="sqlConfDriver"/>
 	<registry_contributions>

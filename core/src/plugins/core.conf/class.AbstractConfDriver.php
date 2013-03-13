@@ -50,8 +50,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
             }
             $this->reloadXPath();
         }
-    }
 
+    }
 
 	protected function parseSpecificContributions(&$contribNode){
 		parent::parseSpecificContributions($contribNode);

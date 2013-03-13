@@ -42,4 +42,7 @@
             <serverCallback methodName="sendInstantMessage" hookName="msg.instant" />
         </hooks>
     </registry_contributions>
+    <dependencies>
+        <activePlugin pluginName="core.notifications"/>
+    </dependencies>
 </ajxp_plugin>

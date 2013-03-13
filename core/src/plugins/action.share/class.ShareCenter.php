@@ -560,7 +560,7 @@ class ShareCenter extends AJXP_Plugin{
         $repoObject = $data["REPOSITORY"];
         ConfService::switchRootDir($repoObject->getId());
         ConfService::loadRepositoryDriver();
-        ConfService::initActivePlugins();
+        AJXP_PluginsService::getInstance()->initActivePlugins();
         try{
             $params = array("file" => SystemTextEncoding::toUTF8($data["FILE_PATH"]));
             if(isSet($data["PLUGINS_DATA"])){

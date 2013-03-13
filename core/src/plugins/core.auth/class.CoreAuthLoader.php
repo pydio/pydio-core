@@ -26,12 +26,27 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * Config loader overrider
  */
 class CoreAuthLoader extends AJXP_Plugin{
-	
+
+    /**
+     * @var AbstractAuthDriver
+     */
+    protected  static $authStorageImpl;
+
 	public function getConfigs(){
 		$configs = parent::getConfigs();
 		$configs["ALLOW_GUEST_BROWSING"] = !isSet($_SERVER["HTTP_AJXP_FORCE_LOGIN"]) && ($configs["ALLOW_GUEST_BROWSING"] === "true" || $configs["ALLOW_GUEST_BROWSING"] === true || intval($configs["ALLOW_GUEST_BROWSING"]) == 1);
 		return $configs;
 	}
-		
+
+    public function getAuthImpl(){
+        if(!isSet(self::$authStorageImpl)){
+            if(isset($this->pluginConf["MASTER_INSTANCE_CONFIG"])){
+                self::$authStorageImpl = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["MASTER_INSTANCE_CONFIG"], "AbstractAuthDriver");
+                AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("auth", self::$authStorageImpl->getName());
+            }
+        }
+        return self::$authStorageImpl;
+    }
+
+
 }
-?>

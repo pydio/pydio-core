@@ -33,7 +33,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
 	public $repository;
 	public $driverType = "access";
 		
-	public function init($repository, $options = null){
+	public function init($repository, $options = array()){
 		//$this->loadActionsFromManifest();
 		parent::init($options);
 		$this->repository = $repository;

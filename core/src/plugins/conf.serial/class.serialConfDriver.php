@@ -36,9 +36,9 @@ class serialConfDriver extends AbstractConfDriver {
 
 	function init($options){
 		parent::init($options);
-		$this->repoSerialFile = AJXP_VarsFilter::filter($options["REPOSITORIES_FILEPATH"]);
-		$this->usersSerialDir = AJXP_VarsFilter::filter($options["USERS_DIRPATH"]);
-		$this->rolesSerialFile = AJXP_VarsFilter::filter($options["ROLES_FILEPATH"]);
+		$this->repoSerialFile = AJXP_VarsFilter::filter($this->options["REPOSITORIES_FILEPATH"]);
+		$this->usersSerialDir = AJXP_VarsFilter::filter($this->options["USERS_DIRPATH"]);
+		$this->rolesSerialFile = AJXP_VarsFilter::filter($this->options["ROLES_FILEPATH"]);
 		$this->aliasesIndexFile = dirname($this->repoSerialFile)."/aliases.ser";
 		$this->pluginsConfigsFile = dirname($this->repoSerialFile)."/plugins_configs.ser";
 	}
