@@ -45,19 +45,15 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         $this->userId = AuthService::getLoggedUser() !== null ? AuthService::getLoggedUser()->getId() : "shared";
         $this->useQueue = $this->pluginConf["USE_QUEUE"];
         try{
-            $eStore = ConfService::getInstance()->getUniquePluginImplInst("FEED_DRIVER", "feed");
-            if(is_a($eStore, "AJXP_FeedStore")){
-                $this->eventStore = $eStore;
-            }
-        }catch (Exception $e){};
-        try{
-            $msgBroker = ConfService::getInstance()->getUniquePluginImplInst("MQ_DRIVER", "mq");
-            if(is_a($msgBroker, "AJXP_MessageExchanger")){
-                $this->msgExchanger = $msgBroker;
-            }
-        }catch (Exception $e){};
+            $this->eventStore = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_FEED_INSTANCE"], "AJXP_FeedStore");
+            $this->msgExchanger = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_MS_INSTANCE"], "AJXP_MessageExchanger");
+        }catch (Exception $e){
+
+        }
 
     }
+
+
 
     protected function parseSpecificContributions(&$contribNode){
    		parent::parseSpecificContributions($contribNode);

@@ -27,7 +27,7 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
     private $sqlDriver;
 
     public function init($options){
-        $this->sqlDriver = $options["SQL_DRIVER"];
+        $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
         parent::init($options);
     }
 

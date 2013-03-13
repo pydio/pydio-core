@@ -119,19 +119,24 @@ class textLogDriver extends AbstractLogDriver {
 		$this->storageDir = AJXP_VarsFilter::filter($this->storageDir);
 		$this->logFileName = isset($options['LOG_FILE_NAME']) ? $options['LOG_FILE_NAME'] : 'log_' . date('m-d-y') . '.txt';
 		$this->USER_GROUP_RIGHTS = isset($options['LOG_CHMOD']) ? $options['LOG_CHMOD'] : 0770;
-		
+
+        if(preg_match("/(.*)date\('(.*)'\)(.*)/i", $this->logFileName, $matches)){
+            $this->logFileName = $matches[1].date($matches[2]).$matches[3];
+        }
+
 		$this->initStorage();
 	}
-	
-	/**
-	 * Write text to the log file.
-	 * 
-	 * If write is not allowed because the file is not yet open, the message is buffered until
-	 * file becomes available.
-	 *
-	 * @param String $textMessage The message to write.
-	 * @param Integer $severityLevel Log severity: one of LOG_LEVEL_* (DEBUG,INFO,NOTICE,WARNING,ERROR)
-	 */
+
+    /**
+     * Write text to the log file.
+     *
+     * If write is not allowed because the file is not yet open, the message is buffered until
+     * file becomes available.
+     *
+     * @param String $textMessage The message to write.
+     * @param int|String $severityLevel Log severity: one of LOG_LEVEL_* (DEBUG,INFO,NOTICE,WARNING,ERROR)
+     * @return void
+     */
 	function write($textMessage, $severityLevel = LOG_LEVEL_DEBUG) {
 		$textMessage = $this->formatMessage($textMessage, $severityLevel);
 

@@ -1317,7 +1317,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			</columns>');		
 			$mess = ConfService::getMessages();
 			foreach($uniqTypes as $type){
-				if(!isset($types[$type])) continue;				
+				if(!isset($types[$type])) continue;
 				foreach($types[$type] as $pId => $pObject){
 					$meta = array(				
 						"icon" 		=> ($type == "core"?"preferences_desktop.png":"preferences_plugin.png"),
@@ -1326,6 +1326,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						"plugin_description" => $pObject->getManifestDescription()
 					);
 					if($type == "core"){
+                        // Check if there are actually any parameters to display!
+                        if($pObject->getManifestRawContent("server_settings", "xml")->length == 0) continue;
 					    $label =  $pObject->getManifestLabel();//sprintf($mess["ajxp_conf.100"], $pObject->getName());
 					}else{
 						if($activePlugins[$pObject->getId()] !== true) continue;

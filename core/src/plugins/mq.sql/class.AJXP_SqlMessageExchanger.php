@@ -26,8 +26,7 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
 
     function init($options){
    		parent::init($options);
-   		require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
-   		$this->sqlDriver = $options["SQL_DRIVER"];
+   		$this->sqlDriver = $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
    	}
 
 
@@ -190,6 +189,7 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
      */
     public function consumeWorkerChannel($channelName, $filter = null)
     {
+        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         $results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE [store_id]=%s ORDER BY [object_id] ASC", "queues.$channelName");
         $rows = $results->fetchAll();
@@ -212,6 +212,7 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
      */
     public function publishWorkerMessage($channel, $message)
     {
+        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         $r = dibi::query("SELECT MAX( [object_id] ) FROM [ajxp_simple_store] WHERE [store_id]=%s", "queues.$channel");
         $index = $r->fetchSingle();

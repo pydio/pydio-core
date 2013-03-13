@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin label="CONF_MESSAGE[Application Logger]" description="CONF_MESSAGE[Setup the logging system]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition classname="AJXP_Logger" filename="plugins/core.log/class.AJXP_Logger.php"/>
     <server_settings>
         <global_param description="CONF_MESSAGE[Plugin instance to handle log implementation]" label="CONF_MESSAGE[Logger plugin]" name="UNIQUE_PLUGIN_INSTANCE" type="plugin_instance:log" default="text" mandatory="true"/>
     </server_settings>

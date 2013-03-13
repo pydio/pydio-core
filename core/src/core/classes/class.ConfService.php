@@ -136,7 +136,8 @@ class ConfService
         $detected = $pServ->getDetectedPlugins();
         $toActivate = array();
         foreach ($detected as $pType => $pObjects){
-            if(in_array($pType, array("conf", "auth", "log", "access", "meta","metastore", "index"))) continue;
+            //if(in_array($pType, array("conf", "auth", "log", "access", "meta","metastore", "index", "feed", "mq"))) continue;
+            if($pServ->findPlugin("core", $pType) !== false) continue;
             foreach ($pObjects as $pName => $pObject){
                 $toActivate[$pObject->getId()] = $pObject ;
             }
@@ -179,6 +180,40 @@ class ConfService
 		$pServ = AJXP_PluginsService::getInstance();
 		$pServ->setPluginUniqueActiveForType($plugType, $name);
 	}
+
+    /**
+     * @static
+     * @param $globalsArray
+     * @param string $interfaceCheck
+     * @param string $bootstrapConfigKey
+     * @param string $bootstrapConfigType
+     * @throws Exception
+     * @return AJXP_Plugin|null
+     */
+    public static function instanciatePluginFromGlobalParams($globalsArray, $interfaceCheck = "", $bootstrapConfigKey = "", $bootstrapConfigType = ""){
+
+        $plugin = false;
+        if($bootstrapConfigKey != "" && $bootstrapConfigType != ""){
+            $plugin = self::getInstance()->getUniquePluginImplInst($bootstrapConfigKey, $bootstrapConfigType);
+        }
+
+        if(isSet($globalsArray["instance_name"])){
+            $pName = $globalsArray["instance_name"];
+            unset($globalsArray["instance_name"]);
+            $plugin = AJXP_PluginsService::findPluginById($pName);
+            $plugin->init($globalsArray);
+            $plugin->performChecks();
+        }
+
+        if($plugin != false && !empty($interfaceCheck)){
+            if(!is_a($plugin, $interfaceCheck)){
+                $plugin = false;
+            }
+        }
+
+        return $plugin;
+
+    }
 	/**
      * Lazy loading of unique plugin
      * @param $key
@@ -224,15 +259,6 @@ class ConfService
 	 */
 	public static function getAuthDriverImpl(){
 		return self::getInstance()->getUniquePluginImplInst("AUTH_DRIVER");
-	}
-	
-	/**
-	 * Get log driver implementation
-	 *
-	 * @return AbstractLogDriver
-	 */
-	public static function getLogDriverImpl(){
-		return self::getInstance()->getUniquePluginImplInst("LOG_DRIVER", "log");
 	}
 
 	public static function switchUserToActiveRepository($loggedUser, $parameterId = -1){
