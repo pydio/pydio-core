@@ -649,10 +649,12 @@ class AuthService
         if(!ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest"){
             throw new Exception("Reserved user id");
         }
+        /*
 		if(strlen($userPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth") && $userId != "guest"){
 			$messages = ConfService::getMessages();
 			throw new Exception($messages[378]);
 		}
+        */
 		$authDriver = ConfService::getAuthDriverImpl();
 		$confDriver = ConfService::getConfStorageImpl();
 		$authDriver->createUser($userId, $userPass);
