@@ -82,7 +82,11 @@ class AJXP_ShutdownScheduler
         flush();
         foreach ($this->callbacks as $arguments) {
             $callback = array_shift($arguments);
-            call_user_func_array($callback, $arguments);
+            try{
+                call_user_func_array($callback, $arguments);
+            }catch (Exception $e){
+                AJXP_Logger::logAction("error", array("context"=>"Applying hook ".get_class($callback[0])."::".$callback[1],  "message" => $e->getMessage()));
+            }
         }
      }
 }
