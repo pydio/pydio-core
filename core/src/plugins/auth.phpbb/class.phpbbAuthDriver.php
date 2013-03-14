@@ -31,8 +31,9 @@ class phpbbAuthDriver extends serialAuthDriver  {
 	
 	function init($options){
 		parent::init($options);
+        $options = $this->options;
 
-		$this->usersSerFile = $options["USERS_FILEPATH"];
+        $this->usersSerFile = $options["USERS_FILEPATH"];
 		$this->slaveMode = ($options["SLAVE_MODE"]) ? true : false;
 		$this->urls = array($options["LOGIN_URL"], $options["LOGOUT_URL"]);
 

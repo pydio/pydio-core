@@ -33,6 +33,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 
     public function init($options){
         parent::init($options);
+        $options = $this->options;
 
         // BACKWARD COMPATIBILIY PREVIOUS CONFIG VIA OPTIONS
         if(isSet($options["CUSTOM_DATA"])){

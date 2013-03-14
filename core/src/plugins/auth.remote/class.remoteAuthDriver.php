@@ -66,8 +66,10 @@ class remoteAuthDriver extends AbstractAuthDriver {
         		}
         	}
         }
-		parent::init($options);		
-		$this->usersSerFile = $options["USERS_FILEPATH"];
+		parent::init($options);
+        $options = $this->options;
+
+        $this->usersSerFile = $options["USERS_FILEPATH"];
         $this->secret = $options["SECRET"];
         $this->urls = array($options["LOGIN_URL"], $options["LOGOUT_URL"]);
 	}	

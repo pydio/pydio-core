@@ -63,22 +63,22 @@ class cmsmsAuthDriver extends AbstractAuthDriver {
 	function init($options){
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
 		parent::init($options);
-		$this->sqlDriver = $options["SQL_DRIVER"];
+		$this->sqlDriver = $this->options["SQL_DRIVER"];
 		try {
 			dibi::connect($this->sqlDriver);		
 		} catch (DibiException $e) {
 			echo get_class($e), ': ', $e->getMessage(), "\n";
 			exit(1);
 		}
-		$this->secret = $options["SECRET"];
-		$this->prefix = $options["PREFIX_TABLE"];
-        $this->urls = array($options["LOGIN_URL"], $options["LOGOUT_URL"]);
+		$this->secret = $this->options["SECRET"];
+		$this->prefix = $this->options["PREFIX_TABLE"];
+        $this->urls = array($this->options["LOGIN_URL"], $this->options["LOGOUT_URL"]);
 		$this->slaveMode = true;
-	$res = dibi::query("SELECT sitepref_value FROM [".$this->prefix."siteprefs] WHERE sitepref_name = 'FEUajaxplorer_mapi_pref_ajxp_auth_group'");
-	$grp = $res->fetchSingle();
+        $res = dibi::query("SELECT sitepref_value FROM [".$this->prefix."siteprefs] WHERE sitepref_name = 'FEUajaxplorer_mapi_pref_ajxp_auth_group'");
+        $grp = $res->fetchSingle();
 		$this->groupid = $grp;
-	$res2 = dibi::query("SELECT sitepref_value FROM [".$this->prefix."siteprefs] WHERE sitepref_name = 'FEUajaxplorer_mapi_pref_ajxp_secret'");
-	$sec = $res2->fetchSingle();
+        $res2 = dibi::query("SELECT sitepref_value FROM [".$this->prefix."siteprefs] WHERE sitepref_name = 'FEUajaxplorer_mapi_pref_ajxp_secret'");
+        $sec = $res2->fetchSingle();
 		$this->secret_cmsms = trim($sec);
 
 	}

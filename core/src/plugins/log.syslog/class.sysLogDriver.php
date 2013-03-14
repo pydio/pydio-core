@@ -79,12 +79,13 @@ class sysLogDriver extends textLogDriver {
 	 * @return null
 	 */
 	function init($options) {
-		
+
+        parent::init($options);
 		$this->severityDescription = 0;
 		$this->stack = array();
 		$this->fileHandle = false;
 
-        $this->signature = $options["IDENTIFIER"];
+        $this->signature = $this->options["IDENTIFIER"];
 
 		$this->initStorage();
 

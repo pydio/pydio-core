@@ -109,16 +109,20 @@ class textLogDriver extends AbstractLogDriver {
 	 * @return null
 	 */
 	function init($options) {
-		
+
+
+        parent::init($options);
+
 		$this->severityDescription = 0;
 		$this->stack = array();
 		$this->fileHandle = false;
 		
 		
-		$this->storageDir = isset($options['LOG_PATH']) ? $options['LOG_PATH'] : "";
+		$this->storageDir = isset($this->options['LOG_PATH']) ? $this->options['LOG_PATH'] : "";
 		$this->storageDir = AJXP_VarsFilter::filter($this->storageDir);
-		$this->logFileName = isset($options['LOG_FILE_NAME']) ? $options['LOG_FILE_NAME'] : 'log_' . date('m-d-y') . '.txt';
-		$this->USER_GROUP_RIGHTS = isset($options['LOG_CHMOD']) ? $options['LOG_CHMOD'] : 0770;
+        $this->storageDir = (rtrim($this->storageDir))."/";
+		$this->logFileName = isset($this->options['LOG_FILE_NAME']) ? $this->options['LOG_FILE_NAME'] : 'log_' . date('m-d-y') . '.txt';
+		$this->USER_GROUP_RIGHTS = isset($this->options['LOG_CHMOD']) ? $this->options['LOG_CHMOD'] : 0770;
 
         if(preg_match("/(.*)date\('(.*)'\)(.*)/i", $this->logFileName, $matches)){
             $this->logFileName = $matches[1].date($matches[2]).$matches[3];

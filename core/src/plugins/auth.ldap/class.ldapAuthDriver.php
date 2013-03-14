@@ -41,6 +41,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
 
     function init($options){
         parent::init($options);
+        $options = $this->options;
         $this->ldapUrl = $options["LDAP_URL"];
         if ($options["LDAP_PORT"]) $this->ldapPort = $options["LDAP_PORT"];
         if ($options["LDAP_USER"]) $this->ldapAdminUsername = $options["LDAP_USER"];
