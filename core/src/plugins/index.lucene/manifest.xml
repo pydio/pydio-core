@@ -41,11 +41,11 @@
             </action>
 			<action name="index">
 				<gui text="index.lucene.1" title="index.lucene.2" iconClass="icon-book" src="lucene_images/ICON_SIZE/ark_view.png" accessKey="folder_access_key">
-					<context selection="true" dir="true" recycle="false"
-						actionBar="true" actionBarGroup="more" contextMenu="true" infoPanel="false">
-					</context>
-                    <selectionContext dir="true" file="false" recycle="false" unique="true"/>
-				</gui>			
+                    <context selection="false" dir="true" recycle="hidden"
+                             actionBar="true" contextMenu="true" infoPanel="false"
+                             actionBarGroup="remote" inZip="false">
+                    </context>
+                </gui>
 				<rightsContext noUser="true" userLogged="only" read="true"
 					write="true" adminOnly="false">
 				</rightsContext>				
