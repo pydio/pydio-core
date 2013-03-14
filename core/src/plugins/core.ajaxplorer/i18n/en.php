@@ -504,4 +504,7 @@ $mess=array(
 "457" => "update",
 "458" => "remove",
 "459" => "Top folder",
+"460" => "Details",
+"461" => "Switch to details view",
+"detail_access_key" => "D",
 );

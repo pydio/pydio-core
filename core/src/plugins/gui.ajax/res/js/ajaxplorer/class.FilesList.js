@@ -31,6 +31,7 @@ Class.create("FilesList", SelectableElements, {
     _dataModel:null,
     _doubleClickListener:null,
     _previewFactory : null,
+    _detailThumbSize : 35,
 	/**
 	 * Constructor
 	 * @param $super klass Reference to the constructor
@@ -53,13 +54,16 @@ Class.create("FilesList", SelectableElements, {
             if(this.options.displayMode) {
                 this._displayMode = this.options.displayMode;
             }else {
-                this._displayMode = 'list';
+                this._displayMode = 'detail';
             }
             if(this.options.dataModel){
                 this._dataModel = this.options.dataModel;
             }
             if(this.options.doubleClickListener){
                 this._doubleClickListener = this.options.doubleClickListener;
+            }
+            if(this.options.detailThumbSize){
+                this._detailThumbSize = this.options.detailThumbSize;
             }
 		}
         //this.options.replaceScroller = false;
@@ -73,7 +77,7 @@ Class.create("FilesList", SelectableElements, {
         var userLoggedObserver = function(){
 			if(!ajaxplorer || !ajaxplorer.user) return;
 			disp = ajaxplorer.user.getPreference("display");
-			if(disp && (disp == 'thumb' || disp == 'list')){
+			if(disp && (disp == 'thumb' || disp == 'list' || disp == 'detail')){
 				if(disp != this._displayMode) this.switchDisplayMode(disp);
 			}
 			this._thumbSize = parseInt(ajaxplorer.user.getPreference("thumb_size"));
@@ -422,12 +426,20 @@ Class.create("FilesList", SelectableElements, {
 			subMenuUpdateImage:true,
 			callback: function(){
 				if(window.actionArguments){
+                    var command;
 					if(Object.isString(window.actionArguments[0])){
-						oThis.switchDisplayMode(window.actionArguments[0]);
+                        command = window.actionArguments[0];
 					}else{
-						oThis.switchDisplayMode(window.actionArguments[0].command);
+                        command = window.actionArguments[0].command;
 					}
-				}			
+                    oThis.switchDisplayMode(command);
+                    /*
+                    window.setTimeout(function(){
+                        var item = this.subMenuItems.staticItems.detect(function(item){return item.command == command;});
+                        this.notify("submenu_active", item);
+                    }.bind(window.listenerContext), 500);
+                    */
+                }
 			},
 			listeners : {
 				init:function(){
@@ -449,9 +461,10 @@ Class.create("FilesList", SelectableElements, {
 			};
 		var subMenuItems1 = {
 			staticItems:[
-				{text:228,title:229,src:'view_icon.png',icon_class:'icon-th',command:'thumb',hasAccessKey:true,accessKey:'thumbs_access_key'},
-				{text:226,title:227,src:'view_text.png',icon_class:'icon-list',command:'list',hasAccessKey:true,accessKey:'list_access_key'}
-				]
+                {text:226,title:227,src:'view_text.png',icon_class:'icon-table',command:'list',hasAccessKey:true,accessKey:'list_access_key'},
+                {text:460,title:461,src:'view_detail.png',icon_class:'icon-th-list',command:'detail',hasAccessKey:true,accessKey:'detail_access_key'},
+                {text:228,title:229,src:'view_icon.png',icon_class:'icon-th',command:'thumb',hasAccessKey:true,accessKey:'thumbs_access_key'}
+            ]
 		};
 		// Create an action from these options!
 		var multiAction = new Action(options1, context1, {}, {}, subMenuItems1);
@@ -513,11 +526,11 @@ Class.create("FilesList", SelectableElements, {
 				init:function(){
                     var actBar = window.ajaxplorer.actionBar;
                     oThis.observe('switch-display-mode', function(e){
-                        if(oThis._displayMode != 'thumb') actBar.getActionByName("thumbs_sortby").disable();
+                        if(oThis._displayMode == 'list') actBar.getActionByName("thumbs_sortby").disable();
                         else actBar.getActionByName("thumbs_sortby").enable();
                     });
                     window.setTimeout(function(){
-                        if(oThis._displayMode != 'thumb') actBar.getActionByName("thumbs_sortby").disable();
+                        if(oThis._displayMode == 'list') actBar.getActionByName("thumbs_sortby").disable();
                         else actBar.getActionByName("thumbs_sortby").enable();
                     }.bind(window.listenerContext), 800);
                 }
@@ -711,14 +724,14 @@ Class.create("FilesList", SelectableElements, {
 			  }.bind(this)
 			});
 		}
-		else if(this._displayMode == "thumb")
+		else if(this._displayMode == "thumb" || this._displayMode == "detail")
 		{
 			if(this.headerMenu){
 				this.headerMenu.destroy();
 				delete this.headerMenu;
 			}
 			var buffer = '<div class="panelHeader"><div style="float:right;padding-right:5px;font-size:1px;height:16px;"><input type="image" height="16" width="16" src="'+ajxpResourcesFolder+'/images/actions/16/zoom-in.png" id="slider-input-1" style="border:0px;width:16px;height:16px;margin-top:0px;padding:0px;" value="64"/></div>'+MessageHash[126]+'</div>';
-			buffer += '<div id="selectable_div-'+this.__currentInstanceIndex+'" class="selectable_div" style="overflow:auto; padding:2px 5px;">';
+			buffer += '<div id="selectable_div-'+this.__currentInstanceIndex+'" class="selectable_div'+(this._displayMode == "detail" ? ' detailed':'')+'" style="overflow:auto; padding:2px 5px;">';
 			this.htmlElement.update(buffer);
 			attachMobileScroll(this.htmlElement.down(".selectable_div"), "vertical");
 			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){				
@@ -1012,12 +1025,12 @@ Class.create("FilesList", SelectableElements, {
 	initRows: function(){
         this.notify("rows:willInitialize");
 		// Disable text select on elements
-		if(this._displayMode == "thumb")
+		if(this._displayMode == "thumb" || this._displayMode == "detail")
 		{
 			this.resizeThumbnails();		
 			if(this.protoMenu) this.protoMenu.addElements('#selectable_div-'+this.__currentInstanceIndex);
 			window.setTimeout(function(){
-                this._previewFactory.setThumbSize(this._thumbSize);
+                this._previewFactory.setThumbSize((this._displayMode=='detail'? this._detailThumbSize:this._thumbSize));
                 this._previewFactory.loadNextImage();
             }.bind(this),10);
 		}
@@ -1167,7 +1180,7 @@ Class.create("FilesList", SelectableElements, {
     childAddedToContext : function(childPath){
 
         if(this.loading) return;
-        var renderer = (this._displayMode == "list"?this.ajxpNodeToTableRow.bind(this):this.ajxpNodeToDiv.bind(this));
+        var renderer = this.getRenderer(); //(this._displayMode == "list"?this.ajxpNodeToTableRow.bind(this):this.ajxpNodeToDiv.bind(this));
         var child = this.crtContext.findChildByPath(childPath);
         if(!child) return;
         var newItem;
@@ -1211,6 +1224,12 @@ Class.create("FilesList", SelectableElements, {
 
     },
 
+    getRenderer : function(){
+        if(this._displayMode == "thumb") return this.ajxpNodeToDiv.bind(this);
+        else if(this._displayMode == "detail") return this.ajxpNodeToLargeDiv.bind(this);
+        else if(this._displayMode == "list") return this.ajxpNodeToTableRow.bind(this);
+    },
+
 	/**
 	 * Populates the list with the children of the passed contextNode
 	 * @param contextNode AjxpNode
@@ -1251,7 +1270,7 @@ Class.create("FilesList", SelectableElements, {
 		// NOW PARSE LINES
 		this.parsingCache = new Hash();		
 		var children = contextNode.getChildren();
-        var renderer = (this._displayMode == "list"?this.ajxpNodeToTableRow.bind(this):this.ajxpNodeToDiv.bind(this));
+        var renderer = this.getRenderer();// (this._displayMode == "list"?this.ajxpNodeToTableRow.bind(this):this.ajxpNodeToDiv.bind(this));
 		for (var i = 0; i < children.length ; i++) 
 		{
 			var child = children[i];
@@ -1305,18 +1324,30 @@ Class.create("FilesList", SelectableElements, {
 		var item = sel[0]; // We assume this action was triggered with a single-selection active.
 		var offset = {top:0,left:0};
 		var scrollTop = 0;
+        var addStyle = {};
 		if(this._displayMode == "list"){
 			var span = item.select('span.text_label')[0];
 			var posSpan = item.select('span.list_selectable_span')[0];
 			offset.top=1;
 			offset.left=20;
 			scrollTop = this.htmlElement.down('div.table_rows_container').scrollTop;
-		}else{
+		}else if(this._displayMode == "thumb"){
 			var span = item.select('div.thumbLabel')[0];
 			var posSpan = span;
 			offset.top=2;
 			offset.left=3;
 			scrollTop = this.htmlElement.down('.selectable_div').scrollTop;
+		}else if(this._displayMode == "detail"){
+			var span = item.select('div.thumbLabel')[0];
+			var posSpan = span;
+			offset.top=5;
+			offset.left= this._detailThumbSize + 25;
+			scrollTop = this.htmlElement.down('.selectable_div').scrollTop;
+            addStyle = {
+                fontSize : '20px',
+                paddingLeft: '2px',
+                color: 'rgb(111, 121, 131)'
+            };
 		}
 		var pos = posSpan.cumulativeOffset();
 		var text = span.innerHTML;
@@ -1328,8 +1359,9 @@ Class.create("FilesList", SelectableElements, {
 			height:'24px',
             padding: 0
 		});
+        edit.setStyle(addStyle);
 		$(document.getElementsByTagName('body')[0]).insert({bottom:edit});				
-		modal.showContent('editbox', (posSpan.getWidth()-offset.left)+'', '20', true, false, {opacity:0.25, backgroundColor:'#fff'});
+		modal.showContent('editbox', (posSpan.getWidth()-offset.left)+'', '26', true, false, {opacity:0.25, backgroundColor:'#fff'});
 		edit.setStyle({left:(pos.left+offset.left)+'px', top:(pos.top+offset.top-scrollTop)+'px'});
 		window.setTimeout(function(){
 			edit.focus();
@@ -1376,6 +1408,10 @@ Class.create("FilesList", SelectableElements, {
 			edit.setStyle({left:pos.left+offset.left - 70 + origWidth});
 			newWidth = 70;
 		}
+        if(this._displayMode == "detail") {
+            origWidth -= 20;
+            newWidth -= 20;
+        }
 		edit.setStyle({width:newWidth+'px'});
 		
 		buttons.select('input').invoke('setStyle', {
@@ -1429,7 +1465,7 @@ Class.create("FilesList", SelectableElements, {
 			attributeList = this.parsingCache.get('attributeList');
 		}
 		var attKeys = attributeList.keys();
-		for(i = 0; i<attKeys.length;i++ ){
+		for(var i = 0; i<attKeys.length;i++ ){
 			var s = attKeys[i];			
 			var tableCell = new Element("td");			
 			var fullview = '';
@@ -1661,6 +1697,154 @@ Class.create("FilesList", SelectableElements, {
 		return newRow;
 	},
 		
+	/**
+	 * Populates a node as a thumbnail div
+	 * @param ajxpNode AjxpNode
+	 * @returns HTMLElement
+	 */
+	ajxpNodeToLargeDiv: function(ajxpNode){
+
+        var largeRow = new Element('div', {className:"thumbnail_selectable_cell detailed", id:ajxpNode.getPath()+"-cont"});
+        var metadataDiv = new Element("div", {className:"thumbnail_cell_metadata"});
+
+        var newRow = new Element('div', {className:"thumbnail_selectable_cell", id:ajxpNode.getPath()});
+		var metaData = ajxpNode.getMetadata();
+
+		var innerSpan = new Element('span', {style:"cursor:default;"});
+
+        var img = this._previewFactory.generateBasePreview(ajxpNode);
+
+        var textNode = ajxpNode.getLabel();
+		var label = new Element('div', {
+			className:"thumbLabel",
+			title:textNode
+		}).update(textNode);
+
+		innerSpan.insert({"bottom":img});
+		//newRow.insert({"bottom":label});
+		newRow.insert({"bottom": innerSpan});
+		newRow.IMAGE_ELEMENT = img;
+		newRow.LABEL_ELEMENT = label;
+        if(ajxpNode.getMetadata().get("overlay_icon")){
+            var ovDiv = new Element("div");
+            var ovIcs = $A(ajxpNode.getMetadata().get("overlay_icon").split(","));
+            var bgPos = $A();
+            var bgImg = $A();
+            var bgRep = $A();
+            var index = 0;
+            ovIcs.each(function(ic){
+                bgPos.push('0px '+((index*12)+(index>0?2:0))+'px');
+                bgImg.push("url('"+resolveImageSource(ovIcs[index], "/images/overlays/ICON_SIZE", 12)+"')");
+                bgRep.push('no-repeat');
+                index++;
+            });
+
+
+            ovDiv.setStyle({
+                position: "absolute",
+                top: "3px",
+                right: "2px",
+                height: ((ovIcs.length*12) + (ovIcs.length > 1 ? (ovIcs.length-1)*2 : 0 )) + "px",
+                width: "12px",
+                backgroundImage:bgImg.join(', '),
+                backgroundPosition:bgPos.join(', '),
+                backgroundRepeat:bgRep.join(', ')
+            });
+            newRow.setStyle({position:'relative'});
+            innerSpan.insert({after:ovDiv});
+        }
+
+        largeRow.insert(newRow);
+        largeRow.insert(label);
+        largeRow.insert(metadataDiv);
+
+        var attributeList;
+        if(!this.parsingCache.get('attributeList')){
+            attributeList = $H();
+            var visibleColumns = this.getVisibleColumns();
+            visibleColumns.each(function(column){
+                attributeList.set(column.attributeName, column);
+            });
+            this.parsingCache.set('attributeList', attributeList);
+        }else{
+            attributeList = this.parsingCache.get('attributeList');
+        }
+        var first = false;
+        var attKeys = attributeList.keys();
+        for(var i = 0; i<attKeys.length;i++ ){
+            var s = attKeys[i];
+            var cell = new Element("span", {className:'metadata_chunk'});
+            if(s == "ajxp_label")
+            {
+                continue;
+            }else if(s=="ajxp_modiftime"){
+                var date = new Date();
+                date.setTime(parseInt(metaData.get(s))*1000);
+                newRow.ajxp_modiftime = date;
+                cell.update('<span class="text_label">' + formatDate(date) + '</span>');
+            }else if(s == "filesize" && metaData.get(s) == "-"){
+
+                continue;
+
+            }else
+            {
+                var metaValue = metaData.get(s) || "";
+                if(!metaValue) continue;
+                cell.update('<span class="text_label">' + metaValue  + "</span>");
+            }
+            if(!first){
+                metadataDiv.insert(new Element('span', {className:'icon-angle-right'}));
+            }
+            metadataDiv.insert(cell);
+            first = false;
+            if(attributeList.get(s).modifier){
+                var modifier = eval(attributeList.get(s).modifier);
+                modifier(cell, ajxpNode, 'row');
+            }
+        }
+
+        this._htmlElement.insert(largeRow);
+
+
+
+		var modifiers ;
+		if(!this.parsingCache.get('modifiers')){
+			modifiers = $A();
+			this.columnsDef.each(function(column){
+				if(column.modifier){
+					try{
+						modifiers.push(eval(column.modifier));
+					}catch(e){}
+				}
+			});
+			this.parsingCache.set('modifiers', modifiers);
+		}else{
+			modifiers = this.parsingCache.get('modifiers');
+		}
+		modifiers.each(function(el){
+			el(newRow, ajxpNode, 'thumb');
+		});
+
+        this._previewFactory.enrichBasePreview(ajxpNode, newRow);
+
+		// Defer Drag'n'drop assignation for performances
+		if(!ajxpNode.isRecycle()){
+			window.setTimeout(function(){
+				var newDrag = new AjxpDraggable(largeRow, {
+					revert:true,
+					ghosting:true,
+					scroll:($('tree_container')?'tree_container':null),
+					containerScroll:this.htmlElement.down(".selectable_div")
+				}, this, 'filesList');
+			}.bind(this), 500);
+		}
+		if(!ajxpNode.isLeaf())
+		{
+			AjxpDroppables.add(largeRow, ajxpNode);
+		}
+		return largeRow;
+	},
+
 	partSizeCellRenderer : function(element, ajxpNode, type){
         if(!element) return;
 		element.setAttribute("data-sorter_value", ajxpNode.getMetadata().get("bytesize"));
@@ -1739,27 +1923,34 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	resizeThumbnails: function(one_element){
 			
-		var defaultMargin = 5;
 		var elList;
 		if(one_element) elList = [one_element]; 
 		else elList = this._htmlElement.select('div.thumbnail_selectable_cell');
 		elList.each(function(element){
+            if(element.up('div.thumbnail_selectable_cell.detailed')) return;
 			var node = element.ajxpNode;
-			var image_element = element.IMAGE_ELEMENT || element.select('img')[0];		
-			var label_element = element.LABEL_ELEMENT || element.select('.thumbLabel')[0];
-            var tSize = this._thumbSize;
-            element.setStyle({width:tSize+25+'px', height:tSize+30+'px'});
+			var image_element = element.IMAGE_ELEMENT || element.down('img');
+			var label_element = element.LABEL_ELEMENT || element.down('.thumbLabel');
+            var elementsAreSiblings = (label_element.siblings().indexOf(image_element) !== -1);
+            var tSize = (this._displayMode=='detail'? this._detailThumbSize:this._thumbSize);
+            if(element.down('div.thumbnail_selectable_cell')){
+                element.down('div.thumbnail_selectable_cell').setStyle({width:tSize+5+'px', height:tSize+10 +'px'});
+            }else{
+                element.setStyle({width:tSize+25+'px', height:tSize+ 30 +'px'});
+            }
             this._previewFactory.setThumbSize(tSize);
             this._previewFactory.resizeThumbnail(image_element);
 
-            // RESIZE LABEL
-			var el_width = tSize + 25;
-			var charRatio = 6;
-			var nbChar = parseInt(el_width/charRatio);
-			var label = new String(label_element.getAttribute('title'));
-			//alert(element.getAttribute('text'));
-			label_element.innerHTML = label.truncate(nbChar, '...');
-			
+            if(label_element){
+                // RESIZE LABEL
+                var el_width = (!elementsAreSiblings ? (element.getWidth() - tSize - 10)  : (tSize + 25) ) ;
+                var charRatio = 6;
+                var nbChar = parseInt(el_width/charRatio);
+                var label = new String(label_element.getAttribute('title'));
+                //alert(element.getAttribute('text'));
+                label_element.innerHTML = label.truncate(nbChar, '...');
+            }
+
 		}.bind(this));
 		
 	},
@@ -1786,7 +1977,7 @@ Class.create("FilesList", SelectableElements, {
         this.notify("rows:willClear");
 		var rows;		
 		if(this._displayMode == "list") rows = $(this._htmlElement).select('tr');
-		else if(this._displayMode == "thumb") rows = $(this._htmlElement).select('div.thumbnail_selectable_cell');
+		else rows = $(this._htmlElement).select('div.thumbnail_selectable_cell');
 		for(var i=0; i<rows.length;i++)
 		{
 			try{
@@ -1956,7 +2147,7 @@ Class.create("FilesList", SelectableElements, {
 		{
 			return true;
 		}
-		if(this._displayMode == "thumb" && keyCode != Event.KEY_UP && keyCode != Event.KEY_DOWN && keyCode != Event.KEY_LEFT && keyCode != Event.KEY_RIGHT &&  keyCode != Event.KEY_RETURN && keyCode != Event.KEY_END && keyCode != Event.KEY_HOME)
+		if(this._displayMode != "list" && keyCode != Event.KEY_UP && keyCode != Event.KEY_DOWN && keyCode != Event.KEY_LEFT && keyCode != Event.KEY_RIGHT &&  keyCode != Event.KEY_RETURN && keyCode != Event.KEY_END && keyCode != Event.KEY_HOME)
 		{
 			return true;
 		}
@@ -2135,7 +2326,7 @@ Class.create("FilesList", SelectableElements, {
 				( node.parentNode.tagName == "TBODY" || node.parentNode.tagName == "tbody" )&&
 				node.parentNode.parentNode == this._htmlElement;
 		}
-		if(this._displayMode == "thumb")
+		else
 		{
 			return node != null && ( node.tagName == "DIV" || node.tagName == "div") && 
 				node.parentNode == this._htmlElement;
@@ -2152,7 +2343,7 @@ Class.create("FilesList", SelectableElements, {
 		{
 			return this._htmlElement.rows;
 		}
-		if(this._displayMode == "thumb")
+		else
 		{
 			var tmp = [];
 			var j = 0;
@@ -2175,7 +2366,7 @@ Class.create("FilesList", SelectableElements, {
 		{
 			return el.rowIndex;
 		}
-		if(this._displayMode == "thumb")
+		else
 		{
 			var j = 0;
 			var cs = this._htmlElement.childNodes;
@@ -2199,7 +2390,7 @@ Class.create("FilesList", SelectableElements, {
 		{
 			return this._htmlElement.rows[nIndex];
 		}
-		if(this._displayMode == "thumb")
+		else
 		{
 			var j = 0;
 			var cs = this._htmlElement.childNodes;

@@ -504,5 +504,8 @@ $mess=array(
 "457" => "m-à-j",
 "458" => "supprimer",
 "459" => "Répertoire principal",
-    /* END SENTENCE */
+"460" => "Détails",
+"461" => "Passer à la vue détaillée",
+"detail_access_key" => "D",
+/* END SENTENCE */
 );
