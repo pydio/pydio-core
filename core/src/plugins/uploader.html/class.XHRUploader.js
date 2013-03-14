@@ -639,6 +639,7 @@ Class.create("XHRUploader", {
 			}else if(behaviour == 'alert'){
 				if(!confirm(MessageHash[124])){
 					item.remove();
+                    item.submitNext();
 					return;
 				}
 			}else{
