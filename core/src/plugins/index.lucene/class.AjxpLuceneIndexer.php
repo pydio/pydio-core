@@ -35,8 +35,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
     private $verboseIndexation = false;
 
 	public function init($options){
-		//parent::init($options);
-        $this->options = $options;
+		parent::init($options);
 		set_include_path(get_include_path().PATH_SEPARATOR.AJXP_INSTALL_PATH."/plugins/index.lucene");
         if(!empty($this->options["index_meta_fields"])){
         	$this->metaFields = explode(",",$this->options["index_meta_fields"]);

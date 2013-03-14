@@ -46,17 +46,7 @@ class AbstractLogDriver extends AJXP_Plugin {
 	 * @var String type of driver
 	 */
 	var $driverType = "log";
-	
-	/**
-	 * Initialise the driver.
-	 *
-	 * Gives the driver a chance to set up it's connection / file resource etc..
-	 * 
-	 * @param Array $options array of options specific to the logger driver.
-	 * @access public
-	 */
-	function init($options) {}
-	
+
 	/**
 	 * Write an entry to the log.
 	 *
