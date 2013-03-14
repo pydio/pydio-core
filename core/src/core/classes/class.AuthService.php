@@ -649,7 +649,7 @@ class AuthService
         if(!ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest"){
             throw new Exception("Reserved user id");
         }
-		if(strlen($userPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth") && $userId != "guest"){
+		if(strlen($userPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth") && $userId != "guest" && $isAdmin === false){
 			$messages = ConfService::getMessages();
 			throw new Exception($messages[378]);
 		}
