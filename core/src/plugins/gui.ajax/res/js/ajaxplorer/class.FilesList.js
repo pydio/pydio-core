@@ -26,7 +26,7 @@ Class.create("FilesList", SelectableElements, {
 	
 	__implements : ["IAjxpWidget", "IFocusable", "IContextMenuable", "IActionProvider"],
 
-    __allObservers : $A(),
+    __allObservers : null,
     __currentInstanceIndex:1,
     _dataModel:null,
     _doubleClickListener:null,
@@ -45,6 +45,7 @@ Class.create("FilesList", SelectableElements, {
 		this.htmlElement = $(oElement);
         this._previewFactory = new PreviewFactory();
         this._previewFactory.sequencialLoading = true;
+        this.__allObservers = $A();
 
 		if(typeof initDefaultDispOrOptions == "string"){
 			this.options = {};
@@ -978,8 +979,10 @@ Class.create("FilesList", SelectableElements, {
 	 * @returns String
 	 */
 	switchDisplayMode: function(mode){
-        var dm = (this._dataModel?this._dataModel:ajaxplorer.getContextHolder());
-		//dm.setPendingSelection(dm.getSelectedNodes());
+        if(this.options.fixedDisplayMode) {
+            if(this.options.fixedDisplayMode == this._displayMode) return this._displayMode;
+            else mode = this.options.fixedDisplayMode;
+        }
         this.removeCurrentLines(true);
 
         if(mode){
@@ -1160,7 +1163,7 @@ Class.create("FilesList", SelectableElements, {
                     }
                 }
                 item.ajxpNode = null;
-                new Effect.Shrink(item, {afterFinish:function(){
+                new Effect.Fade(item, {afterFinish:function(){
                     try{item.remove();}catch(e){}
                     delete item;
                     this.initRowsBuffered();

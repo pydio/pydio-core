@@ -274,7 +274,7 @@ Class.create("HeaderResizer", {
 			
 		});
 	},
-	
+
 	/**
 	 * Create a ghost during drag resizing
 	 * @returns HTMLElement
@@ -287,26 +287,27 @@ Class.create("HeaderResizer", {
 		ghost.setStyle({height: h+"px", left:0});
 		return ghost;
 	},
-	
+
 	/**
 	 * Apply the columns sizes to the body. When possible, uses CSS3 selectors
 	 */
 	refreshBody : function(){
 		var newSizes = this.getCurrentSizes();
-		var useCSS3  = this.options.useCSS3;
-		var sheet = this.createStyleSheet();
-		
+        if(!newSizes) return;
+        var useCSS3  = this.options.useCSS3;
+        var sheet = this.createStyleSheet();
+
 		if(Prototype.Browser.IE){
 			this.options.body.select(this.options.bodyRowSelector).each(function(row){
 				var cells = row.select(this.options.bodyCellSelector);
 				for(var i=0; i<cells.length;i++){
 					if(newSizes[i]) this.setGridCellWidth(cells[i], newSizes[i]);
 				}
-			}.bind(this) );					
+			}.bind(this) );
 			this.checkBodyScroll();
 			return;
 		}
-		
+
 		// ADD CSS3 RULE
 		for(var i=0;i<newSizes.length;i++){
 			if(useCSS3){
@@ -315,9 +316,9 @@ Class.create("HeaderResizer", {
 				var selector = "#"+this.options.body.id+" td.resizer_"+ (i);
 			}
 			var rule = "width:"+(newSizes[i] + (Prototype.Browser.IE?10:0))+"px !important;";
-			
+
 			this.addStyleRule(sheet, selector, rule);
-			
+
 			if(useCSS3){
 				selector = "#"+this.options.body.id+" td:nth-child("+(i+1)+") .text_label";
 			}else{
@@ -329,7 +330,7 @@ Class.create("HeaderResizer", {
 
 		this.checkBodyScroll();
 	},
-	
+
 	/**
 	 * Add a CSS RULE dynamically
 	 * @param sheet CSSSheet

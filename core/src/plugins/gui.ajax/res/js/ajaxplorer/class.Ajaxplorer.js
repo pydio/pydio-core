@@ -398,8 +398,11 @@ Class.create("Ajaxplorer", {
 			if(!this.guiActions) this.guiActions = new Hash();
 			this.guiActions.update(obj.getActions());
 		}
+        if($(ajxpId).parentNode && $(ajxpId).parentNode.ajxpPaneObject && $(ajxpId).parentNode.ajxpPaneObject.scanChildrenPanes){
+            $(ajxpId).parentNode.ajxpPaneObject.scanChildrenPanes($(ajxpId).parentNode.ajxpPaneObject.htmlElement);
+        }
 
-		obj.__ajxpOptionsString = ajxpOptionsString;
+            obj.__ajxpOptionsString = ajxpOptionsString;
 		
 		window[ajxpId] = obj;
 		obj.resize();

@@ -1234,7 +1234,9 @@ a.carousel-control img{
     border-radius: 2px 2px 0 0;
 }
 
-#content_pane div.panelHeader {
+#content_pane div.panelHeader,
+#search_results div.panelHeader
+{
     display: none;
 }
 
@@ -1540,7 +1542,7 @@ img.user_widget_mini{
 /********************************/
 /* HEADER RESIZER WIDGET
 /******************************/
-div.header_resizer{
+div.header_resizer, div#search_meta{
     overflow:hidden;
     box-shadow: 0 1px 4px rgba(0,0,0,0.3);
     opacity: 0.8;
@@ -2226,15 +2228,6 @@ div.tabulatorContainer{
     /*    width: 100%;*/
 }
 
-#search_results
-{
-    width:100%;
-    overflow: auto;
-    height: 120px;
-    background-color: #fff;
-    margin-bottom: 3px;
-    position: relative;
-}
 
 #search_container
 {
@@ -2333,10 +2326,8 @@ meta_opt.checked {
 #search_results
 {
     margin-left: 0;
-    width: 250px;
+    width: 350px;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-size: 11px;
-    background-color: #ebedf0;
 }
 
 .close_results.icon-remove-sign {
@@ -2351,17 +2342,29 @@ meta_opt.checked {
     font-style:normal;
 }
 
-#search_results div
+#search_results div.ajxpNodeProvider
 {
-    border-bottom: 1px solid #fff;
-    padding: 7px;
     cursor: pointer;
-    color: rgb(111, 121, 131);
+    background-color: transparent !important;
+    border-bottom: 1px solid #ffffff;
 }
 
-#search_results div:hover
+#search_results div.ajxpNodeProvider:hover
 {
-    background-color: rgb(252, 250, 207) !important
+    background-color: transparent !important;
+}
+
+#search_results div.ajxpNodeProvider.selected{
+    background-color: #59F !important;
+}
+
+#search_results div.thumbnail_selectable_cell.detailed div.thumbLabel{
+    font-size: 14px;
+    padding-top: 4px;
+}
+
+#search_results div.thumbnail_selectable_cell.detailed span.text_label{
+    padding-top: 0;
 }
 
 .infoPanelActions

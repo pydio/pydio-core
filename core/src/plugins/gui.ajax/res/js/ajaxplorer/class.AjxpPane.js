@@ -24,6 +24,7 @@
 Class.create("AjxpPane", {	
 	
 	__implements : "IAjxpWidget",
+    childrenPanes : null,
 	
 	/**
 	 * Constructor
@@ -143,7 +144,7 @@ Class.create("AjxpPane", {
 	 * @param element HTMLElement
 	 */
 	scanChildrenPanes : function(element){
-		if(!element.childNodes) return;
+        if(!element.childNodes) return;
 		$A(element.childNodes).each(function(c){
 			if(c.ajxpPaneObject) {
 				this.childrenPanes.push(c.ajxpPaneObject);

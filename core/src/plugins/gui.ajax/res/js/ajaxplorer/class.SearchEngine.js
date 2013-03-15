@@ -43,6 +43,10 @@ Class.create("SearchEngine", AjxpPane, {
     _searchMode : "local",
     _even : false,
 
+    _rootNode : null,
+    _dataModel : null,
+    _fileList : null,
+
 	/**
 	 * Constructor
 	 * @param $super klass Superclass reference
@@ -63,12 +67,25 @@ Class.create("SearchEngine", AjxpPane, {
 		$super($(mainElementName), this._ajxpOptions);
         this.updateSearchModeFromRegistry();
         document.observe("ajaxplorer:registry_loaded", this.updateSearchModeFromRegistry.bind(this));
-		this.initGUI();
-	},
+
+        this._dataModel = new AjxpDataModel(true);
+        this._rootNode = new AjxpNode("/", false, "Results", "folder.png");
+        this._dataModel.setRootNode(this._rootNode);
+
+        this.initGUI();
+
+         this._dataModel.observe("selection_changed", function(){
+             var selectedNode = this._dataModel.getSelectedNodes()[0];
+             if(selectedNode) ajaxplorer.goTo(selectedNode);
+         }.bind(this));
+
+    },
 
     updateSearchModeFromRegistry : function(){
-        if($(this._resultsBoxId)){
+        if($(this._resultsBoxId) && !this._rootNode){
             $(this._resultsBoxId).update('');
+        }else if(this._rootNode){
+            this._rootNode.clear();
         }
         var reg = ajaxplorer.getXmlRegistry();
         var indexerNode = XPathSelectSingleNode(reg, "plugins/indexer");
@@ -160,8 +177,28 @@ Class.create("SearchEngine", AjxpPane, {
 		this._queue = $A([]);
 		
 		$('stop_'+this._searchButtonName).addClassName("disabled");
-		
-		this.htmlElement.select('a', 'div[id="search_results"]').each(function(element){
+
+
+        this._fileList = new FilesList($(this._resultsBoxId), {
+            dataModel:this._dataModel,
+            columnsDef:[{attributeName:"ajxp_label", messageId:1, sortType:'String'},
+                {attributeName:"search_score", messageString:'Score', sortType:'Number'},
+                {attributeName:"filename", messageString:'Path', sortType:'String'}
+            ],
+            displayMode: 'detail',
+            fixedDisplayMode: 'detail',
+            defaultSortTypes:["String", "String", "String"],
+            columnsTemplate:"search_results",
+            selectable: true,
+            draggable: false,
+            replaceScroller:true,
+            fit:'height',
+            fitParent : this.options.toggleResultsVisibility,
+            detailThumbSize:22
+        });
+
+
+        this.htmlElement.select('a', 'div[id="search_results"]').each(function(element){
 			disableTextSelection(element);
 		});
         
@@ -236,13 +273,21 @@ Class.create("SearchEngine", AjxpPane, {
         }else{
             fitHeightToBottom($(this._resultsBoxId), null, (this._ajxpOptions.fitMarginBottom?this._ajxpOptions.fitMarginBottom:0));
         }
+        if(this._fileList){
+            this._fileList.resize();
+        }
+
 		if(this.htmlElement && this.htmlElement.visible()){
 			//this._inputBox.setStyle({width:Math.max((this.htmlElement.getWidth() - this.htmlElement.getStyle("paddingLeft")- this.htmlElement.getStyle("paddingRight") -70),70) + "px"});
 		}
 	},
 	
 	destroy : function(){
-		if(this.htmlElement) {
+        if(this._fileList){
+            this._fileList.destroy();
+            this._fileList = null;
+        }
+        if(this.htmlElement) {
             var ajxpId = this.htmlElement.id;
             this.htmlElement.update('');
         }
@@ -342,8 +387,8 @@ Class.create("SearchEngine", AjxpPane, {
 		$(this._searchButtonName).addClassName("disabled");
 		$('stop_'+this._searchButtonName).removeClassName("disabled");
         if(this._ajxpOptions.toggleResultsVisibility){
-            if(!$(this._ajxpOptions.toggleResultsVisibility).down("div.panelHeader")){
-                $(this._ajxpOptions.toggleResultsVisibility).insert({top:"<div class='panelHeader'>Results<span class='close_results icon-remove-sign'></span></div>"});
+            if(!$(this._ajxpOptions.toggleResultsVisibility).down("div.panelHeader.toggleResults")){
+                $(this._ajxpOptions.toggleResultsVisibility).insert({top:"<div class='panelHeader toggleResults'>Results<span class='close_results icon-remove-sign'></span></div>"});
                 this.resultsDraggable = new Draggable(this._ajxpOptions.toggleResultsVisibility, {
                     handle:"panelHeader",
                     zindex:999,
@@ -367,9 +412,11 @@ Class.create("SearchEngine", AjxpPane, {
                     }
                 });
             }
-            $(this._ajxpOptions.toggleResultsVisibility).down("span.close_results").observe("click", function(){
-                $(this._ajxpOptions.toggleResultsVisibility).setStyle({display:"none"});
-            }.bind(this));
+            if($(this._ajxpOptions.toggleResultsVisibility).down("span.close_results")){
+                $(this._ajxpOptions.toggleResultsVisibility).down("span.close_results").observe("click", function(){
+                    $(this._ajxpOptions.toggleResultsVisibility).setStyle({display:"none"});
+                }.bind(this));
+            }
 
             if(!$(this._ajxpOptions.toggleResultsVisibility).visible()){
                 this.updateSearchResultPosition($(this._ajxpOptions.toggleResultsVisibility));
@@ -416,10 +463,7 @@ Class.create("SearchEngine", AjxpPane, {
 	clearResults : function(){
 		// Clear the results
         this.hasResults = false;
-		while($(this._resultsBoxId).childNodes.length)
-		{
-			$(this._resultsBoxId).removeChild($(this._resultsBoxId).childNodes[0]);
-		}
+        this._rootNode.clear();
         this._even = false;
 	},
 	/**
@@ -429,6 +473,12 @@ Class.create("SearchEngine", AjxpPane, {
 	 * @param metaFound String
 	 */
 	addResult : function(folderName, ajxpNode, metaFound){
+
+        if(this._rootNode){
+            this._rootNode.addChild(ajxpNode);
+            return;
+        }
+
 		var fileName = ajxpNode.getLabel();
 		var icon = ajxpNode.getIcon();
 		// Display the result in the results box.
@@ -592,7 +642,9 @@ Class.create("SearchEngine", AjxpPane, {
                 }
 			}
 		}		
-		
+		if(this._fileList){
+            this._fileList.reload();
+        }
 	},
 	
 	_searchNode : function(ajxpNode, currentFolder){
