@@ -80,22 +80,18 @@ div.descending > .css_gradient{
 MAJOR STYLES
 */
 a:link {
-    color: #676965;
     text-decoration: none;
     outline: 0;
 }
 a:visited {
     text-decoration: none;
-    color: rgb(63, 65, 66);
 }
 a:hover {
     text-decoration: none;
-    color: #676965;
 }
 a:active,
 a:focus{
     text-decoration: none;
-    color: #676965;
     outline: 0;
 }
 
@@ -185,6 +181,10 @@ textarea{
     height: auto !important;
     border-radius: 0;
     border-bottom: 1px solid #ebedf0;
+}
+
+.thumbnail_selectable_cell.detailed:hover{
+    background-color: rgb(253, 252, 228);
 }
 
 .thumbnail_selectable_cell.detailed:last-child{
