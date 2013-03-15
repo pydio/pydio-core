@@ -44,6 +44,7 @@ class UserMetaManager extends AJXP_Plugin {
 
 	public function initMeta($accessDriver){
 		$this->accessDriver = $accessDriver;
+
         $store = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
         if($store === false){
             throw new Exception("The 'meta.user' plugin requires at least one active 'metastore' plugin");
@@ -168,42 +169,44 @@ class UserMetaManager extends AJXP_Plugin {
 		$selection = new UserSelection();
 		$selection->initFromHttpVars();
 		$currentFile = $selection->getUniqueFile();
-		$wrapperData = $this->accessDriver->detectStreamWrapper(false);
-		$urlBase = $wrapperData["protocol"]."://".$this->accessDriver->repository->getId();
+		$urlBase = $this->accessDriver->getResourceUrl($currentFile);
+        $ajxpNode = new AJXP_Node($urlBase);
 
-		
-		$newValues = array();
+
+        $newValues = array();
 		$def = $this->getMetaDefinition();
-        $ajxpNode = new AJXP_Node($urlBase.$currentFile);
+        $ajxpNode->setDriver($this->accessDriver);
         AJXP_Controller::applyHook("node.before_change", array(&$ajxpNode));
 		foreach ($def as $key => $label){
 			if(isSet($httpVars[$key])){
 				$newValues[$key] = AJXP_Utils::decodeSecureMagic($httpVars[$key]);
 			}else{
 				if(!isset($original)){
-                    $original = $this->metaStore->retrieveMetadata($ajxpNode, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
+                    $original = $ajxpNode->retrieveMetadata("users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
 				}
 				if(isSet($original) && isset($original[$key])){
 					$newValues[$key] = $original[$key];
 				}
 			}
 		}		
-        $this->metaStore->setMetadata($ajxpNode, "users_meta", $newValues, false, AJXP_METADATA_SCOPE_GLOBAL);
-        AJXP_Controller::applyHook("node.change", array(null, &$ajxpNode));
+        $ajxpNode->setMetadata("users_meta", $newValues, false, AJXP_METADATA_SCOPE_GLOBAL);
+        AJXP_Controller::applyHook("node.meta_change", array($ajxpNode));
 		AJXP_XMLWriter::header();
-		//AJXP_XMLWriter::reloadDataNode("", SystemTextEncoding::toUTF8($currentFile), true);
         AJXP_XMLWriter::writeNodesDiff(array("UPDATE" => array($ajxpNode->getPath() => $ajxpNode)), true);
 		AJXP_XMLWriter::close();
 	}
-	
-	/**
-	 * 
-	 * @param AJXP_Node $ajxpNode
-	 */
-	public function extractMeta(&$ajxpNode, $contextNode = false, $details = false){
-		$currentFile = $ajxpNode->getUrl();
 
-        $metadata = $this->metaStore->retrieveMetadata($ajxpNode, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
+    /**
+     *
+     * @param AJXP_Node $ajxpNode
+     * @param bool $contextNode
+     * @param bool $details
+     * @return void
+     */
+	public function extractMeta(&$ajxpNode, $contextNode = false, $details = false){
+
+        //$metadata = $this->metaStore->retrieveMetadata($ajxpNode, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
+        $metadata = $ajxpNode->retrieveMetadata("users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
         if(count($metadata)){
             // @todo : Should be UTF8-IZED at output only !!??
             // array_map(array("SystemTextEncoding", "toUTF8"), $metadata);

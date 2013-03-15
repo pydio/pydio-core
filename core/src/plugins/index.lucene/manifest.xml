@@ -31,6 +31,14 @@
 					<serverCallback methodName="applyAction"/>
 				</processing>
 			</action>					
+			<action name="search_by_keyword">
+				<rightsContext noUser="true" userLogged="only" read="true"
+					write="false" adminOnly="false">
+				</rightsContext>
+				<processing>
+					<serverCallback methodName="applyAction"/>
+				</processing>
+			</action>
             <action name="check_lock">
                 <rightsContext noUser="true" userLogged="only" read="true"
                     write="false" adminOnly="false">

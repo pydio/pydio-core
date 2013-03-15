@@ -68,6 +68,14 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 	public function applyAction($actionName, $httpVars, $fileVars){
         $messages = ConfService::getMessages();
 		if($actionName == "search"){
+
+            // TMP
+            if(strpos($httpVars["query"], "keyword:") === 0){
+                $parts = explode(":", $httpVars["query"]);
+                $this->applyAction("search_by_keyword", array("field" => $parts[1]), array());
+                return;
+            }
+
 			require_once("Zend/Search/Lucene.php");
             if($this->isIndexLocked(ConfService::getRepository()->getId())){
                 throw new Exception($messages["index.lucene.6"]);
@@ -92,7 +100,8 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
                     }
                 }
                 $query = implode(" OR ", $sParts);
-				AJXP_Logger::debug("Query : $query");
+                $query = "ajxp_scope:shared AND ($query)";
+                AJXP_Logger::debug("Query : $query");
 			}else{
 				$index->setDefaultSearchField("basename");
 				$query = $httpVars["query"];
@@ -108,9 +117,62 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 
 			AJXP_XMLWriter::header();
 			foreach ($hits as $hit){
-                $meta = array();
-                //$isDir = false; // TO BE STORED IN INDEX
-                //$meta["icon"] = AJXP_Utils::mimetype(SystemTextEncoding::fromUTF8($hit->node_url), "image", $isDir);
+                if($hit->serialized_metadata!=null){
+                    $meta = unserialize(base64_decode($hit->serialized_metadata));
+                	$tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), $meta);
+                }else{
+                	$tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), array());
+                    $tmpNode->loadNodeInfo();
+                }
+                if(!file_exists($tmpNode->getUrl())){
+                    $index->delete($hit->id);
+                    $commitIndex = true;
+                    continue;
+                }
+                $tmpNode->search_score = sprintf("%0.2f", $hit->score);
+				AJXP_XMLWriter::renderAjxpNode($tmpNode);
+			}
+			AJXP_XMLWriter::close();
+            if($commitIndex){
+                $index->commit();
+            }
+		}else if($actionName == "search_by_keyword"){
+			require_once("Zend/Search/Lucene.php");
+            $scope = "user";
+
+            if($this->isIndexLocked(ConfService::getRepository()->getId())){
+                throw new Exception($messages["index.lucene.6"]);
+            }
+            try{
+                $index =  $this->loadIndex(ConfService::getRepository()->getId(), false);
+            }catch(Exception $ex){
+                $this->applyAction("index", array(), array());
+                throw new Exception($messages["index.lucene.7"]);
+            }
+            $sParts = array();
+            $searchField = $httpVars["field"];
+            if($searchField == "ajxp_node"){
+                $sParts[] = "$searchField:yes";
+            }else{
+                $sParts[] = "$searchField:true";
+            }
+            if($scope == "user"){
+                if(AuthService::usersEnabled() && AuthService::getLoggedUser() == null){
+                    throw new Exception("Cannot find current user");
+                }
+                $sParts[] = "ajxp_scope:user";
+                $sParts[] = "ajxp_user:".AuthService::getLoggedUser()->getId();
+            }else{
+                $sParts[] = "ajxp_scope:shared";
+            }
+            $query = implode(" AND ", $sParts);
+            AJXP_Logger::debug("Query : $query");
+            $hits = $index->find($query);
+
+            $commitIndex = false;
+
+			AJXP_XMLWriter::header();
+			foreach ($hits as $hit){
                 if($hit->serialized_metadata!=null){
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
                 	$tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), $meta);
@@ -216,7 +278,29 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
      * @param AJXP_Node $node
      */
     public function updateNodeIndexMeta($node){
-        $this->updateNodeIndex(null, $node, false);
+        require_once("Zend/Search/Lucene.php");
+        if(isSet($this->currentIndex)){
+            $index = $this->currentIndex;
+        }else{
+            $index =  $this->loadIndex(ConfService::getRepository()->getId());
+        }
+        Zend_Search_Lucene_Analysis_Analyzer::setDefault( new Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum_CaseInsensitive());
+
+        if(AuthService::usersEnabled() && AuthService::getLoggedUser()!=null){
+            $term = new Zend_Search_Lucene_Index_Term(SystemTextEncoding::toUTF8($node->getUrl()), "node_url");
+            $hits = $index->termDocs($term);
+            foreach($hits as $hitId){
+                $hit = $index->getDocument($hitId);
+                if($hit->ajxp_scope == 'shared' || ($hit->ajxp_scope == 'user' && $hit->ajxp_user == AuthService::getLoggedUser()->getId())){
+                    $index->delete($hitId);
+                }
+            }
+        }else{
+            $id = $this->getIndexedDocumentId($index, $node);
+            if($id != null) $index->delete($id);
+        }
+        $this->createIndexedDocument($node, $index);
+
     }
 
         /**
@@ -262,8 +346,8 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
                     $index->delete($hit->id);
                 }
             }
-            $doc = $this->createIndexedDocument($newNode);
-            $index->addDocument($doc);
+            $doc = $this->createIndexedDocument($newNode, $index);
+            //$index->addDocument($doc);
             if($oldNode == null && is_dir($newNode->getUrl())){
                 $this->recursiveIndexation($newNode->getUrl());
             }
@@ -281,7 +365,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
                                            SystemTextEncoding::toUTF8($newNode->getUrl()),
                                            $oldChildURL);
                 $newChildURL = SystemTextEncoding::fromUTF8($newChildURL);
-                $index->addDocument($this->createIndexedDocument(new AJXP_Node($newChildURL)));
+                $this->createIndexedDocument(new AJXP_Node($newChildURL), $index);
             }
         }
         
@@ -292,9 +376,11 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 
     /**
      * @param AJXP_Node $ajxpNode
+     * @param Zend_Search_Lucene_Interface $index
+     * @throws Exception
      * @return Zend_Search_Lucene_Document
      */
-    public function createIndexedDocument($ajxpNode){
+    public function createIndexedDocument($ajxpNode, &$index){
         $ajxpNode->loadNodeInfo();
         $ext = pathinfo($ajxpNode->getLabel(), PATHINFO_EXTENSION);
         $parseContent = $this->indexContent;
@@ -316,14 +402,41 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
             $doc = new Zend_Search_Lucene_Document();
         }
         if($doc == null) throw new Exception("Could not load document");
+
         $doc->addField(Zend_Search_Lucene_Field::Keyword("node_url", $ajxpNode->getUrl()), SystemTextEncoding::getEncoding());
         $doc->addField(Zend_Search_Lucene_Field::Keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath())), SystemTextEncoding::getEncoding());
         $doc->addField(Zend_Search_Lucene_Field::Text("basename", basename($ajxpNode->getPath())), SystemTextEncoding::getEncoding());
-        $doc->addField(Zend_Search_Lucene_Field::Text("ajxp_node", "yes"), SystemTextEncoding::getEncoding());
+        $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_node", "yes"), SystemTextEncoding::getEncoding());
+        $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_scope", "shared"));
+
+        // Store a cached copy of the metadata
+        $serializedMeta = base64_encode(serialize($ajxpNode->metadata));
+        $doc->addField(Zend_Search_Lucene_Field::Binary("serialized_metadata", $serializedMeta));
+        if(isSet($ajxpNode->indexableMetaKeys["shared"])){
+            foreach($ajxpNode->indexableMetaKeys["shared"] as $sharedField){
+                if($ajxpNode->$sharedField) $doc->addField(Zend_search_Lucene_Field::keyword($sharedField, $ajxpNode->$sharedField));
+            }
+        }
         foreach ($this->metaFields as $field){
             if($ajxpNode->$field != null){
                 $doc->addField(Zend_Search_Lucene_Field::Text("ajxp_meta_$field", $ajxpNode->$field), SystemTextEncoding::getEncoding());
             }
+        }
+        if(isSet($ajxpNode->indexableMetaKeys["user"]) && count($ajxpNode->indexableMetaKeys["user"]) && AuthService::usersEnabled() && AuthService::getLoggedUser() != null){
+            $privateDoc = new Zend_Search_Lucene_Document();
+            $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("node_url", $ajxpNode->getUrl()), SystemTextEncoding::getEncoding());
+            $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath())), SystemTextEncoding::getEncoding());
+
+            $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_scope", "user"));
+            $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_user", AuthService::getLoggedUser()->getId()));
+            foreach($ajxpNode->indexableMetaKeys["user"] as $userField){
+                if($ajxpNode->$userField) {
+                    $privateDoc->addField(Zend_search_Lucene_Field::keyword($userField, $ajxpNode->$userField));
+                }
+            }
+            $privateDoc->addField(Zend_Search_Lucene_Field::Binary("serialized_metadata", $serializedMeta));
+
+            $index->addDocument($privateDoc);
         }
         if($parseContent && in_array($ext, explode(",",$this->pluginConf["PARSE_CONTENT_TXT"]))){
             $doc->addField(Zend_Search_Lucene_Field::unStored("body", file_get_contents($ajxpNode->getUrl())));
@@ -369,8 +482,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
        		$doc->addField(Zend_Search_Lucene_Field::unStored("body", $asciiString));       		
         }
         
-        // Store a cached copy of the metadata
-        $doc->addField(Zend_Search_Lucene_Field::Binary("serialized_metadata", base64_encode(serialize($ajxpNode->metadata))));
+        $index->addDocument($doc);
         return $doc;
     }
 
