@@ -52,6 +52,23 @@ class AJXP_Node{
      * @var bool Whether the core information of the node is already loaded or not
      */
     protected $nodeInfoLoaded = false;
+    /**
+     * @var Repository
+     */
+    private $_repository;
+    /**
+     * @var AbstractAccessDriver
+     */
+    private $_accessDriver;
+    /**
+     * @return MetaStoreProvider
+     */
+    private $_metaStore;
+
+    /**
+     * @var array
+     */
+    private $_indexableMetaKeys = array();
 
     /**
      * @param string $url URL of the node in the form ajxp.protocol://repository_id/path/to/node
@@ -63,7 +80,7 @@ class AJXP_Node{
 	}
 
     /**
-     * @param $url URL of the node in the form ajxp.protocol://repository_id/path/to/node
+     * @param String $url of the node in the form ajxp.protocol://repository_id/path/to/node
      * @return void
      */
     public function setUrl($url){
@@ -76,6 +93,105 @@ class AJXP_Node{
         }
         $this->parseUrl();
     }
+
+    public function getRepository(){
+        if(!isSet($this->_repository)){
+            $this->_repository = ConfService::getRepositoryById($this->urlParts["host"]);
+        }
+        return $this->_repository;
+    }
+
+    /**
+     * @return AbstractAccessDriver
+     */
+    public function getDriver(){
+        if(!isSet($this->_accessDriver)){
+            $repo = $this->getRepository();
+            if($repo != null){
+                $this->_accessDriver = ConfService::loadDriverForRepository($repo);
+            }
+        }
+        return $this->_accessDriver;
+    }
+
+    /**
+     * @param AbstractAccessDriver
+     */
+    public function setDriver($accessDriver){
+        $this->_accessDriver = $accessDriver;
+    }
+
+    /**
+     * @return MetaStoreProvider
+     */
+    protected function getMetaStore(){
+        if(!isSet($this->_metaStore)){
+            $this->getDriver();
+            $this->_metaStore = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
+        }
+        return $this->_metaStore;
+    }
+
+    public function hasMetaStore(){
+        return ($this->getMetaStore() != false);
+    }
+
+    /**
+     * @param $nameSpace
+     * @param $metaData
+     * @param bool $private
+     * @param int $scope
+     * @param bool $indexable
+     */
+    public function setMetadata($nameSpace, $metaData, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false){
+        $metaStore = $this->getMetaStore();
+        if($metaStore !== false){
+            $metaStore->setMetadata($this, $nameSpace, $metaData, $private, $scope);
+            //$this->mergeMetadata($metaData);
+            if($indexable){
+                if(!isSet($this->_indexableMetaKeys[$private ? "user":"shared"]))$this->_indexableMetaKeys[$private ? "user":"shared"] = array();
+                $this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace] = $nameSpace;
+            }
+            AJXP_Controller::applyHook("node.meta_change", array(&$this));
+        }
+    }
+
+    /**
+     * @abstract
+     * @param String $nameSpace
+     * @param bool $private
+     * @param int $scope
+     * @param bool $indexable
+     */
+    public function removeMetadata($nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false){
+        $metaStore = $this->getMetaStore();
+        if($metaStore !== false){
+            $metaStore->removeMetadata($this, $nameSpace, $private, $scope);
+            if($indexable && isSet($this->_indexableMetaKeys[$private ? "user":"shared"]) && isset($this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace])){
+                unset($this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace]);
+            }
+            AJXP_Controller::applyHook("node.meta_change", array(&$this));
+        }
+    }
+
+    /**
+     * @abstract
+     * @param String $nameSpace
+     * @param bool $private
+     * @param int $scope
+     */
+    public function retrieveMetadata($nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false){
+        $metaStore = $this->getMetaStore();
+        if($metaStore !== false){
+            $data = $metaStore->retrieveMetadata($this, $nameSpace, $private, $scope);
+            if(!empty($data) && $indexable){
+                if(!isSet($this->_indexableMetaKeys[$private ? "user":"shared"]))$this->_indexableMetaKeys[$private ? "user":"shared"] = array();
+                $this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace] = $nameSpace;
+            }
+            return $data;
+        }
+    }
+
 
     /**
      * @param bool $boolean Leaf or Collection?
@@ -108,12 +224,20 @@ class AJXP_Node{
     }
 
     /**
+     * List all set metadata keys
+     * @return array
+     */
+    public function listMetaKeys(){
+        return array_keys($this->_metadata);
+    }
+
+    /**
      * Applies the "node.info" hook, thus going through the plugins that have registered this node, and loading
      * all metadata at once.
      * @param bool $forceRefresh
      * @param bool $contextNode The parent node, if it can be useful for the hooks callbacks
      * @param mixed $details A specification of expected metadata fields, or minimal
-     * @return
+     * @return void
      */
     public function loadNodeInfo($forceRefresh = false, $contextNode = false, $details = false){
         if($this->nodeInfoLoaded && !$forceRefresh) return;
@@ -192,6 +316,7 @@ class AJXP_Node{
 		if(strtolower($varName) == "wrapperclassname") return $this->_wrapperClassName;
 		if(strtolower($varName) == "url") return $this->_url;
 		if(strtolower($varName) == "metadata") return $this->_metadata;
+		if(strtolower($varName) == "indexablemetakeys") return $this->_indexableMetaKeys;
 
 		if(isSet($this->_metadata[$varName])){
 			return $this->_metadata[$varName];

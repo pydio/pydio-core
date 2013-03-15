@@ -31,7 +31,7 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
      */
     protected $repository;
     /**
-     * @var AjxpWebdavProvider
+     * @var AjxpWrapperProvider
      */
     protected $accessDriver;
 
@@ -50,7 +50,7 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
     }
 
     /**
-     * @return AjxpWebdavProvider
+     * @return AjxpWrapperProvider
      * @throws Sabre_DAV_Exception_FileNotFound
      */
     function getAccessDriver(){
@@ -59,7 +59,7 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
             ConfService::switchRootDir($RID);
             ConfService::getConfStorageImpl();
             $this->accessDriver = ConfService::loadRepositoryDriver();
-            if(!$this->accessDriver instanceof AjxpWebdavProvider){
+            if(!$this->accessDriver instanceof AjxpWrapperProvider){
                 throw new Sabre_DAV_Exception_FileNotFound( $RID );
             }
             $this->accessDriver->detectStreamWrapper(true);
@@ -72,7 +72,7 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
      */
     function getUrl(){
         if(!isSet($this->url)){
-            $this->url = $this->getAccessDriver()->getRessourceUrl($this->path);
+            $this->url = $this->getAccessDriver()->getResourceUrl($this->path);
         }
         return $this->url;
     }

@@ -1044,6 +1044,92 @@ class ConfService
 	}
 
     /**
+     * @static
+     * @param Repository $repository
+     * @return AbstractAccessDriver
+     */
+    public static function loadDriverForRepository(&$repository){
+        return self::getInstance()->loadRepositoryDriverREST($repository);
+    }
+
+    /**
+     * See static method
+     * @param Repository $repository
+     * @throws AJXP_Exception|Exception
+     * @return AbstractAccessDriver
+     */
+	public function loadRepositoryDriverREST(&$repository)
+	{
+        if(isset($repository->driverInstance)) {
+            return $repository->driverInstance;
+        }
+		$accessType = $repository->getAccessType();
+		$pServ = AJXP_PluginsService::getInstance();
+		$plugInstance = $pServ->getPluginByTypeName("access", $accessType);
+
+        // TRIGGER BEFORE INIT META
+        $metaSources = $repository->getOption("META_SOURCES");
+        if(isSet($metaSources) && is_array($metaSources) && count($metaSources)){
+            $keys = array_keys($metaSources);
+            foreach ($keys as $plugId){
+                if($plugId == "") continue;
+                $instance = $pServ->getPluginById($plugId);
+                if(!is_object($instance)) {
+                    continue;
+                }
+                if(!method_exists($instance, "beforeInitMeta")){
+                    continue;
+                }
+                try{
+                    $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $repository->getId()));
+                    $instance->beforeInitMeta($plugInstance);
+                }catch(Exception $e){
+                    AJXP_Logger::logAction('ERROR : Cannot instanciate Meta plugin, reason : '.$e->getMessage());
+                    $this->errors[] = $e->getMessage();
+                }
+            }
+        }
+
+        // INIT MAIN DRIVER
+		$plugInstance->init($repository);
+		try{
+			$plugInstance->initRepository();
+		}catch (Exception $e){
+			throw $e;
+		}
+		$pServ->setPluginUniqueActiveForType("access", $accessType);
+
+        // TRIGGER INIT META
+		$metaSources = $repository->getOption("META_SOURCES");
+		if(isSet($metaSources) && is_array($metaSources) && count($metaSources)){
+			$keys = array_keys($metaSources);
+			foreach ($keys as $plugId){
+				if($plugId == "") continue;
+				$split = explode(".", $plugId);
+				$instance = $pServ->getPluginById($plugId);
+				if(!is_object($instance)) {
+					continue;
+				}
+                try{
+                    $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $repository->getId()));
+                    $instance->initMeta($plugInstance);
+                }catch(Exception $e){
+                    AJXP_Logger::logAction('ERROR : Cannot instanciate Meta plugin, reason : '.$e->getMessage());
+                    $this->errors[] = $e->getMessage();
+                }
+                $pServ->setPluginActive($split[0], $split[1]);
+			}
+		}
+        if(count($this->errors)>0){
+            $e = new AJXP_Exception("Error while loading repository feature : ".implode(",",$this->errors));
+			throw $e;
+        }
+
+        $repository->driverInstance = $plugInstance;
+		return $plugInstance;
+	}
+
+    /**
      * Search the manifests declaring ajxpdriver as their root node. Remove ajxp_conf & ajxp_shared
      * @static
      * @param string $filterByTagName

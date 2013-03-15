@@ -589,7 +589,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				foreach($repoList as $repoIndex => $repoObject){
 					$accessType = $repoObject->getAccessType();
                     $driver = AJXP_PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
-					if(is_a($driver, "AjxpWebdavProvider") && ($loggedUser->canRead($repoIndex) || $loggedUser->canWrite($repoIndex))){
+					if(is_a($driver, "AjxpWrapperProvider") && ($loggedUser->canRead($repoIndex) || $loggedUser->canWrite($repoIndex))){
 						$davRepos[$repoIndex] = $webdavBaseUrl ."".($repoObject->getSlug()==null?$repoObject->getId():$repoObject->getSlug());
 					}
 				}

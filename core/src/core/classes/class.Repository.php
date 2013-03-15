@@ -112,6 +112,8 @@ class Repository implements AjxpGroupPathProvider {
     protected $groupPath;
 
 
+    public $driverInstance;
+
     /**
      * @param string $id
      * @param string $display
@@ -126,6 +128,7 @@ class Repository implements AjxpGroupPathProvider {
 		$this->slug = AJXP_Utils::slugify($display);
         $this->inferOptionsFromParent = false;
 	}
+
 	/**
      * Create a shared version of this repository
      * @param string $newLabel

@@ -24,10 +24,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package info.ajaxplorer.core
  */
 /**
- * @interface AjxpWebdavProvider
- * Interface must be implemented for access drivers that can be accessed via webdav.
+ * @interface AjxpWrapperProvider
+ * Interface must be implemented for access drivers that can be accessed via a wrapper protocol.
  */
-interface AjxpWebdavProvider {
+interface AjxpWrapperProvider {
 
 	/**
 	 * @return string
@@ -39,7 +39,7 @@ interface AjxpWebdavProvider {
 	 * @param String $path
 	 * @return String
 	 */
-	function getRessourceUrl($path);
+	function getResourceUrl($path);
 	
 	/**
 	 * Creates a directory

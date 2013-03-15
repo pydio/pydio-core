@@ -32,7 +32,7 @@ if(!function_exists('download_exception_handler')){
  * AJXP_Plugin to access a filesystem. Most "FS" like driver (even remote ones)
  * extend this one.
  */
-class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
+class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 {
 	/**
 	* @var Repository
@@ -86,7 +86,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		}
 	}
 	
-	public function getRessourceUrl($path){
+	public function getResourceUrl($path){
 		return $this->urlBase.$path;
 	}
 	
