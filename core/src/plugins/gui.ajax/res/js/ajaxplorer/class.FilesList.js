@@ -2143,11 +2143,11 @@ Class.create("FilesList", SelectableElements, {
 		if(event.keyCode == 9 && !ajaxplorer.blockNavigation) return false;
 		if(!this.hasFocus) return true;
 		var keyCode = event.keyCode;
-		if(this._displayMode == "list" && keyCode != Event.KEY_UP && keyCode != Event.KEY_DOWN && keyCode != Event.KEY_RETURN && keyCode != Event.KEY_END && keyCode != Event.KEY_HOME)
+		if(this._displayMode != "thumb" && keyCode != Event.KEY_UP && keyCode != Event.KEY_DOWN && keyCode != Event.KEY_RETURN && keyCode != Event.KEY_END && keyCode != Event.KEY_HOME)
 		{
 			return true;
 		}
-		if(this._displayMode != "list" && keyCode != Event.KEY_UP && keyCode != Event.KEY_DOWN && keyCode != Event.KEY_LEFT && keyCode != Event.KEY_RIGHT &&  keyCode != Event.KEY_RETURN && keyCode != Event.KEY_END && keyCode != Event.KEY_HOME)
+		if(this._displayMode == "thumb" && keyCode != Event.KEY_UP && keyCode != Event.KEY_DOWN && keyCode != Event.KEY_LEFT && keyCode != Event.KEY_RIGHT &&  keyCode != Event.KEY_RETURN && keyCode != Event.KEY_END && keyCode != Event.KEY_HOME)
 		{
 			return true;
 		}
@@ -2203,7 +2203,7 @@ Class.create("FilesList", SelectableElements, {
 		// UP
 		else if(event.keyCode == Event.KEY_UP)
 		{
-			if(this._displayMode == 'list') nextItem = this.getPrevious(currentItem);
+			if(this._displayMode != 'thumb') nextItem = this.getPrevious(currentItem);
 			else{			
 				 nextItemIndex = this.findOverlappingItem(currentItemIndex, false);
 				 if(nextItemIndex != null){ nextItem = allItems[nextItemIndex];selectLine = true;}
@@ -2216,7 +2216,7 @@ Class.create("FilesList", SelectableElements, {
 		//DOWN
 		else if(event.keyCode == Event.KEY_DOWN)
 		{
-			if(this._displayMode == 'list') nextItem = this.getNext(currentItem);
+			if(this._displayMode != 'thumb') nextItem = this.getNext(currentItem);
 			else{
 				 nextItemIndex = this.findOverlappingItem(currentItemIndex, true);
 				 if(nextItemIndex != null){ nextItem = allItems[nextItemIndex];selectLine = true;}
