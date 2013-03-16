@@ -147,7 +147,10 @@ Class.create("AjxpPane", {
         if(!element.childNodes) return;
 		$A(element.childNodes).each(function(c){
 			if(c.ajxpPaneObject) {
-				this.childrenPanes.push(c.ajxpPaneObject);
+				if(!this.childrenPanes){
+                    this.childrenPanes = $A();
+                }
+                this.childrenPanes.push(c.ajxpPaneObject);
 			}else{
 				this.scanChildrenPanes(c);
 			}
