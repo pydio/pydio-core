@@ -520,12 +520,18 @@ Class.create("Action", {
 	 */
 	setIconSrc : function(newSrc, iconClass){
 		this.options.src = newSrc;
+        var previousIconClass;
+        if(iconClass){
+            previousIconClass = this.options.icon_class;
+            this.options.icon_class = iconClass;
+            if(iconClass && $(this.options.name +'_button')&& $(this.options.name +'_button').down('span.ajxp_icon_span')){
+                $(this.options.name +'_button').down('span.ajxp_icon_span').removeClassName(previousIconClass);
+                $(this.options.name +'_button').down('span.ajxp_icon_span').addClassName(iconClass);
+            }
+        }
 		if($(this.options.name +'_button_icon')){
 			$(this.options.name +'_button_icon').src = resolveImageSource(this.options.src,this.__DEFAULT_ICON_PATH, 22);
 		}
-        if(iconClass){
-            this.options.icon_class = iconClass;
-        }
 	},
 	
 	/**

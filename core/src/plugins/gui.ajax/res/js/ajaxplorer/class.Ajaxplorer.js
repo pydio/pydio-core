@@ -634,16 +634,19 @@ Class.create("Ajaxplorer", {
             this._contextHolder.requireContextChange(gotoNode);
             return;
         }
+        window.setTimeout(function(){
 
-        this._contextHolder.loadPathInfoSync(path, function(foundNode){
-            if(foundNode.isLeaf()) {
-                this._contextHolder.setPendingSelection(getBaseName(path));
-                gotoNode = new AjxpNode(getRepName(path));
-            }else{
-                gotoNode = foundNode;
-            }
-        }.bind(this));
-		this._contextHolder.requireContextChange(gotoNode);
+            this._contextHolder.loadPathInfoSync(path, function(foundNode){
+                if(foundNode.isLeaf()) {
+                    this._contextHolder.setPendingSelection(getBaseName(path));
+                    gotoNode = new AjxpNode(getRepName(path));
+                }else{
+                    gotoNode = foundNode;
+                }
+            }.bind(this));
+    		this._contextHolder.requireContextChange(gotoNode);
+
+        }.bind(this), 0);
 	},
 	
 	/**

@@ -1235,7 +1235,8 @@ a.carousel-control img{
 }
 
 #content_pane div.panelHeader,
-#search_results div.panelHeader
+#search_results div.panelHeader,
+div.class-FetchedResultPane > div.panelHeader
 {
     display: none;
 }
@@ -2166,27 +2167,69 @@ div#upload_files_list div, div#multiple_download_container div
 }
 
 div.tabulatorContainer{
-    padding: 3px;
-    padding-bottom: 0;
-    height: 24px;
-    border-bottom: 1px solid #676965;
+    padding: 0;
+    height: 28px;
+    overflow: hidden;
 }
 
-.toggleHeader
-{
-    width: 50%;
+div.tabulatorContainer div#display_toolbar{
+    min-width: 0;
+    padding-top: 6px;
+    padding-right: 6px;
+}
+span.toggleHeader{
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 6px 6px;
+    background-color: rgb(111, 123, 136);
+}
+
+span.toggleHeader.toggleInactive{
+    background-color: transparent;
+    font-size: 0.9em;
     cursor: pointer;
-    padding-right: 2px;
-    border: 1px solid #676965;
-    border-bottom: 0;
-    border-radius: 4px 4px 0 0;
-    -moz-border-radius: 4px 4px 0 0;
-    -webkit-border-radius: 4px 4px 0 0;
 }
 
-.toggleHeader a, .toggleHeader a, .toggleHeader a:link, .toggleHeader a:visited, .toggleHeader a:hover , .toggleHeader a:active
+span.toggleHeader span[class^="icon-"],
+span.toggleHeader span[class*=" icon-"]{
+    margin-right: 4px;
+}
+
+div.tabulator-vertical div {
+    display: none;
+}
+
+div.tabulator-vertical div.tabulatorContainer {
+    display: block;
+    height: 100%;
+}
+
+div.tabulator-vertical div.toolbarGroup{
+    display: block;
+    height: 24px;
+    font-size: 1.4em;
+}
+
+div.tabulatorContainer.icons_only span.tab_label{
+    display: none;
+}
+
+div.tabulatorContainer.icons_only span[class^="icon-"],
+div.tabulatorContainer.icons_only span[class*=" icon-"]
 {
-    text-decoration:none;
+    display: inline;
+    font-size: 1.2em;
+}
+
+div.tabulatorContainer.icons_only div.toggleInactive span[class^="icon-"],
+div.tabulatorContainer.icons_only div.toggleInactive span[class*=" icon-"],
+div.tabulatorContainer.icons_only div.toolbarGroup span[class^="icon-"],
+div.tabulatorContainer.icons_only div.toolbarGroup span[class*=" icon-"]
+{
+    display: inline;
+    font-size: 1em;
 }
 
 .panelHeader.panelHeaderWithIcon{
@@ -2202,22 +2245,6 @@ div.tabulatorContainer{
     left: auto;
     right: 6px;
     cursor: pointer;
-}
-
-.toggleInactive
-{
-    background: #EEE !important;
-    border-width: 1px;
-    border-bottom: 1px solid #676965;
-    filter:alpha(opacity=60);
-    opacity: 0.6;
-    -moz-opacity:0.6;
-}
-
-.toggleInactive a, .toggleInactive a:link, .toggleInactive a:visited, .toggleInactive a:hover , .toggleInactive a:active
-{
-    color: #999;
-    text-decoration:none;
 }
 
 #search_panel{
@@ -2342,27 +2369,37 @@ meta_opt.checked {
     font-style:normal;
 }
 
-#search_results div.ajxpNodeProvider
+div.class-FetchedResultPane{
+    background-color: #ebedf0;
+}
+
+#search_results div.ajxpNodeProvider,
+div.class-FetchedResultPane div.ajxpNodeProvider
 {
     cursor: pointer;
     background-color: transparent !important;
     border-bottom: 1px solid #ffffff;
 }
 
-#search_results div.ajxpNodeProvider:hover
+#search_results div.ajxpNodeProvider:hover,
+div.class-FetchedResultPane div.ajxpNodeProvider:hover
 {
     background-color: transparent !important;
 }
 
-#search_results div.ajxpNodeProvider.selected{
+div.class-FetchedResultPane div.ajxpNodeProvider.selected,
+#search_results div.ajxpNodeProvider.selected
+{
     background-color: #59F !important;
 }
 
+div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel,
 #search_results div.thumbnail_selectable_cell.detailed div.thumbLabel{
     font-size: 14px;
     padding-top: 4px;
 }
 
+div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_label,
 #search_results div.thumbnail_selectable_cell.detailed span.text_label{
     padding-top: 0;
 }

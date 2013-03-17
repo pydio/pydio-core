@@ -52,6 +52,7 @@ js/ajaxplorer/class.PreviewFactory.js
 js/ajaxplorer/class.FilesList.js
 js/ajaxplorer/class.FoldersTree.js
 js/ajaxplorer/class.SearchEngine.js
+js/ajaxplorer/class.FetchedResultPane.js
 js/ajaxplorer/class.InfoPanel.js
 js/ajaxplorer/class.PropertyPanel.js
 js/ajaxplorer/class.AbstractEditor.js
