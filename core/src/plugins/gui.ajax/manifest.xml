@@ -104,7 +104,7 @@
 					    <div style="float:left;" ajxpClass="AjxpPane"  id="buttons_bar_cont">
 						    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put", "get"],"groupOtherToolbars":["more", "change", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
 						</div>
-						<div style="float:right;" ajxpClass="AjxpPane" ajxpOptions='{"bindSizeTo":{"width":{"id":"info_panel", "events":["resize-InfoPanel-info_panel", "resize-FoldersTree-topPane","actions_refreshed"], "min":120, "offset":-20, "checkSiblings":true}}}' id="search_engine_cont">
+						<div style="float:right;" ajxpClass="AjxpPane" ajxpOptions='{"bindSizeTo":{"width":{"id":"info_panel", "events":["resize-InfoPanel-info_panel", "resize-FoldersTree-folder_pane","actions_refreshed"], "min":120, "offset":-20, "checkSiblings":true}}}' id="search_engine_cont">
 						    <div id="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}'></div>
 						</div>
 						<div style="clear:both;" class="skipSibling"/>

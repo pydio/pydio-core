@@ -227,7 +227,8 @@ Class.create("Splitter", AjxpPane, {
             },
             listeners : {
                 init:function(){
-                }
+                    this.refreshFoldingAction();
+                }.bind(this)
             }
             };
         var context = {
@@ -346,6 +347,7 @@ Class.create("Splitter", AjxpPane, {
 
     refreshFoldingAction : function(){
         var state = this.splitbar.hasClassName("folded");
+        if(!ajaxplorer.actionBar.getActionByName("folding_action")) return;
         if(this.options.foldingAlternateClose){
             ajaxplorer.actionBar.getActionByName("folding_action")[(state?"enable":"disable")]();
         }else{
