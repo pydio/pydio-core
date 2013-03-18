@@ -66,7 +66,7 @@ Class.create("FetchedResultPane", FilesList, {
         document.observe("ajaxplorer:repository_list_refreshed", function(){
             this._rootNode.clear();
             this._dataLoaded = false;
-            if(this.htmlElement.visible()){
+            if(this.htmlElement && this.htmlElement.visible()){
                 this.showElement(true);
             }
         }.bind(this));

@@ -298,6 +298,14 @@ class AJXP_ClientDriver extends AJXP_Plugin
     function nodeBookmarkMetadata(&$ajxpNode){
         $user = AuthService::getLoggedUser();
         if($user == null) return;
+        $metadata = $ajxpNode->retrieveMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+        if(count($metadata)){
+            $ajxpNode->mergeMetadata(array(
+                     "ajxp_bookmarked" => "true",
+                     "overlay_icon"  => "bookmark.png"
+                ), true);
+            return;
+        }
         if(!isSet(self::$loadedBookmarks)){
             self::$loadedBookmarks = $user->getBookmarks();
         }
@@ -307,12 +315,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
                          "ajxp_bookmarked" => "true",
                          "overlay_icon"  => "bookmark.png"
                     ), true);
-                /*
-                 * TESTING MULTIPLE OVERLAYS
-                $ajxpNode->mergeMetadata(array(
-                         "overlay_icon"  => "shared.png"
-                    ), true);
-                */
+                $ajxpNode->setMetadata("ajxp_bookmarked", array("ajxp_bookmarked"=> "true"), true, AJXP_METADATA_SCOPE_REPOSITORY, true);
             }
         }
     }

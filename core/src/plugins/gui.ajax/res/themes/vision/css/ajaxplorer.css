@@ -193,7 +193,9 @@ textarea{
     font-size: 20px;
     text-align: left;
     padding-top: 10px;
-
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata{
@@ -202,7 +204,7 @@ textarea{
     padding-top: 1px;
     opacity: 0.8;
     font-size: 11px;
-
+    white-space: nowrap;
 }
 
 div.thumbnail_cell_metadata span.metadata_chunk span.text_label{
@@ -918,6 +920,12 @@ input.SF_input.SF_number{
     height: 53px;
     font-size: 25px;
     color: rgb(111, 121, 131);
+}
+
+#simple_repository_label div.repository_title{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 #simple_repository_label div.repository_legend {

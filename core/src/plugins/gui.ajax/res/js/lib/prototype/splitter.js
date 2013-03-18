@@ -353,6 +353,9 @@ Class.create("Splitter", AjxpPane, {
         }else{
             ajaxplorer.actionBar.getActionByName("folding_action").setIconSrc('view_left_'+ (state?'right':'close') + '.png', (state?'icon-caret-right':'icon-remove-sign'));
         }
+        if($(this.paneA).ajxpPaneObject){
+      	    $(this.paneA).ajxpPaneObject.resize();
+   		}
     },
 
     fold:function(){

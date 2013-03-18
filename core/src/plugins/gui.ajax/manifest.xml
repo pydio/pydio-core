@@ -116,7 +116,7 @@
     					    <div id="topPane" ajxpClass="AjxpTabulator" ajxpOptions='{"defaultTabId": "folders","tabInfos" : [{"id":"folders","label":"130","iconClass":"icon-folder-open","element":"folder_pane"},{"id":"shared","label":"363","iconClass":"icon-share","element":"shared_elements"},{"id":"flagged","label":"147","iconClass":"icon-star","element":"flagged_elements"}],"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["filter"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'>
     							<div id="folder_pane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ></div>
     							<div id="shared_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_shared"}}'></div>
-    							<div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_bookmark"}}'></div>
+    							<div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_bookmarked"}}'></div>
     					    </div>
 							<div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
 							    <div id="cpane_header" class="panelHeader">

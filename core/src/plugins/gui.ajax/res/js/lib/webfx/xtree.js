@@ -307,6 +307,7 @@ WebFXTreeAbstractNode.prototype.toggle = function() {
 WebFXTreeAbstractNode.prototype.select = function() {
 	if($(this.id + '-anchor')) {
         $(this.id + '-anchor').focus();
+        webFXTreeHandler.focus(this);
         try{
             if(!this.scrollContainer){
                 var root = this;

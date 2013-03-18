@@ -2015,7 +2015,7 @@ Class.create("FilesList", SelectableElements, {
 	setOnLoad: function()	{
 		if(this.loading) return;
         this.htmlElement.setStyle({position:'relative'});
-        var element = this.htmlElement.down('.selectable_div,.table_rows_container') || this.htmlElement;
+        var element = this.htmlElement; // this.htmlElement.down('.selectable_div,.table_rows_container') || this.htmlElement;
 		addLightboxMarkupToElement(element);
 		var img = new Element('img', {
 			src : ajxpResourcesFolder+'/images/loadingImage.gif'
@@ -2029,7 +2029,7 @@ Class.create("FilesList", SelectableElements, {
 	 * Remove the loading image
 	 */
 	removeOnLoad: function(){
-        var element = this.htmlElement.down('.selectable_div,.table_rows_container') || this.htmlElement;
+        var element = this.htmlElement; //this.htmlElement.down('.selectable_div,.table_rows_container') || this.htmlElement;
 		removeLightboxFromElement(element);
 		this.loading = false;
 	},
@@ -2086,7 +2086,7 @@ Class.create("FilesList", SelectableElements, {
 	selectFile: function(fileName, multiple)
 	{
 		fileName = getBaseName(fileName);
-		if(!ajaxplorer.getContextHolder().fileNameExists(fileName))
+		if(!ajaxplorer.getContextHolder().fileNameExists(fileName, true))
 		{
 			return;
 		}
@@ -2336,7 +2336,7 @@ Class.create("FilesList", SelectableElements, {
 		}
 		else
 		{
-			return node != null && ( node.tagName == "DIV" || node.tagName == "div") && 
+			return node != null && ( node.tagName == "DIV" || node.tagName == "div") &&
 				node.parentNode == this._htmlElement;
 		}
 	},
