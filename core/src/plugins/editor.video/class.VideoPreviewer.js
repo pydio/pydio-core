@@ -106,10 +106,19 @@ Class.create("VideoPreviewer", AbstractEditor, {
 							playerFallbackOrder : (mime == "mp4" || mime=="m4v"?["html5", "flash", "links"]:["html5", "links"])
 						});
 					}
-					div.setStyle({width:dimensionObject.width});
-					div.down('.vjs-flash-fallback').setAttribute('width', dimensionObject.width);
-					if(videoObject) videoObject.setAttribute('width', dimensionObject.width);
-					if(div.ajxpPlayer) div.ajxpPlayer.triggerResizeListeners();
+                    var height = Math.min(dimensionObject.height, dimensionObject.maxHeight);
+                    var width = dimensionObject.width;
+                    var styleObject = {height: height + 'px', width : width + 'px'};
+					div.setStyle(styleObject);
+					div.down('.vjs-flash-fallback').setAttribute('width', width);
+					if(videoObject) {
+                        videoObject.setAttribute('width', width);
+                        videoObject.setStyle(styleObject);
+                    }
+					if(div.ajxpPlayer) {
+                        div.ajxpPlayer.height(height);
+                        div.ajxpPlayer.width(width);
+                    }
 				}
 				
 			}else{
