@@ -525,7 +525,7 @@ function parseXml(xmlStr){
         xmlDoc.loadXML(xmlStr);
         xmlDoc.setProperty('SelectionLanguage', 'XPath');
         return xmlDoc;
-    }else if(typeof window.DOMParser() != "undefined"){
+    }else if(typeof window.DOMParser != "undefined"){
         return ( new window.DOMParser() ).parseFromString(xmlStr, "text/xml");
     }
 }

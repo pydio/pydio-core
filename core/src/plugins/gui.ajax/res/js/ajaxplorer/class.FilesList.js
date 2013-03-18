@@ -181,7 +181,9 @@ Class.create("FilesList", SelectableElements, {
         var keydownObserver = this.keydown.bind(this);
         var repoSwitchObserver = this.setOnLoad.bind(this);
 		this._registerObserver(document, "keydown", keydownObserver);
-        this._registerObserver(document, "ajaxplorer:trigger_repository_switch", repoSwitchObserver);
+        if(!this._dataModel){
+            this._registerObserver(document, "ajaxplorer:trigger_repository_switch", repoSwitchObserver);
+        }
 	},
 
     _registerObserver:function(object, eventName, handler, objectEvent){
@@ -2012,7 +2014,9 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	setOnLoad: function()	{
 		if(this.loading) return;
-		addLightboxMarkupToElement(this.htmlElement);
+        this.htmlElement.setStyle({position:'relative'});
+        var element = this.htmlElement.down('.selectable_div,.table_rows_container') || this.htmlElement;
+		addLightboxMarkupToElement(element);
 		var img = new Element('img', {
 			src : ajxpResourcesFolder+'/images/loadingImage.gif'
 		});
@@ -2025,7 +2029,8 @@ Class.create("FilesList", SelectableElements, {
 	 * Remove the loading image
 	 */
 	removeOnLoad: function(){
-		removeLightboxFromElement(this.htmlElement);
+        var element = this.htmlElement.down('.selectable_div,.table_rows_container') || this.htmlElement;
+		removeLightboxFromElement(element);
 		this.loading = false;
 	},
 	

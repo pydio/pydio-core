@@ -79,20 +79,10 @@ div.descending > .css_gradient{
 /*
 MAJOR STYLES
 */
-a:link {
+a:link, a:visited, a:hover, a:active, a:focus {
     text-decoration: none;
     outline: 0;
-}
-a:visited {
-    text-decoration: none;
-}
-a:hover {
-    text-decoration: none;
-}
-a:active,
-a:focus{
-    text-decoration: none;
-    outline: 0;
+    color: rgb(111, 121, 131);
 }
 
 body, html

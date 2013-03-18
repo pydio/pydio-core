@@ -66,7 +66,8 @@ Class.create("SearchEngine", AjxpPane, {
         }
 		$super($(mainElementName), this._ajxpOptions);
         this.updateSearchModeFromRegistry();
-        document.observe("ajaxplorer:registry_loaded", this.updateSearchModeFromRegistry.bind(this));
+        this.searchModeObserver = this.updateSearchModeFromRegistry.bind(this);
+        document.observe("ajaxplorer:registry_loaded", this.searchModeObserver);
 
         this._dataModel = new AjxpDataModel(true);
         this._rootNode = new AjxpNode("/", false, "Results", "folder.png");
@@ -292,6 +293,7 @@ Class.create("SearchEngine", AjxpPane, {
             this.htmlElement.update('');
         }
         document.stopObserving("ajaxplorer:repository_list_refreshed", this.refreshObserver);
+        document.stopObserving("ajaxplorer:registry_loaded", this.searchModeObserver);
 		this.htmlElement = null;
         if(ajxpId && window[ajxpId]){
             try {delete window[ajxpId];}catch(e){}

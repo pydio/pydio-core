@@ -63,9 +63,12 @@ Class.create("FetchedResultPane", FilesList, {
              if(selectedNode) ajaxplorer.goTo(selectedNode);
          }.bind(this));
 
-        document.observe("ajaxplorer:registry_loaded", function(){
+        document.observe("ajaxplorer:repository_list_refreshed", function(){
             this._rootNode.clear();
             this._dataLoaded = false;
+            if(this.htmlElement.visible()){
+                this.showElement(true);
+            }
         }.bind(this));
 
         mainElementName.addClassName('class-FetchedResultPane');
