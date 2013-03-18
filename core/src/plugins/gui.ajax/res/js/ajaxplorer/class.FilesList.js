@@ -31,7 +31,7 @@ Class.create("FilesList", SelectableElements, {
     _dataModel:null,
     _doubleClickListener:null,
     _previewFactory : null,
-    _detailThumbSize : 35,
+    _detailThumbSize : 28,
 	/**
 	 * Constructor
 	 * @param $super klass Reference to the constructor

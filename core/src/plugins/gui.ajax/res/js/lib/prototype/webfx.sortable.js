@@ -239,6 +239,7 @@ SortableTable = Class.create({
 		}catch(e){
 			return;
 		}
+        if(!cells || !cells.length) return;
 		var l = cells.length;
 		var c;
 		for (var i = 0; i < l; i++) {

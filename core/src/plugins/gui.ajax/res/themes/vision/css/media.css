@@ -6,8 +6,7 @@ and (max-width : 620px) {
     span.actionbar_button_label,
     .action_bar span.actionbar_button_label,
     #get_my_feed_button_label,
-    #search_form a,
-    #topPane
+    #search_form a
     {
         display: none;
     }

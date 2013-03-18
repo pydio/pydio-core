@@ -190,9 +190,9 @@ textarea{
 
 .thumbnail_selectable_cell.detailed div.thumbLabel{
 
-    font-size: 20px;
+    font-size: 18px;
     text-align: left;
-    padding-top: 10px;
+    padding-top: 7px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -201,10 +201,11 @@ textarea{
 .thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata{
 
     text-align: left;
-    padding-top: 1px;
+    padding-top: 0;
     opacity: 0.8;
     font-size: 11px;
     white-space: nowrap;
+    margin-top: -1px;
 }
 
 div.thumbnail_cell_metadata span.metadata_chunk span.text_label{
@@ -2492,19 +2493,10 @@ td.infoPanelLabel {
 
 .panelContent div.panelHeader{
 
-
     font-size: 12px;
-
-
-
     padding: 6px 7px;
-
-
     background-color: rgba(138, 149, 160, 0.65) !important;
-
-
     border-bottom: 0 !important;
-
 
 }
 
@@ -2520,6 +2512,18 @@ tr td.infoPanelLabel
 }
 .infoPanelImagePreview img
 {
+}
+
+div.double div.infoPanelAllMetadata > div{
+    float: left;
+    margin: 1%;
+    width: 48%;
+}
+
+div.triple div.infoPanelAllMetadata > div{
+    float: left;
+    margin: 1%;
+    width: 31%;
 }
 
 #browser

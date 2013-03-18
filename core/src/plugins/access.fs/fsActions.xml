@@ -875,29 +875,31 @@
 					<message key="header_string" id="341"/>
 				</messages>
 				<html><![CDATA[
-				<div>
-					<div class="infoPanelImagePreview">
-						#{preview_rich}
-					</div>
-					<div class="panelHeader infoPanelGroup">#{header_string}</div>
-					<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
-						<tr>
-							<td class="infoPanelLabel">#{name_string}</td>
-							<td class="infoPanelValue">#{basename}</td>
-						</tr>
-						<tr class="even">
-							<td class="infoPanelLabel">#{size_string}</td>
-							<td class="infoPanelValue">#{filesize}</td>
-						</tr>
-						<tr>
-							<td class="infoPanelLabel">#{modif_string}</td>
-							<td class="infoPanelValue">#{formated_date}</td>
-						</tr>
-						<tr class="even">
-							<td class="infoPanelLabel">#{type_string}</td>
-							<td class="infoPanelValue">#{mimestring}</td>
-						</tr>
-					</table>					
+                <div class="infoPanelImagePreview">
+                    #{preview_rich}
+                </div>
+				<div class="infoPanelAllMetadata">
+				    <div>
+                        <div class="panelHeader infoPanelGroup">#{header_string}</div>
+                        <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
+                            <tr>
+                                <td class="infoPanelLabel">#{name_string}</td>
+                                <td class="infoPanelValue">#{basename}</td>
+                            </tr>
+                            <tr class="even">
+                                <td class="infoPanelLabel">#{size_string}</td>
+                                <td class="infoPanelValue">#{filesize}</td>
+                            </tr>
+                            <tr>
+                                <td class="infoPanelLabel">#{modif_string}</td>
+                                <td class="infoPanelValue">#{formated_date}</td>
+                            </tr>
+                            <tr class="even">
+                                <td class="infoPanelLabel">#{type_string}</td>
+                                <td class="infoPanelValue">#{mimestring}</td>
+                            </tr>
+                        </table>
+                    </div>
 				</div>
 				]]></html>
 			</infoPanel>
@@ -908,21 +910,23 @@
 					<message key="header_string" id="342"/>
 				</messages>
 				<html><![CDATA[
-					<div>
-						<div class="folderImage infoPanelImagePreview">
-							<img src="AJXP_THEME_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
+                    <div class="folderImage infoPanelImagePreview">
+                        <img src="AJXP_THEME_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
+                    </div>
+					<div class="infoPanelAllMetadata">
+					    <div>
+                            <div class="panelHeader infoPanelGroup">#{header_string}</div>
+                            <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
+                                <tr>
+                                    <td class="infoPanelLabel">#{name_string}</td>
+                                    <td class="infoPanelValue">#{basename}</td>
+                                </tr>
+                                <tr class="even">
+                                    <td class="infoPanelLabel">#{modif_string}</td>
+                                    <td class="infoPanelValue">#{formated_date}</td>
+                                </tr>
+                            </table>
 						</div>
-						<div class="panelHeader infoPanelGroup">#{header_string}</div>
-						<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
-							<tr>
-								<td class="infoPanelLabel">#{name_string}</td>
-								<td class="infoPanelValue">#{basename}</td>
-							</tr>
-							<tr class="even">
-								<td class="infoPanelLabel">#{modif_string}</td>
-								<td class="infoPanelValue">#{formated_date}</td>
-							</tr>
-						</table>						
 					</div>
 				]]></html>
 			</infoPanel>

@@ -242,14 +242,26 @@ Class.create("InfoPanel", AjxpPane, {
 	 * Resize the panel
 	 */
 	resize : function(){
+        this.contentContainer.removeClassName('double');
+        this.contentContainer.removeClassName('triple');
+        var previewMaxHeight = 150;
+        if(parseInt(this.contentContainer.getWidth()) > 500) {
+            this.contentContainer.addClassName('double');
+            previewMaxHeight = 300;
+        }
+        if(parseInt(this.contentContainer.getWidth()) > 750) {
+            this.contentContainer.addClassName('triple');
+            previewMaxHeight = 450;
+        }
 		fitHeightToBottom(this.contentContainer, null);
+        previewMaxHeight = Math.min(previewMaxHeight, parseInt(this.contentContainer.getHeight()) - parseInt(this.contentContainer.getStyle('paddingTop')));
         if(this.scrollbar){
             this.scroller.setStyle({height:parseInt(this.contentContainer.getHeight())+'px'});
             this.scrollbar.recalculateLayout();
         }
 		if(this.htmlElement && this.currentPreviewElement && this.currentPreviewElement.visible()){
 			var squareDim = Math.min(parseInt(this.htmlElement.getWidth()-40));
-			this.currentPreviewElement.resizePreviewElement({width:squareDim,height:squareDim, maxHeight:150});
+			this.currentPreviewElement.resizePreviewElement({width:squareDim,height:squareDim, maxHeight:previewMaxHeight});
 		}
         if(this.htmlElement){
             document.fire("ajaxplorer:resize-InfoPanel-" + this.htmlElement.id, this.htmlElement.getDimensions());
@@ -335,7 +347,11 @@ Class.create("InfoPanel", AjxpPane, {
 				this[pair.key] = MessageHash[pair.value];
 			}.bind(tArgs));
 			var template = new Template(tString);
-			this.contentContainer.insert(template.evaluate(tArgs));
+            if(this.contentContainer.down('div.infoPanelAllMetadata')){
+                this.contentContainer.down('div.infoPanelAllMetadata').insert(template.evaluate(tArgs));
+            }else{
+                this.contentContainer.insert(template.evaluate(tArgs));
+            }
 			if(tModifier){
 				var modifierFunc = eval(tModifier);
 				modifierFunc(this.contentContainer, fileNode);
