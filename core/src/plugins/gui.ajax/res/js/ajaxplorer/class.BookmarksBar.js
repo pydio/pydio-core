@@ -57,18 +57,17 @@
 				alt:bmAction.options.title,
 				image:ajxpResourcesFolder+'/images/actions/16/bookmark_add.png',
 				callback:function(e){
-					var node = ajaxplorer.getContextNode();
-                    node.getMetadata().set('ajxp_bookmarked', 'true');
-                    node.getMetadata().set('overlay_icon', 'bookmark.png');
-					this.addBookmark(node.getPath(), node.getLabel());
+                    document.notify("ajaxplorer:add_bookmark");
 				}.bind(this)
 			};		
 		}.bind(this));
 		document.observe("ajaxplorer:add_bookmark", function(){
 			var node = ajaxplorer.getUserSelection().getUniqueNode();
-			this.addBookmark(node.getPath(), node.getLabel());
-            node.getMetadata().set('ajxp_bookmarked', 'true');
-            node.getMetadata().set('overlay_icon', 'bookmark.png');
+            if(node.getMetadata().get('ajxp_bookmarked') && node.getMetadata().get('ajxp_bookmarked') == 'true'){
+                this.removeBookmark(node.getPath(), function(){ajaxplorer.fireNodeRefresh(node);});
+            }else{
+                this.addBookmark(node.getPath(), node.getLabel(),function(){ajaxplorer.fireNodeRefresh(node);});
+            }
 		}.bind(this) );
 	},
 	/**
@@ -90,15 +89,18 @@
 			bookmark.moreActions = this.getContextActions(bookmark.alt, bookmark.name);
 			this.bookmarks.push(bookmark);
 		}
-		this.bmMenu.options.menuItems = this.bookmarks;
-		this.bmMenu.refreshList();
-		if(this.bookmarks.length) this.element.removeClassName('inline_disabled');
+        if(this.bmMenu){
+    		this.bmMenu.options.menuItems = this.bookmarks;
+	    	this.bmMenu.refreshList();
+        }
+		if(this.bookmarks.length && this.element) this.element.removeClassName('inline_disabled');
 		if(modal.pageLoading) modal.updateLoadingProgress('Bookmarks Loaded');
 	},
 	/**
 	 * Creates the sub menu
 	 */
 	createMenu : function(){
+        if(!this.element) return;
 		this.bmMenu = new Proto.Menu(Object.extend(this.bookmarksMenuOptions, {
             anchor:this.element,
             menuItems: this.bookmarks
@@ -115,9 +117,11 @@
 		}else{
 			this.bookmarks = $A();
 		}
-		this.element.addClassName('inline_disabled');
-		this.bmMenu.options.menuItems = this.bookmarks;
-		this.bmMenu.refreshList();		
+		if(this.element) this.element.addClassName('inline_disabled');
+        if(this.bmMenu){
+            this.bmMenu.options.menuItems = this.bookmarks;
+            this.bmMenu.refreshList();
+        }
 	},
 	
 	/**
@@ -179,21 +183,27 @@
 	 * Reload the bookmarks via the registry loading
 	 * @param actionsParameters Hash
 	 */
-	load: function(actionsParameters, silently){
+	load: function(actionsParameters, silently, onComplete){
         if(!ajaxplorer || !ajaxplorer.user) return;
 		var connexion = new Connexion();
 		if(!actionsParameters) actionsParameters = new Hash();
 		actionsParameters.set('get_action', 'get_bookmarks');
 		connexion.setParameters(actionsParameters);
-		connexion.onComplete = function(transport){
-			document.observeOnce("ajaxplorer:registry_part_loaded", function(event){
-				if(event.memo != "user/bookmarks") return;
-				this.parseXml(ajaxplorer.getXmlRegistry());
-			}.bind(this) );			
-			ajaxplorer.loadXmlRegistry(false, "user/bookmarks");
-			this.bmMenu.refreshList();
-			if(!silently) this.bmMenu.show();
-		}.bind(this);
+        if(onComplete){
+            connexion.onComplete = onComplete;
+        }else{
+            connexion.onComplete = function(transport){
+                document.observeOnce("ajaxplorer:registry_part_loaded", function(event){
+                    if(event.memo != "user/bookmarks") return;
+                    this.parseXml(ajaxplorer.getXmlRegistry());
+                }.bind(this) );
+                ajaxplorer.loadXmlRegistry(false, "user/bookmarks");
+                if(this.bmMenu){
+                    this.bmMenu.refreshList();
+                    if(!silently) this.bmMenu.show();
+                }
+            }.bind(this);
+        }
 		connexion.sendAsync();
 	},
 	
@@ -202,25 +212,25 @@
 	 * @param path String
 	 * @param title String
 	 */
-	addBookmark: function(path,title){
+	addBookmark: function(path,title, onComplete){
 		var parameters = new Hash();
 		parameters.set('bm_action', 'add_bookmark');
 		parameters.set('bm_path', path);
 		if(title){
 			parameters.set('bm_title', title);
 		}
-		this.load(parameters);
+		this.load(parameters, false, onComplete);
 	},
 	
 	/**
 	 * Remove a bookmark
 	 * @param path String
 	 */
-	removeBookmark: function(path){
+	removeBookmark: function(path, onComplete){
 		var parameters = new Hash();
 		parameters.set('bm_action', 'delete_bookmark');
 		parameters.set('bm_path', path);
-		this.load(parameters);		
+		this.load(parameters, false, onComplete);
 	},
 	
 	/**

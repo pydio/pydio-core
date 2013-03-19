@@ -133,7 +133,8 @@ class ShareCenter extends AJXP_Plugin{
             	if($subAction == "delegate_repo"){
 					header("Content-type:text/plain");
 					$result = $this->createSharedRepository($httpVars, $this->repository, $this->accessDriver);
-					print($result);
+                    AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
+                    print($result);
             	}else{
 					$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                     if(!isSet($httpVars["downloadlimit"])){
@@ -164,7 +165,8 @@ class ShareCenter extends AJXP_Plugin{
                     }
                     $hash = md5(serialize($data));
 	                header("Content-type:text/plain");
-	                echo $url;
+                    AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
+                    echo $url;
             	}
             break;
 
@@ -288,7 +290,9 @@ class ShareCenter extends AJXP_Plugin{
                     $ajxpNode->removeMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
                     //AJXP_Controller::applyHook("node.meta_change", array(&$ajxpNode));
                 }
-            break;
+                AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
+
+                break;
 
             case "reset_counter":
                 $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);

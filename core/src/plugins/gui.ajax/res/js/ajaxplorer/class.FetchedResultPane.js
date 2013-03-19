@@ -44,11 +44,12 @@ Class.create("FetchedResultPane", FilesList, {
         $super($(mainElementName), {
             dataModel:dataModel,
             columnsDef:[{attributeName:"ajxp_label", messageId:1, sortType:'String'},
-                {attributeName:"filename", messageString:'Path', sortType:'String'}
+                {attributeName:"filename", messageString:'Path', sortType:'String'},
+                {attributeName:"is_file", messageString:'Type', sortType:'String', defaultVisibility:'hidden'}
             ],
             displayMode: 'detail',
             fixedDisplayMode: 'detail',
-            defaultSortTypes:["String", "String"],
+            defaultSortTypes:["String", "String", "String"],
             columnsTemplate:"search_results",
             selectable: true,
             draggable: false,
@@ -71,7 +72,25 @@ Class.create("FetchedResultPane", FilesList, {
             }
         }.bind(this));
 
+        this.hiddenColumns.push("is_file");
+        this._sortableTable.sort(2, false);
+
         mainElementName.addClassName('class-FetchedResultPane');
+
+        if(ajxpOptions.reloadOnServerMessage){
+            ajaxplorer.observe("server_message", function(event){
+                var newValue = XPathSelectSingleNode(event, ajxpOptions.reloadOnServerMessage);
+                if(newValue && this._dataLoaded){
+                    this._rootNode.clear();
+                    this._dataLoaded = false;
+                    if(this.htmlElement && this.htmlElement.visible()){
+                        this._dataModel.requireContextChange(this._rootNode, true);
+                        this._dataLoaded = true;
+                    }
+                }
+            }.bind(this));
+        }
+
     },
 
 
@@ -87,7 +106,14 @@ Class.create("FetchedResultPane", FilesList, {
             this._dataLoaded = true;
         }
         if(show) this.htmlElement.show();
-        else this.htmlElement.hide();
-	}
+        else {
+            this._dataModel.setSelectedNodes($A());
+            this.htmlElement.hide();
+        }
+	},
+
+    getActions : function(){
+
+    }
 
 });

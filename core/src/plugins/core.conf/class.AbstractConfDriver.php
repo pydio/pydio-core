@@ -435,6 +435,11 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 					$bmUser = $confStorage->createUserObject("shared");
 				}
 				if($bmUser == null) exit(1);
+                $driver = ConfService::loadRepositoryDriver();
+                if(!is_a($driver, "AjxpWrapperProvider")){
+                    $driver = false;
+                }
+
 				if(isSet($httpVars["bm_action"]) && isset($httpVars["bm_path"]))
 				{
 					if($httpVars["bm_action"] == "add_bookmark")
@@ -443,15 +448,24 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 						if(isSet($httpVars["bm_title"])) $title = $httpVars["bm_title"];
 						if($title == "" && $httpVars["bm_path"]=="/") $title = ConfService::getCurrentRootDirDisplay();
 						$bmUser->addBookMark(SystemTextEncoding::magicDequote($httpVars["bm_path"]), SystemTextEncoding::magicDequote($title));
+                        if($driver){
+                            $node = new AJXP_Node($driver->getResourceUrl(SystemTextEncoding::magicDequote($httpVars["bm_path"])));
+                            $node->setMetadata("ajxp_bookmarked", array("ajxp_bookmarked" => "true"), true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+                        }
 					}
 					else if($httpVars["bm_action"] == "delete_bookmark")
 					{
 						$bmUser->removeBookmark($httpVars["bm_path"]);
-					}
+                        if($driver){
+                            $node = new AJXP_Node($driver->getResourceUrl(SystemTextEncoding::magicDequote($httpVars["bm_path"])));
+                            $node->removeMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+                        }
+                    }
 					else if($httpVars["bm_action"] == "rename_bookmark" && isset($httpVars["bm_title"]))
 					{
 						$bmUser->renameBookmark($httpVars["bm_path"], $httpVars["bm_title"]);
 					}
+                    AJXP_Controller::applyHook("msg.instant", array("<reload_bookmarks/>", ConfService::getRepository()->getId()));
 				}
 				if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null)
 				{

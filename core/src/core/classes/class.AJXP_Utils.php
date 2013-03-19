@@ -1320,7 +1320,7 @@ class AJXP_Utils
 
     public static function cleanDibiDriverParameters($params){
         $value = $params["group_switch_value"];
-        if(isSet($value)){
+        if(isSet($value) && is_array($value)){
             foreach($params as $k => $v){
                 if(strpos($k, $value."_") === 0){
                     $params[substr($k, strlen($value."_"))] = $v;

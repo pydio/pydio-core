@@ -1167,14 +1167,19 @@ Class.create("Ajaxplorer", {
 	 * Create a Tab navigation between registerd IAjxpFocusable
 	 */
 	initTabNavigation: function(){
-		var objects = this._focusables;
 		// ASSIGN OBSERVER
 		Event.observe(document, "keydown", function(e)
 		{			
 			if(e.keyCode == Event.KEY_TAB)
 			{
 				if(this.blockNavigation) return;
-				var shiftKey = e['shiftKey'];
+                var objects = [];
+                $A(this._focusables).each(function(el){
+                    if((!el.htmlElement || el.htmlElement.visible())){
+                        objects.push(el);
+                    }
+                });
+                var shiftKey = e['shiftKey'];
 				var foundFocus = false;
 				for(i=0; i<objects.length;i++)
 				{
@@ -1192,9 +1197,9 @@ Class.create("Ajaxplorer", {
 							if(i<objects.length-1)nextIndex=i+1;
 							else nextIndex = 0;
 						}
-						objects[nextIndex].focus();
-						foundFocus = true;
-						break;
+                        objects[nextIndex].focus();
+                        foundFocus = true;
+                        break;
 					}
 				}
 				if(!foundFocus && objects[0]){
