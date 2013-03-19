@@ -32,7 +32,7 @@ Class.create("NotificationLoader", {
         this.ajxpNode._iNodeProvider = rP;
         this.pFactory = new PreviewFactory();
         this.pFactory.sequencialLoading = false;
-        this.pFactory.setThumbSize(16);
+        this.pFactory.setThumbSize(22);
         this.pe = new PeriodicalExecuter(function(){
             if(window.ajaxplorer.user){
                 this.ajxpNode.reload();
@@ -59,11 +59,20 @@ Class.create("NotificationLoader", {
     childrenToMenuItems : function(){
         var menuItems = $A([]);
         var eventIndex = 0;
+
         this.ajxpNode.getChildren().each(function(el){
+
+            var block = '<div class="notif_event_label">'+el.getLabel()+'</div>';
+            if(el.getMetadata().get('event_repository_label')){
+                block += '<div class="notif_event_repository">'+ el.getMetadata().get('event_repository_label') + '</div>';
+            }
+            block += '<div class="notif_event_description">'+ el.getMetadata().get('event_description') + '</div>';
+            block += '<div class="notif_event_date">'+ el.getMetadata().get('event_date') + '</div>';
+            block = '<div class="notif_event_container">'+block+'</div><br style="clear:left;"/>';
             menuItems.push({
                 id: "event_" + eventIndex,
-                name:el.getMetadata().get("event_description"),
-                alt:el.getMetadata().get("event_description").stripTags(),
+                name:block,
+                alt: el.getMetadata().get("event_description_long").stripTags(),
                 pFactory : this.pFactory,
                 ajxpNode:el,
                 callback:function(e){}

@@ -21,15 +21,15 @@ ul.notification_list{
 */
 
 #feed_content li{
-    border-bottom: 1px solid #000;
-    padding: 5px 0;
+    padding: 0;
 }
 
 #feed_content a{
     clear: left;
     padding: 5px;
-    /*margin: 2px;*/
-    font-size: 11px;
+    font-size: 12px;
+    height: auto;
+    letter-spacing: 1px;
 }
 
 #feed_content a em{
@@ -48,7 +48,25 @@ width: 150px;
 
 #feed_content img {
     float: left;
-    height: 16px;
-    width: 16px;
+    height: 22px;
+    width: 22px;
     margin: 4px 14px 3px 6px;
+}
+
+.notif_event_container {
+    float: left;
+    font-size: 11px;
+    margin-bottom: 7px;
+    letter-spacing: 0;
+    width: 150px;
+}
+
+.notif_event_container > div {
+    padding: 2px 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.notif_event_label {
+    font-size: 14px;
+    letter-spacing: 1px;
 }

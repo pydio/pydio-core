@@ -95,6 +95,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         $userId = $u->getId();
         $userGroup = $u->getGroupPath();
         $authRepos = array();
+        $crtRepId = ConfService::getCurrentRootDirIndex();
         if(isSet($httpVars["repository_id"]) && $u->mergedRole->canRead($httpVars["repository_id"])){
             $authRepos[] = $httpVars["repository_id"];
         }else{
@@ -141,11 +142,14 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     }catch (Exception $e){
                         continue;
                     }
-                    $node->event_description = $notif->getDescriptionShort();
-                    if(empty($node->event_description)) {
-                        $node->event_description = $notif->getDescriptionLong(true);
+                    $node->event_description = ucfirst($notif->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notif->getAuthor();
+                    $node->event_description_long = $notif->getDescriptionLong(true);
+                    $node->event_date = AJXP_Utils::relativeDate($notif->getDate(), $mess);
+                    $node->repository_id = $node->getRepository()->getUniqueId();
+                    if($node->repository_id != $crtRepId && $node->getRepository()->getDisplay() != null){
+                        $node->event_repository_label = "[".$node->getRepository()->getDisplay()."]";
                     }
-                    $node->repository_id = $node->getRepositoryId();
+                    $node->event_author = $notif->getAuthor();
                     AJXP_XMLWriter::renderAjxpNode($node);
                 }
             }

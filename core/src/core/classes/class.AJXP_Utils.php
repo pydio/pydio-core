@@ -603,6 +603,42 @@ class AJXP_Utils
         }
     }
 
+
+    //Relative Date Function
+
+    public static function relativeDate($time, $messages) {
+
+        $today = strtotime(date('M j, Y'));
+        $reldays = ($time - $today)/86400;
+        $relTime = date($messages['date_relative_time_format'], $time);
+
+        if ($reldays >= 0 && $reldays < 1) {
+            return  str_replace("TIME", $relTime, $messages['date_relative_today']);
+        } else if ($reldays >= 1 && $reldays < 2) {
+            return  str_replace("TIME", $relTime, $messages['date_relative_tomorrow']);
+        } else if ($reldays >= -1 && $reldays < 0) {
+            return  str_replace("TIME", $relTime, $messages['date_relative_yesterday']);
+        }
+
+        if (abs($reldays) < 7) {
+
+            if ($reldays > 0) {
+                $reldays = floor($reldays);
+                return  str_replace("%s", $reldays, $messages['date_relative_days_ahead']);
+                //return 'In ' . $reldays . ' day' . ($reldays != 1 ? 's' : '');
+            } else {
+                $reldays = abs(floor($reldays));
+                return  str_replace("%s", $reldays, $messages['date_relative_days_ago']);
+                //return $reldays . ' day' . ($reldays != 1 ? 's' : '') . ' ago';
+            }
+
+        }
+
+        return str_replace("DATE", date($messages["date_relative_date_format"], $time ? $time : time()), $messages["date_relative_date"]);
+
+    }
+
+
     /**
      * Replace specific chars by their XML Entities, for use inside attributes value
      * @static
@@ -1319,8 +1355,9 @@ class AJXP_Utils
     }
 
     public static function cleanDibiDriverParameters($params){
+        if(!is_array($params)) return $params;
         $value = $params["group_switch_value"];
-        if(isSet($value) && is_array($value)){
+        if(isSet($value)){
             foreach($params as $k => $v){
                 if(strpos($k, $value."_") === 0){
                     $params[substr($k, strlen($value."_"))] = $v;

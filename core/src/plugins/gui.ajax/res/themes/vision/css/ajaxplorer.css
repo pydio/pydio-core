@@ -1453,6 +1453,7 @@ img.simple_button_arrow{
     padding: 3px 10px 12px 7px;
     cursor: pointer;
     font-size: 12px;
+    letter-spacing: 1px;
 }
 
 .user_widget_label.withImage{
@@ -3409,11 +3410,10 @@ div.menu a {
 .bookmarksMenu a
 {
     display: block;
-    padding: 6px;
-    padding-right: 20px;
-    padding-left: 5px;
-    padding-top: 4px;
+    padding: 6px 5px 5px 6px;
     color: #fff;
+    letter-spacing: 1px;
+    height: 16px;
 }
 
 .rootDirChooser a img,
