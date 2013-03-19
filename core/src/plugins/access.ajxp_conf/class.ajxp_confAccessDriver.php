@@ -1310,7 +1310,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				AJXP_XMLWriter::renderNode("/$root/plugins/".$t, ucfirst($t), false, $meta);
 			}
 		}else if($dir == "/core"){
-			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="list"  template_name="ajxp_conf.plugins">
+			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="detail"  template_name="ajxp_conf.plugins">
 			<column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
 			<column messageId="ajxp_conf.102" attributeName="plugin_id" sortType="String"/>
 			<column messageId="ajxp_conf.103" attributeName="plugin_description" sortType="String"/>
