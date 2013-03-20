@@ -632,7 +632,7 @@ class AjaXplorerUpgrader {
             "meta_visibility" => $sources["meta.serial"]["meta_visibility"]
         );
         unset($sources["meta.serial"]);
-        $oldId = $repo->getUniqueId();
+        $oldId = $repo->getId();
         $repo->addOption("META_SOURCES", $sources);
         $log = print_r($sources, true);
         if(!$dryRun){

@@ -540,7 +540,15 @@ class ConfService
 		AJXP_Logger::logAction("Create Repository", array("repo_name"=>$oRepository->getDisplay()));
 		$this->configs["REPOSITORIES"] = self::initRepositoriesList($this->configs["DEFAULT_REPOSITORIES"]);
 	}
-	
+
+    public static function findRepositoryByIdOrAlias($idOrAlias){
+        $repository = ConfService::getRepositoryById($idOrAlias);
+        if($repository != null ) return $repository;
+        $repository = ConfService::getRepositoryByAlias($idOrAlias);
+        if($repository != null) return $repository;
+        return null;
+    }
+
 	/**
 	 * Retrieve a repository object
 	 *
@@ -994,6 +1002,7 @@ class ConfService
 		$plugInstance->init($crtRepository);
 		try{
 			$plugInstance->initRepository();
+            $crtRepository->driverInstance = $plugInstance;
 		}catch (Exception $e){
 			// Remove repositories from the lists
 			unset($this->configs["REPOSITORIES"][$crtRepository->getId()]);
@@ -1126,6 +1135,10 @@ class ConfService
         }
 
         $repository->driverInstance = $plugInstance;
+        if(isSet($_SESSION["REPO_ID"]) && $_SESSION["REPO_ID"] == $repository->getId()){
+            $this->configs["REPOSITORY"] = $repository;
+            $this->configs["REPOSITORIES"][$_SESSION['REPO_ID']] = $repository;
+        }
 		return $plugInstance;
 	}
 

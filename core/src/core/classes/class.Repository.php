@@ -371,6 +371,7 @@ class Repository implements AjxpGroupPathProvider {
 	 * @return string
 	 */
 	function getId() {
+        if($this->isWriteable()) return $this->getUniqueId();
 		return $this->id;
 	}
 	

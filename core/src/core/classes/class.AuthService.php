@@ -29,6 +29,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class AuthService
 {
 	static $roles;
+    public static $useSession = true;
+    private static $currentUser;
 	/**
      * Whether the whole users management system is enabled or not.
      * @static
@@ -94,7 +96,8 @@ class AuthService
 	 */
 	static function getLoggedUser()
 	{
-		if(isSet($_SESSION["AJXP_USER"])) return $_SESSION["AJXP_USER"];
+		if(self::$useSession && isSet($_SESSION["AJXP_USER"])) return $_SESSION["AJXP_USER"];
+		if(!self::$useSession && isSet(self::$currentUser)) return self::$currentUser;
 		return null;
 	}
 	/**
@@ -245,9 +248,10 @@ class AuthService
 
     static function clearTemporaryUser($temporaryUserId){
         AJXP_Logger::logAction("Log out", array("temporary user"), $temporaryUserId);
-        if(isSet($_SESSION["AJXP_USER"])){
+        if(isSet($_SESSION["AJXP_USER"]) || isSet(self::$currentUser)){
             AJXP_Logger::logAction("Log Out");
             unset($_SESSION["AJXP_USER"]);
+            if(isSet(self::$currentUser)) unset(self::$currentUser);
             if(ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")){
                 AJXP_Safe::clearCredentials();
             }
@@ -276,7 +280,11 @@ class AuthService
 		$confDriver = ConfService::getConfStorageImpl();
 		if($user_id == null)
 		{
-			if(isSet($_SESSION["AJXP_USER"]) && is_object($_SESSION["AJXP_USER"])) return 1; 
+            if(self::$useSession){
+                if(isSet($_SESSION["AJXP_USER"]) && is_object($_SESSION["AJXP_USER"])) return 1;
+            }else{
+                if(isSet(self::$currentUser) && is_object(self::$currentUser)) return 1;
+            }
 			if(ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth"))
 			{
 				$authDriver = ConfService::getAuthDriverImpl();
@@ -340,7 +348,9 @@ class AuthService
 				//$user->setAcl("ajxp_shared", "rw");
 			}
 		}
-		$_SESSION["AJXP_USER"] = $user;
+        if(self::$useSession) $_SESSION["AJXP_USER"] = $user;
+        else self::$currentUser = $user;
+
 		if($authDriver->autoCreateUser() && !$user->storageExists()){
 			$user->save("superuser"); // make sure update rights now
 		}
@@ -355,7 +365,8 @@ class AuthService
      */
 	static function updateUser($userObject)
 	{
-		$_SESSION["AJXP_USER"] = $userObject;
+        if(self::$useSession) $_SESSION["AJXP_USER"] = $userObject;
+        else self::$currentUser = $userObject;
 	}
 	/**
      * Clear the session
@@ -364,10 +375,11 @@ class AuthService
      */
 	static function disconnect()
 	{
-		if(isSet($_SESSION["AJXP_USER"])){
+		if(isSet($_SESSION["AJXP_USER"]) || isSet(self::$currentUser)){
             AuthService::clearRememberCookie();
 			AJXP_Logger::logAction("Log Out");
 			unset($_SESSION["AJXP_USER"]);
+            if(isSet(self::$currentUser)) unset(self::$currentUser);
 			if(ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")){
 				AJXP_Safe::clearCredentials();
 			}
@@ -439,12 +451,8 @@ class AuthService
     {
         $authDriver = ConfService::getAuthDriverImpl();
         $logout = $authDriver->getLogoutRedirect();
-        if($logUserOut && isSet($_SESSION["AJXP_USER"])){
-			AJXP_Logger::logAction("Log Out");
-			unset($_SESSION["AJXP_USER"]);
-			if(ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")){
-				AJXP_Safe::clearCredentials();
-			}			
+        if($logUserOut){
+            self::disconnect();
 		}
         return $logout;
     }

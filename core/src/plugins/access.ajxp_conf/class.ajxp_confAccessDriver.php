@@ -770,7 +770,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$repositories = ConfService::getRepositoriesList();
 				foreach ($repositories as $repo){
 					if(!$repo->isTemplate) continue;
-					$repoId = $repo->getUniqueId();
+					$repoId = $repo->getId();
 					$repoLabel = $repo->getDisplay();
 					$repoType = $repo->getAccessType();
 					print("<template repository_id=\"$repoId\" repository_label=\"$repoLabel\" repository_type=\"$repoType\">");
