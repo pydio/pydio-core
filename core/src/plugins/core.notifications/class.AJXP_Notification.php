@@ -33,6 +33,8 @@ define('AJXP_NOTIF_NODE_COPY_FROM', "copy_from");
 define('AJXP_NOTIF_NODE_MOVE_FROM', "move_from");
 /**
  * Simple properties container
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
  */
 class AJXP_Notification
 {

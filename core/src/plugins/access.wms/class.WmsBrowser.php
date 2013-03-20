@@ -22,7 +22,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * AJXP_Plugin to access a WMS Server
- * @package Plugins
+ * @package AjaXplorer_Plugins
  * @subpackage Access
  */
 class WmsBrowser extends AbstractAccessDriver 

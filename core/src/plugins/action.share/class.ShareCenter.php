@@ -23,6 +23,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 require_once("class.PublicletCounter.php");
 
+/**
+ * @package AjaXplorer_Plugins
+ * @subpackage Action
+ */
 class ShareCenter extends AJXP_Plugin{
 
     /**

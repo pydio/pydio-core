@@ -21,7 +21,8 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.conf
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
  * @class AbstractAjxpUser
  * @abstract
  * User abstraction, the "conf" driver must provides its own implementation

@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Simple non-fonctionnal plugin for demoing pre/post processes hooks
+ * @package AjaXplorer_Plugins
+ * @subpackage Action
  */
 class PluginSkeleton extends AJXP_Plugin {
 

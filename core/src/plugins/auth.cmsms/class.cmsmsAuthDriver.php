@@ -20,7 +20,6 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
- * @package info.ajaxplorer.plugins
  * Abstract representation of an access to FEU athentification module(CMS Made Simple).
  * like auth.remote:
  *   In slave mode, the login dialog is not displayed in AJXP.
@@ -47,6 +46,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 			)
 
 	),
+ * @package AjaXplorer_Plugins
+ * @subpackage Auth
  */
 class cmsmsAuthDriver extends AbstractAuthDriver {
 	

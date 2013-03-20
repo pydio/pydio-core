@@ -28,7 +28,11 @@
  *
  *    The idea is: this script is require()'d by the CMS script.
  */
-  
+
+/**
+ * @package AjaXplorer_Plugins
+ * @subpackage Auth
+ */
 global $AJXP_GLUE_GLOBALS;
 if(!isSet($AJXP_GLUE_GLOBALS)){
 	$AJXP_GLUE_GLOBALS = array();

@@ -23,7 +23,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * AJXP_Plugin to access a remote server using the File Transfer Protocol
- * @package Plugins
+ * @package AjaXplorer_Plugins
  * @subpackage Access
  */
 class ftpAccessDriver extends fsAccessDriver {

@@ -25,7 +25,7 @@ require_once(AJXP_INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
 
 /**
  * Encapsulation of the PEAR webDAV client
- * @package Plugins
+ * @package AjaXplorer_Plugins
  * @subpackage Access
  */
 class hpcAccessWrapper extends fsAccessWrapper {

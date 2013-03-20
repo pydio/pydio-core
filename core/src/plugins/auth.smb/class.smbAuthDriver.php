@@ -21,8 +21,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Authenticates user against an SMB server
+ * @package AjaXplorer_Plugins
+ * @subpackage Auth
  */
 class smbAuthDriver extends AbstractAuthDriver {
 	

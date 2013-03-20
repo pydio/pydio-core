@@ -21,9 +21,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.core
- * @class PublicletCounter
  * Download counter for publiclets
+ * @package AjaXplorer_Plugins
+ * @subpackage Action
  */
 class PublicletCounter {
 	

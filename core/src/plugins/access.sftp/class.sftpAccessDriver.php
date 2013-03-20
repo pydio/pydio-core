@@ -23,7 +23,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * AJXP_Plugin to access an ftp server over SSH
- * @package Plugins
+ * @package AjaXplorer_Plugins
  * @subpackage Access
  */
 class sftpAccessDriver extends fsAccessDriver

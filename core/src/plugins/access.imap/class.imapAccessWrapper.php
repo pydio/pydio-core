@@ -24,7 +24,7 @@ function rejectEmpty($element){return !empty($element);}
 
 /**
  * AJXP_Plugin to browse a mailbox content (IMAP OR POP)
- * @package Plugins
+ * @package AjaXplorer_Plugins
  * @subpackage Access
  */
 class imapAccessWrapper implements AjxpWrapper {

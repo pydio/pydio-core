@@ -22,7 +22,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * AJXP_Plugin to access a remote server that implements AjaXplorer API
- * @package Plugins
+ * @package AjaXplorer_Plugins
  * @subpackage Access
  */
 class remote_fsAccessDriver extends AbstractAccessDriver 

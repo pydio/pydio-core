@@ -30,7 +30,7 @@ if(!function_exists('download_exception_handler')){
 /**
  * AJXP_Plugin to access a filesystem. Most "FS" like driver (even remote ones)
  * extend this one.
- * @package Plugins
+ * @package AjaXplorer_Plugins
  * @subpackage Access
  */
 class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider

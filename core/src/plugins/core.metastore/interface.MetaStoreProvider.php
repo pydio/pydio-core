@@ -25,9 +25,10 @@ define('AJXP_METADATA_SHAREDUSER', 'AJXP_METADATA_SHAREDUSER');
 define('AJXP_METADATA_SCOPE_GLOBAL', 1);
 define('AJXP_METADATA_SCOPE_REPOSITORY', 2);
 /**
- * @package info.ajaxplorer.plugins
  * Simple metadata implementation, stored in hidden files inside the
  * folders
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
  */
 interface MetaStoreProvider {
 

@@ -27,7 +27,7 @@ require_once (AJXP_BIN_FOLDER.'/interface.AjxpWrapper.php');
 
 /**
  * AjxpWrapper encapsulation the PHP Dropbox client
- * @package Plugins
+ * @package AjaXplorer_Plugins
  * @subpackage Access
  */
 class dropboxWrapper implements AjxpWrapper {

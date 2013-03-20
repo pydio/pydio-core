@@ -36,10 +36,11 @@ websocket.onmessage = function(event){console.log(event.data);};
      conn.onComplete = function(transport){ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);};
      conn.sendAsync();
      }, 5);
-
+ *
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
  *
  */
-
 class MqManager extends AJXP_Plugin
 {
 

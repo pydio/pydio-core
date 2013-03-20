@@ -25,7 +25,7 @@ require_once(AJXP_INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
 
 /**
  * AJXP_Wrapper encapsulating calls to the smbclient command line tool
- * @package Plugins
+ * @package AjaXplorer_Plugins
  * @subpackage Access
  */
 class smbAccessWrapper extends fsAccessWrapper {		

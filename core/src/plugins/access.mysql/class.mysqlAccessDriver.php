@@ -21,7 +21,7 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package Plugins
+ * @package AjaXplorer_Plugins
  * @subpackage Access
  */
 class mysqlAccessDriver extends AbstractAccessDriver 

@@ -22,7 +22,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * AJXP_Plugin to browse a mailbox content (IMAP OR POP)
- * @package Plugins
+ * @package AjaXplorer_Plugins
  * @subpackage Access
  */
 class imapAccessDriver extends fsAccessDriver

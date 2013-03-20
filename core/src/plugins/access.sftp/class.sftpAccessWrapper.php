@@ -55,7 +55,7 @@ function macerrorSftp($packet){
 
 /**
  * AJXP_Plugin to access an ftp server over SSH
- * @package Plugins
+ * @package AjaXplorer_Plugins
  * @subpackage Access
  */
 class sftpAccessWrapper extends fsAccessWrapper {		

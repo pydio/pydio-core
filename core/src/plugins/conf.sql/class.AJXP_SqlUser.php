@@ -35,7 +35,8 @@ require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
  * 
  * 		
  * @author ebrosnan
- *
+ * @package AjaXplorer_Plugins
+ * @subpackage Conf
  */
 class AJXP_SqlUser extends AbstractAjxpUser
 {

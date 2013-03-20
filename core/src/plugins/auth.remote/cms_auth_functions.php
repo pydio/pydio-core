@@ -23,7 +23,9 @@
  */
 
 /**
- * 
+ * @package AjaXplorer_Plugins
+ * @subpackage Auth
+ *
  * @param HttpClient $client
  * @return array
  */

@@ -21,8 +21,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * AJXP_Plugin to authenticate users against the Basic-HTTP mechanism
+ * @package AjaXplorer_Plugins
+ * @subpackage Auth
  */
 class basic_httpAuthDriver extends serialAuthDriver  {
 	

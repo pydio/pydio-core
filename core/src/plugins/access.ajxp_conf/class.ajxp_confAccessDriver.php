@@ -22,7 +22,7 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package Plugins
+ * @package AjaXplorer_Plugins
  * @subpackage Access
  * @class ajxp_confAccessDriver
  * AJXP_Plugin to access the configurations data
