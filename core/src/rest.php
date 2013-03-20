@@ -22,9 +22,10 @@ $uri = $_SERVER["REQUEST_URI"];
 $scriptUri = dirname($_SERVER["SCRIPT_NAME"])."/api/";
 $uri = substr($uri, strlen($scriptUri));
 $uri = explode("/", $uri);
-$action = array_shift($uri);
-
+// GET REPO ID
 $repoID = array_shift($uri);
+// GET ACTION NAME
+$action = array_shift($uri);
 $path = "/".implode("/", $uri);
 $repo = &ConfService::findRepositoryByIdOrAlias($repoID);
 if($repo == null){

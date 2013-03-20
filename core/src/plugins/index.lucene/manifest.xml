@@ -28,7 +28,7 @@
 					write="false" adminOnly="false">
 				</rightsContext>
 				<processing>
-					<serverCallback methodName="applyAction"/>
+					<serverCallback methodName="applyAction" restPath="/query/"/>
 				</processing>
 			</action>					
 			<action name="search_by_keyword">
@@ -36,7 +36,7 @@
 					write="false" adminOnly="false">
 				</rightsContext>
 				<processing>
-					<serverCallback methodName="applyAction"/>
+					<serverCallback methodName="applyAction" restPath="/query/"/>
 				</processing>
 			</action>
             <action name="check_lock">
