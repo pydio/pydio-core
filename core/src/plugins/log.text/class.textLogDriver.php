@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Standard logger. Writes logs into text files
+ * @package AjaXplorer_Plugins
+ * @subpackage Log
  */
 class textLogDriver extends AbstractLogDriver {
 	

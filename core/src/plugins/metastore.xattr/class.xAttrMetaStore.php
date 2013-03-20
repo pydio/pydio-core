@@ -21,7 +21,11 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 
-
+/**
+ * Use an xattr-enabled filesystem to store metadata
+ * @package AjaXplorer_Plugins
+ * @subpackage Metastore
+ */
 class xAttrMetaStore extends AJXP_Plugin implements MetaStoreProvider
 {
     /**

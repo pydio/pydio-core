@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Encapsultion of the Zend_Search_Lucene component as a plugin
+ * @package AjaXplorer_Plugins
+ * @subpackage Index
  */
 class AjxpLuceneIndexer extends AJXP_Plugin{
 

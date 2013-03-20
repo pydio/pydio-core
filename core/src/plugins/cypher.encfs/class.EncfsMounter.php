@@ -21,6 +21,10 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * @package AjaXplorer_Plugins
+ * @subpackage Cypher
+ */
 class EncfsMounter extends AJXP_Plugin
 {
 

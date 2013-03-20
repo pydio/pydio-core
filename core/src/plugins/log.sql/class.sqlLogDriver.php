@@ -22,9 +22,10 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * SQL Logging Plugin
  * Requires php bcmath (for inet_dtop/inet_ptod) enabled and php version 5.1 (for DateTime class) minimum
+ * @package AjaXplorer_Plugins
+ * @subpackage Log
  */
 class sqlLogDriver extends AbstractLogDriver {
 	

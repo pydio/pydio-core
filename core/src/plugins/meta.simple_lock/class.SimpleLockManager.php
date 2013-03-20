@@ -21,6 +21,11 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Locks a folder manually
+ * @package AjaXplorer_Plugins
+ * @subpackage Meta
+ */
 class SimpleLockManager extends AJXP_Plugin
 {
     /**

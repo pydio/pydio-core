@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Streams MP3 files to the flash client
+ * @package AjaXplorer_Plugins
+ * @subpackage Editor
  */
 class AudioPreviewer extends AJXP_Plugin {
 

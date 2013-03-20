@@ -21,6 +21,11 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Computes used storage for user
+ * @package AjaXplorer_Plugins
+ * @subpackage Meta
+ */
 class QuotaComputer extends AJXP_Plugin
 {
     /**

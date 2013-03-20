@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Encapsulation of the Jumploader Java applet (must be downloaded separately).
+ * @package AjaXplorer_Plugins
+ * @subpackage Uploader
  */
 class JumploaderProcessor extends AJXP_Plugin {
 

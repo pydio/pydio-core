@@ -6,6 +6,11 @@
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+/**
+ * Multiple implementation to choose from various webservices
+ * @package AjaXplorer_Plugins
+ * @subpackage Shorten
+ */
 class multiShortener extends AJXP_Plugin {		
 	public function postProcess($action, $httpVars, $params){
 		if(isset($this->pluginConf["SHORTEN_TYPE"]))

@@ -21,6 +21,12 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Sql-based plugin to manage messages queues
+ *
+ * @package AjaXplorer_Plugins
+ * @subpackage Mq
+ */
 class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchanger
 {
 

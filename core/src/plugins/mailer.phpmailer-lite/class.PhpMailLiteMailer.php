@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Send notifications to user on some predefined actions
+ * @package AjaXplorer_Plugins
+ * @subpackage Mailer
  */
 class PhpMailLiteMailer extends AjxpMailer {
 

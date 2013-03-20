@@ -21,9 +21,10 @@
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
- * @package info.ajaxplorer.plugins
- * Simple metadata implementation, stored in hidden files inside the
- * folders
+ * Simple metadata implementation, coupled with an S3 repository, stores
+ * the metadata in the s3 bucket
+ * @package AjaXplorer_Plugins
+ * @subpackage Metastore
  */
 class s3MetaStore extends AJXP_Plugin implements MetaStoreProvider {
 	

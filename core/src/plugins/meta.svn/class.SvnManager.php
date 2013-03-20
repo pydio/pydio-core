@@ -25,8 +25,9 @@ if(SVNLIB_PATH != ""){
     putenv("LD_LIBRARY_PATH=".SVNLIB_PATH);
 }
 /**
- * @package info.ajaxplorer.plugins
  * Uses svn command lines to extract version infos. Autocommit on change.
+ * @package AjaXplorer_Plugins
+ * @subpackage Meta
  */
 class SvnManager extends AJXP_Plugin {
 	

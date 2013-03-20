@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Remote files downloader
+ * @package AjaXplorer_Plugins
+ * @subpackage Downloader
  */
 class HttpDownloader extends AJXP_Plugin{
 
