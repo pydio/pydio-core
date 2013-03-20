@@ -21,7 +21,8 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.core
+ * @package AjaXplorer
+ * @subpackage SabreDav
  */
 class AJXP_Sabre_BrowserPlugin extends Sabre_DAV_Browser_Plugin
 {
