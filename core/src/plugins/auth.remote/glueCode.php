@@ -79,7 +79,7 @@ switch($plugInAction)
 		        $isAdmin = (isSet($login["right"]) && $login["right"] == "admin");
 	        	AuthService::createUser($login["name"], $login["password"], $isAdmin);
 	        }
-	        if(isSet($AJXP_GLUE_GLOBALS["checkPassord"]) && $AJXP_GLUE_GLOBALS["checkPassord"] === TRUE){
+	        if(isSet($AJXP_GLUE_GLOBALS["checkPassword"]) && $AJXP_GLUE_GLOBALS["checkPassword"] === TRUE){
 		        $result = AuthService::logUser($login["name"], $login["password"], false, false, -1);
 	        }else{
 	        	$result = AuthService::logUser($login["name"], $login["password"], true);
