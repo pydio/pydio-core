@@ -22,8 +22,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 require_once('../classes/class.AbstractTest.php');
 
 /**
- * @package info.ajaxplorer.test
  * Gather various php configurations that will limit the application
+ * @package AjaXplorer
+ * @subpackage Tests
  */
 class PHPLimits extends AbstractTest
 {

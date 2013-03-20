@@ -22,8 +22,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 require_once('../classes/class.AbstractTest.php');
 
 /**
- * @package info.ajaxplorer.test
  * Check serveur OS
+ * @package AjaXplorer
+ * @subpackage Tests
  */
 class PHPOS extends AbstractTest
 {

@@ -22,8 +22,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 require_once('../classes/class.AbstractTest.php');
 
 /**
- * @package info.ajaxplorer.test
  * Check php session writeability
+ * @package AjaXplorer
+ * @subpackage Tests
  */
 class PHPSession extends AbstractTest
 {
