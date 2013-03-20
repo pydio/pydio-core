@@ -22,7 +22,8 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
+ * @package Plugins
+ * @subpackage Access
  * @class ajxp_confAccessDriver
  * AJXP_Plugin to access the configurations data
  */

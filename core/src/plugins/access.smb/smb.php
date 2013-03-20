@@ -38,7 +38,10 @@ define ('SMB4PHP_AUTHMODE', 'arg'); # set to 'env' to use USER enviroment variab
 
 $GLOBALS['__smb_cache'] = array ('stat' => array (), 'dir' => array ());
 
-
+/**
+ * @package Plugins
+ * @subpackage Access
+ */
 class smb {
 
     function parse_url ($url) {

@@ -23,8 +23,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 function rejectEmpty($element){return !empty($element);}
 
 /**
- * @package info.ajaxplorer.plugins
  * AJXP_Plugin to browse a mailbox content (IMAP OR POP)
+ * @package Plugins
+ * @subpackage Access
  */
 class imapAccessWrapper implements AjxpWrapper {
 	

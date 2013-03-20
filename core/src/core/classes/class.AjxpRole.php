@@ -21,11 +21,10 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * Authentication "role" concept : set of permissions that can be applied to
  * one or more users, plus set of actions to be disabled.
+ * @package AjaXplorer
+ * @subpackage Core
  * @deprecated use AJXP_Role instead. Still present in package for automatic migration.
  */
 class AjxpRole implements AjxpGroupPathProvider

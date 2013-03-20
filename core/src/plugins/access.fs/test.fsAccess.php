@@ -22,6 +22,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 require_once(AJXP_BIN_FOLDER . '/class.AbstractTest.php');
 
+/**
+ * @package Plugins
+ * @subpackage Access
+ */
 class fsAccessTest extends AbstractTest
 {
     function fsAccessTest() { parent::AbstractTest("Filesystem Plugin", ""); }

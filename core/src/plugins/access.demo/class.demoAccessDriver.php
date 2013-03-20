@@ -22,7 +22,8 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
+ * @package Plugins
+ * @subpackage Access
  * @class demoAccessDriver
  * AJXP_Plugin to access a filesystem with all write actions disabled
  */

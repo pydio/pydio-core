@@ -24,8 +24,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 //require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.fs/class.fsAccessDriver.php");
 
 /**
- * @package info.ajaxplorer.plugins
  * AJXP_Plugin to access a webdav enabled server
+ * @package Plugins
+ * @subpackage Access
  */
 class webdavAccessDriver extends fsAccessDriver
 {

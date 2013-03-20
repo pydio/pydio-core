@@ -23,8 +23,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * AJXP_Plugin to access a webdav enabled server
+ * @package Plugins
+ * @subpackage Access
  */
 class s3AccessDriver extends fsAccessDriver
 {

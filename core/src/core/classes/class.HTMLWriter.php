@@ -21,10 +21,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * Static functions for generating HTML.
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class HTMLWriter
 {

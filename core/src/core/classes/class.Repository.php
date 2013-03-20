@@ -20,11 +20,10 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * The basic abstraction of a data store. Can map a FileSystem, but can also map data from a totally
  * different source, like the application configurations, a mailbox, etc.
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class Repository implements AjxpGroupPathProvider {
 

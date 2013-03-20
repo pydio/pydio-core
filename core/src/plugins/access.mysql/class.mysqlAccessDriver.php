@@ -21,8 +21,8 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
- * AJXP_Plugin to access a MySQL Server and make AjaXplorer act like a phpMyAdmin
+ * @package Plugins
+ * @subpackage Access
  */
 class mysqlAccessDriver extends AbstractAccessDriver 
 {

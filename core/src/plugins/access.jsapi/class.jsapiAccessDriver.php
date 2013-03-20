@@ -21,8 +21,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * AJXP_Plugin to send a javascript source to the browser
+ * @package Plugins
+ * @subpackage Access
  */
 class jsapiAccessDriver extends AbstractAccessDriver{
 	

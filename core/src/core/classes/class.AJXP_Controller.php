@@ -20,11 +20,10 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * Core controller for dispatching the actions.
  * It uses the XML Registry (simple version, not extended) to search all the <action> tags and find the action.
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class AJXP_Controller{
 

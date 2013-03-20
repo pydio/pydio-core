@@ -26,8 +26,9 @@ require_once (AJXP_INSTALL_PATH.'/plugins/access.dropbox/dropbox-php/autoload.ph
 require_once (AJXP_BIN_FOLDER.'/interface.AjxpWrapper.php');
 
 /**
- * @package info.ajaxplorer.plugins
  * AjxpWrapper encapsulation the PHP Dropbox client
+ * @package Plugins
+ * @subpackage Access
  */
 class dropboxWrapper implements AjxpWrapper {
 	

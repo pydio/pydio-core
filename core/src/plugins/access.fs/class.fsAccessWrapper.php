@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Wrapper for a local filesystem
+ * @package Plugins
+ * @subpackage Access
  */
 class fsAccessWrapper implements AjxpWrapper {
 		
