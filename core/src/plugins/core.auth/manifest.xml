@@ -7,6 +7,7 @@
         </resources>
     </client_settings>
 	<server_settings>
+		<param name="auth_scheme" scope="user" description="The authentication scheme that the user has been created with" label="Authentication scheme" type="string" expose="false"/>
 		<global_param name="ENABLE_USERS" group="CONF_MESSAGE[Generic Auth Features]"  type="boolean" label="CONF_MESSAGE[Enable Users]" description="CONF_MESSAGE[Activate the users management system to protect your AjaXplorer installation.]" mandatory="true" default="true"/>
 		<global_param name="CASE_SENSITIVE" group="CONF_MESSAGE[Generic Auth Features]"  type="boolean" label="CONF_MESSAGE[Case Sensitive]" description="CONF_MESSAGE[Whether the users identifiers should be case sensitive or not]" mandatory="true" default="true"/>
 		<global_param name="ALLOW_GUEST_BROWSING" group="CONF_MESSAGE[Generic Auth Features]"  type="boolean" label="CONF_MESSAGE[Guest Browsing]" description="CONF_MESSAGE[Enable the 'guest' user, who does not need to log in.]" mandatory="true" default="false"/>
