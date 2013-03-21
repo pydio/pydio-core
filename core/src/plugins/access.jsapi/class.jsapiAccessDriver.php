@@ -37,7 +37,10 @@ class jsapiAccessDriver extends AbstractAccessDriver{
 				if($jsName == "Splitter"){
 					$fName = "splitter.js";
 				}
-				// Locate the file class.ClassName.js
+                if(!defined("CLIENT_RESOURCES_FOLDER")){
+                    define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
+                }
+                    // Locate the file class.ClassName.js
 				if($jsType == "class"){
 					$searchLocations = array(
 						CLIENT_RESOURCES_FOLDER."/js/ajaxplorer",
