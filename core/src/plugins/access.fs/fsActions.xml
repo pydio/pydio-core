@@ -5,10 +5,10 @@
 			<gui text="32" title="32" src="fileopen.png" iconClass="icon-folder-open-alt"
 				accessKey="folder_access_key">
 				<context selection="true" dir="" recycle="false"
-					actionBar="false" actionBarGroup="put" contextMenu="true" infoPanel="true">
+					actionBar="true" actionBarGroup="inline" contextMenu="true" infoPanel="true">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false"
-					unique="true" allowedMimes="ajxp_folder,AJXP_MIMES_ZIP">
+				<selectionContext dir="true" file="false" recycle="false"
+					unique="true" allowedMimes="ajxp_folder,AJXP_MIMES_ZIP" behaviour="hidden">
 				</selectionContext>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true"
@@ -32,6 +32,7 @@
 					]]></clientCallback>
 				<serverCallback methodName="switchAction" restParams="/dir+" checkParams="true" developerComment="Standard listing action to retrieve a list of children for a given directory.">
                     <input_param description="Directory to browse, from the repository root" name="dir" type="string" mandatory="true"/>
+                    <input_param description="One file to check" name="file" type="string" mandatory="false"/>
                     <input_param description="Details to send back" name="options" type="string" mandatory="false" default="al"/>
 				</serverCallback>
 			</processing>
@@ -103,7 +104,7 @@
 			<gui text="88" title="88" src="download_manager.png" iconClass="icon-download-alt" accessKey="download_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="false" infoPanel="true"
-					actionBarGroup="get">
+					actionBarGroup="get,inline">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
@@ -316,7 +317,7 @@
             <gui text="316" title="316" src="fileopen.png" iconClass="icon-eye-close" accessKey="open_with_access" hasAccessKey="true">
                 <context selection="true" dir="" recycle="hidden"  behaviour="hidden"
                     actionBar="true" contextMenu="true" infoPanel="false"
-                    actionBarGroup="get" inZip="false">
+                    actionBarGroup="get,inline" inZip="false">
                 </context>
                 <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE" behaviour="hidden"></selectionContext></gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
