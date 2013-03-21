@@ -63,6 +63,9 @@
                             display: inline-block;
                             margin: 5px 0;
                         }
+                        .table_rows_container td{
+                            vertical-align:top;
+                        }
                     </style>
                     <script>
                         $("vertical_splitter").ajxpPaneObject.paneB._max = 1;

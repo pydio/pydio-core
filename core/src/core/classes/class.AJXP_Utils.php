@@ -296,6 +296,9 @@ class AJXP_Utils
             @unlink(AJXP_PLUGINS_CACHE_FILE);
             @unlink(AJXP_PLUGINS_REQUIRES_FILE);
         }
+        if (AJXP_SERVER_DEBUG && isSet($parameters["extract_application_hooks"])){
+            self::extractHooksToDoc();
+        }
 
         if (isSet($parameters["external_selector_type"])) {
             $output["SELECTOR_DATA"] = array("type" => $parameters["external_selector_type"], "data" => $parameters);
@@ -745,6 +748,122 @@ class AJXP_Utils
         }
 
         return $text;
+    }
+
+    static function getHooksFile(){
+        return AJXP_INSTALL_PATH."/".AJXP_DOCS_FOLDER."/hooks.json";
+    }
+
+    static function extractHooksToDoc(){
+
+        $docFile = self::getHooksFile();
+        if(is_file($docFile)){
+            copy($docFile, $docFile.".bak");
+            $existingHooks = json_decode(file_get_contents($docFile), true);
+        }else{
+            $existingHooks = array();
+        }
+        $allPhpFiles = glob_recursive(AJXP_INSTALL_PATH."/*.php");
+        $hooks = array();
+        foreach($allPhpFiles as $phpFile){
+            $fileContent = file($phpFile);
+            foreach($fileContent as $lineNumber => $line){
+                if(preg_match_all('/AJXP_Controller::applyHook\("([^"]+)", (.*)\)/', $line, $matches)){
+                    $names = $matches[1];
+                    $params = $matches[2];
+                    foreach($names as $index => $hookName){
+                        if(!isSet($hooks[$hookName])) $hooks[$hookName] = array("TRIGGERS" => array(), "LISTENERS" => array());
+                        $hooks[$hookName]["TRIGGERS"][] = array("FILE" => substr($phpFile, strlen(AJXP_INSTALL_PATH)), "LINE" => $lineNumber);
+                        $hooks[$hookName]["PARAMETER_SAMPLE"] = $params[$index];
+                    }
+                }
+
+            }
+        }
+        $registryHooks = AJXP_PluginsService::getInstance()->searchAllManifests("//hooks/serverCallback", "xml", false, false, true);
+        $regHooks = array();
+        foreach($registryHooks as $xmlHook){
+            $name = $xmlHook->getAttribute("hookName");
+            $method = $xmlHook->getAttribute("methodName");
+            $pluginId = $xmlHook->getAttribute("pluginId");
+            if($pluginId == "") $pluginId = $xmlHook->parentNode->parentNode->parentNode->getAttribute("id");
+            if(!isSet($regHooks[$name])) $regHooks[$name] = array();
+            $regHooks[$name][] = array("PLUGIN_ID" => $pluginId, "METHOD" => $method);
+        }
+
+        foreach($hooks as $h => $data) {
+
+            if(isSet($regHooks[$h])){
+                $data["LISTENERS"] = $regHooks[$h];
+            }
+            if(isSet($existingHooks[$h])){
+                $existingHooks[$h]["TRIGGERS"] = $data["TRIGGERS"];
+                $existingHooks[$h]["LISTENERS"] = $data["LISTENERS"];
+                $existingHooks[$h]["PARAMETER_SAMPLE"] = $data["PARAMETER_SAMPLE"];
+            }else{
+                $existingHooks[$h] = $data;
+            }
+        }
+        file_put_contents($docFile, self::prettyPrintJSON(json_encode($existingHooks)));
+
+    }
+
+    /**
+     * Indents a flat JSON string to make it more human-readable.
+     *
+     * @param string $json The original JSON string to process.
+     *
+     * @return string Indented version of the original JSON string.
+     */
+    function prettyPrintJSON($json) {
+
+        $result      = '';
+        $pos         = 0;
+        $strLen      = strlen($json);
+        $indentStr   = '  ';
+        $newLine     = "\n";
+        $prevChar    = '';
+        $outOfQuotes = true;
+
+        for ($i=0; $i<=$strLen; $i++) {
+
+            // Grab the next character in the string.
+            $char = substr($json, $i, 1);
+
+            // Are we inside a quoted string?
+            if ($char == '"' && $prevChar != '\\') {
+                $outOfQuotes = !$outOfQuotes;
+
+                // If this character is the end of an element,
+                // output a new line and indent the next line.
+            } else if(($char == '}' || $char == ']') && $outOfQuotes) {
+                $result .= $newLine;
+                $pos --;
+                for ($j=0; $j<$pos; $j++) {
+                    $result .= $indentStr;
+                }
+            }
+
+            // Add the character to the result string.
+            $result .= $char;
+
+            // If the last character was the beginning of an element,
+            // output a new line and indent the next line.
+            if (($char == ',' || $char == '{' || $char == '[') && $outOfQuotes) {
+                $result .= $newLine;
+                if ($char == '{' || $char == '[') {
+                    $pos ++;
+                }
+
+                for ($j = 0; $j < $pos; $j++) {
+                    $result .= $indentStr;
+                }
+            }
+
+            $prevChar = $char;
+        }
+
+        return $result;
     }
 
     /**
