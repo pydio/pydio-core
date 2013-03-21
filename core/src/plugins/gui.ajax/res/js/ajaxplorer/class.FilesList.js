@@ -32,6 +32,8 @@ Class.create("FilesList", SelectableElements, {
     _doubleClickListener:null,
     _previewFactory : null,
     _detailThumbSize : 28,
+    _inlineToolbarOptions: null,
+    _instanciatedToolbars : null,
 	/**
 	 * Constructor
 	 * @param $super klass Reference to the constructor
@@ -65,6 +67,10 @@ Class.create("FilesList", SelectableElements, {
             }
             if(this.options.detailThumbSize){
                 this._detailThumbSize = this.options.detailThumbSize;
+            }
+            if(this.options.inlineToolbarOptions){
+                this._inlineToolbarOptions = this.options.inlineToolbarOptions;
+                this._instanciatedToolbars = $A();
             }
 		}
         //this.options.replaceScroller = false;
@@ -841,7 +847,6 @@ Class.create("FilesList", SelectableElements, {
             this.observe("resize", this.scrollSizeObserver);
         }
 
-
 		this.notify("resize");
 	},
 	
@@ -1607,7 +1612,11 @@ Class.create("FilesList", SelectableElements, {
         }else{
             if(replaceItem.hasClassName('even')) $(newRow).addClassName('even');
         }
-		return newRow;
+
+        this.addInlineToolbar(textLabel ? textLabel : tableCell, ajxpNode);
+
+
+        return newRow;
 	},
 	
 	/**
@@ -1698,8 +1707,11 @@ Class.create("FilesList", SelectableElements, {
 		if(!ajxpNode.isLeaf())
 		{
 			AjxpDroppables.add(newRow, ajxpNode);
-		}		
-		return newRow;
+		}
+
+        this.addInlineToolbar(newRow, ajxpNode);
+
+        return newRow;
 	},
 		
 	/**
@@ -1847,8 +1859,36 @@ Class.create("FilesList", SelectableElements, {
 		{
 			AjxpDroppables.add(largeRow, ajxpNode);
 		}
-		return largeRow;
+
+        this.addInlineToolbar(largeRow, ajxpNode);
+
+        return largeRow;
 	},
+
+    addInlineToolbar : function(element, ajxpNode){
+        if(this._inlineToolbarOptions){
+            var tBarElement = new Element('div', {id:"FL-tBar-"+this._instanciatedToolbars.size(), className:"FL-inlineToolbar" + (this._inlineToolbarOptions.unique?' FL-inlineToolbarUnique':' FL-inlineToolbarMultiple')});
+            element.insert(tBarElement);
+            var aT = new ActionsToolbar(tBarElement, this._inlineToolbarOptions);
+            aT.actions = ajaxplorer.actionBar.actions;
+            aT.initToolbars();
+            if(!this._inlineToolbarOptions.unique){
+                var dm = (this._dataModel?this._dataModel:ajaxplorer.getContextHolder());
+                aT.registeredButtons.each(function(button){
+                    // MAKE SURE THE CURRENT ROW IS SELECTED BEFORE TRIGGERING THE ACTION
+                    button.stopObserving('click');
+                    button.observe("click", function(event){
+                        Event.stop(event);
+                        dm.setSelectedNodes([ajxpNode]);
+                        window.setTimeout(function(){
+                            button.ACTION.apply();
+                        }, 20);
+                    });
+                });
+            }
+            this._instanciatedToolbars.push(aT);
+        }
+    },
 
 	partSizeCellRenderer : function(element, ajxpNode, type){
         if(!element) return;
@@ -1980,7 +2020,11 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	removeCurrentLines: function(skipFireChange){
         this.notify("rows:willClear");
-		var rows;		
+        if(this._instanciatedToolbars && this._instanciatedToolbars.size()){
+            this._instanciatedToolbars.invoke('destroy');
+            this._instanciatedToolbars = $A();
+        }
+		var rows;
 		if(this._displayMode == "list") rows = $(this._htmlElement).select('tr');
 		else rows = $(this._htmlElement).select('div.thumbnail_selectable_cell');
 		for(var i=0; i<rows.length;i++)

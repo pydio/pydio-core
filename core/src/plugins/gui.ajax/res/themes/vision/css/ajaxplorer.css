@@ -1220,6 +1220,22 @@ a.carousel-control{
     cursor:pointer;
     background-color: #fff;
 }
+
+.FL-inlineToolbar {
+    text-align: left;
+}
+
+div.FL-inlineToolbar.FL-inlineToolbarUnique{
+    display: none;
+}
+div.selected div.FL-inlineToolbar.FL-inlineToolbarUnique {
+    display: block;
+}
+tr.selected div.FL-inlineToolbar.FL-inlineToolbarUnique,
+tr div.FL-inlineToolbar.FL-inlineToolbarMultiple {
+    display: inline-block;
+}
+
 a.carousel-disabled{
     background-color: transparent;
 }
