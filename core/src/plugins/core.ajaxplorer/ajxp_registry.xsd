@@ -543,13 +543,18 @@
     <xs:element name="activeCondition" type="xs:string"/>
     <xs:element name="serverCallback">
         <xs:complexType>
+            <xs:choice maxOccurs="unbounded" minOccurs="0">
+                <xs:element ref="input_param"/>
+            </xs:choice>
             <xs:attribute name="applyCondition"/>
             <xs:attribute name="capture" type="xs:boolean"/>
             <xs:attribute name="hookName" type="xs:NCName"/>
             <xs:attribute name="methodName" use="required" type="xs:NCName"/>
             <xs:attribute name="pluginId" use="optional" type="xs:NCName"/>
             <xs:attribute name="defer" type="xs:boolean"/>
-            <xs:attribute name="restPath"/>
+            <xs:attribute name="restParams"/>
+            <xs:attribute name="developerComment"/>
+            <xs:attribute name="checkParams" type="xs:boolean"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="standardFormDefinition">
@@ -667,6 +672,16 @@
             <xs:attribute name="uploadAction" use="optional"/>
             <xs:attribute name="loadAction" use="optional"/>
             <xs:attribute name="defaultImage" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="input_param">
+        <xs:complexType>
+            <xs:attribute name="choices"/>
+            <xs:attribute name="default"/>
+            <xs:attribute name="description" use="required"/>
+            <xs:attribute name="mandatory" type="xs:boolean"/>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+            <xs:attribute name="type" use="required" type="xs:Name"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="user_param">

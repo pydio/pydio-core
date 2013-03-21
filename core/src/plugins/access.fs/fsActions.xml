@@ -30,7 +30,10 @@
 						ajaxplorer.updateContextData(path);
 					}						
 					]]></clientCallback>
-				<serverCallback methodName="switchAction" restPath="/dir/"></serverCallback>
+				<serverCallback methodName="switchAction" restParams="/dir+" checkParams="true" developerComment="Standard listing action to retrieve a list of children for a given directory.">
+                    <input_param description="Directory to browse, from the repository root" name="dir" type="string" mandatory="true"/>
+                    <input_param description="Details to send back" name="options" type="string" mandatory="false" default="al"/>
+				</serverCallback>
 			</processing>
 		</action>
         <action name="create">

@@ -209,6 +209,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             "diagnostic" => array("LABEL" => $mess["ajxp_conf.5"], "ICON" => "susehelpcenter.png", "LIST" => "printDiagnostic")
                         )
                     ),
+                    "developer" => array(
+                        "LABEL" => "Developer",
+                        "ICON" => "applications_engineering.png",
+                        "CHILDREN" => array(
+                            "actions" => array("LABEL" => "Actions API", "ICON" => "book.png", "LIST" => "listActions"),
+                            "hooks" => array("LABEL" => "Hooks Definitions", "ICON" => "book.png", "LIST" => "listHooks")
+                        )
+                    )
                 );
                 if($currentUserIsGroupAdmin){
                     unset($rootNodes["config"]);
@@ -1574,7 +1582,112 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             AJXP_XMLWriter::renderNode("/repositories/$repoIndex", $name, true, $metaData);
 		}
 	}
+
+    function listActions($dir, $root = NULL){
+        $parts = explode("/",$dir);
+        $pServ = AJXP_PluginsService::getInstance();
+        $activePlugins = $pServ->getActivePlugins();
+        $types = $pServ->getDetectedPlugins();
+        if(count($parts) == 1){
+            // list all types
+            AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.plugins_folder">
+			<column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
+			</columns>');
+            ksort($types);
+            foreach( $types as $t => $tPlugs){
+                $meta = array(
+                    "icon" 		=> "folder_development.png",
+                    "plugin_id" => $t
+                );
+                AJXP_XMLWriter::renderNode("/$root/actions/".$t, ucfirst($t), false, $meta);
+            }
+
+        }else if(count($parts) == 2){
+            // list plugs
+            $type = $parts[1];
+            AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="detail" template_name="ajxp_conf.plugins_folder">
+                <column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
+                <column messageId="ajxp_conf.102" attributeName="actions" sortType="String"/>
+			</columns>');
+            $pObject = new AJXP_Plugin("","");
+            foreach($types[$type] as $pId => $pObject){
+                $actions = $pObject->getManifestRawContent("//action/@name", "xml", true);
+                $actLabel = array();
+                if($actions->length){
+                    foreach($actions as $node){
+                        $actLabel[] = $node->nodeValue;
+                    }
+                }
+                $meta = array(
+                    "icon" 		=> "preferences_plugin.png",
+                    "plugin_id" => $pObject->getId(),
+                    "actions"   => implode(", ", $actLabel)
+                );
+                AJXP_XMLWriter::renderNode("/$root/actions/$type/".$pObject->getName(), $pObject->getManifestLabel(), false, $meta);
+            }
+
+        }else if(count($parts) == 3){
+            // list actions
+            $type = $parts[1];
+            $name = $parts[2];
+            $mess = ConfService::getMessages();
+            AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="full" template_name="ajxp_conf.plugins_folder">
+                <column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String" defaultWidth="10%"/>
+                <column messageId="ajxp_conf.102" attributeName="parameters" sortType="String" fixedWidth="30%"/>
+			</columns>');
+            $pObject = new AJXP_Plugin("","");
+            $pObject = $types[$type][$name];
+
+            $actions = $pObject->getManifestRawContent("//action", "xml", true);
+            $actLabel = array();
+            if($actions->length){
+                foreach($actions as $node){
+                    $xPath = new DOMXPath($node->ownerDocument);
+                    $callbacks = $xPath->query("processing/serverCallback", $node);
+                    if(!$callbacks->length) continue;
+                    $callback = $callbacks->item(0);
+
+                    $actName = $actLabel = $node->attributes->getNamedItem("name")->nodeValue;
+                    $text = $xPath->query("gui/@text", $node);
+                    if($text->length) {
+                        $actLabel = $mess[$text->item(0)->nodeValue]." ($actName)";
+                    }
+                    $params = $xPath->query("processing/serverCallback/input_param", $node);
+                    $paramLabel = array();
+                    if($callback->getAttribute("developerComment") != ""){
+                        $paramLabel[] = "<span class='developerComment'>".$callback->getAttribute("developerComment")."</span>";
+                    }
+                    $restPath = "";
+                    if($callback->getAttribute("restParams")){
+                        $restPath = "/api/$actName/". ltrim($callback->getAttribute("restParams"), "/");
+                    }
+                    if($restPath != null){
+                        $paramLabel[] = "<span class='developerApiAccess'>"."API Access : ".$restPath."</span>";
+                    }
+                    if($params->length){
+                        $paramLabel[] = "Expected Parameters :";
+                        foreach($params as $param){
+                            $paramLabel[]= '. ['.$param->getAttribute("type").'] <b>'.$param->getAttribute("name").($param->getAttribute("mandatory") == "true" ? '*':'').'</b> : '.$param->getAttribute("description");
+                        }
+                    }
+                    $parameters = "";
+                    $meta = array(
+                        "icon" 		=> "preferences_plugin.png",
+                        "action_id" => $actName,
+                        "parameters"=> '<div class="developerDoc">'.implode("<br/>", $paramLabel).'</div>',
+                        "rest_params"=> $restPath
+                    );
+                    AJXP_XMLWriter::renderNode("/$root/actions/$type/".$pObject->getName()."/$actName", $actLabel, true, $meta);
+                }
+            }
+
+        }
+    }
 	
+    function listHooks($dir, $root = NULL){
+        $toto = $dir;
+    }
+
 	function listLogFiles($dir, $root = NULL){
         $dir = "/$dir";
 		$logger = AJXP_Logger::getInstance();

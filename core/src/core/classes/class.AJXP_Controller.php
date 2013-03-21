@@ -97,12 +97,12 @@ class AJXP_Controller{
             return false;
         }
         $action = $actions->item(0);
-        $restPath = $xPath->query("processing/serverCallback/@restPath", $action);
-        if(!$restPath->length){
+        $restPathList = $xPath->query("processing/serverCallback/@restParams", $action);
+        if(!$restPathList->length){
             self::$lastActionNeedsAuth = true;
             return false;
         }
-        $restPath = $restPath->item(0)->nodeValue;
+        $restPath = $restPathList->item(0)->nodeValue;
         $paramNames = explode("/", trim($restPath, "/"));
         $path = array_shift(explode("?", $path));
         $paramValues = explode("/", trim($path, "/"), count($paramNames));
@@ -112,9 +112,43 @@ class AJXP_Controller{
                 $paramValues[$i] = "/" . $paramValues[$i];
             }
         }
+        if(count($paramValues) < count($paramNames)){
+            $paramNames = array_slice($paramNames, 0, count($paramValues));
+        }
         $httpVars = array_merge($_GET, $_POST, array_combine($paramNames, $paramValues));
-        return self::findActionAndApply($actionName, $httpVars, $_FILES);
+        return self::findActionAndApply($actionName, $httpVars, $_FILES, $action);
 
+    }
+
+    /**
+     * @static
+     * @param Array $parameters
+     * @param DOMNode $callbackNode
+     * @param DOMXPath $xPath
+     * @throws Exception
+     */
+    public static function checkParams(&$parameters, $callbackNode, $xPath){
+        if(!$callbackNode->attributes->getNamedItem('checkParams') || $callbackNode->attributes->getNamedItem('checkParams')->nodeValue != "true"){
+            return;
+        }
+        $inputParams = $xPath->query("input_param", $callbackNode);
+        $declaredParams = array();
+        foreach($inputParams as $param){
+            $name = $param->attributes->getNamedItem("name")->nodeValue;
+            $type = $param->attributes->getNamedItem("type")->nodeValue;
+            $defaultNode = $param->attributes->getNamedItem("default");
+            $mandatory = ($param->attributes->getNamedItem("mandatory")->nodeValue == "true");
+            if($mandatory && !isSet($parameters[$name])){
+                throw new Exception("Missing parameter '".$name."' of type '$type'");
+            }
+            if($defaultNode != null && !isSet($parameters[$name])){
+                $parameters[$name] = $defaultNode->nodeValue;
+            }
+            $declaredParams[] = $name;
+        }
+        foreach($parameters as $k => $n){
+            if(!in_array($k, $declaredParams)) unset($parameters[$k]);
+        }
     }
 
     /**
@@ -124,10 +158,10 @@ class AJXP_Controller{
      * @param String $actionName
      * @param array $httpVars
      * @param array $fileVars
+     * @param DOMNode $action
      * @return bool
      */
-	public static function findActionAndApply($actionName, $httpVars, $fileVars){
-        $xPath = self::initXPath();
+	public static function findActionAndApply($actionName, $httpVars, $fileVars, &$action = null){
         if($actionName == "cross_copy"){
             $pService = AJXP_PluginsService::getInstance();
             $actives = $pService->getActivePlugins();
@@ -143,13 +177,16 @@ class AJXP_Controller{
             self::$lastActionNeedsAuth = true;
             return ;
         }
-        $actions = $xPath->query("actions/action[@name='$actionName']");
-        if(!$actions->length){
-            self::$lastActionNeedsAuth = true;
-            return false;
+        $xPath = self::initXPath();
+        if($action == null){
+            $actions = $xPath->query("actions/action[@name='$actionName']");
+            if(!$actions->length){
+                self::$lastActionNeedsAuth = true;
+                return false;
+            }
+            $action = $actions->item(0);
         }
-        $action = $actions->item(0);
-		//Check Rights
+        //Check Rights
 		if(AuthService::usersEnabled()){
 			$loggedUser = AuthService::getLoggedUser();
 			if( AJXP_Controller::actionNeedsRight($action, $xPath, "adminOnly") && 
@@ -191,6 +228,9 @@ class AJXP_Controller{
 		$postCalls = self::getCallbackNode($xPath, $action, 'post_processing/serverCallback[not(@capture="true")]', $actionName, $httpVars, $fileVars, true);
 		$captureCalls = self::getCallbackNode($xPath, $action, 'post_processing/serverCallback[@capture="true"]', $actionName, $httpVars, $fileVars, true);
 		$mainCall = self::getCallbackNode($xPath, $action, "processing/serverCallback",$actionName, $httpVars, $fileVars, false);
+        if($mainCall != null){
+            self::checkParams($httpVars, $mainCall, $xPath);
+        }
 		
 		if($captureCalls !== false){
 			ob_start();
@@ -297,7 +337,7 @@ class AJXP_Controller{
      * @param array $httpVars
      * @param array $fileVars
      * @param bool $multiple
-     * @return array|bool
+     * @return DOMNode|bool
      */
 	private static function getCallbackNode($xPath, $actionNode, $query ,$actionName, $httpVars, $fileVars, $multiple = true){		
 		$callbacks = $xPath->query($query, $actionNode);

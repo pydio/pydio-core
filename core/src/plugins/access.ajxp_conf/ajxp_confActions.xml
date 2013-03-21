@@ -30,7 +30,7 @@
 						ajaxplorer.updateContextData(path);
 					}						
 					]]></clientCallback>
-				<serverCallback methodName="switchAction" restPath="/dir+/"></serverCallback>
+				<serverCallback methodName="switchAction" restParams="/dir+/"></serverCallback>
 			</processing>
 		</action>
 		<action name="stat">
@@ -40,27 +40,27 @@
 		</action>
         <action name="list_all_plugins_actions">
             <processing>
-                <serverCallback methodName="listAllActions"></serverCallback>
+                <serverCallback methodName="listAllActions" restParams="/" developerComment="Returns a structured JSON object of all plugins and all their available actions"/>
             </processing>
         </action>
         <action name="list_all_plugins_parameters">
             <processing>
-                <serverCallback methodName="listAllActions"></serverCallback>
+                <serverCallback methodName="listAllActions" restParams="/" developerComment="Returns a structured JSON object of all plugins and all their available parameter"></serverCallback>
             </processing>
         </action>
         <action name="parameters_to_form_definitions">
             <processing>
-                <serverCallback methodName="listAllActions"></serverCallback>
+                <serverCallback methodName="listAllActions" developerComment="Takes in input a list of plugin parameters and builds the corresponding XML to create a standard form."/>
             </processing>
         </action>
         <action name="list_all_repositories">
             <processing>
-                <serverCallback methodName="listAllActions"></serverCallback>
+                <serverCallback methodName="listAllActions" developerComment="Returns all repository (output format is XML)"></serverCallback>
             </processing>
         </action>
         <action name="list_all_users">
             <processing>
-                <serverCallback methodName="listAllActions"></serverCallback>
+                <serverCallback methodName="listAllActions" developerComment="Returns all users"></serverCallback>
             </processing>
         </action>
 		<action name="get_plugin_manifest">
@@ -508,17 +508,14 @@
 					<textarea id="text_copy" style="width:630px; height: 350px;"></textarea>
 				</div>
 				]]></clientForm>
-				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>					
 	    <action name="update_user_right">
             <processing>
-                <serverCallback methodName="switchAction" restPath="/repository_id/user_id/right">
-                    <input_parameters>
-                        <input_param name="user_id" type="AJXP_USER" mandatory="true" description="ID of the user"/>
-                        <input_param name="repository_id" type="AJXP_REPOSITORY" mandatory="true" description="Repository ID"/>
-                        <input_param name="right" type="string" mandatory="true" description="Must be r (read), w (write) or n (none)"/>
-                    </input_parameters>
+                <serverCallback methodName="switchAction" restParams="/repository_id/user_id/right" checkParams="true">
+                    <input_param name="user_id" type="AJXP_USER" mandatory="true" description="ID of the user"/>
+                    <input_param name="repository_id" type="AJXP_REPOSITORY" mandatory="true" description="Repository ID"/>
+                    <input_param name="right" type="string" mandatory="true" description="Must be r (read), w (write) or n (none)"/>
                 </serverCallback>
             </processing>
         </action>

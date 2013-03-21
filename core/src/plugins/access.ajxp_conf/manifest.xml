@@ -55,6 +55,14 @@
                         #switch_to_settings_button {
                             display: none !important;
                         }
+                        .developerDoc{
+                            font-size: 12px !important;
+                            line-height: 18px !important;
+                        }
+                        .developerApiAccess{
+                            display: inline-block;
+                            margin: 5px 0;
+                        }
                     </style>
                     <script>
                         $("vertical_splitter").ajxpPaneObject.paneB._max = 1;

@@ -4,6 +4,9 @@ die("This is experimental and should not be used in production yet!");
 
 include_once("base.conf.php");
 
+set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE & ~E_STRICT );
+set_exception_handler(array("AJXP_XMLWriter", "catchException"));
+
 $pServ = AJXP_PluginsService::getInstance();
 ConfService::init();
 $confPlugin = ConfService::getInstance()->confPluginSoftLoad($pServ);
@@ -39,7 +42,4 @@ if(!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSIN
 }
 AJXP_PluginsService::getInstance()->initActivePlugins();
 
-try{
-    AJXP_Controller::findRestActionAndApply($action, $path);
-}catch(Exception $e){
-}
+AJXP_Controller::findRestActionAndApply($action, $path);
