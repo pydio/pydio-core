@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Extract the mimetype of a file and send it to the browser
+ * @package AjaXplorer_Plugins
+ * @subpackage Editor
  */
 class FileMimeSender extends AJXP_Plugin {
     

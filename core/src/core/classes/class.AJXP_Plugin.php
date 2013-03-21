@@ -21,10 +21,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * The basic concept of plugin. Only needs a manifest.xml file.
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class AJXP_Plugin implements Serializable{
 	protected $baseDir;

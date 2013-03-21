@@ -21,7 +21,8 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.core
+ * @package AjaXplorer
+ * @subpackage SabreDav
  */
 class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
 {
@@ -55,7 +56,7 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
      */
     function getAccessDriver(){
         if(!isset($this->accessDriver)){
-            $RID = ($this->repository->isWriteable() ? $this->repository->getUniqueId() : $this->repository->getId());
+            $RID = $this->repository->getId();
             ConfService::switchRootDir($RID);
             ConfService::getConfStorageImpl();
             $this->accessDriver = ConfService::loadRepositoryDriver();

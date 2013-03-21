@@ -29,7 +29,8 @@ if(!defined('LOG_LEVEL_DEBUG')){
 }
 
 /**
- * @package info.ajaxplorer.log
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
  * @class AbstractLogDriver
  * @author mosen
  * @abstract

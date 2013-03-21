@@ -20,7 +20,11 @@
  */
 
 defined('AJXP_EXEC') or die('Access not allowed');
- 
+
+/**
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
+ */
 interface AJXP_MessageExchanger{
 
     /**

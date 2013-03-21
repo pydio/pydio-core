@@ -22,6 +22,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * Bridge with the phpBB users system.
+ * @package AjaXplorer_Plugins
+ * @subpackage Auth
  */
 class phpbbAuthDriver extends serialAuthDriver  {
 	

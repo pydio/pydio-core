@@ -21,10 +21,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * XML output Generator
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class AJXP_XMLWriter
 {

@@ -21,10 +21,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * Encapsulation of the javascript/css packing library
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class AJXP_JSPacker{
 	

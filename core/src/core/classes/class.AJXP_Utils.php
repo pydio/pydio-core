@@ -25,10 +25,9 @@ define('AJXP_SANITIZE_HTML_STRICT', 2);
 define('AJXP_SANITIZE_ALPHANUM', 3);
 define('AJXP_SANITIZE_EMAILCHARS', 4);
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * Various functions used everywhere, static library
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class AJXP_Utils
 {
@@ -257,7 +256,7 @@ class AJXP_Utils
             if ($repository == null) {
                 $repository = ConfService::getRepositoryByAlias($repoId);
                 if ($repository != null) {
-                    $parameters["repository_id"] = ($repository->isWriteable()?$repository->getUniqueId():$repository->getId());
+                    $parameters["repository_id"] = $repository->getId();
                 }
             }
             require_once(AJXP_BIN_FOLDER . "/class.SystemTextEncoding.php");

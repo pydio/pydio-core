@@ -21,9 +21,10 @@
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
- * @package info.ajaxplorer.plugins
  * Simple metadata implementation, stored in hidden files inside the
  * folders
+ * @package AjaXplorer_Plugins
+ * @subpackage Metastore
  */
 class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider {
 	

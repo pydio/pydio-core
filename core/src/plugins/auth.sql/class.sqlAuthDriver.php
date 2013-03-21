@@ -21,8 +21,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Store authentication data in an SQL database
+ * @package AjaXplorer_Plugins
+ * @subpackage Auth
  */
 class sqlAuthDriver extends AbstractAuthDriver {
 	

@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Generate an image thumbnail and send the thumb/full version to the browser
+ * @package AjaXplorer_Plugins
+ * @subpackage Editor
  */
 class ImagePreviewer extends AJXP_Plugin {
 

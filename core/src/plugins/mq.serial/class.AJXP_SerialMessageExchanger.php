@@ -20,7 +20,11 @@
  */
 
 defined('AJXP_EXEC') or die('Access not allowed');
-
+/**
+ * Serialized file plugin to manage messages queues
+ * @package AjaXplorer_Plugins
+ * @subpackage Mq
+ */
 class AJXP_SerialMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchanger
 {
 

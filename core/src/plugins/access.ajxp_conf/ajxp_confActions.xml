@@ -30,7 +30,7 @@
 						ajaxplorer.updateContextData(path);
 					}						
 					]]></clientCallback>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction" restPath="/dir+/"></serverCallback>
 			</processing>
 		</action>
 		<action name="stat">
@@ -511,7 +511,17 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>					
-					
+	    <action name="update_user_right">
+            <processing>
+                <serverCallback methodName="switchAction" restPath="/repository_id/user_id/right">
+                    <input_parameters>
+                        <input_param name="user_id" type="AJXP_USER" mandatory="true" description="ID of the user"/>
+                        <input_param name="repository_id" type="AJXP_REPOSITORY" mandatory="true" description="Repository ID"/>
+                        <input_param name="right" type="string" mandatory="true" description="Must be r (read), w (write) or n (none)"/>
+                    </input_parameters>
+                </serverCallback>
+            </processing>
+        </action>
 	</actions>
 	<client_configs>
 		<component_config className="InfoPanel">

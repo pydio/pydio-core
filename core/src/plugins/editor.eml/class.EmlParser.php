@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Parses an EML file and return the result as XML
+ * @package AjaXplorer_Plugins
+ * @subpackage Editor
  */
 class EmlParser extends AJXP_Plugin{
 	

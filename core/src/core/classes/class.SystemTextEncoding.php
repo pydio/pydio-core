@@ -20,10 +20,9 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * Static utilitaries to encode/decode charset to/from utf8
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class SystemTextEncoding
 {

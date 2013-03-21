@@ -21,7 +21,8 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
- * @package info.ajaxplorer.plugins
+ * @package AjaXplorer_Plugins
+ * @subpackage Access
  * @class ajxpSharedAccessDriver
  * AJXP_Plugin to access the shared elements of the current user
  */

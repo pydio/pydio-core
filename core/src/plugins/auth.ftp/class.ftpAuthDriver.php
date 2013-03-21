@@ -29,8 +29,9 @@ class ftpSonWrapper extends ftpAccessWrapper {
 }
 
 /**
- * @package info.ajaxplorer.plugins
  * Authenticate users against an FTP server
+ * @package AjaXplorer_Plugins
+ * @subpackage Auth
  */
 class ftpAuthDriver extends AbstractAuthDriver {
 	

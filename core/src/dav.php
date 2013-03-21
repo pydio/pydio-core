@@ -73,7 +73,7 @@ if((!empty($end) || $end ==="0") && $end[0] != "?"){
     if($repository == null){
         $repository = ConfService::getRepositoryByAlias($repositoryId);
         if($repository != null){
-            $repositoryId = ($repository->isWriteable()?$repository->getUniqueId():$repository->getId());
+            $repositoryId = $repository->getId();
         }
     }
     if($repository == null){

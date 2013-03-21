@@ -20,11 +20,10 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * Recycle bin actions manager. Utilitaries to check whether the current dir is the recycle bin,
  * and to filter the actions accordingly : transform an item deletion into a move into the recycle folder, etc.
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class RecycleBinManager
 {

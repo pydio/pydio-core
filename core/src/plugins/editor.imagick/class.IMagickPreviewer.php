@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Encapsulates calls to Image Magick to extract JPG previews of PDF, PSD, TIFF, etc.
+ * @package AjaXplorer_Plugins
+ * @subpackage Editor
  */
 class IMagickPreviewer extends AJXP_Plugin {
 

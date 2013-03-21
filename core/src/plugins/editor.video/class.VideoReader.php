@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Streams video to a client
+ * @package AjaXplorer_Plugins
+ * @subpackage Editor
  */
 class VideoReader extends AJXP_Plugin {
 	

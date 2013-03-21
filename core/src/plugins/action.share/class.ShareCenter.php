@@ -23,6 +23,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 require_once("class.PublicletCounter.php");
 
+/**
+ * @package AjaXplorer_Plugins
+ * @subpackage Action
+ */
 class ShareCenter extends AJXP_Plugin{
 
     /**
@@ -78,30 +82,15 @@ class ShareCenter extends AJXP_Plugin{
 
     function init($options){
         parent::init($options);
-        $pServ = AJXP_PluginsService::getInstance();
-        $aPlugs = $pServ->getActivePlugins();
-        $accessPlugs = $pServ->getPluginsByType("access");
         $this->repository = ConfService::getRepository();
-        foreach($accessPlugs as $pId => $plug){
-            if(array_key_exists("access.".$pId, $aPlugs) && $aPlugs["access.".$pId] === true){
-                $this->accessDriver = $plug;
-                if(!isSet($this->accessDriver->repository)){
-                    $this->accessDriver->init($this->repository);
-                    $this->accessDriver->initRepository();
-                    $wrapperData = $this->accessDriver->detectStreamWrapper(true);
-                }else{
-                    $wrapperData = $this->accessDriver->detectStreamWrapper(false);
-                }
-                $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
-                $this->baseProtocol = $wrapperData["protocol"];
-            }
+        if(!is_a($this->repository->driverInstance, "AjxpWrapperProvider")){
+            return;
         }
-        $this->metaStore = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
-        if($this->metaStore !== false){
-            $this->metaStore->initMeta($this->accessDriver);
-            if(array_key_exists("meta.watch", AJXP_PluginsService::getInstance()->getActivePlugins())){
-                $this->watcher = AJXP_PluginsService::getInstance()->getPluginById("meta.watch");
-            }
+        $this->accessDriver = $this->repository->driverInstance;
+        $this->urlBase = $this->repository->driverInstance->getResourceUrl("/");
+        $this->baseProtocol = array_shift(explode("://", $this->urlBase));
+        if(array_key_exists("meta.watch", AJXP_PluginsService::getInstance()->getActivePlugins())){
+            $this->watcher = AJXP_PluginsService::getInstance()->getPluginById("meta.watch");
         }
     }
 
@@ -212,13 +201,11 @@ class ShareCenter extends AJXP_Plugin{
                 $messages = ConfService::getMessages();
                 $node = new AJXP_Node($this->urlBase.$file);
 
-                if($this->metaStore != null){
-                    $metadata = $node->retrieveMetadata(
-                        "ajxp_shared",
-                        true,
-                        AJXP_METADATA_SCOPE_REPOSITORY
-                    );
-                }
+                $metadata = $node->retrieveMetadata(
+                    "ajxp_shared",
+                    true,
+                    AJXP_METADATA_SCOPE_REPOSITORY
+                );
                 $elementWatch = false;
                 if(count($metadata)){
                     header("Content-type:application/json");
@@ -345,7 +332,6 @@ class ShareCenter extends AJXP_Plugin{
 	 */
 	public function updateNodeSharedData($oldNode/*, $newNode = null, $copy = false*/){
         if($this->accessDriver->getId() == "access.imap") return;
-        if($this->metaStore  == null) return;
         if($oldNode == null) return;
         $metadata = $oldNode->retrieveMetadata("ajxp_shared", true);
         if(count($metadata) && !empty($metadata["element"])){

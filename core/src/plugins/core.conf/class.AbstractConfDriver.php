@@ -21,7 +21,8 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.core
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
  * @class AbstractConfDriver
  * Abstract representation of a conf driver. Must be implemented by the "conf" plugin
  */
@@ -654,7 +655,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				foreach ($repositories as $repo){
 					if(!$repo->isTemplate) continue;
                     if(!$repo->getOption("TPL_USER_CAN_CREATE")) continue;
-					$repoId = $repo->getUniqueId();
+					$repoId = $repo->getId();
 					$repoLabel = $repo->getDisplay();
 					$repoType = $repo->getAccessType();
 					print("<template repository_id=\"$repoId\" repository_label=\"$repoLabel\" repository_type=\"$repoType\">");

@@ -22,8 +22,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 require_once('../classes/class.AbstractTest.php');
 
 /**
- * @package info.ajaxplorer.test
  * Check whether GD is installed or not
+ * @package AjaXplorer
+ * @subpackage Tests
  */
 class PHPGDVersion extends AbstractTest
 {

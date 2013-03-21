@@ -21,6 +21,11 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Computes used storage for user
+ * @package AjaXplorer_Plugins
+ * @subpackage Meta
+ */
 class QuotaComputer extends AJXP_Plugin
 {
     /**
@@ -115,7 +120,7 @@ class QuotaComputer extends AJXP_Plugin
         $q = $this->computeDirSpace($path);
         $this->storeUsage($path, $q);
         $t = $this->getAuthorized();
-        AJXP_Controller::applyHook("msg.instant", array("<metaquota usage='{$q}' total='{$t}'/>", ConfService::getRepository()->getUniqueId()));
+        AJXP_Controller::applyHook("msg.instant", array("<metaquota usage='{$q}' total='{$t}'/>", ConfService::getRepository()->getId()));
     }
 
     protected function storeUsage($dir, $quota){

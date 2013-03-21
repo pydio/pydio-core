@@ -28,7 +28,11 @@
  *
  *    The idea is: this script is require()'d by the CMS script.
  */
-  
+
+/**
+ * @package AjaXplorer_Plugins
+ * @subpackage Auth
+ */
 global $AJXP_GLUE_GLOBALS;
 if(!isSet($AJXP_GLUE_GLOBALS)){
 	$AJXP_GLUE_GLOBALS = array();
@@ -79,7 +83,7 @@ switch($plugInAction)
 		        $isAdmin = (isSet($login["right"]) && $login["right"] == "admin");
 	        	AuthService::createUser($login["name"], $login["password"], $isAdmin);
 	        }
-	        if(isSet($AJXP_GLUE_GLOBALS["checkPassord"]) && $AJXP_GLUE_GLOBALS["checkPassord"] === TRUE){
+	        if(isSet($AJXP_GLUE_GLOBALS["checkPassword"]) && $AJXP_GLUE_GLOBALS["checkPassword"] === TRUE){
 		        $result = AuthService::logUser($login["name"], $login["password"], false, false, -1);
 	        }else{
 	        	$result = AuthService::logUser($login["name"], $login["password"], true);

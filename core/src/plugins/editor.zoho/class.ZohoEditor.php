@@ -24,6 +24,10 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+/**
+ * @package AjaXplorer_Plugins
+ * @subpackage Editor
+ */
 class ZohoEditor extends AJXP_Plugin {
 
     public function performChecks(){

@@ -26,10 +26,9 @@ define("LOG_LEVEL_NOTICE", "Notice");
 define("LOG_LEVEL_WARNING", "Warning");
 define("LOG_LEVEL_ERROR", "Error");
 /**
- * @package info.ajaxplorer.core
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
  * @static
- */
-/**
  * Provides static access to the logging mechanism
  */
 class AJXP_Logger extends AJXP_Plugin {

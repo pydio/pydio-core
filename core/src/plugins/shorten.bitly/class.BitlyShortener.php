@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Use a developer Bit.ly account to shorten publiclet links.
+ * @package AjaXplorer_Plugins
+ * @subpackage Shorten
  */
 class BitlyShortener extends AJXP_Plugin {
 			

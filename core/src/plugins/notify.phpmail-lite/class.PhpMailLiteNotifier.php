@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Send notifications to user on some predefined actions
+ * @package AjaXplorer_Plugins
+ * @subpackage Notify
  */
 class PhpMailLiteNotifier extends AJXP_Plugin {
 
@@ -139,7 +140,7 @@ class PhpMailLiteNotifier extends AJXP_Plugin {
 
         $directUrl = "";
         if(!empty($this->pluginConf["SERVER_URL"])){
-            $directUrl = rtrim($this->pluginConf["SERVER_URL"], "/")."/?repository_id=".ConfService::getRepository()->getUniqueId()."&folder=". urlencode($folder);
+            $directUrl = rtrim($this->pluginConf["SERVER_URL"], "/")."/?repository_id=".ConfService::getRepository()->getId()."&folder=". urlencode($folder);
             AJXP_Logger::debug($directUrl);
         }
 

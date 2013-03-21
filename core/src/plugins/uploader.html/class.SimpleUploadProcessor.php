@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Processor for standard POST upload
+ * @package AjaXplorer_Plugins
+ * @subpackage Uploader
  */
 class SimpleUploadProcessor extends AJXP_Plugin {
 	

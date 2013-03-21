@@ -22,13 +22,12 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 global $MAIN_testsArray;
 /**
- * @package info.ajaxplorer.core
  * Abstract test class
- */
-/**
  * Abstract class for diagnostic tests. These tests are run at the first application start up, and their
  * results are displayed in the Diagnostic page. It's possible to re-run the full diagnostic by calling
  * the runTests.php script (first line needs to be commented first).
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class AbstractTest
 {

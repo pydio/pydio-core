@@ -30,7 +30,7 @@
 						ajaxplorer.updateContextData(path);
 					}						
 					]]></clientCallback>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction" restPath="/dir/"></serverCallback>
 			</processing>
 		</action>
         <action name="create">

@@ -21,8 +21,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Utilitary class for switching session
+ * @package AjaXplorer_Plugins
+ * @subpackage Auth
  */
 class SessionSwitcher
 {

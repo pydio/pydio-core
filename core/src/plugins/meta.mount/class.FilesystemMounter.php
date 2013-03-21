@@ -21,6 +21,12 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Dynamically mount a remote folder when switching to the repository
+ * @package AjaXplorer_Plugins
+ * @subpackage Meta
+ *
+ */
 class FilesystemMounter extends AJXP_Plugin
 {
     protected $accessDriver;

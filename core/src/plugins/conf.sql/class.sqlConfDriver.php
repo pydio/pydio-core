@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Configuration stored in an SQL Database
+ * @package AjaXplorer_Plugins
+ * @subpackage Conf
  */
 class sqlConfDriver extends AbstractConfDriver {
 		

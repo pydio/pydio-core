@@ -20,10 +20,9 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * Abstraction of a user selection passed via http parameters.
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class UserSelection
 {

@@ -21,8 +21,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Authenticate users against an LDAP server
+ * @package AjaXplorer_Plugins
+ * @subpackage Auth
  */
 class ldapAuthDriver extends AbstractAuthDriver {
 

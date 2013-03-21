@@ -22,7 +22,8 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
+ * @package AjaXplorer_Plugins
+ * @subpackage Access
  * @class ajxp_confAccessDriver
  * AJXP_Plugin to access the configurations data
  */
@@ -770,7 +771,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$repositories = ConfService::getRepositoriesList();
 				foreach ($repositories as $repo){
 					if(!$repo->isTemplate) continue;
-					$repoId = $repo->getUniqueId();
+					$repoId = $repo->getId();
 					$repoLabel = $repo->getDisplay();
 					$repoType = $repo->getAccessType();
 					print("<template repository_id=\"$repoId\" repository_label=\"$repoLabel\" repository_type=\"$repoType\">");

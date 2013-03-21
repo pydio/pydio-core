@@ -21,7 +21,6 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * AJXP_Plugin to bridge authentication between Ajxp and external CMS
  *  This class works in 2 modes (master / slave)
     It requires the following arguments:
@@ -42,6 +41,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
     The user will log in on the remote site, and the remote script will call us, as GET ajxpPath/plugins/auth.remote/login.php?object=<serialized object>&key=MD5(object.SECRET)
 
     The serialized object contains the same data as the serialAuthDriver.
+ *
+ * @package AjaXplorer_Plugins
+ * @subpackage Auth
  */
 class remoteAuthDriver extends AbstractAuthDriver {
 	

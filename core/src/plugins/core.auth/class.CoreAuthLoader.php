@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Config loader overrider
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
  */
 class CoreAuthLoader extends AJXP_Plugin{
 

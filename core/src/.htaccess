@@ -9,6 +9,7 @@ RewriteBase /ajaxplorer
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^shares ./dav.php [L]
+RewriteRule ^api ./rest.php [L]
 
 #Following lines seem to be necessary if PHP is working
 #with apache as CGI or FCGI. Just remove the #

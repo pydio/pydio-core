@@ -20,11 +20,10 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * Core controller for dispatching the actions.
  * It uses the XML Registry (simple version, not extended) to search all the <action> tags and find the action.
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class AJXP_Controller{
 
@@ -90,38 +89,66 @@ class AJXP_Controller{
 		return $changes;
 	}
 
+    public static function findRestActionAndApply($actionName, $path){
+        $xPath = self::initXPath();
+        $actions = $xPath->query("actions/action[@name='$actionName']");
+        if(!$actions->length){
+            self::$lastActionNeedsAuth = true;
+            return false;
+        }
+        $action = $actions->item(0);
+        $restPath = $xPath->query("processing/serverCallback/@restPath", $action);
+        if(!$restPath->length){
+            self::$lastActionNeedsAuth = true;
+            return false;
+        }
+        $restPath = $restPath->item(0)->nodeValue;
+        $paramNames = explode("/", trim($restPath, "/"));
+        $path = array_shift(explode("?", $path));
+        $paramValues = explode("/", trim($path, "/"), count($paramNames));
+        foreach($paramNames as $i => $pName){
+            if(strpos($pName, "+") !== false){
+                $paramNames[$i] = str_replace("+", "", $pName);
+                $paramValues[$i] = "/" . $paramValues[$i];
+            }
+        }
+        $httpVars = array_merge($_GET, $_POST, array_combine($paramNames, $paramValues));
+        return self::findActionAndApply($actionName, $httpVars, $_FILES);
+
+    }
+
     /**
      * Main method for querying the XML registry, find an action and all its associated processors,
      * and apply all the callbacks.
      * @static
-     * @param $actionName
-     * @param $httpVars
-     * @param $fileVars
+     * @param String $actionName
+     * @param array $httpVars
+     * @param array $fileVars
      * @return bool
      */
 	public static function findActionAndApply($actionName, $httpVars, $fileVars){
-		if($actionName == "cross_copy"){
-			$pService = AJXP_PluginsService::getInstance();
-			$actives = $pService->getActivePlugins();
-			$accessPlug = $pService->getPluginsByType("access");
-			if(count($accessPlug)){
-				foreach($accessPlug as $key=>$objbect){
-					if($actives[$objbect->getId()] === true){
-						call_user_func(array($pService->getPluginById($objbect->getId()), "crossRepositoryCopy"), $httpVars);
-						break;
-					}
-				}
-			}
-			self::$lastActionNeedsAuth = true;
-			return ;
-		}
-		$xPath = self::initXPath();
-		$actions = $xPath->query("actions/action[@name='$actionName']");		
-		if(!$actions->length){
-			self::$lastActionNeedsAuth = true;
-			return false;
-		}
-		$action = $actions->item(0);
+        $xPath = self::initXPath();
+        if($actionName == "cross_copy"){
+            $pService = AJXP_PluginsService::getInstance();
+            $actives = $pService->getActivePlugins();
+            $accessPlug = $pService->getPluginsByType("access");
+            if(count($accessPlug)){
+                foreach($accessPlug as $key=>$objbect){
+                    if($actives[$objbect->getId()] === true){
+                        call_user_func(array($pService->getPluginById($objbect->getId()), "crossRepositoryCopy"), $httpVars);
+                        break;
+                    }
+                }
+            }
+            self::$lastActionNeedsAuth = true;
+            return ;
+        }
+        $actions = $xPath->query("actions/action[@name='$actionName']");
+        if(!$actions->length){
+            self::$lastActionNeedsAuth = true;
+            return false;
+        }
+        $action = $actions->item(0);
 		//Check Rights
 		if(AuthService::usersEnabled()){
 			$loggedUser = AuthService::getLoggedUser();

@@ -549,6 +549,7 @@
             <xs:attribute name="methodName" use="required" type="xs:NCName"/>
             <xs:attribute name="pluginId" use="optional" type="xs:NCName"/>
             <xs:attribute name="defer" type="xs:boolean"/>
+            <xs:attribute name="restPath"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="standardFormDefinition">

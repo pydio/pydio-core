@@ -26,6 +26,10 @@ define('AJXP_REPO_SCOPE_ALL',"AJXP_REPO_SCOPE_ALL");
 define('AJXP_REPO_SCOPE_SHARED',"AJXP_REPO_SCOPE_SHARED");
 define('AJXP_PLUGINS_SCOPE_ALL',"plugin_all");
 
+/**
+ * @package AjaXplorer
+ * @subpackage Core
+ */
 class AJXP_Role implements AjxpGroupPathProvider
 {
 

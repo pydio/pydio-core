@@ -21,6 +21,11 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Generates and caches and md5 hash of each file
+ * @package AjaXplorer_Plugins
+ * @subpackage Meta
+ */
 class FileHasher extends AJXP_Plugin
 {
     protected $accessDriver;

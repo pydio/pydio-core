@@ -22,6 +22,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * Notification dispatcher
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
  */
 class AJXP_NotificationCenter extends AJXP_Plugin
 {

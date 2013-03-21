@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Uses Pixlr.com service to edit images online.
+ * @package AjaXplorer_Plugins
+ * @subpackage Editor
  */
 class PixlrEditor extends AJXP_Plugin {
 

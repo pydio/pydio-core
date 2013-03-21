@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
- * Implementation of the AbstractUser for serial 
+ * Implementation of the AbstractUser for serial
+ * @package AjaXplorer_Plugins
+ * @subpackage Conf
  */
 class AJXP_SerialUser extends AbstractAjxpUser
 {

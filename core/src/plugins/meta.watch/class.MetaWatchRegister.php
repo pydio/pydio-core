@@ -21,6 +21,11 @@
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+/**
+ * Keep an eye on a folder to be alerted when something changes inside it
+ * @package AjaXplorer_Plugins
+ * @subpackage Meta
+ */
 class MetaWatchRegister extends AJXP_Plugin{
 
     public static $META_WATCH_CHANGE = "META_WATCH_CHANGE";

@@ -21,8 +21,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Standard auth implementation, stores the data in serialized files
+ * @package AjaXplorer_Plugins
+ * @subpackage Auth
  */
 class serialAuthDriver extends AbstractAuthDriver {
 	

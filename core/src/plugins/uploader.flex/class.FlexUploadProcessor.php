@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Legacy Flash plugin for upload
+ * @package AjaXplorer_Plugins
+ * @subpackage Uploader
  */
 class FlexUploadProcessor extends AJXP_Plugin {
 

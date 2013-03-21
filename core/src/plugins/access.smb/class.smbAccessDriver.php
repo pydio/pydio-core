@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * AJXP_Plugin to access a samba server
+ * @package AjaXplorer_Plugins
+ * @subpackage Access
  */
 class smbAccessDriver extends fsAccessDriver
 {

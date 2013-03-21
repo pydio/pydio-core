@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * User Interface main implementation
+ * @package AjaXplorer_Plugins
+ * @subpackage Gui
  */
 class AJXP_ClientDriver extends AJXP_Plugin 
 {

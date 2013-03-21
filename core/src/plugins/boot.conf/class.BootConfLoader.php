@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Implementation of the configuration driver on serial files
+ * @package AjaXplorer_Plugins
+ * @subpackage Boot
  */
 class BootConfLoader extends AbstractConfDriver {
 

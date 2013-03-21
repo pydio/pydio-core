@@ -20,7 +20,12 @@
  */
 
 defined('AJXP_EXEC') or die('Access not allowed');
-
+/**
+ *
+ * @package AjaXplorer
+ * @subpackage Core
+ *
+ */
 class AJXP_ShutdownScheduler
 {
     private static $instance;

@@ -7,8 +7,9 @@ require_once("../../core/classes/class.HttpClient.php");
  * This demo resource handler will respond to all messages sent to /echo/ on the socketserver below
  *
  * All this handler does is echoing the responds to the user
- * @author Chris
- *
+ * @author Cdujeu
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
  */
 class AjaXplorerHandler extends WebSocketUriHandler {
 

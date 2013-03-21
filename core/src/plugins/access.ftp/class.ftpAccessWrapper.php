@@ -24,8 +24,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 require_once(AJXP_BIN_FOLDER."/interface.AjxpWrapper.php");
 /**
- * @package info.ajaxplorer.plugins
  * Wrapper for encapsulation FTP accesses
+ * @package AjaXplorer_Plugins
+ * @subpackage Access
  */
 class ftpAccessWrapper implements AjxpWrapper {
 	
