@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor enabled="false" id="editor.infopanel" openable="true" order="1000" text="1" title="2"
+        iconClass="icon-list-alt"
+        icon="openother_images/actions/ICON_SIZE/unknown.png" className="InfoPanel"
+        mimes="*" formId="ip_content_info_panel" label="CONF_MESSAGE[Info Panel...]" description="CONF_MESSAGE[Info Panel]"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd"
+        >
+</editor>

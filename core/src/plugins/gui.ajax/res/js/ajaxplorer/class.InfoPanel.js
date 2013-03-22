@@ -33,6 +33,9 @@ Class.create("InfoPanel", AjxpPane, {
 		disableTextSelection(htmlElement);
         var id = htmlElement.id;
         var container = new Element("div", {className:"panelContent", id:"ip_content_"+id});
+        if(!options){
+            options = {replaceScroller:true};
+        }
         if(options.replaceScroller){
             this.scroller = new Element('div', {id:'ip_scroller_'+id, className:'scroller_track'});
             this.scroller.insert(new Element('div', {id:'ip_scrollbar_handle_'+id, className:'scroller_handle'}));
@@ -65,6 +68,24 @@ Class.create("InfoPanel", AjxpPane, {
             document.observe("ajaxplorer:user_logged", this.userLogHandler );
         }
 	},
+
+
+    /**
+     * Opened as an editor
+     * @param $super
+     * @param node
+     */
+    open : function($super, node){
+        this.htmlElement.up('div.dialogBox').setStyle({width:'450px'});
+        this.htmlElement.up('div.dialogContent').setStyle({padding:0});
+        this.htmlElement.down('#ip_content_info_panel').setStyle({position:"relative", top:0, left:0, width:'100%', height: '450px', overflow:'auto'});
+        try{
+            this.htmlElement.down('#ip_content_modal_action_form').remove();
+            this.htmlElement.down('#ip_scroller_modal_action_form').remove();
+        }catch (e){}
+        modal.refreshDialogPosition();
+    },
+
 	/**
 	 * Clean destroy of the panel, remove listeners
 	 */

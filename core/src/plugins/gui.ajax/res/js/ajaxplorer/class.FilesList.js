@@ -1984,8 +1984,9 @@ Class.create("FilesList", SelectableElements, {
                 element.setStyle({width:tSize+25+'px', height:tSize+ 30 +'px'});
             }
             this._previewFactory.setThumbSize(tSize);
-            this._previewFactory.resizeThumbnail(image_element);
-
+            if(image_element){
+                this._previewFactory.resizeThumbnail(image_element);
+            }
             if(label_element){
                 // RESIZE LABEL
                 var el_width = (!elementsAreSiblings ? (element.getWidth() - tSize - 10)  : (tSize + 25) ) ;
