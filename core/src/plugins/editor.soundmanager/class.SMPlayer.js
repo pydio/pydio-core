@@ -121,9 +121,9 @@ function hookToFilesList(){
             resManager.load();
         }
         $A(fList.getItems()).each(function(row){
-            if(!row.ajxpNode || row.ajxpNode.getAjxpMime() != "mp3") return;
+            if(!row.ajxpNode || row.ajxpNode.getAjxpMime() != "mp3" || row.ajxpNode.getAjxpMime() != "wav") return;
             addVolumeButton();
-            var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+'&get_action=audio_proxy&file='+base64_encode(row.ajxpNode.getPath())+ '&fake=extension.mp3';
+            var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+'&get_action=audio_proxy&file='+base64_encode(row.ajxpNode.getPath())+ '&fake=extension.'+ajxpNode.getAjxpMime();
             var player = new Element("div", {className:"ui360 ui360-micro"}).update(new Element("a", {href:url}).update(""));
             row.down("span#ajxp_label").setStyle({backgroundImage:'none'}).insert({top:player});
             threeSixtyPlayer.config.items = [player];
@@ -203,9 +203,9 @@ Class.create("SMPlayer", AbstractEditor, {
         addVolumeButton();
         var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+'&get_action=audio_proxy&file='+base64_encode(ajxpNode.getPath());
         if(rich){
-            url += '&rich_preview=true&fake=extension.mp3';
+            url += '&rich_preview=true&fake=extension.'+ajxpNode.getAjxpMime();
         }else{
-            url += '&fake=extension.mp3';
+            url += '&fake=extension.'+ajxpNode.getAjxpMime();
         }
         var container = new Element("div", {className:"ui360container"+(rich?" nobackground":"")});
         var player = new Element("div", {className:"ui360"+(rich?" ui360-vis ui360-vis-retracted":"")}).update(new Element("a", {href:url}).update(""));
