@@ -1231,10 +1231,40 @@ div.FL-inlineToolbar.FL-inlineToolbarUnique{
 div.selected div.FL-inlineToolbar.FL-inlineToolbarUnique {
     display: block;
 }
+
 tr.selected div.FL-inlineToolbar.FL-inlineToolbarUnique,
 tr div.FL-inlineToolbar.FL-inlineToolbarMultiple {
     display: inline-block;
 }
+
+div.FL-inlineToolbar a {
+    margin: 0 5px;
+}
+
+div.FL-inlineToolbar a span.actionbar_button_label {
+    margin-left: 5px;
+}
+
+.selected div.FL-inlineToolbar a {
+    color: white;
+
+}
+
+/* inline bar in detailed mode */
+div.detailed div.FL-inlineToolbar a span.actionbar_button_label{
+    display: inline-block !important;
+}
+
+div.detailed div.FL-inlineToolbar {
+    margin-left: 50px;
+    margin-bottom: 7px;
+    margin-top: 2px;
+}
+
+div.detailed div.FL-inlineToolbar div.toolbarGroup {
+    min-width: 400px;
+}
+
 
 a.carousel-disabled{
     background-color: transparent;
