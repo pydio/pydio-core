@@ -337,7 +337,7 @@ Class.create("FilesList", SelectableElements, {
 		if(domNode.getAttribute("local") && !this.restoreConfig){			
 			this.restoreConfig = this.extractComponentConfig();
 		}
-		refreshGUI = false;
+		var refreshGUI = false;
 		this.columnsTemplate = false;
 		// CHECK FOR COLUMNS DEFINITION DATA
 		var columnsNode = XPathSelectSingleNode(domNode, "columns");
@@ -356,6 +356,7 @@ Class.create("FilesList", SelectableElements, {
 				}
 				if(dispMode != this._displayMode){
 					this.switchDisplayMode(dispMode);
+                    refreshGUI = true;
 				}				
 			}
 			if(columnsNode.getAttribute('template_name')){
