@@ -505,6 +505,17 @@ $mess=array(
 "460" => "Details",
 "461" => "Switch to details view",
 "detail_access_key" => "D",
+"date_relative_date" => "on DATE",
+"date_relative_time" => "TIME",
+"date_relative_date_format" => "Y/m/d",
+"date_relative_time_format" => "H:i",
+"date_relative_today" => "today at TIME",
+"date_relative_yesterday" => "yesterday at TIME",
+"date_relative_tomorrow" => "tomorrow at TIME",
+"date_relative_days_ago" => "%s days ago",
+"date_relative_days_ahead" => "in %s days",
+"462" => "Preview",
+"preview_access_key" => "e",
 /* END SENTENCE */
 );
 ?>

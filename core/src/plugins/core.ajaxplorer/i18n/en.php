@@ -516,4 +516,6 @@ $mess=array(
 "460" => "Details",
 "461" => "Switch to details view",
 "detail_access_key" => "D",
+"462" => "Preview",
+"preview_access_key" => "e",
 );

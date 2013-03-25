@@ -1873,9 +1873,14 @@ Class.create("FilesList", SelectableElements, {
 
     addInlineToolbar : function(element, ajxpNode){
         if(this._inlineToolbarOptions){
+            if(!this._inlineToolbarOptions.unique){
+                var options = Object.extend(this._inlineToolbarOptions, {
+                    attachToNode: ajxpNode
+                });
+            }
             var tBarElement = new Element('div', {id:"FL-tBar-"+this._instanciatedToolbars.size(), className:"FL-inlineToolbar" + (this._inlineToolbarOptions.unique?' FL-inlineToolbarUnique':' FL-inlineToolbarMultiple')});
             element.insert(tBarElement);
-            var aT = new ActionsToolbar(tBarElement, this._inlineToolbarOptions);
+            var aT = new ActionsToolbar(tBarElement, options);
             aT.actions = ajaxplorer.actionBar.actions;
             aT.initToolbars();
             if(!this._inlineToolbarOptions.unique){

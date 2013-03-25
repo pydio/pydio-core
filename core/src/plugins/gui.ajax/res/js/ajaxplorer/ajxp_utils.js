@@ -302,6 +302,7 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, listen)
 	if(typeof(addMarginBottom) == "undefined" || addMarginBottom == null){
 		addMarginBottom = 0;
 	}
+    if(parentElement == "window") parentElement = window;
 		
 	var observer = function(){	
 		if(!element) return;	

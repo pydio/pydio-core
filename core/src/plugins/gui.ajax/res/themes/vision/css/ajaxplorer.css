@@ -3618,13 +3618,13 @@ div.menuActions img{
 /* NEW HTML5 / CSS3 STYLES  	            */
 /* Generally applied after a Modernizr test */
 /********************************************/
-.css_boxshadow{
+.css_boxshadow,div.menu{
     -moz-box-shadow : 5px 5px 40px rgba(100, 100, 100, 0.5);
     -webkit-box-shadow : 5px 5px 40px rgba(100, 100, 100, 0.5);
     box-shadow : 5px 5px 40px rgba(100, 100, 100, 0.5);
 }
 
-.dialogBox.css_boxshadow{
+.dialogBox, div.dialogBox.css_boxshadow{
     -moz-box-shadow: 5px 5px 60px #222;
     -webkit-box-shadow: 5px 5px 60px #222;
     box-shadow: 5px 5px 60px #222;

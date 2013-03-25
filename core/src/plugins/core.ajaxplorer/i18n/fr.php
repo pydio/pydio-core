@@ -516,5 +516,7 @@ $mess=array(
 "460" => "Détails",
 "461" => "Passer à la vue détaillée",
 "detail_access_key" => "D",
+"462" => "Preview",
+"preview_access_key" => "e",
 /* END SENTENCE */
 );

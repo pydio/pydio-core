@@ -317,7 +317,7 @@
             <gui text="316" title="316" src="fileopen.png" iconClass="icon-eye-close" accessKey="open_with_access" hasAccessKey="true">
                 <context selection="true" dir="" recycle="hidden"  behaviour="hidden"
                     actionBar="true" contextMenu="true" infoPanel="false"
-                    actionBarGroup="get,inline" inZip="false">
+                    actionBarGroup="get" inZip="false">
                 </context>
                 <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE" behaviour="hidden"></selectionContext></gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
@@ -376,6 +376,32 @@
                         if(ajaxplorer.actionBar.getActionByName("download")){
                             ajaxplorer.actionBar.getActionByName("download").apply();
                         }
+                    }
+                ]]></clientCallback>
+                <serverCallback methodName="switchAction"></serverCallback>
+                </processing>
+        </action>
+        <action name="open_with_unique">
+            <gui text="462" title="462" src="fileopen.png" iconClass="icon-eye-close" accessKey="preview_access_key" hasAccessKey="true">
+                <context selection="true" dir="" recycle="hidden"  behaviour="hidden"
+                    actionBar="true" contextMenu="true" infoPanel="false"
+                    actionBarGroup="inline" inZip="false">
+                </context>
+                <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE" behaviour="hidden"></selectionContext></gui>
+            <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+            <processing>
+                <clientCallback prepareModal="false"><![CDATA[
+                    var editorData = window.actionArguments[0];
+                    if(!editorData){
+                        var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
+                        var editors = ajaxplorer.findEditorsForMime(selectedMime);
+                        if(editors.length && editors[0].openable){
+                            editorData = editors[0];
+                        }
+                    }
+                    if(editorData){
+                        ajaxplorer.loadEditorResources(editorData.resourcesManager);
+                        modal.openEditorDialog(editorData);
                     }
                 ]]></clientCallback>
                 <serverCallback methodName="switchAction"></serverCallback>

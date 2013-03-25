@@ -244,8 +244,8 @@ Class.create("ActionsToolbar", {
                     button.OBSERVERS.each(function(pair){
                         button.ACTION.stopObserving(pair.key, pair.value);
                     });
+                    button.remove();
                 }
-                button.remove();
             });
         }
 		if(this.element.subMenus){
@@ -371,6 +371,22 @@ Class.create("ActionsToolbar", {
 	 * @param action Action The action to observe.
 	 */
 	attachListeners : function(button, action){
+
+        if(this.options.attachToNode){
+            action.fireContextChange(ajaxplorer.usersEnabled, ajaxplorer.user, this.options.attachToNode.getParent());
+            var fakeDm = new AjxpDataModel();
+            fakeDm.setSelectedNodes([this.options.attachToNode]);
+            action.fireSelectionChange(fakeDm);
+            if(action.deny) {
+                button.hide();
+            }  else {
+                button.show();
+            }
+            button.ACTION = action;
+            return;
+        }
+
+
         button.OBSERVERS = $H();
         button.OBSERVERS.set("hide", function(){button.hide()}.bind(this));
         button.OBSERVERS.set("show", function(){button.show()}.bind(this));
