@@ -187,7 +187,11 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 			}.bind(this)
 		};
 		
-		
+        if(window.ajxpMobile){
+              this.setFullScreen();
+              window.setTimeout(this.setFullScreen.bind(this), 500);
+        }
+
 		this.initCodeMirror(false, function(){
 			this.loadFileContent(fileName);
 		}.bind(this));
@@ -216,10 +220,6 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 
 		this.updateHistoryButtons();
 		
-		if(window.ajxpMobile){
-			this.setFullScreen();
-			//attachMobileScroll(this.textarea, "vertical");
-		}
 
         this.element.observe("editor:resize", function(event){
             if(this.goingToFullScreen) return;
