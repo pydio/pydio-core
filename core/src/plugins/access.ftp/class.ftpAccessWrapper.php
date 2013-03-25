@@ -284,8 +284,8 @@ class ftpAccessWrapper implements AjxpWrapper {
 			$parentDir = $this->safeDirname($serverPath);
 			$fileName = $this->safeBasename($serverPath);
 			ftp_chdir($link, $parentDir);
-			$rl_dirlist = @ftp_rawlist($link, ".");
-			//AJXP_Logger::debug("FILE RAWLIST FROM ".$parentDir);
+			$rl_dirlist = @ftp_rawlist($link, (ConfService::getRepositoryById($this->repositoryId)->getOption("SHOW_HIDDEN_FILES") ? "-A ." : "."));
+			AJXP_Logger::debug("FILE RAWLIST FROM ".$parentDir);
 			if (is_array($rl_dirlist)){
                 $escaped = preg_quote($fileName);
 				foreach($rl_dirlist as $rl_index => $rl_entry){
@@ -298,8 +298,8 @@ class ftpAccessWrapper implements AjxpWrapper {
 		else 
 		{			
 			ftp_chdir($link, $serverPath);
-			$contents = ftp_rawlist($link, ".");
-        	//AJXP_Logger::debug("RAW LIST RESULT ".print_r($contents, true));			
+			$contents = ftp_rawlist($link, (ConfService::getRepositoryById($this->repositoryId)->getOption("SHOW_HIDDEN_FILES") ? "-A ." : "."));
+			AJXP_Logger::debug("RAW LIST RESULT ".print_r($contents, true));			
 		}
 		
         if (!is_array($contents) && !$this->ftpActive) 

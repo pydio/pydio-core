@@ -124,7 +124,9 @@ class ldapAuthDriver extends AbstractAuthDriver {
             if($this->ldapFilter == "") $filter = "(" . $this->ldapUserAttr . "=" . $login . ")";
             else  $filter = "(&" . $this->ldapFilter . "(" . $this->ldapUserAttr . "=" . $login . "))";
         }
-        $this->startConnexion();
+        if($this->ldapconn == null){
+        	$this->startConnexion();
+        }
         $conn = array();
         if(is_array($this->ldapDN)){
             foreach($this->ldapDN as $dn){
@@ -136,6 +138,14 @@ class ldapAuthDriver extends AbstractAuthDriver {
         $expected = array($this->ldapUserAttr);
         if($login != null && !empty($this->customParamsMapping)){
             $expected = array_merge($expected, array_keys($this->customParamsMapping));
+        }
+        foreach ($conn as $dn => $ldapc) {
+            if (!$ldapc) {
+                unset($conn[$dn]);
+            }
+        }
+        if (count($conn) < 1) {
+            return array("count" => 0);
         }
         $ret = ldap_search($conn,$this->ldapDN,$filter, $expected);
         $allEntries = array("count" => 0);
@@ -215,6 +225,14 @@ class ldapAuthDriver extends AbstractAuthDriver {
     }
 
 	function userExists($login){
+		// Check if local storage exists for the user. If it does, assume the user
+		// exists. This prevents a barrage of ldap_connect/ldap_bind/ldap_search
+		// calls.
+		$confDriver = ConfService::getConfStorageImpl();
+		$userObject = $confDriver->instantiateAbstractUserImpl($login);
+		if ($userObject->storageExists()) {
+			return true;
+		}
         $entries = $this->getUserEntries($login);
         if(!is_array($entries)) return false;
         if(AuthService::ignoreUserCase()) {
