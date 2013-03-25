@@ -70,7 +70,12 @@ if(isSet($_GET["tmp_repository_id"])){
 	ConfService::switchRootDir($_SESSION["SWITCH_BACK_REPO_ID"]);
 	unset($_SESSION["SWITCH_BACK_REPO_ID"]);
 }
-$action = (strpos($_SERVER["HTTP_ACCEPT"], "text/html") !== false ? "get_boot_gui" : "ping");
+$action = "ping";
+if(preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])){
+    $action = "get_boot_gui";
+}else{
+    $action = (strpos($_SERVER["HTTP_ACCEPT"], "text/html") !== false ? "get_boot_gui" : "ping");
+}
 if(isSet($_GET["action"]) || isSet($_GET["get_action"])) $action = (isset($_GET["get_action"])?$_GET["get_action"]:$_GET["action"]);
 else if(isSet($_POST["action"]) || isSet($_POST["get_action"])) $action = (isset($_POST["get_action"])?$_POST["get_action"]:$_POST["action"]);
 

@@ -152,24 +152,8 @@ lightbox.prototype = {
 			currentDraggable = new Draggable(this.content, {
 				handle:"dialogTitle",
 				zindex:1050, 
-				starteffect : function(element){
-					if(element.shadows) {
-						Shadower.deshadow(element);
-						element.hadShadow = true;
-					}
-				},
-				endeffect : function(element){
-					if(element.hadShadow){
-						Shadower.shadow(element,{
-							distance: 4,
-							angle: 130,
-							opacity: 0.5,
-							nestedShadows: 3,
-							color: '#000000',
-							shadowStyle:{display:'block'}
-						});
-					}
-				}
+				starteffect : function(element){},
+				endeffect : function(element){}
 			});
 		}
 		//if(display != 'none') this.actions();		
@@ -272,7 +256,6 @@ function hideLightBox(onFormSubmit)
 		modal.closeFunction();
 		modal.closeFunction = null;
 	}
-	Shadower.deshadow($(modal.elementName));
 }
 
 function setOverlay()

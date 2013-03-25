@@ -394,24 +394,8 @@ Class.create("SearchEngine", AjxpPane, {
                 this.resultsDraggable = new Draggable(this._ajxpOptions.toggleResultsVisibility, {
                     handle:"panelHeader",
                     zindex:999,
-                    starteffect : function(element){
-                        if(element.shadows) {
-                            Shadower.deshadow(element);
-                            element.hadShadow = true;
-                        }
-                    },
-                    endeffect : function(element){
-                        if(element.hadShadow){
-                            Shadower.shadow(element,{
-                                distance: 4,
-                                angle: 130,
-                                opacity: 0.5,
-                                nestedShadows: 3,
-                                color: '#000000',
-                                shadowStyle:{display:'block'}
-                            });
-                        }
-                    }
+                    starteffect : function(element){},
+                    endeffect : function(element){}
                 });
             }
             if($(this._ajxpOptions.toggleResultsVisibility).down("span.close_results")){

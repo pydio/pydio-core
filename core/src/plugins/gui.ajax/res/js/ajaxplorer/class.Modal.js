@@ -277,18 +277,7 @@ Class.create("Modal", {
 			// REFRESH PNG IMAGES FOR IE!
 			refreshPNGImages(this.dialogContent);			
 		}
-		
-		if(skipShadow) return;
-		Shadower.shadow($(elementName), 
-			{
-				distance: 3,
-				angle: 130,
-				opacity: 0.5,
-				nestedShadows: 3,
-				color: '#000000',
-				shadowStyle:{display:'block'}
-			}, true);
-				
+
 	},
 	/**
 	 * Find an editor using the editorData and initialize it
@@ -434,15 +423,6 @@ Class.create("Modal", {
 	 * Refresh appearance after the dialog box changed (shadow)
 	 */
 	refreshDialogAppearance:function(){
-		Shadower.shadow($(this.elementName), 
-			{
-				distance: 4,
-				angle: 130,
-				opacity: 0.5,
-				nestedShadows: 3,
-				color: '#000000',
-				shadowStyle:{display:'block'}
-			}, true);		
 	},
 	/**
 	 * Clear all content
@@ -597,9 +577,6 @@ Class.create("Modal", {
 			left:leftPosition+'px',
 			width:boxWidth+'px'
 		});
-		if(!Modernizr.borderradius) {
-            new Effect.Corner(this.messageBox,"5px");
-        }
 		new Effect.Appear(this.messageBox);
 		this.tempoMessageDivClosing();
 	},
@@ -658,7 +635,6 @@ Class.create("Modal", {
 	 * Close action. Remove shadow if any, call close callback if any.
 	 */
 	close: function(){	
-		Shadower.deshadow($(this.elementName));
 		if(this.closeFunction){
 			 this.closeFunction();
 			 //this.closeFunction = null;

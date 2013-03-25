@@ -32,9 +32,9 @@ class AJXP_ClientDriver extends AJXP_Plugin
 
     public function loadConfigs($configData){
         parent::loadConfigs($configData);
-        if(preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])){
+        if(preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT'])){
             // Force legacy theme for the moment
-            $this->pluginConf["GUI_THEME"] = "oxygen";
+             $this->pluginConf["GUI_THEME"] = "oxygen";
         }
         if(!defined("AJXP_THEME_FOLDER")){
             define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
@@ -48,7 +48,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 	function switchAction($action, $httpVars, $fileVars)
 	{
 		if(!isSet($this->actions[$action])) return;
-        if(preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])){
+        if(preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT'])){
             // Force legacy theme for the moment
             $this->pluginConf["GUI_THEME"] = "oxygen";
         }
@@ -190,7 +190,9 @@ class AJXP_ClientDriver extends AJXP_Plugin
 					$START_PARAMETERS["ALERT"] = implode(", ", array_values($confErrors));
 				}
                 // PRECOMPUTE BOOT CONF
-                $START_PARAMETERS["PRELOADED_BOOT_CONF"] = $this->computeBootConf();
+                if(!preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) && !preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])){
+                    $START_PARAMETERS["PRELOADED_BOOT_CONF"] = $this->computeBootConf();
+                }
 
                 // PRECOMPUTE REGISTRY
                 $regDoc = AJXP_PluginsService::getXmlRegistry();

@@ -133,7 +133,7 @@ Class.create("AjxpPane", {
         });
         this.htmlElement.update("");
         if(window[this.htmlElement.id]){
-            delete window[this.htmlElement.id];
+            try{delete window[this.htmlElement.id];}catch(e){}
         }
 		this.htmlElement = null;
 

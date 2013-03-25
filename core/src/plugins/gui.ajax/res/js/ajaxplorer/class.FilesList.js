@@ -235,7 +235,7 @@ Class.create("FilesList", SelectableElements, {
 	destroy : function(){
         this._clearObservers();
         if(window[this.htmlElement.id]){
-            delete window[this.htmlElement.id];
+            try{delete window[this.htmlElement.id];}catch(e){}
         }
 		this.htmlElement = null;
 	},
@@ -1455,7 +1455,7 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	ajxpNodeToTableRow: function(ajxpNode, replaceItem){
 		var metaData = ajxpNode.getMetadata();
-		var newRow = new Element("tr", {id:ajxpNode.getPath()});
+		var newRow = new Element("tr", {id:slugString(ajxpNode.getPath())});
 		var tBody = this.parsingCache.get('tBody') || $(this._htmlElement).select("tbody")[0];
 		this.parsingCache.set('tBody', tBody);
 		metaData.each(function(pair){
@@ -1626,7 +1626,9 @@ Class.create("FilesList", SelectableElements, {
 	 * @returns HTMLElement
 	 */
 	ajxpNodeToDiv: function(ajxpNode){
-		var newRow = new Element('div', {className:"thumbnail_selectable_cell", id:ajxpNode.getPath()});
+		var newRow = new Element('div', {
+            className:"thumbnail_selectable_cell",
+            id:slugString(ajxpNode.getPath())});
 		var metadata = ajxpNode.getMetadata();
 				
 		var innerSpan = new Element('span', {style:"cursor:default;"});
@@ -1722,7 +1724,10 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	ajxpNodeToLargeDiv: function(ajxpNode){
 
-        var largeRow = new Element('div', {className:"thumbnail_selectable_cell detailed", id:ajxpNode.getPath()+"-cont"});
+        var largeRow = new Element('div', {
+            className:"thumbnail_selectable_cell detailed",
+            id:slugString(ajxpNode.getPath())+"-cont"
+        });
         var metadataDiv = new Element("div", {className:"thumbnail_cell_metadata"});
 
         var newRow = new Element('div', {className:"thumbnail_selectable_cell", id:ajxpNode.getPath()});
@@ -1977,7 +1982,7 @@ Class.create("FilesList", SelectableElements, {
 			var node = element.ajxpNode;
 			var image_element = element.IMAGE_ELEMENT || element.down('img');
 			var label_element = element.LABEL_ELEMENT || element.down('.thumbLabel');
-            var elementsAreSiblings = (label_element.siblings().indexOf(image_element) !== -1);
+            var elementsAreSiblings = (label_element && (label_element.siblings().indexOf(image_element) !== -1));
             var tSize = (this._displayMode=='detail'? this._detailThumbSize:this._thumbSize);
             if(element.down('div.thumbnail_selectable_cell')){
                 element.down('div.thumbnail_selectable_cell').setStyle({width:tSize+5+'px', height:tSize+10 +'px'});
