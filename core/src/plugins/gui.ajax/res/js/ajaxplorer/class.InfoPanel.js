@@ -76,9 +76,9 @@ Class.create("InfoPanel", AjxpPane, {
      * @param node
      */
     open : function($super, node){
-        this.htmlElement.up('div.dialogBox').setStyle({width:'450px'});
+        this.htmlElement.up('div.dialogBox').setStyle({width:Math.min(450, document.viewport.getWidth())+'px'});
         this.htmlElement.up('div.dialogContent').setStyle({padding:0});
-        this.htmlElement.down('#ip_content_info_panel').setStyle({position:"relative", top:0, left:0, width:'100%', height: '450px', overflow:'auto'});
+        this.htmlElement.down('#ip_content_info_panel').setStyle({position:"relative", top:0, left:0, width:'100%', height: Math.min(450, document.viewport.getHeight()-28)+'px', overflow:'auto'});
         try{
             this.htmlElement.down('#ip_content_modal_action_form').remove();
             this.htmlElement.down('#ip_scroller_modal_action_form').remove();

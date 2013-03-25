@@ -79,7 +79,21 @@ SelectableElements = Class.create({
 			oElement.attachEvent("ondblclick", this._ondblclick);
 		}
         if(addTouch){
-            oElement.observe("touchend", this._onclick);
+            oElement.observe("touchstart", function(event){
+                var touchData = event.changedTouches[0];
+                oElement.selectableTouchStart = touchData["clientY"];
+            }.bind(this));
+            oElement.observe("touchend", function(event){
+                if(oElement.selectableTouchStart) {
+                    var touchData = event.changedTouches[0];
+                    var delta = touchData['clientY'] - oElement.selectableTouchStart;
+                    if(Math.abs(delta) > 2){
+                        return;
+                    }
+                }
+                oElement.selectableTouchStart = null;
+                this._onclick(event);
+            }.bind(this) );
         }
 
 		this.eventMouseUp = this.dragEnd.bindAsEventListener(this);

@@ -821,7 +821,7 @@ Class.create("FilesList", SelectableElements, {
 
 			this.disableTextSelection(scrollElement, true);
             if(this.options.selectable == undefined || this.options.selectable === true){
-			    this.initSelectableItems(scrollElement, true);
+			    this.initSelectableItems(scrollElement, true, scrollElement, true);
             }else{
                 this.initNonSelectableItems(scrollElement);
             }
