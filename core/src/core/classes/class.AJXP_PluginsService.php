@@ -140,7 +140,11 @@ class AJXP_PluginsService{
             $this->registry[$plugType] = array();
         }
         $plugin = $this->instanciatePluginClass($plugin);
-        $options = $this->confStorage->loadPluginConfig($plugType, $plugin->getName());
+        if($plugType == "conf" || $plugin->getId() == "core.conf"){
+            $options = ConfService::getBootConfStorageImpl()->loadPluginConfig($plugType, $plugin->getName());
+        }else{
+            $options = $this->confStorage->loadPluginConfig($plugType, $plugin->getName());
+        }
         $plugin->loadConfigs($options);
         $this->registry[$plugType][$plugin->getName()] = $plugin;
         $plugin->loadingState = "loaded";

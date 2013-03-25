@@ -44,6 +44,18 @@ class ConfService
         return $corePlug->getConfImpl();
 
 	}
+
+    /**
+     * @return AbstractConfDriver
+     */
+    public static function getBootConfStorageImpl(){
+        $inst = AJXP_PluginsService::getInstance()->findPluginById("boot.conf");
+        if(empty($inst)){
+            $inst = AJXP_PluginsService::getInstance()->softLoad("boot.conf", array());
+        }
+        return $inst;
+    }
+
     /**
      * Initialize singleton
      * @static
