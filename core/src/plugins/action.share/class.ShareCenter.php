@@ -139,20 +139,18 @@ class ShareCenter extends AJXP_Plugin{
                     if(count($customData)){
                         $data["PLUGINS_DATA"] = $customData;
                     }
-                    $url = $this->writePubliclet($data, $this->accessDriver, $this->repository);
+                    list($hash, $url) = $this->writePubliclet($data, $this->accessDriver, $this->repository);
                     $ajxpNode = new AJXP_Node($this->urlBase.$file);
                     if($ajxpNode->hasMetaStore()){
-                        $ar = explode(".", basename($url));
+                        //$ar = explode(".", basename($url));
                         $ajxpNode->setMetadata(
                             "ajxp_shared",
-                            array("element"     => array_shift($ar)),
+                            array("element"     => $hash),
                             true,
                             AJXP_METADATA_SCOPE_REPOSITORY,
                             true
                         );
-                        //AJXP_Controller::applyHook("node.meta_change", array(&$ajxpNode));
                     }
-                    $hash = md5(serialize($data));
 	                header("Content-type:text/plain");
                     AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
                     echo $url;
@@ -400,7 +398,7 @@ class ShareCenter extends AJXP_Plugin{
         // Cypher the data with a random key
         $outputData = serialize($data);
         // Hash the data to make sure it wasn't modified
-        $hash = md5($outputData);
+        $hash = $this->computeHash($outputData, $downloadFolder); // md5($outputData);
         // The initialisation vector is only required to avoid a warning, as ECB ignore IV
         $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
         // We have encoded as base64 so if we need to store the result in a database, it can be stored in text column
@@ -412,7 +410,7 @@ class ShareCenter extends AJXP_Plugin{
         '   $cypheredData = base64_decode("'.$outputData.'"); '."\n".
         '   $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND); '."\n".
         '   $inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $id, $cypheredData, MCRYPT_MODE_ECB, $iv), "\0");  '."\n".
-        '   if (md5($inputData) != $id) { header("HTTP/1.0 401 Not allowed, script was modified"); exit(); } '."\n".
+        '   if (!ShareCenter::checkHash($inputData, $id)) { header("HTTP/1.0 401 Not allowed, script was modified"); exit(); } '."\n".
         '   // Ok extract the data '."\n".
         '   $data = unserialize($inputData); ShareCenter::loadPubliclet($data); ?'.'>';
         if (@file_put_contents($downloadFolder."/".$hash.".php", $fileData) === FALSE){
@@ -420,7 +418,40 @@ class ShareCenter extends AJXP_Plugin{
         }
         @chmod($downloadFolder."/".$hash.".php", 0755);
         PublicletCounter::reset($hash);
-        return $this->buildPublicletLink($hash);
+        return array($hash, $this->buildPublicletLink($hash));
+    }
+
+    /**
+     * Computes a short form of the hash, checking if it already exists in the folder,
+     * in which case it increases the hashlength until there is no collision.
+     * @static
+     * @param String $outputData Serialized data
+     * @param String|null $checkInFolder Path to folder
+     * @return string
+     */
+    public function computeHash($outputData, $checkInFolder = null){
+        $length = $this->pluginConf["HASH_MIN_LENGTH"];
+        $full =  md5($outputData);
+        $starter = substr($full, 0, $length);
+        if($checkInFolder != null){
+            while(file_exists($checkInFolder.DIRECTORY_SEPARATOR.$starter.".php")){
+                $length ++;
+                $starter = substr($full, 0, $length);
+            }
+        }
+        return $starter;
+    }
+
+    /**
+     * Check if the hash seems to correspond to the serialized data.
+     * @static
+     * @param String $outputData serialized data
+     * @param String $hash Id to check
+     * @return bool
+     */
+    public static function checkHash($outputData, $hash){
+        $full = md5($outputData);
+        return (!empty($hash) && strpos($full, $hash) === 0);
     }
 
     function buildPublicDlURL(){
@@ -436,11 +467,18 @@ class ShareCenter extends AJXP_Plugin{
     }
 
     function buildPublicletLink($hash){
-        return $this->buildPublicDlURL()."/".$hash.".php?lang=".ConfService::getLanguage();
+        $addLang = ConfService::getLanguage() != ConfService::getCoreConf("DEFAULT_LANGUAGE");
+        if($this->pluginConf["USE_REWRITE_RULE"] == true){
+            if($addLang) return $this->buildPublicDlURL()."/".$hash."-".ConfService::getLanguage();
+            else return $this->buildPublicDlURL()."/".$hash;
+        }else{
+            if($addLang) return $this->buildPublicDlURL()."/".$hash.".php?lang=".ConfService::getLanguage();
+            else return $this->buildPublicDlURL()."/".$hash.".php";
+        }
     }
 
     function initPublicFolder($downloadFolder){
-        if(is_file($downloadFolder."/down.png")){
+        if(is_file($downloadFolder."/grid_t.png")){
             return;
         }
         $language = ConfService::getLanguage();
@@ -461,7 +499,22 @@ class ShareCenter extends AJXP_Plugin{
         @copy($pDir."/res/grid_t.png", $downloadFolder."/grid_t.png");
         @copy($pDir."/res/button_cancel.png", $downloadFolder."/button_cancel.png");
         @copy(AJXP_INSTALL_PATH."/server/index.html", $downloadFolder."/index.html");
-        file_put_contents($downloadFolder."/.htaccess", "ErrorDocument 404 ".$this->buildPublicDlURL()."/404.html\n<Files \".ajxp_*\">\ndeny from all\n</Files>");
+        $dlUrl = $this->buildPublicDlURL();
+        $htaccessContent = "ErrorDocument 404 ".$dlUrl."/404.html\n<Files \".ajxp_*\">\ndeny from all\n</Files>";
+        if($this->pluginConf["USE_REWRITE_RULE"] == true){
+            $path = parse_url($dlUrl, PHP_URL_PATH);
+            $htaccessContent .= '
+            <IfModule mod_rewrite.c>
+            RewriteEngine on
+            RewriteBase '.$path.'
+            RewriteCond %{REQUEST_FILENAME} !-f
+            RewriteCond %{REQUEST_FILENAME} !-d
+            RewriteRule ^([a-z0-9]+)-([a-z]+)$ $1.php?lang=$2 [L]
+            RewriteRule ^([a-z0-9]+)$ $1.php [L]
+            </IfModule>
+            ';
+        }
+        file_put_contents($downloadFolder."/.htaccess", $htaccessContent);
         $content404 = file_get_contents($pDir."/res/404.html");
         $content404 = str_replace(array("AJXP_MESSAGE_TITLE", "AJXP_MESSAGE_LEGEND"), array($sTitle, $sLegend), $content404);
         file_put_contents($downloadFolder."/404.html", $content404);
@@ -923,7 +976,7 @@ class ShareCenter extends AJXP_Plugin{
         $inputData = '';
         $code = $lines[3] . $lines[4] . $lines[5];
         eval($code);
-        $dataModified = (md5($inputData) != $id);
+        $dataModified = self::checkHash($inputData, $id); //(md5($inputData) != $id);
         $publicletData = unserialize($inputData);
         $publicletData["SECURITY_MODIFIED"] = $dataModified;
         $publicletData["DOWNLOAD_COUNT"] = PublicletCounter::getCount($id);

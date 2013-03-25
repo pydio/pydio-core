@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin name="share" label="CONF_MESSAGE[Sharing Features]" description="CONF_MESSAGE[Share Center actions and hooks]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <server_settings>
+        <global_param name="USE_REWRITE_RULE" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Use web server RewriteEngine mechanism to generate prettier URLs]" label="CONF_MESSAGE[Use Rewrite Rule]" type="boolean" default="true" expose="false"/>
+        <global_param name="HASH_MIN_LENGTH" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Minimum length of the generated hash]" label="CONF_MESSAGE[Hash minimum length]" type="integer" default="6" expose="false"/>
         <global_param name="SHARED_USERS_LIST_MINIMUM" group="CONF_MESSAGE[Shared users configurations]" description="CONF_MESSAGE[Minimum number of characters to start getting results by auto-completion when sharing a folder with other users]" label="CONF_MESSAGE[Autocomplete minimum chars]" type="integer" default="2" expose="true"/>
         <global_param name="SHARED_USERS_LIST_LIMIT" group="CONF_MESSAGE[Shared users configurations]" description="CONF_MESSAGE[Limit the number of results returned by the auto-completion feature when sharing a folder with other users]" label="CONF_MESSAGE[Autocompletion results limit]" type="integer" default="50" expose="true"/>
         <global_param name="SHARED_USERS_TMP_PREFIX" group="CONF_MESSAGE[Shared users configurations]" description="CONF_MESSAGE[Mandatory prefix for users created temporary users login]" label="CONF_MESSAGE[Tmp users prefix]" type="string" expose="true"/>
