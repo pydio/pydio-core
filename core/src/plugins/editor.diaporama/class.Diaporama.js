@@ -707,9 +707,9 @@ Class.create("Diaporama", AbstractEditor, {
             var realLeftOffset = Math.max(off.left, theImage.parentNode.positionedOffset().left);
 			theImage.previewOpener.setStyle({
                 display:'block',
-                left: realLeftOffset + 'px',
-                width:theImage.getWidth() + "px",
-                top: (off.top + theImage.getHeight() - theImage.previewOpener.getHeight()) + "px"
+                left: (realLeftOffset + 1) + 'px',
+                width: (theImage.getWidth() - 2) + "px",
+                top: (off.top + theImage.getHeight() - theImage.previewOpener.getHeight() -1 )  + "px"
             });
 		});
 		img.observe("mouseout", function(event){
