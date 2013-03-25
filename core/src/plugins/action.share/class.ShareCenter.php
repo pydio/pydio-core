@@ -412,7 +412,7 @@ class ShareCenter extends AJXP_Plugin{
         '   $inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $id, $cypheredData, MCRYPT_MODE_ECB, $iv), "\0");  '."\n".
         '   if (!ShareCenter::checkHash($inputData, $id)) { header("HTTP/1.0 401 Not allowed, script was modified"); exit(); } '."\n".
         '   // Ok extract the data '."\n".
-        '   $data = unserialize($inputData); ShareCenter::loadPubliclet($data); ?'.'>';
+        '   $data = unserialize($inputData); ShareCenter::loadPubliclet($data); ';
         if (@file_put_contents($downloadFolder."/".$hash.".php", $fileData) === FALSE){
             return "Can't write to PUBLIC URL";
         }
@@ -521,6 +521,14 @@ class ShareCenter extends AJXP_Plugin{
 
     }
 
+    static function loadMinisite($data){
+        $repository = $data["REPOSITORY"];
+        $uniqueUser = $data["UNIQUE_USER"];
+        $html = file_get_contents(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/res/minisite.php");
+        $html = str_replace("AJXP_START_REPOSITORY", $repository, $html);
+        echo($html);
+    }
+
     /**
      * @static
      * @param Array $data
@@ -615,6 +623,8 @@ class ShareCenter extends AJXP_Plugin{
 
     /**
      * @param String $repoId
+     * @param $mixUsersAndGroups
+     * @param $currentFileUrl
      * @return array
      */
     function computeSharedRepositoryAccessRights($repoId, $mixUsersAndGroups, $currentFileUrl){

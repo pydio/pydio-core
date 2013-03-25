@@ -230,7 +230,9 @@ class AJXP_ClientDriver extends AJXP_Plugin
 			//	GET CONFIG FOR BOOT
 			//------------------------------------
 			case "get_boot_conf":
-				
+
+                $out = array();
+                AJXP_Utils::parseApplicationGetParameters($_GET, $out, $_SESSION);
                 $config = $this->computeBootConf();
 				header("Content-type:application/json;charset=UTF-8");
 				print(json_encode($config));
