@@ -909,6 +909,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 
     /**
      * @param AJXP_Node $ajxpNode
+     * @param bool $parentNode
+     * @param bool $details
      * @return void
      */
     function loadNodeInfo(&$ajxpNode, $parentNode = false, $details = false){

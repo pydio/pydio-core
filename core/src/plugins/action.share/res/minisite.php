@@ -14,8 +14,7 @@
 				padding: 5px;
 			}
 			#ajxp_shared_folder{
-				width:600px;
-				height:90%;
+				width:100%;
 				text-align:left;
 				/* THESE ONE ARE IMPORTANT */
 				overflow:hidden;
@@ -51,7 +50,7 @@
 	<body marginheight="0" marginwidth="0" leftmargin="0" topmargin="0">
 	<div align="center">
 		<div class="widget_title">AjaXplorer Shared Folder</div>
-		<div id="ajxp_shared_folder" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"window", "fitMarginBottom":40}'></div>
+		<div id="ajxp_shared_folder" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"window"}'></div>
 	</div>		
 	</body>
 </html>
