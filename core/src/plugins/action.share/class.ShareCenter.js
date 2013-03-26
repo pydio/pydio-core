@@ -20,12 +20,35 @@
 Class.create("ShareCenter", {
 
     currentNode : null,
+    shareFolderMode : "workspace",
 
     performShareAction : function(){
         var userSelection = ajaxplorer.getUserSelection();
         this.currentNode = userSelection.getUniqueNode();
+        this.shareFolderMode = "workspace";
         if(userSelection.hasDir() && !userSelection.hasMime($A(['ajxp_browsable_archive']))){
-            this.shareRepository();
+            var nodeMeta = this.currentNode.getMetadata();
+            if(!nodeMeta.get("ajxp_shared")){
+                var oThis = this;
+                modal.showDialogForm("Share", "share_folder_chooser", function(oForm){
+                    oForm.down('[name="ok"]').setStyle({opacity:0.5});
+                    oForm.down("ul.share_chooser_list").select("li").each(function(el){
+                        el.observe("click", function(){
+                            oForm.down("ul.share_chooser_list").select("li").invoke("removeClassName", "selected");
+                            el.addClassName("selected");
+                            oThis.shareFolderMode = el.getAttribute("data-shareListValue");
+                            oForm.down('[name="ok"]').setStyle({opacity:1});
+                        });
+                    });
+                }, function(){
+                    this.shareRepository();
+                }.bind(this), function(){}, false,false, true);
+            }else{
+                if(nodeMeta.get("ajxp_shared_minisite")){
+                    this.shareFolderMode = nodeMeta.get("ajxp_shared_minisite") == "public" ? "minisite_public" : "minisite_private";
+                }
+                this.shareRepository();
+            }
         }else{
             this.shareFile(userSelection);
         }
@@ -33,11 +56,130 @@ Class.create("ShareCenter", {
 
     shareRepository : function(reload){
 
+        var submitFunc = function(oForm){
+            if(!oForm.down('input[name="repo_label"]').value){
+                alert(MessageHash[349]);
+                return false;
+            }
+            var userSelection = ajaxplorer.getUserSelection();
+            var publicUrl = ajxpServerAccessPath+'&get_action=share';
+            publicUrl = userSelection.updateFormOrUrl(null, publicUrl);
+            var conn = new Connexion(publicUrl);
+            conn.setMethod("POST");
+            var params = modal.getForm().serialize(true);
+            conn.setParameters(params);
+            if(this._currentRepositoryId){
+                conn.addParameter("repository_id", this._currentRepositoryId);
+            }
+            if(this.shareFolderMode == "minisite_public"){
+                conn.addParameter("create_guest_user", "true");
+                conn.addParameter("sub_action", "create_minisite");
+            }else if(this.shareFolderMode == "minisite_private"){
+                conn.addParameter("sub_action", "create_minisite");
+            }else{
+                conn.addParameter("sub_action", "delegate_repo");
+            }
+            var index = 0;
+            $("shared_users_summary").select("div.user_entry").each(function(entry){
+                conn.addParameter("user_"+index, entry.getAttribute("data-entry_id"));
+                conn.addParameter("right_read_"+index, entry.down('input[name="r"]').checked ? "true":"false");
+                conn.addParameter("right_write_"+index, entry.down('input[name="w"]').checked ? "true":"false");
+                if(entry.down('input[name="n"]')){
+                    conn.addParameter("right_watch_"+index, entry.down('input[name="n"]').checked ? "true":"false");
+                }
+                if(entry.NEW_USER_PASSWORD){
+                    conn.addParameter("user_pass_"+index, entry.NEW_USER_PASSWORD);
+                }
+                conn.addParameter("entry_type_"+index, entry.hasClassName("group_entry")?"group":"user");
+                index++;
+            });
+            if(oForm.down("#watch_folder")){
+                conn.addParameter("self_watch_folder",oForm.down("#watch_folder").checked?"true":"false");
+            }
+            if(this.shareFolderMode == "workspace"){
+                conn.onComplete = function(transport){
+                    var response = parseInt(transport.responseText);
+                    if(response == 200){
+                        if(this._currentRepositoryId){
+                            ajaxplorer.displayMessage('SUCCESS', MessageHash['share_center.19']);
+                        }else{
+                            ajaxplorer.displayMessage('SUCCESS', MessageHash['share_center.18']);
+                        }
+                        ajaxplorer.fireNodeRefresh(this.currentNode);
+                        this.currentNode.getMetadata().set("ajxp_shared", "true");
+                        this.shareRepository(true);
+                    }else{
+                        var messages = {100:349, 101:352, 102:350, 103:351};
+                        ajaxplorer.displayMessage('ERROR', MessageHash[messages[response]]);
+                        if(response == 101){
+                            oForm.down("#repo_label").focus();
+                        }
+                    }
+                }.bind(this);
+            }else{
+                oForm.down('div#generate_indicator').show();
+                conn.onComplete = function(transport){
+
+                    oForm.down('div#generate_indicator').hide();
+                    var response = transport.responseText;
+                    if(!response.startsWith('http')){
+                        response = parseInt(response);
+                        var messages = {100:349, 101:352, 102:350, 103:351};
+                        ajaxplorer.displayMessage('ERROR', MessageHash[messages[response]]?MessageHash[messages[response]]:'Unknown error code :'+response);
+                        if(response == 101){
+                            oForm.down("#repo_label").focus();
+                        }
+                    }else{
+                        this.currentNode.getMetadata().set("ajxp_shared", "true");
+                        ajaxplorer.fireNodeRefresh(this.currentNode);
+                        ajaxplorer.displayMessage('SUCCESS', 'Created a new public folder at ' + response);
+                        oForm.down("#share_container").setValue(response);
+                        oForm.down("#share_container").select();
+                        oForm.down("#share_unshare").show();
+                        oForm.down("#share_generate").hide();
+                        this.updateDialogButtons(oForm.next("div.dialogButtons"), "folder");
+                    }
+
+                }.bind(this);
+            }
+            //closeFunc(oForm);
+            conn.sendAsync();
+            return false;
+        }.bind(this);
+
         var loadFunc = function(oForm){
 
             if(reload){
                 addLightboxMarkupToElement(oForm.up(".dialogContent"));
             }
+
+            oForm.down("#target_user_title").insert({after:oForm.down("#target_user")});
+            if(this.shareFolderMode == "minisite_public"){
+
+                oForm.select(".mode-ws").invoke('hide');
+                oForm.select(".mode-minipriv").invoke('hide');
+                oForm.select(".mode-minipub").invoke('show');
+
+            }else if(this.shareFolderMode == "minisite_private"){
+
+                oForm.select(".mode-ws").invoke('hide');
+                oForm.select(".mode-minipub").invoke('hide');
+                oForm.select(".mode-minipriv").invoke('show');
+                oForm.down(".editable_users_list").setStyle({height: '80px'});
+                oForm.down("#share_generate").insert({before:oForm.down("#target_user")});
+
+            }else{
+                oForm.select(".mode-minipriv").invoke('hide');
+                oForm.select(".mode-minipub").invoke('hide');
+                oForm.select(".mode-ws").invoke('show');
+                oForm.down(".editable_users_list").setStyle({height: '160px'});
+            }
+            if(!reload){
+                modal.refreshDialogPosition();
+            }
+
+
+
             var nodeMeta = this.currentNode.getMetadata();
             if(nodeMeta.get("ajxp_shared")){
                 // Reorganize
@@ -89,6 +231,7 @@ Class.create("ShareCenter", {
             this._currentRepositoryLink = null;
             this._currentRepositoryLabel = null;
             if(nodeMeta.get("ajxp_shared")){
+                oForm.down('div#share_generate').hide();
                 oForm.down('div#share_unshare').show();
                 oForm.down('#unshare_button').observe("click", this.performUnshareAction.bind(this));
                 oForm.down('#complete_indicator').show();
@@ -98,6 +241,10 @@ Class.create("ShareCenter", {
                     this._currentRepositoryLink = json['repository_url'];
                     oForm.down('input#repo_label').value = json['label'];
                     oForm.down('#complete_indicator').hide();
+                    if(json.minisite){
+                        oForm.down('#share_container').setValue(json.minisite.public_link);
+                        this._currentRepositoryLink = json.minisite.public_link;
+                    }
                     $A(json['entries']).each(function(u){
                         var newItem =  $('share_folder_form').autocompleter.createUserEntry(u.TYPE=="group", u.TYPE =="tmp_user", u.ID, u.LABEL);
                         updateUserEntryAfterCreate(newItem, (u.RIGHT?u.RIGHT:""), u.WATCH);
@@ -135,6 +282,10 @@ Class.create("ShareCenter", {
                 });
             });
             this.updateDialogButtons($("share_folder_form").next("div.dialogButtons"), "folder");
+            if(this.shareFolderMode != "workspace"){
+                oForm.down("#generate_publiclet").observe("click", function(){submitFunc(oForm);} );
+            }
+
         }.bind(this);
         var closeFunc = function (oForm){
             if(Prototype.Browser.IE){
@@ -147,65 +298,17 @@ Class.create("ShareCenter", {
                 $('create_shared_user').select('div.dialogButtons>input').invoke("removeClassName", "dialogButtons");
             }
         }
-        var submitFunc = function(oForm){
-            if(!oForm.down('input[name="repo_label"]').value){
-                alert(MessageHash[349]);
-                return false;
-            }
-            var userSelection = ajaxplorer.getUserSelection();
-            var publicUrl = ajxpServerAccessPath+'&get_action=share&sub_action=delegate_repo';
-            publicUrl = userSelection.updateFormOrUrl(null, publicUrl);
-            var conn = new Connexion(publicUrl);
-            conn.setMethod("POST");
-            var params = modal.getForm().serialize(true);
-            conn.setParameters(params);
-            if(this._currentRepositoryId){
-                conn.addParameter("repository_id", this._currentRepositoryId);
-            }
-            var index = 0;
-            $("shared_users_summary").select("div.user_entry").each(function(entry){
-                conn.addParameter("user_"+index, entry.getAttribute("data-entry_id"));
-                conn.addParameter("right_read_"+index, entry.down('input[name="r"]').checked ? "true":"false");
-                conn.addParameter("right_write_"+index, entry.down('input[name="w"]').checked ? "true":"false");
-                if(entry.down('input[name="n"]')){
-                    conn.addParameter("right_watch_"+index, entry.down('input[name="n"]').checked ? "true":"false");
-                }
-                if(entry.NEW_USER_PASSWORD){
-                    conn.addParameter("user_pass_"+index, entry.NEW_USER_PASSWORD);
-                }
-                conn.addParameter("entry_type_"+index, entry.hasClassName("group_entry")?"group":"user");
-                index++;
-            });
-            if(oForm.down("#watch_folder")){
-                conn.addParameter("self_watch_folder",oForm.down("#watch_folder").checked?"true":"false");
-            }
-            conn.onComplete = function(transport){
-                var response = parseInt(transport.responseText);
-                if(response == 200){
-                    if(this._currentRepositoryId){
-                        ajaxplorer.displayMessage('SUCCESS', MessageHash['share_center.19']);
-                    }else{
-                        ajaxplorer.displayMessage('SUCCESS', MessageHash['share_center.18']);
-                    }
-                    //hideLightBox(true);
-                    this.currentNode.getMetadata().set("ajxp_shared", true);
-                    this.shareRepository(true);
-                }else{
-                    var messages = {100:349, 101:352, 102:350, 103:351};
-                    ajaxplorer.displayMessage('ERROR', MessageHash[messages[response]]);
-                    if(response == 101){
-                        oForm.down("#repo_label").focus();
-                    }
-                }
-            }.bind(this);
-            //closeFunc(oForm);
-            conn.sendAsync();
-            return false;
-        }.bind(this);
         if(window.ajxpBootstrap.parameters.get("usersEditable") == false){
             ajaxplorer.displayMessage('ERROR', MessageHash[394]);
         }else{
-            modal.showDialogForm('Get', 'share_folder_form', loadFunc, submitFunc, closeFunc);
+            modal.showDialogForm('Get',
+                'share_folder_form',
+                loadFunc,
+                (this.shareFolderMode != "workspace" ? function(){hideLightBox();} : submitFunc),
+                closeFunc,
+                (this.shareFolderMode != "workspace" ? true: false),
+                false
+            );
         }
     },
 
@@ -271,8 +374,11 @@ Class.create("ShareCenter", {
 
     },
 
-    loadSharedElementData : function(uniqueNode, jsonCallback){
+    loadSharedElementData : function(uniqueNode, jsonCallback, discrete){
         var conn = new Connexion();
+        if(discrete){
+            conn.discrete = true;
+        }
         conn.addParameter("get_action", "load_shared_element_data");
         conn.addParameter("file", uniqueNode.getPath());
         conn.addParameter("element_type", uniqueNode.isLeaf() ? "file" : "repository");
@@ -315,7 +421,16 @@ Class.create("ShareCenter", {
                 $A(jsonData.entries).each(function(entry){
                     entries.push(entry.LABEL + ' ('+ entry.RIGHT +')');
                 });
-                container.down('#ajxp_shared_info_panel table').update('\
+                var linkString = '';
+                if(jsonData.minisite){
+                    linkString = '\
+                    <tr>\
+                        <td class="infoPanelLabel">'+MessageHash['share_center.50']+'</td>\
+                        <td class="infoPanelValue"><textarea style="width:100%;height: 40px;">'+ jsonData.minisite.public_link +'</textarea></td>\
+                    </tr>\
+                    ';
+                }
+                container.down('#ajxp_shared_info_panel table').update(linkString + '\
                     <tr>\
                         <td class="infoPanelLabel">'+MessageHash['share_center.35']+'</td>\
                         <td class="infoPanelValue">'+ jsonData.label +'</td>\
@@ -326,7 +441,7 @@ Class.create("ShareCenter", {
                     </tr>\
                 ');
             }
-        });
+        }, true);
     },
 
     performUnshareAction : function(){

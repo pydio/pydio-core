@@ -119,13 +119,33 @@ class ShareCenter extends AJXP_Plugin{
             //------------------------------------
             case "share":
             	$subAction = (isSet($httpVars["sub_action"])?$httpVars["sub_action"]:"");
+                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $ajxpNode = new AJXP_Node($this->urlBase.$file);
+                $metadata = null;
+
             	if($subAction == "delegate_repo"){
 					header("Content-type:text/plain");
 					$result = $this->createSharedRepository($httpVars, $this->repository, $this->accessDriver);
+                    if(is_a($result, "Repository")){
+                        $metadata = array("element" => $result->getUniqueId());
+                        $numResult = 200;
+                    }else{
+                        $numResult = $result;
+                    }
                     AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
-                    print($result);
+                    print($numResult);
+                }else if ($subAction == "create_minisite"){
+                    header("Content-type:text/plain");
+                    $res = $this->createSharedMinisite($httpVars, $this->repository, $this->accessDriver);
+                    if(is_int($res) && !is_array($res)){
+                        $url = $res;
+                    }else{
+                        list($hash, $url) = $res;
+                        $metadata = array("element" => $hash, "minisite" => (isSet($httpVars["create_guest_user"])?"public":"private"));
+                        AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
+                    }
+                    print($url);
             	}else{
-					$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                     if(!isSet($httpVars["downloadlimit"])){
                         $httpVars["downloadlimit"] = 0;
                     }
@@ -140,21 +160,21 @@ class ShareCenter extends AJXP_Plugin{
                         $data["PLUGINS_DATA"] = $customData;
                     }
                     list($hash, $url) = $this->writePubliclet($data, $this->accessDriver, $this->repository);
-                    $ajxpNode = new AJXP_Node($this->urlBase.$file);
-                    if($ajxpNode->hasMetaStore()){
-                        //$ar = explode(".", basename($url));
-                        $ajxpNode->setMetadata(
-                            "ajxp_shared",
-                            array("element"     => $hash),
-                            true,
-                            AJXP_METADATA_SCOPE_REPOSITORY,
-                            true
-                        );
-                    }
+                    $metadata = array("element" => $hash);
 	                header("Content-type:text/plain");
                     AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
                     echo $url;
             	}
+                if($metadata != null && $ajxpNode->hasMetaStore()){
+                    $ajxpNode->setMetadata(
+                        "ajxp_shared",
+                        $metadata,
+                        true,
+                        AJXP_METADATA_SCOPE_REPOSITORY,
+                        true
+                    );
+                }
+
             break;
 
             case "toggle_link_watch":
@@ -234,7 +254,14 @@ class ShareCenter extends AJXP_Plugin{
                              "element_watch"    => $elementWatch
                              );
                     }else if( $elementType == "repository"){
-                        $repoId = $metadata["element"];
+                        if(isSet($metadata["minisite"])){
+                            $minisiteData = self::loadPublicletData($metadata["element"]);
+                            $repoId = $minisiteData["REPOSITORY"];
+                            $minisiteIsPublic = isSet($minisiteData["PRELOG_USER"]);
+                            $minisiteLink = $this->buildPublicletLink($metadata["element"]);
+                        }else{
+                            $repoId = $metadata["element"];
+                        }
                         $repo = ConfService::getRepositoryById($repoId);
                         if($repo->getOwner() != AuthService::getLoggedUser()->getId()){
                             throw new Exception($messages["share_center.48"]);
@@ -255,6 +282,12 @@ class ShareCenter extends AJXP_Plugin{
                             "element_watch" => $elementWatch,
                             "repository_url"=> AJXP_Utils::detectServerURL(true)."?goto=". $repo->getSlug() ."/"
                         );
+                        if(isSet($minisiteData)){
+                            $jsonData["minisite"] = array(
+                                "public" => $minisiteIsPublic?"true":"false",
+                                "public_link" => $minisiteLink
+                            );
+                        }
                     }
                     echo json_encode($jsonData);
                 }
@@ -271,9 +304,10 @@ class ShareCenter extends AJXP_Plugin{
                     AJXP_METADATA_SCOPE_REPOSITORY
                 );
                 if(count($metadata)){
-                    self::deleteSharedElement($httpVars["element_type"], $metadata["element"], AuthService::getLoggedUser());
+                    $eType = $httpVars["element_type"];
+                    if(isSet($metadata["minisite"])) $eType = "minisite";
+                    self::deleteSharedElement($eType, $metadata["element"], AuthService::getLoggedUser());
                     $ajxpNode->removeMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-                    //AJXP_Controller::applyHook("node.meta_change", array(&$ajxpNode));
                 }
                 AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
 
@@ -308,14 +342,18 @@ class ShareCenter extends AJXP_Plugin{
         if($this->accessDriver->getId() == "access.imap") return;
         $metadata = $ajxpNode->retrieveMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
         if(count($metadata)){
-            if(!self::sharedElementExists($ajxpNode->isLeaf()?"file":"repository", $metadata["element"], AuthService::getLoggedUser())){
+            $eType = $ajxpNode->isLeaf()?"file":"repository";
+            if(isSet($metadata["minisite"])) $eType = "minisite";
+            if(!self::sharedElementExists($eType, $metadata["element"], AuthService::getLoggedUser())){
                 $ajxpNode->removeMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
                 return;
             }
-            $ajxpNode->mergeMetadata(array(
-                     "ajxp_shared"      => "true",
-                     "overlay_icon"     => "shared.png"
-                ), true);
+            $merge = array(
+                 "ajxp_shared"      => "true",
+                 "overlay_icon"     => "shared.png"
+            );
+            if($eType == "minisite") $merge["ajxp_shared_minisite"] = $metadata["minisite"];
+            $ajxpNode->mergeMetadata($merge, true);
         }
     }
 
@@ -330,7 +368,7 @@ class ShareCenter extends AJXP_Plugin{
 	 */
 	public function updateNodeSharedData($oldNode/*, $newNode = null, $copy = false*/){
         if($this->accessDriver->getId() == "access.imap") return;
-        if($oldNode == null) return;
+        if($oldNode == null || !$oldNode->hasMetaStore()) return;
         $metadata = $oldNode->retrieveMetadata("ajxp_shared", true);
         if(count($metadata) && !empty($metadata["element"])){
             // TODO
@@ -363,7 +401,7 @@ class ShareCenter extends AJXP_Plugin{
      *               - AUTHOR_WATCH If set, will post notifications for the publiclet author each time the file is loaded
      * @param AbstractAccessDriver $accessDriver
      * @param Repository $repository
-     * @return the URL to the downloaded file
+     * @return array An array containing the hash (0) and the generated url (1)
     */
     function writePubliclet(&$data, $accessDriver, $repository)
     {
@@ -399,11 +437,9 @@ class ShareCenter extends AJXP_Plugin{
         $outputData = serialize($data);
         // Hash the data to make sure it wasn't modified
         $hash = $this->computeHash($outputData, $downloadFolder); // md5($outputData);
-        // The initialisation vector is only required to avoid a warning, as ECB ignore IV
+
         $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
-        // We have encoded as base64 so if we need to store the result in a database, it can be stored in text column
         $outputData = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $hash, $outputData, MCRYPT_MODE_ECB, $iv));
-        // Okay, write the file:
         $fileData = "<"."?"."php \n".
         '   require_once("'.str_replace("\\", "/", AJXP_INSTALL_PATH).'/publicLet.inc.php"); '."\n".
         '   $id = str_replace(".php", "", basename(__FILE__)); '."\n". // Not using "" as php would replace $ inside
@@ -523,9 +559,13 @@ class ShareCenter extends AJXP_Plugin{
 
     static function loadMinisite($data){
         $repository = $data["REPOSITORY"];
-        $uniqueUser = $data["UNIQUE_USER"];
         $html = file_get_contents(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/res/minisite.php");
         $html = str_replace("AJXP_START_REPOSITORY", $repository, $html);
+        if(!empty($data["PRELOG_USER"])){
+            session_name("AjaXplorer");
+            session_start();
+            AuthService::logUser($data["PRELOG_USER"], "", true);
+        }
         echo($html);
     }
 
@@ -694,13 +734,70 @@ class ShareCenter extends AJXP_Plugin{
     }
 
     /**
+     * @param $httpVars
+     * @param $repository
+     * @param $accessDriver
+     * @return array An array containing the hash (0) and the generated url (1)
+     */
+    function createSharedMinisite($httpVars, $repository, $accessDriver){
+
+        $uniqueUser = null;
+        if(isSet($httpVars["create_guest_user"])){
+            // Create a guest user
+            $userId = substr(md5(time()), 0, 12);
+            if(!empty($this->pluginConf["SHARED_USERS_TMP_PREFIX"])){
+                $userId = $this->pluginConf["SHARED_USERS_TMP_PREFIX"].$userId;
+            }
+            $userPass = substr(md5(time()), 13, 24);
+            $httpVars["user_0"] = $userId;
+            $httpVars["user_pass_0"] = $httpVars["shared_pass"] = $userPass;
+            $httpVars["entry_type_0"] = "user";
+            $httpVars["right_read_0"] = ($httpVars["simple_right_read"] == "on" ? "true" : "false");
+            $httpVars["right_write_0"] = ($httpVars["simple_right_write"] == "on" ? "true" : "false");
+            $httpVars["right_watch_0"] = "false";
+            $httpVars["disable_download"] = ($httpVars["simple_right_download"] == "on" ? false : true);
+            $uniqueUser = $userId;
+        }
+
+        $newRepo = $this->createSharedRepository($httpVars, $repository, $accessDriver, $uniqueUser);
+
+        if(!is_a($newRepo, "Repository")) return $newRepo;
+
+        $newId = $newRepo->getId();
+        $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
+        $data = array("REPOSITORY"=>$newId, "PRELOG_USER"=>$userId);
+        $outputData = serialize($data);
+        $hash = self::computeHash($outputData, $downloadFolder);
+
+        $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
+        $outputData = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $hash, $outputData, MCRYPT_MODE_ECB, $iv));
+        $fileData = "<"."?"."php \n".
+        '   require_once("'.str_replace("\\", "/", AJXP_INSTALL_PATH).'/publicLet.inc.php"); '."\n".
+        '   $id = str_replace(".php", "", basename(__FILE__)); '."\n". // Not using "" as php would replace $ inside
+        '   $cypheredData = base64_decode("'.$outputData.'"); '."\n".
+        '   $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND); '."\n".
+        '   $inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $id, $cypheredData, MCRYPT_MODE_ECB, $iv), "\0");  '."\n".
+        '   if (!ShareCenter::checkHash($inputData, $id)) { header("HTTP/1.0 401 Not allowed, script was modified"); exit(); } '."\n".
+        '   // Ok extract the data '."\n".
+        '   $data = unserialize($inputData); ShareCenter::loadMinisite($data); ';
+        if (@file_put_contents($downloadFolder."/".$hash.".php", $fileData) === FALSE){
+            return "Can't write to PUBLIC URL";
+        }
+        @chmod($downloadFolder."/".$hash.".php", 0755);
+
+        return array($hash, $this->buildPublicletLink($hash));
+
+    }
+
+    /**
      * @param Array $httpVars
      * @param Repository $repository
      * @param AbstractAccessDriver $accessDriver
-     * @return int
+     * @param null $uniqueUser
      * @throws Exception
+     * @return int|Repository
      */
-    function createSharedRepository($httpVars, $repository, $accessDriver){
+    function createSharedRepository($httpVars, $repository, $accessDriver, $uniqueUser = null){
 		// ERRORS
 		// 100 : missing args
 		// 101 : repository label already exists
@@ -875,6 +972,9 @@ class ShareCenter extends AJXP_Plugin{
             }
             // CREATE USER WITH NEW REPO RIGHTS
             $userObject->personalRole->setAcl($newRepo->getUniqueId(), $uRights[$userName]);
+            if(isSet($httpVars["disable_download"])){
+                $userObject->personalRole->setActionState("access.fs", "download", $newRepo->getUniqueId(), "disabled");
+            }
             $userObject->save("superuser");
             if($this->watcher !== false){
                 // Register a watch on the current folder for shared user
@@ -915,20 +1015,7 @@ class ShareCenter extends AJXP_Plugin{
             AuthService::updateRole($grRole);
         }
 
-        // METADATA
-        $ajxpNode = new AJXP_Node($this->urlBase.$file);
-        if(!isSet($editingRepo) && $ajxpNode->hasMetaStore()){
-            $ajxpNode->setMetadata(
-                "ajxp_shared",
-                array("element" => $newRepo->getUniqueId()),
-                true,
-                AJXP_METADATA_SCOPE_REPOSITORY,
-                true
-            );
-            //AJXP_Controller::applyHook("node.meta_change", array(&$ajxpNode));
-        }
-
-    	return 200;
+    	return $newRepo;
     }
 
 
@@ -952,6 +1039,23 @@ class ShareCenter extends AJXP_Plugin{
                     throw new Exception($mess["ajxp_conf.51"]);
                 }
             }
+        }else if( $type == "minisite"){
+            $minisiteData = self::loadPublicletData($element);
+            $repoId = $minisiteData["REPOSITORY"];
+            $repo = ConfService::getRepositoryById($repoId);
+            if(!$repo->hasOwner() || $repo->getOwner() != $loggedUser->getId()){
+                throw new Exception($mess["ajxp_shared.12"]);
+            }else{
+                $res = ConfService::deleteRepository($repoId);
+                if($res == -1){
+                    throw new Exception($mess["ajxp_conf.51"]);
+                }
+                // If guest user created, remove it now.
+                if(isSet($minisiteData["PRELOG_USER"])){
+                    AuthService::deleteUser($minisiteData["PRELOG_USER"]);
+                }
+                unlink($minisiteData["PUBLICLET_PATH"]);
+            }
         }else if( $type == "user" ){
             $confDriver = ConfService::getConfStorageImpl();
             $object = $confDriver->createUserObject($element);
@@ -974,7 +1078,7 @@ class ShareCenter extends AJXP_Plugin{
     public static function sharedElementExists($type, $element, $loggedUser){
         if($type == "repository"){
             return (ConfService::getRepositoryById($element) != null);
-        }else if($type == "file"){
+        }else if($type == "file" || $type == "minisite"){
             $dlFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
             return is_file($dlFolder."/".$element.".php");
         }
@@ -992,7 +1096,9 @@ class ShareCenter extends AJXP_Plugin{
         $dataModified = self::checkHash($inputData, $id); //(md5($inputData) != $id);
         $publicletData = unserialize($inputData);
         $publicletData["SECURITY_MODIFIED"] = $dataModified;
-        $publicletData["DOWNLOAD_COUNT"] = PublicletCounter::getCount($id);
+        if(!isSet($publicletData["REPOSITORY"])){
+            $publicletData["DOWNLOAD_COUNT"] = PublicletCounter::getCount($id);
+        }
         $publicletData["PUBLICLET_PATH"] = $file;
         return $publicletData;
     }
