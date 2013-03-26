@@ -413,11 +413,9 @@ abstract class AbstractAjxpUser
     }
 
     protected function orderRoles($r1, $r2){
-        if(strpos($r1, "AJXP_GRP_") === 0) return -1;
-        if(strpos($r2, "AJXP_GRP_") === 0) return 1;
         if(strpos($r1, "AJXP_USR_") === 0) return 1;
         if(strpos($r2, "AJXP_USR_") === 0) return -1;
-        return 0;
+        return strcmp($r1,$r2);
     }
 
     public function setResolveAsParent($resolveAsParent)
