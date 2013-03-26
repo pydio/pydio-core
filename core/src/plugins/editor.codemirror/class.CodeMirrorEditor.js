@@ -109,6 +109,9 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 		var fileName = nodeOrNodes.getPath();
 		
 		var path = 'plugins/editor.codemirror/CodeMirror/';
+        if(window.ajxpBootstrap.parameters.get("SERVER_PREFIX_URI")){
+            path = window.ajxpBootstrap.parameters.get("SERVER_PREFIX_URI")+"plugins/editor.codemirror/CodeMirror/";
+        }
 		var extension = getFileExtension(fileName);
 		var parserFile; var styleSheet;
 		var parserConfig = {};
@@ -248,6 +251,9 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 		this.options.indentUnit = this.indentSize;
 		this.options.textWrapping = this.textWrapping;
 		this.options.lineNumbers = this.lineNumbers;
+        if(window.ajxpBootstrap.parameters.get("SERVER_PREFIX_URI")){
+            this.options.path = window.ajxpBootstrap.parameters.get("SERVER_PREFIX_URI")+"plugins/editor.codemirror/CodeMirror/js/";
+        }
 
 		this.options.onLoad = onLoad? onLoad : function(mirror){
 			if(this.currentCode){

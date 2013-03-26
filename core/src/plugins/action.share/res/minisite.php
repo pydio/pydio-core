@@ -1,12 +1,11 @@
 <html xmlns:ajxp>
 	<head>
-        <base href="/ajaxplorer/plugins/gui.ajax/"/>
 		<title>AjaXplorer</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<link rel="icon" type="image/x-png" href="res/themes/vision/images/html-folder.png">
-		<link rel="stylesheet" type="text/css" href="res/themes/vision/css/allz.css">
-        <link rel="stylesheet" href="res/themes/vision/css/font-awesome.css"/>
-        <link rel="stylesheet" href="res/themes/vision/css/media.css"/>
+		<link rel="icon" type="image/x-png" href="../../plugins/gui.ajax/res/themes/vision/images/html-folder.png">
+		<link rel="stylesheet" type="text/css" href="../../plugins/gui.ajax/res/themes/vision/css/allz.css">
+        <link rel="stylesheet" href="../../plugins/gui.ajax/res/themes/vision/css/font-awesome.css"/>
+        <link rel="stylesheet" href="../../plugins/gui.ajax/res/themes/vision/css/media.css"/>
 		<style type="text/css">
 			.widget_title{
 				font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
@@ -32,7 +31,7 @@
                 border-left-width: 0;
             }
 		</style>
-		<script language="javascript" type="text/javascript" src="res/js/ajaxplorer_boot.js"></script>
+		<script language="javascript" type="text/javascript" src="../../plugins/gui.ajax/res/js/ajaxplorer_boot.js"></script>
 		<script type="text/javascript">
 			var ajaxplorer, MessageHash={};
 			var startParameters = {
