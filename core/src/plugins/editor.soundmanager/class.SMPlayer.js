@@ -203,6 +203,9 @@ Class.create("SMPlayer", AbstractEditor, {
         window.setTimeout(function(){
             try{this.currentRichPreview.down('span.sm2-360btn').click();}catch(e){}
         }.bind(this), 400);
+        modal.setCloseValidation(function(){
+            this.currentRichPreview.destroyElement();
+        }.bind(this));
     },
 
     /**

@@ -136,7 +136,6 @@ Class.create("VideoPreviewer", AbstractEditor, {
 				};
                 div.destroyElement = function(){
                     if(div.ajxpPlayer){
-                        console.log(div.ajxpPlayer);
                         div.ajxpPlayer.pause();
                         try{
                             $A(div.children).invoke("remove");
