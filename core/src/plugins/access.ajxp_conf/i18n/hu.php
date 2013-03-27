@@ -95,7 +95,6 @@ $mess=array(
 "73" => "Szerep hozzáadva ehhez a felhasználóhoz: ",
 "74" => "Szerep elvéve ettől a felhasználótól: ",
 "75" => "Új szerep",
-"role_access" => "o",
 "76" => "Szerep azonosító",
 "77" => "Hozzáférés",
 "78" => "Személyes adatok",
@@ -117,7 +116,6 @@ $mess=array(
 "94" => "Csoportos szerkesztés",
 "95" => "Válassz egy címkét és az adatok eléréséhez egy driver-t (figyelj a kötelező mezőkre, mozgasd az egeret a címkék fölé további információért).",
 "96" => "A címke és a driver kiválasztása után a jelölőnégyzetek segítségével állítsd be a sablonban előre kitöltött mezőket. A nem kijelölt mezőket a felhasználó töltheti ki. Egy kiválasztott mezőt üresen hagyva a mező rejtve marad a felhasználó elől.",
-"repository_access_key" => "N",
 "97" => "Plugin beállítások sikeresen módosítva",
 "98" => "Core beállítások",
 "99" => "Pluginek",
@@ -133,14 +131,13 @@ $mess=array(
 "109" => "Global beállítások",
 "110" => "Gyűjtemények & Felhasználók",
 "111" => "Naplók & egyéb adatok",
-"112" => "<b>Alapbeállításként hozzáadva</b> minden új felhasználóhoz.",
+"112" => "<b>Alapbeállításként legyen hozzáadva</b> minden új felhasználóhoz.",
 "113" => "Szerep státusza sikeresen módosítva",
 "114" => "Alapbeállítás",
 "115" => "Séma",
 "116" => "Sablon címke",
 "117" => "Sablon driver",
-"118" => "Új csoport",
-    "group_access" => "g",
+"118" => "Új csoport"
 
 /* END SENTENCE */
 );
