@@ -85,6 +85,9 @@
                 top: 1px;
                 right: 1px;
             }
+            #element_overlay{
+                top:0 !important; left:0 !important;
+            }
 		</style>
 		<script language="javascript" type="text/javascript" src="../../plugins/gui.ajax/res/js/ajaxplorer_boot.js"></script>
 		<script type="text/javascript">
