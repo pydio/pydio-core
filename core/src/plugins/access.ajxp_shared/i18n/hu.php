@@ -20,6 +20,7 @@
  */
 //  hungarian translation: Gyarmati Balázs <gyarmati.balazs@gmail.com>
 //  updates: Levente Huszkó <levente.huszko@gmail.com>
+//  fixed
 $mess=array(
 "1" => "Megosztott felhasználók",
 "2" => "Megosztott gyűjtemények",
