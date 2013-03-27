@@ -7,7 +7,7 @@
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" actionBarGroup="inline" contextMenu="true" infoPanel="true">
 				</context>
-				<selectionContext dir="true" file="false" recycle="false"
+				<selectionContext dir="true" file="true" recycle="false"
 					unique="true" allowedMimes="ajxp_folder,AJXP_MIMES_ZIP" behaviour="hidden">
 				</selectionContext>
 			</gui>
@@ -319,7 +319,7 @@
                     actionBar="true" contextMenu="true" infoPanel="false"
                     actionBarGroup="get" inZip="false">
                 </context>
-                <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE" behaviour="hidden"></selectionContext></gui>
+                <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE,^ajxp_browsable_archive,^zip" behaviour="hidden"></selectionContext></gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
             <subMenu>
                 <dynamicBuilder><![CDATA[
@@ -387,7 +387,7 @@
                     actionBar="true" contextMenu="true" infoPanel="false"
                     actionBarGroup="inline" inZip="false">
                 </context>
-                <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE" behaviour="hidden"></selectionContext></gui>
+                <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE,^ajxp_browsable_archive,^zip" behaviour="hidden"></selectionContext></gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
             <processing>
                 <clientCallback prepareModal="false"><![CDATA[
@@ -694,10 +694,10 @@
 				if(ajaxplorer){
 					var action = ajaxplorer.getActionBar().getActionByName("copy");
 					if(action){
-						//action.rightsContext.write = true;
+						action.rightsContext.write = true;
 						var ajxpUser = ajaxplorer.user;
 						if(ajxpUser && !ajxpUser.canWrite() && ajxpUser.canCrossRepositoryCopy() && ajxpUser.hasCrossRepositories()){
-							//action.rightsContext.write = false;
+							action.rightsContext.write = false;
 							action.selectionContext.dir = false;
 							ajaxplorer.actionBar.defaultActions.unset('ctrldragndrop');
 							ajaxplorer.actionBar.defaultActions.unset('dragndrop');

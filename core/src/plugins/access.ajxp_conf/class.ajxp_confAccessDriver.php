@@ -1207,7 +1207,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					}
 					AuthService::deleteRole($roleId);
 					AJXP_XMLWriter::header();
-					AJXP_XMLWriter::sendMessage($mess["ajxp_conf.66"], null);
+					AJXP_XMLWriter::sendMessage($mess["ajxp_conf.68"], null);
 					AJXP_XMLWriter::reloadDataNode();
 					AJXP_XMLWriter::close();
                 }else if(isSet($httpVars["group"])){

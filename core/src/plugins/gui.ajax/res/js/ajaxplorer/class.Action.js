@@ -242,6 +242,9 @@ Class.create("Action", {
 			if( !this.context.allowedMimes.include("*") && !this.context.allowedMimes.include(crtAjxpMime)){
 				return this.hideForContext();
 			}
+            if( this.context.allowedMimes.include("^"+crtAjxpMime)){
+                return this.hideForContext();
+            }
 		}
 		if(this.context.recycle){
 			if(this.context.recycle == 'only' && !crtIsRecycle){
@@ -319,6 +322,20 @@ Class.create("Action", {
 			if(selectionContext.behaviour == 'hidden') return this.hide();
 			else return this.disable();
 		}
+        if(selectionContext.allowedMimes.size() && userSelection && Object.toJSON(selectionContext.allowedMimes).indexOf("^") !== -1){
+            var forbiddenValueFound = false;
+            selectionContext.allowedMimes.each(function(m){
+                if(m.indexOf("^") == -1) return;
+                if(userSelection.hasMime([m.replace("^", "")])){
+                    forbiddenValueFound = true;
+                    throw $break;
+                }
+            });
+            if(forbiddenValueFound){
+                if(selectionContext.behaviour == 'hidden') return this.hide();
+       			else return this.disable();
+            }
+        }
 		this.show();
 		this.enable();
 		

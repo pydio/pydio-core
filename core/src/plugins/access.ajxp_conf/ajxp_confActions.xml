@@ -405,11 +405,11 @@
 					if(meta.get("ajxp_mime") == "user_editable"){
 						deleteMessage = MessageHash['ajxp_conf.34'];
 						fieldName = "user_id";
-						fieldValue = meta.get("text");
+						fieldValue = getBaseName(meta.get("filename"));
 					}else if(meta.get("ajxp_mime") == "role"){
 						deleteMessage = MessageHash['ajxp_shared.11'];
 						fieldName = "role_id";
-						fieldValue = meta.get("text");
+						fieldValue = getBaseName(meta.get("filename"));
 					}else if(meta.get("ajxp_mime") == "shared_file"){
 						deleteMessage = MessageHash['ajxp_shared.11'];
 						fieldName = "shared_file";
