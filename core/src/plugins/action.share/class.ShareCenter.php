@@ -561,6 +561,7 @@ class ShareCenter extends AJXP_Plugin{
         $repository = $data["REPOSITORY"];
         $html = file_get_contents(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/res/minisite.php");
         $html = str_replace("AJXP_START_REPOSITORY", $repository, $html);
+        $html = str_replace("AJXP_REPOSITORY_LABEL", ConfService::getRepositoryById($repository)->getDisplay(), $html);
         if(!empty($data["PRELOG_USER"])){
             session_name("AjaXplorer");
             session_start();

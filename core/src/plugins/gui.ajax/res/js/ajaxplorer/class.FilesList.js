@@ -1873,8 +1873,9 @@ Class.create("FilesList", SelectableElements, {
 
     addInlineToolbar : function(element, ajxpNode){
         if(this._inlineToolbarOptions){
+            var options = this._inlineToolbarOptions;
             if(!this._inlineToolbarOptions.unique){
-                var options = Object.extend(this._inlineToolbarOptions, {
+                options = Object.extend(this._inlineToolbarOptions, {
                     attachToNode: ajxpNode
                 });
             }

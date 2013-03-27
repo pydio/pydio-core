@@ -249,9 +249,11 @@ SelectableElements = Class.create({
 	// This method updates the UI of the item
 	setItemSelectedUi: function (oEl, bSelected) {
 		if (bSelected){
-			$(oEl).addClassName("selected");
-			$(oEl).addClassName("selected-focus");
-			
+            if(!this.options || !this.options.invisibleSelection){
+                $(oEl).addClassName("selected");
+                $(oEl).addClassName("selected-focus");
+            }
+
 			if(!this.skipScroll){
 				// CHECK THAT SCROLLING IS OK
 				var parent = this._htmlElement;
@@ -290,8 +292,9 @@ SelectableElements = Class.create({
 	focus: function()
 	{
 		this.hasFocus = true;
-		this.selectFirst();
-		for(var i=0; i < this._selectedItems.length;i++)
+        //this.selectFirst();
+        if(this.options && this.options.invisibleSelection) return;
+        for(var i=0; i < this._selectedItems.length;i++)
 		{
 			if(this._selectedItems[i])
 			{
@@ -303,6 +306,7 @@ SelectableElements = Class.create({
 	blur: function()
 	{
 		this.hasFocus = false;
+        if(this.options && this.options.invisibleSelection) return;
 		for(var i=0; i < this._selectedItems.length;i++)
 		{
 			if(this._selectedItems[i])
