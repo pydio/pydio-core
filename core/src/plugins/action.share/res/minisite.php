@@ -100,6 +100,7 @@
                document.documentElement.className += " ajxp_theme_vision";
            });
 			window.ajxpBootstrap = new AjxpBootstrap(startParameters);
+            window.ajxpMinisite = true;
 		</script>
 	</head>
 

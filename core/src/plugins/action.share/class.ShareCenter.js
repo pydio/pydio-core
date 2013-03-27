@@ -123,9 +123,13 @@ Class.create("ShareCenter", {
                     oForm.down('div#generate_indicator').hide();
                     var response = transport.responseText;
                     if(!response.startsWith('http')){
-                        response = parseInt(response);
+                        var iResponse = parseInt(response);
                         var messages = {100:349, 101:352, 102:350, 103:351};
-                        ajaxplorer.displayMessage('ERROR', MessageHash[messages[response]]?MessageHash[messages[response]]:'Unknown error code :'+response);
+                        var err;
+                        if(messages[iResponse]) err = MessageHash[messages[iResponse]];
+                        else if(MessageHash[response]) err = MessageHash[response];
+                        else err = 'Unknown error code ' + response;
+                        ajaxplorer.displayMessage('ERROR', err);
                         if(response == 101){
                             oForm.down("#repo_label").focus();
                         }
@@ -134,9 +138,12 @@ Class.create("ShareCenter", {
                         ajaxplorer.fireNodeRefresh(this.currentNode);
                         ajaxplorer.displayMessage('SUCCESS', 'Created a new public folder at ' + response);
                         oForm.down("#share_container").setValue(response);
+                        this._currentRepositoryLink = response;
+                        this._currentRepositoryLabel = oForm.down("#repo_label").getValue();
                         oForm.down("#share_container").select();
                         oForm.down("#share_unshare").show();
                         oForm.down("#share_generate").hide();
+                        oForm.down('#unshare_button').observe("click", this.performUnshareAction.bind(this));
                         this.updateDialogButtons(oForm.next("div.dialogButtons"), "folder");
                     }
 
@@ -173,9 +180,6 @@ Class.create("ShareCenter", {
                 oForm.select(".mode-minipub").invoke('hide');
                 oForm.select(".mode-ws").invoke('show');
                 oForm.down(".editable_users_list").setStyle({height: '160px'});
-            }
-            if(!reload){
-                modal.refreshDialogPosition();
             }
 
 
@@ -244,6 +248,14 @@ Class.create("ShareCenter", {
                     if(json.minisite){
                         oForm.down('#share_container').setValue(json.minisite.public_link);
                         this._currentRepositoryLink = json.minisite.public_link;
+                        oForm.down('#simple_right_download').checked = !(json.minisite.disable_download);
+                        if(json.entries && json.entries.length){
+                            oForm.down('#simple_right_read').checked = (json.entries[0].RIGHT.indexOf('r') !== -1);
+                            oForm.down('#simple_right_write').checked = (json.entries[0].RIGHT.indexOf('w') !== -1);
+                        }
+                        oForm.down('#simple_right_download').disable();
+                        oForm.down('#simple_right_read').disable();
+                        oForm.down('#simple_right_write').disable();
                     }
                     $A(json['entries']).each(function(u){
                         var newItem =  $('share_folder_form').autocompleter.createUserEntry(u.TYPE=="group", u.TYPE =="tmp_user", u.ID, u.LABEL);
@@ -284,6 +296,10 @@ Class.create("ShareCenter", {
             this.updateDialogButtons($("share_folder_form").next("div.dialogButtons"), "folder");
             if(this.shareFolderMode != "workspace"){
                 oForm.down("#generate_publiclet").observe("click", function(){submitFunc(oForm);} );
+            }
+
+            if(!reload){
+                window.setTimeout(modal.refreshDialogPosition.bind(modal), 400);
             }
 
         }.bind(this);

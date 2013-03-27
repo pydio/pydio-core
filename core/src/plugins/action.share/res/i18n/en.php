@@ -60,4 +60,5 @@ $mess = array(
     "55"=> "Shared...",
     "56"=> "Configure sharing...",
     "57"=> "times",
+    "58"=> "Please check at least one permission!",
 );

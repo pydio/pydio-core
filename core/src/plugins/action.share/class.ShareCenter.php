@@ -137,7 +137,7 @@ class ShareCenter extends AJXP_Plugin{
                 }else if ($subAction == "create_minisite"){
                     header("Content-type:text/plain");
                     $res = $this->createSharedMinisite($httpVars, $this->repository, $this->accessDriver);
-                    if(is_int($res) && !is_array($res)){
+                    if(!is_array($res)){
                         $url = $res;
                     }else{
                         list($hash, $url) = $res;
@@ -258,6 +258,7 @@ class ShareCenter extends AJXP_Plugin{
                             $minisiteData = self::loadPublicletData($metadata["element"]);
                             $repoId = $minisiteData["REPOSITORY"];
                             $minisiteIsPublic = isSet($minisiteData["PRELOG_USER"]);
+                            $dlDisabled = isSet($minisiteData["DOWNLOAD_DISABLED"]);
                             $minisiteLink = $this->buildPublicletLink($metadata["element"]);
                         }else{
                             $repoId = $metadata["element"];
@@ -285,8 +286,10 @@ class ShareCenter extends AJXP_Plugin{
                         if(isSet($minisiteData)){
                             $jsonData["minisite"] = array(
                                 "public" => $minisiteIsPublic?"true":"false",
-                                "public_link" => $minisiteLink
+                                "public_link" => $minisiteLink,
+                                "disable_download" => $dlDisabled
                             );
+
                         }
                     }
                     echo json_encode($jsonData);
@@ -757,9 +760,16 @@ class ShareCenter extends AJXP_Plugin{
             $httpVars["right_write_0"] = ($httpVars["simple_right_write"] == "on" ? "true" : "false");
             $httpVars["right_watch_0"] = "false";
             $httpVars["disable_download"] = ($httpVars["simple_right_download"] == "on" ? false : true);
+            if($httpVars["right_write_0"] == "false" && $httpVars["right_read_0"] == "false"){
+                return "share_center.58";
+            }
+            if($httpVars["right_read_0"] == "false" && !$httpVars["disable_download"]){
+                $httpVars["right_read_0"] = "true";
+            }
             $uniqueUser = $userId;
         }
 
+        $httpVars["minisite"] = true;
         $newRepo = $this->createSharedRepository($httpVars, $repository, $accessDriver, $uniqueUser);
 
         if(!is_a($newRepo, "Repository")) return $newRepo;
@@ -767,6 +777,9 @@ class ShareCenter extends AJXP_Plugin{
         $newId = $newRepo->getId();
         $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
         $data = array("REPOSITORY"=>$newId, "PRELOG_USER"=>$userId);
+        if($httpVars["disable_download"]){
+            $data["DOWNLOAD_DISABLED"] = true;
+        }
         $outputData = serialize($data);
         $hash = self::computeHash($outputData, $downloadFolder);
 
@@ -973,8 +986,24 @@ class ShareCenter extends AJXP_Plugin{
             }
             // CREATE USER WITH NEW REPO RIGHTS
             $userObject->personalRole->setAcl($newRepo->getUniqueId(), $uRights[$userName]);
-            if(isSet($httpVars["disable_download"])){
-                $userObject->personalRole->setActionState("access.fs", "download", $newRepo->getUniqueId(), "disabled");
+            if(isSet($httpVars["minisite"])){
+                $newRole = new AJXP_Role("AJXP_SHARED-".$newRepo->getUniqueId());
+                $r = AuthService::getRole("MINISITE");
+                if(is_a($r, "AJXP_Role")){
+                    if($httpVars["disable_download"]){
+                        $f = AuthService::getRole("MINISITE_NODOWNLOAD");
+                        if(is_a($f, "AJXP_Role")){
+                            $r = $f->override($r);
+                        }
+                    }
+                    $allData = $r->getDataArray();
+                    $newData = $newRole->getDataArray();
+                    if(isSet($allData["ACTIONS"][AJXP_REPO_SCOPE_SHARED])) $newData["ACTIONS"][$newRepo->getUniqueId()] = $allData["ACTIONS"][AJXP_REPO_SCOPE_SHARED];
+                    if(isSet($allData["PARAMETERS"][AJXP_REPO_SCOPE_SHARED])) $newData["PARAMETERS"][$newRepo->getUniqueId()] = $allData["PARAMETERS"][AJXP_REPO_SCOPE_SHARED];
+                    $newRole->bunchUpdate($newData);
+                    AuthService::updateRole($newRole);
+                    $userObject->addRole($newRole);
+                }
             }
             $userObject->save("superuser");
             if($this->watcher !== false){
@@ -1051,6 +1080,8 @@ class ShareCenter extends AJXP_Plugin{
                 if($res == -1){
                     throw new Exception($mess["ajxp_conf.51"]);
                 }
+                // Silently delete corresponding role if it exists
+                AuthService::deleteRole("AJXP_SHARED-".$repoId);
                 // If guest user created, remove it now.
                 if(isSet($minisiteData["PRELOG_USER"])){
                     AuthService::deleteUser($minisiteData["PRELOG_USER"]);

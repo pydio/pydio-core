@@ -22,8 +22,20 @@ Class.create("VideoPreviewer", AbstractEditor, {
 	fullscreenMode: false,
 	
 	initialize: function($super, oFormObject){
-	},
-		
+        this.element = oFormObject;
+    },
+
+    open : function($super, ajxpNode){
+        this.currentRichPreview = this.getPreview(ajxpNode, true);
+        this.element.down("#videojs_previewer").setStyle({height:'297px'});
+        this.element.down("#videojs_previewer").insert(this.currentRichPreview);
+        this.currentRichPreview.resizePreviewElement({width:380, height:260, maxHeight:260}, true);
+        modal.setCloseValidation(function(){
+            this.currentRichPreview.destroyElement();
+            return true;
+        }.bind(this));
+    },
+
 	getPreview : function(ajxpNode, rich){
 		if(rich){
 			var url = document.location.href;
@@ -92,14 +104,14 @@ Class.create("VideoPreviewer", AbstractEditor, {
 				content += '<p align="center"> <img src="'+poster+'" width="64" height="64"></p>';
 				
 				div.update(content);
-				div.resizePreviewElement = function(dimensionObject){
+				div.resizePreviewElement = function(dimensionObject, innerInstance){
 					var videoObject = div.down('.video-js');
 					if(!div.ajxpPlayer && div.parentNode && videoObject){						
 						$(div.parentNode).setStyle({paddingLeft:10,paddingRight:10});
 						div.ajxpPlayer = VideoJS.setup(videoObject, {
 							preload:true,
-							controlsBelow: false, // Display control bar below video instead of in front of
-							controlsHiding: true, // Hide controls when mouse is not over the video
+							controlsBelow: innerInstance?true:false, // Display control bar below video instead of in front of
+							controlsHiding: innerInstance?false:true, // Hide controls when mouse is not over the video
 							defaultVolume: 0.85, // Will be overridden by user's last volume if available
 							flashVersion: 9, // Required flash version for fallback
 							linksHiding: true, // Hide download links when video is supported,
@@ -111,15 +123,28 @@ Class.create("VideoPreviewer", AbstractEditor, {
                     var styleObject = {height: height + 'px', width : width + 'px'};
 					div.setStyle(styleObject);
 					div.down('.vjs-flash-fallback').setAttribute('width', width);
+                    if(innerInstance) div.down('.vjs-flash-fallback').setAttribute('height', height);
 					if(videoObject) {
                         videoObject.setAttribute('width', width);
+                        if(innerInstance) videoObject.setAttribute('height', height);
                         videoObject.setStyle(styleObject);
                     }
-					if(div.ajxpPlayer) {
+                    if(div.ajxpPlayer) {
                         div.ajxpPlayer.height(height);
                         div.ajxpPlayer.width(width);
                     }
-				}
+				};
+                div.destroyElement = function(){
+                    if(div.ajxpPlayer){
+                        console.log(div.ajxpPlayer);
+                        div.ajxpPlayer.pause();
+                        try{
+                            $A(div.children).invoke("remove");
+                            div.down("video").destroy();
+                        }catch(e){}
+                        div.update('');
+                    }
+                };
 				
 			}else{
                 var f = encodeURIComponent(url+'/'+ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=read_video_data&file='+ajxpNode.getPath());

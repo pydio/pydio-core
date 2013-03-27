@@ -418,6 +418,17 @@ label{
     margin-right: 8px;
 }
 
+.checkbox_left {
+    float: left;
+    clear: left;
+    margin: 0 4px 5px 0 !important;
+}
+
+label.checkbox_label_left{
+    float: left;
+    display: inline-block;
+}
+
 .dialogLegend
 {
     color: #666;

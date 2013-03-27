@@ -193,7 +193,26 @@ Class.create("SMPlayer", AbstractEditor, {
 	fullscreenMode: false,
 	
 	initialize: function($super, oFormObject){
+        this.element = oFormObject;
 	},
+
+    open : function($super, ajxpNode){
+        this.currentRichPreview = this.getPreview(ajxpNode, true);
+        this.element.down(".smplayer_title").update(ajxpNode.getLabel());
+        this.element.down(".smplayer_preview_element").insert(this.currentRichPreview);
+        window.setTimeout(function(){
+            try{this.currentRichPreview.down('span.sm2-360btn').click();}catch(e){}
+        }.bind(this), 400);
+    },
+
+    /**
+   	 * Closes the editor
+   	 * @returns Boolean
+   	 */
+   	close : function($super){
+        this.currentRichPreview.destroyElement();
+   		return $super.close();
+   	},
 		
 	getPreview : function(ajxpNode, rich){
         if(!window.soundManager || !window.soundManager.enabled){
@@ -222,6 +241,9 @@ Class.create("SMPlayer", AbstractEditor, {
                     }catch (e){}
                 }
             }else{
+                var addLeft = 12;
+                if(container.up('.thumbnail_selectable_cell.detailed')) addLeft = 2;
+
                 if(element.height >= 50)
                 {
                     var mT = parseInt((element.height - 50)/2) + element.margin;
@@ -232,10 +254,14 @@ Class.create("SMPlayer", AbstractEditor, {
                     var mT = 0;
                     var mB = element.height-40;
                     container.addClassName("nobackground");
-                    container.setStyle({paddingTop:mT+'px', paddingBottom:'0px', marginBottom:mB+'px'});
+                    if(mB + addLeft < 0) {
+                        container.setStyle({marginTop:(mB/2)+'px', paddingBottom:'0px', marginLeft:((mB/2)-2)+'px'});
+                    }else{
+                        container.setStyle({paddingTop:mT+'px', paddingBottom:'0px', marginBottom:mB+'px'});
+                    }
                 }
                 container.setStyle({
-                    paddingLeft:Math.ceil((element.width-50)/2)+12+"px"
+                    paddingLeft:Math.ceil((element.width-50)/2)+addLeft+"px"
                 });
             }
         };
