@@ -14,7 +14,7 @@
                 font-weight: normal;
                 padding: 10px 0 0 5px;
                 color: rgb(111,123,136);
-                background-image: url(../../plugins/gui.ajax/AjxpLogo250.png);
+                background-image: url('../../plugins/gui.ajax/AjxpLogo250.png');
                 background-repeat: no-repeat;
                 background-position: right 9px;
                 background-size: 170px;
@@ -31,7 +31,7 @@
                 background-color: #ffffff;
             }
             .action_bar > .toolbarGroup{
-                height: 40px;
+                height: auto;
             }
             div.separator{
                 border-left-width: 0;
@@ -88,6 +88,9 @@
             #element_overlay{
                 top:0 !important; left:0 !important;
             }
+            body.ajxp_preloged_user a#logout_button{
+                display: none;
+            }
 		</style>
 		<script language="javascript" type="text/javascript" src="../../plugins/gui.ajax/res/js/ajaxplorer_boot.js"></script>
 		<script type="text/javascript">
@@ -104,10 +107,13 @@
            });
 			window.ajxpBootstrap = new AjxpBootstrap(startParameters);
             window.ajxpMinisite = true;
+            window.onunload = function(){
+                if(ajaxplorer) ajaxplorer.actionBar.fireAction("logout");
+            }
 		</script>
 	</head>
 
-	<body marginheight="0" marginwidth="0" leftmargin="0" topmargin="0">
+	<body marginheight="0" marginwidth="0" leftmargin="0" topmargin="0" class="AJXP_PRELOGED_USER">
         <div class="widget_title">AJXP_REPOSITORY_LABEL</div>
         <div id="ajxp_shared_folder" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"window"}'></div>
 	</body>

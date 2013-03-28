@@ -569,6 +569,9 @@ class ShareCenter extends AJXP_Plugin{
             session_name("AjaXplorer");
             session_start();
             AuthService::logUser($data["PRELOG_USER"], "", true);
+            $html = str_replace("AJXP_PRELOGED_USER", "ajxp_preloged_user", $html);
+        }else{
+            $html = str_replace("AJXP_PRELOGED_USER", "", $html);
         }
         echo($html);
     }

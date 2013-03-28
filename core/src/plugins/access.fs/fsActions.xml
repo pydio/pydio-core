@@ -54,7 +54,7 @@
 			<gui text="27" title="27" src="yast_backup.png" iconClass="icon-upload-alt" accessKey="upload_access_key" hasAccessKey="true">
 				<context selection="false" dir="true" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="put" inZip="false">
+					actionBarGroup="put,minisite" inZip="false">
 				</context></gui>
 			<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""></rightsContext>
 			<processing>
@@ -186,14 +186,33 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
+        <action name="download_all">
+            <gui text="463" title="464" src="download_manager.png" iconClass="icon-download-alt" accessKey="download_access_key" hasAccessKey="true">
+                <context selection="false" dir="true" recycle="false" actionBar="true" contextMenu="false" infoPanel="false"
+                    actionBarGroup="minisite">
+                </context>
+            </gui>
+            <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
+            <processing>
+                <clientCallback prepareModal="true"><![CDATA[
+                        var dm = ajaxplorer.getContextHolder();
+                        dm._selectedNodes = $A([dm.getRootNode()]);
+                        dm._bEmpty = dm._bDir = true; dm._bFile = false;
+                        dm.publish("selection_changed", dm);
+                        window.setTimeout(function(){
+                            ajaxplorer.actionBar.fireAction("download");
+                        }, 200);
+                ]]></clientCallback>
+            </processing>
+        </action>
 		<action name="compress">
 			<gui text="313" title="314" src="archive_insert.png" iconClass="icon-briefcase" accessKey="" hasAccessKey="false">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="false" infoPanel="true"
 					actionBarGroup="more" inZip="false">
 				</context>
-				<selectionContext dir="true" file="file" recycle="false" unique="false"></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+				<selectionContext dir="true" file="file" recycle="false" unique="false"/></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection = ajaxplorer.getUserSelection();					
