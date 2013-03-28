@@ -36,6 +36,7 @@ class AjxpMailer extends AJXP_Plugin
             $this->mailCache = $this->getPluginWorkDir(true)."/mailbox";
         }
         $pId = $this->pluginConf["UNIQUE_MAILER_INSTANCE"];
+        if(is_array($pId)) $pId = $pId["instance_name"];
         list($t, $n) = explode(".", $pId);
         AJXP_PluginsService::setPluginActive($t, $n);
     }

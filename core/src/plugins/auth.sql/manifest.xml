@@ -3,7 +3,7 @@
             description="CONF_MESSAGE[Stores the Authentication data in an SQL database.]"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd"
-            mixins="dibidriver_provider"
+            mixins="dibidriver_provider,authdriver_commons"
         >
     <client_settings>
         <resources>

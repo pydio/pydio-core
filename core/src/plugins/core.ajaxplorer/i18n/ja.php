@@ -523,6 +523,8 @@ $mess=array(
 "preview_access_key" => "e",
 "463" => "Download all",
 "464" => "Download all workspace content at once (zipped)",
+"465" => "Show alternative URLs (mount workspaces separately)",
+"466" => "Loading...",
 /* 文章はここまで */
 /* 文章終了 */
 );

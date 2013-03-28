@@ -137,6 +137,7 @@ lightbox.prototype = {
                 }.bind(this)
             });
 		}else{
+            $('overlay').setAttribute('style', '');
 			$('overlay').style.display = display;
             if(this.overlayStyle){
                 this.originalStyle = {};

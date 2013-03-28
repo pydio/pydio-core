@@ -456,8 +456,8 @@ $mess=array(
 "401" => "You can download and install the following software to join the pieces once on your computer : ",
 "402" => "http://www.hjsplit.org/",
 "403" => "WebDAV Preferences",
-"404" => "You can use the WebDAV protocol to mount your AjaXplorer repositories as a 'network drive' on various clients, including Windows, Mac, iPhone, etc.",
-"405" => "Use the following URLS to access your workspaces, with your username and the password you entered. Warning, this won't work until you set this feature as 'active' and you enter your password.",
+"404" => "WebDAV is a protocol that allows you to mount your AjaXplorer workspaces as a 'network drive' directly on your desktop. To enable this feature, please check the box below, and enter your password if necessary.",
+"405" => "Any WebDAV client will ask you for an adress, a login and a password. Use the URL below along with your standard name and password.",
 "406" => "Activate WebDAV shares",
 "407" => "Enter your password if it's the first time that you are activating webDAV shares, or if you want to re-type a new password :",
 "408" => "Activated WebDav shares successfully, do not forget to update your password if it's the first time!",
@@ -520,4 +520,6 @@ $mess=array(
 "preview_access_key" => "e",
 "463" => "Download all",
 "464" => "Download all workspace content at once (zipped)",
+"465" => "Show alternative URLs (mount workspaces separately)",
+"466" => "Loading..."
 );

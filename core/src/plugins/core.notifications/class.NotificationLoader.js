@@ -87,7 +87,7 @@ Class.create("NotificationLoader", {
         action.builderMenuItems = $A([]);
         action.builderMenuItems.push({
             id:'event_loading',
-            name:'Loading ...',
+            name:MessageHash[466],
             alt:'',
             className:'loading_input',
             image:resolveImageSource('images/actions/22/hdd_external_unmount.png', '',  22),
@@ -125,7 +125,7 @@ Class.create("NotificationLoader", {
                     protoMenu.options.menuItems = $A([]);
                     protoMenu.options.menuItems.push({
                         id:'event_loading',
-                        name:'Loading ...',
+                        name:MessageHash[466],
                         alt:'',
                         image:resolveImageSource('images/actions/22/hdd_external_unmount.png', '',  22),
                         icon_class:'icon-spinner event_loading',

@@ -628,7 +628,6 @@ class AuthService
         if($authDriver->getOption("TRANSMIT_CLEAR_PASS") === true){
             // We can directly update the HA1 version of the WEBDAV Digest
             $realm = ConfService::getCoreConf("WEBDAV_DIGESTREALM");
-            AJXP_Logger::debug(("{$userId}:{$realm}:{$userPass}"));
             $ha1 = md5("{$userId}:{$realm}:{$userPass}");
             $zObj = ConfService::getConfStorageImpl()->createUserObject($userId);
             $wData = $zObj->getPref("AJXP_WEBDAV_DATA");
@@ -671,6 +670,17 @@ class AuthService
 			$user->setAdmin(true);			
 			$user->save("superuser");
 		}
+        if($authDriver->getOption("TRANSMIT_CLEAR_PASS") === true){
+            $realm = ConfService::getCoreConf("WEBDAV_DIGESTREALM");
+            $ha1 = md5("{$userId}:{$realm}:{$userPass}");
+            if(!isSet($user)){
+                $user = $confDriver->createUserObject($userId);
+            }
+            $wData = $user->getPref("AJXP_WEBDAV_DATA");
+            $wData["HA1"] = $ha1;
+            $user->setPref("AJXP_WEBDAV_DATA", $wData);
+            $user->save();
+        }
         AJXP_Controller::applyHook("user.after_create", array($user));
 		AJXP_Logger::logAction("Create User", array("user_id"=>$userId));
 		return null;

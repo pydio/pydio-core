@@ -3650,6 +3650,27 @@ div.dialogBox div.dialogBox.css_boxshadow{
 /****************************************/
 /* WEBDAV PREFERENCES                    */
 /****************************************/
+#webdav_main_access{
+    font-size: 20px;
+    padding: 5px;
+    text-align: center;
+    border-radius: 3px;
+    background-color: white;
+    width: 97%;
+    margin-bottom: 5px;
+    color: rgb(111, 121, 131);
+}
+
+#perworkspace-urls-toggle{
+    text-decoration: underline;
+    cursor: pointer;
+}
+#perworkspace-urls-toggle span{
+    font-size: 13px;
+    margin: 0 7px;
+    text-decoration: none;
+}
+
 #webdav_repo_list{
     height: 200px;
     overflow: auto;
@@ -3662,7 +3683,7 @@ div.dialogBox div.dialogBox.css_boxshadow{
 
 #webdav_repo_list span{
     display: inline-block;
-    width: 25%;
+    width: 24%;
 }
 
 #webdav_repo_list input {

@@ -456,8 +456,8 @@ $mess=array(
 "401" => "Vous pouvez télécharger et installer le logiciel suivant pour recoller les morceaux sur votre ordinateur : ",
 "402" => "http://www.hjsplit.org/",
 "403" => "Préférences WebDAV",
-"404" => "Vous pouvez utiliser le protocole webDAV pour 'monter' vos dépôts AjaXplorer comme des disques durs réseaux directement sur votre bureau, sur Mac, Windows ou Linux, ainsi que via des clients dédiés pour les smartphones.",
-"405" => "Utilisez les URLs suivantes pour connecter vos dépôts, avec votre login et le mot de passe entré ci-dessus. Attention, cette fonctionnalité ne sera activé qu'une fois que la case est cochée et que vous avez mis à jour votre mot de passe.",
+"404" => "WebDAV est un protocole permettant de 'monter' vos espaces de travail AjaXplorer comme des disques durs réseaux, directement sur votre bureau. Pour activer cette fonctionnalité, cochez la case et entrez un mot de passe s'il vous est demandé.",
+"405" => "Pour vous connecter, vous seront demandés une adresse internet, un identifiant et un mot de passe. Utilisez l'URL ci-dessous et vos identifiants standards.",
 "406" => "Activer les partages webDAV.",
 "407" => "Entrez votre mot de passe si c'est la première fois que vous activez webDAV, ou que vous désirez le changer :",
 "408" => "Les partages webDAV ont été activés avec succès, n'oubliez pas de mettre à jour votre mot de passe si c'est la première activation!",
@@ -520,5 +520,7 @@ $mess=array(
 "preview_access_key" => "o",
 "463" => "Télécharger tout",
 "464" => "Télécharger tout le workspace d'un coup (au format ZIP)",
+"465" => "Afficher les autres URLs (monter les workspace séparément)",
+"466" => "Chargement...",
 /* END SENTENCE */
 );

@@ -124,7 +124,7 @@ Class.create("FormManager", {
                 var choices, json_list;
                 if(Object.isString(param.get("choices"))){
                     if(param.get("choices").startsWith("json_list:")){
-                        choices = ["loading|Loading..."];
+                        choices = ["loading|"+MessageHash[466]+"..."];
                         json_list = param.get("choices").split(":")[1];
                     }else if(param.get("choices") == "AJXP_AVAILABLE_LANGUAGES"){
                         var object = window.ajxpBootstrap.parameters.get("availableLanguages");

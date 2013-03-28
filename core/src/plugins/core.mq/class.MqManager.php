@@ -147,7 +147,11 @@ class MqManager extends AJXP_Plugin
             case "client_consume_channel":
                $user = AuthService::getLoggedUser();
                if($user == null){
-                   throw new Exception("You must be logged in");
+                   //throw new Exception("You must be logged in");
+                   AJXP_XMLWriter::header();
+                   AJXP_XMLWriter::requireAuth();
+                   AJXP_XMLWriter::close();
+                   return;
                }
                $GROUP_PATH = $user->getGroupPath();
                if($GROUP_PATH == null) $GROUP_PATH = false;
