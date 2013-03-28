@@ -236,7 +236,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 		foreach($contents as $entry)
        	{
        		$result = $this->rawListEntryToStat($entry);
-            //AbstractAccessDriver::fixPermissions($result["stat"], ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));
+            AbstractAccessDriver::fixPermissions($result["stat"], ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));
        		$isDir = $result["dir"];
        		$statValue = $result["stat"];
        		$file = $result["name"];       		
