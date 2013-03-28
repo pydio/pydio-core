@@ -80,9 +80,37 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre_DAV_IFile
      *
      * If null is returned, we'll assume application/octet-stream
      *
-     * @return void
+     * @return void|string
      */
     function getContentType(){
+
+         //Get mimetype with fileinfo PECL extension
+        $fp = fopen($this->getUrl(), "r");
+        $fileMime = null;
+        if(class_exists("finfo")) {
+            $finfo = new finfo(FILEINFO_MIME);
+            $fileMime = $finfo->buffer(fread($fp, 100));
+        } elseif (function_exists("mime_content_type")) {
+            $fileMime = @mime_content_type($fp);
+        } else {
+            $fileExt = substr(strrchr(basename($this->getUrl()), '.'), 1);
+            if(empty($fileExt))
+                $fileMime = "application/octet-stream";
+            else {
+                $regex = "/^([\w\+\-\.\/]+)\s+(\w+\s)*($fileExt\s)/i";
+                $lines = file( AJXP_CONF_PATH ."/mime.types");
+                foreach($lines as $line) {
+                    if(substr($line, 0, 1) == '#')
+                        continue; // skip comments
+                    $line = rtrim($line) . " ";
+                    if(!preg_match($regex, $line, $matches))
+                        continue; // no match to the extension
+                    $fileMime = $matches[1];
+                }
+            }
+        }
+        fclose($fp);
+        return $fileMime;
         /*
         if ( $this->options->useMimeExts && ezcBaseFeatures::hasExtensionSupport( 'fileinfo' ) )
         {
@@ -104,7 +132,6 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre_DAV_IFile
             return $mimeType;
         }
         */
-        return null;
     }
 
     /**
