@@ -100,7 +100,14 @@ $authBackend = new AJXP_Sabre_AuthBackend($rId);
 $authPlugin = new Sabre_DAV_Auth_Plugin($authBackend, ConfService::getCoreConf("WEBDAV_DIGESTREALM"));
 $server->addPlugin($authPlugin);
 
-$lockBackend = new Sabre_DAV_Locks_Backend_File("data/plugins/server.sabredav/locks");
+if(!is_dir(AJXP_DATA_PATH."/plugins/server.sabredav")){
+    mkdir(AJXP_DATA_PATH."/plugins/server.sabredav", 0755);
+    $fp = fopen(AJXP_DATA_PATH."/plugins/server.sabredav/locks", "w");
+    fwrite($fp, "");
+    fclose($fp);
+}
+
+$lockBackend = new Sabre_DAV_Locks_Backend_File(AJXP_DATA_PATH."/plugins/server.sabredav/locks");
 $lockPlugin = new Sabre_DAV_Locks_Plugin($lockBackend);
 $server->addPlugin($lockPlugin);
 

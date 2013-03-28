@@ -548,7 +548,7 @@ class Sabre_DAV_Server {
 
         $range = $this->getHTTPRange();
         $ifRange = $this->httpRequest->getHeader('If-Range');
-        $ignoreRangeHeader = false;
+        $ignoreRangeHeader = true;
 
         // If ifRange is set, and range is specified, we first need to check
         // the precondition.
@@ -601,6 +601,7 @@ class Sabre_DAV_Server {
             // New read/write stream
             $newStream = fopen('php://temp','r+');
 
+            //("Should stream body from $start to ". ($end-$start+1));
             stream_copy_to_stream($body, $newStream, $end-$start+1, $start);
             rewind($newStream);
 
