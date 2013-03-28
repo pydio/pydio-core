@@ -112,9 +112,17 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				$regDoc = AJXP_PluginsService::getXmlRegistry();
                 $changes = AJXP_Controller::filterActionsRegistry($regDoc);
                 if($changes) AJXP_PluginsService::updateXmlRegistry($regDoc);
+
+                $clone = $regDoc->cloneNode(true);
+                $clonePath = new DOMXPath($clone);
+                $serverCallbacks = $clonePath->query("//serverCallback|hooks");
+                foreach($serverCallbacks as $callback){
+                    $processing = $callback->parentNode->removeChild($callback);
+                }
+
 				if(isSet($_GET["xPath"])){
-					$regPath = new DOMXPath($regDoc);
-					$nodes = $regPath->query($_GET["xPath"]);
+					//$regPath = new DOMXPath($regDoc);
+					$nodes = $clonePath->query($_GET["xPath"]);
 					AJXP_XMLWriter::header("ajxp_registry_part", array("xPath"=>$_GET["xPath"]));
 					if($nodes->length){
 						print(AJXP_XMLWriter::replaceAjxpXmlKeywords($regDoc->saveXML($nodes->item(0))));
@@ -123,7 +131,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				}else{
                     AJXP_Utils::safeIniSet("zlib.output_compression", "4096");
 					header('Content-Type: application/xml; charset=UTF-8');
-                    print(AJXP_XMLWriter::replaceAjxpXmlKeywords($regDoc->saveXML()));
+                    print(AJXP_XMLWriter::replaceAjxpXmlKeywords($clone->saveXML()));
 				}
 				
 			break;

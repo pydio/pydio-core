@@ -236,7 +236,7 @@ class AJXP_Role implements AjxpGroupPathProvider
         if(isSet($this->actions[AJXP_REPO_SCOPE_ALL])){
             $actions = $this->actions[AJXP_REPO_SCOPE_ALL];
         }
-        if(isSet($this->actions[AJXP_REPO_SCOPE_SHARED]) && $repository->hasParent()){
+        if($repository != null && isSet($this->actions[AJXP_REPO_SCOPE_SHARED]) && $repository->hasParent()){
             $actions = array_merge($actions, $this->actions[AJXP_REPO_SCOPE_SHARED]);
         }
         if($repository != null && isSet($this->actions[$repository->getId()])){
