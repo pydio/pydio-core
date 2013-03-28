@@ -629,6 +629,12 @@ Class.create("Diaporama", AbstractEditor, {
 		}
 	},
 	
+    getSharedPreviewTemplate : function(node){
+
+        return new Template('<img width="#{WIDTH}" height="#{HEIGHT}" src="#{DL_CT_LINK}">');
+
+    },
+
 	/**
 	 * 
 	 * @param ajxpNode AjxpNode

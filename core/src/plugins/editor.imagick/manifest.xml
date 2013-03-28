@@ -20,7 +20,7 @@
 			<serverCallback hookName="node.change" methodName="deleteImagickCache"></serverCallback>
 		</hooks>			
 		<actions>
-			<action name="imagick_data_proxy">
+			<action name="imagick_data_proxy" contentTypedProvider="true">
 				<processing>
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>

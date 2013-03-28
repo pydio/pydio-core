@@ -72,7 +72,7 @@
 					<serverCallback methodName="switchAction"></serverCallback>
 					</processing>
 			</action>
-			<action name="preview_data_proxy" skipSecureToken="true">
+			<action name="preview_data_proxy" skipSecureToken="true" contentTypedProvider="true">
 				<processing>
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>

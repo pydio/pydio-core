@@ -657,6 +657,21 @@ class ShareCenter extends AJXP_Plugin{
             if(isSet($data["PLUGINS_DATA"])){
                 $params["PLUGINS_DATA"] = $data["PLUGINS_DATA"];
             }
+            if(isset($_GET["ct"]) && $_GET["ct"] == "true"){
+                $mime = pathinfo($params["file"], PATHINFO_EXTENSION);
+                $editors = AJXP_PluginsService::searchAllManifests("//editor[contains(@mimes,'$mime') and @previewProvider='true']", "node", true, true, false);
+                if(count($editors)){
+                    foreach($editors as $editor){
+                        $xPath = new DOMXPath($editor->ownerDocument);
+                        $callbacks = $xPath->query("//action[@contentTypedProvider]", $editor);
+                        if($callbacks->length) {
+                            $data["ACTION"] = $callbacks->item(0)->getAttribute("name");
+                            if($data["ACTION"] == "audio_proxy") $params["file"] = base64_encode($params["file"]);
+                            break;
+                        }
+                    }
+                }
+            }
             AJXP_Controller::findActionAndApply($data["ACTION"], $params, null);
             register_shutdown_function(array("AuthService", "clearTemporaryUser"), $hash);
         }catch (Exception $e){

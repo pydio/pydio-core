@@ -60,4 +60,9 @@ $mess = array(
     "55"=> "Partagé...",
     "56"=> "Configurer le partage...",
     "57"=> "fois",
+    "58"=> "Please check at least one permission!",
+    "59"=> "Download Page",
+    "60"=> "Direct Download Link",
+    "61"=> "HTML Embed Code",
+    "62"=> "Minisite Adress",
 );

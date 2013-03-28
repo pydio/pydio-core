@@ -61,4 +61,8 @@ $mess = array(
     "56"=> "Configure sharing...",
     "57"=> "times",
     "58"=> "Please check at least one permission!",
+    "59"=> "Download Page",
+    "60"=> "Direct Download Link",
+    "61"=> "HTML Embed Code",
+    "62"=> "Minisite Adress",
 );

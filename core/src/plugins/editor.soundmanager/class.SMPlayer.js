@@ -216,7 +216,29 @@ Class.create("SMPlayer", AbstractEditor, {
         this.currentRichPreview.destroyElement();
    		return $super.close();
    	},
-		
+
+    getSharedPreviewTemplate: function(node){
+
+        var crtRoot = document.location.href.split("#").shift().split("?").shift();
+        var rgxtrim = new RegExp('\/+$');
+        crtRoot = crtRoot.replace(rgxtrim, '');
+
+        var tpl = new Template('<link rel="stylesheet" type="text/css" href="'+crtRoot+'/plugins/editor.soundmanager/sm/shared/mp3-player-button.css" />\n\
+&lt;script type="text/javascript" src="'+crtRoot+'/plugins/editor.soundmanager/sm/shared/soundmanager2.js"&gt;&lt;/script&gt;\n\
+&lt;script type="text/javascript" src="'+crtRoot+'/plugins/editor.soundmanager/sm/shared/mp3-player-button.js"&gt;&lt;/script&gt;\n\
+&lt;script&gt;\n \
+soundManager.setup({\n\
+      url: "'+crtRoot+'/plugins/editor.soundmanager/sm/swf/",\n\
+      debugMode : false\n\
+});\n\
+&lt;/script&gt;\n\
+<a href="#{DL_CT_LINK}&fake=ext.'+getAjxpMimeType(node)+'" class="sm2_button">'+node.getLabel()+'</a> '+node.getLabel());
+
+        return tpl;
+
+    },
+
+
 	getPreview : function(ajxpNode, rich){
         if(!window.soundManager || !window.soundManager.enabled){
             var im = new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64),align:"absmiddle"});

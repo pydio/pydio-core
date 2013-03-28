@@ -38,6 +38,7 @@
             <xs:attribute name="fileDefault" type="xs:boolean"/>
             <xs:attribute name="name" use="required" type="xs:NCName"/>
             <xs:attribute name="skipSecureToken" type="xs:boolean"/>
+            <xs:attribute name="contentTypedProvider" type="xs:boolean"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="gui">

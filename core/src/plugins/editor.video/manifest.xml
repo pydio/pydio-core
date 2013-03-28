@@ -18,7 +18,7 @@
     ]]></clientForm>
 	<registry_contributions>
 		<actions>
-			<action name="read_video_data">
+			<action name="read_video_data" contentTypedProvider="true">
 				<processing>
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>

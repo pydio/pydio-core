@@ -36,6 +36,22 @@ Class.create("VideoPreviewer", AbstractEditor, {
         }.bind(this));
     },
 
+    getSharedPreviewTemplate : function(node){
+
+        var mime = getAjxpMimeType(node);
+        var cType;
+        if(mime == "mp4" || mime == "m4v") cType = "video/mp4";
+        else if(mime == "ogv") cType = "video/ogg";
+        else if(mime == "webm") cType = "video/webm";
+        return new Template('<link href="http://vjs.zencdn.net/c/video-js.css" rel="stylesheet">\n\
+&lt;script src="http://vjs.zencdn.net/c/video.js"&gt;&lt;/script&gt;\n\
+<video id="my_video_1" class="video-js vjs-default-skin" controls\n\
+preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
+<source src="#{DL_CT_LINK}" type="'+cType+'">\n\
+</video>');
+
+    },
+
 	getPreview : function(ajxpNode, rich){
 		if(rich){
 			var url = document.location.href;

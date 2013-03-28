@@ -414,11 +414,39 @@ Class.create("ShareCenter", {
             "use strict";
             if(node.isLeaf()){
 
+                var directLink = "";
+                if(!jsonData.hasPassword){
+                    directLink = '\
+                    <tr>\
+                        <td class="infoPanelLabel">'+MessageHash['share_center.60']+'</td>\
+                        <td class="infoPanelValue"><textarea style="width:100%;height: 45px;"><a href="'+ jsonData.publiclet_link +'?dl=true">Download '+node.getLabel()+'</a></textarea></td>\
+                    </tr>\
+                    ';
+                    var editors = ajaxplorer.findEditorsForMime(node.getAjxpMime(), true);
+                    if(editors.length){
+                        var tplString ;
+                        var messKey = "share_center.61";
+                        if(Class.getByName(editors[0].editorClass).prototype.getSharedPreviewTemplate){
+                            var template = Class.getByName(editors[0].editorClass).prototype.getSharedPreviewTemplate(node);
+                            tplString = template.evaluate({WIDTH:480, HEIGHT:260, DL_CT_LINK:jsonData.publiclet_link +'?dl&true&ct=true'});
+                        }else{
+                            tplString = jsonData.publiclet_link +'?dl&true&ct=true';
+                            messKey = "share_center.60";
+                        }
+                        directLink += '\
+                            <tr>\
+                                <td class="infoPanelLabel">'+MessageHash[messKey]+'</td>\
+                                <td class="infoPanelValue"><textarea style="width:100%;height: 80px;">'+ tplString + '</textarea></td>\
+                            </tr>\
+                        ';
+                    }
+                }
+
                 container.down('#ajxp_shared_info_panel table').update('\
                     <tr>\
-                        <td class="infoPanelLabel">'+MessageHash['share_center.50']+'</td>\
+                        <td class="infoPanelLabel">'+MessageHash['share_center.59']+'</td>\
                         <td class="infoPanelValue"><textarea style="width:100%;height: 45px;">'+ jsonData.publiclet_link +'</textarea></td>\
-                    </tr>\
+                    </tr>'+directLink+'\
                     <tr>\
                         <td class="infoPanelLabel">'+MessageHash['share_center.51']+'</td>\
                         <td class="infoPanelValue">'+ jsonData.download_counter +' ' +  MessageHash['share_center.57'] + '</td>\
@@ -441,8 +469,12 @@ Class.create("ShareCenter", {
                 if(jsonData.minisite){
                     linkString = '\
                     <tr>\
-                        <td class="infoPanelLabel">'+MessageHash['share_center.50']+'</td>\
+                        <td class="infoPanelLabel">'+MessageHash['share_center.62']+'</td>\
                         <td class="infoPanelValue"><textarea style="width:100%;height: 40px;">'+ jsonData.minisite.public_link +'</textarea></td>\
+                    </tr>\
+                    <tr>\
+                        <td class="infoPanelLabel">'+MessageHash['share_center.61']+'</td>\
+                        <td class="infoPanelValue"><textarea style="width:100%;height: 80px;" id="embed_code"></textarea></td>\
                     </tr>\
                     ';
                 }
@@ -456,7 +488,14 @@ Class.create("ShareCenter", {
                         <td class="infoPanelValue">'+ entries.join(', ') +'</td>\
                     </tr>\
                 ');
+                if(jsonData.minisite){
+                    container.down("#embed_code").setValue("<iframe height='500' width='600' style='border:1px solid black;' src='"+jsonData.minisite.public_link+"'></iframe>");
+                }
             }
+            container.select("textarea").each(function(t){
+                t.observe("click", function(event){event.target.select();});
+            });
+            container.up("div[ajxpClass]").ajxpPaneObject.resize();
         }, true);
     },
 
