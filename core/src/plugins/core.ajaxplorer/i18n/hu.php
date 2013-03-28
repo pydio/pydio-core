@@ -521,6 +521,8 @@ $mess=array(
 "date_relative_days_ahead" => "%s nap múlva",
 "462" => "Előnézet",
 "preview_access_key" => "e",
+"463" => "Download all",
+"464" => "Download all workspace content at once (zipped)",
 /* END SENTENCE */
 );
 ?>

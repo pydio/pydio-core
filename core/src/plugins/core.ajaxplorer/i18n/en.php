@@ -518,4 +518,6 @@ $mess=array(
 "detail_access_key" => "D",
 "462" => "Preview",
 "preview_access_key" => "e",
+"463" => "Download all",
+"464" => "Download all workspace content at once (zipped)",
 );

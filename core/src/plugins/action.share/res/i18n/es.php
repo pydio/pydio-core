@@ -63,5 +63,6 @@ $mess = array(
 "60"=> "Direct Download Link",
 "61"=> "HTML Embed Code",
 "62"=> "Minisite Adress",
+"57" => "times",
 // will be replaced by the filename to download
 );

@@ -517,6 +517,8 @@ $mess=array(
 "date_relative_days_ahead" => "in %s days",
 "462" => "Preview",
 "preview_access_key" => "e",
+"463" => "Download all",
+"464" => "Download all workspace content at once (zipped)",
 /* END SENTENCE */
 /* password strength tester */
 /* quick access keys */
