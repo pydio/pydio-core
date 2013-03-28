@@ -950,8 +950,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $crtPath = $ajxpNode->getPath();
         $vRoots = $this->repository->listVirtualRoots();
         if(!empty($crtPath)){
-            if(!@is_writable($ajxpNode->getUrl())){
-                $metaData["ajxp_readonly"] = "true";
+            if(!@$this->isWriteable($ajxpNode->getUrl())){
+               $metaData["ajxp_readonly"] = "true";
             }
             if(isSet($vRoots[ltrim($crtPath, "/")])){
                 $metaData["ajxp_readonly"] = $vRoots[ltrim($crtPath, "/")]["right"] == "r" ? "true" : "false";
@@ -1665,6 +1665,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 	{
 		$num = 0;
 		//$verbose = true;
+        $recurse = array();
 		if(!is_dir($dstdir)) mkdir($dstdir);
 		if($curdir = opendir($srcdir)) 
 		{
@@ -1692,14 +1693,16 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 							}
 						}
 					}
-					else
-					{
-						if($verbose) echo "Dircopy $srcfile";
-						$num += $this->dircopy($srcfile, $dstfile, $errors, $success, $verbose, $convertSrcFile);
+					else{
+                        $recurse[] = array("src" => $srcfile, "dest"=> $dstfile);
 					}
 				}
 			}
 			closedir($curdir);
+            foreach($recurse as $rec){
+                if($verbose) echo "Dircopy $srcfile";
+                $num += $this->dircopy($rec["src"], $rec["dest"], $errors, $success, $verbose, $convertSrcFile);
+            }
 		}
 		return $num;
 	}
