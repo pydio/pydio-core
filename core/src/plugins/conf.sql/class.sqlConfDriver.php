@@ -493,7 +493,17 @@ class sqlConfDriver extends AbstractConfDriver {
 
 
     function deleteGroup($groupPath){
-        dibi::query("DELETE FROM [ajxp_groups] WHERE [groupPath] = %s", $groupPath);
+        // Delete users of this group, as well as subgroups
+        $ids = array();
+		$res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %s ORDER BY [login] ASC", $groupPath."%");
+		$rows = $res->fetchAll();
+        $subUsers = array();
+        foreach($rows as $row){
+            $this->deleteUser($row["login"], $subUsers);
+            dibi::query("DELETE FROM [ajxp_users] WHERE [login] = %s", $row["login"]);
+        }
+        dibi::query("DELETE FROM [ajxp_groups] WHERE [groupPath] LIKE %s", $groupPath."%");
+        dibi::query('DELETE FROM [ajxp_roles] WHERE [role_id] = %s', 'AJXP_GRP_'.$groupPath);
     }
 
     /**
@@ -533,6 +543,7 @@ class sqlConfDriver extends AbstractConfDriver {
             dibi::query('DELETE FROM [ajxp_user_rights] WHERE [login] = %s', $userId);
             dibi::query('DELETE FROM [ajxp_user_prefs] WHERE [login] = %s', $userId);
             dibi::query('DELETE FROM [ajxp_user_bookmarks] WHERE [login] = %s', $userId);
+            dibi::query('DELETE FROM [ajxp_roles] WHERE [role_id] = %s', 'AJXP_USR_/'.$userId);
             dibi::commit();
             foreach ($children as $childId){
                 $this->deleteUser($childId, $deletedSubUsers);
