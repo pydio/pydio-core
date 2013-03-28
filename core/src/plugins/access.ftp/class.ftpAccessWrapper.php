@@ -47,12 +47,13 @@ class ftpAccessWrapper implements AjxpWrapper {
 	protected $crtTarget;
 	
 	// Shared vars self::
+	private static $dirContentLoopPath;
 	private static $dirContent;
 	private static $dirContentKeys;
 	private static $dirContentIndex;
 
     private $monthes = array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Juil", "Aug", "Sep", "Oct", "Nov", "Dec");
-	
+
     public static function getRealFSReference($path, $persistent = false){
     	$tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time());
     	$tmpHandle = fopen($tmpFile, "wb");
@@ -62,30 +63,30 @@ class ftpAccessWrapper implements AjxpWrapper {
     		register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $tmpFile);
     	}
     	return $tmpFile;
-    }	
+    }
 
     public static function isRemote(){
     	return true;
     }
-    
+
     public static function copyFileInStream($path, $stream){
     	$fake = new ftpAccessWrapper();
     	$parts = $fake->parseUrl($path);
-		$link = $fake->createFTPLink();	
+		$link = $fake->createFTPLink();
 		$serverPath = AJXP_Utils::securePath($fake->path."/".$parts["path"]);
 		AJXP_Logger::debug($serverPath);
     	ftp_fget($link, $stream, $serverPath, FTP_BINARY);
     }
-    
+
     public static function changeMode($path, $chmodValue){
     	$fake = new ftpAccessWrapper();
     	$parts = $fake->parseUrl($path);
-		$link = $fake->createFTPLink();	
+		$link = $fake->createFTPLink();
 		$serverPath = AJXP_Utils::securePath($fake->path."/".$parts["path"]);
     	ftp_chmod($link, $chmodValue, $serverPath);
     }
-    
-	public function stream_open($url, $mode, $options, &$context){		
+
+	public function stream_open($url, $mode, $options, &$context){
 		if(stripos($mode, "w") !== false){
 			$this->crtMode = 'write';
 			$parts = $this->parseUrl($url);
@@ -93,9 +94,9 @@ class ftpAccessWrapper implements AjxpWrapper {
 			$this->crtLink = $this->createFTPLink();
 			$this->fp = tmpfile();
 		}else{
-			$this->crtMode = 'read';			
+			$this->crtMode = 'read';
 			$this->fp = tmpfile();
-			$this->copyFileInStream($url, $this->fp);			
+			$this->copyFileInStream($url, $this->fp);
 			rewind($this->fp);
 		}
 		/*
@@ -107,20 +108,20 @@ class ftpAccessWrapper implements AjxpWrapper {
 		*/
 		return ($this->fp !== false);
 	}
-	
+
     public function stream_stat(){
     	return fstat($this->fp);
-    }	
-    
+    }
+
     public function stream_seek($offset , $whence = SEEK_SET){
     	fseek($this->fp, $offset, SEEK_SET);
     }
-    
+
     public function stream_tell(){
     	return ftell($this->fp);
-    }	
-    
-    public function stream_read($count){    	
+    }
+
+    public function stream_read($count){
     	return fread($this->fp, $count);
     }
 
@@ -132,13 +133,13 @@ class ftpAccessWrapper implements AjxpWrapper {
     public function stream_eof(){
     	return feof($this->fp);
     }
-   
+
     public function stream_close(){
     	if(isSet($this->fp) && $this->fp!=-1 && $this->fp!==false){
     		fclose($this->fp);
     	}
     }
-    
+
     // PHP bug #62035
     public static function fput_quota_hack($errno, $errstr, $errfile, $errline, $errcontext)
     {
@@ -146,7 +147,7 @@ class ftpAccessWrapper implements AjxpWrapper {
         $errstr = "Transfer failed. Please check available disk space (quota)";
       AJXP_XMLWriter::catchError($errno, $errstr, $errfile, $errline, $errcontext);
     }
-    
+
     public function stream_flush(){
     	if(isSet($this->fp) && $this->fp!=-1 && $this->fp!==false){
     		if($this->crtMode == 'write'){
@@ -161,27 +162,27 @@ class ftpAccessWrapper implements AjxpWrapper {
     		}
     	}
     }
-        
+
     public function unlink($url){
     	return unlink($this->buildRealUrl($url));
     }
-    
+
     public function rmdir($url, $options){
     	return rmdir($this->buildRealUrl($url));
     }
-    
+
     public function mkdir($url, $mode, $options){
     	return mkdir($this->buildRealUrl($url), $mode);
     }
-    
+
     public function rename($from, $to){
     	return rename($this->buildRealUrl($from), $this->buildRealUrl($to));
     }
-    
+
     public function url_stat($path, $flags){
     	// We are in an opendir loop
     	AJXP_Logger::debug("URL_STAT", $path);
-    	if(self::$dirContent != null){
+    	if(self::$dirContent != null && self::$dirContentLoopPath == $this->safeDirname($path)){
     		$search = $this->safeBasename($path);
     		//if($search == "") $search = ".";
     		if(array_key_exists($search, self::$dirContent)){
@@ -189,33 +190,33 @@ class ftpAccessWrapper implements AjxpWrapper {
     		}
     	}
     	$parts = $this->parseUrl($path);
-		$link = $this->createFTPLink();	
-		$serverPath = AJXP_Utils::securePath($this->path."/".$parts["path"]);	
+		$link = $this->createFTPLink();
+		$serverPath = AJXP_Utils::securePath($this->path."/".$parts["path"]);
 		if($parts["path"] == "/"){
 			$basename = ".";
 		}else{
 			$basename = $this->safeBasename($serverPath);
-		}	
-		
+		}
+
 		$serverParent = $this->safeDirname($parts["path"]);
 		$serverParent = AJXP_Utils::securePath($this->path."/".$serverParent);
-		
+
 		$testCd = @ftp_chdir($link, $serverPath);
 		if($testCd === true){
 			// DIR
 			$contents = $this->rawList($link, $serverParent, 'd');
 			foreach ($contents as $entry){
 				$res = $this->rawListEntryToStat($entry);
-				AJXP_Logger::debug("RAWLISTENTRY ".$res["name"]. " (searching ".$basename.")", $res["stat"]);				
+				AJXP_Logger::debug("RAWLISTENTRY ".$res["name"]. " (searching ".$basename.")", $res["stat"]);
 				if($res["name"] == $basename){
-					AbstractAccessDriver::fixPermissions($res["stat"], ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));					
-					$statValue = $res["stat"];					
+					AbstractAccessDriver::fixPermissions($res["stat"], ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));
+					$statValue = $res["stat"];
 					return $statValue;
 				}
 			}
 		}else{
 			// FILE
-			$contents = $this->rawList($link, $serverPath, 'f');		
+			$contents = $this->rawList($link, $serverPath, 'f');
 	    	if(count($contents) == 1){
 	    		$res = $this->rawListEntryToStat($contents[0]);
 	    		AbstractAccessDriver::fixPermissions($res["stat"], ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));
@@ -226,11 +227,11 @@ class ftpAccessWrapper implements AjxpWrapper {
 		}
     	return null;
     }
-	
+
 	public function dir_opendir ($url , $options ){
 		$parts = $this->parseUrl($url);
-		$link = $this->createFTPLink();	
-		$serverPath = AJXP_Utils::securePath($this->path."/".$parts["path"]);		
+		$link = $this->createFTPLink();
+		$serverPath = AJXP_Utils::securePath($this->path."/".$parts["path"]);
 		$contents = $this->rawList($link, $serverPath);
         $folders = $files = array();
 		foreach($contents as $entry)
@@ -239,7 +240,7 @@ class ftpAccessWrapper implements AjxpWrapper {
             AbstractAccessDriver::fixPermissions($result["stat"], ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));
        		$isDir = $result["dir"];
        		$statValue = $result["stat"];
-       		$file = $result["name"];       		
+       		$file = $result["name"];
 			if($isDir){
 				$folders[$file] = $statValue;
 			}else{
@@ -251,16 +252,18 @@ class ftpAccessWrapper implements AjxpWrapper {
        		$folders[$key] = $value;
        	}
        	AJXP_Logger::debug("OPENDIR ", $folders);
+        self::$dirContentLoopPath = $this->safeDirname($url);
 		self::$dirContent = $folders;//array_merge($folders, $files);
 		self::$dirContentKeys = array_keys(self::$dirContent);
-		self::$dirContentIndex = 0;	
+		self::$dirContentIndex = 0;
        	return true;
 	}
-	
+
 	public function dir_closedir  (){
 		AJXP_Logger::debug("CLOSEDIR");
-		//self::$dirContent = null;
-		//self::$dirContentKeys = null;
+		self::$dirContent = null;
+		self::$dirContentKeys = null;
+        self::$dirContentLoopPath = null;
 		self::$dirContentIndex = 0;
 	}	
 	
