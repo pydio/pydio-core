@@ -1825,7 +1825,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
 		
 		foreach ($files as $file){
-			$publicletData = $this->loadPublicletData($file);			
+			$publicletData = $this->loadPublicletData($file);
+            if(!is_a($publicletData["REPOSITORY"], "Repository")){
+                continue;
+            }
 			AJXP_XMLWriter::renderNode(str_replace(".php", "", basename($file)), "".SystemTextEncoding::toUTF8($publicletData["REPOSITORY"]->getDisplay()).":/".SystemTextEncoding::toUTF8($publicletData["FILE_PATH"]), true, array(
 				"icon"		=> "html.png",
 				"password" => ($publicletData["PASSWORD"]!=""?$publicletData["PASSWORD"]:"-"), 
@@ -1872,10 +1875,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         $inputData = null;
 		$lines = file($file);
 		$id = str_replace(".php", "", basename($file));
-		$code = $lines[3] . $lines[4] . $lines[5];
+		$code = trim($lines[3] . $lines[4] . $lines[5]);
+        if(strpos($code, '$cypheredData =') !== 0) return null;
 		eval($code);
-		$dataModified = (md5($inputData) != $id);
+		$dataModified = !ShareCenter::checkHash($inputData, $id);
 		$publicletData = unserialize($inputData);
+        if(!is_array($publicletData)) return null;
 		$publicletData["SECURITY_MODIFIED"] = $dataModified;		
 		return $publicletData;
 	}
