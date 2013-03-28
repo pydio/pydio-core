@@ -121,9 +121,9 @@ function hookToFilesList(){
             resManager.load();
         }
         $A(fList.getItems()).each(function(row){
-            if(!row.ajxpNode || row.ajxpNode.getAjxpMime() != "mp3" || row.ajxpNode.getAjxpMime() != "wav") return;
+            if(!row.ajxpNode || (row.ajxpNode.getAjxpMime() != "mp3" && row.ajxpNode.getAjxpMime() != "wav")) return;
             addVolumeButton();
-            var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+'&get_action=audio_proxy&file='+base64_encode(row.ajxpNode.getPath())+ '&fake=extension.'+ajxpNode.getAjxpMime();
+            var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+'&get_action=audio_proxy&file='+base64_encode(row.ajxpNode.getPath())+ '&fake=extension.'+row.ajxpNode.getAjxpMime();
             var player = new Element("div", {className:"ui360 ui360-micro"}).update(new Element("a", {href:url}).update(""));
             row.down("span#ajxp_label").setStyle({backgroundImage:'none'}).insert({top:player});
             threeSixtyPlayer.config.items = [player];
