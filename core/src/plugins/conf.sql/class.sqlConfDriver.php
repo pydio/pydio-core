@@ -323,6 +323,13 @@ class sqlConfDriver extends AbstractConfDriver {
 			$result_opts = dibi::query('DELETE FROM [ajxp_repo_options] WHERE [uuid] = %s', $repositoryId);
 			$result_opts_rights = dibi::query('DELETE FROM [ajxp_user_rights] WHERE [repo_uuid] = %s',$repositoryId); //jcg
 
+            $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [serial_role] LIKE %s GROUP BY [role_id]', '%"'.$repositoryId.'";s:%');
+            $all = $children_results->fetchAll();
+            foreach ($all as $item){
+                $role = unserialize($item["serial_role"]);
+                $role->setAcl($repositoryId, "");
+                $this->updateRole($role);
+            }
 			
 		} catch (DibiException $e) {
 			return -1;

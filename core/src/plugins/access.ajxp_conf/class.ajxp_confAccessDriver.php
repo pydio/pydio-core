@@ -932,12 +932,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			
 			case "edit_repository" : 
 				$repId = $httpVars["repository_id"];
-				$repList = ConfService::getRepositoriesList();
-				//print_r($repList);
-				if(!isSet($repList[$repId])){
-					throw new Exception("Cannot find repository with id $repId");
-				}
-				$repository = $repList[$repId];
+                $repository = ConfService::getRepositoryById($repId);
+                if($repository == null){
+                    throw new Exception("Cannot find repository with id $repId");
+                }
                 if(!AuthService::canAdministrate($repository)){
                     throw new Exception("You are not allowed to edit this repository!");
                 }
