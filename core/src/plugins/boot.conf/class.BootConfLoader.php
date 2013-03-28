@@ -79,9 +79,10 @@ class BootConfLoader extends AbstractConfDriver {
 
     /**
      * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
+     * @param AbstractAjxpUser $user
      * @return Array
      */
-    function listRepositories()
+    function listRepositories($user = null)
     {
         // TODO: Implement listRepositories() method.
     }

@@ -98,9 +98,20 @@ class serialConfDriver extends AbstractConfDriver {
 	}
 
 	// SAVE / EDIT / CREATE / DELETE REPOSITORY
-	function listRepositories(){
-		return AJXP_Utils::loadSerialFile($this->repoSerialFile);
-
+    /**
+     * @param AbstractAjxpUser $user
+     * @return Array
+     */
+    function listRepositories($user = null){
+		$all = AJXP_Utils::loadSerialFile($this->repoSerialFile);
+        if($user != null){
+            foreach($all as $repoId => $repoObject){
+                if(!ConfService::repositoryIsAccessible($repoId, $repoObject, $user)){
+                    unset($all[$repoId]);
+                }
+            }
+        }
+        return $all;
 	}
 
 	function listRoles($roleIds = array(), $excludeReserved = false){

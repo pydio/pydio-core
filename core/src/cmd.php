@@ -160,7 +160,7 @@ if(AuthService::usersEnabled())
 
 	if($loggedUser != null)
 	{
-		$currentRepoId = ConfService::getCurrentRootDirIndex();
+		$currentRepoId = ConfService::getCurrentRepositoryId();
 		$lastRepoId  = $loggedUser->getArrayPref("history", "last_repository");
 		$defaultRepoId = AuthService::getDefaultRootId();
 		if($defaultRepoId == -1){
@@ -192,7 +192,7 @@ if(AuthService::usersEnabled())
         }
 	}
 }else{
-	AJXP_Logger::debug(ConfService::getCurrentRootDirIndex());	
+	AJXP_Logger::debug(ConfService::getCurrentRepositoryId());
 }
 
 //Set language

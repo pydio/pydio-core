@@ -150,9 +150,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	// SAVE / EDIT / CREATE / DELETE REPOSITORY
 	/**
 	 * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
+     * @param AbstractAjxpUser $user
 	 * @return Array
 	 */
-	abstract function listRepositories();
+	abstract function listRepositories($user = null);
 	/**
 	 * Retrieve a Repository given its unique ID.
 	 *
@@ -411,7 +412,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				ConfService::loadRepositoryDriver();
 				if(AuthService::usersEnabled() && AuthService::getLoggedUser()!=null){
 					$user = AuthService::getLoggedUser();
-					$activeRepId = ConfService::getCurrentRootDirIndex();
+					$activeRepId = ConfService::getCurrentRepositoryId();
 					$user->setArrayPref("history", "last_repository", $activeRepId);
 					$user->save("user");
 				}

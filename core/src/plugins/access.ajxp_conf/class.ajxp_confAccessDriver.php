@@ -1561,7 +1561,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
     }
 
 	function listRepositories(){
-		$repos = ConfService::getRepositoriesList();
+		$repos = ConfService::getRepositoriesList("all");
 		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.repositories">
 			<column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/>
 			<column messageId="ajxp_conf.9" attributeName="accessType" sortType="String"/>

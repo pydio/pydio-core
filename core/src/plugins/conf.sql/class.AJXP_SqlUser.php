@@ -243,7 +243,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
 	 */
 	function addBookmark($path, $title="", $repId = -1){
 		if(!isSet($this->bookmarks)) $this->bookmarks = array();
-		if($repId == -1) $repId = ConfService::getCurrentRootDirIndex();
+		if($repId == -1) $repId = ConfService::getCurrentRepositoryId();
 		if($title == "") $title = basename($path);
 		if(!isSet($this->bookmarks[$repId])) $this->bookmarks[$repId] = array();
 		foreach ($this->bookmarks[$repId] as $v)
@@ -277,7 +277,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
 	 * @see AbstractAjxpUser#removeBookmark($path)
 	 */
 	function removeBookmark($path){
-		$repId = ConfService::getCurrentRootDirIndex();
+		$repId = ConfService::getCurrentRepositoryId();
 		if(isSet($this->bookmarks) 
 			&& isSet($this->bookmarks[$repId])
 			&& is_array($this->bookmarks[$repId]))
@@ -310,7 +310,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
 	 * @see AbstractAjxpUser#renameBookmark($path, $title)
 	 */
 	function renameBookmark($path, $title){
-		$repId = ConfService::getCurrentRootDirIndex();
+		$repId = ConfService::getCurrentRepositoryId();
 		if(isSet($this->bookmarks) 
 			&& isSet($this->bookmarks[$repId])
 			&& is_array($this->bookmarks[$repId]))

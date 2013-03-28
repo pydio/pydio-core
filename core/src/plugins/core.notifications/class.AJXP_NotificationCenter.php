@@ -97,7 +97,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         $userId = $u->getId();
         $userGroup = $u->getGroupPath();
         $authRepos = array();
-        $crtRepId = ConfService::getCurrentRootDirIndex();
+        $crtRepId = ConfService::getCurrentRepositoryId();
         if(isSet($httpVars["repository_id"]) && $u->mergedRole->canRead($httpVars["repository_id"])){
             $authRepos[] = $httpVars["repository_id"];
         }else{

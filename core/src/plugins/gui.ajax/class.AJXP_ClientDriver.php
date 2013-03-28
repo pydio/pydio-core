@@ -174,8 +174,8 @@ class AJXP_ClientDriver extends AJXP_Plugin
 							AuthService::disconnect();
 						}else{
 							$loggedUser = AuthService::getLoggedUser();
-							if(!$loggedUser->canRead(ConfService::getCurrentRootDirIndex()) 
-									&& AuthService::getDefaultRootId() != ConfService::getCurrentRootDirIndex())
+							if(!$loggedUser->canRead(ConfService::getCurrentRepositoryId())
+									&& AuthService::getDefaultRootId() != ConfService::getCurrentRepositoryId())
 							{
 								ConfService::switchRootDir(AuthService::getDefaultRootId());
 							}

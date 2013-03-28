@@ -264,7 +264,7 @@ class ShareCenter extends AJXP_Plugin{
                             $repoId = $metadata["element"];
                         }
                         $repo = ConfService::getRepositoryById($repoId);
-                        if($repo->getOwner() != AuthService::getLoggedUser()->getId()){
+                        if($repo == null || $repo->getOwner() != AuthService::getLoggedUser()->getId()){
                             throw new Exception($messages["share_center.48"]);
                         }
                         if($this->watcher != false){
@@ -1079,6 +1079,7 @@ class ShareCenter extends AJXP_Plugin{
         AJXP_Logger::debug($type."-".$element);
         if($type == "repository"){
             $repo = ConfService::getRepositoryById($element);
+            if($repo == null) return;
             if(!$repo->hasOwner() || $repo->getOwner() != $loggedUser->getId()){
                 throw new Exception($mess["ajxp_shared.12"]);
             }else{

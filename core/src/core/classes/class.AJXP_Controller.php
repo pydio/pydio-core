@@ -199,10 +199,10 @@ class AJXP_Controller{
 					exit(1);
 				}			
 			if( AJXP_Controller::actionNeedsRight($action, $xPath, "read") && 
-				($loggedUser == null || !$loggedUser->canRead(ConfService::getCurrentRootDirIndex().""))){
+				($loggedUser == null || !$loggedUser->canRead(ConfService::getCurrentRepositoryId().""))){
 					AJXP_XMLWriter::header();
 					if($actionName == "ls" & $loggedUser!=null 
-						&& $loggedUser->canWrite(ConfService::getCurrentRootDirIndex()."")){
+						&& $loggedUser->canWrite(ConfService::getCurrentRepositoryId()."")){
 						// Special case of "write only" right : return empty listing, no auth error.
 						AJXP_XMLWriter::close();
 						exit(1);					
@@ -214,7 +214,7 @@ class AJXP_Controller{
 					exit(1);
 				}
 			if( AJXP_Controller::actionNeedsRight($action, $xPath, "write") && 
-				($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRootDirIndex().""))){
+				($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRepositoryId().""))){
                     $mess = ConfService::getMessages();
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendMessage(null, $mess[207]);

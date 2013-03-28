@@ -175,13 +175,22 @@ class sqlConfDriver extends AbstractConfDriver {
 	 * Get a list of repositories
 	 * 
 	 * The list is an associative array of Array( 'uuid' => [Repository Object] );
-	 * 
-	 * @todo Create a repository object that lazy loads options, so that these list queries don't incur the multiple queries of options.
-	 * @see AbstractConfDriver#listRepositories()
+	 * @param AbstractAjxpUser $user
+     * @return Repository[]
+     * @see AbstractConfDriver#listRepositories()
 	 */
-	function listRepositories(){
+	function listRepositories($user = null){
 
-		$res = dibi::query('SELECT * FROM [ajxp_repo]');
+        if($user != null){
+            $acls = $user->mergedRole->listAcls();
+            $limitRepositories = array_keys($acls);
+            foreach($limitRepositories as $i => $k) $limitRepositories[$i] = "'$k'";
+            $query = 'SELECT * FROM [ajxp_repo] WHERE uuid IN ('.implode(",",$limitRepositories).')';
+        }else{
+            $query = 'SELECT * FROM [ajxp_repo]';
+        }
+
+		$res = dibi::query($query);
 		$all = $res->fetchAll();
 		
 		$repositories = Array();

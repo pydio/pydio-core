@@ -115,7 +115,7 @@ if(AuthService::usersEnabled())
    	}
 
 }else{
-	AJXP_Logger::debug(ConfService::getCurrentRootDirIndex());	
+	AJXP_Logger::debug(ConfService::getCurrentRepositoryId());
 }
 
 //Set language
@@ -129,7 +129,7 @@ else if(isSet($_COOKIE["AJXP_lang"])) ConfService::setLanguage($_COOKIE["AJXP_la
 if(AuthService::usersEnabled())
 {
 	$loggedUser = AuthService::getLoggedUser();	
-	if($action == "upload" && ($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRootDirIndex()."")) && isSet($_FILES['Filedata']))
+	if($action == "upload" && ($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRepositoryId()."")) && isSet($_FILES['Filedata']))
 	{
 		header('HTTP/1.0 ' . '410 Not authorized');
 		die('Error 410 Not authorized!');

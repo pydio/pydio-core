@@ -487,7 +487,7 @@ class AJXP_XMLWriter
 		if(!AuthService::usersEnabled()){
 			$buffer.="<user id=\"shared\">";
 			if(!$details){
-				$buffer.="<active_repo id=\"".ConfService::getCurrentRootDirIndex()."\" write=\"1\" read=\"1\"/>";
+				$buffer.="<active_repo id=\"".ConfService::getCurrentRepositoryId()."\" write=\"1\" read=\"1\"/>";
 			}
 			$buffer.= AJXP_XMLWriter::writeRepositoriesData(null, $details);
 			$buffer.="</user>";	
@@ -495,7 +495,7 @@ class AJXP_XMLWriter
             $lock = $loggedUser->getLock();
 			$buffer.="<user id=\"".$loggedUser->id."\">";
 			if(!$details){
-				$buffer.="<active_repo id=\"".ConfService::getCurrentRootDirIndex()."\" write=\"".($loggedUser->canWrite(ConfService::getCurrentRootDirIndex())?"1":"0")."\" read=\"".($loggedUser->canRead(ConfService::getCurrentRootDirIndex())?"1":"0")."\"/>";
+				$buffer.="<active_repo id=\"".ConfService::getCurrentRepositoryId()."\" write=\"".($loggedUser->canWrite(ConfService::getCurrentRepositoryId())?"1":"0")."\" read=\"".($loggedUser->canRead(ConfService::getCurrentRepositoryId())?"1":"0")."\"/>";
 			}else{
 				$buffer .= "<ajxp_roles>";
 				foreach ($loggedUser->getRoles() as $roleId => $boolean){

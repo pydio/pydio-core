@@ -62,7 +62,7 @@ class Repository implements AjxpGroupPathProvider {
     /**
      * @var bool
      */
-	var $writeable = false;
+	var $writeable = true;
     /**
      * @var bool
      */
