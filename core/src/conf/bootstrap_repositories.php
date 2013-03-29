@@ -105,7 +105,7 @@ $REPOSITORIES[1] = array(
 // SHARE ELEMENTS
 $REPOSITORIES["ajxp_shared"] = array(
 	"DISPLAY"		=>	"Shared Elements",
-	"DISPLAY_ID"		=>	"363",
+	"DISPLAY_ID"		=>	"467",
 	"DRIVER"		=>	"ajxp_shared",
 	"DRIVER_OPTIONS"=> array(
 		"DEFAULT_RIGHTS" => "rw"
