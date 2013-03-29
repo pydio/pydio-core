@@ -417,7 +417,7 @@ $mess=array(
 "360" => "Rights", 
 "361" => "Read",
 "362" => "Write",
-"363" => "Shared Elements",
+"363" => "Shared",
 "364" => "You do not have the rights to perform this operation",
 "365" => "You are not allowed to upload more than %s files at once.",
 "366" => "This user does not have any active workspace.",
@@ -521,5 +521,6 @@ $mess=array(
 "463" => "Download all",
 "464" => "Download all workspace content at once (zipped)",
 "465" => "Show alternative URLs (mount workspaces separately)",
-"466" => "Loading..."
+"466" => "Loading...",
+"467" => "All Shared Elements"
 );

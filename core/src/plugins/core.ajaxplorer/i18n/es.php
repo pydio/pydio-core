@@ -526,6 +526,7 @@ $mess=array(
 "464" => "Download all workspace content at once (zipped)",
 "465" => "Show alternative URLs (mount workspaces separately)",
 "466" => "Loading...",
+"467" => "All Shared Elements",
 /* END SENTENCE */
 );
 ?>

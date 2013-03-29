@@ -418,7 +418,7 @@ $mess=array(
 "360" => "Droits",
 "361" => "Lecture",
 "362" => "Ecriture",
-"363" => "Elements Partagés",
+"363" => "Partagés",
 "364" => "Vous n'avez pas les droits pour cette opération",
 "365" => "Vous ne pouvez uploader plus de %s fichiers à la fois.",
 "366" => "Cet utilisateur n'a aucun dépôt actif.",
@@ -522,5 +522,6 @@ $mess=array(
 "464" => "Télécharger tout le workspace d'un coup (au format ZIP)",
 "465" => "Afficher les autres URLs (monter les workspace séparément)",
 "466" => "Chargement...",
+"467" => "Tous les éléments partagés",
 /* END SENTENCE */
 );
