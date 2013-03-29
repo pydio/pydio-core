@@ -188,6 +188,10 @@ div.role_edit-params-form{
     border-right: 1px solid #ccc;
 }
 
+div#parameters-selected{
+    overflow-y: hidden;
+}
+
 div#parameters-selected.non_empty{
     border: 0;
     border-bottom: 1px solid #ccc;

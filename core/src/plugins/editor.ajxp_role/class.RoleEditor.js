@@ -37,7 +37,7 @@ Class.create("RoleEditor", AbstractEditor, {
         // INIT TAB
         this.element.down("#pane-infos").setStyle({position:"relative"});
         $("pane-infos").resizeOnShow = function(tab){
-            fitHeightToBottom($("pane-infos"), $("role_edit_box"));
+            fitHeightToBottom($("pane-infos"), $("role_edit_box"), Prototype.Browser.IE ? 40 : 0);
         }
         $("pane-actions").resizeOnShow = function(tab){
             fitHeightToBottom($("actions-selected"), $("pane-actions"), 20);

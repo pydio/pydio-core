@@ -36,10 +36,10 @@ Class.create("PluginEditor", AbstractEditor, {
 
         infoPane.setStyle({position:"relative"});
         infoPane.resizeOnShow = function(tab){
-            fitHeightToBottom(infoPane, $("plugin_edit_box"));
+            fitHeightToBottom(infoPane, $("plugin_edit_box"), Prototype.Browser.IE ? 40 : 0);
         }
         docPane.resizeOnShow = function(tab){
-            fitHeightToBottom(docPane, $("plugin_edit_box"));
+            fitHeightToBottom(docPane, $("plugin_edit_box"), Prototype.Browser.IE ? 40 : 0);
         }
         this.tab = new AjxpSimpleTabs(oFormObject.down("#pluginTabulator"));
         this.actions.get("saveButton").observe("click", this.save.bind(this) );
