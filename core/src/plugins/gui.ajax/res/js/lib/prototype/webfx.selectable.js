@@ -368,7 +368,9 @@ SelectableElements = Class.create({
 		}
 		var oldFireChange = this._fireChange;
 		this._fireChange = false;
-		
+
+        // Adapt to MacOS Cmd key
+        var ctrlOrCmd = e.ctrlKey || e.metaKey;
 		
 		// create a copy to compare with after changes
 		var selectedBefore = this.getSelectedItems();	// is a cloned array
@@ -386,11 +388,11 @@ SelectableElements = Class.create({
 		var aIndex = this._anchorIndex;
 	
 		// test whether the current row should be the anchor
-		if (this._selectedItems.length == 0 || (e.ctrlKey && !e.shiftKey && this._multiple)) {
+		if (this._selectedItems.length == 0 || (ctrlOrCmd && !e.shiftKey && this._multiple)) {
 			aIndex = this._anchorIndex = rIndex;
 		}
 	
-		if (!e.ctrlKey && !e.shiftKey || !this._multiple) {
+		if (!ctrlOrCmd && !e.shiftKey || !this._multiple) {
 			// deselect all
 			var items = this._selectedItems;
 			for (var i = items.length - 1; i >= 0; i--) {
@@ -405,13 +407,13 @@ SelectableElements = Class.create({
 		}
 	
 		// ctrl
-		else if (this._multiple && e.ctrlKey && !e.shiftKey) {
+		else if (this._multiple && ctrlOrCmd && !e.shiftKey) {
 			this.setItemSelected(el, !el._selected);
 			this._anchorIndex = rIndex;
 		}
 	
 		// ctrl + shift
-		else if (this._multiple && e.ctrlKey && e.shiftKey) {
+		else if (this._multiple && ctrlOrCmd && e.shiftKey) {
 			// up or down?
 			var dirUp = this.isBefore(rIndex, aIndex);
 	
@@ -427,7 +429,7 @@ SelectableElements = Class.create({
 		}
 	
 		// shift
-		else if (this._multiple && !e.ctrlKey && e.shiftKey) {
+		else if (this._multiple && !ctrlOrCmd && e.shiftKey) {
 			// up or down?
 			var dirUp = this.isBefore(rIndex, aIndex);
 	

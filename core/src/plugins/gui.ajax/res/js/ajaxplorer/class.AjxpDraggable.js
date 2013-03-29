@@ -60,6 +60,7 @@ Class.create("AjxpDraggable", Draggable, {
 	initialize: function($super, element, options, component, componentType){		
 		element = $(element);
 		element.addClassName('ajxp_draggable');
+        if(!options.zindex) options.zindex = 900;
 		$super(element, options);
 		this.options.reverteffect =  function(element, top_offset, left_offset) {
 			new Effect.Move(element, { x: -left_offset, y: -top_offset, duration: 0,

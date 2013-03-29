@@ -1207,7 +1207,7 @@ Class.create("Ajaxplorer", {
 				}
 				Event.stop(e);
 			}
-			if(this.blockShortcuts || e['ctrlKey']) return;
+			if(this.blockShortcuts || e['ctrlKey'] || e['metaKey']) return;
 			if(e.keyCode != Event.KEY_DELETE && ( e.keyCode > 90 || e.keyCode < 65 ) ) return;
 			else return this.actionBar.fireActionByKey(e, (e.keyCode == Event.KEY_DELETE ? "key_delete":String.fromCharCode(e.keyCode).toLowerCase()));
 		}.bind(this));
