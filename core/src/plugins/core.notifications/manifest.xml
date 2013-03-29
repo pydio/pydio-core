@@ -44,7 +44,6 @@
                     ]]></clientCallback>
                     <clientForm id="user_feed"><![CDATA[
                         <div id="user_feed" box_padding="0" class="dialogBox css_boxshadow">
-                            <link type="text/css" rel="stylesheet" href="plugins/core.notifications/res/css/notification_center.css"/>
                         </div>
                     ]]></clientForm>
                     <serverCallback methodName="loadUserFeed"/>

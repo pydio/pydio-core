@@ -504,6 +504,12 @@ class ShareCenter extends AJXP_Plugin{
         }
     }
 
+    function computeMinisiteToServerURL(){
+        $minisite = parse_url($this->buildPublicDlURL(), PHP_URL_PATH) ."/a.php";
+        $server   = parse_url( AJXP_Utils::detectServerURL(), PHP_URL_PATH) . dirname($_SERVER['REQUEST_URI']);
+        return AJXP_Utils::getTravelPath($minisite, $server);
+    }
+
     function buildPublicletLink($hash){
         $addLang = ConfService::getLanguage() != ConfService::getCoreConf("DEFAULT_LANGUAGE");
         if($this->pluginConf["USE_REWRITE_RULE"] == true){
@@ -572,6 +578,8 @@ class ShareCenter extends AJXP_Plugin{
         }else{
             $html = str_replace("AJXP_PRELOGED_USER", "", $html);
         }
+        $tPath = (!empty($data["TRAVEL_PATH_TO_ROOT"]) ? $data["TRAVEL_PATH_TO_ROOT"] : "../..");
+        $html = str_replace("AJXP_PATH_TO_ROOT", $tPath, $html);
         echo($html);
     }
 
@@ -797,6 +805,8 @@ class ShareCenter extends AJXP_Plugin{
         if($httpVars["disable_download"]){
             $data["DOWNLOAD_DISABLED"] = true;
         }
+        $data["TRAVEL_PATH_TO_ROOT"] = $this->computeMinisiteToServerURL();
+
         $outputData = serialize($data);
         $hash = self::computeHash($outputData, $downloadFolder);
 

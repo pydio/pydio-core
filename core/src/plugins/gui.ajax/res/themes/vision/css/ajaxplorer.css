@@ -193,6 +193,7 @@ textarea{
     font-size: 18px;
     text-align: left;
     padding-top: 7px;
+    padding-bottom: 2px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -205,7 +206,7 @@ textarea{
     opacity: 0.8;
     font-size: 11px;
     white-space: nowrap;
-    margin-top: -1px;
+    margin-top: -3px;
 }
 
 div.thumbnail_cell_metadata span.metadata_chunk span.text_label{
