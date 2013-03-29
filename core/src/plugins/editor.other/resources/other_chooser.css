@@ -16,11 +16,23 @@
 	border-top: 1px solid #ddd;
 }
 
+#other_editor_box a.iconic{
+    padding-left: 2px;
+}
+
+#other_editor_box a.iconic span[class^="icon-"]{
+    display: inline-block;
+    margin: 0px 10px 0 5px;
+    width: 10px;
+    font-size: 13px;
+    text-align: center;
+}
+
 #other_editor_box a:first-child{
 	border-top:0px;
 }
 
-#other_editor_box a span{
+#other_editor_box a span.chooser_editor_legend{
 	float:right;
 	opacity:0.7;
 	-moz-opacity:0.7;

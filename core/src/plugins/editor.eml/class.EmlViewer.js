@@ -30,7 +30,7 @@ Class.create("EmlViewer", AbstractEditor, {
 	},
 	
 	
-	open : function($super, userSelection){
+	open : function($super, node){
 		// Move hidden download form in body, if not already there
 		var original = $("emlDownloadAttachmentForm");
 		if($("emlDownloadForm")){
@@ -44,8 +44,8 @@ Class.create("EmlViewer", AbstractEditor, {
 			$("emlDownloadForm").insert(new Element("input", {"type":"hidden", "name":"secure_token", "value":Connexion.SECURE_TOKEN}));
 			$("emlDownloadForm").insert(new Element("input", {"type":"hidden", "name":"attachment_id", "value":""}));
 		}
-		$super(userSelection);
-		var fileName = userSelection.getUniqueFileName();
+		$super(node);
+		var fileName = node.getPath();
 		this.textareaContainer = new Element('div');
 		this.contentMainContainer = this.textareaContainer;
 		this.textareaContainer.setStyle({width:'100%', overflow:'auto'});	

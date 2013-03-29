@@ -59,11 +59,18 @@ Class.create("OtherEditorChooser", AbstractEditor, {
 		var even = false;
 		allEditors.each(function(el){
 			if(el.editorClass == "OtherEditorChooser") return;
-			var elDiv = new Element('a', {
-				href:'#', 
-				className:(even?'even':''),
-				style:"background-image:url('"+resolveImageSource(el.icon, '/images/actions/ICON_SIZE', 22)+"');background-size:22px;"
-				}).update(el.text + '<span>'+el.title+'</span>');
+            if(ajaxplorer.currentThemeUsesIconFonts && el.icon_class){
+                var elDiv = new Element('a', {
+                    href:'#',
+                    className:'iconic '+(even?'even':'')
+                }).update('<span class="'+ el.icon_class+'"></span>' + el.text + '<span class="chooser_editor_legend">'+el.title+'</span>');
+            }else{
+                var elDiv = new Element('a', {
+                    href:'#',
+                    className:(even?'even':''),
+                    style:"background-image:url('"+resolveImageSource(el.icon, '/images/actions/ICON_SIZE', 22)+"');background-size:22px;"
+                }).update(el.text + '<span class="chooser_editor_legend">'+el.title+'</span>');
+            }
 			even = !even;
             elDiv.currentMime = node.getAjxpMime();
 			elDiv.editorData = el;
