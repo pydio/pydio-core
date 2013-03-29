@@ -493,6 +493,8 @@ Class.create("ShareCenter", {
                 }
             }
             container.select("textarea").each(function(t){
+                t.observe("focus", function(e){ ajaxplorer.disableShortcuts();});
+                t.observe("blur", function(e){ ajaxplorer.enableShortcuts();});
                 t.observe("click", function(event){event.target.select();});
             });
             container.up("div[ajxpClass]").ajxpPaneObject.resize();

@@ -132,7 +132,6 @@ class ShareCenter extends AJXP_Plugin{
                     }else{
                         $numResult = $result;
                     }
-                    AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
                     print($numResult);
                 }else if ($subAction == "create_minisite"){
                     header("Content-type:text/plain");
@@ -142,7 +141,6 @@ class ShareCenter extends AJXP_Plugin{
                     }else{
                         list($hash, $url) = $res;
                         $metadata = array("element" => $hash, "minisite" => (isSet($httpVars["create_guest_user"])?"public":"private"));
-                        AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
                     }
                     print($url);
             	}else{
@@ -162,7 +160,6 @@ class ShareCenter extends AJXP_Plugin{
                     list($hash, $url) = $this->writePubliclet($data, $this->accessDriver, $this->repository);
                     $metadata = array("element" => $hash);
 	                header("Content-type:text/plain");
-                    AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
                     echo $url;
             	}
                 if($metadata != null && $ajxpNode->hasMetaStore()){
@@ -174,8 +171,10 @@ class ShareCenter extends AJXP_Plugin{
                         true
                     );
                 }
+                AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
 
-            break;
+
+                break;
 
             case "toggle_link_watch":
 

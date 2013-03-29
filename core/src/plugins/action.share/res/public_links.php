@@ -2,7 +2,6 @@
 <html>
 	<head>	
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<link rel='stylesheet' type='text/css' href='allz.css'/>
         <style type="text/css">
             * {
                 font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;

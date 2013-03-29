@@ -124,7 +124,7 @@ class MqManager extends AJXP_Plugin
                 $this->wsClient->addHeader("Admin-Key", $configs["WS_SERVER_ADMIN"]);
                 @$this->wsClient->open();
             }
-            $this->wsClient->sendMessage($msg);
+            @$this->wsClient->sendMessage($msg);
         }
 
     }
