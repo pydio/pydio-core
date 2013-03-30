@@ -228,11 +228,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                                 "DESCRIPTION" => "Core application parameters",
                                 "ICON" => "preferences_desktop.png",
                                 "LIST" => "listPlugins"),
-                            "plugins"	   => array(
-                                "LABEL" => $mess["ajxp_conf.99"],
-                                "DESCRIPTION" => "Enable/disable plugins, check if they are correctly working, set up global parameters of the plugins.",
+                            "core_plugins" => array(
+                                "LABEL" => "Core Plugins",
+                                "DESCRIPTION" => "Enable/disable core plugins (auth, conf, mail, etc), check if they are correctly working. Configuration of these plugins are generally done through the Main Options",
                                 "ICON" => "folder_development.png",
                                 "LIST" => "listPlugins"),
+                            "plugins"	   => array(
+                                "LABEL" => $mess["ajxp_conf.99"],
+                                "DESCRIPTION" => "Enable/disable additional feature-oriented plugins, check if they are correctly working, set up global parameters of the plugins.",
+                                "ICON" => "folder_development.png",
+                                "LIST" => "listPlugins")
                         )
                     ),
                     "admin" => array(
@@ -257,7 +262,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         )
                     ),
                     "developer" => array(
-                        "LABEL" => "Developer",
+                        "LABEL" => "Developer Resources",
                         "ICON" => "applications_engineering.png",
                         "DESCRIPTION" => "Generated documentations for developers",
                         "CHILDREN" => array(
@@ -1328,26 +1333,25 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				
 			break;
 
-            case "test_plugin_options":
+            case "run_plugin_action":
 
                 $options = array();
                 $this->parseParameters($httpVars, $options, null, true);
-                $confStorage = ConfService::getConfStorageImpl();
-                $pluginId = $httpVars["button_source"];
+                $pluginId = $httpVars["action_plugin_id"];
                 if(isSet($httpVars["button_key"])){
                     $options = $options[$httpVars["button_key"]];
                 }
                 $plugin = AJXP_PluginsService::getInstance()->softLoad($pluginId, array());
-                if(method_exists($plugin, "testParameters")){
+                if(method_exists($plugin, $httpVars["action_plugin_method"])){
                     try{
-                        $res = call_user_func(array($plugin, "testParameters"), $options);
+                        $res = call_user_func(array($plugin, $httpVars["action_plugin_method"]), $options);
                     }catch (Exception $e){
                         echo("ERROR:" . $e->getMessage());
                         break;
                     }
                     echo($res);
                 }else{
-                    echo 'ERROR: Plugin does not implement testParameters method!';
+                    echo 'ERROR: Plugin '.$httpVars["action_plugin_id"].' does not implement '.$httpVars["action_plugin_method"].' method!';
                 }
 
             break;
@@ -1384,13 +1388,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$activePlugins = $pServ->getActivePlugins();
 		$types = $pServ->getDetectedPlugins();
 		$uniqTypes = array("core");
-		if($dir == "/plugins"){
+        $coreTypes = array("auth", "conf", "boot", "feed", "log", "mailer", "mq");
+        if($dir == "/plugins" || $dir == "/core_plugins"){
+            if($dir == "/core_plugins") $uniqTypes = $coreTypes;
+            else $uniqTypes = array_diff(array_keys($types), $coreTypes);
 			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.plugins_folder">
 			<column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
 			</columns>');		
 			ksort($types);
 			foreach( $types as $t => $tPlugs){
-				if(in_array($t, $uniqTypes))continue;
+				if(!in_array($t, $uniqTypes))continue;
 				$meta = array(
 					"icon" 		=> "folder_development.png",					
 					"plugin_id" => $t
@@ -1404,26 +1411,29 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			<column messageId="ajxp_conf.103" attributeName="plugin_description" sortType="String"/>
 			</columns>');		
 			$mess = ConfService::getMessages();
+            $all =  $first = "";
 			foreach($uniqTypes as $type){
 				if(!isset($types[$type])) continue;
 				foreach($types[$type] as $pId => $pObject){
+                    $isMain = ($pObject->getId() == "core.ajaxplorer");
 					$meta = array(				
-						"icon" 		=> ($type == "core"?"preferences_desktop.png":"preferences_plugin.png"),
+						"icon" 		=> ($isMain?"preferences_desktop.png":"desktop.png"),
 						"ajxp_mime" => "ajxp_plugin",
 						"plugin_id" => $pObject->getId(),						
 						"plugin_description" => $pObject->getManifestDescription()
 					);
-					if($type == "core"){
-                        // Check if there are actually any parameters to display!
-                        if($pObject->getManifestRawContent("server_settings", "xml")->length == 0) continue;
-					    $label =  $pObject->getManifestLabel();//sprintf($mess["ajxp_conf.100"], $pObject->getName());
-					}else{
-						if($activePlugins[$pObject->getId()] !== true) continue;
-						$label = $pObject->getManifestLabel();
-					}
-					AJXP_XMLWriter::renderNode("/$root/plugins/".$pObject->getId(), $label, true, $meta);
-				}				
+                    // Check if there are actually any parameters to display!
+                    if($pObject->getManifestRawContent("server_settings", "xml")->length == 0) continue;
+                    $label =  $pObject->getManifestLabel();
+                    $nodeString =AJXP_XMLWriter::renderNode("/$root/plugins/".$pObject->getId(), $label, true, $meta, true, false);
+                    if($isMain){
+                        $first = $nodeString;
+                    }else{
+                        $all .= $nodeString;
+                    }
+				}
 			}
+            print($first.$all);
 		}else{
 			$split = explode("/", $dir);
 			if(empty($split[0])) array_shift($split);
@@ -1593,7 +1603,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
 	function listRepositories(){
 		$repos = ConfService::getRepositoriesList("all");
-		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.repositories">
+		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.repositories">
 			<column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/>
 			<column messageId="ajxp_conf.9" attributeName="accessType" sortType="String"/>
 			<column messageId="ajxp_shared.27" attributeName="owner" sortType="String"/>

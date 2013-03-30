@@ -50,6 +50,9 @@ Class.create("PluginEditor", AbstractEditor, {
             }
             return true;
         }.bind(this) );
+        modal.setCloseAction(function(){
+            this.formManager.destroyForm(this.infoPane.down("div.driver_form"));
+        }.bind(this));
         oFormObject.down(".action_bar").select("a").invoke("addClassName", "css_gradient");
         this.infoPane = infoPane;
         this.docPane = docPane;

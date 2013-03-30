@@ -277,6 +277,8 @@ class AJXP_Controller{
      * @param String $currentRepositoryId
      * @param String $actionName
      * @param Array $parameters
+     * @param string $user
+     * @param string $statusFile
      * @return null|UnixProcess
      */
 	public static function applyActionInBackground($currentRepositoryId, $actionName, $parameters, $user ="", $statusFile = ""){
@@ -305,6 +307,9 @@ class AJXP_Controller{
             if($key == "action" || $key == "get_action") continue;
 			$cmd .= " --$key=".escapeshellarg($value);
 		}
+
+        return self::runCommandInBackground($cmd, $logFile);
+        /*
 		if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows"){
             if(AJXP_SERVER_DEBUG) $cmd .= " > ".$logFile;
             if(class_exists("COM") && ConfService::getCoreConf("CLI_USE_COM")){
@@ -315,17 +320,41 @@ class AJXP_Controller{
                 $cmd .= "\n DEL ".chr(34).$tmpBat.chr(34);
                 AJXP_Logger::debug("Writing file $cmd to $tmpBat");
                 file_put_contents($tmpBat, $cmd);
- 				/* Following 1 line modified by rmeske: The windows Start command identifies the first parameter in quotes as a title for the window.  Therefore, when enclosing a command with double quotes you must include a window title first
-				START	["title"] [/Dpath] [/I] [/MIN] [/MAX] [/SEPARATE | /SHARED] [/LOW | /NORMAL | /HIGH | /REALTIME] [/WAIT] [/B] [command / program] [parameters]
-				*/
-               pclose(popen('start /b "CLI" "'.$tmpBat.'"', 'r'));
+                pclose(popen('start /b "CLI" "'.$tmpBat.'"', 'r'));
             }
 		}else{
 			$process = new UnixProcess($cmd, (AJXP_SERVER_DEBUG?$logFile:null));
 			AJXP_Logger::debug("Starting process and sending output dev null");
             return $process;
-		}		
+		}
+        */
 	}
+
+    /**
+     * @param $cmd
+     * @param $logFile
+     * @return UnixProcess|null
+     */
+    public static function runCommandInBackground($cmd, $logFile){
+        if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows"){
+              if(AJXP_SERVER_DEBUG) $cmd .= " > ".$logFile;
+              if(class_exists("COM") && ConfService::getCoreConf("CLI_USE_COM")){
+                  $WshShell   = new COM("WScript.Shell");
+                  $oExec      = $WshShell->Run("cmd /C $cmd", 0, false);
+              }else{
+                  $basePath = str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH);
+                  $tmpBat = implode(DIRECTORY_SEPARATOR, array( $basePath, "data","tmp", md5(time()).".bat"));
+                  $cmd .= "\n DEL ".chr(34).$tmpBat.chr(34);
+                  AJXP_Logger::debug("Writing file $cmd to $tmpBat");
+                  file_put_contents($tmpBat, $cmd);
+                  pclose(popen('start /b "CLI" "'.$tmpBat.'"', 'r'));
+              }
+        }else{
+            $process = new UnixProcess($cmd, (AJXP_SERVER_DEBUG?$logFile:null));
+            AJXP_Logger::debug("Starting process and sending output dev null");
+            return $process;
+        }
+    }
 
     /**
      * Find a callback node by its xpath query, filtering with the applyCondition if the xml attribute exists.

@@ -12,7 +12,9 @@
         <global_param description="WebSocket server port" label="WS Port" name="WS_SERVER_PORT" type="string" expose="true" default="8090"/>
         <global_param description="WebSocket handler path" label="WS Path" name="WS_SERVER_PATH" type="string" expose="true"/>
         <global_param description="WebSocket admin key" label="WS Key" name="WS_SERVER_ADMIN" type="string"/>
-        <global_param name="TEST_CONNEXION" type="button" choices="test_plugin_options" default="core.mq" label="CONF_MESSAGE[Test Connexion]" description="CONF_MESSAGE[Connect to the WS server]" mandatory="false"/>
+        <global_param type="monitor" name="WS_STATUS" choices="run_plugin_action:core.mq:getWebSocketStatus" label="CONF_MESSAGE[WebSocket Server Status]" description="CONF_MESSAGE[Try to detect if the server is running correctly]" mandatory="false"/>
+        <global_param type="button" name="SWITCH_WS_ON" choices="run_plugin_action:core.mq:switchWebSocketOn" label="CONF_MESSAGE[Run WebSocket Server]" description="CONF_MESSAGE[Switch the WS server ON]" mandatory="false"/>
+        <global_param type="button" name="SWITCH_WS_OFF" choices="run_plugin_action:core.mq:switchWebSocketOff" label="CONF_MESSAGE[Stop WebSocket Server]" description="CONF_MESSAGE[Switch the WS server OFF]" mandatory="false"/>
     </server_settings>
     <class_definition classname="MqManager" filename="plugins/core.mq/class.MqManager.php"/>
     <registry_contributions>

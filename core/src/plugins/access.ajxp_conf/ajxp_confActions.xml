@@ -73,7 +73,7 @@
 				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
-		<action name="test_plugin_options">
+		<action name="run_plugin_action">
 			<processing>
 				<serverCallback methodName="switchAction"/>
 			</processing>

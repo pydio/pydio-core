@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<authdriver name="sql" label="CONF_MESSAGE[DB Storage]"
+<authdriver name="sql" label="CONF_MESSAGE[DB Auth Storage]"
             description="CONF_MESSAGE[Stores the Authentication data in an SQL database.]"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd"
-            mixins="dibidriver_provider,authdriver_commons"
+            mixins="dibidriver_consumer,dibidriver_provider,authdriver_commons"
         >
     <client_settings>
         <resources>

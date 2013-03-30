@@ -212,4 +212,63 @@ class MqManager extends AJXP_Plugin
 
     }
 
+    public function switchWebSocketOn($params){
+
+        $wDir = $this->getPluginWorkDir(true);
+        $pidFile = $wDir.DIRECTORY_SEPARATOR."ws-pid";
+        if(file_exists($pidFile)){
+            $pId = file_get_contents($pidFile);
+            $unixProcess = new UnixProcess();
+            $unixProcess->setPid($pId);
+            $status = $unixProcess->status();
+            if($status){
+                throw new Exception("Web Socket server seems to already be running!");
+            }
+        }
+
+        $cmd = ConfService::getCoreConf("CLI_PHP")." ws-server.php -host=".$params["WS_SERVER_HOST"]." -port=".$params["WS_SERVER_PORT"]." -path=".$params["WS_SERVER_PATH"];
+        chdir(AJXP_INSTALL_PATH.DIRECTORY_SEPARATOR.AJXP_PLUGINS_FOLDER.DIRECTORY_SEPARATOR."core.mq");
+        $process = AJXP_Controller::runCommandInBackground($cmd, null);
+        if($process != null){
+            $pId = $process->getPid();
+            $wDir = $this->getPluginWorkDir(true);
+            file_put_contents($wDir.DIRECTORY_SEPARATOR."ws-pid", $pId);
+            return "SUCCESS: Started WebSocket Server with process ID $pId";
+        }
+        return "SUCCESS: Started WebSocket Server";
+    }
+
+    public function switchWebSocketOff($params){
+
+        $wDir = $this->getPluginWorkDir(true);
+        $pidFile = $wDir.DIRECTORY_SEPARATOR."ws-pid";
+        if(!file_exists($pidFile)){
+            throw new Exception("No information found about WebSocket server");
+        }else{
+            $pId = file_get_contents($pidFile);
+            $unixProcess = new UnixProcess();
+            $unixProcess->setPid($pId);
+            $unixProcess->stop();
+            unlink($pidFile);
+        }
+        return "SUCCESS: Killed WebSocket Server";
+    }
+
+    public function getWebSocketStatus(){
+
+        $wDir = $this->getPluginWorkDir(true);
+        $pidFile = $wDir.DIRECTORY_SEPARATOR."ws-pid";
+        if(!file_exists($pidFile)){
+            return "OFF";
+        }else{
+            $pId = file_get_contents($pidFile);
+            $unixProcess = new UnixProcess();
+            $unixProcess->setPid($pId);
+            $status = $unixProcess->status();
+            if($status) return "ON";
+            else return "OFF";
+        }
+
+    }
+
 }

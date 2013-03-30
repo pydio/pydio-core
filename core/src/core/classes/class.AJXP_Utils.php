@@ -1512,13 +1512,15 @@ class AJXP_Utils
         if(!is_array($params)) return $params;
         $value = $params["group_switch_value"];
         if(isSet($value)){
-            foreach($params as $k => $v){
-                if(strpos($k, $value."_") === 0){
-                    $params[substr($k, strlen($value."_"))] = $v;
-                    unset($params[$k]);
-                }
+            if($value == "core"){
+                $params = ConfService::getCoreConf("DIBI_PRECONFIGURATION");
+            }else{
+                unset($params["group_switch_value"]);
             }
-            unset($params["group_switch_value"]);
+            foreach($params as $k => $v){
+                $params[array_pop(explode("_", $k, 2))] = $v;
+                unset($params[$k]);
+            }
         }
         return $params;
     }

@@ -47,6 +47,11 @@
             <param group="MIXIN_MESSAGE[Auth Driver Commons]" name="AJXP_ADMIN_LOGIN" type="string" label="MIXIN_MESSAGE[Admin Login]" description="MIXIN_MESSAGE[For exotic auth drivers, an user ID that must be considered as admin by default.]" mandatory="false"/>
         </server_settings>
     </authdriver_commons>
+    <dibidriver_consumer>
+        <server_settings uuidAttr="name">
+            <global_param group_switch_name="dibi" group_switch_label="Core Connexion" group_switch_value="core" name="core_driver" default="core" label="Core Connexion" description="Driver type (do not touch)" type="hidden" mandatory="true"/>
+        </server_settings>
+    </dibidriver_consumer>
     <dibidriver_provider>
         <server_settings uuidAttr="name">
             <global_param group_switch_name="dibi" group_switch_label="MySQL" group_switch_value="mysql" name="mysql_driver" default="mysql" label="Driver" description="Driver type (do not touch)" type="hidden" mandatory="true"/>
