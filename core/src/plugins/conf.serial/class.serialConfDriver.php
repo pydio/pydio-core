@@ -86,7 +86,7 @@ class serialConfDriver extends AbstractConfDriver {
 		}
 	}
 
-	function savePluginConfig($pluginId, $options){
+	function _savePluginConfig($pluginId, $options){
 		$data = AJXP_Utils::loadSerialFile($this->pluginsConfigsFile);
         foreach ($options as $k=>$v){
             if(is_string($v)){

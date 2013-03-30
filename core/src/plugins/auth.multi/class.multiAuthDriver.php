@@ -259,7 +259,18 @@ class multiAuthDriver extends AbstractAuthDriver {
 			throw new Exception("No driver instanciated in multi driver!");
 		}		
 	}	
-	
+
+    function userExistsWrite($login){
+        if($this->masterSlaveMode){
+            if($this->drivers[$this->slaveName]->userExists($login)){
+                return true;
+            }
+            return false;
+        }else{
+            return $this->userExists($login);
+        }
+    }
+
 	function userExists($login){
         if($this->masterSlaveMode){
             if($this->drivers[$this->slaveName]->userExists($login)){

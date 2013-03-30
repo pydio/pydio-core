@@ -76,11 +76,10 @@ class sqlConfDriver extends AbstractConfDriver {
 	
 	/**
 	 * 
-	 * @param String $pluginType
 	 * @param String $pluginId
 	 * @param String $options
 	 */
-	function savePluginConfig($pluginId, $options){
+	function _savePluginConfig($pluginId, $options){
 		$res_opts = dibi::query('SELECT * FROM [ajxp_plugin_configs] WHERE [id] = %s', $pluginId);
 		if(count($res_opts)){
 			dibi::query('UPDATE [ajxp_plugin_configs] SET [configs] = %s WHERE [id] = %s', serialize($options), $pluginId);

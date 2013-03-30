@@ -43,6 +43,18 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             //------------------------------------
             //	BASIC LISTING
             //------------------------------------
+            case "list_all_repositories_json":
+
+                $repositories = ConfService::getRepositoriesList("all");
+                $repoOut = array();
+                foreach($repositories as $repoObject){
+                    $repoOut[$repoObject->getId()] = $repoObject->getDisplay();
+                }
+                HTMLWriter::charsetHeader("application/json");
+                echo json_encode(array("LEGEND" => "Select a repository", "LIST" => $repoOut));
+
+            break;
+
             case "list_all_plugins_actions":
                 $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//action", "node", false, true, true);
                 $actions = array();
@@ -523,7 +535,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					return;						
 				}
 				$new_user_login = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($httpVars["new_user_login"]), AJXP_SANITIZE_EMAILCHARS);
-				if(AuthService::userExists($new_user_login) || AuthService::isReservedUserId($new_user_login))
+				if(AuthService::userExists($new_user_login, "w") || AuthService::isReservedUserId($new_user_login))
 				{
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.43"]);
@@ -1264,6 +1276,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $pInstNode->setAttribute("type", "group_switch:".$fieldName);
                     $typePlugs = AJXP_PluginsService::getInstance()->getPluginsByType($instType);
                     foreach($typePlugs as $typePlug){
+                        if($typePlug->getId() == "auth.multi") continue;
                         $tParams = AJXP_XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/param"));
                         $addParams .= '<global_param group_switch_name="'.$fieldName.'" name="instance_name" group_switch_label="'.$typePlug->getManifestLabel().'" group_switch_value="'.$typePlug->getId().'" default="'.$typePlug->getId().'" type="hidden"/>';
                         $addParams .= str_replace("<param", "<global_param group_switch_name=\"${fieldName}\" group_switch_label=\"".$typePlug->getManifestLabel()."\" group_switch_value=\"".$typePlug->getId()."\" ", $tParams);
@@ -1314,16 +1327,36 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				AJXP_XMLWriter::close("admin_data");
 				
 			break;
-			
+
+            case "test_plugin_options":
+
+                $options = array();
+                $this->parseParameters($httpVars, $options, null, true);
+                $confStorage = ConfService::getConfStorageImpl();
+                $pluginId = $httpVars["button_source"];
+                if(isSet($httpVars["button_key"])){
+                    $options = $options[$httpVars["button_key"]];
+                }
+                $plugin = AJXP_PluginsService::getInstance()->softLoad($pluginId, array());
+                if(method_exists($plugin, "testParameters")){
+                    try{
+                        $res = call_user_func(array($plugin, "testParameters"), $options);
+                    }catch (Exception $e){
+                        echo("ERROR:" . $e->getMessage());
+                        break;
+                    }
+                    echo($res);
+                }else{
+                    echo 'ERROR: Plugin does not implement testParameters method!';
+                }
+
+            break;
+
 			case "edit_plugin_options":
 				
 				$options = array();
 				$this->parseParameters($httpVars, $options, null, true);
-                if($httpVars["plugin_id"] == "core.conf" || strpos($httpVars["plugin_id"], "conf.") === 0){
-                    $confStorage = ConfService::getBootConfStorageImpl();
-                }else{
-                    $confStorage = ConfService::getConfStorageImpl();
-                }
+                $confStorage = ConfService::getConfStorageImpl();
                 $confStorage->savePluginConfig($httpVars["plugin_id"], $options);
 				@unlink(AJXP_PLUGINS_CACHE_FILE);
 				@unlink(AJXP_PLUGINS_REQUIRES_FILE);				
