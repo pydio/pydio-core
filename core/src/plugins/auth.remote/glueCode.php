@@ -79,7 +79,7 @@ switch($plugInAction)
 	    if (is_array($login))
 	    {
 	        $newSession = new SessionSwitcher("AjaXplorer");
-	        if($autoCreate && !AuthService::userExists($login["name"])){
+	        if($autoCreate && !AuthService::userExists($login["name"], "w")){
 		        $isAdmin = (isSet($login["right"]) && $login["right"] == "admin");
 	        	AuthService::createUser($login["name"], $login["password"], $isAdmin);
 	        }

@@ -134,17 +134,43 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				unset($DRIVER_CONF);
 			}
 		}
-		$this->_loadPluginConfig($pluginType.".".$pluginName, $options);
+        if($this->pluginUsesBootConf($pluginType.".".$pluginName)){
+            ConfService::getBootConfStorageImpl()->_loadPluginConfig($pluginType.".".$pluginName, $options);
+        }else{
+            $this->_loadPluginConfig($pluginType.".".$pluginName, $options);
+        }
 		return $options;
 	}
 
 	abstract function _loadPluginConfig($pluginId, &$options);
-	
+
+    /**
+     * Intercept CONF and AUTH configs to use the BootConf Storage
+   	 * @param String $pluginId
+   	 * @param String $options
+   	 */
+    public function savePluginConfig($pluginId, $options){
+        if($this->pluginUsesBootConf($pluginId)){
+            ConfService::getBootConfStorageImpl()->_savePluginConfig($pluginId, $options);
+        }else{
+            $this->_savePluginConfig($pluginId, $options);
+        }
+    }
+
+    /**
+     * @param String $pluginId
+     * @return bool
+     */
+    protected function pluginUsesBootConf($pluginId){
+        return ($pluginId == "core.conf" || strpos($pluginId, "conf.") === 0
+            || $pluginId == "core.auth" || strpos($pluginId, "auth.") === 0);
+    }
+
 	/**
 	 * @param String $pluginId
 	 * @param String $options
 	 */
-	abstract function savePluginConfig($pluginId, $options);
+	abstract function _savePluginConfig($pluginId, $options);
 	
 	
 	// SAVE / EDIT / CREATE / DELETE REPOSITORY

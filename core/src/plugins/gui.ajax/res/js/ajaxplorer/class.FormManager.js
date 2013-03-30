@@ -105,6 +105,32 @@ Class.create("FormManager", {
             }
 			if(type == 'string' || type == 'integer' || type == 'array' || type == "hidden"){
                 element = new Element('input', Object.extend({type: (type == "hidden" ? 'hidden' : 'text'), className:'SF_input', value:defaultValue}, commonAttributes));
+            }else if(type == 'button'){
+
+                element = new Element('div', {className:'SF_input SF_inlineButton'}).update('<span class="icon-play-circle"></span>'+param.get('description'));
+                element.observe("click", function(event){
+                    element.addClassName('SF_inlineButtonWorking');
+                    var testValues = $H();
+                    this.serializeParametersInputs(form, testValues, "DRIVER_OPTION_");
+                    var conn = new Connexion();
+                    testValues.set('get_action', param.get("choices"));
+                    testValues.set("button_source", param.get("default"));
+                    if(name.indexOf("/") !== -1){
+                        testValues.set("button_key", getRepName(name));
+                    }
+                    conn.setMethod('post');
+                    conn.setParameters(testValues);
+                    conn.onComplete = function(transport){
+                        element.removeClassName('SF_inlineButtonWorking');
+                        if(transport.responseText.startsWith('SUCCESS:')){
+                            ajaxplorer.displayMessage("SUCCESS", transport.responseText.replace("SUCCESS:", ""));
+                        }else{
+                            ajaxplorer.displayMessage("ERROR", transport.responseText.replace("ERROR:", ""));
+                        }
+                    };
+                    conn.sendAsync();
+                }.bind(this));
+
             }else if(type == 'textarea'){
                 if(defaultValue) defaultValue = defaultValue.replace(new RegExp("__LBR__", "g"), "\n");
                 element = '<textarea class="SF_input" style="height:70px;" data-ajxp_type="'+type+'" data-ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'"'+disabledString+'>'+defaultValue+'</textarea>'
@@ -281,10 +307,11 @@ Class.create("FormManager", {
             if(json_list){
                 var conn = new Connexion();
                 element = div.down("select");
+                if(defaultValue) element.defaultValue = defaultValue;
                 conn.setParameters({get_action:json_list});
                 conn.onComplete = function(transport){
-                    element.down("option").update("Select an action");
                     var json = transport.responseJSON;
+                    element.down("option").update(json.LEGEND ? json.LEGEND : "Select...");
                     if(json.HAS_GROUPS){
                         for(var key in json.LIST){
                             var opt = new Element("OPTGROUP", {label:key});
@@ -293,6 +320,12 @@ Class.create("FormManager", {
                                 var option = new Element("OPTION").update(json.LIST[key][index].action);
                                 element.insert(option);
                             }
+                        }
+                    }else{
+                        for (var key in json.LIST){
+                            var option = new Element("OPTION", {value:key}).update(json.LIST[key]);
+                            if(key == defaultValue) option.setAttribute("selected", "true");
+                            element.insert(option);
                         }
                     }
                 };

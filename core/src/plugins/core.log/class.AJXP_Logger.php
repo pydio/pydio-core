@@ -43,7 +43,7 @@ class AJXP_Logger extends AJXP_Plugin {
         parent::init($options);
         $this->pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_PLUGIN_INSTANCE"], "AbstractLogDriver");
         if($this->pluginInstance != false){
-            AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("log", $this->pluginInstance->getName(), "LOG_DRIVER", "log");
+            AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("log", $this->pluginInstance->getName(), $this->pluginInstance);
         }
         self::$loggerInstance = $this->pluginInstance;
     }

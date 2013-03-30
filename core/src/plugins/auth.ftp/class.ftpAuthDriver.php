@@ -69,12 +69,15 @@ class ftpAuthDriver extends AbstractAuthDriver {
 
 	
 	function listUsers(){
-		$adminUser = $this->options["ADMIN_USER"];
+		$adminUser = $this->options["AJXP_ADMIN_LOGIN"];
+		if(isSet($this->options["ADMIN_USER"])) {
+            $adminUser = $this->options["AJXP_ADMIN_LOGIN"];
+        }
 		return array($adminUser => $adminUser);
 	}
 	
 	function userExists($login){
-		return true;
+		return true ;
 	}	
 	
 	function logoutCallback($actionName, $httpVars, $fileVars){		
@@ -84,7 +87,10 @@ class ftpAuthDriver extends AbstractAuthDriver {
 			unset($_SESSION["AJXP_DYNAMIC_FTP_DATA"]);
 		}
 		AJXP_Safe::clearCredentials();
-		$adminUser = $this->options["ADMIN_USER"];
+		$adminUser = $this->options["AJXP_ADMIN_LOGIN"];
+        if(isSet($this->options["ADMIN_USER"])) {
+              $adminUser = $this->options["AJXP_ADMIN_LOGIN"];
+          }
 		$subUsers = array();
 		if($crtUser != $adminUser && $crtUser!=""){
             ConfService::getConfStorageImpl()->deleteUser($crtUser, $subUsers);
@@ -107,9 +113,24 @@ class ftpAuthDriver extends AbstractAuthDriver {
 		}
 		$_SESSION["AJXP_DYNAMIC_FTP_DATA"] = $ftpOptions;
 	}
-		
+
+    function testParameters($params){
+        AJXP_Logger::debug("TESTING", $params);
+        $repositoryId = $params["REPOSITORY_ID"];
+        $wrapper = new ftpSonWrapper();
+        try{
+            $wrapper->initUrl("ajxp.ftp://fake:fake@$repositoryId/");
+        }catch (Exception $e){
+            if($e->getMessage() == "Cannot login to FTP server with user fake"){
+                return "SUCCESS: FTP server successfully contacted.";
+            }else{
+                return "ERROR: ".$e->getMessage();
+            }
+        }
+        return "SUCCESS; Could succesfully connect to the FTP server!";
+    }
+
 	function checkPassword($login, $pass, $seed){
-		$adminUser = $this->options["ADMIN_USER"];
 		$wrapper = new ftpSonWrapper();
 		$repoId = $this->options["REPOSITORY_ID"];
 		try{

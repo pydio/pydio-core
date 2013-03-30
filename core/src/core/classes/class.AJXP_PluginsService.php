@@ -140,11 +140,7 @@ class AJXP_PluginsService{
             $this->registry[$plugType] = array();
         }
         $plugin = $this->instanciatePluginClass($plugin);
-        if($plugType == "conf" || $plugin->getId() == "core.conf"){
-            $options = ConfService::getBootConfStorageImpl()->loadPluginConfig($plugType, $plugin->getName());
-        }else{
-            $options = $this->confStorage->loadPluginConfig($plugType, $plugin->getName());
-        }
+        $options = $this->confStorage->loadPluginConfig($plugType, $plugin->getName());
         $plugin->loadConfigs($options);
         $this->registry[$plugType][$plugin->getName()] = $plugin;
         $plugin->loadingState = "loaded";
@@ -449,15 +445,19 @@ class AJXP_PluginsService{
      * Some type require only one active plugin at a time
      * @param $type
      * @param $name
+     * @param AJXP_Plugin $updateInstance
      * @return void
      */
-    public function setPluginUniqueActiveForType($type, $name){
+    public function setPluginUniqueActiveForType($type, $name, $updateInstance = null){
         $typePlugs = $this->getPluginsByType($type);
         $this->tmpDeferRegistryBuild = true;
         foreach($typePlugs as $plugName => $plugObject){
             $this->setPluginActiveInst($type, $plugName, false);
         }
         $this->tmpDeferRegistryBuild = false;
+        if(isSet($updateInstance) && isSet($this->registry[$type][$name])){
+            $this->registry[$type][$name] = $updateInstance;
+        }
         $this->setPluginActiveInst($type, $name, true);
     }
     /**

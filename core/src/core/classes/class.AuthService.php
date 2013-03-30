@@ -551,16 +551,20 @@ class AuthService
 	/**
      * Use driver implementation to check whether the user exists or not.
      * @static
-     * @param $userId
+     * @param String $userId
+     * @param String $mode "r" or "w"
      * @return bool
      */
-	static function userExists($userId)
+	static function userExists($userId, $mode = "r")
 	{
         if($userId == "guest" && !ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")){
             return false;
         }
         $userId = AuthService::filterUserSensitivity($userId);
 		$authDriver = ConfService::getAuthDriverImpl();
+        if($mode == "w"){
+            return $authDriver->userExistsWrite($userId);
+        }
 		return $authDriver->userExists($userId);
 	}
 

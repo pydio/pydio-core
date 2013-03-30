@@ -68,7 +68,7 @@ class BootConfLoader extends AbstractConfDriver {
      * @param String $pluginId
      * @param String $options
      */
-    function savePluginConfig($pluginId, $options)
+    function _savePluginConfig($pluginId, $options)
     {
         $jsonPath = $this->getPluginWorkDir(true)."/bootstrap.json";
         $jsonData = AJXP_Utils::loadSerialFile($jsonPath, false, "json");

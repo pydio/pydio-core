@@ -512,7 +512,9 @@ textarea#myCode
     margin-top: 5px;
 }
 
-.largeButton {
+.largeButton,
+.SF_input.SF_inlineButton
+{
     padding: 4px 5px 3px;
     font-size: 12px;
     text-align: center;
@@ -798,6 +800,22 @@ input.SF_input.SF_number{
 .SF_elementWithCheckbox > .SF_input{
     width: 50% !important;
     _width:46% !important; /*IE*/
+}
+
+.SF_inlineButton {
+    margin: 3px 0 !important;
+    padding: 4px !important;
+    background-image: url('../images/grid_tl.png');
+}
+
+.SF_inlineButton span[class^="icon-"]{
+    margin-right: 3px;
+}
+
+.SF_inlineButton.SF_inlineButtonWorking{
+    box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.35);
+    padding-top: 5px !important;
+    padding-bottom: 3px !important;
 }
 
 .SF_failed{

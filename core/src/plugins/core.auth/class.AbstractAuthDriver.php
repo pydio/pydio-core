@@ -236,6 +236,16 @@ class AbstractAuthDriver extends AJXP_Plugin {
 	function userExists($login){}
 
     /**
+     * Alternative method to be used when checking if user exists
+     * before creating a new user.
+     * @param $login
+     * @return bool
+     */
+    function userExistsWrite($login){
+        return $this->userExists($login);
+    }
+
+    /**
      * @param string $login
      * @param string $pass
      * @param string $seed

@@ -12,6 +12,7 @@
         <global_param description="WebSocket server port" label="WS Port" name="WS_SERVER_PORT" type="string" expose="true" default="8090"/>
         <global_param description="WebSocket handler path" label="WS Path" name="WS_SERVER_PATH" type="string" expose="true"/>
         <global_param description="WebSocket admin key" label="WS Key" name="WS_SERVER_ADMIN" type="string"/>
+        <global_param name="TEST_CONNEXION" type="button" choices="test_plugin_options" default="core.mq" label="CONF_MESSAGE[Test Connexion]" description="CONF_MESSAGE[Connect to the WS server]" mandatory="false"/>
     </server_settings>
     <class_definition classname="MqManager" filename="plugins/core.mq/class.MqManager.php"/>
     <registry_contributions>
