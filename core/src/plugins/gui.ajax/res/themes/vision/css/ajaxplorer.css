@@ -808,6 +808,13 @@ input.SF_input.SF_number{
     background-image: url('../images/grid_tl.png');
 }
 
+.SF_inlineMonitoring {
+    padding: 7px 4px !important;
+}
+.SF_inlineMonitoring.SF_inlineMonitoringWorking:after{
+    content: " [reloading]";
+}
+
 .SF_inlineButton span[class^="icon-"]{
     margin-right: 3px;
 }

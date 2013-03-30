@@ -113,8 +113,13 @@ Class.create("FormManager", {
                     var testValues = $H();
                     this.serializeParametersInputs(form, testValues, "DRIVER_OPTION_");
                     var conn = new Connexion();
-                    testValues.set('get_action', param.get("choices"));
-                    testValues.set("button_source", param.get("default"));
+
+                    var choicesValue = param.get("choices").split(":");
+                    testValues.set('get_action', choicesValue.shift());
+                    if(choicesValue.length > 1){
+                        testValues.set("action_plugin_id", choicesValue.shift());
+                        testValues.set("action_plugin_method", choicesValue.shift());
+                    }
                     if(name.indexOf("/") !== -1){
                         testValues.set("button_key", getRepName(name));
                     }
@@ -127,9 +132,43 @@ Class.create("FormManager", {
                         }else{
                             ajaxplorer.displayMessage("ERROR", transport.responseText.replace("ERROR:", ""));
                         }
+                        element.siblings().each(function(el){
+                            if(el.pe) el.pe.onTimerEvent();
+                        });
                     };
                     conn.sendAsync();
                 }.bind(this));
+
+            }else if(type == 'monitor'){
+
+                element = new Element('div', {className:'SF_input SF_inlineMonitoring'}).update('loading...');
+                element.pe = new PeriodicalExecuter(function(){
+                    element.addClassName('SF_inlineMonitoringWorking');
+                    var testValues = $H();
+                    this.serializeParametersInputs(form, testValues, "DRIVER_OPTION_");
+                    var conn = new Connexion();
+
+                    var choicesValue = param.get("choices").split(":");
+                    testValues.set('get_action', choicesValue.shift());
+                    if(choicesValue.length > 1){
+                        testValues.set("action_plugin_id", choicesValue.shift());
+                        testValues.set("action_plugin_method", choicesValue.shift());
+                    }
+                    if(name.indexOf("/") !== -1){
+                        testValues.set("button_key", getRepName(name));
+                    }
+                    conn.discrete = true;
+                    conn.setMethod('post');
+                    conn.setParameters(testValues);
+                    conn.onComplete = function(transport){
+                        element.removeClassName('SF_inlineMonitoringWorking');
+                        element.update(transport.responseText);
+                    };
+                    conn.sendAsync();
+
+                }.bind(this), 10);
+                // run now
+                element.pe.onTimerEvent();
 
             }else if(type == 'textarea'){
                 if(defaultValue) defaultValue = defaultValue.replace(new RegExp("__LBR__", "g"), "\n");
@@ -566,6 +605,10 @@ Class.create("FormManager", {
             parametersHash.unset(key);
         });
         $H(treeKeys).each(function(pair){
+            if(parametersHash.get(pair.key + '_ajxptype').startsWith('group_switch:')
+                && !pair.value['group_switch_value']){
+                pair.value['group_switch_value'] = parametersHash.get(pair.key);
+            }
             parametersHash.set(pair.key, Object.toJSON(pair.value));
             parametersHash.set(pair.key+"_ajxptype", "text/json");
         });
@@ -681,5 +724,11 @@ Class.create("FormManager", {
 			this.fetchValueToForm(form, fields, value, index);
 			index++;
 		}.bind(this));
-	}
+	},
+
+    destroyForm : function(form){
+        form.select("div.SF_inlineMonitoring").each(function(el){
+            if(el.pe) el.pe.stop();
+        });
+    }
 });
