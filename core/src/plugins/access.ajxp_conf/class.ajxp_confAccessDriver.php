@@ -1341,7 +1341,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if(isSet($httpVars["button_key"])){
                     $options = $options[$httpVars["button_key"]];
                 }
-                $plugin = AJXP_PluginsService::getInstance()->softLoad($pluginId, array());
+                $plugin = AJXP_PluginsService::getInstance()->softLoad($pluginId, $options);
                 if(method_exists($plugin, $httpVars["action_plugin_method"])){
                     try{
                         $res = call_user_func(array($plugin, $httpVars["action_plugin_method"]), $options);

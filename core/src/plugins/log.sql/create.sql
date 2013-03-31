@@ -1,4 +1,4 @@
-CREATE TABLE `ajxp_log` (
+CREATE TABLE IF NOT EXISTS `ajxp_log` (
 	`id`		INT	PRIMARY KEY	AUTO_INCREMENT,
 	`logdate`	DATETIME,
 	`remote_ip`	VARCHAR(32),

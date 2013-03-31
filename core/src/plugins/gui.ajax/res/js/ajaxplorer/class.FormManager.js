@@ -605,7 +605,7 @@ Class.create("FormManager", {
             parametersHash.unset(key);
         });
         $H(treeKeys).each(function(pair){
-            if(parametersHash.get(pair.key + '_ajxptype').startsWith('group_switch:')
+            if(parametersHash.get(pair.key + '_ajxptype') && parametersHash.get(pair.key + '_ajxptype').startsWith('group_switch:')
                 && !pair.value['group_switch_value']){
                 pair.value['group_switch_value'] = parametersHash.get(pair.key);
             }

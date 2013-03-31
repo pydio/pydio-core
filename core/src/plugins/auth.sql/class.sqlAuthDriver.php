@@ -128,5 +128,9 @@ class sqlAuthDriver extends AbstractAuthDriver {
 		return $pass;
 	}
 
+    public function installSQLTables($param){
+        $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
+        return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+    }
+
 }
-?>

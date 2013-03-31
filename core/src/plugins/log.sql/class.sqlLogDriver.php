@@ -367,4 +367,10 @@ class sqlLogDriver extends AbstractLogDriver {
 
 	    return $ip_address;
 	}
+
+    public function installSQLTables($param){
+        $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
+        return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+    }
+
 }

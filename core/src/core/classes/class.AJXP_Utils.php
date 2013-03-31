@@ -1513,7 +1513,9 @@ class AJXP_Utils
         $value = $params["group_switch_value"];
         if(isSet($value)){
             if($value == "core"){
-                $params = ConfService::getCoreConf("DIBI_PRECONFIGURATION");
+                $bootStorage = ConfService::getBootConfStorageImpl();
+                $configs = $bootStorage->loadPluginConfig("core", "conf");
+                $params = $configs["DIBI_PRECONFIGURATION"];
             }else{
                 unset($params["group_switch_value"]);
             }
@@ -1525,5 +1527,27 @@ class AJXP_Utils
         return $params;
     }
 
+    public static function runCreateTablesQuery($p, $file){
+        dibi::connect($p);
+        $sql = file_get_contents($file);
+        $parts = explode("CREATE TABLE", $sql);
+        $result = array();
+        foreach($parts as $createPart){
+            if(empty($createPart)) continue;
+            $sqlPart = trim("CREATE TABLE".$createPart);
+            try{
+                dibi::nativeQuery($sqlPart);
+                $resKey = str_replace("\n", "", substr($sqlPart, 0, 50))."...";
+                $result[] = "OK: $resKey executed successfully";
+            }catch (DibiException $e){
+                $result[] = "ERROR! $sqlPart failed";
+            }
+        }
+        $message = implode("\n", $result);
+        dibi::disconnect();
+        if(strpos($message, "ERROR!")) return $message;
+        else return "SUCCESS:".$message;
+
+    }
 
 }

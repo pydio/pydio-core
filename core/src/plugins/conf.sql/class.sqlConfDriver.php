@@ -58,11 +58,12 @@ class sqlConfDriver extends AbstractConfDriver {
 		try {
 			dibi::connect($this->sqlDriver);		
 		} catch (DibiException $e) {
+            //throw $e;
 			echo get_class($e), ': ', $e->getMessage(), "\n";
 			exit(1);
 		}
 	}
-	
+
 	function _loadPluginConfig($pluginId, &$options){
 		$res_opts = dibi::query('SELECT * FROM [ajxp_plugin_configs] WHERE [id] = %s', $pluginId);
 		if (count($res_opts) > 0) {
@@ -87,31 +88,31 @@ class sqlConfDriver extends AbstractConfDriver {
 			dibi::query('INSERT INTO [ajxp_plugin_configs]', array('id' => $pluginId, 'configs' => serialize($options)));
 		}
 	}
-	
-	/**
-	 * Create a Repository object from a Database Result
-	 * 
-	 * The method expects the following schema:
-	 * CREATE TABLE ajxp_repo ( uuid VARCHAR(33) PRIMARY KEY, 
-	 * 							path VARCHAR(255), 
-	 * 							display VARCHAR(255), 
-	 * 							accessType VARCHAR(20), 
-	 * 							recycle VARCHAR(255) , 
-	 * 							bcreate BOOLEAN, -- For some reason 'create' is a reserved keyword
-	 * 							writeable BOOLEAN, 
-	 * 							enabled BOOLEAN );
-	 * 
-	 * Additionally, the options are stored in a separate table:
-	 * CREATE TABLE ajxp_repo_options ( oid INTEGER PRIMARY KEY, uuid VARCHAR(33), name VARCHAR(50), val VARCHAR(255) );
-	 * 
-	 * I recommend an index to increase performance of uuid lookups:
-	 * CREATE INDEX ajxp_repo_options_uuid_idx ON ajxp_repo_options ( uuid );
-	 * 
-	 * 
-	 * @param $result Result of a dibi::query() as array
-	 * @param $options_result Result of dibi::query() for options as array
-	 * @return Repository object
-	 */
+
+    /**
+     * Create a Repository object from a Database Result
+     *
+     * The method expects the following schema:
+     * CREATE TABLE ajxp_repo ( uuid VARCHAR(33) PRIMARY KEY,
+     *                             path VARCHAR(255),
+     *                             display VARCHAR(255),
+     *                             accessType VARCHAR(20),
+     *                             recycle VARCHAR(255) ,
+     *                             bcreate BOOLEAN, -- For some reason 'create' is a reserved keyword
+     *                             writeable BOOLEAN,
+     *                             enabled BOOLEAN );
+     *
+     * Additionally, the options are stored in a separate table:
+     * CREATE TABLE ajxp_repo_options ( oid INTEGER PRIMARY KEY, uuid VARCHAR(33), name VARCHAR(50), val VARCHAR(255) );
+     *
+     * I recommend an index to increase performance of uuid lookups:
+     * CREATE INDEX ajxp_repo_options_uuid_idx ON ajxp_repo_options ( uuid );
+     *
+     *
+     * @param $result Result of a dibi::query() as array
+     * @param array|\Result $options_result Result of dibi::query() for options as array
+     * @return Repository object
+     */
 	function repoFromDb($result, $options_result = Array())
 	{
 		$repo = new Repository($result['id'], $result['display'], $result['accessType']);
@@ -661,4 +662,9 @@ class sqlConfDriver extends AbstractConfDriver {
         }
     }
 
+
+    public function installSQLTables($param){
+        $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
+        return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+    }
 }

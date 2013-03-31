@@ -1,4 +1,4 @@
-CREATE TABLE ajxp_feed (
+CREATE TABLE IF NOT EXISTS ajxp_feed (
   id int(11) NOT NULL AUTO_INCREMENT,
   edate int(11) NOT NULL,
   etype varchar(50) NOT NULL,

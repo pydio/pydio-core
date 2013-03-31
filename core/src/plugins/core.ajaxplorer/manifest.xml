@@ -3,7 +3,6 @@
           description="CONF_MESSAGE[Main container for core AjaXplorer settings (application title, sharing, webdav server config, etc...)]"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd"
-          mixins="dibidriver_provider"
         >
     <plugin_info>
         <plugin_author>Charles du Jeu</plugin_author>
@@ -27,7 +26,6 @@
 		<global_param name="WEBDAV_BASEHOST" group="CONF_MESSAGE[WebDAV Server]" type="string" label="CONF_MESSAGE[Shares Host]" description="CONF_MESSAGE[Host used in webDAV protocol. Should be detected by default. Please READ THE DOC to safely use this feature.]" mandatory="false" default=""/>
 		<global_param name="WEBDAV_DIGESTREALM" group="CONF_MESSAGE[WebDAV Server]" type="string" label="CONF_MESSAGE[Digest Realm]" description="CONF_MESSAGE[Default realm for authentication. Please READ THE DOC to safely use this feature.]" mandatory="false" default="ajxp_webdav_realm"/>
 		<global_param name="WEBDAV_BROWSER_LISTING" group="CONF_MESSAGE[WebDAV Server]" type="boolean" label="CONF_MESSAGE[Browser Access]" description="CONF_MESSAGE[Display the list of files and folder when accessing through the browser]" mandatory="false" default="false"/>
-		<global_param name="DIBI_PRECONFIGURATION" group="CONF_MESSAGE[SQL Connexion]" type="group_switch:dibi" label="CONF_MESSAGE[SQL Connexion]" description="CONF_MESSAGE[Simple SQL Connexion definition that can be used by other sql-based plugins]" mandatory="false"/>
 		<global_param name="CMDLINE_ACTIVE" group="CONF_MESSAGE[Command Line]" type="boolean" label="CONF_MESSAGE[Command-line Active]" description="CONF_MESSAGE[Use AjaXplorer framework via the command line, allowing CRONTAB jobs or background actions.]" mandatory="false" default="false"/>
 		<global_param name="CLI_PHP" group="CONF_MESSAGE[Command Line]" type="string" label="CONF_MESSAGE[Command-line PHP]" description="CONF_MESSAGE[On specific hosts, you may have to use a specific path to access the php command line]" mandatory="false" default="php"/>
 		<global_param name="CLI_USE_COM" group="CONF_MESSAGE[Command Line]" type="boolean" label="CONF_MESSAGE[Use COM class]" description="CONF_MESSAGE[On Windows running IIS, set this option to true if the COM extension is loaded, this may enable the use of the php command line.]" mandatory="false" default="false"/>

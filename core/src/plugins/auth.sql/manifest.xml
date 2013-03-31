@@ -12,6 +12,7 @@
     </client_settings>
 	<server_settings>
 		<param name="SQL_DRIVER" type="group_switch:dibi" label="CONF_MESSAGE[Connexion]" description="CONF_MESSAGE[The Database Connexion]" mandatory="true"/>
+        <param type="button" name="INSTALL_SQL" choices="run_plugin_action:conf.sql:installSQLTables" label="CONF_MESSAGE[SQL Tables]" description="CONF_MESSAGE[Install SQL Tables]" mandatory="false"/>
 	</server_settings>
 	<class_definition filename="plugins/auth.sql/class.sqlAuthDriver.php" classname="sqlAuthDriver"/>
 	<registry_contributions>
