@@ -5,6 +5,6 @@
     <server_settings>
         <param description="SQL Connexion Parameters" label="SQL Driver" name="SQL_DRIVER"
                       type="group_switch:dibi" mandatory="true"/>
-        <param type="button" name="INSTALL_SQL" choices="run_plugin_action:conf.sql:installSQLTables" label="CONF_MESSAGE[SQL Tables]" description="CONF_MESSAGE[Install SQL Tables]" mandatory="false"/>
+        <param type="button" name="INSTALL_SQL" choices="run_plugin_action:feed.sql:installSQLTables" label="CONF_MESSAGE[SQL Tables]" description="CONF_MESSAGE[Install SQL Tables]" mandatory="false"/>
     </server_settings>
 </ajxp_plugin>
