@@ -32,7 +32,6 @@ class AJXP_NotificationCenter extends AJXP_Plugin
      */
     static private $instance;
     private $userId;
-    private $useQueue = false ;
     /**
      * @var AJXP_FeedStore|bool
      */
@@ -45,20 +44,13 @@ class AJXP_NotificationCenter extends AJXP_Plugin
     public function init($options){
         parent::init($options);
         $this->userId = AuthService::getLoggedUser() !== null ? AuthService::getLoggedUser()->getId() : "shared";
-        $this->useQueue = $this->pluginConf["USE_QUEUE"];
         try{
             $this->eventStore = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_FEED_INSTANCE"], "AJXP_FeedStore");
-            $this->msgExchanger = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_MS_INSTANCE"], "AJXP_MessageExchanger");
         }catch (Exception $e){
 
         }
 
     }
-
-    public function getExchanger(){
-        return $this->msgExchanger;
-    }
-
 
     protected function parseSpecificContributions(&$contribNode){
    		parent::parseSpecificContributions($contribNode);
@@ -72,6 +64,12 @@ class AJXP_NotificationCenter extends AJXP_Plugin
    			$publicUrlNode = $publicUrlNodeList->item(0);
    			$contribNode->removeChild($publicUrlNode);
    		}
+    }
+
+    public function persistNotificationToAlerts(AJXP_Notification &$notification){
+        if($this->eventStore){
+            $this->eventStore->persistAlert($notification);
+        }
     }
 
 
@@ -159,7 +157,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         if($format == "html"){
             echo("</ul>");
         }else{
-                    AJXP_XMLWriter::close();
+            AJXP_XMLWriter::close();
         }
 
     }
@@ -239,17 +237,6 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         return $notif;
     }
 
-    public function consumeQueue($action, $httpVars, $fileVars){
-        if($action != "consume_notification_queue" || $this->msgExchanger === false) return;
-        $queueObjects = $this->msgExchanger->consumeWorkerChannel("user_notifications");
-        if(is_array($queueObjects)){
-            AJXP_Logger::debug("Processing notification queue, ".count($queueObjects)." notifs to handle");
-            foreach($queueObjects as $notification){
-                $this->dispatch($notification);
-            }
-        }
-    }
-
 
     public function prepareNotification(AJXP_Notification &$notif){
 
@@ -265,25 +252,10 @@ class AJXP_NotificationCenter extends AJXP_Plugin
 
         $this->prepareNotification($notif);
         $notif->setTarget($targetId);
-        $this->sendToQueue($notif);
+        //$this->sendToQueue($notif);
+        AJXP_Controller::applyHook("msg.queue_notification", array($notif));
 
     }
 
-    protected function sendToQueue(AJXP_Notification $notification){
-        if(!$this->useQueue && $this->msgExchanger){
-            AJXP_Logger::debug("SHOULD DISPATCH NOTIFICATION ON ".$notification->getNode()->getUrl()." ACTION ".$notification->getAction());
-            $this->dispatch($notification);
-        }else{
-            $this->msgExchanger->publishWorkerMessage("user_notifications", $notification);
-        }
-    }
-
-    public function dispatch(AJXP_Notification $notification){
-        if($this->eventStore){
-            $this->eventStore->persistAlert($notification);
-        }
-        AJXP_Controller::applyHook("msg.notification", array(&$notification));
-        return;
-    }
 
 }

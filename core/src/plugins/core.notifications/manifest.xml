@@ -14,18 +14,11 @@
         </resources>
     </client_settings>
     <server_settings>
-        <global_param description="CONF_MESSAGE[Post the notification in a temporary queue. You must set up the scheduler accordingly to make sure the queue is then consumed on a regularly basis.]" label="CONF_MESSAGE[Queue notifications]" name="USE_QUEUE" type="boolean" default="false"/>
         <global_param description="CONF_MESSAGE[Display a new entry with all events happening on a user workspaces, and alerts. An SQL database must be setup for the FEED_DRIVER configuration.]" label="CONF_MESSAGE[User events and alerts]" name="USER_EVENTS" type="boolean" default="false"/>
-        <global_param type="plugin_instance:mq" name="UNIQUE_MS_INSTANCE" group="CONF_MESSAGE[Instance Params]" label="CONF_MESSAGE[MQ Instance]" description="CONF_MESSAGE[Choose the plugin]" mandatory="false" default="mq.serial"/>
         <global_param type="plugin_instance:feed" name="UNIQUE_FEED_INSTANCE" group="CONF_MESSAGE[Instance Params]" label="CONF_MESSAGE[Feed Instance]" description="CONF_MESSAGE[Choose the plugin]" mandatory="false" default="feed.sql"/>
     </server_settings>
     <registry_contributions>
         <actions>
-            <action name="consume_notification_queue">
-                <processing>
-                    <serverCallback methodName="consumeQueue"/>
-                </processing>
-            </action>
             <action name="get_my_feed">
                 <gui text="notification_center.1" title="notification_center.2" iconClass="icon-rss" src="notification_center/ICON_SIZE/feed.png" accessKey="" hasAccessKey="false">
              		<context selection="false" dir="" recycle="true" actionBar="true" actionBarGroup="user" contextMenu="false" infoPanel="false"/>
@@ -52,6 +45,7 @@
         </actions>
         <hooks>
             <serverCallback methodName="persistChangeHookToFeed" hookName="node.change" defer="true"/>
+            <serverCallback methodName="persistNotificationToAlerts" hookName="msg.notification" defer="true"/>
         </hooks>
     </registry_contributions>
 </ajxp_plugin>

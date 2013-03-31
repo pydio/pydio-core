@@ -7,18 +7,26 @@
         </resources>
     </client_settings>
     <server_settings>
-        <global_param description="WebSocket server is running" label="WebSocket" name="WS_SERVER_ACTIVE" type="boolean" expose="true"/>
-        <global_param description="WebSocket server host" label="WS Host" name="WS_SERVER_HOST" type="string" expose="true"/>
-        <global_param description="WebSocket server port" label="WS Port" name="WS_SERVER_PORT" type="string" expose="true" default="8090"/>
-        <global_param description="WebSocket handler path" label="WS Path" name="WS_SERVER_PATH" type="string" expose="true"/>
-        <global_param description="WebSocket admin key" label="WS Key" name="WS_SERVER_ADMIN" type="string"/>
-        <global_param type="monitor" name="WS_STATUS" choices="run_plugin_action:core.mq:getWebSocketStatus" label="CONF_MESSAGE[WebSocket Server Status]" description="CONF_MESSAGE[Try to detect if the server is running correctly]" mandatory="false"/>
-        <global_param type="button" name="SWITCH_WS_ON" choices="run_plugin_action:core.mq:switchWebSocketOn" label="CONF_MESSAGE[Run WebSocket Server]" description="CONF_MESSAGE[Switch the WS server ON]" mandatory="false"/>
-        <global_param type="button" name="SWITCH_WS_OFF" choices="run_plugin_action:core.mq:switchWebSocketOff" label="CONF_MESSAGE[Stop WebSocket Server]" description="CONF_MESSAGE[Switch the WS server OFF]" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Inner Messaging]" type="plugin_instance:mq" name="UNIQUE_MS_INSTANCE" label="CONF_MESSAGE[MQ Instance]" description="CONF_MESSAGE[Choose the plugin]" mandatory="false" default="mq.serial"/>
+        <global_param group="CONF_MESSAGE[Inner Messaging]" description="CONF_MESSAGE[Post the notification in a temporary queue. You must set up the scheduler accordingly to make sure the queue is then consumed on a regularly basis.]" label="CONF_MESSAGE[Queue notifications]" name="USE_QUEUE" type="boolean" default="false"/>
+
+        <global_param group="WebSocket Server" description="WebSocket server is running" label="WebSocket" name="WS_SERVER_ACTIVE" type="boolean" expose="true"/>
+        <global_param group="WebSocket Server" description="WebSocket server host" label="WS Host" name="WS_SERVER_HOST" type="string" expose="true"/>
+        <global_param group="WebSocket Server" description="WebSocket server port" label="WS Port" name="WS_SERVER_PORT" type="string" expose="true" default="8090"/>
+        <global_param group="WebSocket Server" description="WebSocket handler path" label="WS Path" name="WS_SERVER_PATH" type="string" expose="true"/>
+        <global_param group="WebSocket Server" description="WebSocket admin key" label="WS Key" name="WS_SERVER_ADMIN" type="string"/>
+        <global_param group="WebSocket Server" type="monitor" name="WS_STATUS" choices="run_plugin_action:core.mq:getWebSocketStatus" label="CONF_MESSAGE[WebSocket Server Status]" description="CONF_MESSAGE[Try to detect if the server is running correctly]" mandatory="false"/>
+        <global_param group="WebSocket Server" type="button" name="SWITCH_WS_ON" choices="run_plugin_action:core.mq:switchWebSocketOn" label="CONF_MESSAGE[Run WebSocket Server]" description="CONF_MESSAGE[Switch the WS server ON]" mandatory="false"/>
+        <global_param group="WebSocket Server" type="button" name="SWITCH_WS_OFF" choices="run_plugin_action:core.mq:switchWebSocketOff" label="CONF_MESSAGE[Stop WebSocket Server]" description="CONF_MESSAGE[Switch the WS server OFF]" mandatory="false"/>
     </server_settings>
     <class_definition classname="MqManager" filename="plugins/core.mq/class.MqManager.php"/>
     <registry_contributions>
         <actions>
+            <action name="consume_notification_queue">
+                <processing>
+                    <serverCallback methodName="consumeQueue"/>
+                </processing>
+            </action>
             <action name="client_register_channel">
                 <processing>
                     <serverCallback methodName="clientChannelMethod"/>
@@ -43,6 +51,7 @@
         <hooks>
             <serverCallback methodName="publishNodeChange" hookName="node.change" defer="true"/>
             <serverCallback methodName="sendInstantMessage" hookName="msg.instant" />
+            <serverCallback methodName="sendToQueue" hookName="msg.queue_notification" />
         </hooks>
     </registry_contributions>
     <dependencies>

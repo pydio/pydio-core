@@ -50,12 +50,36 @@ class MqManager extends AJXP_Plugin
      * @var AJXP_MessageExchanger;
      */
     private $msgExchanger = false;
+    private $useQueue = false ;
+
 
     function init($options){
         parent::init($options);
+        $this->useQueue = $this->pluginConf["USE_QUEUE"];
         try{
-            $this->msgExchanger = AJXP_PluginsService::findPlugin("core", "notifications")->getExchanger();
+            $this->msgExchanger = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_MS_INSTANCE"], "AJXP_MessageExchanger");
         }catch (Exception $e){}
+    }
+
+
+    public function sendToQueue(AJXP_Notification $notification){
+        if(!$this->useQueue){
+            AJXP_Logger::debug("SHOULD DISPATCH NOTIFICATION ON ".$notification->getNode()->getUrl()." ACTION ".$notification->getAction());
+            AJXP_Controller::applyHook("msg.notification", array(&$notification));
+        }else{
+            if($this->msgExchanger) $this->msgExchanger->publishWorkerMessage("user_notifications", $notification);
+        }
+    }
+
+    public function consumeQueue($action, $httpVars, $fileVars){
+        if($action != "consume_notification_queue" || $this->msgExchanger === false) return;
+        $queueObjects = $this->msgExchanger->consumeWorkerChannel("user_notifications");
+        if(is_array($queueObjects)){
+            AJXP_Logger::debug("Processing notification queue, ".count($queueObjects)." notifs to handle");
+            foreach($queueObjects as $notification){
+                AJXP_Controller::applyHook("msg.notification", array(&$notification));
+            }
+        }
     }
 
     /**
