@@ -125,7 +125,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 					$nodes = $clonePath->query($_GET["xPath"]);
 					AJXP_XMLWriter::header("ajxp_registry_part", array("xPath"=>$_GET["xPath"]));
 					if($nodes->length){
-						print(AJXP_XMLWriter::replaceAjxpXmlKeywords($regDoc->saveXML($nodes->item(0))));
+						print(AJXP_XMLWriter::replaceAjxpXmlKeywords($clone->saveXML($nodes->item(0))));
 					}
 					AJXP_XMLWriter::close("ajxp_registry_part");
 				}else{
