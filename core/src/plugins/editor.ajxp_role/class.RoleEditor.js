@@ -96,27 +96,31 @@ Class.create("RoleEditor", AbstractEditor, {
         customFieldsHash.each(function(pair){
             var pName = pair.key.replace("ROLE_CUSTOM_", "");
             if(pName.endsWith("_ajxptype") || pName.endsWith("_replication") || pName.endsWith("_checkbox")) return;
-            var parts = pName.split("/");
-            var repoScope = parts[0];
-            var paramName = parts[2];
-            var pluginId = parts[1];
-            // update roleWrite
-            if(!this.roleWrite.PARAMETERS[repoScope]) this.roleWrite.PARAMETERS[repoScope] = {};
-            if(!this.roleWrite.PARAMETERS[repoScope][pluginId]) this.roleWrite.PARAMETERS[repoScope][pluginId] = {};
-            this.roleWrite.PARAMETERS[repoScope][pluginId][paramName] = pair.value;
-            // update FORMS
-            if(!fullPostData['FORMS'][repoScope]) fullPostData['FORMS'][repoScope] = {};
-            if(!fullPostData['FORMS'][repoScope][pluginId]) fullPostData['FORMS'][repoScope][pluginId] = $H({});
-            fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName, pair.value);
-            if(customFieldsHash.get(pName + "_ajxptype")){
-                fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName+"_ajxptype", customFieldsHash.get(pName + "_ajxptype"));
+            var objectValue = pair.value.evalJSON();
+            var repoScope = pName;
+            for(var pluginId in objectValue){
+                var pluginData = objectValue[pluginId];
+                for(var paramName in pluginData){
+                    // update roleWrite
+                    if(!this.roleWrite.PARAMETERS[repoScope]) this.roleWrite.PARAMETERS[repoScope] = {};
+                    if(!this.roleWrite.PARAMETERS[repoScope][pluginId]) this.roleWrite.PARAMETERS[repoScope][pluginId] = {};
+                    this.roleWrite.PARAMETERS[repoScope][pluginId][paramName] = pluginData[paramName];
+                    // update FORMS
+                    if(!fullPostData['FORMS'][repoScope]) fullPostData['FORMS'][repoScope] = {};
+                    if(!fullPostData['FORMS'][repoScope][pluginId]) fullPostData['FORMS'][repoScope][pluginId] = $H({});
+                    fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName, pluginData[paramName]);
+                    if(customFieldsHash.get(pName + "_ajxptype")){
+                        fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName+"_ajxptype", customFieldsHash.get(pName + "_ajxptype"));
+                    }
+                    if(customFieldsHash.get(pName + "_checkbox")){
+                        fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName+"_checkbox", customFieldsHash.get(pName + "_checkbox"));
+                    }
+                    if(customFieldsHash.get(pName + "_replication")){
+                        fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName+"_replication", customFieldsHash.get(pName + "_replication"));
+                    }
+                }
             }
-            if(customFieldsHash.get(pName + "_checkbox")){
-                fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName+"_checkbox", customFieldsHash.get(pName + "_checkbox"));
-            }
-            if(customFieldsHash.get(pName + "_replication")){
-                fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName+"_replication", customFieldsHash.get(pName + "_replication"));
-            }
+
         }.bind(this));
 
         fullPostData['ROLE'] = this.roleWrite;
