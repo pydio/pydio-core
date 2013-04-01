@@ -22,7 +22,7 @@ Class.create("NotificationLoader", {
 
     ajxpNode : null,
     pFactory : null,
-    timer   : 30,
+    timer   : 60,
     pe  : null,
 
     initialize: function(){
@@ -38,6 +38,11 @@ Class.create("NotificationLoader", {
                 this.ajxpNode.reload();
             }
         }.bind(this), this.timer);
+        ajaxplorer.observe("server_message", function(message){
+            if(XPathSelectSingleNode(message, '//reload_user_feed') && ajaxplorer.user){
+                this.ajxpNode.reload();
+            }
+        }.bind(this));
     },
 
     childrenToMenu: function(menuContainer){

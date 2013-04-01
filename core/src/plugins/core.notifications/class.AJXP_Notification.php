@@ -200,11 +200,17 @@ class AJXP_Notification
         return $this->date;
     }
 
+    /**
+     * @param AJXP_Node $node
+     */
     public function setNode($node)
     {
         $this->node = $node;
     }
 
+    /**
+     * @return AJXP_Node
+     */
     public function getNode()
     {
         return $this->node;

@@ -45,7 +45,7 @@
         </actions>
         <hooks>
             <serverCallback methodName="persistChangeHookToFeed" hookName="node.change" defer="true"/>
-            <serverCallback methodName="persistNotificationToAlerts" hookName="msg.notification" defer="true"/>
+            <serverCallback methodName="persistNotificationToAlerts" hookName="msg.notification"/>
         </hooks>
     </registry_contributions>
 </ajxp_plugin>

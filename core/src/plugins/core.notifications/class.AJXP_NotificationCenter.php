@@ -68,6 +68,11 @@ class AJXP_NotificationCenter extends AJXP_Plugin
 
     public function persistNotificationToAlerts(AJXP_Notification &$notification){
         if($this->eventStore){
+            AJXP_Controller::applyHook("msg.instant",array(
+                "<reload_user_feed/>",
+                $notification->getNode()->getRepositoryId(),
+                $notification->getTarget()
+            ));
             $this->eventStore->persistAlert($notification);
         }
     }
@@ -119,7 +124,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         }
 
         // APPEND USER ALERT IN THE SAME QUERY FOR NOW
-        //$this->loadUserAlerts("", $httpVars, $fileVars);
+        $this->loadUserAlerts("", array_merge($httpVars, array("skip_container_tags" => "true")), $fileVars);
         restore_error_handler();
         foreach($res as $n => $object){
             $args = $object->arguments;
@@ -175,15 +180,62 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         $res = $this->eventStore->loadAlerts($userId, $repositoryFilter);
         if(!count($res)) return;
 
+        $format = $httpVars["format"];
+        $skipContainingTags = (isSet($httpVars["skip_container_tags"]));
         $mess = ConfService::getMessages();
-        echo("<h2>".$mess["notification_center.3"]."</h2>");
-        echo("<ul class='notification_list'>");
-        foreach ($res as $notification){
-            echo("<li>");
-            echo($notification->getDescriptionLong(true));
-            echo("</li>");
+        if(!$skipContainingTags){
+            if($format == "html"){
+                echo("<h2>".$mess["notification_center.3"]."</h2>");
+                echo("<ul class='notification_list'>");
+            }else{
+                AJXP_XMLWriter::header();
+            }
         }
-        echo("</ul>");
+        $cumulated = array();
+        $notification = new AJXP_Notification();
+        foreach ($res as $notification){
+            if($format == "html"){
+                echo("<li>");
+                echo($notification->getDescriptionLong(true));
+                echo("</li>");
+            }else{
+                $node = $notification->getNode();
+                $path = $node->getPath();
+                if(isSet($cumulated[$path])){
+                    $cumulated[$path]->event_occurence ++;
+                    continue;
+                }
+                try{
+                    $node->loadNodeInfo();
+                }catch (Exception $e){
+                    continue;
+                }
+                $node->event_description = ucfirst($notification->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notification->getAuthor();
+                $node->event_description_long = $notification->getDescriptionLong(true);
+                $node->event_date = AJXP_Utils::relativeDate($notification->getDate(), $mess);
+                $node->event_type = "alert";
+                $node->repository_id = $node->getRepository()->getUniqueId();
+                if($node->repository_id != $repositoryFilter && $node->getRepository()->getDisplay() != null){
+                    $node->event_repository_label = "[".$node->getRepository()->getDisplay()."]";
+                }
+                $node->event_author = $notification->getAuthor();
+                $notification->event_occurence = 1;
+                $cumulated[$path] = $node; //AJXP_XMLWriter::renderAjxpNode($node);
+            }
+        }
+        foreach($cumulated as $nodeToSend){
+            if($nodeToSend->event_occurence > 1){
+                $nodeToSend->setLabel(basename($nodeToSend->getPath()) . "(".$nodeToSend->event_occurence.")" );
+                AJXP_XMLWriter::renderAjxpNode($nodeToSend);
+            }
+        }
+        if(!$skipContainingTags){
+            if($format == "html"){
+                echo("</ul>");
+            }else{
+                AJXP_XMLWriter::close();
+            }
+        }
 
     }
     /**
