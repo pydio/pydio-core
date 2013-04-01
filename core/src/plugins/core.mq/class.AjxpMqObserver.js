@@ -99,7 +99,7 @@ Class.create("AjxpMqObserver", {
                 conn.discrete = true;
                 conn.sendAsync();
 
-                this.pe = new PeriodicalExecuter(this.consumeChannel.bind(this), 5);
+                this.pe = new PeriodicalExecuter(this.consumeChannel.bind(this), configs.get('POLLER_FREQUENCY') || 5);
 
             }
 
