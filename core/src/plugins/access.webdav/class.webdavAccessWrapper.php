@@ -155,6 +155,13 @@ class webdavAccessWrapper extends fsAccessWrapper {
 		}
 		return $this->dH !== false;
 	}
+// filename encoding fix
+	public function dir_readdir (){
+		$x = parent::dir_readdir();
+		if ( strstr( $x, '%') !== false) $x = urldecode( $x);
+		return( $x);
+	}
+// filename encoding fix /
 
 	
 	// DUPBLICATE STATIC FUNCTIONS TO BE SURE 
