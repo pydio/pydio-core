@@ -405,19 +405,21 @@ class AJXP_PluginsService{
      * @param string $type
      * @param string $name
      * @param bool $active
+     * @param AJXP_Plugin $updateInstance
      * @return void
      */
-    public static function setPluginActive($type, $name, $active=true){
-        self::getInstance()->setPluginActiveInst($type, $name, $active);
+    public static function setPluginActive($type, $name, $active=true, $updateInstance = null){
+        self::getInstance()->setPluginActiveInst($type, $name, $active, $updateInstance);
     }
     /**
      * Instance implementation of the setPluginActive
      * @param $type
      * @param $name
      * @param bool $active
+     * @param AJXP_Plugin $updateInstance
      * @return void
      */
-    public function setPluginActiveInst($type, $name, $active=true){
+    public function setPluginActiveInst($type, $name, $active=true, $updateInstance = null){
         if($active){
             // Check active plugin dependencies
             $plug = $this->getPluginById($type.".".$name);
@@ -437,6 +439,9 @@ class AJXP_PluginsService{
             }
         }
         $this->activePlugins[$type.".".$name] = $active;
+        if(isSet($updateInstance) && isSet($this->registry[$type][$name])){
+            $this->registry[$type][$name] = $updateInstance;
+        }
         if(isSet($this->xmlRegistry) && !$this->tmpDeferRegistryBuild){
             $this->buildXmlRegistry(($this->registryVersion == "extended"));
         }
@@ -455,10 +460,7 @@ class AJXP_PluginsService{
             $this->setPluginActiveInst($type, $plugName, false);
         }
         $this->tmpDeferRegistryBuild = false;
-        if(isSet($updateInstance) && isSet($this->registry[$type][$name])){
-            $this->registry[$type][$name] = $updateInstance;
-        }
-        $this->setPluginActiveInst($type, $name, true);
+        $this->setPluginActiveInst($type, $name, true, $updateInstance);
     }
     /**
      * Retrieve the whole active plugins list

@@ -1528,6 +1528,7 @@ class AJXP_Utils
     }
 
     public static function runCreateTablesQuery($p, $file){
+        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($p);
         $sql = file_get_contents($file);
         $parts = explode("CREATE TABLE", $sql);

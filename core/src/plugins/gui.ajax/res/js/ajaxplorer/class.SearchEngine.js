@@ -307,13 +307,12 @@ Class.create("SearchEngine", AjxpPane, {
 	 * @param checked Boolean
 	 */
 	initMetaOption : function(element, optionValue, optionLabel, checked){
-		var option = new Element('meta_opt', {value:optionValue}).update(optionLabel);
-		if(checked) option.addClassName('checked icon-ok');
+		var option = new Element('span', {value:optionValue, className:'search_meta_opt'}).update('<span class="icon-ok"></span>'+ optionLabel);
+		if(checked) option.addClassName('checked');
 		if(element.childElements().length) element.insert(', ');
 		element.insert(option);
 		option.observe('click', function(event){
 			option.toggleClassName('checked');
-			option.toggleClassName('icon-ok');
 		});
 		this.metaOptions.push(option);
 	},

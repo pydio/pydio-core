@@ -721,6 +721,9 @@
 							ajaxplorer.actionBar.defaultActions.unset('ctrldragndrop');
 							ajaxplorer.actionBar.defaultActions.unset('dragndrop');
 						}
+						if(ajxpUser && ajxpUser.canWrite() && ajaxplorer.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive")){
+						    action.rightsContext.write = false;
+						}
 						if(ajaxplorer.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive")){
 							action.setLabel(247, 248);
 							action.setIconSrc('ark_extract.png');

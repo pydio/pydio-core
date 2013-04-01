@@ -35,10 +35,11 @@ class AjxpMailer extends AJXP_Plugin
         if(AJXP_SERVER_DEBUG){
             $this->mailCache = $this->getPluginWorkDir(true)."/mailbox";
         }
-        $pId = $this->pluginConf["UNIQUE_MAILER_INSTANCE"];
-        if(is_array($pId)) $pId = $pId["instance_name"];
-        list($t, $n) = explode(".", $pId);
-        AJXP_PluginsService::setPluginActive($t, $n);
+        $pConf = $this->pluginConf["UNIQUE_MAILER_INSTANCE"];
+        if(!empty($pConf)){
+            $p = ConfService::instanciatePluginFromGlobalParams($pConf, "AjxpMailer");
+            AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType($p->getType(), $p->getName(), $p);
+        }
     }
 
     public function processNotification(AJXP_Notification &$notification){
@@ -59,10 +60,6 @@ class AjxpMailer extends AJXP_Plugin
     }
 
     public function sendMail($recipients, $subject, $body, $from = null){
-        if(AJXP_SERVER_DEBUG){
-            $line = "------------------------------------------------------------------------\n";
-            file_put_contents($this->mailCache, "Sending mail from ".print_r($from, true)." to ".print_r($recipients, true)."\n\n$subject\n\n$body\n".$line, FILE_APPEND);
-        }
         $prepend = ConfService::getCoreConf("SUBJECT_PREPEND", "mailer");
         $append = ConfService::getCoreConf("SUBJECT_APPEND", "mailer");
         $layout = ConfService::getCoreConf("BODY_LAYOUT", "mailer");
@@ -72,6 +69,10 @@ class AjxpMailer extends AJXP_Plugin
             $body = str_replace("AJXP_MAIL_BODY", $body, $layout);
         }
         $this->sendMailImpl($recipients, $subject, $body, $from = null);
+        if(AJXP_SERVER_DEBUG){
+            $line = "------------------------------------------------------------------------\n";
+            file_put_contents($this->mailCache, "Sending mail from ".print_r($from, true)." to ".print_r($recipients, true)."\n\n$subject\n\n$body\n".$line, FILE_APPEND);
+        }
     }
 
     protected function sendMailImpl($recipients, $subject, $body, $from = null){

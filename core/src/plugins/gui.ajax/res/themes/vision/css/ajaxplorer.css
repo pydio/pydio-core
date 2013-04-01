@@ -2383,11 +2383,15 @@ div.tabulatorContainer.icons_only div.toolbarGroup span[class*=" icon-"]
 
 }
 
-meta_opt {
+span.search_meta_opt {
     cursor: pointer;
 }
+span.search_meta_opt > span{
+    display: none;
+}
 
-meta_opt.checked {
+span.search_meta_opt.checked > span {
+    display: inline;
 }
 
 #search_results_cont{
