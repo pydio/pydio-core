@@ -418,7 +418,7 @@
             <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
                 <clientCallback><![CDATA[
-                    if(!ajaxplorer.repositoryId || ajaxplorer.repositoryId != "ajxp_conf"){
+                    if(!ajaxplorer.repositoryId || ajaxplorer.repositoryId != "ajxp_shared"){
                         ajaxplorer.triggerRepositoryChange('ajxp_shared');
                     }
                 ]]></clientCallback>
