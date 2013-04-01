@@ -69,7 +69,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
     }
 
     function startConnexion(){
-        AJXP_Logger::logAction('Auth.ldap :: init');
+        AJXP_Logger::debug('Auth.ldap :: start connexion');
         if($this->ldapconn == null){
             $this->ldapconn = $this->LDAP_Connect();
             if($this->ldapconn == null) {
@@ -90,6 +90,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
         $ldapconn = ldap_connect($this->ldapUrl, $this->ldapPort)
         or die("Cannot connect to LDAP server");
         //@todo : return error_code
+        AJXP_Logger::debug('Auth.ldap :: correctly connected to server '.$this->ldapUrl);
 
         if ($ldapconn) {
             //AJXP_Logger::logAction("auth.ldap:We are connected");
@@ -97,16 +98,18 @@ class ldapAuthDriver extends AbstractAuthDriver {
 
             if ($this->ldapAdminUsername === null){
                 //connecting anonymously
-                AJXP_Logger::logAction('Anonymous LDAP connexion');
+                AJXP_Logger::debug('Auth.ldap :: Anonymous LDAP connexion');
                 $ldapbind = @ldap_bind($ldapconn);
             } else {
-                AJXP_Logger::logAction('Standard LDAP connexion');
+                AJXP_Logger::debug('Auth.ldap :: Standard LDAP connexion');
                 $ldapbind = @ldap_bind($ldapconn, $this->ldapAdminUsername, $this->ldapAdminPassword);
             }
 
             if ($ldapbind){
+                AJXP_Logger::debug('Auth.ldap :: LDAP connexion OK');
                 return $ldapconn;
             } else {
+                AJXP_Logger::debug('Auth.ldap :: LDAP connexion FAILED');
                 return null;
             }
             
@@ -231,15 +234,17 @@ class ldapAuthDriver extends AbstractAuthDriver {
 		$confDriver = ConfService::getConfStorageImpl();
 		$userObject = $confDriver->instantiateAbstractUserImpl($login);
 		if ($userObject->storageExists()) {
-			return true;
+			//return true;
 		}
         $entries = $this->getUserEntries($login);
         if(!is_array($entries)) return false;
         if(AuthService::ignoreUserCase()) {
-            return (strcasecmp($login, $entries[0][$this->ldapUserAttr][0]) == 0);
+            $res =  (strcasecmp($login, $entries[0][$this->ldapUserAttr][0]) == 0);
         }else {
-            return (strcmp($login, $entries[0][$this->ldapUserAttr][0]) == 0 );
+            $res =  (strcmp($login, $entries[0][$this->ldapUserAttr][0]) == 0 );
         }
+        AJXP_Logger::debug('Auth.ldap :: checking if user '.$login.' exists  : '.$res);
+        return $res;
     }
 
     function checkPassword($login, $pass, $seed){
@@ -247,13 +252,15 @@ class ldapAuthDriver extends AbstractAuthDriver {
         if(empty($pass)) return false;
         $entries = $this->getUserEntries($login);
         if ($entries['count']>0) {
+            AJXP_Logger::debug('Ldap Password Check: Got user '.$login);
             if (@ldap_bind($this->ldapconn,$entries[0]["dn"],$pass)) {
-                AJXP_Logger::logAction('Ldap Password Check:Got user '.$entries[0]["cn"][0]);
+                AJXP_Logger::debug('Ldap Password Check: Got user '.$entries[0]["cn"][0]);
                 return true;
             }
+            AJXP_Logger::debug('Password Check: failed for user '.$login);
             return false;
         } else {
-            AJXP_Logger::logAction("Ldap Password Check:No user $login found");
+            AJXP_Logger::debug("Ldap Password Check : No user $login found");
             return false;
         }
     }

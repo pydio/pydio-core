@@ -68,6 +68,7 @@ class CoreAuthLoader extends AJXP_Plugin{
                     "MASTER_DRIVER" => $masterName,
                     "USER_BASE_DRIVER" => $baseName,
                     "USER_ID_SEPARATOR" => $separator,
+                    "TRANSMIT_CLEAR_PASS" => $this->pluginConf["TRANSMIT_CLEAR_PASS"],
                     "DRIVERS" => array(
                         $masterName => array(
                             "NAME" => $masterName,

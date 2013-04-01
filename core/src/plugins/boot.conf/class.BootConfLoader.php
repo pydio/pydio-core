@@ -53,15 +53,46 @@ class BootConfLoader extends AbstractConfDriver {
             // Reformat
             $options["UNIQUE_INSTANCE_CONFIG"] = array(
                 "instance_name" => "conf.".$internal["CONF_DRIVER"]["NAME"],
+                "group_switch_value" => "conf.".$internal["CONF_DRIVER"]["NAME"],
             );
             unset($internal["CONF_DRIVER"]["NAME"]);
             $options["UNIQUE_INSTANCE_CONFIG"] = array_merge($options["UNIQUE_INSTANCE_CONFIG"], $internal["CONF_DRIVER"]["OPTIONS"]);
+            return;
+
+        }else if($pluginId == "core.auth" && isSet($internal["AUTH_DRIVER"])){
+
+            $options = $this->authLegacyToBootConf($internal["AUTH_DRIVER"]);
+            return;
+
         }
         $jsonPath = $this->getPluginWorkDir(true)."/bootstrap.json";
         $jsonData = AJXP_Utils::loadSerialFile($jsonPath, false, "json");
         if(is_array($jsonData) && isset($jsonData[$pluginId])){
             $options = array_merge($options, $jsonData[$pluginId]);
         }
+    }
+
+    protected function authLegacyToBootConf($legacy){
+        $data = array();
+        $kOpts = array("LOGIN_REDIRECT","TRANSMIT_CLEAR_PASS", "AUTOCREATE_AJXPUSER");
+        foreach($kOpts as $k){
+            if(isSet($legacy["OPTIONS"][$k])) $data[$k] = $legacy["OPTIONS"][$k];
+        }
+        if($legacy["NAME"] == "multi"){
+            $drivers = $legacy["OPTIONS"]["DRIVERS"];
+            $master = $legacy["OPTIONS"]["MASTER_DRIVER"];
+            $slave = array_pop(array_diff(array_keys($drivers), array($master)));
+
+            $data["MULTI_MODE"] = array("instance_name" => $legacy["OPTIONS"]["MODE"]);
+            $data["MULTI_USER_BASE_DRIVER"] = $legacy["OPTIONS"]["USER_BASE_DRIVER"] == $master ? "master" : ($legacy["OPTIONS"]["USER_BASE_DRIVER"] == $slave ? "slave" :  "" ) ;
+
+            $data["MASTER_INSTANCE_CONFIG"] = array_merge($legacy["OPTIONS"]["DRIVERS"][$master]["OPTIONS"], array("instance_name" => "auth.".$master));
+            $data["SLAVE_INSTANCE_CONFIG"] = array_merge($legacy["OPTIONS"]["DRIVERS"][$slave]["OPTIONS"], array("instance_name" => "auth.".$slave));
+
+        }else{
+            $data["MASTER_INSTANCE_CONFIG"] = array_merge($legacy["OPTIONS"], array("instance_name" => "auth.".$legacy["NAME"]));
+        }
+        return $data;
     }
 
     /**
