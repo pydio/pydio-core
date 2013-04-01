@@ -410,6 +410,42 @@ class AuthService
             }
             AuthService::updateRole($rootRole);
         }
+        $miniRole = AuthService::getRole("MINISITE", false);
+        if($miniRole === false){
+            $rootRole = new AJXP_Role("MINISITE");
+            $rootRole->setLabel("Minisite Users");
+            $actions = array(
+                "access.fs" => array("ajxp_link", "chmod", "purge"),
+                "meta.watch" => array("toggle_watch"),
+                "conf.serial"=> array("get_bookmarks"),
+                "conf.sql"=> array("get_bookmarks"),
+                "index.lucene" => array("index"),
+                "action.share" => array("share"),
+                "gui.ajax" => array("bookmark"),
+                "auth.serial" => array("pass_change"),
+                "auth.sql" => array("pass_change"),
+            );
+            foreach($actions as $pluginId => $acts){
+                foreach($acts as $act){
+                    $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_SHARED);
+                }
+            }
+            AuthService::updateRole($rootRole);
+        }
+        $miniRole = AuthService::getRole("MINISITE_NODOWNLOAD", false);
+        if($miniRole === false){
+            $rootRole = new AJXP_Role("MINISITE_NODOWNLOAD");
+            $rootRole->setLabel("Minisite Users - No Download");
+            $actions = array(
+                "access.fs" => array("download", "download_chunk", "prepare_chunk_dl", "download_all")
+            );
+            foreach($actions as $pluginId => $acts){
+                foreach($acts as $act){
+                    $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_SHARED);
+                }
+            }
+            AuthService::updateRole($rootRole);
+        }
 		$adminCount = AuthService::countAdminUsers();
 		if($adminCount == 0){
 			$authDriver = ConfService::getAuthDriverImpl();
