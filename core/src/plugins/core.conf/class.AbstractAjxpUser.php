@@ -126,6 +126,10 @@ abstract class AbstractAjxpUser
      * @param AJXP_Role $roleObject
      */
     function addRole($roleObject){
+        if(isSet($this->roles[$roleObject->getId()])){
+            // NOTHING SPECIAL TO DO !
+            return;
+        }
 		if(!isSet($this->rights["ajxp.roles"])) $this->rights["ajxp.roles"] = array();
 		$this->rights["ajxp.roles"][$roleObject->getId()] = true;
         uksort($this->rights["ajxp.roles"], array($this, "orderRoles"));

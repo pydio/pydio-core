@@ -313,12 +313,14 @@ class AJXP_Role implements AjxpGroupPathProvider
      */
     function setArrayValue(){
         $args = func_get_args();
-        $arr = array_shift($args);
-        $value = array_pop($args);
+        $arr = $args[0]; //array_shift($args);
+        $argMaxIndex = count($args)-1;
+        $value = $args[$argMaxIndex]; //array_pop($args);
         $current = &$arr;
         foreach ($args as $index => $key){
-            if($index < count($args)-1) {
-                if(!is_array($current[$key])) $current[$key] = array();
+            if($index == 0) continue;
+            if($index < $argMaxIndex -1) {
+                if(!isset($current[$key])) $current[$key] = array();
                 $current = &$current[$key];
             }else{
                 $current[$key] = $value;

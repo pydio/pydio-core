@@ -44,6 +44,8 @@ class AJXP_SerialUser extends AbstractAjxpUser
 	var $registerForSave = array();
     var $create = true;
 
+    var $childrenPointer = null;
+
     /**
      * @param $id
      * @param serialConfDriver $storage
@@ -89,10 +91,14 @@ class AJXP_SerialUser extends AbstractAjxpUser
 			$this->setAdmin(true);
 		}
 		if(isSet($this->rights["ajxp.parent_user"])){
-			$this->setParent($this->rights["ajxp.parent_user"]);
+			//$this->setParent($this->rights["ajxp.parent_user"]);
+            parent::setParent($this->rights["ajxp.parent_user"]);
 		}
         if(isSet($this->rights["ajxp.group_path"])){
             $this->setGroupPath($this->rights["ajxp.group_path"]);
+        }
+        if(isSet($this->rights["ajxp.children_pointer"])){
+            $this->childrenPointer = $this->rights["ajxp.children_pointer"];
         }
 
         // LOAD ROLES
@@ -146,6 +152,9 @@ class AJXP_SerialUser extends AbstractAjxpUser
 		if($this->hasParent()){
 			$this->rights["ajxp.parent_user"] = $this->parentUser;
 		}
+        if(isSet($this->childrenPointer)){
+            $this->rights["ajxp.children_pointer"] = $this->childrenPointer;
+        }
         $this->rights["ajxp.group_path"] = $this->getGroupPath();
 
         if($context == "superuser"){
@@ -183,5 +192,36 @@ class AJXP_SerialUser extends AbstractAjxpUser
         $fastCheck = ($fastCheck == "true" || $fastCheck == true);
         return AJXP_Utils::saveSerialFile($this->getStoragePath()."/".$key.".ser", $value, !$fastCheck);
 	}
+
+    /**
+     * Override parent method to keep a reference to the child users
+     * @param $parentId
+     */
+    function setParent($parentId){
+        $u = ConfService::getConfStorageImpl()->createUserObject($parentId);
+        $p = $u->getChildrenPointer();
+        if($p == null) $p = array();
+        $p[$this->getId()] = $this->getId();
+        $u->setChildrenPointer($p);
+        $u->save("superuser");
+        if(AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getId() == $parentId){
+            AuthService::updateUser($u);
+        }
+        parent::setParent($parentId);
+    }
+
+    /**
+     * @return null|Array
+     */
+    function getChildrenPointer(){
+        return $this->childrenPointer;
+    }
+
+    /**
+     * @param Array $array
+     */
+    function setChildrenPointer($array){
+        $this->childrenPointer = $array;
+    }
 
 }

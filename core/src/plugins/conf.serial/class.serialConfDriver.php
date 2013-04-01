@@ -276,13 +276,38 @@ class serialConfDriver extends AbstractConfDriver {
         $result = array();
         $authDriver = ConfService::getAuthDriverImpl();
         $confDriver = ConfService::getConfStorageImpl();
-        $users = $authDriver->listUsers();
-        foreach (array_keys($users) as $id){
-            $object = $confDriver->createUserObject($id);
-            if($object->hasParent() && $object->getParent() == $userId){
-                $result[] = $object;
+        $parent = $confDriver->createUserObject($userId);
+        $pointer = $parent->getChildrenPointer(); // SERIAL USER SPECIFIC METHOD
+        if(!is_array($pointer)){ // UPDATE FIRST TIME
+            $users = $authDriver->listUsers();
+            $pointer = array();
+            foreach (array_keys($users) as $id){
+                $object = $confDriver->createUserObject($id);
+                if($object->hasParent() && $object->getParent() == $userId){
+                    $result[] = $object;
+                    $pointer[$object->getId()] = $object->getId();
+                }
+            }
+            $parent->setChildrenPointer($pointer);
+            $parent->save("superuser");
+        }else{
+            foreach($pointer as $childId){
+                if(!AuthService::userExists($childId)) {
+                    $clean = true;
+                    unset($pointer[$childId]);
+                    continue;
+                }
+                $object = $confDriver->createUserObject($childId);
+                if($object->hasParent() && $object->getParent() == $userId){
+                    $result[] = $object;
+                }
+            }
+            if($clean){
+                $parent->setChildrenPointer($pointer);
+                $parent->save("superuser");
             }
         }
+
         return $result;
     }
 
@@ -411,13 +436,28 @@ class serialConfDriver extends AbstractConfDriver {
             rmdir($user->getStoragePath());
         }
 
-        $authDriver = ConfService::getAuthDriverImpl();
-        $users = $authDriver->listUsers();
+        // DELETE CHILDREN USING POINTER IF POSSIBLE
+        $users = $this->getUserChildren($userId); // $authDriver->listUsers();
         foreach (array_keys($users) as $id){
             $object = $this->createUserObject($id);
             if($object->hasParent() && $object->getParent() == $userId){
                 $this->deleteUser($id, $deletedSubUsers);
                 $deletedSubUsers[] = $id;
+            }
+        }
+
+
+        // CLEAR PARENT POINTER IF NECESSARY
+        if($user->hasParent()){
+            $parentObject = $this->createUserObject($user->getParent());
+            $pointer = $parentObject->getChildrenPointer();
+            if($pointer !== null){
+                unset($pointer[$userId]);
+                $parentObject->setChildrenPointer($pointer);
+                $parentObject->save("superuser");
+                if(AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getId() == $parentObject->getId()){
+                    AuthService::updateUser($parentObject);
+                }
             }
         }
 

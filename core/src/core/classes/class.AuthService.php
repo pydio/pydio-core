@@ -872,7 +872,7 @@ class AuthService
             $repo = ConfService::getRepository();
             if($repo!=null) $repoId = $repo->getId();
         }
-        if($logged == null) return $params;
+        if($logged == null || $logged->mergedRole == null) return $params;
         $roleParams = $logged->mergedRole->listParameters();
         if(iSSet($roleParams[AJXP_REPO_SCOPE_ALL][$pluginId])){
             $params = array_merge($params, $roleParams[AJXP_REPO_SCOPE_ALL][$pluginId]);
