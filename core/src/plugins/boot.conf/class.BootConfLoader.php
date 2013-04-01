@@ -74,7 +74,24 @@ class BootConfLoader extends AbstractConfDriver {
         $jsonData = AJXP_Utils::loadSerialFile($jsonPath, false, "json");
         if(!is_array($jsonData)) $jsonData = array();
         $jsonData[$pluginId] = $options;
+        if($pluginId == "core.conf" || $pluginId == "core.auth"){
+            $testKey = ($pluginId == "core.conf" ? "UNIQUE_INSTANCE_CONFIG" : "MASTER_INSTANCE_CONFIG" );
+            $current = array();
+            $this->_loadPluginConfig($pluginId, $current);
+            if(isSet($current[$testKey]["instance_name"]) && $current[$testKey]["instance_name"] != $options[$testKey]["instance_name"]){
+                $forceDisconnexion = $pluginId;
+            }
+        }
         AJXP_Utils::saveSerialFile($jsonPath, $jsonData, true, false, "json");
+        if(isSet($forceDisconnexion)){
+            if($pluginId == "core.conf"){
+                // DISCONNECT
+                AuthService::disconnect();
+            }else if($pluginId == "core.auth"){
+                // DELETE admin_counted file and DISCONNECT
+                @unlink(AJXP_CACHE_DIR."/admin_counted");
+            }
+        }
     }
 
     /**
