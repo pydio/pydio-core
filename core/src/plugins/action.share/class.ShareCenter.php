@@ -580,6 +580,7 @@ class ShareCenter extends AJXP_Plugin{
         }
         $tPath = (!empty($data["TRAVEL_PATH_TO_ROOT"]) ? $data["TRAVEL_PATH_TO_ROOT"] : "../..");
         $html = str_replace("AJXP_PATH_TO_ROOT", $tPath, $html);
+        HTMLWriter::charsetHeader();
         echo($html);
     }
 
@@ -621,6 +622,7 @@ class ShareCenter extends AJXP_Plugin{
         $AJXP_LINK_HAS_PASSWORD = false;
         $AJXP_LINK_BASENAME = SystemTextEncoding::toUTF8(basename($data["FILE_PATH"]));
 
+        HTMLWriter::charsetHeader();
         // Check password
         if (strlen($data["PASSWORD"]))
         {
