@@ -34,9 +34,13 @@ class BootConfLoader extends AbstractConfDriver {
 
     private function getInternalConf(){
         if(!isSet(BootConfLoader::$internalConf)){
-            include(AJXP_INSTALL_PATH."/conf/bootstrap_plugins.php");
-            if(isSet($PLUGINS)){
-                BootConfLoader::$internalConf = $PLUGINS;
+            if(file_exists(AJXP_CONF_PATH."/bootstrap_plugins.php")){
+                include(AJXP_CONF_PATH."/bootstrap_plugins.php");
+                if(isSet($PLUGINS)){
+                    BootConfLoader::$internalConf = $PLUGINS;
+                }
+            }else{
+                BootConfLoader::$internalConf = array();
             }
         }
         return BootConfLoader::$internalConf;
