@@ -803,6 +803,7 @@ class ShareCenter extends AJXP_Plugin{
 
         $newId = $newRepo->getId();
         $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
+        $this->initPublicFolder($downloadFolder);
         $data = array("REPOSITORY"=>$newId, "PRELOG_USER"=>$userId);
         if($httpVars["disable_download"]){
             $data["DOWNLOAD_DISABLED"] = true;
