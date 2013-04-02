@@ -75,16 +75,16 @@
                             <div class="dialogContentMainTitle" ajxp_message_id="share_center.28">AJXP_MESSAGE[share_center.28]</div>
                             <ul class="share_chooser_list">
                                 <li data-shareListValue="workspace">
-                                    <div class="shareChooserTitle">New workspace</div>
-                                    <div class="dialogLegend">For both internal and external users, the folder will appear as a new workspace in the target users workspace list.</div>
+                                    <div class="shareChooserTitle" ajxp_message_id="share_center.63">AJXP_MESSAGE[share_center.63]</div>
+                                    <div class="dialogLegend" ajxp_message_id="share_center.64">AJXP_MESSAGE[share_center.64]</div>
                                 </li>
                                 <li data-shareListValue="minisite_public">
-                                    <div class="shareChooserTitle">Public Minisite (no authentification required)</div>
-                                    <div class="dialogLegend">For external users, the folder will appear at a new public adress as a simple file list.</div>
+                                    <div class="shareChooserTitle" ajxp_message_id="share_center.65">AJXP_MESSAGE[share_center.65]</div>
+                                    <div class="dialogLegend" ajxp_message_id="share_center.66">AJXP_MESSAGE[share_center.66]</div>
                                 </li>
                                 <li data-shareListValue="minisite_private">
-                                    <div class="shareChooserTitle">Private Minisite (users authentification required)</div>
-                                    <div class="dialogLegend">For internal or external users, the folder will appear at a new adress as a simple file list, but with user authentification required</div>
+                                    <div class="shareChooserTitle" ajxp_message_id="share_center.67">AJXP_MESSAGE[share_center.67]</div>
+                                    <div class="dialogLegend" ajxp_message_id="share_center.68">AJXP_MESSAGE[share_center.68]</div>
                                 </li>
                             </ul>
                         </div>
@@ -94,20 +94,20 @@
                                 <div class="dialogLegend" ajxp_message_id="share_center.36">AJXP_MESSAGE[share_center.36]</div>
                             </div>
                             <div class="mode-minipub mode-minipriv">
-                                <div class="dialogContentMainTitle" ajxp_message_id="share_center.28">Configure Minisite</div>
-                                <div class="dialogLegend" ajxp_message_id="share_center.36">Use the checkboxes to grant permissions to this folder for the public. If you check 'Upload' only, this folder will be an empty inbox in which people can drop files.</div>
+                                <div class="dialogContentMainTitle" ajxp_message_id="share_center.69">AJXP_MESSAGE[share_center.69]</div>
+                                <div class="dialogLegend" ajxp_message_id="share_center.70">AJXP_MESSAGE[share_center.70]</div>
                             </div>
                             <div id="target_repository" class="SF_element oneFieldForm" style="margin: 5px 10px 15px;">
                                 <div class="SF_label mode-ws" style="font-size:12px;" ajxp_message_id="share_center.35">AJXP_MESSAGE[share_center.35]</div>
-                                <div class="SF_label mode-minipriv mode-minipub" style="font-size:12px;" ajxp_message_id="share_center.35">Title</div>
+                                <div class="SF_label mode-minipriv mode-minipub" style="font-size:12px;" ajxp_message_id="share_center.35">AJXP_MESSAGE[share_center.35]</div>
                                 <input type="text" value="" id="repo_label" name="repo_label" class="SF_input" style="float:right;font-size:12px;"/>
                                 <div id="target_user_simple" class="mode-minipub">
                                     <br style="clear:both;"/>
-                                    <div class="SF_label" style="font-size:12px;" ajxp_message_id="share_center.35">Permissions</div>
+                                    <div class="SF_label" style="font-size:12px;" ajxp_message_id="share_center.71">AJXP_MESSAGE[share_center.71]</div>
                                     <div class="SF_input" style="padding: 7px !important;">
-                                        <input type="checkbox" id="simple_right_read" name="simple_right_read" checked="true" class="checkbox_left"><label class="checkbox_label_left" for="simple_right_read">Browse & preview</label><br/>
-                                        <input type="checkbox" id="simple_right_download" name="simple_right_download" checked="true" class="checkbox_left"><label class="checkbox_label_left" for="simple_right_download">Download files</label><br/>
-                                        <input type="checkbox" id="simple_right_write" name="simple_right_write" class="checkbox_left"><label class="checkbox_label_left" for="simple_right_write">Upload</label><br/>
+                                        <input type="checkbox" id="simple_right_read" name="simple_right_read" checked="true" class="checkbox_left"><label class="checkbox_label_left" for="simple_right_read">AJXP_MESSAGE[share_center.72]</label><br/>
+                                        <input type="checkbox" id="simple_right_download" name="simple_right_download" checked="true" class="checkbox_left"><label class="checkbox_label_left" for="simple_right_download">AJXP_MESSAGE[share_center.73]</label><br/>
+                                        <input type="checkbox" id="simple_right_write" name="simple_right_write" class="checkbox_left"><label class="checkbox_label_left" for="simple_right_write">AJXP_MESSAGE[share_center.74]</label><br/>
                                     </div>
                                 </div>
                                 <br style="clear:both;"/>

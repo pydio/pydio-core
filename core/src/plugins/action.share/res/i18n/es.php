@@ -64,5 +64,17 @@ $mess = array(
 "61"=> "HTML Embed Code",
 "62"=> "Minisite Adress",
 "57" => "times",
+"63"=> "New workspace",
+"64"=> "For both internal and external users, the folder will appear as a new workspace in the target users workspace list.",
+"65"=> "Public Minisite (no authentification required)",
+"66"=> "For external users, the folder will appear at a new public adress as a simple file list.",
+"67"=> "Private Minisite (users authentification required)",
+"68"=> "For internal or external users, the folder will appear at a new adress as a simple file list, but with user authentification required",
+"69"=> "Configure Minisite",
+"70"=> "Use the checkboxes to grant permissions to this folder for the public. If you check 'Upload' only, this folder will be an empty inbox in which people can drop files.",
+"71"=> "Permissions",
+"72"=> "Browse & Preview",
+"73"=> "Download",
+"74"=> "Upload files"
 // will be replaced by the filename to download
 );
