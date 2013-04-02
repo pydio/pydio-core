@@ -783,10 +783,10 @@ class ShareCenter extends AJXP_Plugin{
             $httpVars["user_0"] = $userId;
             $httpVars["user_pass_0"] = $httpVars["shared_pass"] = $userPass;
             $httpVars["entry_type_0"] = "user";
-            $httpVars["right_read_0"] = ($httpVars["simple_right_read"] == "on" ? "true" : "false");
-            $httpVars["right_write_0"] = ($httpVars["simple_right_write"] == "on" ? "true" : "false");
+            $httpVars["right_read_0"] = (isSet($httpVars["simple_right_read"]) ? "true" : "false");
+            $httpVars["right_write_0"] = (isSet($httpVars["simple_right_write"]) ? "true" : "false");
             $httpVars["right_watch_0"] = "false";
-            $httpVars["disable_download"] = ($httpVars["simple_right_download"] == "on" ? false : true);
+            $httpVars["disable_download"] = (isSet($httpVars["simple_right_download"]) ? false : true);
             if($httpVars["right_write_0"] == "false" && $httpVars["right_read_0"] == "false"){
                 return "share_center.58";
             }
