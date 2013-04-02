@@ -19,18 +19,6 @@
         "LINE":171
       },
       {
-        "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
-        "LINE":152
-      },
-      {
-        "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
-        "LINE":277
-      },
-      {
-        "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
-        "LINE":861
-      },
-      {
         "FILE":"\/plugins\/meta.user\/class.UserMetaManager.php",
         "LINE":193
       }
@@ -190,7 +178,7 @@
     "TRIGGERS":[
       {
         "FILE":"\/core\/classes\/class.AuthService.php",
-        "LINE":654
+        "LINE":693
       }
     ],
     "LISTENERS":[
@@ -210,11 +198,11 @@
     "TRIGGERS":[
       {
         "FILE":"\/core\/classes\/class.AuthService.php",
-        "LINE":673
+        "LINE":723
       },
       {
         "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
-        "LINE":807
+        "LINE":1011
       }
     ],
     "LISTENERS":[
@@ -234,7 +222,7 @@
     "TRIGGERS":[
       {
         "FILE":"\/core\/classes\/class.AuthService.php",
-        "LINE":701
+        "LINE":751
       }
     ],
     "LISTENERS":[
@@ -254,7 +242,7 @@
     "TRIGGERS":[
       {
         "FILE":"\/core\/classes\/class.AuthService.php",
-        "LINE":709
+        "LINE":759
       }
     ],
     "LISTENERS":[
@@ -283,19 +271,15 @@
       },
       {
         "FILE":"\/plugins\/core.conf\/class.AbstractConfDriver.php",
-        "LINE":468
+        "LINE":495
       },
       {
         "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
-        "LINE":124
+        "LINE":173
       },
       {
         "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
-        "LINE":156
-      },
-      {
-        "FILE":"\/plugins\/action.share\/class.ShareCenter.php",
-        "LINE":279
+        "LINE":313
       }
     ],
     "LISTENERS":[
@@ -305,8 +289,31 @@
       }
     ]
   },
+    "msg.queue_notification":{
+      "DESCRIPTION":"Post a notification to the queue. It will be directly processed or not (triggering a msg.notification event)",
+        "PARAMETERS":[
+          {
+            "NAME":"notification",
+            "TYPE":"AJXP_Notification",
+            "DESCRIPTION":"Notification object filled with content, author, date, etc"
+          }
+        ],
+      "TRIGGERS":[
+        {
+          "FILE":"\/plugins\/core.notifications\/class.AJXP_NotificationCenter.php",
+          "LINE":307
+        }
+      ],
+      "LISTENERS":[
+        {
+          "PLUGIN_ID":"core.mq",
+          "METHOD":"sendToQueue"
+        }
+      ],
+      "PARAMETER_SAMPLE":"array($notif)"
+    },
   "msg.notification":{
-    "DESCRIPTION":"Sends a notification to the queue",
+    "DESCRIPTION":"Process a notification from the queue",
     "PARAMETERS":[
       {
         "NAME":"notification",
@@ -317,11 +324,19 @@
     "PARAMETER_SAMPLE":"array(&$notification)",
     "TRIGGERS":[
       {
-        "FILE":"\/plugins\/core.notifications\/class.AJXP_NotificationCenter.php",
-        "LINE":284
+        "FILE":"\/plugins\/core.mq\/class.MqManager.php",
+        "LINE":67
+      },
+      {
+        "FILE":"\/plugins\/core.mq\/class.MqManager.php",
+        "LINE":79
       }
     ],
     "LISTENERS":[
+      {
+        "PLUGIN_ID":"core.notifications",
+        "METHOD":"persistNotificationToAlerts"
+      },
       {
         "PLUGIN_ID":"core.mailer",
         "METHOD":"processNotification"
@@ -359,31 +374,31 @@
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1398
+        "LINE":1400
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1573
+        "LINE":1575
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1590
+        "LINE":1592
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1718
+        "LINE":1723
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1744
+        "LINE":1749
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1808
+        "LINE":1813
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1859
+        "LINE":1868
       },
       {
         "FILE":"\/plugins\/core.access\/class.AbstractAccessDriver.php",
@@ -454,39 +469,39 @@
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1400
+        "LINE":1402
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1454
+        "LINE":1456
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1487
+        "LINE":1489
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1521
+        "LINE":1523
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1584
+        "LINE":1586
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1593
+        "LINE":1595
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1610
+        "LINE":1612
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1798
+        "LINE":1803
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1861
+        "LINE":1870
       },
       {
         "FILE":"\/plugins\/core.access\/class.AbstractAccessDriver.php",
@@ -577,11 +592,11 @@
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1462
+        "LINE":1464
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1539
+        "LINE":1541
       },
       {
         "FILE":"\/plugins\/core.access\/class.AbstractAccessDriver.php",
@@ -620,7 +635,7 @@
       },
       {
         "FILE":"\/plugins\/editor.audio\/class.AudioPreviewer.php",
-        "LINE":63
+        "LINE":65
       },
       {
         "FILE":"\/plugins\/editor.imagick\/class.IMagickPreviewer.php",
@@ -675,7 +690,7 @@
     "TRIGGERS":[
       {
         "FILE":"\/plugins\/access.ajxp_conf\/class.ajxp_confAccessDriver.php",
-        "LINE":224
+        "LINE":285
       }
     ],
     "LISTENERS":[
@@ -718,15 +733,15 @@
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1425
+        "LINE":1427
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1464
+        "LINE":1466
       },
       {
         "FILE":"\/plugins\/access.fs\/class.fsAccessDriver.php",
-        "LINE":1806
+        "LINE":1811
       },
       {
         "FILE":"\/plugins\/meta.user\/class.UserMetaManager.php",
