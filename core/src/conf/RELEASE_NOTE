@@ -6,6 +6,206 @@ Demo : http://ajaxplorer.info/demo
 Date : ##VERSION_DATE##
 Rev Number : ##REVISION##
 
+https://github.com/hlev
+https://github.com/gynter
+https://github.com/terminal-addict
+https://github.com/chusopr
+https://github.com/cfoellmann
+
+This is a DEVELOPMENT version that should not be used in a production environement.
+
+Major new features :
+> Share a folder as a public listing ("minisite"), with preview for major file types
+> Share : Generate HTML Embed code for all type of sharing (ministe or file), and direct download link for files
+> Better "Shared Elements" management : browse all shared elements inside a given workspace inside a tab. Use Lucene indexer for performances.
+> New view type "Detail" on two lines.
+> Full rework of the Configuration to be able to manage them entirely via the GUI (drop bootstrap_plugins.php). This opens a better ability to create an installer
+> Notifications : display Alerts in the feed.
+> GUI optimization for IE (IE8 does not switch to legacy anymore), for mobile and for widgeting. Great responsiveness.
+> Performances improvement at various points, especially the first time loading of the GUI
+> DX (Developer Experience) : exposition of the API and the hooks
+> [experimental] New "rest.php" access point to run API queries in a more REST-oriented approach
+
+Roadmap to next version
+> Create an installer to configure all SQL-based plugins at once
+> Complete API Documentation / Expand PHPUnit tests
+> Improve Notifications panel layout
+> Add buttons to test LDAP connexion, test email sending, etc.
+> Digg the WebServer socket feature
+
+Detailed Changelog
+
+Core Auth & Conf
+[core.conf] Legcay to new format conversion for AUTH_DRIVER key in bootstrap_plugin
+[core.conf] MINISITE & MINISITE_NODOWNLOAD roles creation at startup
+[auth.serial] fix two performance problems: For conf.serial, keep a reference to the children to make listUsersChildren acceptable. Was impacting admin users listing and also when sharing a folder to a new worpspace.
+[core.auth] Generally, avoid recomputing merged role after calling addRole() if there is no real changes.
+[core.conf] When updating the INSTANCE of core.auth or core.conf, force disconnexion and remove admin_counted file to make sure it the user is not logged out.
+[conf.sql] SQL_DRIVER is mandatory Add ajxp_user table in conf.sql as well
+Readapt the core.auth plugin to automatically convert parameters into auth.multi driver
+Refactoring : Move QUEUES stuff from core.notification to core.mq
+Core : filter registry from serverCallbacks that are not used by the client
+Make TRANSMIT_CLEAR_PASS a default to "true", to avoid by default having to retype a password for WebDAV access. Rework WebDAV Panel.
+[conf.sql] Clear serial_role on repository delete
+[conf.sql] Fix issue #29 : Deleting a group with users does not delete the users
+Massive refactoring for lazier loading of repositories : only load the accessible repositories, only when it's necessary. May break some stuff, to check...
+[core.conf] Fix orderRoles function to make sure we keep the groups hierarchy
+[boot.conf] For core.conf and all conf.* plugins, always use the boot.conf as storage, otherwise it's weird (conf driver is storing its configs in its own storage)
+Core : fix double loading of external files, do not reload contributions if external files are already appended to the manifest.
+[auth.remote] Typo in checkPassword ! see #41
+[core] At last fix the Repository::getId() method, remove the tests for isWriteable
+[core] Attach instanciated driver instance to the repository
+[core] Switch the AuthService to be usable with session or not.
+[core] Start a REST access point
+Declare "Indexable" metadata for in-house optimization : ajxp_shared meta allow for superfast loading of all shared elements of a repository.
+Also required the ability to create "user-scoped" entries in Lucene : we duplicated for as many as necessary.
+TODO : clear all user-scope Lucene document when deleting a user.
+TODO : use Lucene as well to optimize the whole conf.serial/auth.serial drivers?
+Refactor AjxpWebdavProvider to AjxpWrapperProvider …
+Start a massive refactoring to Restify the behaviour : A node can "on his own" load a repository -> a driver -> a metastore.
+Memory cache the users label for better perfs
+AuthService : remove the "password min length" check as it prevent the admin/admin creation.
+Make sure to call parent::initOptions() to get the default options values (from Manifest)
+Apply defered hooks inside try/catch otherwise it can break the chain.
+Use restore_error_handler to avoid triggering errors when loading feed
+Send template only if the header is text/html, to avoid resending the whole thing if a wrong request is sent.
+AJXP_PLUGIN : Load Options Default like for global parameters …
+Move initActivePlugins from ConfService to AJXP_PluginsService
+Move all bootstrap_plugins configs to a specific boot.conf AbstractConfDriver implementation
+Use AJXP_Utils::cleanDibiDriverParameters() when using a dibi like field
+> Clean dibi parameter by removing the driver prefix …
+> Change the way plugins are automatically activated or not : if there is a core.* plugin, do not load this category, it will be the core plugin task. Create manifests where necessary (meta, index, access)
+> Move AJXP_Logger class to core.log, instanciate the real logger using the core plugin config.
+> Plugins list : skip core plugin that don't have any parameters to avoid polluting display
+Merge pull request #25 from cfoellmann/master minor README update
+
+
+WebDAV
+WebDAV fixes : fix lock backend (create lock file if it does not exists), was preventing upload.
+Always $ignoreRangeHeader for the moment, fseek is not working correctly with the inner streams.
+AJXP_Sabre_NodeLeaf was missing the getContentType() implementation (see #31)
+
+Admin GUI
+Use a button to trigger SQL tables creation. Update all CREATE TABLE instructions with IF NOT EXISTS
+SQL-consumer plugins use the default "Core" driver defined in the core.conf plugin
+Fix plugin editor and roles editor layout details
+
+GUI
+Relabel Shared Elements repository
+[core.mq] : new parameter for polling time
+Fix ajxp_shared tabs, send to user menu, do not show in RepositorySelect
+[gui.ajax] Handle autoload of css files.
+[gui.ajax] Action : specify a forbidden extension in allowedMimes by using "^ext"
+Gui.ajax : Fixes for IE7 and IE8, IE8 now does not switch to legacy theme anymore !
+[gui.ajax] Fix FilesList height and content_pane border radius …
+[gui.ajax] Ability to pass the standard GET parameters during the get_boot_conf action
+Bootstrap : Prepend SERVER_PREFIX_URI to logo path
+FilesList : fix duplicate listing when displayMode is fixed by componentConfig
+gui.mobile : fix content pane duplicate.
+Fix selectable + touch : trigger selection if deltaY is very small, otherwise it's a scrolling action.
+InfoPanel : check viewPort dimensions when opened as editor.
+Use InfoPanel as an editor (disabled by default). To be applied for mobile version
+Declare an 'inline' toolbar for mobile GUI (all the old code could be removed). Put ls, open_with and download in this new toolbar
+FilesList : pass a toolbarOptions to be displayed inline, either multiple (visible on each line) or unique (only selected line)
+Toolbars : ability for an action to belong to many toolbar groups, using comma-separated list
+Rework notifications feed styling.
+Bookmarks implementation as a FetchedResultPanel
+Rework InfoPanel responsiveness > switch to 2 or 3 columns and biggest preview
+Fix video.js preview repositionning
+Handle ajxp_bookmarked metadata in the same way …
+Redefine tabulator content for ajxp_conf driver / TODO check other non-wrappers drivers
+Fix IE Tweaks : make sure parseXML uses XMLDom active X instead of simple DOM parser (to use XPath)
+Forgotten observer in search engine (destroy), set lightbox markup on sub element in the fileList
+Rework the splitter and the tabulator
+Fix AjxpPane.scanChildrenPanes
+Rework Tree Styling, the caret is still not good (white border when selected).
+Fix various JS files to allow concurrent FilesList instances. Use one in the SearchEngine result.
+Fix Key events for new Detail view
+New view type "Detail" on two lines.
+Fix #28 WS not refreshed for user-added repositories
+Avoid many XHR at startup by sending directly the bootconf and the registry in the HTML template.
+Readapt ajxp_widget for new theme
+Default values for nested fields in FormManager
+FormManager : Fix missing "No" selection on boolean
+Rework FormManager to send nested values as JSON, creating too long key names can be blocked by Suhosin
+New group_switch: type for standard form, new hidden type, new mixin for dibidriver_providers using these new types.
+
+
+Sharing
+Use previewProvider editors to generate embeddable HTML code for shared files. Handles Images, audio, and video.
+Fix public links list, was broken by the new share mechanisms, and by any other php file inside the folder (#45)
+Add "minisite" toolbar : upload actions, logout, new download_all action
+Inline Toolbar : fix css for minisite, new invisibleSelection option for Selectable
+Minisite : move template in action.share
+[action.share] New share mechanism : minisite
+[action.share] Better reload minisite configs …
+[action.share] New parameter AVOID_SHARED_FOLDER_SAME_LABEL
+Stripped out version of the template prepared for minisite feature, inlineToolbar in multiple mode
+Use a short form of the web link hash, along with a RewriteRule
+[action.share] Minisite, do not use the <base> tag, must be absolute
+Re-put the Share action in right click
+
+Plugins
+[editors] Fix eml editor, fix editor.other styling, add iconClass to editor.text
+[action.share] Make sure the minisite.php template is dynamically configured to point to server root (e.g. alias to public)
+[access.fs] When looping through a dir and using listing cache, make sure that the base path is also the correct one.
+[access.ftp] Fix ftp permissions (readonly state now has some direct impact)
+[access.fs] Fix dircopy by postponing the recursion after the closedir - should fix access.ftp
+Legcay to new format conversion for AUTH_DRIVER key in bootstrap_plug… …
+[uploader.jumploader] Fix uc_uploadUrl to fit ajxp widget mechanism
+[editor.soundmanager] Fix hookToList that was recently broken
+[editor.soundmanagaer] Fix sound (destroy on validation to be sure it's happening before disapear)
+[editor.diaporama] Handle window.ajxpMinisite config (hide metadata panel)
+[editor.soundmanager] Openable previewer
+[editor.video] Openable previewer
+[access.ajxp_conf] Fix delete user & delete role …
+[access.fs] Fix ls & copy actions rights
+[access.ftp] Let the driver handle the hidden files case, always get the whole list in the wrapper
+[access.ftp] Partially fixed the displaying of hidden files in FTP access plug-in
+[auth.ldap] Updated ldapAuthDriver to reduce calls to ldap_connect/_bind/_search
+[editor.diaporama] : correctly place the open overlay
+[editor.codemirror] Fix SERVER_PREFIX_URI case …
+[editor.infopanel] Create "Folder Info" action
+[editor.codemirror] Fix for mobile version
+[editor.soundmanager] Enable wav support
+[access.jsapi] Fix JSAPI driver
+Add Lucene by default to FTP, SFTP and SMB drivers
+[access.ftp] Fix wrong year for recent monthes, see bug #15
+[uploader.html] Fix #12 Files duplicated with drag and drop upload
+[access.ftp] Merge pull request #26 from ultreia-es/issue-17 Workaround for PHP bug #62035
+Issue 17: Workaround for PHP bug #62035 about PHP not being able to handle properly some FTP responses.
+[auth.cas] CAS Authentification plugin, contributed by Ultreia Communicaciones
+Fixes on WebSocket server
+[core.ajaxplorer/i18n] updated hu.php added translation for untranslated strings
+
+Developer
+List all ACTIONS and HOOKS in a new "Developer" node in the Settings panel.
+Still todo: document all serverCallback nodes, argh.
+Add a new "Developer" node in the Settings panel and display the actions and their API here.
+Rework phpDocs packages and subpackages
+Fix rest access point : /api/repository_id/action_name/parameters
+[core] died rest access point …
+[dist] Git tag and push instead of svn tag
+[dist] New task for git diff-tree, adapt parseSvnSummarize task, rework the prepare_update task
+[dist] Switch automatic builds from SVN to GIT
+Create README.md for new git repository
+
+
+
+
+
+
+
+
+
+---
+
+License : Affero GPL
+Copyright : Charles du Jeu 2013
+Demo : http://ajaxplorer.info/demo
+Date : 20130302
+Rev Number : 8b9a0a6282
+
 This is a DEVELOPMENT version that should not be used in a production environement.
 
 BUG FIXES
