@@ -279,12 +279,38 @@
 		<mkdir dir="${build.working_folder}/rpm"/>
 		<mkdir dir="${build.working_folder}/deb"/>
 		<mkdir dir="${build.working_folder}/deb/builddeb"/>
-        <svncheckout
-                revision="HEAD"
-                repositoryurl="${svn.repository_url}${svn.dist_root}"
-                todir="${build.working_folder}/dist"
-        />
-        
+
+        <if>
+            <available type="dir" file="${svn.local_folder}"/>
+            <then>
+                <svncheckout
+                        revision="HEAD"
+                        repositoryurl="${svn.repository_url}${svn.dist_root}"
+                        todir="${build.working_folder}/dist"
+                        />
+            </then>
+            <else>
+                <copy todir="${build.working_folder}/dist">
+                    <fileset dir="${git.local_repository}/dist">
+                        <include name="**/*"/>
+                    </fileset>
+                </copy>
+                <exec command="git rev-parse --short HEAD" dir="${git.local_repository}" outputProperty="LASTREVISION"/>
+            </else>
+        </if>
+
+        <if>
+            <equals arg1="${build_channel}" arg2="stable"/>
+            <then>
+                <property name="debian_distribution" value="stable"/>
+                <property name="rpm_distribution" value="ajaxplorer-stable"/>
+            </then>
+            <else>
+                <property name="debian_distribution" value="testing"/>
+                <property name="rpm_distribution" value="ajaxplorer-testing"/>
+            </else>
+        </if>
+
 		<!-- TOKEN REPLACE THE RPM SPEC FILE -->
         <copy file="${build.working_folder}/dist/rpm/ajaxplorer.spec.tpl" overwrite="true" toFile="${build.working_folder}/rpm/ajaxplorer.spec">
             <filterchain>
@@ -323,6 +349,7 @@
             <filterchain>
                 <replacetokens begintoken="##" endtoken="##">
                     <token key="KEY_ID" value="${build.signing_key_id}"/>
+                    <token key="DIST" value="${debian_distribution}"/>
                 </replacetokens>
             </filterchain>
         </reflexive>
@@ -362,22 +389,12 @@
 				
 				
 				<!-- UPDATE APT REPOSITORY -->		
-				<exec command="reprepro --ask-passphrase -Vb . include squeeze ${build.working_folder}/deb/ajaxplorer_${build.version}_amd64.changes" dir="${build.repositories_folder}/apt/" passthru="true"/>
+				<exec command="reprepro --ask-passphrase -Vb . include ${debian_distribution} ${build.working_folder}/deb/ajaxplorer_${build.version}_amd64.changes" dir="${build.repositories_folder}/apt/" passthru="true"/>
 		
-				<if>
-					<equals arg1="${build_channel}" arg2="stable"/>
-					<then>
-						<!-- UPDATE EL6 RPM REPOSITORY -->		
-						<copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.noarch.rpm" toDir="${build.repositories_folder}/el6/ajaxplorer-stable/"/>
-						<exec command="createrepo ." dir="${build.repositories_folder}/el6/ajaxplorer-stable/" passthru="true"/>
-					</then>
-					<else>
-						<!-- UPDATE EL6 RPM REPOSITORY -->		
-						<copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.noarch.rpm" toDir="${build.repositories_folder}/el6/ajaxplorer-testing/"/>
-						<exec command="createrepo ." dir="${build.repositories_folder}/el6/ajaxplorer-testing/" passthru="true"/>
-					</else>
-				</if>
-		
+                <!-- UPDATE EL6 RPM REPOSITORY -->
+                <copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.noarch.rpm" toDir="${build.repositories_folder}/el6/{rpm_distribution}/"/>
+                <exec command="createrepo ." dir="${build.repositories_folder}/el6/{rpm_distribution}/" passthru="true"/>
+
 				<!-- UPDATE EL6 SOURCES REPOSITORY -->		
 				<copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.src.rpm" toDir="${build.repositories_folder}/el6/ajaxplorer-sources/"/>
 				<exec command="createrepo ." dir="${build.repositories_folder}/el6/ajaxplorer-sources/" passthru="true"/>
