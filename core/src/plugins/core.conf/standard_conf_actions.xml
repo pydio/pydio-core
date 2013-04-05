@@ -310,7 +310,7 @@
 					conn.onComplete = function(transport){
 						ajaxplorer.webdavCurrentPreferences = transport.responseJSON;
 						$('webdav_activator').checked = ajaxplorer.webdavCurrentPreferences.webdav_active;
-						if($('webdav_activator').checked && !ajaxplorer.webdavCurrentPreferences.digest_set) {
+						if($('webdav_activator').checked && ajaxplorer.webdavCurrentPreferences.http_auth_method_digest && !ajaxplorer.webdavCurrentPreferences.digest_set) {
 						    $('webdav_password_form').show();
 						}
                         ajaxplorer.user.getRepositoriesList().each(function(pair){
@@ -345,7 +345,10 @@
                                 }));
                                 conn.onComplete = function(transport){
                                     ajaxplorer.webdavCurrentPreferences = transport.responseJSON;
-                                    if(ajaxplorer.webdavCurrentPreferences.webdav_active && !ajaxplorer.webdavCurrentPreferences.digest_set) {
+                                    if(ajaxplorer.webdavCurrentPreferences.webdav_active && !ajaxplorer.webdavCurrentPreferences.http_auth_method_digest) {
+                                        $('webdav_password_form').hide();
+                                        ajaxplorer.displayMessage("SUCCESS", MessageHash[408]);
+                                    } else if(ajaxplorer.webdavCurrentPreferences.webdav_active && !ajaxplorer.webdavCurrentPreferences.digest_set) {
                                         $('webdav_password_form').show();
                                         ajaxplorer.displayMessage("SUCCESS", MessageHash[408]);
                                     }else {

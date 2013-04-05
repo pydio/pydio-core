@@ -58,7 +58,8 @@ class AJXP_Sabre_AuthBackendBasic extends Sabre_DAV_Auth_Backend_AbstractBasic{
 			return false;
 		}
         //  check if there are cached credentials. prevents excessive ldap auths.
-		$encryptedPass = md5($userpass[1]);
+		$secret = (defined("AJXP_SECRET_KEY")? AJXP_SAFE_SECRET_KEY:"\1CDAFx¨op#");
+		$encryptedPass = md5($userpass[1].$secret);
         $cachedPasswordValid = 0;
 		//AJXP_Logger::logAction("Checking " . $encryptedPass . " against cache.");
 		foreach ($webdavData as $cacheEncryptedPass => $cacheExpiry) {

@@ -234,7 +234,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
 		$confDriver = ConfService::getConfStorageImpl();
 		$userObject = $confDriver->instantiateAbstractUserImpl($login);
 		if ($userObject->storageExists()) {
-			//return true;
+			return true;
 		}
         $entries = $this->getUserEntries($login);
         if(!is_array($entries)) return false;
