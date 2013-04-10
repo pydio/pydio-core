@@ -58,21 +58,13 @@ class AJXP_Sabre_AuthBackendBasic extends Sabre_DAV_Auth_Backend_AbstractBasic{
 			return false;
 		}
         //  check if there are cached credentials. prevents excessive ldap auths.
-		$secret = (defined("AJXP_SECRET_KEY")? AJXP_SAFE_SECRET_KEY:"\1CDAFx¨op#");
-		$encryptedPass = md5($userpass[1].$secret);
         $cachedPasswordValid = 0;
-		//AJXP_Logger::logAction("Checking " . $encryptedPass . " against cache.");
-		foreach ($webdavData as $cacheEncryptedPass => $cacheExpiry) {
-			//AJXP_Logger::logAction("  Checking: ". $cacheEncryptedPass . "/" . $cacheExpiry);
-			if ($cacheExpiry < time()) {
-				unset($webdavData[$cacheEncryptedPass]);
-			} else {
-				if ($cacheEncryptedPass == $encryptedPass) {
-					$cachedPasswordValid = true;
-					//AJXP_Logger::logAction("Found valid cached password.");
-				}
-			}
-		}
+	$secret = (defined("AJXP_SECRET_KEY")? AJXP_SAFE_SECRET_KEY:"\1CDAFx¨op#");
+	$encryptedPass = md5($userpass[1].$secret.date('YmdHi'));
+	if (isSet($webdavData["PASS"]) && ($encryptedPass == $webdavData["PASS"])) {
+	    $cachedPasswordValid = true;
+        }
+	
 
         if (!$cachedPasswordValid && (!$this->validateUserPass($userpass[0],$userpass[1]))) {
             $auth->requireLogin();
@@ -86,9 +78,9 @@ class AJXP_Sabre_AuthBackendBasic extends Sabre_DAV_Auth_Backend_AbstractBasic{
 			return false;
 		}
 
-		// cache the credentials for 15 mins (900 seconds, adjusted to 90 during testing)
+		// the method used here will invalidate the cached password every minute on the minute
 		if (!$cachedPasswordValid) {
-			$webdavData[$encryptedPass] = time() + 90;
+			$webdavData["PASS"] = $encryptedPass;
 			$userObject->setPref("AJXP_WEBDAV_DATA", $webdavData);
 			$userObject->save("user");
 			AuthService::updateUser($userObject);
