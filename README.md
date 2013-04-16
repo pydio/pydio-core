@@ -27,6 +27,6 @@ Please read the Developer doc located at https://ajaxplorer.info/documentation/d
 
 New in latest build, in the Settings panel, you can find a new "Developer" node where all actions contributed by all plugins are listed. These can be called either by http, or via the CLI API. At the same location, you will find all "hooks" registered and triggered in the server, that are VERY useful when you want your plugin to be really sandboxed.  
 
-#### Signing the CLA
+#### Sign the CLA
 
 Please <a href="http://www.clahub.com/agreements/ajaxplorer/ajaxplorer-core">sign the Contributor License Agreement</a> before contributing.
