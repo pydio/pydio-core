@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.timestamp" className="timestamp_create" mimes="*" formId="timestamp_act" write="true" label="CONF_MESSAGE[timestamp]" description="CONF_MESSAGE[Allow timestamp files with Universign.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/editor.timestamp/class.timestamp.php" classname="timestamp_create"/>
+<editor id="editor.timestamp" className="TimestampCreator" mimes="*" formId="timestamp_act" write="true" label="CONF_MESSAGE[timestamp]" description="CONF_MESSAGE[Allow timestamp files with Universign.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<class_definition filename="plugins/editor.timestamp/class.TimestampCreator.php" classname="TimestampCreator"/>
 	<client_settings>
         <resources>
             <img_library alias="timestamp_images" path="plugins/editor.timestamp/images"/>
