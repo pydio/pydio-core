@@ -7,7 +7,7 @@ v0.1
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-class timestamp_create extends AJXP_Plugin
+class TimestampCreator extends AJXP_Plugin
 {
 	function switchAction($action, $httpVars, $fileVars){
 
