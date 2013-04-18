@@ -838,6 +838,19 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                 }
             break;
 
+            case "get_global_binary_param" :
+
+                if(isSet($httpVars["tmp_file"])){
+                    $file = AJXP_Utils::getAjxpTmpDir()."/".AJXP_Utils::securePath($httpVars["tmp_file"]);
+                    if(isSet($file)){
+                        header("Content-Type:image/png");
+                        readfile($file);
+                    }
+                }else if(isSet($httpVars["binary_id"])){
+                    $this->loadBinary(array(), $httpVars["binary_id"]);
+                }
+            break;
+
             case "store_binary_temp" :
 
                 if(count($fileVars)){

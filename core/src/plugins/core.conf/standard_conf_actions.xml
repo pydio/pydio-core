@@ -192,6 +192,11 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
+		<action name="get_global_binary_param" skipSecureToken="true">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
 		<action name="store_binary_temp">
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>

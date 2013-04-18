@@ -76,7 +76,7 @@ Class.create("SliderInput", {
 		}
         this.docObserver = function(event){
 			var element = Event.findElement(event);
-			if(!element.descendantOf(this.holder) && !element.descendantOf(this.input)
+			if(element.descendantOf && !element.descendantOf(this.holder) && !element.descendantOf(this.input)
                 && element != this.holder && element!=this.input) {
 				this.hide();
 			}

@@ -72,8 +72,6 @@ input, textarea, select
 }
 
 textarea{
-    margin-top: 0;
-    margin-left: 0;
     padding: 0;
     background-color: #fff;
 }

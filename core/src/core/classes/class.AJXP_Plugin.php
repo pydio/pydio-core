@@ -123,6 +123,8 @@ class AJXP_Plugin implements Serializable{
 	}
 
     protected function getFilteredOption($optionName, $repositoryScope = AJXP_REPO_SCOPE_ALL){
+        $repo = ConfService::getRepository();
+        if($repo != null) $repositoryScope = $repo->getId();
         if(AuthService::getLoggedUser() != null){
             return AuthService::getLoggedUser()->mergedRole->filterParameterValue(
                 $this->getId(),
