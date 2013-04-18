@@ -3998,3 +3998,7 @@ td.ip_geo_cell{
 #upload_button {
     border-radius: 0 2px 2px 0;
 }
+
+.custom_top_title{
+    color: white;
+}

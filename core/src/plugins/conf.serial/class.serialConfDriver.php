@@ -523,11 +523,16 @@ class serialConfDriver extends AbstractConfDriver {
      */
     function loadBinary($context, $ID, $outputStream = null)
     {
-        if(is_file($this->getBinaryPathStorage($context)."/".$ID)){
+        $fileName = $this->getBinaryPathStorage($context)."/".$ID;
+        if(is_file($fileName)){
             if($outputStream == null){
                 header("Content-Type: ".AJXP_Utils::getImageMimeType($ID));
                 // PROBLEM AT STARTUP
-                readfile($this->getBinaryPathStorage($context)."/".$ID);
+                header('Pragma:');
+                header('Cache-Control: public');
+                header("Last-Modified: " . gmdate("D, d M Y H:i:s", filemtime($fileName)) . " GMT");
+                header("Expires: " . gmdate("D, d M Y H:i:s", filemtime($fileName)+5*24*3600) . " GMT");
+                readfile($fileName);
             }else if(is_resource($outputStream)) {
                 fwrite($outputStream, file_get_contents($this->getBinaryPathStorage($context)."/".$ID));
             }

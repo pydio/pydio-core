@@ -36,6 +36,7 @@ js/ajaxplorer/class.RepositorySimpleLabel.js
 js/ajaxplorer/class.Breadcrumb.js
 js/ajaxplorer/class.LocationBar.js
 js/ajaxplorer/class.UserWidget.js
+js/ajaxplorer/class.LogoWidget.js
 js/ajaxplorer/class.AjxpAutoCompleter.js
 js/ajaxplorer/class.AjxpUsersCompleter.js
 js/ajaxplorer/class.TreeSelector.js

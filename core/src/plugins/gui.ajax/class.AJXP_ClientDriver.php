@@ -272,6 +272,9 @@ class AJXP_ClientDriver extends AJXP_Plugin
             "iconOnly"       => $this->pluginConf["CUSTOM_ICON_ONLY"],
             "titleFontSize"	 => $this->pluginConf["CUSTOM_FONT_SIZE"]
         );
+        if(!empty($this->pluginConf["CUSTOM_ICON_BINARY"])){
+            $config["customWording"]["icon_binary_url"] = "get_action=get_global_binary_param&binary_id=".$this->pluginConf["CUSTOM_ICON_BINARY"];
+        }
         $config["usersEnabled"] = AuthService::usersEnabled();
         $config["loggedUser"] = (AuthService::getLoggedUser()!=null);
         $config["currentLanguage"] = ConfService::getLanguage();

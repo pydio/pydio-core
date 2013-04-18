@@ -1,5 +1,15 @@
 @media only screen
-and (max-width : 620px) {
+and (max-width : 800px) {
+    .custom_top_title{
+        width: 23%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+}
+
+@media only screen
+and (max-width : 680px) {
     .ws-label{
         display: none !important;
     }
@@ -19,6 +29,7 @@ and (max-width : 620px) {
     }
     .user_widget_label.withImage i{
         width: 30px;
+        overflow: hidden;
     }
 }
 
