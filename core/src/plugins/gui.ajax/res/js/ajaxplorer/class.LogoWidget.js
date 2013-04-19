@@ -22,19 +22,47 @@ Class.create("LogoWidget", AjxpPane, {
     initialize : function($super, element, options){
         $super(element, options);
         var configs = ajaxplorer.getPluginConfigs("guidriver");
+        this.updateConfig(configs);
+    },
+
+    updateConfig : function(configs){
 
         if(configs.get("CUSTOM_TOP_TITLE")){
-            this.titleDiv = new Element('div', {className : 'custom_top_title'}).update(configs.get("CUSTOM_TOP_TITLE"));
+            if(!this.titleDiv){
+                this.titleDiv = new Element('div', {className : 'custom_top_title'}).update(configs.get("CUSTOM_TOP_TITLE"));
+                this.htmlElement.insert(this.titleDiv);
+            }else{
+                this.titleDiv.update(configs.get("CUSTOM_TOP_TITLE"));
+            }
+        }else if(this.titleDiv){
+            this.titleDiv.remove();
+            this.titleDiv = null;
         }
 
-        if(configs.get("CUSTOM_TOP_LOGO")){
-            var url = window.ajxpServerAccessPath + "&get_action=get_global_binary_param&binary_id=" + configs.get("CUSTOM_TOP_LOGO");
-            this.image  = new Image();
-            this.image.src = url;
-            this.image.onload = function(){
-                this.resizeImage(configs, true);
-            }.bind(this);
+        if(configs.get("CUSTOM_TOP_LOGO") && configs.get("CUSTOM_TOP_LOGO") != 'ajxp-remove-original'){
+            var parameter = 'binary_id';
+            if(configs.get("CUSTOM_TOP_LOGO_ISTMP")){
+                parameter = 'tmp_file';
+            }
+            var url = window.ajxpServerAccessPath + "&get_action=get_global_binary_param&"+parameter+"=" + configs.get("CUSTOM_TOP_LOGO");
+            if(!this.image){
+                this.image  = new Image();
+                this.image.src = url;
+                this.image.onload = function(){
+                    this.resizeImage(configs, true);
+                }.bind(this);
+            }else if(this.image.src  != url){
+                this.image.src = url;
+                this.image.onload = function(){
+                    this.resizeImage(configs, false);
+                }.bind(this);
+            }
+        }else if(configs.get("CUSTOM_TOP_LOGO") == 'ajxp-remove-original' && this.image){
+            this.image.remove();
+            this.image = null;
+            this.htmlElement.setAttribute('style', '');
         }
+
 
     },
 
@@ -63,6 +91,8 @@ Class.create("LogoWidget", AjxpPane, {
             top         : imgTop + 'px',
             left        : imgLeft + 'px'
         });
+        // Reset height
+        this.htmlElement.setStyle({paddingTop:'9px'});
         if(imgH > parseInt(this.htmlElement.getHeight())){
             var elPadding = parseInt(this.htmlElement.getStyle('paddingTop')) + (imgH - parseInt(this.htmlElement.getHeight()));
             this.htmlElement.setStyle({paddingTop: elPadding + 'px'});
@@ -87,9 +117,6 @@ Class.create("LogoWidget", AjxpPane, {
 
         if(insert){
             this.htmlElement.insert(this.image);
-            if(this.titleDiv){
-                this.htmlElement.insert(this.titleDiv);
-            }
         }
 
     }

@@ -224,7 +224,7 @@ Class.create("AjxpBootstrap", {
 	/**
 	 * Inserts a progress bar 
 	 */
-	insertLoaderProgress : function(){
+	insertLoaderProgress : function(targetContainer, passedParameters){
 		var html = '<div id="loading_overlay" style="background-color:#555555;opacity: 0.2;"></div>';
 		if(this.parameters.get('customWelcomeScreen')){
 			try { this.parameters.set('customWelcomeScreen', customFuncDecode(this.parameters.get('customWelcomeScreen')));
@@ -235,7 +235,12 @@ Class.create("AjxpBootstrap", {
 		if(this.parameters.get('customWelcomeScreen')){
 			html += this.parameters.get('customWelcomeScreen');
 		}else{
-			var customWording = this.parameters.get("customWording");
+            var customWording;
+            if(passedParameters){
+                customWording = passedParameters;
+            }else{
+                customWording = this.parameters.get("customWording");
+            }
 			html+='	<div id="progressBox" class="dialogBox" style="width: 320px;display:block;top:30%;z-index:2002;left:40%;position: absolute;background-color: #fff;padding: 0;">';
 			html+='	<div align="left" class="dialogContent" style="color:#676965;font-family:Trebuchet MS,sans-serif;font-size:11px;font-weight:normal;left:10px;padding:10px;">';
 			var icon = customWording.icon || ajxpResourcesFolder+'/../../../AjxpLogo250.png';
@@ -262,12 +267,18 @@ Class.create("AjxpBootstrap", {
             html+= '<div id="progressBarHeighter" style="height:10px;"></div>';
 			html+='	</div></div>';
 		}
-
-		$$('body')[0].insert({top:html});
-		viewPort = document.viewport.getDimensions();
-		$('progressBox').setStyle({
-            left:parseInt(Math.max((viewPort.width-$('progressBox').getWidth())/2,0))+"px",
-            top:parseInt(Math.max((viewPort.height-$('progressBox').getHeight())/3,0))+"px"
+        var viewPort;
+        if(!targetContainer){
+            targetContainer = $$('body')[0];
+            viewPort = document.viewport.getDimensions();
+        }else{
+            viewPort = targetContainer.getDimensions();
+        }
+        targetContainer.insert(html);
+        var progressBox = targetContainer.down('#progressBox');
+		progressBox.setStyle({
+            left:parseInt(Math.max((viewPort.width-progressBox.getWidth())/2,0))+"px",
+            top:parseInt(Math.max((viewPort.height-progressBox.getHeight())/3,0))+"px"
         });
 		var options = {
 			animate		: true,										// Animate the progress? - default: true

@@ -497,9 +497,10 @@ Class.create("FormManager", {
             window.formManagerHiddenIFrameSubmission = function(result){
                 imgSrc.src = conn._baseUrl + "&get_action=" + param.get("loadAction")+"&tmp_file="+result.trim();
                 imgSrc.next("input[type='hidden']").setValue(result.trim());
+                this.triggerEvent(imgSrc.next("input[type='hidden']"), 'change');
                 imgSrc.next("input[type='hidden']").setAttribute("data-ajxp_type", "binary");
                 window.formManagerHiddenIFrameSubmission = null;
-            };
+            }.bind(this);
             pane.down("#formManager_uploader").submit();
             return true;
         }.bind(this) , function(){
@@ -508,10 +509,46 @@ Class.create("FormManager", {
 
     },
 
+    triggerEvent : function(element, eventName) {
+        // safari, webkit, gecko
+        if (document.createEvent)
+        {
+            var evt = document.createEvent('HTMLEvents');
+            evt.initEvent(eventName, true, true);
+            return element.dispatchEvent(evt);
+        }
+
+        // Internet Explorer
+        if (element.fireEvent) {
+            return element.fireEvent('on' + eventName);
+        }
+    },
+
+    observeFormChanges : function(form, callback, bufferize){
+        var realCallback;
+        var randId = 'timer-'+parseInt(Math.random()*1000);
+        if(bufferize){
+            realCallback = function(){
+                if(window[randId]) window.clearTimeout(window[randId]);
+                window[randId] = window.setTimeout(function(){
+                    callback();
+                }, bufferize);
+            };
+        }else{
+            realCallback = callback;
+        }
+        form.select("div.SF_element").each(function(element){
+            element.select("input,textarea,select").invoke("observe", "change", realCallback);
+            element.select("input,textarea").invoke("observe", "keydown", realCallback);
+        }.bind(this) );
+
+    },
+
     confirmExistingImageDelete : function(modalParent, imgSrc, hiddenInput, param){
         if(window.confirm('Do you want to remove the current image?')){
             hiddenInput.setValue("ajxp-remove-original");
-            imgSrc.src = "";
+            imgSrc.src = param.get('defaultImage');
+            this.triggerEvent(imgSrc.next("input[type='hidden']"), 'change');
         }
     },
 
