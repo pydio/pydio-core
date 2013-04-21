@@ -7,9 +7,12 @@
                 font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
                 text-shadow: 0 1px 0 white;
                 color: rgb(100, 119, 124);
+                <?php if(!empty($CUSTOM_SHAREPAGE_TEXT_COLOR)) echo "color:$CUSTOM_SHAREPAGE_TEXT_COLOR;";?>
+                <?php if(!empty($CUSTOM_SHAREPAGE_TEXTSHADOW_COLOR)) echo "text-shadow: 0 1px 0 $CUSTOM_SHAREPAGE_TEXTSHADOW_COLOR;";?>
             }
             body{
                 background-image: url("grid_t.png");
+                <?php if(!empty($CUSTOM_SHAREPAGE_BACKGROUND_COLOR)) echo "background-color:$CUSTOM_SHAREPAGE_BACKGROUND_COLOR;";?>
             }
             h1 {
                 margin-bottom: 0;
@@ -114,7 +117,10 @@
     <?php if($AJXP_LINK_HAS_PASSWORD){ ?>
 		<form action='' method='post' name="submit_password">
             <div id="main_dl_container">
-                <h1><?php echo sprintf($messages[1], ConfService::getCoreConf("APPLICATION_TITLE")) ?></h1>
+                <h1><?php
+                    if(!empty($CUSTOM_SHAREPAGE_TITLE)) echo(str_replace(array("AJXP_APPLICATION_TITLE","AJXP_FILENAME"), array(ConfService::getCoreConf("APPLICATION_TITLE"), $AJXP_LINK_BASENAME), $CUSTOM_SHAREPAGE_TITLE));
+                else echo sprintf($messages[1], ConfService::getCoreConf("APPLICATION_TITLE"))
+                    ?></h1>
                 <?php if($AJXP_LINK_WRONG_PASSWORD): ?>
                     <div style="color: hsl(0, 82%, 51%);width: 261px;position: absolute;top: 80px;left: 11px;"><?php echo $messages[3] ?></div>
                 <?php endif; ?>
@@ -122,17 +128,48 @@
                 <a class="link_w_pass" href="#" onclick="document.forms['submit_password'].submit();">
                     <img src="dl.png">
                 </a>
-                <h2 class="legend_w_pass"><?php echo sprintf($messages[4], $AJXP_LINK_BASENAME) ?></h2>
+                <h2 class="legend_w_pass"><?php
+                    if(!empty($CUSTOM_SHAREPAGE_LEGEND_PASS)) echo(str_replace(array("AJXP_APPLICATION_TITLE","AJXP_FILENAME"), array(ConfService::getCoreConf("APPLICATION_TITLE"), $AJXP_LINK_BASENAME), $CUSTOM_SHAREPAGE_LEGEND_PASS));
+                    else echo sprintf($messages[4], $AJXP_LINK_BASENAME) ?></h2>
             </div>
 		</form>
     <?php } else { ?>
         <div id="main_dl_container">
-            <h1><?php echo sprintf($messages[1], ConfService::getCoreConf("APPLICATION_TITLE")) ?></h1>
+            <h1><?php
+                if(!empty($CUSTOM_SHAREPAGE_TITLE)) echo(str_replace(array("AJXP_APPLICATION_TITLE","AJXP_FILENAME"), array(ConfService::getCoreConf("APPLICATION_TITLE"), $AJXP_LINK_BASENAME), $CUSTOM_SHAREPAGE_TITLE));
+                else echo sprintf($messages[1], ConfService::getCoreConf("APPLICATION_TITLE"))
+                ?></h1>
             <a class="button_link" href="?dl=true" style="position: relative;display: block;height: 200px;width: 203px;margin: 0 auto;">
+                <?php if(!empty($CUSTOM_SHAREPAGE_BUTTON)) {
+                echo('<img src="'.$CUSTOM_SHAREPAGE_BUTTON.'" >');
+            } else { ?>
                 <img src="dl.png">
+            <?php } ?>
             </a>
-            <h2 class="legend"><?php echo sprintf($messages[2], $AJXP_LINK_BASENAME) ?></h2>
+            <h2 class="legend"><?php
+                if(!empty($CUSTOM_SHAREPAGE_LEGEND)) echo(str_replace(array("AJXP_APPLICATION_TITLE","AJXP_FILENAME"), array(ConfService::getCoreConf("APPLICATION_TITLE"), $AJXP_LINK_BASENAME), $CUSTOM_SHAREPAGE_LEGEND));
+                else echo sprintf($messages[2], $AJXP_LINK_BASENAME) ?></h2>
         </div>
-    <?php  } ?>
+    <script type="text/javascript">
+        var backgrounds = [];
+    <?php  }
+    $index = 1;
+    $varBase = "CUSTOM_SHAREPAGE_BACKGROUND_";
+    $bgName = $varBase . $index;
+    $bgAttName = $varBase . 'ATTRIBUTES_' .  $index;
+    $bgs = array();
+    while(isSet($$bgName) && !empty($$bgName)){
+        $bgs[] = "background-image:url('".$$bgName."');" . (isSet($$bgAttName) ? $$bgAttName : '');
+        $index ++;
+        $bgName = $varBase . $index;
+        $bgAttName = $varBase . 'ATTRIBUTES_' .  $index;
+    }
+    echo 'backgrounds = ' . json_encode($bgs) . ';';
+    ?>
+    if(backgrounds.length){
+        var i = Math.floor( Math.random() * backgrounds.length);
+        document.body.setAttribute("style", backgrounds[i]);
+    }
+    </script>
 	</body>
 </html>

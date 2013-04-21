@@ -621,6 +621,25 @@ class ShareCenter extends AJXP_Plugin{
 
         $AJXP_LINK_HAS_PASSWORD = false;
         $AJXP_LINK_BASENAME = SystemTextEncoding::toUTF8(basename($data["FILE_PATH"]));
+        $customs = array("title", "legend", "legend_pass", "background_attributes_1", "background_attributes_2", "background_attributes_3", "text_color", "background_color", "textshadow_color");
+        $images = array("button", "background_1", "background_2", "background_3");
+        $confs = ConfService::getInstance()->getConfStorageImpl()->loadPluginConfig("action", "share");
+        foreach($customs as $custom){
+            $varName = "CUSTOM_SHAREPAGE_".strtoupper($custom);
+            $$varName = $confs[$varName];
+        }
+        foreach($images as $custom){
+            $varName = "CUSTOM_SHAREPAGE_".strtoupper($custom);
+            if(!empty($confs[$varName])){
+                $$varName = "binary-".$confs[$varName];
+                $dlFolder = realpath(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
+                if(is_file($dlFolder."/binary-".$confs[$varName])) continue;
+                $copiedImageName = $dlFolder."/binary-".$confs[$varName];
+                $imgFile = fopen($copiedImageName, "wb");
+                ConfService::getConfStorageImpl()->loadBinary(array(), $confs[$varName], $imgFile);
+                fclose($imgFile);
+            }
+        }
 
         HTMLWriter::charsetHeader();
         // Check password
