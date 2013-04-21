@@ -72,6 +72,8 @@ input, textarea, select
 }
 
 textarea{
+    margin-top: 0;
+    margin-left: 0;
     padding: 0;
     background-color: #fff;
 }
@@ -95,6 +97,15 @@ textarea{
 .tooltipped
 {
     background-color: #ffffc0;
+}
+
+.resizer{
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-image: url('../images/resize_handle.png');
+    opacity: 0.5;
+    cursor: nwse-resize;
 }
 
 #sidebar_rootdir_td
