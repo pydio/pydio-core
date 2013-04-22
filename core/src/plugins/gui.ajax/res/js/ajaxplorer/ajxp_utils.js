@@ -225,20 +225,18 @@ function disableTextSelection(target)
 		$(target).addClassName("no_select_bg");
 	}
 	$(target).addClassName("no_select_bg");
-	if($(target).getElementsBySelector('input[type="text"]').length)
-	{
-		$(target).getElementsBySelector('input[type="text"]').each(function(element)
-		{
-			if (typeof element.onselectstart!="undefined")
-			{ //IE route				
-				element.onselectstart=function(){return true;};
-			}
-			else if (typeof element.style.MozUserSelect!="undefined")
-			{ //Firefox route
-				element.style.MozUserSelect=defaultValue;
-			}
-		});
-	}
+    $(target).select('input[type="text"]').each(function(element)
+    {
+        if (typeof element.onselectstart!="undefined")
+        { //IE route
+            element.onselectstart=function(){return true;};
+        }
+        else if (typeof element.style.MozUserSelect!="undefined")
+        { //Firefox route
+            element.style.MozUserSelect=defaultValue;
+        }
+    });
+    $(target).select(">div").each(function(d){disableTextSelection(d)});
 }
 
 function enableTextSelection(element){

@@ -389,14 +389,16 @@ Class.create("FormManager", {
             }else{
                 var gDiv = groupDivs.get(group) || new Element('div', {className:'accordion_content'});
                 b.insert(div);
-                var lab = div.down('.SF_label');
                 var ref = parseInt(form.getWidth()) + (Prototype.Browser.IE?40:0);
-                lab.setStyle({fontSize:'11px'});
-                lab.setStyle({width:parseInt(39*ref/100)+'px'});
-                if( parseInt(lab.getHeight()) > Math.round(parseFloat(lab.getStyle('lineHeight')) + Math.round(parseFloat(lab.getStyle('paddingTop'))) + Math.round(parseFloat(lab.getStyle('paddingBottom')))) ){
-                    lab.next().setStyle({marginTop:lab.getStyle('lineHeight')});
+                if(ref > (Prototype.Browser.IE?40:0)){
+                    var lab = div.down('.SF_label');
+                    lab.setStyle({fontSize:'11px'});
+                    lab.setStyle({width:parseInt(39*ref/100)+'px'});
+                    if( parseInt(lab.getHeight()) > Math.round(parseFloat(lab.getStyle('lineHeight')) + Math.round(parseFloat(lab.getStyle('paddingTop'))) + Math.round(parseFloat(lab.getStyle('paddingBottom')))) ){
+                        lab.next().setStyle({marginTop:lab.getStyle('lineHeight')});
+                    }
+                    lab.setStyle({width:'39%'});
                 }
-                lab.setStyle({width:'39%'});
                 gDiv.insert(div);
                 groupDivs.set(group, gDiv);
             }
@@ -660,6 +662,7 @@ Class.create("FormManager", {
 	 * @param form HTMLForm
 	 */
 	replicateRow : function(templateRow, number, form, values){
+        if(form.ajxpPaneObject) form.ajxpPaneObject.notify('before_replicate_row', templateRow);
         var repIndex = templateRow.getAttribute('data-ajxp-replication-index');
         if(repIndex === null){
             repIndex = 0;
@@ -699,6 +702,7 @@ Class.create("FormManager", {
             });
             tr.insert(removeButton);
 		}
+        if(form.ajxpPaneObject) form.ajxpPaneObject.notify('after_replicate_row', tr);
         /*
 		templateRow.select('input', 'select', 'textarea').each(function(origInput){
 			var newName = origInput.getAttribute('name')+'_0';

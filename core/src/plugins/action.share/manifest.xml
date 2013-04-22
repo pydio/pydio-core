@@ -22,35 +22,35 @@
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_COLOR" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Background Color]" description="CONF_MESSAGE[Share page background color.]" mandatory="false" default="#FFFFFF"/>
         <global_param name="CUSTOM_SHAREPAGE_TEXT_COLOR" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Text Color]" description="CONF_MESSAGE[Share page text color.]" mandatory="false" default="rgb(100, 119, 124)"/>
         <global_param name="CUSTOM_SHAREPAGE_TEXTSHADOW_COLOR" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Text Shadow]" description="CONF_MESSAGE[Share page text shadow color.]" mandatory="false" default="#FFFFFF"/>
-        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_1" group="CONF_MESSAGE[Weblink Page]" type="image" label="CONF_MESSAGE[Custom Background (1)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_1" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Custom Background (1)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
                       defaultImage="plugins/action.share/res/grid_t.png"
                       expose="true"
         />
-        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_1" group="CONF_MESSAGE[Weblink Page]" type="select"
+        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_1" group="CONF_MESSAGE[Page Background Images]" type="select"
                       choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:100%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
                       label="CONF_MESSAGE[Background Attributes(1)]" description="CONF_MESSAGE[Image used as a background]"
                       mandatory="false" expose="true"/>
-        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_2" group="CONF_MESSAGE[Weblink Page]" type="image" label="CONF_MESSAGE[Custom Background (2)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_2" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Custom Background (2)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
                       defaultImage="plugins/action.share/res/grid_t.png"
                       expose="true"
         />
-        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_2" group="CONF_MESSAGE[Weblink Page]" type="select"
+        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_2" group="CONF_MESSAGE[Page Background Images]" type="select"
                       choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:100%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
                       label="CONF_MESSAGE[Background Attributes(2)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false" expose="true"/>
-        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_3" group="CONF_MESSAGE[Weblink Page]" type="image" label="CONF_MESSAGE[Custom Background (3)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_3" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Custom Background (3)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
                       defaultImage="plugins/action.share/res/grid_t.png"
                       expose="true"
         />
-        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_3" group="CONF_MESSAGE[Weblink Page]" type="select"
+        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_3" group="CONF_MESSAGE[Page Background Images]" type="select"
                       choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:100%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
                       label="CONF_MESSAGE[Background Attributes(3)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false" expose="true"/>
     </server_settings>

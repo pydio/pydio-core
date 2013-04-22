@@ -35,7 +35,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 		var div = new Element('div', {className:'tabulatorContainer panelHeader'});
 		$(this.htmlElement).insert({top:div});
 		this.tabulatorData.each(function(tabInfo){
-			var td = new Element('span', {className:'toggleHeader', title:MessageHash[tabInfo.label]});
+			var td = new Element('span', {className:'toggleHeader', title:MessageHash[tabInfo.title] || MessageHash[tabInfo.label].stripTags()});
             if(tabInfo.icon){
                 td.insert('<img width="16" height="16" align="absmiddle" src="'+resolveImageSource(tabInfo.icon, '/images/actions/ICON_SIZE', 16)+'">');
             }
@@ -96,6 +96,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 			toShow.resize();
 		}
         this.resize();
+        this.notify("switch", tabId);
 	},
 	
 	/**
