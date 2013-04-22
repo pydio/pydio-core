@@ -543,7 +543,14 @@ Class.create("FormManager", {
             element.select("input,textarea,select").invoke("observe", "change", realCallback);
             element.select("input,textarea").invoke("observe", "keydown", realCallback);
         }.bind(this) );
-
+        if(form.ajxpPaneObject){
+            form.ajxpPaneObject.observe("after_replicate_row", function(replicate){
+                replicate.select("div.SF_element").each(function(element){
+                    element.select("input,textarea,select").invoke("observe", "change", realCallback);
+                    element.select("input,textarea").invoke("observe", "keydown", realCallback);
+                }.bind(this) );
+            });
+        }
     },
 
     confirmExistingImageDelete : function(modalParent, imgSrc, hiddenInput, param){

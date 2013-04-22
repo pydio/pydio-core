@@ -623,7 +623,9 @@ class ShareCenter extends AJXP_Plugin{
         $AJXP_LINK_BASENAME = SystemTextEncoding::toUTF8(basename($data["FILE_PATH"]));
         $customs = array("title", "legend", "legend_pass", "background_attributes_1", "background_attributes_2", "background_attributes_3", "text_color", "background_color", "textshadow_color");
         $images = array("button", "background_1", "background_2", "background_3");
-        $confs = ConfService::getInstance()->getConfStorageImpl()->loadPluginConfig("action", "share");
+        AJXP_PluginsService::getInstance()->initActivePlugins();
+        $shareCenter = AJXP_PluginsService::findPlugin("action", "share");
+        $confs = $shareCenter->getConfigs();
         foreach($customs as $custom){
             $varName = "CUSTOM_SHAREPAGE_".strtoupper($custom);
             $$varName = $confs[$varName];
