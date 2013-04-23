@@ -547,6 +547,13 @@ Class.create("ShareCenter", {
         conn.addParameter('get_action','share');
         var oThis = this;
         conn.onComplete = function(transport){
+            if (transport.status != 200) // If it failed
+            {
+                // Restore button image
+                oForm.down('img#generate_image').src = window.ajxpResourcesFolder+"/images/actions/16/share.png";
+                // And exit
+                return;
+            }
             var cont = oForm.down('[id="share_container"]');
             cont.setValue(transport.responseText);
             var email = oForm.down('a[id="email"]');
