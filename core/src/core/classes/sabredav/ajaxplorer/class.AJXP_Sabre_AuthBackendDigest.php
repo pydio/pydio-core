@@ -24,7 +24,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer
  * @subpackage SabreDav
  */
-class AJXP_Sabre_AuthBackend extends Sabre_DAV_Auth_Backend_AbstractDigest{
+class AJXP_Sabre_AuthBackendDigest extends Sabre_DAV_Auth_Backend_AbstractDigest{
 
     protected $currentUser;
     private  $secretKey;

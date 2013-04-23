@@ -589,6 +589,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				$userObject = AuthService::getLoggedUser();
 				$webdavActive = false;
 				$passSet = false;
+				$httpAuthMethodDigest = false;
                 $digestSet = false;
 				// Detect http/https and host
 				if(ConfService::getCoreConf("WEBDAV_BASEHOST") != ""){
@@ -598,6 +599,9 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				}
 				$webdavBaseUrl = $baseURL.ConfService::getCoreConf("WEBDAV_BASEURI")."/";
                 $davData = $userObject->getPref("AJXP_WEBDAV_DATA");
+                if (strcasecmp(ConfService::getCoreConf("WEBDAV_AUTH_METHOD"),"digest")==0) {
+                    $httpAuthMethodDigest = true;
+                }
                 $digestSet = isSet($davData["HA1"]);
                 if(isSet($httpVars["activate"]) || isSet($httpVars["webdav_pass"])){
 					if(!empty($httpVars["activate"])){
@@ -638,6 +642,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				$prefs = array(
 					"webdav_active"  => $webdavActive,
 					"password_set"   => $passSet,
+					"http_auth_method_digest" => $httpAuthMethodDigest,
                     "digest_set"    => $digestSet,
 					"webdav_base_url"  => $webdavBaseUrl, 
 					"webdav_repositories" => $davRepos

@@ -96,7 +96,13 @@ if((!empty($end) || $end ==="0") && $end[0] != "?"){
 }
 
 
-$authBackend = new AJXP_Sabre_AuthBackend($rId);
+if (strcasecmp(ConfService::getCoreConf("WEBDAV_AUTH_METHOD"),"digest")==0) {
+      AJXP_Logger::logAction("Using DIGEST for webdav auth");
+      $authBackend = new AJXP_Sabre_AuthBackendDigest($rId);
+} else {
+      AJXP_Logger::logAction("Using BASIC for webdav auth");
+      $authBackend = new AJXP_Sabre_AuthBackendBasic($rId);
+}
 $authPlugin = new Sabre_DAV_Auth_Plugin($authBackend, ConfService::getCoreConf("WEBDAV_DIGESTREALM"));
 $server->addPlugin($authPlugin);
 
