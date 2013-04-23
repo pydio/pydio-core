@@ -47,7 +47,7 @@ class AJXP_Sabre_AuthBackend extends Sabre_DAV_Auth_Backend_AbstractDigest{
         $confDriver = ConfService::getConfStorageImpl();
         $user = $confDriver->createUserObject($username);
         $webdavData = $user->getPref("AJXP_WEBDAV_DATA");
-        if(empty($webdavData) || !isset($webdavData["ACTIVE"]) || $webdavData["ACTIVE"] !== true || !isSet($webdavData["PASS"])){
+        if(empty($webdavData) || !isset($webdavData["ACTIVE"]) || $webdavData["ACTIVE"] !== true || (!isSet($webdavData["PASS"]) && !isset($webdavData["HA1"]) ) ){
             return false;
         }
         if(isSet($webdavData["HA1"])){
