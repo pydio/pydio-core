@@ -16,7 +16,7 @@
     <param name="CAS_PORT" type="integer" label="CONF_MESSAGE[CAS Port]" description="CONF_MESSAGE[Port where CAS server is running on]" mandatory="true" />
     <param name="CAS_URI" type="string" label="CONF_MESSAGE[CAS URI]" description="CONF_MESSAGE[URI for CAS service]" mandatory="false" />
     <param name="LOGOUT_URL" type="string" label="CONF_MESSAGE[Logout URL]" description="CONF_MESSAGE[Redirect to the given URL on loggin out]" mandatory="false" />
-    <param name="USERS_FILEPATH" type="string" label="CONF_MESSAGE[Users]" description="CONF_MESSAGE[The users list]" mandatory="true"/>
+    <param name="USERS_FILEPATH" type="string" label="CONF_MESSAGE[Users]" description="CONF_MESSAGE[The users list]" mandatory="true" default="AJXP_DATA_PATH/plugins/auth.serial/users.ser"/>
   </server_settings>
   <class_definition filename="plugins/auth.cas/class.casAuthDriver.php" classname="casAuthDriver"/>
   <registry_contributions>
