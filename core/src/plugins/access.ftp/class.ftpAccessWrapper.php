@@ -287,7 +287,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 			$parentDir = $this->safeDirname($serverPath);
 			$fileName = $this->safeBasename($serverPath);
 			ftp_chdir($link, $parentDir);
-			$rl_dirlist = @ftp_rawlist($link, "-A .");
+			$rl_dirlist = @ftp_rawlist($link, "-a .");
 			//AJXP_Logger::debug("FILE RAWLIST FROM ".$parentDir);
 			if (is_array($rl_dirlist)){
                 $escaped = preg_quote($fileName);
@@ -301,7 +301,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 		else 
 		{			
 			ftp_chdir($link, $serverPath);
-			$contents = ftp_rawlist($link, "-A .");
+			$contents = ftp_rawlist($link, "-a .");
 			//AJXP_Logger::debug("RAW LIST RESULT ".print_r($contents, true));
 		}
 		
