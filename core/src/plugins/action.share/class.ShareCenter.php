@@ -630,16 +630,23 @@ class ShareCenter extends AJXP_Plugin{
             $varName = "CUSTOM_SHAREPAGE_".strtoupper($custom);
             $$varName = $confs[$varName];
         }
+        $dlFolder = realpath(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
         foreach($images as $custom){
             $varName = "CUSTOM_SHAREPAGE_".strtoupper($custom);
             if(!empty($confs[$varName])){
-                $$varName = "binary-".$confs[$varName];
-                $dlFolder = realpath(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
-                if(is_file($dlFolder."/binary-".$confs[$varName])) continue;
-                $copiedImageName = $dlFolder."/binary-".$confs[$varName];
-                $imgFile = fopen($copiedImageName, "wb");
-                ConfService::getConfStorageImpl()->loadBinary(array(), $confs[$varName], $imgFile);
-                fclose($imgFile);
+                if(strpos($confs[$varName], "plugins/") === 0 && is_file(AJXP_INSTALL_PATH."/".$confs[$varName])){
+                    $realFile = AJXP_INSTALL_PATH."/".$confs[$varName];
+                    copy($realFile, $dlFolder."/binary-".basename($realFile));
+                    $$varName = "binary-".basename($realFile);
+                }else{
+                    $$varName = "binary-".$confs[$varName];
+                    if(is_file($dlFolder."/binary-".$confs[$varName])) continue;
+                    $copiedImageName = $dlFolder."/binary-".$confs[$varName];
+                    $imgFile = fopen($copiedImageName, "wb");
+                    ConfService::getConfStorageImpl()->loadBinary(array(), $confs[$varName], $imgFile);
+                    fclose($imgFile);
+                }
+
             }
         }
 
