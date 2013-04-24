@@ -250,7 +250,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
      * @abstract
      * @param array $context
      * @param String $ID
-     * @param Stream $outputStream
+     * @param Resource $outputStream
      * @return boolean
      */
     abstract function loadBinary($context, $ID, $outputStream = null);
