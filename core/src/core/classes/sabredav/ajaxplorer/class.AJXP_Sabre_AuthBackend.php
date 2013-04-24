@@ -24,7 +24,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer
  * @subpackage SabreDav
  */
-class AJXP_Sabre_AuthBackend extends Sabre_DAV_Auth_Backend_AbstractDigest{
+class AJXP_Sabre_AuthBackend extends Sabre\DAV\Auth\Backend\AbstractDigest{
 
     protected $currentUser;
     private  $secretKey;
@@ -59,14 +59,14 @@ class AJXP_Sabre_AuthBackend extends Sabre_DAV_Auth_Backend_AbstractDigest{
 
     }
 
-    public function authenticate(Sabre_DAV_Server $server, $realm){
+    public function authenticate(Sabre\DAV\Server $server, $realm){
         //AJXP_Logger::debug("Try authentication on $realm", $server);
 
         $success = parent::authenticate($server, $realm);
         if($success){
             $res = AuthService::logUser($this->currentUser, null, true);
             if($res < 1){
-                throw new Sabre_DAV_Exception_NotAuthenticated();
+                throw new Sabre\DAV\Exception\NotAuthenticated();
             }
             $this->updateCurrentUserRights(AuthService::getLoggedUser());
             if(ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")){
@@ -75,7 +75,7 @@ class AJXP_Sabre_AuthBackend extends Sabre_DAV_Auth_Backend_AbstractDigest{
             }
         }
         if($success === false){
-            throw new Sabre_DAV_Exception_NotAuthenticated();
+            throw new Sabre\DAV\Exception\NotAuthenticated();
         }
         ConfService::loadRepositoryDriver();
         return true;
@@ -87,7 +87,7 @@ class AJXP_Sabre_AuthBackend extends Sabre_DAV_Auth_Backend_AbstractDigest{
             return true;
         }
         if(!$user->canSwitchTo($this->repositoryId)){
-            throw new Sabre_DAV_Exception_NotAuthenticated();
+            throw new Sabre\DAV\Exception\NotAuthenticated();
         }
     }
 

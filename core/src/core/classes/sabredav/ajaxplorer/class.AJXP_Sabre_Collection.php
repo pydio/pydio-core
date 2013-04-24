@@ -24,7 +24,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer
  * @subpackage SabreDav
  */
-class AJXP_Sabre_Collection extends AJXP_Sabre_Node implements Sabre_DAV_ICollection
+class AJXP_Sabre_Collection extends AJXP_Sabre_Node implements Sabre\DAV\ICollection
 {
 
     protected $children;
@@ -118,7 +118,7 @@ class AJXP_Sabre_Collection extends AJXP_Sabre_Node implements Sabre_DAV_ICollec
      * Returns a specific child node, referenced by its name
      *
      * @param string $name
-     * @return Sabre_DAV_INode
+     * @return Sabre\DAV\INode
      */
     function getChild($name){
 
@@ -127,14 +127,14 @@ class AJXP_Sabre_Collection extends AJXP_Sabre_Node implements Sabre_DAV_ICollec
             if ($child->getName()==$name) return $child;
 
         }
-        throw new Sabre_DAV_Exception_NotFound('File not found: ' . $name);
+        throw new Sabre\DAV\Exception\NotFound('File not found: ' . $name);
 
     }
 
     /**
      * Returns an array with all the child nodes
      *
-     * @return Sabre_DAV_INode[]
+     * @return Sabre\DAV\INode[]
      */
     function getChildren(){
 

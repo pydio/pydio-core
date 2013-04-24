@@ -24,7 +24,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer
  * @subpackage SabreDav
  */
-class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre_DAV_IFile
+class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre\DAV\IFile
 {
 
     /**
