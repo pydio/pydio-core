@@ -408,15 +408,18 @@ Proto.Menu = Class.create({
 	},
 	
 	onClick: function(e) {
-		//e.stop();
-		if (e.target._callback && !e.target.hasClassName('disabled')) {
-			this.options.beforeSelect(e);
+        var target = e.target;
+        if(!e.target._callback && e.target.up('li') && e.target.up('li')._callback){
+            target = e.target.up('li');
+        }
+        if (target._callback && !target.hasClassName('disabled')) {
+            this.options.beforeSelect(e);
 			if(this.options.anchor && typeof(this.options.anchor)!="string"){
 				this.options.anchor.removeClassName('menuAnchorSelected');
 			}
 			if (this.ie) this.shim.hide();
 			this.container.hide();
-			e.target._callback(this.event);
+			target._callback(this.event);
 		}		
 	},
 	

@@ -80,7 +80,9 @@ Class.create("NotificationLoader", {
                 alt: el.getMetadata().get("event_description_long").stripTags(),
                 pFactory : this.pFactory,
                 ajxpNode:el,
-                callback:function(e){}
+                callback:function(e){
+                    window.ajaxplorer.goTo(el);
+                }
             });
             eventIndex ++;
         }.bind(this) );

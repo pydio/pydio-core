@@ -50,7 +50,11 @@ Class.create("AjxpMqObserver", {
                         this.ws.close();
 
                     } else {
-                        this.ws.send("register:" + repoId);
+                        try{
+                            this.ws.send("register:" + repoId);
+                        }catch(e){
+                            if(console) console.log('Error while sending WebSocket message: '+ e.message);
+                        }
                     }
                 }else{
                     if(repoId){

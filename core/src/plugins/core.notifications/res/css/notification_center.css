@@ -41,7 +41,7 @@ display: inline-block;
 float: left;
 }
 
-eed_content span.event_label {
+#feed_content span.event_label {
 display: inline-block;
 width: 150px;
 }
@@ -69,4 +69,9 @@ width: 150px;
 .notif_event_label {
     font-size: 14px;
     letter-spacing: 1px;
+}
+
+#feed_content .ui360container.nobackground {
+    float: left;
+    margin-left: -6px !important;
 }
