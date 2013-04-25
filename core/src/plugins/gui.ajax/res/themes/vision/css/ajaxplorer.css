@@ -3514,11 +3514,18 @@ div.menu a {
 }
 
 .rootDirChooser li.separator {
+    /*
     border-bottom: 1px solid #fff;
     margin: 1px 1px 0 1px;
     line-height: 1px !important;
     padding: 0;
     height: 1px !important;
+    */
+    border-top: 1px solid rgba(255, 255, 255, 0.98);
+    margin: 0 auto;
+    line-height: 1px !important;
+    height: 0 !important;
+    width: 98%;
 }
 
 
