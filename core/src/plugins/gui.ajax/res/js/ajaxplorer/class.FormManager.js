@@ -690,13 +690,13 @@ Class.create("FormManager", {
                     input.setValue(values.get(newName));
                 }
 			});
-			templateRow.up().insert({bottom:tr});
+			templateRow.insert({after:tr});
             if(tr.select('.SF_replication_Add').length){
                 tr.select('.SF_replication_Add').invoke("remove");
             }
             if(index == number - 1){
-                if(templateRow.up().select('.SF_replication_Add').length){
-                    tr.insert(templateRow.up().select('.SF_replication_Add')[0]);
+                if(templateRow.select('.SF_replication_Add').length){
+                    tr.insert(templateRow.select('.SF_replication_Add')[0]);
                 }
             }
             var removeButton = new Element('a', {className:'SF_replication_Remove', title:'Remove this group'})

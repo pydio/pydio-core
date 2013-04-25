@@ -173,10 +173,8 @@ Class.create("PluginEditor", AbstractEditor, {
                 toggles.invoke("removeClassName", "accordion_toggle_active");
                 toggles.invoke("addClassName", "innerTitle");
             }
-            form.select("div.SF_element").each(function(element){
-                element.select("input,textarea,select").invoke("observe", "change", this.setDirty.bind(this));
-                element.select("input,textarea").invoke("observe", "keydown", this.setDirty.bind(this));
-            }.bind(this) );
+            this.formManager.observeFormChanges(form, this.setDirty.bind(this));
+
 
             ajaxplorer.blurAll();
         }.bind(this);
