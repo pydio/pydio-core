@@ -262,6 +262,7 @@ Class.create("RoleEditor", AbstractEditor, {
 
     buildInfoPane : function(node, scope){
         var f = this.getFormManager();
+        this.element.ajxpPaneObject = this;
         if(scope == "user"){
             // MAIN INFO
             var rolesChoicesString = this.roleData.ALL.ROLES.join(",");
@@ -443,11 +444,7 @@ Class.create("RoleEditor", AbstractEditor, {
         }
 
 
-        // UPDATE FORMS ELEMENTS
-        this.element.down("#pane-infos").select("div.SF_element").each(function(element){
-            element.select("input,textarea,select").invoke("observe", "change", this.setDirty.bind(this));
-            element.select("input,textarea").invoke("observe", "keydown", this.setDirty.bind(this));
-        }.bind(this) );
+        f.observeFormChanges(this.element,  this.setDirty.bind(this));
     },
 
     initJSONResponse : function(responseJSON){

@@ -288,6 +288,7 @@ Class.create("FormManager", {
                 element = new Element("div").update(selector);
                 var subFields = new Element("div");
                 element.insert(subFields);
+                if(form.ajxpPaneObject) subFields.ajxpPaneObject = form.ajxpPaneObject;
                 selector.FIELDS_CONTAINER = subFields;
 
                 selector.observe("change", function(e){
@@ -541,13 +542,23 @@ Class.create("FormManager", {
         }
         form.select("div.SF_element").each(function(element){
             element.select("input,textarea,select").invoke("observe", "change", realCallback);
-            element.select("input,textarea").invoke("observe", "keydown", realCallback);
+            element.select("input,textarea").invoke("observe", "keydown", function(event){
+                if(event.keyCode == Event.KEY_DOWN || event.keyCode == Event.KEY_UP || event.keyCode == Event.KEY_RIGHT || event.keyCode == Event.KEY_LEFT || event.keyCode == Event.KEY_TAB){
+                    return;
+                }
+                realCallback();
+            });
         }.bind(this) );
         if(form.ajxpPaneObject){
             form.ajxpPaneObject.observe("after_replicate_row", function(replicate){
                 replicate.select("div.SF_element").each(function(element){
                     element.select("input,textarea,select").invoke("observe", "change", realCallback);
-                    element.select("input,textarea").invoke("observe", "keydown", realCallback);
+                    element.select("input,textarea").invoke("observe", "keydown", function(event){
+                        if(event.keyCode == Event.KEY_DOWN || event.keyCode == Event.KEY_UP || event.keyCode == Event.KEY_RIGHT || event.keyCode == Event.KEY_LEFT || event.keyCode == Event.KEY_TAB){
+                            return;
+                        }
+                        realCallback();
+                    });
                 }.bind(this) );
             });
         }

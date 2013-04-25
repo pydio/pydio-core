@@ -140,6 +140,7 @@ Class.create("PluginEditor", AbstractEditor, {
                 driverParamsHash.push(hashedParams);
             }
             var form = new Element('div', {className:'driver_form'});
+
             if(documentation){
                 var docDiv = new Element('div', {style:'height:100%;'}).insert("<div class='documentation'>" + documentation.firstChild.nodeValue + "</div>");
                 docDiv.select('img').each(function(img){
@@ -159,6 +160,7 @@ Class.create("PluginEditor", AbstractEditor, {
             }
 
             this.infoPane.insert({bottom:form});
+            form.ajxpPaneObject = this;
 
             if(driverParamsHash.size()){
                 this.formManager.createParametersInputs(form, driverParamsHash, true, (paramsValues.size()?paramsValues:null));

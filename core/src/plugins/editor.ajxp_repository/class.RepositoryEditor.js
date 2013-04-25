@@ -158,6 +158,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
             }
         });
         this.currentRepoWriteable = (repo.getAttribute("writeable")?(repo.getAttribute("writeable")=="true"):false);
+        this.infoPane.ajxpPaneObject = this;
         this.formManager.createParametersInputs(
             this.infoPane,
             driverParamsHash,
@@ -170,10 +171,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
 
         if(this.infoPane.SF_accordion){
             this.infoPane.SF_accordion.openAll();
-            this.infoPane.select("div.SF_element").each(function(element){
-                element.select("input,textarea,select").invoke("observe", "change", this.setDirty.bind(this));
-                element.select("input,textarea").invoke("observe", "keydown", this.setDirty.bind(this));
-            }.bind(this) );
+            this.formManager.observeFormChanges(this.infoPane, this.setDirty.bind(this));
             var toggles = this.infoPane.select(".accordion_toggle");
             toggles.invoke("removeClassName", "accordion_toggle");
             toggles.invoke("removeClassName", "accordion_toggle_active");
