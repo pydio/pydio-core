@@ -110,7 +110,6 @@ class AJXP_NotificationCenter extends AJXP_Plugin
             }
         }
         $res = $this->eventStore->loadEvents($authRepos, $userId, $userGroup, 0, 10);
-        if(!count($res)) return;
         $mess = ConfService::getMessages();
         $format = "html";
         if(isSet($httpVars["format"])){

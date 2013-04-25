@@ -38,7 +38,17 @@ class ldapAuthDriver extends AbstractAuthDriver {
     var $ldapconn = null;
     var $separateGroup = "";
 
+    /**
+     * Legacy way, defined through PHP array
+     * @var array
+     */
     var $customParamsMapping = array();
+
+    /**
+     * New way, defined through GUI Options (PARAM_MAPPING replication group).
+     * @var array
+     */
+    var $paramsMapping = array();
 
     function init($options){
         parent::init($options);
@@ -47,8 +57,9 @@ class ldapAuthDriver extends AbstractAuthDriver {
         if ($options["LDAP_PORT"]) $this->ldapPort = $options["LDAP_PORT"];
         if ($options["LDAP_USER"]) $this->ldapAdminUsername = $options["LDAP_USER"];
         if ($options["LDAP_PASSWORD"]) $this->ldapAdminPassword = $options["LDAP_PASSWORD"];
-        if ($options["LDAP_DN"]) $this->ldapDN = $options["LDAP_DN"];
+        if ($options["LDAP_DN"]) $this->ldapDN = $this->parseReplicatedParams($options, array("LDAP_DN"));
         if (is_array($options["CUSTOM_DATA_MAPPING"])) $this->customParamsMapping = $options["CUSTOM_DATA_MAPPING"];
+        $this->paramsMapping = $this->parseReplicatedParams($options, array("MAPPING_LDAP_PARAM", "MAPPING_LOCAL_TYPE", "MAPPING_LOCAL_PARAM"));
         if (isSet($options["LDAP_FILTER"])){
             $this->ldapFilter = $options["LDAP_FILTER"];
             if ($this->ldapFilter != "" &&  !preg_match("/^\(.*\)$/", $this->ldapFilter)) {
@@ -62,10 +73,31 @@ class ldapAuthDriver extends AbstractAuthDriver {
 		}else{ 
 			$this->ldapUserAttr = 'uid' ; 
 		}
-        /*
-        $this->ldapconn = $this->LDAP_Connect();
-        if ($this->ldapconn == null) AJXP_Logger::logAction('LDAP Server connexion could NOT be established');
-        */
+    }
+
+    function parseReplicatedParams($options, $optionsNames){
+        $i = 0;
+        $data = array();
+        while(true){
+            $ok = true;
+            $occurence = array();
+            $suffix = ($i==0 ? "" : "_" . $i);
+            foreach($optionsNames as $name){
+                if(!isSet($options[$name.$suffix])) {
+                    $ok = false;
+                    break;
+                }
+                if(count($optionsNames) == 1){
+                    $occurence = $options[$name.$suffix];
+                }else{
+                    $occurence[$name] = $options[$name.$suffix];
+                }
+            }
+            if(!$ok) break;
+            $data[] = $occurence;
+            $i++;
+        }
+        return $data;
     }
 
     function startConnexion(){
@@ -139,8 +171,15 @@ class ldapAuthDriver extends AbstractAuthDriver {
             $conn = array($this->ldapconn);
         }
         $expected = array($this->ldapUserAttr);
-        if($login != null && !empty($this->customParamsMapping)){
-            $expected = array_merge($expected, array_keys($this->customParamsMapping));
+        if($login != null && (!empty($this->customParamsMapping) || !empty($this->paramsMapping))){
+            if(!empty($this->customParamsMapping)){
+                $expected = array_merge($expected, array_keys($this->customParamsMapping));
+            }
+            if(!empty($this->paramsMapping)){
+                $keys = array();
+                foreach($this->paramsMapping as $param) $keys[] = $param["MAPPING_LDAP_PARAM"];
+                $expected = array_merge($expected, $keys);
+            }
         }
         foreach ($conn as $dn => $ldapc) {
             if (!$ldapc) {
@@ -153,6 +192,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
         $ret = ldap_search($conn,$this->ldapDN,$filter, $expected);
         $allEntries = array("count" => 0);
         foreach($ret as $resourceResult){
+            if($resourceResult === false) continue;
             if($countOnly){
                 $allEntries["count"] += ldap_count_entries($this->ldapconn, $resourceResult);
                 continue;
@@ -274,6 +314,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
 
     function updateUserObject(&$userObject){
         if(!empty($this->separateGroup)) $userObject->setGroupPath("/".$this->separateGroup);
+        // SHOULD BE DEPRECATED
         if(!empty($this->customParamsMapping)){
             $checkValues =  array_values($this->customParamsMapping);
             $prefs = $userObject->getPref("CUSTOM_PARAMS");
@@ -299,6 +340,53 @@ class ldapAuthDriver extends AbstractAuthDriver {
                 $userObject->setPref("CUSTOM_PARAMS", $prefs);
                 $userObject->save();
             }
+        }
+        if(!empty($this->paramsMapping)){
+
+            $changes = false;
+            $entries = $this->getUserEntries($userObject->getId());
+            if($entries["count"]){
+                $entry = $entries[0];
+                foreach($this->paramsMapping as $params){
+                    $key = strtolower($params['MAPPING_LDAP_PARAM']);
+                    if(isSet($entry[$key])){
+                        $value = $entry[$key][0];
+                        switch($params['MAPPING_LOCAL_TYPE']){
+                            case "role_id":
+                                if(!in_array($value, array_keys($userObject->getRoles()))){
+                                    $userObject->addRole(AuthService::getRole($value, true));
+                                    $changes = true;
+                                }
+                                break;
+                            case "group_path":
+                                $value = "/".ltrim($value, "/");
+                                if($userObject->getGroupPath() != $value) {
+                                    AuthService::createGroup("/", $value, "LDAP ".$value);
+                                    $userObject->setGroupPath($value);
+                                    $changes = true;
+                                }
+                                break;
+                            case "profile":
+                                if($userObject->getProfile() != $value){
+                                    $changes = true;
+                                    $userObject->setProfile($value);
+                                }
+                                break;
+                            case "plugin_param":
+                            default:
+                                if($userObject->personalRole->filterParameterValue($this->getId(), $params["MAPPING_LOCAL_PARAM"], AJXP_REPO_SCOPE_ALL, "") != $value){
+                                    $userObject->personalRole->setParameterValue($this->getId(), $params["MAPPING_LOCAL_PARAM"], $value);
+                                    $changes = true;
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+            if($changes){
+                $userObject->save("superuser");
+            }
+
         }
     }
 

@@ -13,9 +13,12 @@
 		<param name="LDAP_PORT" type="string" label="CONF_MESSAGE[LDAP Port]" description="CONF_MESSAGE[LDAP Server Port (leave blank for default)]" mandatory="false"/>
 		<param name="LDAP_USER" type="string" label="CONF_MESSAGE[LDAP bind username]" description="CONF_MESSAGE[Username (uid + dn) of LDAP bind user]" mandatory="false"/>
 		<param name="LDAP_PASSWORD" type="string" label="CONF_MESSAGE[LDAP bind password]" description="CONF_MESSAGE[Password of LDAP bind user]" mandatory="false"/>
-		<param name="LDAP_DN" type="string" label="CONF_MESSAGE[People DN]" description="CONF_MESSAGE[DN where the users are stored]" mandatory="false"/>
+		<param name="LDAP_DN" type="string" replicationGroup="LDAPDN" label="CONF_MESSAGE[People DN]" description="CONF_MESSAGE[DN where the users are stored]" mandatory="false"/>
 		<param name="LDAP_FILTER" type="string" label="CONF_MESSAGE[LDAP Filter]" description="CONF_MESSAGE[Filter which users to fetch.]" mandatory="false"/>
 		<param name="LDAP_USERATTR" type="string" label="CONF_MESSAGE[User attribute]" description="CONF_MESSAGE[Username attribute]" mandatory="false"/>
+		<param name="MAPPING_LDAP_PARAM" type="string" replicationGroup="MAPPING" label="CONF_MESSAGE[LDAP attribute]" description="CONF_MESSAGE[Name of the LDAP attribute to read]" mandatory="false"/>
+		<param name="MAPPING_LOCAL_TYPE" type="select" replicationGroup="MAPPING" choices="plugin_param|Plugin Parameter,role_id|Role Id,group_path|Group Path,profile|Profile" label="CONF_MESSAGE[Mapping Type]" description="CONF_MESSAGE[Determine the type of mapping]" mandatory="false"/>
+		<param name="MAPPING_LOCAL_PARAM" type="string" replicationGroup="MAPPING" label="CONF_MESSAGE[Plugin parameter]" description="CONF_MESSAGE[Name of the custom local parameter to set]" mandatory="false"/>
 	</server_settings>
 	<class_definition filename="plugins/auth.ldap/class.ldapAuthDriver.php" classname="ldapAuthDriver"/>
 	<registry_contributions>
