@@ -65,4 +65,9 @@ interface AJXP_FeedStore{
      */
     public function loadAlerts($userId, $repositoryIdFilter = null);
 
+
+    /**
+     * @param $alertId
+     */
+    public function dismissAlertById($alertId);
 }

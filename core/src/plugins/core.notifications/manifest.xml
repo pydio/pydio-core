@@ -42,6 +42,9 @@
                     <serverCallback methodName="loadUserFeed"/>
                 </processing>
             </action>
+            <action name="dismiss_user_alert">
+                <processing><serverCallback methodName="dismissUserAlert"/></processing>
+            </action>
         </actions>
         <hooks>
             <serverCallback methodName="persistChangeHookToFeed" hookName="node.change" defer="true"/>

@@ -131,10 +131,20 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         foreach($res as $n => $row){
             $test = unserialize($row->content);
             if(is_a($test, "AJXP_Notification")){
+                $test->alert_id = $row->id;
                 $data[] = $test;
             }
         }
         return $data;
+    }
+
+    /**
+     * @param $alertId
+     */
+    public function dismissAlertById($alertId){
+        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
+        dibi::connect($this->sqlDriver);
+        dibi::query("DELETE FROM [ajxp_feed] WHERE [id] = %i AND [etype] = %s AND [user_id] = %s", $alertId, "alert", AuthService::getLoggedUser()->getId());
     }
 
     public function installSQLTables($param){

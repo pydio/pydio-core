@@ -64,9 +64,19 @@ Class.create("NotificationLoader", {
     childrenToMenuItems : function(){
         var menuItems = $A([]);
         var eventIndex = 0;
+        var alerts = false;
+        var parentAjxpNode = this.ajxpNode;
 
         this.ajxpNode.getChildren().each(function(el){
 
+            var isAlert = el.getMetadata().get("event_is_alert") ? true : false;
+            if(alerts && !isAlert){
+                alerts = false;
+                menuItems.push({separator:true});
+            }
+            if(isAlert){
+                alerts = true;
+            }
             var block = '<div class="notif_event_label">'+el.getLabel()+'</div>';
             if(el.getMetadata().get('event_repository_label')){
                 block += '<div class="notif_event_repository">'+ el.getMetadata().get('event_repository_label') + '</div>';
@@ -74,6 +84,32 @@ Class.create("NotificationLoader", {
             block += '<div class="notif_event_description">'+ el.getMetadata().get('event_description') + '</div>';
             block += '<div class="notif_event_date">'+ el.getMetadata().get('event_date') + '</div>';
             block = '<div class="notif_event_container">'+block+'</div><br style="clear:left;"/>';
+            var moreActions = $A([{
+                name:"Go to...",
+                icon_class:"icon-circle-arrow-right",
+                callback:function(e){
+                    window.ajaxplorer.goTo(el);
+                }
+            }]);
+            if(isAlert){
+                moreActions.push({
+                    name:"Dismiss",
+                    icon_class:"icon-remove-sign",
+                    callback:function(e){
+                        Event.stop(e);
+                        Effect.Fade(e.target.up('li'));
+                        var conn = new Connexion();
+                        conn.onComplete = function(){
+                            parentAjxpNode.reload();
+                        };
+                        conn.setParameters({
+                            get_action:'dismiss_user_alert',
+                            alert_id:el.getMetadata().get("alert_id")
+                        });
+                        conn.sendAsync();
+                    }
+                });
+            }
             menuItems.push({
                 id: "event_" + eventIndex,
                 name:block,
@@ -81,8 +117,9 @@ Class.create("NotificationLoader", {
                 pFactory : this.pFactory,
                 ajxpNode:el,
                 callback:function(e){
-                    window.ajaxplorer.goTo(el);
-                }
+                    Event.stop(e);
+                },
+                moreActions: moreActions
             });
             eventIndex ++;
         }.bind(this) );
@@ -121,6 +158,7 @@ Class.create("NotificationLoader", {
             position: "bottom middle",
             menuMaxHeight: 350,
             topOffset: 14,
+            menuTitle: 'Alerts',
             beforeShow: function(){
                 protoMenu.container.removeClassName('panelHeaderMenu');
                 protoMenu.container.removeClassName('toolbarmenu');

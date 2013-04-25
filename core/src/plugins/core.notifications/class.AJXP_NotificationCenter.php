@@ -167,6 +167,13 @@ class AJXP_NotificationCenter extends AJXP_Plugin
     }
 
 
+    public function dismissUserAlert($actionName, $httpVars, $fileVars){
+        if(!$this->eventStore) return;
+        $alertId = $httpVars["alert_id"];
+        $this->eventStore->dismissAlertById($alertId);
+    }
+
+
     public function loadUserAlerts($actionName, $httpVars, $fileVars){
 
         if(!$this->eventStore) return;
@@ -209,10 +216,12 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                 }catch (Exception $e){
                     continue;
                 }
+                $node->event_is_alert = true;
                 $node->event_description = ucfirst($notification->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notification->getAuthor();
                 $node->event_description_long = $notification->getDescriptionLong(true);
                 $node->event_date = AJXP_Utils::relativeDate($notification->getDate(), $mess);
                 $node->event_type = "alert";
+                $node->alert_id = $notification->alert_id;
                 $node->repository_id = $node->getRepository()->getId();
                 if($node->repository_id != $repositoryFilter && $node->getRepository()->getDisplay() != null){
                     $node->event_repository_label = "[".$node->getRepository()->getDisplay()."]";
