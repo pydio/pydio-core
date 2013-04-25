@@ -186,11 +186,16 @@ Class.create("RepositorySelect", {
         }
 
         var menuItems = $A();
+        if(!this.loadedOnce) {
+            ajaxplorer.actionBar.loadActionsFromRegistry(ajaxplorer.getXmlRegistry());
+            this.loadedOnce = true;
+        }
         var otherActions = ajaxplorer.actionBar.getActionsForAjxpWidget("RepositorySelect", this.element.id).each(function(otherAction){
             menuItems.push({
                 name:otherAction.getKeyedText(),
                 alt:otherAction.options.title,
                 action_id:otherAction.options.name,
+                icon_class:otherAction.options.icon_class,
                 className:"edit",
                 image:resolveImageSource(otherAction.options.src, '/images/actions/ICON_SIZE', 16),
                 callback:function(e){this.apply();}.bind(otherAction)
