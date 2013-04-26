@@ -97,6 +97,11 @@ class AJXP_NotificationCenter extends AJXP_Plugin
 
         if(!$this->eventStore) return;
         $u = AuthService::getLoggedUser();
+        if($u == null) {
+            if($httpVars["format"] == "html") return;
+            AJXP_XMLWriter::header();
+            AJXP_XMLWriter::close();
+        }
         $userId = $u->getId();
         $userGroup = $u->getGroupPath();
         $authRepos = array();
@@ -233,7 +238,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         }
         foreach($cumulated as $nodeToSend){
             if($nodeToSend->event_occurence > 1){
-                $nodeToSend->setLabel(basename($nodeToSend->getPath()) . "(".$nodeToSend->event_occurence.")" );
+                $nodeToSend->setLabel(basename($nodeToSend->getPath()) . " (".$nodeToSend->event_occurence.")" );
                 AJXP_XMLWriter::renderAjxpNode($nodeToSend);
             }
         }

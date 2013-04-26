@@ -481,6 +481,29 @@ class Repository implements AjxpGroupPathProvider {
     }
 
     /**
+     * @param String $descriptionText
+     */
+    public function setDescription( $descriptionText ){
+        $this->options["USER_DESCRIPTION"] = $descriptionText;
+    }
+
+    /**
+     * @return String
+     */
+    public function getDescription (){
+        if(isset($this->options["USER_DESCRIPTION"])){
+            return $this->options["USER_DESCRIPTION"];
+        }else{
+
+            $s = "Access type is ". $this->getAccessType();
+            if(isSet($this->parentId) && isset($this->owner)){
+                $s = "Shared by ".$this->owner;
+            }
+            return $s ;
+        }
+    }
+
+    /**
      * Infer a security scope for this repository. Will determine to whome the messages
      * will be broadcasted.
      * @return bool|string

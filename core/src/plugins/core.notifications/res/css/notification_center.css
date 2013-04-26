@@ -13,15 +13,16 @@ ul.notification_list{
     overflow-y: auto !important;
 }
 
-
-/*
-#feed_content li:nth-child(2n){
-    background-color: #888888;
-}
-*/
-
-#feed_content li{
-    padding: 0;
+.badge {
+    background-color: white;
+    border-radius: 3px;
+    display: inline-block;
+    margin: 0 1px 0 3px;
+    font-size: 11px;
+    color: #666;
+    font-weight: bold;
+    padding: 0 3px 0 4px;
+    text-align: center;
 }
 
 #feed_content a{

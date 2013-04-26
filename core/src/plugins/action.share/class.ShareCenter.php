@@ -278,6 +278,7 @@ class ShareCenter extends AJXP_Plugin{
                         $jsonData = array(
                             "repositoryId"  => $repoId,
                             "label"         => $repo->getDisplay(),
+                            "description"   => $repo->getDescription(),
                             "entries"       => $sharedEntries,
                             "element_watch" => $elementWatch,
                             "repository_url"=> AJXP_Utils::detectServerURL(true)."?goto=". $repo->getSlug() ."/"
@@ -925,6 +926,7 @@ class ShareCenter extends AJXP_Plugin{
         }
 
 		$label = AJXP_Utils::decodeSecureMagic($httpVars["repo_label"]);
+		$description = AJXP_Utils::decodeSecureMagic($httpVars["repo_description"]);
         if(isSet($httpVars["repository_id"])){
             $editingRepo = ConfService::getRepositoryById($httpVars["repository_id"]);
         }
@@ -972,6 +974,7 @@ class ShareCenter extends AJXP_Plugin{
                 $newRepo->setDisplay($label);
                 ConfService::replaceRepository($httpVars["repository_id"], $newRepo);
             }
+            $editingRepo->setDescription($description);
         }else{
             if($repository->getOption("META_SOURCES")){
                 $options["META_SOURCES"] = $repository->getOption("META_SOURCES");
@@ -992,6 +995,7 @@ class ShareCenter extends AJXP_Plugin{
             if(!empty($gPath)){
                 $newRepo->setGroupPath($gPath);
             }
+            $newRepo->setDescription($description);
             ConfService::addRepository($newRepo);
         }
 

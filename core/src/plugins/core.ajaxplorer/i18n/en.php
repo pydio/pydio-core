@@ -508,7 +508,7 @@ $mess=array(
 "452" => "Thumbs size",
 "453" => "Set thumbnails size",
 "454" => "Select files on your computer",
-"455" => "My Workspaces",
+"455" => "Workspaces",
 "456" => "More",
 "457" => "update",
 "458" => "remove",
@@ -522,5 +522,7 @@ $mess=array(
 "464" => "Download all workspace content at once (zipped)",
 "465" => "Show alternative URLs (mount workspaces separately)",
 "466" => "Loading...",
-"467" => "All Shared Elements"
+"467" => "All Shared Elements",
+"468" => "My Workspaces",
+"469" => "Shared with me",
 );

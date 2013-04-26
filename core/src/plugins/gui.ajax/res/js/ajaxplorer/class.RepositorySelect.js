@@ -128,8 +128,12 @@ Class.create("RepositorySelect", {
                     return;
                 }
 
+                var label = '<span class="menu_label">' + repoObject.getLabel() + '</span>';
+                if(repoObject.getDescription()){
+                    label += '<span class="menu_description">' + repoObject.getDescription() + '</span>';
+                }
                 var actionData = {
-					name:repoObject.getLabel(),
+					name:label,
 					alt:repoObject.getLabel() + (repoObject.getOwner() ? " ("+MessageHash[413]+" " + repoObject.getOwner()+ ")":""),
 					image:repoObject.getIcon(),
                     icon_class:"icon-hdd",
@@ -168,12 +172,18 @@ Class.create("RepositorySelect", {
         actions.sort(fonc);
         if(sharedActions.length){
 	        sharedActions.sort(fonc);
-	        actions.push({separator:true});	        
+	        actions.push({
+                separator:true,
+                menuTitle:MessageHash[469]
+            });
 	        actions = actions.concat(sharedActions);
         }
         if(lastActions.length){
 	        lastActions.sort(fonc);
-	        actions.push({separator:true});
+	        actions.push({
+                separator:true,
+                menuTitle:'Other Actions'
+            });
 	        actions = actions.concat(lastActions);
         }
 
@@ -211,7 +221,7 @@ Class.create("RepositorySelect", {
 			this.repoMenu.refreshList();
 		}else{
 			this.repoMenu = new Proto.Menu({			
-				className: 'menu rootDirChooser',
+				className: 'menu rootDirChooser menuDetails',
 				mouseClick:(this.options.menuEvent? this.options.menuEvent : 'left'),
 				anchor:button,
                 position: (this.options.menuPosition? this.options.menuPosition : 'bottom'),
@@ -221,7 +231,7 @@ Class.create("RepositorySelect", {
 				anchorTitle:MessageHash[200],
 				topOffset:(this.options.menuOffsetTop !== undefined ? this.options.menuOffsetTop: 2),
 				leftOffset:(this.options.menuOffsetLeft !== undefined ? this.options.menuOffsetLeft: -127),
-				menuTitle:MessageHash[200],
+				menuTitle:MessageHash[468],
 				menuItems: actions,
                 menuMaxHeight:this.options.menuMaxHeight,
 				fade:true,

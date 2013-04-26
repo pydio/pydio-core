@@ -541,6 +541,8 @@ $mess=array(
 "465" => "Mostra URL alternativi (monta separatamente i workspace)",
 "466" => "Caricamento...",
 "467" => "Tutti gli elementi condivisi",
+"468" => "My Workspaces",
+"469" => "Shared with me",
 /* END SENTENCE */
 );
 ?>

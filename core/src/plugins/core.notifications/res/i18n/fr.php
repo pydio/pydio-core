@@ -23,4 +23,5 @@ $mess=array(
 "2" => "Flux",
 "3" => "Alertes",
 "4" => "Notifications",
+"5" => "Tous les évenements",
 );

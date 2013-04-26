@@ -11,6 +11,7 @@
 	</credentials_consumer>
 	<slug_provider>
 		<server_settings uuidAttr="name">
+            <param group="MIXIN_MESSAGE[Repository Commons]" name="USER_DESCRIPTION" type="textarea" label="MIXIN_MESSAGE[Description]" description="MIXIN_MESSAGE[A user-defined description of the content of this workspace]" default=""/>
             <param group="MIXIN_MESSAGE[Repository Commons]" name="DEFAULT_RIGHTS" type="select" choices="r|Read Only,rw|Read and Write,w|Write Only (upload)" label="MIXIN_MESSAGE[Default Rights]" description="MIXIN_MESSAGE[This right pattern (empty, r, or rw) will be applied at user creation for this repository.]" default=""/>
             <param group="MIXIN_MESSAGE[Repository Commons]" name="AJXP_SLUG" type="string" label="MIXIN_MESSAGE[Alias]" description="MIXIN_MESSAGE[Alias for replacing the generated unique id of the repository]" mandatory="false" no_templates="true"/>
             <param group="MIXIN_MESSAGE[Repository Commons]" name="AJXP_GROUP_PATH" type="string" label="MIXIN_MESSAGE[Group Path]" description="MIXIN_MESSAGE[Set this repository group owner : only users of this group will see it]" mandatory="false" no_templates="true"/>

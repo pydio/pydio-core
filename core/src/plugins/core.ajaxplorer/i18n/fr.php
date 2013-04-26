@@ -508,7 +508,7 @@ $mess=array(
 "452" => "Taille des vignettes",
 "453" => "Modifier la taille des vignettes",
 "454" => "Sélectionner des fichiers",
-"455" => "Mes workspaces",
+"455" => "Workspaces",
 "456" => "Plus",
 "457" => "m-à-j",
 "458" => "supprimer",
@@ -523,5 +523,7 @@ $mess=array(
 "465" => "Afficher les autres URLs (monter les workspace séparément)",
 "466" => "Chargement...",
 "467" => "Tous les éléments partagés",
+"468" => "Mes Workspaces",
+"469" => "Partagés avec moi",
 /* END SENTENCE */
 );

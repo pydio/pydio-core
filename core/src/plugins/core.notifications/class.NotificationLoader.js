@@ -24,6 +24,7 @@ Class.create("NotificationLoader", {
     pFactory : null,
     timer   : 60,
     pe  : null,
+    menuItems : null,
 
     initialize: function(){
         var rP = new RemoteNodeProvider();
@@ -33,6 +34,9 @@ Class.create("NotificationLoader", {
         this.pFactory = new PreviewFactory();
         this.pFactory.sequencialLoading = false;
         this.pFactory.setThumbSize(22);
+        this.ajxpNode.observe('loaded', function(){
+            this.menuItems = this.childrenToMenuItems();
+        }.bind(this));
         this.pe = new PeriodicalExecuter(function(){
             if(window.ajaxplorer.user){
                 this.ajxpNode.reload();
@@ -43,6 +47,12 @@ Class.create("NotificationLoader", {
                 this.ajxpNode.reload();
             }
         }.bind(this));
+        document.observe("ajaxplorer:repository_list_refreshed", function(){
+            window.setTimeout(function(){
+                this.ajxpNode.reload();
+            }.bind(this), 100);
+        }.bind(this));
+        this.ajxpNode.reload();
     },
 
     childrenToMenu: function(menuContainer){
@@ -66,15 +76,17 @@ Class.create("NotificationLoader", {
         var eventIndex = 0;
         var alerts = false;
         var parentAjxpNode = this.ajxpNode;
+        var alertsCounts = 0;
 
         this.ajxpNode.getChildren().each(function(el){
 
             var isAlert = el.getMetadata().get("event_is_alert") ? true : false;
             if(alerts && !isAlert){
                 alerts = false;
-                menuItems.push({separator:true});
+                menuItems.push({separator:true, menuTitle:MessageHash['notification_center.5']});
             }
             if(isAlert){
+                alertsCounts ++;
                 alerts = true;
             }
             var block = '<div class="notif_event_label">'+el.getLabel()+'</div>';
@@ -123,6 +135,18 @@ Class.create("NotificationLoader", {
             });
             eventIndex ++;
         }.bind(this) );
+        var button = $('get_my_feed_button');
+        var badge = button.down('.badge');
+        if(!badge){
+            badge = new Element('span', {className:'badge'});
+            button.down('.icon-caret-down').insert({before: badge});
+        }
+        if(alertsCounts){
+            badge.update(alertsCounts);
+            badge.show();
+        }else{
+            badge.hide();
+        }
         return menuItems;
     },
 
@@ -145,20 +169,24 @@ Class.create("NotificationLoader", {
             if(!menuContainer) {
                 return;
             }
-            this.ajxpNode.observe("loaded", function(){
-                protoMenu.options.menuItems = this.childrenToMenuItems();
+            if(!this.ajxpNode.isLoaded()){
+                this.ajxpNode.observeOnce("loaded", function(){
+                    protoMenu.options.menuItems = this.menuItems;
+                    protoMenu.refreshList();
+                    protoMenu.container.setStyle(protoMenu.computeAnchorOffset());
+                }.bind(this));
+                this.ajxpNode.load();
+            }else{
+                protoMenu.options.menuItems = this.menuItems;
                 protoMenu.refreshList();
                 protoMenu.container.setStyle(protoMenu.computeAnchorOffset());
-            }.bind(this));
-            if(!this.ajxpNode.isLoaded()){
-                this.ajxpNode.load();
             }
         }.bind(this);
         protoMenu.options = Object.extend(protoMenu.options, {
             position: "bottom middle",
             menuMaxHeight: 350,
             topOffset: 14,
-            menuTitle: 'Alerts',
+            menuTitle: MessageHash['notification_center.3'],
             beforeShow: function(){
                 protoMenu.container.removeClassName('panelHeaderMenu');
                 protoMenu.container.removeClassName('toolbarmenu');

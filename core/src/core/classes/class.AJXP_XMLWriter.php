@@ -573,8 +573,12 @@ class AJXP_XMLWriter
                 $label = $uObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $uId);
                 $isSharedString =  "owner='".$label."'";
             }
-
-            $xmlString = "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$rightString $streamString $slugString $isSharedString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label>".$repoObject->getClientSettings()."</repo>";
+            $descTag = "";
+            $description = $repoObject->getDescription();
+            if(!empty($description)){
+                $descTag = '<description>'.$description.'</description>';
+            }
+            $xmlString = "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$rightString $streamString $slugString $isSharedString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings()."</repo>";
             if($toLast){
                 $lastString = $xmlString;
             }else{

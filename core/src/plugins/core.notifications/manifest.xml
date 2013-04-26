@@ -28,7 +28,6 @@
                     <dynamicBuilder><![CDATA[
                         var context = window.builderContext;
                         var protoMenu = window.builderProtoMenu;
-                        ResourcesManager.prototype.loadJSResource('plugins/core.notifications/class.NotificationLoader.js', 'NotificationLoader');
                         NotificationLoader.getInstance().dynamicBuilderLoader(context, protoMenu);
                     ]]></dynamicBuilder>
                 </subMenu>
@@ -39,6 +38,10 @@
                         <div id="user_feed" box_padding="0" class="dialogBox css_boxshadow">
                         </div>
                     ]]></clientForm>
+                    <clientListener name="init"><![CDATA[
+                        ResourcesManager.prototype.loadJSResource('plugins/core.notifications/class.NotificationLoader.js', 'NotificationLoader');
+                        NotificationLoader.getInstance();
+                    ]]></clientListener>
                     <serverCallback methodName="loadUserFeed"/>
                 </processing>
             </action>

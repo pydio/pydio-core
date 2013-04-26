@@ -522,6 +522,8 @@ $mess=array(
 "465" => "Show alternative URLs (mount workspaces separately)",
 "466" => "Loading...",
 "467" => "All Shared Elements",
+"468" => "My Workspaces",
+"469" => "Shared with me",
 /* END SENTENCE */
 /* END SENTENCE */
 );

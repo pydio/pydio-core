@@ -3341,21 +3341,21 @@ div.menu a {
 }
 
 .rootDirChooser li.menuTitle {
-    font-size: 11px;
-    font-weight: bold;
-    padding-top: 2px;
-    padding-left: 5px;
-    padding-right: 25px;
-    padding-bottom: 5px;
-    color: #ccc;
-    border-bottom: 0 solid #ddd;
+    padding: 7px 0 7px 8px;
+    color: rgb(255, 255, 255);
     text-align: left;
-    font-style: italic;
-    display: none;
+    background-color: rgba(255, 255, 255, 0.28);
+    font-size: 13px;
+    /*margin: 1px;*/
+    border-bottom: 1px solid rgb(172, 172, 172);
 }
 
 .menu li.menuTitle{
     display: none;
+}
+
+.menu.rootDirChooser li.menuTitle{
+    display: block;
 }
 
 .menu.desktop.panelHeaderMenu li.menuTitle {
@@ -3432,6 +3432,7 @@ div.menu a {
     padding: 0;
     height: 1px !important;
 }
+
 /* we need explicit enabled class to overcome css deficiences (without creating unnecessary markup) */
 .menu.desktop a.enabled:hover {
     background-color: #73a2d7;
@@ -3450,7 +3451,7 @@ div.menu a {
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     position:absolute;
     z-index: 1500;
-    min-width: 180px;
+    min-width: 250px;
     /* IE */
     width:expression("250px");
     background-color: #666;
@@ -3469,18 +3470,16 @@ div.menu a {
     border: 0;
 }
 
-.rootDirChooser a,
-.bookmarksMenu a
+.rootDirChooser a
 {
     display: block;
     padding: 6px 5px 5px 6px;
     color: #fff;
     letter-spacing: 1px;
-    height: 16px;
+    /*height: 16px;*/
 }
 
-.rootDirChooser a img,
-.bookmarksMenu a img
+.rootDirChooser a img
 {
     margin-right:5px;
 }
@@ -3527,6 +3526,45 @@ div.menu a {
     height: 0 !important;
     width: 98%;
 }
+
+.rootDirChooser li.separator.menuTitle{
+    height: auto !important;
+    line-height: 14px !important;
+    border-top: none;
+    padding-top: 7px !important;
+    width: 100%;
+
+}
+
+.menu.menuDetails {
+}
+
+.menu.menuDetails a{
+    line-height: 17px;
+    padding: 10px 5px;
+}
+
+.menu.menuDetails span.ajxp_icon_span{
+    float: left;
+    padding: 3px 9px 15px 4px;
+    font-size: 18px;
+}
+
+.menu.menuDetails span.menu_label{
+    font-size: 14px;
+    display: block;
+}
+
+.menu.menuDetails span.menu_description{
+    display: block;
+    letter-spacing: 0;
+    line-height: 13px;
+}
+
+.menu.menuDetails img{
+    display: none;
+}
+
 
 
 .bookmarksMenu

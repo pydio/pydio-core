@@ -142,9 +142,10 @@
                                 <div class="dialogLegend" ajxp_message_id="share_center.70">AJXP_MESSAGE[share_center.70]</div>
                             </div>
                             <div id="target_repository" class="SF_element oneFieldForm" style="margin: 5px 10px 15px;">
-                                <div class="SF_label mode-ws" style="font-size:12px;" ajxp_message_id="share_center.35">AJXP_MESSAGE[share_center.35]</div>
-                                <div class="SF_label mode-minipriv mode-minipub" style="font-size:12px;" ajxp_message_id="share_center.35">AJXP_MESSAGE[share_center.35]</div>
+                                <div class="SF_label" style="font-size:12px;" ajxp_message_id="share_center.35">AJXP_MESSAGE[share_center.35]</div>
                                 <input type="text" value="" id="repo_label" name="repo_label" class="SF_input" style="float:right;font-size:12px;"/>
+                                <div class="SF_label" style="font-size:12px; clear:left;" ajxp_message_id="share_center.35">Description</div>
+                                <textarea id="repo_description" name="repo_description" class="SF_input" style="float:right;font-size:12px;"></textarea>
                                 <div id="target_user_simple" class="mode-minipub">
                                     <br style="clear:both;"/>
                                     <div class="SF_label" style="font-size:12px;" ajxp_message_id="share_center.71">AJXP_MESSAGE[share_center.71]</div>

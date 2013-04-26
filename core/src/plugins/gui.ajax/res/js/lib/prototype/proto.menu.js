@@ -220,22 +220,25 @@ Proto.Menu = Class.create({
                 img = item.pFactory.generateBasePreview(item.ajxpNode);
             }
 
-			newItem.insert(
-					item.separator 
-						? '' 
-						: Object.extend(new Element('a', {
-							href: '#',
-							title: item.alt,
-                            id:(item.action_id?'action_instance_'+item.action_id:''),
-							className: (item.className?item.className+' ':'') + (item.disabled ? 'disabled' : 'enabled'),
-							style:(item.isDefault?'font-weight:bold':'')
-						}), { _callback: item.callback })
-						.writeAttribute('onclick', 'return false;')
-						.observe('click', this.onClick.bind(this))
-						.observe('contextmenu', Event.stop)
-						.update(Object.extend(img, {_callback:item.callback} ))
-						.insert(item.name)
+            if(item.separator && item.menuTitle){
+                newItem.insert(item.menuTitle);
+                newItem.addClassName('menuTitle');
+            }else{
+			    newItem.insert(
+                    Object.extend(new Element('a', {
+                        href: '#',
+                        title: item.alt,
+                        id:(item.action_id?'action_instance_'+item.action_id:''),
+                        className: (item.className?item.className+' ':'') + (item.disabled ? 'disabled' : 'enabled'),
+                        style:(item.isDefault?'font-weight:bold':'')
+                    }), { _callback: item.callback })
+                    .writeAttribute('onclick', 'return false;')
+                    .observe('click', this.onClick.bind(this))
+                    .observe('contextmenu', Event.stop)
+                    .update(Object.extend(img, {_callback:item.callback} ))
+                    .insert(item.name)
 				);
+            }
             if(newItem.down('u')){
                 newItem.down('u')._callback = item.callback;
             }
@@ -293,7 +296,12 @@ Proto.Menu = Class.create({
         // Clean separators
         list.select("li.separator").each(function(sep){
             var next = sep.next("li");
-            if(!next || next.hasClassName('separator')) sep.remove();
+            var prev = sep.previous("li");
+            if(!prev || prev.hasClassName('separator') || prev.hasClassName('menuTitle')) {
+                sep.remove();
+                return;
+            }
+            if(!next || next.hasClassName('separator') || prev.hasClassName('menuTitle')) sep.remove();
         });
 	},
 	
