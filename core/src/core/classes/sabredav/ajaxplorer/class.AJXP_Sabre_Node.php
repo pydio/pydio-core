@@ -24,7 +24,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer
  * @subpackage SabreDav
  */
-class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
+class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
 {
 
     /**
@@ -52,7 +52,7 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
 
     /**
      * @return AjxpWrapperProvider
-     * @throws Sabre_DAV_Exception_FileNotFound
+     * @throws Sabre\DAV\Exception\FileNotFound
      */
     function getAccessDriver(){
         if(!isset($this->accessDriver)){
@@ -61,7 +61,7 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
             ConfService::getConfStorageImpl();
             $this->accessDriver = ConfService::loadRepositoryDriver();
             if(!$this->accessDriver instanceof AjxpWrapperProvider){
-                throw new Sabre_DAV_Exception_FileNotFound( $RID );
+                throw new Sabre\DAV\Exception\FileNotFound( $RID );
             }
             $this->accessDriver->detectStreamWrapper(true);
         }
@@ -143,7 +143,7 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
      * Updates properties on this node,
      *
      * @param array $properties
-     * @see Sabre_DAV_IProperties::updateProperties
+     * @see Sabre\DAV\IProperties::updateProperties
      * @return bool|array
      */
     public function updateProperties($properties) {
