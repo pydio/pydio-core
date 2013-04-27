@@ -31,7 +31,7 @@ class Writeability extends AbstractTest
     function Writeability() { parent::AbstractTest("Required writeable folder", "One of the following folder should be writeable and is not : "); }
     function doTest() 
     { 
-    	include(AJXP_CONF_PATH."/bootstrap_plugins.php");
+    	//include(AJXP_CONF_PATH."/bootstrap_plugins.php");
     	$checks = array();
     	if(isSet($PLUGINS["CONF_DRIVER"])){
     		$confDriver = $PLUGINS["CONF_DRIVER"];

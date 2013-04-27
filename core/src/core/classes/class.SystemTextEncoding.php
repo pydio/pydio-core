@@ -110,7 +110,7 @@ class SystemTextEncoding
 	/**
      * This function is used when the server's PHP configuration is using magic quote
      * @param string $text
-     * @return void
+     * @return string
      */
     static function magicDequote($text)
     {
