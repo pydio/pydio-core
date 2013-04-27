@@ -86,7 +86,11 @@ Class.create("NotificationLoader", {
                 menuItems.push({separator:true, menuTitle:MessageHash['notification_center.5']});
             }
             if(isAlert){
-                alertsCounts ++;
+                if(parseInt(el.getMetadata().get("event_occurence")) > 0){
+                    alertsCounts += parseInt(el.getMetadata().get("event_occurence"));
+                }else{
+                    alertsCounts ++;
+                }
                 alerts = true;
             }
             var block = '<div class="notif_event_label">'+el.getLabel()+'</div>';
@@ -114,10 +118,14 @@ Class.create("NotificationLoader", {
                         conn.onComplete = function(){
                             parentAjxpNode.reload();
                         };
-                        conn.setParameters({
+                        var params = {
                             get_action:'dismiss_user_alert',
                             alert_id:el.getMetadata().get("alert_id")
-                        });
+                        };
+                        if(el.getMetadata().get("event_occurence")){
+                            params.occurrences = el.getMetadata().get("event_occurence");
+                        }
+                        conn.setParameters(params);
                         conn.sendAsync();
                     }
                 });

@@ -39,7 +39,7 @@ class AjaXplorerHandler extends WebSocketUriHandler {
         $msg->setData($data["CONTENT"]);
         foreach($this->getConnections() as $conn){
             if($conn == $user) continue;
-            if(!isSet($conn->currentRepository) || $conn->currentRepository != $repoId) {
+            if($repoId != "AJXP_REPO_SCOPE_ALL" && (!isSet($conn->currentRepository) || $conn->currentRepository != $repoId)) {
                 $this->say("Skipping, not the same repository");
                 continue;
             }

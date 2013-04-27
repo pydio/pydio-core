@@ -70,7 +70,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         if($this->eventStore){
             AJXP_Controller::applyHook("msg.instant",array(
                 "<reload_user_feed/>",
-                $notification->getNode()->getRepositoryId(),
+                AJXP_REPO_SCOPE_ALL,
                 $notification->getTarget()
             ));
             $this->eventStore->persistAlert($notification);
@@ -183,7 +183,9 @@ class AJXP_NotificationCenter extends AJXP_Plugin
     public function dismissUserAlert($actionName, $httpVars, $fileVars){
         if(!$this->eventStore) return;
         $alertId = $httpVars["alert_id"];
-        $this->eventStore->dismissAlertById($alertId);
+        $oc = 1;
+        if(isSet($httpVars["occurrences"])) $oc = intval($httpVars["occurrences"]);
+        $this->eventStore->dismissAlertById($alertId, $oc);
     }
 
 
@@ -257,7 +259,8 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         }
         foreach($cumulated as $nodeToSend){
             if($nodeToSend->event_occurence > 1){
-                $nodeToSend->setLabel(basename($nodeToSend->getPath()) . " (".$nodeToSend->event_occurence.")" );
+                $nodeToSend->event_occurence ++;
+                $nodeToSend->setLabel(basename($nodeToSend->getPath()) . " (". $nodeToSend->event_occurence .")" );
                 AJXP_XMLWriter::renderAjxpNode($nodeToSend);
             }
         }

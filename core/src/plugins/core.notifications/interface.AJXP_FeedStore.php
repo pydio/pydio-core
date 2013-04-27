@@ -68,6 +68,7 @@ interface AJXP_FeedStore{
 
     /**
      * @param $alertId
+     * @param $occurrences
      */
-    public function dismissAlertById($alertId);
+    public function dismissAlertById($alertId, $occurrences = 1);
 }

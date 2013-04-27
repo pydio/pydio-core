@@ -115,15 +115,19 @@ class MqManager extends AJXP_Plugin
 
     public function sendInstantMessage($xmlContent, $repositoryId, $targetUserId = null, $targetGroupPath = null){
 
-        $scope = ConfService::getRepositoryById($repositoryId)->securityScope();
-        if($scope == "USER"){
-            $userId = AuthService::getLoggedUser()->getId();
-        }else if($scope == "GROUP"){
-            $gPath = AuthService::getLoggedUser()->getGroupPath();
-        }else if(isSet($targetUserId)){
+        if($repositoryId == AJXP_REPO_SCOPE_ALL){
             $userId = $targetUserId;
-        }else if(isSet($targetGroupPath)){
-            $gPath = $targetGroupPath;
+        }else{
+            $scope = ConfService::getRepositoryById($repositoryId)->securityScope();
+            if($scope == "USER"){
+                $userId = AuthService::getLoggedUser()->getId();
+            }else if($scope == "GROUP"){
+                $gPath = AuthService::getLoggedUser()->getGroupPath();
+            }else if(isSet($targetUserId)){
+                $userId = $targetUserId;
+            }else if(isSet($targetGroupPath)){
+                $gPath = $targetGroupPath;
+            }
         }
 
         // Publish for pollers

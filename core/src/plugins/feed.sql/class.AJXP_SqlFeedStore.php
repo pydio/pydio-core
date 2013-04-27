@@ -139,12 +139,29 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
     }
 
     /**
+     * @param $occurrences
      * @param $alertId
      */
-    public function dismissAlertById($alertId){
+    public function dismissAlertById($alertId, $occurrences = 1){
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
-        dibi::query("DELETE FROM [ajxp_feed] WHERE [id] = %i AND [etype] = %s AND [user_id] = %s", $alertId, "alert", AuthService::getLoggedUser()->getId());
+        $userId = AuthService::getLoggedUser()->getId();
+        if($occurrences == 1){
+            dibi::query("DELETE FROM [ajxp_feed] WHERE [id] = %i AND [user_id] = %s", $alertId, $userId);
+        }else{
+            $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [id] = %i AND [user_id] = %s", $alertId, $userId);
+            foreach($res as $n => $row){
+                $startEventRow = $row;
+                break;
+            }
+            $startEventNotif = new AJXP_Notification();
+            $startEventNotif = unserialize($startEventRow->content);
+            $url = $startEventNotif->getNode()->getUrl();
+            $date = $startEventRow->edate;
+            $newRes = dibi::query("SELECT [id] FROM [ajxp_feed] WHERE [etype] = %s AND [user_id] = %s AND [edate] <= %s AND content LIKE %s ORDER BY [edate] DESC LIMIT 0,$occurrences", "alert", $userId, $date, "%\"$url\"%");
+            $a = $newRes->fetchPairs();
+            dibi::query("DELETE FROM [ajxp_feed] WHERE [id] IN (%s)",  $a);
+        }
     }
 
     public function installSQLTables($param){
