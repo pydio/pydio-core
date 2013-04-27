@@ -25,6 +25,7 @@ Class.create("NotificationLoader", {
     timer   : 60,
     pe  : null,
     menuItems : null,
+    hasAlerts : false,
 
     initialize: function(){
         var rP = new RemoteNodeProvider();
@@ -77,12 +78,14 @@ Class.create("NotificationLoader", {
         var alerts = false;
         var parentAjxpNode = this.ajxpNode;
         var alertsCounts = 0;
+        this.hasAlerts = false;
 
         this.ajxpNode.getChildren().each(function(el){
 
             var isAlert = el.getMetadata().get("event_is_alert") ? true : false;
             if(alerts && !isAlert){
                 alerts = false;
+                this.hasAlerts = true;
                 menuItems.push({separator:true, menuTitle:MessageHash['notification_center.5']});
             }
             if(isAlert){
@@ -180,6 +183,7 @@ Class.create("NotificationLoader", {
             if(!this.ajxpNode.isLoaded()){
                 this.ajxpNode.observeOnce("loaded", function(){
                     protoMenu.options.menuItems = this.menuItems;
+                    protoMenu.options.menuTitle = this.hasAlerts ? MessageHash['notification_center.3'] : MessageHash['notification_center.5'];
                     protoMenu.refreshList();
                     protoMenu.container.setStyle(protoMenu.computeAnchorOffset());
                 }.bind(this));
@@ -194,7 +198,7 @@ Class.create("NotificationLoader", {
             position: "bottom middle",
             menuMaxHeight: 350,
             topOffset: 14,
-            menuTitle: MessageHash['notification_center.3'],
+            menuTitle: this.hasAlerts ? MessageHash['notification_center.3'] : MessageHash['notification_center.5'],
             beforeShow: function(){
                 protoMenu.container.removeClassName('panelHeaderMenu');
                 protoMenu.container.removeClassName('toolbarmenu');

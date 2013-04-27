@@ -72,6 +72,8 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre\DAV\IFile
      * @return mixed
      */
     function get(){
+        $ajxpNode = new AJXP_Node($this->getUrl());
+        AJXP_Controller::applyHook("node.read", array(&$ajxpNode));
         return fopen($this->getUrl(), "r");
     }
 

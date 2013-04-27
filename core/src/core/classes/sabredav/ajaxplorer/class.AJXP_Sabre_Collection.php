@@ -118,6 +118,7 @@ class AJXP_Sabre_Collection extends AJXP_Sabre_Node implements Sabre\DAV\ICollec
      * Returns a specific child node, referenced by its name
      *
      * @param string $name
+     * @throws Sabre\DAV\Exception\NotFound
      * @return Sabre\DAV\INode
      */
     function getChild($name){
@@ -168,6 +169,10 @@ class AJXP_Sabre_Collection extends AJXP_Sabre_Node implements Sabre\DAV\ICollec
             }
         }
         $this->children = $contents;
+
+        $ajxpNode = new AJXP_Node($this->getUrl());
+        AJXP_Controller::applyHook("node.read", array(&$ajxpNode));
+
         return $contents;
 
     }

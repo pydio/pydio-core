@@ -259,8 +259,9 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         }
         foreach($cumulated as $nodeToSend){
             if($nodeToSend->event_occurence > 1){
-                $nodeToSend->event_occurence ++;
                 $nodeToSend->setLabel(basename($nodeToSend->getPath()) . " (". $nodeToSend->event_occurence .")" );
+                AJXP_XMLWriter::renderAjxpNode($nodeToSend);
+            }else{
                 AJXP_XMLWriter::renderAjxpNode($nodeToSend);
             }
         }
