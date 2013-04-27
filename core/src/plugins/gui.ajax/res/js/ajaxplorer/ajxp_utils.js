@@ -763,6 +763,10 @@ function attachMobileScroll(targetId, direction){
 	}else{
 		var target = targetId;
 		targetId = target.id;
+        if(!target.id){
+            targetId = "scroll-pane-"+Math.floor(Math.random()*1000);
+            target.setAttribute('id', targetId);
+        }
 	}
 	if(!target) return;
 	target.addEventListener("touchmove", function(event){ scrollByTouch(event, direction, targetId); });

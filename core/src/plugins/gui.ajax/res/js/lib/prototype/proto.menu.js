@@ -356,10 +356,11 @@ Proto.Menu = Class.create({
 			this.container.setStyle({height:(vpHeight-(y - vpOff.top))+'px',overflowY:'scroll'}); 
 			if(!this.containerShrinked) this.container.setStyle({width:elDim.width+16+'px'});
 			this.containerShrinked = true;
-		}else{
-			this.container.setStyle({height:'auto', overflowY:'hidden'});
-		}		
-	},
+        }else{
+            this.container.setStyle({height:'auto', overflowY:'hidden'});
+        }
+        attachMobileScroll(this.container, "vertical");
+    },
 	
 	computeMouseOffset: function(e){
 		var x = Event.pointer(e).x,

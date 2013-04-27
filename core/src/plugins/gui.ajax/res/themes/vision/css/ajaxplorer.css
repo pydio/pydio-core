@@ -3451,7 +3451,7 @@ div.menu a {
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     position:absolute;
     z-index: 1500;
-    min-width: 250px;
+    width: 250px !important;
     /* IE */
     width:expression("250px");
     background-color: #666;
@@ -3566,22 +3566,14 @@ div.menu a {
 }
 
 
-
-.bookmarksMenu
-{
-    font-size: 11px;
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    position:absolute;
-    z-index: 1500;
-    border: 1px solid #D1D2D0;
-    width: 200px;
-    padding: 2px;
+.rightAlignMenu{
+    width: 180px !important;
 }
+
 
 .rightAlignMenu a{
     padding: 6px 5px 5px 20px;
     text-align:right;
-    height: 16px;
     letter-spacing: 1px;
 }
 
