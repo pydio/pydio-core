@@ -631,6 +631,7 @@ Class.create("Ajaxplorer", {
                     ajaxplorer.user.setPreference("pending_folder", nodeOrPath.getPath());
                 }
                 this.triggerRepositoryChange(nodeOrPath.getMetadata().get("repository_id"));
+                return;
             }
 		}
 

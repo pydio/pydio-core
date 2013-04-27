@@ -197,6 +197,9 @@ class AJXP_NotificationCenter extends AJXP_Plugin
             $repositoryFilter = $httpVars["repository_id"];
         }
         $res = $this->eventStore->loadAlerts($userId, $repositoryFilter);
+        if($repositoryFilter == null){
+            $repositoryFilter = ConfService::getRepository()->getId();
+        }
         if(!count($res)) return;
 
         $format = $httpVars["format"];
@@ -243,7 +246,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                 $node->event_date = AJXP_Utils::relativeDate($notification->getDate(), $mess);
                 $node->event_type = "alert";
                 $node->alert_id = $notification->alert_id;
-                $node->repository_id = $node->getRepository()->getId();
+                $node->repository_id = ''.$node->getRepository()->getId();
                 if($node->repository_id != $repositoryFilter && $node->getRepository()->getDisplay() != null){
                     $node->event_repository_label = "[".$node->getRepository()->getDisplay()."]";
                 }
