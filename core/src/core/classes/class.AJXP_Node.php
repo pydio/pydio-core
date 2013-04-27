@@ -275,6 +275,13 @@ class AJXP_Node{
 	}
 
     /**
+     * @return string The scheme part of the url
+     */
+	public function getScheme(){
+		return $this->urlParts["scheme"];
+	}
+
+    /**
      * @return string The repository identifer
      */
     public function getRepositoryId(){
