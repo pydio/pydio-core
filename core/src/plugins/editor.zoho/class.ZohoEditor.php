@@ -37,7 +37,7 @@ class ZohoEditor extends AJXP_Plugin {
     }
 
 
-	public function switchAction($action, $httpVars, $filesVars){
+    public function switchAction($action, $httpVars, $filesVars){
 		
 		if(!isSet($this->actions[$action])) return false;
     	
@@ -102,6 +102,7 @@ class ZohoEditor extends AJXP_Plugin {
             }else if(in_array($extension, $docExt)){
                 $service = "exportwriter";
             }
+            $arguments = array();
             $httpClient->GetRequestArguments("https://".$service.".zoho.com/remotedoc.im", $arguments);
             $arguments["PostValues"] = $params;
             $arguments["PostFiles"] = array(
@@ -113,6 +114,7 @@ class ZohoEditor extends AJXP_Plugin {
                 if(empty($err)){
                     $response = "";
                     while(true){
+                        $body = "";
                         $error = $httpClient->ReadReplyBody($body, 1000);
                         if($error != "" || strlen($body) == 0) break;
                         $response .= $body;
@@ -161,4 +163,3 @@ class ZohoEditor extends AJXP_Plugin {
 	}
 	
 }
-?>
