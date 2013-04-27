@@ -144,7 +144,9 @@ class ConfService
                 $plugin = false;
             }
         }
-
+        if($plugin !== false){
+            AJXP_PluginsService::getInstance()->setPluginActive($plugin->getType(), $plugin->getName(), true, $plugin);
+        }
         return $plugin;
 
     }

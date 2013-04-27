@@ -35,6 +35,15 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         parent::init($options);
     }
 
+    public function performChecks(){
+        if(!isSet($this->options)) return;
+        $test = AJXP_Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
+        if(!count($test)){
+            throw new Exception("Please define an SQL connexion in the core configuration");
+        }
+    }
+
+
     /**
      * @param string $hookName
      * @param mixed $data

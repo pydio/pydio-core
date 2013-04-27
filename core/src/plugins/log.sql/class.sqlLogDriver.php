@@ -48,7 +48,15 @@ class sqlLogDriver extends AbstractLogDriver {
 			exit(1);
 		}
 	}
-	
+
+    public function performChecks(){
+        if(!isSet($this->options)) return;
+        $test = AJXP_Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
+        if(!count($test)){
+            throw new Exception("Please define an SQL connexion in the core configuration");
+        }
+    }
+
 	/**
 	 * Simple function to format Date objects to fit MySQL expected where condition
 	 *

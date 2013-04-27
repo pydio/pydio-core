@@ -45,6 +45,7 @@ class serialConfDriver extends AbstractConfDriver {
 	}
 
 	function performChecks(){
+        if(!isSet($this->options)) return;
         if(isSet($this->options["FAST_CHECKS"]) && $this->options["FAST_CHECKS"] === true) return;
 		$this->performSerialFileCheck($this->repoSerialFile, "repositories file");
 		$this->performSerialFileCheck($this->usersSerialDir, "users file", true);

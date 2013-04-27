@@ -42,6 +42,14 @@ class sqlAuthDriver extends AbstractAuthDriver {
 		}		
 	}
 
+    public function performChecks(){
+        if(!isSet($this->options)) return;
+        $test = AJXP_Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
+        if(!count($test)){
+            throw new Exception("Please define an SQL connexion in the core configuration");
+        }
+    }
+
     function supportsUsersPagination(){
         return true;
     }

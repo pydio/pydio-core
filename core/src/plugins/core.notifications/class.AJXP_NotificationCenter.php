@@ -49,7 +49,9 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         }catch (Exception $e){
 
         }
-
+        if($this->eventStore === false){
+            $this->pluginConf["USER_EVENTS"] = false;
+        }
     }
 
     protected function parseSpecificContributions(&$contribNode){

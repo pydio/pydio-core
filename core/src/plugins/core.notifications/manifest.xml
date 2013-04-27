@@ -15,7 +15,7 @@
     </client_settings>
     <server_settings>
         <global_param description="CONF_MESSAGE[Display a new entry with all events happening on a user workspaces, and alerts. An SQL database must be setup for the FEED_DRIVER configuration.]" label="CONF_MESSAGE[User events and alerts]" name="USER_EVENTS" type="boolean" default="false"/>
-        <global_param type="plugin_instance:feed" name="UNIQUE_FEED_INSTANCE" group="CONF_MESSAGE[Instance Params]" label="CONF_MESSAGE[Feed Instance]" description="CONF_MESSAGE[Choose the plugin]" mandatory="false" default="feed.sql"/>
+        <global_param type="plugin_instance:feed" name="UNIQUE_FEED_INSTANCE" group="CONF_MESSAGE[Instance Params]" label="CONF_MESSAGE[Feed Instance]" description="CONF_MESSAGE[Choose the plugin]" mandatory="true" default="feed.sql"/>
     </server_settings>
     <registry_contributions>
         <actions>

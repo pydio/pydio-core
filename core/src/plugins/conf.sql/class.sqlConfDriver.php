@@ -64,6 +64,14 @@ class sqlConfDriver extends AbstractConfDriver {
 		}
 	}
 
+    public function performChecks(){
+        if(!isSet($this->options)) return;
+        $test = AJXP_Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
+        if(!count($test)){
+            throw new Exception("Please define an SQL connexion in the core configuration");
+        }
+    }
+
 	function _loadPluginConfig($pluginId, &$options){
 		$res_opts = dibi::query('SELECT * FROM [ajxp_plugin_configs] WHERE [id] = %s', $pluginId);
 		if (count($res_opts) > 0) {
