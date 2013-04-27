@@ -108,7 +108,7 @@
 					</processing>
 			</action>
 			<action name="clear_expired">
-				<gui text="ajxp_shared.25" title="ajxp_shared.26" src="edit_clear_history.png" accessKey="" hasAccessKey="false">
+				<gui text="ajxp_shared.25" title="ajxp_shared.26" iconClass="icon-time" src="edit_clear_history.png" accessKey="" hasAccessKey="false">
 					<context selection="true" dir="true" recycle="false"  behaviour="hidden"
 						actionBar="true" contextMenu="true" infoPanel="false"
 						actionBarGroup="change" inZip="false">

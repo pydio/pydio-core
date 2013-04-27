@@ -3,7 +3,7 @@
 	<actions>
 		<action name="ls" dirDefault="true">
 			<gui text="32" title="32" src="fileopen.png"
-				accessKey="folder_access_key">
+				accessKey="folder_access_key" iconClass="icon-folder-open-alt">
 				<context selection="true" dir="" recycle="false"
 					actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="false">
 				</context>
@@ -92,7 +92,7 @@
             </subMenu>
         </action>
 		<action name="create_user">
-			<gui text="297" title="298" src="yast_user_add.png" accessKey="create_user_accesskey" hasAccessKey="true">
+			<gui text="297" title="298" src="yast_user_add.png" iconClass="icon-user" accessKey="create_user_accesskey" hasAccessKey="true">
 				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
 					actionBar="false" contextMenu="false" infoPanel="false"
 					actionBarGroup="put" inZip="false">
@@ -147,7 +147,7 @@
 				</processing>
 		</action>
 		<action name="create_role">
-			<gui text="ajxp_conf.75" title="ajxp_conf.75" src="user_group_new.png" accessKey="ajxp_conf.role_access" hasAccessKey="true">
+			<gui text="ajxp_conf.75" title="ajxp_conf.75" iconClass="icon-th" src="user_group_new.png" accessKey="ajxp_conf.role_access" hasAccessKey="true">
 				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
 					actionBar="false" contextMenu="false" infoPanel="false"
 					actionBarGroup="put" inZip="false">
@@ -169,7 +169,7 @@
 			</processing>
 		</action>
 		<action name="create_group">
-			<gui text="ajxp_conf.118" title="ajxp_conf.118" src="user_group_new.png" accessKey="ajxp_conf.group_access" hasAccessKey="true">
+			<gui text="ajxp_conf.118" title="ajxp_conf.118" iconClass="icon-group" src="user_group_new.png" accessKey="ajxp_conf.group_access" hasAccessKey="true">
 				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
 					actionBar="false" contextMenu="false" infoPanel="false"
 					actionBarGroup="put" inZip="false">
@@ -206,7 +206,7 @@
             </processing>
 		</action>
 		<action name="create_repository">
-			<gui text="299" title="300" iconClass="icon-hdd" src="hdd_external_unmount.png" accessKey="ajxp_conf.repository_access_key" hasAccessKey="true">
+			<gui text="299" title="300" iconClass="icon-hdd" src="hdd_external_unmount.png" accessKey="ajxp_conf.repository_access_key" hasAccessKey="false">
 				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
 					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="put" inZip="false">
@@ -221,6 +221,7 @@
                         name:MessageHash['ajxp_conf.90'],
                         alt:MessageHash[300],
                         isDefault : true,
+                        icon_class:'icon-hdd',
                         image:resolveImageSource('images/actions/22/hdd_external_unmount.png', '',  22),
                         callback:function(e){
                             window.createRepoCmd = "repository";
@@ -233,6 +234,7 @@
                         name:MessageHash['ajxp_conf.91'],
                         alt:MessageHash['ajxp_conf.92'],
                         isDefault : false,
+                        icon_class:'icon-sitemap',
                         image:resolveImageSource('images/actions/22/hdd_external_mount.png', '',  22),
                         callback:function(e){
                             window.createRepoCmd = "template";
@@ -282,7 +284,7 @@
 				</processing>
 		</action>	
 		<action name="rename">
-			<gui text="6" title="158" src="applix.png" accessKey="rename_access_key" hasAccessKey="true">
+			<gui text="6" title="158" src="applix.png" iconClass="icon-pencil" accessKey="rename_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change" inZip="false">
@@ -348,7 +350,7 @@
 			</processing>
 		</action>
 		<action name="edit" fileDefault="true">
-			<gui text="ajxp_conf.93" title="301" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
+			<gui text="ajxp_conf.93" title="301" iconClass="icon-edit" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="get" inZip="false">
@@ -399,7 +401,7 @@
 			</processing>
 		</action>
 		<action name="delete">			
-			<gui text="7" title="161" src="editdelete.png" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
+			<gui text="7" title="161" src="editdelete.png" iconClass="icon-trash" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change" inZip="false">
@@ -480,13 +482,13 @@
 				</processing>
 		</action>		
 		<action name="copyAsText">			
-			<gui text="302" title="303" src="editcopy.png" accessKey="" hasAccessKey="false">
+			<gui text="302" title="303" iconClass="icon-copy" src="editcopy.png" accessKey="" hasAccessKey="false">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change" inZip="false">
 				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="false" allowedMimes="log,testResult"  image="false" editable="false"></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+				<selectionContext dir="false" file="true" recycle="false" unique="false" allowedMimes="log,testResult"  image="false" editable="false"/></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var onLoad = function(oForm){

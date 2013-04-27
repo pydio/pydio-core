@@ -20,7 +20,7 @@
  */
 $mess=array(
 "1" => "Données de configuration",
-"2" => "Utilisateurs",
+"2" => "Utilisateurs & Groupes",
 "3" => "Dépôts",
 "4" => "Journal",
 "5" => "Diagnostique",

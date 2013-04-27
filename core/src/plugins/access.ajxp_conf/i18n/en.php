@@ -20,7 +20,7 @@
  */
 $mess=array(
 "1" => "Configuration Data",
-"2" => "Users",
+"2" => "Users & Groups",
 "3" => "Workspaces",
 "4" => "Logs",
 "5" => "Diagnostic",
