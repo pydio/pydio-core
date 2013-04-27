@@ -33,6 +33,7 @@ class Writeability extends AbstractTest
     { 
     	//include(AJXP_CONF_PATH."/bootstrap_plugins.php");
     	$checks = array();
+        /*
     	if(isSet($PLUGINS["CONF_DRIVER"])){
     		$confDriver = $PLUGINS["CONF_DRIVER"];
     		if(isSet($confDriver["OPTIONS"]) && isSet($confDriver["OPTIONS"]["REPOSITORIES_FILEPATH"])){
@@ -52,8 +53,10 @@ class Writeability extends AbstractTest
     		if(isset($PLUGINS["LOG_DRIVER"]["OPTIONS"]) && isSet($PLUGINS["LOG_DRIVER"]["OPTIONS"]["LOG_PATH"])){
     			$checks[] = $PLUGINS["LOG_DRIVER"]["OPTIONS"]["LOG_PATH"];
     		}
-    	}    
+    	}
+        */
     	$checks[] = AJXP_CACHE_DIR;	
+    	$checks[] = AJXP_DATA_PATH;
     	$checked = array();
     	$success = true;
     	foreach ($checks as $check){
