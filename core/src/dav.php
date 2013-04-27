@@ -38,6 +38,8 @@ if(!ConfService::getCoreConf("WEBDAV_ENABLE")){
 $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
 
+AJXP_PluginsService::getInstance()->initActivePlugins();
+
 /**
  * @param string $className
  * @return void
