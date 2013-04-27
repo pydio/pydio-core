@@ -30,6 +30,10 @@ class AJXP_ClientDriver extends AJXP_Plugin
 {
     private static $loadedBookmarks;
 
+    public function isEnabled(){
+        return true;
+    }
+
     public function loadConfigs($configData){
         parent::loadConfigs($configData);
         if(preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT'])){
