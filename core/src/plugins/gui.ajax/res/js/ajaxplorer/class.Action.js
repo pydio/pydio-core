@@ -272,8 +272,7 @@ Class.create("Action", {
 			window.listenerContext = this;
 			this.options.listeners["selectionChange"].evalScripts();			
 		}
-		if(arguments.length < 1 
-			|| this.contextHidden 
+		if(this.contextHidden
 			|| !this.context.selection) {	
 			return;
 		}
@@ -618,8 +617,11 @@ Class.create("Action", {
 	 * Changes show/hide state
 	 */
 	showForContext: function(){
-		this.show();
-		this.contextHidden = false;
+        this.contextHidden = false;
+        this.show();
+        if(this.selectionContext){
+            this.fireSelectionChange();
+        }
 	},
 	
 	/**
