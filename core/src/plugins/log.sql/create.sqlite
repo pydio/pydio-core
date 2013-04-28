@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS ajxp_log (
+  id integer NOT NULL primary key autoincrement,
+  logdate datetime DEFAULT NULL,
+  remote_ip text DEFAULT NULL,
+  severity text DEFAULT NULL,
+  "user" text DEFAULT NULL,
+  message text DEFAULT NULL,
+  params text DEFAULT NULL
+);

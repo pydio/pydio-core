@@ -197,11 +197,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
 			// The repository supplied does not exist, so insert the right.
 			} else {
 	
-				dibi::query('INSERT INTO [ajxp_user_prefs]', Array(
-					'login' => $this->getId(),
-					'name' => $prefName,
-					'val' => $prefValue		
-				));
+				dibi::query('INSERT INTO [ajxp_user_prefs] ([login],[name],[val]) VALUES (%s, %s, %bin)', $this->getId(),$prefName,$prefValue);
 				
 				$this->log('INSERT PREFERENCE: [Login]: '.$this->getId().' [Preference]:'.$prefName.' [Value]:'.$prefValue);
 				$this->prefs[$prefName] = $prefValue;

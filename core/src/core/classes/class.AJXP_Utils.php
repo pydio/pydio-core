@@ -1520,7 +1520,7 @@ class AJXP_Utils
                 unset($params["group_switch_value"]);
             }
             foreach($params as $k => $v){
-                $params[array_pop(explode("_", $k, 2))] = $v;
+                $params[array_pop(explode("_", $k, 2))] = AJXP_VarsFilter::filter($v);
                 unset($params[$k]);
             }
         }
@@ -1529,23 +1529,45 @@ class AJXP_Utils
 
     public static function runCreateTablesQuery($p, $file){
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
-        dibi::connect($p);
-        $sql = file_get_contents($file);
-        $parts = explode("CREATE TABLE", $sql);
         $result = array();
-        foreach($parts as $createPart){
-            if(empty($createPart)) continue;
-            $sqlPart = trim("CREATE TABLE".$createPart);
-            try{
-                dibi::nativeQuery($sqlPart);
-                $resKey = str_replace("\n", "", substr($sqlPart, 0, 50))."...";
-                $result[] = "OK: $resKey executed successfully";
-            }catch (DibiException $e){
-                $result[] = "ERROR! $sqlPart failed";
+        if($p["driver"] == "sqlite" || $p["driver"] == "sqlite3"){
+            dibi::connect($p);
+            $file = dirname($file) ."/". str_replace(".sql", ".sqlite", basename($file) );
+            $sql = file_get_contents($file);
+            dibi::begin();
+            $parts = explode("CREATE TABLE", $sql);
+            foreach($parts as $createPart){
+                if(empty($createPart)) continue;
+                $sqlPart = trim("CREATE TABLE".$createPart);
+                try{
+                    dibi::nativeQuery($sqlPart);
+                    $resKey = str_replace("\n", "", substr($sqlPart, 0, 50))."...";
+                    $result[] = "OK: $resKey executed successfully";
+                }catch (DibiException $e){
+                    $result[] = "ERROR! $sqlPart failed";
+                }
             }
+            $message = implode("\n", $result);
+            dibi::commit();
+            dibi::disconnect();
+        }else{
+            dibi::connect($p);
+            $sql = file_get_contents($file);
+            $parts = explode("CREATE TABLE", $sql);
+            foreach($parts as $createPart){
+                if(empty($createPart)) continue;
+                $sqlPart = trim("CREATE TABLE".$createPart);
+                try{
+                    dibi::nativeQuery($sqlPart);
+                    $resKey = str_replace("\n", "", substr($sqlPart, 0, 50))."...";
+                    $result[] = "OK: $resKey executed successfully";
+                }catch (DibiException $e){
+                    $result[] = "ERROR! $sqlPart failed";
+                }
+            }
+            $message = implode("\n", $result);
+            dibi::disconnect();
         }
-        $message = implode("\n", $result);
-        dibi::disconnect();
         if(strpos($message, "ERROR!")) return $message;
         else return "SUCCESS:".$message;
 

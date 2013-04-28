@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS ajxp_feed (
   repository_id varchar(255) NOT NULL,
   user_group varchar(500) NOT NULL,
   repository_scope varchar(50) NOT NULL,
-  content longtext NOT NULL,
+  content longblob NOT NULL,
   PRIMARY KEY (id),
   KEY edate (edate,etype,htype,user_id,repository_id,repository_scope)
 )

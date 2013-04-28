@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS ajxp_feed (
+  id integer NOT NULL primary key autoincrement,
+  edate integer NOT NULL,
+  etype text NOT NULL,
+  htype text NOT NULL,
+  user_id text NOT NULL,
+  repository_id text NOT NULL,
+  user_group text NOT NULL,
+  repository_scope text NOT NULL,
+  content blob NOT NULL,
+  UNIQUE (edate,htype,user_id,repository_id,repository_scope)
+);

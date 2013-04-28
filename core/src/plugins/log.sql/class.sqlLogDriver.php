@@ -28,7 +28,13 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @subpackage Log
  */
 class sqlLogDriver extends AbstractLogDriver {
-	
+
+
+    /**
+     * @var Array
+     */
+    private $sqlDriver;
+
 	/**
 	 * Initialise the driver.
 	 *
@@ -64,7 +70,8 @@ class sqlLogDriver extends AbstractLogDriver {
 	 * @return String Date string formatted to fit a MySQL where condition.
 	 */
 	function toMysqlDateTime($unix_time) {
-		return date('Y-m-d G:i:s', $unix_time);
+		$t = date('Y-m-d G:i:s', $unix_time);
+        return $t;
 	}
 
 	/**
@@ -181,7 +188,15 @@ class sqlLogDriver extends AbstractLogDriver {
 	function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs") {
 
 		$xml_strings = array();
-		
+
+        if($this->sqlDriver["driver"] == "sqlite3"){
+            $yFunc = "strftime('%Y', [logdate])";
+            $mFunc = "strftime('%m', [logdate])";
+        }else{
+            $yFunc = "YEAR([logdate])";
+            $mFunc = "MONTH([logdate])";
+        }
+
 		try {
 			if ($month != null) { // Get days
 				
@@ -212,8 +227,8 @@ class sqlLogDriver extends AbstractLogDriver {
 				$year_end_time = mktime(0,0,0,1,1,$year+1);
 			
 				$q = 'SELECT 
-					DISTINCT YEAR([logdate]) AS year,
-					MONTH([logdate]) AS month 
+					DISTINCT '.$yFunc.' AS year,
+					'.$mFunc.' AS month
 					FROM [ajxp_log] 
 					WHERE [logdate] >= %s AND [logdate] < %s';
 				$result = dibi::query($q, $this->toMysqlDateTime($year_start_time), $this->toMysqlDateTime($year_end_time));
@@ -233,7 +248,7 @@ class sqlLogDriver extends AbstractLogDriver {
 						
 			} else { // Get years
 				$q = 'SELECT 
-					DISTINCT YEAR([logdate]) AS year 
+					DISTINCT '.$yFunc.' AS year
 					FROM [ajxp_log]';
 				$result = dibi::query($q);
 			
@@ -268,13 +283,9 @@ class sqlLogDriver extends AbstractLogDriver {
 		$end_time = mktime(0,0,0,date('m', $start_time), date('d', $start_time) + 1, date('Y', $start_time));
 		
 		try {
-			$q = 'SELECT 
-				*
-				FROM [ajxp_log]
-				WHERE [logdate] >= %d AND [logdate] < %d';
-			//dibi::test($q, $this->toMysqlDateTime($start_time), $this->toMysqlDateTime($end_time));
-			$result = dibi::query($q, $this->toMysqlDateTime($start_time), $this->toMysqlDateTime($end_time));
-		
+            $q = 'SELECT * FROM [ajxp_log] WHERE [logdate] >= %d AND [logdate] < %d';
+            $result = dibi::query($q, $this->toMysqlDateTime($start_time), $this->toMysqlDateTime($end_time));
+
 			$log_items = "";
 		
 			foreach ($result as $r) {

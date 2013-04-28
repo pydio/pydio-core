@@ -68,7 +68,7 @@ class sqlAuthDriver extends AbstractAuthDriver {
     }
     function getUsersCount(){
         $res = dibi::query("SELECT [login] FROM [ajxp_users]") ;
-        return $res->getRowCount();
+        return count($res->fetchAll()) > 0;
     }
 
 	function listUsers($baseGroup="/"){
@@ -85,7 +85,7 @@ class sqlAuthDriver extends AbstractAuthDriver {
 	
 	function userExists($login){
 		$res = dibi::query("SELECT * FROM [ajxp_users] WHERE [login]=%s", $login);
-		return($res->getRowCount());
+		return(count($res->fetchAll()) > 0);
 	}	
 	
 	function checkPassword($login, $pass, $seed){
@@ -114,6 +114,7 @@ class sqlAuthDriver extends AbstractAuthDriver {
 		}else{
 			$userData["password"] = $passwd;
 		}
+        $userData['groupPath'] = '';
 		dibi::query('INSERT INTO [ajxp_users]', $userData);
 	}	
 	function changePassword($login, $newPass){

@@ -68,7 +68,11 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         if($this->sqlDriver["password"] == "XXXX") return;
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
-        dibi::query("INSERT INTO [ajxp_feed]", $value);
+        try{
+            dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[user_group],[repository_scope],[content]) VALUES (%i,%s,%s,%s,%s,%s,%s,%bin)", time(), "event", "node.change", $userId, $repositoryId, $userGroup, ($repositoryScope !== false ? $repositoryScope : "ALL"), serialize($data));
+        }catch (DibiException $e){
+            AJXP_Logger::logAction("error", $e->getMessage());
+        }
     }
 
     /**

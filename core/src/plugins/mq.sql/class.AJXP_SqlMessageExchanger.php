@@ -236,7 +236,8 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
             "object_id" => $index,
             "serialized_data" => serialize($message)
         );
-        dibi::query("INSERT INTO [ajxp_simple_store]", $values);
+        dibi::query("INSERT INTO [ajxp_simple_store] ([object_id],[store_id],[serialized_data],[binary_data],[related_object_id]) VALUES (%s,%s,%bin,%bin,%s)",
+            $values["object_id"], $values["store_id"], $values["serialized_data"], $values["binary_data"], $values["related_object_id"]);
     }
 
     /**

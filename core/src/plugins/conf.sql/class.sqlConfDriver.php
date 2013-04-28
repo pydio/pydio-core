@@ -74,13 +74,11 @@ class sqlConfDriver extends AbstractConfDriver {
 
 	function _loadPluginConfig($pluginId, &$options){
 		$res_opts = dibi::query('SELECT * FROM [ajxp_plugin_configs] WHERE [id] = %s', $pluginId);
-		if (count($res_opts) > 0) {
-			$config_row = $res_opts->fetchPairs();
-			$confOpt = unserialize($config_row[$pluginId]);
-			if(is_array($confOpt)){
-				foreach($confOpt as $key => $value) $options[$key] = $value;
-			}
-		}
+        $config_row = $res_opts->fetchPairs();
+        $confOpt = unserialize($config_row[$pluginId]);
+        if(is_array($confOpt)){
+            foreach($confOpt as $key => $value) $options[$key] = $value;
+        }
 	}
 	
 	/**
@@ -90,7 +88,7 @@ class sqlConfDriver extends AbstractConfDriver {
 	 */
 	function _savePluginConfig($pluginId, $options){
 		$res_opts = dibi::query('SELECT * FROM [ajxp_plugin_configs] WHERE [id] = %s', $pluginId);
-		if(count($res_opts)){
+		if(count($res_opts->fetchAll())){
 			dibi::query('UPDATE [ajxp_plugin_configs] SET [configs] = %s WHERE [id] = %s', serialize($options), $pluginId);
 		}else{
 			dibi::query('INSERT INTO [ajxp_plugin_configs]', array('id' => $pluginId, 'configs' => serialize($options)));
@@ -224,8 +222,8 @@ class sqlConfDriver extends AbstractConfDriver {
 	function getRepositoryById($repositoryId){
 		$res = dibi::query('SELECT * FROM [ajxp_repo] WHERE [uuid] = %s', $repositoryId);
 		
-		if (count($res) > 0) {
-            $repo_row = $res->fetchAll();
+        $repo_row = $res->fetchAll();
+        if (count($repo_row) > 0) {
             $repo_row = $repo_row[0];
 			$res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
 			$opts = $res_opts->fetchPairs('name', 'val');
@@ -244,17 +242,17 @@ class sqlConfDriver extends AbstractConfDriver {
 	 */	
 	function getRepositoryByAlias($repositorySlug){
 		$res = dibi::query('SELECT * FROM [ajxp_repo] WHERE [slug] = %s', $repositorySlug);
-		
-		if (count($res) > 0) {
-            $repo_row = $res->fetchAll();
+
+        $repo_row = $res->fetchAll();
+        if (count($repo_row) > 0) {
             $repo_row = $repo_row[0];
             $res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
             $opts = $res_opts->fetchPairs('name', 'val');
-			$repository = $this->repoFromDb($repo_row, $opts);
-			return $repository;
-		}
-		
-		return null;		
+            $repository = $this->repoFromDb($repo_row, $opts);
+            return $repository;
+        }
+
+        return null;
 	}
 	
 	
@@ -277,13 +275,7 @@ class sqlConfDriver extends AbstractConfDriver {
                     if(!is_string($v)){
                         $v = '$phpserial$'.serialize($v);
                     }
-					dibi::query('INSERT INTO [ajxp_repo_options]', 
-						Array(
-							'uuid' => $repositoryObject->getUniqueId(),
-							'name' => $k,
-							'val' => $v
-						)
-					);
+					dibi::query('INSERT INTO [ajxp_repo_options] ([uuid],[name],[val]) VALUES (%s,%s,%bin)', $repositoryObject->getUniqueId(), $k,$v);
 				}
 				/*
 				//set maximum rights to the repositorie's creator jcg
@@ -302,13 +294,7 @@ class sqlConfDriver extends AbstractConfDriver {
                     if(!is_string($v)){
                         $v = '$phpserial$'.serialize($v);
                     }
-					dibi::query('INSERT INTO [ajxp_repo_options]', 
-						Array(
-							'uuid' => $repositoryObject->getUniqueId(),
-							'name' => $k,
-							'val' => $v
-						)
-					);
+					dibi::query('INSERT INTO [ajxp_repo_options] ([uuid],[name],[val]) VALUES (%s,%s,%bin)',$repositoryObject->getUniqueId(),$k,$v);
 				}
 			}
 		
@@ -479,7 +465,7 @@ class sqlConfDriver extends AbstractConfDriver {
 	
 	function countAdminUsers(){
 		$rows = dibi::query("SELECT [login] FROM ajxp_user_rights WHERE [repo_uuid] = %s AND [rights] = %s", "ajxp.admin", "1");
-		return count($rows);
+		return count($rows->fetchAll());
 	}
 
     /**
@@ -585,7 +571,8 @@ class sqlConfDriver extends AbstractConfDriver {
             throw new Exception("Unsupported format type ".$dataType);
         }
         dibi::query("DELETE FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id]=%s", $storeID, $dataID);
-        dibi::query("INSERT INTO [ajxp_simple_store]", $values);
+        dibi::query("INSERT INTO [ajxp_simple_store] ([object_id],[store_id],[serialized_data],[binary_data],[related_object_id]) VALUES (%s,%s,%bin,%bin,%s)",
+            $dataID, $storeID, $values["serialized_data"], $values["binary_data"], $values["related_object_id"]);
     }
 
     protected function simpleStoreClear($storeID, $dataID){
