@@ -319,20 +319,25 @@ Class.create("FormManager", {
                 }
 
             }
-			var div = new Element('div', {className:"SF_element" + (addFieldCheckbox?" SF_elementWithCheckbox":"")});
-            if(type == "hidden") div.setStyle({display:"none"});
-
+            var div;
             // INSERT LABEL
-            div.insert(new Element('div', {className:"SF_label"}).update(label+(mandatory?'*':'')+' :'));
-            // INSERT CHECKBOX
-            if(addFieldCheckbox){
-                cBox = '<input type="checkbox" class="SF_fieldCheckBox" name="SFCB_'+name+'" '+(defaultValue?'checked':'')+'/>';
-                cBox = new Element('input', {type:'checkbox', className:'SF_fieldCheckBox', name:'SFCB_'+name});
-                cBox.checked = defaultValue?true:false;
-                div.insert(cBox);
+            if(type != "legend"){
+                div = new Element('div', {className:"SF_element" + (addFieldCheckbox?" SF_elementWithCheckbox":"")});
+                if(type == "hidden") div.setStyle({display:"none"});
+
+                div.insert(new Element('div', {className:"SF_label"}).update(label+(mandatory?'*':'')+' :'));
+                // INSERT CHECKBOX
+                if(addFieldCheckbox){
+                    cBox = '<input type="checkbox" class="SF_fieldCheckBox" name="SFCB_'+name+'" '+(defaultValue?'checked':'')+'/>';
+                    cBox = new Element('input', {type:'checkbox', className:'SF_fieldCheckBox', name:'SFCB_'+name});
+                    cBox.checked = defaultValue?true:false;
+                    div.insert(cBox);
+                }
+                // INSERT ELEMENT
+                div.insert(element);
+            }else{
+                div = new Element('div', {className:'dialogLegend'}).update(desc);
             }
-            // INSERT ELEMENT
-            div.insert(element);
             if(type == "image"){
                 div.down("span.SF_image_link.image_update").observe("click", function(){
                     this.createUploadForm(form, div.down('img'), param);
@@ -341,7 +346,7 @@ Class.create("FormManager", {
                     this.confirmExistingImageDelete(form, div.down('img'), div.down('input[name="'+param.get("name")+'"]'), param);
                 }.bind(this));
             }
-			if(desc){
+			if(desc && type != "legend"){
 				modal.simpleTooltip(div.select('.SF_label')[0], '<div class="simple_tooltip_title">'+label+'</div>'+desc);
 			}
             if(json_list){
@@ -393,12 +398,14 @@ Class.create("FormManager", {
                 var ref = parseInt(form.getWidth()) + (Prototype.Browser.IE?40:0);
                 if(ref > (Prototype.Browser.IE?40:0)){
                     var lab = div.down('.SF_label');
-                    lab.setStyle({fontSize:'11px'});
-                    lab.setStyle({width:parseInt(39*ref/100)+'px'});
-                    if( parseInt(lab.getHeight()) > Math.round(parseFloat(lab.getStyle('lineHeight')) + Math.round(parseFloat(lab.getStyle('paddingTop'))) + Math.round(parseFloat(lab.getStyle('paddingBottom')))) ){
-                        lab.next().setStyle({marginTop:lab.getStyle('lineHeight')});
+                    if(lab){
+                        lab.setStyle({fontSize:'11px'});
+                        lab.setStyle({width:parseInt(39*ref/100)+'px'});
+                        if( parseInt(lab.getHeight()) > Math.round(parseFloat(lab.getStyle('lineHeight')) + Math.round(parseFloat(lab.getStyle('paddingTop'))) + Math.round(parseFloat(lab.getStyle('paddingBottom')))) ){
+                            lab.next().setStyle({marginTop:lab.getStyle('lineHeight')});
+                        }
+                        lab.setStyle({width:'39%'});
                     }
-                    lab.setStyle({width:'39%'});
                 }
                 gDiv.insert(div);
                 groupDivs.set(group, gDiv);

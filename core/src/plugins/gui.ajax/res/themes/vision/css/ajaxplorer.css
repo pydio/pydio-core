@@ -654,24 +654,37 @@ html.boxshadow div.errorMessage{
     box-shadow: 2px 2px 5px #AAAAAA;
 }
 
+
+div.accordion_toggle,
+div.dialogContentMainTitle{
+    color: rgb(117, 128, 139);
+    font-size: 20px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgb(117, 128, 139);
+    padding-bottom: 0;
+}
+
 div.accordion_toggle{
-    clear:left;
-    background-color: #B0C6D8;
-    padding: 2px 6px;
-    margin-top: 2px;
-    color: white;
-    font-weight: bold;
     cursor: pointer;
-    border-radius: 4px;
-    background-image: url('../images/0.gif');
+    background-image: url('../images/Tplus.png');
     background-repeat: no-repeat;
-    background-position: 5px 6px;
-    padding-left: 18px;
-    line-height:15px;
+    background-position-x: -6px;
+    background-position-y: -3px;
+    padding-left: 15px;
+    font-size: 16px;
+    margin-bottom: 0;
+    margin-top: 10px;
+    padding-bottom: 2px;
+}
+
+div.accordion_content div.dialogLegend{
+    text-align: justify;
+    opacity: 0.7;
+    color: rgb(117, 128, 139);
 }
 
 div.accordion_toggle_active{
-    background-image: url('../images/1.gif');
+    background-image: url('../images/Tminus.png');
 }
 
 
@@ -680,13 +693,6 @@ div.accordion_content{
     padding: 5px;
 }
 
-div.dialogContentMainTitle{
-    color: rgb(117, 128, 139);
-    font-size: 20px;
-    margin-bottom: 10px;
-    border-bottom: 1px solid rgb(117, 128, 139);
-    padding-bottom: 0;
-}
 
 div.oneFieldForm{
     margin-bottom: 13px;
