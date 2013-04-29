@@ -21,7 +21,12 @@ Class.create("AjxpInstaller", AjxpPane, {
 
     initialize: function($super, element, options){
         $super(element, options);
+        modal.setCloseValidation(function(){
+            return false;
+        });
         this.formManager = new FormManager();
+        this.formElement = this.htmlElement.down("#the_form");
+        this.formElement.ajxpPaneObject = this;
         this.initForm();
     },
 
@@ -30,24 +35,79 @@ Class.create("AjxpInstaller", AjxpPane, {
         params.set("get_action", "load_installer_form");
         var connexion = new Connexion();
         connexion.setParameters(params);
-        this.htmlElement.update('<div class="dialogLegend">This quick wizard will help you set up your AjaXplorer installation in a couple of minutes. Don\'t worry, you will be able to change all settings later while using the application.</div>');
         connexion.onComplete = function(transport){
             var params = this.formManager.parseParameters(transport.responseXML, "//global_param");
-            this.formManager.createParametersInputs(this.htmlElement,  params, true);
+            this.formManager.createParametersInputs(this.formElement,  params, true, false, false, false, false, true);
+            this.formElement.SF_accordion.observe("animation-finished", function(){
+                modal.refreshDialogPosition();
+            });
+            this.formElement.select("select").invoke("observe", "change", function(){
+                modal.refreshDialogPosition();
+            });
+            var observer = function(){
+                var passValidating = (this.formElement.down('input[name="ADMIN_USER_PASS"]').getValue() == this.formElement.down('input[name="ADMIN_USER_PASS2"]').getValue());
+                passValidating = passValidating && (this.formElement.down('input[name="ADMIN_USER_PASS"]').PROTOPASS.strength > 0);
+                if(!passValidating){
+                    this.formElement.down('input[name="ADMIN_USER_PASS"]').addClassName("SF_failed");
+                    this.formElement.down('input[name="ADMIN_USER_PASS2"]').addClassName("SF_failed");
+                }else{
+                    this.formElement.down('input[name="ADMIN_USER_PASS"]').removeClassName("SF_failed");
+                    this.formElement.down('input[name="ADMIN_USER_PASS2"]').removeClassName("SF_failed");
+                }
+
+                var missing = this.formManager.serializeParametersInputs(this.formElement, new Hash(), '', true);
+                missing = (missing > 0 || !this.formElement.down('select[name="STORAGE_TYPE"]').getValue() || !passValidating);
+
+                if(!missing){
+                    this.htmlElement.select('.SF_inlineButton').last().removeClassName("disabled");
+                }else{
+                    this.htmlElement.select('.SF_inlineButton').last().addClassName("disabled");
+                }
+            }.bind(this);
+            this.formManager.observeFormChanges(this.formElement, observer, 50);
+            this.formElement.select('select').invoke("observe", "change", function(){
+                this.formManager.observeFormChanges(this.formElement, observer, 50);
+            }.bind(this));
             this.updateAndBindButton(this.htmlElement.select('.SF_inlineButton').last());
+            this.bindPassword(this.formElement.down('input[name="ADMIN_USER_PASS"]').up('div.accordion_content'));
+            this.formElement.ajxpPaneObject.observe("after_replicate_row", function(newRow){
+                this.bindPassword(newRow);
+            }.bind(this));
+            this.htmlElement.down("#start_button").observe("click", function(){
+                this.htmlElement.down(".installerWelcome").update("Click on each section to edit parameters");
+                new Effect.Appear(this.formElement, {afterFinish : function(){
+                    this.formElement.SF_accordion.activate(this.formElement.down('.accordion_toggle'));
+                }.bind(this)});
+            }.bind(this));
         }.bind(this);
         connexion.sendAsync();
     },
 
+    bindPassword : function(contentDiv){
+        var passes = contentDiv.select('input[type="password"]');
+        var container = new Element("div", {className:'SF_element'});
+        passes[1].up('div.SF_element').insert({after:container});
+        var p = new Protopass(passes[0], {
+            barContainer:container,
+            barPosition:'bottom'
+        });
+        passes[0].PROTOPASS = p;
+    },
+
     updateAndBindButton : function(startButton){
         //startButton.removeClassName('SF_input').addClassName('largeButton');
-        startButton.setStyle({fontSize: '19px'});
         startButton.stopObserving("click");
         startButton.observe("click", function(){
+            if(startButton.hasClassName("disabled")) return;
             var conn = new Connexion();
             var params = new Hash({get_action: "apply_installer_form"});
-            this.formManager.serializeParametersInputs(this.htmlElement, params);
+            this.formManager.serializeParametersInputs(this.formElement, params);
             conn.setParameters(params);
+            conn.onComplete = function(transport){
+                if(transport.responseText == "OK"){
+                    document.location.reload(true);
+                }
+            };
             conn.sendAsync();
         }.bind(this));
     }

@@ -60,7 +60,7 @@ Class.create("FormManager", {
 		return paramsHash;
 	},
 	
-	createParametersInputs : function(form, parametersDefinitions, showTip, values, disabled, skipAccordion, addFieldCheckbox){
+	createParametersInputs : function(form, parametersDefinitions, showTip, values, disabled, skipAccordion, addFieldCheckbox, startAccordionClosed){
         var b=document.body;
         var groupDivs = $H({});
         var replicableGroups = $H({});
@@ -462,7 +462,7 @@ Class.create("FormManager", {
             },
             direction : 'vertical'
         });
-        form.SF_accordion.activate(form.down('div.accordion_toggle'));
+        if(!startAccordionClosed) form.SF_accordion.activate(form.down('div.accordion_toggle'));
         if(addFieldCheckbox){
             form.select("input.SF_fieldCheckBox").each(function(cb){
                 cb.observe("click", function(event){
@@ -706,6 +706,8 @@ Class.create("FormManager", {
 				if(form && Prototype.Browser.IE){form[newName] = input;}
                 if(values && values.get(newName)){
                     input.setValue(values.get(newName));
+                }else{
+                    input.setValue('');
                 }
 			});
 			templateRow.insert({after:tr});

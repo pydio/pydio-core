@@ -476,7 +476,8 @@ class AuthService
 			$adminUser->save("superuser");
 			$START_PARAMETERS["ALERT"] .= "There is an admin user, but without admin right. Now any user can have the administration rights, \\n your 'admin' user was set with the admin rights. Please check that this suits your security configuration.";
     	}
-        AJXP_Utils::setApplicationFirstRunPassed();
+        //register_shutdown_function(array("AJXP_Utils", "setApplicationFirstRunPassed"));
+
 	}
     /**
      * If the auth driver implementatino has a logout redirect URL, clear session and return it.

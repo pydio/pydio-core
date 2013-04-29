@@ -222,7 +222,9 @@ class BootConfLoader extends AbstractConfDriver {
             $newConfigPlugin->_savePluginConfig($pluginId, $options);
         }
 
+
         ConfService::setTmpStorageImplementations($newConfigPlugin, $newAuthPlugin);
+        require_once($newConfigPlugin->getUserClassFileName());
 
         $adminLogin = $data["ADMIN_USER_LOGIN"];
         $adminName = $data["ADMIN_USER_NAME"];
@@ -236,7 +238,7 @@ class BootConfLoader extends AbstractConfDriver {
 
         $loginP = "USER_LOGIN";
         $i = 0;
-        while(isSet($data[$loginP])){
+        while(isSet($data[$loginP]) && !empty($data[$loginP])){
             $pass  = $data[str_replace("_LOGIN", "_PASS",  $loginP)];
             $pass2 = $data[str_replace("_LOGIN", "_PASS2", $loginP)];
             $name  = $data[str_replace("_LOGIN", "_NAME",  $loginP)];
@@ -252,8 +254,13 @@ class BootConfLoader extends AbstractConfDriver {
 
 
 
-        session_regenerate_id(true);
-        // Create Users with new plugin
+        @unlink(AJXP_PLUGINS_CACHE_FILE);
+        @unlink(AJXP_PLUGINS_REQUIRES_FILE);
+        @unlink(AJXP_PLUGINS_MESSAGES_FILE);
+        AJXP_Utils::setApplicationFirstRunPassed();
+        session_destroy();
+
+        echo 'OK';
 
     }
 
@@ -272,7 +279,15 @@ class BootConfLoader extends AbstractConfDriver {
 
         }else if($action == "boot_test_mailer"){
 
-
+            $mailerPlug = AJXP_PluginsService::findPluginById("mailer.phpmailer-lite");
+            $mailerPlug->loadConfigs(array("MAILER" => $data["MAILER_ENABLE"]["MAILER_SYSTEM"]));
+            $mailerPlug->sendMail(
+                array($data["MAILER_ENABLE"]["MAILER_ADMIN"]),
+                "AjaXplorer Test Mail",
+                "Body of the test",
+                array($data["MAILER_ENABLE"]["MAILER_ADMIN"])
+            );
+            echo 'SUCCESS:Mail sent to the admin adress, please check it is in your inbox!';
 
         }
     }
