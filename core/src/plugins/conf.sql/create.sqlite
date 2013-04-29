@@ -52,7 +52,8 @@ CREATE TABLE IF NOT EXISTS ajxp_repo_options (
 
 CREATE TABLE IF NOT EXISTS ajxp_roles (
   role_id text NOT NULL,
-  serial_role text NOT NULL
+  serial_role blob NOT NULL,
+  searchable_repositories text
 );
 
 CREATE TABLE IF NOT EXISTS ajxp_groups (

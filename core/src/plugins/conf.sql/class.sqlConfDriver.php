@@ -28,7 +28,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class sqlConfDriver extends AbstractConfDriver {
 		
-	
+	var $sqlDriver = array();
+
 	/**
 	 * Initialise the driver.
 	 * 
@@ -317,7 +318,11 @@ class sqlConfDriver extends AbstractConfDriver {
 			$result_opts = dibi::query('DELETE FROM [ajxp_repo_options] WHERE [uuid] = %s', $repositoryId);
 			$result_opts_rights = dibi::query('DELETE FROM [ajxp_user_rights] WHERE [repo_uuid] = %s',$repositoryId); //jcg
 
-            $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [serial_role] LIKE %s GROUP BY [role_id]', '%"'.$repositoryId.'";s:%');
+            if($this->sqlDriver["driver"] == "sqlite3"){
+                $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %s GROUP BY [role_id]', '%"'.$repositoryId.'";s:%');
+            }else{
+                $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [serial_role] LIKE %s GROUP BY [role_id]', '%"'.$repositoryId.'";s:%');
+            }
             $all = $children_results->fetchAll();
             foreach ($all as $item){
                 $role = unserialize($item["serial_role"]);
@@ -362,7 +367,11 @@ class sqlConfDriver extends AbstractConfDriver {
             $result[$item["login"]] = $this->createUserObject($item["login"]);
         }
         // NEW METHOD : SEARCH PERSONAL ROLE
-        $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [serial_role] LIKE %s GROUP BY [role_id]', '%"'.$repositoryId.'";s:%');
+        if($this->sqlDriver["driver"] == "sqlite3"){
+            $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %s GROUP BY [role_id]', '%"'.$repositoryId.'";s:%');
+        }else{
+            $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [serial_role] LIKE %s GROUP BY [role_id]', '%"'.$repositoryId.'";s:%');
+        }
         $all = $children_results->fetchAll();
         foreach ($all as $item){
             $rId = $item["role_id"];
@@ -430,14 +439,23 @@ class sqlConfDriver extends AbstractConfDriver {
 		return $roles;
 		
 	}
-	
-	function saveRoles($roles){
+
+    /**
+     * @param AJXP_Role[] $roles
+     */
+    function saveRoles($roles){
 		dibi::query("DELETE FROM [ajxp_roles]");
 		foreach ($roles as $roleId => $roleObject){
-			dibi::query("INSERT INTO [ajxp_roles]", array(
-				'role_id' => $roleId, 
-				'serial_role' => serialize($roleObject))
-				);
+            if($this->sqlDriver["driver"] == "sqlite3"){
+                $repos = $roleObject->listAcls();
+                $repoString = serialize($repos);
+                dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories]) VALUES (%s, %bin, %s)", $roleId, serialize($roleObject), $repoString);
+            }else{
+                dibi::query("INSERT INTO [ajxp_roles]", array(
+                    'role_id' => $roleId,
+                    'serial_role' => serialize($roleObject))
+                    );
+            }
 		}
 	}
 
@@ -446,10 +464,16 @@ class sqlConfDriver extends AbstractConfDriver {
      */
     function updateRole($role, $userObject = null){
         dibi::query("DELETE FROM [ajxp_roles] WHERE [role_id]=%s", $role->getId());
-        dibi::query("INSERT INTO [ajxp_roles]", array(
-                'role_id' => $role->getId(),
-                'serial_role' => serialize($role))
-        );
+        if($this->sqlDriver["driver"] == "sqlite3"){
+            $repos = $role->listAcls();
+            $repoString = serialize($repos);
+            dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories]) VALUES (%s, %bin,%s)", $role->getId(), serialize($role), $repoString);
+        }else{
+            dibi::query("INSERT INTO [ajxp_roles]", array(
+                    'role_id' => $role->getId(),
+                    'serial_role' => serialize($role))
+            );
+        }
     }
 
     /**
