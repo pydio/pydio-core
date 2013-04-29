@@ -210,16 +210,18 @@ class BootConfLoader extends AbstractConfDriver {
             $newConfigPlugin->_savePluginConfig($pluginId, $options);
         }
 
-        foreach($sqlPlugs as $core => $value){
-            list($pluginId, $param) = explode("/",$core);
-            $options = array();
-            $newConfigPlugin->_loadPluginConfig($pluginId, $options);
-            $options[$param] = array(
-                "instance_name"=> $value,
-                "group_switch_value"=> $value,
-                "SQL_DRIVER"   => array("core_driver" => "core", "group_switch_value" => "core")
-            );
-            $newConfigPlugin->_savePluginConfig($pluginId, $options);
+        if(isSet($sqlPlugs)){
+            foreach($sqlPlugs as $core => $value){
+                list($pluginId, $param) = explode("/",$core);
+                $options = array();
+                $newConfigPlugin->_loadPluginConfig($pluginId, $options);
+                $options[$param] = array(
+                    "instance_name"=> $value,
+                    "group_switch_value"=> $value,
+                    "SQL_DRIVER"   => array("core_driver" => "core", "group_switch_value" => "core")
+                );
+                $newConfigPlugin->_savePluginConfig($pluginId, $options);
+            }
         }
 
 
