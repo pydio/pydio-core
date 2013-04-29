@@ -64,8 +64,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 			unset($this->actions["webdav_preferences"]);
 			$actionXpath=new DOMXPath($contribNode->ownerDocument);
 			$publicUrlNodeList = $actionXpath->query('action[@name="webdav_preferences"]', $contribNode);
-			$publicUrlNode = $publicUrlNodeList->item(0);
-			$contribNode->removeChild($publicUrlNode);			
+            if($publicUrlNodeList->length){
+                $publicUrlNode = $publicUrlNodeList->item(0);
+                $contribNode->removeChild($publicUrlNode);
+            }
 		}
 
         // PERSONAL INFORMATIONS
@@ -96,13 +98,17 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 			unset($this->actions["user_create_repository"]);
 			$actionXpath=new DOMXPath($contribNode->ownerDocument);
 			$publicUrlNodeList = $actionXpath->query('action[@name="user_create_repository"]', $contribNode);
-			$publicUrlNode = $publicUrlNodeList->item(0);
-			$contribNode->removeChild($publicUrlNode);
+            if($publicUrlNodeList->length){
+                $publicUrlNode = $publicUrlNodeList->item(0);
+                $contribNode->removeChild($publicUrlNode);
+            }
 			unset($this->actions["user_delete_repository"]);
 			$actionXpath=new DOMXPath($contribNode->ownerDocument);
 			$publicUrlNodeList = $actionXpath->query('action[@name="user_delete_repository"]', $contribNode);
-			$publicUrlNode = $publicUrlNodeList->item(0);
-			$contribNode->removeChild($publicUrlNode);
+            if($publicUrlNodeList->length){
+                $publicUrlNode = $publicUrlNodeList->item(0);
+                $contribNode->removeChild($publicUrlNode);
+            }
 		}
 
 	}

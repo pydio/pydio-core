@@ -637,14 +637,14 @@
         <xs:complexType>
             <xs:attribute name="choices"/>
             <xs:attribute name="default"/>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+            <xs:attribute name="type" use="required" type="xs:Name"/>
+            <xs:attribute name="label" use="required"/>
             <xs:attribute name="description" use="required"/>
             <xs:attribute name="expose" type="xs:boolean"/>
             <xs:attribute name="group"/>
             <xs:attribute name="replicationGroup"/>
-            <xs:attribute name="label" use="required"/>
             <xs:attribute name="mandatory" type="xs:boolean"/>
-            <xs:attribute name="name" use="required" type="xs:NCName"/>
-            <xs:attribute name="type" use="required" type="xs:Name"/>
             <xs:attribute name="scope"/>
             <xs:attribute name="repoScope"/>
             <xs:attribute name="editable" type="xs:boolean" use="optional"/>

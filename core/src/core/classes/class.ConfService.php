@@ -166,13 +166,32 @@ class ConfService
 	public static function backgroundActionsSupported(){
 		return function_exists("mcrypt_create_iv") && ConfService::getCoreConf("CMDLINE_ACTIVE");
 	}
-	
+
+    /**
+     * @var AbstractConfDriver
+     */
+    private static $tmpConfStorageImpl;
+    /**
+     * @var AbstractAuthDriver
+     */
+    private static $tmpAuthStorageImpl;
+
+    /**
+     * @param $confStorage AbstractConfDriver
+     * @param $authStorage AbstractAuthDriver
+     */
+    public static function setTmpStorageImplementations($confStorage, $authStorage){
+        self::$tmpConfStorageImpl = $confStorage;
+        self::$tmpAuthStorageImpl = $authStorage;
+    }
+
 	/**
 	 * Get conf driver implementation
 	 *
 	 * @return AbstractConfDriver
 	 */
 	public static function getConfStorageImpl(){
+        if(isSet(self::$tmpConfStorageImpl)) return self::$tmpConfStorageImpl;
 		return AJXP_PluginsService::getInstance()->getPluginById("core.conf")->getConfImpl();
 	}
 
@@ -182,6 +201,7 @@ class ConfService
 	 * @return AbstractAuthDriver
 	 */
 	public static function getAuthDriverImpl(){
+        if(isSet(self::$tmpAuthStorageImpl)) return self::$tmpAuthStorageImpl;
         return AJXP_PluginsService::getInstance()->getPluginById("core.auth")->getAuthImpl();
 	}
 

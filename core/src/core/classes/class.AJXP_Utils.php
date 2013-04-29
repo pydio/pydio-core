@@ -172,6 +172,14 @@ class AJXP_Utils
         return realpath(sys_get_temp_dir());
     }
 
+    public static function detectApplicationFirstRun(){
+        return !file_exists(AJXP_CACHE_DIR."/admin_counted");
+    }
+
+    public static function setApplicationFirstRunPassed(){
+        @file_put_contents(AJXP_CACHE_DIR."/admin_counted", "true");
+    }
+
     /**
      * Parse a Comma-Separated-Line value
      * @static
@@ -1227,7 +1235,7 @@ class AJXP_Utils
      * @param string $format
      * @throws Exception
      */
-    static function saveSerialFile($filePath, $value, $createDir = true, $silent = false, $format="ser")
+    static function saveSerialFile($filePath, $value, $createDir = true, $silent = false, $format="ser", $jsonPrettyPrint = false)
     {
         $filePath = AJXP_VarsFilter::filter($filePath);
         if ($createDir && !is_dir(dirname($filePath))){
@@ -1241,7 +1249,10 @@ class AJXP_Utils
         try {
             $fp = fopen($filePath, "w");
             if($format == "ser") $content = serialize($value);
-            else if($format == "json") $content = json_encode($value);
+            else if($format == "json") {
+                $content = json_encode($value);
+                if($jsonPrettyPrint) $content = self::prettyPrintJSON($content);
+            }
             fwrite($fp, $content);
             fclose($fp);
         } catch (Exception $e) {

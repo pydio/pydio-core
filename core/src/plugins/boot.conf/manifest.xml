@@ -1,5 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin label="CONF_MESSAGE[]" description="CONF_MESSAGE[]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition classname="BootConfLoader" filename="plugins/boot.conf/class.BootConfLoader.php"/>
+             xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd" mixins="dibidriver_provider" id="boot.conf">
+    <class_definition classname="BootConfLoader" filename="plugins/boot.conf/class.BootConfLoader.php" />
+    <server_settings>
+        <global_param name="StorageLegend" group="1. Storage Type" type="legend" label="" description="Select how the application configuration data will be stored (users, plugins configurations, etc. This does not concern how your actual documents are managed). For a small amount of users and to get started rapidly, select No Database. To enable more advanced features, configure a database connexion."/>
+        <global_param group="1. Storage Type" name="STORAGE_TYPE" type="group_switch:storage_type" label="Storage Type" description="Select how the configurations will be stored." default="serial" mandatory="true"/>
+        <global_param group_switch_name="storage_type" group_switch_label="No Database (Quick Start)" group_switch_value="serial" name="type" default="serial" label="No Database" description="h" type="hidden" mandatory="true"/>
+        <global_param group_switch_name="storage_type" group_switch_label="Database (Requires MySQL or SQLite)" group_switch_value="db" name="type" default="db" label="Database" description="Driver type (do not touch)" type="hidden" mandatory="true"/>
+        <global_param group_switch_name="storage_type" group_switch_label="Enable Notifications" group_switch_value="db" name="notifications" default="true" label="Enable Notifications" description="Log all events and alerts" type="boolean" mandatory="false"/>
+        <global_param group_switch_name="storage_type" group_switch_label="Database" group_switch_value="db" name="db_type" default="mysql" label="Database" description="Driver type (do not touch)" type="group_switch:dibi_provider" mandatory="true" choices="mysql|MySQL,sqlite3|Sqlite 3"/>
+        <global_param group_switch_name="storage_type" group_switch_label="Database" group_switch_value="db" type="button" name="TEST_SQL" choices="boot_test_sql_connexion" label="CONF_MESSAGE[Test SQL Connexion]" description="CONF_MESSAGE[Try connecting to the database]" mandatory="false"/>
+        <global_param group="2. System Options" name="APPLICATION_TITLE" type="string" label="Application Title" description="Your system title" default="AjaXplorer" mandatory="false"/>
+        <global_param group="2. System Options" name="APPLICATION_LANGUAGE" type="select" choices="AJXP_AVAILABLE_LANGUAGES" label="Default Language" description="Select a language activated by default( users will still be able to switch)" default="en" mandatory="true"/>
+        <global_param group="2. System Options" name="MAILER_ENABLE" type="group_switch:mailer" label="Enable emails" description="Set up system to send emails" default="no" mandatory="true"/>
+        <global_param group_switch_name="mailer" group_switch_value="no" group_switch_label="No (you can enable mails later)" name="status" type="hidden" label="No" description="s" default="no"/>
+        <global_param group_switch_name="mailer" group_switch_value="yes" group_switch_label="Yes (requires a correct PHP configuration)" name="status" type="hidden" label="Yes" description="s" default="yes"/>
+        <global_param group_switch_name="mailer" group_switch_value="yes" group_switch_label="Yes" name="MAILER_SYSTEM" type="select" label="Php Mailer" description="Set up the correct value to send emails" choices="mail|Mail,sendmail|Sendmail" default="mail" mandatory="true"/>
+        <global_param group_switch_name="mailer" group_switch_value="yes" group_switch_label="Yes" name="MAILER_ADMIN" type="string" label="Administrator Email" description="Default 'From' email used to send emails." mandatory="true"/>
+        <global_param group_switch_name="mailer" group_switch_label="yes" group_switch_value="yes" type="button" name="TEST_MAILER" choices="boot_test_mailer" label="CONF_MESSAGE[Test Mailer]" description="CONF_MESSAGE[Try sending an email with the configured data]" mandatory="false"/>
+        <global_param group="3. Users" name="ADMIN_USER_LOGIN" type="string" label="Admin Login" description="Alphanumeric login" mandatory="true"/>
+        <global_param group="3. Users" name="ADMIN_USER_NAME" type="string" label="Admin Display Name" description="User-friendly name of the user" mandatory="true"/>
+        <global_param group="3. Users" name="ADMIN_USER_PASS" type="password" label="Admin Password" description="Password" mandatory="true"/>
+        <global_param group="3. Users" name="ADMIN_USER_PASS2" type="password" label="Confirm" description="Confirm password" mandatory="true"/>
+        <global_param group="3. Users" name="USER_LOGIN" type="string" label="Login" replicationGroup="users" description="Alphanumeric login"/>
+        <global_param group="3. Users" name="USER_MAIL" type="string" label="User Email" replicationGroup="users" description="User-friendly name of the user"/>
+        <global_param group="3. Users" name="USER_NAME" type="string" label="User Name" replicationGroup="users" description="User-friendly name of the user"/>
+        <global_param group="3. Users" name="USER_PASS" type="password" label="Password" replicationGroup="users" description="Password"/>
+        <global_param group="3. Users" name="USER_PASS2" type="password" label="Confirm" replicationGroup="users" description="Confirm password"/>
+        <global_param group="4. Start installation" type="button" name="START_INSTALL" choices="" label="CONF_MESSAGE[Ready to start the installation?]" description="CONF_MESSAGE[Install AjaXplorer Now!]" mandatory="false"/>
+    </server_settings>
+    <registry_contributions>
+        <actions>
+            <action name="load_installer_form">
+                <processing><serverCallback methodName="loadInstallerForm"/></processing>
+            </action>
+            <action name="boot_test_sql_connexion">
+                <processing><serverCallback methodName="testConnexions"/></processing>
+            </action>
+            <action name="boot_test_sql_connexion">
+                <processing><serverCallback methodName="testConnexions"/></processing>
+            </action>
+            <action name="apply_installer_form">
+                <processing><serverCallback methodName="applyInstallerForm"/></processing>
+            </action>
+            <action name="ajxp_installer">
+                <gui iconClass="icon-cog" src="" text="1" title="2">
+                    <context dir="" recycle="false" selection="false" actionBar="true" actionBarGroup="user"/>
+                </gui>
+                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="false" write="false"/>
+                <processing>
+                    <clientCallback dialogOpenForm="installer_form" dialogSkipButtons="true" prepareModal="true">
+                        <dialogOnOpen><![CDATA[
+                            ResourcesManager.prototype.loadJSResource('plugins/boot.conf/class.AjxpInstaller.js', 'AjxpInstaller');
+                            var installer = new AjxpInstaller(modal.getForm().down('#installer_form'), {});
+                        ]]></dialogOnOpen>
+                        <dialogOnComplete><![CDATA[
+
+                        ]]></dialogOnComplete>
+                    </clientCallback>
+                    <clientForm id="installer_form"><![CDATA[
+                        <div id="installer_form" box_padding="0" box_resize="true" box_width="460" overlayStyle='{"backgroundColor":"white","opacity":10,"backgroundImage":"url(\"AJXP_THEME_FOLDER/images/grid_t.png\")"}' style="padding: 10px; padding-bottom:40px; overflow:auto; background-color: white;"></div>
+                    ]]></clientForm>
+                    <clientListener name="init"><![CDATA[
+                        ajaxplorer.actionBar.fireAction("ajxp_installer");
+                    ]]></clientListener>
+                </processing>
+            </action>
+        </actions>
+    </registry_contributions>
 </ajxp_plugin>
