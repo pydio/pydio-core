@@ -126,6 +126,12 @@ class BootConfLoader extends AbstractConfDriver {
         if($storageType == "db"){
             // REWRITE BOOTSTRAP.JSON
             $coreConf["DIBI_PRECONFIGURATION"] = $data["STORAGE_TYPE"]["db_type"];
+            if(isSet($coreConf["DIBI_PRECONFIGURATION"]["sqlite3_driver"])){
+                $dbFile = AJXP_VarsFilter::filter($coreConf["DIBI_PRECONFIGURATION"]["sqlite3_database"]);
+                if(!file_exists(dirname($dbFile))){
+                    mkdir(dirname($dbFile), 0755, true);
+                }
+            }
             $coreConf["UNIQUE_INSTANCE_CONFIG"] = array_merge($coreConf["UNIQUE_INSTANCE_CONFIG"], array(
                 "instance_name"=> "conf.sql",
                 "group_switch_value"=> "conf.sql",
@@ -273,6 +279,13 @@ class BootConfLoader extends AbstractConfDriver {
         if($action == "boot_test_sql_connexion"){
 
             $p = AJXP_Utils::cleanDibiDriverParameters($data["STORAGE_TYPE"]["db_type"]);
+            if($p["driver"] == "sqlite3"){
+                $dbFile = AJXP_VarsFilter::filter($p["database"]);
+                if(!file_exists(dirname($dbFile))){
+                    mkdir(dirname($dbFile), 0755, true);
+                }
+            }
+
             require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
             // Should throw an exception if there was a problem.
             dibi::connect($p);
