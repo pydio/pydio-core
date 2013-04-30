@@ -155,6 +155,13 @@ class webdavAccessWrapper extends fsAccessWrapper {
 		}
 		return $this->dH !== false;
 	}
+// filename encoding fix
+	public function dir_readdir (){
+		$x = parent::dir_readdir();
+		if ( strstr( $x, '%') !== false) $x = urldecode( $x);
+		return( $x);
+	}
+// filename encoding fix /
 
 	
 	// DUPBLICATE STATIC FUNCTIONS TO BE SURE 
@@ -176,19 +183,16 @@ class webdavAccessWrapper extends fsAccessWrapper {
 	}
 
 	public static function getRealFSReference($path, $persistent = false){
-		$contextOpened =false;
-		if(self::$crtZip != null){
-			$contextOpened = true;
-			$crtZip = self::$crtZip;
-			self::$crtZip = null;
-		}
-		$realPath = self::initPath($path, "file");
-		if(!$contextOpened) {
-			self::closeWrapper();
-		}else{
-			self::$crtZip = $crtZip;
-		}
-		return $realPath;
+	    if ( $persistent) {
+    	$tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time());
+    	$tmpHandle = fopen($tmpFile, "wb");
+    	self::copyFileInStream($path, $tmpHandle);
+    	fclose($tmpHandle);
+    	return $tmpFile;
+    	    } else {
+    	$realPath = self::initPath($path, "file");
+    	return $realPath;
+    	    }
 	}
 
 	
