@@ -504,7 +504,7 @@ Class.create("HeaderResizer", {
 	getInnerWidth : function(){
 		var leftWidth = parseInt(this.element.getStyle('borderLeftWidth')) || 0;
 		var rightWidth = parseInt(this.element.getStyle('borderRightWidth')) || 0;
-		return innerWidth = this.element.getWidth() - leftWidth - rightWidth ;
+		return this.element.getWidth() - leftWidth - rightWidth ;
 	},
 	
 	/**
