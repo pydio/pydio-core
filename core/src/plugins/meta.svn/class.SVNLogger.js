@@ -81,7 +81,8 @@ initialize:function(form){
                 columnsTemplate:"svnlog_file",
                 selectable: false,
                 draggable: false,
-                replaceScroller:true
+                replaceScroller:true,
+                displayMode: "list"
             });
         }else{
             this.filesList = new FilesList(this.element, {
@@ -96,7 +97,8 @@ initialize:function(form){
                 columnsTemplate:"svnlog_folder",
                 selectable: false,
                 draggable: false,
-                replaceScroller:true
+                replaceScroller:true,
+                displayMode: "list"
             });
         }
 

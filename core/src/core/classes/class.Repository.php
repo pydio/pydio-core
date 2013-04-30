@@ -126,6 +126,10 @@ class Repository implements AjxpGroupPathProvider {
 		$this->uuid = md5(microtime());
 		$this->slug = AJXP_Utils::slugify($display);
         $this->inferOptionsFromParent = false;
+        $this->options["CREATION_TIME"] = time();
+        if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null){
+            $this->options["CREATION_USER"] = AuthService::getLoggedUser()->getId();
+        }
 	}
 
 	/**
@@ -491,15 +495,25 @@ class Repository implements AjxpGroupPathProvider {
      * @return String
      */
     public function getDescription (){
-        if(isset($this->options["USER_DESCRIPTION"])){
+        $m = ConfService::getMessages();
+        if(isset($this->options["USER_DESCRIPTION"]) && !empty($this->options["USER_DESCRIPTION"])){
             return $this->options["USER_DESCRIPTION"];
-        }else{
-
-            $s = "Access type is ". $this->getAccessType();
-            if(isSet($this->parentId) && isset($this->owner)){
-                $s = "Shared by ".$this->owner;
+        }if(isSet($this->parentId) && isset($this->owner)){
+            if(isSet($this->options["CREATION_TIME"])){
+                $date = AJXP_Utils::relativeDate($this->options["CREATION_TIME"], $m);
+                return str_replace(array("%date", "%user"), array($date, $this->owner), $m["473"]);
+            }else{
+                return str_replace(array("%user"), array($this->owner), $m["472"]);
             }
-            return $s ;
+        }else if($this->isWriteable() && isSet($this->options["CREATION_TIME"])){
+            $date = AJXP_Utils::relativeDate($this->options["CREATION_TIME"], $m);
+            if(isSet($this->options["CREATION_USER"])){
+                return str_replace(array("%date", "%user"), array($date, $this->options["CREATION_USER"]), $m["471"]);
+            }else{
+                return str_replace(array("%date"), array($date), $m["470"]);
+            }
+        }else{
+            return $m["474"];
         }
     }
 

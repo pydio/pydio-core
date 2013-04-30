@@ -525,5 +525,10 @@ $mess=array(
 "467" => "Tous les éléments partagés",
 "468" => "Mes Workspaces",
 "469" => "Partagés avec moi",
+"470" => "Créé %date",
+"471" => "Créé par %user %date",
+"472" => "Partagé par %user",
+"473" => "Partagé par %user %date",
+"474" => "Pas de description",
 /* END SENTENCE */
 );

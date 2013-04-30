@@ -524,6 +524,11 @@ $mess=array(
 "467" => "All Shared Elements",
 "468" => "My Workspaces",
 "469" => "Shared with me",
+"470" => "Created %date",
+"471" => "Created by %user %date",
+"472" => "Shared by %user",
+"473" => "Shared by %user %date",
+"474" => "No description available",
 /* END SENTENCE */
 /* END SENTENCE */
 );
