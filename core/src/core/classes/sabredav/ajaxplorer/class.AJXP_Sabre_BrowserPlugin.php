@@ -58,7 +58,6 @@ class AJXP_Sabre_BrowserPlugin extends Sabre\DAV\Browser\Plugin
         if($name != "favicon.ico") {
             return parent::getLocalAssetPath($name);
         }
-        AJXP_Logger::debug("THEME FOLDER name $name");
         return AJXP_INSTALL_PATH."/plugins/gui.ajax/res/themes/umbra/images/html-folder.png";
     }
 

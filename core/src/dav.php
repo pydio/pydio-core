@@ -97,8 +97,12 @@ if((!empty($end) || $end ==="0") && $end[0] != "?"){
 
 }
 
-
-$authBackend = new AJXP_Sabre_AuthBackend($rId);
+if((AJXP_Sabre_AuthBackendBasic::detectBasicHeader() || ConfService::getCoreConf("WEBDAV_FORCE_BASIC"))
+    && ConfService::getAuthDriverImpl()->getOption("TRANSMIT_CLEAR_PASS")){
+    $authBackend = new AJXP_Sabre_AuthBackendBasic($rId);
+}else{
+    $authBackend = new AJXP_Sabre_AuthBackendDigest($rId);
+}
 $authPlugin = new Sabre\DAV\Auth\Plugin($authBackend, ConfService::getCoreConf("WEBDAV_DIGESTREALM"));
 $server->addPlugin($authPlugin);
 
@@ -119,5 +123,8 @@ if(ConfService::getCoreConf("WEBDAV_BROWSER_LISTING")){
     $server->addPlugin($browerPlugin);
     $server->addPlugin($extPlugin);
 }
-
-$server->exec();
+try{
+    $server->exec();
+}catch ( Exception $e ){
+    AJXP_Logger::logAction("error:".$e->getMessage());
+}

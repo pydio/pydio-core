@@ -68,7 +68,7 @@ class AJXP_Sabre_Collection extends AJXP_Sabre_Node implements Sabre\DAV\ICollec
 
                 $p = $this->path."/".$name;
                 $this->getAccessDriver()->nodeWillChange($p, intval($_SERVER["CONTENT_LENGTH"]));
-                AJXP_Logger::debug("Should now copy stream or string in ".$this->getUrl()."/".$name);
+                //AJXP_Logger::debug("Should now copy stream or string in ".$this->getUrl()."/".$name);
                 if(is_resource($data)){
                     $stream = fopen($this->getUrl()."/".$name, "w");
                     stream_copy_to_stream($data, $stream);

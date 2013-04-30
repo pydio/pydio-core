@@ -24,7 +24,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer
  * @subpackage SabreDav
  */
-class AJXP_Sabre_AuthBackend extends Sabre\DAV\Auth\Backend\AbstractDigest{
+class AJXP_Sabre_AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest{
 
     protected $currentUser;
     private  $secretKey;
@@ -41,7 +41,6 @@ class AJXP_Sabre_AuthBackend extends Sabre\DAV\Auth\Backend\AbstractDigest{
 
     public function getDigestHash($realm, $username){
         if(!AuthService::userExists($username)){
-            AJXP_Logger::debug("not exists! ".$username);
             return false;
         }
         $confDriver = ConfService::getConfStorageImpl();

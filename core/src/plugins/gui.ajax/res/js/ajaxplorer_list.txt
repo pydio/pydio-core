@@ -62,3 +62,4 @@ js/ajaxplorer/class.FormManager.js
 js/ajaxplorer/class.MultiDownloader.js
 js/ajaxplorer/class.ActivityMonitor.js
 js/ajaxplorer/class.Ajaxplorer.js
+../../meta.git/class.HistoryBrowser.js

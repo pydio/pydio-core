@@ -360,6 +360,9 @@ Class.create("ActionsToolbar", {
         }
 		button.hide();
 		this.attachListeners(button, action);
+        if(!this.registeredButtons){
+            this.registeredButtons = $A();
+        }
         this.registeredButtons.push(button);
 		return button;
 		

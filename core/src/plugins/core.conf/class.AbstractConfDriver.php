@@ -645,6 +645,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 					"webdav_active"  => $webdavActive,
 					"password_set"   => $passSet,
                     "digest_set"    => $digestSet,
+                    "webdav_force_basic" => (ConfService::getCoreConf("WEBDAV_FORCE_BASIC") === true),
 					"webdav_base_url"  => $webdavBaseUrl, 
 					"webdav_repositories" => $davRepos
 				);
