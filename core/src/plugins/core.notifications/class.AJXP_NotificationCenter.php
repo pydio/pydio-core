@@ -90,8 +90,9 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         $repository = ConfService::getRepositoryById($repoId);
         $repositoryScope = $repository->securityScope();
         $repositoryScope = ($repositoryScope !== false ? $repositoryScope : "ALL");
+        $repositoryOwner = $repository->hasOwner() ? $repository->getOwner() : null;
 
-        $this->eventStore->persistEvent("node.change", func_get_args(), $repoId, $repositoryScope, $userId, $userGroup);
+        $this->eventStore->persistEvent("node.change", func_get_args(), $repoId, $repositoryScope, $repositoryOwner, $userId, $userGroup);
 
     }
 

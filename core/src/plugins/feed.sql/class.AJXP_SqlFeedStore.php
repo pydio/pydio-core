@@ -49,27 +49,18 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
      * @param mixed $data
      * @param string $repositoryId
      * @param string $repositoryScope
+     * @param string $repositoryOwner
      * @param string $userId
      * @param string $userGroup
      * @return void
      */
-    public function persistEvent($hookName, $data, $repositoryId, $repositoryScope, $userId, $userGroup)
+    public function persistEvent($hookName, $data, $repositoryId, $repositoryScope, $repositoryOwner, $userId, $userGroup)
     {
-        $value = array(
-            "edate" => time(),
-            "etype"  => "event",
-            "htype"  => "node.change",
-            "user_id" => $userId,
-            "repository_id" => $repositoryId,
-            "user_group" => $userGroup,
-            "repository_scope" => ($repositoryScope !== false ? $repositoryScope : "ALL"),
-            "content" => serialize($data)
-        );
         if($this->sqlDriver["password"] == "XXXX") return;
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         try{
-            dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[user_group],[repository_scope],[content]) VALUES (%i,%s,%s,%s,%s,%s,%s,%bin)", time(), "event", "node.change", $userId, $repositoryId, $userGroup, ($repositoryScope !== false ? $repositoryScope : "ALL"), serialize($data));
+            dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[repository_owner],[user_group],[repository_scope],[content]) VALUES (%i,%s,%s,%s,%s,%s,%s,%s,%bin)", time(), "event", "node.change", $userId, $repositoryId, $repositoryOwner, $userGroup, ($repositoryScope !== false ? $repositoryScope : "ALL"), serialize($data));
         }catch (DibiException $e){
             AJXP_Logger::logAction("error", $e->getMessage());
         }
@@ -88,7 +79,14 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         if($this->sqlDriver["password"] == "XXXX") return array();
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
-        $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND [repository_id] IN (%s) AND ([repository_scope] = 'ALL' OR  ([repository_scope] = 'USER' AND [user_id] = %s  ) OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )) ORDER BY [edate] DESC LIMIT $offset,$limit ", "event", $filterByRepositories, $userId, $userGroup);
+        $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND
+            ( [repository_id] IN (%s) OR [repository_owner] = %s )
+            AND (
+                [repository_scope] = 'ALL'
+                OR  ([repository_scope] = 'USER' AND [user_id] = %s  )
+                OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )
+            )
+            ORDER BY [edate] DESC LIMIT $offset,$limit ", "event", $filterByRepositories, $userId, $userId, $userGroup);
         $data = array();
         foreach($res as $n => $row){
             $object = new stdClass();
@@ -111,18 +109,11 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         if(!$notif->getNode()) return;
         $repositoryId = $notif->getNode()->getRepositoryId();
         $userId = $notif->getTarget();
-        $value = array(
-            "edate" => time(),
-            "etype"  => "alert",
-            "htype"  => "notification",
-            "user_id" => $userId,
-            "repository_id" => $repositoryId,
-            "content" => serialize($notif)
-        );
         if($this->sqlDriver["password"] == "XXXX") return;
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
-        dibi::query("INSERT INTO [ajxp_feed]", $value);
+        dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[content]) VALUES (%i,%s,%s,%s,%s,%bin)",
+            time(), "alert", "notification", $userId, $repositoryId, serialize($notif));
     }
 
     /**

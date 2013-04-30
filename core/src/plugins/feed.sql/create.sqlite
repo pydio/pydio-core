@@ -5,8 +5,9 @@ CREATE TABLE IF NOT EXISTS ajxp_feed (
   htype text NOT NULL,
   user_id text NOT NULL,
   repository_id text NOT NULL,
-  user_group text NOT NULL,
-  repository_scope text NOT NULL,
+  user_group text,
+  repository_scope text,
+  repository_owner text,
   content blob NOT NULL,
-  UNIQUE (edate,htype,user_id,repository_id,repository_scope)
+  UNIQUE (edate,htype,user_id,repository_id)
 );

@@ -33,11 +33,12 @@ interface AJXP_FeedStore{
      * @param string $data
      * @param string $repositoryId
      * @param string $repositoryScope
+     * @param string $repositoryOwner
      * @param string $userId
      * @param string $userGroup
      * @return void
      */
-    public function persistEvent($hookName, $data, $repositoryId, $repositoryScope, $userId, $userGroup);
+    public function persistEvent($hookName, $data, $repositoryId, $repositoryScope, $repositoryOwner, $userId, $userGroup);
 
     /**
      * @abstract
