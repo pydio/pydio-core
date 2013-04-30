@@ -120,7 +120,7 @@
 							}												
 						}
 						var agent = navigator.userAgent;
-						if(agent && (agent.indexOf('iPhone')!=-1||agent.indexOf('iPod')!=-1||agent.indexOf('iPad')!=-1||agent.indexOf('iOs')!=-1)){
+						if(agent && (agent.indexOf('iPhone')!=-1||agent.indexOf('iPod')!=-1||agent.indexOf('iPad')!=-1||agent.indexOf('iOs')!=-1||agent.indexOf('Safari')!=-1)){
 							var downloadUrl = ajxpServerAccessPath+'&get_action=download';
 							downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
 							document.location.href=downloadUrl;
@@ -131,7 +131,11 @@
 								if(input.name!='get_action' && input.name!='secure_token') input.remove();
 							});
 							userSelection.updateFormOrUrl($('download_form'));
-							$('download_form').submit();
+							try{
+    							$('download_form').submit();
+    					    }catch(e){
+
+    					    }
 						}
 					}
 					else

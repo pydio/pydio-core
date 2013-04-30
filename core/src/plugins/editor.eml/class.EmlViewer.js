@@ -82,12 +82,17 @@ Class.create("EmlViewer", AbstractEditor, {
 		
 	
 	dlAttachment : function(event){
-		//console.log(event.target.__ATTACHMENT_ID);
 		var form = $("emlDownloadForm");
-		form.elements["secure_token"].value = Connexion.SECURE_TOKEN;
-		form.elements["file"].value = this.currentFile; 
-		form.elements["attachment_id"].value = event.target.up("div").__ATTACHMENT_ID;
-		form.submit();
+        form.elements["secure_token"].value = Connexion.SECURE_TOKEN;
+        form.elements["file"].value = this.currentFile;
+        form.elements["attachment_id"].value = event.target.up("div").__ATTACHMENT_ID;
+
+        var agent = navigator.userAgent;
+        if(agent && (agent.indexOf('iPhone')!=-1||agent.indexOf('iPod')!=-1||agent.indexOf('iPad')!=-1||agent.indexOf('iOs')!=-1||agent.indexOf('Safari')!=-1)){
+            document.location.href = window.ajxpServerAccessPath + "&" + form.serialize();
+        }else{
+            form.submit();
+        }
 	},
 	
 	cpAttachment : function(event){
