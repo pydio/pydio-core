@@ -310,10 +310,11 @@ Class.create("HeaderResizer", {
 
 		// ADD CSS3 RULE
 		for(var i=0;i<newSizes.length;i++){
+            var selector;
 			if(useCSS3){
-				var selector = "#"+this.options.body.id+" td:nth-child("+(i+1)+")";
+				selector = "#"+this.options.body.id+" td:nth-child("+(i+1)+")";
 			}else{
-				var selector = "#"+this.options.body.id+" td.resizer_"+ (i);
+				selector = "#"+this.options.body.id+" td.resizer_"+ (i);
 			}
 			var rule = "width:"+(newSizes[i] + (Prototype.Browser.IE?10:0))+"px !important;";
 
@@ -349,12 +350,13 @@ Class.create("HeaderResizer", {
 	 * Creates a style sheet
 	 */
 	createStyleSheet : function(){
+        var sheet;
 		if(Prototype.Browser.IE){
 			return;
 			if(!window['ajxp_resizer_'+this.options.body.id]){
 		        window['ajxp_resizer_'+this.options.body.id] = document.createStyleSheet();
 			}
-			var sheet = window['ajxp_resizer_'+this.options.body.id];
+			sheet = window['ajxp_resizer_'+this.options.body.id];
 	        // Remove previous rules
 	        var rules = sheet.rules;
 	        var len = rules.length;	
@@ -368,7 +370,7 @@ Class.create("HeaderResizer", {
 			if(cssTag) cssTag.remove();
 	        cssTag = new Element("style", {type:"text/css", id:'resizer_css-'+this.options.body.id});
 	        $$("head")[0].insert(cssTag);
-	        var sheet = cssTag.sheet;		        
+	        sheet = cssTag.sheet;
 		}
 		return sheet;		
 	},
@@ -511,7 +513,7 @@ Class.create("HeaderResizer", {
 	 * Get the header inner height
 	 */
 	getInnerHeight : function(element){
-		return innerWidth = element.getHeight() - (parseInt(element.getStyle('borderTopWidth')) || 0) - (parseInt(element.getStyle('borderBottomWidth')) || 0);
+		return element.getHeight() - (parseInt(element.getStyle('borderTopWidth')) || 0) - (parseInt(element.getStyle('borderBottomWidth')) || 0);
 	},		
 	
 	/**
