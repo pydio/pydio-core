@@ -1714,7 +1714,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 	
 	public function isWriteable($dir, $type="dir")
 	{
-        if($this->pluginConf["USE_POSIX"] && extension_loaded('posix')){
+        if(isSet($this->pluginConf["USE_POSIX"]) && $this->pluginConf["USE_POSIX"] == true && extension_loaded('posix')){
             $real = call_user_func(array( $this->wrapperClassName, "getRealFSReference"), $dir);
             return posix_access($real, POSIX_W_OK);
         }
