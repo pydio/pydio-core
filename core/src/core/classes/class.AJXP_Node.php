@@ -78,6 +78,11 @@ class AJXP_Node{
 		$this->_metadata = $metadata;
 	}
 
+    public function __sleep(){
+        $t = array_diff(array_keys(get_class_vars("AJXP_Node")), array("_accessDriver", "_repository", "_metaStore"));
+        return $t;
+    }
+
     /**
      * @param String $url of the node in the form ajxp.protocol://repository_id/path/to/node
      * @return void
