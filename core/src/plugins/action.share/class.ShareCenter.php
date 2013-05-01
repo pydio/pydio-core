@@ -595,12 +595,15 @@ class ShareCenter extends AJXP_Plugin{
         // create driver from $data
         $className = $data["DRIVER"]."AccessDriver";
         $hash = md5(serialize($data));
+        $u = parse_url($_SERVER["REQUEST_URI"]);
+        $shortHash = pathinfo(basename($u["path"]), PATHINFO_FILENAME);
+
         if ( ($data["EXPIRE_TIME"] && time() > $data["EXPIRE_TIME"]) || 
-            ($data["DOWNLOAD_LIMIT"] && $data["DOWNLOAD_LIMIT"]> 0 && $data["DOWNLOAD_LIMIT"] <= PublicletCounter::getCount($hash)) )
+            ($data["DOWNLOAD_LIMIT"] && $data["DOWNLOAD_LIMIT"]> 0 && $data["DOWNLOAD_LIMIT"] <= PublicletCounter::getCount($shortHash)) )
         {
             // Remove the publiclet, it's done
             if (strstr(realpath($_SERVER["SCRIPT_FILENAME"]),realpath(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"))) !== FALSE){
-		        PublicletCounter::delete($hash);
+		        PublicletCounter::delete($shortHash);
                 unlink($_SERVER["SCRIPT_FILENAME"]);
             }
 
@@ -678,8 +681,8 @@ class ShareCenter extends AJXP_Plugin{
         $driver = new $className($data["PLUGIN_ID"], $data["BASE_DIR"]);
         $driver->loadManifest();
 
-        $hash = md5(serialize($data));
-        PublicletCounter::increment($hash);
+        //$hash = md5(serialize($data));
+        PublicletCounter::increment($shortHash);
 
         //AuthService::logUser($data["OWNER_ID"], "", true);
         AuthService::logTemporaryUser($data["OWNER_ID"], $hash);
