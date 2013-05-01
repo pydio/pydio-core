@@ -8,7 +8,7 @@
     <property name="env" value="testing"/>
     <property name="skip_deploy" value="false"/>
     <property name="build_linux" value="false"/>
-    <property name="build_channel" value="stable"/>
+    <property name="build_channel" value="testing"/>
     <property name="build.source_folder" value="${build.working_folder}/source"/>
     <property name="svn.local_folder" value="${build.working_folder}/svnwc"/>
     <taskdef classname="lib.AjxpPluginDiscriminate" name="plugindiscriminate"/>
@@ -312,6 +312,8 @@
             </else>
         </if>
 
+        <echo message="DEBIAN DISTRIB IS ${debian_distribution} and RPM is ${rpm_distribution}"/>
+
 		<!-- TOKEN REPLACE THE RPM SPEC FILE -->
         <copy file="${build.working_folder}/dist/rpm/ajaxplorer.spec.tpl" overwrite="true" toFile="${build.working_folder}/rpm/ajaxplorer.spec">
             <filterchain>
@@ -365,6 +367,7 @@
                 <replacetokens begintoken="##" endtoken="##">
                     <token key="VERSION_NUMBER" value="${build.version}"/>
                     <token key="FORMATTED_DATE" value="${FORMATTED_DATE}"/>
+		    <token key="DIST" value="${debian_distribution}"/>
                 </replacetokens>
             </filterchain>
         </reflexive>
