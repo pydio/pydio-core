@@ -392,9 +392,9 @@
 				<!-- UPDATE APT REPOSITORY -->		
 				<exec command="reprepro --ask-passphrase -Vb . include ${debian_distribution} ${build.working_folder}/deb/ajaxplorer_${build.version}_amd64.changes" dir="${build.repositories_folder}/apt/" passthru="true"/>
 		
-                <!-- UPDATE EL6 RPM REPOSITORY -->
-                <copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.noarch.rpm" toDir="${build.repositories_folder}/el6/{rpm_distribution}/"/>
-                <exec command="createrepo ." dir="${build.repositories_folder}/el6/{rpm_distribution}/" passthru="true"/>
+		                <!-- UPDATE EL6 RPM REPOSITORY -->
+                		<copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.noarch.rpm" toDir="${build.repositories_folder}/el6/${rpm_distribution}/"/>
+		                <exec command="createrepo ." dir="${build.repositories_folder}/el6/${rpm_distribution}/" passthru="true"/>
 
 				<!-- UPDATE EL6 SOURCES REPOSITORY -->		
 				<copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.src.rpm" toDir="${build.repositories_folder}/el6/ajaxplorer-sources/"/>
