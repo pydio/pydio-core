@@ -380,27 +380,25 @@
 			</fileset>
 		</copy>
 
-		
-		<!-- NOW DEPLOY, TO LOCAL REPO THEN TO REMOTE COPY -->
-		<if>
-			<not><equals arg1="${skip_deploy}" arg2="true"/></not>
-			<then>
-		
-				<!-- TODO: SHOULD REPORT BACK THE CHANGELOG AND COMMIT -->
-				
-				
-				<!-- UPDATE APT REPOSITORY -->		
-				<exec command="reprepro --ask-passphrase -Vb . include ${debian_distribution} ${build.working_folder}/deb/ajaxplorer_${build.version}_amd64.changes" dir="${build.repositories_folder}/apt/" passthru="true"/>
-		
-		                <!-- UPDATE EL6 RPM REPOSITORY -->
-                		<copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.noarch.rpm" toDir="${build.repositories_folder}/el6/${rpm_distribution}/"/>
-		                <exec command="createrepo ." dir="${build.repositories_folder}/el6/${rpm_distribution}/" passthru="true"/>
 
-				<!-- UPDATE EL6 SOURCES REPOSITORY -->		
-				<copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.src.rpm" toDir="${build.repositories_folder}/el6/ajaxplorer-sources/"/>
-				<exec command="createrepo ." dir="${build.repositories_folder}/el6/ajaxplorer-sources/" passthru="true"/>
-		
-		
+        <!-- TODO: SHOULD REPORT BACK THE CHANGELOG AND COMMIT -->
+
+
+        <!-- UPDATE APT REPOSITORY -->
+        <exec command="reprepro --ask-passphrase -Vb . include ${debian_distribution} ${build.working_folder}/deb/ajaxplorer_${build.version}_amd64.changes" dir="${build.repositories_folder}/apt/" passthru="true"/>
+
+        <!-- UPDATE EL6 RPM REPOSITORY -->
+        <copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.noarch.rpm" toDir="${build.repositories_folder}/el6/${rpm_distribution}/"/>
+        <exec command="createrepo ." dir="${build.repositories_folder}/el6/${rpm_distribution}/" passthru="true"/>
+
+        <!-- UPDATE EL6 SOURCES REPOSITORY -->
+        <copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.src.rpm" toDir="${build.repositories_folder}/el6/ajaxplorer-sources/"/>
+        <exec command="createrepo ." dir="${build.repositories_folder}/el6/ajaxplorer-sources/" passthru="true"/>
+
+        <!-- NOW DEPLOY, TO REMOTE COPY -->
+        <if>
+            <not><equals arg1="${skip_deploy}" arg2="true"/></not>
+            <then>
 				<!-- SYNCHRONIZE -->
 				<scp 
 					username="${repository_machine.user}" 
