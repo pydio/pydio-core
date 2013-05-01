@@ -530,5 +530,7 @@ $mess=array(
 "472" => "Partagé par %user",
 "473" => "Partagé par %user %date",
 "474" => "Pas de description",
+"475" => "Fichiers partagés par tous les utilisateurs",
+"476" => "Votre espace personnel",
 /* END SENTENCE */
 );

@@ -497,7 +497,11 @@ class Repository implements AjxpGroupPathProvider {
     public function getDescription (){
         $m = ConfService::getMessages();
         if(isset($this->options["USER_DESCRIPTION"]) && !empty($this->options["USER_DESCRIPTION"])){
-            return $this->options["USER_DESCRIPTION"];
+            if(isSet($m[$this->options["USER_DESCRIPTION"]])) {
+                return $m[$this->options["USER_DESCRIPTION"]];
+            } else {
+                return $this->options["USER_DESCRIPTION"];
+            }
         }if(isSet($this->parentId) && isset($this->owner)){
             if(isSet($this->options["CREATION_TIME"])){
                 $date = AJXP_Utils::relativeDate($this->options["CREATION_TIME"], $m);

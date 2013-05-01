@@ -540,6 +540,9 @@ class ConfService
 		if(isSet($repository["DISPLAY_ID"])){
 			$repo->setDisplayStringId($repository["DISPLAY_ID"]);
 		}
+		if(isSet($repository["DESCRIPTION_ID"])){
+			$repo->setDescription($repository["DESCRIPTION_ID"]);
+		}
 		if(isSet($repository["AJXP_SLUG"])){
 			$repo->setSlug($repository["AJXP_SLUG"]);
 		}

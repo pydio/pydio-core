@@ -529,6 +529,8 @@ $mess=array(
 "472" => "Shared by %user",
 "473" => "Shared by %user %date",
 "474" => "No description available",
+"475" => "Files shared amongst all users",
+"476" => "Your personal workspace",
 /* END SENTENCE */
 /* END SENTENCE */
 );
