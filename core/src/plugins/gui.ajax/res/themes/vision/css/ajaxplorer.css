@@ -2495,6 +2495,7 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     border-left: 1px solid rgb(172, 178, 184);
     border-right: 1px solid rgb(172, 178, 184);
+    padding-bottom: 15px;
 }
 
 #info_panel div.panelHeader.panelHeaderWithIcon{
@@ -2547,6 +2548,10 @@ td.infoPanelValue
     border-bottom: 1px solid #fff;
 }
 
+.panelContent.scrolling td.infoPanelValue{
+    padding-right: 18px;
+}
+
 td.infoPanelLabel {
     padding: 6px 6px;
     width: 35%;
@@ -2569,6 +2574,10 @@ td.infoPanelLabel {
     background-color: rgba(138, 149, 160, 0.65) !important;
     border-bottom: 0 !important;
 
+}
+
+.panelContent.scrolling div.panelHeader{
+    padding-right: 13px;
 }
 
 tr td.infoPanelLabel
