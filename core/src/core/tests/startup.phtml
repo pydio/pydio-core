@@ -159,6 +159,21 @@
             </div>
 
             <script type="text/javascript">
+                var testRewrite = new Ajax.Request('data/cache/diag_result.php', {
+                    method : 'get',
+                    onComplete : function(response){
+                        if(200 == response.status){
+                            var html = '<div class="testLine error">\
+                                <div class="testName"><span>-</span>Security Breach</div>\
+                                <div class="testStatus">error</div>\
+                                <div class="testDescription  visible">It seems that your <b>data/</b> folder is not correctly protected, and that subfolders (like the data/cache/ folder) are web-accessible. If you are using <b>Apache</b>, make sure the AllowOverride All option is active for your current directory. If you are running <b>Windows IIS</b>, you must manually add a RequestFiltering/HiddenSegments configuration to prevent web access to these folders. If you have defined a different AJXP_DATA_PATH pointing outside the webfolder, you can ignore this warning.</div>\
+                                <div class="testClear"></div>\
+                            </div>';
+                            $$('div.testList')[0].insert({top:html});
+                        }
+                    }
+                });
+
                 $$('div.testName').invoke("observe", "click", function(event){
                     var target = event.target;
                     if(target.tagName.toLowerCase() == "span") target = target.up("div.testName");
