@@ -30,6 +30,9 @@ Class.create("AjxpMqObserver", {
 
     initialize : function(){
         "use strict";
+
+        if(window.ajxpMinisite) return;
+
         this.clientId = window.ajxpBootstrap.parameters.get("SECURE_TOKEN");
         var configs = ajaxplorer.getPluginConfigs("mq");
 

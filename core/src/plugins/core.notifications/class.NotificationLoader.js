@@ -28,6 +28,9 @@ Class.create("NotificationLoader", {
     hasAlerts : false,
 
     initialize: function(){
+
+        if(window.ajxpMinisite) return;
+
         var rP = new RemoteNodeProvider();
         rP.initProvider({get_action:'get_my_feed', format:'xml', connexion_discrete:true});
         this.ajxpNode = new AjxpNode("/");
