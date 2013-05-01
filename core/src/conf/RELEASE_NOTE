@@ -7,6 +7,128 @@ Date : ##VERSION_DATE##
 Rev Number : ##REVISION##
 
 Contributors :
+https://github.com/mattlef
+https://github.com/piterdias
+https://github.com/ultreia-es
+https://github.com/chusopr
+https://github.com/sabas
+
+This is a DEVELOPMENT version that should not be used in a production environement.
+
+>>> Major new features
+
+Startup Installer : deploy on a database, define admin user credentials, etc.
+SQLite3 support
+Lots of bug fixes since 4.3.2, to make it a serious release candidate for AjaXplorer 5
+New customizations options
+Workspaces now take and display a description
+Test parameters (SQL connexion, email sender, etc) before saving them.
+SabreDAV & Dibi updated to latest version
+
+>>> Details
+
+Fix resizer conflix
+Disable MqObserver and NotificationLoader in ajxpMinisite context.
+Fix sqlite binaries : store_id cannot be null
+Update hooks.json
+Startup Tests : add a test for APC extension. Add a client-side test to check that data/cache/ is correctly protected.
+Change download, chmod and download_chunk positions
+Fix download counter and new link form
+Adapt InfoPanel padding when there is a scroller.
+Set up a description for default repositories
+Set share links RewriteRule disabled by default
+Fix Alerts for SQlite
+Fix history browsers (git & svn). Fix repository description (use creation time and user if they exist)
+revert commit
+[access.webdav] Add performChecks function / Better error / update getRealFSReference ( see @dmitrydvorkin PR #50)
+WebDAV Server : automatically switch to BASIC if detected in headers, and also add a parameter to force BASIC auth (using standard user password in that case). This closes #57
+AJXP_Node : do not serialize utilitary variables
+[access.fs] Add a config for using POSIX when checking write permission.
+[access.fs] Add a config for using POSIX when checking write permission.
+Fix Safari download : do not use hidden iframe, it fails after the first download.
+Complete #82 Fix FF20+ error
+Merge pull request #82 from mattleff/master
+SQLite : create parent folder during test or installation.
+Rework accordion
+Big refactorings to create a first-run installer.
+Sqlite : add a searchable_repositories field as blob are not searchable.
+Fix resizing issue with Firefox 20+.
+Adapt all SQL-based plugins for Sqlite3
+Tmp fix #78
+Fix #66
+Try as much as possible to avoid admin setting wrong config if no SQL connexion is defined.
+Fix warnings
+Remove include in Writeability test.
+Make sure WebDAV triggers the correct events.
+Remove bootstrap_plugins.php file
+Delete all alert occurrences at once. Send an instant message to the AJXP_SCOPE_REPOSITORY_ALL Make sure dav.php initialize all plugins
+Delete all alert occurrences at once. Send an instant message to the AJXP_SCOPE_REPOSITORY_ALL Make sure dav.php initialize all plugins
+Merge pull request #72 from piterdias/master
+Last compile
+Fix ajaxplorer.goTo to other repository Fix notifications list
+Feed loading : automatically load the wrapper if not already registered. Should be generalized at some point.
+"Settings" Workspace icons & fixes
+If necessary, rerun fireSelectionChange just after fireContextChange to avoid intempestive buttons appearing/disappearing
+AttachMobileScroll is not working if the element does not have an ID. Add a random one. Proto.menu : attachMobileScroll to the container Fix to menu widthes
+Rework the Workspaces & Notifications Menu, both styling and features. Implement a description field on the repositories. Ability to add label in the menu, defining a separator with a menuTitle option Move switch_to_settings button inside the user menu.
+PHP Version is now officially 5.3
+Dismiss alerts from feed
+Fix Goto in another repository
+Fix protoMenu click detection
+Catch WebSocket error
+Fix get_user_templates_definition
+Fix #75
+Transmit ajxpPaneObject to subforms (to propagate replicate_row events)
+[auth.ldap] Upgrade auth.ldap to define custom parameters mapping and multiple DN's from GUI. Custom params can be mapped to plugin parameter, role ID, group path or profile. [auth.multi] Fix users listing in "user choice" mode [core.notifications] Fix empty result if no notifications returned.
+Fix problems when many replication group in the same form. Use formManager.observerFormChanges() when possible
+Merge pull request #70 from ultreia-es/ajaxplorer-core-cas_default_users_filepath
+Merge branch 'master' of https://github.com/ajaxplorer/ajaxplorer-core
+Merge remote-tracking branch 'origin/master'
+Binaries & logos, handle case where it's directly pointing to a plugin folder
+Upgrade SabreDAV to 1.8.5
+Fix PHPDoc signature
+Default value for USERS_FILEPATH in auth.cas plugin.
+Fix #67 : WebDAV problem in 4.3.2 if only HA1 is set but not PASS.
+Merge pull request #69 from ultreia-es/ajaxplorer-core-69
+Fix #53 : update S3 regions
+Fixed again the #24 (reopened)
+Issue 69: auth.cas type mismatch for server port parameter
+Read observer after replication Action.share : load configs from plugin instance
+Fix disableTextSelection function
+Pass a title to a tabulator, or use the label and stripTags
+Do not compute the labels width if current form has 0 width
+[action.share] Put the background options in a separate group
+Add an image for the resize_handle
+Add Resizable class from Cameron Wengert
+Set up custom attributes for share link page
+Update logo widget dynamically
+Send cache headers for binary images
+Update the toolbar logo from the Gui plugins options
+Fix media queries
+getFilteredOption should always take repositoryScope into account
+Method get_global_binary_param to skip the USER context.
+SliderInput do not trig an error on click if element does not have descendantOf method
+Remove default texterea styling
+Use image types for logos, will break the logo display for the moment.
+Update README.md
+Create CONTRIBUTING.md
+Merge pull request #58 from sabas/master
+Merge pull request #63 from piterdias/master
+Add Canon CR2 extension (RAW) to editor.imagick
+Italian translation update
+
+
+-------------------------------------------------------------
+
+AjaXplorer 4.3.2 Release Note
+
+License : Affero GPL
+Copyright : Charles du Jeu 2013
+Demo : http://ajaxplorer.info/demo
+Date : ##VERSION_DATE##
+Rev Number : ##REVISION##
+
+Contributors :
 https://github.com/hlev
 https://github.com/gynter
 https://github.com/terminal-addict
