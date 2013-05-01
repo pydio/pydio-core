@@ -1542,6 +1542,9 @@ class AJXP_Utils
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         $result = array();
         if($p["driver"] == "sqlite" || $p["driver"] == "sqlite3"){
+            if(!file_exists(dirname($p["database"]))){
+                @mkdir(dirname($p["database"]), 0755, true);
+            }
             dibi::connect($p);
             $file = dirname($file) ."/". str_replace(".sql", ".sqlite", basename($file) );
             $sql = file_get_contents($file);

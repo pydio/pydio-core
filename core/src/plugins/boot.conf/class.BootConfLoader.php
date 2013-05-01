@@ -48,6 +48,11 @@ class BootConfLoader extends AbstractConfDriver {
 
     public function init($options){
         parent::init($options);
+        try{
+            $this->getPluginWorkDir(true);
+        }catch(Exception $e){
+            die("Impossible write into the AJXP_DATA_PATH folder: Make sure to grant write access to this folder for your webserver!");
+        }
     }
 
     public function loadManifest(){
@@ -326,7 +331,7 @@ class BootConfLoader extends AbstractConfDriver {
             return;
 
         }
-        $jsonPath = $this->getPluginWorkDir(true)."/bootstrap.json";
+        $jsonPath = $this->getPluginWorkDir(false)."/bootstrap.json";
         $jsonData = AJXP_Utils::loadSerialFile($jsonPath, false, "json");
         if(is_array($jsonData) && isset($jsonData[$pluginId])){
             $options = array_merge($options, $jsonData[$pluginId]);
