@@ -621,7 +621,7 @@ class sqlConfDriver extends AbstractConfDriver {
     }
 
     protected function binaryContextToStoreID($context){
-        $storage = null;
+        $storage = "binaries";
         if(isSet($context["USER"])){
             $storage ="users_binaries.".$context["USER"];
         }else if(isSet($context["REPO"])){
