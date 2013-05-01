@@ -674,6 +674,7 @@ class AuthService
             $ha1 = md5("{$userId}:{$realm}:{$userPass}");
             $zObj = ConfService::getConfStorageImpl()->createUserObject($userId);
             $wData = $zObj->getPref("AJXP_WEBDAV_DATA");
+            if(!is_array($wData)) $wData = array();
             $wData["HA1"] = $ha1;
             $zObj->setPref("AJXP_WEBDAV_DATA", $wData);
             $zObj->save();
@@ -720,6 +721,7 @@ class AuthService
                 $user = $confDriver->createUserObject($userId);
             }
             $wData = $user->getPref("AJXP_WEBDAV_DATA");
+            if(!is_array($wData)) $wData = array();
             $wData["HA1"] = $ha1;
             $user->setPref("AJXP_WEBDAV_DATA", $wData);
             $user->save();
