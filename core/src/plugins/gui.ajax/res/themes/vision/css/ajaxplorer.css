@@ -98,8 +98,7 @@ textarea{
 {
     background-color: #ffffc0;
 }
-
-.resizer{
+.resizableHandle{
     position: absolute;
     width: 10px;
     height: 10px;
@@ -3630,6 +3629,7 @@ div.menu a {
 
 .menuActions.moreActions{
     margin-top: 0 !important;
+    z-index: 1;
 }
 .menuActions.moreActions span{
     color: #ffffff;

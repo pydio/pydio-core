@@ -29,7 +29,7 @@ Class.create("Resizable", {
                 onStart: null,
                 onEnd: null,
                 'default_style':true,
-                'class_name':'resizer'
+                'class_name':'resizableHandle'
             };
 
             this.options = Object.extend(defaults, arguments[1] || {});

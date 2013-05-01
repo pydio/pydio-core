@@ -34,6 +34,13 @@ Class.create("LogoWidget", AjxpPane, {
             }else{
                 this.titleDiv.update(configs.get("CUSTOM_TOP_TITLE"));
             }
+            if(!configs.get("CUSTOM_TOP_LOGO") || configs.get("CUSTOM_TOP_LOGO") == 'ajxp-remove-original'){
+                if(this.image){
+                    this.image.remove();
+                    this.image = null;
+                }
+                this.resizeImage(configs, true);
+            }
         }else if(this.titleDiv){
             this.titleDiv.remove();
             this.titleDiv = null;
@@ -72,29 +79,34 @@ Class.create("LogoWidget", AjxpPane, {
 
     resizeImage : function(configs, insert){
 
-        var w = this.image.width;
-        var h = this.image.height;
         var imgH, imgW;
-        if(configs.get("CUSTOM_TOP_LOGO_H")){
-            imgH = parseInt(configs.get("CUSTOM_TOP_LOGO_H")) || h;
-            imgW = parseInt(imgH * w / h);
-        }else if(configs.get("CUSTOM_TOP_LOGO_W")){
-            imgW = parseInt(configs.get("CUSTOM_TOP_LOGO_W"));
-            imgH = parseInt(imgW * h / w);
+        if(this.image){
+            var w = this.image.width;
+            var h = this.image.height;
+            if(configs.get("CUSTOM_TOP_LOGO_H")){
+                imgH = parseInt(configs.get("CUSTOM_TOP_LOGO_H")) || h;
+                imgW = parseInt(imgH * w / h);
+            }else if(configs.get("CUSTOM_TOP_LOGO_W")){
+                imgW = parseInt(configs.get("CUSTOM_TOP_LOGO_W"));
+                imgH = parseInt(imgW * h / w);
+            }
+            if(!imgW){
+                imgW = w;
+                imgH = h;
+            }
+            var imgTop = parseInt(configs.get("CUSTOM_TOP_LOGO_T")) || 0;
+            var imgLeft = parseInt(configs.get("CUSTOM_TOP_LOGO_L")) || 0;
+            this.image.setStyle({
+                position    : 'absolute',
+                height      : imgH + 'px',
+                width       : imgW + 'px',
+                top         : imgTop + 'px',
+                left        : imgLeft + 'px'
+            });
+        }else{
+            imgW = -3;
+            imgH = 0;
         }
-        if(!imgW){
-            imgW = w;
-            imgH = h;
-        }
-        var imgTop = parseInt(configs.get("CUSTOM_TOP_LOGO_T")) || 0;
-        var imgLeft = parseInt(configs.get("CUSTOM_TOP_LOGO_L")) || 0;
-        this.image.setStyle({
-            position    : 'absolute',
-            height      : imgH + 'px',
-            width       : imgW + 'px',
-            top         : imgTop + 'px',
-            left        : imgLeft + 'px'
-        });
         // Reset height
         this.htmlElement.setStyle({paddingTop:'9px'});
         if(imgH > parseInt(this.htmlElement.getHeight())){
