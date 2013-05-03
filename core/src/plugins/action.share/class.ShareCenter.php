@@ -554,8 +554,8 @@ class ShareCenter extends AJXP_Plugin{
             RewriteBase '.$path.'
             RewriteCond %{REQUEST_FILENAME} !-f
             RewriteCond %{REQUEST_FILENAME} !-d
-            RewriteRule ^([a-z0-9]+)-([a-z]+)$ $1.php?lang=$2 [L]
-            RewriteRule ^([a-z0-9]+)$ $1.php [L]
+            RewriteRule ^([a-z0-9]+)-([a-z]+)$ $1.php?lang=$2 [QSA]
+            RewriteRule ^([a-z0-9]+)$ $1.php [QSA]
             </IfModule>
             ';
         }
