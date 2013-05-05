@@ -100,6 +100,38 @@ class ldapAuthDriver extends AbstractAuthDriver {
         return $data;
     }
 
+    public function testLDAPConnexion($options){
+
+        $this->ldapUrl = $options["LDAP_URL"];
+        if ($options["LDAP_PORT"]) $this->ldapPort = $options["LDAP_PORT"];
+        if ($options["LDAP_USER"]) $this->ldapAdminUsername = $options["LDAP_USER"];
+        if ($options["LDAP_PASSWORD"]) $this->ldapAdminPassword = $options["LDAP_PASSWORD"];
+        if ($options["LDAP_DN"]) $this->ldapDN = $this->parseReplicatedParams($options, array("LDAP_DN"));
+        $this->startConnexion();
+        if($this->ldapconn == null){
+            return "ERROR: Cannot connect to the server";
+        }else{
+            if(!empty($options["TEST_USER"])){
+                $entries = $this->getUserEntries($options["TEST_USER"]);
+                if(!is_array($entries)) return false;
+                if(AuthService::ignoreUserCase()) {
+                    $res =  (strcasecmp($options["TEST_USER"], $entries[0][$this->ldapUserAttr][0]) == 0);
+                }else {
+                    $res =  (strcmp($options["TEST_USER"], $entries[0][$this->ldapUserAttr][0]) == 0 );
+                }
+                AJXP_Logger::debug('Auth.ldap :: checking if user '.$options["TEST_USER"].' exists  : '.$res);
+                if(!$res){
+                    return "ERROR: Could <b>correctly connect</b> to the server, but could <b>not find the specified user</b> in the directory.";
+                }else{
+                    return "SUCCESS: Could connect to the server, and could find the specified user inside the directory.";
+                }
+            }else{
+                return "SUCCESS: Correctly connected to the server";
+            }
+        }
+
+    }
+
     function startConnexion(){
         AJXP_Logger::debug('Auth.ldap :: start connexion');
         if($this->ldapconn == null){
@@ -112,7 +144,6 @@ class ldapAuthDriver extends AbstractAuthDriver {
     }
 
     function __deconstruct(){
-        //@todo : if PHP server < 5, this method will never be closed. Maybe use a close() method ?
         if($this->ldapconn != null){
             ldap_close($this->ldapconn);
         }
