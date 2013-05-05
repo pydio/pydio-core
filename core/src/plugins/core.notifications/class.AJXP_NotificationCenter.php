@@ -104,6 +104,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
             if($httpVars["format"] == "html") return;
             AJXP_XMLWriter::header();
             AJXP_XMLWriter::close();
+            return;
         }
         $userId = $u->getId();
         $userGroup = $u->getGroupPath();
