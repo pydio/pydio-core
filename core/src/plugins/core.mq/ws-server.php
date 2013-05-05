@@ -1,7 +1,7 @@
 #!/php -q
 <?php
 // Run from command prompt > php demo.php
-require_once("../../vendor/phpws/websocket.server.php");
+require_once("vendor/phpws/websocket.server.php");
 require_once("../../core/classes/class.HttpClient.php");
 /**
  * This demo resource handler will respond to all messages sent to /echo/ on the socketserver below
