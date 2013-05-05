@@ -173,11 +173,11 @@ class AJXP_Utils
     }
 
     public static function detectApplicationFirstRun(){
-        return !file_exists(AJXP_CACHE_DIR."/admin_counted");
+        return !file_exists(AJXP_CACHE_DIR."/first_run_passed");
     }
 
     public static function setApplicationFirstRunPassed(){
-        @file_put_contents(AJXP_CACHE_DIR."/admin_counted", "true");
+        @file_put_contents(AJXP_CACHE_DIR."/first_run_passed", "true");
     }
 
     /**

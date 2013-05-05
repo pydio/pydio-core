@@ -392,7 +392,8 @@ class AuthService
      */
 	public static function bootSequence(&$START_PARAMETERS){
 
-        if(!AJXP_Utils::detectApplicationFirstRun()) return;
+        if(AJXP_Utils::detectApplicationFirstRun()) return;
+        if(file_exists(AJXP_CACHE_DIR."/admin_counted")) return;
         $rootRole = AuthService::getRole("ROOT_ROLE", false);
         if($rootRole === false){
             $rootRole = new AJXP_Role("ROOT_ROLE");
@@ -448,7 +449,6 @@ class AuthService
         }
 		$adminCount = AuthService::countAdminUsers();
 		if($adminCount == 0){
-            /*
 			$authDriver = ConfService::getAuthDriverImpl();
 			$adminPass = ADMIN_PASSWORD;
 			if($authDriver->getOption("TRANSMIT_CLEAR_PASS") !== true){
@@ -467,7 +467,6 @@ class AuthService
                  $START_PARAMETERS["ALERT"] .= "Warning! User 'admin' was created with the initial password '". INITIAL_ADMIN_PASSWORD ."'. \\nPlease log in as admin and change the password now!";
 			 }
             AuthService::updateUser($userObject);
-            */
 		}else if($adminCount == -1){
 			// Here we may come from a previous version! Check the "admin" user and set its right as admin.
 			$confStorage = ConfService::getConfStorageImpl();
@@ -476,7 +475,7 @@ class AuthService
 			$adminUser->save("superuser");
 			$START_PARAMETERS["ALERT"] .= "There is an admin user, but without admin right. Now any user can have the administration rights, \\n your 'admin' user was set with the admin rights. Please check that this suits your security configuration.";
     	}
-        //register_shutdown_function(array("AJXP_Utils", "setApplicationFirstRunPassed"));
+        file_put_contents(AJXP_CACHE_DIR."/admin_counted", "true");
 
 	}
     /**

@@ -357,7 +357,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				if(AuthService::getRole($roleId) !== false){
 					throw new Exception($mess["ajxp_conf.65"]);
 				}
-                $r = new AjxpRole($roleId);
+                $r = new AJXP_Role($roleId);
                 if(AuthService::getLoggedUser()!=null && AuthService::getLoggedUser()->getGroupPath()!=null){
                     $r->setGroupPath(AuthService::getLoggedUser()->getGroupPath());
                 }
@@ -1607,6 +1607,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return false;
     }
 
+    /**
+     * @param Repository $a
+     * @param Repository $b
+     * @return integer
+     */
+    function sortReposByLabel($a, $b){
+        return strcasecmp($a->getDisplay(), $b->getDisplay());
+    }
+
 	function listRepositories(){
 		$repos = ConfService::getRepositoriesList("all");
 		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.repositories">
@@ -1619,6 +1628,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         $childRepos = array();
         $templateRepos = array();
         $flatChildrenRepos = array();
+        //uasort($repos, array($this, "sortReposByLabel"));
 		foreach ($repos as $repoIndex => $repoObject){
             if(!AuthService::canAdministrate($repoObject)){
                 continue;
