@@ -150,16 +150,18 @@ Class.create("NotificationLoader", {
             eventIndex ++;
         }.bind(this) );
         var button = $('get_my_feed_button');
-        var badge = button.down('.badge');
-        if(!badge){
-            badge = new Element('span', {className:'badge'});
-            button.down('.icon-caret-down').insert({before: badge});
-        }
-        if(alertsCounts){
-            badge.update(alertsCounts);
-            badge.show();
-        }else{
-            badge.hide();
+        if(button){
+            var badge = button.down('.badge');
+            if(!badge){
+                badge = new Element('span', {className:'badge'});
+                button.down('.icon-caret-down').insert({before: badge});
+            }
+            if(alertsCounts){
+                badge.update(alertsCounts);
+                badge.show();
+            }else{
+                badge.hide();
+            }
         }
         return menuItems;
     },
