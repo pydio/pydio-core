@@ -150,22 +150,24 @@
                 if(!empty($CUSTOM_SHAREPAGE_LEGEND)) echo(str_replace(array("AJXP_APPLICATION_TITLE","AJXP_FILENAME"), array(ConfService::getCoreConf("APPLICATION_TITLE"), $AJXP_LINK_BASENAME), $CUSTOM_SHAREPAGE_LEGEND));
                 else echo sprintf($messages[2], $AJXP_LINK_BASENAME) ?></h2>
         </div>
+    <?php  } ?>
+
     <script type="text/javascript">
-        var backgrounds = [];
-    <?php  }
-    $index = 1;
-    $varBase = "CUSTOM_SHAREPAGE_BACKGROUND_";
-    $bgName = $varBase . $index;
-    $bgAttName = $varBase . 'ATTRIBUTES_' .  $index;
-    $bgs = array();
-    while(isSet($$bgName) && !empty($$bgName)){
-        $bgs[] = "background-image:url('".$$bgName."');" . (isSet($$bgAttName) ? $$bgAttName : '');
-        $index ++;
+            var backgrounds = [];
+    <?php
+        $index = 1;
+        $varBase = "CUSTOM_SHAREPAGE_BACKGROUND_";
         $bgName = $varBase . $index;
         $bgAttName = $varBase . 'ATTRIBUTES_' .  $index;
-    }
-    echo 'backgrounds = ' . json_encode($bgs) . ';';
-    ?>
+        $bgs = array();
+        while(isSet($$bgName) && !empty($$bgName)){
+            $bgs[] = "background-image:url('".$$bgName."');" . (isSet($$bgAttName) ? $$bgAttName : '');
+            $index ++;
+            $bgName = $varBase . $index;
+            $bgAttName = $varBase . 'ATTRIBUTES_' .  $index;
+        }
+        echo 'backgrounds = ' . json_encode($bgs) . ';';
+        ?>
     if(backgrounds.length){
         var i = Math.floor( Math.random() * backgrounds.length);
         document.body.setAttribute("style", backgrounds[i]);
