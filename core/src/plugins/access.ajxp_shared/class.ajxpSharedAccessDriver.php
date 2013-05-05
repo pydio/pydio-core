@@ -174,12 +174,14 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 		foreach ($files as $file){
             $ar = explode(".", basename($file));
             $id = array_shift($ar);
-            if(strlen($id) != 32) continue;
+            if($ar[0] != "php") continue;
+            //if(strlen($id) != 32) continue;
 			$publicletData = ShareCenter::loadPublicletData($id);
 			if(isset($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] != $userId){
 				continue;
 			}
 			$expired = ($publicletData["EXPIRE_TIME"]!=0?($publicletData["EXPIRE_TIME"]<time()?true:false):false);
+            if(!is_a($publicletData["REPOSITORY"], "Repository")) continue;
 			AJXP_XMLWriter::renderNode(str_replace(".php", "", basename($file)), "".SystemTextEncoding::toUTF8($publicletData["REPOSITORY"]->getDisplay()).":/".SystemTextEncoding::toUTF8($publicletData["FILE_PATH"]), true, array(
 				"icon"		=> "html.png",
 				"password" => ($publicletData["PASSWORD"]!=""?$publicletData["PASSWORD"]:"-"), 
@@ -261,7 +263,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 	}
 	
 	function listRepositories(){
-		$repos = ConfService::getRepositoriesList();
+		$repos = ConfService::getRepositoriesList("all");
 		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_conf.9" attributeName="accessType" sortType="String"/><column messageId="ajxp_shared.9" attributeName="repo_accesses" sortType="String"/></columns>');		
         $repoArray = array();
         $childRepos = array();
