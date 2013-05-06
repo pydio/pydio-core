@@ -540,11 +540,19 @@ Class.create("ShareCenter", {
         var userSelection = ajaxplorer.getUserSelection();
         if(!userSelection.isUnique() || (userSelection.hasDir() && !userSelection.hasMime($A(['ajxp_browsable_archive'])))) return;
         var oForm = $(modal.getForm());
-        oForm.down('img#generate_image').src = window.ajxpResourcesFolder+"/images/autocompleter-loader.gif";
         var publicUrl = window.ajxpServerAccessPath+'&get_action=share';
         publicUrl = userSelection.updateFormOrUrl(null,publicUrl);
         var conn = new Connexion(publicUrl);
-        conn.setParameters(oForm.serialize(true));
+        var serialParams = oForm.serialize(true);
+        if(serialParams["expiration"] && ! this.checkPositiveNumber(serialParams["expiration"])
+            || serialParams["downloadlimit"] && ! this.checkPositiveNumber(serialParams["downloadlimit"])){
+            ajaxplorer.displayMessage("ERROR", MessageHash["share_center.75"]);
+            return;
+        }
+
+        oForm.down('img#generate_image').src = window.ajxpResourcesFolder+"/images/autocompleter-loader.gif";
+        conn.setParameters(serialParams);
+
         conn.addParameter('get_action','share');
         var oThis = this;
         conn.onComplete = function(transport){
@@ -627,6 +635,11 @@ Class.create("ShareCenter", {
                 });
             }.bind(this));
         }
+    },
+
+    checkPositiveNumber : function(str){
+        var n = ~~Number(str);
+        return String(n) === str && n >= 0;
     }
 
 });

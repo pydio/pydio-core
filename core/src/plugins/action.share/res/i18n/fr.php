@@ -76,5 +76,6 @@ $mess = array(
     "71"=> "Droits",
     "72"=> "Lister & Prévisualiser",
     "73"=> "Télécharger",
-    "74"=> "Envoyer des fichiers"
+    "74"=> "Envoyer des fichiers",
+    "75"=> "Veuillez utiliser des entiers positifs pour les champs Expiration et Nombre de downloads!",
 );
