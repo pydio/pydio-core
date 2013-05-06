@@ -190,6 +190,9 @@ class ldapAuthDriver extends AbstractAuthDriver {
             if($this->ldapFilter == "") $filter = "(" . $this->ldapUserAttr . "=" . $login . ")";
             else  $filter = "(&" . $this->ldapFilter . "(" . $this->ldapUserAttr . "=" . $login . "))";
         }
+        if(empty($filter)){
+            $filter = $this->ldapUserAttr . "=*";
+        }
         if($this->ldapconn == null){
         	$this->startConnexion();
         }
@@ -222,13 +225,13 @@ class ldapAuthDriver extends AbstractAuthDriver {
         }
         $ret = ldap_search($conn,$this->ldapDN,$filter, $expected);
         $allEntries = array("count" => 0);
-        foreach($ret as $resourceResult){
+        foreach($ret as $i => $resourceResult){
             if($resourceResult === false) continue;
             if($countOnly){
-                $allEntries["count"] += ldap_count_entries($this->ldapconn, $resourceResult);
+                $allEntries["count"] += ldap_count_entries($conn[$i], $resourceResult);
                 continue;
             }
-            $entries = ldap_get_entries($this->ldapconn, $resourceResult);
+            $entries = ldap_get_entries($conn[$i], $resourceResult);
             $index = 0;
             if(!empty($entries["count"])){
                 $allEntries["count"] += $entries["count"];
@@ -405,8 +408,15 @@ class ldapAuthDriver extends AbstractAuthDriver {
                                 break;
                             case "plugin_param":
                             default:
-                                if($userObject->personalRole->filterParameterValue($this->getId(), $params["MAPPING_LOCAL_PARAM"], AJXP_REPO_SCOPE_ALL, "") != $value){
-                                    $userObject->personalRole->setParameterValue($this->getId(), $params["MAPPING_LOCAL_PARAM"], $value);
+                                if(strpos($params["MAPPING_LOCAL_PARAM"], "/") !== false){
+                                    list($pId, $param) = explode("/", $params["MAPPING_LOCAL_PARAM"]);
+                                }else{
+                                    $pId = $this->getId();
+                                    $param = $params["MAPPING_LOCAL_PARAM"];
+                                }
+                                if($userObject->personalRole->filterParameterValue($pId, $param, AJXP_REPO_SCOPE_ALL, "") != $value){
+                                    $userObject->personalRole->setParameterValue($pId, $param, $value);
+                                    $userObject->recomputeMergedRole();
                                     $changes = true;
                                 }
                                 break;
