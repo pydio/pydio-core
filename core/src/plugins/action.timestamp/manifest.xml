@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.timestamp" className="timestamp_create" mimes="*" formId="timestamp_act" write="true" label="CONF_MESSAGE[timestamp]" description="CONF_MESSAGE[Allow timestamp files with Universign.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/editor.timestamp/class.timestamp.php" classname="timestamp_create"/>
+<ajxp_plugin id="action.timestamp" label="CONF_MESSAGE[timestamp]" description="CONF_MESSAGE[Allow timestamp files with Universign.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<class_definition filename="plugins/action.timestamp/class.TimestampCreator.php" classname="TimestampCreator"/>
 	<client_settings>
         <resources>
-            <img_library alias="timestamp_images" path="plugins/editor.timestamp/images"/>
-            <i18n path="plugins/editor.timestamp/i18n" namespace="timestamp"/>
+            <img_library alias="timestamp_images" path="plugins/action.timestamp/images"/>
+            <i18n path="plugins/action.timestamp/i18n" namespace="timestamp"/>
         </resources>
 	</client_settings>
 
@@ -76,13 +76,16 @@ ajaxplorer.fireContextRefresh()
 				</div>				]]></clientForm>
 
 
-				<serverCallback methodName="SwitchAction"></serverCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 			</action>
 			
 		</actions>
-			<extensions>
-				<extension icon="timestamp_images/mimes/ICON_SIZE/horo.png" messageId="CONF_MESSAGE[timestamp]" mime="ers"/>
-			</extensions>
+        <extensions>
+            <extension icon="timestamp_images/mimes/ICON_SIZE/horo.png" messageId="CONF_MESSAGE[timestamp]" mime="ers"/>
+        </extensions>
 	</registry_contributions>
-</editor>
+    <dependencies>
+        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+    </dependencies>
+</ajxp_plugin>
