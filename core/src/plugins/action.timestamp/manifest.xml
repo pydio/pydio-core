@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxp_plugin id="action.timestamp" label="CONF_MESSAGE[timestamp]" description="CONF_MESSAGE[Allow timestamp files with Universign.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<ajxp_plugin id="action.timestamp"  enabled="false" label="CONF_MESSAGE[timestamp]" description="CONF_MESSAGE[Allow timestamp files with Universign.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <core_relation packaged="false" tested_version="4.3.3"/>
+        <plugin_author>FDecourt</plugin_author>
+        <plugin_version>1.0</plugin_version>
+    </plugin_info>
 	<class_definition filename="plugins/action.timestamp/class.TimestampCreator.php" classname="TimestampCreator"/>
 	<client_settings>
         <resources>
@@ -30,21 +35,13 @@
 			<processing>
                 <clientCallback prepareModal="true"><![CDATA[
 
-                                        var onLoad = function(oForm){
-
-                                             $(oForm).getElementsBySelector('span[id="timestamp_message"]')[0].innerHTML = "CONF_MESSAGE[msgBox1]";
-                                        };
-
-                                        
-
-
-                                       var onok = function(){
-
-						var oForm = modal.getForm();
-
-
-                                               var userSelection = ajaxplorer.getUserSelection();
-                                                var selected = userSelection.getFileNames()
+                        var onLoad = function(oForm){
+                             $(oForm).getElementsBySelector('span[id="timestamp_message"]')[0].innerHTML = "CONF_MESSAGE[msgBox1]";
+                        };
+                       var onok = function(){
+                            var oForm = modal.getForm();
+                            var userSelection = ajaxplorer.getUserSelection();
+                            var selected = userSelection.getFileNames()
 
 						var conn = new Connexion();
 						conn.addParameter('get_action', 'get_timestamp');
@@ -56,14 +53,14 @@
 						conn.sendSync();
 
 						hideLightBox(true);
-ajaxplorer.fireContextRefresh()
+                        ajaxplorer.fireContextRefresh()
 						return false;
 					};
 
 				var closeFunc = function(){
-						hideLightBox();
-							return false;
-						};
+                    hideLightBox();
+                    return false;
+                };
 
 				modal.showDialogForm('Horodater', 'timestamp_form', onLoad, onok);
                                 
