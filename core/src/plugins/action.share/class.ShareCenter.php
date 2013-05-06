@@ -144,6 +144,13 @@ class ShareCenter extends AJXP_Plugin{
                     }
                     print($url);
             	}else{
+		    // Check if expiration value is a natural number
+                    if (!preg_match("/^[0-9]+$/", $httpVars["expiration"]))
+                    {
+                        header("HTTP/1.1 400 Bad Request");
+                        header("Status: 400 Bad Request");
+                        throw new Exception("Invalid expiration value");
+                    }
                     if(!isSet($httpVars["downloadlimit"])){
                         $httpVars["downloadlimit"] = 0;
                     }
