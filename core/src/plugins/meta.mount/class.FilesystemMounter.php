@@ -59,7 +59,9 @@ class FilesystemMounter extends AJXP_Plugin
 			if($safeCred !== false){
 				$user = $safeCred["user"];
 				$password = $safeCred["password"];
-			}
+			}else{
+                throw new Exception("Session credential are empty! Did you forget to check the Set Session Credential in the Authentication configuration panel?");
+            }
 		}
         return array($user, $password);
     }
