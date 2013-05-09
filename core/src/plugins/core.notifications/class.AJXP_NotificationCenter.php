@@ -252,9 +252,13 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                 $node->event_date = AJXP_Utils::relativeDate($notification->getDate(), $mess);
                 $node->event_type = "alert";
                 $node->alert_id = $notification->alert_id;
-                $node->repository_id = ''.$node->getRepository()->getId();
-                if($node->repository_id != $repositoryFilter && $node->getRepository()->getDisplay() != null){
-                    $node->event_repository_label = "[".$node->getRepository()->getDisplay()."]";
+                if($node->getRepository() != null){
+                    $node->repository_id = ''.$node->getRepository()->getId();
+                    if($node->repository_id != $repositoryFilter && $node->getRepository()->getDisplay() != null){
+                        $node->event_repository_label = "[".$node->getRepository()->getDisplay()."]";
+                    }
+                }else{
+                    $node->event_repository_label = "[N/A]";
                 }
                 $node->event_author = $notification->getAuthor();
                 $notification->event_occurence = 1;
