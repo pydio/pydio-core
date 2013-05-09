@@ -76,5 +76,6 @@ $mess = array(
     "71"=> "Permissions",
     "72"=> "Browse & Preview",
     "73"=> "Download",
-    "74"=> "Upload files"
+    "74"=> "Upload files",
+    "75"=> "Please use a positive number for both Expiration and Download limit fields.",
 );

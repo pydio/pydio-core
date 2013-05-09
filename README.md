@@ -7,7 +7,7 @@
 This is the main source code repository of AjaXplorer, containing all the PHP server and HTML5 Web GUI. It was migrated from previous Sourceforge SVN repository, which is hence deprecated. 
 
 * Latest Stable release : 4.2.3
-* Latest Dev release : 4.3.1 (RC for AjaXplorer5)
+* Latest Dev release : 4.3.3 (RC for AjaXplorer5)
 * License: [AGPLv3](https://www.gnu.org/licenses/agpl.html)
 * Lead developer  : Charles du Jeu (cdujeu): [Github](https://github.com/cdujeu) | [Twitter](https://twitter.com/AjaXplorer)
 

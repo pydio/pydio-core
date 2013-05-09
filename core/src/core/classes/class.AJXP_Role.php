@@ -324,6 +324,7 @@ class AJXP_Role implements AjxpGroupPathProvider
                 $current = &$current[$key];
             }else{
                 $current[$key] = $value;
+                break;
             }
         }
         return $arr;

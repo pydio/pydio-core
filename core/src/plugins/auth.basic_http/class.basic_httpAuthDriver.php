@@ -37,14 +37,12 @@ class basic_httpAuthDriver extends serialAuthDriver  {
 	function preLogUser($sessionId){
 		$localHttpLogin = $_SERVER["REMOTE_USER"];		
 		if(!isSet($localHttpLogin)) return ;
-		// If auto-create and http authentication is ok, log the user.
-		if($this->autoCreateUser()){
-			if(!$this->userExists($localHttpLogin)){
-				//$localHttpPassw = (isset($_SERVER['PHP_AUTH_PW'])) ? $_SERVER['PHP_AUTH_PW'] : md5(microtime(true)) ;
-				$localHttpPassw = md5(microtime(true));
-				$_tvcrhtau = $this->createUser($localHttpLogin, $localHttpPassw);
+        $localHttpPassw = (isset($_SERVER['PHP_AUTH_PW'])) ? $_SERVER['PHP_AUTH_PW'] : md5(microtime(true)) ;
+        if($this->autoCreateUser()){
+            if(!$this->userExists($localHttpLogin)){
+				$this->createUser($localHttpLogin, $localHttpPassw);
 			}
-			AuthService::logUser($localHttpLogin, "", true);
+			AuthService::logUser($localHttpLogin, $localHttpPassw, true);
 		}else{
 			// If not auto-create but the user exists, log him.
 			if($this->userExists($localHttpLogin)){

@@ -75,5 +75,5 @@ $mess = array(
 "72" => "Browse & Preview",
 "73" => "Download",
 "74" => "Upload files",
-// will be replaced by the filename to download
+"75"=> "Please use a positive number for both Expiration and Download limit fields.",
 );
