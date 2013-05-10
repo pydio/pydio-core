@@ -838,7 +838,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			case  "get_templates_definition":
 				
 				AJXP_XMLWriter::header("repository_templates");
-				$repositories = ConfService::getRepositoriesList();
+				$repositories = ConfService::getRepositoriesList("all");
 				foreach ($repositories as $repo){
 					if(!$repo->isTemplate) continue;
 					$repoId = $repo->getId();
@@ -1520,7 +1520,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
         }
 		$mess = ConfService::getMessages();
-		$repos = ConfService::getRepositoriesList();
+		$repos = ConfService::getRepositoriesList("all");
 		$loggedUser = AuthService::getLoggedUser();		
         $userArray = array();
 		foreach ($users as $userIndex => $userObject){
@@ -1576,7 +1576,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		if(!AuthService::usersEnabled()) return ;
 		$roles = AuthService::getRolesList(array(), !$this->listSpecialRoles);
 		$mess = ConfService::getMessages();
-		$repos = ConfService::getRepositoriesList();
+		$repos = ConfService::getRepositoriesList("all");
         ksort($roles);
         foreach($roles as $roleId => $roleObject) {
             //if(strpos($roleId, "AJXP_GRP_") === 0 && !$this->listSpecialRoles) continue;
