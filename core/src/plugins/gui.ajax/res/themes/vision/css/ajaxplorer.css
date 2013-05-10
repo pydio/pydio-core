@@ -4066,3 +4066,8 @@ td.ip_geo_cell{
 .custom_top_title{
     color: white;
 }
+
+#action_instance_user_create_repository {
+    font-size: 14px;
+    line-height: 21px;
+}

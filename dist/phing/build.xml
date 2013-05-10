@@ -73,18 +73,18 @@
     <target name="deploy" description="Send package to FTP">
         <phingcall target="ftp_deploy">
             <property name="base_folder" value="${build.working_folder}/build"/>
-            <property name="remote_folder" value="${ftp.dir}"/>
+            <property name="remote_folder" value="${scp.dir}"/>
         </phingcall>
         <phingcall target="ftp_deploy">
             <property name="base_folder" value="${build.working_folder}/build/plugins"/>
-            <property name="remote_folder" value="${ftp.dir}/plugins"/>
+            <property name="remote_folder" value="${scp.dir}/plugins"/>
         </phingcall>
     </target>
     
     <target name="deploy_upgrade" description="Send package to FTP">
         <phingcall target="ftp_deploy">
             <property name="base_folder" value="${build.working_folder}/build/upgrade"/>
-            <property name="remote_folder" value="${ftp.update_dir}"/>
+            <property name="remote_folder" value="${scp.update_dir}"/>
         </phingcall>
     </target>
         
@@ -455,6 +455,18 @@
     </target>    
     
     <target name="ftp_deploy" description="Generic FTP deployment">
+                               <scp 
+                                        username="${scp.username}" 
+                                        password="${scp.password}"
+                                        host="${scp.host}" 
+					port="${scp.port}"
+                                        todir="${remote_folder}">
+                                    <fileset dir="${base_folder}">
+                                        <include name="*.zip" />
+					<include name="*.tar.gz"/>
+                                    </fileset>
+                                </scp>
+<!--
         <ftpdeploy
           host="${ftp.host}"
           port="${ftp.port}"
@@ -467,7 +479,8 @@
               <include name="*.tar.gz"/>
           </fileset>
         </ftpdeploy>
-        <echo message="Successfully sent zip and tars from ${base_folder} to ${ftp.host}/${remote_folder}"/>
+-->
+        <echo message="Successfully sent zip and tars from ${base_folder} to ${scp.host}/${remote_folder}"/>
     </target>
 
     <target name="lint" description="Check syntax of sources">
