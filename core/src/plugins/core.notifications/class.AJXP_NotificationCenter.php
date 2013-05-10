@@ -150,6 +150,10 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     echo("</li>");
                 }else{
                     $node = $notif->getNode();
+                    if($node == null){
+                        AJXP_Logger::logAction("Warning : Empty node stored in notification ".$notif->getAuthor()."/ ".$notif->getAction());
+                        continue;
+                    }
                     try{
                         $wClass = $node->wrapperClassName;
                         if(!empty($wClass)){

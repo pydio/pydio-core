@@ -1409,7 +1409,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					"icon" 		=> "folder_development.png",					
 					"plugin_id" => $t
 				);
-				AJXP_XMLWriter::renderNode("/$root/plugins/".$t, ucfirst($t), false, $meta);
+				AJXP_XMLWriter::renderNode("/".$root.$dir."/".$t, ucfirst($t), false, $meta);
 			}
 		}else if($dir == "/core"){
 			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="detail"  template_name="ajxp_conf.plugins">
@@ -1432,7 +1432,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     // Check if there are actually any parameters to display!
                     if($pObject->getManifestRawContent("server_settings", "xml")->length == 0) continue;
                     $label =  $pObject->getManifestLabel();
-                    $nodeString =AJXP_XMLWriter::renderNode("/$root/plugins/".$pObject->getId(), $label, true, $meta, true, false);
+                    $nodeString =AJXP_XMLWriter::renderNode("/$root".$dir."/".$pObject->getId(), $label, true, $meta, true, false);
                     if($isMain){
                         $first = $nodeString;
                     }else{
@@ -1468,7 +1468,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					"plugin_id" => $pObject->getId(),
 					"plugin_description" => $pObject->getManifestDescription()
 				);
-				AJXP_XMLWriter::renderNode("/$root/plugins/".$pObject->getId(), $pObject->getManifestLabel(), true, $meta);
+				AJXP_XMLWriter::renderNode("/$root".$dir."/".$pObject->getId(), $pObject->getManifestLabel(), true, $meta);
 			}
 		}
 	}
@@ -1556,7 +1556,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $test = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
             if(!empty($test)) $nodeLabel = $test;
             $scheme = AuthService::getAuthScheme($userId);
-			AJXP_XMLWriter::renderNode("/users/".$userId, $nodeLabel, true, array(
+			AJXP_XMLWriter::renderNode("/data/users/".$userId, $nodeLabel, true, array(
 				"isAdmin" => $mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")], 
 				"icon" => $icon.".png",
                 "auth_scheme" => ($scheme != null? $scheme : ""),

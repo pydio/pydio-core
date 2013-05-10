@@ -399,7 +399,7 @@ class AuthService
             $rootRole = new AJXP_Role("ROOT_ROLE");
             $rootRole->setLabel("Root Role");
             $rootRole->setAutoApplies(array("standard"));
-            foreach (ConfService::getRepositoriesList() as $repositoryId => $repoObject)
+            foreach (ConfService::getRepositoriesList("all") as $repositoryId => $repoObject)
             {
                 if($repoObject->isTemplate) continue;
                 $gp = $repoObject->getGroupPath();
@@ -937,7 +937,7 @@ class AuthService
         $repoList = null;
         foreach(self::$roles as $roleId => $roleObject){
             if(is_a($roleObject, "AjxpRole")){
-                if($repoList == null) $repoList = ConfService::getRepositoriesList();
+                if($repoList == null) $repoList = ConfService::getRepositoriesList("all");
                 $newRole = new AJXP_Role($roleId);
                 $newRole->migrateDeprectated($repoList, $roleObject);
                 self::$roles[$roleId] = $newRole;
