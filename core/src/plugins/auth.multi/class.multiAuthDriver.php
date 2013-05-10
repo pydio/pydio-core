@@ -175,23 +175,32 @@ class multiAuthDriver extends AbstractAuthDriver {
     }
 
     function supportsUsersPagination(){
-        return (!empty($this->baseName) && $this->drivers[$this->baseName]->supportsUsersPagination());
+        if(!empty($this->baseName)){
+            return $this->drivers[$this->baseName]->supportsUsersPagination();
+        }else{
+            return $this->drivers[$this->masterName]->supportsUsersPagination() && $this->drivers[$this->slaveName]->supportsUsersPagination();
+        }
     }
 
     function listUsersPaginated($baseGroup="/", $regexp, $offset, $limit){
-        return $this->drivers[$this->baseName]->listUsersPaginated($baseGroup, $regexp, $offset, $limit);
+        if(!empty($this->baseName)){
+            return $this->drivers[$this->baseName]->listUsersPaginated($baseGroup, $regexp, $offset, $limit);
+        }else{
+            $keys = array_keys($this->drivers);
+            return $this->drivers[$keys[0]]->listUsersPaginated($baseGroup, $regexp, $offset, $limit) +  $this->drivers[$keys[1]]->listUsersPaginated($baseGroup, $regexp, $offset, $limit);
+        }
     }
 
-    function getUsersCount(){
+    function getUsersCount($baseGroup = "/", $regexp = ""){
         if(empty($this->baseName)){
             if($this->masterSlaveMode){
-                return $this->drivers[$this->slaveName]->getUsersCount() +  $this->drivers[$this->masterName]->getUsersCount();
+                return $this->drivers[$this->slaveName]->getUsersCount($baseGroup, $regexp) +  $this->drivers[$this->masterName]->getUsersCount($baseGroup, $regexp);
             }else{
                 $keys = array_keys($this->drivers);
-                return $this->drivers[$keys[0]]->getUsersCount() +  $this->drivers[$keys[0]]->getUsersCount();
+                return $this->drivers[$keys[0]]->getUsersCount($baseGroup, $regexp) +  $this->drivers[$keys[1]]->getUsersCount($baseGroup, $regexp);
             }
         }else{
-            return $this->drivers[$this->baseName]->getUsersCount();
+            return $this->drivers[$this->baseName]->getUsersCount($baseGroup, $regexp);
         }
     }
 

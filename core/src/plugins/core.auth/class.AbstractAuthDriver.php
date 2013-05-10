@@ -230,7 +230,7 @@ class AbstractAuthDriver extends AJXP_Plugin {
     function listUsersPaginated($baseGroup = "/", $regexp, $offset, $limit){
         return $this->listUsers($baseGroup);
     }
-    function getUsersCount(){
+    function getUsersCount($baseGroup = "/", $regexp = ""){
         return -1;
     }
 

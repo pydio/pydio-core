@@ -27,6 +27,15 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class UpdateController extends AJXP_Plugin {
 
+    public function init($options){
+        parent::init($options);
+        $u = AuthService::getLoggedUser();
+        if($u == null) return;
+        if($u->getGroupPath() != "/"){
+            $this->enabled = false;
+        }
+    }
+
 	/**
 	 * Parse
 	 * @param DOMNode $contribNode

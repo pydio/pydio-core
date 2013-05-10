@@ -851,9 +851,9 @@ class AuthService
         return $authDriver->supportsUsersPagination();
     }
 
-    static function authCountUsers(){
+    static function authCountUsers($baseGroup="/", $regexp=""){
         $authDriver = ConfService::getAuthDriverImpl();
-        return $authDriver->getUsersCount();
+        return $authDriver->getUsersCount($baseGroup, $regexp);
     }
 
     static function getAuthScheme($userName){

@@ -282,6 +282,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if($currentUserIsGroupAdmin){
                     unset($rootNodes["config"]);
                     unset($rootNodes["admin"]);
+                    unset($rootNodes["developer"]);
                 }
                 AJXP_Controller::applyHook("ajxp_conf.list_config_nodes", array(&$rootNodes));
 				$dir = trim(AJXP_Utils::decodeSecureMagic((isset($httpVars["dir"])?$httpVars["dir"]:"")), " /");
@@ -1490,12 +1491,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
 		AJXP_XMLWriter::sendFilesListComponentConfig($columns);
 		if(!AuthService::usersEnabled()) return ;
-        $count = AuthService::authCountUsers();
         $USER_PER_PAGE = 50;
         if(empty($hashValue)) $hashValue = 1;
         if($root == "users") $baseGroup = "/";
         else $baseGroup = substr($root, strlen("users"));
-        if(AuthService::authSupportsPagination() && $count > $USER_PER_PAGE){
+
+        $count = AuthService::authCountUsers($baseGroup);
+        if(AuthService::authSupportsPagination() && $count >= $USER_PER_PAGE){
             $offset = ($hashValue - 1) * $USER_PER_PAGE;
             AJXP_XMLWriter::renderPaginationData($count, $hashValue, ceil($count/$USER_PER_PAGE));
             $users = AuthService::listUsers($baseGroup, "", $offset, $USER_PER_PAGE);

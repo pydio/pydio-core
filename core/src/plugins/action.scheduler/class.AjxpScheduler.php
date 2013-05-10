@@ -34,6 +34,15 @@ class AjxpScheduler extends AJXP_Plugin{
 
     }
 
+    public function init($options){
+        parent::init($options);
+        $u = AuthService::getLoggedUser();
+        if($u == null) return;
+        if($u->getGroupPath() != "/"){
+            $this->enabled = false;
+        }
+    }
+
     function getDbFile(){
         if(!isSet($this->db)){
             $this->db = $this->getPluginWorkDir(true). "/calendar.json" ;
