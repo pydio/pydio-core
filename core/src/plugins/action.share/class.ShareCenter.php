@@ -172,7 +172,8 @@ class ShareCenter extends AJXP_Plugin{
                     );
                 }
                 AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
-
+                // as the result can be quite small (e.g error code), make sure it's output in case of OB active.
+                flush();
 
                 break;
 
