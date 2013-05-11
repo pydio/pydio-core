@@ -2981,12 +2981,17 @@ legend a.active {
     width: 160px;
 }
 
+#user_acl{
+    font-size:1.1em;
+}
+
 div#available_roles, div#user_roles{
     padding: 0;
     border: 1px solid #aaa;
     width: 100%;
-    height: 80px;
+    height: 110px;
     overflow:auto;
+    border-radius: 3px;
 }
 
 div#rights_pane{
@@ -3003,15 +3008,12 @@ div.ajxp_role{
     background-color:#FFFFFF;
     border-left:7px solid #DDDDDD;
     cursor:move;
-    margin-left:1px;
-    margin-top:1px;
-    padding:1px 4px;
+    margin: 2px;
+    padding:3px 5px;
+    border-radius: 2px;
 }
 
 div.available_role{
-    filter:alpha(opacity=60);
-    opacity: 0.6;
-    -moz-opacity:0.6;
 }
 
 div.user_role{

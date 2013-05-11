@@ -35,7 +35,7 @@
 		</action>
 		<action name="stat">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction" developerComment="To comply with GUI client, always returns true."/>
 			</processing>
 		</action>
         <action name="list_all_plugins_actions">
@@ -70,12 +70,14 @@
         </action>
 		<action name="get_plugin_manifest">
 			<processing>
-				<serverCallback methodName="switchAction"/>
+				<serverCallback methodName="switchAction" restParams="/plugin_id">
+                    <input_param description="Plugin identifier (like type.name)" name="plugin_id" type="string"/>
+				</serverCallback>
 			</processing>
 		</action>
 		<action name="run_plugin_action">
 			<processing>
-				<serverCallback methodName="switchAction"/>
+				<serverCallback methodName="switchAction" developerComment="Execute a class method on a plugin. Used for testing connexions."/>
 			</processing>
 		</action>
         <action name="create_users_menu">
@@ -98,7 +100,7 @@
 					actionBarGroup="put" inZip="false">
 				</context>
 			</gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"></rightsContext>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var completeFunc = function(){
@@ -143,7 +145,13 @@
 						</div>
 					</div>				
 				]]></clientForm>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"
+                                developerComment="Create a user with login and password in the AUTH directory."
+                                restParams="/new_user_login/new_user_pwd"
+                        >
+                    <input_param description="User login, must be alphanumerical, no special chars" name="new_user_login" type="string"/>
+                    <input_param description="User password, must be alphanumerical, no special chars" name="new_user_pwd" type="string"/>
+				</serverCallback>
 				</processing>
 		</action>
 		<action name="create_role">
@@ -153,7 +161,7 @@
 					actionBarGroup="put" inZip="false">
 				</context>
 			</gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"></rightsContext>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					modal.showDialogForm('Create Role', 'create_role_box');
@@ -165,7 +173,9 @@
 						</div>
 					</div>
 				]]></clientForm>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction" developerComment="Create an empty role" restParams="/role_id">
+                    <input_param description="Role identifier" name="role_id" type="string"/>
+				</serverCallback>
 			</processing>
 		</action>
 		<action name="create_group">
@@ -175,7 +185,7 @@
 					actionBarGroup="put" inZip="false">
 				</context>
 			</gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"></rightsContext>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					modal.showDialogForm('Create Role', 'create_group_box');
@@ -190,19 +200,25 @@
 						</div>
 					</div>
 				]]></clientForm>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction" developerComment="Create a new group of users" restParams="/group_label/group_path+">
+                    <input_param description="Full group path, must be in the form /group/path/name" name="group_path" type="String"/>
+                    <input_param description="Group Label" name="group_label" type="String"/>
+				</serverCallback>
 			</processing>
 		</action>
 		<action name="user_update_group" dragndropDefault="true">
-			<gui text="ajxp_conf.75" title="ajxp_conf.75" src="user_group_new.png" accessKey="ajxp_conf.role_access" hasAccessKey="true">
+			<gui text="ajxp_conf.119" title="ajxp_conf.119" src="user_group_new.png" accessKey="ajxp_conf.role_access" hasAccessKey="true">
 				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
 					actionBar="false" contextMenu="false" infoPanel="false"
 					actionBarGroup="put" inZip="false">
 				</context>
 			</gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"></rightsContext>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
             <processing>
-                <serverCallback methodName="switchAction"/>
+                <serverCallback methodName="switchAction" developerComment="Move an existing user to an existing group" restParams="/file/group_path+">
+                    <input_param description="User identifier" name="file" type="String"/>
+                    <input_param description="Target group path, must be /group/path" name="group_path" type="String"/>
+                </serverCallback>
             </processing>
 		</action>
 		<action name="create_repository">
@@ -280,10 +296,12 @@
 						</div>
 					</div>				
 				]]></clientForm>
-				<serverCallback methodName="switchAction"/>
+				<serverCallback methodName="switchAction" restParams="/json_data">
+                    <input_param description="A JSON object containing the following mandatory keys : DISPLAY (string), DRIVER (string), DRIVER_OPTIONS (array of options) and optional keys : DISPLAY_ID (string), DESCRIPTION_ID (string), AJXP_SLUG (string), IS_TEMPLATE (boolean). &lt;br&gt;&lt;br&gt; The expected DRIVER value can be either an access type plugin name (fs, ftp, etc), or a template id by using the ajxp_template_ prefix (ajxp_template_TEMPLATE_ID). The DRIVER_OPTIONS array may depend on the used access type." name="json_data" type="JSON"/>
+				</serverCallback>
 				</processing>
 		</action>	
-		<action name="rename">
+		<action name="edit_repository_label">
 			<gui text="6" title="158" src="applix.png" iconClass="icon-pencil" accessKey="rename_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
@@ -307,17 +325,20 @@
 
 					if(ajaxplorer.getUserSelection() && ajaxplorer.getUserSelection().getSelectionSource() && ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition) {ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition(callback);}
 					]]></clientCallback>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction" restParams="/repository_id/newLabel">
+                    <input_param description="Repository Identifier" name="repository_id" type="string"/>
+                    <input_param description="New Label" name="newLabel" type="string"/>
+				</serverCallback>
 				</processing>
 		</action>						
-		<action name="batch_users_roles" fileDefault="false">
+		<action name="user_update_role" fileDefault="false">
 			<gui text="ajxp_conf.94" title="ajxp_conf.82" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="get" inZip="false">
 				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="false" multipleOnly="true" allowedMimes="user,user_editable" behaviour="hidden"></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+				<selectionContext dir="false" file="true" recycle="false" unique="false" multipleOnly="true" allowedMimes="user,user_editable" behaviour="hidden"/></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection =  ajaxplorer.getUserSelection();
@@ -329,12 +350,26 @@
 						ajaxplorer.actionBar.configEditor.setForm(oForm);
 						ajaxplorer.actionBar.configEditor.loadUsers(userSelection);
 					};
-					modal.showDialogForm('Batch Edition', 'edit_config_box', loadFunc, function(){hideLightBox();}, null, true);					
+					modal.showDialogForm('Batch Edition', 'batch_roles_edit_box', loadFunc, function(){hideLightBox();}, null, true);
 				]]></clientCallback>
+                <clientForm id="batch_roles_edit_box"><![CDATA[
+                    <div id="batch_roles_edit_box" action="edit_user" box_width="420">
+                        <div id="user_acl">
+                            <div id="roles_pane">
+                                <div class="dialogLegend" ajxp_message_id="ajxp_conf.83">AJXP_MESSAGE[ajxp_conf.83]</div>
+                                <div>
+                                    <div style="width:44%;float:left;"><span ajxp_message_id="ajxp_conf.71">AJXP_MESSAGE[ajxp_conf.71]</span> : <br><div id="available_roles"></div></div>
+                                    <div style="width:10%;float:left;text-align:center;vertical-align:middle; margin-top: 20px;"><span class="icon-chevron-left"></span> <span  class="icon-chevron-right"></span></div>
+                                    <div style="width:44%;float:left;"><span ajxp_message_id="ajxp_conf.70">AJXP_MESSAGE[ajxp_conf.70]</span> : <br><div id="user_roles"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ]]></clientForm>
 				<clientListener name="selectionChange"><![CDATA[
 				if(ajaxplorer){
 					var userSelection = ajaxplorer.getUserSelection();
-					var action = ajaxplorer.getActionBar().getActionByName("batch_users_roles");
+					var action = ajaxplorer.getActionBar().getActionByName("user_update_role");
 					if(action){
 						if(userSelection.isUnique()){
 							action.selectionContext.dir = true;
@@ -345,8 +380,12 @@
 						}					
 					}
 				}
-				]]></clientListener>				
-				<serverCallback methodName="switchAction"></serverCallback>
+				]]></clientListener>
+				<serverCallback methodName="switchAction" developerComment="Add or remove a given role to a set of users. The rest access can only handle one user at a time, using the file parameter." restParams="/file/update_role_action/role_id">
+                    <input_param description="Users selection" name="file_0...N" type="string"/>
+                    <input_param description="Role identifier" name="role_id" type="string"/>
+                    <input_param description="Action : add or remove role?" name="update_role_action" type="string"/>
+				</serverCallback>
 			</processing>
 		</action>
 		<action name="edit" fileDefault="true">
@@ -372,32 +411,44 @@
                         modal.openEditorDialog(editorData);
                     }
                 ]]></clientCallback>
-                <serverCallback methodName="switchAction"/>
+                <serverCallback methodName="switchAction" developerComment="Shortcut for various actions, calling edit with subaction parameter."/>
             </processing>
         </action>
-		<action name="delete_role">
-			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
-			</processing>
-		</action>
 		<action name="save_user_preference">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction" developerComment="Sets a user preference value. Rest can only take one value, but CLI or http GET can pass many preferences, using _1, _2, _3, etc." restParams="/user_id/pref_name_0/pref_value_0">
+                    <input_param description="User login" name="user_id" type="string"/>
+                    <input_param description="Preference name" name="pref_name_0" type="string"/>
+                    <input_param description="Preference value" name="pref_value_0" type="string"/>
+				</serverCallback>
 			</processing>
 		</action>
-		<action name="edit_meta_source">
+		<action name="meta_source_edit">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction" developerComment="Edit an existing meta source parameters." restParams="/repository_id/plugId/json_data">
+                    <input_param description="Id of the repository" name="repository_id" type="string"/>
+                    <input_param description="Id of the plugin" name="plugId" type="string"/>
+                    <input_param description="JSON Representation of the plugin necessary options" name="json_data"
+                                 type="JSON"/>
+				</serverCallback>
 			</processing>
 		</action>
-		<action name="add_meta_source">
+		<action name="meta_source_add">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction" developerComment="Add a meta source to a repository, setting its parameters." restParams="/repository_id/plugId/json_data">
+                    <input_param description="Id of the repository" name="repository_id" type="string"/>
+                    <input_param description="Id of the plugin" name="plugId" type="string"/>
+                    <input_param description="JSON Representation of the plugin necessary options" name="json_data"
+                                 type="JSON"/>
+				</serverCallback>
 			</processing>
 		</action>
-		<action name="delete_meta_source">
+		<action name="meta_source_delete">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction" developerComment="Remove a given meta source from a repository." restParams="/repository_id/plugId">
+                    <input_param description="Id of the repository" name="repository_id" type="string"/>
+                    <input_param description="Id of the plugin" name="plugId" type="string"/>
+				</serverCallback>
 			</processing>
 		</action>
 		<action name="delete">			
@@ -406,8 +457,8 @@
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change" inZip="false">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable,shared_file,role,group" image="false" editable="false"></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+				<selectionContext dir="true" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable,shared_file,role,group" image="false" editable="false"/></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection =  ajaxplorer.getUserSelection();
@@ -478,7 +529,11 @@
 					<input type="hidden" name="" value=""/>
 				</div>
 				]]></clientForm>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction" restParams="/data_type/data_id+">
+                    <input_param description="Type of the data to delete. Can be : user, group, role, repository, shared_file" name="date_type" type="String"/>
+                    <input_param description="Id of the data to delete. For groups, full group path." name="data_id"
+                                 type="string"/>
+				</serverCallback>
 				</processing>
 		</action>		
 		<action name="copyAsText">			
@@ -522,7 +577,7 @@
 				]]></clientForm>
 				</processing>
 		</action>					
-	    <action name="update_user_right">
+	    <action name="user_update_right">
             <processing>
                 <serverCallback methodName="switchAction" restParams="/repository_id/user_id/right" checkParams="true">
                     <input_param name="user_id" type="AJXP_USER" mandatory="true" description="ID of the user"/>
