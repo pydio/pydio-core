@@ -564,6 +564,7 @@ Class.create("RoleEditor", AbstractEditor, {
    		var rightsTable = rightsPane.down('#acls-selected');
         rightsTable.update("");
         var repositories = this.roleData.ALL.REPOSITORIES;
+        if(!Object.keys(repositories).length) return;
         //repositories.sortBy(function(element) {return XPathGetSingleNodeText(element, "label");});
         //var defaultRepository = XPathGetSingleNodeText(xmlData, '//pref[@name="force_default_repository"]/@value');
    		for(var repoId in repositories){
