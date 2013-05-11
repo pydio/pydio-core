@@ -19,7 +19,7 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"file.add" => "Innerhalb des Repository AJXP_REPOSITORY_LABEL wurde die Datei AJXP_NODE_LABEL erstellt, innerhalb AJXP_PARENT_PATH am AJXP_DATE von AJXP_USER.",
+"file.add" => "Innerhalb des Repository AJXP_REPOSITORY_LABEL wurde die Datei AJXP_NODE_LABEL erstellt, innerhalb des Ordners AJXP_PARENT_PATH. AJXP_DATE von AJXP_USER.",
 "file.delete" => "Die Datei AJXP_NODE_LABEL wurde gelöscht aus AJXP_PARENT_PATH am AJXP_DATE von AJXP_USER.",
 "file.change" => "Die Datei AJXP_NODE_LABEL wurde geändert am AJXP_DATE von AJXP_USER.",
 "file.view" => "Die Datei AJXP_NODE_LABEL wurde betrachtet von AJXP_USER am AJXP_DATE.",
