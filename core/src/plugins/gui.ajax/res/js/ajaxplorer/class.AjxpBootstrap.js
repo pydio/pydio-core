@@ -111,7 +111,7 @@ Class.create("AjxpBootstrap", {
 
 		var url = this.parameters.get('BOOTER_URL')+(this.parameters.get("debugMode")?'&debug=true':'');
 		if(this.parameters.get('SERVER_PREFIX_URI')){
-			url += '&server_prefix_uri=' + this.parameters.get('SERVER_PREFIX_URI');
+			url += '&server_prefix_uri=' + this.parameters.get('SERVER_PREFIX_URI').replace(/\.\.\//g, "_UP_/");
 		}
 		var connexion = new Connexion(url);
 		connexion.onComplete = function(transport){			

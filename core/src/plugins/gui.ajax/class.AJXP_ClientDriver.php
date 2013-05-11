@@ -260,7 +260,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 
     function computeBootConf(){
         if(isSet($_GET["server_prefix_uri"])){
-            $_SESSION["AJXP_SERVER_PREFIX_URI"] = $_GET["server_prefix_uri"];
+            $_SESSION["AJXP_SERVER_PREFIX_URI"] = str_replace("_UP_", "..", $_GET["server_prefix_uri"]);
         }
         $config = array();
         $config["ajxpResourcesFolder"] = "plugins/gui.ajax/res";
