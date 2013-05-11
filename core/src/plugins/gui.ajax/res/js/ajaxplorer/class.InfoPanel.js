@@ -185,6 +185,7 @@ Class.create("InfoPanel", AjxpPane, {
 			this.addActions('empty');
             if(this.scrollbar) this.scrollbar.recalculateLayout();
             this.updateTitle();
+            disableTextSelection(this.contentContainer);
             return;
 		}
 		if(!passedNode && !userSelection.isUnique())
@@ -192,6 +193,7 @@ Class.create("InfoPanel", AjxpPane, {
 			this.setContent('<br><br><center><i>'+ userSelection.getFileNames().length + ' '+MessageHash[128]+'</i></center><br><br>');
 			this.addActions('multiple');
             if(this.scrollbar) this.scrollbar.recalculateLayout();
+            disableTextSelection(this.contentContainer);
 			return;
 		}
 
@@ -230,6 +232,7 @@ Class.create("InfoPanel", AjxpPane, {
 			this.resize();
 		}
 		if(this.scrollbar) this.scrollbar.recalculateLayout();
+        disableTextSelection(this.contentContainer);
 	},
 	/**
 	 * Insert html in content pane
