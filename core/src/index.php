@@ -137,8 +137,7 @@ if(AuthService::usersEnabled())
 }
 
 // THIS FIRST DRIVERS DO NOT NEED ID CHECK
-$ajxpDriver = AJXP_PluginsService::findPlugin("gui", "ajax");
-//$ajxpDriver->init(ConfService::getRepository());
+//$ajxpDriver = AJXP_PluginsService::findPlugin("gui", "ajax");
 $authDriver = ConfService::getAuthDriverImpl();
 // DRIVERS BELOW NEED IDENTIFICATION CHECK
 if(!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") || AuthService::getLoggedUser()!=null){
