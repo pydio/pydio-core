@@ -233,6 +233,9 @@ class AJXP_Controller{
         }
 		
 		if($captureCalls !== false){
+            // Make sure the ShutdownScheduler has its own OB started BEFORE, as it will presumabily be
+            // executed AFTER the end of this one.
+            AJXP_ShutdownScheduler::getInstance();
 			ob_start();
 			$params = array("pre_processor_results" => array(), "post_processor_results" => array());
 		}
