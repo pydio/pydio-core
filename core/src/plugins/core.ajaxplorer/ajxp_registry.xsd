@@ -667,22 +667,25 @@
         <xs:complexType>
             <xs:attribute name="choices"/>
             <xs:attribute name="default"/>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+            <xs:attribute name="type" use="required" type="xs:Name"/>
+            <xs:attribute name="label" use="required"/>
             <xs:attribute name="description" use="required"/>
             <xs:attribute name="expose" type="xs:boolean"/>
             <xs:attribute name="group"/>
             <xs:attribute name="replicationGroup"/>
-            <xs:attribute name="label" use="required"/>
             <xs:attribute name="mandatory" type="xs:boolean"/>
-            <xs:attribute name="name" use="required" type="xs:NCName"/>
             <xs:attribute name="no_templates" type="xs:boolean"/>
             <xs:attribute name="templates_only" type="xs:boolean"/>
-            <xs:attribute name="type" use="required" type="xs:Name"/>
             <xs:attribute name="scope"/>
             <xs:attribute name="repoScope"/>
             <xs:attribute name="editable" type="xs:boolean" use="optional"/>
             <xs:attribute name="uploadAction" use="optional"/>
             <xs:attribute name="loadAction" use="optional"/>
             <xs:attribute name="defaultImage" use="optional"/>
+            <xs:attribute name="group_switch_name" use="optional"/>
+            <xs:attribute name="group_switch_value" use="optional"/>
+            <xs:attribute name="group_switch_label" use="optional"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="input_param">

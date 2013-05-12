@@ -56,11 +56,44 @@ class remoteAuthDriver extends AbstractAuthDriver {
     var $urls;
 	
 	function init($options){
+
+        // Migrate new version of the options
+        if(isSet($options["CMS_TYPE"])){
+            // Transform MASTER_URL + LOGIN_URI to MASTER_HOST, MASTER_URI, LOGIN_URL, LOGOUT_URI
+            $options["SLAVE_MODE"] = "true";
+            $cmsOpts = $options["CMS_TYPE"];
+            if($cmsOpts["cms"] != "custom"){
+                $loginURI = $cmsOpts["LOGIN_URI"];
+                if(strpos($cmsOpts["MASTER_URL"], "http") === 0){
+                    $parse = parse_url($cmsOpts["MASTER_URL"]);
+                    $rootHost = $parse["host"];
+                    $rootURI = $parse["path"];
+                }else{
+                    $rootHost = "";
+                    $rootURI = $cmsOpts["MASTER_URL"];
+                }
+                $cmsOpts["MASTER_HOST"] = $rootHost;
+                $cmsOpts["LOGIN_URL"] = $cmsOpts["MASTER_URI"] = AJXP_Utils::securePath("/".$rootURI."/".$loginURI);
+                $logoutAction = $cmsOpts["LOGOUT_ACTION"];
+                switch($cmsOpts["cms"]){
+                    case "wp":
+                        $cmsOpts["LOGOUT_URL"] = ($logoutAction == "back" ? $cmsOpts["LOGIN_URL"] : $cmsOpts["MASTER_URL"]."/wp-logging.php?action=logout");
+                        break;
+                    case "joomla":
+                        $cmsOpts["LOGOUT_URL"] = $cmsOpts["LOGIN_URL"];
+                        break;
+                    case "drupal":
+                        $cmsOpts["LOGOUT_URL"] = ($logoutAction == "back" ? $cmsOpts["LOGIN_URL"] : $cmsOpts["MASTER_URL"]."/logout");
+                        break;
+                    default:
+                        break;
+                }
+            }
+            $options = array_merge($options, $cmsOpts);
+        }
+
         $this->slaveMode = $options["SLAVE_MODE"] == "true";
         if($this->slaveMode && ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")){
-        	// Make sure "login" is disabled, or it will re-appear if GUEST browsing is enabled!
-        	// OLD WAY : unset($this->actions["login"]);
-        	// NEW WAY : Modify manifest dynamically (more coplicated...)
         	$contribs = $this->xPath->query("registry_contributions/external_file");
         	foreach ($contribs as $contribNode){        		
         		if($contribNode->getAttribute('filename') == 'plugins/core.auth/standard_auth_actions.xml'){
@@ -185,14 +218,14 @@ class remoteAuthDriver extends AbstractAuthDriver {
         if ($this->slaveMode) {
             if (isset($_SESSION["AJXP_USER"])) return false;
             return $this->urls[0];
-        } 
+        }
         return false;
     }
     
 	function getLogoutRedirect(){
         if ($this->slaveMode) {
             return $this->urls[1];
-        } 
+        }
         return false;
     }
     
