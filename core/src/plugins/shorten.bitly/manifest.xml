@@ -14,7 +14,7 @@
         <!-- Override a simple action -->
             <action name="share">
                 <post_processing>
-                    <serverCallback methodName="postProcess" capture="true" applyCondition="$apply=!isSet($httpVars['sub_action']);"/>
+                    <serverCallback methodName="postProcess" capture="true" applyCondition="$apply=(!isSet($httpVars['sub_action']) || $httpVars['sub_action'] == 'create_minisite');"/>
                 </post_processing>
             </action>
         </actions>

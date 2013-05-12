@@ -259,7 +259,11 @@ class ShareCenter extends AJXP_Plugin{
                             $repoId = $minisiteData["REPOSITORY"];
                             $minisiteIsPublic = isSet($minisiteData["PRELOG_USER"]);
                             $dlDisabled = isSet($minisiteData["DOWNLOAD_DISABLED"]);
-                            $minisiteLink = $this->buildPublicletLink($metadata["element"]);
+                            if(isSet($metadata["short_form_url"])){
+                                $minisiteLink = $metadata["short_form_url"];
+                            }else{
+                                $minisiteLink = $this->buildPublicletLink($metadata["element"]);
+                            }
                         }else{
                             $repoId = $metadata["element"];
                         }
