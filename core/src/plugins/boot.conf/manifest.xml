@@ -15,6 +15,7 @@
         <global_param group="&lt;span class='icon-key'&gt;&lt;/span&gt; Admin access" name="ADMIN_USER_PASS2" type="password" label="Confirm" description="Confirm password" mandatory="true"/>
         <global_param group="&lt;span class='icon-cogs'&gt;&lt;/span&gt; Global options" name="sysLegend" type="legend" label="" description="Set up some application parameters. If you enable Emails, please use the Test button to check if your php is correctly configured."/>
         <global_param group="&lt;span class='icon-cogs'&gt;&lt;/span&gt; Global options" name="APPLICATION_TITLE" type="string" label="Application Title" description="Your system title" default="AjaXplorer" mandatory="false"/>
+        <global_param group="&lt;span class='icon-cogs'&gt;&lt;/span&gt; Global options" name="APPLICATION_WELCOME" type="textarea" label="Welcome Message" description="An additional message displayed at startup, on the splash screen and the login screen." default="" mandatory="false"/>
         <global_param group="&lt;span class='icon-cogs'&gt;&lt;/span&gt; Global options" name="APPLICATION_LANGUAGE" type="select" choices="AJXP_AVAILABLE_LANGUAGES" label="Default Language" description="Select a language activated by default( users will still be able to switch)" default="en" mandatory="true"/>
         <global_param group="&lt;span class='icon-cogs'&gt;&lt;/span&gt; Global options" name="MAILER_ENABLE" type="group_switch:mailer" label="Enable emails" description="Set up system to send emails" default="no" mandatory="true"/>
         <global_param group_switch_name="mailer" group_switch_value="no" group_switch_label="No (you can enable mails later)" name="status" type="hidden" label="No" description="s" default="no"/>
@@ -70,6 +71,12 @@
                             <img src="plugins/gui.ajax/AjxpLogo250.png" style="display:block;">
                             <div class="dialogLegend installerWelcome"> Thank you for installing AjaXplorer!<br> This tool will make sure your new sharing platform is up and running in no time: browse through the various sections to set up the general behaviour of the application. You can fly over the fields labels with your mouse to get more information. <br>Are you ready ? <span id="start_button">Start wizard!</span></div>
                             <div id="the_form" style="display:none; margin:0 5px;"></div>
+                            <div id="configuration_progress" class="dialogLegend installerWelcome" style="display:none; margin:0 5px;">
+                                Please wait while AjaXplorer 5 is being configured! It will be up and running in a couple of seconds...
+                                <div style="margin: 20px auto; width: 40px;">
+                                    <span class="icon-spinner rotating spinner_large"></span>
+                                </div>
+                            </div>
                             <div style="margin-top:20px;">
                                 <div id="save_button" class="SF_input SF_inlineButton disabled"><span class="icon-play-circle"></span>Install AjaXplorer Now!</div>
                             </div>

@@ -4073,3 +4073,64 @@ td.ip_geo_cell{
     font-size: 14px;
     line-height: 21px;
 }
+
+/* rotation animation */
+@-webkit-keyframes rotate {
+    from { -webkit-transform:rotate(0deg); }
+    to { -webkit-transform:rotate(360deg); }
+}
+
+@-moz-keyframes rotate {
+    from { -moz-transform:rotate(0deg); }
+    to { -moz-transform:rotate(360deg); }
+}
+
+@-ms-keyframes rotate {
+    from { -ms-transform:rotate(0deg); }
+    to { -ms-transform:rotate(360deg); }
+}
+
+@-o-keyframes rotate {
+    from { -o-transform:rotate(0deg); }
+    to { -o-transform:rotate(360deg); }
+}
+
+.rotating, .icon-spinner {
+    -webkit-transform-origin: 50% 50%;
+    -webkit-animation-name: rotate;
+    -webkit-animation-duration: 1.0s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+    -moz-transform-origin: 50% 50%;
+    -moz-animation-name: rotate;
+    -moz-animation-duration: 1.5s;
+    -moz-animation-iteration-count: infinite;
+    -moz-animation-timing-function: linear;
+    -ms-transform-origin: 50% 50%;
+    -ms-animation-name: rotate;
+    -ms-animation-duration: 1.5s;
+    -ms-animation-iteration-count: infinite;
+    -ms-animation-timing-function: linear;
+    -o-transform-origin: 50% 50%;
+    -o-animation-name: rotate;
+    -o-animation-duration: 1.5s;
+    -o-animation-iteration-count: infinite;
+    -o-animation-timing-function: linear;
+}
+
+.icon-spinner{
+    display: block !important;
+    text-align: center;
+}
+
+.icon-spinner.spinner_large{
+    font-size: 22px;
+}
+
+.events_menu span.icon-spinner{
+    display: block !important;
+    text-align: center;
+    width: 14px !important;
+    height: 16px !important;
+    float: left;
+}
