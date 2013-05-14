@@ -447,6 +447,23 @@ class AuthService
             }
             AuthService::updateRole($rootRole);
         }
+        $miniRole = AuthService::getRole("GUEST", false);
+        if($miniRole === false){
+            $rootRole = new AJXP_Role("GUEST");
+            $rootRole->setLabel("Guest user role");
+            $actions = array(
+                "access.fs" => array("purge"),
+                "meta.watch" => array("toggle_watch"),
+                "index.lucene" => array("index"),
+            );
+            $rootRole->setAutoApplies(array("guest"));
+            foreach($actions as $pluginId => $acts){
+                foreach($acts as $act){
+                    $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_ALL);
+                }
+            }
+            AuthService::updateRole($rootRole);
+        }
 		$adminCount = AuthService::countAdminUsers();
 		if($adminCount == 0){
 			$authDriver = ConfService::getAuthDriverImpl();

@@ -200,7 +200,8 @@ class BootConfLoader extends AbstractConfDriver {
         $direct = array(
             "APPLICATION_TITLE" => "core.ajaxplorer/APPLICATION_TITLE",
             "APPLICATION_LANGUAGE" => "core.ajaxplorer/DEFAULT_LANGUAGE",
-            "ENABLE_NOTIF"      => "core.notifications/USER_EVENTS"
+            "ENABLE_NOTIF"      => "core.notifications/USER_EVENTS",
+            "APPLICATION_WELCOME" => "gui.ajax/CUSTOM_WELCOME_MESSAGE"
         );
         $mailerEnabled = $data["MAILER_ENABLE"]["status"];
         if($mailerEnabled == "yes"){

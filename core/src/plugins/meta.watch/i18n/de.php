@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
 $mess = array(
-    "1" => "Beobachten nach...",
+    "1" => "Beobachten nach..",
     "2" => "Benachrichtigen, wenn auf diesen Ordner/Datei zugegriffen wird",
     "3" => "Stopp beobachten",
     "4" => "Stopp das Beobachten, des Ordners, nach Änderungen.",

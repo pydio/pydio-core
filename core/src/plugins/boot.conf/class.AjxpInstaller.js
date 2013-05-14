@@ -44,6 +44,12 @@ Class.create("AjxpInstaller", AjxpPane, {
             this.formElement.select("select").invoke("observe", "change", function(){
                 modal.refreshDialogPosition();
             });
+            this.formElement.down('input[name="ADMIN_USER_LOGIN"]').observe("input", function(){
+                var n = this.formElement.down('input[name="ADMIN_USER_NAME"]');
+                var newValue = this.formElement.down('input[name="ADMIN_USER_LOGIN"]').getValue();
+                n.setValue(newValue);
+            }.bind(this));
+
             var observer = function(){
                 var passValidating = (this.formElement.down('input[name="ADMIN_USER_PASS"]').getValue() == this.formElement.down('input[name="ADMIN_USER_PASS2"]').getValue());
                 passValidating = passValidating && (this.formElement.down('input[name="ADMIN_USER_PASS"]').PROTOPASS.strength > 0);
@@ -103,9 +109,22 @@ Class.create("AjxpInstaller", AjxpPane, {
             var params = new Hash({get_action: "apply_installer_form"});
             this.formManager.serializeParametersInputs(this.formElement, params);
             conn.setParameters(params);
+            this.formElement.hide();
+            startButton.up('div').hide();
+            this.formElement.previous('.dialogLegend').hide();
+            var progress = this.formElement.next('#configuration_progress');
+            progress.show();
+            modal.refreshDialogPosition();
             conn.onComplete = function(transport){
                 if(transport.responseText == "OK"){
-                    document.location.reload(true);
+                    window.setTimeout(function(){
+                        progress.insert('...done! <br/>The page will now reload automatically. You can log in with the admin user <b>"'+params.get('ADMIN_USER_LOGIN')+'"</b> you have just defined.<br/><br/>');
+                        new Effect.Fade(progress.down('span.icon-spinner'), {afterFinish : function(){progress.down('span.icon-spinner').remove();}});
+                        modal.refreshDialogPosition();
+                        window.setTimeout(function(){
+                            document.location.reload(true);
+                        }, 6000);
+                    }, 3000);
                 }
             };
             conn.sendAsync();

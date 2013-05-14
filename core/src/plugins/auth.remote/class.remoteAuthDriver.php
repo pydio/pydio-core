@@ -77,13 +77,13 @@ class remoteAuthDriver extends AbstractAuthDriver {
                 $logoutAction = $cmsOpts["LOGOUT_ACTION"];
                 switch($cmsOpts["cms"]){
                     case "wp":
-                        $cmsOpts["LOGOUT_URL"] = ($logoutAction == "back" ? $cmsOpts["LOGIN_URL"] : $cmsOpts["MASTER_URL"]."/wp-logging.php?action=logout");
+                        $cmsOpts["LOGOUT_URL"] = ($logoutAction == "back" ? $cmsOpts["LOGIN_URL"] : $cmsOpts["MASTER_URL"]."/wp-login.php?action=logout");
                         break;
                     case "joomla":
                         $cmsOpts["LOGOUT_URL"] = $cmsOpts["LOGIN_URL"];
                         break;
                     case "drupal":
-                        $cmsOpts["LOGOUT_URL"] = ($logoutAction == "back" ? $cmsOpts["LOGIN_URL"] : $cmsOpts["MASTER_URL"]."/logout");
+                        $cmsOpts["LOGOUT_URL"] = ($logoutAction == "back" ? $cmsOpts["LOGIN_URL"] : $cmsOpts["MASTER_URL"]."/user/logout");
                         break;
                     default:
                         break;
