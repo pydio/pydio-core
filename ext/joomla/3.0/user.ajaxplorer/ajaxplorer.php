@@ -74,7 +74,8 @@ class plgUserAjaxplorer extends JPlugin {
 		$AJXP_GLUE_GLOBALS["user"] = array();
 		$AJXP_GLUE_GLOBALS["user"]['name']	= $joomlaUser['username'];
 		$AJXP_GLUE_GLOBALS["user"]['password']	= $joomlaUser['password'];
-		if($joomlaUser['usertype'] == "Super Administrator" || $joomlaUser['usertype'] == "Administrator"){
+		if($joomlaUser['usertype'] == "Super Administrator" || $joomlaUser['usertype'] == "Administrator" || $joomlaUser["isRoot"]
+            || is_array($joomlaUser["groups"]) && in_array("8", $joomlaUser["groups"])){
 			$AJXP_GLUE_GLOBALS["user"]['right'] = 'admin';
 		}else{
 			$AJXP_GLUE_GLOBALS["user"]['right'] = '';
