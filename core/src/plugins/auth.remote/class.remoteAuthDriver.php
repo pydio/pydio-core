@@ -60,7 +60,7 @@ class remoteAuthDriver extends AbstractAuthDriver {
         // Migrate new version of the options
         if(isSet($options["CMS_TYPE"])){
             // Transform MASTER_URL + LOGIN_URI to MASTER_HOST, MASTER_URI, LOGIN_URL, LOGOUT_URI
-            $options["SLAVE_MODE"] = "true";
+            $options["SLAVE_MODE"] = "false";
             $cmsOpts = $options["CMS_TYPE"];
             if($cmsOpts["cms"] != "custom"){
                 $loginURI = $cmsOpts["LOGIN_URI"];
@@ -132,11 +132,12 @@ class remoteAuthDriver extends AbstractAuthDriver {
 			$userStoredPass = $this->getUserPass($login);
 			if(!$userStoredPass) return false;
 			if($seed == "-1"){ // Seed = -1 means that password is not encoded.
-				return ($userStoredPass == $pass);
+				return ($userStoredPass == md5($pass));
 			}else{
 				return (md5($userStoredPass.$seed) == $pass);
 			}			
 		}else{
+            $crtSessionId = session_id();
 			session_write_close();
 			$host = "";
 			if(isSet($this->options["MASTER_HOST"])){
@@ -159,7 +160,20 @@ class remoteAuthDriver extends AbstractAuthDriver {
 					return true;					
 				}
 			}
-			return  false;
+            // NOW CHECK IN LOCAL USERS LIST
+            $userStoredPass = $this->getUserPass($login);
+            if(!$userStoredPass) return false;
+            if($seed == "-1"){ // Seed = -1 means that password is not encoded.
+                $res = ($userStoredPass == md5($pass));
+            }else{
+                $res = (md5($userStoredPass.$seed) == $pass);
+            }
+            if($res){
+                session_id($crtSessionId);
+                session_start();
+                return true;
+            }
+			return false;
 		}		
 	}
 	
@@ -181,9 +195,9 @@ class remoteAuthDriver extends AbstractAuthDriver {
 		if(!is_array($users)) $users = array();
 		if(array_key_exists($login, $users)) return "exists";
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$users[$login] = $passwd;
-		}else{
 			$users[$login] = md5($passwd);
+		}else{
+			$users[$login] = $passwd;
 		}
 		AJXP_Utils::saveSerialFile($this->usersSerFile, $users);		
 	}	
@@ -192,9 +206,9 @@ class remoteAuthDriver extends AbstractAuthDriver {
 		$users = $this->listUsers();
 		if(!is_array($users) || !array_key_exists($login, $users)) return ;
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$users[$login] = $newPass;
-		}else{
 			$users[$login] = md5($newPass);
+		}else{
+			$users[$login] = $newPass;
 		}
 		AJXP_Utils::saveSerialFile($this->usersSerFile, $users);
 	}	
@@ -215,18 +229,18 @@ class remoteAuthDriver extends AbstractAuthDriver {
 	}
     
     function getLoginRedirect(){
-        if ($this->slaveMode) {
-            if (isset($_SESSION["AJXP_USER"])) return false;
-            return $this->urls[0];
-        }
+        //if ($this->slaveMode) {
+        //    if (isset($_SESSION["AJXP_USER"])) return false;
+        //    return $this->urls[0];
+        //}
         return false;
     }
     
 	function getLogoutRedirect(){
-        if ($this->slaveMode) {
+        //if ($this->slaveMode) {
             return $this->urls[1];
-        }
-        return false;
+        //}
+        //return false;
     }
     
 }

@@ -8,7 +8,7 @@
                     ajxpWidgets="UserWidget::logging_string">
 				</context>
 			</gui>
-			<rightsContext noUser="false" userLogged="only" guestLogged="show" read="false" write="false" adminOnly=""></rightsContext>			
+			<rightsContext noUser="false" userLogged="only" guestLogged="show" read="false" write="false" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
 					clearRememberData();
