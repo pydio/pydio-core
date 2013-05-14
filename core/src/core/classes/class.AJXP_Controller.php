@@ -162,6 +162,7 @@ class AJXP_Controller{
      * @return bool
      */
 	public static function findActionAndApply($actionName, $httpVars, $fileVars, &$action = null){
+        $actionName = AJXP_Utils::sanitize($actionName, AJXP_SANITIZE_EMAILCHARS);
         if($actionName == "cross_copy"){
             $pService = AJXP_PluginsService::getInstance();
             $actives = $pService->getActivePlugins();
