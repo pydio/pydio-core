@@ -96,7 +96,7 @@
 		<script type="text/javascript">
 			var ajaxplorer, MessageHash={};
 			var startParameters = {
-				"BOOTER_URL":"AJXP_PATH_TO_ROOT/index.php?get_action=get_boot_conf&goto=AJXP_START_REPOSITORY/",
+				"BOOTER_URL":"AJXP_PATH_TO_ROOT/index_shared.php?get_action=get_boot_conf&goto=AJXP_START_REPOSITORY&minisite_session=true",
 				"EXT_REP":"\/", 
 				"MAIN_ELEMENT":"ajxp_shared_folder",
 				"SERVER_PREFIX_URI": "AJXP_PATH_TO_ROOT/"

@@ -61,7 +61,9 @@ ConfService::start();
 $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
 //new AjxpSessionHandler();
-session_name("AjaXplorer");
+if(!isSet($OVERRIDE_SESSION)){
+    session_name("AjaXplorer");
+}
 session_start();
 
 if(isSet($_GET["tmp_repository_id"])){

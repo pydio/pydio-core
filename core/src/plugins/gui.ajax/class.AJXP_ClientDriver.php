@@ -264,7 +264,11 @@ class AJXP_ClientDriver extends AJXP_Plugin
         }
         $config = array();
         $config["ajxpResourcesFolder"] = "plugins/gui.ajax/res";
-        $config["ajxpServerAccess"] = AJXP_SERVER_ACCESS;
+        if(session_name() == "AjaXplorer_Shared"){
+            $config["ajxpServerAccess"] = "index_shared.php";
+        }else{
+            $config["ajxpServerAccess"] = AJXP_SERVER_ACCESS;
+        }
         $config["zipEnabled"] = ConfService::zipEnabled();
         $config["multipleFilesDownloadEnabled"] = ConfService::getCoreConf("ZIP_CREATION");
         $config["customWording"] = array(

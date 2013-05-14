@@ -577,7 +577,7 @@ class ShareCenter extends AJXP_Plugin{
         $html = str_replace("AJXP_START_REPOSITORY", $repository, $html);
         $html = str_replace("AJXP_REPOSITORY_LABEL", ConfService::getRepositoryById($repository)->getDisplay(), $html);
         if(!empty($data["PRELOG_USER"])){
-            session_name("AjaXplorer");
+            session_name("AjaXplorer_Shared");
             session_start();
             AuthService::logUser($data["PRELOG_USER"], "", true);
             $html = str_replace("AJXP_PRELOGED_USER", "ajxp_preloged_user", $html);
