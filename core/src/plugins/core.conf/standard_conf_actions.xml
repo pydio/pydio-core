@@ -353,8 +353,11 @@
                                 }));
                                 conn.onComplete = function(transport){
                                     ajaxplorer.webdavCurrentPreferences = transport.responseJSON;
-                                    if(ajaxplorer.webdavCurrentPreferences.webdav_active && !ajaxplorer.webdavCurrentPreferences.digest_set && !ajaxplorer.webdavCurrentPreferences.webdav_force_basic ) {
-                                        $('webdav_password_form').show();
+                                    if(ajaxplorer.webdavCurrentPreferences.webdav_active){
+                                        if(!ajaxplorer.webdavCurrentPreferences.digest_set
+                                        || ajaxplorer.webdavCurrentPreferences.webdav_force_basic) {
+                                            $('webdav_password_form').show();
+                                        }
                                         ajaxplorer.displayMessage("SUCCESS", MessageHash[408]);
                                     }else {
                                         $('webdav_password_form').hide();
@@ -407,7 +410,7 @@
 			</processing>		
 		</action>
         <action name="switch_to_settings">
-            <gui src="drive_remote.png" text="165" title="165" accessKey="settings_access_key" hasAccessKey="true" iconClass="icon-cog" >
+            <gui src="drive_remote.png" text="165" title="165" accessKey="settings_access_key" hasAccessKey="true" iconClass="icon-cogs" >
                 <context dir="false" recycle="true" selection="false" actionBar="true" actionBarGroup="utils" ajxpWidgets="UserWidget::logging_string"/>
             </gui>
             <rightsContext adminOnly="true" noUser="true" read="false" userLogged="only" write="false"/>
