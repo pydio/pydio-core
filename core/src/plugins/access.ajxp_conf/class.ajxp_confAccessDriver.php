@@ -37,7 +37,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         parent::accessPreprocess($action, $httpVars, $fileVars);
         $loggedUser = AuthService::getLoggedUser();
         if(AuthService::usersEnabled() && !$loggedUser->isAdmin()) return ;
-        $mess = ConfService::getMessages();
         switch($action)
         {
             //------------------------------------
@@ -58,7 +57,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case "list_all_plugins_actions":
                 $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//action", "node", false, true, true);
                 $actions = array();
-                $mess = ConfService::getMessages();
                 foreach($nodes as $node){
                     $xPath = new DOMXPath($node->ownerDocument);
                     $proc = $xPath->query("processing", $node);
@@ -95,7 +93,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case "list_all_plugins_parameters":
                 $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//param|//global_param", "node", false, true, true);
                 $actions = array();
-                $mess = ConfService::getMessages();
                 foreach($nodes as $node){
                     if($node->parentNode->nodeName != "server_settings") continue;
                     $parentPlugin = $node->parentNode->parentNode;
@@ -872,7 +869,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $isTemplate = isSet($httpVars["sf_checkboxes_active"]);
                 unset($repDef["get_action"]);
                 unset($repDef["sf_checkboxes_active"]);
-                if(iSet($httpVars["json_data"])){
+                if(isSet($httpVars["json_data"])){
                     $options = json_decode($httpVars["json_data"], true);
                 }else{
                     $options = array();
@@ -1440,7 +1437,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         $dir = "/$dir";
 		AJXP_Logger::logAction("Listing plugins"); // make sure that the logger is started!
 		$pServ = AJXP_PluginsService::getInstance();
-		$activePlugins = $pServ->getActivePlugins();
 		$types = $pServ->getDetectedPlugins();
 		$uniqTypes = array("core");
         $coreTypes = array("auth", "conf", "boot", "feed", "log", "mailer", "mq");
