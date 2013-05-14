@@ -2,9 +2,98 @@ AjaXplorer ##VERSION_NUMBER## Release Note
 
 License : Affero GPL
 Copyright : Charles du Jeu 2013
-Demo : http://ajaxplorer.info/demo
+Demo : http://demo.ajaxplorer.info/
 Date : ##VERSION_DATE##
 Rev Number : ##REVISION##
+
+Contributors:
+https://github.com/Vorlif
+https://github.com/oo12
+https://github.com/fdecourt
+
+This is a massive bugfix from 4.3.3. Please deploy on test on your machines.
+
+Dist : fix debian testing
+Sharelink rewrite : use [QSA] Query String Append file to avoid breaking download
+Fix #92, Fix #94, Fix #93
+Fix #91 : typo when creating role, using old AjxpRole instead of AJXP_Role!
+Fix #90 : Reintroduced admin_counted and first_run_passed to differenciate both behaviours
+Fix SerialMetaStore wrong check on repository scope.
+Null button in FF. Fix #87
+Add a test for LDAP connexion, and optionnaly test whether a given user exists.
+Quickly fix Shared Elements driver
+Todo: should be reworked more deeply to display more info, or simply dropped.
+Fix #95, various issues on both Sqlite and MySQL for handling dates.
+Fix #80 : table creation was broken
+Embed the phpws library for simpler setup. Close #5
+Initiate 4.3.4 migration script.
+Close #71 by checking parameter client-side.
+Universign feature by @fdecourt
+Fix timestamp system, this is NOT an editor, but simply an action provider.
+Update README.md
+Fix array_merging polluting roles parameters.
+Fix from @dmitrydvorkin for basic_auth
+Fix build deployment
+Fix #103
+Fix add WS action / fix websocket
+Fix #107
+Fix #110
+Fix #101
+Fix templates not appearing
+Fix #98
+Fix notification problem (empty node), ignore and log a warning
+Fix Settings navigation problems fix #79
+Fix Settings Search (was performing ok but results were not displayed)
+Probably fix weirdness of repositories
+Call flush() after sharing problems can arise if OB active
+Fixes #104
+Fix #104 (pass ignored group when getting context menu actions, ignore "inline")
+Disable text selection in InfoPanel
+Fix cmd.php warnings, do not init gui driver anymore. Comment in index.php as well, should be unnecessary
+Massive documentation of the administration driver (ajxp_conf), along with some actions renamed for consistency. update_user_group renamed to user_update_group, same for right. Meta sources actions renamed as well, now meta_source_add, meta_source_edit, meta_source_edit.
+Alternative JSON encoded parameters accepted for repository creation, and meta source edition as well.
+Meta Source deletion was probably broken.
+URLDECODE the path parts when using rest access.
+Fix an output_buffering conflict, was preventing BitLy shortening to work correctly
+Fix #99 : Mod Sec may block uri containing a ../../ in the query parameters. Replace them by _UP_/_UP_/ to avoid blocking.
+Optimize raster graphics (@oo12)
+Update German translation (@Vorlif)
+Update Shortener plugins
+> New way of storing metadata
+> Use group_switch type for a better GUI
+> Fix #113 apply shortening on folders sharing
+Update XSD and ajxp_mixins
+Auto check new version upgrades
+Display release note if there is one before upgrading.
+New version of the Joomla Bridge for Joomla! 3.0 (JForm replaced by JRegistry). Fixes #106
+Rework auth.remote parameters using group_switch feature to simplify the process.
+Fix logout urls for WP & Drupal
+Update Readme
+Commit uploader.plupload, disabled by default as it requires downloading and installing the PlUpload sources.
+Fix Rename position
+Create guest Role (disable notifications & watches for guest)
+Rework installer last step (show an informational panel instead of nothing and reload)
+Typo, fix #119
+Update Joomla! Bridge : detect group "8" (Super Administrator) to apply to AjaXplorer
+Avoid Main and Minisite collision by using different session name. Make sure it does not have side-effects.
+Change how auth.remote is working : set bi-directonnial mode by default (not slave only), and fix the pass checks to implement an equivalent of auth.multi config. Auth against remote CMS, and then against local user base, to allow folder sharing user creations.
+Fix #120
+Update FontAwesome version to 3.1.11
+Fix wrong message displayed on WebDAV activation
+Quick fixes for Umbra Theme
+Sanitize actionName parameter before applying xpath query.
+Test access to data/cache/index.html, testing .ser file is irrelevant in IIS
+Fix bootstratp copyright year
+
+---------------------------------------------------------------
+
+AjaXplorer 4.3.3 Release Note
+
+License : Affero GPL
+Copyright : Charles du Jeu 2013
+Demo : http://ajaxplorer.info/demo
+Date : 2013-05-01
+Rev Number : 4.3.3
 
 Contributors :
 https://github.com/mattlef
