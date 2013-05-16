@@ -642,9 +642,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $basePath = (AuthService::getLoggedUser()!=null ? AuthService::getLoggedUser()->getGroupPath(): "/");
                     if(empty ($basePath)) $basePath = "/";
                     if(!empty($groupPath)){
-                        $user->setGroupPath(rtrim($basePath, "/")."/".ltrim($groupPath, "/"));
+                        $user->setGroupPath(rtrim($basePath, "/")."/".ltrim($groupPath, "/"), true);
                     }else{
-                        $user->setGroupPath($basePath);
+                        $user->setGroupPath($basePath, true);
                     }
                     $user->save("superuser");
                 }

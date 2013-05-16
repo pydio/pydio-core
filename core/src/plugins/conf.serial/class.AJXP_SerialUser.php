@@ -55,7 +55,22 @@ class AJXP_SerialUser extends AbstractAjxpUser
         $this->registerForSave = array();
     }
 
-    function setGroupPath($groupPath){
+    function setGroupPath($groupPath, $update = false){
+        if($update && isSet($this->groupPath) && $this->groupPath != $groupPath){
+            $children = $this->getChildrenPointer();
+            foreach($children as $userId){
+                // UPDATE USER GROUP AND ROLES
+                $u = ConfService::getConfStorageImpl()->createUserObject($userId);
+                $u->setGroupPath($groupPath);
+                $r = $u->getRoles();
+                // REMOVE OLD GROUP ROLES
+                foreach(array_keys($r) as $role){
+                    if(strpos($role, "AJXP_GRP_/") === 0) $u->removeRole($role);
+                }
+                $u->recomputeMergedRole();
+                $u->save("superuser");
+            }
+        }
         parent::setGroupPath($groupPath);
         $groups = AJXP_Utils::loadSerialFile(AJXP_VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/groups.ser");
         $groups[$this->getId()] = $groupPath;
@@ -169,6 +184,8 @@ class AJXP_SerialUser extends AbstractAjxpUser
         $fastCheck = $this->storage->getOption("FAST_CHECKS");
         $fastCheck = ($fastCheck == "true" || $fastCheck == true);
         if(isSet($this->registerForSave["rights"]) || $this->create){
+            $filteredRights = $this->rights;
+            if(isSet($filteredRights["ajxp.roles"])) $filteredRights["ajxp.roles"] = $this->filterRolesForSaving($filteredRights["ajxp.roles"]);
             AJXP_Utils::saveSerialFile($this->getStoragePath()."/rights.ser", $this->rights, !$fastCheck);
             AJXP_Utils::saveSerialFile($this->getStoragePath()."/role.ser", $this->personalRole, !$fastCheck);
         }

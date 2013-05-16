@@ -401,7 +401,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
                                 $value = "/".ltrim($value, "/");
                                 if($userObject->getGroupPath() != $value) {
                                     AuthService::createGroup("/", $value, "LDAP ".$value);
-                                    $userObject->setGroupPath($value);
+                                    $userObject->setGroupPath($value, true);
                                     $changes = true;
                                 }
                                 break;

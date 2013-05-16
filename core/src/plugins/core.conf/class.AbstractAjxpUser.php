@@ -338,7 +338,7 @@ abstract class AbstractAjxpUser
         return $password;
     }
 
-    public function setGroupPath($groupPath)
+    public function setGroupPath($groupPath, $update = false)
     {
         $this->groupPath = $groupPath;
     }
@@ -430,6 +430,20 @@ abstract class AbstractAjxpUser
     public function getResolveAsParent()
     {
         return $this->resolveAsParent;
+    }
+
+    /**
+     * @param array $roles
+     * @return array
+     */
+    protected function filterRolesForSaving($roles){
+        $res = array();
+        foreach($roles as $rName => $status){
+            if(!$status) continue;
+            if(strpos($rName, "AJXP_GRP_/") === 0) continue;
+            $res[$rName] = true;
+        }
+        return $res;
     }
 
 }
