@@ -158,7 +158,7 @@
     	<mkdir dir="${upgrade_export}"/>
     	<mkdir dir="${upgrade_export}/UPGRADE"/>
     	<git_summarize
-    	 commit1="${previous_revision}"
+    	 commit1="${previous_tag}"
     	 commit2="${LASTREVISION}"
     	 summarizeFile="${build.working_folder}/upgrade/svn_summarize"
     	 repository="${git.local_repository}"
