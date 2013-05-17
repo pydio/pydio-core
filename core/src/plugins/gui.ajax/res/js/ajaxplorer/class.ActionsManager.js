@@ -80,9 +80,10 @@ Class.create("ActionsManager", {
 	/**
 	 * Filter the actions given the srcElement passed as arguments. 
 	 * @param srcElement String An identifier among selectionContext, genericContext, a webfx object id
+     * @param ignoreGroups Array a list of groups to ignore
 	 * @returns Array
 	 */
-	getContextActions: function(srcElement)
+	getContextActions: function(srcElement, ignoreGroups)
 	{		
 		var actionsSelectorAtt = 'selectionContext';
 		if(srcElement.id && (srcElement.hasClassName('table_rows_container') ||  srcElement.hasClassName('selectable_div')))
@@ -159,6 +160,9 @@ Class.create("ActionsManager", {
 		contextActionsGroup.each(function(pair){
             if(!first){
                 contextActions.push({separator:true});
+            }
+            if(ignoreGroups && ignoreGroups.indexOf(pair.key) != -1){
+                return;
             }
             first = false;
             pair.value.each(function(mItem){

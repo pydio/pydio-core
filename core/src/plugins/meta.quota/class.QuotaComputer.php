@@ -50,14 +50,16 @@ class QuotaComputer extends AJXP_Plugin
         // SPECIAL : QUOTA MUST BE COMPUTED ON PARENT REPOSITORY FOLDER
         if($repo->hasParent()){
             $parentOwner = $repo->getOwner();
-            $repo = ConfService::getRepositoryById($repo->getParentId());
-            $originalUser = AuthService::getLoggedUser();
-            $loggedUser = AuthService::getLoggedUser();
-            if(!$loggedUser->hasParent()){
-                $loggedUser->setParent($parentOwner);
+            if($parentOwner !== null){
+                $repo = ConfService::getRepositoryById($repo->getParentId());
+                $originalUser = AuthService::getLoggedUser();
+                $loggedUser = AuthService::getLoggedUser();
+                if(!$loggedUser->hasParent()){
+                    $loggedUser->setParent($parentOwner);
+                }
+                $loggedUser->setResolveAsParent(true);
+                AuthService::updateUser($loggedUser);
             }
-            $loggedUser->setResolveAsParent(true);
-            AuthService::updateUser($loggedUser);
         }
         $path = $repo->getOption("PATH");
         if(iSset($originalUser)){

@@ -105,7 +105,7 @@ class AJXP_Controller{
         $restPath = $restPathList->item(0)->nodeValue;
         $paramNames = explode("/", trim($restPath, "/"));
         $path = array_shift(explode("?", $path));
-        $paramValues = explode("/", trim($path, "/"), count($paramNames));
+        $paramValues = array_map("urldecode", explode("/", trim($path, "/"), count($paramNames)));
         foreach($paramNames as $i => $pName){
             if(strpos($pName, "+") !== false){
                 $paramNames[$i] = str_replace("+", "", $pName);
@@ -162,6 +162,7 @@ class AJXP_Controller{
      * @return bool
      */
 	public static function findActionAndApply($actionName, $httpVars, $fileVars, &$action = null){
+        $actionName = AJXP_Utils::sanitize($actionName, AJXP_SANITIZE_EMAILCHARS);
         if($actionName == "cross_copy"){
             $pService = AJXP_PluginsService::getInstance();
             $actives = $pService->getActivePlugins();
@@ -233,6 +234,9 @@ class AJXP_Controller{
         }
 		
 		if($captureCalls !== false){
+            // Make sure the ShutdownScheduler has its own OB started BEFORE, as it will presumabily be
+            // executed AFTER the end of this one.
+            AJXP_ShutdownScheduler::getInstance();
 			ob_start();
 			$params = array("pre_processor_results" => array(), "post_processor_results" => array());
 		}

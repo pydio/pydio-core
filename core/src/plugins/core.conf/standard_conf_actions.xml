@@ -31,6 +31,7 @@
                             ], {
                                 afterFinish:function(){
                                     $('user_templates_selector').select('div').invoke('removeClassName', 'selected-focus');
+                                    modal.refreshDialogPosition();
                                 }
                             });
                        }).setStyle({opacity:0});
@@ -52,19 +53,20 @@
                             $('user_tpl_params_parameters').insert(new Element('input', {type:'hidden',name:'template_id',value:tplId}));
                             var elements = $('user_tpl_params_parameters').select("div.SF_element");
                             $('user_template_parameters').down('div.dialogLegend').insert({before:elements[elements.length-1]});
-                            var targetHeight = params.length * 30 + 80;
+                            var targetHeight = parseInt($('user_template_parameters').getHeight());
+                             if(!targetHeight) targetHeight = params.length * 40 + 80;
                             new Effect.Parallel([
                                 new Effect.Morph('user_templates_selector', {style:'left:-250px;'}),
                                 new Effect.Morph('user_template_parameters', {style:'left:0px;'}),
                                 new Effect.Morph('user_tpl_container', {style:'height:'+targetHeight+'px;'}),
                                 new Effect.Opacity(okButton, {sync:true,from:0,to:1.0}),
                                 new Effect.Opacity(backButton, {sync:true,from:0,to:1.0})
-                            ]);
+                            ], {afterFinish : function(){modal.refreshDialogPosition();}});
                        }
                        conn.onComplete = function(transport){
                             conn.TPL_XML = transport.responseXML;
                             var templates = XPathSelectNodes(conn.TPL_XML, "//template");
-                            conn.ORIGINAL_HEIGHT = (templates.length*31+23);
+                            conn.ORIGINAL_HEIGHT = (templates.length*31+25);
                             $('user_tpl_container').setStyle({height:conn.ORIGINAL_HEIGHT+'px'});
                             $('user_templates_selector').update('<div class="panelHeader">'+MessageHash[420]+'</div>');
                             for(var i=0;i<templates.length;i++){
@@ -351,8 +353,11 @@
                                 }));
                                 conn.onComplete = function(transport){
                                     ajaxplorer.webdavCurrentPreferences = transport.responseJSON;
-                                    if(ajaxplorer.webdavCurrentPreferences.webdav_active && !ajaxplorer.webdavCurrentPreferences.digest_set && !ajaxplorer.webdavCurrentPreferences.webdav_force_basic ) {
-                                        $('webdav_password_form').show();
+                                    if(ajaxplorer.webdavCurrentPreferences.webdav_active){
+                                        if(!ajaxplorer.webdavCurrentPreferences.digest_set
+                                        || ajaxplorer.webdavCurrentPreferences.webdav_force_basic) {
+                                            $('webdav_password_form').show();
+                                        }
                                         ajaxplorer.displayMessage("SUCCESS", MessageHash[408]);
                                     }else {
                                         $('webdav_password_form').hide();
@@ -405,7 +410,7 @@
 			</processing>		
 		</action>
         <action name="switch_to_settings">
-            <gui src="drive_remote.png" text="165" title="165" accessKey="settings_access_key" hasAccessKey="true" iconClass="icon-cog" >
+            <gui src="drive_remote.png" text="165" title="165" accessKey="settings_access_key" hasAccessKey="true" iconClass="icon-cogs" >
                 <context dir="false" recycle="true" selection="false" actionBar="true" actionBarGroup="utils" ajxpWidgets="UserWidget::logging_string"/>
             </gui>
             <rightsContext adminOnly="true" noUser="true" read="false" userLogged="only" write="false"/>

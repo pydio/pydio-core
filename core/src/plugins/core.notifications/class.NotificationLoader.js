@@ -154,7 +154,7 @@ Class.create("NotificationLoader", {
             var badge = button.down('.badge');
             if(!badge){
                 badge = new Element('span', {className:'badge'});
-                button.down('.icon-caret-down').insert({before: badge});
+                button.down('.icon-caret-down,img').insert({before: badge});
             }
             if(alertsCounts){
                 badge.update(alertsCounts);

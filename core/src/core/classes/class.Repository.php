@@ -146,7 +146,7 @@ class Repository implements AjxpGroupPathProvider {
 		$newOptions = array_merge($this->options, $newOptions);
 		$repo->options = $newOptions;
 		if($parentId == null){
-			$parentId = $this->id;
+			$parentId = $this->getId();
 		}
 		$repo->setOwnerData($parentId, $owner, $uniqueUser);
 		return $repo;
@@ -162,7 +162,7 @@ class Repository implements AjxpGroupPathProvider {
 	function createTemplateChild($newLabel, $newOptions, $owner = null, $uniqueUser = null){
 		$repo = new Repository(0, $newLabel, $this->accessType);
 		$repo->options = $newOptions;
-		$repo->setOwnerData($this->id, $owner, $uniqueUser);
+		$repo->setOwnerData($this->getId(), $owner, $uniqueUser);
 		$repo->setInferOptionsFromParent(true);
 		return $repo;
 	}

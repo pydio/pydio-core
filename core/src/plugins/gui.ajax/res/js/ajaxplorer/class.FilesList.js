@@ -472,7 +472,7 @@ Class.create("FilesList", SelectableElements, {
 		var subMenuItems1 = {
 			staticItems:[
                 {text:226,title:227,src:'view_text.png',icon_class:'icon-table',command:'list',hasAccessKey:true,accessKey:'list_access_key'},
-                {text:460,title:461,src:'view_detail.png',icon_class:'icon-th-list',command:'detail',hasAccessKey:true,accessKey:'detail_access_key'},
+                {text:460,title:461,src:'view_list_details.png',icon_class:'icon-th-list',command:'detail',hasAccessKey:true,accessKey:'detail_access_key'},
                 {text:228,title:229,src:'view_icon.png',icon_class:'icon-th',command:'thumb',hasAccessKey:true,accessKey:'thumbs_access_key'}
             ]
 		};
@@ -1335,31 +1335,31 @@ Class.create("FilesList", SelectableElements, {
 		var item = sel[0]; // We assume this action was triggered with a single-selection active.
 		var offset = {top:0,left:0};
 		var scrollTop = 0;
-        var addStyle = {};
-		if(this._displayMode == "list"){
-			var span = item.select('span.text_label')[0];
-			var posSpan = item.select('span.list_selectable_span')[0];
-			offset.top=1;
-			offset.left=20;
-			scrollTop = this.htmlElement.down('div.table_rows_container').scrollTop;
-		}else if(this._displayMode == "thumb"){
-			var span = item.select('div.thumbLabel')[0];
-			var posSpan = span;
-			offset.top=2;
-			offset.left=3;
-			scrollTop = this.htmlElement.down('.selectable_div').scrollTop;
-		}else if(this._displayMode == "detail"){
-			var span = item.select('div.thumbLabel')[0];
-			var posSpan = span;
-			offset.top=5;
-			offset.left= this._detailThumbSize + 25;
-			scrollTop = this.htmlElement.down('.selectable_div').scrollTop;
+        var addStyle = {fontSize: '12px'};
+        if(this._displayMode == "list"){
+            var span = item.select('span.text_label')[0];
+            var posSpan = item.select('span.list_selectable_span')[0];
+            offset.top=-3;
+            offset.left=25;
+            scrollTop = this.htmlElement.down('div.table_rows_container').scrollTop;
+        }else if(this._displayMode == "thumb"){
+            var span = item.select('div.thumbLabel')[0];
+            var posSpan = span;
+            offset.top=-2;
+            offset.left=3;
+            scrollTop = this.htmlElement.down('.selectable_div').scrollTop;
+        }else if(this._displayMode == "detail"){
+            var span = item.select('div.thumbLabel')[0];
+            var posSpan = span;
+            offset.top=0;
+            offset.left= 0;
+            scrollTop = this.htmlElement.down('.selectable_div').scrollTop;
             addStyle = {
                 fontSize : '20px',
                 paddingLeft: '2px',
                 color: 'rgb(111, 121, 131)'
             };
-		}
+        }
 		var pos = posSpan.cumulativeOffset();
 		var text = span.innerHTML;
 		var edit = new Element('input', {value:item.ajxpNode.getLabel('text'), id:'editbox'}).setStyle({
@@ -1436,7 +1436,7 @@ Class.create("FilesList", SelectableElements, {
 			width:'46px',
 			zIndex:2500,
 			left:(pos.left+offset.left+origWidth)+'px',
-			top:((pos.top+offset.top-scrollTop)-1)+'px'
+			top:((pos.top+offset.top-scrollTop)+1)+'px'
 		});
 		var closeFunc = function(){
 			span.setStyle({color:''});

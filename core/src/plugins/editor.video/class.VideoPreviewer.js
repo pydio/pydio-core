@@ -173,7 +173,10 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
 				div.update(content);
 				div.resizePreviewElement = function(dimensionObject){
 					// do nothing;
-				}
+				};
+                div.destroyElement = function(){
+                    div.update('');
+                };
 			}
 			return div;
 		}else{

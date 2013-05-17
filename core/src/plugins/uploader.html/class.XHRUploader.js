@@ -127,10 +127,30 @@ Class.create("XHRUploader", {
 		
 		dropzone.addEventListener("drop", function(event) {
 			event.preventDefault();
-			var files = event.dataTransfer.files;
-			for(var i=0;i<files.length;i++){
-				this.addListRow(files[i]);
-			}
+
+            var items = event.dataTransfer.items || [], files = event.dataTransfer.files, firstEntry;
+
+            if (false && items[0] && items[0].webkitGetAsEntry) {
+                var callback = this.addListRow.bind(this);
+                var error = (console ? console.log : function(error){window.alert(error); }) ;
+                var length = items.length;
+                for (var i = 0; i < length; i++) {
+                    var entry = items[i].webkitGetAsEntry();
+                    if (entry.isFile) {
+                        entry.file(function(File) {
+                            callback(File);
+                        }, error );
+                    } else if (entry.isDirectory) {
+                        this.recurseDirectory(entry.filesystem.root, this.addListRow.bind(this), error );
+                    }
+                }
+            }else{
+                var files = event.dataTransfer.files;
+                for(var i=0;i<files.length;i++){
+                    this.addListRow(files[i]);
+                }
+            }
+
 			if(this.optionPane.autoSendCheck.checked){
 				this.submit();
 			}
@@ -185,7 +205,40 @@ Class.create("XHRUploader", {
 		}
 		
 	},
-	
+
+    recurseDirectory: function(item, completeHandler, errorHandler) {
+
+        var recurseDir = this.recurseDirectory.bind(this);
+        var dirReader = item.createReader();
+        var entries = [];
+
+        var toArray = function(list){
+            return Array.prototype.slice.call(list || [], 0);
+        }
+
+        // Call the reader.readEntries() until no more results are returned.
+        var readEntries = function() {
+            dirReader.readEntries (function(results) {
+                if (!results.length) {
+
+                    $A(entries).each(function(e){
+                        if(e.isDirectory){
+                            recurseDir(e, completeHandler, errorHandler);
+                        }else{
+                            completeHandler(e);
+                        }
+                    });
+                } else {
+                    entries = entries.concat(toArray(results));
+                    readEntries();
+                }
+            }, errorHandler);
+        };
+
+        readEntries(); // Start reading dirs.
+
+    },
+
 	createOptionsPane : function(){
         var optionPane = this.mainForm.down("#uploader_options_pane");
         var totalPane = this.mainForm.down('#total_files_list');
@@ -528,7 +581,7 @@ Class.create("XHRUploader", {
             if(this.sendButton) this.sendButton.addClassName("disabled");
         }
 		if(size){
-			var percentage = Math.round(100*uploaded/size);
+			percentage = Math.round(100*uploaded/size);
 		}
         if(this.totalProgressBar){
             this.totalProgressBar.setPercentage(percentage, true);
@@ -544,7 +597,8 @@ Class.create("XHRUploader", {
 	
 	submitNext : function(){
 
-		if(item = this.getNextItem()){
+        var item;
+        if(item = this.getNextItem()){
             document.fire("ajaxplorer:longtask_starting");
 			this.sendFileMultipart(item);
 		}else{
@@ -668,7 +722,7 @@ Class.create("XHRUploader", {
 	
 	sendFileUsingFormData : function(xhr, file){
         var formData = new FormData();
-        formData.append("userfile_0", file);
+        formData.append("userfile_0", file, file.name);
         xhr.send(formData);
 	},	
 

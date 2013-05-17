@@ -224,7 +224,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 		$users = AuthService::listUsers();
 		$mess = ConfService::getMessages();
 		$loggedUser = AuthService::getLoggedUser();		
-		$repoList = ConfService::getRepositoriesList();
+		$repoList = ConfService::getRepositoriesList("all");
         $userArray = array();
 		foreach ($users as $userIndex => $userObject){
 			$label = $userObject->getId();
@@ -241,11 +241,8 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 			$repoAccesses = array();
 			foreach ($repoList as $repoObject) {
 				if($repoObject->hasOwner() && $repoObject->getOwner() == $loggedUser->getId()){
-					if($userObject->canWrite($repoObject->getId())){
-						$repoAccesses[] = $repoObject->getDisplay()." (rw)";
-					}else if($userObject->canRead($repoObject->getId())){
-						$repoAccesses[] = $repoObject->getDisplay()." (r)";
-					}
+                    $acl = $userObject->mergedRole->getAcl($repoObject->getId());
+                    if(!empty($acl)) $repoAccesses[] = $repoObject->getDisplay()." ($acl)";
 				}
 			}			
 			print '<tree 
@@ -296,12 +293,10 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 			foreach ($users as $userId => $userObject) {
 				//if(!$userObject->hasParent()) continue;
                 if($userObject->getId() == $loggedUser->getId()) continue;
-				if($userObject->canWrite($repoIndex)){
-					$repoAccesses[] = $userId." (rw)";
-				}else if($userObject->canRead($repoIndex)){
-					$repoAccesses[] = $userId." (r)";
-				}
-			}			
+                $label = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $userId);
+                $acl = $userObject->mergedRole->getAcl($repoObject->getId());
+                if(!empty($acl)) $repoAccesses[] = $label. " (".$acl.")";
+            }
             
             $metaData = array(
             	"repository_id" => $repoIndex,

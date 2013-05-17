@@ -399,7 +399,7 @@ class AuthService
             $rootRole = new AJXP_Role("ROOT_ROLE");
             $rootRole->setLabel("Root Role");
             $rootRole->setAutoApplies(array("standard"));
-            foreach (ConfService::getRepositoriesList() as $repositoryId => $repoObject)
+            foreach (ConfService::getRepositoriesList("all") as $repositoryId => $repoObject)
             {
                 if($repoObject->isTemplate) continue;
                 $gp = $repoObject->getGroupPath();
@@ -443,6 +443,23 @@ class AuthService
             foreach($actions as $pluginId => $acts){
                 foreach($acts as $act){
                     $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_SHARED);
+                }
+            }
+            AuthService::updateRole($rootRole);
+        }
+        $miniRole = AuthService::getRole("GUEST", false);
+        if($miniRole === false){
+            $rootRole = new AJXP_Role("GUEST");
+            $rootRole->setLabel("Guest user role");
+            $actions = array(
+                "access.fs" => array("purge"),
+                "meta.watch" => array("toggle_watch"),
+                "index.lucene" => array("index"),
+            );
+            $rootRole->setAutoApplies(array("guest"));
+            foreach($actions as $pluginId => $acts){
+                foreach($acts as $act){
+                    $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_ALL);
                 }
             }
             AuthService::updateRole($rootRole);
@@ -851,9 +868,9 @@ class AuthService
         return $authDriver->supportsUsersPagination();
     }
 
-    static function authCountUsers(){
+    static function authCountUsers($baseGroup="/", $regexp=""){
         $authDriver = ConfService::getAuthDriverImpl();
-        return $authDriver->getUsersCount();
+        return $authDriver->getUsersCount($baseGroup, $regexp);
     }
 
     static function getAuthScheme($userName){
@@ -937,7 +954,7 @@ class AuthService
         $repoList = null;
         foreach(self::$roles as $roleId => $roleObject){
             if(is_a($roleObject, "AjxpRole")){
-                if($repoList == null) $repoList = ConfService::getRepositoriesList();
+                if($repoList == null) $repoList = ConfService::getRepositoriesList("all");
                 $newRole = new AJXP_Role($roleId);
                 $newRole->migrateDeprectated($repoList, $roleObject);
                 self::$roles[$roleId] = $newRole;

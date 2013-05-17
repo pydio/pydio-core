@@ -251,12 +251,13 @@ function enableTextSelection(element){
 }
 
 function testStringWidth(text){
-	if(!$('string_tester')){
-		$$('body')[0].insert(new Element('div',{id:'string_tester'}));
-		$('string_tester').setStyle({fontFamily:'Trebuchet MS',fontSize:'11px',position:'absolute',visibility:'hidden',height:'auto',width:'auto',whiteSpace:'nowrap'});
-	}
-	$('string_tester').update(text);
-	return $('string_tester').getWidth() + (Prototype.Browser.IE?20:0);
+    var e = new Element('div',{id:'string_tester'});
+    $$('body')[0].insert(e);
+    e.setStyle({fontSize:'11px',position:'absolute',visibility:'hidden',height:'auto',width:'auto',whiteSpace:'nowrap'});
+	e.update(text);
+    var result = parseInt(e.getWidth()) + (Prototype.Browser.IE?20:0);
+    e.remove();
+	return result;
 }
 
 function fitRectangleToDimension(rectDim, targetDim){

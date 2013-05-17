@@ -643,14 +643,20 @@ Class.create("SearchEngine", AjxpPane, {
 		}
 		if(searchFileName && ajxpNode.getLabel().toLowerCase().indexOf(this.crtText) != -1){
 			this.addResult(currentFolder, ajxpNode);
-			return;
+            if(this._fileList){
+                this._fileList.reload();
+            }
+            return;
 		}
 		if(!searchCols) return;
 		for(var i=0;i<searchCols.length;i++){
 			var meta = ajxpNode.getMetadata().get(searchCols[i]);
 			if(meta && meta.toLowerCase().indexOf(this.crtText) != -1){
 				this.addResult(currentFolder, ajxpNode, meta);
-				return;			
+                if(this._fileList){
+                    this._fileList.reload();
+                }
+                return;
 			}
 		}
 	},

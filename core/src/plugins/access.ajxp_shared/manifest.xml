@@ -124,7 +124,7 @@
 						};
 						conn.sendAsync();
 					]]></clientCallback>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction" developerComment="Clear expired links" restParams="/"/>
 					</processing>
 			</action>
 			

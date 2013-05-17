@@ -73,6 +73,7 @@ rm -rf %{buildroot}
 %attr(755,apache,apache) %{_localstatedir}/lib/%{name}
 %dir %attr(755,apache,apache) %{_localstatedir}/cache/%{name}
 %{_localstatedir}/cache/%{name}/.htaccess
+%{_localstatedir}/cache/%{name}/index.html
 %dir %attr(755,apache,apache) %{_localstatedir}/log/%{name}
 %{_localstatedir}/log/%{name}/.htaccess
 %{_localstatedir}/log/%{name}/*
