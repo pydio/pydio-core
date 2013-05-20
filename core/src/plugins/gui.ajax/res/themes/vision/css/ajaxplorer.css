@@ -2242,6 +2242,20 @@ div.tabulatorContainer div#display_toolbar{
     padding-top: 6px;
     padding-right: 6px;
 }
+
+#info_panel div#display_toolbar {
+    float: left;
+    text-align: left;
+    min-width: 20px;
+    height: 10px;
+}
+
+#info_panel div#display_toolbar a {
+    background: none;
+    border: none;
+    margin-right: 0;
+}
+
 span.toggleHeader{
     display: inline-block;
     overflow: hidden;
@@ -2500,6 +2514,18 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
 #info_panel div.panelHeader.panelHeaderWithIcon{
     background-color: #5599FF !important;
     border-bottom: 2px solid rgb(65, 117, 194);
+}
+
+#info_panel.folded div.panelHeader{
+    height: 100%;
+}
+
+#info_panel.folded{
+    /*width: 26px !important;*/
+}
+
+#info_panel.folded span[ajxp_message_id]{
+    display: none;
 }
 
 #info_panel a

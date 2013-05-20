@@ -201,18 +201,23 @@ Class.create("Splitter", AjxpPane, {
         }
     },
 
+    getFoldingAction : function(){
+        return ajaxplorer.actionBar.getActionByName(this.htmlElement.id + "_folding_action");
+    },
+
     /**
      * Gets the action of this component
      * @returns $H
      */
     getActions : function(){
         if(!this.options.foldingButton) return $H();
+        var foldingValue = this.options.foldingButton;
 
         var butts = $H();
         // function may be bound to another context
         var oThis = this;
         var options = {
-            name:'folding_action',
+            name: oThis.htmlElement.id + '_folding_action',
             src:'view_left_close.png',
             icon_class:'icon-remove-sign',
             text_id:416,
@@ -223,25 +228,25 @@ Class.create("Splitter", AjxpPane, {
             subMenu:false,
             subMenuUpdateImage:false,
             callback: function(){
-                var state = oThis.toggleFolding();
+                var state = oThis.toggleFolding(foldingValue == "B" ? oThis.paneB : oThis.paneA);
             },
             listeners : {
                 init:function(){
-                    this.refreshFoldingAction();
+                    this.refreshFoldingAction(foldingValue == "B" ? this.paneB : this.paneA);
                 }.bind(this)
             }
-            };
+        };
         var context = {
             selection:false,
             dir:true,
             actionBar:true,
-            actionBarGroup:'filter',
+            actionBarGroup:oThis.htmlElement.id+'-actions',
             contextMenu:false,
             infoPanel:false
             };
         // Create an action from these options!
         var foldingAction = new Action(options, context);
-        butts.set("folding_button", foldingAction);
+        butts.set(this.htmlElement.id + "_folding_button", foldingAction);
 
         if(this.options.foldingAlternateClose){
             var options2 = {
@@ -256,15 +261,15 @@ Class.create("Splitter", AjxpPane, {
                 subMenu:false,
                 subMenuUpdateImage:false,
                 callback: function(){
-                    var state = oThis.toggleFolding();
-                    ajaxplorer.actionBar.getActionByName("folding_action").enable();
+                    var state = oThis.toggleFolding(foldingValue == "B" ? oThis.paneB : oThis.paneA);
+                    oThis.getFoldingAction().enable();
                 },
                 listeners : {
                     init:function(){
                         "use strict";
                         window.setTimeout(function(){
                             if(!oThis.splitbar.hasClassName("folded")) {
-                                try{ajaxplorer.actionBar.getActionByName("folding_action").disable();}catch(e){}
+                                try{oThis.getFoldingAction().disable();}catch(e){}
                             }
                         }, 1500);
                     }
@@ -280,7 +285,7 @@ Class.create("Splitter", AjxpPane, {
             };
             // Create an action from these options!
             var foldingCloseAction = new Action(options2, context2);
-            butts.set("folding_close_button", foldingCloseAction);
+            butts.set(this.htmlElement.id + "_folding_close_button", foldingCloseAction);
             if(!this.splitbar.hasClassName("folded")) {
                 foldingAction.deny = true;
                 foldingAction.disable();
@@ -317,9 +322,15 @@ Class.create("Splitter", AjxpPane, {
 		this.splitbar.setStyle(this.makeStyleObject(optName, this.group._fixed+'px'));		
 
         if(this.splitbar.hasClassName("folded")){
-            var hiddenWidth = parseInt(this.paneA.getStyle(this.options.set));
-            this.moveSplitter(0, true, -hiddenWidth);
-            return;
+            if(this.foldedPane == this.paneA){
+                var hiddenWidth = parseInt(this.paneA.getStyle(this.options.set));
+                this.moveSplitter(0, true, -hiddenWidth);
+                return;
+            }else{
+                //var hiddenWidth = parseInt(this.paneA.getStyle(this.options.set));
+                this.moveSplitter(this.group._adjust, this.paneB, 0);
+                return;
+            }
         }
 		// Recompute adjust
 		if(keepPercents && !size && groupInitAdjust){			
@@ -335,30 +346,39 @@ Class.create("Splitter", AjxpPane, {
     /**
      * @return boolean Folded (true) or not
      */
-    toggleFolding : function(){
+    toggleFolding : function(pane){
         if(this.splitbar.hasClassName("folded")) {
             this.unfold();
             return false;
         }else {
-            this.fold();
+            this.foldPane(pane);
             return true;
         }
     },
 
-    refreshFoldingAction : function(){
+    refreshFoldingAction : function(pane){
+        if(!pane) pane = this.foldedPane;
         var state = this.splitbar.hasClassName("folded");
-        if(!ajaxplorer.actionBar.getActionByName("folding_action")) return;
+        if(!this.getFoldingAction()) return;
         if(this.options.foldingAlternateClose){
-            ajaxplorer.actionBar.getActionByName("folding_action")[(state?"enable":"disable")]();
+            this.getFoldingAction()[(state?"enable":"disable")]();
         }else{
-            ajaxplorer.actionBar.getActionByName("folding_action").setIconSrc('view_left_'+ (state?'right':'close') + '.png', (state?'icon-caret-right':'icon-remove-sign'));
+            this.getFoldingAction().setIconSrc(
+                'view_left_'+ (state?'right':'close') + '.png',
+                (state?(pane == this.paneA?'icon-caret-right':'icon-caret-left'):'icon-remove-sign'));
         }
-        if($(this.paneA).ajxpPaneObject){
-      	    $(this.paneA).ajxpPaneObject.resize();
-   		}
+        if(pane == this.paneA && $(this.paneA).ajxpPaneObject){
+            $(this.paneA).ajxpPaneObject.resize();
+        }
+        if(pane == this.paneB && $(this.paneB).ajxpPaneObject){
+            $(this.paneB).ajxpPaneObject.resize();
+        }
     },
 
     fold:function(){
+
+        this.foldPane(this.paneA);
+        /*
         if(this.effectWorking) return;
         this.prefoldValue = this.options.getAdjust(this.paneA);
         this.effectWorking = true;
@@ -370,29 +390,69 @@ Class.create("Splitter", AjxpPane, {
         }.bind(this)}, function(p){
             this.moveSplitter(p, (this.options.minA?false:true), this.prefoldValue);
         }.bind(this) );
+        */
+    },
+
+    foldPane:function(pane){
+        if(this.effectWorking) return;
+        var realFoldValue;
+        if(this.options.foldingButton == "A"){
+            realFoldValue = this.prefoldValue = this.options.getAdjust(this.paneA);
+        }else{
+            this.prefoldValue = this.options.getAdjust(this.paneB);
+            realFoldValue = this.group._adjust - this.prefoldValue;
+        }
+        this.foldedPane = pane;
+        this.effectWorking = true;
+        var target = (pane==this.paneA?0:this.group._adjust);
+        new Effect.Tween(null, realFoldValue, target, {afterFinish:function(){
+            this.splitbar.addClassName('folded');
+            this.foldedPane.addClassName('folded');
+            this.effectWorking = false;
+            this.setUserPreference("folded", true);
+            this.refreshFoldingAction(pane);
+        }.bind(this), duration: 0.8}, function(p){
+            if(p == target - 3) this.foldedPane.addClassName('folded');
+            this.moveSplitter(p, (this.options.minA?false:pane), realFoldValue);
+        }.bind(this) );
     },
 
     unfold:function(){
         if(this.effectWorking) return;
-        var target = this.prefoldValue;
-        if(!target){
-            target = 150;
-            this.paneA.setStyle(this.makeStyleObject(this.options.adjust, 150+'px'));
+        if(!this.prefoldValue){
+            this.prefoldValue = 150;
+            //this.paneA.setStyle(this.makeStyleObject(this.options.adjust, target+'px'));
+        }
+        var target = this.options.foldingButton == "A" ? this.prefoldValue : (this.group._adjust - this.prefoldValue);
+        var presetAdjust = this.prefoldValue;
+        if(this.options.foldingButton == "B") {
+            presetAdjust -= this.paneB._padAdjust + this.splitbar._adjust;
+            this[this.options.foldingButton=="A"?"paneA":"paneB"].setStyle(this.makeStyleObject(this.options.adjust, presetAdjust+'px'));
         }
         this.effectWorking = true;
-        new Effect.Tween(null, 0, target, {afterFinish:function(){
+        new Effect.Tween(null, (this.foldedPane == this.paneA ? 0 : this.group._adjust), target, {afterFinish:function(){
             this.splitbar.removeClassName('folded');
             this.effectWorking = false;
             this.setUserPreference("folded", false);
-            this.refreshFoldingAction();
-        }.bind(this) }, function(p){
-            this.moveSplitter(p, (this.options.minA?false:true), target);
+            this.refreshFoldingAction(this.foldedPane);
+        }.bind(this), duration: 0.8}, function(p){
+            this.moveSplitter(p, (this.options.minA?false:this.foldedPane), target);
         }.bind(this) );
+        if(this.foldedPane)this.foldedPane.removeClassName('folded');
     },
 
     foldWithoutAnim : function(){
-        this.prefoldValue = this.options.getAdjust(this.paneA);
-        this.moveSplitter(0, (!this.options.minA), this.prefoldValue);
+        if(this.options.foldingButton == "A"){
+            this.prefoldValue = this.options.getAdjust(this.paneA);
+            this.moveSplitter(0, (!this.options.minA ? this.paneA:false), this.prefoldValue);
+            this.foldedPane = this.paneA;
+            this.paneA.addClassName('folded');
+        }else{
+            this.prefoldValue = this.options.getAdjust(this.paneB);
+            this.moveSplitter(this.group._adjust, this.paneB, this.prefoldValue);
+            this.foldedPane = this.paneB;
+            this.paneB.addClassName('folded');
+        }
         this.splitbar.addClassName('folded');
         this.setUserPreference("folded", true);
         this.refreshFoldingAction();
@@ -493,18 +553,20 @@ Class.create("Splitter", AjxpPane, {
 			borderAdjA = this.initBorderA;
 		}
         var targetAdjustA = np-this.paneA._padAdjust-borderAdjA;
-        if(folding){
+        if(folding && folding == this.paneA){
             this.paneA.setStyle(this.makeStyleObject(this.options.set, (targetAdjustA - foldingSize) +'px'));
         }else{
             this.paneA.setStyle(this.makeStyleObject(this.options.adjust, targetAdjustA+'px'));
         }
-		this.paneB.setStyle(this.makeStyleObject(this.options.set, np+this.splitbar._adjust+'px'));
+        this.paneB.setStyle(this.makeStyleObject(this.options.set, np+this.splitbar._adjust+'px'));
 		if(this.initBorderB){
 			borderAdjB = this.initBorderB;
 		}
         var bSide =this.group._adjust-this.splitbar._adjust-this.paneB._padAdjust-np-borderAdjB;
         bSide = Math.max(0,bSide);
-		this.paneB.setStyle(this.makeStyleObject(this.options.adjust, bSide+"px"));
+        if(!folding || folding != this.paneB){
+            this.paneB.setStyle(this.makeStyleObject(this.options.adjust, bSide+"px"));
+        }
 		if(!Prototype.Browser.IE){
 			this.paneA.fire("resize");
 			this.paneB.fire("resize");
@@ -518,6 +580,12 @@ Class.create("Splitter", AjxpPane, {
 		}
         if(forceFolded){
             if(!this.prefoldValue) this.prefoldValue = 150;
+            if(this.options.foldingButton == "A"){
+                this.paneA.addClassName("folded");
+            }else{
+                //if(!this.prefoldValue) this.prefoldValue = this.group._adjust - 150;
+                this.paneB.addClassName("folded");
+            }
             this.splitbar.addClassName('folded');
             this.setUserPreference("folded", true);
             this.refreshFoldingAction();

@@ -245,7 +245,7 @@ Class.create("InfoPanel", AjxpPane, {
         if(!title) title = MessageHash[131];
         var panelTitle = this.htmlElement.down('div.panelHeader');
         if(panelTitle) {
-            if(panelTitle.down('span')) panelTitle.down('span').update(title);
+            if(panelTitle.down('span[ajxp_message_id]')) panelTitle.down('span[ajxp_message_id]').update(title);
             else panelTitle.update(title);
         }
     },
