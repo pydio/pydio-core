@@ -458,6 +458,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
         foreach($this->rights as $rightKey => $rightValue){
             if($rightKey == "ajxp.roles"){
                 if(is_array($rightValue) && count($rightValue)){
+                    $rightValue = $this->filterRolesForSaving($rightValue);
                     $rightValue = '$phpserial$'.serialize($rightValue);
                 }else{
                     continue;
@@ -513,8 +514,25 @@ class AJXP_SqlUser extends AbstractAjxpUser
         return AJXP_Utils::saveSerialFile($dirPath."/".$id."/temp-".$key.".ser", $value);
 	}
 
-    function setGroupPath($groupPath){
-        $this->groupPath = $groupPath;
+    function setGroupPath($groupPath, $update = false){
+        if($update &&  isSet($this->groupPath) && $groupPath != $this->groupPath){
+            // Update Shared Users groups as well
+            $res = dibi::query("SELECT u.login FROM ajxp_users AS u, ajxp_user_rights AS p WHERE u.login=p.login AND p.repo_uuid = %s AND p.rights = %s AND u.groupPath != %s ", "ajxp.parent_user", $this->getId(), $groupPath);
+            foreach ($res as $row){
+                $userId = $row->login;
+                // UPDATE USER GROUP AND ROLES
+                $u = ConfService::getConfStorageImpl()->createUserObject($userId);
+                $u->setGroupPath($groupPath);
+                $r = $u->getRoles();
+                // REMOVE OLD GROUP ROLES
+                foreach(array_keys($r) as $role){
+                    if(strpos($role, "AJXP_GRP_/") === 0) $u->removeRole($role);
+                }
+                $u->recomputeMergedRole();
+                $u->save("superuser");
+            }
+        }
+        parent::setGroupPath($groupPath);
         dibi::query('UPDATE [ajxp_users] SET ', Array('groupPath'=>$groupPath), 'WHERE [login] = %s', $this->getId());
         $this->log('UPDATE GROUP: [Login]: '.$this->getId().' [Group]:'.$groupPath);
     }

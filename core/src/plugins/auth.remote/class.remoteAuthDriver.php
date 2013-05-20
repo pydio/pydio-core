@@ -56,11 +56,44 @@ class remoteAuthDriver extends AbstractAuthDriver {
     var $urls;
 	
 	function init($options){
+
+        // Migrate new version of the options
+        if(isSet($options["CMS_TYPE"])){
+            // Transform MASTER_URL + LOGIN_URI to MASTER_HOST, MASTER_URI, LOGIN_URL, LOGOUT_URI
+            $options["SLAVE_MODE"] = "false";
+            $cmsOpts = $options["CMS_TYPE"];
+            if($cmsOpts["cms"] != "custom"){
+                $loginURI = $cmsOpts["LOGIN_URI"];
+                if(strpos($cmsOpts["MASTER_URL"], "http") === 0){
+                    $parse = parse_url($cmsOpts["MASTER_URL"]);
+                    $rootHost = $parse["host"];
+                    $rootURI = $parse["path"];
+                }else{
+                    $rootHost = "";
+                    $rootURI = $cmsOpts["MASTER_URL"];
+                }
+                $cmsOpts["MASTER_HOST"] = $rootHost;
+                $cmsOpts["LOGIN_URL"] = $cmsOpts["MASTER_URI"] = AJXP_Utils::securePath("/".$rootURI."/".$loginURI);
+                $logoutAction = $cmsOpts["LOGOUT_ACTION"];
+                switch($cmsOpts["cms"]){
+                    case "wp":
+                        $cmsOpts["LOGOUT_URL"] = ($logoutAction == "back" ? $cmsOpts["LOGIN_URL"] : $cmsOpts["MASTER_URL"]."/wp-login.php?action=logout");
+                        break;
+                    case "joomla":
+                        $cmsOpts["LOGOUT_URL"] = $cmsOpts["LOGIN_URL"];
+                        break;
+                    case "drupal":
+                        $cmsOpts["LOGOUT_URL"] = ($logoutAction == "back" ? $cmsOpts["LOGIN_URL"] : $cmsOpts["MASTER_URL"]."/user/logout");
+                        break;
+                    default:
+                        break;
+                }
+            }
+            $options = array_merge($options, $cmsOpts);
+        }
+
         $this->slaveMode = $options["SLAVE_MODE"] == "true";
         if($this->slaveMode && ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")){
-        	// Make sure "login" is disabled, or it will re-appear if GUEST browsing is enabled!
-        	// OLD WAY : unset($this->actions["login"]);
-        	// NEW WAY : Modify manifest dynamically (more coplicated...)
         	$contribs = $this->xPath->query("registry_contributions/external_file");
         	foreach ($contribs as $contribNode){        		
         		if($contribNode->getAttribute('filename') == 'plugins/core.auth/standard_auth_actions.xml'){
@@ -99,11 +132,12 @@ class remoteAuthDriver extends AbstractAuthDriver {
 			$userStoredPass = $this->getUserPass($login);
 			if(!$userStoredPass) return false;
 			if($seed == "-1"){ // Seed = -1 means that password is not encoded.
-				return ($userStoredPass == $pass);
+				return ($userStoredPass == md5($pass));
 			}else{
 				return (md5($userStoredPass.$seed) == $pass);
 			}			
 		}else{
+            $crtSessionId = session_id();
 			session_write_close();
 			$host = "";
 			if(isSet($this->options["MASTER_HOST"])){
@@ -126,7 +160,20 @@ class remoteAuthDriver extends AbstractAuthDriver {
 					return true;					
 				}
 			}
-			return  false;
+            // NOW CHECK IN LOCAL USERS LIST
+            $userStoredPass = $this->getUserPass($login);
+            if(!$userStoredPass) return false;
+            if($seed == "-1"){ // Seed = -1 means that password is not encoded.
+                $res = ($userStoredPass == md5($pass));
+            }else{
+                $res = (md5($userStoredPass.$seed) == $pass);
+            }
+            if($res){
+                session_id($crtSessionId);
+                session_start();
+                return true;
+            }
+			return false;
 		}		
 	}
 	
@@ -148,9 +195,9 @@ class remoteAuthDriver extends AbstractAuthDriver {
 		if(!is_array($users)) $users = array();
 		if(array_key_exists($login, $users)) return "exists";
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$users[$login] = $passwd;
-		}else{
 			$users[$login] = md5($passwd);
+		}else{
+			$users[$login] = $passwd;
 		}
 		AJXP_Utils::saveSerialFile($this->usersSerFile, $users);		
 	}	
@@ -159,9 +206,9 @@ class remoteAuthDriver extends AbstractAuthDriver {
 		$users = $this->listUsers();
 		if(!is_array($users) || !array_key_exists($login, $users)) return ;
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$users[$login] = $newPass;
-		}else{
 			$users[$login] = md5($newPass);
+		}else{
+			$users[$login] = $newPass;
 		}
 		AJXP_Utils::saveSerialFile($this->usersSerFile, $users);
 	}	
@@ -182,18 +229,18 @@ class remoteAuthDriver extends AbstractAuthDriver {
 	}
     
     function getLoginRedirect(){
-        if ($this->slaveMode) {
-            if (isset($_SESSION["AJXP_USER"])) return false;
-            return $this->urls[0];
-        } 
+        //if ($this->slaveMode) {
+        //    if (isset($_SESSION["AJXP_USER"])) return false;
+        //    return $this->urls[0];
+        //}
         return false;
     }
     
 	function getLogoutRedirect(){
-        if ($this->slaveMode) {
+        //if ($this->slaveMode) {
             return $this->urls[1];
-        } 
-        return false;
+        //}
+        //return false;
     }
     
 }

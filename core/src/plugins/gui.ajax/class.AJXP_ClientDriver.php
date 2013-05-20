@@ -260,11 +260,15 @@ class AJXP_ClientDriver extends AJXP_Plugin
 
     function computeBootConf(){
         if(isSet($_GET["server_prefix_uri"])){
-            $_SESSION["AJXP_SERVER_PREFIX_URI"] = $_GET["server_prefix_uri"];
+            $_SESSION["AJXP_SERVER_PREFIX_URI"] = str_replace("_UP_", "..", $_GET["server_prefix_uri"]);
         }
         $config = array();
         $config["ajxpResourcesFolder"] = "plugins/gui.ajax/res";
-        $config["ajxpServerAccess"] = AJXP_SERVER_ACCESS;
+        if(session_name() == "AjaXplorer_Shared"){
+            $config["ajxpServerAccess"] = "index_shared.php";
+        }else{
+            $config["ajxpServerAccess"] = AJXP_SERVER_ACCESS;
+        }
         $config["zipEnabled"] = ConfService::zipEnabled();
         $config["multipleFilesDownloadEnabled"] = ConfService::getCoreConf("ZIP_CREATION");
         $config["customWording"] = array(

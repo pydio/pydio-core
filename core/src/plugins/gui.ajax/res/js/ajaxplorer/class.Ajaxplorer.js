@@ -169,7 +169,7 @@ Class.create("Ajaxplorer", {
 		var protoMenu = this.contextMenu;		
 		protoMenu.options.beforeShow = function(e){
 			this.options.lastElement = Event.element(e);
-			this.options.menuItems = ajaxplorer.actionBar.getContextActions(Event.element(e));
+			this.options.menuItems = ajaxplorer.actionBar.getContextActions(Event.element(e), ["inline"]);
 			this.refreshList();
 		}.bind(protoMenu);
 		protoMenu.options.beforeHide = function(e){
@@ -177,7 +177,7 @@ Class.create("Ajaxplorer", {
 		}.bind(protoMenu);
 		document.observe("ajaxplorer:actions_refreshed", function(){
 			if(this.options.lastElement){
-				this.options.menuItems = ajaxplorer.actionBar.getContextActions(this.options.lastElement);
+				this.options.menuItems = ajaxplorer.actionBar.getContextActions(this.options.lastElement, ["inline"]);
 				this.refreshList();
 			}			
 		}.bind(protoMenu));

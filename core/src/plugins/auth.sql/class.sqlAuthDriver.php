@@ -66,9 +66,15 @@ class sqlAuthDriver extends AbstractAuthDriver {
         $pairs = $res->fetchPairs('login', 'password');
    		return $pairs;
     }
-    function getUsersCount(){
-        $res = dibi::query("SELECT [login] FROM [ajxp_users]") ;
-        return count($res->fetchAll()) > 0;
+    function getUsersCount($baseGroup = "/", $regexp = ""){
+        if(!empty($regexp)){
+            if($regexp[0]=="^") $regexp = ltrim($regexp, "^")."%";
+            else if($regexp[strlen($regexp)-1] == "$") $regexp = "%".rtrim($regexp, "$");
+            $res = dibi::query("SELECT [login] FROM [ajxp_users] WHERE [login] LIKE '".$regexp."' AND [groupPath] LIKE %s ", $baseGroup."%") ;
+        }else{
+            $res = dibi::query("SELECT [login] FROM [ajxp_users] WHERE [groupPath] LIKE %s", $baseGroup."%");
+        }
+        return count($res->fetchAll());
     }
 
 	function listUsers($baseGroup="/"){
@@ -114,7 +120,7 @@ class sqlAuthDriver extends AbstractAuthDriver {
 		}else{
 			$userData["password"] = $passwd;
 		}
-        $userData['groupPath'] = '';
+        $userData['groupPath'] = '/';
 		dibi::query('INSERT INTO [ajxp_users]', $userData);
 	}	
 	function changePassword($login, $newPass){

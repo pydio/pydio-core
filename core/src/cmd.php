@@ -78,7 +78,7 @@ if(strpos($optUser,",") !== false){
 }else if(strpos($optUser, "queue:") === 0){
     $optUserQueue = substr($optUser, strlen("queue:"));
     $optUser = false;
-    echo("QUEUE : ".$optUserQueue);
+    //echo("QUEUE : ".$optUserQueue);
     if(is_file($optUserQueue)){
         $lines = file($optUserQueue);
         if(count($lines) && !empty($lines[0])){
@@ -105,7 +105,7 @@ if(strpos($optRepoId,",") !== false){
     $nextRepositories = implode(",", $nextRepositories);
 }
 
-echo("REPOSITORY : ".$optRepoId." USER : ".$optUser."\n");
+//echo("REPOSITORY : ".$optRepoId." USER : ".$optUser."\n");
 
 $optDetectUser = $options["detect_user"] OR false;
 $detectedUser = false;
@@ -202,8 +202,7 @@ else if(isSet($_COOKIE["AJXP_lang"])) ConfService::setLanguage($_COOKIE["AJXP_la
 $mess = ConfService::getMessages();
 
 // THIS FIRST DRIVERS DO NOT NEED ID CHECK
-$ajxpDriver = AJXP_PluginsService::findPlugin("gui", "ajax");
-$ajxpDriver->init(ConfService::getRepository());
+//$ajxpDriver = AJXP_PluginsService::findPlugin("gui", "ajax");
 $authDriver = ConfService::getAuthDriverImpl();
 // DRIVERS BELOW NEED IDENTIFICATION CHECK
 if(!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") || AuthService::getLoggedUser()!=null){
@@ -235,7 +234,7 @@ if(!empty($nextUsers) || !empty($nextRepositories) || !empty($optUserQueue) ){
     }
     if(!empty($optUserQueue)){
         sleep(1);
-        echo("Should go to next with $optUserQueue");
+        //echo("Should go to next with $optUserQueue");
         $process = AJXP_Controller::applyActionInBackground($options["r"], $optAction, $optArgs, "queue:".$optUserQueue, $optStatusFile);
         if($process != null && is_a($process, "UnixProcess") && isSet($optStatusFile)){
             file_put_contents($optStatusFile, "RUNNING:".$process->getPid());
@@ -255,6 +254,3 @@ if(!empty($nextUsers) || !empty($nextRepositories) || !empty($optUserQueue) ){
     file_put_contents($optStatusFile, "FINISHED".(in_array("QUEUED", $status)?":QUEUED":""));
 
 }
-
-
-?>

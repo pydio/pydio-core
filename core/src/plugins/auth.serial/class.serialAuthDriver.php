@@ -88,8 +88,8 @@ class serialAuthDriver extends AbstractAuthDriver {
         }
         return $result;
     }
-    function getUsersCount(){
-        return count($this->listUsers());
+    function getUsersCount($baseGroup = "/", $regexp = ""){
+        return count($this->listUsersPaginated($baseGroup, $regexp));
     }
 
 	

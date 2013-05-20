@@ -172,7 +172,8 @@ class ShareCenter extends AJXP_Plugin{
                     );
                 }
                 AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
-
+                // as the result can be quite small (e.g error code), make sure it's output in case of OB active.
+                flush();
 
                 break;
 
@@ -258,7 +259,11 @@ class ShareCenter extends AJXP_Plugin{
                             $repoId = $minisiteData["REPOSITORY"];
                             $minisiteIsPublic = isSet($minisiteData["PRELOG_USER"]);
                             $dlDisabled = isSet($minisiteData["DOWNLOAD_DISABLED"]);
-                            $minisiteLink = $this->buildPublicletLink($metadata["element"]);
+                            if(isSet($metadata["short_form_url"])){
+                                $minisiteLink = $metadata["short_form_url"];
+                            }else{
+                                $minisiteLink = $this->buildPublicletLink($metadata["element"]);
+                            }
                         }else{
                             $repoId = $metadata["element"];
                         }
@@ -572,7 +577,7 @@ class ShareCenter extends AJXP_Plugin{
         $html = str_replace("AJXP_START_REPOSITORY", $repository, $html);
         $html = str_replace("AJXP_REPOSITORY_LABEL", ConfService::getRepositoryById($repository)->getDisplay(), $html);
         if(!empty($data["PRELOG_USER"])){
-            session_name("AjaXplorer");
+            session_name("AjaXplorer_Shared");
             session_start();
             AuthService::logUser($data["PRELOG_USER"], "", true);
             $html = str_replace("AJXP_PRELOGED_USER", "ajxp_preloged_user", $html);

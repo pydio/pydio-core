@@ -41,11 +41,11 @@ Class.create("ConfigEditor",{
 		this.roleId = null;
 		this.userId = null;
 			
-		this.form.down('#rights_pane').remove();
-		this.form.down('#rights_legend').remove();
+//		this.form.down('#rights_pane').remove();
+//		this.form.down('#rights_legend').remove();
 		this.form.down('#roles_pane').select('.dialogLegend')[0].update(MessageHash['ajxp_conf.83']);
-		this.form.down('#roles_pane').select('span')[1].update(MessageHash['ajxp_conf.84']);
-		var url = window.ajxpServerAccessPath + '&get_action=batch_users_roles';
+//		this.form.down('#roles_pane').select('span')[1].update(MessageHash['ajxp_conf.84']);
+		var url = window.ajxpServerAccessPath + '&get_action=user_update_role';
 		this.selectionUrl = selection.updateFormOrUrl(null, url);
 		var connexion = new Connexion(this.selectionUrl);
 		connexion.onComplete = function(transport){			
@@ -174,7 +174,7 @@ Class.create("ConfigEditor",{
 			ajaxplorer.displayMessage("ERROR", MessageHash['ajxp_conf.37']);
 			return false;
 		}
-		parameters = new Hash();
+		var parameters = new Hash();
 		parameters.set('new_user_login', login.value);
 		parameters.set('new_user_pwd', this.encodePassword(pass.value));
         var currentPath = ajaxplorer.getContextNode().getPath();

@@ -51,29 +51,24 @@ class BitlyShortener extends AJXP_Plugin {
 	}
 
     protected function updateMetaShort($file, $shortUrl){
-        $metaStore = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
-        if($metaStore !== false){
-            $driver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
-            $metaStore->initMeta($driver);
-            $streamData = $driver->detectStreamWrapper(false);
-            $baseUrl = $streamData["protocol"]."://".ConfService::getRepository()->getId();
-            $node = new AJXP_Node($baseUrl.$file);
-            $metadata = $metaStore->retrieveMetadata(
-                $node,
+        $driver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
+        $streamData = $driver->detectStreamWrapper(false);
+        $baseUrl = $streamData["protocol"]."://".ConfService::getRepository()->getId();
+        $node = new AJXP_Node($baseUrl.$file);
+        if($node->hasMetaStore()){
+            $metadata = $node->retrieveMetadata(
                 "ajxp_shared",
                 true,
                 AJXP_METADATA_SCOPE_REPOSITORY
             );
             $metadata["short_form_url"] = $shortUrl;
-            $metaStore->setMetadata(
-                $node,
+            $node->setMetadata(
                 "ajxp_shared",
                 $metadata,
                 true,
                 AJXP_METADATA_SCOPE_REPOSITORY
             );
         }
-
     }
 
 }

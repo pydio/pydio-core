@@ -111,7 +111,7 @@ Class.create("AjxpBootstrap", {
 
 		var url = this.parameters.get('BOOTER_URL')+(this.parameters.get("debugMode")?'&debug=true':'');
 		if(this.parameters.get('SERVER_PREFIX_URI')){
-			url += '&server_prefix_uri=' + this.parameters.get('SERVER_PREFIX_URI');
+			url += '&server_prefix_uri=' + this.parameters.get('SERVER_PREFIX_URI').replace(/\.\.\//g, "_UP_/");
 		}
 		var connexion = new Connexion(url);
 		connexion.onComplete = function(transport){			
@@ -257,7 +257,7 @@ Class.create("AjxpBootstrap", {
 			}else{
 				html+='	<div style="padding:4px 7px;position: relative;"><div>The web data-browser<span id="version_span"></span></div>';
 			}
-			html+='	Copyright C. du Jeu 2008-2012 - AGPL License. <div id="progressCustomMessage" style="margin-top: 35px;font-weight: bold;padding-bottom: 5px;">';
+			html+='	Copyright C. du Jeu 2008-2013 - AGPL License. <div id="progressCustomMessage" style="margin-top: 35px;font-weight: bold;padding-bottom: 5px;">';
 			if(customWording.welcomeMessage){
 				html+= customWording.welcomeMessage.replace(new RegExp("\n", "g"), "<br>");
 			}
@@ -344,7 +344,7 @@ Class.create("AjxpBootstrap", {
 	 */
 	insertBasicSkeleton : function(desktopNode){
         var elem = new Element("div", {style:"position: absolute;z-index: 10000; bottom: 0; right: 0; color: #666;font-family: Arial;font-size: 11px;text-align: right;padding: 3px; padding-right: 10px;"});
-        elem.update('AjaXplorer Community - Free non supported version &copy; C. du Jeu 2008-2012 - <a target="_blank" href="http://ajaxplorer.info/">http://ajaxplorer.info/</a>');
+        elem.update('AjaXplorer Community - Free non supported version &copy; C. du Jeu 2008-2013 - <a target="_blank" href="http://ajaxplorer.info/">http://ajaxplorer.info/</a>');
         $(desktopNode).insert({after:elem});
         disableTextSelection(elem);
 		if($('all_forms')) return;

@@ -144,7 +144,7 @@ class MqManager extends AJXP_Plugin
         $configs = $this->getConfigs();
         if($configs["WS_SERVER_ACTIVE"]){
 
-            require_once(AJXP_INSTALL_PATH."/vendor/phpws/websocket.client.php");
+            require_once($this->getBaseDir()."/vendor/phpws/websocket.client.php");
             // Publish for websockets
             $input = array("REPO_ID" => $repositoryId, "CONTENT" => "<tree>".$xmlContent."</tree>");
             if(isSet($userId)) $input["USER_ID"] = $userId;

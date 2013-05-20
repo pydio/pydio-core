@@ -58,6 +58,7 @@
                         .developerDoc{
                             font-size: 12px !important;
                             line-height: 18px !important;
+                            padding-bottom: 5px;
                         }
                         .developerApiAccess{
                             display: inline-block;
