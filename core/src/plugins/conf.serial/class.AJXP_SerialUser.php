@@ -58,17 +58,19 @@ class AJXP_SerialUser extends AbstractAjxpUser
     function setGroupPath($groupPath, $update = false){
         if($update && isSet($this->groupPath) && $this->groupPath != $groupPath){
             $children = $this->getChildrenPointer();
-            foreach($children as $userId){
-                // UPDATE USER GROUP AND ROLES
-                $u = ConfService::getConfStorageImpl()->createUserObject($userId);
-                $u->setGroupPath($groupPath);
-                $r = $u->getRoles();
-                // REMOVE OLD GROUP ROLES
-                foreach(array_keys($r) as $role){
-                    if(strpos($role, "AJXP_GRP_/") === 0) $u->removeRole($role);
+            if(is_array($children)){
+                foreach($children as $userId){
+                    // UPDATE USER GROUP AND ROLES
+                    $u = ConfService::getConfStorageImpl()->createUserObject($userId);
+                    $u->setGroupPath($groupPath);
+                    $r = $u->getRoles();
+                    // REMOVE OLD GROUP ROLES
+                    foreach(array_keys($r) as $role){
+                        if(strpos($role, "AJXP_GRP_/") === 0) $u->removeRole($role);
+                    }
+                    $u->recomputeMergedRole();
+                    $u->save("superuser");
                 }
-                $u->recomputeMergedRole();
-                $u->save("superuser");
             }
         }
         parent::setGroupPath($groupPath);
