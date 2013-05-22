@@ -9,21 +9,19 @@ rpm -ivh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.no
 sleep 1
 
 # Now install all RPMs
-yum -y install httpd php php-pdo php-ldap ajaxplorer
+yum -y install httpd php php-pdo php-ldap php-pecl-apc ImageMagick ajaxplorer
 sleep 1
 
 # Update PHP Configuration
 mv /etc/php.ini /etc/php.ini.orig
 sed 's/output_buffering = 4096/output_buffering = Off/g' /etc/php.ini.orig > /etc/php.ini
 
-# Start Apache
-apachectl start
-
 # Create target folders inside the gluster volumes
 echo 'Configuring RHS nodes'
 mkdir /mnt/samba/ajxp-config/appdata
 mkdir /mnt/samba/ajxp-config/cache
 mkdir /mnt/samba/ajxp-config/log
+mkdir /mnt/samba/ajxp-data/public
 mkdir /mnt/samba/ajxp-data/common
 mkdir /mnt/samba/ajxp-data/users
 cp -R /var/lib/ajaxplorer/plugins /mnt/samba/ajxp-config/appdata
@@ -44,6 +42,13 @@ sed -i 's/"\/var\/log\/ajaxplorer\/"/"\/mnt\/samba\/ajxp-config\/log\/"/g' /etc/
 sed -i 's/"AJXP_DATA_PATH\/files"/"\/mnt\/samba\/ajxp-data\/common"/g' /etc/ajaxplorer/bootstrap_repositories.php
 sed -i 's/"AJXP_DATA_PATH\/personal\/AJXP_USER"/"\/mnt\/samba\/ajxp-data\/users\/AJXP_USER"/g' /etc/ajaxplorer/bootstrap_repositories.php
 
+# Update Share URL
+sed -i 's/"AJXP_INSTALL_PATH\/data\/public"/"\/mnt\/samba\/ajxp-data\/public"/g' /usr/share/ajaxplorer/plugins/core.ajaxplorer/manifest.xml
+sed -i 's/\/var\/lib\/ajaxplorer\/public/\/mnt\/samba\/ajxp-data\/public/g' /etc/httpd/conf.d/ajaxplorer.conf
+
+# Start Apache
+apachectl start
+
 echo 'Finalizing Installation status'
 if [ -e /mnt/samba/ajxp-config/skip_install ]
 then
@@ -58,6 +63,7 @@ else
     echo '-----------------------'
     echo 'Your first AjaXplorer node is now running.'
     echo 'Please open http://yourhost/ajaxplorer/ in a web browser and follow the setup wizard.'
+    echo 'Then you should update the necessary settings, particularly the outside world IP of the installation, in the AjaXplorer Core Options.'
     echo '-----------------------'
     touch /mnt/samba/ajxp-config/skip_install
 fi
