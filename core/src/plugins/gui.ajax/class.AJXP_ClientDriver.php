@@ -323,7 +323,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
         $user = AuthService::getLoggedUser();
         if($user == null) return;
         $metadata = $ajxpNode->retrieveMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-        if(count($metadata)){
+        if(is_array($metadata) && count($metadata)){
             $ajxpNode->mergeMetadata(array(
                      "ajxp_bookmarked" => "true",
                      "overlay_icon"  => "bookmark.png"
