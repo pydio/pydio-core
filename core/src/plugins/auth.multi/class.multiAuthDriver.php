@@ -71,7 +71,7 @@ class multiAuthDriver extends AbstractAuthDriver {
 	}
 	
 	public function getRegistryContributions( $extendedVersion = true ){
-		AJXP_Logger::debug("get contributions NOW");
+		// AJXP_Logger::debug("get contributions NOW");
 		$this->loadRegistryContributions();
 		return parent::getRegistryContributions( $extendedVersion );
 	}
