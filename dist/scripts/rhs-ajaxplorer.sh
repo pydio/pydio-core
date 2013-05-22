@@ -9,8 +9,15 @@ rpm -ivh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.no
 sleep 1
 
 # Now install all RPMs
-yum -y install httpd php php-pdo php-ldap php-pecl-apc ImageMagick ajaxplorer
+# Warning, this requires the "RHS EUS Server Optional" channel to be activated through RHN
+# See for example http://itsystemsadmin.wordpress.com/2011/04/27/red-hat-enterprise-linux-6-rhel-6-install-php-mbstring/
+yum -y install httpd php php-pdo php-ldap php-pecl-apc php-mbstring php-devel libattr-devel ImageMagick ajaxplorer
 sleep 1
+echo "Compiling Extended Attribute PECL Extension"
+pecl install xattr
+echo "extension=xattr.so" >> /etc/php.d/xattr.ini
+sleep 1
+
 
 # Update PHP Configuration
 mv /etc/php.ini /etc/php.ini.orig
