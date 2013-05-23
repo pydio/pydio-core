@@ -19,6 +19,15 @@ echo "extension=xattr.so" >> /etc/php.d/xattr.ini
 sleep 1
 
 
+# Update HTTPD Configuration
+# Filter out the regular health checks of HAProxy
+cp /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.orig
+sed -i 's/CustomLog logs\/access_log combined/#CustomLog logs\/access_log combined/' /etc/httpd/conf/httpd.conf
+cat >> /etc/httpd/conf/httpd.conf << HTTPDCONF
+SetEnvIf Request_URI "^/ajaxplorer/check\.txt$" dontlog
+CustomLog logs/access_log combined env=!dontlog
+HTTPDCONF
+
 # Update PHP Configuration
 mv /etc/php.ini /etc/php.ini.orig
 sed 's/output_buffering = 4096/output_buffering = Off/g' /etc/php.ini.orig > /etc/php.ini
@@ -59,13 +68,21 @@ apachectl start
 echo 'Finalizing Installation status'
 if [ -e /mnt/samba/ajxp-config/skip_install ]
 then
+
+    # Deploy patches if necessary
+    if [ -d /mnt/samba/ajxp-config/install_patches ]
+    then
+        cp -R /mnt/samba/ajxp-config/install_patches/* /usr/share/ajaxplorer
+    fi
+
+    touch /var/cache/ajaxplorer/admin_counted
+    touch /var/cache/ajaxplorer/first_run_passed
+    touch /var/cache/ajaxplorer/diag_result.php
+
     echo '-----------------------'
     echo 'AjaXplorer is ready to go. Configurations were launched from RHS node.'
     echo 'You can verify this by opening http://yourhost/ajaxplorer/ through a web browser'
     echo '-----------------------'
-    touch /var/cache/ajaxplorer/admin_counted
-    touch /var/cache/ajaxplorer/first_run_passed
-    touch /var/cache/ajaxplorer/diag_result.php
 else
     echo '-----------------------'
     echo 'Your first AjaXplorer node is now running.'
