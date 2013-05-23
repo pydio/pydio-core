@@ -42,7 +42,7 @@ class xAttrMetaStore extends AJXP_Plugin implements MetaStoreProvider
 
     public function initMeta($accessDriver){
         $this->accessDriver = $accessDriver;
-        $this->rootPath = ConfService::getRepository()->getOption("PATH");
+        //$this->rootPath = ConfService::getRepository()->getOption("PATH");
     }
 
     private function getMetaKey($namespace, $scope, $user){
@@ -75,8 +75,8 @@ class xAttrMetaStore extends AJXP_Plugin implements MetaStoreProvider
         $path = $ajxpNode->getRealFile();
         if(!file_exists($path)) return;
         $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private));
-        if(!xattr_supported($this->rootPath)){
-            throw Exception("Filesystem does not support Extended Attributes!");
+        if(!xattr_supported($path)){
+            throw new Exception("Filesystem does not support Extended Attributes!");
         }
         $value = base64_encode(serialize($metaData));
         xattr_set($path, $key, $value);
@@ -94,8 +94,8 @@ class xAttrMetaStore extends AJXP_Plugin implements MetaStoreProvider
         $path = $ajxpNode->getRealFile();
         if(!file_exists($path)) return;
         $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private));
-        if(!xattr_supported($this->rootPath)){
-            throw Exception("Filesystem does not support Extended Attributes!");
+        if(!xattr_supported($path)){
+            throw new Exception("Filesystem does not support Extended Attributes!");
         }
         xattr_remove($path, $key);
     }
@@ -111,11 +111,14 @@ class xAttrMetaStore extends AJXP_Plugin implements MetaStoreProvider
         $path = $ajxpNode->getRealFile();
         if(!file_exists($path)) return array();
         $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private));
-        if(!xattr_supported($this->rootPath)){
-            throw Exception("Filesystem does not support Extended Attributes!");
+        if(!xattr_supported($path)){
+            //throw new Exception("Filesystem does not support Extended Attributes!");
+            return array();
         }
         $data = xattr_get($path, $key);
-        return unserialize(base64_decode($data));
+        $data = unserialize(base64_decode($data));
+        if( empty($data) || !is_array($data)) return array();
+        return $data;
     }
 
     /**
