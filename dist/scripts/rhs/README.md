@@ -1,0 +1,1 @@
+This is a set of scripts allowing the deployment of AjaXplorer in a scalable and HA fashion on top of Red Hat Storage.
