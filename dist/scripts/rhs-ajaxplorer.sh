@@ -78,16 +78,21 @@ then
     touch /var/cache/ajaxplorer/admin_counted
     touch /var/cache/ajaxplorer/first_run_passed
     touch /var/cache/ajaxplorer/diag_result.php
+    touch /usr/share/ajaxplorer/check.txt
 
     echo '-----------------------'
     echo 'AjaXplorer is ready to go. Configurations were launched from RHS node.'
     echo 'You can verify this by opening http://yourhost/ajaxplorer/ through a web browser'
     echo '-----------------------'
 else
+
+    touch /usr/share/ajaxplorer/check.txt
+    touch /mnt/samba/ajxp-config/skip_install
+
     echo '-----------------------'
     echo 'Your first AjaXplorer node is now running.'
     echo 'Please open http://yourhost/ajaxplorer/ in a web browser and follow the setup wizard.'
     echo 'Then you should update the necessary settings, particularly the outside world IP of the installation, in the AjaXplorer Core Options.'
     echo '-----------------------'
-    touch /mnt/samba/ajxp-config/skip_install
+
 fi
