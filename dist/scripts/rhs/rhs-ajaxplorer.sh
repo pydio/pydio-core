@@ -68,7 +68,8 @@ apachectl start
 # Deploy patches if necessary
 if [ -d /mnt/samba/ajxp-config/install_patches ]
 then
-    cp -Rf /mnt/samba/ajxp-config/install_patches/* /usr/share/ajaxplorer
+    cp -Rf /mnt/samba/ajxp-config/install_patches/* /usr/share/ajaxplorer/
+    cp /mnt/samba/ajxp-config/install_patches/.*?? /usr/share/ajaxplorer/
 fi
 
 echo 'Finalizing Installation status'
