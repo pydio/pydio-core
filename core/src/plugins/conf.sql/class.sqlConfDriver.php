@@ -192,9 +192,9 @@ class sqlConfDriver extends AbstractConfDriver {
             $acls = $user->mergedRole->listAcls();
             $limitRepositories = array_keys($acls);
             foreach($limitRepositories as $i => $k) $limitRepositories[$i] = "'$k'";
-            $query = 'SELECT * FROM [ajxp_repo] WHERE uuid IN ('.implode(",",$limitRepositories).')';
+            $query = 'SELECT * FROM [ajxp_repo] WHERE uuid IN ('.implode(",",$limitRepositories).' ORDER BY [display] ASC)';
         }else{
-            $query = 'SELECT * FROM [ajxp_repo]';
+            $query = 'SELECT * FROM [ajxp_repo] ORDER BY [display] ASC';
         }
 
 		$res = dibi::query($query);
