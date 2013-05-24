@@ -34,13 +34,13 @@ sed 's/output_buffering = 4096/output_buffering = Off/g' /etc/php.ini.orig > /et
 
 # Create target folders inside the gluster volumes
 echo 'Configuring RHS nodes'
-mkdir /mnt/samba/ajxp-config/appdata
-mkdir /mnt/samba/ajxp-config/cache
-mkdir /mnt/samba/ajxp-config/log
-mkdir /mnt/samba/ajxp-data/public
-mkdir /mnt/samba/ajxp-data/common
-mkdir /mnt/samba/ajxp-data/users
-cp -R /var/lib/ajaxplorer/plugins /mnt/samba/ajxp-config/appdata
+mkdir -p /mnt/samba/ajxp-config/appdata
+mkdir -p /mnt/samba/ajxp-config/cache
+mkdir -p /mnt/samba/ajxp-config/log
+mkdir -p /mnt/samba/ajxp-data/public
+mkdir -p /mnt/samba/ajxp-data/common
+mkdir -p /mnt/samba/ajxp-data/users
+cp -Rf /var/lib/ajaxplorer/plugins /mnt/samba/ajxp-config/appdata
 
 chown -R apache:apache /mnt/samba/ajxp-config
 chown -R apache:apache /mnt/samba/ajxp-data
@@ -65,15 +65,15 @@ sed -i 's/\/var\/lib\/ajaxplorer\/public/\/mnt\/samba\/ajxp-data\/public/g' /etc
 # Start Apache
 apachectl start
 
+# Deploy patches if necessary
+if [ -d /mnt/samba/ajxp-config/install_patches ]
+then
+    cp -Rf /mnt/samba/ajxp-config/install_patches/* /usr/share/ajaxplorer
+fi
+
 echo 'Finalizing Installation status'
 if [ -e /mnt/samba/ajxp-config/skip_install ]
 then
-
-    # Deploy patches if necessary
-    if [ -d /mnt/samba/ajxp-config/install_patches ]
-    then
-        cp -R /mnt/samba/ajxp-config/install_patches/* /usr/share/ajaxplorer
-    fi
 
     touch /var/cache/ajaxplorer/admin_counted
     touch /var/cache/ajaxplorer/first_run_passed
