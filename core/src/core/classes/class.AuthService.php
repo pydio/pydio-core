@@ -428,7 +428,7 @@ class AuthService
             );
             foreach($actions as $pluginId => $acts){
                 foreach($acts as $act){
-                    $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_SHARED);
+                    $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_SHARED, false);
                 }
             }
             AuthService::updateRole($rootRole);
@@ -442,7 +442,7 @@ class AuthService
             );
             foreach($actions as $pluginId => $acts){
                 foreach($acts as $act){
-                    $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_SHARED);
+                    $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_SHARED, false);
                 }
             }
             AuthService::updateRole($rootRole);
