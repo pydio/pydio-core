@@ -257,8 +257,15 @@ class IMagickPreviewer extends AJXP_Plugin {
 				if($this->extractAll) $tmpFileThumb = str_replace(".jpg", "-0.jpg", $tmpFileThumb);
 			}
 		}
-		$params = ($this->extractAll?"-quality ".$this->pluginConf["IM_VIEWER_QUALITY"]:"-resize 250 -quality ".$this->pluginConf["IM_THUMB_QUALITY"]);
-		$cmd = $this->pluginConf["IMAGE_MAGICK_CONVERT"]." ".escapeshellarg(($masterFile).$pageLimit)." ".$params." ".escapeshellarg($tmpFileThumb);
+
+        if(!isSet($this->pluginConf["IM_CUSTOM_OPTIONS"])){
+            $this->pluginConf["IM_CUSTOM_OPTIONS"] = "";
+        }
+        if(iSset($this->pluginConf["ADDITIONAL_ENV_PATH"]) && !empty($this->pluginConf["ADDITIONAL_ENV_PATH"])){
+            putenv("PATH=".getenv("PATH").":".$this->pluginConf["ADDITIONAL_ENV_PATH"]);
+        }
+        $params = ($this->extractAll?"-quality ".$this->pluginConf["IM_VIEWER_QUALITY"]:"-resize 250 ".$this->pluginConf["IM_CUSTOM_OPTIONS"]." -quality ".$this->pluginConf["IM_THUMB_QUALITY"]);
+        $cmd = $this->pluginConf["IMAGE_MAGICK_CONVERT"]." ".escapeshellarg(($masterFile).$pageLimit)." ".$params." ".escapeshellarg($tmpFileThumb);
 		AJXP_Logger::logAction("IMagick Command : $cmd");
 		session_write_close(); // Be sure to give the hand back
 		exec($cmd, $out, $return);
