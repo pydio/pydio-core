@@ -2514,10 +2514,27 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
 #info_panel div.panelHeader.panelHeaderWithIcon{
     background-color: #5599FF !important;
     border-bottom: 2px solid rgb(65, 117, 194);
+    -webkit-transition-property: height;
+    -webkit-transition-duration: 0.2s;
+    -webkit-transition-timing-function: ease-out;
+    -moz-transition-property: height;
+    -moz-transition-duration: 0.2s;
+    -moz-transition-timing-function: ease-out;
+    transition-property: height;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-out;
+    padding-left: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #info_panel.folded div.panelHeader{
     height: 100%;
+}
+
+#info_panel.folded div.panelHeader a{
+    font-size: 1.4em;
 }
 
 #info_panel.folded{
@@ -2526,6 +2543,54 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
 
 #info_panel.folded span[ajxp_message_id]{
     display: none;
+}
+
+#info_panel div.folded_icons{
+    display: none;
+}
+
+#info_panel.folded div.folded_icons{
+    display: block;
+    position: absolute;
+    top: 19px;
+    left: 7px;
+}
+
+#info_panel.folded div.folded_icons span{
+    display: block;
+    margin: 17px 0;
+    font-size: 13px;
+    text-align: center;
+}
+
+#info_panel.folded div.folded_icons span.clickable{
+    cursor: pointer;
+}
+
+div.foldedPanel_tooltip{
+    background-color: #5599FF;
+    border-radius: 0;
+    border-width: 0;
+    border-right: 2px solid #3969B2;
+    box-shadow: none;
+}
+
+div.foldedPanel_tooltip td{
+    color: white;
+    font-size: 11px;
+
+}
+
+div.foldedPanel_tooltip:after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-width: 7px;
+    border-style: solid;
+    border-color: transparent transparent transparent #3969B2;
+    top: 15px;
+    left: 220px;
 }
 
 #info_panel a

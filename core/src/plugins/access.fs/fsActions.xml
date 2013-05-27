@@ -939,7 +939,7 @@
                 </div>
 				<div class="infoPanelAllMetadata">
 				    <div>
-                        <div class="panelHeader infoPanelGroup"><span class="icon-info" data-ajxpAction="test"></span> #{header_string}</div>
+                        <div class="panelHeader infoPanelGroup"><span class="icon-info" data-ajxpAction="no-action"></span> #{header_string}</div>
                         <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
                             <tr>
                                 <td class="infoPanelLabel">#{name_string}</td>
