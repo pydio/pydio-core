@@ -536,10 +536,16 @@ class sqlConfDriver extends AbstractConfDriver {
      * @return string[]
      */
     function getChildrenGroups($baseGroup = "/"){
-        $res = dibi::query("SELECT * FROM [ajxp_groups] WHERE [groupPath] LIKE %s", $baseGroup."%");
+        $searchGroup = $baseGroup;
+        if($baseGroup[strlen($baseGroup)-1] != "/") $searchGroup.="/";
+        $res = dibi::query("SELECT * FROM [ajxp_groups] WHERE [groupPath] LIKE %s AND [groupPath] NOT LIKE %s", $searchGroup."%", $searchGroup."%/%");
         $pairs = $res->fetchPairs("groupPath", "groupLabel");
         foreach($pairs as $path => $label){
             if(strlen($path) <= strlen($baseGroup)) unset($pairs[$path]);
+            if($baseGroup != "/"){
+                unset($pairs[$path]);
+                $pairs[substr($path, strlen($baseGroup))] = $label;
+            }
         }
         return $pairs;
     }
