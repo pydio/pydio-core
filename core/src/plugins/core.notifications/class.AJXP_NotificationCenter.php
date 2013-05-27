@@ -170,9 +170,11 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     $node->event_description = ucfirst($notif->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notif->getAuthor();
                     $node->event_description_long = $notif->getDescriptionLong(true);
                     $node->event_date = AJXP_Utils::relativeDate($notif->getDate(), $mess);
-                    $node->repository_id = ''.$node->getRepository()->getId();
-                    if($node->repository_id != $crtRepId && $node->getRepository()->getDisplay() != null){
-                        $node->event_repository_label = "[".$node->getRepository()->getDisplay()."]";
+                    if($node->getRepository() != null){
+                        $node->repository_id = ''.$node->getRepository()->getId();
+                        if($node->repository_id != $crtRepId && $node->getRepository()->getDisplay() != null){
+                            $node->event_repository_label = "[".$node->getRepository()->getDisplay()."]";
+                        }
                     }
                     $node->event_author = $notif->getAuthor();
                     AJXP_XMLWriter::renderAjxpNode($node);
