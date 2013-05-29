@@ -586,9 +586,7 @@ class ShareCenter extends AJXP_Plugin{
         }
         $tPath = (!empty($data["TRAVEL_PATH_TO_ROOT"]) ? $data["TRAVEL_PATH_TO_ROOT"] : "../..");
         $html = str_replace("AJXP_PATH_TO_ROOT", $tPath, $html);
-        if(strstr($_SERVER["HTTP_USER_AGENT"], "MSIE 9.") || strstr($_SERVER["HTTP_USER_AGENT"], "MSIE 10.")){
-            header("X-UA-Compatible: IE=9");
-        }
+        HTMLWriter::internetExplorerMainDocumentHeader();
         HTMLWriter::charsetHeader();
         echo($html);
     }

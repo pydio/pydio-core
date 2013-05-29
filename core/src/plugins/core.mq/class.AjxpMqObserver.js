@@ -124,8 +124,10 @@ Class.create("AjxpMqObserver", {
         }));
         conn.discrete = true;
         conn.onComplete = function(transport){
-            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
-            ajaxplorer.notify("server_message", transport.responseXML);
+            if(transport.responseXML){
+                ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                ajaxplorer.notify("server_message", transport.responseXML);
+            }
         };
         conn.sendAsync();
     }

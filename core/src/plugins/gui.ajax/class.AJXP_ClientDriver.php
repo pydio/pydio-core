@@ -156,9 +156,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 			//------------------------------------
 			case "get_boot_gui":
 
-                if(strstr($_SERVER["HTTP_USER_AGENT"], "MSIE 9.") || strstr($_SERVER["HTTP_USER_AGENT"], "MSIE 10.")){
-                    header("X-UA-Compatible: IE=9");
-                }
+                HTMLWriter::internetExplorerMainDocumentHeader();
                 HTMLWriter::charsetHeader();
 				
 				if(!is_file(TESTS_RESULT_FILE)){

@@ -104,13 +104,14 @@ Class.create("Connexion", {
 	sendAsync : function(){	
 		this.addSecureToken();
         this.showLoader();
-		new Ajax.Request(this._baseUrl, 
+		var t = new Ajax.Request(this._baseUrl,
 		{
 			method:this._method,
 			onComplete:this.applyComplete.bind(this),
 			parameters:this._parameters.toObject()
 		});
-	},
+        try {t.transport.responseType =  'msxml-document'; } catch(e){}
+    },
 	
 	/**
 	 * Send synchronously
@@ -118,14 +119,15 @@ Class.create("Connexion", {
 	sendSync : function(){	
 		this.addSecureToken();
         this.showLoader();
-		new Ajax.Request(this._baseUrl, 
+		var t = new Ajax.Request(this._baseUrl,
 		{
 			method:this._method,
 			asynchronous: false,
 			onComplete:this.applyComplete.bind(this),
-			parameters:this._parameters.toObject()
+			parameters:this._parameters.toObject(),
+            msxmldoctype: true
 		});
-	},
+    },
 	
 	/**
 	 * Apply the complete callback, try to grab maximum of errors
@@ -146,7 +148,7 @@ Class.create("Connexion", {
 		var headers = transport.getAllResponseHeaders();
 		if(Prototype.Browser.Gecko && transport.responseXML && transport.responseXML.documentElement && transport.responseXML.documentElement.nodeName=="parsererror"){
 			message = "Parsing error : \n" + transport.responseXML.documentElement.firstChild.textContent;					
-		}else if(Prototype.Browser.IE && transport.responseXML.parseError && transport.responseXML.parseError.errorCode != 0){
+		}else if(Prototype.Browser.IE && transport.responseXML && transport.responseXML.parseError && transport.responseXML.parseError.errorCode != 0){
 			message = "Parsing Error : \n" + transport.responseXML.parseError.reason;
 		}else if(headers.indexOf("text/xml")>-1 && transport.responseXML == null){
 			message = "Unknown Parsing Error!";

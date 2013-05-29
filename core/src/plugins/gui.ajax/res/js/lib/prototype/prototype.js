@@ -1522,8 +1522,12 @@ Ajax.Request = Class.create(Ajax.Base, {
         this.options.asynchronous);
 
       if (this.options.asynchronous) this.respondToReadyState.bind(this).defer(1);
+      else if(this.options.msxmldoctype) {
+          try {this.transport.responseType = 'msxml-document'; } catch(e){}
+      }
 
-      this.transport.onreadystatechange = this.onStateChange.bind(this);
+
+        this.transport.onreadystatechange = this.onStateChange.bind(this);
       this.setRequestHeaders();
 
       this.body = this.method == 'post' ? (this.options.postBody || params) : null;
