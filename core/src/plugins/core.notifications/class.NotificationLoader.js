@@ -190,13 +190,13 @@ Class.create("NotificationLoader", {
                     protoMenu.options.menuItems = this.menuItems;
                     protoMenu.options.menuTitle = this.hasAlerts ? MessageHash['notification_center.3'] : MessageHash['notification_center.5'];
                     protoMenu.refreshList();
-                    protoMenu.container.setStyle(protoMenu.computeAnchorOffset());
+                    this.refreshProtoMenuContainerPosition(protoMenu);
                 }.bind(this));
                 this.ajxpNode.load();
             }else{
                 protoMenu.options.menuItems = this.menuItems;
                 protoMenu.refreshList();
-                protoMenu.container.setStyle(protoMenu.computeAnchorOffset());
+                this.refreshProtoMenuContainerPosition(protoMenu);
             }
         }.bind(this);
         protoMenu.options = Object.extend(protoMenu.options, {
@@ -237,10 +237,17 @@ Class.create("NotificationLoader", {
                 protoMenu.container.addClassName('rootDirChooser');
                 protoMenu.container.addClassName('events_menu');
                 protoMenu.container.id = "feed_content";
-                protoMenu.container.setStyle(protoMenu.computeAnchorOffset());
+                this.refreshProtoMenuContainerPosition(protoMenu);
                 loaderFunc();
-            }, 50);
+            }.bind(this), 50);
         }
+    },
+
+    refreshProtoMenuContainerPosition: function(protoMenu){
+        var dim = protoMenu.container.getDimensions();
+        var offset = protoMenu.computeAnchorOffset();
+        protoMenu.container.setStyle(offset);
+        protoMenu.correctWindowClipping(protoMenu.container, offset, dim);
     }
 
 });

@@ -666,7 +666,7 @@ Class.create("XHRUploader", {
         };		
 
 		xhr.open("POST", uri, true);
-        try {xhr.responseType =  'msxml-document'; } catch(e){}
+        try {if(Prototype.Browser.IE10) xhr.responseType =  'msxml-document'; } catch(e){}
         return xhr;
 		
 	},
@@ -800,7 +800,7 @@ Class.create("XHRUploader", {
         }
         
         xhr.open("post", url, true);
-        try {xhr.responseType =  'msxml-document'; } catch(e){}
+        try {if(Prototype.Browser.IE10) xhr.responseType =  'msxml-document'; } catch(e){}
         xhr.setRequestHeader("If-Modified-Since", "Mon, 26 Jul 1997 05:00:00 GMT");
         xhr.setRequestHeader("Cache-Control", "no-cache");
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");

@@ -322,26 +322,38 @@ Proto.Menu = Class.create({
 		}else{
 			elOff = this.computeAnchorOffset();		
 		}
-		this.container.setStyle(elOff);		
+		this.container.setStyle(elOff);
 		this.container.setStyle({zIndex: this.options.zIndex});
 		if (this.ie) { 
 			this.shim.setStyle(Object.extend(Object.extend(elDim, elOff), {zIndex: this.options.zIndex - 1})).show();
 		}				
 		if(this.options.fade){
             this.checkHeight(elOff.top);
+            this.correctWindowClipping(this.container, elOff, elDim);
 			Effect.Appear(this.container, {
 				duration: this.options.fadeTime || 0.15, 
 				afterFinish : function(e){
 					this.checkHeight(elOff.top);
+                    this.correctWindowClipping(this.container, elOff, elDim);
 				}.bind(this)
 			});
 		}else{
 			this.container.show();
 			this.checkHeight(elOff.top);
+            this.correctWindowClipping(this.container, elOff, elDim);
 		}
 		this.event = e;
 	},
-	
+
+    correctWindowClipping: function(container, position, dim){
+        var viewPort = document.viewport.getDimensions();
+        if(parseInt(position.left) + dim.width > viewPort.width ){
+            position.left = parseInt(position.left) + (viewPort.width - (parseInt(position.left) + dim.width) - 5);
+            container.setStyle({left:position.left + "px"});
+        }
+    },
+
+
 	checkHeight : function(offsetTop){
         offsetTop = parseInt(offsetTop);
 		if(this.options.anchor == 'mouse') return;

@@ -110,7 +110,7 @@ Class.create("Connexion", {
 			onComplete:this.applyComplete.bind(this),
 			parameters:this._parameters.toObject()
 		});
-        try {t.transport.responseType =  'msxml-document'; } catch(e){}
+        try {if(Prototype.Browser.IE10) t.transport.responseType =  'msxml-document'; } catch(e){}
     },
 	
 	/**
