@@ -82,7 +82,9 @@ class ldapAuthDriver extends AbstractAuthDriver {
                 $this->ldapFilter = "(" . $this->ldapFilter . ")";
             }
         } else {
-            $this->ldapFilter = "!(objectClass=group)";
+            if($this->hasGroupsMapping && !empty($this->ldapGFilter)){
+                $this->ldapFilter = "!(".$this->ldapGFilter.")";
+            }
         }
         if (!empty($options["LDAP_GROUP_FILTER"])){
             $this->ldapGFilter = $options["LDAP_GROUP_FILTER"];

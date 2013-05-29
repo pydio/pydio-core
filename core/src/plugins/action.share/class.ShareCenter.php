@@ -913,9 +913,9 @@ class ShareCenter extends AJXP_Plugin{
             }
             if($eType == "user"){
                 $u = AJXP_Utils::decodeSecureMagic($httpVars["user_".$index], AJXP_SANITIZE_ALPHANUM);
-                if(!AuthService::userExists($u, "w") && !isSet($httpVars["user_pass_".$index])){
+                if(!AuthService::userExists($u) && !isSet($httpVars["user_pass_".$index])){
                     return 100;
-                }else if(AuthService::userExists($u, "w") && isSet($httpVars["user_pass_".$index])){
+                }else if(AuthService::userExists($u) && isSet($httpVars["user_pass_".$index])){
                     throw new Exception("User $u already exists, please choose another name.");
                 }
                 if(!AuthService::userExists($u, "w") && !empty($this->pluginConf["SHARED_USERS_TMP_PREFIX"])
@@ -953,7 +953,7 @@ class ShareCenter extends AJXP_Plugin{
 
 		$confDriver = ConfService::getConfStorageImpl();
         foreach($users as $userName){
-            if(AuthService::userExists($userName, "w")){
+            if(AuthService::userExists($userName)){
                 // check that it's a child user
                 $userObject = $confDriver->createUserObject($userName);
                 if( ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf") != true && ( !$userObject->hasParent() || $userObject->getParent() != $loggedUser->id ) ){
