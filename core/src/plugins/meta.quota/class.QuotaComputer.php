@@ -166,9 +166,9 @@ class QuotaComputer extends AJXP_Plugin
         }
 
         if($this->pluginConf["USAGE_SCOPE"] == "local"){
-            return intval($data["REPO_USAGES"][$repo]);
+            return floatval($data["REPO_USAGES"][$repo]);
         }else{
-            return array_sum(array_map("intval", $data["REPO_USAGES"]));
+            return array_sum(array_map("floatval", $data["REPO_USAGES"]));
         }
 
     }
@@ -196,7 +196,7 @@ class QuotaComputer extends AJXP_Plugin
             $obj = new COM ( 'scripting.filesystemobject' );
             if ( is_object ( $obj ) ){
                 $ref = $obj->getfolder ( $dir );
-                $s = intval($ref->size);
+                $s = floatval($ref->size);
                 $obj = null;
             }else{
                 echo 'can not create object';
@@ -207,7 +207,7 @@ class QuotaComputer extends AJXP_Plugin
             $io = popen ( '/usr/bin/du '.$option.' ' . escapeshellarg($dir), 'r' );
            	$size = fgets ( $io, 4096);
             $size = trim(str_replace($dir, "", $size));
-            $s = intval($size);
+            $s =  floatval($size);
             if(PHP_OS == "Darwin") $s = $s * 1024;
            	//$s = intval(substr ( $size, 0, strpos ( $size, ' ' ) ));
            	pclose ( $io );
@@ -231,7 +231,7 @@ class QuotaComputer extends AJXP_Plugin
                     $total_size += $size;
                 }
             } else {
-                $size = filesize(rtrim($path, '/') . '/' . $t);
+                $size = sprintf("%u", filesize(rtrim($path, '/') . '/' . $t));
                 $total_size += $size;
             }
         }
