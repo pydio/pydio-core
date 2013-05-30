@@ -191,6 +191,7 @@ class sqlConfDriver extends AbstractConfDriver {
         if($user != null){
             $acls = $user->mergedRole->listAcls();
             $limitRepositories = array_keys($acls);
+            if(!count($limitRepositories)) return array();
             foreach($limitRepositories as $i => $k) $limitRepositories[$i] = "'$k'";
             $query = 'SELECT * FROM [ajxp_repo] WHERE uuid IN ('.implode(",",$limitRepositories).') ORDER BY [display] ASC';
         }else{
