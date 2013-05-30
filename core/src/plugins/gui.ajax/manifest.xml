@@ -103,7 +103,7 @@
 							<div id="topPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ajxpPaneHeader="130" ajxpPaneIcon="view_tree.png" style="margin:20px;margin-bottom:10px;padding-right: 10px;"></div>
 							<div id="info_panel" ajxpClass="InfoPanel" ajxpPaneHeader="131" ajxpPaneIcon="file_info.png" ajxpOptions='{"replaceScroller":"true"}' style="margin:20px;margin-top:10px;padding-right: 10px;" ></div>
 					    </div>
-						<div id="searchbar_splitter" style="overflow:hidden;" ajxpClass="Splitter" ajxpOptions='{"direction":"horizontal","initA":0, "minSize":0, "startFolded": true}'>
+						<div id="searchbar_splitter" style="overflow:hidden;" ajxpClass="Splitter" ajxpOptions='{"direction":"horizontal","initA":0, "minSize":0, "startFolded": true, "foldingButton": "A"}'>
 							<div id="search_container" ajxpClass="SearchEngine" ajxpPaneHeader="87" ajxpPaneIcon="xmag.png" data-globalOptions='{"headerClose":{"icon":"panel_vertical_hide.png","splitter":"searchbar_splitter","title":86}}' style="height: 0px; overflow:hidden;"></div>
     						<div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"list","replaceScroller":true}' style="border: 1px solid #bbb;"></div>
 					    </div>
