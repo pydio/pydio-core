@@ -5,7 +5,7 @@
 			<gui text="32" title="32" src="fileopen.png" iconClass="icon-folder-open-alt"
 				accessKey="folder_access_key">
 				<context selection="true" dir="" recycle="false"
-					actionBar="true" actionBarGroup="inline" contextMenu="true" infoPanel="true">
+					actionBar="true" actionBarGroup="inline,put" contextMenu="true" infoPanel="true">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false"
 					unique="true" allowedMimes="ajxp_folder,AJXP_MIMES_ZIP" behaviour="hidden">

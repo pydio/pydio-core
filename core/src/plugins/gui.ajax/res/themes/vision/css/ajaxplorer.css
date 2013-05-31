@@ -4132,6 +4132,10 @@ td.ip_geo_cell{
     height: 28px;
 }
 
+#ls_button{
+    display: none;
+}
+
 #create_button {
     /*padding: 7px 10px 10px 10px;*/
     margin-right: 0;
