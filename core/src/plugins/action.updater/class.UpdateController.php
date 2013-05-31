@@ -138,6 +138,9 @@ class UpdateController extends AJXP_Plugin {
                     }
                     if($errors) break;
                 }
+                print('<script type="text/javascript">replaceTop();</script>');
+                print str_repeat(' ',300);
+                flush();
 
 
             break;

@@ -77,6 +77,7 @@ class AjaXplorerUpgrader {
             "updateVersion"         => "Everything went ok, upgrading version!",
             "clearCache"            => "Clearing plugins cache",
             "displayNote"           => "Release note : ",
+            "displayUpgradeInstructions"=> "Upgrade instructions",
         );
 
     }
@@ -272,6 +273,9 @@ class AjaXplorerUpgrader {
 
     function updateVersion(){
         // Finally copy VERSION file
+        if(!is_file($this->workingFolder."/conf/VERSION")){
+            return "<b>No VERSION file in archive</b>";
+        }
         copy($this->workingFolder."/conf/VERSION", $this->installPath."/conf/VERSION");
         $vCont = file_get_contents($this->installPath."/conf/VERSION");
         list($v, $date) = explode("__", $vCont);
@@ -294,6 +298,14 @@ class AjaXplorerUpgrader {
     function displayNote(){
         if(is_file($this->workingFolder."/UPGRADE/NOTE")){
             return nl2br(file_get_contents($this->workingFolder."/UPGRADE/NOTE"));
+        }
+    }
+
+    function displayUpgradeInstructions(){
+        if(is_file($this->workingFolder."/UPGRADE/Instructions.html")){
+            return "<div id='upgrade_last_html'>".file_get_contents($this->workingFolder."/UPGRADE/Instructions.html")."
+            <style type='text/css'>div.upgrade_step{display:none;}</style>
+            </div>";
         }
     }
 

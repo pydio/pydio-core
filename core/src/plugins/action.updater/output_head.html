@@ -33,12 +33,29 @@
             div.upgrade_result.error{
                 color: #861313;
             }
+            div#upgrade_last_html{
+                background-color: white;
+                padding: 1px 20px;
+                padding-bottom: 20px;
+                border-radius: 5px;
+                position: absolute;
+                top: 0;
+                left: 0;
+                min-height: 100%;
+                margin-bottom: 50px;
+            }
         </style>
 
         <script type="text/javascript">
             function doScroll(){
                 window.scrollTo(0, 10000);
             };
+            function replaceTop(){
+                if(document.getElementById('upgrade_last_html')){
+                    document.body.insertBefore(document.getElementById('upgrade_last_html'), document.body.firstChild);
+                    window.scrollTo(0);
+                }
+            }
         </script>
 
     </head>
