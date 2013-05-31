@@ -59,6 +59,7 @@ Class.create("NotificationLoader", {
         this.ajxpNode.reload();
     },
 
+    /*
     childrenToMenu: function(menuContainer){
         this.ajxpNode.getChildren().each(function(el){
            var div = new Element('a');
@@ -74,6 +75,7 @@ Class.create("NotificationLoader", {
         }.bind(this) );
 
     },
+    */
 
     childrenToMenuItems : function(){
         var menuItems = $A([]);
@@ -85,6 +87,9 @@ Class.create("NotificationLoader", {
 
         this.ajxpNode.getChildren().each(function(el){
 
+            // REPLACE REAL PATH NOW
+            el._path = el.getMetadata().get("real_path");
+            el.getMetadata().set("filename", el._path);
             var isAlert = el.getMetadata().get("event_is_alert") ? true : false;
             if(alerts && !isAlert){
                 alerts = false;
@@ -186,17 +191,17 @@ Class.create("NotificationLoader", {
                 return;
             }
             if(!this.ajxpNode.isLoaded()){
-                this.ajxpNode.observeOnce("loaded", function(){
+                this.ajxpNode.observe("loaded", function(){
                     protoMenu.options.menuItems = this.menuItems;
                     protoMenu.options.menuTitle = this.hasAlerts ? MessageHash['notification_center.3'] : MessageHash['notification_center.5'];
                     protoMenu.refreshList();
-                    protoMenu.container.setStyle(protoMenu.computeAnchorOffset());
+                    this.refreshProtoMenuContainerPosition(protoMenu);
                 }.bind(this));
                 this.ajxpNode.load();
             }else{
                 protoMenu.options.menuItems = this.menuItems;
                 protoMenu.refreshList();
-                protoMenu.container.setStyle(protoMenu.computeAnchorOffset());
+                this.refreshProtoMenuContainerPosition(protoMenu);
             }
         }.bind(this);
         protoMenu.options = Object.extend(protoMenu.options, {
@@ -237,10 +242,17 @@ Class.create("NotificationLoader", {
                 protoMenu.container.addClassName('rootDirChooser');
                 protoMenu.container.addClassName('events_menu');
                 protoMenu.container.id = "feed_content";
-                protoMenu.container.setStyle(protoMenu.computeAnchorOffset());
+                this.refreshProtoMenuContainerPosition(protoMenu);
                 loaderFunc();
-            }, 50);
+            }.bind(this), 50);
         }
+    },
+
+    refreshProtoMenuContainerPosition: function(protoMenu){
+        var dim = protoMenu.container.getDimensions();
+        var offset = protoMenu.computeAnchorOffset();
+        protoMenu.container.setStyle(offset);
+        protoMenu.correctWindowClipping(protoMenu.container, offset, dim);
     }
 
 });
