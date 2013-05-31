@@ -222,7 +222,7 @@
             </processing>
 		</action>
 		<action name="create_repository">
-			<gui text="299" title="300" iconClass="icon-hdd" src="hdd_external_unmount.png" accessKey="ajxp_conf.repository_access_key" hasAccessKey="false">
+			<gui text="299" title="300" iconClass="icon-sitemap" src="hdd_external_unmount.png" accessKey="ajxp_conf.repository_access_key" hasAccessKey="false">
 				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
 					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="put" inZip="false">
@@ -250,7 +250,7 @@
                         name:MessageHash['ajxp_conf.91'],
                         alt:MessageHash['ajxp_conf.92'],
                         isDefault : false,
-                        icon_class:'icon-sitemap',
+                        icon_class:'icon-th',
                         image:resolveImageSource('images/actions/22/hdd_external_mount.png', '',  22),
                         callback:function(e){
                             window.createRepoCmd = "template";

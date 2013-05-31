@@ -69,16 +69,22 @@
                         }
                     </style>
                     <script>
-                        $("vertical_splitter").ajxpPaneObject.paneB._max = 1;
-                        $("vertical_splitter").ajxpPaneObject.options.maxB = 1;
+                        var splitter = $("vertical_splitter").ajxpPaneObject;
+                        splitter.paneB._max = 1;
+                        splitter.options.maxB = 1;
+                        splitter.resizeGroup();
                         document.observe("ajaxplorer:user_logged", function(){
                             if(ajaxplorer.repositoryId == "ajxp_conf"){
-                                $("vertical_splitter").ajxpPaneObject.paneB._max = 1;
-                                $("vertical_splitter").ajxpPaneObject.options.maxB = 1;
+                                splitter.paneB._max = 1;
+                                splitter.options.maxB = 1;
                             }else{
-                                $("vertical_splitter").ajxpPaneObject.paneB._max = 0;
-                                $("vertical_splitter").ajxpPaneObject.options.maxB = 0;
+                                splitter.paneB._max = 0;
+                                splitter.options.maxB = 0;
+                                if(splitter.foldedPane && splitter.foldedPane == splitter.paneB){
+                                    splitter.paneB.setStyle({width:'26px'});
+                                }
                             }
+                            splitter.resizeGroup();
                         });
                     </script>
                     ]]></template_part>

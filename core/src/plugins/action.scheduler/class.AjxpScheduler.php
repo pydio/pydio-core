@@ -291,7 +291,7 @@ class AjxpScheduler extends AJXP_Plugin{
     function listTasks($action, $httpVars, $postProcessData){
 
         $mess =ConfService::getMessages();
-        AJXP_XMLWriter::renderHeaderNode("tree", "Scheduler", false, array("icon" => "scheduler/ICON_SIZE/player_time.png"));
+        AJXP_XMLWriter::renderHeaderNode("/admin/scheduler", "Scheduler", false, array("icon" => "scheduler/ICON_SIZE/player_time.png"));
         AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="list"  template_name="action.scheduler_list">
      			<column messageId="action.scheduler.12" attributeName="ajxp_label" sortType="String"/>
      			<column messageId="action.scheduler.2" attributeName="schedule" sortType="String"/>
