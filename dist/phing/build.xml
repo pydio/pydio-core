@@ -195,6 +195,13 @@
 			</then>
 		</if>
 		
+		<if>
+			<available type="file" file="${git.local_repository}/dist/php/${new_version}.html"/>
+			<then>
+				<copy file="${git.local_repository}/dist/php/${new_version}.html" toFile="${upgrade_export}/UPGRADE/Instructions.html"/>
+			</then>
+		</if>
+
     </target>
     
     <target name="zip" description="Package as Zip archive">
