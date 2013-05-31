@@ -28,5 +28,6 @@ $mess=array(
 "Password" => "Password",
 "User account" => "Compte utilisateur",
 "User Password" => "Mot de passe utilisateur",
+"Timestamp" => "Timestamp",
 );
 ?>

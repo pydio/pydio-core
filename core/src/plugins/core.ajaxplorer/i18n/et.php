@@ -259,7 +259,6 @@ $mess=array(
 "204" => "Fail \"",
 "205" => "\" ületab suuruspiirangu (",
 "206" => "Mb).\\Faili ei laeta üles.",
-/* END SENTENCE */
 "207" => "Sul ei ole sellele kataloogis kirjutusõigust",
 "208" => "Sul ei ole selles kataloogis lugemisõigust",
 "209" => "Serveripoolne viga, võta ühendust oma kontaktisikuga!",
@@ -534,5 +533,7 @@ $mess=array(
 "474" => "Kirjeldus puudub",
 "475" => "Kõikide kasutajate vahel jagatud failid",
 "476" => "Sinu personaalne töölaud",
+"477" => "Select a file or folder to see its details here",
+/* END SENTENCE */
 );
 ?>

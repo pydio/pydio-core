@@ -141,6 +141,7 @@ $mess=array(
 "116" => "Template Label",
 "117" => "Template Driver",
 "118" => "New group",
-    "group_access" => "g",
+"group_access" => "g",
+"119" => "Set user group",
 /* END SENTENCE */
 );

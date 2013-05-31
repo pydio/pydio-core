@@ -141,6 +141,7 @@ $mess=array(
 "117" => "Sablon driver",
 "118" => "Új csoport",
 "group_access" => "g",
+"119" => "Set user group",
 
 /* END SENTENCE */
 );

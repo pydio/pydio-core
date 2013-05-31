@@ -532,5 +532,6 @@ $mess=array(
 "474" => "Pas de description",
 "475" => "Fichiers partagés par tous les utilisateurs",
 "476" => "Votre espace personnel",
+"477" => "Selectionnez un fichier ou un répertoire pour voir ses infos s'afficher ici"
 /* END SENTENCE */
 );

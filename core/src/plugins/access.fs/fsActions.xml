@@ -901,11 +901,12 @@
 					<message key="folders_string" id="130"/>
 					<message key="files_string" id="265"/>
 					<message key="totalsize_string" id="259"/>
+					<message key="select_something_string" id="477"/>
 				</messages>
 				<html><![CDATA[
 				    <div class="ipanel_no_selection_select">
                             <span class="icon-info-sign"></span>
-                            <span class="label">Select a file or folder to see its details here</span>
+                            <span class="label">#{select_something_string}</span>
 				    </div>
 					<div class="ipanel_no_selection_data">
 						<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
@@ -974,7 +975,7 @@
                     </div>
 					<div class="infoPanelAllMetadata">
 					    <div>
-                            <div class="panelHeader infoPanelGroup">#{header_string}</div>
+                            <div class="panelHeader infoPanelGroup"><span class="icon-info" data-ajxpAction="no-action"></span> #{header_string}</div>
                             <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
                                 <tr>
                                     <td class="infoPanelLabel">#{name_string}</td>

@@ -137,9 +137,10 @@ $mess=array(
 "113" => "Der Status der Rolle wurde erfogreich geändert",
 "114" => "Standard",
 "115" => "Schema",
-    "116" => "Template Label",
-    "117" => "Template Driver",
-    "118" => "Neue Gruppe",
-    "group_access" => "G",
+"116" => "Template Label",
+"117" => "Template Driver",
+"118" => "Neue Gruppe",
+"group_access" => "G",
+"119" => "Set user group",
 
 );

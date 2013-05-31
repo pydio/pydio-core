@@ -534,6 +534,7 @@ $mess=array(
 "474" => "Keine Beschreibung verfügbar",
 "475" => "Für alle Benutzer freigegeben",
 "476" => "Ihr persöhnliches Repositorie",
+"477" => "Select a file or folder to see its details here",
 /* END SENTENCE */
 );
 ?>

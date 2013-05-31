@@ -536,6 +536,7 @@ $mess=array(
 "474" => "No hay descripción disponible",
 "475" => "Ficheros compartidos con todos los usuarios",
 "476" => "Su espacio de trabajo personal",
+"477" => "Select a file or folder to see its details here",
 /* END SENTENCE */
 );
 ?>

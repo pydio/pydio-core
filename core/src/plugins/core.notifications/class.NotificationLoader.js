@@ -112,7 +112,7 @@ Class.create("NotificationLoader", {
             block += '<div class="notif_event_date">'+ el.getMetadata().get('event_date') + '</div>';
             block = '<div class="notif_event_container">'+block+'</div><br style="clear:left;"/>';
             var moreActions = $A([{
-                name:"Go to...",
+                name:MessageHash["notification_center.6"],
                 icon_class:"icon-circle-arrow-right",
                 callback:function(e){
                     window.ajaxplorer.goTo(el);
@@ -120,7 +120,7 @@ Class.create("NotificationLoader", {
             }]);
             if(isAlert){
                 moreActions.push({
-                    name:"Dismiss",
+                    name:MessageHash["notification_center.7"],
                     icon_class:"icon-remove-sign",
                     callback:function(e){
                         Event.stop(e);

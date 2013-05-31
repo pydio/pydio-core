@@ -23,5 +23,7 @@ $mess=array(
 "2" => "Benachrichtigungs Feed",
 "3" => "Wichtige Nachrichten",
 "4" => "Benachrichtigungen",
-"5" => "Aktuelle Geschehen"
+"5" => "Aktuelle Geschehen",
+"6" => "Go to ...",
+"7" => "Dismiss",
 );
