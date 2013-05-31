@@ -40,7 +40,7 @@ rm -rf %{buildroot}
 
 # copy application
 install -d %{buildroot}%{ajaxplorerdir}
-cp -pr * %{buildroot}%{ajaxplorerdir}
+cp -pr . %{buildroot}%{ajaxplorerdir}
 
 # apache conf
 mkdir -p %{buildroot}%{_sysconfdir}/httpd/conf.d
