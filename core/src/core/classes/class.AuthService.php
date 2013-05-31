@@ -95,7 +95,13 @@ class AuthService
 	 */
 	static function getLoggedUser()
 	{
-		if(self::$useSession && isSet($_SESSION["AJXP_USER"])) return $_SESSION["AJXP_USER"];
+		if(self::$useSession && isSet($_SESSION["AJXP_USER"])) {
+            if(is_a($_SESSION["AJXP_USER"], "__PHP_Incomplete_Class")){
+                session_unset("AJXP_USER");
+                return null;
+            }
+            return $_SESSION["AJXP_USER"];
+        }
 		if(!self::$useSession && isSet(self::$currentUser)) return self::$currentUser;
 		return null;
 	}
