@@ -137,6 +137,7 @@
         <copy todir="${INNER_DIRECTORY}">
         	<fileset dir="${git.local_repository}/core/src" defaultexcludes="false">
         		<include name="*/**"/>
+                <exclude name=".gitignore"/>
         	</fileset>
         </copy>        	                
         <!-- PREPARE VERSION FILE -->
