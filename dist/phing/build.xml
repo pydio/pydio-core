@@ -295,6 +295,7 @@
                 <copy todir="${build.working_folder}/dist">
                     <fileset dir="${git.local_repository}/dist" defaultexcludes="false">
                         <include name="**/*"/>
+                        <exclude name=".gitignore"/>
                     </fileset>
                 </copy>
                 <exec command="git rev-parse --short HEAD" dir="${git.local_repository}" outputProperty="LASTREVISION"/>
