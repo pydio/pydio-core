@@ -690,7 +690,7 @@ class ShareCenter extends AJXP_Plugin{
         PublicletCounter::increment($shortHash);
 
         //AuthService::logUser($data["OWNER_ID"], "", true);
-        AuthService::logTemporaryUser($data["OWNER_ID"], $hash);
+        AuthService::logTemporaryUser($data["OWNER_ID"], $shortHash);
         if($driver->hasMixin("credentials_consumer") && isSet($data["SAFE_USER"]) && isSet($data["SAFE_PASS"])){
             // FORCE SESSION MODE
             AJXP_Safe::getInstance()->forceSessionCredentialsUsage();
@@ -722,9 +722,9 @@ class ShareCenter extends AJXP_Plugin{
                 }
             }
             AJXP_Controller::findActionAndApply($data["ACTION"], $params, null);
-            register_shutdown_function(array("AuthService", "clearTemporaryUser"), $hash);
+            register_shutdown_function(array("AuthService", "clearTemporaryUser"), $shortHash);
         }catch (Exception $e){
-            AuthService::clearTemporaryUser($hash);
+            AuthService::clearTemporaryUser($shortHash);
         	die($e->getMessage());
         }
     }
