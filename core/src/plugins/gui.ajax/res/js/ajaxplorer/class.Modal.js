@@ -501,16 +501,35 @@ Class.create("Modal", {
 	 * Create a simple tooltip
 	 * @param element HTMLElement
 	 * @param title String
+     * @param position Describe tooltip position
+     * @param className Add an arbitrary class to the tooltip
+     * @param hookTo either 'element' or 'pointer'
+     * @param updateOnShow Load the tooltip content from the "title" element passed.
 	 */
-	simpleTooltip : function(element, title){
+	simpleTooltip : function(element, title, position, className, hookTo, updateOnShow){
+        if(!position) position = 'bottom right';
+        if(!hookTo) hookTo = 'pointer';
 		element.observe("mouseover", function(event){
-			var x = Event.pointerX(event)+10;
-			var y = Event.pointerY(event)+10;
 			if(!this.tooltip){
 				this.tooltip = new Element("div", {className:"simple_tooltip"});
+                if(className) this.tooltip.addClassName(className);
 				$$('body')[0].insert(this.tooltip);
 			}
-			this.tooltip.update(title);
+            if(updateOnShow){
+                this.tooltip.update(title.cloneNode(true));
+            }else{
+                this.tooltip.update(title);
+            }
+            var baseX = hookTo == "element" ? Element.cumulativeOffset(element).left : Event.pointerX(event);
+            var baseY = hookTo == "element" ? Element.cumulativeOffset(element).top : Event.pointerY(event);
+            var x = (position.indexOf('right') != -1 ? baseX+10 : (baseX - 10 - parseInt(this.tooltip.getWidth())) );
+            var y = baseY+10;
+            if(position.indexOf('middle') != -1){
+                y -= 5 + parseInt(this.tooltip.getHeight())/2;
+            }else if(position.indexOf('bottom') != -1){
+                y -= 13 + parseInt(element.getHeight());
+            }
+
 			this.tooltip.setStyle({top:y+"px",left:x+"px"});
 			if(this.tipTimer){
 				window.clearTimeout(this.tipTimer);

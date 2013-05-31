@@ -135,6 +135,7 @@ Class.create("InfoPanel", AjxpPane, {
         var userSelection = ajaxplorer.getUserSelection();
         var contextNode = userSelection.getContextNode();
 		this.empty();
+        this.clearPanelHeaderIcons();
         if(this.scrollbar) this.scrollbar.recalculateLayout();
 		if(!contextNode) {
 			return;
@@ -220,10 +221,21 @@ Class.create("InfoPanel", AjxpPane, {
             }
         }.bind(this));
         this.contentContainer.select('[data-ajxpAction]').each(function(act){
-            act.observe('click', function(event){
-                window.ajaxplorer.actionBar.fireAction(event.target.getAttribute('data-ajxpAction'));
-            });
-        });
+            if(act.getAttribute('data-ajxpAction') != 'no-action'){
+                act.observe('click', function(event){
+                    window.ajaxplorer.actionBar.fireAction(event.target.getAttribute('data-ajxpAction'));
+                }.bind(this));
+            }else{
+                act.setStyle({cursor:"default"});
+            }
+            var panelPointer = act.up("div.panelHeader").next();
+            this.contributePanelHeaderIcon(
+                act.getAttribute("class"),
+                act.getAttribute("title"),
+                act.getAttribute('data-ajxpAction'),
+                panelPointer
+            );
+        }.bind(this));
         this.addActions('unique');
 		var fakes = this.contentContainer.select('div[id="preview_rich_fake_element"]');
 		if(fakes && fakes.length){
@@ -248,8 +260,36 @@ Class.create("InfoPanel", AjxpPane, {
         if(!title) title = MessageHash[131];
         var panelTitle = this.htmlElement.down('div.panelHeader');
         if(panelTitle) {
-            if(panelTitle.down('span')) panelTitle.down('span').update(title);
-            else panelTitle.update(title);
+            if(panelTitle.down('span[ajxp_message_id]')) panelTitle.down('span[ajxp_message_id]').update(title);
+            //else panelTitle.update(title);
+        }
+    },
+
+    clearPanelHeaderIcons:function(){
+        if(!this.htmlElement) return;
+        var div = this.htmlElement.down('div.folded_icons');
+        if(div) div.update("");
+    },
+
+    contributePanelHeaderIcon:function(iconClass, iconTitle, ajxpAction, panelPointer){
+        if(!this.htmlElement || !this.htmlElement.down('div.panelHeader')) return;
+        var div = this.htmlElement.down('div.folded_icons');
+        if(!div) {
+            div = new Element('div', {className: 'folded_icons'});
+            this.htmlElement.down('div.panelHeader').insert(div);
+        }else{
+            if(div.down('span.'+iconClass)) return;
+        }
+        var ic = new Element("span", {className:iconClass, title: iconTitle});
+        div.insert(ic);
+        if(ajxpAction){
+            ic.addClassName('clickable');
+            ic.observe("click", function(){
+                ajaxplorer.actionBar.fireAction(ajxpAction);
+            }.bind(this));
+        }
+        if(panelPointer){
+             modal.simpleTooltip(ic, panelPointer, 'bottom left', 'foldedPanel_tooltip', 'element', true);
         }
     },
 
@@ -419,6 +459,7 @@ Class.create("InfoPanel", AjxpPane, {
 			ajaxplorer.loadEditorResources(editors[0].resourcesManager);
 			var editorClass = Class.getByName(editors[0].editorClass);
 			if(editorClass){
+                this.contributePanelHeaderIcon('icon-eye-close', 'Preview', 'open_with');
 				if(getTemplateElement){
 					return '<div id="preview_rich_fake_element"></div>';
 				}else{

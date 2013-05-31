@@ -191,10 +191,11 @@ class sqlConfDriver extends AbstractConfDriver {
         if($user != null){
             $acls = $user->mergedRole->listAcls();
             $limitRepositories = array_keys($acls);
+            if(!count($limitRepositories)) return array();
             foreach($limitRepositories as $i => $k) $limitRepositories[$i] = "'$k'";
-            $query = 'SELECT * FROM [ajxp_repo] WHERE uuid IN ('.implode(",",$limitRepositories).')';
+            $query = 'SELECT * FROM [ajxp_repo] WHERE uuid IN ('.implode(",",$limitRepositories).') ORDER BY [display] ASC';
         }else{
-            $query = 'SELECT * FROM [ajxp_repo]';
+            $query = 'SELECT * FROM [ajxp_repo] ORDER BY [display] ASC';
         }
 
 		$res = dibi::query($query);
@@ -536,10 +537,16 @@ class sqlConfDriver extends AbstractConfDriver {
      * @return string[]
      */
     function getChildrenGroups($baseGroup = "/"){
-        $res = dibi::query("SELECT * FROM [ajxp_groups] WHERE [groupPath] LIKE %s", $baseGroup."%");
+        $searchGroup = $baseGroup;
+        if($baseGroup[strlen($baseGroup)-1] != "/") $searchGroup.="/";
+        $res = dibi::query("SELECT * FROM [ajxp_groups] WHERE [groupPath] LIKE %s AND [groupPath] NOT LIKE %s", $searchGroup."%", $searchGroup."%/%");
         $pairs = $res->fetchPairs("groupPath", "groupLabel");
         foreach($pairs as $path => $label){
             if(strlen($path) <= strlen($baseGroup)) unset($pairs[$path]);
+            if($baseGroup != "/"){
+                unset($pairs[$path]);
+                $pairs[substr($path, strlen($baseGroup))] = $label;
+            }
         }
         return $pairs;
     }

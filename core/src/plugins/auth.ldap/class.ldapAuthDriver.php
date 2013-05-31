@@ -32,11 +32,18 @@ class ldapAuthDriver extends AbstractAuthDriver {
     var $ldapAdminUsername;
     var $ldapAdminPassword;
     var $ldapDN;
+    var $ldapGDN;
     var $ldapFilter;
+    var $ldapGFilter;
+    var $dynamicFilter;
     var $ldapUserAttr;
+    var $ldapGroupAttr;
 
     var $ldapconn = null;
     var $separateGroup = "";
+
+    var $hasGroupsMapping = false;
+
 
     /**
      * Legacy way, defined through PHP array
@@ -58,20 +65,44 @@ class ldapAuthDriver extends AbstractAuthDriver {
         if ($options["LDAP_USER"]) $this->ldapAdminUsername = $options["LDAP_USER"];
         if ($options["LDAP_PASSWORD"]) $this->ldapAdminPassword = $options["LDAP_PASSWORD"];
         if ($options["LDAP_DN"]) $this->ldapDN = $this->parseReplicatedParams($options, array("LDAP_DN"));
+        if ($options["LDAP_GDN"]) $this->ldapGDN = $this->parseReplicatedParams($options, array("LDAP_GDN"));
         if (is_array($options["CUSTOM_DATA_MAPPING"])) $this->customParamsMapping = $options["CUSTOM_DATA_MAPPING"];
         $this->paramsMapping = $this->parseReplicatedParams($options, array("MAPPING_LDAP_PARAM", "MAPPING_LOCAL_TYPE", "MAPPING_LOCAL_PARAM"));
-        if (isSet($options["LDAP_FILTER"])){
+        if(count($this->paramsMapping)){
+            foreach($this->paramsMapping as $param){
+                if(strtolower($param["MAPPING_LOCAL_TYPE"]) == "group_path"){
+                    $this->hasGroupsMapping = $param["MAPPING_LDAP_PARAM"];
+                    break;
+                }
+            }
+        }
+        if (!empty($options["LDAP_FILTER"])){
             $this->ldapFilter = $options["LDAP_FILTER"];
             if ($this->ldapFilter != "" &&  !preg_match("/^\(.*\)$/", $this->ldapFilter)) {
                 $this->ldapFilter = "(" . $this->ldapFilter . ")";
             }
         } else {
-            $this->ldapFilter = "(objectClass=person)";
+            if($this->hasGroupsMapping && !empty($this->ldapGFilter)){
+                $this->ldapFilter = "!(".$this->ldapGFilter.")";
+            }
         }
-        if ($options["LDAP_USERATTR"]){
+        if (!empty($options["LDAP_GROUP_FILTER"])){
+            $this->ldapGFilter = $options["LDAP_GROUP_FILTER"];
+            if ($this->ldapGFilter != "" &&  !preg_match("/^\(.*\)$/", $this->ldapGFilter)) {
+                $this->ldapGFilter = "(" . $this->ldapGFilter . ")";
+            }
+        } else {
+            $this->ldapGFilter = "(objectClass=group)";
+        }
+        if (!empty($options["LDAP_USERATTR"])){
 			$this->ldapUserAttr = strtolower($options["LDAP_USERATTR"]);
 		}else{ 
 			$this->ldapUserAttr = 'uid' ; 
+		}
+        if (!empty($options["LDAP_GROUPATTR"])){
+			$this->ldapGroupAttr = strtolower($options["LDAP_GROUPATTR"]);
+		}else{
+			$this->ldapGroupAttr = 'cn' ;
 		}
     }
 
@@ -191,7 +222,10 @@ class ldapAuthDriver extends AbstractAuthDriver {
             else  $filter = "(&" . $this->ldapFilter . "(" . $this->ldapUserAttr . "=" . $login . "))";
         }
         if(empty($filter)){
-            $filter = $this->ldapUserAttr . "=*";
+            if(!empty($this->dynamicFilter)) $filter = $this->dynamicFilter;
+            else $filter = $this->ldapUserAttr . "=*";
+        }else{
+            if(!empty($this->dynamicFilter)) $filter = "(&(".$this->dynamicFilter.")(".$filter."))";
         }
         if($this->ldapconn == null){
         	$this->startConnexion();
@@ -254,12 +288,22 @@ class ldapAuthDriver extends AbstractAuthDriver {
     }
     function listUsersPaginated($baseGroup="/", $regexp, $offset, $limit){
 
-        if($baseGroup != "/".$this->separateGroup) return array();
+        if($this->hasGroupsMapping !== false){
+            if($baseGroup == "/"){
+                $this->dynamicFilter = $this->hasGroupsMapping."=";
+            }else{
+                $this->dynamicFilter = $this->hasGroupsMapping."=".ltrim($baseGroup, "/");
+            }
+
+        }else if(!empty($this->separateGroup) && $baseGroup != "/".$this->separateGroup) {
+            return array();
+        }
 
         if($regexp[0]=="^") $regexp = ltrim($regexp, "^")."*";
         else if($regexp[strlen($regexp)-1] == "$") $regexp = "*".rtrim($regexp, "$");
 
         $entries = $this->getUserEntries($regexp, false, $offset, $limit);
+        $this->dynamicFilter = null;
         $persons = array();
         unset($entries['count']); // remove 'count' entry
         foreach($entries as $id => $person){
@@ -288,14 +332,57 @@ class ldapAuthDriver extends AbstractAuthDriver {
      */
     function listChildrenGroups($baseGroup = "/"){
         $arr = array();
-        if($baseGroup == "/" && !empty($this->separateGroup)) $arr[$this->separateGroup] = "LDAP Annuary";
+        if($baseGroup == "/" && !empty($this->separateGroup)) {
+            $arr[$this->separateGroup] = "LDAP Annuary";
+            return $arr;
+        }
+        if($this->hasGroupsMapping){
+            $origUsersDN = $this->ldapDN;
+            $origUsersFilter = $this->ldapFilter;
+            $origUsersAttr = $this->ldapUserAttr;
+            $this->ldapDN = $this->ldapGDN;
+            $this->ldapFilter = $this->ldapGFilter;
+            $this->ldapUserAttr = $this->ldapGroupAttr;
+
+            if($baseGroup != "/"){
+                $this->dynamicFilter = $this->hasGroupsMapping."=".ltrim($baseGroup, "/");
+            }else{
+                //STRANGE, SHOULD WORK BUT EXCLUDES ALL GROUPS
+                //$this->dynamicFilter = "!(".$this->hasGroupsMapping."=*)";
+            }
+
+            $entries = $this->getUserEntries();
+            $this->dynamicFilter = null;
+            $persons = array();
+            unset($entries['count']); // remove 'count' entry
+            foreach($entries as $id => $person){
+                $login = $person[$this->ldapUserAttr][0];
+                if(AuthService::ignoreUserCase()) $login = strtolower($login);
+                $persons[$person["dn"]] = $login;
+            }
+            $this->ldapDN = $origUsersDN;
+            $this->ldapFilter = $origUsersFilter;
+            $this->ldapUserAttr = $origUsersAttr;
+            return $persons;
+        }
+
         return $arr;
     }
 
 
     function listUsers($baseGroup = "/"){
-        if($baseGroup != "/".$this->separateGroup) return array();
-		$entries = $this->getUserEntries();
+        if($this->hasGroupsMapping !== false){
+            if($baseGroup == "/"){
+                $this->dynamicFilter = $this->hasGroupsMapping."=";
+            }else{
+                $this->dynamicFilter = $this->hasGroupsMapping."=".ltrim($baseGroup, "/");
+            }
+        }else if(!empty($this->separateGroup) && $baseGroup != "/".$this->separateGroup) {
+            return array();
+        }
+
+        $entries = $this->getUserEntries();
+        $this->dynamicFilter = null;
         $persons = array();
         unset($entries['count']); // remove 'count' entry
         foreach($entries as $id => $person){
@@ -399,8 +486,19 @@ class ldapAuthDriver extends AbstractAuthDriver {
                                 break;
                             case "group_path":
                                 $value = "/".ltrim($value, "/");
-                                if($userObject->getGroupPath() != $value) {
-                                    AuthService::createGroup("/", $value, "LDAP ".$value);
+                                if(true /*$userObject->getGroupPath() != $value*/) {
+                                    $humanName = "LDAP ".$value;
+                                    if($key == "memberof"){
+                                        // get CN from value
+                                        $hnParts = array();
+                                        $parts = explode(",", ltrim($value, '/'));
+                                        foreach($parts as $part){
+                                            list($att,$attVal) = explode("=", $part);
+                                            if(strtolower($att) == "cn") $hnParts[] = $attVal;
+                                        }
+                                        if(count($hnParts)) $humanName = implode(",", $hnParts);
+                                    }
+                                    AuthService::createGroup("/", $value, $humanName);
                                     $userObject->setGroupPath($value, true);
                                     $changes = true;
                                 }

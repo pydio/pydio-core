@@ -894,8 +894,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					if(!$isTemplate && is_file($testFile))
 					{
 					    //chdir(AJXP_TESTS_FOLDER."/plugins");
-						include($testFile);
 						$className = $newRep->getAccessType()."AccessTest";
+						if (!class_exists($className))
+							include($testFile);
 						$class = new $className();
 						$result = $class->doRepositoryTest($newRep);
 						if(!$result){

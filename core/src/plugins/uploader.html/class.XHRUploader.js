@@ -632,7 +632,7 @@ Class.create("XHRUploader", {
 	
 	initializeXHR : function(item, queryStringParam){
 
-		var xhr = new XMLHttpRequest(); 	  
+		var xhr = new XMLHttpRequest();
 		var uri = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=upload&xhr_uploader=true&dir="+encodeURIComponent(this.crtContext.getContextNode().getPath());
 		if(queryStringParam){
 			uri += '&' + queryStringParam;
@@ -665,7 +665,8 @@ Class.create("XHRUploader", {
 			item.updateStatus('error');
         };		
 
-		xhr.open("POST", uri, true);   
+		xhr.open("POST", uri, true);
+        try {if(Prototype.Browser.IE10) xhr.responseType =  'msxml-document'; } catch(e){}
         return xhr;
 		
 	},
@@ -759,7 +760,7 @@ Class.create("XHRUploader", {
 			}
 		}
 
-        var xhr = new XMLHttpRequest;
+        var xhr = new XMLHttpRequest();
 		var upload = xhr.upload;
 		upload.addEventListener("progress", function(e){
 			if (e.lengthComputable) {  
@@ -799,6 +800,7 @@ Class.create("XHRUploader", {
         }
         
         xhr.open("post", url, true);
+        try {if(Prototype.Browser.IE10) xhr.responseType =  'msxml-document'; } catch(e){}
         xhr.setRequestHeader("If-Modified-Since", "Mon, 26 Jul 1997 05:00:00 GMT");
         xhr.setRequestHeader("Cache-Control", "no-cache");
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");

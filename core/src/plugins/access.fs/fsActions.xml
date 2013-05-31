@@ -41,9 +41,9 @@
         <action name="create">
             <gui text="154" title="155" src="folder_new.png" iconClass="icon-plus" accessKey="folder_access_key" hasAccessKey="true">
                 <context selection="false" dir="true" recycle="hidden" actionBar="true"
-                         contextMenu="true" infoPanel="false" actionBarGroup="put" inZip="false"></context>
+                         contextMenu="true" infoPanel="false" actionBarGroup="put" inZip="false"/>
             </gui>
-            <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+            <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
             <subMenu>
                 <dynamicItems>
                     <item1 actionId="mkdir"/>
@@ -82,13 +82,13 @@
 						modal.showDialogForm('Upload', uploader.formId, dialogOnOpen, null, dialogOnComplete, true, true);
 					}
 				]]></clientCallback>
-				<serverCallback methodName="switchAction"/>
+				<serverCallback methodName="switchAction" restParams="/input_stream/dir+"/>
 				</processing>
 		</action>
 		<action name="empty_recycle">
 			<gui text="220" title="221" src="trashcan_empty.png" iconClass="icon-ban-circle" accessKey="empty_recycle_access_key" hasAccessKey="true">
 				<context selection="false" dir="true" recycle="only" actionBar="true"
-                         contextMenu="true" infoPanel="false" actionBarGroup="change"></context>
+                         contextMenu="true" infoPanel="false" actionBarGroup="change"/>
 			</gui>
 			<rightsContext noUser="true" userLogged="" read="true" write="true" adminOnly=""/>
 			<processing>
@@ -98,7 +98,7 @@
 						ajaxplorer.actionBar.fireAction('delete');
 					}, 200);
 					]]></clientCallback>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 				</processing>
 		</action>
 		<action name="download" fileDefault="false">
@@ -107,8 +107,8 @@
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="get,inline">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="false"></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+				<selectionContext dir="true" file="true" recycle="false" unique="false"/></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection = ajaxplorer.getUserSelection();
@@ -188,7 +188,7 @@
 						}
 					}
 					]]></clientListener>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction" restParams="/file+" />
 				</processing>
 		</action>
         <action name="download_all">
@@ -939,7 +939,7 @@
                 </div>
 				<div class="infoPanelAllMetadata">
 				    <div>
-                        <div class="panelHeader infoPanelGroup">#{header_string}</div>
+                        <div class="panelHeader infoPanelGroup"><span class="icon-info" data-ajxpAction="no-action"></span> #{header_string}</div>
                         <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
                             <tr>
                                 <td class="infoPanelLabel">#{name_string}</td>

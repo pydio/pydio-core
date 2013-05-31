@@ -713,7 +713,8 @@ class ConfService
      */
 	public static function zipEnabled()
 	{
-		return (function_exists("gzopen")?true:false);		
+        if(ConfService::getCoreConf("DISABLE_ZIP_BROWSING") === true) return false;
+		return (function_exists("gzopen")?true:false);
 	}
     /**
      * Get the list of all "conf" messages

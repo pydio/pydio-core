@@ -1,6 +1,17 @@
 <?php
 
-die("This is experimental and should not be used in production yet!");
+die("This is experimental! You must set an API KEY & SECRET to enable Basic Http Auth");
+
+define("AJXP_API_LOGIN", "admin");
+define("AJXP_API_PASSWORD", "123456");
+define("AJXP_API_USER", "admin");
+
+if (!isset($_SERVER['PHP_AUTH_USER'])  || $_SERVER["PHP_AUTH_USER"] != AJXP_API_LOGIN || $_SERVER["PHP_AUTH_PW"] != AJXP_API_PASSWORD ) {
+    header('WWW-Authenticate: Basic realm="AjaXplorer API Realm"');
+    header('HTTP/1.0 401 Unauthorized');
+    echo 'You are not authorized to access this API.';
+    exit;
+}
 
 include_once("base.conf.php");
 
@@ -17,7 +28,7 @@ require_once($confStorageDriver->getUserClassFileName());
 session_name("AjaXplorer");
 session_start();
 AuthService::$useSession = false;
-AuthService::logUser("admin", "", true);
+AuthService::logUser(AJXP_API_USER, "", true);
 $authDriver = ConfService::getAuthDriverImpl();
 
 

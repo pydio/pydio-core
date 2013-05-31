@@ -156,9 +156,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 			//------------------------------------
 			case "get_boot_gui":
 
-                if(strstr($_SERVER["HTTP_USER_AGENT"], "MSIE 9.") || strstr($_SERVER["HTTP_USER_AGENT"], "MSIE 10.")){
-                    header("X-UA-Compatible: IE=9");
-                }
+                HTMLWriter::internetExplorerMainDocumentHeader();
                 HTMLWriter::charsetHeader();
 				
 				if(!is_file(TESTS_RESULT_FILE)){
@@ -323,7 +321,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
         $user = AuthService::getLoggedUser();
         if($user == null) return;
         $metadata = $ajxpNode->retrieveMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-        if(count($metadata)){
+        if(is_array($metadata) && count($metadata)){
             $ajxpNode->mergeMetadata(array(
                      "ajxp_bookmarked" => "true",
                      "overlay_icon"  => "bookmark.png"

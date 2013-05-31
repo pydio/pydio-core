@@ -14,9 +14,12 @@
 		<param name="LDAP_USER" type="string" label="CONF_MESSAGE[LDAP bind username]" description="CONF_MESSAGE[Username (uid + dn) of LDAP bind user]" mandatory="false"/>
 		<param name="LDAP_PASSWORD" type="string" label="CONF_MESSAGE[LDAP bind password]" description="CONF_MESSAGE[Password of LDAP bind user]" mandatory="false"/>
 		<param name="LDAP_DN" type="string" replicationGroup="LDAPDN" label="CONF_MESSAGE[People DN]" description="CONF_MESSAGE[DN where the users are stored]" mandatory="false"/>
-		<param name="LDAP_FILTER" type="string" label="CONF_MESSAGE[LDAP Filter]" description="CONF_MESSAGE[Filter which users to fetch.]" mandatory="false"/>
-		<param name="LDAP_USERATTR" type="string" label="CONF_MESSAGE[User attribute]" description="CONF_MESSAGE[Username attribute]" mandatory="false"/>
-		<param name="MAPPING_LDAP_PARAM" type="string" replicationGroup="MAPPING" label="CONF_MESSAGE[LDAP attribute]" description="CONF_MESSAGE[Name of the LDAP attribute to read]" mandatory="false"/>
+		<param name="LDAP_FILTER" type="string" label="CONF_MESSAGE[LDAP Filter]" description="CONF_MESSAGE[Filter which users to fetch.]" mandatory="false" default="objectClass=person"/>
+        <param name="LDAP_USERATTR" type="string" label="CONF_MESSAGE[User attribute]" description="CONF_MESSAGE[Username attribute]" mandatory="false"/>
+        <param name="LDAP_GDN" type="string" replicationGroup="LDAPGDN" label="CONF_MESSAGE[Groups DN]" description="CONF_MESSAGE[DN where the groups are stored. Must be used in cunjonction with a group parameter mapping, generally using the memberOf feature.]" mandatory="false"/>
+        <param name="LDAP_GROUP_FILTER" type="string" label="CONF_MESSAGE[LDAP Groups Filter]" description="CONF_MESSAGE[Filter which groups to fetch.]" mandatory="false" default="objectClass=group"/>
+        <param name="LDAP_GROUPATTR" type="string" label="CONF_MESSAGE[Group attribute]" description="CONF_MESSAGE[Group main attribute to be used as a label]" mandatory="false"/>
+        <param name="MAPPING_LDAP_PARAM" type="string" replicationGroup="MAPPING" label="CONF_MESSAGE[LDAP attribute]" description="CONF_MESSAGE[Name of the LDAP attribute to read]" mandatory="false"/>
 		<param name="MAPPING_LOCAL_TYPE" type="select" replicationGroup="MAPPING" choices="plugin_param|Plugin Parameter,role_id|Role Id,group_path|Group Path,profile|Profile" label="CONF_MESSAGE[Mapping Type]" description="CONF_MESSAGE[Determine the type of mapping]" mandatory="false"/>
 		<param name="MAPPING_LOCAL_PARAM" type="string" replicationGroup="MAPPING" label="CONF_MESSAGE[Plugin parameter]" description="CONF_MESSAGE[Name of the custom local parameter to set]" mandatory="false"/>
         <param type="string" name="TEST_USER" label="CONF_MESSAGE[Test User]" description="CONF_MESSAGE[Use the Test Connexion button to check if this user is correctly found in your LDAP directory.]" mandatory="false"/>

@@ -108,6 +108,21 @@ class HTMLWriter
      * @param string $charset
      * @return void
      */
+    static function internetExplorerMainDocumentHeader(){
+        if(strstr($_SERVER["HTTP_USER_AGENT"], "MSIE 9.")){
+            header("X-UA-Compatible: IE=9");
+        }else if(strstr($_SERVER["HTTP_USER_AGENT"], "MSIE 10.")){
+            header("X-UA-Compatible: IE=Edge,chrome=1");
+        }
+    }
+
+    /**
+     * Send a simple Content-type header
+     * @static
+     * @param string $type
+     * @param string $charset
+     * @return void
+     */
     static function charsetHeader($type = 'text/html', $charset='UTF-8'){
     	header("Content-type:$type; charset=$charset");
     }
