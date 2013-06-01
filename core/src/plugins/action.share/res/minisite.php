@@ -111,7 +111,18 @@
             window.onunload = function(){
                 if(ajaxplorer) ajaxplorer.actionBar.fireAction("logout");
             }
+            document.observe("dom:loaded", function(){
+                var cookieEnabled=(navigator.cookieEnabled)? true : false
+                   if (typeof navigator.cookieEnabled=="undefined" && !cookieEnabled){
+                       document.cookie="testcookie";
+                       cookieEnabled=(document.cookie.indexOf("testcookie")!=-1)? true : false;
+                   }
+                   if(!cookieEnabled){
+                       alert('AJXP_MESSAGE[share_center.76]');
+                   }
+            });
 		</script>
+        <noscript><h2>AJXP_MESSAGE[share_center.77]</h2></noscript>
 	</head>
 
 	<body marginheight="0" marginwidth="0" leftmargin="0" topmargin="0" class="AJXP_PRELOGED_USER">

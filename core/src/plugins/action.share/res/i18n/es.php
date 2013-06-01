@@ -77,6 +77,7 @@ $mess = array(
 "73"=> "Descargar",
 "74"=> "Cargar",
 "75"=> "Por favor use un número positivo para Caducidad y Límite de Descargas.",
-// will be replaced by the filename to download
+"76"=> "Please enable Cookies to access this application",
+"77"=> "Please enable JavaScript to access this application",
 );
 

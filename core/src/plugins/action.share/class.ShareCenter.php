@@ -574,16 +574,28 @@ class ShareCenter extends AJXP_Plugin{
     static function loadMinisite($data){
         $repository = $data["REPOSITORY"];
         $html = file_get_contents(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/res/minisite.php");
+        $html = AJXP_XMLWriter::replaceAjxpXmlKeywords($html);
         $html = str_replace("AJXP_START_REPOSITORY", $repository, $html);
         $html = str_replace("AJXP_REPOSITORY_LABEL", ConfService::getRepositoryById($repository)->getDisplay(), $html);
+        session_name("AjaXplorer_Shared");
+        session_start();
         if(!empty($data["PRELOG_USER"])){
-            session_name("AjaXplorer_Shared");
-            session_start();
             AuthService::logUser($data["PRELOG_USER"], "", true);
             $html = str_replace("AJXP_PRELOGED_USER", "ajxp_preloged_user", $html);
         }else{
+            $_SESSION["PENDING_REPOSITORY_ID"] = $repository;
+            $_SESSION["PENDING_FOLDER"] = "/";
             $html = str_replace("AJXP_PRELOGED_USER", "", $html);
         }
+        if(isSet($_GET["lang"])) {
+            $loggedUser = &AuthService::getLoggedUser();
+            if($loggedUser != null){
+                $loggedUser->setPref("lang", $_GET["lang"]);
+            }else{
+                setcookie("AJXP_lang", $_GET["lang"]);
+            }
+        }
+
         $tPath = (!empty($data["TRAVEL_PATH_TO_ROOT"]) ? $data["TRAVEL_PATH_TO_ROOT"] : "../..");
         $html = str_replace("AJXP_PATH_TO_ROOT", $tPath, $html);
         HTMLWriter::internetExplorerMainDocumentHeader();

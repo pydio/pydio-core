@@ -76,4 +76,6 @@ $mess = array(
 "73" => "Download",
 "74" => "Upload",
 "75"=> "Bitte verwenden Sie eine positive Zahl für die Verfall- und Downloadbegrenzung.",
+"76"=> "Please enable Cookies to access this application",
+"77"=> "Please enable JavaScript to access this application",
 );

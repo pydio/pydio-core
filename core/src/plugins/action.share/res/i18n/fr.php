@@ -78,4 +78,6 @@ $mess = array(
     "73"=> "Télécharger",
     "74"=> "Envoyer des fichiers",
     "75"=> "Veuillez utiliser des entiers positifs pour les champs Expiration et Nombre de downloads!",
+    "76"=> "Merci d'activer les Cookies pour accèder à cette application",
+    "77"=> "Merci d'activer JavaScript pour accèder à cette application",
 );
