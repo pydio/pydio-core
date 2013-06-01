@@ -92,7 +92,11 @@ class AjaXplorerUpgrader {
     }
 
     static function getUpgradePath($url, $format = "php", $channel="stable"){
-        $json = AJXP_Utils::getRemoteContent($url."?channel=".$channel."&version=".AJXP_VERSION, null, self::$context);
+        if(isSet(self::$context)){
+            $json = file_get_contents($url."?channel=".$channel."&version=".AJXP_VERSION, null, self::$context);
+        }else{
+            $json = AJXP_Utils::getRemoteContent($url."?channel=".$channel."&version=".AJXP_VERSION);
+        }
         if($format == "php") return json_decode($json, true);
         else return $json;
     }
