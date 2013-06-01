@@ -266,6 +266,8 @@ class AJXP_Utils
                 if ($repository != null) {
                     $parameters["repository_id"] = $repository->getId();
                 }
+            }else{
+                $parameters["repository_id"] = $repository->getId();
             }
             require_once(AJXP_BIN_FOLDER . "/class.SystemTextEncoding.php");
             if (AuthService::usersEnabled()) {
