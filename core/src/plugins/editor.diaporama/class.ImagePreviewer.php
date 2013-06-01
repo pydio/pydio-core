@@ -49,6 +49,7 @@ class ImagePreviewer extends AJXP_Plugin {
 		    	
 		if($action == "preview_data_proxy"){
 			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+            if(!file_exists($destStreamURL.$file)) return;
 			
 			if(isSet($httpVars["get_thumb"]) && $this->pluginConf["GENERATE_THUMBNAIL"]){
                 $dimension = 200;

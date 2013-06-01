@@ -168,7 +168,11 @@ Class.create("IMagickPreviewer", Diaporama, {
 	},
 	
 	getThumbnailSource : function(ajxpNode){
-		return ajxpServerAccessPath+"&get_action=imagick_data_proxy&file="+encodeURIComponent(ajxpNode.getPath());
+        var repoString = "";
+        if(ajaxplorer.repositoryId && ajxpNode.getMetadata().get("repository_id") && ajxpNode.getMetadata().get("repository_id") != ajaxplorer.repositoryId){
+            repoString = "&tmp_repository_id=" + ajxpNode.getMetadata().get("repository_id");
+        }
+		return ajxpServerAccessPath+"&get_action=imagick_data_proxy"+repoString+"&file="+encodeURIComponent(ajxpNode.getPath());
 	},
 	
 	setOnLoad: function()	{

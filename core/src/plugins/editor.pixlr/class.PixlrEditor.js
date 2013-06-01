@@ -118,8 +118,12 @@ Class.create("PixlrEditor", AbstractEditor, {
 	getThumbnailSource : function(ajxpNode){
 		if(ajxpNode.getAjxpMime() == "bmp" || ajxpNode.getAjxpMime() == "pxd"){
 			return AbstractEditor.prototype.getThumbnailSource(ajxpNode);
-		}		
-		return ajxpServerAccessPath+"&get_action=preview_data_proxy&get_thumb=true&file="+encodeURIComponent(ajxpNode.getPath());
+		}
+        var repoString = "";
+        if(ajaxplorer.repositoryId && ajxpNode.getMetadata().get("repository_id") && ajxpNode.getMetadata().get("repository_id") != ajaxplorer.repositoryId){
+            repoString = "&tmp_repository_id=" + ajxpNode.getMetadata().get("repository_id");
+        }
+		return ajxpServerAccessPath+"&get_action=preview_data_proxy"+repoString+"&get_thumb=true&file="+encodeURIComponent(ajxpNode.getPath());
 	}
 	
 });
