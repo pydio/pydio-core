@@ -156,14 +156,6 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                         continue;
                     }
                     try{
-                        $wClass = $node->wrapperClassName;
-                        if(!empty($wClass)){
-                            $registered = AJXP_PluginsService::getInstance()->getRegisteredWrappers();
-                            if(!isSet($registered[$node->getScheme()])){
-                                stream_wrapper_register($node->getScheme(), $wClass);
-                                AJXP_PluginsService::getInstance()->registerWrapperClass($node->getScheme(), $wClass);
-                            }
-                        }
                         $node->loadNodeInfo();
                     }catch (Exception $e){
                         continue;
@@ -248,14 +240,6 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     continue;
                 }
                 try{
-                    $wClass = $node->wrapperClassName;
-                    if(!empty($wClass)){
-                        $registered = AJXP_PluginsService::getInstance()->getRegisteredWrappers();
-                        if(!isSet($registered[$node->getScheme()])){
-                            stream_wrapper_register($node->getScheme(), $wClass);
-                            AJXP_PluginsService::getInstance()->registerWrapperClass($node->getScheme(), $wClass);
-                        }
-                    }
                     $node->loadNodeInfo();
                 }catch (Exception $e){
                     continue;

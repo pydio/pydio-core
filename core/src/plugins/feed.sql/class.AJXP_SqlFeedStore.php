@@ -62,7 +62,7 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         try{
             dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[repository_owner],[user_group],[repository_scope],[content]) VALUES (%i,%s,%s,%s,%s,%s,%s,%s,%bin)", time(), "event", "node.change", $userId, $repositoryId, $repositoryOwner, $userGroup, ($repositoryScope !== false ? $repositoryScope : "ALL"), serialize($data));
         }catch (DibiException $e){
-            AJXP_Logger::logAction("error", $e->getMessage());
+            AJXP_Logger::logAction("error: (trying to persist event)". $e->getMessage());
         }
     }
 
@@ -112,8 +112,12 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         if($this->sqlDriver["password"] == "XXXX") return;
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
-        dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[content]) VALUES (%i,%s,%s,%s,%s,%bin)",
+        try{
+            dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[content]) VALUES (%i,%s,%s,%s,%s,%bin)",
             time(), "alert", "notification", $userId, $repositoryId, serialize($notif));
+        }catch (DibiException $e){
+            AJXP_Logger::logAction("error: (trying to persist alert)". $e->getMessage());
+        }
     }
 
     /**

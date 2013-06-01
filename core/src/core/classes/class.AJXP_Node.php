@@ -245,6 +245,12 @@ class AJXP_Node{
      */
     public function loadNodeInfo($forceRefresh = false, $contextNode = false, $details = false){
         if($this->nodeInfoLoaded && !$forceRefresh) return;
+        if(!empty($this->_wrapperClassName)){
+            $registered = AJXP_PluginsService::getInstance()->getRegisteredWrappers();
+            if(!isSet($registered[$this->getScheme()])){
+                $this->getDriver()->detectStreamWrapper(true);
+            }
+        }
         AJXP_Controller::applyHook("node.info", array(&$this, $contextNode, $details));
         $this->nodeInfoLoaded = true;
     }
