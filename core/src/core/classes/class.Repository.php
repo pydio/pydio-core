@@ -532,6 +532,7 @@ class Repository implements AjxpGroupPathProvider {
         if(empty($path)) return false;
         if(strpos($path, "AJXP_USER") !== false) return "USER";
         if(strpos($path, "AJXP_GROUP_PATH") !== false) return "GROUP";
+        if(strpos($path, "AJXP_GROUP_PATH_FLAT") !== false) return "GROUP";
         return false;
     }
 
