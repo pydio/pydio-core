@@ -132,6 +132,9 @@ class sqlConfDriver extends AbstractConfDriver {
 		$repo->enabled = $result['enabled'];
 		$repo->recycle = "";
 		$repo->setSlug($result['slug']);
+        if(isSet($result['groupPath']) && !empty($result['groupPath'])){
+            $repo->setGroupPath($result['groupPath']);
+        }
         $repo->isTemplate = intval($result['isTemplate']) == 1 ? true : false;
         $repo->setInferOptionsFromParent(intval($result['inferOptionsFromParent']) == 1 ? true : false);
 
@@ -157,23 +160,24 @@ class sqlConfDriver extends AbstractConfDriver {
 	{
 
 		$repository_row = Array(
-				'uuid' => $repository->getUniqueId(),
-				'parent_uuid' => $repository->getParentId(), 
-				'owner_user_id' => $repository->getOwner(), 
-				'child_user_id' => $repository->getUniqueUser(), 
-				'path' => $repository->options['PATH'],
-				'display' => $repository->getDisplay(),
-				'accessType' => $repository->getAccessType(),
-				'recycle' => $repository->recycle, 
-				'bcreate' => $repository->getCreate(),
-				'writeable' => $repository->isWriteable(),
-				'enabled' => $repository->isEnabled(),
-				'options' => $repository->options,
-				'slug'		=> $repository->getSlug(),
-                'isTemplate'=> $repository->isTemplate,
-                'inferOptionsFromParent'=> ($repository->getInferOptionsFromParent()?1:0)
+				'uuid'                      => $repository->getUniqueId(),
+				'parent_uuid'               => $repository->getParentId(),
+				'owner_user_id'             => $repository->getOwner(),
+				'child_user_id'             => $repository->getUniqueUser(),
+				'path'                      => $repository->options['PATH'],
+				'display'                   => $repository->getDisplay(),
+				'accessType'                => $repository->getAccessType(),
+				'recycle'                   => $repository->recycle,
+				'bcreate'                   => $repository->getCreate(),
+				'writeable'                 => $repository->isWriteable(),
+				'enabled'                   => $repository->isEnabled(),
+				'options'                   => $repository->options,
+                'groupPath'                 => $repository->getGroupPath(),
+				'slug'		                => $repository->getSlug(),
+                'isTemplate'                => $repository->isTemplate,
+                'inferOptionsFromParent'    => ($repository->getInferOptionsFromParent()?1:0)
 		);
-		
+
 		return $repository_row;
 	}
 	

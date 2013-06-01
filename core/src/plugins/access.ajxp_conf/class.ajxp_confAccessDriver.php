@@ -877,6 +877,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
 				if(count($options)){
 					$repDef["DRIVER_OPTIONS"] = $options;
+                    unset($repDef["DRIVER_OPTIONS"]["AJXP_GROUP_PATH_PARAMETER"]);
 				}
 				if(strstr($repDef["DRIVER"], "ajxp_template_") !== false){
 					$templateId = substr($repDef["DRIVER"], 14);
@@ -939,7 +940,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 if($currentUserIsGroupAdmin){
                     $newRep->setGroupPath(AuthService::getLoggedUser()->getGroupPath());
+                }else if(!empty($options["AJXP_GROUP_PATH_PARAMETER"])){
+                    $basePath = "/";
+                    if(AuthService::getLoggedUser()!=null && AuthService::getLoggedUser()->getGroupPath()!=null){
+                        $basePath = AuthService::getLoggedUser()->getGroupPath();
+                    }
+                    $value =  AJXP_Utils::securePath(rtrim($basePath, "/")."/".ltrim($options["AJXP_GROUP_PATH_PARAMETER"], "/"));
+                    $newRep->setGroupPath($value);
                 }
+
 				$res = ConfService::addRepository($newRep);
 				AJXP_XMLWriter::header();
 				if($res == -1){
@@ -1024,8 +1033,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         }
                         $groupPath = $repository->getGroupPath();
                         if($basePath != "/") $groupPath = substr($repository->getGroupPath(), strlen($basePath));
-                        print("<param name=\"AJXP_GROUP_PATH\" value=\"".$groupPath."\"/>");
+                        print("<param name=\"AJXP_GROUP_PATH_PARAMETER\" value=\"".$groupPath."\"/>");
                     }
+
 					print("</repository>");
 				}else{
 					print("/>");
@@ -1085,7 +1095,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 							if($key == "AJXP_SLUG"){
 								$repo->setSlug($value);
 								continue;
-							}elseif($key == "AJXP_GROUP_PATH"){
+							}elseif($key == "AJXP_GROUP_PATH_PARAMETER"){
                                 $basePath = "/";
                                 if(AuthService::getLoggedUser()!=null && AuthService::getLoggedUser()->getGroupPath()!=null){
                                     $basePath = AuthService::getLoggedUser()->getGroupPath();
