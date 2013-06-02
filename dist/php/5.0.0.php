@@ -32,7 +32,7 @@ if(is_a($confDriver, "sqlConfDriver")){
         $test = AJXP_Utils::cleanDibiDriverParameters($confDriver->getOption("SQL_DRIVER"));
     }
     if(is_array($test) && isSet($test["driver"])){
-        $sqlInstructions = file_get_contents($this->workingFolder."/".$this->dbUpgrade.".sql");
+        $sqlInstructions = file_get_contents($this->workingFolder."/UPGRADE/DB-UPGRADE.sql");
 
         $parts = array_map("trim", explode("/* SEPARATOR */", $sqlInstructions));
         $results = array();
@@ -61,3 +61,6 @@ if(is_a($confDriver, "sqlConfDriver")){
 }else{
     echo "Nothing to do for the DB";
 }
+
+$htmlInstructions = file_get_contents($this->workingFolder."/UPGRADE/NOTE-HTML");
+echo($htmlInstructions);

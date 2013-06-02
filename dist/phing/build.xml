@@ -198,7 +198,20 @@
 		<if>
 			<available type="file" file="${git.local_repository}/dist/php/${new_version}.html"/>
 			<then>
-				<copy file="${git.local_repository}/dist/php/${new_version}.html" toFile="${upgrade_export}/UPGRADE/Instructions.html"/>
+				<copy file="${git.local_repository}/dist/php/${new_version}.html" toFile="${upgrade_export}/UPGRADE/NOTE-HTML"/>
+			</then>
+		</if>
+
+		<if>
+			<available type="file" file="${git.local_repository}/dist/php/${new_version}.sql"/>
+			<then>
+				<copy file="${git.local_repository}/dist/php/${new_version}.sql" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sql"/>
+                <if>
+              			<available type="file" file="${git.local_repository}/dist/php/${new_version}.sqlite"/>
+              			<then>
+              				<copy file="${git.local_repository}/dist/php/${new_version}.sqlite" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sqlite"/>
+              			</then>
+              		</if>
 			</then>
 		</if>
 
