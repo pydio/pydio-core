@@ -4137,7 +4137,7 @@ td.ip_geo_cell{
     height: 28px;
 }
 
-#ls_button{
+#workspace_toolbar a#ls_button{
     display: none;
 }
 
