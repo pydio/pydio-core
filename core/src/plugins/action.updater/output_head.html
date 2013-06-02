@@ -53,6 +53,10 @@
             function replaceTop(){
                 if(document.getElementById('upgrade_last_html')){
                     document.body.insertBefore(document.getElementById('upgrade_last_html'), document.body.firstChild);
+                    var steps = document.getElementsByClassName("upgrade_step");
+                    for(var i=0;i<steps.length;i++) {
+                        document.getElementById("upgrade_last_html").appendChild(steps[i]);
+                    }
                     window.scrollTo(0);
                 }
             }
