@@ -40,7 +40,8 @@ CREATE TABLE IF NOT EXISTS ajxp_repo (
   enabled integer DEFAULT NULL,
   isTemplate integer DEFAULT NULL,
   inferOptionsFromParent integer DEFAULT NULL,
-  slug text DEFAULT NULL
+  slug text DEFAULT NULL,
+  groupPath text DEFAULT NULL
 );
  
 CREATE TABLE IF NOT EXISTS ajxp_repo_options (

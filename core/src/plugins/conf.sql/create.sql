@@ -41,7 +41,8 @@ CREATE TABLE IF NOT EXISTS ajxp_repo (
  	enabled BOOLEAN ,
  	isTemplate BOOLEAN,
  	inferOptionsFromParent BOOLEAN,
- 	slug VARCHAR(255)
+ 	slug VARCHAR(255),
+  groupPath VARCHAR(255)
 );
  
 CREATE TABLE IF NOT EXISTS ajxp_repo_options (
