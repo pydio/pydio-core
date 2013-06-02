@@ -5,6 +5,87 @@ Copyright : Charles du Jeu 2013
 Demo : http://demo.ajaxplorer.info/
 Date : ##VERSION_DATE##
 Rev Number : ##REVISION##
+Contributors: kainv, chusopr, dmitrydvorkin, tbote
+
+This is a major release. Changelog below summarize all bugfixes applied since last dev release,
+but read the more generic release announcement for v5 online.
+
+Changelog
+
+Display some instructions for the migration in the various possible setups after upgrade
+Auth.remote : use the standard "Login Redirect" parameter
+Add DB upgrade in common tasks.
+Missing groupPath column in repo
+Fix Proxy config broken in Upgrader
+Notification feed : fix button out of reach on Chrome, by making it b… …
+Include autoloading of the wrapper inside AJXP_Node->loadNodeInfo() ,… …
+Goto was broken if not using a repository alias
+Fix notifications pointing to a wrong repository, or trying to load a… …
+Stable migration
+Detect AJXP_GROUP_PATH_FLAT as GROUP security scope. …
+Missing workspace groupPath in SQL implementation …
+Detect the Instructions.html during the automatic build (inside the d… …
+Display a set of HTML instructions after upgrade, if found inside the… …
+Add a release note to be displayed BEFORE upgrade …
+Fix #161 & last compile
+Fix #135
+Fix #157
+Use "." instead of "*" to make sure to copy .htaccess - to be verified
+Fix #158 and other translation problems …
+Fix #159 …
+Test for __PHP_Incomplete_Class in session AJXP_USER, and kill the se… …
+Shared file notification was broken by new hash short form
+Fix XML templates for umbra theme
+Avoid SQL error if a user has no repository accesses
+Fix Notification Menu being out of the viewport …
+IE 10 FULL SUPPORT
+Fix doctype for IE8
+access.webdav : fix #51 by dmitry dvorkin
+meta.quota : use float instead of int to overcome 32bits limitation. … …
+action.share : fix #136 …
+Spanish translation, by tbote
+Merge pull request #153 from kainv/patch-9 …
+Fix Minisite rights problems : were in fact happening at specific rol… …
+Send correct header for IE (fix #131)
+New parameter DISABLE_ZIP_BROWSING …
+Merge pull request #143 from ultreia-es/ajaxplorer-core-issue-143 …
+Should fix #141
+Fix markdown lists and code
+Catch null repository error
+Fixed SQL typo in previous commit 25594b1.
+Update README
+Toggle right-hand panel
+Query sorted repositories list.
+Fix #143: Missing ';' after first CREATE statement.
+Fix install patches copy
+Fix CP & Patches
+Update script
+Fix metastore.xattr
+Move scripts under /rhs/ folder
+Touch check.txt directly
+Update RHS scripts
+Activate restParams for upload action.
+Re-adapt upload processor to handle a rest call.
+Simple Basic http auth for the rest.php point (still disabled by defa… …
+Fix metadata check to avoid false positives bookmarks
+Deploy script of AjaXplorer on top of an RHS node
+Update LDAP driver to better support Groups, in both AD & LDAP contex… …
+Avoid foreach error if childrenPointer is not an array
+Fix #134: Avoid redeclaring TestAccess classes.
+chusopr authored 12 days ago
+Right panel folding
+Fix #111
+Make sure to set defaultexcludes to "false" for fileset, otherwise fo… …
+Update groupPath of children users (fix #125), filter roles before sa…
+
+------------------------------------------
+AjaXplorer 4.3.4 Release Note
+
+License : Affero GPL
+Copyright : Charles du Jeu 2013
+Demo : http://demo.ajaxplorer.info/
+Date : 2013-05-14
+Rev Number : aabc9199
 
 Contributors:
 https://github.com/Vorlif
