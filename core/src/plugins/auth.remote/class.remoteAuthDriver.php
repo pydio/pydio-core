@@ -229,18 +229,11 @@ class remoteAuthDriver extends AbstractAuthDriver {
 	}
     
     function getLoginRedirect(){
-        //if ($this->slaveMode) {
-        //    if (isset($_SESSION["AJXP_USER"])) return false;
-        //    return $this->urls[0];
-        //}
-        return false;
+        return parent::getLoginRedirect();
     }
     
 	function getLogoutRedirect(){
-        //if ($this->slaveMode) {
-            return $this->urls[1];
-        //}
-        //return false;
+        return $this->urls[1];
     }
     
 }
