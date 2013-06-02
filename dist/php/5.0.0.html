@@ -540,15 +540,34 @@
 
     <h2>Activating the new features</h2>
 
-    <h3>Already using a DB-based setup</h3>
-    If you were already using a DB-Based setup (conf.sql / auth.sql), the tables must have been updated automatically. You may check the Upgrade Report below to see if there were errors. Still you will have to create the new ajxp_feed table if you want to activate the notifications. After reloading, you will go to the Notification Center and activate notifications here, using the "Install SQL Tables" button to upgrade your DB.
-
-    <h3>Using a standard serial setup</h3>
-    If you want to activate the notifications, you will require an SQL connexion. Either you have MySQL DB ready to go, or you can simply make sure your PHP has the "Sqlite3" extension loaded, and you will be able to create a lightweight Sqlite db from within the interface.
-
     <h3>Applying changes for core plugins (conf & auth)</h3>
 
-    The configurations are now managed from withing the application, and for this reason, the <b>conf/bootstrap_plugins.php</b> file is no more the reference. But to avoid messing up your configs, until you manually remove it (or rename it to something else), it will still be loaded and read by the application. Make yourself comfortable with the new configurations management, make sure the parameters appearing in the GUI are the same as your previous configs, and then you can remove the bootstrapl_plugings file.
+    The configurations are now managed from withing the application, and for this reason, the <b>conf/bootstrap_plugins.php</b> file is not used anymore. But to avoid messing up your configs, until you manually remove it (or rename it to something else), it will still be loaded and read by the application. Make yourself comfortable with the new configurations management, make sure the parameters appearing in the GUI are the same as your previous configs, and then you can remove the bootstrapl_plugings file. See below for more details.
+
+    <h3>Already using a DB-based setup?</h3>
+    If you were already using a DB-Based setup (conf.sql / auth.sql), the tables must have been updated automatically. You may check the Upgrade Report below to see if there were errors. As explained in the previous section, the bootstrap_plugins.php file will still be the master until you delete. To make sure your configuration is up-to-date, do the following :
+    <ul>
+        <li>As Admin, open Global Configs > Core Configs > Configurations Management. Define the parameters for your SQL connexion, <b>they are not migrated automatically</b>. Do not save yet. The Instance Param lower in the page should already be switched to "DB Storage".</li>
+        <li>Move bootstrap_plugins.php to something else</li>
+        <li>Save the Configurations Management parameters</li>
+        <li>Open the Authentication Parameters and make sure the Main Instance is switched to "DB Auth Storage". Save and close</li>
+        <li>Same for the "Logger" if you are already logging in a database</li>
+        <li>Log out and check you can correctly log back.</li>
+        <li>If you have a problem, you can safely make your bootstrap_plugins.php file back up, and log in.</li>
+    </ul>
+    <br>Also you will have to create the new ajxp_feed table if you want to activate the notifications. After reloading, you will go to the Notification Center and activate notifications here, using the "Install SQL Tables" button to upgrade your DB.
+
+    <h3>Using a standard serial setup</h3>
+
+    If you want to activate the notifications, you will require an SQL connexion. Either you have MySQL DB ready to go, or you can simply make sure your PHP has the "Sqlite3" extension loaded, and you will be able to create a lightweight Sqlite db from within the interface.
+
+    <h3>Using a "remote" setup with CMS bridges</h3>
+
+    The options have been simplified, but you'll have to manually migrate them. As explained before, your configuration will not be overriden until you manually remove the bootstrap_plugins.php file. Check the Authentification settings panel and update the parameters accordingly. The main changes is that there is a "master" URL pointing to the root of the CMS, and some of the previous values are then computed automatically depending on the CMS type.
+    <br>
+    The automatic redirection when accessing AjaXplorer as a non-logged user is now disabled by default, which allows the users to log directly from AjaXplorer, and this is particularly handy to create "shared" workspaces to third-party user that are not registered in the CMS directory.
+    <br>
+    Also make sure to update the CMS-side plugin, using the latest version of the CMS bridges.
 
     <h2>What to do next?</h2>
 
