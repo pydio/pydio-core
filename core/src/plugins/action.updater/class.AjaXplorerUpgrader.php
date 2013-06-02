@@ -37,7 +37,7 @@ class AjaXplorerUpgrader {
     private $cleanFile = "UPGRADE/CLEAN-FILES";
     private $additionalScript = "UPGRADE/PHP-SCRIPT";
     private $releaseNote = "UPGRADE/NOTE";
-    private $htmlInstructions = "UPGRADE/Instructions.html";
+    private $htmlInstructions = "UPGRADE/NOTE-HTML";
     private $dbUpgrade = "UPGRADE/DB-UPGRADE";
     private $installPath;
     private static $context = null;
