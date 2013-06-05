@@ -3,6 +3,71 @@
 # CONFIG_VOLUME /mnt/samba/ajxp-config
 # DATA_VOLUME /mnt/samba/ajxp-data
 
+function channels_error {
+   declare -a reg_channels=(`rhn-channel --list`)
+   echo "ERROR: All required channels are not registered!"
+   echo -e "Required Channel for Ajaxplorer:\n\trhel-x86_64-server-optional-6"
+   echo -e "Registered Channels:"
+   for chan in "${reg_channels[@]}"
+   do
+         echo -e "\t$chan"
+   done
+   return 1
+}
+
+
+function check_channels {
+
+   declare -a reg_channels=(`rhn-channel --list`)
+   correct=0
+   for chan in "${reg_channels[@]}"
+   do
+      if [ "$chan" == "rhel-x86_64-server-optional" ]
+      then
+         (( correct++ ))
+      fi
+   done
+
+   if [ $correct -ne 1 ]
+   then
+      channels_error
+      return 1
+   fi
+
+   echo -e "Registered Channels:"
+   for chan in "${reg_channels[@]}"
+   do
+         echo -e "\t$chan"
+   done
+   return 0
+}
+
+
+function rhn_register_rhel_optional {
+
+    profile_name=`hostname -s`
+    profile_name=RHS_$profile_name
+    rhn_register
+
+    echo "---- Register Channels ----"
+    read -p "RHN Login: " rhn_login
+    read -s -p "RHN Password: " rhn_password
+    echo ""
+    rhn-channel --verbose --user $rhn_login --password $rhn_password \
+        --add --channel=rhel-x86_64-server-optional
+
+    check_channels || return 1
+    echo "System registered to the correct Red Hat Channels!"
+}
+
+registered = rhn_register_rhel_optional;
+
+if [ registered -eq 1 ]
+    then
+        echo "RHN Optional Channels are not correctly registered! Exiting the script."
+        exit 1
+    fi
+
 # Install additional RPM Repositories
 rpm -Uvh http://dl.ajaxplorer.info/repos/el6/ajaxplorer-stable/ajaxplorer-release-4-1.noarch.rpm
 rpm -ivh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
