@@ -79,13 +79,13 @@ rm -rf %{buildroot}
 %{_localstatedir}/log/%{name}/*
 
 %post
-if [ -f "%{buildroot}%{_localstatedir}/cache/plugins_cache.ser" ]
+if [ -f "%{_localstatedir}/cache/%{name}/plugins_cache.ser" ]
 then
 # Upgrading an existing install
-rm -f %{buildroot}%{_localstatedir}/cache/plugins_*.ser
-if [ ! -f "%{buildroot}%{_localstatedir}/cache/first_run_passed" ]
+rm -f %{_localstatedir}/cache/%{name}/plugins_*.ser
+if [ ! -f "%{_localstatedir}/cache/%{name}/first_run_passed" ]
 then
-touch %{buildroot}%{_localstatedir}/cache/first_run_passed
+touch %{_localstatedir}/cache/%{name}/first_run_passed
 fi
 fi
 
