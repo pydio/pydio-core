@@ -66,7 +66,7 @@
     </target>
 
     <target name="usage" description="Describe this script usage">
-        <echo message="For releasing and deploying : phing -Denv=release -Dskip_deploy=false -Dchannel=stable -Dbuild_linux=true -Dprevious_tag=XaZeR35 -Dprevious_version=4.0.4 -Dnew_version=4.2.0"/>
+        <echo message="For releasing and deploying : phing -Denv=release -Dskip_deploy=false -Dbuild_channel=stable -Dbuild_linux=true -Dprevious_tag=XaZeR35 -Dprevious_version=4.0.4 -Dnew_version=4.2.0"/>
         <echo message="For tagging : phing tag_version -Dversion=4.2.0 -Dnext_version=4.3.0"/>
     </target>
 
