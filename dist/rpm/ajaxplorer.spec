@@ -78,7 +78,22 @@ rm -rf %{buildroot}
 %{_localstatedir}/log/%{name}/.htaccess
 %{_localstatedir}/log/%{name}/*
 
+%post
+if [ -f "%{buildroot}%{_localstatedir}/cache/plugins_cache.ser" ]
+then
+    # Upgrading an existing install
+    rm -f %{buildroot}%{_localstatedir}/cache/plugins_*.ser
+    if [ ! -f "%{buildroot}%{_localstatedir}/cache/first_run_passed" ]
+    then
+        touch %{buildroot}%{_localstatedir}/cache/first_run_passed
+    fi
+fi
+
+
 %changelog
+* Wed Jun 01 2013 Charles du Jeu <charles@ajaxplorer.info> - 5.0.0-1
+- Add post install script
+
 * Wed Jun 27 2012 Charles du Jeu <charles@ajaxplorer.info> - 4.2.0-1
 - Update spec file, integrate in the phing automated process
 - Replace the patch by sed commands (more line changes proof)
