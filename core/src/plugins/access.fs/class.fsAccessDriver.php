@@ -660,6 +660,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     $createdNode = new AJXP_Node($destination."/".$userfile_name);
                     AJXP_Controller::applyHook("node.change", array(null, $createdNode, false));
 					$logMessage.="$mess[34] ".SystemTextEncoding::toUTF8($userfile_name)." $mess[35] $dir";
+					AJXP_Controller::applyHook("node.upload", array(new AJXP_Node($destination."/".$userfile_name), $boxData["size"]));		//ajout
 					AJXP_Logger::logAction("Upload File", array("file"=>SystemTextEncoding::fromUTF8($dir)."/".$userfile_name));
 				}
 				
