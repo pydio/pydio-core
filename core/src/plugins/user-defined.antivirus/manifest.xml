@@ -29,7 +29,7 @@
 	<!-- déclaration des hooks -->
 	<registry_contributions>
 		<hooks>
-			<serverCallback hookName="node.upload" methodName="scan_file"/>
+			<serverCallback hookName="node.change" methodName="scan_file"/>
 		</hooks>
 	</registry_contributions>
 </ajxp_plugin>
