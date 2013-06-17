@@ -14,9 +14,17 @@ class scan extends AJXP_Plugin {
 
 //fonction principale du plugin, c'est elle qui est appeler par la hook. La structure de if else correspond a la prise de décision de l'action effectue surle fichier
 
-	public function scan_file ($node) {
+	public function scan_file ($oldNode, $newNode) {
 
-		$this->CallSet($node);											//appelle de la fonction qui appelle tout les setteur
+		$this->CallSet($newNode);											//appelle de la fonction qui appelle tout les setteur
+
+		if($oldNode==null && $newNode != null){
+
+		} else{
+			return;
+		}
+
+
 
 		if($this->file_size < $this->scan_max_size) {								//si le fichier est plus petit que la limite de taille
 			if($this->scan_all == true) {									//si on scanne tout
