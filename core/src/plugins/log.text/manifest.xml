@@ -8,7 +8,7 @@
     </client_settings>
     <server_settings>
         <param name="LOG_PATH" type="string" label="CONF_MESSAGE[Log Folder]" description="CONF_MESSAGE[The path to where the logs are kept.]" mandatory="true" default="AJXP_INSTALL_PATH/data/logs"/>
-        <param name="LOG_FILE_NAME" type="string" label="CONF_MESSAGE[Files Name Pattern]" description="CONF_MESSAGE[The name of the log file]" mandatory="true" default="log_date('m-d-y').txt"/>
+        <param name="LOG_FILE_NAME" type="string" label="CONF_MESSAGE[Files Name Pattern]" description="CONF_MESSAGE[The name of the log file]" mandatory="true" default="log_date('Y-m-d').txt"/>
         <param name="LOG_CHMOD" type="integer" label="CONF_MESSAGE[Files Permissions]" description="CONF_MESSAGE[]" default="0770" mandatory="true"/>
     </server_settings>
 </logdriver>

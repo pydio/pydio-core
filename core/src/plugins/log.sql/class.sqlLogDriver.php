@@ -147,10 +147,10 @@ class sqlLogDriver extends AbstractLogDriver {
 	function formatXmlLogItem($node, $icon, $dateattrib, $filename, $remote_ip, $log_level, $user, $action, $params, $rootPath = "/logs") {
 		$remote_ip = $this->inet_dtop($remote_ip);
 		$log_unixtime = strtotime($dateattrib);
-		$log_datetime = date("m-d-y", $log_unixtime) . " " . date("G:i:s", $log_unixtime);
+		$log_datetime = date("Y-m-d", $log_unixtime) . " " . date("G:i:s", $log_unixtime);
 		$log_year = date('Y', $log_unixtime);
 		$log_month = date('m', $log_unixtime);
-		$log_date = date("m-d-y", $log_unixtime);
+		$log_date = date("Y-m-d", $log_unixtime);
 		
 		// Some actions or parameters can contain characters that need to be encoded, especially when a piece of code raises a notification or error.
 		$action = AJXP_Utils::xmlEntities($action);
@@ -278,7 +278,7 @@ class sqlLogDriver extends AbstractLogDriver {
 	/**
 	 * List log contents in XML
 	 *
-	 * @param String $date Assumed to be m-d-y format.
+	 * @param String $date Assumed to be Y-m-d format.
 	 * @param String [optional] $nodeName
 	 */
 	function xmlLogs($parentDir, $date, $nodeName = "log", $rootPath = "/logs") {
