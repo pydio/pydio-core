@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin id="antivirus" label="CONF_MESSAGE[Antivirus]" description="CONF_MESSAGE[antivirus plugin adaptor]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	
+	<!-- class file -->
+	<class_definition filename="plugins/action.antivirus/class.AntivirusScanner.php" classname="AntivirusScanner"/>
+
+	<!-- plugin information -->
+	<plugin_info>
+		<plugin_author>Sylvain Letreguilly</plugin_author>
+		<plugin_uri>no</plugin_uri>
+		<plugin_version>1</plugin_version>
+	        <core_relation packaged="false" tested_version="4.3.3"/>
+	</plugin_info>
+
+	<!-- plugin parameter -->
+	<server_settings>
+		<global_param group="CONF_MESSAGE[antivirus]" name="COMMAND" type="string" label="CONF_MESSAGE[antivirus command]" description="CONF_MESSAGE[Enter the antivirus system command. Use $FILE for the file path]" mandatory="false" default="clamdscan --remove=yes $FILE"/>
+		<global_param group="CONF_MESSAGE[antivirus]" name="EXT" type="textarea" label="CONF_MESSAGE[File extension to scan]" description="CONF_MESSAGE[List all file extension that are to be scanned. Typing */ at the beginning of the list will scan all files execpt for extensions included after */]" mandatory="false" default="*/"/>
+		<global_param group="CONF_MESSAGE[antivirus]" name="SIZE" type="string" label="CONF_MESSAGE[max file size]" description="CONF_MESSAGE[max file size that will be  scanned immediatly after upload]" mandatory="false" default="12G"/>
+		<global_param group="CONF_MESSAGE[Generate a trace file for unscanned files]" name="TRACE" type="boolean" label="CONF_MESSAGE[Trace enabled]" description="CONF_MESSAGE[Store the path to the list of file that have not been scanned]" default="false"/>
+		<global_param group="CONF_MESSAGE[Generate a trace file for unscanned files]" name="PATH" type="string" label="CONF_MESSAGE[Directory path]"  mandatory="false" default="/var/www/trace"/>
+	</server_settings>
+	
+	
+	<!-- hooks -->
+	<registry_contributions>
+		<hooks>
+			<serverCallback hookName="node.change" methodName="scan_file"/>
+		</hooks>
+	</registry_contributions>
+</ajxp_plugin>
