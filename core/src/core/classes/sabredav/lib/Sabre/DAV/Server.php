@@ -644,6 +644,7 @@ class Server {
             $this->httpResponse->sendBody($body);
 
         }
+        \AJXP_Logger::logAction("Download", array("files"=>$node->getUrl()));
 
     }
 
@@ -904,6 +905,7 @@ class Server {
             $this->httpResponse->sendStatus(201);
 
         }
+        \AJXP_Logger::logAction("Upload", array("files"=>$node->getUrl()));
 
     }
 
