@@ -237,9 +237,9 @@ class textLogDriver extends AbstractLogDriver {
 				$split2 = explode("_", $split[0]);
 				$date = $split2[1];
 				$dSplit = explode("-", $date);
-				$logY = $dSplit[2];
-				$logM = $dSplit[0];
-				$time = mktime(0,0,1,intval($dSplit[0]), intval($dSplit[1]), intval($dSplit[2]));
+				$logY = $dSplit[0];
+				$logM = $dSplit[1];
+				$time = mktime(0,0,1,intval($dSplit[1]), intval($dSplit[2]), intval($dSplit[0]));
 				$display = date("l d", $time);
 				$fullYear = date("Y", $time);
 				$fullMonth = date("F", $time);
