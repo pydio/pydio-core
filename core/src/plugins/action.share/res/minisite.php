@@ -109,7 +109,7 @@
 			window.ajxpBootstrap = new AjxpBootstrap(startParameters);
             window.ajxpMinisite = true;
             window.onunload = function(){
-                if(ajaxplorer) ajaxplorer.actionBar.fireAction("logout");
+                if(ajaxplorer && !Prototype.Browser.Gecko) ajaxplorer.actionBar.fireAction("logout");
             }
             document.observe("dom:loaded", function(){
                 var cookieEnabled=(navigator.cookieEnabled)? true : false
