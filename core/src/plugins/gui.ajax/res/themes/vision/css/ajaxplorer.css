@@ -1999,7 +1999,7 @@ div#upload_files_list, div#multiple_download_container
 #content_pane.dropareaHover {
     border-color: #D96252 !important;
     border-style: dashed;
-    background: white;
+    background-color: white !important;
 }
 
 div#uploader_options_pane {
