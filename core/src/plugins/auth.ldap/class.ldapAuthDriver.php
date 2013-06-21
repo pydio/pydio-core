@@ -225,7 +225,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
             if(!empty($this->dynamicFilter)) $filter = $this->dynamicFilter;
             else $filter = $this->ldapUserAttr . "=*";
         }else{
-            if(!empty($this->dynamicFilter)) $filter = "(&(".$this->dynamicFilter.")(".$filter."))";
+            if(!empty($this->dynamicFilter)) $filter = "(&(".$this->dynamicFilter.")".$filter.")";
         }
         if($this->ldapconn == null){
         	$this->startConnexion();
