@@ -227,7 +227,7 @@ Class.create("ShareCenter", {
                             confirmPass: $("shared_pass_confirm")
                         },
                         indicator: $("complete_indicator"),
-                        minChars:parseInt(ajaxplorer.getPluginConfigs("ajxp_plugin[@name='share']").get("SHARED_USERS_LIST_MINIMUM"))
+                        minChars:parseInt(ajaxplorer.getPluginConfigs("conf").get("USERS_LIST_COMPLETE_MIN_CHARS"))
                     }
                 );
             }
