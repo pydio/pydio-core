@@ -449,5 +449,13 @@ var AjxpDroppables = {
         }
 		Droppables.add(element, this.options);
 		AllAjxpDroppables.push($(element));
-	}	
+
+        if(AjxpDroppables.dragOverHook){
+            $(element).select("*").invoke("observe", "dragover", AjxpDroppables.dragOverHook, true);
+            $(element).select("*").invoke("observe", "drop", AjxpDroppables.dropHook, true);
+            $(element).select("*").invoke("observe", "dragenter", AjxpDroppables.dragEnterHook, true);
+            $(element).select("*").invoke("observe", "dragleave", AjxpDroppables.dragLeaveHook, true);
+        }
+
+    }
 };

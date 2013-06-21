@@ -25,8 +25,12 @@ Class.create("XHRUploader", {
     mainForm: null,
     id : null,
     rowAsProgressBar: false,
+    dataModel: null,
+    contextNode: null,
 
 	initialize : function( formObject, mask ){
+
+        window.UploaderInstanceRunning = true;
 
 		formObject = $(formObject);
 		// Main form
@@ -55,7 +59,13 @@ Class.create("XHRUploader", {
 			this.mask = $A(mask.split(","));
             this.maskLabel = this._globalConfigs.get("ALLOWED_EXTENSIONS_READABLE");
 		}
-		this.crtContext = ajaxplorer.getUserSelection();
+		this.dataModel = ajaxplorer.getContextHolder();
+        this.contextNode = this.dataModel.getContextNode();
+
+        if(window.UploaderDroppedTarget && window.UploaderDroppedTarget.ajxpNode){
+            //console.log(this.contextNode);
+            this.contextNode = window.UploaderDroppedTarget.ajxpNode;
+        }
 
 		this.clearList();
 		
@@ -107,6 +117,7 @@ Class.create("XHRUploader", {
         if(closeButton){
             closeButton.observe("click", function(){
                 if(this.hasLoadingItem()) return;
+                window.UploaderInstanceRunning = false;
                 hideLightBox();
             }.bind(this));
         }
@@ -195,6 +206,7 @@ Class.create("XHRUploader", {
 
 		if(window.UploaderDroppedFiles){
 			var files = window.UploaderDroppedFiles;
+
 			for(var i=0;i<files.length;i++){
 				this.addListRow(files[i]);
 			}
@@ -202,8 +214,9 @@ Class.create("XHRUploader", {
 				this.submit();
 			}
 			window.UploaderDroppedFiles = null;
+			window.UploaderDroppedTarget = null;
 		}
-		
+
 	},
 
     recurseDirectory: function(item, completeHandler, errorHandler) {
@@ -605,6 +618,7 @@ Class.create("XHRUploader", {
             if(this.hasLoadingItem()) return;
 			//ajaxplorer.fireContextRefresh();
 			if(this.optionPane.autoCloseCheck.checked){
+                window.UploaderInstanceRunning = false;
 				hideLightBox(true);
 			}
             document.fire("ajaxplorer:longtask_finished");
@@ -633,7 +647,7 @@ Class.create("XHRUploader", {
 	initializeXHR : function(item, queryStringParam){
 
 		var xhr = new XMLHttpRequest();
-		var uri = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=upload&xhr_uploader=true&dir="+encodeURIComponent(this.crtContext.getContextNode().getPath());
+		var uri = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=upload&xhr_uploader=true&dir="+encodeURIComponent(this.contextNode.getPath());
 		if(queryStringParam){
 			uri += '&' + queryStringParam;
 		}
@@ -674,19 +688,19 @@ Class.create("XHRUploader", {
 	sendFileMultipart : function(item){
     	var auto_rename = false;
 
-        var newNode = new AjxpNode(this.crtContext.getContextNode().getPath()+"/"+getBaseName(item.file.name));
+        var newNode = new AjxpNode(this.contextNode.getPath()+"/"+getBaseName(item.file.name));
         if(item.file.size){
             newNode.getMetadata().set("filesize", item.file.size);
         }
         try{
-            this.crtContext.applyCheckHook(newNode);
+            this.dataModel.applyCheckHook(newNode);
         }catch(e){
             item.updateStatus('error');
             this.submitNext();
             return;
         }
 
-        if(this.crtContext.fileNameExists(item.file.name))
+        if(this.dataModel.fileNameExists(item.file.name))
 		{
 			var behaviour = this.optionPane.getExistingBehaviour();
 			if(behaviour == 'rename'){
@@ -745,7 +759,7 @@ Class.create("XHRUploader", {
 		item.updateStatus('loading');
 		
     	var auto_rename = false;
-		if(this.crtContext.fileNameExists(item.file.name))
+		if(this.dataModel.fileNameExists(item.file.name))
 		{
 			var behaviour = this.optionPane.getExistingBehaviour();
 			if(behaviour == 'rename'){
@@ -794,7 +808,7 @@ Class.create("XHRUploader", {
         	item.statusText.update('[error]');        	
         };
         
-        var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=upload&xhr_uploader=true&input_stream=true&dir="+encodeURIComponent(this.crtContext.getContextNode().getPath());
+        var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=upload&xhr_uploader=true&input_stream=true&dir="+encodeURIComponent(this.contextNode.getPath());
         if(auto_rename){
         	url += '&auto_rename=true';
         }
@@ -924,7 +938,7 @@ Class.create("XHRUploader", {
 		conn.setParameters({
 			"get_action" : "upload_chunks_unify",
 			"file_name" : fileName,
-			"dir" : this.crtContext.getContextNode().getPath()
+			"dir" : this.contextNode.getPath()
 		});
 		for(var i=0;i<lastIndex;i++){
 			conn.addParameter("chunk_"+i, fileName+"_part_"+i);

@@ -1992,8 +1992,14 @@ div#upload_files_list, div#multiple_download_container
     background-position: 10px 100%;
 }
 
-.dropareaHover {
-    border-color:#D96252 !important;
+.dropareaHover{
+    background-color: #c3d9ff !important;
+}
+
+#content_pane.dropareaHover {
+    border-color: #D96252 !important;
+    border-style: dashed;
+    background: white;
 }
 
 div#uploader_options_pane {

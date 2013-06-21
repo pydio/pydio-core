@@ -99,24 +99,46 @@
 		if(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span') && (window.FileReader || window.FormData) ){
 			var dropzone = $('content_pane');
 			dropzone.addClassName('droparea');
+			var selector = '#content_pane,div.webfx-tree-item,.ajxpNodeProvider';
 			var dragOverFunc = function(event) {
-			    dropzone.addClassName("dropareaHover");
+			    var el = Event.findElement(event, selector);
+			    if(el.hasClassName('ajxpNodeProvider') && el.ajxpNode.isLeaf()){
+			        el = Event.findElement(event, '#content_pane');
+			    }
+			    el.addClassName("dropareaHover");
   				event.preventDefault();
 			};
 			var dropFunc = function(event) {
   				event.preventDefault();
-  				dropzone.removeClassName("dropareaHover");
-  				if(event.dataTransfer.files.length){
+			    var el = Event.findElement(event, selector);
+			    if(el.hasClassName('ajxpNodeProvider') && el.ajxpNode.isLeaf()){
+			        el = Event.findElement(event, '#content_pane');
+			    }
+  				el.removeClassName("dropareaHover");
+  				if(event.dataTransfer.files.length && !window.UploaderInstanceRunning){
 	  				window.UploaderDroppedFiles = event.dataTransfer.files;
+	  				window.UploaderDroppedTarget = el;
 	  				ajaxplorer.actionBar.fireAction('upload');
 	  			}
 			};
 			var enterFunc = function(){
-				dropzone.addClassName("dropareaHover");
+			    var el = Event.findElement(event, selector);
+			    if(el.hasClassName('ajxpNodeProvider') && el.ajxpNode.isLeaf()){
+			        el = Event.findElement(event, '#content_pane');
+			    }
+				el.addClassName("dropareaHover");
 			};
 			var leaveFunc = function(){
-				dropzone.removeClassName("dropareaHover");
+			    var el = Event.findElement(event, selector);
+			    if(el.hasClassName('ajxpNodeProvider') && el.ajxpNode.isLeaf()){
+			        el = Event.findElement(event, '#content_pane');
+			    }
+				el.removeClassName("dropareaHover");
 			};
+			AjxpDroppables.dragOverHook = dragOverFunc;
+			AjxpDroppables.dropHook = dropFunc;
+			AjxpDroppables.dragEnterHook = enterFunc;
+			AjxpDroppables.dragLeaveHook = leaveFunc;
 			dropzone.addEventListener("dragover", dragOverFunc, true);
 			dropzone.addEventListener("drop", dropFunc, true);
 			dropzone.addEventListener("dragenter", enterFunc, true);
@@ -127,6 +149,10 @@
 				dropzone.removeEventListener("drop", dropFunc, true);
 				dropzone.removeEventListener("dragenter", enterFunc, true);
 				dropzone.removeEventListener("dragleave", leaveFunc, true);
+                AjxpDroppables.dragOverHook = null;
+                AjxpDroppables.dropHook = null;
+                AjxpDroppables.dragEnterHook = null;
+                AjxpDroppables.dragLeaveHook = null;
 			});
 		}
 		]]></extensionOnInit>		
