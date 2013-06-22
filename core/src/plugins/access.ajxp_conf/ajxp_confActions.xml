@@ -586,6 +586,11 @@
                 </serverCallback>
             </processing>
         </action>
+        <action name="get_bookmarks">
+            <pre_processing>
+                <serverCallback methodName="preProcessBookmarkAction"></serverCallback>
+            </pre_processing>
+        </action>
 	</actions>
 	<client_configs>
 		<component_config className="InfoPanel">

@@ -185,7 +185,7 @@ class sqlLogDriver extends AbstractLogDriver {
 	 * @param String [optional] $year
 	 * @param String [optional] $month
 	 */
-	function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs") {
+	function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs", $print = true) {
 
 		$xml_strings = array();
 
@@ -267,12 +267,14 @@ class sqlLogDriver extends AbstractLogDriver {
 			echo get_class($e), ': ', $e->getMessage(), "\n";
 			exit(1);			
 		}
-		
-		foreach ($xml_strings as $s) {
-			print($s);
-		}
-		
-		return ;
+
+        if($print){
+            foreach ($xml_strings as $s) {
+                print($s);
+            }
+        }
+
+		return $xml_strings ;
 	}
 	
 	/**

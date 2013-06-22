@@ -152,12 +152,14 @@ class sysLogDriver extends textLogDriver {
 	 * @param Integer $month The month to list.
 	 * @return null
 	 */
-	function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs"){
-        print "<$nodeName icon=\"toggle_log.png\" date=\"\"
+	function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs", $print = true){
+        $xml = "<$nodeName icon=\"toggle_log.png\" date=\"\"
         display=\"Logs are not readable via this GUI, they are sent directly to your system logger daemon.\"
         text=\"Logs are not readable via this GUI, they are sent directly to your system logger daemon.\"
         is_file=\"1\"
         filename=\"$rootPath/see\"/>";
+        if($print) print $xml;
+        return array($xml);
 	}
 	
 	/**

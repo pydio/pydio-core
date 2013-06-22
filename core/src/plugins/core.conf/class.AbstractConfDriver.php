@@ -468,7 +468,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 					$confStorage = ConfService::getConfStorageImpl();
 					$bmUser = $confStorage->createUserObject("shared");
 				}
-				if($bmUser == null) exit(1);
+				if($bmUser == null) {
+                    AJXP_XMLWriter::header();
+                    AJXP_XMLWriter::close();
+                }
                 $driver = ConfService::loadRepositoryDriver();
                 if(!is_a($driver, "AjxpWrapperProvider")){
                     $driver = false;
@@ -500,21 +503,18 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 						$bmUser->renameBookmark($httpVars["bm_path"], $httpVars["bm_title"]);
 					}
                     AJXP_Controller::applyHook("msg.instant", array("<reload_bookmarks/>", ConfService::getRepository()->getId()));
-				}
-				if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null)
-				{
-					$bmUser->save("user");
-					AuthService::updateUser($bmUser);
-				}
-				else if(!AuthService::usersEnabled())
-				{
-					$bmUser->save("user");
-				}		
+
+                    if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null){
+                        $bmUser->save("user");
+                        AuthService::updateUser($bmUser);
+                    }else if(!AuthService::usersEnabled()){
+                        $bmUser->save("user");
+                    }
+                }
 				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::writeBookmarks($bmUser->getBookmarks());
+				AJXP_XMLWriter::writeBookmarks($bmUser->getBookmarks(), true, isset($httpVars["format"])?$httpVars["format"]:"legacy");
 				AJXP_XMLWriter::close();
-				exit(1);
-			
+
 			break;
 					
 			//------------------------------------

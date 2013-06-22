@@ -223,7 +223,7 @@ class textLogDriver extends AbstractLogDriver {
 	 * @param Integer $month The month to list.
 	 * @return null
 	 */
-	function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs"){
+	function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs", $print = true){
 		$dir = $this->storageDir;
 		if(!is_dir($this->storageDir)) return ;
 		$logs = array();
@@ -259,8 +259,8 @@ class textLogDriver extends AbstractLogDriver {
 			}
 		}
 		krsort($result);
-		foreach($result as $log) print($log);
-		return ;		
+        if($print) foreach($result as $log) print($log);
+		return $log;
 	}
 	
 	/**

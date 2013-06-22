@@ -31,6 +31,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 {	
 
     private $listSpecialRoles = AJXP_SERVER_DEBUG;
+    private $currentBookmarks = array();
 
 	function listAllActions($action, $httpVars, $fileVars){
         if(!isSet($this->actions[$action])) return;
@@ -170,11 +171,34 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
     }
 
+	function preProcessBookmarkAction($action, &$httpVars, $fileVars){
+
+        if(isSet($httpVars["bm_action"]) && $httpVars["bm_action"] == "add_bookmark" && AuthService::usersEnabled()){
+            $bmUser = AuthService::getLoggedUser();
+            $bookmarks = $bmUser->getBookmarks();
+            $found = false;
+            foreach($bookmarks as $bm){
+                if($bm["PATH"] == $httpVars["bm_path"]){
+                    $httpVars["bm_action"] = "delete_bookmark";
+                    break;
+                }
+            }
+        }
+
+    }
+
 	function switchAction($action, $httpVars, $fileVars){
 		if(!isSet($this->actions[$action])) return;
 		parent::accessPreprocess($action, $httpVars, $fileVars);
 		$loggedUser = AuthService::getLoggedUser();
 		if(AuthService::usersEnabled() && !$loggedUser->isAdmin()) return ;
+        if(AuthService::usersEnabled()){
+            $currentBookmarks = AuthService::getLoggedUser()->getBookmarks();
+            // FLATTEN
+            foreach($currentBookmarks as $bm){
+                $this->currentBookmarks[] = $bm["PATH"];
+            }
+        }
 		
 		if($action == "edit"){
 			if(isSet($httpVars["sub_action"])){
@@ -291,15 +315,26 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
     				$splits = explode("/", $dir);
                     $root = array_shift($splits);
                     if(count($splits)){
+                        $returnNodes = false;
+                        if(isSet($httpVars["file"])){
+                            $returnNodes = true;
+                        }
                         $child = $splits[0];
                         if(isSet($rootNodes[$root]["CHILDREN"][$child])){
                             $callback = $rootNodes[$root]["CHILDREN"][$child]["LIST"];
                             if(is_string($callback) && method_exists($this, $callback)){
-                                AJXP_XMLWriter::header();
-                                call_user_func(array($this, $callback), implode("/", $splits), $root, $hash);
-                                AJXP_XMLWriter::close();
+                                if(!$returnNodes) AJXP_XMLWriter::header();
+                                $res = call_user_func(array($this, $callback), implode("/", $splits), $root, $hash, $returnNodes);
+                                if(!$returnNodes) AJXP_XMLWriter::close();
                             }else if(is_array($callback)){
-                                call_user_func($callback, implode("/", $splits), $root, $hash);
+                                $res = call_user_func($callback, implode("/", $splits), $root, $hash, $returnNodes);
+                            }
+                            if($returnNodes){
+                                AJXP_XMLWriter::header();
+                                if(isSet($res["/".$dir."/".$httpVars["file"]])){
+                                    print $res["/".$dir."/".$httpVars["file"]];
+                                }
+                                AJXP_XMLWriter::close();
                             }
                             return;
                         }
@@ -319,7 +354,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     AJXP_XMLWriter::header();
                     if(!isSet($httpVars["file"])) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="detail"><column messageId="ajxp_conf.1" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_conf.102" attributeName="description" sortType="String"/></columns>');
                     foreach ($nodes as $key => $data){
-                        print '<tree text="'.AJXP_Utils::xmlEntities($data["LABEL"]).'" description="'.AJXP_Utils::xmlEntities($data["DESCRIPTION"]).'" icon="'.$data["ICON"].'" filename="'.$parentName.$key.'"/>';
+                        $bmString = '';
+                        if(in_array($parentName.$key, $this->currentBookmarks)) $bmString = ' ajxp_bookmarked="true" overlay_icon="bookmark.png" ';
+                        print '<tree text="'.AJXP_Utils::xmlEntities($data["LABEL"]).'" description="'.AJXP_Utils::xmlEntities($data["DESCRIPTION"]).'" icon="'.$data["ICON"].'" filename="'.$parentName.$key.'" '.$bmString.'/>';
                     }
                     AJXP_XMLWriter::close();
 
@@ -1444,8 +1481,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	}
 	
 	
-	function listPlugins($dir, $root = NULL){
+	function listPlugins($dir, $root = NULL, $hash = null, $returnNodes = false){
         $dir = "/$dir";
+        $allNodes = array();
 		AJXP_Logger::logAction("Listing plugins"); // make sure that the logger is started!
 		$pServ = AJXP_PluginsService::getInstance();
 		$types = $pServ->getDetectedPlugins();
@@ -1454,20 +1492,24 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         if($dir == "/plugins" || $dir == "/core_plugins"){
             if($dir == "/core_plugins") $uniqTypes = $coreTypes;
             else $uniqTypes = array_diff(array_keys($types), $coreTypes);
-			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.plugins_folder">
+			if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.plugins_folder">
 			<column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
 			</columns>');		
 			ksort($types);
 			foreach( $types as $t => $tPlugs){
 				if(!in_array($t, $uniqTypes))continue;
+                $nodeKey = "/".$root.$dir."/".$t;
 				$meta = array(
 					"icon" 		=> "folder_development.png",					
 					"plugin_id" => $t
 				);
-				AJXP_XMLWriter::renderNode("/".$root.$dir."/".$t, ucfirst($t), false, $meta);
+                if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
+                $xml = AJXP_XMLWriter::renderNode($nodeKey, ucfirst($t), false, $meta, true, false);
+                if($returnNodes) $allNodes[$nodeKey] = $xml;
+                else print($xml);
 			}
 		}else if($dir == "/core"){
-			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="detail"  template_name="ajxp_conf.plugins">
+            if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="detail"  template_name="ajxp_conf.plugins">
 			<column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
 			<column messageId="ajxp_conf.102" attributeName="plugin_id" sortType="String"/>
 			<column messageId="ajxp_conf.103" attributeName="plugin_description" sortType="String"/>
@@ -1487,7 +1529,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     // Check if there are actually any parameters to display!
                     if($pObject->getManifestRawContent("server_settings", "xml")->length == 0) continue;
                     $label =  $pObject->getManifestLabel();
-                    $nodeString =AJXP_XMLWriter::renderNode("/$root".$dir."/".$pObject->getId(), $label, true, $meta, true, false);
+                    $nodeKey = "/$root".$dir."/".$pObject->getId();
+                    if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
+                    $nodeString =AJXP_XMLWriter::renderNode($nodeKey, $label, true, $meta, true, false);
+                    if($returnNodes) $allNodes[$nodeKey] = $nodeString;
                     if($isMain){
                         $first = $nodeString;
                     }else{
@@ -1495,12 +1540,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     }
 				}
 			}
-            print($first.$all);
+            if(!$returnNodes) print($first.$all);
 		}else{
 			$split = explode("/", $dir);
 			if(empty($split[0])) array_shift($split);
 			$type = $split[1];
-			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="full" template_name="ajxp_conf.plugin_detail">
+            if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="full" template_name="ajxp_conf.plugin_detail">
 			<column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String" defaultWidth="10%"/>
 			<column messageId="ajxp_conf.102" attributeName="plugin_id" sortType="String" defaultWidth="10%"/>
 			<column messageId="ajxp_conf.103" attributeName="plugin_description" sortType="String" defaultWidth="60%"/>
@@ -1523,12 +1568,18 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					"plugin_id" => $pObject->getId(),
 					"plugin_description" => $pObject->getManifestDescription()
 				);
-				AJXP_XMLWriter::renderNode("/$root".$dir."/".$pObject->getId(), $pObject->getManifestLabel(), true, $meta);
+                $nodeKey = "/$root".$dir."/".$pObject->getId();
+                if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
+				$xml = AJXP_XMLWriter::renderNode($nodeKey, $pObject->getManifestLabel(), true, $meta, true, false);
+                if($returnNodes) $allNodes[$nodeKey] = $xml;
+                else print $xml;
 			}
 		}
+        return $allNodes;
 	}
 	
-	function listUsers($root, $child, $hashValue = null){
+	function listUsers($root, $child, $hashValue = null, $returnNodes = false){
+        $allNodes = array();
         $columns = '<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.users">
         			<column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String" defaultWidth="40%"/>
         			<column messageId="ajxp_conf.7" attributeName="isAdmin" sortType="String" defaultWidth="10%"/>
@@ -1544,7 +1595,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             			<column messageId="ajxp_conf.62" attributeName="rights_summary" sortType="String" defaultWidth="15%"/>
             </columns>';
         }
-		AJXP_XMLWriter::sendFilesListComponentConfig($columns);
+		if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig($columns);
 		if(!AuthService::usersEnabled()) return ;
         $USER_PER_PAGE = 50;
         if(empty($hashValue)) $hashValue = 1;
@@ -1554,7 +1605,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         $count = AuthService::authCountUsers($baseGroup);
         if(AuthService::authSupportsPagination() && $count >= $USER_PER_PAGE){
             $offset = ($hashValue - 1) * $USER_PER_PAGE;
-            AJXP_XMLWriter::renderPaginationData($count, $hashValue, ceil($count/$USER_PER_PAGE));
+            if(!$returnNodes) AJXP_XMLWriter::renderPaginationData($count, $hashValue, ceil($count/$USER_PER_PAGE));
             $users = AuthService::listUsers($baseGroup, "", $offset, $USER_PER_PAGE);
             if($hashValue == 1){
                 $groups = AuthService::listChildrenGroups($baseGroup);
@@ -1567,11 +1618,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
         foreach($groups as $groupId => $groupLabel){
 
-            AJXP_XMLWriter::renderNode("/data/".$root."/".ltrim($groupId,"/"),
-                $groupLabel, false, array(
-                    "icon" => "users-folder.png",
-                    "ajxp_mime" => "group"
-                ));
+            $nodeKey = "/data/".$root."/".ltrim($groupId,"/");
+            $meta = array(
+                                "icon" => "users-folder.png",
+                                "ajxp_mime" => "group"
+                            );
+            if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
+            $xml = AJXP_XMLWriter::renderNode($nodeKey,
+                $groupLabel, false, $meta, true, false);
+            if(!$returnNodes) print($xml);
+            else $allNodes[$nodeKey] = $xml;
 
         }
 		$mess = ConfService::getMessages();
@@ -1611,19 +1667,26 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $test = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
             if(!empty($test)) $nodeLabel = $test;
             $scheme = AuthService::getAuthScheme($userId);
-			AJXP_XMLWriter::renderNode("/data/users/".$userId, $nodeLabel, true, array(
-				"isAdmin" => $mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")], 
-				"icon" => $icon.".png",
-                "auth_scheme" => ($scheme != null? $scheme : ""),
-				"rights_summary" => $rightsString,
-				"ajxp_roles" => implode(", ", array_keys($userObject->getRoles())),
-				"ajxp_mime" => "user".(($userId!="guest"&&$userId!=$loggedUser->getId())?"_editable":"")
-			));
+            $nodeKey = "/data/users/".$userId;
+            $meta = array(
+            				"isAdmin" => $mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")],
+            				"icon" => $icon.".png",
+                            "auth_scheme" => ($scheme != null? $scheme : ""),
+            				"rights_summary" => $rightsString,
+            				"ajxp_roles" => implode(", ", array_keys($userObject->getRoles())),
+            				"ajxp_mime" => "user".(($userId!="guest"&&$userId!=$loggedUser->getId())?"_editable":"")
+            			);
+            if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
+			$xml = AJXP_XMLWriter::renderNode($nodeKey, $nodeLabel, true, $meta, true, false);
+            if(!$returnNodes) print($xml);
+            else $allNodes[$nodeKey] = $xml;
 		}
+        return $allNodes;
 	}
 	
-	function listRoles(){
-		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.roles">
+	function listRoles($root, $child, $hashValue = null, $returnNodes = false){
+        $allNodes = array();
+        if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.roles">
 			<column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String"/>			
 			<column messageId="ajxp_conf.114" attributeName="is_default" sortType="String"/>
 			<column messageId="ajxp_conf.62" attributeName="rights_summary" sortType="String"/>
@@ -1645,14 +1708,20 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $r[] = $repository->getDisplay()." (".$rs.")";
 			}
 			$rightsString = implode(", ", $r);
-			AJXP_XMLWriter::renderNode("/roles/".$roleId, $roleId, true, array(
-				"icon" => "user-acl.png",
-				"rights_summary" => $rightsString,
+            $nodeKey = "/roles/".$roleId;
+            $meta = array(
+                "icon" => "user-acl.png",
+                "rights_summary" => $rightsString,
                 "is_default"    => implode(",", $roleObject->listAutoApplies()), //($roleObject->autoAppliesTo("standard") ? $mess[440]:$mess[441]),
-				"ajxp_mime" => "role",
+                "ajxp_mime" => "role",
                 "text"      => $roleObject->getLabel()
-			));
+            );
+            if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
+			$xml = AJXP_XMLWriter::renderNode($nodeKey, $roleId, true, $meta, true, false);
+            if(!$returnNodes) echo $xml;
+            else $allNodes[$nodeKey] = $xml;
 		}
+        return $allNodes;
 	}
 	
     function repositoryExists($name)
@@ -1673,9 +1742,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return strcasecmp($a->getDisplay(), $b->getDisplay());
     }
 
-	function listRepositories(){
+	function listRepositories($root, $child, $hashValue = null, $returnNodes = false){
 		$repos = ConfService::getRepositoriesList("all");
-		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.repositories">
+		if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.repositories">
 			<column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/>
 			<column messageId="ajxp_conf.9" attributeName="accessType" sortType="String"/>
 			<column messageId="ajxp_shared.27" attributeName="owner" sortType="String"/>
@@ -1685,6 +1754,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         $childRepos = array();
         $templateRepos = array();
         $flatChildrenRepos = array();
+        $allNodes = array();
         //uasort($repos, array($this, "sortReposByLabel"));
 		foreach ($repos as $repoIndex => $repoObject){
             if(!AuthService::canAdministrate($repoObject)){
@@ -1732,7 +1802,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $editable = false;
                 }
             }
-            $metaData = array(
+            $meta = array(
             	"repository_id" => $repoIndex,
             	"accessType"	=> ($repoObject->isTemplate?"Template for ":"").$repoObject->getAccessType(),
             	"icon"			=> $icon,
@@ -1741,18 +1811,24 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             	"parentname"	=> "/repositories",
 				"ajxp_mime" 	=> "repository".($editable?"_editable":"")
             );
-            AJXP_XMLWriter::renderNode("/repositories/$repoIndex", $name, true, $metaData);
+            $nodeKey = "/repositories/$repoIndex";
+            if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
+            $xml = AJXP_XMLWriter::renderNode($nodeKey, $name, true, $meta, true, false);
+            if($returnNodes) $allNodes[$nodeKey] = $xml;
+            else print($xml);
 		}
+        return $allNodes;
 	}
 
-    function listActions($dir, $root = NULL){
+    function listActions($dir, $root = NULL, $hash = null, $returnNodes = false){
+        $allNodes = array();
         $parts = explode("/",$dir);
         $pServ = AJXP_PluginsService::getInstance();
         $activePlugins = $pServ->getActivePlugins();
         $types = $pServ->getDetectedPlugins();
         if(count($parts) == 1){
             // list all types
-            AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.plugins_folder">
+            if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.plugins_folder">
 			<column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
 			</columns>');
             ksort($types);
@@ -1761,13 +1837,17 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     "icon" 		=> "folder_development.png",
                     "plugin_id" => $t
                 );
-                AJXP_XMLWriter::renderNode("/$root/actions/".$t, ucfirst($t), false, $meta);
+                $nodeKey = "/$root/actions/".$t;
+                if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
+                $xml = AJXP_XMLWriter::renderNode($nodeKey, ucfirst($t), false, $meta, true, false);
+                if($returnNodes) $allNodes[$nodeKey] = $xml;
+                else print($xml);
             }
 
         }else if(count($parts) == 2){
             // list plugs
             $type = $parts[1];
-            AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="detail" template_name="ajxp_conf.plugins_folder">
+            if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="detail" template_name="ajxp_conf.plugins_folder">
                 <column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
                 <column messageId="ajxp_conf.103" attributeName="actions" sortType="String"/>
 			</columns>');
@@ -1785,7 +1865,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     "plugin_id" => $pObject->getId(),
                     "actions"   => implode(", ", $actLabel)
                 );
-                AJXP_XMLWriter::renderNode("/$root/actions/$type/".$pObject->getName(), $pObject->getManifestLabel(), false, $meta);
+                $nodeKey = "/$root/actions/$type/".$pObject->getName();
+                if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
+                $xml = AJXP_XMLWriter::renderNode($nodeKey, $pObject->getManifestLabel(), false, $meta, true, false);
+                if($returnNodes) $allNodes[$nodeKey] = $xml;
+                else print($xml);
+
             }
 
         }else if(count($parts) == 3){
@@ -1793,7 +1878,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $type = $parts[1];
             $name = $parts[2];
             $mess = ConfService::getMessages();
-            AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="full" template_name="ajxp_conf.plugins_folder">
+            if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="full" template_name="ajxp_conf.plugins_folder">
                 <column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String" defaultWidth="10%"/>
                 <column messageId="ajxp_conf.103" attributeName="parameters" sortType="String" fixedWidth="30%"/>
 			</columns>');
@@ -1801,7 +1886,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $pObject = $types[$type][$name];
 
             $actions = $pObject->getManifestRawContent("//action", "xml", true);
-            $allNodes = array();
+            $allNodesAcc = array();
             if($actions->length){
                 foreach($actions as $node){
                     $xPath = new DOMXPath($node->ownerDocument);
@@ -1839,8 +1924,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         "parameters"=> '<div class="developerDoc">'.implode("<br/>", $paramLabel).'</div>',
                         "rest_params"=> $restPath
                     );
-                    $allNodes[$actName] = AJXP_XMLWriter::renderNode(
-                        "/$root/actions/$type/".$pObject->getName()."/$actName",
+                    $nodeKey = "/$root/actions/$type/".$pObject->getName()."/$actName";
+                    if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
+                    $allNodes[$nodeKey] = $allNodesAcc[$actName] = AJXP_XMLWriter::renderNode(
+                        $nodeKey,
                         $actLabel,
                         true,
                         $meta,
@@ -1848,14 +1935,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         false
                     );
                 }
-                ksort($allNodes);
-                print(implode("", array_values($allNodes)));
+                ksort($allNodesAcc);
+                if(!$returnNodes) print(implode("", array_values($allNodesAcc)));
             }
 
         }
+        return $allNodes;
     }
 	
-    function listHooks($dir, $root = NULL){
+    function listHooks($dir, $root = NULL, $hash = null, $returnNodes = false){
         $jsonContent = json_decode(file_get_contents(AJXP_Utils::getHooksFile()), true);
         $config = '<columns switchDisplayMode="full" template_name="hooks.list">
 				<column messageId="ajxp_conf.17" attributeName="ajxp_label" sortType="String" defaultWidth="20%"/>
@@ -1864,7 +1952,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				<column messageId="ajxp_conf.20" attributeName="listeners" sortType="String" defaultWidth="25%"/>
 				<column messageId="ajxp_conf.21" attributeName="sample" sortType="String" defaultWidth="10%"/>
 			</columns>';
-        AJXP_XMLWriter::sendFilesListComponentConfig($config);
+        if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig($config);
+        $allNodes = array();
         foreach($jsonContent as $hookName => $hookData){
             $metadata = array(
                 "icon"          => "preferences_plugin.png",
@@ -1881,12 +1970,18 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $listeners[] = "<span>Plugin ".$listener["PLUGIN_ID"].", in method ".$listener["METHOD"]."</span>";
             }
             $metadata["listeners"] = implode("<br/>", $listeners);
-            AJXP_XMLWriter::renderNode("/$root/hooks/$hookName/$hookName", $hookName, true, $metadata);
+            $nodeKey = "/$root/hooks/$hookName/$hookName";
+            if(in_array($nodeKey, $this->currentBookmarks)) $metadata = array_merge($metadata, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
+            $xml = AJXP_XMLWriter::renderNode($nodeKey, $hookName, true, $metadata, true, false);
+            if($returnNodes) $allNodes[$nodeKey] = $xml;
+            else print($xml);
         }
+        return $allNodes;
     }
 
-	function listLogFiles($dir, $root = NULL){
+	function listLogFiles($dir, $root = NULL, $hash = null, $returnNodes = false){
         $dir = "/$dir";
+        $allNodes = array();
 		$logger = AJXP_Logger::getInstance();
 		$parts = explode("/", $dir);
 		if(count($parts)>4){
@@ -1898,30 +1993,46 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				<column messageId="ajxp_conf.21" attributeName="action" sortType="String" defaultWidth="10%"/>
 				<column messageId="ajxp_conf.22" attributeName="params" sortType="String" defaultWidth="50%"/>
 			</columns>';				
-			AJXP_XMLWriter::sendFilesListComponentConfig($config);
+			if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig($config);
 			$date = $parts[count($parts)-1];
-			$logger->xmlLogs($dir, $date, "tree", $root."/logs");
+			$logger->xmlLogs($dir, $date, "tree", "/".$root."/logs");
 		}else{
-			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.16" attributeName="ajxp_label" sortType="String"/></columns>');
-			$logger->xmlListLogFiles("tree", (count($parts)>2?$parts[2]:null), (count($parts)>3?$parts[3]:null), $root."/logs");
+            if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.16" attributeName="ajxp_label" sortType="String"/></columns>');
+			$nodes = $logger->xmlListLogFiles("tree", (count($parts)>2?$parts[2]:null), (count($parts)>3?$parts[3]:null), "/".$root."/logs", false);
+            foreach($nodes as $last => $nodeXML){
+                if(is_numeric($last) && $last < 10) $last = "0".$last;
+                $key = "/$root$dir/$last";
+                if(in_array($key, $this->currentBookmarks)){
+                    $nodeXML = str_replace("/>", ' ajxp_bookmarked="true" overlay_icon="bookmark.png"/>', $nodeXML);
+                }
+                $allNodes[$key] = $nodeXML;
+                if(!$returnNodes){
+                    print($nodeXML);
+                }
+            }
 		}
+        return $allNodes;
 	}
 	
-	function printDiagnostic(){
+	function printDiagnostic($dir, $root = NULL, $hash = null, $returnNodes = false){
 		$outputArray = array();
 		$testedParams = array();
+        $allNodes = array();
 		$passed = AJXP_Utils::runTests($outputArray, $testedParams);
 		AJXP_Utils::testResultsToFile($outputArray, $testedParams);		
-		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="fileList" template_name="ajxp_conf.diagnostic" defaultWidth="20%"><column messageId="ajxp_conf.23" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_conf.24" attributeName="data" sortType="String"/></columns>');		
+		if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="fileList" template_name="ajxp_conf.diagnostic" defaultWidth="20%"><column messageId="ajxp_conf.23" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_conf.24" attributeName="data" sortType="String"/></columns>');
 		if(is_file(TESTS_RESULT_FILE)){
 			include_once(TESTS_RESULT_FILE);
             if(isset($diagResults)){
                 foreach ($diagResults as $id => $value){
                     $value = AJXP_Utils::xmlEntities($value);
-                    print "<tree icon=\"susehelpcenter.png\" is_file=\"1\" filename=\"$id\" text=\"$id\" data=\"$value\" ajxp_mime=\"testResult\"/>";
+                    $xml =  "<tree icon=\"susehelpcenter.png\" is_file=\"1\" filename=\"/$dir/$id\" text=\"$id\" data=\"$value\" ajxp_mime=\"testResult\"/>";
+                    if(!$returnNodes) print($xml);
+                    else $allNodes["/$dir/$id"] = $xml;
                 }
             }
 		}
+        return $allNodes;
 	}
 	
 	function listSharedFiles(){

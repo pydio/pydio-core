@@ -109,7 +109,7 @@ class AbstractLogDriver extends AJXP_Plugin {
      * @internal param $String [optional] $year
      * @internal param $String [optional] $month
      */
-	function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs"){}
+	function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs", $print = true){}
 
     /**
      * List log contents in XML
