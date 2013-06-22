@@ -433,7 +433,7 @@ class AJXP_XMLWriter
                     $node = new AJXP_Node($driver->getResourceUrl($path));
                     $buffer .= AJXP_XMLWriter::renderAjxpNode($node, true, false);
                 }else{
-                    $buffer .= AJXP_XMLWriter::renderNode($path, $title, false, array(), true, false);
+                    $buffer .= AJXP_XMLWriter::renderNode($path, $title, false, array('icon' => "mime_empty.png"), true, false);
                 }
             }else{
                 $buffer .= "<bookmark path=\"".AJXP_Utils::xmlEntities($path)."\" title=\"".AJXP_Utils::xmlEntities($title)."\"/>";

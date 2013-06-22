@@ -1620,9 +1620,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             $nodeKey = "/data/".$root."/".ltrim($groupId,"/");
             $meta = array(
-                                "icon" => "users-folder.png",
-                                "ajxp_mime" => "group"
-                            );
+                "icon" => "users-folder.png",
+                "ajxp_mime" => "group"
+            );
             if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
             $xml = AJXP_XMLWriter::renderNode($nodeKey,
                 $groupLabel, false, $meta, true, false);
@@ -1667,15 +1667,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $test = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
             if(!empty($test)) $nodeLabel = $test;
             $scheme = AuthService::getAuthScheme($userId);
-            $nodeKey = "/data/users/".$userId;
+            $nodeKey = "/data/$root/".$userId;
             $meta = array(
-            				"isAdmin" => $mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")],
-            				"icon" => $icon.".png",
-                            "auth_scheme" => ($scheme != null? $scheme : ""),
-            				"rights_summary" => $rightsString,
-            				"ajxp_roles" => implode(", ", array_keys($userObject->getRoles())),
-            				"ajxp_mime" => "user".(($userId!="guest"&&$userId!=$loggedUser->getId())?"_editable":"")
-            			);
+                "isAdmin" => $mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")],
+                "icon" => $icon.".png",
+                "auth_scheme" => ($scheme != null? $scheme : ""),
+                "rights_summary" => $rightsString,
+                "ajxp_roles" => implode(", ", array_keys($userObject->getRoles())),
+                "ajxp_mime" => "user".(($userId!="guest"&&$userId!=$loggedUser->getId())?"_editable":"")
+            );
             if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
 			$xml = AJXP_XMLWriter::renderNode($nodeKey, $nodeLabel, true, $meta, true, false);
             if(!$returnNodes) print($xml);
@@ -1811,7 +1811,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             	"parentname"	=> "/repositories",
 				"ajxp_mime" 	=> "repository".($editable?"_editable":"")
             );
-            $nodeKey = "/repositories/$repoIndex";
+            $nodeKey = "/data/repositories/$repoIndex";
             if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
             $xml = AJXP_XMLWriter::renderNode($nodeKey, $name, true, $meta, true, false);
             if($returnNodes) $allNodes[$nodeKey] = $xml;
