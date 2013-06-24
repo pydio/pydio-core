@@ -146,7 +146,7 @@ class PowerFSController extends AJXP_Plugin
                     $archiveName = AJXP_Utils::getAjxpTmpDir()."/".$httpVars["ope_id"]."_".$archiveName;
                 }
                 chdir($rootDir);
-                $cmd = "zip -r \"".$archiveName."\" ".implode(" ", $args);
+                $cmd = "zip -r ".escapeshellarg($archiveName)." ".implode(" ", $args);
                 $fsDriver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
                 $c = $fsDriver->getConfigs();
                 if(!isSet($c["SHOW_HIDDEN_FILES"]) || $c["SHOW_HIDDEN_FILES"] == false){

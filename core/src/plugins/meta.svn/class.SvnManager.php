@@ -193,7 +193,7 @@ class SvnManager extends AJXP_Plugin {
 			exit(0);
         }else if($actionName == "revert_file"){
 
-            $revision = $httpVars["revision"];
+            $revision = escapeshellarg($httpVars["revision"]);
    			$realFile = $init["SELECTION"][0];
             $compare = (isSet($httpVars["compare"]) && $httpVars["compare"] == "true");
             $escapedFile = escapeshellarg($realFile);
@@ -207,7 +207,7 @@ class SvnManager extends AJXP_Plugin {
             }
 
 		}else if($actionName == "svnswitch"){
-			$revision = $httpVars["revision"];
+			$revision = escapeshellarg($httpVars["revision"]);
 			ExecSvnCmd("svn update -r$revision ".$init["DIR"]);
 		}
 	}
