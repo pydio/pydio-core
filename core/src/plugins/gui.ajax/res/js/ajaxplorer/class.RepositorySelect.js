@@ -236,7 +236,7 @@ Class.create("RepositorySelect", {
                 menuMaxHeight:this.options.menuMaxHeight,
 				fade:true,
 				zIndex:1500
-			});		
+			});
 			this.notify("createMenu");
 		}
 		if(actions.length) button.removeClassName('disabled');

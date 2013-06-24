@@ -3755,6 +3755,7 @@ div.menuActions img{
     padding-top: 2px;
 }
 
+/*
 .backgroundPanel{
     position:absolute;
     right:0;
@@ -3764,12 +3765,28 @@ div.menuActions img{
     font-weight:bold;
     color: #fff;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif , sans-serif;
-    background-color:#5E7C90;
+    background-color:#5599ff;
     filter:alpha(opacity=80);
     opacity: 0.8;
     -moz-opacity:0.8;
     z-index:10000;
-    border-radius: 7px 0 0 7px;
+    border-radius: 3px 0 0 3px;
+}*/
+
+.backgroundPanel {
+    position: absolute;
+    bottom: 0;
+    padding: 3px 7px 4px 7px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #fff;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif , sans-serif;
+    background-color: #59f;
+    z-index: 10000;
+    border-radius: 3px 3px 0 0;
+    width: 15%;
+    margin-left: 45%;
+    text-align: center;
 }
 
 /*******************************/

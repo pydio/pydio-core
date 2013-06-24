@@ -75,7 +75,9 @@ Proto.Menu = Class.create({
 		}		
 
 		document.observe('click', function(e) {
-			if (this.container.visible() && !e.isRightClick()) {
+			if (this.container.visible() && !e.isRightClick() &&
+                !(this.options.mouseClick == 'over' && !Object.isString(this.options.anchor) && this.options.anchor.id && Event.findElement(e, "#"+this.options.anchor.id))
+                ) {
 				this.hide();
 			}
 		}.bind(this));
@@ -314,7 +316,6 @@ Proto.Menu = Class.create({
 	  	}		
 		this.options.beforeShow(e);
 		this.refreshList();	
-		//if(!this.options.menuItems.length) return;
 		var elOff = {};
 		var elDim = this.container.getDimensions();
 		if(this.options.anchor == 'mouse'){
@@ -343,6 +344,10 @@ Proto.Menu = Class.create({
             this.correctWindowClipping(this.container, elOff, elDim);
 		}
 		this.event = e;
+        window.setTimeout(function(){
+            if(!this.container.select('li').length) this.hide();
+        }.bind(this), 150);
+
 	},
 
     correctWindowClipping: function(container, position, dim){
