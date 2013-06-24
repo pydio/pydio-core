@@ -49,6 +49,7 @@ class FlexUploadProcessor extends AJXP_Plugin {
 		$result = $postProcessData["processor_result"];
 		if(isSet($result["SUCCESS"]) && $result["SUCCESS"] === true){
 			header('HTTP/1.0 200 OK');
+            AJXP_Controller::applyHook("node.change", array(null, $result["CREATED_NODE"], false));
 			//die("200 OK");
 		}else if(isSet($result["ERROR"]) && is_array($result["ERROR"])){
 			$code = $result["ERROR"]["CODE"];

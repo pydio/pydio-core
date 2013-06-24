@@ -44,7 +44,6 @@ class PluploadProcessor extends AJXP_Plugin {
 // usleep(5000);
 
 	public function unifyChunks($action, &$httpVars, &$fileVars){
-			error_log("unifyChunks Ran");
 			$filename = SystemTextEncoding::fromUTF8($fileVars["file"]["name"]);
 			$tmpName = $fileVars["file"]["tmp_name"];
 			$chunk = $httpVars["chunk"];
@@ -113,7 +112,10 @@ class PluploadProcessor extends AJXP_Plugin {
 					fclose($out);
 				} else
 					die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
-			}						
+			}
+            /* we apply the hook if we are uploading the last chunk */
+            if($chunk == $chunks-1)
+                AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($destStreamURL.$filename), false));
 			// Return JSON-RPC response
 			die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
 	}

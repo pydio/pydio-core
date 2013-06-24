@@ -568,7 +568,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 					$errorMessage = "$mess[38] ".SystemTextEncoding::toUTF8($dir)." $mess[99].";
 					AJXP_Logger::debug("Upload error 412", array("destination"=>$destination));
 					return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $errorMessage));
-				}	
+				}
 				foreach ($fileVars as $boxName => $boxData)
 				{
 					if(substr($boxName, 0, 9) != "userfile_") continue;
@@ -581,7 +581,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 					}
 					$userfile_name = $boxData["name"];
 					try{
-						$this->filterUserSelectionToHidden(array($userfile_name));					
+						$this->filterUserSelectionToHidden(array($userfile_name));
 					}catch (Exception $e){
 						return array("ERROR" => array("CODE" => 411, "MESSAGE" => "Forbidden"));
 					}
@@ -658,20 +658,20 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 
 					$this->changeMode($destination."/".$userfile_name);
                     $createdNode = new AJXP_Node($destination."/".$userfile_name);
-                    AJXP_Controller::applyHook("node.change", array(null, $createdNode, false));
+                    //AJXP_Controller::applyHook("node.change", array(null, $createdNode, false));
 					$logMessage.="$mess[34] ".SystemTextEncoding::toUTF8($userfile_name)." $mess[35] $dir";
 					AJXP_Logger::logAction("Upload File", array("file"=>SystemTextEncoding::fromUTF8($dir)."/".$userfile_name));
 				}
-				
+
 				if(isSet($errorMessage)){
 					AJXP_Logger::debug("Return error $errorCode $errorMessage");
-					return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $errorMessage));
+                    return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $errorMessage));
 				}else{
 					AJXP_Logger::debug("Return success");
 					return array("SUCCESS" => true, "CREATED_NODE" => $createdNode);
 				}
 				return ;
-				
+
 			break;
 
             case "lsync" :

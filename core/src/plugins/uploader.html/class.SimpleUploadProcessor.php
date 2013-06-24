@@ -105,7 +105,11 @@ class SimpleUploadProcessor extends AJXP_Plugin {
                     AJXP_XMLWriter::writeNodesDiff(array("ADD" => array($result["CREATED_NODE"])), true);
                 }
                 AJXP_XMLWriter::close();
-				//exit("OK");
+                /* for further implementation */
+                if(!isset($httpVars["prevent_notification"])){
+                    AJXP_Controller::applyHook("node.change", array(null, $result["CREATED_NODE"], false));
+                }
+                //exit("OK");
 			}
 		}
 		
@@ -138,7 +142,7 @@ class SimpleUploadProcessor extends AJXP_Plugin {
 			unlink($destStreamURL.$chunks[$i]);
 		}
 		fclose($newDest);
-		
+        AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($newDest), false));
 	}
 }
 ?>
