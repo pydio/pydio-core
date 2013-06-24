@@ -29,4 +29,5 @@ $mess = array(
     "7" => "Lancement de la première indexation, veuillez attendre puis relancer votre recherche.",
     "8" => "Indexation (%s) en arrière plan.",
     "9" => "Impossible de trouver un index pour ce dépôt, vous devrier déclencher l'indexation d'abord.",
+    "10" => "Indexation des sous-répertoires",
 );

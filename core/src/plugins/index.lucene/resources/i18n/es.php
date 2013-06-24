@@ -29,4 +29,5 @@ $mess = array(
     "7" => "Primera indexación de esta carpeta, por favor espere y reintente más tarde su búsqueda",
     "8" => "Indexando %s en segundo plano",
     "9" => "No puedo encontrar el índice de la carpeta actual! Debería ejecutar la indexación de los datos primero!",
+    "10" => "Indexing subfolders in background",
 );

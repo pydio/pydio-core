@@ -29,4 +29,5 @@ $mess = array(
     "7" => "First indexing of this repository, please wait and retry your search",
     "8" => "Indexing %s in background",
     "9" => "Cannot find index for current repository! You should trigger the indexation of the data first!",
+    "10" => "Indexing subfolders in background",
 );

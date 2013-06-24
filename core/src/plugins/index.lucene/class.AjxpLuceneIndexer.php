@@ -212,7 +212,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
             if(ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()){
                 AJXP_Controller::applyActionInBackground($repoId, "index", $httpVars);
                 AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("check_lock", array(), sprintf($messages["index.lucene.8"], $dir), true, 2);
+                AJXP_XMLWriter::triggerBgAction("check_lock", array("repository_id" => $repoId), sprintf($messages["index.lucene.8"], $dir), true, 2);
                 AJXP_XMLWriter::close();
                 return;
             }
@@ -237,7 +237,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
             $repoId = $httpVars["repository_id"];
             if($this->isIndexLocked($repoId)){
                 AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("check_lock", array("repository_id" => $repoId), sprintf($messages["index.lucene.8"], ""), true, 3);
+                AJXP_XMLWriter::triggerBgAction("check_lock", array("repository_id" => $repoId), $messages["index.lucene.10"], true, 3);
                 AJXP_XMLWriter::close();
             }else{
                 AJXP_XMLWriter::header();
@@ -254,6 +254,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
         if(ConfService::currentContextIsCommandLine() && $this->verboseIndexation){
             print("Indexing content of ".$url."\n");
         }
+        @set_time_limit(60);
         $handle = opendir($url);
         if($handle !== false){
             while( ($child = readdir($handle)) != false){

@@ -61,7 +61,7 @@
 					<clientCallback prepareModal="false"><![CDATA[
 						var crtDir = ajaxplorer.getUserSelection().getUniqueNode();
 						var bgManager = ajaxplorer.actionBar.bgManager;
-						bgManager.queueAction("index", new Hash({dir:crtDir}), "Indexing current folder");
+						bgManager.queueAction("index", new Hash({dir:crtDir}), MessageHash["index.lucene.8"]);
 						bgManager.next();
 					]]></clientCallback>				
 					<serverCallback methodName="applyAction"/>
