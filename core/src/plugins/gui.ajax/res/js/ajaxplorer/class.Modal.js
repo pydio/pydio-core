@@ -389,7 +389,7 @@ Class.create("Modal", {
 		var winWidth = document.viewport.getWidth();
 		var winHeight = document.viewport.getHeight();
         var element = $(this.elementName);
-		boxWidth = element.getWidth();
+		var boxWidth = element.getWidth();
 		var boxHeight = element.getHeight();
 		
 		if(checkHeight && boxHeight > parseInt(winHeight*90/100)){

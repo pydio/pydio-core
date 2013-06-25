@@ -242,7 +242,7 @@ Class.create("AjxpBootstrap", {
                 customWording = this.parameters.get("customWording");
             }
 			html+='	<div id="progressBox" class="dialogBox" style="width: 320px;display:block;top:30%;z-index:2002;left:40%;position: absolute;background-color: #fff;padding: 0;">';
-			html+='	<div align="left" class="dialogContent" style="color:#676965;font-family:Trebuchet MS,sans-serif;font-size:11px;font-weight:normal;left:10px;padding:10px;">';
+			html+='	<div align="left" class="dialogContent" style="background-image:none; font-size: 13px;line-height: 1.5em;border-radius: 3px;padding: 0; border-width:0">';
 			var icon = customWording.icon || ajxpResourcesFolder+'/../../../AjxpLogo250.png';
             if(customWording.icon_binary_url){
                 icon = this.parameters.get("ajxpServerAccess") + "&" + customWording.icon_binary_url;
@@ -251,21 +251,24 @@ Class.create("AjxpBootstrap", {
 			var iconWidth = customWording.iconWidth || '35px';
 			var fontSize = customWording.titleFontSize || '35px';
             var titleDivSize = (customWording.iconHeight ? 'height:' + customWording.iconHeight + ';' : '');
-			html+=' <div style="margin-bottom:0px; font-size:'+fontSize+';font-weight:bold; background-image:url(\''+ (this.parameters.get("SERVER_PREFIX_URI") || '') + icon+'\');background-position:left center;background-repeat:no-repeat;padding-left:'+iconWidth+';'+titleDivSize+'color:#0077b3;">'+(customWording.iconOnly?'':title)+'</div>';
-			if(customWording.title.toLowerCase() != "ajaxplorer"){
+			html+=' <div class="dialogTitle" style="border-bottom:0; margin-bottom:0px; font-size:'+fontSize+';font-weight:bold; background-size: 100%; background-image:url(\''+ (this.parameters.get("SERVER_PREFIX_URI") || '') + icon+'\');background-position:left center;background-repeat:no-repeat;padding-left:'+iconWidth+';'+titleDivSize+'color:#0077b3;border-radius:3px 3px 0 0;">'+(customWording.iconOnly?'':title)+'</div>';
+            if(customWording.welcomeMessage){
+                html+= '<div id="progressCustomMessage" style="font-size: 20px;line-height: 1.3em;padding:10px;">' + customWording.welcomeMessage.replace(new RegExp("\n", "g"), "<br>") + '</div>';
+            }else{
+                html+= '';
+            }
+            html += '<div style="height: 85px;position: relative;" class=""><div class="rotating" style="width: 0;height: 0;border: 24px solid rgb(0, 123, 219);border-radius: 50px;position: absolute;clip: rect(0px, 50px, 100px, 0px);left: 131px;top: 11px;color: white;font-size: 20px;">.</div></div>';
+			html += '<div style="padding:5px;font-size: 11px;line-height: 1.5em;" class="dialogFooter">';
+            if(customWording.title.toLowerCase() != "ajaxplorer"){
 				html+='	<div style="padding:4px 7px;position: relative;"><div>AjaXplorer Community Edition<span id="version_span"></span></div>';
 			}else{
-				html+='	<div style="padding:4px 7px;position: relative;"><div>The web data-browser<span id="version_span"></span></div>';
+				html+='	<div style="padding:4px 7px;position: relative;"><div>Build your own box! <span id="version_span"></span></div>';
 			}
-			html+='	Copyright C. du Jeu 2008-2013 - AGPL License. <div id="progressCustomMessage" style="margin-top: 35px;font-weight: bold;padding-bottom: 5px;">';
-			if(customWording.welcomeMessage){
-				html+= customWording.welcomeMessage.replace(new RegExp("\n", "g"), "<br>");
-			}
-            html+="</div>";
-            html+='<div id="progressState" style="float:left; display: inline;">Booting...</div>';
-			html+='	<div id="progressBarContainer" style="margin-top:3px; margin-left: 126px;"><span id="loaderProgress"></span></div>';
-            html+= '<div id="progressBarHeighter" style="height:10px;"></div>';
-			html+='	</div></div>';
+			html+='	Copyright C. du Jeu 2008-2013 - AGPL License';
+            html+='<div id="progressState" style="float:left; display: none;">Booting...</div>';
+			html+='	<div id="progressBarContainer" style="margin-top:3px; margin-left: 126px;display: none;"><span id="loaderProgress"></span></div>';
+            html+= '<div id="progressBarHeighter" style="height:10px;display: none;"></div>';
+			html+='</div></div></div>';
 		}
         var viewPort;
         if(!targetContainer){
@@ -289,6 +292,9 @@ Class.create("AjxpBootstrap", {
 			height		: 11,										// Height of the progressbar - don't forget to adjust your image too!!!
 			onTick		: function(pbObj) { 
 				if(pbObj.getPercentage() == 100){
+                    $('progressBox').hide();
+                    $('loading_overlay').remove();
+                    /*
                     new Effect.Parallel([
                             new Effect.Opacity($('loading_overlay'),{sync:true,from:0.2,to:0,duration:0.3}),
                             new Effect.Opacity($('progressBox'),{sync:true,from:1,to:0,duration:0.3})
@@ -298,8 +304,9 @@ Class.create("AjxpBootstrap", {
                             if($('progressCustomMessage').innerHTML.strip() && $("generic_dialog_box") && $("generic_dialog_box").visible() && $("generic_dialog_box").down('div.dialogLegend')){
                                 $("generic_dialog_box").down('div.dialogLegend').update($('progressCustomMessage').innerHTML.strip());
                             }
-                            $('progressBox').remove();
+                            //$('progressBox').remove();
                         }});
+                    */
 					return false;
 				}
 				return true ;

@@ -724,9 +724,9 @@ div.oneFieldForm input.SF_input{
     z-index: 2002;
     left: 40%;
     position: absolute;
-    -webkit-box-shadow: 1px 1px 24px #aaa;
-    -moz-box-shadow: 1px 1px 24px #aaa;
-    box-shadow: 1px 1px 24px #aaa;
+    -webkit-box-shadow: 5px 5px 60px #222;
+    -moz-box-shadow:  5px 5px 60px #222;
+    box-shadow: 5px 5px 60px #222;
 }
 
 .pg_cancel_button{
