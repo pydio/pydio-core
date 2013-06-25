@@ -644,7 +644,8 @@ class Server {
             $this->httpResponse->sendBody($body);
 
         }
-        \AJXP_Logger::logAction("Download", array("files"=>$node->getUrl()));
+        $repositories = \ConfService::getRepositoriesList("user");
+        \AJXP_Logger::logAction("Download", array("files"=>$repositories[\ConfService::getCurrentRepositoryId()]->getSlug()."/".$uri));
 
     }
 
@@ -905,7 +906,8 @@ class Server {
             $this->httpResponse->sendStatus(201);
 
         }
-        \AJXP_Logger::logAction("Upload", array("files"=>$node->getUrl()));
+        $repositories = \ConfService::getRepositoriesList("user");
+        \AJXP_Logger::logAction("Upload", array("files"=>$repositories[\ConfService::getCurrentRepositoryId()]->getSlug()."/".$uri));
 
     }
 
