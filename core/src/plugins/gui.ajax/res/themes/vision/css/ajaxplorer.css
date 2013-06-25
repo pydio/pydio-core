@@ -181,15 +181,16 @@ textarea{
     opacity: 0.8;
     font-size: 11px;
     white-space: nowrap;
-    margin-top: -3px;
+    margin-top: 1px;
 }
 
 div.thumbnail_cell_metadata span.metadata_chunk span.text_label{
     margin-left: 0;
+    display:inline;
 }
 
 div.thumbnail_cell_metadata span.metadata_chunk{
-    display: inline-block;
+    display: inline;
     margin-right: 5px;
 }
 
