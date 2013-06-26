@@ -46,7 +46,7 @@ class sqlAuthDriver extends AbstractAuthDriver {
         if(!isSet($this->options)) return;
         $test = AJXP_Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
         if(!count($test)){
-            throw new Exception("Please define an SQL connexion in the core configuration");
+            throw new Exception("You probably did something wrong! To fix this issue you have to remove the file \"bootsrap.json\" and rename the backup file \"bootstrap.json.bak\" into \"bootsrap.json\" in data/plugins/boot.conf/");
         }
     }
 

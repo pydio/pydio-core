@@ -380,6 +380,9 @@ class BootConfLoader extends AbstractConfDriver {
                 $forceDisconnexion = $pluginId;
             }
         }
+        if(file_exists($jsonPath)){
+            copy($jsonPath, $jsonPath.".bak");
+        }
         AJXP_Utils::saveSerialFile($jsonPath, $jsonData, true, false, "json", true);
         if(isSet($forceDisconnexion)){
             if($pluginId == "core.conf"){
