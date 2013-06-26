@@ -23,6 +23,6 @@ $mess=array(
 "Enable Users" => "Activer les users",
 "Guest Browsing" => "Activer le guest",
 "Password length" => "Longueur mot de passe",
-"Store Credentials in Session" => "Guarder les identifiants dans la session",
+"Store Credentials in Session" => "Garder les identifiants dans la session",
 );
 ?>
