@@ -257,8 +257,8 @@ Class.create("AjxpBootstrap", {
             }else{
                 html+= '';
             }
-            html += '<div style="height: 85px;position: relative;" class=""><div class="rotating" style="width: 0;height: 0;border: 24px solid rgb(0, 123, 219);border-radius: 50px;position: absolute;clip: rect(0px, 50px, 100px, 0px);left: 131px;top: 11px;color: white;font-size: 20px;">.</div></div>';
-			html += '<div style="padding:5px;font-size: 11px;line-height: 1.5em;" class="dialogFooter">';
+            html += '<div style="height: 85px;position: relative;" id="loader_round_progress"><div class="rotating" style="width: 0;height: 0;border: 24px solid rgb(0, 123, 219);border-radius: 50px;position: absolute;clip: rect(0px, 50px, 100px, 0px);left: 131px;top: 11px;color: white;font-size: 20px;">.</div></div>';
+			html += '<div style="padding:5px;font-size: 11px;line-height: 1.5em;" class="dialogFooter" id="loader_dialog_footer">';
             if(customWording.title.toLowerCase() != "ajaxplorer"){
 				html+='	<div style="padding:4px 7px;position: relative;"><div>AjaXplorer Community Edition<span id="version_span"></span></div>';
 			}else{
@@ -292,21 +292,14 @@ Class.create("AjxpBootstrap", {
 			height		: 11,										// Height of the progressbar - don't forget to adjust your image too!!!
 			onTick		: function(pbObj) { 
 				if(pbObj.getPercentage() == 100){
-                    $('progressBox').hide();
-                    $('loading_overlay').remove();
-                    /*
                     new Effect.Parallel([
-                            new Effect.Opacity($('loading_overlay'),{sync:true,from:0.2,to:0,duration:0.3}),
-                            new Effect.Opacity($('progressBox'),{sync:true,from:1,to:0,duration:0.3})
+                            new Effect.Opacity($('loader_round_progress'),{sync:true,from:1,to:0,duration:0.4}),
+                            new Effect.Opacity($('loader_dialog_footer'),{sync:true,from:1,to:0,duration:0.4})
                         ],
                         {afterFinish : function(){
                             $('loading_overlay').remove();
-                            if($('progressCustomMessage').innerHTML.strip() && $("generic_dialog_box") && $("generic_dialog_box").visible() && $("generic_dialog_box").down('div.dialogLegend')){
-                                $("generic_dialog_box").down('div.dialogLegend').update($('progressCustomMessage').innerHTML.strip());
-                            }
-                            //$('progressBox').remove();
+                            $('progressBox').hide();
                         }});
-                    */
 					return false;
 				}
 				return true ;

@@ -29,7 +29,7 @@
 			<div id="hidden_forms" style="position:absolute;left:-1000px;"></div>	
 			
 			<!-- LOGIN SCREEN MUST BE ALREADY IN PAGE TO ENABLE PASSWORD REMEMBERING -->
-            <form id="login_form" action="login" style="display:none;padding: 10px 10px 6px 10px;font-size: 1.3em;display: block;margin: 10px 30px;border-radius: 5px;background-color: rgb(245, 245, 245);border: 1px solid #eee;" box_width="320" box_padding="0" overlayStyle='{"backgroundColor":"white","opacity":10,"backgroundImage":"url(\"<?php print(AJXP_THEME_FOLDER); ?>/images/grid_t.png\")"}'>
+            <form id="login_form" action="login" style="display:none;" box_width="320" box_padding="0" overlayStyle='{"backgroundColor":"white","opacity":10,"backgroundImage":"url(\"AJXP_THEME_FOLDER/images/grid_t.png\")"}'>
 				<input type="hidden" name="get_action" value="login">
 				<input type="hidden" name="login_seed" id="login_seed" value="">
 		 	   	<a style="float:right;font-size: 16px;" href="javascript:ajaxplorer.actionBar.fireAction('switch_language');" title="AJXP_MESSAGE[190]" alt="AJXP_MESSAGE[190]" class="icon-flag">&nbsp;</a>
@@ -37,11 +37,11 @@
 				<div style="width:100%;">
 					<div class="SF_element">
 						<div class="SF_label"><ajxp:message ajxp_message_id="181">AJXP_MESSAGE[181]</ajxp:message></div>
-						<div class="SF_input"><input type="text" name="userid" style="width: 100px; padding:0px;" class="dialogFocus"></div>
+						<div class="SF_input"><input type="text" name="userid" style="width: 100px; padding:0px;" class="dialogFocus" placeholder="AJXP_MESSAGE[181]"></div>
 					</div>
 					<div class="SF_element">
 						<div class="SF_label"><ajxp:message ajxp_message_id="182">AJXP_MESSAGE[182]</ajxp:message></div>
-						<div class="SF_input"><input type="password" name="password"  style="width: 100px; padding:0px;"></div>
+						<div class="SF_input"><input type="password" name="password"  style="width: 100px; padding:0px;" placeholder="AJXP_MESSAGE[182]"></div>
 					</div>
 					<div class="SF_element">
 						<input type="checkbox" class="radio" name="remember_me" style="border: none; width:20px !important;"/><ajxp:message ajxp_message_id="261">AJXP_MESSAGE[261]</ajxp:message>

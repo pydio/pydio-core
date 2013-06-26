@@ -909,6 +909,41 @@ input.SF_input.SF_number{
     border: 1px solid #ddd;
 }
 
+#login_form{
+    margin: 20px 52px 0px 53px;
+    font-size: 15px;
+    padding-bottom: 20px;
+}
+
+#login_form div.SF_label{
+    display: none;
+}
+
+#login_form.no_placeholder div.SF_label{
+    display: block;
+    text-align: left;
+    padding: 0 4px;
+}
+
+#login_form.no_placeholder div.SF_input{
+    clear: left;
+}
+
+#login_form div.SF_input > input{
+    width: 200px !important;
+    padding: 4px !important;
+    font-size: 17px;
+}
+
+.ajxp_login_error {
+    margin-top: 10px;
+    font-size: 14px !important;
+    background-color: transparent !important;
+    color: rgb(219, 0, 0) !important;
+    border: 1px solid rgb(216, 0, 0);
+    padding: 7px !important;
+}
+
 /***************/
 /*ACTION BAR   */
 /***************/
