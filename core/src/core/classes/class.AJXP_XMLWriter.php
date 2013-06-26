@@ -592,7 +592,7 @@ class AJXP_XMLWriter
             $descTag = "";
             $description = $repoObject->getDescription();
             if(!empty($description)){
-                $descTag = '<description>'.$description.'</description>';
+                $descTag = '<description>'.AJXP_Utils::xmlEntities($description, true).'</description>';
             }
             $xmlString = "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$rightString $streamString $slugString $isSharedString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings()."</repo>";
             if($toLast){
