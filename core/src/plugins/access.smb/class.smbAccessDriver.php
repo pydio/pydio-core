@@ -82,8 +82,8 @@ class smbAccessDriver extends fsAccessDriver
         require_once(AJXP_BIN_FOLDER."/pclzip.lib.php");
         $filePaths = array();
         foreach ($src as $item){
-            $realFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase."/".AJXP_Utils::securePath($item));
-            $basedir = trim(dirname($realFile));
+            $realFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase.(($item[0] == "/")? "" : "/").AJXP_Utils::securePath($item));
+            $basedir = trim(dirname($realFile))."/";
             $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile,
                 PCLZIP_ATT_FILE_NEW_SHORT_NAME => basename($item));
         }

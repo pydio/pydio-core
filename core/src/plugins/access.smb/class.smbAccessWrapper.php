@@ -58,10 +58,10 @@ class smbAccessWrapper extends fsAccessWrapper {
 		$basePath = $repoObject->getOption("PATH");
 		$fullPath = "smb://".$credentials.$host."/";//.$basePath."/".$path;
 		if ($basePath!="") {
-           $fullPath.=trim($basePath, "/\\" )."/";
+           $fullPath.=trim($basePath, "/\\" );
        	}
        	if ($path!="") {
-           $fullPath.=$path;
+           $fullPath.= (($path[0] == "/")? "" : "/").$path;
        	}
 		
 		return $fullPath;
