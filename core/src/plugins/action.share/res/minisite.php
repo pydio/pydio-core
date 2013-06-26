@@ -118,7 +118,7 @@
                        cookieEnabled=(document.cookie.indexOf("testcookie")!=-1)? true : false;
                    }
                    if(!cookieEnabled){
-                       alert('AJXP_MESSAGE[share_center.76]');
+                       alert("AJXP_MESSAGE[share_center.76]");
                    }
             });
 		</script>
