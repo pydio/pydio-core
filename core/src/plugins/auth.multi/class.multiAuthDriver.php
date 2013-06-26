@@ -204,6 +204,11 @@ class multiAuthDriver extends AbstractAuthDriver {
         }
     }
 
+    function isAjxpAdmin($login){
+        $keys = array_keys($this->drivers);
+        return ($this->drivers[$keys[0]]->getOption("AJXP_ADMIN_LOGIN") === $login) ||  ($this->drivers[$keys[1]]->getOption("AJXP_ADMIN_LOGIN") === $login);
+    }
+
 	function listUsers($baseGroup="/"){
         if($this->masterSlaveMode){
             if(!empty($this->baseName)) {
