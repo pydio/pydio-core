@@ -69,7 +69,7 @@
 						}
 						]]></clientCallback>
 						<clientForm id="ftp_login_form"><![CDATA[						
-							<div id="ftp_login_form" action="login" box_width="340">
+							<div id="ftp_login_form" action="login" box_width="350">
 							<input type="hidden" name="get_action" value="login">
 							<input type="hidden" name="login_seed" id="login_seed" value="-1">
 							<div>
@@ -134,5 +134,5 @@
 	</registry_contributions>
 	<dependencies>
 		<pluginClass pluginName="access.ftp"/>
-	</dependencies>	
+	</dependencies>
 </authdriver>
