@@ -1057,6 +1057,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 								if(is_bool($optValue)){
 									$optValue = ($optValue?"true":"false");
 								}
+                                $optValue = AJXP_Utils::xmlEntities($optValue, true);
 								print("<param name=\"$key\" value=\"$optValue\"/>");
 							}
 						}
