@@ -272,6 +272,7 @@
 	    						ajaxplorer.user.savePreference("lang");
 	    					}
 						});
+						$(oForm).up('.dialogContent').previous('.dialogTitle').select('span').invoke('remove');
 					]]></dialogOnOpen>
 					<dialogOnComplete hideDialog="true"><![CDATA[
                         if(ajaxplorer.user){
@@ -293,8 +294,9 @@
 					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
 				</clientCallback>
 				<clientForm id="switch_language_form"><![CDATA[
-					<div id="switch_language_form" action="switch_language_form" box_width="202">
-						<select id="language_selector"></select>
+					<div id="switch_language_form" action="switch_language_form" box_width="320">
+					    <div class="dialogLegend"  style="margin-left:50px; font-size: 15px;">AJXP_MESSAGE[190]</div>
+						<select id="language_selector" style="margin-left:50px; margin-bottom: 20px;"></select>
 					</div>
 				]]></clientForm>				
 				<serverCallback methodName="switchAction"></serverCallback>
