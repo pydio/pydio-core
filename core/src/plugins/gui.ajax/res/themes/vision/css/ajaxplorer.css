@@ -2079,6 +2079,13 @@ div#upload_files_list div, div#multiple_download_container div
     color: #666;
 }
 
+div#upload_files_list span.item_relative_path{
+    color: #ccc;
+    margin-left: 15px;
+    font-size: 0.8em;
+}
+
+
 #upload_files_list img
 {
     margin-right: 6px;

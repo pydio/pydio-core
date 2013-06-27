@@ -484,7 +484,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 				$dirname = substr($dirname, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
 				$this->filterUserSelectionToHidden(array($dirname));
                 AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($dir."/".$dirname), -2));
-				$error = $this->mkDir($dir, $dirname);
+				$error = $this->mkDir($dir, $dirname, isSet($httpVars["ignore_exists"])?true:false);
 				if(isSet($error)){
 					throw new AJXP_Exception($error);
 				}
@@ -1422,7 +1422,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 		return $name."-$i".$ext;
 	}
 	
-	function mkDir($crtDir, $newDirName)
+	function mkDir($crtDir, $newDirName, $ignoreExists = false)
 	{
         $currentNodeDir = new AJXP_Node($this->urlBase.$crtDir);
         AJXP_Controller::applyHook("node.before_change", array(&$currentNodeDir));
@@ -1434,6 +1434,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 		}
 		if(file_exists($this->urlBase."$crtDir/$newDirName"))
 		{
+            if($ignoreExists) return null;
 			return "$mess[40]"; 
 		}
 		if(!$this->isWriteable($this->urlBase."$crtDir"))

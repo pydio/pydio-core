@@ -72,6 +72,11 @@ Class.create("XHRUploader", {
 		// INITIALIZE GUI, IF NOT ALREADY!
 		this.sendButton = formObject.down('#uploadSendButton');
         this.sendButton.addClassName("disabled");
+        modal.setCloseValidation(function(){
+            window.UploaderInstanceRunning = false;
+            return true;
+        });
+
 		if(this.sendButton.observerSet){
             if(this.mainForm.PROGRESSBAR){
                 this.totalProgressBar = this.mainForm.PROGRESSBAR;
@@ -81,143 +86,57 @@ Class.create("XHRUploader", {
 			this.optionPane = this.mainForm.down('#uploader_options_pane');
 			this.optionPane.loadData();
 			this.updateTotalData();
-			if(window.UploaderDroppedFiles){
-				var files = window.UploaderDroppedFiles;
-				for(var i=0;i<files.length;i++){
-					this.addListRow(files[i]);
-				}
-				if(this.optionPane.autoSendCheck.checked){
-					this.submit();
-				}
-				window.UploaderDroppedFiles = null;
-			}
-			return;		
-		}
-		
-		var optionsButton = formObject.down('#uploadOptionsButton');
-		var closeButton = formObject.down('#uploadCloseButton');
-		this.sendButton.observe("click", function(){
-            if(!this.hasClassName("disabled")){
-			    ajaxplorer.actionBar.multi_selector.submit();
-            }
-		}.bind(this.sendButton) );
-        this.sendButton.observerSet = true;
-		optionsButton.observe("click", function(){
-			var optionPane = this.mainForm.down('#uploader_options_pane');
-			var closeSpan = optionsButton.down('span');
-			if(optionPane.visible()) {
-				optionPane.hidePane();
-				closeSpan.hide();
-			}
-			else {
-				optionPane.showPane();
-				closeSpan.show();
-			}
-		}.bind(this));
-        if(closeButton){
-            closeButton.observe("click", function(){
-                if(this.hasLoadingItem()) return;
-                window.UploaderInstanceRunning = false;
-                hideLightBox();
-            }.bind(this));
+		}else{
+            this.initGUI();
         }
 
-		this.initElement(formObject.select('.dialogFocus')[0]);		
-		
-		var dropzone = this.listTarget;
-		dropzone.addClassName('droparea');
-		dropzone.addEventListener("dragover", function(event) {
-				event.preventDefault();
-		}, true);
-		dropzone.addEventListener("dragenter", function(){
-			dropzone.addClassName("dropareaHover");
-		}, true);
-		dropzone.addEventListener("dragleave", function(){
-			dropzone.removeClassName("dropareaHover");
-		}, true);
-		
-		dropzone.addEventListener("drop", function(event) {
-			event.preventDefault();
-
-            var items = event.dataTransfer.items || [], files = event.dataTransfer.files, firstEntry;
-
-            if (false && items[0] && items[0].webkitGetAsEntry) {
-                var callback = this.addListRow.bind(this);
-                var error = (console ? console.log : function(error){window.alert(error); }) ;
-                var length = items.length;
-                for (var i = 0; i < length; i++) {
-                    var entry = items[i].webkitGetAsEntry();
-                    if (entry.isFile) {
-                        entry.file(function(File) {
-                            callback(File);
-                        }, error );
-                    } else if (entry.isDirectory) {
-                        this.recurseDirectory(entry.filesystem.root, this.addListRow.bind(this), error );
-                    }
-                }
-            }else{
-                var files = event.dataTransfer.files;
-                for(var i=0;i<files.length;i++){
-                    this.addListRow(files[i]);
-                }
-            }
-
-			if(this.optionPane.autoSendCheck.checked){
-				this.submit();
-			}
-		}.bind(this) , true);
-		
-		
-		if(this.mainForm.down('#uploadFilesListContainer')) {
-            this.mainForm.down('#uploadFilesListContainer').setAttribute("rowspan", "1");
+        if(window.UploaderDroppedFiles || window.UploaderDroppedItems){
+             this.handleDropEventResults(window.UploaderDroppedItems, window.UploaderDroppedFiles);
+             window.setTimeout(function(){
+                 window.UploaderDroppedItems = window.UploaderDroppedFiles = null;
+             }, 2000);
         }
-        if(this.mainForm.down('#optClosButtonsContainer')){
-            var totalDiv = new Element('div', {id:'total_files_list'});
-            this.mainForm.down('#optClosButtonsContainer').insert({after:new Element('td', {style:'vertical-align:bottom'}).update(totalDiv)});
-            totalDiv.insert('<img src="'+ajxpResourcesFolder+'/images/actions/22/trashcan_empty.png" class="fakeUploadButton fakeOptionButton" id="clear_list_button"\
-			width="22" height="22" style="float:right;margin-top:3px;padding:4px;width:22px;" title="'+MessageHash[216]+'"/>\
-			<span id="totalStrings">'+MessageHash[258]+' : 0 '+MessageHash[259]+' : 0Kb</span>\
-			<div style="padding-top:3px;">\
-			<div id="pgBar_total" style="width:154px; height: 4px;border: 1px solid #ccc;float:left;margin-top: 6px;"></div>\
-			<span style="float:left;margin-left:10px;" id="uploadedString">'+MessageHash[256]+' : 0%</span>\
-			</div>');
-        }
-		var options = {
-			animate		: false,									// Animate the progress? - default: true
-			showText	: false,									// show text with percentage in next to the progressbar? - default : true
-			width		: 154,										// Width of the progressbar - don't forget to adjust your image too!!!
-			boxImage	: ajxpResourcesFolder+'/images/progress_box.gif',			// boxImage : image around the progress bar
-			barImage	: ajxpResourcesFolder+'/images/progress_bar.gif',	// Image to use in the progressbar. Can be an array of images too.
-			height		: 4										// Height of the progressbar - don't forget to adjust your image too!!!
-		};
-		this.mainForm.down('#clear_list_button').observe("click", function(e){
-			ajaxplorer.actionBar.multi_selector.clearList();
-			ajaxplorer.actionBar.multi_selector.updateTotalData();			
-		});
-		this.optionPane = this.createOptionsPane();
-		this.optionPane.loadData();
-
-        if(this.mainForm.down('#phBar_total')){
-            this.totalProgressBar = new JS_BRAMUS.jsProgressBar($('pgBar_total'), 0, options);
-            this.mainForm.PROGRESSBAR = this.totalProgressBar;
-        }
-        this.totalStrings = $('totalStrings');
-        this.uploadedString = $('uploadedString');
-
-		if(window.UploaderDroppedFiles){
-			var files = window.UploaderDroppedFiles;
-
-			for(var i=0;i<files.length;i++){
-				this.addListRow(files[i]);
-			}
-			if(this.optionPane.autoSendCheck.checked){
-				this.submit();
-			}
-			window.UploaderDroppedFiles = null;
-			window.UploaderDroppedTarget = null;
-		}
 
 	},
+
+    handleDropEventResults: function(items, files){
+
+        if (items && items.length && (items[0].getAsEntry || items[0].webkitGetAsEntry)) {
+            var callback = this.addListRow.bind(this);
+            var error = (console ? console.log : function(error){window.alert(error); }) ;
+            var length = items.length;
+            for (var i = 0; i < length; i++) {
+                var entry;
+                if(items[0].getAsEntry){
+                    entry = items[i].getAsEntry();
+                }else{
+                    entry = items[i].webkitGetAsEntry();
+                }
+                if (entry.isFile) {
+                    entry.file(function(File) {
+                        if(File.size == 0) return;
+                        callback(File);
+                    }, error );
+                } else if (entry.isDirectory) {
+                    this.recurseDirectory(entry, function(fileEntry){
+                        var relativePath = fileEntry.fullPath;
+                        fileEntry.file(function(File) {
+                            if(File.size == 0) return;
+                            callback(File, relativePath);
+                        }, error );
+                    }, error );
+                }
+            }
+        }else{
+            for(var j=0;j<files.length;j++){
+                this.addListRow(files[j]);
+            }
+        }
+
+        if(this.optionPane.autoSendCheck.checked){
+             window.setTimeout(this.submit.bind(this), 1000);
+        }
+    },
 
     recurseDirectory: function(item, completeHandler, errorHandler) {
 
@@ -249,6 +168,95 @@ Class.create("XHRUploader", {
         };
 
         readEntries(); // Start reading dirs.
+
+    },
+
+    initGUI: function(){
+        var optionsButton = this.mainForm.down('#uploadOptionsButton');
+        var closeButton = this.mainForm.down('#uploadCloseButton');
+        this.sendButton.observe("click", function(){
+            if(!this.hasClassName("disabled")){
+                ajaxplorer.actionBar.multi_selector.submit();
+            }
+        }.bind(this.sendButton) );
+        this.sendButton.observerSet = true;
+        optionsButton.observe("click", function(){
+            var optionPane = this.mainForm.down('#uploader_options_pane');
+            var closeSpan = optionsButton.down('span');
+            if(optionPane.visible()) {
+                optionPane.hidePane();
+                closeSpan.hide();
+            }
+            else {
+                optionPane.showPane();
+                closeSpan.show();
+            }
+        }.bind(this));
+        if(closeButton){
+            closeButton.observe("click", function(){
+                if(this.hasLoadingItem()) return;
+                window.UploaderInstanceRunning = false;
+                hideLightBox();
+            }.bind(this));
+        }
+
+        this.initElement();
+
+        var dropzone = this.listTarget;
+        dropzone.addClassName('droparea');
+        dropzone.addEventListener("dragover", function(event) {
+            event.preventDefault();
+        }, true);
+        dropzone.addEventListener("dragenter", function(){
+            dropzone.addClassName("dropareaHover");
+        }, true);
+        dropzone.addEventListener("dragleave", function(){
+            dropzone.removeClassName("dropareaHover");
+        }, true);
+
+        dropzone.addEventListener("drop", function(event) {
+            event.preventDefault();
+            var items = event.dataTransfer.items || [];
+            var files = event.dataTransfer.files;
+            this.handleDropEventResults(items, files);
+        }.bind(this) , true);
+
+
+        if(this.mainForm.down('#uploadFilesListContainer')) {
+            this.mainForm.down('#uploadFilesListContainer').setAttribute("rowspan", "1");
+        }
+        if(this.mainForm.down('#optClosButtonsContainer')){
+            var totalDiv = new Element('div', {id:'total_files_list'});
+            this.mainForm.down('#optClosButtonsContainer').insert({after:new Element('td', {style:'vertical-align:bottom'}).update(totalDiv)});
+            totalDiv.insert('<img src="'+ajxpResourcesFolder+'/images/actions/22/trashcan_empty.png" class="fakeUploadButton fakeOptionButton" id="clear_list_button"\
+            width="22" height="22" style="float:right;margin-top:3px;padding:4px;width:22px;" title="'+MessageHash[216]+'"/>\
+            <span id="totalStrings">'+MessageHash[258]+' : 0 '+MessageHash[259]+' : 0Kb</span>\
+            <div style="padding-top:3px;">\
+            <div id="pgBar_total" style="width:154px; height: 4px;border: 1px solid #ccc;float:left;margin-top: 6px;"></div>\
+            <span style="float:left;margin-left:10px;" id="uploadedString">'+MessageHash[256]+' : 0%</span>\
+            </div>');
+        }
+        var options = {
+            animate		: false,									// Animate the progress? - default: true
+            showText	: false,									// show text with percentage in next to the progressbar? - default : true
+            width		: 154,										// Width of the progressbar - don't forget to adjust your image too!!!
+            boxImage	: ajxpResourcesFolder+'/images/progress_box.gif',			// boxImage : image around the progress bar
+            barImage	: ajxpResourcesFolder+'/images/progress_bar.gif',	// Image to use in the progressbar. Can be an array of images too.
+            height		: 4										// Height of the progressbar - don't forget to adjust your image too!!!
+        };
+        this.mainForm.down('#clear_list_button').observe("click", function(e){
+            ajaxplorer.actionBar.multi_selector.clearList();
+            ajaxplorer.actionBar.multi_selector.updateTotalData();
+        });
+        this.optionPane = this.createOptionsPane();
+        this.optionPane.loadData();
+
+        if(this.mainForm.down('#phBar_total')){
+            this.totalProgressBar = new JS_BRAMUS.jsProgressBar($('pgBar_total'), 0, options);
+            this.mainForm.PROGRESSBAR = this.totalProgressBar;
+        }
+        this.totalStrings = $('totalStrings');
+        this.uploadedString = $('uploadedString');
 
     },
 
@@ -397,7 +405,7 @@ Class.create("XHRUploader", {
 	/**
 	 * Add a new row to the list of files
 	 */
-	addListRow : function( file ){
+	addListRow : function( file , relativePath){
 
         this.listTarget.removeClassName('dropareaHover');
 
@@ -405,7 +413,7 @@ Class.create("XHRUploader", {
 			// FOLDER!
 			alert(MessageHash[336]);
 			return;
-		}else if(Prototype.Browser.WebKit && !getBaseName(file.name).indexOf(".")){
+		}else if(!file.size && Prototype.Browser.WebKit && getBaseName(file.name).indexOf(".") !== 0){
 			var res = confirm(MessageHash[395]);
 			if(!res){
 				return;
@@ -463,6 +471,11 @@ Class.create("XHRUploader", {
 		// Add button & text
 		item.insert( delButton );
 		item.insert( label );
+        if(relativePath){
+            item.relativePath = relativePath;
+            item.insert( '<span class="item_relative_path">'+getRepName(relativePath)+'</span>' );
+        }
+
 		// Add it to the list
 		this.listTarget.insert( item );
 		
@@ -644,14 +657,17 @@ Class.create("XHRUploader", {
         return false;
     },
 	
-	initializeXHR : function(item, queryStringParam){
+	initializeXHR : function(item, queryStringParam, forceDir){
+
+        var currentDir = this.contextNode.getPath();
+        if(forceDir) currentDir = forceDir;
 
 		var xhr = new XMLHttpRequest();
-		var uri = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=upload&xhr_uploader=true&dir="+encodeURIComponent(this.contextNode.getPath());
+		var uri = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=upload&xhr_uploader=true&dir="+encodeURIComponent(currentDir);
 		if(queryStringParam){
 			uri += '&' + queryStringParam;
 		}
-		
+
 		var upload = xhr.upload;
 		upload.addEventListener("progress", function(e){
 			if (!e.lengthComputable) return;
@@ -688,7 +704,32 @@ Class.create("XHRUploader", {
 	sendFileMultipart : function(item){
     	var auto_rename = false;
 
-        var newNode = new AjxpNode(this.contextNode.getPath()+"/"+getBaseName(item.file.name));
+        var currentDir = this.contextNode.getPath();
+        if(item.relativePath){
+            if(!this.createdDirs) {
+                this.createdDirs = $A();
+            }
+            // Create the folder directly!
+            var createConn = new Connexion();
+            var dirPath = getRepName(item.relativePath);
+            var fullPath = currentDir+dirPath;
+            if(this.createdDirs.indexOf(dirPath) == -1){
+                item.down('span.item_relative_path').update('Creating '+dirPath + '...');
+                createConn.setParameters(new Hash({
+                    get_action: 'mkdir',
+                    dir: getRepName(fullPath),
+                    ignore_exists:true,
+                    dirname:getBaseName(fullPath)
+                }));
+                createConn.sendSync();
+                item.down('span.item_relative_path').update(dirPath);
+                this.createdDirs.push(dirPath);
+            }
+            currentDir = fullPath;
+        }
+
+        var parentNode = new AjxpNode(currentDir);
+        var newNode = new AjxpNode(currentDir+"/"+getBaseName(item.file.name));
         if(item.file.size){
             newNode.getMetadata().set("filesize", item.file.size);
         }
@@ -700,7 +741,7 @@ Class.create("XHRUploader", {
             return;
         }
 
-        if(this.dataModel.fileNameExists(item.file.name))
+        if(this.dataModel.fileNameExists(item.file.name, false, parentNode))
 		{
 			var behaviour = this.optionPane.getExistingBehaviour();
 			if(behaviour == 'rename'){
@@ -716,7 +757,7 @@ Class.create("XHRUploader", {
 			}
 		}		
 		
-		var xhr = this.initializeXHR(item, (auto_rename?"auto_rename=true":""));
+		var xhr = this.initializeXHR(item, (auto_rename?"auto_rename=true":""), currentDir);
 		var file = item.file;
         item.updateProgress(null, 0);
 		item.updateStatus('loading');		

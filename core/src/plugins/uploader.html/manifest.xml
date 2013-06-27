@@ -115,11 +115,18 @@
 			        el = Event.findElement(event, '#content_pane');
 			    }
   				el.removeClassName("dropareaHover");
-  				if(event.dataTransfer.files.length && !window.UploaderInstanceRunning){
-	  				window.UploaderDroppedFiles = event.dataTransfer.files;
-	  				window.UploaderDroppedTarget = el;
-	  				ajaxplorer.actionBar.fireAction('upload');
-	  			}
+  				if(!window.UploaderInstanceRunning){
+                    var items = event.dataTransfer.items || [];
+                    if (items[0] && (items[0].getAsEntry || items[0].webkitGetAsEntry)) {
+                        window.UploaderDroppedItems = items;
+                        window.UploaderDroppedTarget = el;
+                        ajaxplorer.actionBar.fireAction('upload');
+                    }else if(event.dataTransfer.files.length){
+                        window.UploaderDroppedFiles = event.dataTransfer.files;
+                        window.UploaderDroppedTarget = el;
+                        ajaxplorer.actionBar.fireAction('upload');
+                    }
+  				}
 			};
 			var enterFunc = function(){
 			    var el = Event.findElement(event, selector);
