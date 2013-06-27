@@ -120,9 +120,10 @@ Class.create("XHRUploader", {
 
     handleDropEventResults: function(items, files){
 
-        if (items && items.length && (items[0].getAsEntry || items[0].webkitGetAsEntry)) {
+        var isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+        if ( !isMac && items && items.length && (items[0].getAsEntry || items[0].webkitGetAsEntry)) {
             var callback = this.addListRow.bind(this);
-            var error = (console ? console.log : function(error){window.alert(error); }) ;
+            var error = (console ? console.log : function(err){window.alert(err); }) ;
             var length = items.length;
             for (var i = 0; i < length; i++) {
                 var entry;
