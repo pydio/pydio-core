@@ -74,21 +74,16 @@ Class.create("XHRUploader", {
 		this.sendButton = formObject.down('#uploadSendButton');
         this.sendButton.addClassName("disabled");
         modal.setCloseValidation(function(){
-            if(this.getNextItem()){
-                var conf = window.confirm('Do you want to carry on uploads in the background?');
-                if(conf){
-                    var panels = $$('div.backgroundPanel');
-                    var panel;
-                    if(!panels.length){
-                        panel = new Element('div', {className:'backgroundPanel'});
-                        ajxpBootstrap.parameters.get("MAIN_ELEMENT").insert(panel);
-                    }else{
-                        panel = panels[0];
-                    }
-                    this.attachToBackgroundPanel(panel);
+            if(this.hasLoadingItem()){
+                var panels = $$('div.backgroundPanel');
+                var panel;
+                if(!panels.length){
+                    panel = new Element('div', {className:'backgroundPanel'});
+                    ajxpBootstrap.parameters.get("MAIN_ELEMENT").insert(panel);
                 }else{
-                    return false;
+                    panel = panels[0];
                 }
+                this.attachToBackgroundPanel(panel);
             }else{
                 window.UploaderInstanceRunning = false;
             }
