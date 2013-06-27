@@ -910,8 +910,9 @@ input.SF_input.SF_number{
 }
 
 #login_form{
-    margin: 20px 52px 0px 53px;
+    margin: 0 53px;
     font-size: 15px;
+    padding-top: 20px;
     padding-bottom: 20px;
 }
 
