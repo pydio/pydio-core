@@ -27,6 +27,7 @@ Class.create("XHRUploader", {
     rowAsProgressBar: false,
     dataModel: null,
     contextNode: null,
+    currentBackgroundPanel: null,
 
 	initialize : function( formObject, mask ){
 
@@ -73,9 +74,26 @@ Class.create("XHRUploader", {
 		this.sendButton = formObject.down('#uploadSendButton');
         this.sendButton.addClassName("disabled");
         modal.setCloseValidation(function(){
-            window.UploaderInstanceRunning = false;
+            if(this.getNextItem()){
+                var conf = window.confirm('Do you want to carry on uploads in the background?');
+                if(conf){
+                    var panels = $$('div.backgroundPanel');
+                    var panel;
+                    if(!panels.length){
+                        panel = new Element('div', {className:'backgroundPanel'});
+                        ajxpBootstrap.parameters.get("MAIN_ELEMENT").insert(panel);
+                    }else{
+                        panel = panels[0];
+                    }
+                    this.attachToBackgroundPanel(panel);
+                }else{
+                    return false;
+                }
+            }else{
+                window.UploaderInstanceRunning = false;
+            }
             return true;
-        });
+        }.bind(this));
 
 		if(this.sendButton.observerSet){
             if(this.mainForm.PROGRESSBAR){
@@ -98,6 +116,12 @@ Class.create("XHRUploader", {
         }
 
 	},
+
+    attachToBackgroundPanel: function(panel){
+        panel.show();
+        panel.update('Upload running...');
+        this.currentBackgroundPanel = panel;
+    },
 
     handleDropEventResults: function(items, files){
 
@@ -402,6 +426,25 @@ Class.create("XHRUploader", {
         if(this.sendButton) this.sendButton.addClassName("disabled");
 	},
 
+    /*
+    pathToIndent: function( item,  itemPath ){
+        var length = itemPath.split("/").length - 1;
+        if(!length) return;
+        for(var i=0;i<length;i++){
+            item.insert({top: '<span class="item-indent">&nbsp;</span>'});
+        }
+    },
+
+    addFolderRow: function ( folderPath ){
+
+        var row = new Element('div').update('<span class="icon-folder-close"></span> ' + getBaseName(folderPath));
+        this.pathToIndent(row, folderPath);
+        row.FOLDER = true;
+        this.listTarget.insert(row);
+
+    },
+    */
+
 	/**
 	 * Add a new row to the list of files
 	 */
@@ -530,6 +573,7 @@ Class.create("XHRUploader", {
 			}
 			this.percentValue = percentage;
 		}.bind(item);
+        var oThis = this;
 		item.updateStatus = function(status){
 			this.status = status;
             var messageIds = {
@@ -541,7 +585,10 @@ Class.create("XHRUploader", {
             try{
                 status = window.MessageHash[messageIds[status]];
             }catch(e){};
-			this.statusText.innerHTML = "["+status+"]";
+            if(oThis.currentBackgroundPanel){
+                oThis.currentBackgroundPanel.update(item.file.name + ' ['+status+']');
+            }
+            this.statusText.innerHTML = "["+status+"]";
 		}.bind(item);
 	},
 	
@@ -563,6 +610,7 @@ Class.create("XHRUploader", {
 			}
 			this.percentValue = percentage;
 		}.bind(item);
+        var oThis = this;
 		item.updateStatus = function(status){
 			this.status = status;
             var messageIds = {
@@ -580,6 +628,9 @@ Class.create("XHRUploader", {
             this.statusText.removeClassName('loaded');
             this.statusText.removeClassName('error');
             this.statusText.addClassName(this.status);
+            if(oThis.currentBackgroundPanel){
+                oThis.currentBackgroundPanel.update(item.file.name + ' ['+status+']');
+            }
 		}.bind(item);
 	},
 
@@ -630,9 +681,13 @@ Class.create("XHRUploader", {
 		}else{
             if(this.hasLoadingItem()) return;
 			//ajaxplorer.fireContextRefresh();
-			if(this.optionPane.autoCloseCheck.checked){
+			if(this.optionPane.autoCloseCheck.checked || this.currentBackgroundPanel){
                 window.UploaderInstanceRunning = false;
-				hideLightBox(true);
+                if(this.currentBackgroundPanel){
+                    this.currentBackgroundPanel.hide();
+                }else{
+                    hideLightBox(true);
+                }
 			}
             document.fire("ajaxplorer:longtask_finished");
 		}
