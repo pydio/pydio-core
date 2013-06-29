@@ -1,0 +1,71 @@
+<div>
+        <h2>AjaXplorer 5.0.1 available</h2>
+                      <p>This is a bugfix and security release from v5.0.0. Update is automatic using the in-app upgrade mechanism, and is highly recommended, as this release fixes three potential vulnerabilities. There are also a couple of new improvements:</p>
+    <ul>
+    <li>When using the HTML5 uploader, closing the window will carry on the upload in the background, and display a bottom indication of current upload. When using drag’n'drop, you can now point to an existing application folder to upload directly inside this folder.</li>
+    <li>With this same uploader, Google Chrome on Windows and Linux now supports folders upload and &nbsp;drag’n'drop and upload! Unfortunately not yet available on MacOS, as UTF-8 characters get messed up.</li>
+    <li>Important fixes on Jumploader that was broken in v5.0.0 as soon as it partionned file</li>
+    <li>Better handling of SQL errors when misconfiguring the application</li>
+    <li>See detailed changelog below for other fixes</li>
+    </ul>
+    <p>License : Affero GPL<br>
+    Copyright : Charles du Jeu 2013<br>
+    Demo : http://demo.ajaxplorer.info/<br>
+    Date : 29th, June 2013<br>
+    Contributors: thomasCresson, Destroyer, Letreguilly, adrianbj, chusopr</p>
+    <h2>Detailed changeLog</h2>
+    <ul>
+    <li>Update README.md</li>
+    <li>Test RHN optional channel activation</li>
+    <li>Clear cache and touch first_run_passed at upgrade for linux packages</li>
+    <li>Report spec to tpl</li>
+    <li>Fix POST script</li>
+    <li>Fix usage, use build_channel not channel</li>
+    <li>Fix RHN optional channel registration</li>
+    <li>Fix #169: File transfers via WebDAV are not logged.</li>
+    <li>antivirus plugin</li>
+    <li>Delete File</li>
+    <li>Update test.PHPOS.php</li>
+    <li>Fix double parenthesis problem</li>
+    <li>Fix #175</li>
+    <li>Update manifest.xml</li>
+    <li>Update class.scan.php</li>
+    <li>Update class.fsAccessDriver.php</li>
+    <li>update plugin</li>
+    <li>Update manifest.xml</li>
+    <li>Pass an optional ContextNode to filenameExits method Define hooks automatically attached to AjxpDroppables for drag’n'drop support Fix #194, Fix the multiple copy upload problems by preventing re-opening the uploader.</li>
+    <li>Refix background dropHover</li>
+    <li>Fix #178 by removing autocompleter options from action.share and let them only in core.conf (autocompleter is a generic widget)</li>
+    <li>The unload action may create a problem on reload in FF (user is logged out). Disable it for Gecko browsers.</li>
+    <li>Fix #171</li>
+    <li>Full replug of the bookmarks for the Settings panel. Fix #187</li>
+    <li>Fix settings bookmarks</li>
+    <li>Backward compatibiliy for «&nbsp;Bookmarks&nbsp;» tabs: a standard workspace only has 2 tabs, Folders &amp; Bookmarks, using legacy bookmarks loading, whereas index.lucene is redifining this template part to provide the 3rd tab, and use search for feeding the results pane.</li>
+    <li>Call escapeshellarg where missing</li>
+    <li>Move node.change hook from fsAccessDriver to uploader’s postProcessors. It’s now the responsibility of the uploader to trigger the events. Comment the header content-encoding: none from AJXP_ShutdownScheduler to avoid encoding error (was breaking Jumploader).</li>
+    <li>Czech translation update</li>
+    <li>Revert «&nbsp;Czech translation update&nbsp;»</li>
+    <li>Czech translation update</li>
+    <li>&gt; Fix protoMenu clicking on Workspaces &amp; User widget buttons, annoying menu disappearing &gt; redesign backgroundManager panel</li>
+    <li>index.lucene: fix disappearing background manager. Fix information string displayed. Add set_time_limit instruction in the recursive indexation to avoid error if possible</li>
+    <li>Czech translation update #2</li>
+    <li>Fix metadata line for FF &amp; IE</li>
+    <li>Rework splash / login form, still w-i-p</li>
+    <li>Fix French message</li>
+    <li>Rework splash + login screen</li>
+    <li>Fix #168</li>
+    <li>Fix #168</li>
+    <li>Fix #186 – impossible to compress the files into an archive when using a smb repository -&gt; verify if there is a scheme with parse_url and add an extra slash (to get an url like «&nbsp;scheme://&nbsp;» instead of «&nbsp;scheme:/&nbsp;») – problem with the files’ name when creating an archive using smb (two first characters are suppressed) -&gt; clean the extra slash from the real_path</li>
+    <li>Better SQL error when you modify your SQL connection by an empty one. Create a backup file to fix the problem if it happens. New error message.</li>
+    <li>Fix isAjxpAdmin() for multiAuthDriver Set antivirus plugin disabled by default for the moment</li>
+    <li>Fix «&nbsp;webftp&nbsp;» case of auth.ftp driver</li>
+    <li>Support folder upload in chrome</li>
+    <li>Wrong compile, probably a linefeed problem</li>
+    <li>Use backgroundPanel to display upload status, if the user closes the upload dialog. Nice!</li>
+    <li>Do not ask for background upload, make it a hidden feature for now on</li>
+    <li>Fix login display if no welcome message Default welcome message in installer</li>
+    <li>New try on splash screen</li>
+    <li>Unfortunately, the drag’n'drop + FileAPI + UTF-8 characters is not working on Mac OS X .. Disabled folders drag’n'drop, only working on Windows yet.</li>
+    <li>Clean and refactor for naming convention the Antivirus contribution. Still to be more deeply tested.</li>
+    </ul>
+</div>
