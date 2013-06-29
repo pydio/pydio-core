@@ -5,6 +5,72 @@ Copyright : Charles du Jeu 2013
 Demo : http://demo.ajaxplorer.info/
 Date : ##VERSION_DATE##
 Rev Number : ##REVISION##
+Contributors: thomasCresson, Destroyer, Letreguilly, adrianbj, chusopr
+
+This is a bugfix and security release from v5.0.1
+
+Update README.md
+Test RHN optional channel activation
+Clear cache and touch first_run_passed at upgrade for linux packages
+Report spec to tpl
+Fix POST script
+Fix usage, use build_channel not channel
+Fix RHN optional channel registration
+Fix #169: File transfers via WebDAV are not logged.
+antivirus plugin
+Delete File
+Update test.PHPOS.php
+Fix double parenthesis problem
+Fix #175
+Update manifest.xml
+Update class.scan.php
+Update class.fsAccessDriver.php
+update plugin
+Update manifest.xml
+Pass an optional ContextNode to filenameExits method Define hooks automatically attached to AjxpDroppables for drag'n'drop support Fix #194, Fix the multiple copy upload problems by preventing re-opening the uploader.
+Refix background dropHover
+Fix #178 by removing autocompleter options from action.share and let them only in core.conf (autocompleter is a generic widget)
+The unload action may create a problem on reload in FF (user is logged out). Disable it for Gecko browsers.
+Fix #171
+Full replug of the bookmarks for the Settings panel. Fix #187
+Fix settings bookmarks
+Backward compatibiliy for "Bookmarks" tabs: a standard workspace only has 2 tabs, Folders & Bookmarks, using legacy bookmarks loading, whereas index.lucene is redifining this template part to provide the 3rd tab, and use search for feeding the results pane.
+Call escapeshellarg where missing
+Move node.change hook from fsAccessDriver to uploader's postProcessors. It's now the responsibility of the uploader to trigger the events. Comment the header content-encoding: none from AJXP_ShutdownScheduler to avoid encoding error (was breaking Jumploader).
+Czech translation update
+Revert "Czech translation update"
+Czech translation update
+> Fix protoMenu clicking on Workspaces & User widget buttons, annoying menu disappearing > redesign backgroundManager panel
+index.lucene: fix disappearing background manager. Fix information string displayed. Add set_time_limit instruction in the recursive indexation to avoid error if possible
+Czech translation update #2
+Fix metadata line for FF & IE
+Rework splash / login form, still w-i-p
+Fix French message
+Rework splash + login screen
+Fix #168
+Fix #168
+Fix #186 - impossible to compress the files into an archive when using a smb repository ->  verify if there is a scheme with parse_url and add an extra slash (to get an url like "scheme://" instead of "scheme:/") - problem with the files' name when creating an archive using smb (two first characters are suppressed) -> clean the extra slash from the real_path
+Better SQL error when you modify your SQL connection by an empty one. Create a backup file to fix the problem if it happens. New error message.
+Fix isAjxpAdmin() for multiAuthDriver Set antivirus plugin disabled by default for the moment
+Fix "webftp" case of auth.ftp driver
+Support folder upload in chrome
+Wrong compile, probably a linefeed problem
+Use backgroundPanel to display upload status, if the user closes the upload dialog. Nice!
+Do not ask for background upload, make it a hidden feature for now on
+Fix login display if no welcome message Default welcome message in installer
+New try on splash screen
+Unfortunately, the drag'n'drop + FileAPI + UTF-8 characters is not working on Mac OS X .. Disabled folders drag'n'drop, only working on Windows yet.
+Clean and refactor for naming convention the Antivirus contribution. Still to be more deeply tested.
+
+
+-----------------------------
+AjaXplorer 5.0.0 Release Note
+
+License : Affero GPL
+Copyright : Charles du Jeu 2013
+Demo : http://demo.ajaxplorer.info/
+Date : 2nd, June 2013
+Rev Number : cc2ea271251c7d8d045b8d94e92b3996af7ac43d
 Contributors: kainv, chusopr, dmitrydvorkin, tbote
 
 This is a major release. Changelog below summarize all bugfixes applied since last dev release,
