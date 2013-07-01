@@ -44,7 +44,7 @@ class PluploadProcessor extends AJXP_Plugin {
 // usleep(5000);
 
 	public function unifyChunks($action, &$httpVars, &$fileVars){
-			$filename = SystemTextEncoding::fromUTF8($fileVars["file"]["name"]);
+			$filename = SystemTextEncoding::fromUTF8($httpVars["name"]);
 			$tmpName = $fileVars["file"]["tmp_name"];
 			$chunk = $httpVars["chunk"];
 			$chunks = $httpVars["chunks"];
@@ -63,7 +63,7 @@ class PluploadProcessor extends AJXP_Plugin {
 			//error_log("Directory: ".$dir);
 			
 			// Clean the fileName for security reasons
-			$filename = preg_replace('/[^\w\._]+/', '', $filename);
+			//$filename = preg_replace('/[^\w\._]+/', '', $filename);
 			
 			// Look for the content type header
 			if (isset($_SERVER["HTTP_CONTENT_TYPE"]))
