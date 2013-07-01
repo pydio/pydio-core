@@ -77,23 +77,29 @@ class JumploaderProcessor extends AJXP_Plugin {
 
         if(isset($postProcessData["processor_result"]["ERROR"])){
             if(isset($httpVars["lastPartition"]) && isset($httpVars["partitionCount"])){
-                if($httpVars["partitionCount"] > 1){
-                    /* we get the stream url (where all the partitions have been uploaded so far) */
-                    $repository = ConfService::getRepository();
-                    $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
-                    $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
-                    $streamData = $plugin->detectStreamWrapper(true);
-                    $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir."/";
+                /* we get the stream url (where all the partitions have been uploaded so far) */
+                $repository = ConfService::getRepository();
+                $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
+                $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
+                $streamData = $plugin->detectStreamWrapper(true);
+                $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir."/";
 
+                if($httpVars["partitionCount"] > 1){
                     /* we fetch the information that help us to construct the temp files name */
                     $index = intval($httpVars["partitionIndex"]);
                     $fileId = $httpVars["fileId"];
                     $clientId = $httpVars["ajxp_sessid"];
 
                     /* deletion of all the partitions that have been uploaded */
-                    for($i = 0; $i < $index; $i++){
-                        unlink($destStreamURL."$clientId.$fileId.$i");
+                    for($i = 0; $i < $httpVars["partitionCount"]; $i++){
+                        if(file_exists($destStreamURL."$clientId.$fileId.$i")){
+                            unlink($destStreamURL."$clientId.$fileId.$i");
+                        }
                     }
+                }
+                else{
+                    $fileName = $httpVars["fileName"];
+                    unlink($destStreamURL.$fileName);
                 }
             }
             echo "Error: ".$postProcessData["processor_result"]["ERROR"]["MESSAGE"];
@@ -111,7 +117,6 @@ class JumploaderProcessor extends AJXP_Plugin {
         }
 
         if($httpVars["lastPartition"]){
-
             $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
             $streamData = $plugin->detectStreamWrapper(true);
             $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
@@ -122,6 +127,40 @@ class JumploaderProcessor extends AJXP_Plugin {
             $subs = explode("/", $httpVars["relativePath"]);
             $userfile_name = array_pop($subs);
             $folderForbidden = false;
+            $all_in_place = true;
+            $partitions_length = 0;
+            $fileId = $httpVars["fileId"];
+            $clientId = $httpVars["ajxp_sessid"];
+            $partitionCount = $httpVars["partitionCount"];
+            $partitionIndex = $httpVars["partitionIndex"];
+            $fileLength = $_POST["fileLength"];
+
+            /* check if all the partitions have been uploaded or not */
+            for( $i = 0; $all_in_place && $i < $partitionCount; $i++ ) {
+                $partition_file = $destStreamURL."$clientId.$fileId.$i";
+                if( file_exists( $partition_file ) ) {
+                    $partitions_length += filesize( $partition_file );
+                } else {
+                    $all_in_place = false;
+                }
+            }
+
+            if(!$all_in_place || $partitions_length != intval($fileLength)){
+                echo "Error: Upload validation error!";
+                /* we delete all the uploaded partitions */
+                if($httpVars["partitionCount"] > 1){
+                    for($i = 0; $i < $partitionCount; $i++){
+                        if(file_exists($destStreamURL."$clientId.$fileId.$i")){
+                            unlink($destStreamURL."$clientId.$fileId.$i");
+                        }
+                    }
+                }
+                else{
+                    $fileName = $httpVars["fileName"];
+                    unlink($destStreamURL.$fileName);
+                }
+                return;
+            }
 
             if(count($subs) > 0){
                 $curDir = "";
@@ -194,6 +233,10 @@ class JumploaderProcessor extends AJXP_Plugin {
                 $err = copy($current, $target);
                 if($err !== false){
                     unlink($current);
+                    AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($target), false));
+                }
+
+                else if($current == $target){
                     AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($target), false));
                 }
             }
