@@ -196,6 +196,10 @@ class JumploaderProcessor extends AJXP_Plugin {
                     unlink($current);
                     AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($target), false));
                 }
+
+                else if($current == $target){
+                    AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($target), false));
+                }
             }
 
             else{
