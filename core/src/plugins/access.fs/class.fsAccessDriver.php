@@ -1534,6 +1534,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 		$mess = ConfService::getMessages();		
 		$destFile = $this->urlBase.$destDir."/".basename($srcFile);
 		$realSrcFile = $this->urlBase.$srcFile;
+
+		if (is_dir(dirname($realSrcFile)) && (strpos($destFile, rtrim($realSrcFile, "/") . "/") === 0))
+		{
+			$error[] = $mess[101];
+			return;
+		}
+
 		if(!file_exists($realSrcFile))
 		{
 			$error[] = $mess[100].$srcFile;
