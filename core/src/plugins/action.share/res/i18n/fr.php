@@ -80,4 +80,5 @@ $mess = array(
     "75"=> "Veuillez utiliser des entiers positifs pour les champs Expiration et Nombre de downloads!",
     "76"=> "Merci d'activer les Cookies pour accèder à cette application",
     "77"=> "Merci d'activer JavaScript pour accèder à cette application",
+    "78"=> "Attention, vous ne devez utiliser que des caractères alphanumériques standards pour les identifiants. L'identifiant '%CURRENT%' sera remplaçé par '%NEW%'",
 );

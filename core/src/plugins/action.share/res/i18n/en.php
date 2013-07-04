@@ -80,4 +80,5 @@ $mess = array(
     "75"=> "Please use a positive number for both Expiration and Download limit fields.",
     "76"=> "Please enable Cookies to access this application",
     "77"=> "Please enable JavaScript to access this application",
+    "78"=> "Warning, you should only use standard alphanumerical characters for user names. The identifier '%CURRENT%' will be replaced by '%NEW%'",
 );

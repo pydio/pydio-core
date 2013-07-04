@@ -88,6 +88,14 @@ Class.create("ShareCenter", {
                     conn.addParameter("right_watch_"+index, entry.down('input[name="n"]').checked ? "true":"false");
                 }
                 if(entry.NEW_USER_PASSWORD){
+                    //check entry characters
+                    var currentId =entry.getAttribute("data-entry_id");
+                    var newCurrentId = currentId.replace(/[^a-zA-Z0-9.!@#$%&'*+-/=?\^_`{|}~-]/g, '');
+                    if( newCurrentId != currentId ){
+                        alert(MessageHash["share_center.78"].replace('%CURRENT%', currentId).replace('%NEW%', newCurrentId));
+                        conn.addParameter("user_"+index, newCurrentId);
+                        entry.setAttribute("data-entry_id", newCurrentId);
+                    }
                     conn.addParameter("user_pass_"+index, entry.NEW_USER_PASSWORD);
                 }
                 conn.addParameter("entry_type_"+index, entry.hasClassName("group_entry")?"group":"user");
