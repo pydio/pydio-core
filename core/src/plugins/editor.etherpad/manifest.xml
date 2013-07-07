@@ -9,6 +9,10 @@
             <i18n path="plugins/editor.etherpad/i18n" namespace="etherpad"/>
         </resources>
 	</client_settings>
+    <server_settings>
+        <global_param name="ETHERPAD_SERVER" type="string" label="Server Host" description="Etherpad server host"/>
+        <global_param name="ETHERPAD_APIKEY" type="string" label="Api Key" description="Etherpad api key"/>
+    </server_settings>
 	<clientForm id="ether_box"><![CDATA[
 		<div id="ether_box" action="editer" box_width="80%" box_height="90%" box_padding="0">
 			<div class="action_bar">
@@ -42,8 +46,8 @@
                     <clientForm id="etherpad_container"><![CDATA[
                             <div id="etherpad_container" box_width="80%" box_height="80%" box_resize="true" box_padding="0">
                                 <div class="action_bar" style="padding-left: 10px;border-bottom: 1px solid #ccc;padding-bottom: 5px;">
-                                    Join an existing board or create a new one: <select name="pad_list"></select> <input type="text" name="new_pad_name" placeholder="Board name" style="display:none;">
-                                    <a id="join_pad" style="float:none;" class="icon-comments-alt" href="#" title="Join" style=""><span message_id="235" class="actionbar_button_label">Join</span></a>
+                                    AJXP_MESSAGE[etherpad.4]<select name="pad_list"></select> <input type="text" name="new_pad_name" placeholder="AJXP_MESSAGE[etherpad.8]" style="display:none;">
+                                    <a id="join_pad" style="float:none;" class="icon-comments-alt" href="#" title="Join" style=""><span message_id="235" class="actionbar_button_label">AJXP_MESSAGE[etherpad.7]</span></a>
                                 </div>
                                 <iframe id="ether_frame" style="width:100%;border: none;" src=""></iframe>
                             </div>

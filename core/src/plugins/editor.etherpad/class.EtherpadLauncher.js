@@ -67,14 +67,14 @@ Class.create("EtherpadLauncher", AbstractEditor, {
                     files.push(label);
                 }
             });
-            selector.insert(new Element('optgroup',{label:'Free boards'}));
+            selector.insert(new Element('optgroup',{label:MessageHash['etherpad.5']}));
             frees.each(function(e){
                 selector.insert(new Element('option', {value:e}).update(e.replace('FREEPAD__', '')));
             });
-            selector.insert(new Element('option', {value:-1}).update('Create new pad'));
+            selector.insert(new Element('option', {value:-1}).update(MessageHash['etherpad.9']));
 
             if(files.size()){
-                selector.insert(new Element('optgroup', {label:'Files'}));
+                selector.insert(new Element('optgroup', {label:MessageHash['etherpad.6']}));
                 files.each(function(e){
                     selector.insert(new Element('option', {value:e}).update(e));
                 });

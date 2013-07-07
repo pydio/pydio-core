@@ -20,14 +20,14 @@
  */
 
 $mess = array(
-    "1" => "Collaboration board",
-    "1b"=> "Create or join an empty collaboration pad",
-    "2" => "Collaborative Editor",
-    "3" => "Real-time collaborative edition",
-    "4" => "Join an existing board or create a new one: ",
-    "5" => "Free boards",
-    "6" => "Files",
-    "7" => "Join",
-    "8" => "Board name",
-    "9" => "Create new board",
+    "1" => "Ardoise de Collaboration",
+    "1b"=> "Créer ou rejoindre une ardoise",
+    "2" => "Edition collaborative",
+    "3" => "Edition collaborative en temps en réel",
+    "4" => "Rejoindre une ardoise de collaboration, ou en créer une nouvelle",
+    "5" => "Ardoises libres",
+    "6" => "Fichiers",
+    "7" => "Rejoindre",
+    "8" => "Nom de l'ardoise",
+    "9" => "Créer une nouvelle ardoise",
 );

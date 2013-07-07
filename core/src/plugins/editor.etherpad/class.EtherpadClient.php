@@ -1,10 +1,35 @@
 <?php
+/*
+ * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
+ * This file is part of AjaXplorer.
+ *
+ * AjaXplorer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AjaXplorer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <http://www.ajaxplorer.info/>.
+ */
+
+defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class EtherpadClient extends AJXP_Plugin{
 
-    var $baseURL = "http://10.211.55.3:9001";
+    var $baseURL = "http://localhost:9001";
+    var $apiKey = "";
 
     public function switchAction($actionName, $httpVars, $fileVars){
+
+        $this->baseURL = rtrim($this->pluginConf["ETHERPAD_SERVER"], "/");
+        $this->apiKey =  $this->pluginConf["ETHERPAD_APIKEY"];
 
         if(isSet($httpVars["file"])){
 
@@ -23,7 +48,7 @@ class EtherpadClient extends AJXP_Plugin{
         }
 
         require_once("etherpad-client/etherpad-lite-client.php");
-        $client = new EtherpadLiteClient("nl8VJIWXZMHNj7aWj6rWy4CLct1mu97v",$this->baseURL."/api");
+        $client = new EtherpadLiteClient($this->apiKey,$this->baseURL."/api");
         $userName = AuthService::getLoggedUser()->getId();
         $res = $client->createAuthorIfNotExistsFor($userName, $userName);
         $authorID = $res->authorID;
