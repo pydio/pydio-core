@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.etherpad" openable="true" iconClass="icon-edit" order="10" text="etherpad.2" title="etherpad.3" icon="edit.png" className="EtherpadLauncher" mimes="txt" formId="ether_box" label="CONF_MESSAGE[Etherpad]" description="CONF_MESSAGE[Collaborative edition of text files]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<editor id="editor.etherpad" openable="true" iconClass="icon-comments-alt" order="10"
+        text="etherpad.2" title="etherpad.3" icon="edit.png" className="EtherpadLauncher"
+        mimes="txt,pad" formId="ether_box" label="CONF_MESSAGE[Etherpad]" description="CONF_MESSAGE[Collaborative edition of text files]"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<client_settings>
         <resources>
-            <js file="plugins/editor.etherpad/class.EtherpadLauncher.js" className="EtherpadLauncher"/>
+            <js file="plugins/editor.etherpad/class.EtherpadLauncher.js" className="EtherpadLauncher" autoload="true"/>
             <i18n path="plugins/editor.etherpad/i18n" namespace="etherpad"/>
         </resources>
 	</client_settings>
@@ -22,30 +25,26 @@
     <registry_contributions>
         <actions>
             <action name="etherpad_create">
-                <gui src="" text="51" title="51">
-                    <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="more"/>
+                <gui src="" text="etherpad.1" title="etherpad.1b" iconClass="icon-comments-alt">
+                    <context dir="true" recycle="true" selection="false" actionBarGroup="utils" ajxpWidgets="UserWidget::logging_string"/>
                 </gui>
                 <processing>
                     <clientCallback prepareModal="true" dialogOkButtonOnly="true" dialogOpenForm="etherpad_container">
                         <dialogOnOpen><![CDATA[
-                                var conn = new Connexion();
-                                conn.addParameter("get_action", "etherpad_create");
-                                conn.addParameter("pad_name", "new_pad_" + Math.floor(Math.random()*1001));
-                                conn.onComplete = function(transport){
-                                    var url = transport.responseText;
-                                    $("etherpad_container").down("#ether_frame").src = url;
-                                    fitHeightToBottom($("etherpad_container").down("#ether_frame"));
-                                }
-                                conn.sendAsync();
-                                ]]></dialogOnOpen>
+                            EtherpadLauncher.prototype.initEmptyPadPane(modal.getForm());
+                        ]]></dialogOnOpen>
                         <dialogOnComplete><![CDATA[
-                                $("etherpad_container").down("#ether_frame").remove();
-                                hideLightBox();
-                                ]]></dialogOnComplete>
+                            $("etherpad_container").down("#ether_frame").remove();
+                            hideLightBox();
+                        ]]></dialogOnComplete>
                         <dialogOnCancel><![CDATA[]]></dialogOnCancel>
                     </clientCallback>
                     <clientForm id="etherpad_container"><![CDATA[
                             <div id="etherpad_container" box_width="80%" box_height="80%" box_resize="true" box_padding="0">
+                                <div class="action_bar" style="padding-left: 10px;border-bottom: 1px solid #ccc;padding-bottom: 5px;">
+                                    Join an existing board or create a new one: <select name="pad_list"></select> <input type="text" name="new_pad_name" placeholder="Board name" style="display:none;">
+                                    <a id="join_pad" style="float:none;" class="icon-comments-alt" href="#" title="Join" style=""><span message_id="235" class="actionbar_button_label">Join</span></a>
+                                </div>
                                 <iframe id="ether_frame" style="width:100%;border: none;" src=""></iframe>
                             </div>
                     ]]></clientForm>
@@ -58,6 +57,11 @@
                 </processing>
             </action>
             <action name="etherpad_close">
+                <processing>
+                    <serverCallback methodName="switchAction"/>
+                </processing>
+            </action>
+            <action name="etherpad_proxy_api">
                 <processing>
                     <serverCallback methodName="switchAction"/>
                 </processing>
