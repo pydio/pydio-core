@@ -85,7 +85,7 @@ class AJXP_Sabre_AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic{
         }
         $this->currentUser = $userpass[0];
 
-		AuthService::logUser($this->currentUser, null, true);
+		AuthService::logUser($this->currentUser, $userpass[1], true);
 		$res = $this->updateCurrentUserRights(AuthService::getLoggedUser());
 		if($res === false){
 			return false;

@@ -62,10 +62,12 @@ class casAuthDriver extends serialAuthDriver
     }
     phpCAS::forceAuthentication();
     $cas_user = phpCAS::getUser();
-    
-    if($this->userExists($cas_user)){
+
+    if (!$this->userExists($cas_user) && $this->autoCreateUser())
+      $this->createUser($cas_user, openssl_random_pseudo_bytes(20));
+
+    if ($this->userExists($cas_user))
       AuthService::logUser($cas_user, "", true);
-    }
   }
 
   function getLogoutRedirect()

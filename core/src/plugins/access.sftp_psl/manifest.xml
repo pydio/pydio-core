@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver
+	name="sftp_psl"
+	label="CONF_MESSAGE[SSH File Transfer Protocol (SFTP)]"
+	description="CONF_MESSAGE[The SSH File Transfer Protocol is a network protocol that provides file access, file transfer, and file management functionalities over SSH2.]"
+	mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd"
+>
+
+    <plugin_info>
+        <core_relation packaged="false" tested_version="5.0.1"/>
+        <plugin_author>Rou Nik</plugin_author>
+        <plugin_uri>http://ajaxplorer.info/plugins/access/sftp_psl</plugin_uri>
+        <plugin_version>0.8</plugin_version>
+    </plugin_info>
+	<client_settings icon="plugins/access.sftp_psl/icon.png">
+		<resources>
+			<i18n namespace="sftp_psl_access" path="plugins/access.sftp_spl/i18n"/>
+		</resources>
+	</client_settings>
+
+	<server_settings>
+		<param name="SFTP_HOST" type="string" label="CONF_MESSAGE[Host]" description="CONF_MESSAGE[SFTP Host to connect to]" mandatory="true"/>
+		<param name="SFTP_PORT" type="string" label="CONF_MESSAGE[Port]" description="CONF_MESSAGE[SFTP Host port]" mandatory="true" default="22"/>
+		<param name="PATH" type="string" label="CONF_MESSAGE[Path]" description="CONF_MESSAGE[Real path to the root folder on the server]" mandatory="true" default="/"/>
+		<param name="FIX_PERMISSIONS" type="string" label="CONF_MESSAGE[Fix Permissions]" description="CONF_MESSAGE[How to handle remote permissions to be used by PHP as local permissions. See manual.]" mandatory="false" default="detect_remote_user_id"/>
+		<global_param
+			group="MIXIN_MESSAGE[Metadata and indexation]"
+			name="DEFAULT_METASOURCES"
+			type="string"
+			label="MIXIN_MESSAGE[Default Metasources]"
+			description="MIXIN_MESSAGE[Comma separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver]"
+			mandatory="false"
+			default="metastore.serial,meta.filehasher,index.lucene"/>
+	</server_settings>
+
+	<class_definition filename="plugins/access.sftp_psl/class.sftpPSLAccessDriver.php" classname="sftpPSLAccessDriver"/>
+	<class_stream_wrapper filename="plugins/access.sftp_psl/class.sftpPSLAccessWrapper.php" classname="sftpPSLAccessWrapper" protocol="ajxp.sftppsl"/>
+
+	<registry_contributions>
+		<client_configs>
+			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>
+			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}' theme="vision"/>
+			<component_config className="FilesList">
+				<columns switchGridMode="filelist">
+					<column messageId="1" attributeName="ajxp_label" sortType="StringDirFile"/>
+					<column messageId="2" attributeName="filesize" sortType="NumberKo"/>
+					<column messageId="3" attributeName="mimestring" sortType="String"/>
+					<column messageId="4" attributeName="ajxp_modiftime" sortType="MyDate"/>
+				</columns>
+			</component_config>
+			<component_config className="FoldersTree">
+				<property name="display" value="d"/>
+			</component_config>
+		</client_configs>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude="actions/action[@name='compress'],actions/action[@name='empty_recycle'],actions/action[@name='restore'],actions/action[@name='purge']"/>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
+		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
+	</registry_contributions>
+
+	<dependencies>
+		<pluginClass pluginName="access.fs"/>
+	</dependencies>
+</ajxpdriver>
