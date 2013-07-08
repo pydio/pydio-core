@@ -5396,7 +5396,7 @@
   function PclZipUtilPathReduction($p_dir)
   {
     $v_result = "";
-    $scheme = parse_url($p_dir, PHP_URL_SCHEME) != NULL;
+//    $scheme = parse_url($p_dir, PHP_URL_SCHEME) != NULL;
 
     // ----- Look for not empty path
     if ($p_dir != "") {
@@ -5427,7 +5427,7 @@
 		  }
 		  // ----- Last '/' i.e. indicates a directory
 		  else if ($i == (sizeof($v_list)-1)) {
-            $v_result = $v_list[$i]."/";
+            $v_result = $v_list[$i];
 		  }
 		  // ----- Double '/' inside the path
 		  else {
@@ -5441,7 +5441,7 @@
 		    $v_skip--;
 		  }
 		  else {
-              $v_result = (($i==0 && $scheme)? $v_list[$i]."/" : $v_list[$i]).($i!=(sizeof($v_list)-1)? "/".$v_result : "");
+             $v_result = $v_list[$i].($i!=(sizeof($v_list)-1)? "/".$v_result : "");
 		  }
         }
       }
