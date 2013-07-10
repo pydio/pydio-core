@@ -81,10 +81,11 @@ class EncfsMounter extends AJXP_Plugin
     public function switchAction($actionName, $httpVars, $fileVars){
 
         //var_dump($httpVars);
+        $xmlTemplate = $this->getFilteredOption("ENCFS_XML_TEMPLATE");
 
         switch($actionName){
             case "encfs.cypher_folder" :
-                if(empty($this->pluginConf["ENCFS_XML_TEMPLATE"]) || !is_file($this->pluginConf["ENCFS_XML_TEMPLATE"])){
+                if(empty($xmlTemplate) || !is_file($xmlTemplate)){
                     throw new Exception("It seems that you have not set the plugin 'Enfcs XML File' configuration, or the system cannot find it!");
                 }
                 $dir = $this->getWorkingPath().AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
@@ -98,7 +99,7 @@ class EncfsMounter extends AJXP_Plugin
                     $clear  = dirname($dir).DIRECTORY_SEPARATOR."ENCFS_CLEAR_".basename($dir);
 
                     mkdir($raw);
-                    $result = self::initEncFolder($raw, $this->pluginConf["ENCFS_XML_TEMPLATE"], $this->pluginConf["ENCFS_XML_PASSWORD"], $pass);
+                    $result = self::initEncFolder($raw, $xmlTemplate, $this->getFilteredOption("ENCFS_XML_PASSWORD"), $pass);
                     if($result){
                         // Mount folder
                         mkdir($clear);

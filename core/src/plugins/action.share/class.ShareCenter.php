@@ -474,7 +474,7 @@ class ShareCenter extends AJXP_Plugin{
      * @return string
      */
     public function computeHash($outputData, $checkInFolder = null){
-        $length = $this->pluginConf["HASH_MIN_LENGTH"];
+        $length = $this->getFilteredOption("HASH_MIN_LENGTH", $this->repository->getId());
         $full =  md5($outputData);
         $starter = substr($full, 0, $length);
         if($checkInFolder != null){
@@ -518,7 +518,7 @@ class ShareCenter extends AJXP_Plugin{
 
     function buildPublicletLink($hash){
         $addLang = ConfService::getLanguage() != ConfService::getCoreConf("DEFAULT_LANGUAGE");
-        if($this->pluginConf["USE_REWRITE_RULE"] == true){
+        if($this->getFilteredOption("USE_REWRITE_RULE", $this->repository->getId()) == true){
             if($addLang) return $this->buildPublicDlURL()."/".$hash."-".ConfService::getLanguage();
             else return $this->buildPublicDlURL()."/".$hash;
         }else{
@@ -551,7 +551,7 @@ class ShareCenter extends AJXP_Plugin{
         @copy(AJXP_INSTALL_PATH."/server/index.html", $downloadFolder."/index.html");
         $dlUrl = $this->buildPublicDlURL();
         $htaccessContent = "ErrorDocument 404 ".$dlUrl."/404.html\n<Files \".ajxp_*\">\ndeny from all\n</Files>";
-        if($this->pluginConf["USE_REWRITE_RULE"] == true){
+        if($this->getFilteredOption("USE_REWRITE_RULE", $this->repository->getId()) == true){
             $path = parse_url($dlUrl, PHP_URL_PATH);
             $htaccessContent .= '
             <IfModule mod_rewrite.c>
@@ -833,8 +833,9 @@ class ShareCenter extends AJXP_Plugin{
         if(isSet($httpVars["create_guest_user"])){
             // Create a guest user
             $userId = substr(md5(time()), 0, 12);
-            if(!empty($this->pluginConf["SHARED_USERS_TMP_PREFIX"])){
-                $userId = $this->pluginConf["SHARED_USERS_TMP_PREFIX"].$userId;
+            $pref = $this->getFilteredOption("SHARED_USERS_TMP_PREFIX", $this->repository->getId());
+            if(!empty($pref)){
+                $userId = $pref.$userId;
             }
             $userPass = substr(md5(time()), 13, 24);
             $httpVars["user_0"] = $userId;
@@ -921,6 +922,7 @@ class ShareCenter extends AJXP_Plugin{
         $groups = array();
 
         $index = 0;
+        $prefix = $this->getFilteredOption("SHARED_USERS_TMP_PREFIX", $this->repository->getId());
         while(isSet($httpVars["user_".$index])){
             $eType = $httpVars["entry_type_".$index];
             $rightString = ($httpVars["right_read_".$index]=="true"?"r":"").($httpVars["right_write_".$index]=="true"?"w":"");
@@ -936,9 +938,9 @@ class ShareCenter extends AJXP_Plugin{
                 }else if(AuthService::userExists($u) && isSet($httpVars["user_pass_".$index])){
                     throw new Exception("User $u already exists, please choose another name.");
                 }
-                if(!AuthService::userExists($u, "w") && !empty($this->pluginConf["SHARED_USERS_TMP_PREFIX"])
-                && strpos($u, $this->pluginConf["SHARED_USERS_TMP_PREFIX"])!==0 ){
-                    $u = $this->pluginConf["SHARED_USERS_TMP_PREFIX"] . $u;
+                if(!AuthService::userExists($u, "w") && !empty($prefix)
+                && strpos($u, $prefix)!==0 ){
+                    $u = $prefix . $u;
                 }
                 $users[] = $u;
             }else{
@@ -960,7 +962,7 @@ class ShareCenter extends AJXP_Plugin{
         }
 
 		// CHECK USER & REPO DOES NOT ALREADY EXISTS
-        if($this->pluginConf["AVOID_SHARED_FOLDER_SAME_LABEL"]){
+        if( $this->getFilteredOption("AVOID_SHARED_FOLDER_SAME_LABEL", $this->repository->getId()) == true) {
             $repos = ConfService::getRepositoriesList();
             foreach ($repos as $obj){
                 if($obj->getDisplay() == $label && (!isSet($editingRepo) || $editingRepo != $obj)){

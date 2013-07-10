@@ -270,28 +270,30 @@ class AJXP_ClientDriver extends AJXP_Plugin
         $config["zipEnabled"] = ConfService::zipEnabled();
         $config["multipleFilesDownloadEnabled"] = ConfService::getCoreConf("ZIP_CREATION");
         $config["customWording"] = array(
-            "welcomeMessage" => $this->pluginConf["CUSTOM_WELCOME_MESSAGE"],
+            "welcomeMessage" => $this->getFilteredOption("CUSTOM_WELCOME_MESSAGE"),
             "title"			 => ConfService::getCoreConf("APPLICATION_TITLE"),
-            "icon"			 => $this->pluginConf["CUSTOM_ICON"],
-            "iconWidth"		 => $this->pluginConf["CUSTOM_ICON_WIDTH"],
-            "iconHeight"     => $this->pluginConf["CUSTOM_ICON_HEIGHT"],
-            "iconOnly"       => $this->pluginConf["CUSTOM_ICON_ONLY"],
-            "titleFontSize"	 => $this->pluginConf["CUSTOM_FONT_SIZE"]
+            "icon"			 => $this->getFilteredOption("CUSTOM_ICON"),
+            "iconWidth"		 => $this->getFilteredOption("CUSTOM_ICON_WIDTH"),
+            "iconHeight"     => $this->getFilteredOption("CUSTOM_ICON_HEIGHT"),
+            "iconOnly"       => $this->getFilteredOption("CUSTOM_ICON_ONLY"),
+            "titleFontSize"	 => $this->getFilteredOption("CUSTOM_FONT_SIZE")
         );
-        if(!empty($this->pluginConf["CUSTOM_ICON_BINARY"])){
-            $config["customWording"]["icon_binary_url"] = "get_action=get_global_binary_param&binary_id=".$this->pluginConf["CUSTOM_ICON_BINARY"];
+        $cIcBin = $this->getFilteredOption("CUSTOM_ICON_BINARY");
+        if(!empty($cIcBin)){
+            $config["customWording"]["icon_binary_url"] = "get_action=get_global_binary_param&binary_id=".$cIcBin;
         }
         $config["usersEnabled"] = AuthService::usersEnabled();
         $config["loggedUser"] = (AuthService::getLoggedUser()!=null);
         $config["currentLanguage"] = ConfService::getLanguage();
         $config["session_timeout"] = intval(ini_get("session.gc_maxlifetime"));
-        if(!isSet($this->pluginConf["CLIENT_TIMEOUT_TIME"]) || $this->pluginConf["CLIENT_TIMEOUT_TIME"] == ""){
+        $timeoutTime = $this->getFilteredOption("CLIENT_TIMEOUT_TIME");
+        if(empty($timeoutTime)){
             $to = $config["session_timeout"];
         }else{
-            $to = $this->pluginConf["CLIENT_TIMEOUT_TIME"];
+            $to = $timeoutTime;
         }
         $config["client_timeout"] = $to;
-        $config["client_timeout_warning"] = $this->pluginConf["CLIENT_TIMEOUT_WARN"];
+        $config["client_timeout_warning"] = $this->getFilteredOption("CLIENT_TIMEOUT_WARN");
         $config["availableLanguages"] = ConfService::getConf("AVAILABLE_LANG");
         $config["usersEditable"] = ConfService::getAuthDriverImpl()->usersEditable();
         $config["ajxpVersion"] = AJXP_VERSION;
@@ -299,11 +301,13 @@ class AJXP_ClientDriver extends AJXP_Plugin
         if(stristr($_SERVER["HTTP_USER_AGENT"], "msie 6")){
             $config["cssResources"] = array("css/pngHack/pngHack.css");
         }
-        if(!empty($this->pluginConf['GOOGLE_ANALYTICS_ID'])) {
+        $analytic = $this->getFilteredOption('GOOGLE_ANALYTICS_ID');
+        if(!empty($analytic)) {
             $config["googleAnalyticsData"] = array(
-                "id"=> 		$this->pluginConf['GOOGLE_ANALYTICS_ID'],
-                "domain" => $this->pluginConf['GOOGLE_ANALYTICS_DOMAIN'],
-                "event" => 	$this->pluginConf['GOOGLE_ANALYTICS_EVENT']);
+                "id"=> 		$analytic,
+                "domain" => $this->getFilteredOption('GOOGLE_ANALYTICS_DOMAIN'),
+                "event" => 	$this->getFilteredOption('GOOGLE_ANALYTICS_EVENT')
+            );
         }
         $config["i18nMessages"] = ConfService::getMessages();
         $config["password_min_length"] = ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth");

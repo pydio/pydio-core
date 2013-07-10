@@ -171,7 +171,7 @@ class QuotaComputer extends AJXP_Plugin
             $this->saveUserData($data);
         }
 
-        if($this->pluginConf["USAGE_SCOPE"] == "local"){
+        if($this->getFilteredOption("USAGE_SCOPE", $repo) == "local"){
             return floatval($data["REPO_USAGES"][$repo]);
         }else{
             return array_sum(array_map("floatval", $data["REPO_USAGES"]));

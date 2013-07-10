@@ -53,12 +53,13 @@ class IMagickPreviewer extends AJXP_Plugin {
 		if(!$repository->detectStreamWrapper(true)){
 			return false;
 		}
-		if(!is_array($this->pluginConf) || !isSet($this->pluginConf["IMAGE_MAGICK_CONVERT"])){
+        $convert = $this->getFilteredOption("IMAGE_MAGICK_CONVERT");
+		if(empty($convert)){
 			return false;
 		}
 		$streamData = $repository->streamData;		
     	$destStreamURL = $streamData["protocol"]."://".$repository->getId();
-    	$flyThreshold = 1024*1024*intval($this->pluginConf["ONTHEFLY_THRESHOLD"]);
+    	$flyThreshold = 1024*1024*intval($this->getFilteredOption("ONTHEFLY_THRESHOLD", $repository->getId()));
 		    	
 		if($action == "imagick_data_proxy"){
 			$this->extractAll = false;
@@ -175,7 +176,8 @@ class IMagickPreviewer extends AJXP_Plugin {
 	protected function listPreviewFiles($file, $prefix){
 		$files = array();
 		$index = 0;
-		if(isset($this->pluginConf["UNOCONV"]) && !empty($this->pluginConf["UNOCONV"])){
+        $unoconv =  $this->getFilteredOption("UNOCONV");
+		if(!empty($unoconv)){
 			$officeExt = array('xls', 'xlsx', 'ods', 'doc', 'docx', 'odt', 'ppt', 'pptx', 'odp', 'rtf');
 			$extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
 			if(in_array($extension, $officeExt)){
@@ -199,11 +201,12 @@ class IMagickPreviewer extends AJXP_Plugin {
 	}
 	
 	public function generateJpegsCallback($masterFile, $targetFile){
-		$unoconv = false;
-		if(isset($this->pluginConf["UNOCONV"]) && !empty($this->pluginConf["UNOCONV"])){
-			$unoconv = $this->pluginConf["UNOCONV"];
+        $unoconv =  $this->getFilteredOption("UNOCONV");
+		if(!empty($unoconv)){
 			$officeExt = array('xls', 'xlsx', 'ods', 'doc', 'docx', 'odt', 'ppt', 'pptx', 'odp', 'rtf');
-		}
+		}else{
+            $unoconv = false;
+        }
 
         $extension = strtolower(pathinfo($masterFile, PATHINFO_EXTENSION));
         $node = new AJXP_Node($masterFile);
@@ -236,7 +239,7 @@ class IMagickPreviewer extends AJXP_Plugin {
 			$unoDoc = str_replace(".jpg", "_unoconv.pdf", $tmpFileThumb);
 			if(!is_file($tmpFileThumb)){
 				// Create PDF Version now
-				$unoconv =  "HOME=/tmp ".$this->pluginConf["UNOCONV"]." --stdout -f pdf ".escapeshellarg($masterFile)." > ".escapeshellarg(basename($unoDoc));
+				$unoconv =  "HOME=/tmp ".$unoconv." --stdout -f pdf ".escapeshellarg($masterFile)." > ".escapeshellarg(basename($unoDoc));
 				exec($unoconv, $out, $return);
 			}
 			if(is_file($unoDoc)){
@@ -258,15 +261,19 @@ class IMagickPreviewer extends AJXP_Plugin {
 			}
 		}
 
-        if(!isSet($this->pluginConf["IM_CUSTOM_OPTIONS"])){
-            $this->pluginConf["IM_CUSTOM_OPTIONS"] = "";
+        $customOptions = $this->getFilteredOption("IM_CUSTOM_OPTIONS");
+        $customEnvPath = $this->getFilteredOption("ADDITIONAL_ENV_PATH");
+        $viewerQuality = $this->getFilteredOption("IM_VIEWER_QUALITY");
+        $thumbQuality = $this->getFilteredOption("IM_THUMB_QUALITY");
+        if(empty($customOptions)){
+            $customOptions = "";
         }
-        if(iSset($this->pluginConf["ADDITIONAL_ENV_PATH"]) && !empty($this->pluginConf["ADDITIONAL_ENV_PATH"])){
-            putenv("PATH=".getenv("PATH").":".$this->pluginConf["ADDITIONAL_ENV_PATH"]);
+        if(!empty($customEnvPath)){
+            putenv("PATH=".getenv("PATH").":".$customEnvPath);
         }
-        $params = ($this->extractAll?"-quality ".$this->pluginConf["IM_VIEWER_QUALITY"]:"-resize 250 ".$this->pluginConf["IM_CUSTOM_OPTIONS"]." -quality ".$this->pluginConf["IM_THUMB_QUALITY"]);
-        $cmd = $this->pluginConf["IMAGE_MAGICK_CONVERT"]." ".escapeshellarg(($masterFile).$pageLimit)." ".$params." ".escapeshellarg($tmpFileThumb);
-		AJXP_Logger::logAction("IMagick Command : $cmd");
+        $params = ($this->extractAll?"-quality ".$viewerQuality:"-resize 250 ".$customOptions." -quality ".$thumbQuality);
+        $cmd = $this->getFilteredOption("IMAGE_MAGICK_CONVERT")." ".escapeshellarg(($masterFile).$pageLimit)." ".$params." ".escapeshellarg($tmpFileThumb);
+		AJXP_Logger::debug("IMagick Command : $cmd");
 		session_write_close(); // Be sure to give the hand back
 		exec($cmd, $out, $return);
 		if(is_array($out) && count($out)){

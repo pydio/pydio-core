@@ -29,7 +29,7 @@ class AntivirusScanner extends AJXP_Plugin {
         if($this->file_size < $this->scan_max_size) {
             if($this->scan_all == true) {
                 if($this->inList()==true) {
-                    if($this->pluginConf["TRACE"] == false) {return;}
+                    if($this->getFilteredOption("TRACE") == false) {return;}
                     $this->scanLater();
                     return ;
                 }else {
@@ -41,7 +41,7 @@ class AntivirusScanner extends AJXP_Plugin {
                     $this->scanNow();
                     return ;
                 }else {
-                    if($this->pluginConf["TRACE"] == false) {return;}
+                    if($this->getFilteredOption("TRACE") == false) {return;}
                     $this->scanLater();
                     return ;
                 }
@@ -75,8 +75,8 @@ class AntivirusScanner extends AJXP_Plugin {
      * This function immediatly scans the file, it calls the antivirus command
      */
 	private function scanNow() {
-		$command = $this->pluginConf["COMMAND"];
-		$command = str_replace('$' . 'FILE', '"' . $this->path . '"', $command);
+		$command = $this->getFilteredOption("COMMAND");
+		$command = str_replace('$' . 'FILE', escapeshellarg($this->path), $command);
 
         ob_start();
         passthru($command, $int);
@@ -113,7 +113,7 @@ class AntivirusScanner extends AJXP_Plugin {
 			if(file_exists( $this->scan_diff_folder .DIRECTORY_SEPARATOR. 'file_' . $numero)) {
 				$numero++;
 			}
-			else {	
+			else {
 				$command = 'echo "'. '\"' . $this->path . '\"' . '" >' . $this->scan_diff_folder .DIRECTORY_SEPARATOR. 'file_' . $numero;
 				passthru($command);
 				$scanned=true;
@@ -172,7 +172,7 @@ class AntivirusScanner extends AJXP_Plugin {
      * This function initializes the extension list
      */
     public function setExtensionScan() {
-		$this->extension_scan = $this->pluginConf["EXT"];
+		$this->extension_scan =  $this->getFilteredOption("EXT");
 		return ;
 	}
 
@@ -180,7 +180,7 @@ class AntivirusScanner extends AJXP_Plugin {
      * this function initializes attribute scan_all
      */
     public function setScanAll(){
-		$extension = $this->pluginConf["EXT"];
+		$extension = $this->getFilteredOption("EXT");
 		if(substr($extension, 0, 2) == "*/"){
 			$this->scan_all = true;
 		}else{
@@ -193,7 +193,7 @@ class AntivirusScanner extends AJXP_Plugin {
      * this function initializes the trace folder
      */
     public function setScanDiffFolder () {
-		$this->scan_diff_folder = $this->pluginConf["PATH"];	
+		$this->scan_diff_folder = $this->getFilteredOption("PATH");
 		return ;
 	}
 
@@ -201,7 +201,7 @@ class AntivirusScanner extends AJXP_Plugin {
      * this function initializes max size of the scanned file
      */
     public function setScanMaxSize () {
-		$this->scan_max_size = AJXP_Utils::convertBytes($this->pluginConf["SIZE"]);
+		$this->scan_max_size = AJXP_Utils::convertBytes($this->getFilteredOption("SIZE"));
 		return ;
 	}
 

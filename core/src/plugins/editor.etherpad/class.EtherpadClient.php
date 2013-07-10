@@ -28,8 +28,8 @@ class EtherpadClient extends AJXP_Plugin{
 
     public function switchAction($actionName, $httpVars, $fileVars){
 
-        $this->baseURL = rtrim($this->pluginConf["ETHERPAD_SERVER"], "/");
-        $this->apiKey =  $this->pluginConf["ETHERPAD_APIKEY"];
+        $this->baseURL = rtrim($this->getFilteredOption("ETHERPAD_SERVER"), "/");
+        $this->apiKey =  $this->getFilteredOption("ETHERPAD_APIKEY");
 
         if(isSet($httpVars["file"])){
 

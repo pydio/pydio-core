@@ -51,7 +51,7 @@ class ImagePreviewer extends AJXP_Plugin {
 			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
             if(!file_exists($destStreamURL.$file)) return;
 			
-			if(isSet($httpVars["get_thumb"]) && $this->pluginConf["GENERATE_THUMBNAIL"]){
+			if(isSet($httpVars["get_thumb"]) && $this->getFilteredOption("GENERATE_THUMBNAIL", $repository->getId())){
                 $dimension = 200;
                 if(isSet($httpVars["dimension"]) && is_numeric($httpVars["dimension"])) $dimension = $httpVars["dimension"];
                 $this->currentDimension = $dimension;
@@ -116,7 +116,7 @@ class ImagePreviewer extends AJXP_Plugin {
 	public function generateThumbnail($masterFile, $targetFile){
         $size = $this->currentDimension;
 		require_once(AJXP_INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
-		$pThumb = new PThumb($this->pluginConf["THUMBNAIL_QUALITY"]);
+		$pThumb = new PThumb($this->getFilteredOption("THUMBNAIL_QUALITY"));
 		if(!$pThumb->isError()){
 			$pThumb->remote_wrapper = $this->streamData["classname"];
             //AJXP_Logger::debug("Will fit thumbnail");
@@ -148,11 +148,11 @@ class ImagePreviewer extends AJXP_Plugin {
 		$ajxpNode->is_image = $isImage;
 		if(!$isImage) return;
 		$setRemote = false;
-		$remoteWrappers = $this->pluginConf["META_EXTRACTION_REMOTEWRAPPERS"];
+		$remoteWrappers = $this->getFilteredOption("META_EXTRACTION_REMOTEWRAPPERS");
         if(is_string($remoteWrappers)){
             $remoteWrappers = explode(",",$remoteWrappers);
         }
-		$remoteThreshold = $this->pluginConf["META_EXTRACTION_THRESHOLD"];		
+		$remoteThreshold = $this->getFilteredOption("META_EXTRACTION_THRESHOLD");
 		if(in_array($wrapperClassName, $remoteWrappers)){
 			if($remoteThreshold != 0 && isSet($ajxpNode->bytesize)){
 				$setRemote = ($ajxpNode->bytesize > $remoteThreshold);

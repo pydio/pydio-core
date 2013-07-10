@@ -12,18 +12,19 @@ class TimestampCreator extends AJXP_Plugin
 	function switchAction($action, $httpVars, $fileVars){
 
 		$mess = ConfService::getMessages();
-                
-		//Check if the configuration has been initiated
-		if(!isSet($this->pluginConf["TIMESTAMP_URL"]) || !isSet($this->pluginConf["USER"]) || !isSet($this->pluginConf["PASS"]) ){
+
+        $timestamp_url = $this->getFilteredOption("TIMESTAMP_URL");
+        $timestamp_login = $this->getFilteredOption("USER");
+        $timestamp_password = $this->getFilteredOption("PASS");
+
+        //Check if the configuration has been initiated
+		if(empty($timestamp_url) || empty($timestamp_login) || !empty($timestamp_password) ){
 			throw new AJXP_Exception($mess["timestamp.4"]);
 			AJXP_Logger::logAction("error", "TimeStamp : configuration is needed");
 			return false;
 		}
 		
-		$timestamp_url = $this->pluginConf["TIMESTAMP_URL"];
-		$timestamp_login = $this->pluginConf["USER"];
-		$timestamp_password = $this->pluginConf["PASS"];
-                
+
 		//Check if after being initiated, conf. fields have some values
 		if(strlen($timestamp_url)<2 || strlen($timestamp_login)<2 || strlen($timestamp_password)<2 ){
 			throw new AJXP_Exception($mess["timestamp.4"]);

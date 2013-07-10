@@ -68,9 +68,6 @@ class FileHasher extends AJXP_Plugin
         if(!$repository->detectStreamWrapper(true)){
             return false;
         }
-        if(!isSet($this->pluginConf)){
-            $this->pluginConf = array("GENERATE_THUMBNAIL"=>false);
-        }
         $streamData = $repository->streamData;
         $this->streamData = $streamData;
         $destStreamURL = $streamData["protocol"]."://".$repository->getId();

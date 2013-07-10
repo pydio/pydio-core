@@ -30,13 +30,16 @@ class BitlyShortener extends AJXP_Plugin {
 			
 	public function postProcess($action, $httpVars, $params){
         $url = $params["ob_output"];
-        if(!isSet($this->pluginConf["BITLY_USER"]) || !isSet($this->pluginConf["BITLY_APIKEY"])){
+        $BITLY_USER = $this->getFilteredOption("BITLY_USER");
+        $BITLY_APIKEY = $this->getFilteredOption("BITLY_APIKEY");
+
+        if(empty($BITLY_USER) || empty($BITLY_APIKEY)){
             print($url);
             AJXP_Logger::logAction("error", "Bitly Shortener : you must drop the conf.shorten.bitly.inc file inside conf.php and set the login/api key!");
             return;
         }
-        $bitly_login = $this->pluginConf["BITLY_USER"];
-        $bitly_api = $this->pluginConf["BITLY_APIKEY"];
+        $bitly_login = $BITLY_USER;
+        $bitly_api = $BITLY_APIKEY;
         $format = 'json';
         $version = '2.0.1';
         $bitly = 'http://api.bit.ly/shorten?version='.$version.'&longUrl='.urlencode($url).'&login='.$bitly_login.'&apiKey='.$bitly_api.'&format='.$format;
