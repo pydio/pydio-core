@@ -114,7 +114,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 			case "get_xml_registry" :
 				
 				$regDoc = AJXP_PluginsService::getXmlRegistry();
-                $changes = AJXP_Controller::filterActionsRegistry($regDoc);
+                $changes = AJXP_Controller::filterRegistryFromRole($regDoc);
                 if($changes) AJXP_PluginsService::updateXmlRegistry($regDoc);
 
                 $clone = $regDoc->cloneNode(true);
@@ -206,7 +206,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 
                 // PRECOMPUTE REGISTRY
                 $regDoc = AJXP_PluginsService::getXmlRegistry();
-                $changes = AJXP_Controller::filterActionsRegistry($regDoc);
+                $changes = AJXP_Controller::filterRegistryFromRole($regDoc);
                 if($changes) AJXP_PluginsService::updateXmlRegistry($regDoc);
                 $START_PARAMETERS["PRELOADED_REGISTRY"] = AJXP_XMLWriter::replaceAjxpXmlKeywords($regDoc->saveXML());
 				$JSON_START_PARAMETERS = json_encode($START_PARAMETERS);
