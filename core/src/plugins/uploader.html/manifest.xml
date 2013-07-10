@@ -90,7 +90,11 @@
 		]]></clientForm>
 		<dialogOnOpen><![CDATA[ 
 			if(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span')){
-				ajaxplorer.actionBar.multi_selector = new XHRUploader(oForm);
+			    if(ajaxplorer.actionBar.multi_selector && ajaxplorer.actionBar.multi_selector.__className == 'XHRUploader'){
+			        ajaxplorer.actionBar.multi_selector.initialize(oForm);
+			    }else{
+    				ajaxplorer.actionBar.multi_selector = new XHRUploader(oForm);
+                }
 			}else{
 				ajaxplorer.actionBar.multi_selector = new MultiUploader(oForm);
 			}
