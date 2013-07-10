@@ -47,6 +47,7 @@ class QuotaComputer extends AJXP_Plugin
 
     protected function getWorkingPath(){
         $repo = ConfService::getRepository();
+        $clearParent = null;
         // SPECIAL : QUOTA MUST BE COMPUTED ON PARENT REPOSITORY FOLDER
         if($repo->hasParent()){
             $parentOwner = $repo->getOwner();
@@ -56,6 +57,9 @@ class QuotaComputer extends AJXP_Plugin
                 $loggedUser = AuthService::getLoggedUser();
                 if(!$loggedUser->hasParent()){
                     $loggedUser->setParent($parentOwner);
+                    $clearParent = null;
+                }else{
+                    $clearParent = $loggedUser->getParent();
                 }
                 $loggedUser->setResolveAsParent(true);
                 AuthService::updateUser($loggedUser);
@@ -63,6 +67,8 @@ class QuotaComputer extends AJXP_Plugin
         }
         $path = $repo->getOption("PATH");
         if(iSset($originalUser)){
+            $originalUser->setParent($clearParent);
+            $originalUser->setResolveAsParent(false);
             AuthService::updateUser($originalUser);
         }
 
