@@ -38,11 +38,11 @@ Class.create("ZohoEditor", AbstractEditor, {
             conn.addParameter("get_action", "retrieve_from_zohoagent");
             conn.onComplete = function(transport){
                 if(transport.responseText == "MODIFIED"){
-                    ajaxplorer.fireContextRefresh();
+                    ajaxplorer.fireNodeRefresh(this.currentNode);// fireContextRefresh();
                 }
-            };
+            }.bind(this);
             conn.sendAsync();
-        });
+        }.bind(this));
 	},
 
 	

@@ -156,7 +156,7 @@ class ZohoEditor extends AJXP_Plugin {
                     echo "MODIFIED";
                 }
             }
-            AJXP_Controller::applyHook("node.change", array(&$node));
+            AJXP_Controller::applyHook("node.change", array(null, &$node));
         }
 
 
