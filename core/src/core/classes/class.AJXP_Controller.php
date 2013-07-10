@@ -49,7 +49,7 @@ class AJXP_Controller{
 		if(!isSet(self::$xPath)){
 			
 			$registry = AJXP_PluginsService::getXmlRegistry( false );
-			$changes = self::filterActionsRegistry($registry);
+			$changes = self::filterRegistryFromRole($registry);
 			if($changes) AJXP_PluginsService::updateXmlRegistry($registry);
 			self::$xPath = new DOMXPath($registry);		
 		}
@@ -62,7 +62,7 @@ class AJXP_Controller{
      * @param DOMDocument $registry
      * @return bool
      */
-	public static function filterActionsRegistry(&$registry){
+	public static function filterRegistryFromRole(&$registry){
 		if(!AuthService::usersEnabled()) return false ;
 		$loggedUser = AuthService::getLoggedUser();
 		if($loggedUser == null) return false;
@@ -86,9 +86,31 @@ class AJXP_Controller{
                 $changes = true;
             }
         }
+        $parameters = $loggedUser->mergedRole->listParameters();
+        foreach($parameters as $scope => $paramsPlugs){
+            if($scope == AJXP_REPO_SCOPE_ALL || $scope == $crtRepoId || ($crtRepo->hasParent() && $scope == AJXP_REPO_SCOPE_SHARED)){
+                foreach($paramsPlugs as $plugId => $params){
+                    foreach($params as $name => $value){
+                        // Search exposed plugin_configs, replace if necessary.
+                        $searchparams = $xPath->query("plugins/*[@id='$plugId']/plugin_configs/property[@name='$name']");
+                        if(!$searchparams->length) continue;
+                        $param = $searchparams->item(0);
+                        $newCdata = $registry->createCDATASection(json_encode($value));
+                        $param->removeChild($param->firstChild);
+                        $param->appendChild($newCdata);
+                    }
+                }
+            }
+        }
 		return $changes;
 	}
 
+
+    /**
+     * @param $actionName
+     * @param $path
+     * @return bool
+     */
     public static function findRestActionAndApply($actionName, $path){
         $xPath = self::initXPath();
         $actions = $xPath->query("actions/action[@name='$actionName']");

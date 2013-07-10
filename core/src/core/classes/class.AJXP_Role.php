@@ -191,12 +191,12 @@ class AJXP_Role implements AjxpGroupPathProvider
     public function filterParameterValue($pluginId, $parameterName, $repositoryId, $parameterValue){
         if(isSet($this->parameters[AJXP_REPO_SCOPE_ALL][$pluginId][$parameterName])){
             $v = $this->parameters[AJXP_REPO_SCOPE_ALL][$pluginId][$parameterName];
-            if($v == AJXP_VALUE_CLEAR) return "";
+            if($v === AJXP_VALUE_CLEAR) return "";
             else return $v;
         }
         if(isSet($this->parameters[$repositoryId][$pluginId][$parameterName])){
             $v = $this->parameters[$repositoryId][$pluginId][$parameterName];
-            if($v == AJXP_VALUE_CLEAR) return "";
+            if($v === AJXP_VALUE_CLEAR) return "";
             else return $v;
         }
         return $parameterValue;
@@ -286,6 +286,10 @@ class AJXP_Role implements AjxpGroupPathProvider
         foreach($newParams as $repoId => $data){
             foreach ($data as $pluginId => $param) {
                 foreach($param as $parameterName => $parameterValue){
+                    if($parameterValue === true || $parameterValue === false){
+                        $newRole->setParameterValue($pluginId, $parameterName, $parameterValue, $repoId);
+                        continue;
+                    }
                     if($parameterValue == AJXP_VALUE_CLEAR) continue;
                     $newRole->setParameterValue($pluginId, $parameterName, $parameterValue, $repoId);
                 }

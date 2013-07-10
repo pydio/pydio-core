@@ -123,17 +123,22 @@ class AJXP_Plugin implements Serializable{
 	}
 
     protected function getFilteredOption($optionName, $repositoryScope = AJXP_REPO_SCOPE_ALL){
-        $repo = ConfService::getRepository();
-        if($repo != null) $repositoryScope = $repo->getId();
-        if(AuthService::getLoggedUser() != null){
-            return AuthService::getLoggedUser()->mergedRole->filterParameterValue(
+        $merged = $this->options;
+        if(is_array($this->pluginConf)) $merged = array_merge($merged, $this->pluginConf);
+        $loggedUser = AuthService::getLoggedUser();
+        if($loggedUser != null){
+            if($repositoryScope == AJXP_REPO_SCOPE_ALL){
+                $repo = ConfService::getRepository();
+                if($repo != null) $repositoryScope = $repo->getId();
+            }
+            return $loggedUser->mergedRole->filterParameterValue(
                 $this->getId(),
                 $optionName,
                 $repositoryScope,
-                isSet($this->options[$optionName]) ? $this->options[$optionName] : null
+                isSet($merged[$optionName]) ? $merged[$optionName] : null
             );
         }else{
-            return isSet($this->options[$optionName]) ? $this->options[$optionName] : null;
+            return isSet($merged[$optionName]) ? $merged[$optionName] : null;
         }
     }
     /**
