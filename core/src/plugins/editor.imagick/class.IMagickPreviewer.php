@@ -177,7 +177,7 @@ class IMagickPreviewer extends AJXP_Plugin {
 		$index = 0;
 		if(isset($this->pluginConf["UNOCONV"]) && !empty($this->pluginConf["UNOCONV"])){
 			$officeExt = array('xls', 'xlsx', 'ods', 'doc', 'docx', 'odt', 'ppt', 'pptx', 'odp', 'rtf');
-			$extension = pathinfo($file, PATHINFO_EXTENSION);
+			$extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
 			if(in_array($extension, $officeExt)){
 				$unoDoc = $prefix."_unoconv.pdf";
 				if(is_file($unoDoc)) $file = $unoDoc;
@@ -205,7 +205,7 @@ class IMagickPreviewer extends AJXP_Plugin {
 			$officeExt = array('xls', 'xlsx', 'ods', 'doc', 'docx', 'odt', 'ppt', 'pptx', 'odp', 'rtf');
 		}
 
-        $extension = pathinfo($masterFile, PATHINFO_EXTENSION);
+        $extension = strtolower(pathinfo($masterFile, PATHINFO_EXTENSION));
         $node = new AJXP_Node($masterFile);
         $masterFile = $node->getRealFile();
 
