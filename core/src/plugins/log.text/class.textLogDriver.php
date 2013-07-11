@@ -258,9 +258,9 @@ class textLogDriver extends AbstractLogDriver {
 				$result = $logs;
 			}
 		}
-		krsort($result);
+		krsort($result, SORT_STRING);
         if($print) foreach($result as $log) print($log);
-		return $log;
+		return $result;
 	}
 	
 	/**
