@@ -67,7 +67,42 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
         parent::init($this->options);
     }
 
-	
+
+    protected function setDefaultAnalyzer(){
+
+        switch ($this->getFilteredOption("QUERY_ANALYSER")){
+            case "utf8num_insensitive":
+                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8Num_CaseInsensitive());
+                break;
+            case "utf8num_sensitive":
+                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8Num());
+                break;
+            case "utf8_insensitive":
+                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8_CaseInsensitive());
+                break;
+            case "utf8_sensitive":
+                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8());
+                break;
+            case "textnum_insensitive":
+                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum_CaseInsensitive());
+                break;
+            case "textnum_sensitive":
+                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_textNum());
+                break;
+            case "text_insensitive":
+                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Text_CaseInsensitive());
+                break;
+            case "text_sensitive":
+                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Text());
+                break;
+            default:
+                Zend_Search_Lucene_Analysis_Analyzer::setDefault(new Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8Num_CaseInsensitive());
+                break;
+        }
+        Zend_Search_Lucene_Search_Query_Wildcard::setMinPrefixLength(intval($this->getFilteredOption("WILDCARD_LIMITATION")));
+
+    }
+
 	public function applyAction($actionName, $httpVars, $fileVars){
         $messages = ConfService::getMessages();
 		if($actionName == "search"){
@@ -109,6 +144,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 				$index->setDefaultSearchField("basename");
 				$query = $httpVars["query"];
 			}
+            $this->setDefaultAnalyzer();
             if($query == "*"){
                 $index->setDefaultSearchField("ajxp_node");
                 $query = "yes";
@@ -325,8 +361,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
         }else{
        		$index =  $this->loadIndex(ConfService::getRepository()->getId());
         }
-        Zend_Search_Lucene_Analysis_Analyzer::setDefault( new Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum_CaseInsensitive());
-
+        $this->setDefaultAnalyzer();
         if($oldNode != null && $copy == false){
             $oldDocId = $this->getIndexedDocumentId($index, $oldNode);
             if($oldDocId != null){
