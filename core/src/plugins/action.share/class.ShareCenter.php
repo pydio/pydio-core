@@ -512,7 +512,7 @@ class ShareCenter extends AJXP_Plugin{
 
     function computeMinisiteToServerURL(){
         $minisite = parse_url($this->buildPublicDlURL(), PHP_URL_PATH) ."/a.php";
-        $server   = parse_url( AJXP_Utils::detectServerURL(), PHP_URL_PATH) . dirname($_SERVER['REQUEST_URI']);
+        $server = rtrim(parse_url( AJXP_Utils::detectServerURL(true), PHP_URL_PATH), "/");
         return AJXP_Utils::getTravelPath($minisite, $server);
     }
 
