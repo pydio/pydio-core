@@ -541,8 +541,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				}
 				header("Content-Type:text/plain");
 				print "SUCCESS";
-				exit(1);
-				
+
 			break;					
 					
 			//------------------------------------

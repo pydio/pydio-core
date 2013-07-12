@@ -274,6 +274,7 @@ class AJXP_Utils
             if (AuthService::usersEnabled()) {
                 $loggedUser = AuthService::getLoggedUser();
                 if ($loggedUser != null && $loggedUser->canSwitchTo($parameters["repository_id"])) {
+                    $output["FORCE_REGISTRY_RELOAD"] = true;
                     $output["EXT_REP"] = SystemTextEncoding::toUTF8(urldecode($parameters["folder"]));
                     $loggedUser->setArrayPref("history", "last_repository", $parameters["repository_id"]);
                     $loggedUser->setPref("pending_folder", SystemTextEncoding::toUTF8(AJXP_Utils::decodeSecureMagic($parameters["folder"])));

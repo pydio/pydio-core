@@ -205,10 +205,19 @@ class AJXP_ClientDriver extends AJXP_Plugin
                 }
 
                 // PRECOMPUTE REGISTRY
-                $regDoc = AJXP_PluginsService::getXmlRegistry();
-                $changes = AJXP_Controller::filterRegistryFromRole($regDoc);
-                if($changes) AJXP_PluginsService::updateXmlRegistry($regDoc);
-                $START_PARAMETERS["PRELOADED_REGISTRY"] = AJXP_XMLWriter::replaceAjxpXmlKeywords($regDoc->saveXML());
+                if(!isSet($START_PARAMETERS["FORCE_REGISTRY_RELOAD"])){
+                    $regDoc = AJXP_PluginsService::getXmlRegistry();
+                    $changes = AJXP_Controller::filterRegistryFromRole($regDoc);
+                    if($changes) AJXP_PluginsService::updateXmlRegistry($regDoc);
+                    $clone = $regDoc->cloneNode(true);
+                    $clonePath = new DOMXPath($clone);
+                    $serverCallbacks = $clonePath->query("//serverCallback|hooks");
+                    foreach($serverCallbacks as $callback){
+                        $callback->parentNode->removeChild($callback);
+                    }
+                    $START_PARAMETERS["PRELOADED_REGISTRY"] = AJXP_XMLWriter::replaceAjxpXmlKeywords($clone->saveXML());
+                }
+
 				$JSON_START_PARAMETERS = json_encode($START_PARAMETERS);
                 $crtTheme = $this->pluginConf["GUI_THEME"];
 				if(ConfService::getConf("JS_DEBUG")){
