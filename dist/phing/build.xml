@@ -250,6 +250,13 @@
                 includeemptydirs="true"
                 compression="gzip"
             ><fileset dir="${build.source_folder}" defaultexcludes="false"><include name="*/**"/></fileset></tar>
+        <if>
+            <equals arg1="${env}" arg2="testing"/>
+            <then>
+                <copy file="${build.working_folder}/build/${packaged_zip}" tofile="${build.working_folder}/build/ajaxplorer-latest.zip"/>
+                <copy file="${build.working_folder}/build/${packaged_tar.gz}" tofile="${build.working_folder}/build/ajaxplorer-latest.tar.gz"/>
+            </then>
+        </if>
         <phingcall target="build_external_plugins"/>
         <if>
         	<equals arg1="${build_linux}" arg2="true"/>
