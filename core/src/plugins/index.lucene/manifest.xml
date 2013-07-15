@@ -61,9 +61,12 @@
 				</rightsContext>				
 				<processing>
 					<clientCallback prepareModal="false"><![CDATA[
-						var crtDir = ajaxplorer.getUserSelection().getUniqueNode();
+                        var crtDir = "/";
+                        if(!ajaxplorer.getUserSelection().isEmpty()){
+                            crtDir = ajaxplorer.getUserSelection().getUniqueNode().getPath();
+                        }
 						var bgManager = ajaxplorer.actionBar.bgManager;
-						bgManager.queueAction("index", new Hash({dir:crtDir}), MessageHash["index.lucene.8"]);
+						bgManager.queueAction("index", new Hash({dir:crtDir}), MessageHash["index.lucene.8"].replace('%s', crtDir));
 						bgManager.next();
 					]]></clientCallback>				
 					<serverCallback methodName="applyAction"/>
