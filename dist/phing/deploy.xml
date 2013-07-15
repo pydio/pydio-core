@@ -44,7 +44,7 @@
                 user="${admin_user}"
                 password="${admin_password}"
                 action="create_repository"
-                params='--DISPLAY="smb" --DRIVER=smb --json_data={\"HOST\":\"${ws.samba.host}\",\"PATH\":\"${ws.samba.share}\",\"USER\":\"${ws.samba.user}\",\"PASSWORD\":\"${ws.samba.password}\",}'/>
+                params='--DISPLAY="smb" --DRIVER=smb --json_data={\"HOST\":\"${ws.samba.host}\",\"PATH\":\"${ws.samba.share}\",\"USER\":\"${ws.samba.user}\",\"PASSWORD\":\"${ws.samba.password}\"}'/>
 
         <!-- Some cleaning before accessing via HTTP -->
         <delete file="${cliPath}/data/cache/i18n/en_plugins_messages.ser"/>
