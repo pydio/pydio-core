@@ -253,8 +253,19 @@
         <if>
             <equals arg1="${env}" arg2="testing"/>
             <then>
-                <copy file="${build.working_folder}/build/${packaged_zip}" tofile="${build.working_folder}/build/ajaxplorer-latest.zip"/>
-                <copy file="${build.working_folder}/build/${packaged_tar.gz}" tofile="${build.working_folder}/build/ajaxplorer-latest.tar.gz"/>
+                <copy todir="${build.working_folder}/build/ajaxplorer-latest">
+                    <fileset dir="${build.source_folder}/${package_name}/" defaultexcludes="false"><include name="*/**"></include></fileset>
+                </copy>
+                <zip
+                        destfile="${build.working_folder}/build/ajaxplorer-latest.zip"
+                        includeemptydirs="true"
+                        ><fileset dir="${build.working_folder}/build/" defaultexcludes="false"><include name="ajaxplorer-latest/**"/></fileset></zip>
+                <tar
+                        destfile="${build.working_folder}/build/ajaxplorer-latest.tar.gz"
+                        includeemptydirs="true"
+                        compression="gzip"
+                        ><fileset dir="${build.working_folder}/build/" defaultexcludes="false"><include name="ajaxplorer-latest/**"/></fileset></tar>
+                <delete dir="${build.working_folder}/build/ajaxplorer-latest" quiet="true"/>
             </then>
         </if>
         <phingcall target="build_external_plugins"/>
