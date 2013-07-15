@@ -439,7 +439,7 @@ class fsAccessWrapper implements AjxpWrapper {
 
 	protected function getTrueSizeOnFileSystem($file) {
 		if (!(strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')){
-			$cmd = "stat -L -c%s \"".escapeshellarg($file)."\"";
+			$cmd = "stat -L -c%s ".escapeshellarg($file);
 			$val = trim(`$cmd`);
 			if (strlen($val) == 0 || floatval($val) == 0)
 			{
