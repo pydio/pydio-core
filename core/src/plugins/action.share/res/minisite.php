@@ -30,6 +30,7 @@
 			}
             .action_bar{
                 background-color: #ffffff;
+                height: 41px !important;
             }
             .action_bar > .toolbarGroup{
                 height: auto;
