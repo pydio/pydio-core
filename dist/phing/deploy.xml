@@ -15,7 +15,12 @@
                 <httpget url="http://ajaxplorer.info/build/ajaxplorer-latest.zip" dir="${installPath}" filename="ajaxplorer-latest.zip"/>
             </then>
         </if>
-        <unzip file="${installPath}/ajaxplorer-latest.zip" todir="${installPath}"/>
+        <if>
+            <not><available type="dir" file="${installPath}/ajaxplorer-latest"/></not>
+            <then>
+                <unzip file="${installPath}/ajaxplorer-latest.zip" todir="${installPath}"/>
+            </then>
+        </if>
         <property name="cliPath" value="${installPath}/ajaxplorer-latest"/>
         <touch file="${cliPath}/data/cache/diag_result.php"/>
 
@@ -32,13 +37,13 @@
                 user="${admin_user}"
                 password="${admin_password}"
                 action="create_repository"
-                params='--DISPLAY="fs" --DRIVER=fs --json_data={\"PATH\":\"AJXP_DATA_PATH/files/phing\"}'/>
+                params='--DISPLAY="fs" --DRIVER=fs --json_data={\"PATH\":\"AJXP_DATA_PATH/files/phing\",\"CREATE\":\"true\"}'/>
 
         <ajaxplorer_sdk
                 cliPath="${cliPath}"
                 user="${admin_user}"
                 password="${admin_password}"
                 action="create_repository"
-                params='--DISPLAY="smb" --DRIVER=smb --json_data={\"HOST\":\"${ws.samba.host}\",\"PATH\":\"${ws.samba.shares}\",\"USER\":\"${ws.samba.user}\",\"PASSWORD\":\"${ws.samba.password}\",}'/>
+                params='--DISPLAY="smb" --DRIVER=smb --json_data={\"HOST\":\"${ws.samba.host}\",\"PATH\":\"${ws.samba.share}\",\"USER\":\"${ws.samba.user}\",\"PASSWORD\":\"${ws.samba.password}\",}'/>
     </target>
 </project>
