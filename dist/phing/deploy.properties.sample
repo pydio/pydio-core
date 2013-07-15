@@ -1,0 +1,9 @@
+installPath=
+admin_user=
+admin_password=
+
+# SAMBA CONFIGS
+ws.samba.host=192.168.0.205
+ws.samba.share=homes
+ws.samba.user=samba-user
+ws.samba.password=sambapwd

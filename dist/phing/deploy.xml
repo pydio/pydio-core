@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="phing-grammar.rng"
+        type="application/xml"
+        schematypens="http://relaxng.org/ns/structure/1.0" ?>
+<project name="AjaXplorer" default="build" basedir=".">
+
+    <taskdef classname="lib.AjxpAPIClientTask" name="ajaxplorer_sdk"/>
+    <property file="deploy.properties"/>
+
+    <target name="build" description="Main sequence">
+
+        <if>
+            <not><available type="file" file="${installPath}/ajaxplorer-latest.zip"/></not>
+            <then>
+                <httpget url="http://ajaxplorer.info/build/ajaxplorer-latest.zip" dir="${installPath}" filename="ajaxplorer-latest.zip"/>
+            </then>
+        </if>
+        <unzip file="${installPath}/ajaxplorer-latest.zip" todir="${installPath}"/>
+        <property name="cliPath" value="${installPath}/ajaxplorer-latest"/>
+        <touch file="${cliPath}/data/cache/diag_result.php"/>
+
+        <!-- RUN FIRST INSTALL -->
+        <ajaxplorer_sdk
+                cliPath="${cliPath}"
+                action="apply_installer_form"
+                params='--ADMIN_USER_LOGIN=${admin_user} --ADMIN_USER_PASS=${admin_password}'
+        />
+
+        <!-- CREATE REPOSITORIES -->
+        <ajaxplorer_sdk
+                cliPath="${cliPath}"
+                user="${admin_user}"
+                password="${admin_password}"
+                action="create_repository"
+                params='--DISPLAY="fs" --DRIVER=fs --json_data={\"PATH\":\"AJXP_DATA_PATH/files/phing\"}'/>
+
+        <ajaxplorer_sdk
+                cliPath="${cliPath}"
+                user="${admin_user}"
+                password="${admin_password}"
+                action="create_repository"
+                params='--DISPLAY="smb" --DRIVER=smb --json_data={\"HOST\":\"${ws.samba.host}\",\"PATH\":\"${ws.samba.shares}\",\"USER\":\"${ws.samba.user}\",\"PASSWORD\":\"${ws.samba.password}\",}'/>
+    </target>
+</project>
