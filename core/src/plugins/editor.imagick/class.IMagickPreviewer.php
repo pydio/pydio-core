@@ -179,8 +179,8 @@ class IMagickPreviewer extends AJXP_Plugin {
         $unoconv =  $this->getFilteredOption("UNOCONV");
 		if(!empty($unoconv)){
 			$officeExt = array('xls', 'xlsx', 'ods', 'doc', 'docx', 'odt', 'ppt', 'pptx', 'odp', 'rtf');
-			$extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-			if(in_array($extension, $officeExt)){
+			$extension = pathinfo($file, PATHINFO_EXTENSION);
+			if(in_array(strtolower($extension), $officeExt)){
 				$unoDoc = $prefix."_unoconv.pdf";
 				if(is_file($unoDoc)) $file = $unoDoc;
 			}			
@@ -208,7 +208,7 @@ class IMagickPreviewer extends AJXP_Plugin {
             $unoconv = false;
         }
 
-        $extension = strtolower(pathinfo($masterFile, PATHINFO_EXTENSION));
+        $extension = pathinfo($masterFile, PATHINFO_EXTENSION);
         $node = new AJXP_Node($masterFile);
         $masterFile = $node->getRealFile();
 
@@ -235,7 +235,7 @@ class IMagickPreviewer extends AJXP_Plugin {
 			@set_time_limit(90);
 		}
 		chdir($workingDir);
-		if($unoconv !== false && in_array($extension, $officeExt)){
+		if($unoconv !== false && in_array(strtolower($extension), $officeExt)){
 			$unoDoc = str_replace(".jpg", "_unoconv.pdf", $tmpFileThumb);
 			if(!is_file($tmpFileThumb)){
 				// Create PDF Version now
