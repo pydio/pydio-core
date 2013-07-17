@@ -53,12 +53,59 @@ class JumploaderProcessor extends AJXP_Plugin {
         $index = $httpVars["partitionIndex"];
         $realName = $fileVars["userfile_0"]["name"];
 
+				/* if fileId is not set, request for cross-session resume */
+				if(!isSet($httpVars["fileId"])) {
+        	AJXP_LOGGER::debug("Cross-Session Resume request");
+
+          $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
+          $streamData = $plugin->detectStreamWrapper(true);
+          $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
+          $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir;
+
+          $fileHash = md5($httpVars["fileName"]);
+            
+          $resumeIndexes = array();
+					$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($destStreamURL));
+					while($it->valid()) {
+	
+				  	if (!$it->isDot()) {
+				    	$subPathName = $it->getSubPathName();
+			    		AJXP_LOGGER::debug("Iterator SubPathName: " . $it->getSubPathName());
+			    		if(strpos($subPathName, $fileHash) === 0) {
+			    			$explodedSubPathName = explode('.', $subPathName);
+			    			$resumeFileId = $explodedSubPathName[1];
+			    			$resumeIndexes[] = $explodedSubPathName[2];
+
+				    		AJXP_LOGGER::debug("Current Index: " . $explodedSubPathName[2]);
+			    		}
+   				  }
+
+				   	$it->next();
+					}
+
+	    		$nextResumeIndex = max($resumeIndexes) + 1;
+
+					if(isSet($resumeFileId)) {
+		    		AJXP_LOGGER::debug("ResumeFileId is set. Returning values: fileId: " . $resumeFileId . ", partitionIndex: " . $nextResumeIndex);
+	          $httpVars["resumeFileId"] = $resumeFileId;
+	          $httpVars["resumePartitionIndex"] = $nextResumeIndex;
+					}
+
+					return;
+				}
+
         /* if the file has to be partitioned */
         if(isSet($httpVars["partitionCount"]) && intval($httpVars["partitionCount"]) > 1){
             AJXP_LOGGER::debug("Partitioned upload");
             $fileId = $httpVars["fileId"];
             $clientId = $httpVars["ajxp_sessid"];
-            $fileVars["userfile_0"]["name"] = "$clientId.$fileId.$index";
+            $fileHash = md5($realName);
+            
+            /* In order to enable cross-session resume, temp files must not depend on session.
+             * Now named after and md5() of the original file name.
+             */
+						AJXP_LOGGER::debug("Filename: " . $realName . ", File hash: " . $fileHash);
+            $fileVars["userfile_0"]["name"] = "$fileHash.$fileId.$index";
             $httpVars["lastPartition"] = false;
         }
 
@@ -71,6 +118,17 @@ class JumploaderProcessor extends AJXP_Plugin {
 
     public function postProcess($action, $httpVars, $postProcessData){
         if(isSet($httpVars["simple_uploader"]) || isSet($httpVars["xhr_uploader"])) return;
+
+				/* If set resumeFileId and resumePartitionIndex, cross-session resume is requested. */
+    		if(isSet($httpVars["resumeFileId"]) && isSet($httpVars["resumePartitionIndex"])) {
+					header("HTTP/1.1 200 OK");
+							
+        	print("fileId: " . $httpVars["resumeFileId"] . "\n");
+        	print("partitionIndex: " . $httpVars["resumePartitionIndex"]);
+    		
+    			return;
+    		}
+
         /*if(self::$skipDecoding){
 
         }*/
@@ -220,12 +278,14 @@ class JumploaderProcessor extends AJXP_Plugin {
                     $newDest = fopen($destStreamURL.$httpVars["partitionRealName"], "w");
                     AJXP_LOGGER::debug("PartitionRealName", $destStreamURL.$httpVars["partitionRealName"]);
                     for ($i = 0; $i < $count ; $i++){
-                        $part = fopen($destStreamURL."$clientId.$fileId.$i", "r");
+						            $fileHash = md5($httpVars["fileName"]);
+                    	
+                        $part = fopen($destStreamURL."$fileHash.$fileId.$i", "r");
                         while(!feof($part)){
                             fwrite($newDest, fread($part, 4096));
                         }
                         fclose($part);
-                        unlink($destStreamURL."$clientId.$fileId.$i");
+                        unlink($destStreamURL."$fileHash.$fileId.$i");
                     }
                     fclose($newDest);
                 }
