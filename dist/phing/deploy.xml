@@ -46,6 +46,27 @@
                 action="create_repository"
                 params='--DISPLAY="smb" --DRIVER=smb --json_data={\"HOST\":\"${ws.samba.host}\",\"PATH\":\"${ws.samba.share}\",\"USER\":\"${ws.samba.user}\",\"PASS\":\"${ws.samba.password}\"}'/>
 
+        <ajaxplorer_sdk
+                cliPath="${cliPath}"
+                user="${admin_user}"
+                password="${admin_password}"
+                action="create_repository"
+                params='--DISPLAY="ftp" --DRIVER=ftp --json_data={\"HOST\":\"${ws.ftp.host}\",\"PATH\":\"${ws.ftp.path}\",\"USER\":\"${ws.ftp.user}\",\"PASS\":\"${ws.ftp.password}\"}'/>
+
+        <ajaxplorer_sdk
+                cliPath="${cliPath}"
+                user="${admin_user}"
+                password="${admin_password}"
+                action="create_repository"
+                params='--DISPLAY="sftp" --DRIVER=sftp --json_data={\"HOST\":\"${ws.sftp.host}\",\"PATH\":\"${ws.sftp.path}\",\"USER\":\"${ws.sftp.user}\",\"PASS\":\"${ws.sftp.password}\"}'/>
+
+        <ajaxplorer_sdk
+                cliPath="${cliPath}"
+                user="${admin_user}"
+                password="${admin_password}"
+                action="create_repository"
+                params='--DISPLAY="webdav" --DRIVER=webdav --json_data={\"HOST\":\"${ws.webdav.host}\",\"URI\":\"${ws.webdav.uri}\",\"USER\":\"${ws.webdav.user}\",\"PASS\":\"${ws.webdav.password}\"}'/>
+
         <!-- Some cleaning before accessing via HTTP -->
         <delete file="${cliPath}/data/cache/i18n/en_plugins_messages.ser"/>
 	<exec command="chmod -R a+rw ${cliPath}/data"/>
