@@ -9,6 +9,8 @@
 
     <target name="build" description="Main sequence">
 
+        <echo message="**** Deploying latest"/>
+
         <if>
             <not><available type="file" file="${installPath}/ajaxplorer-latest.zip"/></not>
             <then>
@@ -23,6 +25,8 @@
         </if>
         <property name="cliPath" value="${installPath}/ajaxplorer-latest"/>
         <touch file="${cliPath}/data/cache/diag_result.php"/>
+
+        <echo message="**** Creating all workspaces"/>
 
         <!-- RUN FIRST INSTALL -->
         <ajaxplorer_sdk
@@ -69,7 +73,74 @@
 
         <!-- Some cleaning before accessing via HTTP -->
         <delete file="${cliPath}/data/cache/i18n/en_plugins_messages.ser"/>
-	<exec command="chmod -R a+rw ${cliPath}/data"/>
+    	<exec command="chmod -R a+rw ${cliPath}/data"/>
+
+        <echo message="**** Testing a simple write/read on each workspace"/>
+
+        <phingcall target="simple_write">
+            <param name="repository_alias" value="fs"/>
+        </phingcall>
+
+        <phingcall target="simple_write">
+            <param name="repository_alias" value="smb"/>
+        </phingcall>
+
+        <phingcall target="simple_write">
+            <param name="repository_alias" value="ftp"/>
+        </phingcall>
+
+        <phingcall target="simple_write">
+            <param name="repository_alias" value="sftp"/>
+        </phingcall>
+
+        <phingcall target="simple_write">
+            <param name="repository_alias" value="webdav"/>
+        </phingcall>
+
+
 
     </target>
+
+
+    <target name="simple_write" description="Creating an empty file, write and read some content, compare and then delete.">
+
+        <ajaxplorer_sdk
+                cliPath="${cliPath}"
+                user="${admin_user}"
+                password="${admin_password}"
+                action="mkfile"
+                repository="${repository_alias}"
+                params='--dir="/" --filename=testfile.txt'
+        />
+
+        <ajaxplorer_sdk
+                cliPath="${cliPath}"
+                user="${admin_user}"
+                password="${admin_password}"
+                action="put_content"
+                repository="${repository_alias}"
+                params='--file="/testfile.txt" --content="hello world"'
+        />
+
+        <ajaxplorer_sdk
+                cliPath="${cliPath}"
+                user="${admin_user}"
+                password="${admin_password}"
+                action="get_content"
+                repository="${repository_alias}"
+                params='--file="/testfile.txt"'
+                compareResult="hello world"
+        />
+
+        <ajaxplorer_sdk
+                cliPath="${cliPath}"
+                user="${admin_user}"
+                password="${admin_password}"
+                action="delete"
+                repository="${repository_alias}"
+                params='--file="/testfile.txt"'
+        />
+
+    </target>
+
 </project>
