@@ -5,6 +5,83 @@ Copyright : Charles du Jeu 2013
 Demo : http://demo.ajaxplorer.info/
 Date : ##VERSION_DATE##
 Rev Number : ##REVISION##
+Contributors: thomasCresson, josh4trunks, chusopr, mquandalle
+
+This is a bugfix release from v5.0.1. Update is automatic using the in-app upgrade mechanism, and is recommended. Most important fixes are:
+
+Fix various uploaders problems (jumploader, plupload)
+Fix various Zip browsing / creation problems
+Choose Lucene analyzer in the plugin configuration
+Start an automatic deployment and testing framework (using Phing)
+Experimental: Etherpad implementation (collaborative text editor and chat), new SFTP plugin based on phpSeclib
+See detailed changelog below, and bugs fixed list on GitHub
+
+Detailed changeLog
+
+Add repository slug to file names when logging operations with files.
+Mispelling in french translation
+Fix #204 for WebDAV Basic Auth not working with USE_SESSION_CREDENTIALS.
+Fix #1: Auto create AjaXplorer user if CAS login was successful and plugin was configured to auto create users.
+Fix #207: typo in plugins/conf.sql/update_3.0.3_up.sql.
+Notification problem with Jumploader fixed for the upload of single files
+Fix -> Now the quota is respected with jumploader (if you exceed it you will see the error in jumploader GUI and it will erase all the already uploaded partitions and it'll stop the upload) Enhancement -> can now handle errors like missing partitions or corrupted data (you will see the error in jumploader GUI and it will erase all the already uploaded partitions and it'll stop the upload)
+Apply hook before sharing
+File in plupload with html5 will have their original name (renaming "blob" and special characters removal are fixed)
+Apply hook before sharing
+auth.serial_otp contributed by Janos Milus
+Publication plugin derived from the ajaxplorer.info website. Still to be completed, must find a config.properties for configuration.
+New SFTP plugin, working with phpseclib, added
+Fix #213: Prevent copying a directory to itself.
+Sanitize user name before sending. It will be sanitized on the server, but it can be quite confusing.
+Etherpad simple implementation
+Create pads either on a text file, or a "free" pad
+Update strings in etherpad.
+Create pads either on a text file, or a "free" pad
+Revert to previous version, zip browsing was broken.
+Check SSL status from PHP's HTTPS header instead of port
+Fix #217 + Creating archives with a samba workspace now works (exploration and extraction still impossible).
+Do not reuse a new XHRUploader, otherwise the on "change" event is pointing to the wrong one. Should fix the "wrong folder" pointing problem.
+Fix the Zoho file disappearing after edition.
+Fix #215 -> now can preview office files (.docx,...) if the extension is in uppercase
+Fix #214 - Problem with quota and resolveAsParent() not being set back to false.
+Refactored filterActionsFromRegistry to filterRegistryFromRole
+Go through all options of access.fs and use getFilteredOptions instead.
+Massive pass to reveal the full powers of groups: use getFilteredOption() everywhere instead of $this->pluginConfs[]
+Remove alpha-flatten in default ImageMagick options, seems to break on many platforms (deb7/rhel)
+Use UTF8 / TextNum / Insensitive default analyzer, add a parameter to change it if necessary.
+Fix textLogger
+Fix Travel path computation, could break minisite on some setup.
+Registry Preloading: do not forget to clear the serverCallbacks nodes, useless. Force disabling this mechanism when applying an URL shortcut, it breaks. Should fix #226
+Copy last build to "-latest" to ease automatic deployments
+Fix #230
+Fix #232
+Do not use UTF8 default analyzer for Lucene, adds a requirement to php_mbstrings extension. Fix escapeshellarg call in getTrueSizeOnFileSystem()
+Build "latest" package with ajaxplorer-latest foldername inside.
+Cmd.php: allow anonymous call to automatize deployments (before any user is created)
+Starter Phing script to automatically deploy the latest
+Fix samba creation
+add App title and clean instructions
+comma error in json
+comma error in json
+Fix #211
+ReFix #211
+Push Font-awesome CSS at the end of the page. There are still some performances issues for the very first loading, we must digg that.
+Refix #215
+fix #237
+Update deploy
+Fix ftp parameters
+Expand Client Task
+Simple read write task
+Do not break build
+fix #239 by forcing case insensitivy for sql-based drivers.
+---
+AjaXplorer 5.0.1 Release Note
+
+License : Affero GPL
+Copyright : Charles du Jeu 2013
+Demo : http://demo.ajaxplorer.info/
+Date : 29th june 2013
+Rev Number : f37fcbdc3
 Contributors: thomasCresson, Destroyer, Letreguilly, adrianbj, chusopr
 
 This is a bugfix and security release from v5.0.1
