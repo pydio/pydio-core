@@ -20,6 +20,9 @@ class AjxpAPIClientTask extends Task
     private $params;
     private $action;
 
+    private $displayResult = false;
+    private $compareResult;
+
     function main(){
 
         if(isSet($this->user) && isSet($this->password) && isSet($this->repository)){
@@ -28,11 +31,29 @@ class AjxpAPIClientTask extends Task
             // Anon mode
             $cmd = "php {$this->cliPath}/cmd.php -a={$this->action} {$this->params}";
         }
-        passthru($cmd);
+        $result = array();
+        exec($cmd, $result);
+        $res = implode("", $result);
+        if(isSet($this->compareResult)){
+            if(trim($res) == $this->compareResult){
+                $this->log("File content is correct");
+            }else{
+                throw new BuildException("Content are not the same: '".$res."' versus '".$this->compareResult."'");
+            }
+
+        }else{
+            $this->log($this->repository.":".$this->action);
+            if($this->displayResult){
+                $this->log($res, Project::MSG_INFO);
+            }
+        }
 
     }
 
-    function createProperty(){
+    /**
+     * @return \Parameter
+     */
+    function createParameter(){
         var_dump(func_get_args());
     }
 
@@ -94,6 +115,26 @@ class AjxpAPIClientTask extends Task
     public function getUser()
     {
         return $this->user;
+    }
+
+    public function setCompareResult($compare_result)
+    {
+        $this->compareResult = $compare_result;
+    }
+
+    public function getCompareResult()
+    {
+        return $this->compareResult;
+    }
+
+    public function setDisplayResult($displayResult)
+    {
+        $this->displayResult = $displayResult;
+    }
+
+    public function getDisplayResult()
+    {
+        return $this->displayResult;
     }
 
 }
