@@ -1236,6 +1236,22 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 header('Content-Disposition: attachment; filename="' . basename($filePathOrData) . '"');
                 return;
             }
+	if($this->getFilteredOption("USE_XACCELREDIRECT", $this->repository->getId()) && $this->wrapperClassName == "fsAccessWrapper" && array_key_exists("X-Accel-Mapping",$_SERVER)){
+		if(!$realfileSystem) $filePathOrData = fsAccessWrapper::getRealFSReference($filePathOrData);
+		$filePathOrData = str_replace("\\", "/", $filePathOrData);
+		$filePathOrData = SystemTextEncoding::toUTF8($filePathOrData);
+		$mapping = explode('=',$_SERVER['X-Accel-Mapping']);
+		$replacecount = 0;
+		$accelfile = str_replace($mapping[0],$mapping[1],$filePathOrData,$replacecount);
+		if($replacecount == 1){
+			header("X-Accel-Redirect: $accelfile");
+			header("Content-type: application/octet-stream");
+			header('Content-Disposition: attachment; filename="' . basename($accelfile) . '"');
+			return;
+		} else {
+			AJXP_Logger::logAction("error","Problem with X-Accel-Mapping for file $filePathOrData");
+		}
+	}
 			$stream = fopen("php://output", "a");
 			if($realfileSystem){
 				AJXP_Logger::debug("realFS!", array("file"=>$filePathOrData));
