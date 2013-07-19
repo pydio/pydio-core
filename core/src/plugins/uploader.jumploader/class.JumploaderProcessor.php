@@ -1,4 +1,6 @@
 <?php
+
+
 /*
  * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
  * This file is part of AjaXplorer.
@@ -19,7 +21,7 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Encapsulation of the Jumploader Java applet (must be downloaded separately).
@@ -35,277 +37,284 @@ class JumploaderProcessor extends AJXP_Plugin {
 	 */
 	private static $skipDecoding = false;
 
-    public function preProcess($action, &$httpVars, &$fileVars){
-        if(isSet($httpVars["simple_uploader"]) || isSet($httpVars["xhr_uploader"])) return;
-        $repository = ConfService::getRepository();
-        if($repository->detectStreamWrapper(false)){
-            $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
-            $streamData = $plugin->detectStreamWrapper(true);
-            if($streamData["protocol"] == "ajxp.ftp" || $streamData["protocol"]=="ajxp.remotefs"){
-                AJXP_Logger::debug("Skip decoding");
-                self::$skipDecoding = true;
-            }
-        }
-        AJXP_Logger::debug("Jumploader HttpVars", $httpVars);
-        AJXP_Logger::debug("Jumploader FileVars", $fileVars);
+	public function preProcess($action, & $httpVars, & $fileVars) {
+		if (isSet ($httpVars["simple_uploader"]) || isSet ($httpVars["xhr_uploader"]))
+			return;
+		$repository = ConfService :: getRepository();
+		if ($repository->detectStreamWrapper(false)) {
+			$plugin = AJXP_PluginsService :: findPlugin("access", $repository->getAccessType());
+			$streamData = $plugin->detectStreamWrapper(true);
+			if ($streamData["protocol"] == "ajxp.ftp" || $streamData["protocol"] == "ajxp.remotefs") {
+				AJXP_Logger :: debug("Skip decoding");
+				self :: $skipDecoding = true;
+			}
+		}
+		AJXP_Logger :: debug("Jumploader HttpVars", $httpVars);
+		AJXP_Logger :: debug("Jumploader FileVars", $fileVars);
 
-        $httpVars["dir"] = base64_decode(str_replace(" ","+",$httpVars["dir"]));
-        $index = $httpVars["partitionIndex"];
-        $realName = $fileVars["userfile_0"]["name"];
+		$httpVars["dir"] = base64_decode(str_replace(" ", "+", $httpVars["dir"]));
+		$index = $httpVars["partitionIndex"];
+		$realName = $fileVars["userfile_0"]["name"];
 
-				/* if fileId is not set, request for cross-session resume */
-				if(!isSet($httpVars["fileId"])) {
-        	AJXP_LOGGER::debug("Cross-Session Resume request");
+		/* if fileId is not set, request for cross-session resume */
+		if (!isSet ($httpVars["fileId"])) {
+			AJXP_LOGGER :: debug("Cross-Session Resume request");
 
-          $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
-          $streamData = $plugin->detectStreamWrapper(true);
-          $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
-          $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir;
+			$plugin = AJXP_PluginsService :: findPlugin("access", $repository->getAccessType());
+			$streamData = $plugin->detectStreamWrapper(true);
+			$dir = AJXP_Utils :: decodeSecureMagic($httpVars["dir"]);
+			$destStreamURL = $streamData["protocol"] . "://" . $repository->getId() . $dir;
 
-          $fileHash = md5($httpVars["fileName"]);
-            
-          $resumeIndexes = array();
-					$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($destStreamURL));
-					while($it->valid()) {
-	
-				  	if (!$it->isDot()) {
-				    	$subPathName = $it->getSubPathName();
-			    		AJXP_LOGGER::debug("Iterator SubPathName: " . $it->getSubPathName());
-			    		if(strpos($subPathName, $fileHash) === 0) {
-			    			$explodedSubPathName = explode('.', $subPathName);
-			    			$resumeFileId = $explodedSubPathName[1];
-			    			$resumeIndexes[] = $explodedSubPathName[2];
+			$fileHash = md5(urldecode($httpVars["fileName"]));
+			AJXP_LOGGER :: debug("Filename: " . urldecode($httpVars["fileName"]) . ", File hash: " . $fileHash);
 
-				    		AJXP_LOGGER::debug("Current Index: " . $explodedSubPathName[2]);
-			    		}
-   				  }
+			$resumeIndexes = array ();
+			$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($destStreamURL));
+			while ($it->valid()) {
 
-				   	$it->next();
+				if (!$it->isDot()) {
+					$subPathName = $it->getSubPathName();
+					AJXP_LOGGER :: debug("Iterator SubPathName: " . $it->getSubPathName());
+					if (strpos($subPathName, $fileHash) === 0) {
+						$explodedSubPathName = explode('.', $subPathName);
+						$resumeFileId = $explodedSubPathName[1];
+						$resumeIndexes[] = $explodedSubPathName[2];
+
+						AJXP_LOGGER :: debug("Current Index: " . $explodedSubPathName[2]);
 					}
-
-	    		$nextResumeIndex = max($resumeIndexes) + 1;
-
-					if(isSet($resumeFileId)) {
-		    		AJXP_LOGGER::debug("ResumeFileId is set. Returning values: fileId: " . $resumeFileId . ", partitionIndex: " . $nextResumeIndex);
-	          $httpVars["resumeFileId"] = $resumeFileId;
-	          $httpVars["resumePartitionIndex"] = $nextResumeIndex;
-					}
-
-					return;
 				}
 
-        /* if the file has to be partitioned */
-        if(isSet($httpVars["partitionCount"]) && intval($httpVars["partitionCount"]) > 1){
-            AJXP_LOGGER::debug("Partitioned upload");
-            $fileId = $httpVars["fileId"];
-            $clientId = $httpVars["ajxp_sessid"];
-            $fileHash = md5($realName);
-            
-            /* In order to enable cross-session resume, temp files must not depend on session.
-             * Now named after and md5() of the original file name.
-             */
-						AJXP_LOGGER::debug("Filename: " . $realName . ", File hash: " . $fileHash);
-            $fileVars["userfile_0"]["name"] = "$fileHash.$fileId.$index";
-            $httpVars["lastPartition"] = false;
-        }
+				$it->next();
+			}
 
-        /* if we received the last partition */
-        if(intval($index) == intval($httpVars["partitionCount"])-1){
-            $httpVars["lastPartition"] = true;
-            $httpVars["partitionRealName"] = $realName;
-        }
-    }
+			/* no valid temp file found. return. */
+			if (empty ($resumeIndexes))
+				return;
 
-    public function postProcess($action, $httpVars, $postProcessData){
-        if(isSet($httpVars["simple_uploader"]) || isSet($httpVars["xhr_uploader"])) return;
+			AJXP_LOGGER :: debug("ResumeFileID: " . $resumeFileId);
+			AJXP_LOGGER :: debug("Max Resume Index: " . max($resumeIndexes));
+			$nextResumeIndex = max($resumeIndexes) + 1;
+			AJXP_LOGGER :: debug("Next Resume Index: " . $nextResumeIndex);
 
-				/* If set resumeFileId and resumePartitionIndex, cross-session resume is requested. */
-    		if(isSet($httpVars["resumeFileId"]) && isSet($httpVars["resumePartitionIndex"])) {
-					header("HTTP/1.1 200 OK");
-							
-        	print("fileId: " . $httpVars["resumeFileId"] . "\n");
-        	print("partitionIndex: " . $httpVars["resumePartitionIndex"]);
-    		
-    			return;
-    		}
+			if (isSet ($resumeFileId)) {
+				AJXP_LOGGER :: debug("ResumeFileId is set. Returning values: fileId: " . $resumeFileId . ", partitionIndex: " . $nextResumeIndex);
+				$httpVars["resumeFileId"] = $resumeFileId;
+				$httpVars["resumePartitionIndex"] = $nextResumeIndex;
+			}
 
-        /*if(self::$skipDecoding){
+			return;
+		}
 
-        }*/
+		/* if the file has to be partitioned */
+		if (isSet ($httpVars["partitionCount"]) && intval($httpVars["partitionCount"]) > 1) {
+			AJXP_LOGGER :: debug("Partitioned upload");
+			$fileId = $httpVars["fileId"];
 
-        if(isset($postProcessData["processor_result"]["ERROR"])){
-            if(isset($httpVars["lastPartition"]) && isset($httpVars["partitionCount"])){
-                /* we get the stream url (where all the partitions have been uploaded so far) */
-                $repository = ConfService::getRepository();
-                $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
-                $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
-                $streamData = $plugin->detectStreamWrapper(true);
-                $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir."/";
+			/* In order to enable cross-session resume, temp files must not depend on session.
+			 * Now named after and md5() of the original file name.
+			 */
+			$fileHash = md5($realName);
+			AJXP_LOGGER :: debug("Filename: " . $realName . ", File hash: " . $fileHash);
+			$fileVars["userfile_0"]["name"] = "$fileHash.$fileId.$index";
+			$httpVars["lastPartition"] = false;
+		}
 
-                if($httpVars["partitionCount"] > 1){
-                    /* we fetch the information that help us to construct the temp files name */
-                    $index = intval($httpVars["partitionIndex"]);
-                    $fileId = $httpVars["fileId"];
-                    $clientId = $httpVars["ajxp_sessid"];
+		/* if we received the last partition */
+		if (intval($index) == intval($httpVars["partitionCount"]) - 1) {
+			$httpVars["lastPartition"] = true;
+			$httpVars["partitionRealName"] = $realName;
+		}
+	}
 
-                    /* deletion of all the partitions that have been uploaded */
-                    for($i = 0; $i < $httpVars["partitionCount"]; $i++){
-                        if(file_exists($destStreamURL."$clientId.$fileId.$i")){
-                            unlink($destStreamURL."$clientId.$fileId.$i");
-                        }
-                    }
-                }
-                else{
-                    $fileName = $httpVars["fileName"];
-                    unlink($destStreamURL.$fileName);
-                }
-            }
-            echo "Error: ".$postProcessData["processor_result"]["ERROR"]["MESSAGE"];
-            return;
-        }
+	public function postProcess($action, $httpVars, $postProcessData) {
 
-        if(!isSet($httpVars["partitionRealName"]) && !isSet($httpVars["lastPartition"])) {
-            return ;
-        }
+		if (isSet ($httpVars["resumeFileId"]) && isSet ($httpVars["resumePartitionIndex"])) {
+			header("HTTP/1.1 200 OK");
 
-        $repository = ConfService::getRepository();
+			print ("fileId: " . $httpVars["resumeFileId"] . "\n");
+			print ("partitionIndex: " . $httpVars["resumePartitionIndex"]);
 
-        if(!$repository->detectStreamWrapper(false)){
-            return false;
-        }
+			return;
+		}
 
-        if($httpVars["lastPartition"]){
-            $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
-            $streamData = $plugin->detectStreamWrapper(true);
-            $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
-            $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir."/";
+		if (isSet ($httpVars["simple_uploader"]) || isSet ($httpVars["xhr_uploader"]))
+			return;
+		/*if(self::$skipDecoding){
+		
+		}*/
 
-            /* we check if the current file has a relative path (aka we want to upload an entire directory) */
-            AJXP_LOGGER::debug("Now dispatching relativePath dest:", $httpVars["relativePath"]);
-            $subs = explode("/", $httpVars["relativePath"]);
-            $userfile_name = array_pop($subs);
-            $folderForbidden = false;
-            $all_in_place = true;
-            $partitions_length = 0;
-            $fileId = $httpVars["fileId"];
-            $clientId = $httpVars["ajxp_sessid"];
-            $partitionCount = $httpVars["partitionCount"];
-            $partitionIndex = $httpVars["partitionIndex"];
-            $fileLength = $_POST["fileLength"];
+		$fileHash = md5(urldecode($httpVars["fileName"]));
+		AJXP_LOGGER :: debug("Filename: " . urldecode($httpVars["fileName"]) . ", File hash: " . $fileHash);
 
-            /* check if all the partitions have been uploaded or not */
-            for( $i = 0; $all_in_place && $i < $partitionCount; $i++ ) {
-                $partition_file = $destStreamURL."$clientId.$fileId.$i";
-                if( file_exists( $partition_file ) ) {
-                    $partitions_length += filesize( $partition_file );
-                } else {
-                    $all_in_place = false;
-                }
-            }
+		if (isset ($postProcessData["processor_result"]["ERROR"])) {
+			if (isset ($httpVars["lastPartition"]) && isset ($httpVars["partitionCount"])) {
+				/* we get the stream url (where all the partitions have been uploaded so far) */
+				$repository = ConfService :: getRepository();
+				$dir = AJXP_Utils :: decodeSecureMagic($httpVars["dir"]);
+				$plugin = AJXP_PluginsService :: findPlugin("access", $repository->getAccessType());
+				$streamData = $plugin->detectStreamWrapper(true);
+				$destStreamURL = $streamData["protocol"] . "://" . $repository->getId() . $dir . "/";
+				if ($httpVars["partitionCount"] > 1) {
 
-            if(!$all_in_place || $partitions_length != intval($fileLength)){
-                echo "Error: Upload validation error!";
-                /* we delete all the uploaded partitions */
-                if($httpVars["partitionCount"] > 1){
-                    for($i = 0; $i < $partitionCount; $i++){
-                        if(file_exists($destStreamURL."$clientId.$fileId.$i")){
-                            unlink($destStreamURL."$clientId.$fileId.$i");
-                        }
-                    }
-                }
-                else{
-                    $fileName = $httpVars["fileName"];
-                    unlink($destStreamURL.$fileName);
-                }
-                return;
-            }
+					/* we fetch the information that help us to construct the temp files name */
+					$index = intval($httpVars["partitionIndex"]);
+					$fileId = $httpVars["fileId"];
 
-            if(count($subs) > 0){
-                $curDir = "";
+					/* deletion of all the partitions that have been uploaded */
+					for ($i = 0; $i < $httpVars["partitionCount"]; $i++) {
+						if (file_exists($destStreamURL . "$fileHash.$fileId.$i")) {
+							unlink($destStreamURL . "$fileHash.$fileId.$i");
+						}
+					}
 
-                if(substr($curDir, -1) == "/"){
-                    $curDir = substr($curDir, 0, -1);
-                }
+				} else {
+					$fileName = $httpVars["fileName"];
+					unlink($destStreamURL . $fileName);
+				}
+			}
+			echo "Error: " . $postProcessData["processor_result"]["ERROR"]["MESSAGE"];
+			return;
+		}
 
-                // Create the folder tree as necessary
-                foreach ($subs as $key => $spath) {
-                    $messtmp="";
-                    $dirname=AJXP_Utils::decodeSecureMagic($spath, AJXP_SANITIZE_HTML_STRICT);
-                    $dirname = substr($dirname, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
-                    //$this->filterUserSelectionToHidden(array($dirname));
-                    if(AJXP_Utils::isHidden($dirname)){
-                        $folderForbidden = true;
-                        break;
-                    }
+		if (!isSet ($httpVars["partitionRealName"]) && !isSet ($httpVars["lastPartition"])) {
+			return;
+		}
 
-                    if(file_exists($destStreamURL."$curDir/$dirname")) {
-                        // if the folder exists, traverse
-                        AJXP_Logger::debug("$curDir/$dirname existing, traversing for $userfile_name out of", $httpVars["relativePath"]);
-                        $curDir .= "/".$dirname;
-                        continue;
-                    }
+		$repository = ConfService :: getRepository();
 
-                    AJXP_Logger::debug($destStreamURL.$curDir);
-                    $dirMode = 0775;
-                    $chmodValue = $repository->getOption("CHMOD_VALUE");
-                    if(isSet($chmodValue) && $chmodValue != "")
-                    {
-                        $dirMode = octdec(ltrim($chmodValue, "0"));
-                        if ($dirMode & 0400) $dirMode |= 0100; // User is allowed to read, allow to list the directory
-                        if ($dirMode & 0040) $dirMode |= 0010; // Group is allowed to read, allow to list the directory
-                        if ($dirMode & 0004) $dirMode |= 0001; // Other are allowed to read, allow to list the directory
-                    }
-                    $old = umask(0);
-                    mkdir($destStreamURL.$curDir."/".$dirname, $dirMode);
-                    umask($old);
-                    $curDir .= "/".$dirname;
-                }
-            }
+		if (!$repository->detectStreamWrapper(false)) {
+			return false;
+		}
 
-            // Now move the final file to the right folder
-            // Currently the file is at the base of the current
-            $relPath = AJXP_Utils::decodeSecureMagic($httpVars["relativePath"]);
-            $current = $destStreamURL.basename($relPath);
-            $target = $destStreamURL.$relPath;
+		if ($httpVars["lastPartition"]) {
+			$plugin = AJXP_PluginsService :: findPlugin("access", $repository->getAccessType());
+			$streamData = $plugin->detectStreamWrapper(true);
+			$dir = AJXP_Utils :: decodeSecureMagic($httpVars["dir"]);
+			$destStreamURL = $streamData["protocol"] . "://" . $repository->getId() . $dir . "/";
 
-            if(!$folderForbidden){
-                $count = intval($httpVars["partitionCount"]);
-                $fileId = $httpVars["fileId"];
-                $clientId = $httpVars["ajxp_sessid"];
-                AJXP_Logger::debug("Should now rebuild file!", $httpVars);
+			/* we check if the current file has a relative path (aka we want to upload an entire directory) */
+			AJXP_LOGGER :: debug("Now dispatching relativePath dest:", $httpVars["relativePath"]);
+			$subs = explode("/", $httpVars["relativePath"]);
+			$userfile_name = array_pop($subs);
+			$folderForbidden = false;
+			$all_in_place = true;
+			$partitions_length = 0;
+			$fileId = $httpVars["fileId"];
+			$partitionCount = $httpVars["partitionCount"];
+			$partitionIndex = $httpVars["partitionIndex"];
+			$fileLength = $_POST["fileLength"];
 
-                if($count > 1){
-                    $newDest = fopen($destStreamURL.$httpVars["partitionRealName"], "w");
-                    AJXP_LOGGER::debug("PartitionRealName", $destStreamURL.$httpVars["partitionRealName"]);
-                    for ($i = 0; $i < $count ; $i++){
-						            $fileHash = md5($httpVars["fileName"]);
-                    	
-                        $part = fopen($destStreamURL."$fileHash.$fileId.$i", "r");
-                        while(!feof($part)){
-                            fwrite($newDest, fread($part, 4096));
-                        }
-                        fclose($part);
-                        unlink($destStreamURL."$fileHash.$fileId.$i");
-                    }
-                    fclose($newDest);
-                }
+			/* check if all the partitions have been uploaded or not */
+			for ($i = 0; $all_in_place && $i < $partitionCount; $i++) {
+				$partition_file = $destStreamURL . "$fileHash.$fileId.$i";
+				if (file_exists($partition_file)) {
+					$partitions_length += filesize($partition_file);
+				} else {
+					$all_in_place = false;
+				}
+			}
 
-                $err = copy($current, $target);
-                if($err !== false){
-                    unlink($current);
-                    AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($target), false));
-                }
+			if (!$all_in_place || $partitions_length != intval($fileLength)) {
+				echo "Error: Upload validation error!";
+				/* we delete all the uploaded partitions */
+				if ($httpVars["partitionCount"] > 1) {
+					for ($i = 0; $i < $partitionCount; $i++) {
+						if (file_exists($destStreamURL . "$fileHash.$fileId.$i")) {
+							unlink($destStreamURL . "$fileHash.$fileId.$i");
+						}
+					}
+				} else {
+					$fileName = $httpVars["fileName"];
+					unlink($destStreamURL . $fileName);
+				}
+				return;
+			}
 
-                else if($current == $target){
-                    AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($target), false));
-                }
-            }
+			if (count($subs) > 0) {
+				$curDir = "";
 
-            else{
-                // Remove the file, as it should not have been uploaded!
-                unlink($current);
-            }
-        }
-    }
+				if (substr($curDir, -1) == "/") {
+					$curDir = substr($curDir, 0, -1);
+				}
+
+				// Create the folder tree as necessary
+				foreach ($subs as $key => $spath) {
+					$messtmp = "";
+					$dirname = AJXP_Utils :: decodeSecureMagic($spath, AJXP_SANITIZE_HTML_STRICT);
+					$dirname = substr($dirname, 0, ConfService :: getCoreConf("NODENAME_MAX_LENGTH"));
+					//$this->filterUserSelectionToHidden(array($dirname));
+					if (AJXP_Utils :: isHidden($dirname)) {
+						$folderForbidden = true;
+						break;
+					}
+
+					if (file_exists($destStreamURL . "$curDir/$dirname")) {
+						// if the folder exists, traverse
+						AJXP_Logger :: debug("$curDir/$dirname existing, traversing for $userfile_name out of", $httpVars["relativePath"]);
+						$curDir .= "/" . $dirname;
+						continue;
+					}
+
+					AJXP_Logger :: debug($destStreamURL . $curDir);
+					$dirMode = 0775;
+					$chmodValue = $repository->getOption("CHMOD_VALUE");
+					if (isSet ($chmodValue) && $chmodValue != "") {
+						$dirMode = octdec(ltrim($chmodValue, "0"));
+						if ($dirMode & 0400)
+							$dirMode |= 0100; // User is allowed to read, allow to list the directory
+						if ($dirMode & 0040)
+							$dirMode |= 0010; // Group is allowed to read, allow to list the directory
+						if ($dirMode & 0004)
+							$dirMode |= 0001; // Other are allowed to read, allow to list the directory
+					}
+					$old = umask(0);
+					mkdir($destStreamURL . $curDir . "/" . $dirname, $dirMode);
+					umask($old);
+					$curDir .= "/" . $dirname;
+				}
+			}
+
+			// Now move the final file to the right folder
+			// Currently the file is at the base of the current
+			$relPath = AJXP_Utils :: decodeSecureMagic($httpVars["relativePath"]);
+			$current = $destStreamURL . basename($relPath);
+			$target = $destStreamURL . $relPath;
+
+			if (!$folderForbidden) {
+				$count = intval($httpVars["partitionCount"]);
+				$fileId = $httpVars["fileId"];
+				AJXP_Logger :: debug("Should now rebuild file!", $httpVars);
+
+				if ($count > 1) {
+					$newDest = fopen($destStreamURL . $httpVars["partitionRealName"], "w");
+					AJXP_LOGGER :: debug("PartitionRealName", $destStreamURL . $httpVars["partitionRealName"]);
+
+					for ($i = 0; $i < $count; $i++) {
+
+						AJXP_LOGGER :: debug("Trying to open part", $destStreamURL . "$fileHash.$fileId.$i");
+						$part = fopen($destStreamURL . "$fileHash.$fileId.$i", "r");
+						while (!feof($part)) {
+							fwrite($newDest, fread($part, 4096));
+						}
+						fclose($part);
+						unlink($destStreamURL . "$fileHash.$fileId.$i");
+					}
+					fclose($newDest);
+				}
+
+				$err = copy($current, $target);
+				if ($err !== false) {
+					unlink($current);
+					AJXP_Controller :: applyHook("node.change", array (null, new AJXP_Node($target), false));
+				} else
+					if ($current == $target) {
+						AJXP_Controller :: applyHook("node.change", array (null, new AJXP_Node($target), false));
+					}
+			} else {
+				// Remove the file, as it should not have been uploaded!
+				unlink($current);
+			}
+		}
+	}
 }
 ?>
