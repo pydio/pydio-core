@@ -383,6 +383,14 @@ Class.create("ShareCenter", {
                     }.bind(this));
                     this.updateDialogButtons(oForm.down("div.dialogButtons"), "file");
                 }else{
+                    this.maxexpiration = parseInt(ajaxplorer.getPluginConfigs("ajxp_plugin[@name='share']").get("FILE_MAX_EXPIRATION"));
+                    if(this.maxexpiration > 0){
+                        oForm.down("[name='expiration']").setValue(this.maxexpiration);
+                    }
+                    this.maxdownload = parseInt(ajaxplorer.getPluginConfigs("ajxp_plugin[@name='share']").get("FILE_MAX_DOWNLOAD"));
+                    if(this.maxdownload > 0){
+                        oForm.down("[name='downloadlimit']").setValue(this.maxdownload);
+                    }
                     var button = $(oForm).down('div#generate_publiclet');
                     button.observe("click", this.generatePublicLinkCallback.bind(this));
                 }
@@ -555,6 +563,14 @@ Class.create("ShareCenter", {
         if(serialParams["expiration"] && ! this.checkPositiveNumber(serialParams["expiration"])
             || serialParams["downloadlimit"] && ! this.checkPositiveNumber(serialParams["downloadlimit"])){
             ajaxplorer.displayMessage("ERROR", MessageHash["share_center.75"]);
+            return;
+        }
+        if(this.maxexpiration > 0 && !(serialParams["expiration"] > 0 && serialParams["expiration"] <= this.maxexpiration) ){
+            ajaxplorer.displayMessage("ERROR", "Expiration must be between 1 and " + this.maxexpiration);
+            return;
+        }
+        if(this.maxdownload > 0 && !(serialParams["downloadlimit"] > 0 && serialParams["downloadlimit"] <= this.maxdownload) ){
+            ajaxplorer.displayMessage("ERROR", "Download limit must be between 1 and " + this.maxdownload);
             return;
         }
 
