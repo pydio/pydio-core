@@ -92,8 +92,9 @@ include_once 'phing/Task.php';
       			$toDelete[] = $end;
       			continue;
       		}      		
-   			if(substr($end, 0, strlen("/plugins/")=="/plugins/")){
+   			if(substr($end, 0, strlen("/plugins/"))=="/plugins/"){
    				if(file_exists($this->extPluginsFolder.substr($end, strlen("/plugins")))){
+                    $this->log("-- Skipping ".$line.", it's an external plugin", Project::MSG_INFO);
    					continue;
    				}
    			}
