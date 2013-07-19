@@ -37,10 +37,10 @@ class CoreAuthLoader extends AJXP_Plugin{
 		$configs = parent::getConfigs();
 		$configs["ALLOW_GUEST_BROWSING"] = !isSet($_SERVER["HTTP_AJXP_FORCE_LOGIN"]) && ($configs["ALLOW_GUEST_BROWSING"] === "true" || $configs["ALLOW_GUEST_BROWSING"] === true || intval($configs["ALLOW_GUEST_BROWSING"]) == 1);
         // FORCE CASE INSENSITIVY FOR SQL BASED DRIVERS
-        if(isSet($configs["MASTER_INSTANCE_CONFIG"]) && $configs["MASTER_INSTANCE_CONFIG"]["instance_name"] == "auth.sql"){
+        if(isSet($configs["MASTER_INSTANCE_CONFIG"]) && is_array($configs["MASTER_INSTANCE_CONFIG"]) &&  isSet($configs["MASTER_INSTANCE_CONFIG"]["instance_name"]) && $configs["MASTER_INSTANCE_CONFIG"]["instance_name"] == "auth.sql"){
             $configs["CASE_SENSITIVE"] = false;
         }
-        if(isSet($configs["SLAVE_INSTANCE_CONFIG"]) && !empty($configs["SLAVE_INSTANCE_CONFIG"]) && $configs["SLAVE_INSTANCE_CONFIG"]["instance_name"] == "auth.sql"){
+        if(isSet($configs["SLAVE_INSTANCE_CONFIG"]) && !empty($configs["SLAVE_INSTANCE_CONFIG"])  && isset($configs["SLAVE_INSTANCE_CONFIG"]["instance_name"]) && $configs["SLAVE_INSTANCE_CONFIG"]["instance_name"] == "auth.sql"){
             $configs["CASE_SENSITIVE"] = false;
         }
 		return $configs;
