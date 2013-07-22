@@ -26,6 +26,8 @@ Class.create("NotificationLoader", {
     pe  : null,
     menuItems : null,
     hasAlerts : false,
+    lastEventID:null,
+    lastAlertID:null,
 
     initialize: function(){
 
@@ -84,6 +86,8 @@ Class.create("NotificationLoader", {
         var parentAjxpNode = this.ajxpNode;
         var alertsCounts = 0;
         this.hasAlerts = false;
+        var newNotifs = $A();
+        var currentLastAlert = 0, currentLastEvent = 0;
 
         this.ajxpNode.getChildren().each(function(el){
 
@@ -105,11 +109,13 @@ Class.create("NotificationLoader", {
                 alerts = true;
             }
             var block = '<div class="notif_event_label">'+el.getLabel()+'</div>';
+            var detail = '';
             if(el.getMetadata().get('event_repository_label')){
-                block += '<div class="notif_event_repository">'+ el.getMetadata().get('event_repository_label') + '</div>';
+                detail += '<div class="notif_event_repository">'+ el.getMetadata().get('event_repository_label') + '</div>';
             }
-            block += '<div class="notif_event_description">'+ el.getMetadata().get('event_description') + '</div>';
-            block += '<div class="notif_event_date">'+ el.getMetadata().get('event_date') + '</div>';
+            detail += '<div class="notif_event_description">'+ el.getMetadata().get('event_description') + '</div>';
+            detail += '<div class="notif_event_date">'+ el.getMetadata().get('event_date') + '</div>';
+            block += detail;
             block = '<div class="notif_event_container">'+block+'</div><br style="clear:left;"/>';
             var moreActions = $A([{
                 name:MessageHash["notification_center.6"],
@@ -119,6 +125,7 @@ Class.create("NotificationLoader", {
                 }
             }]);
             if(isAlert){
+                var alertID = parseInt(el.getMetadata().get("alert_id"));
                 moreActions.push({
                     name:MessageHash["notification_center.7"],
                     icon_class:"icon-remove-sign",
@@ -131,7 +138,7 @@ Class.create("NotificationLoader", {
                         };
                         var params = {
                             get_action:'dismiss_user_alert',
-                            alert_id:el.getMetadata().get("alert_id")
+                            alert_id:alertID
                         };
                         if(el.getMetadata().get("event_occurence")){
                             params.occurrences = el.getMetadata().get("event_occurence");
@@ -140,7 +147,25 @@ Class.create("NotificationLoader", {
                         conn.sendAsync();
                     }
                 });
+                if(this.lastAlertID && alertID > this.lastAlertID ){
+                    newNotifs.push({
+                        title:el.getLabel(),
+                        body :detail.stripTags()
+                    });
+                }
+                currentLastAlert = Math.max(alertID, currentLastAlert);
+            }else{
+                var eventID = parseInt(el.getMetadata().get("event_id"));
+                if(this.lastEventID && eventID > this.lastEventID ){
+                    newNotifs.push({
+                        title:el.getLabel(),
+                        body :detail.stripTags()
+                    });
+                }
+                currentLastEvent = Math.max(eventID, currentLastEvent);
             }
+            this.lastAlertID = currentLastAlert;
+            this.lastEventID = currentLastEvent;
             menuItems.push({
                 id: "event_" + eventIndex,
                 name:block,
@@ -167,6 +192,19 @@ Class.create("NotificationLoader", {
             }else{
                 badge.hide();
             }
+        }
+        if(window.Notification && newNotifs.size()){
+            newNotifs.each(function(obje){
+                new Notification(
+                    obje.title,
+                    {
+                        body: obje.body,
+                        icon: 'plugins/gui.ajax/res/themes/vision/images/mimes/64/mime_empty.png',
+                        tag: 'ajaxplorer',
+                        dir: 'auto',
+                        lang: ajaxplorer.currentLanguage
+                    });
+            });
         }
         return menuItems;
     },

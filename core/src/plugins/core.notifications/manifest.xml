@@ -14,6 +14,7 @@
         </resources>
     </client_settings>
     <server_settings>
+        <param name="activate_notifications" scope="user" description="Activate desktop notifications" label="Desktop Notifications" type="button" choices="run_client_action:activateDesktopNotifications" expose="true" editable="true"/>
         <global_param description="CONF_MESSAGE[Display a new entry with all events happening on a user workspaces, and alerts. An SQL database must be setup for the FEED_DRIVER configuration.]" label="CONF_MESSAGE[User events and alerts]" name="USER_EVENTS" type="boolean" default="false"/>
         <global_param type="plugin_instance:feed" name="UNIQUE_FEED_INSTANCE" group="CONF_MESSAGE[Instance Params]" label="CONF_MESSAGE[Feed Instance]" description="CONF_MESSAGE[Choose the plugin]" mandatory="true" default="feed.sql"/>
     </server_settings>
@@ -48,10 +49,30 @@
             <action name="dismiss_user_alert">
                 <processing><serverCallback methodName="dismissUserAlert"/></processing>
             </action>
+            <action name="activateDesktopNotifications">
+                <gui src="" iconClass="icon-rss" text="notification_center.1" title="notification_title.2">
+                    <context dir="true" recycle="true" selection="false"/>
+                </gui>
+                <processing>
+                    <clientCallback><![CDATA[
+                        if(window.Notification){
+                            alert('Depending on your browser, this will ask for a specific permission. To disable, go through your browser preferences and exceptions. If you have already enabled this feature, probably nothing will hapen.');
+                            window.Notification.requestPermission(function(grant) {
+                                ['default', 'granted', 'denied'].indexOf(grant) === true
+                            });
+                        }else{
+                            alert('Your browser does not seem to support Desktop Notifications yet.');
+                        }
+                    ]]></clientCallback>
+                </processing>
+            </action>
         </actions>
         <hooks>
             <serverCallback methodName="persistChangeHookToFeed" hookName="node.change" defer="true"/>
             <serverCallback methodName="persistNotificationToAlerts" hookName="msg.notification"/>
         </hooks>
     </registry_contributions>
+    <dependencies>
+        <activePlugin pluginName="core.conf"/>
+    </dependencies>
 </ajxp_plugin>

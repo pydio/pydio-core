@@ -95,6 +95,7 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
             $object->author = $row->user_id;
             $object->date = $row->edate;
             $object->repository = $row->repository_id;
+            $object->event_id = $row->id;
             $data[] = $object;
         }
         return $data;
