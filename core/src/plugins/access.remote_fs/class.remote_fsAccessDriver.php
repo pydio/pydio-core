@@ -29,7 +29,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 {
 	private $plugCapabilities = array();
 	
-	function init($repository, $options = null){
+	function init($repository, $options = array()){
 		$repoCapabilities = $repository->getOption("API_CAPABILITIES");
 		if($repoCapabilities != ""){
 			$this->plugCapabilities = explode(",", $repoCapabilities);
