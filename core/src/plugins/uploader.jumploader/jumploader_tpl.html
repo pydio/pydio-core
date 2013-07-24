@@ -7,9 +7,10 @@
     
 	$repository = ConfService::getRepository();
 	$accessType = $repository->getAccessType();
-	if($accessType == "fs"){
-		$partitionLength = $UploadMaxSize - 1000;	
-	}else if($accessType == "remotefs"){
+
+    $partitionLength = $UploadMaxSize - 1000;
+
+    if($accessType == "remotefs"){
 		$maxFileLength = $UploadMaxSize;
 	}else if($accessType == "ftp"){
 		$partitionLength = $UploadMaxSize - 1000;
