@@ -70,7 +70,7 @@ class JumploaderProcessor extends AJXP_Plugin {
             $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir;
             $fileHash = md5($httpVars["fileName"]);
 
-            if(self::$remote){
+            if(!self::$remote){
                 $resumeIndexes = array ();
                 $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($destStreamURL));
                 $it->setMaxDepth(0);
@@ -245,22 +245,23 @@ class JumploaderProcessor extends AJXP_Plugin {
                     }
                 }
             }
-                if( (!$all_in_place || $partitions_length != intval($fileLength))){
-                    echo "Error: Upload validation error!";
-                    /* we delete all the uploaded partitions */
-                    if($httpVars["partitionCount"] > 1){
-                        for($i = 0; $i < $partitionCount; $i++){
-                            if(file_exists($destStreamURL."$fileHash.$fileId.$i")){
-                                unlink($destStreamURL."$fileHash.$fileId.$i");
-                            }
+
+            if( (!$all_in_place || $partitions_length != intval($fileLength))){
+                echo "Error: Upload validation error!";
+                /* we delete all the uploaded partitions */
+                if($httpVars["partitionCount"] > 1){
+                    for($i = 0; $i < $partitionCount; $i++){
+                        if(file_exists($destStreamURL."$fileHash.$fileId.$i")){
+                            unlink($destStreamURL."$fileHash.$fileId.$i");
                         }
                     }
-                    else{
-                        $fileName = $httpVars["fileName"];
-                        unlink($destStreamURL.$fileName);
-                    }
-                    return;
                 }
+                else{
+                    $fileName = $httpVars["partitionRealName"];
+                    unlink($destStreamURL.$fileName);
+                }
+                return;
+            }
 
                 if(count($subs) > 0 && !self::$remote){
                     $curDir = "";
@@ -308,14 +309,15 @@ class JumploaderProcessor extends AJXP_Plugin {
                     $count = intval($httpVars["partitionCount"]);
                     $fileId = $httpVars["fileId"];
                     AJXP_Logger::debug("Should now rebuild file!", $httpVars);
+                    // Now move the final file to the right folder
+                    // Currently the file is at the base of the current
+                    AJXP_LOGGER::debug("PartitionRealName", $destStreamURL.$httpVars["partitionRealName"]);
+                    $relPath = AJXP_Utils::decodeSecureMagic($httpVars["relativePath"]);
+                    $target = $destStreamURL.$relPath;
+                    $current = $destStreamURL.basename($relPath);
 
                     if($count > 1){
-                        AJXP_LOGGER::debug("PartitionRealName", $destStreamURL.$httpVars["partitionRealName"]);
-                        $relPath = AJXP_Utils::decodeSecureMagic($httpVars["relativePath"]);
-
-                        $target = $destStreamURL.$relPath;
                         if(self::$remote){
-                            $current = "/tmp/".basename($relPath);
                             $newDest = fopen("/tmp/".$httpVars["partitionRealName"], "w");
                             $newFile = array();
                             $length = 0;
@@ -340,12 +342,8 @@ class JumploaderProcessor extends AJXP_Plugin {
                         }
 
                         else{
-                            // Now move the final file to the right folder
-                            // Currently the file is at the base of the current
-                            $current = $destStreamURL.basename($relPath);
-
                             $newDest = fopen($destStreamURL.$httpVars["partitionRealName"], "w");
-                            $fileHash = md5($httpVars["fileName"]);
+                            $fileHash = md5($httpVars["partitionRealName"]);
 
                             for ($i = 0; $i < $count ; $i++){
                                 $part = fopen($destStreamURL."$fileHash.$fileId.$i", "r");
