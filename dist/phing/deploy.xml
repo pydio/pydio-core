@@ -25,8 +25,11 @@
         </if>
         <property name="cliPath" value="${installPath}/ajaxplorer-latest"/>
         <touch file="${cliPath}/data/cache/diag_result.php"/>
-
-        <echo message="**** Creating all workspaces"/>
+	
+	<echo message="**** Getting jumploader_z.jar"/>
+	<httpget url="http://jumploader.com/jumploader_z.jar" dir="${installPath}/ajaxplorer-latest/plugins/uploader.jumploader/" filename="jumploader_z.jar"/>
+        
+	<echo message="**** Creating all workspaces"/>
 
         <!-- RUN FIRST INSTALL -->
         <ajaxplorer_sdk
