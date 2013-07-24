@@ -111,11 +111,17 @@ Class.create("FormManager", {
                 element.observe("click", function(event){
                     element.addClassName('SF_inlineButtonWorking');
                     var testValues = $H();
+                    var choicesValue = param.get("choices").split(":");
+                    var firstPart = choicesValue.shift();
+                    if(firstPart == "run_client_action"){
+                        element.removeClassName('SF_inlineButtonWorking');
+                        ajaxplorer.actionBar.fireAction(choicesValue.shift());
+                        return;
+                    }
+                    testValues.set('get_action', firstPart);
                     this.serializeParametersInputs(form, testValues, "DRIVER_OPTION_");
                     var conn = new Connexion();
 
-                    var choicesValue = param.get("choices").split(":");
-                    testValues.set('get_action', choicesValue.shift());
                     if(choicesValue.length > 1){
                         testValues.set("action_plugin_id", choicesValue.shift());
                         testValues.set("action_plugin_method", choicesValue.shift());
