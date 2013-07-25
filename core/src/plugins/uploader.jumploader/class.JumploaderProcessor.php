@@ -28,12 +28,12 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class JumploaderProcessor extends AJXP_Plugin {
 
-	/**
-	 * Handle UTF8 Decoding
-	 *
-	 * @var unknown_type
-	 */
-	private static $skipDecoding = false;
+    /**
+     * Handle UTF8 Decoding
+     *
+     * @var unknown_type
+     */
+    private static $skipDecoding = false;
     private static $remote = false;
     private static $partitions = array();
 
@@ -61,8 +61,8 @@ class JumploaderProcessor extends AJXP_Plugin {
         $index = $httpVars["partitionIndex"];
         $realName = $fileVars["userfile_0"]["name"];
 
-				/* if fileId is not set, request for cross-session resume (only if the protocol is not ftp)*/
-		if(!isSet($httpVars["fileId"])) {
+        /* if fileId is not set, request for cross-session resume (only if the protocol is not ftp)*/
+        if(!isSet($httpVars["fileId"])) {
             AJXP_LOGGER::debug("Cross-Session Resume request");
 
             $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
@@ -113,11 +113,11 @@ class JumploaderProcessor extends AJXP_Plugin {
             AJXP_LOGGER::debug("Partitioned upload");
             $fileId = $httpVars["fileId"];
             $fileHash = md5($realName);
-            
+
             /* In order to enable cross-session resume, temp files must not depend on session.
              * Now named after and md5() of the original file name.
              */
-						AJXP_LOGGER::debug("Filename: " . $realName . ", File hash: " . $fileHash);
+            AJXP_LOGGER::debug("Filename: " . $realName . ", File hash: " . $fileHash);
             $fileVars["userfile_0"]["name"] = "$fileHash.$fileId.$index";
             $httpVars["lastPartition"] = false;
         }
@@ -131,15 +131,15 @@ class JumploaderProcessor extends AJXP_Plugin {
     public function postProcess($action, $httpVars, $postProcessData){
         if(isSet($httpVars["simple_uploader"]) || isSet($httpVars["xhr_uploader"])) return;
 
-				/* If set resumeFileId and resumePartitionIndex, cross-session resume is requested. */
-    		if(isSet($httpVars["resumeFileId"]) && isSet($httpVars["resumePartitionIndex"])) {
-				header("HTTP/1.1 200 OK");
-							
-        	    print("fileId: " . $httpVars["resumeFileId"] . "\n");
-        	    print("partitionIndex: " . $httpVars["resumePartitionIndex"]);
-    		
-    			return;
-    		}
+        /* If set resumeFileId and resumePartitionIndex, cross-session resume is requested. */
+        if(isSet($httpVars["resumeFileId"]) && isSet($httpVars["resumePartitionIndex"])) {
+            header("HTTP/1.1 200 OK");
+
+            print("fileId: " . $httpVars["resumeFileId"] . "\n");
+            print("partitionIndex: " . $httpVars["resumePartitionIndex"]);
+
+            return;
+        }
 
         /*if(self::$skipDecoding){
 
