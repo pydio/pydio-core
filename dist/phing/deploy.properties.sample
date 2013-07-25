@@ -16,6 +16,7 @@ ws.ftp.path=
 
 #sFTP server
 ws.sftp.host=
+ws.sftp.port=
 ws.sftp.user=
 ws.sftp.password=
 ws.sftp.path=
