@@ -35,6 +35,7 @@ class JumploaderProcessor extends AJXP_Plugin {
 	 */
 	private static $skipDecoding = false;
     private static $remote = false;
+    private static $partitions = array();
 
     public function preProcess($action, &$httpVars, &$fileVars){
         if(isSet($httpVars["simple_uploader"]) || isSet($httpVars["xhr_uploader"])) return;
@@ -78,7 +79,7 @@ class JumploaderProcessor extends AJXP_Plugin {
                     if (!$it->isDot()) {
                         $subPathName = $it->getSubPathName();
                         AJXP_LOGGER :: debug("Iterator SubPathName: " . $it->getSubPathName());
-                        if (strpos($subPathName, $fileHash) === 0) {
+                        if (strstr($subPathName, $fileHash) != false) {
                             $explodedSubPathName = explode('.', $subPathName);
                             $resumeFileId = $explodedSubPathName[1];
                             $resumeIndexes[] = $explodedSubPathName[2];
@@ -120,7 +121,6 @@ class JumploaderProcessor extends AJXP_Plugin {
             $fileVars["userfile_0"]["name"] = "$fileHash.$fileId.$index";
             $httpVars["lastPartition"] = false;
         }
-
         /* if we received the last partition */
         if(intval($index) == intval($httpVars["partitionCount"])-1){
             $httpVars["lastPartition"] = true;
@@ -206,16 +206,29 @@ class JumploaderProcessor extends AJXP_Plugin {
 
             if(self::$remote){
                 $partitions = array();
+                $newPartitions = array();
+                $index_first_partition = -1;
+                $i = 0;
                 do{
+                    $currentFileName = $driver->getFileNameToCopy();
                     $partitions[] = $driver->getNextFileToCopy();
+
+                    if($index_first_partition < 0 && strstr($currentFileName, $fileHash) != false){
+                        $index_first_partition = $i;
+                    }
+
+                    else if($index_first_partition < 0){
+                        $newPartitions[] = array_pop($partitions);
+                    }
                 }while($driver->hasFilesToCopy());
             }
 
+            /* if partitionned */
             if($partitionCount > 1){
                 if(self::$remote){
                     for( $i = 0; $all_in_place && $i < $partitionCount; $i++){
                         $partition_file = "$fileHash.$fileId.$i";
-                        if( strpos($partitions[$i]["name"], $partition_file) == 0 ){
+                        if( strstr($partitions[$i]["name"], $partition_file) != false ){
                             $partitions_length += filesize( $partitions[$i]["tmp_name"] );
                         }
                         else{ $all_in_place = false; }
@@ -234,8 +247,8 @@ class JumploaderProcessor extends AJXP_Plugin {
 
             else{
                 if(self::$remote){
-                    if( strpos($partitions[0]["name"], $userfile_name) ){
-                        $partitions_length += filesize( $partitions[0]["tmp_name"] );
+                    if( strstr($newPartitions[count($newPartitions)-1]["name"], $userfile_name) != false){
+                        $partitions_length += filesize( $newPartitions[count($newPartitions)-1]["tmp_name"] );
                     }
                 }
 
@@ -263,118 +276,126 @@ class JumploaderProcessor extends AJXP_Plugin {
                 return;
             }
 
-                if(count($subs) > 0 && !self::$remote){
-                    $curDir = "";
+            if(count($subs) > 0 && !self::$remote){
+                $curDir = "";
 
-                    if(substr($curDir, -1) == "/"){
-                        $curDir = substr($curDir, 0, -1);
-                    }
-
-                    // Create the folder tree as necessary
-                    foreach ($subs as $key => $spath) {
-                        $messtmp="";
-                        $dirname=AJXP_Utils::decodeSecureMagic($spath, AJXP_SANITIZE_HTML_STRICT);
-                        $dirname = substr($dirname, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
-                        //$this->filterUserSelectionToHidden(array($dirname));
-                        if(AJXP_Utils::isHidden($dirname)){
-                            $folderForbidden = true;
-                            break;
-                        }
-
-                        if(file_exists($destStreamURL."$curDir/$dirname")) {
-                            // if the folder exists, traverse
-                            AJXP_Logger::debug("$curDir/$dirname existing, traversing for $userfile_name out of", $httpVars["relativePath"]);
-                            $curDir .= "/".$dirname;
-                            continue;
-                        }
-
-                        AJXP_Logger::debug($destStreamURL.$curDir);
-                        $dirMode = 0775;
-                        $chmodValue = $repository->getOption("CHMOD_VALUE");
-                        if(isSet($chmodValue) && $chmodValue != "")
-                        {
-                            $dirMode = octdec(ltrim($chmodValue, "0"));
-                            if ($dirMode & 0400) $dirMode |= 0100; // User is allowed to read, allow to list the directory
-                            if ($dirMode & 0040) $dirMode |= 0010; // Group is allowed to read, allow to list the directory
-                            if ($dirMode & 0004) $dirMode |= 0001; // Other are allowed to read, allow to list the directory
-                        }
-                        $old = umask(0);
-                        mkdir($destStreamURL.$curDir."/".$dirname, $dirMode);
-                        umask($old);
-                        $curDir .= "/".$dirname;
-                    }
+                if(substr($curDir, -1) == "/"){
+                    $curDir = substr($curDir, 0, -1);
                 }
 
-                if(!$folderForbidden){
-                    $count = intval($httpVars["partitionCount"]);
-                    $fileId = $httpVars["fileId"];
-                    AJXP_Logger::debug("Should now rebuild file!", $httpVars);
-                    // Now move the final file to the right folder
-                    // Currently the file is at the base of the current
-                    AJXP_LOGGER::debug("PartitionRealName", $destStreamURL.$httpVars["partitionRealName"]);
-                    $relPath = AJXP_Utils::decodeSecureMagic($httpVars["relativePath"]);
-                    $target = $destStreamURL.$relPath;
-                    $current = $destStreamURL.basename($relPath);
+                // Create the folder tree as necessary
+                foreach ($subs as $key => $spath) {
+                    $messtmp="";
+                    $dirname=AJXP_Utils::decodeSecureMagic($spath, AJXP_SANITIZE_HTML_STRICT);
+                    $dirname = substr($dirname, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
+                    //$this->filterUserSelectionToHidden(array($dirname));
+                    if(AJXP_Utils::isHidden($dirname)){
+                        $folderForbidden = true;
+                        break;
+                    }
 
-                    if($count > 1){
-                        if(self::$remote){
-                            $newDest = fopen("/tmp/".$httpVars["partitionRealName"], "w");
-                            $newFile = array();
-                            $length = 0;
-                            for($i = 0, $count = count($partitions); $i < $count; $i++){
-                                $currentFile = $partitions[$i];
-                                $currentFileName = $currentFile["tmp_name"];
-                                $part = fopen($currentFileName, "r");
-                                while(!feof($part)){
-                                    $length += fwrite($newDest, fread($part, 4096));
-                                }
-                                fclose($part);
-                                unlink($currentFileName);
+                    if(file_exists($destStreamURL."$curDir/$dirname")) {
+                        // if the folder exists, traverse
+                        AJXP_Logger::debug("$curDir/$dirname existing, traversing for $userfile_name out of", $httpVars["relativePath"]);
+                        $curDir .= "/".$dirname;
+                        continue;
+                    }
+
+                    AJXP_Logger::debug($destStreamURL.$curDir);
+                    $dirMode = 0775;
+                    $chmodValue = $repository->getOption("CHMOD_VALUE");
+                    if(isSet($chmodValue) && $chmodValue != "")
+                    {
+                        $dirMode = octdec(ltrim($chmodValue, "0"));
+                        if ($dirMode & 0400) $dirMode |= 0100; // User is allowed to read, allow to list the directory
+                        if ($dirMode & 0040) $dirMode |= 0010; // Group is allowed to read, allow to list the directory
+                        if ($dirMode & 0004) $dirMode |= 0001; // Other are allowed to read, allow to list the directory
+                    }
+                    $old = umask(0);
+                    mkdir($destStreamURL.$curDir."/".$dirname, $dirMode);
+                    umask($old);
+                    $curDir .= "/".$dirname;
+                }
+            }
+
+            if(!$folderForbidden){
+                $fileId = $httpVars["fileId"];
+                AJXP_Logger::debug("Should now rebuild file!", $httpVars);
+                // Now move the final file to the right folder
+                // Currently the file is at the base of the current
+                AJXP_LOGGER::debug("PartitionRealName", $destStreamURL.$httpVars["partitionRealName"]);
+                $relPath = AJXP_Utils::decodeSecureMagic($httpVars["relativePath"]);
+                $target = $destStreamURL;
+                $target .= (self::$remote)? basename($relPath) : $relPath;
+                $current = $destStreamURL.basename($relPath);
+
+                if($httpVars["partitionCount"] > 1){
+                    if(self::$remote){
+                        $test = AJXP_Utils::getAjxpTmpDir()."/".$httpVars["partitionRealName"];
+                        $newDest = fopen(AJXP_Utils::getAjxpTmpDir()."/".$httpVars["partitionRealName"], "w");
+                        $newFile = array();
+                        $length = 0;
+                        for($i = 0, $count = count($partitions); $i < $count; $i++){
+                            $currentFile = $partitions[$i];
+                            $currentFileName = $currentFile["tmp_name"];
+                            $part = fopen($currentFileName, "r");
+                            while(!feof($part)){
+                                $length += fwrite($newDest, fread($part, 4096));
                             }
-                            $newFile["type"] = $partitions[0]["type"];
-                            $newFile["name"] = $httpVars["partitionRealName"];
-                            $newFile["error"] = 0;
-                            $newFile["size"] = $length;
-                            $newFile["tmp_name"] = "/tmp/".$httpVars["partitionRealName"];
-                            $newFile["destination"] = $partitions[0]["destination"];
-                            fclose($newDest);
-                            $driver->storeFileToCopy($newFile);
+                            fclose($part);
+                            unlink($currentFileName);
+                        }
+                        $newFile["type"] = $partitions[0]["type"];
+                        $newFile["name"] = $httpVars["partitionRealName"];
+                        $newFile["error"] = 0;
+                        $newFile["size"] = $length;
+                        $newFile["tmp_name"] = AJXP_Utils::getAjxpTmpDir()."/".$httpVars["partitionRealName"];
+                        $newFile["destination"] = $partitions[0]["destination"];
+                        $newPartitions[] = $newFile;
+                    }
+
+                    else{
+                        $newDest = fopen($destStreamURL.$httpVars["partitionRealName"], "w");
+                        $fileHash = md5($httpVars["partitionRealName"]);
+
+                        for ($i = 0; $i < $httpVars["partitionCount"] ; $i++){
+                            $part = fopen($destStreamURL."$fileHash.$fileId.$i", "r");
+                            while(!feof($part)){
+                                fwrite($newDest, fread($part, 4096));
+                            }
+                            fclose($part);
+                            unlink($destStreamURL."$fileHash.$fileId.$i");
                         }
 
-                        else{
-                            $newDest = fopen($destStreamURL.$httpVars["partitionRealName"], "w");
-                            $fileHash = md5($httpVars["partitionRealName"]);
-
-                            for ($i = 0; $i < $count ; $i++){
-                                $part = fopen($destStreamURL."$fileHash.$fileId.$i", "r");
-                                while(!feof($part)){
-                                    fwrite($newDest, fread($part, 4096));
-                                }
-                                fclose($part);
-                                unlink($destStreamURL."$fileHash.$fileId.$i");
-                            }
-
-                        }
-                        fclose($newDest);
                     }
+                    fclose($newDest);
+                }
 
-                    if(!self::$remote) $err = copy($current, $target);
-
-                    if($err !== false){
-                        if(!self::$remote) unlink($current);
-                        AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($target), false));
-                    }
-
-                    else if($current == $target){
-                        AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($target), false));
-                    }
+                if(!self::$remote){
+                    $err = copy($current, $target);
                 }
 
                 else{
-                    // Remove the file, as it should not have been uploaded!
+                    for($i=0, $count=count($newPartitions); $i<$count; $i++){
+                        $driver->storeFileToCopy($newPartitions[$i]);
+                    }
+                }
+
+                if($err !== false){
                     if(!self::$remote) unlink($current);
+                    AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($target), false));
+                }
+
+                else if($current == $target){
+                    AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($target), false));
                 }
             }
+
+            else{
+                // Remove the file, as it should not have been uploaded!
+                if(!self::$remote) unlink($current);
+            }
         }
+    }
 }
 ?>
