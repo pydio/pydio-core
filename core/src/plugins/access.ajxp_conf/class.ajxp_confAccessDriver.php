@@ -375,7 +375,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case "create_group":
 
                 if(isSet($httpVars["group_path"])){
-                    $basePath = dirname($httpVars["group_path"]);
+                    $basePath = AJXP_Utils::forwardSlashDirname($httpVars["group_path"]);
                     if(empty($basePath)) $basePath = "/";
                     $gName = AJXP_Utils::sanitize(AJXP_Utils::decodeSecureMagic(basename($httpVars["group_path"])), AJXP_SANITIZE_ALPHANUM);
                 }else{
@@ -414,7 +414,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $roleGroup = false;
                 if(strpos($roleId, "AJXP_GRP_") === 0){
                     $groupPath = AuthService::filterBaseGroup(substr($roleId, strlen("AJXP_GRP_/")));
-                    $groups = AuthService::listChildrenGroups(dirname($groupPath));
+                    $groups = AuthService::listChildrenGroups(AJXP_Utils::forwardSlashDirname($groupPath));
                     $key = "/".basename($groupPath);
                     if(!array_key_exists($key, $groups)){
                         throw new Exception("Cannot find group with this id!");
@@ -485,7 +485,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if(strpos($roleId, "AJXP_GRP_") === 0){
                     $groupPath = AuthService::filterBaseGroup(substr($roleId, strlen("AJXP_GRP_")));
                     $roleId = "AJXP_GRP_".$groupPath;
-                    $groups = AuthService::listChildrenGroups(dirname($groupPath));
+                    $groups = AuthService::listChildrenGroups(AJXP_Utils::forwardSlashDirname($groupPath));
                     $key = "/".basename($groupPath);
                     if(!array_key_exists($key, $groups)){
                         throw new Exception("Cannot find group with this id!");
@@ -1321,7 +1321,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::close();
                 }else if(isSet($httpVars["group"])){
                     $groupPath = $httpVars["group"];
-                    $basePath = substr(dirname($groupPath), strlen("/data/users"));
+                    $basePath = substr(AJXP_Utils::forwardSlashDirname($groupPath), strlen("/data/users"));
                     $gName = basename($groupPath);
                     AuthService::deleteGroup($basePath, $gName);
                     AJXP_XMLWriter::header();

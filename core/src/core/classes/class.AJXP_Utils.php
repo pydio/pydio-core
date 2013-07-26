@@ -181,6 +181,15 @@ class AJXP_Utils
         @file_put_contents(AJXP_CACHE_DIR."/first_run_passed", "true");
     }
 
+    public static function forwardSlashDirname($path){
+        return (DIRECTORY_SEPARATOR === "\\" ? str_replace("\\", "/", dirname($path)): dirname($path));
+    }
+
+    public static function forwardSlashBasename($path){
+        return (DIRECTORY_SEPARATOR === "\\" ? str_replace("\\", "/", basename($path)): basename($path));
+    }
+
+
     /**
      * Parse a Comma-Separated-Line value
      * @static
