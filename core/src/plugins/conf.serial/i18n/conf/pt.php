@@ -20,7 +20,7 @@
 */
 $mess=array(
 "Serialized Configuration Storage" => "Ficheiros em série",
-"Stores the conf data as serialized PHP values on the filesystem." => "GGuarda os dados de autenticação em valores em série PHP no sistema de ficheiros.",
+"Stores the conf data as serialized PHP values on the filesystem." => "Guarda os dados de autenticação em valores em série PHP no sistema de ficheiros.",
 "Repositories" => "Áreas de Trabalho",
 "The file in which the repositories are stored" => "O ficheiro onde as Áreas de Trabalho são guardadas",
 "Users" => "Utilizadores",

@@ -23,7 +23,7 @@ $mess = array(
     "1" => "Acção",
     "1d" => "Acção a ser executada pela tarefa",
     "2" => "Agenda",
-    "2d" => "Expressão cronológica utilizando o seguinte formato : minutos horas dias diasSemanas meses. Pode utilizar Wildcards, paços e intervalos.",
+    "2d" => "Expressão cronológica utilizando o seguinte formato : minutos horas dias diasSemanas meses. Pode utilizar Wildcards, passos e intervalos.",
     "3" => "Próxima Execução",
     "4" => "ID do Repositório",
     "4s" => "Repositório",
@@ -54,6 +54,6 @@ $mess = array(
     "19d" => "Remover entrada da agenda e remover as tarefas seleccionadas",
     "20" => "Expressão Cronológica",
     "20d" => "Gerar uma expressão Cronológica",
-    "21" => "Adicionar a seguinte linha á sua Tabela Cronológica, substituindo o valor da sua palavra-chave real e agendando o que pretende (configurado aqui para correr a cada cinco minutos).",
-    "22" => "Agendamento Genérico para correr tarefas de forma relugar. Requer a activação de CLI e de uma Tabela Cronológica ou de um sistema semelhante.",
+    "21" => "Adicionar a seguinte linha à sua Tabela Cronológica, substituindo o valor da sua palavra-chave real e agendando o que pretende (configurado aqui para correr a cada cinco minutos).",
+    "22" => "Agendamento Genérico para correr tarefas de forma regular. Requer a activação de CLI e de uma Tabela Cronológica ou de um sistema semelhante.",
 );

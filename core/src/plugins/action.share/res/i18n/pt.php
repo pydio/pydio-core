@@ -80,5 +80,5 @@ $mess = array(
     "75"=> "Por favor utilize um número positivo tanto para o campo Validade como para o Limite Máximo de Transferências.",
     "76"=> "Por favor active as cookies no seu Navegador para poder aceder a esta aplicação",
     "77"=> "Por favor active o Javascript no seu Navegador para aceder a esta aplicação",
-    "78"=> "ATENÇÃO: Só deve utilizar caracteres alphanuméricos padrão para nomes de utilizador. O Identificador '%CURRENT%' será substituido por '%NEW%'",
+    "78"=> "ATENÇÃO: Só deve utilizar caracteres alfa-numéricos padrão para nomes de utilizador. O Identificador '%CURRENT%' será substituído por '%NEW%'",
 );
