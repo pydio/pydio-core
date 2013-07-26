@@ -1,0 +1,26 @@
+<?php
+/*
+* Multi shortener plugin for ajaXplorer by FrenandoAloso
+*         based in bit.ly plugin
+*/
+$mess=array(
+"Multi URL Shortener" => "Redutor de Multi URLs",
+"Shorten Download URLs before sending them back to the user." => "Reduzir URLs antes de os devolver ao utilizador.",
+"User ID" => "ID de Utilizador",
+"adF.ly account user ID.\nThe numbers after -= ?id= =- in of your referral program's URL" => "ID de conta adF.ly ID.\nOs números após -= ?id= =- para usar o seu programa de Referral URLs",
+"API Key" => "Chave API",
+"adF.ly account API Key" => "Chave API da conta adF.ly",
+"Type of ADS" => "Tipo de Publicidade",
+"Type of AD you like to show.\n Select Fullscreen AD or Top banner AD" => "Tipo de Publicidade que gostaria de mostrar.\n Seleccione publicidade do tipo Ecrã Cheio ou Banner Superior",
+"Short domain" => "Domino Curto",
+"adF.ly or q.gs domains, select wich you like" => "Seleccione um domínio adF.ly ou q.gs, que goste",
+"FullScreen" => "Ecrã Cheio",
+"Banner" => "Banner",
+"Bit.ly URL Shortener" => "Redutor de URLs Bit.lyr",
+"Shorten Download URLs before sending them back to the user. Requires a Bit.ly account." => "Reduzir URLs antes de os devolver ao utilizador. Requer uma conta em Bit.ly.",
+"User Name" => "Nome de Utilizador",
+"Bit.ly account user name" => "Nome de Conta de Utilizador Bit.ly",
+"API Key" => "Chave API",
+"Bit.ly account API Key" => "Chave API da conta Bit.ly",
+);
+?>
