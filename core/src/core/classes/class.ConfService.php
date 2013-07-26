@@ -337,7 +337,8 @@ class ConfService
      */
     public static function getAccessibleRepositories($userObject=null, $details=false, $labelOnly = false, $skipShared = false){
         $result = array();
-        foreach (ConfService::getRepositoriesList("all") as $repositoryId => $repositoryObject)
+        $allReps = ConfService::getRepositoriesList("all");
+        foreach ($allReps as $repositoryId => $repositoryObject)
         {
             if(!ConfService::repositoryIsAccessible($repositoryId, $repositoryObject, $userObject, $details, $skipShared)){
                 continue;
