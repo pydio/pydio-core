@@ -340,6 +340,7 @@ abstract class AbstractAjxpUser
 
     public function setGroupPath($groupPath, $update = false)
     {
+        if(strlen($groupPath) > 1) $groupPath = rtrim($groupPath, "/");
         $this->groupPath = $groupPath;
     }
 

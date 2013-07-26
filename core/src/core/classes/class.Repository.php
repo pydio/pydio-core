@@ -473,6 +473,7 @@ class Repository implements AjxpGroupPathProvider {
      */
     public function setGroupPath($groupPath)
     {
+        if(strlen($groupPath) > 1) $groupPath = rtrim($groupPath, "/");
         $this->groupPath = $groupPath;
     }
 
