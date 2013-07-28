@@ -318,14 +318,27 @@ class multiAuthDriver extends AbstractAuthDriver {
                         $this->drivers[$this->slaveName]->changePassword($login, $pass);
                     }else{
                         $this->drivers[$this->slaveName]->createUser($login, $pass);
+                        $confDriver = ConfService::getConfStorageImpl();
+                        $userObject = $confDriver->createUserObject($login);
+                        $userObject->personalRole->setParameterValue("auth.core", "auth_scheme", "master");
+                        $userObject->save();
                     }
+
                     return true;
                 }else{
                     return false;
                 }
             }else{
-                $res = $this->drivers[$this->slaveName]->checkPassword($login, $pass, $seed);
-                return $res;
+                // only allow auth from slave plugin if the user hasn't been created
+                // from the master auth plugin
+                if ($this->drivers[$this->slaveName]->checkPassword($login, $pass, $seed)){
+                    $confDriver = ConfService::getConfStorageImpl();
+                    $userObject = $confDriver->createUserObject($login);
+                    $param = $userObject->personalRole->filterParameterValue("auth.core", "auth_scheme", AJXP_REPO_SCOPE_ALL, "");
+                    return ($param != "master");
+                }else{
+                    return false;
+                }
             }
         }
 
