@@ -61,10 +61,10 @@ class ImagePreviewer extends AJXP_Plugin {
 				
 				header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($cId))."; name=\"".basename($cId)."\"");
 				header("Content-Length: ".strlen($data));
-				header('Cache-Control: public');
-                header("Pragma:");
+				header('Cache-Control: no-cache');
+                header("Pragma: no-cache");
                 header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()-10000) . " GMT");
-                header("Expires: " . gmdate("D, d M Y H:i:s", time()+5*24*3600) . " GMT");
+                header("Expires: " . gmdate("D, d M Y H:i:s", time()) . " GMT");
 				print($data);
 
 			}else{
@@ -77,10 +77,10 @@ class ImagePreviewer extends AJXP_Plugin {
                 $filesize = $stat["size"];
 				header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($file))."; name=\"".basename($file)."\"");
 				header("Content-Length: ".$filesize);
-				header('Cache-Control: public');
-                header("Pragma:");
+				header('Cache-Control: no-cache');
+                header("Pragma: no-cache");
                 header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()-10000) . " GMT");
-                header("Expires: " . gmdate("D, d M Y H:i:s", time()+5*24*3600) . " GMT");
+                header("Expires: " . gmdate("D, d M Y H:i:s", time()) . " GMT");
 
 				$class = $streamData["classname"];
 				$stream = fopen("php://output", "a");
