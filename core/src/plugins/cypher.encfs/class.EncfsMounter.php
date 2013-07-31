@@ -90,17 +90,18 @@ class EncfsMounter extends AJXP_Plugin
                 }
 
                 //$repo = ConfService::getRepository();
-                $dir = $this->getWorkingPath().ltrim(AJXP_Utils::decodeSecureMagic($httpVars["dir"]), "/");
+                $workingP = rtrim($this->getWorkingPath(), "/");
+                $dir = $workingP.AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
 
-                if(dirname($dir) != rtrim($this->getWorkingPath(), "/")){
+                if(dirname($dir) != $workingP){
                     throw new Exception("Please cypher only folders at the root of your repository");
                 }
+
                 $pass = $httpVars["pass"];
                 $raw  = dirname($dir).DIRECTORY_SEPARATOR."ENCFS_RAW_".basename($dir);
                 if(!strstr($dir, "ENCFS_CLEAR_") && !is_dir($raw)){
                     // NEW FOLDER SCENARIO
                     $clear  = dirname($dir).DIRECTORY_SEPARATOR."ENCFS_CLEAR_".basename($dir);
-
                     mkdir($raw);
                     $result = self::initEncFolder($raw, $xmlTemplate, $this->getFilteredOption("ENCFS_XML_PASSWORD"), $pass);
                     if($result){
