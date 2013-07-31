@@ -159,9 +159,6 @@ Class.create("MetaCellRenderer", {
                         obj.linkEditableDiv(editableDiv);
                     }
                 break;
-                case "choice":
-
-                break;
                 default:
                 break;
             }
@@ -292,7 +289,7 @@ Class.create("MetaCellRenderer", {
 		cont.innerHTML = formElement.value;
 		formElement.replace(cont);
 		
-	 	var select = cont //window.document.getElementsByName('select_test');
+	 	var select = cont 
 		option.each(function(item)  {
     	select.options[select.options.length] = new Option(item, item);
 									})

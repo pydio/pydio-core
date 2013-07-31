@@ -68,9 +68,9 @@ define("ADMIN_PASSWORD", "admin");
 
 
 // DEBUG OPTIONS
-define("AJXP_CLIENT_DEBUG"  ,	True);
-define("AJXP_SERVER_DEBUG"  ,	True);
-define("AJXP_SKIP_CACHE"    ,   True);
+define("AJXP_CLIENT_DEBUG"  ,	false);
+define("AJXP_SERVER_DEBUG"  ,	false);
+define("AJXP_SKIP_CACHE"    ,   false);
 
 require(AJXP_BIN_FOLDER."/compat.php");
 

@@ -65,7 +65,6 @@
 
 									var element = form.down('input[name="'+metaFields[i]+'"]');
 									var option = metaFields[i].substr(7).split('-');
-									console.log(option);
 									MetaCellRenderer.prototype.select(element, form,option);
 								}
 								// mod for textarea
