@@ -33,7 +33,7 @@ class IMagickPreviewer extends AJXP_Plugin {
 	protected $useOnTheFly = false;
 
     protected $imagickExtensions = array("pdf", "svg", "tif", "tiff", "psd", "xcf", "eps", "cr2");
-    protected $unoconvExtensios = array("xls", "xlsx", "ods", "doc", "docx", "odt", "ppt", "pptx", "odp", "rtf");
+    protected $unoconvExtensios = array("xls", "xlt", "xlsx", "xltx", "ods", "doc", "dot", "docx", "dotx", "odt", "ppt", "pptx", "odp", "rtf");
 
     public function loadConfigs($configsData){
         parent::loadConfigs($configsData);
@@ -178,7 +178,7 @@ class IMagickPreviewer extends AJXP_Plugin {
 		$index = 0;
         $unoconv =  $this->getFilteredOption("UNOCONV");
 		if(!empty($unoconv)){
-			$officeExt = array('xls', 'xlsx', 'ods', 'doc', 'docx', 'odt', 'ppt', 'pptx', 'odp', 'rtf');
+			$officeExt = array('xls', 'xlt', 'xlsx', 'xltx', 'ods', 'doc', 'dot', 'docx', 'dotx', 'odt', 'ppt', 'pptx', 'odp', 'rtf');
 			$extension = pathinfo($file, PATHINFO_EXTENSION);
 			if(in_array(strtolower($extension), $officeExt)){
 				$unoDoc = $prefix."_unoconv.pdf";
@@ -203,7 +203,7 @@ class IMagickPreviewer extends AJXP_Plugin {
 	public function generateJpegsCallback($masterFile, $targetFile){
         $unoconv =  $this->getFilteredOption("UNOCONV");
 		if(!empty($unoconv)){
-			$officeExt = array('xls', 'xlsx', 'ods', 'doc', 'docx', 'odt', 'ppt', 'pptx', 'odp', 'rtf');
+			$officeExt = array('xls', 'xlt', 'xlsx', 'xltx', 'ods', 'doc', 'dot', 'docx', 'dotx', 'odt', 'ppt', 'pptx', 'odp', 'rtf');
 		}else{
             $unoconv = false;
         }
