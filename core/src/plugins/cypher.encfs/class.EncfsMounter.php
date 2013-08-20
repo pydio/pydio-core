@@ -88,22 +88,27 @@ class EncfsMounter extends AJXP_Plugin
                 if(empty($xmlTemplate) || !is_file($xmlTemplate)){
                     throw new Exception("It seems that you have not set the plugin 'Enfcs XML File' configuration, or the system cannot find it!");
                 }
-                $dir = $this->getWorkingPath().AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
-                if(dirname($dir) != $this->getWorkingPath()){
+
+                //$repo = ConfService::getRepository();
+                $workingP = rtrim($this->getWorkingPath(), "/");
+                $dir = $workingP.AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
+
+                if(dirname($dir) != $workingP){
                     throw new Exception("Please cypher only folders at the root of your repository");
                 }
+
                 $pass = $httpVars["pass"];
                 $raw  = dirname($dir).DIRECTORY_SEPARATOR."ENCFS_RAW_".basename($dir);
                 if(!strstr($dir, "ENCFS_CLEAR_") && !is_dir($raw)){
                     // NEW FOLDER SCENARIO
                     $clear  = dirname($dir).DIRECTORY_SEPARATOR."ENCFS_CLEAR_".basename($dir);
-
                     mkdir($raw);
                     $result = self::initEncFolder($raw, $xmlTemplate, $this->getFilteredOption("ENCFS_XML_PASSWORD"), $pass);
                     if($result){
                         // Mount folder
                         mkdir($clear);
-                        self::mountFolder($raw, $clear, $pass);
+                        $uid = $this->getFilteredOption("ENCFS_UID");
+                        self::mountFolder($raw, $clear, $pass, $uid);
                         $content = scandir($dir);
                         foreach($content as $fileOrFolder){
                             if($fileOrFolder == "." || $fileOrFolder == "..") continue;
@@ -117,15 +122,16 @@ class EncfsMounter extends AJXP_Plugin
                     // SIMPLY UNMOUNT
                     self::umountFolder($dir);
                 }
-            break;
+                break;
             case "encfs.uncypher_folder":
                 $dir = $this->getWorkingPath().AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
                 $raw = str_replace("ENCFS_CLEAR_", "ENCFS_RAW_", $dir);
                 $pass = $httpVars["pass"];
+                $uid = $this->getFilteredOption("ENCFS_UID");
                 if(is_dir($raw)){
-                    self::mountFolder($raw, $dir, $pass);
+                    self::mountFolder($raw, $dir, $pass, $uid);
                 }
-            break;
+                break;
         }
         AJXP_XMLWriter::header();
         AJXP_XMLWriter::reloadDataNode();
@@ -158,10 +164,10 @@ class EncfsMounter extends AJXP_Plugin
 
         copy($originalXML, $raw."/".basename($originalXML));
         $descriptorspec = array(
-                0 => array("pipe", "r"),  // stdin
-                1 => array("pipe", "w"),  // stdout
-                2 => array("pipe", "w")   // stderr ?? instead of a file
-                );
+            0 => array("pipe", "r"),  // stdin
+            1 => array("pipe", "w"),  // stdout
+            2 => array("pipe", "w")   // stderr ?? instead of a file
+        );
         $command = 'sudo encfsctl autopasswd '.escapeshellarg($raw);
         $process = proc_open($command, $descriptorspec, $pipes);
         $text = ""; $error = "";
@@ -172,11 +178,11 @@ class EncfsMounter extends AJXP_Plugin
             fflush($pipes[0]);
             fclose($pipes[0]);
             while($s= fgets($pipes[1], 1024)) {
-              $text .= $s;
+                $text .= $s;
             }
             fclose($pipes[1]);
             while($s= fgets($pipes[2], 1024)) {
-              $error .= $s . "\n";
+                $error .= $s . "\n";
             }
             fclose($pipes[2]);
         }
@@ -189,25 +195,25 @@ class EncfsMounter extends AJXP_Plugin
     }
 
 
-    public static function mountFolder($raw, $clear, $secret){
+    public static function mountFolder($raw, $clear, $secret, $uid){
 
         $descriptorspec = array(
-                0 => array("pipe", "r"),  // stdin
-                1 => array("pipe", "w"),  // stdout
-                2 => array("pipe", "w")   // stderr ?? instead of a file
-                );
-        $command = 'sudo encfs -o allow_other,uid=33 -S '.escapeshellarg($raw).' '.escapeshellarg($clear);
+            0 => array("pipe", "r"),  // stdin
+            1 => array("pipe", "w"),  // stdout
+            2 => array("pipe", "w")   // stderr ?? instead of a file
+        );
+        $command = 'sudo encfs -o allow_other,uid='.$uid.' -S '.escapeshellarg($raw).' '.escapeshellarg($clear);
         $process = proc_open($command, $descriptorspec, $pipes);
         $text = ""; $error = "";
         if (is_resource($process)) {
             fwrite($pipes[0], $secret);
             fclose($pipes[0]);
             while($s= fgets($pipes[1], 1024)) {
-              $text .= $s;
+                $text .= $s;
             }
             fclose($pipes[1]);
             while($s= fgets($pipes[2], 1024)) {
-              $error .= $s . "\n";
+                $error .= $s . "\n";
             }
             fclose($pipes[2]);
         }
@@ -225,19 +231,19 @@ class EncfsMounter extends AJXP_Plugin
 
     public static function umountFolder($clear){
         $descriptorspec = array(
-                1 => array("pipe", "w"),  // stdout
-                2 => array("pipe", "w")   // stderr ?? instead of a file
-                );
+            1 => array("pipe", "w"),  // stdout
+            2 => array("pipe", "w")   // stderr ?? instead of a file
+        );
         $command = 'sudo umount '.escapeshellarg($clear);
         $process = proc_open($command, $descriptorspec, $pipes);
         $text = ""; $error = "";
         if (is_resource($process)) {
             while($s= fgets($pipes[1], 1024)) {
-              $text .= $s;
+                $text .= $s;
             }
             fclose($pipes[1]);
             while($s= fgets($pipes[2], 1024)) {
-              $error .= $s . "\n";
+                $error .= $s . "\n";
             }
             fclose($pipes[2]);
         }
