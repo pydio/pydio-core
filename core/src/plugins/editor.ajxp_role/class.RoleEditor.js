@@ -406,6 +406,8 @@ Class.create("RoleEditor", AbstractEditor, {
             ];
             defs = $A(defs);
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);
+            // UPDATE MAIN HEADER
+            this.element.down("span.header_label").update(this.roleData.GROUP.LABEL);
 
             // REMOVE BUTTONS
             this.element.down("#pane-infos").down("#account_actions").remove();

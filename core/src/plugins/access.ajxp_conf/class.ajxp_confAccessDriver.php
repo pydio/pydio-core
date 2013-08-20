@@ -413,13 +413,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$roleId = SystemTextEncoding::magicDequote($httpVars["role_id"]);
                 $roleGroup = false;
                 if(strpos($roleId, "AJXP_GRP_") === 0){
-                    $groupPath = AuthService::filterBaseGroup(substr($roleId, strlen("AJXP_GRP_/")));
+                    $groupPath = substr($roleId, strlen("AJXP_GRP_"));
+                    $filteredGroupPath = AuthService::filterBaseGroup($groupPath);
                     $groups = AuthService::listChildrenGroups(AJXP_Utils::forwardSlashDirname($groupPath));
                     $key = "/".basename($groupPath);
                     if(!array_key_exists($key, $groups)){
                         throw new Exception("Cannot find group with this id!");
                     }
-                    $roleId = "AJXP_GRP_".$groupPath;
+                    $roleId = "AJXP_GRP_".$filteredGroupPath;
                     $groupLabel = $groups[$key];
                     $roleGroup = true;
                 }
@@ -483,8 +484,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $roleId = SystemTextEncoding::magicDequote($httpVars["role_id"]);
                 $roleGroup = false;
                 if(strpos($roleId, "AJXP_GRP_") === 0){
-                    $groupPath = AuthService::filterBaseGroup(substr($roleId, strlen("AJXP_GRP_")));
-                    $roleId = "AJXP_GRP_".$groupPath;
+                    $groupPath = substr($roleId, strlen("AJXP_GRP_"));
+                    $filteredGroupPath = AuthService::filterBaseGroup($groupPath);
+                    $roleId = "AJXP_GRP_".$filteredGroupPath;
                     $groups = AuthService::listChildrenGroups(AJXP_Utils::forwardSlashDirname($groupPath));
                     $key = "/".basename($groupPath);
                     if(!array_key_exists($key, $groups)){
@@ -531,7 +533,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $userObject->setProfile($data["USER"]["PROFILE"]);
                 }
                 if(isSet($data["GROUP_LABEL"]) && isSet($groupLabel) && $groupLabel != $data["GROUP_LABEL"]){
-                    ConfService::getConfStorageImpl()->relabelGroup($groupPath, $data["GROUP_LABEL"]);
+                    ConfService::getConfStorageImpl()->relabelGroup($filteredGroupPath, $data["GROUP_LABEL"]);
                 }
 
                 $output = array();
