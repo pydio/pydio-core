@@ -132,7 +132,7 @@ class remoteAuthDriver extends AbstractAuthDriver {
 			$userStoredPass = $this->getUserPass($login);
 			if(!$userStoredPass) return false;
 			if($seed == "-1"){ // Seed = -1 means that password is not encoded.
-				return ($userStoredPass == md5($pass));
+				return  AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass);// ($userStoredPass == md5($pass));
 			}else{
 				return (md5($userStoredPass.$seed) == $pass);
 			}			
@@ -164,7 +164,7 @@ class remoteAuthDriver extends AbstractAuthDriver {
             $userStoredPass = $this->getUserPass($login);
             if(!$userStoredPass) return false;
             if($seed == "-1"){ // Seed = -1 means that password is not encoded.
-                $res = ($userStoredPass == md5($pass));
+                $res = AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass); //($userStoredPass == md5($pass));
             }else{
                 $res = (md5($userStoredPass.$seed) == $pass);
             }
@@ -195,7 +195,7 @@ class remoteAuthDriver extends AbstractAuthDriver {
 		if(!is_array($users)) $users = array();
 		if(array_key_exists($login, $users)) return "exists";
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$users[$login] = md5($passwd);
+			$users[$login] = AJXP_Utils::pbkdf2_create_hash($passwd);
 		}else{
 			$users[$login] = $passwd;
 		}
@@ -206,7 +206,7 @@ class remoteAuthDriver extends AbstractAuthDriver {
 		$users = $this->listUsers();
 		if(!is_array($users) || !array_key_exists($login, $users)) return ;
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$users[$login] = md5($newPass);
+			$users[$login] = AJXP_Utils::pbkdf2_create_hash($newPass);
 		}else{
 			$users[$login] = $newPass;
 		}

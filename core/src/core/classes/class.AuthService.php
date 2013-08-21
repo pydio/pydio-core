@@ -65,7 +65,8 @@ class AuthService
      * @return
      */
 	static function generateSecureToken(){
-		$_SESSION["SECURE_TOKEN"] = md5(time());
+
+		$_SESSION["SECURE_TOKEN"] = AJXP_Utils::generateRandomString(32); //md5(time());
 		return $_SESSION["SECURE_TOKEN"];
 	}
 	/**
@@ -212,7 +213,7 @@ class AuthService
             $user->invalidateCookieString(substr($current, strpos($current, ":")+1));
         }
         $rememberPass = $user->getCookieString();
-        setcookie("AjaXplorer-remember", $user->id.":".$rememberPass, time()+3600*24*10);
+        setcookie("AjaXplorer-remember", $user->id.":".$rememberPass, time()+3600*24*10, null, null, (isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"), true);
     }
 
     /**
@@ -233,7 +234,7 @@ class AuthService
         if(!empty($current) && $user != null){
             $user->invalidateCookieString(substr($current, strpos($current, ":")+1));
         }
-        setcookie("AjaXplorer-remember", "", time()-3600);
+        setcookie("AjaXplorer-remember", "", time()-3600, null, null, (isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"), true);
     }
 
     static function logTemporaryUser($parentUserId, $temporaryUserId){

@@ -133,7 +133,7 @@ class serial_otpAuthDriver extends AbstractAuthDriver {
 
 		//No OTP token is set
 		if ($g == '' and $y1 == '' and $y2 == ''){
-			return ($userStoredPass == md5($pass));
+			return AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass); //($userStoredPass == md5($pass));
 		}
 
 		//Just the Google Authenticator set
@@ -171,7 +171,7 @@ class serial_otpAuthDriver extends AbstractAuthDriver {
 		if(!is_array($users)) $users = array();
 		if(array_key_exists($login, $users)) return "exists";
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$users[$login] = md5($passwd);
+			$users[$login] = AJXP_Utils::pbkdf2_create_hash($passwd);
 		}else{
 			$users[$login] = $passwd;
 		}
@@ -183,7 +183,7 @@ class serial_otpAuthDriver extends AbstractAuthDriver {
 		$users = $this->_listAllUsers();
 		if(!is_array($users) || !array_key_exists($login, $users)) return ;
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$users[$login] = md5($newPass);
+			$users[$login] = AJXP_Utils::pbkdf2_create_hash($newPass);
 		}else{
 			$users[$login] = $newPass;
 		}
@@ -314,7 +314,7 @@ class serial_otpAuthDriver extends AbstractAuthDriver {
 			}
 		}
 
-		return ($userStoredPass == md5($pass) && $valid == 1);
+		return ( AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass) && $valid == 1);
 	}
 
 
@@ -336,7 +336,7 @@ class serial_otpAuthDriver extends AbstractAuthDriver {
 		$yubi = new Auth_Yubico($this->yubico_client_id, $this->yubico_secret_key);
 		$auth = $yubi->verify($yotp);
 
-		return ((!PEAR::isError($auth)) && $userStoredPass == md5($pass));
+		return ((!PEAR::isError($auth)) &&  AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass));
 	}
 }
 ?>

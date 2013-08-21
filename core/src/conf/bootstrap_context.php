@@ -72,6 +72,24 @@ define("AJXP_CLIENT_DEBUG"  ,	false);
 define("AJXP_SERVER_DEBUG"  ,	false);
 define("AJXP_SKIP_CACHE"    ,   false);
 
+
+// PBKDF2 CONSTANTS FOR A SECURE STORAGE OF PASSWORDS
+// These constants may be changed without breaking existing hashes.
+define("PBKDF2_HASH_ALGORITHM", "sha256");
+define("PBKDF2_ITERATIONS", 1000);
+define("PBKDF2_SALT_BYTE_SIZE", 24);
+define("PBKDF2_HASH_BYTE_SIZE", 24);
+
+define("HASH_SECTIONS", 4);
+define("HASH_ALGORITHM_INDEX", 0);
+define("HASH_ITERATION_INDEX", 1);
+define("HASH_SALT_INDEX", 2);
+define("HASH_PBKDF2_INDEX", 3);
+
+// CAN BE SWITCHED TO TRUE TO MAKE THE SECURE TOKEN MORE SAFE
+// MAKE SURE YOU HAVE PHP.5.3, OPENSSL, AND THAT IT DOES NOT DEGRADE PERFORMANCES
+define("USE_OPENSSL_RANDOM", false);
+
 require(AJXP_BIN_FOLDER."/compat.php");
 
 function AjaXplorer_autoload($className){

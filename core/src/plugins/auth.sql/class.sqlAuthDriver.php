@@ -99,7 +99,7 @@ class sqlAuthDriver extends AbstractAuthDriver {
 		if(!$userStoredPass) return false;		
 		
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){ // Seed = -1 means that password is not encoded.
-			return ($userStoredPass == md5($pass));
+			return AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass); //($userStoredPass == md5($pass));
 		}else{
 			return (md5($userStoredPass.$seed) == $pass);
 		}
@@ -116,7 +116,7 @@ class sqlAuthDriver extends AbstractAuthDriver {
 		if($this->userExists($login)) return "exists";
 		$userData = array("login" => $login);
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$userData["password"] = md5($passwd);
+			$userData["password"] = AJXP_Utils::pbkdf2_create_hash($passwd); //md5($passwd);
 		}else{
 			$userData["password"] = $passwd;
 		}
@@ -127,7 +127,7 @@ class sqlAuthDriver extends AbstractAuthDriver {
         if(!$this->userExists($login)) throw new Exception("User does not exists!");
 		$userData = array("login" => $login);
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$userData["password"] = md5($newPass);
+			$userData["password"] = AJXP_Utils::pbkdf2_create_hash($newPass); //md5($newPass);
 		}else{
 			$userData["password"] = $newPass;
 		}
