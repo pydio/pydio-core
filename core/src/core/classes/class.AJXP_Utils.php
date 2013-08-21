@@ -1540,6 +1540,9 @@ class AJXP_Utils
                 $bootStorage = ConfService::getBootConfStorageImpl();
                 $configs = $bootStorage->loadPluginConfig("core", "conf");
                 $params = $configs["DIBI_PRECONFIGURATION"];
+                if(!is_array($params)){
+                     throw new Exception("Empty SQL default connexion, there is something wrong with your setup! You may have switch to an SQL-based plugin without defining a connexion.");
+                }
             }else{
                 unset($params["group_switch_value"]);
             }
