@@ -64,6 +64,7 @@ class serialAuthDriver extends AbstractAuthDriver {
             $users = array_combine(array_map("strtolower", array_keys($users)), array_values($users));
         }
         ConfService::getConfStorageImpl()->filterUsersByGroup($users, $baseGroup, false);
+        ksort($users);
         return $users;
 	}
 

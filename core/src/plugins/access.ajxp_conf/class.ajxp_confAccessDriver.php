@@ -187,7 +187,52 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
     }
 
-	function switchAction($action, $httpVars, $fileVars){
+    function recursiveSearchGroups($baseGroup, $term){
+
+        $groups = AuthService::listChildrenGroups($baseGroup);
+        foreach($groups as $groupId => $groupLabel){
+
+            if(preg_match("/$term/i", $groupLabel) == TRUE ){
+                $nodeKey = "/data/users/".trim($baseGroup, "/")."/".ltrim($groupId,"/");
+                $meta = array(
+                    "icon" => "users-folder.png",
+                    "ajxp_mime" => "group"
+                );
+                if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
+                echo AJXP_XMLWriter::renderNode($nodeKey, $groupLabel, false, $meta, true, false);
+            }
+            $this->recursiveSearchGroups(rtrim($baseGroup, "/")."/".$groupId, $term);
+
+        }
+
+        $users = AuthService::listUsers($baseGroup, $term);
+        foreach($users as $userId => $userObject){
+
+            $nodeKey = "/data/users/".trim($userObject->getGroupPath(),"/")."/".$userId;
+            $meta = array(
+                "icon" => "user.png",
+                "ajxp_mime" => "user"
+            );
+            if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
+            echo AJXP_XMLWriter::renderNode($nodeKey, $userId, false, $meta, true, false);
+
+        }
+
+    }
+
+
+    function searchAction($action, $httpVars, $fileVars){
+
+        if(! AJXP_Utils::decodeSecureMagic($httpVars["dir"]) == "/data/users") return;
+        $query = AJXP_Utils::decodeSecureMagic($httpVars["query"]);
+        AJXP_XMLWriter::header();
+
+        $this->recursiveSearchGroups("/", $query);
+        AJXP_XMLWriter::close();
+
+    }
+
+    function switchAction($action, $httpVars, $fileVars){
 		if(!isSet($this->actions[$action])) return;
 		parent::accessPreprocess($action, $httpVars, $fileVars);
 		$loggedUser = AuthService::getLoggedUser();
@@ -321,16 +366,20 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         }
                         $child = $splits[0];
                         if(isSet($rootNodes[$root]["CHILDREN"][$child])){
+                            $atts = array();
+                            if($child == "users"){
+                                $atts["remote_indexation"] = "admin_search";
+                            }
                             $callback = $rootNodes[$root]["CHILDREN"][$child]["LIST"];
                             if(is_string($callback) && method_exists($this, $callback)){
-                                if(!$returnNodes) AJXP_XMLWriter::header();
-                                $res = call_user_func(array($this, $callback), implode("/", $splits), $root, $hash, $returnNodes);
+                                if(!$returnNodes) AJXP_XMLWriter::header("tree", $atts);
+                                $res = call_user_func(array($this, $callback), implode("/", $splits), $root, $hash, $returnNodes, isSet($httpVars["file"])?$httpVars["file"]:'');
                                 if(!$returnNodes) AJXP_XMLWriter::close();
                             }else if(is_array($callback)){
-                                $res = call_user_func($callback, implode("/", $splits), $root, $hash, $returnNodes);
+                                $res = call_user_func($callback, implode("/", $splits), $root, $hash, $returnNodes, isSet($httpVars["file"])?$httpVars["file"]:'');
                             }
                             if($returnNodes){
-                                AJXP_XMLWriter::header();
+                                AJXP_XMLWriter::header("tree", $atts);
                                 if(isSet($res["/".$dir."/".$httpVars["file"]])){
                                     print $res["/".$dir."/".$httpVars["file"]];
                                 }
@@ -356,6 +405,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     foreach ($nodes as $key => $data){
                         $bmString = '';
                         if(in_array($parentName.$key, $this->currentBookmarks)) $bmString = ' ajxp_bookmarked="true" overlay_icon="bookmark.png" ';
+                        if($key == "users") $bmString .= ' remote_indexation="admin_search"';
                         print '<tree text="'.AJXP_Utils::xmlEntities($data["LABEL"]).'" description="'.AJXP_Utils::xmlEntities($data["DESCRIPTION"]).'" icon="'.$data["ICON"].'" filename="'.$parentName.$key.'" '.$bmString.'/>';
                     }
                     AJXP_XMLWriter::close();
@@ -1581,7 +1631,30 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return $allNodes;
 	}
 	
-	function listUsers($root, $child, $hashValue = null, $returnNodes = false){
+	function listUsers($root, $child, $hashValue = null, $returnNodes = false, $findNodePosition=null){
+
+        $USER_PER_PAGE = 50;
+        if($root == "users") $baseGroup = "/";
+        else $baseGroup = substr($root, strlen("users"));
+
+        if($findNodePosition != null && $hashValue == null){
+
+            // Loop on each page to find the correct page.
+            $count = AuthService::authCountUsers($baseGroup);
+            $pages = ceil($count / $USER_PER_PAGE);
+            for($i = 0; $i < $pages ; $i ++){
+
+                $tests = $this->listUsers($root, $child, $i+1, true, $findNodePosition);
+                if(is_array($tests) && isSet($tests["/data/".$root."/".$findNodePosition])){
+                    return array("/data/".$root."/".$findNodePosition => str_replace("ajxp_mime", "page_position='".($i+1)."' ajxp_mime", $tests["/data/".$root."/".$findNodePosition]));
+                }
+
+            }
+
+            return array();
+
+        }
+
         $allNodes = array();
         $columns = '<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.users">
         			<column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String" defaultWidth="40%"/>
@@ -1600,10 +1673,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
 		if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig($columns);
 		if(!AuthService::usersEnabled()) return ;
-        $USER_PER_PAGE = 50;
         if(empty($hashValue)) $hashValue = 1;
-        if($root == "users") $baseGroup = "/";
-        else $baseGroup = substr($root, strlen("users"));
 
         $count = AuthService::authCountUsers($baseGroup);
         if(AuthService::authSupportsPagination() && $count >= $USER_PER_PAGE){

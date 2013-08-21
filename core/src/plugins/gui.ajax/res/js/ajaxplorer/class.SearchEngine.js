@@ -368,7 +368,7 @@ Class.create("SearchEngine", AjxpPane, {
 		var folder = ajaxplorer.getContextNode().getPath();
 		if(folder == "/") folder = "";
 		window.setTimeout(function(){
-			this.searchFolderContent(folder);
+			this.searchFolderContent(folder, ajaxplorer.getContextNode().getMetadata().get("remote_indexation"));
 		}.bind(this), 0);		
 	},
 	/**
@@ -516,17 +516,17 @@ Class.create("SearchEngine", AjxpPane, {
 	 * Put a folder to search in the queue
 	 * @param path String
 	 */
-	appendFolderToQueue : function(path){
-		this._queue.push(path);
+	appendFolderToQueue : function(path, remoteIndexation){
+		this._queue.push({path:path,remoteIndexation:remoteIndexation?remoteIndexation:false});
 	},
 	/**
 	 * Process the next element of the queue, or finish
 	 */
 	searchNext : function(){
 		if(this._queue.length){
-			var path = this._queue.first();
+			var element = this._queue.first();
 			this._queue.shift();
-			this.searchFolderContent(path);
+			this.searchFolderContent(element.path, element.remoteIndexation);
 		}else{
 			this.updateStateFinished();
 		}
@@ -536,7 +536,7 @@ Class.create("SearchEngine", AjxpPane, {
 	 * Should reference the IAjxpNodeProvider instead!! Still a "ls" here!
 	 * @param currentFolder String
 	 */
-	searchFolderContent : function(currentFolder){
+	searchFolderContent : function(currentFolder, remote_indexation){
 		if(this._state == 'interrupt') {
 			this.updateStateFinished();
 			return;
@@ -557,16 +557,39 @@ Class.create("SearchEngine", AjxpPane, {
             this.setOnLoad($(this._resultsBoxId));
             connexion.sendAsync();
         }else{
-            /* LIST CONTENT, SEARCH CLIENT SIDE, AND RECURSE */
-            var connexion = new Connexion();
-            connexion.addParameter('get_action', 'ls');
-            connexion.addParameter('options', 'a' + (this.hasMetaSearch()?'l':''));
-            connexion.addParameter('dir', currentFolder);
-            connexion.onComplete = function(transport){
-                this._parseXmlAndSearchString(transport.responseXML, currentFolder);
-                this.searchNext();
-            }.bind(this);
-            connexion.sendAsync();
+
+            if(remote_indexation){
+
+                var connexion = new Connexion();
+                connexion.addParameter('get_action', remote_indexation);
+                connexion.addParameter('query', this.crtText);
+                connexion.addParameter('dir', currentFolder);
+                if(this.hasMetaSearch()){
+                    connexion.addParameter('fields', this.getSearchColumns().join(','));
+                }
+                connexion.onComplete = function(transport){
+                    this._parseResults(transport.responseXML, currentFolder);
+                    this.removeOnLoad($(this._resultsBoxId));
+                    this.searchNext();
+                }.bind(this);
+                this.setOnLoad($(this._resultsBoxId));
+                connexion.sendAsync();
+
+            }else{
+
+                /* LIST CONTENT, SEARCH CLIENT SIDE, AND RECURSE */
+                var connexion = new Connexion();
+                connexion.addParameter('get_action', 'ls');
+                connexion.addParameter('options', 'a' + (this.hasMetaSearch()?'l':''));
+                connexion.addParameter('dir', currentFolder);
+                connexion.onComplete = function(transport){
+                    this._parseXmlAndSearchString(transport.responseXML, currentFolder);
+                    this.searchNext();
+                }.bind(this);
+                connexion.sendAsync();
+
+            }
+
         }
 	},
 	
@@ -588,7 +611,7 @@ Class.create("SearchEngine", AjxpPane, {
 					if(!node.isLeaf())
 					{
 						var newPath = node.getPath();
-						this.appendFolderToQueue(newPath);
+						this.appendFolderToQueue(newPath, node.getMetadata().get("remote_indexation"));
 					}
 				}
 			}		

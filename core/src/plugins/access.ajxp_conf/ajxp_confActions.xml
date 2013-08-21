@@ -33,6 +33,11 @@
 				<serverCallback methodName="switchAction" restParams="/dir+/"></serverCallback>
 			</processing>
 		</action>
+		<action name="admin_search">
+			<processing>
+				<serverCallback methodName="searchAction" developerComment="Remote search implementation, currently only supporting users search."/>
+			</processing>
+		</action>
 		<action name="stat">
 			<processing>
 				<serverCallback methodName="switchAction" developerComment="To comply with GUI client, always returns true."/>
