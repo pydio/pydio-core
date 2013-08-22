@@ -4,7 +4,7 @@
         <action name="logout" expireDefault="true">
 			<gui text="304" title="305" src="go_back.png" iconClass="icon-home" accessKey="" hasAccessKey="false">
 				<context selection="false" dir="" recycle="false"
-					actionBar="true" contextMenu="false" infoPanel="false"
+					actionBar="false" contextMenu="false" infoPanel="false"
                     ajxpWidgets="UserWidget::logging_string">
 				</context>
 			</gui>
