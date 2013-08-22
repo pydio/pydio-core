@@ -122,7 +122,7 @@ class textLogDriver extends AbstractLogDriver {
 		$this->storageDir = isset($this->options['LOG_PATH']) ? $this->options['LOG_PATH'] : "";
 		$this->storageDir = AJXP_VarsFilter::filter($this->storageDir);
         $this->storageDir = (rtrim($this->storageDir))."/";
-		$this->logFileName = isset($this->options['LOG_FILE_NAME']) ? $this->options['LOG_FILE_NAME'] : 'log_' . date('m-d-y') . '.txt';
+		$this->logFileName = isset($this->options['LOG_FILE_NAME']) ? $this->options['LOG_FILE_NAME'] : 'log_' . date('Y-m-d') . '.txt';
 		$this->USER_GROUP_RIGHTS = isset($this->options['LOG_CHMOD']) ? $this->options['LOG_CHMOD'] : 0770;
 
         if(preg_match("/(.*)date\('(.*)'\)(.*)/i", $this->logFileName, $matches)){
@@ -190,7 +190,7 @@ class textLogDriver extends AbstractLogDriver {
 	 * @return String the formatted message.
 	 */
 	function formatMessage($message, $severity) {
-		$msg = date("m-d-y") . " " . date("G:i:s") . "\t";
+		$msg = date("Y-m-d") . " " . date("G:i:s") . "\t";
 
         $msg .= AJXP_Logger::getClientAdress()."\t";
 		$msg .= strtoupper($severity)."\t";
@@ -237,9 +237,9 @@ class textLogDriver extends AbstractLogDriver {
 				$split2 = explode("_", $split[0]);
 				$date = $split2[1];
 				$dSplit = explode("-", $date);
-				$logY = $dSplit[2];
-				$logM = $dSplit[0];
-				$time = mktime(0,0,1,intval($dSplit[0]), intval($dSplit[1]), intval($dSplit[2]));
+				$logY = $dSplit[0];
+				$logM = $dSplit[1];
+				$time = mktime(0,0,1,intval($dSplit[1]), intval($dSplit[2]), intval($dSplit[0]));
 				$display = date("l d", $time);
 				$fullYear = date("Y", $time);
 				$fullMonth = date("F", $time);
@@ -266,7 +266,7 @@ class textLogDriver extends AbstractLogDriver {
 	/**
 	 * Get a log in XML format.
 	 *
-	 * @param String $date Date in m-d-y format.
+	 * @param String $date Date in Y-m-d format.
 	 * @param String $nodeName The name of the node to use for each log item.
 	 * @return null
 	 */

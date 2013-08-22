@@ -165,7 +165,7 @@ class sysLogDriver extends textLogDriver {
 	/**
 	 * Get a log in XML format.
 	 *
-	 * @param String $date Date in m-d-y format.
+	 * @param String $date Date in Y-m-d format.
 	 * @param String $nodeName The name of the node to use for each log item.
 	 * @return null
 	 */

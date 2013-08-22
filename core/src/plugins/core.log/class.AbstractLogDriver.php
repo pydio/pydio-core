@@ -115,7 +115,7 @@ class AbstractLogDriver extends AJXP_Plugin {
      * List log contents in XML
      *
      * @param $parentDir
-     * @param String $date Assumed to be m-d-y format.
+     * @param String $date Assumed to be Y-m-d format.
      * @param string $nodeName
      * @param string $rootPath
      * @return void
