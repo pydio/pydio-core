@@ -239,7 +239,11 @@ class IMagickPreviewer extends AJXP_Plugin {
 			$unoDoc = str_replace(".jpg", "_unoconv.pdf", $tmpFileThumb);
 			if(!is_file($tmpFileThumb)){
 				// Create PDF Version now
-				$unoconv =  "HOME=/tmp ".$unoconv." --stdout -f pdf ".escapeshellarg($masterFile)." > ".escapeshellarg(basename($unoDoc));
+				// Old UNIX command : $unoconv =  "HOME=/tmp ".$unoconv." --stdout -f pdf ".escapeshellarg($masterFile)." > ".escapeshellarg(basename($unoDoc));
+				// New Windows command :
+				$unoconv = $this->pluginConf["UNOCONV"]." -o ".escapeshellarg(basename($unoDoc))." -f pdf ".escapeshellarg($masterFile);
+				// TODO : detect system (UNIX or Windows) and execute the good command
+				AJXP_Logger::logAction("Unoconv Command : $unoconv");
 				exec($unoconv, $out, $return);
 			}
 			if(is_file($unoDoc)){
