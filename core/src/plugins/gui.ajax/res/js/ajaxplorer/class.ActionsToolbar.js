@@ -158,7 +158,7 @@ Class.create("ActionsToolbar", {
                 dir:true,
                 actionBar:true,
                 actionBarGroup:'put',
-                contextMenu:true,
+                contextMenu:false,
                 infoPanel:false
 
             }, {}, {}, {dynamicItems: submenuItems});
