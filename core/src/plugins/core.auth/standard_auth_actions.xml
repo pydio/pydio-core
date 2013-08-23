@@ -17,7 +17,7 @@
 						document.location.href=loginRedirect;
 					}else{
 					    modal.setCloseValidation(function(){
-					        return false;
+					        return (ajaxplorer && ajaxplorer.user && ajaxplorer.user.id == "guest")
 					    });
 						modal.showDialogForm('Log In', ($('login_form')?'login_form':'login_form_dynamic'), 
 						function(oForm){
@@ -35,12 +35,6 @@
 						    oForm.setStyle({display:'block'});
 						    oForm.up(".dialogContent").setStyle({backgroundImage:'none', borderWidth:0});
 
-						    /*
-						    if(ajxpBootstrap.parameters.get("customWording")){
-                                var ttSt = $("generic_dialog_box").down("span.titleString");
-                                ttSt.innerHTML = ttSt.innerHTML.replace("AjaXplorer", ajxpBootstrap.parameters.get("customWording").title );
-						    }
-						    */
 							ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
 							if(Prototype.Browser.IE && !Modernizr.borderradius && !oForm.down('input[type="text"]').key_enter_attached){
 								oForm.select('input').invoke("observe", "keydown", function(event){
@@ -55,6 +49,17 @@
 								});
 								oForm.down('input[type="text"]').key_enter_attached = true;
 							}
+
+                            var authConfs = ajaxplorer.getPluginConfigs("auth");
+                            if(authConfs && authConfs.get("SECURE_LOGIN_FORM")){
+                                try{
+                                    oForm.down('input[name="remember_me"]').up("div.SF_element").remove();
+                                    oForm.down('input[name="userid"]').setAttribute("autocomplete", "off");
+                                    oForm.down('input[name="password"]').setAttribute("autocomplete", "off");
+                                    oForm.setAttribute("autocomplete", "off");
+                                }catch(e){}
+                            }
+                            modal.refreshDialogPosition();
 						}, 
 						function(){
 							var oForm = modal.getForm();
@@ -62,7 +67,7 @@
 							connexion.addParameter('get_action', 'login');
 							connexion.addParameter('userid', oForm.userid.value);
 							connexion.addParameter('login_seed', oForm.login_seed.value);
-							connexion.addParameter('remember_me', (oForm.remember_me.checked?"true":"false"));
+							connexion.addParameter('remember_me', (oForm.remember_me && oForm.remember_me.checked?"true":"false"));
 							if(oForm.login_seed.value != '-1'){
 								connexion.addParameter('password', hex_md5(hex_md5(oForm.password.value)+oForm.login_seed.value));
 							}else{
