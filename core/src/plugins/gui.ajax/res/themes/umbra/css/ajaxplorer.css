@@ -188,6 +188,19 @@ textarea{
    border-radius : 5px;
 }
 
+div.detailed > div.thumbnail_selectable_cell {
+    width: 48%;
+    text-align: left;
+    height: 55px;
+    overflow: hidden;
+}
+
+div.detailed > div.thumbnail_selectable_cell > div.thumbnail_selectable_cell {
+    margin: 9px 11px;
+    border: 0;
+    background: transparent;
+}
+
 .thumbnail_iconlike_shadow{
     border: 1px solid white;
     -webkit-box-shadow: 0 0 5px #666666;
@@ -210,9 +223,11 @@ textarea{
 	box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);*/
 }
 
-.thumbLabel
+div.detailed div.thumbLabel
 {
-   /*overflow: hidden;*/
+    font-size: 1.4em;
+    margin-top: 8px;
+    margin-bottom: 1px;
 }
 
 .img_cont
@@ -2888,7 +2903,8 @@ div.menu a {
 }
 .menu li {
 	list-style-position: outside;
-	height: 24px;
+	min-height: 24px;
+    height: auto;
 }
 
 .menu.desktop {
@@ -2941,7 +2957,7 @@ div.menu a {
     padding-bottom: 0px;
 }
 
-.rootDirChooser li.menuTitle {
+.menu li.menuTitle {
    font-size: 11px;
    font-weight: bold;
    padding-top: 2px;
@@ -2990,10 +3006,15 @@ div.menu a {
 	filter: alpha(opacity=25);
 	zoom: 1;
 }
-.menu.desktop li.separator {
+.menu.desktop li.separator a{
+    display: none !important;
+}
+.menu li.separator {
 	border-bottom: 1px solid #fff;
 	margin: 1px 1px 0 1px;
 	line-height: 1px !important;
+    height: 1px !important;
+    min-height: 1px !important;
 }
 .menu.desktop.toolbarmenu li.separator{
 	border-bottom: 1px solid #ddd;
@@ -3043,6 +3064,10 @@ div.menu a {
    padding-right: 20px;
    padding-left: 5px;
    padding-top: 4px;
+}
+
+.rootDirChooser span.menu_description{
+    display:none;
 }
 
 .rootDirChooser a img,

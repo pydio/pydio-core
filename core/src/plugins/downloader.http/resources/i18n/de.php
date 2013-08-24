@@ -16,10 +16,10 @@ $mess = array(
 "10d" => "AjXp Download (%s)",
 "11" => "Drag one of the following link to your bookmark bar : ",
 "12" => "Trigger remote file download",
-"13" => "From computer",
-"14" => "From remote server",
+"13" => "Von Computer",
+"14" => "Von entfernten Server",
 "15" => "Or create a bookmark manually and use the code below as the link url : ",
 "16" => "Drag me to your bookmark bar!",
-"17" => "Download file",
+"17" => "Datei Downloaden",
 "18" => "Partial file",
 );

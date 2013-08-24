@@ -21,7 +21,8 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.core
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
  * @class AbstractConfDriver
  * Abstract representation of a conf driver. Must be implemented by the "conf" plugin
  */
@@ -63,8 +64,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 			unset($this->actions["webdav_preferences"]);
 			$actionXpath=new DOMXPath($contribNode->ownerDocument);
 			$publicUrlNodeList = $actionXpath->query('action[@name="webdav_preferences"]', $contribNode);
-			$publicUrlNode = $publicUrlNodeList->item(0);
-			$contribNode->removeChild($publicUrlNode);			
+            if($publicUrlNodeList->length){
+                $publicUrlNode = $publicUrlNodeList->item(0);
+                $contribNode->removeChild($publicUrlNode);
+            }
 		}
 
         // PERSONAL INFORMATIONS
@@ -95,13 +98,17 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 			unset($this->actions["user_create_repository"]);
 			$actionXpath=new DOMXPath($contribNode->ownerDocument);
 			$publicUrlNodeList = $actionXpath->query('action[@name="user_create_repository"]', $contribNode);
-			$publicUrlNode = $publicUrlNodeList->item(0);
-			$contribNode->removeChild($publicUrlNode);
+            if($publicUrlNodeList->length){
+                $publicUrlNode = $publicUrlNodeList->item(0);
+                $contribNode->removeChild($publicUrlNode);
+            }
 			unset($this->actions["user_delete_repository"]);
 			$actionXpath=new DOMXPath($contribNode->ownerDocument);
 			$publicUrlNodeList = $actionXpath->query('action[@name="user_delete_repository"]', $contribNode);
-			$publicUrlNode = $publicUrlNodeList->item(0);
-			$contribNode->removeChild($publicUrlNode);
+            if($publicUrlNodeList->length){
+                $publicUrlNode = $publicUrlNodeList->item(0);
+                $contribNode->removeChild($publicUrlNode);
+            }
 		}
 
 	}
@@ -133,25 +140,52 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				unset($DRIVER_CONF);
 			}
 		}
-		$this->_loadPluginConfig($pluginType.".".$pluginName, $options);
+        if($this->pluginUsesBootConf($pluginType.".".$pluginName)){
+            ConfService::getBootConfStorageImpl()->_loadPluginConfig($pluginType.".".$pluginName, $options);
+        }else{
+            $this->_loadPluginConfig($pluginType.".".$pluginName, $options);
+        }
 		return $options;
 	}
 
 	abstract function _loadPluginConfig($pluginId, &$options);
-	
+
+    /**
+     * Intercept CONF and AUTH configs to use the BootConf Storage
+   	 * @param String $pluginId
+   	 * @param String $options
+   	 */
+    public function savePluginConfig($pluginId, $options){
+        if($this->pluginUsesBootConf($pluginId)){
+            ConfService::getBootConfStorageImpl()->_savePluginConfig($pluginId, $options);
+        }else{
+            $this->_savePluginConfig($pluginId, $options);
+        }
+    }
+
+    /**
+     * @param String $pluginId
+     * @return bool
+     */
+    protected function pluginUsesBootConf($pluginId){
+        return ($pluginId == "core.conf" || strpos($pluginId, "conf.") === 0
+            || $pluginId == "core.auth" || strpos($pluginId, "auth.") === 0);
+    }
+
 	/**
 	 * @param String $pluginId
 	 * @param String $options
 	 */
-	abstract function savePluginConfig($pluginId, $options);
+	abstract function _savePluginConfig($pluginId, $options);
 	
 	
 	// SAVE / EDIT / CREATE / DELETE REPOSITORY
 	/**
 	 * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
+     * @param AbstractAjxpUser $user
 	 * @return Array
 	 */
-	abstract function listRepositories();
+	abstract function listRepositories($user = null);
 	/**
 	 * Retrieve a Repository given its unique ID.
 	 *
@@ -222,7 +256,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
      * @abstract
      * @param array $context
      * @param String $ID
-     * @param Stream $outputStream
+     * @param Resource $outputStream
      * @return boolean
      */
     abstract function loadBinary($context, $ID, $outputStream = null);
@@ -244,6 +278,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	 * @return AbstractAjxpUser
 	 */
 	function createUserObject($userId){
+        $userId = AuthService::filterUserSensitivity($userId);
 		$abstractUser = $this->instantiateAbstractUserImpl($userId);
 		if(!$abstractUser->storageExists()){
 			AuthService::updateDefaultRights($abstractUser);
@@ -410,7 +445,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				ConfService::loadRepositoryDriver();
 				if(AuthService::usersEnabled() && AuthService::getLoggedUser()!=null){
 					$user = AuthService::getLoggedUser();
-					$activeRepId = ConfService::getCurrentRootDirIndex();
+					$activeRepId = ConfService::getCurrentRepositoryId();
 					$user->setArrayPref("history", "last_repository", $activeRepId);
 					$user->save("user");
 				}
@@ -434,7 +469,15 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 					$confStorage = ConfService::getConfStorageImpl();
 					$bmUser = $confStorage->createUserObject("shared");
 				}
-				if($bmUser == null) exit(1);
+				if($bmUser == null) {
+                    AJXP_XMLWriter::header();
+                    AJXP_XMLWriter::close();
+                }
+                $driver = ConfService::loadRepositoryDriver();
+                if(!is_a($driver, "AjxpWrapperProvider")){
+                    $driver = false;
+                }
+
 				if(isSet($httpVars["bm_action"]) && isset($httpVars["bm_path"]))
 				{
 					if($httpVars["bm_action"] == "add_bookmark")
@@ -443,30 +486,36 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 						if(isSet($httpVars["bm_title"])) $title = $httpVars["bm_title"];
 						if($title == "" && $httpVars["bm_path"]=="/") $title = ConfService::getCurrentRootDirDisplay();
 						$bmUser->addBookMark(SystemTextEncoding::magicDequote($httpVars["bm_path"]), SystemTextEncoding::magicDequote($title));
+                        if($driver){
+                            $node = new AJXP_Node($driver->getResourceUrl(SystemTextEncoding::magicDequote($httpVars["bm_path"])));
+                            $node->setMetadata("ajxp_bookmarked", array("ajxp_bookmarked" => "true"), true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+                        }
 					}
 					else if($httpVars["bm_action"] == "delete_bookmark")
 					{
 						$bmUser->removeBookmark($httpVars["bm_path"]);
-					}
+                        if($driver){
+                            $node = new AJXP_Node($driver->getResourceUrl(SystemTextEncoding::magicDequote($httpVars["bm_path"])));
+                            $node->removeMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+                        }
+                    }
 					else if($httpVars["bm_action"] == "rename_bookmark" && isset($httpVars["bm_title"]))
 					{
 						$bmUser->renameBookmark($httpVars["bm_path"], $httpVars["bm_title"]);
 					}
-				}
-				if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null)
-				{
-					$bmUser->save("user");
-					AuthService::updateUser($bmUser);
-				}
-				else if(!AuthService::usersEnabled())
-				{
-					$bmUser->save("user");
-				}		
+                    AJXP_Controller::applyHook("msg.instant", array("<reload_bookmarks/>", ConfService::getRepository()->getId()));
+
+                    if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null){
+                        $bmUser->save("user");
+                        AuthService::updateUser($bmUser);
+                    }else if(!AuthService::usersEnabled()){
+                        $bmUser->save("user");
+                    }
+                }
 				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::writeBookmarks($bmUser->getBookmarks());
+				AJXP_XMLWriter::writeBookmarks($bmUser->getBookmarks(), true, isset($httpVars["format"])?$httpVars["format"]:"legacy");
 				AJXP_XMLWriter::close();
-				exit(1);
-			
+
 			break;
 					
 			//------------------------------------
@@ -493,8 +542,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				}
 				header("Content-Type:text/plain");
 				print "SUCCESS";
-				exit(1);
-				
+
 			break;					
 					
 			//------------------------------------
@@ -597,6 +645,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 					"webdav_active"  => $webdavActive,
 					"password_set"   => $passSet,
                     "digest_set"    => $digestSet,
+                    "webdav_force_basic" => (ConfService::getCoreConf("WEBDAV_FORCE_BASIC") === true),
 					"webdav_base_url"  => $webdavBaseUrl, 
 					"webdav_repositories" => $davRepos
 				);
@@ -635,12 +684,12 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 			case  "get_user_templates_definition":
 
 				AJXP_XMLWriter::header("repository_templates");
-				$repositories = ConfService::getRepositoriesList();
+				$repositories = ConfService::getRepositoriesList("all");
                 $pServ = AJXP_PluginsService::getInstance();
 				foreach ($repositories as $repo){
 					if(!$repo->isTemplate) continue;
                     if(!$repo->getOption("TPL_USER_CAN_CREATE")) continue;
-					$repoId = $repo->getUniqueId();
+					$repoId = $repo->getId();
 					$repoLabel = $repo->getDisplay();
 					$repoType = $repo->getAccessType();
 					print("<template repository_id=\"$repoId\" repository_label=\"$repoLabel\" repository_type=\"$repoType\">");
@@ -793,6 +842,19 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                         $context = array("USER" => AuthService::getLoggedUser()->getId());
                     }
                     $this->loadBinary($context, $httpVars["binary_id"]);
+                }
+            break;
+
+            case "get_global_binary_param" :
+
+                if(isSet($httpVars["tmp_file"])){
+                    $file = AJXP_Utils::getAjxpTmpDir()."/".AJXP_Utils::securePath($httpVars["tmp_file"]);
+                    if(isSet($file)){
+                        header("Content-Type:image/png");
+                        readfile($file);
+                    }
+                }else if(isSet($httpVars["binary_id"])){
+                    $this->loadBinary(array(), $httpVars["binary_id"]);
                 }
             break;
 

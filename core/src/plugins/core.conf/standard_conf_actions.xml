@@ -31,6 +31,7 @@
                             ], {
                                 afterFinish:function(){
                                     $('user_templates_selector').select('div').invoke('removeClassName', 'selected-focus');
+                                    modal.refreshDialogPosition();
                                 }
                             });
                        }).setStyle({opacity:0});
@@ -52,19 +53,20 @@
                             $('user_tpl_params_parameters').insert(new Element('input', {type:'hidden',name:'template_id',value:tplId}));
                             var elements = $('user_tpl_params_parameters').select("div.SF_element");
                             $('user_template_parameters').down('div.dialogLegend').insert({before:elements[elements.length-1]});
-                            var targetHeight = params.length * 30 + 80;
+                            var targetHeight = parseInt($('user_template_parameters').getHeight());
+                             if(!targetHeight) targetHeight = params.length * 40 + 80;
                             new Effect.Parallel([
                                 new Effect.Morph('user_templates_selector', {style:'left:-250px;'}),
                                 new Effect.Morph('user_template_parameters', {style:'left:0px;'}),
                                 new Effect.Morph('user_tpl_container', {style:'height:'+targetHeight+'px;'}),
                                 new Effect.Opacity(okButton, {sync:true,from:0,to:1.0}),
                                 new Effect.Opacity(backButton, {sync:true,from:0,to:1.0})
-                            ]);
+                            ], {afterFinish : function(){modal.refreshDialogPosition();}});
                        }
                        conn.onComplete = function(transport){
                             conn.TPL_XML = transport.responseXML;
                             var templates = XPathSelectNodes(conn.TPL_XML, "//template");
-                            conn.ORIGINAL_HEIGHT = (templates.length*31+23);
+                            conn.ORIGINAL_HEIGHT = (templates.length*31+25);
                             $('user_tpl_container').setStyle({height:conn.ORIGINAL_HEIGHT+'px'});
                             $('user_templates_selector').update('<div class="panelHeader">'+MessageHash[420]+'</div>');
                             for(var i=0;i<templates.length;i++){
@@ -143,7 +145,7 @@
 		</action>
 		<action name="get_bookmarks">
             <gui text="145" title="145" src="edit_user.png" iconClass="icon-star" accessKey="" hasAccessKey="false">
-                <context selection="false" dir="" recycle="true" actionBar="true" actionBarGroup="filter" contextMenu="false" infoPanel="false"/>
+                <context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="filter" contextMenu="false" infoPanel="false"/>
             </gui>
             <rightsContext adminOnly="false" noUser="true" read="false" userLogged="only" write="false"/>
             <processing>
@@ -152,7 +154,10 @@
                 ]]></clientCallback>
                 <clientListener name="init"><![CDATA[
                 window.setTimeout(function(){
-                    if(!$('get_bookmarks_button')) return;
+                    if(!$('get_bookmarks_button')) {
+                        ajaxplorer.bookmarkBar = new BookmarksBar(null, {});
+                        return;
+                    }
                     var bmBar = new BookmarksBar($('get_bookmarks_button'), {bookmarksMenuOptions:{
                         className: 'menu desktop toolbarmenu panelHeaderMenu bmbarMenu',
                         mouseClick:'over',
@@ -185,6 +190,11 @@
 			</processing>
 		</action>
 		<action name="get_binary_param" skipSecureToken="true">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="get_global_binary_param" skipSecureToken="true">
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
@@ -262,6 +272,7 @@
 	    						ajaxplorer.user.savePreference("lang");
 	    					}
 						});
+						$(oForm).up('.dialogContent').previous('.dialogTitle').select('span').invoke('remove');
 					]]></dialogOnOpen>
 					<dialogOnComplete hideDialog="true"><![CDATA[
                         if(ajaxplorer.user){
@@ -283,8 +294,9 @@
 					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
 				</clientCallback>
 				<clientForm id="switch_language_form"><![CDATA[
-					<div id="switch_language_form" action="switch_language_form" box_width="202">
-						<select id="language_selector"></select>
+					<div id="switch_language_form" action="switch_language_form" box_width="320">
+					    <div class="dialogLegend"  style="margin-left:50px; font-size: 15px;">AJXP_MESSAGE[190]</div>
+						<select id="language_selector" style="margin-left:50px; margin-bottom: 20px;"></select>
 					</div>
 				]]></clientForm>				
 				<serverCallback methodName="switchAction"></serverCallback>
@@ -307,56 +319,74 @@
 					conn.onComplete = function(transport){
 						ajaxplorer.webdavCurrentPreferences = transport.responseJSON;
 						$('webdav_activator').checked = ajaxplorer.webdavCurrentPreferences.webdav_active;
-						if($('webdav_activator').checked && !ajaxplorer.webdavCurrentPreferences.digestSet) {
+						if($('webdav_activator').checked && !ajaxplorer.webdavCurrentPreferences.digest_set
+						    && !ajaxplorer.webdavCurrentPreferences.webdav_force_basic) {
 						    $('webdav_password_form').show();
 						}
-					};
-					conn.sendSync();
-					ajaxplorer.user.getRepositoriesList().each(function(pair){					
-						if(ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key]){
-							var div = new Element('div', {className:(even?'even':'')});
-							div.update('<span>'+pair.value.label+'</span><input readonly type="text" value="'+ ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key] +'">' );				
-							cont.insert(div);
-							even = !even;
-						}
-					});	
-					modal.getForm().down('input[name="ok"]').observe("click", hideLightBox);
-					if(!$('webdav_activator').hasObserver){
-						$('webdav_activator').observe("change", function(e){
-							var checked = $('webdav_activator').checked;
-							var conn = new Connexion();
-							conn.setParameters(new Hash({
-								get_action:'webdav_preferences',
-								activate:(checked?'true':'false')
-							}));
-							conn.onComplete = function(transport){
-								ajaxplorer.webdavCurrentPreferences = transport.responseJSON;
-								if(ajaxplorer.webdavCurrentPreferences.webdav_active && !ajaxplorer.webdavCurrentPreferences.digestSet) {
-									$('webdav_password_form').show();
-									ajaxplorer.displayMessage("SUCCESS", MessageHash[408]);
-								}else {
-									$('webdav_password_form').hide();
-									ajaxplorer.displayMessage("SUCCESS", MessageHash[409]);									
-								}								
-							};
-							conn.sendAsync();
-						});
-						if(!ajaxplorer.webdavCurrentPreferences.digestSet){
-                            $('webdav_pass_saver').observe("click", function(){
+                        ajaxplorer.user.getRepositoriesList().each(function(pair){
+                            if(ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key]){
+                                var div = new Element('div', {className:(even?'even':'')});
+                                div.update('<span>'+pair.value.label+'</span><input readonly type="text" value="'+ ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key] +'">' );
+                                cont.insert(div);
+                                even = !even;
+                            }
+                        });
+                        modal.getForm().down('#webdav_main_access').setValue(ajaxplorer.webdavCurrentPreferences.webdav_base_url);
+                        modal.getForm().down('#webdav_main_access').observe("click", function(){
+                            modal.getForm().down('#webdav_main_access').select();
+                        });
+                        modal.getForm().down('#perworkspace-urls-toggle').observe("click", function(event){
+                            modal.getForm().down('#webdav_repo_list').toggle();
+                            var span = modal.getForm().down('#perworkspace-urls-toggle').down("span");
+                            var open = span.hasClassName("icon-caret-right");
+                            span.removeClassName(open ? "icon-caret-right" : "icon-caret-down");
+                            span.addClassName(!open ? "icon-caret-right" : "icon-caret-down");
+                            modal.refreshDialogPosition();
+                        });
+
+                        modal.getForm().down('input[name="ok"]').observe("click", hideLightBox);
+                        if(!$('webdav_activator').hasObserver){
+                            $('webdav_activator').observe("change", function(e){
+                                var checked = $('webdav_activator').checked;
                                 var conn = new Connexion();
-                                conn.setMethod('POST');
                                 conn.setParameters(new Hash({
                                     get_action:'webdav_preferences',
-                                    webdav_pass: $('webdav_password').value
+                                    activate:(checked?'true':'false')
                                 }));
                                 conn.onComplete = function(transport){
-                                    ajaxplorer.displayMessage("SUCCESS", MessageHash[410]);
+                                    ajaxplorer.webdavCurrentPreferences = transport.responseJSON;
+                                    if(ajaxplorer.webdavCurrentPreferences.webdav_active){
+                                        if(!ajaxplorer.webdavCurrentPreferences.digest_set
+                                        || ajaxplorer.webdavCurrentPreferences.webdav_force_basic) {
+                                            $('webdav_password_form').show();
+                                        }
+                                        ajaxplorer.displayMessage("SUCCESS", MessageHash[408]);
+                                    }else {
+                                        $('webdav_password_form').hide();
+                                        ajaxplorer.displayMessage("SUCCESS", MessageHash[409]);
+                                    }
                                 };
                                 conn.sendAsync();
                             });
-						}
-						$('webdav_activator').hasObserver = true;
-					}
+                            if(!ajaxplorer.webdavCurrentPreferences.digest_set){
+                                $('webdav_pass_saver').observe("click", function(){
+                                    var conn = new Connexion();
+                                    conn.setMethod('POST');
+                                    conn.setParameters(new Hash({
+                                        get_action:'webdav_preferences',
+                                        webdav_pass: $('webdav_password').value
+                                    }));
+                                    conn.onComplete = function(transport){
+                                        ajaxplorer.displayMessage("SUCCESS", MessageHash[410]);
+                                    };
+                                    conn.sendAsync();
+                                });
+                            }
+                            $('webdav_activator').hasObserver = true;
+                        }
+					};
+					conn.sendAsync();
+
 					]]></dialogOnOpen>
 					<dialogOnComplete hideDialog="false"><![CDATA[
 					]]></dialogOnComplete>
@@ -364,15 +394,17 @@
 				</clientCallback>
 				<clientForm id="webdav_pref_form"><![CDATA[
 					<div id="webdav_pref_form" action="webdav_pref_form" box_width="450">
-						<div>
-							<input type="checkbox" id="webdav_activator" style="width:16px;" name="webdav_activator"> <label for="webdav_activator">AJXP_MESSAGE[406]</label>
-						</div>
+					    <div class="dialogContentMainTitle">WebDAV Access</div>
+						<div class="dialogLegend" style="margin-bottom: 2px;padding: 0 5px;" ajxp_message_id="404">AJXP_MESSAGE[404]</div>
+						<div style="padding:10px;"><input type="checkbox" id="webdav_activator" style="width:16px;" name="webdav_activator"> <label for="webdav_activator">AJXP_MESSAGE[406]</label></div>
 						<div class="dialogButtons" id="webdav_password_form" style="display:none;text-align: left;padding-left: 15px;height: 42px;font-size: 0.9em;padding-top: 5px;">
 							<div style="width: 70%; float: left; padding-right: 5px; text-align: right;">AJXP_MESSAGE[407]</div><input type="password" id="webdav_password" style="float:left;height: 24px;width: 80px;"> <input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" height="22" width="22" title="OK" id="webdav_pass_saver">
-						</div>						
-						<div class="dialogLegend" style="margin-bottom: 2px; padding:5px;" ajxp_message_id="404">AJXP_MESSAGE[404]</div>
-						<div class="dialogLegend" style="margin-bottom: 2px; padding:5px;" ajxp_message_id="405">AJXP_MESSAGE[405]</div>
-						<div id="webdav_repo_list" style="height: 200px; overflow:auto;"></div>
+						</div>
+						<div class="dialogLegend" style="margin: 5px;" ajxp_message_id="405">AJXP_MESSAGE[405]</div>
+						<input type="text" id="webdav_main_access" value="AJXP_MESSAGE[466]" readonly/>
+						<div class="dialogLegend" id="perworkspace-urls-toggle" style="margin-bottom: 2px; padding:5px;" ajxp_message_id="405">
+						<span class="icon-caret-right"></span>AJXP_MESSAGE[465]</div>
+						<div id="webdav_repo_list" style="display:none; height: 200px; overflow:auto;"></div>
 						<input type="hidden" name="get_action" value="webdav_preferences">									
 					</div>					
 				]]></clientForm>				
@@ -380,14 +412,27 @@
 			</processing>		
 		</action>
         <action name="switch_to_settings">
-            <gui src="settings.php" text="165" title="165" accessKey="settings_access_key" hasAccessKey="true" iconClass="icon-cog" >
-                <context dir="false" recycle="true" selection="false" actionBar="true" actionBarGroup="user"/>
+            <gui src="drive_remote.png" text="165" title="165" accessKey="settings_access_key" hasAccessKey="true" iconClass="icon-cogs" >
+                <context dir="false" recycle="true" selection="false" actionBar="true" actionBarGroup="utils" ajxpWidgets="UserWidget::logging_string"/>
             </gui>
             <rightsContext adminOnly="true" noUser="true" read="false" userLogged="only" write="false"/>
             <processing>
                 <clientCallback><![CDATA[
                     if(!ajaxplorer.repositoryId || ajaxplorer.repositoryId != "ajxp_conf"){
                         ajaxplorer.triggerRepositoryChange('ajxp_conf');
+                    }
+                ]]></clientCallback>
+            </processing>
+        </action>
+        <action name="switch_to_shared_elements">
+            <gui src="drive_remote.png" text="467" title="467" hasAccessKey="false" iconClass="icon-share" >
+                <context dir="false" recycle="true" selection="false" actionBar="false" actionBarGroup="utils" ajxpWidgets="UserWidget::logging_string"/>
+            </gui>
+            <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
+            <processing>
+                <clientCallback><![CDATA[
+                    if(!ajaxplorer.repositoryId || ajaxplorer.repositoryId != "ajxp_shared"){
+                        ajaxplorer.triggerRepositoryChange('ajxp_shared');
                     }
                 ]]></clientCallback>
             </processing>

@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Simple non-fonctionnal plugin for demoing pre/post processes hooks
+ * @package AjaXplorer_Plugins
+ * @subpackage Action
  */
 class PluginSkeleton extends AJXP_Plugin {
 
@@ -40,10 +41,10 @@ class PluginSkeleton extends AJXP_Plugin {
         $actionXpath=new DOMXPath($contribNode->ownerDocument);
         $footerTplNodeList = $actionXpath->query('template[@name="bottom"]', $contribNode);
         $footerTplNode = $footerTplNodeList->item(0);
-        if(!$this->pluginConf["SHOW_CUSTOM_FOOTER"]){
+        if(!$this->getFilteredOption("SHOW_CUSTOM_FOOTER")){
             $contribNode->removeChild($footerTplNode);
         }else{
-            $content = $this->pluginConf["CUSTOM_FOOTER_CONTENT"];
+            $content = $this->getFilteredOption("CUSTOM_FOOTER_CONTENT");
             $content = str_replace("\\n", "<br>", $content);
             $cdata = '<div id="optional_bottom_div" style="font-family:arial;padding:10px;">'.$content.'</div>';
             $cdataSection = $contribNode->ownerDocument->createCDATASection($cdata);

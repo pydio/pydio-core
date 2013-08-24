@@ -21,14 +21,15 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * AJXP_Plugin to access a remote server that implements AjaXplorer API
+ * @package AjaXplorer_Plugins
+ * @subpackage Access
  */
 class remote_fsAccessDriver extends AbstractAccessDriver 
 {
 	private $plugCapabilities = array();
 	
-	function init($repository, $options = null){
+	function init($repository, $options = array()){
 		$repoCapabilities = $repository->getOption("API_CAPABILITIES");
 		if($repoCapabilities != ""){
 			$this->plugCapabilities = explode(",", $repoCapabilities);

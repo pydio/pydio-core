@@ -123,8 +123,8 @@ Class.create("RemoteNodeProvider", {
             try{
                 this.parseNodes(node, transport, null, nodeCallback, true);
             }catch(e){
-                if(ajaxplorer) ajaxplorer.displayMessage('ERROR', 'Loading error :'+e.message);
-                else alert('Loading error :'+ e.message);
+                if(ajaxplorer) ajaxplorer.displayMessage('ERROR', e.message);
+                else alert(e.message);
             }
         }.bind(this);
         conn.sendAsync();
@@ -139,7 +139,14 @@ Class.create("RemoteNodeProvider", {
 	 * @param childCallback Function
 	 */
 	parseNodes : function(origNode, transport, nodeCallback, childCallback, childrenOnly){
-		if(!transport.responseXML || !transport.responseXML.documentElement) return;
+		if(!transport.responseXML || !transport.responseXML.documentElement) {
+		    if(console){
+		         console.log(transport.responseText);
+		    }
+		    nodeCallback(origNode);
+		    origNode.setLoaded(false);
+		    throw new Error('Invalid XML Document (see console)');
+		}
 		var rootNode = transport.responseXML.documentElement;
 		var children = rootNode.childNodes;
         if(!childrenOnly){

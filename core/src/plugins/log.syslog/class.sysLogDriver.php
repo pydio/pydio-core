@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Standard logger. Writes logs into text files
+ * @package AjaXplorer_Plugins
+ * @subpackage Log
  */
 class sysLogDriver extends textLogDriver {
 
@@ -151,12 +152,14 @@ class sysLogDriver extends textLogDriver {
 	 * @param Integer $month The month to list.
 	 * @return null
 	 */
-	function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs"){
-        print "<$nodeName icon=\"toggle_log.png\" date=\"\"
+	function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs", $print = true){
+        $xml = "<$nodeName icon=\"toggle_log.png\" date=\"\"
         display=\"Logs are not readable via this GUI, they are sent directly to your system logger daemon.\"
         text=\"Logs are not readable via this GUI, they are sent directly to your system logger daemon.\"
         is_file=\"1\"
         filename=\"$rootPath/see\"/>";
+        if($print) print $xml;
+        return array($xml);
 	}
 	
 	/**

@@ -23,4 +23,7 @@ $mess=array(
 "2" => "Notifications feed",
 "3" => "Alerts",
 "4" => "Notifications",
+"5" => "All Events",
+"6" => "Go to ...",
+"7" => "Dismiss",
 );

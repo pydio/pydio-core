@@ -24,8 +24,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 //require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.fs/class.fsAccessDriver.php");
 
 /**
- * @package info.ajaxplorer.plugins
  * AJXP_Plugin to access a webdav enabled server
+ * @package AjaXplorer_Plugins
+ * @subpackage Access
  */
 class webdavAccessDriver extends fsAccessDriver
 {
@@ -36,7 +37,13 @@ class webdavAccessDriver extends fsAccessDriver
 	public $driverConf;
 	protected $wrapperClassName;
 	protected $urlBase;
-		
+
+    function performChecks(){
+        if(!AJXP_Utils::searchIncludePath('HTTP/WebDAV/Client.php')){
+            throw new Exception("The PEAR HTTP_WebDAV_Client package must be installed!");
+        }
+    }
+
 	function initRepository(){
         @include_once("HTTP/WebDAV/Client.php");
 		if(is_array($this->pluginConf)){
@@ -77,7 +84,7 @@ class webdavAccessDriver extends fsAccessDriver
             if(webdavAccessWrapper::$lastException){
                 throw webdavAccessWrapper::$lastException;
             }
-			throw new AJXP_Exception("Cannot find base path ($path) for your repository! Please check the configuration!");
+			throw new AJXP_Exception("Cannot connect to the WebDAV server ($path). Please check the configuration!");
 		}
 		if($recycle != ""){
 			RecycleBinManager::init($this->urlBase, "/".$recycle);

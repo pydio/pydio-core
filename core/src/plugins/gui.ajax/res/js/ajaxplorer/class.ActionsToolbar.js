@@ -76,7 +76,8 @@ Class.create("ActionsToolbar", {
 		return this.element;
 	},
 	destroy : function(){
-		
+		this.emptyToolbars();
+
 	},
 
     /**
@@ -109,15 +110,19 @@ Class.create("ActionsToolbar", {
 	 * Initialize all toolbars
 	 */
 	initToolbars: function () {
+        this.registeredButtons = $A();
+
 		this.actions.each(function(pair){
 			var action = pair.value;
 			var actionName = pair.key;
 			if(action.context.actionBar){
-				if(this.toolbars.get(action.context.actionBarGroup) == null){
-					this.toolbars.set(action.context.actionBarGroup, new Array());
-				}
-				this.toolbars.get(action.context.actionBarGroup).push(actionName);
-			}			
+                $A(action.context.actionBarGroup.split(",")).each(function(barGroup){
+                    if(this.toolbars.get(barGroup) == null){
+                        this.toolbars.set(barGroup, new Array());
+                    }
+                    this.toolbars.get(barGroup).push(actionName);
+                }.bind(this));
+			}
 		}.bind(this));
 
         // Regroup actions artificially
@@ -153,7 +158,7 @@ Class.create("ActionsToolbar", {
                 dir:true,
                 actionBar:true,
                 actionBarGroup:'put',
-                contextMenu:true,
+                contextMenu:false,
                 infoPanel:false
 
             }, {}, {}, {dynamicItems: submenuItems});
@@ -211,7 +216,7 @@ Class.create("ActionsToolbar", {
 		if(!this.toolbars.get(toolbar)) {
 			return '';
 		}
-		var toolEl = $(toolbar+'_toolbar');		
+		var toolEl = this.element.down('#'+toolbar+'_toolbar');
 		if(!toolEl){ 
 			var toolEl = new Element('div', {
 				id: toolbar+'_toolbar',
@@ -233,6 +238,16 @@ Class.create("ActionsToolbar", {
 	 * Remove all toolbars
 	 */
 	emptyToolbars: function(){
+        if(this.registeredButtons){
+            this.registeredButtons.each(function(button){
+                if(button.ACTION && button.OBSERVERS){
+                    button.OBSERVERS.each(function(pair){
+                        button.ACTION.stopObserving(pair.key, pair.value);
+                    });
+                    button.remove();
+                }
+            });
+        }
 		if(this.element.subMenus){
 			this.element.subMenus.invoke("destroy");
 		}
@@ -345,6 +360,10 @@ Class.create("ActionsToolbar", {
         }
 		button.hide();
 		this.attachListeners(button, action);
+        if(!this.registeredButtons){
+            this.registeredButtons = $A();
+        }
+        this.registeredButtons.push(button);
 		return button;
 		
 	},
@@ -355,6 +374,31 @@ Class.create("ActionsToolbar", {
 	 * @param action Action The action to observe.
 	 */
 	attachListeners : function(button, action){
+
+        if(this.options.attachToNode){
+            action.fireContextChange(ajaxplorer.usersEnabled, ajaxplorer.user, this.options.attachToNode.getParent());
+            var fakeDm = new AjxpDataModel();
+            fakeDm.setSelectedNodes([this.options.attachToNode]);
+            action.fireSelectionChange(fakeDm);
+            if(action.deny) {
+                button.hide();
+            }  else {
+                button.show();
+            }
+            button.ACTION = action;
+            return;
+        }
+
+
+        button.OBSERVERS = $H();
+        button.OBSERVERS.set("hide", function(){button.hide()}.bind(this));
+        button.OBSERVERS.set("show", function(){button.show()}.bind(this));
+
+        button.OBSERVERS.each(function(pair){
+            action.observe(pair.key, pair.value);
+        });
+        button.ACTION = action;
+
 		action.observe("hide", function(){
 			button.hide();
 		}.bind(this));

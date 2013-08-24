@@ -24,8 +24,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 require_once(AJXP_INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
 
 /**
- * @package info.ajaxplorer.plugins
- * Encapsulation of the PEAR webDAV client 
+ * Encapsulation of the PEAR webDAV client
+ * @package AjaXplorer_Plugins
+ * @subpackage Access
  */
 class webdavAccessWrapper extends fsAccessWrapper {		
 
@@ -155,6 +156,12 @@ class webdavAccessWrapper extends fsAccessWrapper {
 		return $this->dH !== false;
 	}
 
+    public function dir_readdir (){
+        $x = parent::dir_readdir();
+        if ( strstr( $x, '%') !== false) $x = urldecode( $x);
+        return( $x);
+    }
+
 	
 	// DUPBLICATE STATIC FUNCTIONS TO BE SURE 
 	// NOT TO MESS WITH self:: CALLS
@@ -174,23 +181,20 @@ class webdavAccessWrapper extends fsAccessWrapper {
 		}
 	}
 
-	public static function getRealFSReference($path, $persistent = false){
-		$contextOpened =false;
-		if(self::$crtZip != null){
-			$contextOpened = true;
-			$crtZip = self::$crtZip;
-			self::$crtZip = null;
-		}
-		$realPath = self::initPath($path, "file");
-		if(!$contextOpened) {
-			self::closeWrapper();
-		}else{
-			self::$crtZip = $crtZip;
-		}
-		return $realPath;
-	}
+    public static function getRealFSReference($path, $persistent = false){
+        if ( $persistent) {
+            $tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time());
+            $tmpHandle = fopen($tmpFile, "wb");
+            self::copyFileInStream($path, $tmpHandle);
+            fclose($tmpHandle);
+            return $tmpFile;
+        } else {
+            $realPath = self::initPath($path, "file");
+            return $realPath;
+        }
+    }
 
-	
+
     public static function isRemote(){
     	return true;
     }

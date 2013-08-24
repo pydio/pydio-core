@@ -20,11 +20,10 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * The basic abstraction of a data store. Can map a FileSystem, but can also map data from a totally
  * different source, like the application configurations, a mailbox, etc.
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class Repository implements AjxpGroupPathProvider {
 
@@ -63,7 +62,7 @@ class Repository implements AjxpGroupPathProvider {
     /**
      * @var bool
      */
-	var $writeable = false;
+	var $writeable = true;
     /**
      * @var bool
      */
@@ -127,6 +126,10 @@ class Repository implements AjxpGroupPathProvider {
 		$this->uuid = md5(microtime());
 		$this->slug = AJXP_Utils::slugify($display);
         $this->inferOptionsFromParent = false;
+        $this->options["CREATION_TIME"] = time();
+        if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null){
+            $this->options["CREATION_USER"] = AuthService::getLoggedUser()->getId();
+        }
 	}
 
 	/**
@@ -143,7 +146,7 @@ class Repository implements AjxpGroupPathProvider {
 		$newOptions = array_merge($this->options, $newOptions);
 		$repo->options = $newOptions;
 		if($parentId == null){
-			$parentId = $this->id;
+			$parentId = $this->getId();
 		}
 		$repo->setOwnerData($parentId, $owner, $uniqueUser);
 		return $repo;
@@ -159,7 +162,7 @@ class Repository implements AjxpGroupPathProvider {
 	function createTemplateChild($newLabel, $newOptions, $owner = null, $uniqueUser = null){
 		$repo = new Repository(0, $newLabel, $this->accessType);
 		$repo->options = $newOptions;
-		$repo->setOwnerData($this->id, $owner, $uniqueUser);
+		$repo->setOwnerData($this->getId(), $owner, $uniqueUser);
 		$repo->setInferOptionsFromParent(true);
 		return $repo;
 	}
@@ -371,6 +374,7 @@ class Repository implements AjxpGroupPathProvider {
 	 * @return string
 	 */
 	function getId() {
+        if($this->isWriteable()) return $this->getUniqueId();
 		return $this->id;
 	}
 	
@@ -469,6 +473,7 @@ class Repository implements AjxpGroupPathProvider {
      */
     public function setGroupPath($groupPath)
     {
+        if(strlen($groupPath) > 1) $groupPath = rtrim($groupPath, "/");
         $this->groupPath = $groupPath;
     }
 
@@ -478,6 +483,43 @@ class Repository implements AjxpGroupPathProvider {
     public function getGroupPath()
     {
         return $this->groupPath;
+    }
+
+    /**
+     * @param String $descriptionText
+     */
+    public function setDescription( $descriptionText ){
+        $this->options["USER_DESCRIPTION"] = $descriptionText;
+    }
+
+    /**
+     * @return String
+     */
+    public function getDescription (){
+        $m = ConfService::getMessages();
+        if(isset($this->options["USER_DESCRIPTION"]) && !empty($this->options["USER_DESCRIPTION"])){
+            if(isSet($m[$this->options["USER_DESCRIPTION"]])) {
+                return $m[$this->options["USER_DESCRIPTION"]];
+            } else {
+                return $this->options["USER_DESCRIPTION"];
+            }
+        }if(isSet($this->parentId) && isset($this->owner)){
+            if(isSet($this->options["CREATION_TIME"])){
+                $date = AJXP_Utils::relativeDate($this->options["CREATION_TIME"], $m);
+                return str_replace(array("%date", "%user"), array($date, $this->owner), $m["473"]);
+            }else{
+                return str_replace(array("%user"), array($this->owner), $m["472"]);
+            }
+        }else if($this->isWriteable() && isSet($this->options["CREATION_TIME"])){
+            $date = AJXP_Utils::relativeDate($this->options["CREATION_TIME"], $m);
+            if(isSet($this->options["CREATION_USER"])){
+                return str_replace(array("%date", "%user"), array($date, $this->options["CREATION_USER"]), $m["471"]);
+            }else{
+                return str_replace(array("%date"), array($date), $m["470"]);
+            }
+        }else{
+            return $m["474"];
+        }
     }
 
     /**
@@ -491,6 +533,7 @@ class Repository implements AjxpGroupPathProvider {
         if(empty($path)) return false;
         if(strpos($path, "AJXP_USER") !== false) return "USER";
         if(strpos($path, "AJXP_GROUP_PATH") !== false) return "GROUP";
+        if(strpos($path, "AJXP_GROUP_PATH_FLAT") !== false) return "GROUP";
         return false;
     }
 

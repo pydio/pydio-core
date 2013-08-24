@@ -90,7 +90,11 @@
 		]]></clientForm>
 		<dialogOnOpen><![CDATA[ 
 			if(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span')){
-				ajaxplorer.actionBar.multi_selector = new XHRUploader(oForm);
+			    if(ajaxplorer.actionBar.multi_selector && ajaxplorer.actionBar.multi_selector.__className == 'XHRUploader'){
+			        ajaxplorer.actionBar.multi_selector.initialize(oForm);
+			    }else{
+    				ajaxplorer.actionBar.multi_selector = new XHRUploader(oForm);
+                }
 			}else{
 				ajaxplorer.actionBar.multi_selector = new MultiUploader(oForm);
 			}
@@ -99,24 +103,54 @@
 		if(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span') && (window.FileReader || window.FormData) ){
 			var dropzone = $('content_pane');
 			dropzone.addClassName('droparea');
+			var selector = '#content_pane,div.webfx-tree-item,.ajxpNodeProvider';
 			var dragOverFunc = function(event) {
-			    dropzone.addClassName("dropareaHover");
+			    var el = Event.findElement(event, selector);
+			    if(el.hasClassName('ajxpNodeProvider') && el.ajxpNode.isLeaf()){
+			        el = Event.findElement(event, '#content_pane');
+			    }
+			    el.addClassName("dropareaHover");
   				event.preventDefault();
 			};
 			var dropFunc = function(event) {
   				event.preventDefault();
-  				dropzone.removeClassName("dropareaHover");
-  				if(event.dataTransfer.files.length){
-	  				window.UploaderDroppedFiles = event.dataTransfer.files;
-	  				ajaxplorer.actionBar.fireAction('upload');
-	  			}
+			    var el = Event.findElement(event, selector);
+			    if(el.hasClassName('ajxpNodeProvider') && el.ajxpNode.isLeaf()){
+			        el = Event.findElement(event, '#content_pane');
+			    }
+  				el.removeClassName("dropareaHover");
+  				if(!window.UploaderInstanceRunning){
+                    var items = event.dataTransfer.items || [];
+                    if (items[0] && (items[0].getAsEntry || items[0].webkitGetAsEntry)) {
+                        window.UploaderDroppedItems = items;
+                        window.UploaderDroppedFiles = event.dataTransfer.files;
+                        window.UploaderDroppedTarget = el;
+                        ajaxplorer.actionBar.fireAction('upload');
+                    }else if(event.dataTransfer.files.length){
+                        window.UploaderDroppedFiles = event.dataTransfer.files;
+                        window.UploaderDroppedTarget = el;
+                        ajaxplorer.actionBar.fireAction('upload');
+                    }
+  				}
 			};
 			var enterFunc = function(){
-				dropzone.addClassName("dropareaHover");
+			    var el = Event.findElement(event, selector);
+			    if(el.hasClassName('ajxpNodeProvider') && el.ajxpNode.isLeaf()){
+			        el = Event.findElement(event, '#content_pane');
+			    }
+				el.addClassName("dropareaHover");
 			};
 			var leaveFunc = function(){
-				dropzone.removeClassName("dropareaHover");
+			    var el = Event.findElement(event, selector);
+			    if(el.hasClassName('ajxpNodeProvider') && el.ajxpNode.isLeaf()){
+			        el = Event.findElement(event, '#content_pane');
+			    }
+				el.removeClassName("dropareaHover");
 			};
+			AjxpDroppables.dragOverHook = dragOverFunc;
+			AjxpDroppables.dropHook = dropFunc;
+			AjxpDroppables.dragEnterHook = enterFunc;
+			AjxpDroppables.dragLeaveHook = leaveFunc;
 			dropzone.addEventListener("dragover", dragOverFunc, true);
 			dropzone.addEventListener("drop", dropFunc, true);
 			dropzone.addEventListener("dragenter", enterFunc, true);
@@ -127,6 +161,10 @@
 				dropzone.removeEventListener("drop", dropFunc, true);
 				dropzone.removeEventListener("dragenter", enterFunc, true);
 				dropzone.removeEventListener("dragleave", leaveFunc, true);
+                AjxpDroppables.dragOverHook = null;
+                AjxpDroppables.dropHook = null;
+                AjxpDroppables.dragEnterHook = null;
+                AjxpDroppables.dragLeaveHook = null;
 			});
 		}
 		]]></extensionOnInit>		

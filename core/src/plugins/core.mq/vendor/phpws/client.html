@@ -1,0 +1,94 @@
+<html>
+    <head>
+        <title>WebSocket TEST</title>
+
+        <style>
+            html,body{font:normal 0.9em arial,helvetica;}
+            #log {width:440px; height:200px; border:1px solid #7F9DB9; overflow:auto;}
+            #msg {width:330px;}
+        </style>
+
+        <script>
+
+            String.prototype.repeat = function(num)
+            {
+                return new Array(num + 1).join(this);
+            }
+
+
+
+            var socket;
+
+
+            function createSocket(host) {
+
+                if (window.WebSocket)
+                    return new WebSocket(host);
+                else if (window.MozWebSocket)
+                    return new MozWebSocket(host);
+
+            }
+
+            function init() {
+                var host = "ws://" + window.location.host + ":12345/echo";
+                try {
+                    socket = createSocket(host);
+                    log('WebSocket - status ' + socket.readyState);
+                    socket.onopen = function(msg) {
+                        log("Welcome - status " + this.readyState);
+                    };
+                    socket.onmessage = function(msg) {
+                        log("Received (" + msg.data.length + " bytes): " + msg.data);
+                    };
+                    socket.onclose = function(msg) {
+                        log("Disconnected - status " + this.readyState);
+                    };
+                }
+                catch (ex) {
+                    log(ex);
+                }
+                $("msg").focus();
+            }
+
+            function send() {
+
+
+                var msg = document.getElementById('msg').value;
+
+                try {
+                    socket.send(msg);
+                    log('Sent (' + msg.length + " bytes): " + msg);
+                } catch (ex) {
+                    log(ex);
+                }
+            }
+            function quit() {
+                log("Goodbye!");
+                socket.close();
+                socket = null;
+            }
+
+            // Utilities
+            function $(id) {
+                return document.getElementById(id);
+            }
+            function log(msg) {
+                $("log").innerHTML += "<br>" + msg;
+            }
+            function onkey(event) {
+                if (event.keyCode == 13) {
+                    send();
+                }
+            }
+        </script>
+
+    </head>
+    <body onload="init()">
+        <h3>WebSocket Test</h3>
+        <div id="log"></div>
+        <input id="msg" type="textbox" onkeypress="onkey(event)"/>
+        <button onclick="send()">Send</button>
+        <button onclick="quit()">Quit</button>
+        <div>Server will echo your response!</div>
+    </body>
+</html>

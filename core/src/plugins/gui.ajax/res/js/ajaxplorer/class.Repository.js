@@ -64,6 +64,11 @@ Class.create("Repository", {
      */
     owner:'',
 
+    /**
+     * @var String
+     */
+    description:'',
+
 	/**
 	 * Constructor
 	 * @param id String
@@ -98,7 +103,14 @@ Class.create("Repository", {
 	setLabel : function(label){
 		this.label = label;
 	},
-	
+
+    /**
+     * @return String
+     */
+    getDescription: function(){
+        return this.description;
+    },
+
 	/**
 	 * @returns String
 	 */
@@ -186,25 +198,27 @@ Class.create("Repository", {
 		}
 		for(var i=0;i<repoNode.childNodes.length;i++){
 			var childNode = repoNode.childNodes[i];
-			if(childNode.nodeName == "label"){
-				this.setLabel(childNode.firstChild.nodeValue);
-			}else if(childNode.nodeName == "client_settings"){
+            if(childNode.nodeName == "label"){
+                this.setLabel(childNode.firstChild.nodeValue);
+            }else if(childNode.nodeName == "description"){
+                this.description = childNode.firstChild.nodeValue;
+            }else if(childNode.nodeName == "client_settings"){
                 if(childNode.getAttribute('icon_tpl_id')){
                     this.setIcon(window.ajxpServerAccessPath+'&get_action=get_user_template_logo&template_id='+childNode.getAttribute('icon_tpl_id')+'&icon_format=small');
                 }else{
                     this.setIcon(childNode.getAttribute('icon'));
                 }
-				for(var j=0; j<childNode.childNodes.length;j++){
-					var subCh = childNode.childNodes[j];
-					if(subCh.nodeName == 'resources'){
-						this.resourcesManager.loadFromXmlNode(subCh);
-					}else if(subCh.nodeName == 'node_provider'){
-						var nodeProviderName = subCh.getAttribute("ajxpClass");
-						var nodeProviderOptions = subCh.getAttribute("ajxpOptions").evalJSON();
-						this.nodeProviderDef = {name:nodeProviderName, options:nodeProviderOptions};
-					}
-				}
-			}
-		}			
-	}
+                for(var j=0; j<childNode.childNodes.length;j++){
+                    var subCh = childNode.childNodes[j];
+                    if(subCh.nodeName == 'resources'){
+                        this.resourcesManager.loadFromXmlNode(subCh);
+                    }else if(subCh.nodeName == 'node_provider'){
+                        var nodeProviderName = subCh.getAttribute("ajxpClass");
+                        var nodeProviderOptions = subCh.getAttribute("ajxpOptions").evalJSON();
+                        this.nodeProviderDef = {name:nodeProviderName, options:nodeProviderOptions};
+                    }
+                }
+            }
+        }
+    }
 });

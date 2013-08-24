@@ -21,11 +21,10 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * Atomic representation of a data. This the basic node of the hierarchical data.
  * Encapsulates the path and url, the nature (leaf or not) and the metadata of the node.
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class AJXP_Node{
     /**
@@ -78,6 +77,11 @@ class AJXP_Node{
         $this->setUrl($url);
 		$this->_metadata = $metadata;
 	}
+
+    public function __sleep(){
+        $t = array_diff(array_keys(get_class_vars("AJXP_Node")), array("_accessDriver", "_repository", "_metaStore"));
+        return $t;
+    }
 
     /**
      * @param String $url of the node in the form ajxp.protocol://repository_id/path/to/node
@@ -241,6 +245,12 @@ class AJXP_Node{
      */
     public function loadNodeInfo($forceRefresh = false, $contextNode = false, $details = false){
         if($this->nodeInfoLoaded && !$forceRefresh) return;
+        if(!empty($this->_wrapperClassName)){
+            $registered = AJXP_PluginsService::getInstance()->getRegisteredWrappers();
+            if(!isSet($registered[$this->getScheme()])){
+                $this->getDriver()->detectStreamWrapper(true);
+            }
+        }
         AJXP_Controller::applyHook("node.info", array(&$this, $contextNode, $details));
         $this->nodeInfoLoaded = true;
     }
@@ -273,6 +283,13 @@ class AJXP_Node{
      */
 	public function getPath(){
 		return $this->urlParts["path"];
+	}
+
+    /**
+     * @return string The scheme part of the url
+     */
+	public function getScheme(){
+		return $this->urlParts["scheme"];
 	}
 
     /**

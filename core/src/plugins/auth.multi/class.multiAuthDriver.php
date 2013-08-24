@@ -21,8 +21,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Ability to encapsulate many auth drivers and choose the right one at login.
+ * @package AjaXplorer_Plugins
+ * @subpackage Auth
  */
 class multiAuthDriver extends AbstractAuthDriver {
 	
@@ -70,7 +71,7 @@ class multiAuthDriver extends AbstractAuthDriver {
 	}
 	
 	public function getRegistryContributions( $extendedVersion = true ){
-		AJXP_Logger::debug("get contributions NOW");
+		// AJXP_Logger::debug("get contributions NOW");
 		$this->loadRegistryContributions();
 		return parent::getRegistryContributions( $extendedVersion );
 	}
@@ -174,19 +175,38 @@ class multiAuthDriver extends AbstractAuthDriver {
     }
 
     function supportsUsersPagination(){
-        return (!empty($this->baseName) && $this->drivers[$this->baseName]->supportsUsersPagination());
+        if(!empty($this->baseName)){
+            return $this->drivers[$this->baseName]->supportsUsersPagination();
+        }else{
+            return $this->drivers[$this->masterName]->supportsUsersPagination() && $this->drivers[$this->slaveName]->supportsUsersPagination();
+        }
     }
 
     function listUsersPaginated($baseGroup="/", $regexp, $offset, $limit){
-        return $this->drivers[$this->baseName]->listUsersPaginated($baseGroup, $regexp, $offset, $limit);
+        if(!empty($this->baseName)){
+            return $this->drivers[$this->baseName]->listUsersPaginated($baseGroup, $regexp, $offset, $limit);
+        }else{
+            $keys = array_keys($this->drivers);
+            return $this->drivers[$keys[0]]->listUsersPaginated($baseGroup, $regexp, $offset, $limit) +  $this->drivers[$keys[1]]->listUsersPaginated($baseGroup, $regexp, $offset, $limit);
+        }
     }
 
-    function getUsersCount(){
+    function getUsersCount($baseGroup = "/", $regexp = ""){
         if(empty($this->baseName)){
-            return $this->drivers[$this->slaveName]->getUsersCount() +  $this->drivers[$this->masterName]->getUsersCount();
+            if($this->masterSlaveMode){
+                return $this->drivers[$this->slaveName]->getUsersCount($baseGroup, $regexp) +  $this->drivers[$this->masterName]->getUsersCount($baseGroup, $regexp);
+            }else{
+                $keys = array_keys($this->drivers);
+                return $this->drivers[$keys[0]]->getUsersCount($baseGroup, $regexp) +  $this->drivers[$keys[1]]->getUsersCount($baseGroup, $regexp);
+            }
         }else{
-            return $this->drivers[$this->baseName]->getUsersCount();
+            return $this->drivers[$this->baseName]->getUsersCount($baseGroup, $regexp);
         }
+    }
+
+    function isAjxpAdmin($login){
+        $keys = array_keys($this->drivers);
+        return ($this->drivers[$keys[0]]->getOption("AJXP_ADMIN_LOGIN") === $login) ||  ($this->drivers[$keys[1]]->getOption("AJXP_ADMIN_LOGIN") === $login);
     }
 
 	function listUsers($baseGroup="/"){
@@ -258,7 +278,18 @@ class multiAuthDriver extends AbstractAuthDriver {
 			throw new Exception("No driver instanciated in multi driver!");
 		}		
 	}	
-	
+
+    function userExistsWrite($login){
+        if($this->masterSlaveMode){
+            if($this->drivers[$this->slaveName]->userExists($login)){
+                return true;
+            }
+            return false;
+        }else{
+            return $this->userExists($login);
+        }
+    }
+
 	function userExists($login){
         if($this->masterSlaveMode){
             if($this->drivers[$this->slaveName]->userExists($login)){

@@ -21,14 +21,15 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * Static access to the authentication mechanism. Encapsulates the authDriver implementation
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class AuthService
 {
 	static $roles;
+    public static $useSession = true;
+    private static $currentUser;
 	/**
      * Whether the whole users management system is enabled or not.
      * @static
@@ -64,7 +65,8 @@ class AuthService
      * @return
      */
 	static function generateSecureToken(){
-		$_SESSION["SECURE_TOKEN"] = md5(time());
+
+		$_SESSION["SECURE_TOKEN"] = AJXP_Utils::generateRandomString(32); //md5(time());
 		return $_SESSION["SECURE_TOKEN"];
 	}
 	/**
@@ -94,7 +96,14 @@ class AuthService
 	 */
 	static function getLoggedUser()
 	{
-		if(isSet($_SESSION["AJXP_USER"])) return $_SESSION["AJXP_USER"];
+		if(self::$useSession && isSet($_SESSION["AJXP_USER"])) {
+            if(is_a($_SESSION["AJXP_USER"], "__PHP_Incomplete_Class")){
+                session_unset("AJXP_USER");
+                return null;
+            }
+            return $_SESSION["AJXP_USER"];
+        }
+		if(!self::$useSession && isSet(self::$currentUser)) return self::$currentUser;
 		return null;
 	}
 	/**
@@ -204,7 +213,7 @@ class AuthService
             $user->invalidateCookieString(substr($current, strpos($current, ":")+1));
         }
         $rememberPass = $user->getCookieString();
-        setcookie("AjaXplorer-remember", $user->id.":".$rememberPass, time()+3600*24*10);
+        setcookie("AjaXplorer-remember", $user->id.":".$rememberPass, time()+3600*24*10, null, null, (isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"), true);
     }
 
     /**
@@ -225,7 +234,7 @@ class AuthService
         if(!empty($current) && $user != null){
             $user->invalidateCookieString(substr($current, strpos($current, ":")+1));
         }
-        setcookie("AjaXplorer-remember", "", time()-3600);
+        setcookie("AjaXplorer-remember", "", time()-3600, null, null, (isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"), true);
     }
 
     static function logTemporaryUser($parentUserId, $temporaryUserId){
@@ -245,9 +254,10 @@ class AuthService
 
     static function clearTemporaryUser($temporaryUserId){
         AJXP_Logger::logAction("Log out", array("temporary user"), $temporaryUserId);
-        if(isSet($_SESSION["AJXP_USER"])){
+        if(isSet($_SESSION["AJXP_USER"]) || isSet(self::$currentUser)){
             AJXP_Logger::logAction("Log Out");
             unset($_SESSION["AJXP_USER"]);
+            if(isSet(self::$currentUser)) unset(self::$currentUser);
             if(ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")){
                 AJXP_Safe::clearCredentials();
             }
@@ -276,7 +286,11 @@ class AuthService
 		$confDriver = ConfService::getConfStorageImpl();
 		if($user_id == null)
 		{
-			if(isSet($_SESSION["AJXP_USER"]) && is_object($_SESSION["AJXP_USER"])) return 1; 
+            if(self::$useSession){
+                if(isSet($_SESSION["AJXP_USER"]) && is_object($_SESSION["AJXP_USER"])) return 1;
+            }else{
+                if(isSet(self::$currentUser) && is_object(self::$currentUser)) return 1;
+            }
 			if(ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth"))
 			{
 				$authDriver = ConfService::getAuthDriverImpl();
@@ -340,7 +354,9 @@ class AuthService
 				//$user->setAcl("ajxp_shared", "rw");
 			}
 		}
-		$_SESSION["AJXP_USER"] = $user;
+        if(self::$useSession) $_SESSION["AJXP_USER"] = $user;
+        else self::$currentUser = $user;
+
 		if($authDriver->autoCreateUser() && !$user->storageExists()){
 			$user->save("superuser"); // make sure update rights now
 		}
@@ -355,7 +371,8 @@ class AuthService
      */
 	static function updateUser($userObject)
 	{
-		$_SESSION["AJXP_USER"] = $userObject;
+        if(self::$useSession) $_SESSION["AJXP_USER"] = $userObject;
+        else self::$currentUser = $userObject;
 	}
 	/**
      * Clear the session
@@ -364,10 +381,11 @@ class AuthService
      */
 	static function disconnect()
 	{
-		if(isSet($_SESSION["AJXP_USER"])){
+		if(isSet($_SESSION["AJXP_USER"]) || isSet(self::$currentUser)){
             AuthService::clearRememberCookie();
 			AJXP_Logger::logAction("Log Out");
 			unset($_SESSION["AJXP_USER"]);
+            if(isSet(self::$currentUser)) unset(self::$currentUser);
 			if(ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")){
 				AJXP_Safe::clearCredentials();
 			}
@@ -381,13 +399,14 @@ class AuthService
      */
 	public static function bootSequence(&$START_PARAMETERS){
 
-        if(@file_exists(AJXP_CACHE_DIR."/admin_counted")) return;
+        if(AJXP_Utils::detectApplicationFirstRun()) return;
+        if(file_exists(AJXP_CACHE_DIR."/admin_counted")) return;
         $rootRole = AuthService::getRole("ROOT_ROLE", false);
         if($rootRole === false){
             $rootRole = new AJXP_Role("ROOT_ROLE");
             $rootRole->setLabel("Root Role");
             $rootRole->setAutoApplies(array("standard"));
-            foreach (ConfService::getRepositoriesList() as $repositoryId => $repoObject)
+            foreach (ConfService::getRepositoriesList("all") as $repositoryId => $repoObject)
             {
                 if($repoObject->isTemplate) continue;
                 $gp = $repoObject->getGroupPath();
@@ -395,6 +414,59 @@ class AuthService
                     if($repoObject->getDefaultRight() != ""){
                         $rootRole->setAcl($repositoryId, $repoObject->getDefaultRight());
                     }
+                }
+            }
+            AuthService::updateRole($rootRole);
+        }
+        $miniRole = AuthService::getRole("MINISITE", false);
+        if($miniRole === false){
+            $rootRole = new AJXP_Role("MINISITE");
+            $rootRole->setLabel("Minisite Users");
+            $actions = array(
+                "access.fs" => array("ajxp_link", "chmod", "purge"),
+                "meta.watch" => array("toggle_watch"),
+                "conf.serial"=> array("get_bookmarks"),
+                "conf.sql"=> array("get_bookmarks"),
+                "index.lucene" => array("index"),
+                "action.share" => array("share"),
+                "gui.ajax" => array("bookmark"),
+                "auth.serial" => array("pass_change"),
+                "auth.sql" => array("pass_change"),
+            );
+            foreach($actions as $pluginId => $acts){
+                foreach($acts as $act){
+                    $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_SHARED, false);
+                }
+            }
+            AuthService::updateRole($rootRole);
+        }
+        $miniRole = AuthService::getRole("MINISITE_NODOWNLOAD", false);
+        if($miniRole === false){
+            $rootRole = new AJXP_Role("MINISITE_NODOWNLOAD");
+            $rootRole->setLabel("Minisite Users - No Download");
+            $actions = array(
+                "access.fs" => array("download", "download_chunk", "prepare_chunk_dl", "download_all")
+            );
+            foreach($actions as $pluginId => $acts){
+                foreach($acts as $act){
+                    $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_SHARED, false);
+                }
+            }
+            AuthService::updateRole($rootRole);
+        }
+        $miniRole = AuthService::getRole("GUEST", false);
+        if($miniRole === false){
+            $rootRole = new AJXP_Role("GUEST");
+            $rootRole->setLabel("Guest user role");
+            $actions = array(
+                "access.fs" => array("purge"),
+                "meta.watch" => array("toggle_watch"),
+                "index.lucene" => array("index"),
+            );
+            $rootRole->setAutoApplies(array("guest"));
+            foreach($actions as $pluginId => $acts){
+                foreach($acts as $act){
+                    $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_ALL);
                 }
             }
             AuthService::updateRole($rootRole);
@@ -427,7 +499,8 @@ class AuthService
 			$adminUser->save("superuser");
 			$START_PARAMETERS["ALERT"] .= "There is an admin user, but without admin right. Now any user can have the administration rights, \\n your 'admin' user was set with the admin rights. Please check that this suits your security configuration.";
     	}
-        @file_put_contents(AJXP_CACHE_DIR."/admin_counted", "true");
+        file_put_contents(AJXP_CACHE_DIR."/admin_counted", "true");
+
 	}
     /**
      * If the auth driver implementatino has a logout redirect URL, clear session and return it.
@@ -439,12 +512,8 @@ class AuthService
     {
         $authDriver = ConfService::getAuthDriverImpl();
         $logout = $authDriver->getLogoutRedirect();
-        if($logUserOut && isSet($_SESSION["AJXP_USER"])){
-			AJXP_Logger::logAction("Log Out");
-			unset($_SESSION["AJXP_USER"]);
-			if(ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")){
-				AJXP_Safe::clearCredentials();
-			}			
+        if($logUserOut){
+            self::disconnect();
 		}
         return $logout;
     }
@@ -544,16 +613,20 @@ class AuthService
 	/**
      * Use driver implementation to check whether the user exists or not.
      * @static
-     * @param $userId
+     * @param String $userId
+     * @param String $mode "r" or "w"
      * @return bool
      */
-	static function userExists($userId)
+	static function userExists($userId, $mode = "r")
 	{
         if($userId == "guest" && !ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")){
             return false;
         }
         $userId = AuthService::filterUserSensitivity($userId);
 		$authDriver = ConfService::getAuthDriverImpl();
+        if($mode == "w"){
+            return $authDriver->userExistsWrite($userId);
+        }
 		return $authDriver->userExists($userId);
 	}
 
@@ -621,10 +694,10 @@ class AuthService
         if($authDriver->getOption("TRANSMIT_CLEAR_PASS") === true){
             // We can directly update the HA1 version of the WEBDAV Digest
             $realm = ConfService::getCoreConf("WEBDAV_DIGESTREALM");
-            AJXP_Logger::debug(("{$userId}:{$realm}:{$userPass}"));
             $ha1 = md5("{$userId}:{$realm}:{$userPass}");
             $zObj = ConfService::getConfStorageImpl()->createUserObject($userId);
             $wData = $zObj->getPref("AJXP_WEBDAV_DATA");
+            if(!is_array($wData)) $wData = array();
             $wData["HA1"] = $ha1;
             $zObj->setPref("AJXP_WEBDAV_DATA", $wData);
             $zObj->save();
@@ -664,6 +737,18 @@ class AuthService
 			$user->setAdmin(true);			
 			$user->save("superuser");
 		}
+        if($authDriver->getOption("TRANSMIT_CLEAR_PASS") === true){
+            $realm = ConfService::getCoreConf("WEBDAV_DIGESTREALM");
+            $ha1 = md5("{$userId}:{$realm}:{$userPass}");
+            if(!isSet($user)){
+                $user = $confDriver->createUserObject($userId);
+            }
+            $wData = $user->getPref("AJXP_WEBDAV_DATA");
+            if(!is_array($wData)) $wData = array();
+            $wData["HA1"] = $ha1;
+            $user->setPref("AJXP_WEBDAV_DATA", $wData);
+            $user->save();
+        }
         AJXP_Controller::applyHook("user.after_create", array($user));
 		AJXP_Logger::logAction("Create User", array("user_id"=>$userId));
 		return null;
@@ -790,9 +875,9 @@ class AuthService
         return $authDriver->supportsUsersPagination();
     }
 
-    static function authCountUsers(){
+    static function authCountUsers($baseGroup="/", $regexp=""){
         $authDriver = ConfService::getAuthDriverImpl();
-        return $authDriver->getUsersCount();
+        return $authDriver->getUsersCount($baseGroup, $regexp);
     }
 
     static function getAuthScheme($userName){
@@ -813,7 +898,7 @@ class AuthService
 	 * @return AJXP_Role
 	 */
 	static function getRole($roleId, $createIfNotExists = false){
-		$roles = self::getRolesList();
+		$roles = self::getRolesList(array($roleId));
 		if(isSet($roles[$roleId])) return $roles[$roleId];
         if($createIfNotExists){
             $role = new AJXP_Role($roleId);
@@ -851,7 +936,7 @@ class AuthService
             $repo = ConfService::getRepository();
             if($repo!=null) $repoId = $repo->getId();
         }
-        if($logged == null) return $params;
+        if($logged == null || $logged->mergedRole == null) return $params;
         $roleParams = $logged->mergedRole->listParameters();
         if(iSSet($roleParams[AJXP_REPO_SCOPE_ALL][$pluginId])){
             $params = array_merge($params, $roleParams[AJXP_REPO_SCOPE_ALL][$pluginId]);
@@ -876,7 +961,7 @@ class AuthService
         $repoList = null;
         foreach(self::$roles as $roleId => $roleObject){
             if(is_a($roleObject, "AjxpRole")){
-                if($repoList == null) $repoList = ConfService::getRepositoriesList();
+                if($repoList == null) $repoList = ConfService::getRepositoriesList("all");
                 $newRole = new AJXP_Role($roleId);
                 $newRole->migrateDeprectated($repoList, $roleObject);
                 self::$roles[$roleId] = $newRole;

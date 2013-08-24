@@ -21,9 +21,10 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.core
+ * @package AjaXplorer
+ * @subpackage SabreDav
  */
-class AJXP_Sabre_BrowserPlugin extends Sabre_DAV_Browser_Plugin
+class AJXP_Sabre_BrowserPlugin extends Sabre\DAV\Browser\Plugin
 {
 
     protected $repositoryLabel;
@@ -57,7 +58,6 @@ class AJXP_Sabre_BrowserPlugin extends Sabre_DAV_Browser_Plugin
         if($name != "favicon.ico") {
             return parent::getLocalAssetPath($name);
         }
-        AJXP_Logger::debug("THEME FOLDER name $name");
         return AJXP_INSTALL_PATH."/plugins/gui.ajax/res/themes/umbra/images/html-folder.png";
     }
 

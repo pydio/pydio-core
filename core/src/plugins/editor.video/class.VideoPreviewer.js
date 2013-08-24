@@ -22,8 +22,36 @@ Class.create("VideoPreviewer", AbstractEditor, {
 	fullscreenMode: false,
 	
 	initialize: function($super, oFormObject){
-	},
-		
+        this.element = oFormObject;
+    },
+
+    open : function($super, ajxpNode){
+        this.currentRichPreview = this.getPreview(ajxpNode, true);
+        this.element.down("#videojs_previewer").setStyle({height:'297px'});
+        this.element.down("#videojs_previewer").insert(this.currentRichPreview);
+        this.currentRichPreview.resizePreviewElement({width:380, height:260, maxHeight:260}, true);
+        modal.setCloseValidation(function(){
+            this.currentRichPreview.destroyElement();
+            return true;
+        }.bind(this));
+    },
+
+    getSharedPreviewTemplate : function(node){
+
+        var mime = getAjxpMimeType(node);
+        var cType;
+        if(mime == "mp4" || mime == "m4v") cType = "video/mp4";
+        else if(mime == "ogv") cType = "video/ogg";
+        else if(mime == "webm") cType = "video/webm";
+        return new Template('<link href="http://vjs.zencdn.net/c/video-js.css" rel="stylesheet">\n\
+&lt;script src="http://vjs.zencdn.net/c/video.js"&gt;&lt;/script&gt;\n\
+<video id="my_video_1" class="video-js vjs-default-skin" controls\n\
+preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
+<source src="#{DL_CT_LINK}" type="'+cType+'">\n\
+</video>');
+
+    },
+
 	getPreview : function(ajxpNode, rich){
 		if(rich){
 			var url = document.location.href;
@@ -92,25 +120,46 @@ Class.create("VideoPreviewer", AbstractEditor, {
 				content += '<p align="center"> <img src="'+poster+'" width="64" height="64"></p>';
 				
 				div.update(content);
-				div.resizePreviewElement = function(dimensionObject){
+				div.resizePreviewElement = function(dimensionObject, innerInstance){
 					var videoObject = div.down('.video-js');
 					if(!div.ajxpPlayer && div.parentNode && videoObject){						
 						$(div.parentNode).setStyle({paddingLeft:10,paddingRight:10});
 						div.ajxpPlayer = VideoJS.setup(videoObject, {
 							preload:true,
-							controlsBelow: false, // Display control bar below video instead of in front of
-							controlsHiding: true, // Hide controls when mouse is not over the video
+							controlsBelow: innerInstance?true:false, // Display control bar below video instead of in front of
+							controlsHiding: innerInstance?false:true, // Hide controls when mouse is not over the video
 							defaultVolume: 0.85, // Will be overridden by user's last volume if available
 							flashVersion: 9, // Required flash version for fallback
 							linksHiding: true, // Hide download links when video is supported,
 							playerFallbackOrder : (mime == "mp4" || mime=="m4v"?["html5", "flash", "links"]:["html5", "links"])
 						});
 					}
-					div.setStyle({width:dimensionObject.width});
-					div.down('.vjs-flash-fallback').setAttribute('width', dimensionObject.width);
-					if(videoObject) videoObject.setAttribute('width', dimensionObject.width);
-					if(div.ajxpPlayer) div.ajxpPlayer.triggerResizeListeners();
-				}
+                    var height = Math.min(dimensionObject.height, dimensionObject.maxHeight);
+                    var width = dimensionObject.width;
+                    var styleObject = {height: height + 'px', width : width + 'px'};
+					div.setStyle(styleObject);
+					div.down('.vjs-flash-fallback').setAttribute('width', width);
+                    if(innerInstance) div.down('.vjs-flash-fallback').setAttribute('height', height);
+					if(videoObject) {
+                        videoObject.setAttribute('width', width);
+                        if(innerInstance) videoObject.setAttribute('height', height);
+                        videoObject.setStyle(styleObject);
+                    }
+                    if(div.ajxpPlayer) {
+                        div.ajxpPlayer.height(height);
+                        div.ajxpPlayer.width(width);
+                    }
+				};
+                div.destroyElement = function(){
+                    if(div.ajxpPlayer){
+                        div.ajxpPlayer.pause();
+                        try{
+                            $A(div.children).invoke("remove");
+                            div.down("video").destroy();
+                        }catch(e){}
+                        div.update('');
+                    }
+                };
 				
 			}else{
                 var f = encodeURIComponent(url+'/'+ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=read_video_data&file='+ajxpNode.getPath());
@@ -124,7 +173,10 @@ Class.create("VideoPreviewer", AbstractEditor, {
 				div.update(content);
 				div.resizePreviewElement = function(dimensionObject){
 					// do nothing;
-				}
+				};
+                div.destroyElement = function(){
+                    div.update('');
+                };
 			}
 			return div;
 		}else{

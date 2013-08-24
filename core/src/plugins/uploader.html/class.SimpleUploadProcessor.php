@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Processor for standard POST upload
+ * @package AjaXplorer_Plugins
+ * @subpackage Uploader
  */
 class SimpleUploadProcessor extends AJXP_Plugin {
 	
@@ -41,23 +42,25 @@ class SimpleUploadProcessor extends AJXP_Plugin {
 		if(!isSet($httpVars["input_stream"])){
 			return false;
 		}
-		//AJXP_Logger::debug("SimpleUpload::preProcess", $httpVars);
-				
-	    $headersCheck = (
-	        // basic checks
-	        isset(
-	            //$_SERVER['CONTENT_TYPE'],
+
+	    $headersCheck = isset(
 	            $_SERVER['CONTENT_LENGTH'],
-	            $_SERVER['HTTP_X_FILE_SIZE'],
 	            $_SERVER['HTTP_X_FILE_NAME']
-	        ) &&
-	        //$_SERVER['CONTENT_TYPE'] === 'multipart/form-data' &&
-	        $_SERVER['CONTENT_LENGTH'] === $_SERVER['HTTP_X_FILE_SIZE']
-	    );
+	        ) ;
+        if(isSet($_SERVER['HTTP_X_FILE_SIZE'])){
+            if($_SERVER['CONTENT_LENGTH'] != $_SERVER['HTTP_X_FILE_SIZE'])  {
+                exit('Warning, wrong headers');
+            }
+        }
 	    $fileNameH = $_SERVER['HTTP_X_FILE_NAME'];
-	    $fileSizeH = $_SERVER['HTTP_X_FILE_SIZE'];		
-	       
-	    if($headersCheck){
+	    $fileSizeH = $_SERVER['CONTENT_LENGTH'];
+
+        if(dirname($httpVars["dir"]) == "/" && basename($httpVars["dir"]) == $fileNameH){
+            $httpVars["dir"] = "/";
+        }
+        AJXP_Logger::debug("SimpleUpload::preProcess", $httpVars);
+
+        if($headersCheck){
 	        // create the object and assign property
         	$fileVars["userfile_0"] = array(
         		"input_upload" => true,
@@ -102,7 +105,11 @@ class SimpleUploadProcessor extends AJXP_Plugin {
                     AJXP_XMLWriter::writeNodesDiff(array("ADD" => array($result["CREATED_NODE"])), true);
                 }
                 AJXP_XMLWriter::close();
-				//exit("OK");
+                /* for further implementation */
+                if(!isset($httpVars["prevent_notification"])){
+                    AJXP_Controller::applyHook("node.change", array(null, $result["CREATED_NODE"], false));
+                }
+                //exit("OK");
 			}
 		}
 		
@@ -135,7 +142,7 @@ class SimpleUploadProcessor extends AJXP_Plugin {
 			unlink($destStreamURL.$chunks[$i]);
 		}
 		fclose($newDest);
-		
+        AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($newDest), false));
 	}
 }
 ?>

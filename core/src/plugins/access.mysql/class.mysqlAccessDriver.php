@@ -21,8 +21,8 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
- * AJXP_Plugin to access a MySQL Server and make AjaXplorer act like a phpMyAdmin
+ * @package AjaXplorer_Plugins
+ * @subpackage Access
  */
 class mysqlAccessDriver extends AbstractAccessDriver 
 {
@@ -189,7 +189,10 @@ class mysqlAccessDriver extends AbstractAccessDriver
 					if(count($split) == 3 && $split[0]=="field" && is_numeric($split[2]) && in_array($split[1], $fields)){
 						if(!isSet($rows[intval($split[2])])) $rows[intval($split[2])] = array();
 						$rows[intval($split[2])][$split[1]] = $val;
-					}
+					}else if(count($split) == 2 && $split[0] == "field" && in_array($split[1], $fields)){
+                        if(!isSet($rows[0])) $rows[0] = array();
+                        $rows[0][$split[1]] = $val;
+                    }
 				}
 				if(isSet($current_table)){
 					$qMessage = '';
@@ -209,29 +212,27 @@ class mysqlAccessDriver extends AbstractAccessDriver
 					}
 					$logMessage = $qMessage;
 				}else if(isSet($new_table)){
-					$fieldsDef = "";
+					$fieldsDef = array();
 					$pks = array();
 					$indexes = array();
 					$uniqs = array();
 					foreach ($rows as $index=>$row){
-						$fieldsDef .= $this->makeColumnDef($row);
+						$fieldsDef[]= $this->makeColumnDef($row);
 						// Analyse keys
 						if($row["pk"] == "1")$pks[] = $row["name"];
 						if($row["index"]=="1") $indexes[] = $row["name"];
 						if($row["uniq"]=="1") $uniqs[] = $row["name"];
 						
-						if($index < count($rows)-1){
-							$fieldsDef.=",";
-						}
 					}
+                    $fieldsDef = implode(",", $fieldsDef);
 					if(count($pks)){
-						$fieldsDef.= ",PRIMARY KEY (".join(",", $pks).")";
+						$fieldsDef.= ",PRIMARY KEY (".implode(",", $pks).")";
 					}
 					if(count($indexes)){
-						$fieldsDef.=",INDEX (".join(",", $indexes).")";
+						$fieldsDef.=",INDEX (".implode(",", $indexes).")";
 					}
 					if(count($uniqs)){
-						$fieldsDef.=",UNIQUE (".join(",", $uniqs).")";
+						$fieldsDef.=",UNIQUE (".implode(",", $uniqs).")";
 					}
 					$query = "CREATE TABLE $new_table ($fieldsDef)"; 
 					$res = $this->execQuery((trim($query)));
@@ -260,7 +261,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 					foreach ($tables as $index => $tableName){
 						$tables[$index] = basename($tableName);
 					}
-					$query.= " ".join(",", $tables);
+					$query.= " ".implode(",", $tables);
 					$res = $this->execQuery($query);
 					$reload_current_node = true;
 				}else{
@@ -384,8 +385,8 @@ class mysqlAccessDriver extends AbstractAccessDriver
 						$pkString = "";
 						foreach ($row as $key=>$value){
 							if(in_array($key, $blobCols)){
-								$sizeStr = "-NULL";
-								if(strlen($value)) $sizeStr = "-".AJXP_Utils::roundSize(strlen($sizeStr));
+								$sizeStr = " - NULL";
+								if(strlen($value)) $sizeStr = " - ".AJXP_Utils::roundSize(strlen($value));
 								print "$key=\"BLOB$sizeStr\" ";
 							}else{
 								$value = str_replace("\"", "", $value);
@@ -496,7 +497,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 			}
 			$newFlags[] = $flag;
 		}
-		return join(" ", $newFlags);
+		return implode(" ", $newFlags);
 	}
 	
 	function sqlTypeToSortType($fieldType){

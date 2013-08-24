@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Test user agent
+ * @package AjaXplorer_Plugins
+ * @subpackage Gui
  */
 class IOSGuiPlugin extends AJXP_Plugin {
 

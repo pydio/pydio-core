@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Encapsulates calls to Image Magick to extract JPG previews of PDF, PSD, TIFF, etc.
+ * @package AjaXplorer_Plugins
+ * @subpackage Editor
  */
 class IMagickPreviewer extends AJXP_Plugin {
 
@@ -31,7 +32,7 @@ class IMagickPreviewer extends AJXP_Plugin {
 	protected $onTheFly = false;
 	protected $useOnTheFly = false;
 
-    protected $imagickExtensions = array("pdf", "svg", "tif", "tiff", "psd", "xcf", "eps");
+    protected $imagickExtensions = array("pdf", "svg", "tif", "tiff", "psd", "xcf", "eps", "cr2");
     protected $unoconvExtensios = array("xls", "xlsx", "ods", "doc", "docx", "odt", "ppt", "pptx", "odp", "rtf");
 
     public function loadConfigs($configsData){
@@ -52,12 +53,13 @@ class IMagickPreviewer extends AJXP_Plugin {
 		if(!$repository->detectStreamWrapper(true)){
 			return false;
 		}
-		if(!is_array($this->pluginConf) || !isSet($this->pluginConf["IMAGE_MAGICK_CONVERT"])){
+        $convert = $this->getFilteredOption("IMAGE_MAGICK_CONVERT");
+		if(empty($convert)){
 			return false;
 		}
 		$streamData = $repository->streamData;		
     	$destStreamURL = $streamData["protocol"]."://".$repository->getId();
-    	$flyThreshold = 1024*1024*intval($this->pluginConf["ONTHEFLY_THRESHOLD"]);
+    	$flyThreshold = 1024*1024*intval($this->getFilteredOption("ONTHEFLY_THRESHOLD", $repository->getId()));
 		    	
 		if($action == "imagick_data_proxy"){
 			$this->extractAll = false;
@@ -174,10 +176,11 @@ class IMagickPreviewer extends AJXP_Plugin {
 	protected function listPreviewFiles($file, $prefix){
 		$files = array();
 		$index = 0;
-		if(isset($this->pluginConf["UNOCONV"]) && !empty($this->pluginConf["UNOCONV"])){
+        $unoconv =  $this->getFilteredOption("UNOCONV");
+		if(!empty($unoconv)){
 			$officeExt = array('xls', 'xlsx', 'ods', 'doc', 'docx', 'odt', 'ppt', 'pptx', 'odp', 'rtf');
 			$extension = pathinfo($file, PATHINFO_EXTENSION);
-			if(in_array($extension, $officeExt)){
+			if(in_array(strtolower($extension), $officeExt)){
 				$unoDoc = $prefix."_unoconv.pdf";
 				if(is_file($unoDoc)) $file = $unoDoc;
 			}			
@@ -198,11 +201,12 @@ class IMagickPreviewer extends AJXP_Plugin {
 	}
 	
 	public function generateJpegsCallback($masterFile, $targetFile){
-		$unoconv = false;
-		if(isset($this->pluginConf["UNOCONV"]) && !empty($this->pluginConf["UNOCONV"])){
-			$unoconv = $this->pluginConf["UNOCONV"];
+        $unoconv =  $this->getFilteredOption("UNOCONV");
+		if(!empty($unoconv)){
 			$officeExt = array('xls', 'xlsx', 'ods', 'doc', 'docx', 'odt', 'ppt', 'pptx', 'odp', 'rtf');
-		}
+		}else{
+            $unoconv = false;
+        }
 
         $extension = pathinfo($masterFile, PATHINFO_EXTENSION);
         $node = new AJXP_Node($masterFile);
@@ -231,11 +235,11 @@ class IMagickPreviewer extends AJXP_Plugin {
 			@set_time_limit(90);
 		}
 		chdir($workingDir);
-		if($unoconv !== false && in_array($extension, $officeExt)){
+		if($unoconv !== false && in_array(strtolower($extension), $officeExt)){
 			$unoDoc = str_replace(".jpg", "_unoconv.pdf", $tmpFileThumb);
 			if(!is_file($tmpFileThumb)){
 				// Create PDF Version now
-				$unoconv =  "HOME=/tmp ".$this->pluginConf["UNOCONV"]." --stdout -f pdf ".escapeshellarg($masterFile)." > ".escapeshellarg(basename($unoDoc));
+				$unoconv =  "HOME=/tmp ".$unoconv." --stdout -f pdf ".escapeshellarg($masterFile)." > ".escapeshellarg(basename($unoDoc));
 				exec($unoconv, $out, $return);
 			}
 			if(is_file($unoDoc)){
@@ -256,9 +260,20 @@ class IMagickPreviewer extends AJXP_Plugin {
 				if($this->extractAll) $tmpFileThumb = str_replace(".jpg", "-0.jpg", $tmpFileThumb);
 			}
 		}
-		$params = ($this->extractAll?"-quality ".$this->pluginConf["IM_VIEWER_QUALITY"]:"-resize 250 -quality ".$this->pluginConf["IM_THUMB_QUALITY"]);
-		$cmd = $this->pluginConf["IMAGE_MAGICK_CONVERT"]." ".escapeshellarg(($masterFile).$pageLimit)." ".$params." ".escapeshellarg($tmpFileThumb);
-		AJXP_Logger::logAction("IMagick Command : $cmd");
+
+        $customOptions = $this->getFilteredOption("IM_CUSTOM_OPTIONS");
+        $customEnvPath = $this->getFilteredOption("ADDITIONAL_ENV_PATH");
+        $viewerQuality = $this->getFilteredOption("IM_VIEWER_QUALITY");
+        $thumbQuality = $this->getFilteredOption("IM_THUMB_QUALITY");
+        if(empty($customOptions)){
+            $customOptions = "";
+        }
+        if(!empty($customEnvPath)){
+            putenv("PATH=".getenv("PATH").":".$customEnvPath);
+        }
+        $params = ($this->extractAll?"-quality ".$viewerQuality:"-resize 250 ".$customOptions." -quality ".$thumbQuality);
+        $cmd = $this->getFilteredOption("IMAGE_MAGICK_CONVERT")." ".escapeshellarg(($masterFile).$pageLimit)." ".$params." ".escapeshellarg($tmpFileThumb);
+		AJXP_Logger::debug("IMagick Command : $cmd");
 		session_write_close(); // Be sure to give the hand back
 		exec($cmd, $out, $return);
 		if(is_array($out) && count($out)){

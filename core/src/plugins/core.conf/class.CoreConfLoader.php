@@ -20,7 +20,10 @@
  */
 
 defined('AJXP_EXEC') or die('Access not allowed');
- 
+/**
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
+ */
 class CoreConfLoader extends AJXP_Plugin{
 
     /**

@@ -21,7 +21,8 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.core
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
  * @class AbstractAccessDriver
  * Abstract representation of an action driver. Must be implemented.
  */

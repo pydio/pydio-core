@@ -36,10 +36,10 @@ Class.create("PluginEditor", AbstractEditor, {
 
         infoPane.setStyle({position:"relative"});
         infoPane.resizeOnShow = function(tab){
-            fitHeightToBottom(infoPane, $("plugin_edit_box"));
+            fitHeightToBottom(infoPane, $("plugin_edit_box"), Prototype.Browser.IE ? 40 : 0);
         }
         docPane.resizeOnShow = function(tab){
-            fitHeightToBottom(docPane, $("plugin_edit_box"));
+            fitHeightToBottom(docPane, $("plugin_edit_box"), Prototype.Browser.IE ? 40 : 0);
         }
         this.tab = new AjxpSimpleTabs(oFormObject.down("#pluginTabulator"));
         this.actions.get("saveButton").observe("click", this.save.bind(this) );
@@ -50,6 +50,9 @@ Class.create("PluginEditor", AbstractEditor, {
             }
             return true;
         }.bind(this) );
+        modal.setCloseAction(function(){
+            this.formManager.destroyForm(this.infoPane.down("div.driver_form"));
+        }.bind(this));
         oFormObject.down(".action_bar").select("a").invoke("addClassName", "css_gradient");
         this.infoPane = infoPane;
         this.docPane = docPane;
@@ -137,6 +140,7 @@ Class.create("PluginEditor", AbstractEditor, {
                 driverParamsHash.push(hashedParams);
             }
             var form = new Element('div', {className:'driver_form'});
+
             if(documentation){
                 var docDiv = new Element('div', {style:'height:100%;'}).insert("<div class='documentation'>" + documentation.firstChild.nodeValue + "</div>");
                 docDiv.select('img').each(function(img){
@@ -156,6 +160,7 @@ Class.create("PluginEditor", AbstractEditor, {
             }
 
             this.infoPane.insert({bottom:form});
+            form.ajxpPaneObject = this;
 
             if(driverParamsHash.size()){
                 this.formManager.createParametersInputs(form, driverParamsHash, true, (paramsValues.size()?paramsValues:null));
@@ -170,10 +175,8 @@ Class.create("PluginEditor", AbstractEditor, {
                 toggles.invoke("removeClassName", "accordion_toggle_active");
                 toggles.invoke("addClassName", "innerTitle");
             }
-            form.select("div.SF_element").each(function(element){
-                element.select("input,textarea,select").invoke("observe", "change", this.setDirty.bind(this));
-                element.select("input,textarea").invoke("observe", "keydown", this.setDirty.bind(this));
-            }.bind(this) );
+            this.formManager.observeFormChanges(form, this.setDirty.bind(this));
+
 
             ajaxplorer.blurAll();
         }.bind(this);

@@ -40,7 +40,7 @@ rm -rf %{buildroot}
 
 # copy application
 install -d %{buildroot}%{ajaxplorerdir}
-cp -pr * %{buildroot}%{ajaxplorerdir}
+cp -pr . %{buildroot}%{ajaxplorerdir}
 
 # apache conf
 mkdir -p %{buildroot}%{_sysconfdir}/httpd/conf.d
@@ -73,11 +73,27 @@ rm -rf %{buildroot}
 %attr(755,apache,apache) %{_localstatedir}/lib/%{name}
 %dir %attr(755,apache,apache) %{_localstatedir}/cache/%{name}
 %{_localstatedir}/cache/%{name}/.htaccess
+%{_localstatedir}/cache/%{name}/index.html
 %dir %attr(755,apache,apache) %{_localstatedir}/log/%{name}
 %{_localstatedir}/log/%{name}/.htaccess
 %{_localstatedir}/log/%{name}/*
 
+%post
+if [ -f "%{_localstatedir}/cache/%{name}/plugins_cache.ser" ]
+then
+# Upgrading an existing install
+rm -f %{_localstatedir}/cache/%{name}/plugins_*.ser
+if [ ! -f "%{_localstatedir}/cache/%{name}/first_run_passed" ]
+then
+touch %{_localstatedir}/cache/%{name}/first_run_passed
+fi
+fi
+
+
 %changelog
+* Wed Jun 01 2013 Charles du Jeu <charles@ajaxplorer.info> - 5.0.0-1
+- Add post install script
+
 * Wed Jun 27 2012 Charles du Jeu <charles@ajaxplorer.info> - 4.2.0-1
 - Update spec file, integrate in the phing automated process
 - Replace the patch by sed commands (more line changes proof)

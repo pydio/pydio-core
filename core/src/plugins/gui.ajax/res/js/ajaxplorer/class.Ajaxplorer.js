@@ -169,7 +169,7 @@ Class.create("Ajaxplorer", {
 		var protoMenu = this.contextMenu;		
 		protoMenu.options.beforeShow = function(e){
 			this.options.lastElement = Event.element(e);
-			this.options.menuItems = ajaxplorer.actionBar.getContextActions(Event.element(e));
+			this.options.menuItems = ajaxplorer.actionBar.getContextActions(Event.element(e), ["inline"]);
 			this.refreshList();
 		}.bind(protoMenu);
 		protoMenu.options.beforeHide = function(e){
@@ -177,7 +177,7 @@ Class.create("Ajaxplorer", {
 		}.bind(protoMenu);
 		document.observe("ajaxplorer:actions_refreshed", function(){
 			if(this.options.lastElement){
-				this.options.menuItems = ajaxplorer.actionBar.getContextActions(this.options.lastElement);
+				this.options.menuItems = ajaxplorer.actionBar.getContextActions(this.options.lastElement, ["inline"]);
 				this.refreshList();
 			}			
 		}.bind(protoMenu));
@@ -626,6 +626,13 @@ Class.create("Ajaxplorer", {
 			path = nodeOrPath
 		}else{
 			path = nodeOrPath.getPath();
+            if(nodeOrPath.getMetadata().get("repository_id") != undefined && nodeOrPath.getMetadata().get("repository_id") != this.repositoryId){
+                if(ajaxplorer.user){
+                    ajaxplorer.user.setPreference("pending_folder", nodeOrPath.getPath());
+                }
+                this.triggerRepositoryChange(nodeOrPath.getMetadata().get("repository_id"));
+                return;
+            }
 		}
 
         var gotoNode;
@@ -634,16 +641,19 @@ Class.create("Ajaxplorer", {
             this._contextHolder.requireContextChange(gotoNode);
             return;
         }
+        window.setTimeout(function(){
 
-        this._contextHolder.loadPathInfoSync(path, function(foundNode){
-            if(foundNode.isLeaf()) {
-                this._contextHolder.setPendingSelection(getBaseName(path));
-                gotoNode = new AjxpNode(getRepName(path));
-            }else{
-                gotoNode = foundNode;
-            }
-        }.bind(this));
-		this._contextHolder.requireContextChange(gotoNode);
+            this._contextHolder.loadPathInfoSync(path, function(foundNode){
+                if(foundNode.isLeaf()) {
+                    this._contextHolder.setPendingSelection(getBaseName(path));
+                    gotoNode = new AjxpNode(getRepName(path));
+                }else{
+                    gotoNode = foundNode;
+                }
+            }.bind(this));
+    		this._contextHolder.requireContextChange(gotoNode);
+
+        }.bind(this), 0);
 	},
 	
 	/**
@@ -1164,14 +1174,19 @@ Class.create("Ajaxplorer", {
 	 * Create a Tab navigation between registerd IAjxpFocusable
 	 */
 	initTabNavigation: function(){
-		var objects = this._focusables;
 		// ASSIGN OBSERVER
 		Event.observe(document, "keydown", function(e)
 		{			
 			if(e.keyCode == Event.KEY_TAB)
 			{
 				if(this.blockNavigation) return;
-				var shiftKey = e['shiftKey'];
+                var objects = [];
+                $A(this._focusables).each(function(el){
+                    if((!el.htmlElement || el.htmlElement.visible())){
+                        objects.push(el);
+                    }
+                });
+                var shiftKey = e['shiftKey'];
 				var foundFocus = false;
 				for(i=0; i<objects.length;i++)
 				{
@@ -1189,9 +1204,9 @@ Class.create("Ajaxplorer", {
 							if(i<objects.length-1)nextIndex=i+1;
 							else nextIndex = 0;
 						}
-						objects[nextIndex].focus();
-						foundFocus = true;
-						break;
+                        objects[nextIndex].focus();
+                        foundFocus = true;
+                        break;
 					}
 				}
 				if(!foundFocus && objects[0]){
@@ -1199,7 +1214,7 @@ Class.create("Ajaxplorer", {
 				}
 				Event.stop(e);
 			}
-			if(this.blockShortcuts || e['ctrlKey']) return;
+			if(this.blockShortcuts || e['ctrlKey'] || e['metaKey']) return;
 			if(e.keyCode != Event.KEY_DELETE && ( e.keyCode > 90 || e.keyCode < 65 ) ) return;
 			else return this.actionBar.fireActionByKey(e, (e.keyCode == Event.KEY_DELETE ? "key_delete":String.fromCharCode(e.keyCode).toLowerCase()));
 		}.bind(this));

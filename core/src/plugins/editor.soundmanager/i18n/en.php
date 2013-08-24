@@ -20,5 +20,5 @@
 */
 $mess=array(
 "1" => "Sound Volume",
+"2" => "Sound Player",
 );
-?>

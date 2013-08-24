@@ -7,24 +7,19 @@
             <i18n namespace="notification.tpl.short" path="plugins/core.notifications/templates/short"/>
             <i18n namespace="notification.tpl.long" path="plugins/core.notifications/templates/long"/>
             <i18n namespace="notification.tpl.group" path="plugins/core.notifications/templates/group"/>
+            <i18n namespace="notification.tpl.block" path="plugins/core.notifications/templates/block"/>
             <i18n namespace="notification_center" path="plugins/core.notifications/res/i18n"/>
             <css file="plugins/core.notifications/res/css/notification_center.css" autoload="true"/>
             <img_library alias="notification_center" path="plugins/core.notifications/res/img"/>
         </resources>
     </client_settings>
     <server_settings>
-        <global_param description="CONF_MESSAGE[Post the notification in a temporary queue. You must set up the scheduler accordingly to make sure the queue is then consumed on a regularly basis.]" label="CONF_MESSAGE[Queue notifications]" name="USE_QUEUE" type="boolean" default="false"/>
+        <param name="activate_notifications" scope="user" description="Activate desktop notifications" label="Desktop Notifications" type="button" choices="run_client_action:activateDesktopNotifications" expose="true" editable="true"/>
         <global_param description="CONF_MESSAGE[Display a new entry with all events happening on a user workspaces, and alerts. An SQL database must be setup for the FEED_DRIVER configuration.]" label="CONF_MESSAGE[User events and alerts]" name="USER_EVENTS" type="boolean" default="false"/>
-        <global_param type="plugin_instance:mq" name="UNIQUE_MS_INSTANCE" group="CONF_MESSAGE[Instance Params]" label="CONF_MESSAGE[MQ Instance]" description="CONF_MESSAGE[Choose the plugin]" mandatory="false" default="mq.serial"/>
-        <global_param type="plugin_instance:feed" name="UNIQUE_FEED_INSTANCE" group="CONF_MESSAGE[Instance Params]" label="CONF_MESSAGE[Feed Instance]" description="CONF_MESSAGE[Choose the plugin]" mandatory="false" default="feed.sql"/>
+        <global_param type="plugin_instance:feed" name="UNIQUE_FEED_INSTANCE" group="CONF_MESSAGE[Instance Params]" label="CONF_MESSAGE[Feed Instance]" description="CONF_MESSAGE[Choose the plugin]" mandatory="true" default="feed.sql"/>
     </server_settings>
     <registry_contributions>
         <actions>
-            <action name="consume_notification_queue">
-                <processing>
-                    <serverCallback methodName="consumeQueue"/>
-                </processing>
-            </action>
             <action name="get_my_feed">
                 <gui text="notification_center.1" title="notification_center.2" iconClass="icon-rss" src="notification_center/ICON_SIZE/feed.png" accessKey="" hasAccessKey="false">
              		<context selection="false" dir="" recycle="true" actionBar="true" actionBarGroup="user" contextMenu="false" infoPanel="false"/>
@@ -34,7 +29,6 @@
                     <dynamicBuilder><![CDATA[
                         var context = window.builderContext;
                         var protoMenu = window.builderProtoMenu;
-                        ResourcesManager.prototype.loadJSResource('plugins/core.notifications/class.NotificationLoader.js', 'NotificationLoader');
                         NotificationLoader.getInstance().dynamicBuilderLoader(context, protoMenu);
                     ]]></dynamicBuilder>
                 </subMenu>
@@ -43,15 +37,42 @@
                     ]]></clientCallback>
                     <clientForm id="user_feed"><![CDATA[
                         <div id="user_feed" box_padding="0" class="dialogBox css_boxshadow">
-                            <link type="text/css" rel="stylesheet" href="plugins/core.notifications/res/css/notification_center.css"/>
                         </div>
                     ]]></clientForm>
+                    <clientListener name="init"><![CDATA[
+                        ResourcesManager.prototype.loadJSResource('plugins/core.notifications/class.NotificationLoader.js', 'NotificationLoader');
+                        NotificationLoader.getInstance();
+                    ]]></clientListener>
                     <serverCallback methodName="loadUserFeed"/>
+                </processing>
+            </action>
+            <action name="dismiss_user_alert">
+                <processing><serverCallback methodName="dismissUserAlert"/></processing>
+            </action>
+            <action name="activateDesktopNotifications">
+                <gui src="" iconClass="icon-rss" text="notification_center.1" title="notification_title.2">
+                    <context dir="true" recycle="true" selection="false"/>
+                </gui>
+                <processing>
+                    <clientCallback><![CDATA[
+                        if(window.Notification){
+                            alert('Depending on your browser, this will ask for a specific permission. To disable, go through your browser preferences and exceptions. If you have already enabled this feature, probably nothing will hapen.');
+                            window.Notification.requestPermission(function(grant) {
+                                ['default', 'granted', 'denied'].indexOf(grant) === true
+                            });
+                        }else{
+                            alert('Your browser does not seem to support Desktop Notifications yet.');
+                        }
+                    ]]></clientCallback>
                 </processing>
             </action>
         </actions>
         <hooks>
             <serverCallback methodName="persistChangeHookToFeed" hookName="node.change" defer="true"/>
+            <serverCallback methodName="persistNotificationToAlerts" hookName="msg.notification"/>
         </hooks>
     </registry_contributions>
+    <dependencies>
+        <activePlugin pluginName="core.conf"/>
+    </dependencies>
 </ajxp_plugin>

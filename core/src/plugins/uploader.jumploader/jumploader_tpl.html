@@ -7,12 +7,13 @@
     
 	$repository = ConfService::getRepository();
 	$accessType = $repository->getAccessType();
-	if($accessType == "fs"){
-		$partitionLength = $UploadMaxSize - 1000;	
-	}else if($accessType == "remotefs"){
+
+    $partitionLength = $UploadMaxSize - 1000;
+
+    if($accessType == "remotefs"){
 		$maxFileLength = $UploadMaxSize;
 	}else if($accessType == "ftp"){
-		$maxFileLength = $UploadMaxSize;
+		$partitionLength = $UploadMaxSize - 1000;
 		/*
 		// Here we could switch to FTP, but that would mean, by a way or another,
 		// to display in clear the ftp credentials... 
@@ -46,6 +47,7 @@ function appletInitialized(uploader){
 	var origUrl = uploader.getUploaderConfig().getUploadUrl();
 	var currentFolder = parent.base64_encode(parent.ajaxplorer.getUserSelection().getContextNode().getPath());
     uploader.getUploaderConfig().setUploadUrl(origUrl + "&dir=" + currentFolder + "&ajxp_sessid=" + clientId);
+    uploader.getUploaderConfig().setResumeCheckUrl(origUrl + "&dir=" + currentFolder + "&ajxp_sessid=" + clientId);
     uploader.getUploaderConfig().setPartitionLength(partitionLength);
     uploader.getUploaderConfig().setMaxFileLength(maxFileLength);
     parent.document.fire("ajaxplorer:longtask_starting");
@@ -101,7 +103,8 @@ document.write('<applet name="jumpLoaderApplet" id="jumpLoaderApplet" \
 						height="400" \
 						mayscript> \
 					<param name="gc_loggingLevel" value="ERROR"/> \
-					<param name="uc_uploadUrl" value="'+parent.ajxpServerAccessPath+'&get_action=upload"/> \
+					<param name="uc_uploadUrl" value="'+ document.location.href.split("?").shift() + '?secure_token=' + parent.Connexion.SECURE_TOKEN  +'&get_action=upload"/> \
+					<param name="uc_resumeCheckUrl" value="'+ document.location.href.split("?").shift() + '?secure_token=' + parent.Connexion.SECURE_TOKEN  +'&get_action=upload"/> \
 					<param name="uc_fileParameterName" value="userfile_0"/> \
 					<param name="ac_fireUploaderStatusChanged" value="true"/> \
 					<param name="ac_fireAppletInitialized" value="true"/> \

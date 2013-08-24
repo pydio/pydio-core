@@ -22,7 +22,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 require_once('../classes/class.AbstractTest.php');
 
 /**
- * @package info.ajaxplorer.test
+ * @package AjaXplorer
+ * @subpackage Tests
  * @class Client
  * Test client browser
  */

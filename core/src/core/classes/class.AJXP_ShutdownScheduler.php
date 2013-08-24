@@ -20,7 +20,12 @@
  */
 
 defined('AJXP_EXEC') or die('Access not allowed');
-
+/**
+ *
+ * @package AjaXplorer
+ * @subpackage Core
+ *
+ */
 class AJXP_ShutdownScheduler
 {
     private static $instance;
@@ -71,22 +76,22 @@ class AJXP_ShutdownScheduler
          return true;
      }
      public function callRegisteredShutdown() {
-        session_write_close();
-         if(!headers_sent()){
+         session_write_close();
+        if(!headers_sent()){
              $size = ob_get_length();
              header("Connection: close\r\n");
-             header("Content-Encoding: none\r\n");
+             //header("Content-Encoding: none\r\n");
              header("Content-Length: $size");
          }
         ob_end_flush();
-        flush();
-        foreach ($this->callbacks as $arguments) {
-            $callback = array_shift($arguments);
-            try{
-                call_user_func_array($callback, $arguments);
-            }catch (Exception $e){
-                AJXP_Logger::logAction("error", array("context"=>"Applying hook ".get_class($callback[0])."::".$callback[1],  "message" => $e->getMessage()));
-            }
-        }
+         flush();
+         foreach ($this->callbacks as $arguments) {
+             $callback = array_shift($arguments);
+             try{
+                 call_user_func_array($callback, $arguments);
+             }catch (Exception $e){
+                 AJXP_Logger::logAction("error", array("context"=>"Applying hook ".get_class($callback[0])."::".$callback[1],  "message" => $e->getMessage()));
+             }
+         }
      }
 }

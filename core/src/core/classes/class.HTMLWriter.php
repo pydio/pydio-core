@@ -21,10 +21,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * Static functions for generating HTML.
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class HTMLWriter
 {
@@ -100,6 +99,21 @@ class HTMLWriter
     	}
     	echo "MessageHash;";
     	echo "</script>\n";
+    }
+
+    /**
+     * Send a simple Content-type header
+     * @static
+     * @param string $type
+     * @param string $charset
+     * @return void
+     */
+    static function internetExplorerMainDocumentHeader(){
+        if(strstr($_SERVER["HTTP_USER_AGENT"], "MSIE 9.")){
+            header("X-UA-Compatible: IE=9");
+        }else if(strstr($_SERVER["HTTP_USER_AGENT"], "MSIE 10.")){
+            header("X-UA-Compatible: IE=Edge,chrome=1");
+        }
     }
 
     /**

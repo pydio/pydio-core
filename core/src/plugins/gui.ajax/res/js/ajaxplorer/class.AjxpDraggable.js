@@ -60,6 +60,7 @@ Class.create("AjxpDraggable", Draggable, {
 	initialize: function($super, element, options, component, componentType){		
 		element = $(element);
 		element.addClassName('ajxp_draggable');
+        if(!options.zindex) options.zindex = 900;
 		$super(element, options);
 		this.options.reverteffect =  function(element, top_offset, left_offset) {
 			new Effect.Move(element, { x: -left_offset, y: -top_offset, duration: 0,
@@ -448,5 +449,13 @@ var AjxpDroppables = {
         }
 		Droppables.add(element, this.options);
 		AllAjxpDroppables.push($(element));
-	}	
+
+        if(AjxpDroppables.dragOverHook){
+            $(element).select("*").invoke("observe", "dragover", AjxpDroppables.dragOverHook, true);
+            $(element).select("*").invoke("observe", "drop", AjxpDroppables.dropHook, true);
+            $(element).select("*").invoke("observe", "dragenter", AjxpDroppables.dragEnterHook, true);
+            $(element).select("*").invoke("observe", "dragleave", AjxpDroppables.dragLeaveHook, true);
+        }
+
+    }
 };

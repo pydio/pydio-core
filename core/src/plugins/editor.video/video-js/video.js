@@ -712,7 +712,9 @@ VideoJS.player.extend({
     // Set width based on fullscreen or not.
     if (this.videoIsFullScreen) {
       this.box.style.width = "";
+      this.box.style.height = "";
       this.element.style.height="";
+      this.element.style.width="";
       if (this.options.controlsBelow) {
         this.box.style.height = "";
         this.element.style.height = (this.box.offsetHeight - this.controls.offsetHeight) + "px";

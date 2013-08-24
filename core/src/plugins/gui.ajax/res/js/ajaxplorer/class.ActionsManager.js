@@ -80,9 +80,10 @@ Class.create("ActionsManager", {
 	/**
 	 * Filter the actions given the srcElement passed as arguments. 
 	 * @param srcElement String An identifier among selectionContext, genericContext, a webfx object id
+     * @param ignoreGroups Array a list of groups to ignore
 	 * @returns Array
 	 */
-	getContextActions: function(srcElement)
+	getContextActions: function(srcElement, ignoreGroups)
 	{		
 		var actionsSelectorAtt = 'selectionContext';
 		if(srcElement.id && (srcElement.hasClassName('table_rows_container') ||  srcElement.hasClassName('selectable_div')))
@@ -103,15 +104,12 @@ Class.create("ActionsManager", {
 			if(actionsSelectorAtt == 'directoryContext' && !action.context.dir) return;
 			if(actionsSelectorAtt == 'genericContext' && action.context.selection) return;
 			if(action.contextHidden || action.deny) return;
-            /*
-			if(crtGroup && crtGroup != action.context.actionBarGroup){
-				contextActions.push({separator:true});
-			}
-			*/
-            if(!contextActionsGroup[action.context.actionBarGroup]){
-                contextActionsGroup[action.context.actionBarGroup] = $A();
-            }
-			var isDefault = false;
+            $A(action.context.actionBarGroup.split(',')).each(function(barGroup){
+                if(!contextActionsGroup[barGroup]){
+                    contextActionsGroup[barGroup] = $A();
+                }
+            });
+            var isDefault = false;
 			if(actionsSelectorAtt == 'selectionContext'){
 				// set default in bold
 				var userSelection = ajaxplorer.getUserSelection();
@@ -125,31 +123,33 @@ Class.create("ActionsManager", {
 					}
 				}
 			}
-			var menuItem = {
+            $A(action.context.actionBarGroup.split(',')).each(function(barGroup){
+                var menuItem = {
 				name:action.getKeyedText(),
 				alt:action.options.title,
                 action_id:action.options.name,
 				image:resolveImageSource(action.options.src, '/images/actions/ICON_SIZE', 16),
 				isDefault:isDefault,
 				callback:function(e){this.apply();}.bind(action)
-			};
-            if(action.options.icon_class){
-                menuItem.icon_class = action.options.icon_class;
-            }
-			if(action.options.subMenu){
-				menuItem.subMenu = [];
-				if(action.subMenuItems.staticOptions){
-					menuItem.subMenu = action.subMenuItems.staticOptions;
-				}
-				if(action.subMenuItems.dynamicBuilder){
-					menuItem.subMenuBeforeShow = action.subMenuItems.dynamicBuilder;
-				}
-			}
-			//contextActions.push(menuItem);
-            contextActionsGroup[action.context.actionBarGroup].push(menuItem);
-            if(isDefault){
-    			defaultGroup = action.context.actionBarGroup;
-            }
+                };
+                if(action.options.icon_class){
+                    menuItem.icon_class = action.options.icon_class;
+                }
+                if(action.options.subMenu){
+                    menuItem.subMenu = [];
+                    if(action.subMenuItems.staticOptions){
+                        menuItem.subMenu = action.subMenuItems.staticOptions;
+                    }
+                    if(action.subMenuItems.dynamicBuilder){
+                        menuItem.subMenuBeforeShow = action.subMenuItems.dynamicBuilder;
+                    }
+                }
+                //contextActions.push(menuItem);
+                contextActionsGroup[barGroup].push(menuItem);
+                if(isDefault){
+                    defaultGroup = barGroup;
+                }
+            });
 		}.bind(this));
         var first = true;
         contextActionsGroup = $H(contextActionsGroup);
@@ -160,6 +160,9 @@ Class.create("ActionsManager", {
 		contextActionsGroup.each(function(pair){
             if(!first){
                 contextActions.push({separator:true});
+            }
+            if(ignoreGroups && ignoreGroups.indexOf(pair.key) != -1){
+                return;
             }
             first = false;
             pair.value.each(function(mItem){

@@ -25,8 +25,9 @@ if(SVNLIB_PATH != ""){
     putenv("LD_LIBRARY_PATH=".SVNLIB_PATH);
 }
 /**
- * @package info.ajaxplorer.plugins
  * Uses svn command lines to extract version infos. Autocommit on change.
+ * @package AjaXplorer_Plugins
+ * @subpackage Meta
  */
 class SvnManager extends AJXP_Plugin {
 	
@@ -192,7 +193,7 @@ class SvnManager extends AJXP_Plugin {
 			exit(0);
         }else if($actionName == "revert_file"){
 
-            $revision = $httpVars["revision"];
+            $revision = escapeshellarg($httpVars["revision"]);
    			$realFile = $init["SELECTION"][0];
             $compare = (isSet($httpVars["compare"]) && $httpVars["compare"] == "true");
             $escapedFile = escapeshellarg($realFile);
@@ -206,7 +207,7 @@ class SvnManager extends AJXP_Plugin {
             }
 
 		}else if($actionName == "svnswitch"){
-			$revision = $httpVars["revision"];
+			$revision = escapeshellarg($httpVars["revision"]);
 			ExecSvnCmd("svn update -r$revision ".$init["DIR"]);
 		}
 	}

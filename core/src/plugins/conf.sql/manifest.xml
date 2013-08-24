@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <confdriver name="sql" id="conf.sql" label="CONF_MESSAGE[DB Storage]" description="CONF_MESSAGE[Stores the conf data in an SQL database.]"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd"
-        mixins="dibidriver_provider" >
+        mixins="dibidriver_consumer" >
     <client_settings>
         <resources>
             <i18n namespace="sql_conf" path="plugins/conf.sql/i18n"/>
         </resources>
     </client_settings>
 	<server_settings>
-		<param name="SQL_DRIVER" type="group_switch:dibi" label="CONF_MESSAGE[Connexion]" description="CONF_MESSAGE[The Database Connexion]" mandatory="false"/>
+		<param name="SQL_DRIVER" type="group_switch:dibi" label="CONF_MESSAGE[Connexion]" description="CONF_MESSAGE[The Database Connexion]" mandatory="true"/>
+        <param type="button" name="INSTALL_SQL" choices="run_plugin_action:conf.sql:installSQLTables" label="CONF_MESSAGE[SQL Tables]" description="CONF_MESSAGE[Install SQL Tables]" mandatory="false"/>
 	</server_settings>
 	<class_definition filename="plugins/conf.sql/class.sqlConfDriver.php" classname="sqlConfDriver"/>
 	<registry_contributions>

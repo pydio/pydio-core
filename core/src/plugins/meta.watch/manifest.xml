@@ -11,9 +11,10 @@
         <actions>
             <action name="toggle_watch">
                 <gui src="meta.watch/ICON_SIZE/watch.png" text="meta.watch.1" title="meta.watch.2" iconClass="icon-rss">
-                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="more" contextMenu="true"></context>
+                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="more" contextMenu="true"/>
                     <selectionContext dir="true" file="true" recycle="false" unique="true"/>
                 </gui>
+                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
                 <subMenu>
                     <dynamicBuilder><![CDATA[
                     var n = ajaxplorer.getUserSelection().getUniqueNode();

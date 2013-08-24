@@ -22,20 +22,24 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Use a developer Bit.ly account to shorten publiclet links.
+ * @package AjaXplorer_Plugins
+ * @subpackage Shorten
  */
 class BitlyShortener extends AJXP_Plugin {
 			
 	public function postProcess($action, $httpVars, $params){
         $url = $params["ob_output"];
-        if(!isSet($this->pluginConf["BITLY_USER"]) || !isSet($this->pluginConf["BITLY_APIKEY"])){
+        $BITLY_USER = $this->getFilteredOption("BITLY_USER");
+        $BITLY_APIKEY = $this->getFilteredOption("BITLY_APIKEY");
+
+        if(empty($BITLY_USER) || empty($BITLY_APIKEY)){
             print($url);
             AJXP_Logger::logAction("error", "Bitly Shortener : you must drop the conf.shorten.bitly.inc file inside conf.php and set the login/api key!");
             return;
         }
-        $bitly_login = $this->pluginConf["BITLY_USER"];
-        $bitly_api = $this->pluginConf["BITLY_APIKEY"];
+        $bitly_login = $BITLY_USER;
+        $bitly_api = $BITLY_APIKEY;
         $format = 'json';
         $version = '2.0.1';
         $bitly = 'http://api.bit.ly/shorten?version='.$version.'&longUrl='.urlencode($url).'&login='.$bitly_login.'&apiKey='.$bitly_api.'&format='.$format;
@@ -50,29 +54,24 @@ class BitlyShortener extends AJXP_Plugin {
 	}
 
     protected function updateMetaShort($file, $shortUrl){
-        $metaStore = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
-        if($metaStore !== false){
-            $driver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
-            $metaStore->initMeta($driver);
-            $streamData = $driver->detectStreamWrapper(false);
-            $baseUrl = $streamData["protocol"]."://".ConfService::getRepository()->getId();
-            $node = new AJXP_Node($baseUrl.$file);
-            $metadata = $metaStore->retrieveMetadata(
-                $node,
+        $driver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
+        $streamData = $driver->detectStreamWrapper(false);
+        $baseUrl = $streamData["protocol"]."://".ConfService::getRepository()->getId();
+        $node = new AJXP_Node($baseUrl.$file);
+        if($node->hasMetaStore()){
+            $metadata = $node->retrieveMetadata(
                 "ajxp_shared",
                 true,
                 AJXP_METADATA_SCOPE_REPOSITORY
             );
             $metadata["short_form_url"] = $shortUrl;
-            $metaStore->setMetadata(
-                $node,
+            $node->setMetadata(
                 "ajxp_shared",
                 $metadata,
                 true,
                 AJXP_METADATA_SCOPE_REPOSITORY
             );
         }
-
     }
 
 }

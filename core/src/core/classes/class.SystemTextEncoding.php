@@ -20,10 +20,9 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * Static utilitaries to encode/decode charset to/from utf8
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class SystemTextEncoding
 {
@@ -111,7 +110,7 @@ class SystemTextEncoding
 	/**
      * This function is used when the server's PHP configuration is using magic quote
      * @param string $text
-     * @return void
+     * @return string
      */
     static function magicDequote($text)
     {

@@ -1,13 +1,22 @@
 @media only screen
-and (max-width : 620px) {
+and (max-width : 800px) {
+    .custom_top_title{
+        width: 23%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+}
+
+@media only screen
+and (max-width : 680px) {
     .ws-label{
         display: none !important;
     }
     span.actionbar_button_label,
     .action_bar span.actionbar_button_label,
     #get_my_feed_button_label,
-    #search_form a,
-    #topPane
+    #search_form a
     {
         display: none;
     }
@@ -20,6 +29,7 @@ and (max-width : 620px) {
     }
     .user_widget_label.withImage i{
         width: 30px;
+        overflow: hidden;
     }
 }
 

@@ -21,6 +21,11 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Generates and caches and md5 hash of each file
+ * @package AjaXplorer_Plugins
+ * @subpackage Meta
+ */
 class FileHasher extends AJXP_Plugin
 {
     protected $accessDriver;
@@ -62,9 +67,6 @@ class FileHasher extends AJXP_Plugin
         $repository = ConfService::getRepository();
         if(!$repository->detectStreamWrapper(true)){
             return false;
-        }
-        if(!isSet($this->pluginConf)){
-            $this->pluginConf = array("GENERATE_THUMBNAIL"=>false);
         }
         $streamData = $repository->streamData;
         $this->streamData = $streamData;

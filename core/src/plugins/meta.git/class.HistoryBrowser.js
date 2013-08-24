@@ -129,7 +129,8 @@ Class.create("HistoryBrowser", {
                 columnsTemplate:"history_file",
                 selectable: true,
                 draggable: false,
-                replaceScroller:true
+                replaceScroller:true,
+                displayMode: "list"
             });
         }else{
             this.filesList = new FilesList(this.element, {
@@ -144,7 +145,8 @@ Class.create("HistoryBrowser", {
                 columnsTemplate:"svnlog_folder",
                 selectable: false,
                 draggable: false,
-                replaceScroller:true
+                replaceScroller:true,
+                displayMode: "list"
             });
         }
     },

@@ -29,7 +29,8 @@ if(!defined('LOG_LEVEL_DEBUG')){
 }
 
 /**
- * @package info.ajaxplorer.log
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
  * @class AbstractLogDriver
  * @author mosen
  * @abstract
@@ -108,7 +109,7 @@ class AbstractLogDriver extends AJXP_Plugin {
      * @internal param $String [optional] $year
      * @internal param $String [optional] $month
      */
-	function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs"){}
+	function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs", $print = true){}
 
     /**
      * List log contents in XML

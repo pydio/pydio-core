@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Wrapper for a local filesystem
+ * @package AjaXplorer_Plugins
+ * @subpackage Access
  */
 class fsAccessWrapper implements AjxpWrapper {
 		
@@ -438,18 +439,18 @@ class fsAccessWrapper implements AjxpWrapper {
 
 	protected function getTrueSizeOnFileSystem($file) {
 		if (!(strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')){
-			$cmd = "stat -L -c%s \"".$file."\"";
+			$cmd = "stat -L -c%s ".escapeshellarg($file);
 			$val = trim(`$cmd`);
 			if (strlen($val) == 0 || floatval($val) == 0)
 			{
 				// No stat on system
-				$cmd = "ls -1s --block-size=1 \"".$file."\"";
+				$cmd = "ls -1s --block-size=1 ".escapeshellarg($file);
 				$val = trim(`$cmd`);
 			}
 			if (strlen($val) == 0 || floatval($val) == 0)
 			{
 				// No block-size on system (probably busybox), try long output
-				$cmd = "ls -l \"".$file."\"";
+				$cmd = "ls -l ".escapeshellarg($file)."";
 
 				$arr = explode("/[\s]+/", `$cmd`);
 				$val = trim($arr[4]);

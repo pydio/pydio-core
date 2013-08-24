@@ -19,17 +19,19 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
 //  hungarian translation: Gyarmati Balázs <gyarmati.balazs@gmail.com>
+//  updates: Levente Huszkó <levente.huszko@gmail.com>
+//  fixed
 $mess=array(
 "1" => "Megosztott felhasználók",
-"2" => "Megosztott mappák",
+"2" => "Megosztott gyűjtemények",
 "3" => "Publikus fájlok",
 "4"	=> "Fájl útvonal",
-"5"	=> "Mappa",
+"5"	=> "Gyűjtemény",
 "6"	=> "Jelszó",
 "7"	=> "Lejárati idő",
 "8" => "Elemek",
 "9" => "Hozzárendelt felhasználók",
-"10"=> "Hozzárendelt mappák",
+"10"=> "Hozzárendelt gyűjtemények",
 "11"=> "Biztos, hogy törölni akarod a kiválasztott eleme(ke)t?",
 "12"=> "Nincs jogod törölni ezt az elemet.",
 "13"=> "Fájl publikus hozzáférése törölve.",
@@ -47,9 +49,9 @@ $mess=array(
 "25"=> "Lejártak törlése",
 "26"=> "Lejárt publikus hozzáférése törlése.",
 "27"=> "Tulajdonos",
-"28"=> "Publikus hozzáférésű fájlok, jelszóval vagy anélkül.",
-"29"=> "Felhasználók által létrehozott mappák felhasználói.",
-"30"=> "Felhasználók hozták létre, hogy el lehessen érni a megosztott mappákat.",
+"28"=> "Publikus hozzáférésű fájlok, jelszóval védve vagy anélkül.",
+"29"=> "Felhasználók által megosztott mappák (gyűjtemények).",
+"30"=> "A megosztott mappák (gyűjtemények) eléréséhez létrehozott felhasználók.",
 "31"=> "Leírás",
 "32"=> "Nullázás",
 "33"=> "A letöltésszámláló nullázása",

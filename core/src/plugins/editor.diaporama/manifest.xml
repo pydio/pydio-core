@@ -72,7 +72,7 @@
 					<serverCallback methodName="switchAction"></serverCallback>
 					</processing>
 			</action>
-			<action name="preview_data_proxy" skipSecureToken="true">
+			<action name="preview_data_proxy" skipSecureToken="true" contentTypedProvider="true">
 				<processing>
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
@@ -96,7 +96,7 @@
 					</messages>
 					<html><![CDATA[
 						<div style="">
-							<div class="panelHeader infoPanelGroup" colspan="2">#{header_string}</div>
+							<div class="panelHeader infoPanelGroup" colspan="2"><span class="icon-picture" data-ajxpAction="no-action"></span> #{header_string}</div>
 							<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
 								<tr>
 									<td class="infoPanelLabel">#{dim_string}</td>

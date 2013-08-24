@@ -1,7 +1,7 @@
 # Very basic Makefile
 
 DESTDIR		= /
-DIST		= stable
+DIST		= ##DIST##
 URGENCY		= high
 KEY_ID		= ##KEY_ID##
 

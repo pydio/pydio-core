@@ -16,6 +16,8 @@
         <global_param name="PARSE_CONTENT_TXT" type="string" label="CONF_MESSAGE[Text files]" description="CONF_MESSAGE[List of extensions to consider as Text file and parse content]" mandatory="true" default="txt"/>
 		<global_param name="UNOCONV" type="string" label="CONF_MESSAGE[Unoconv Path]" description="CONF_MESSAGE[Full path on the server to the 'unoconv' binary]" default="" mandatory="false"/>
 		<global_param name="PDFTOTEXT" type="string" label="CONF_MESSAGE[PdftoText Path]" description="CONF_MESSAGE[Full path on the server to the 'pdftotext' binary]" default="" mandatory="false"/>
+        <global_param name="QUERY_ANALYSER" type="select" choices="utf8num_insensitive|UTF8 Text/Num (case insensitive),utf8num_sensitive|UTF8 Text/Num (case sensitive),utf8_insensitive|UTF8 Text (case insensitive),utf8_sensitive|UTF8 Text (case sensitive),textnum_insensitive|Text/Num (case insensitive),textnum_sensitive|Text/Num (case sensitive),text_insensitive|Text (case insensitive),text_sensitive|Text (case sensitive)" label="CONF_MESSAGE[Query Analyzer]" description="CONF_MESSAGE[Analyzer used by Zend to parse the queries. Warning, the UTF8 analyzers require the php mbstring extension.]" default="textnum_insensitive" mandatory="false"/>
+        <global_param name="WILDCARD_LIMITATION" type="integer" label="CONF_MESSAGE[Wildcard limitation]" description="CONF_MESSAGE[For the sake of performances, it is not recommanded to use wildcard as a very first character of a query string. Lucene recommends asking the user minimum 3 characters before wildcard. Still, you can set it to 0 if necessary for your usecases.]" default="3" mandatory="false"/>
     </server_settings>
 	<registry_contributions>
 		<hooks>
@@ -28,7 +30,7 @@
 					write="false" adminOnly="false">
 				</rightsContext>
 				<processing>
-					<serverCallback methodName="applyAction"/>
+					<serverCallback methodName="applyAction" restPath="/query/"/>
 				</processing>
 			</action>					
 			<action name="search_by_keyword">
@@ -36,7 +38,7 @@
 					write="false" adminOnly="false">
 				</rightsContext>
 				<processing>
-					<serverCallback methodName="applyAction"/>
+					<serverCallback methodName="applyAction" restPath="/query/"/>
 				</processing>
 			</action>
             <action name="check_lock">
@@ -59,15 +61,25 @@
 				</rightsContext>				
 				<processing>
 					<clientCallback prepareModal="false"><![CDATA[
-						var crtDir = ajaxplorer.getUserSelection().getUniqueNode();
+                        var crtDir = "/";
+                        if(!ajaxplorer.getUserSelection().isEmpty()){
+                            crtDir = ajaxplorer.getUserSelection().getUniqueNode().getPath();
+                        }
 						var bgManager = ajaxplorer.actionBar.bgManager;
-						bgManager.queueAction("index", new Hash({dir:crtDir}), "Indexing current folder");
+						bgManager.queueAction("index", new Hash({dir:crtDir}), MessageHash["index.lucene.8"].replace('%s', crtDir));
 						bgManager.next();
 					]]></clientCallback>				
 					<serverCallback methodName="applyAction"/>
 				</processing>
 			</action>					
-		</actions>		
+		</actions>
+        <client_configs>
+            <template_part ajxpClass="AjxpTabulator" theme="vision" ajxpId="topPane" ajxpOptions='{"defaultTabId": "folders","tabInfos" : [{"id":"folders","label":"130","iconClass":"icon-folder-open","element":"folder_pane"},{"id":"shared","label":"363","iconClass":"icon-share","element":"shared_elements"},{"id":"flagged","label":"147","iconClass":"icon-star","element":"flagged_elements"}],"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["filter","vertical_splitter2-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'><![CDATA[
+                <div id="folder_pane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ></div>
+                <div id="shared_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_shared"},"reloadOnServerMessage":"tree/reload_shared_elements"}'></div>
+                <div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_bookmarked"},"reloadOnServerMessage":"tree/reload_bookmarks"}'></div>
+            ]]></template_part>
+        </client_configs>
 	</registry_contributions>
     <dependencies>
         <!-- Stream Wrapper Access -->

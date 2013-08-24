@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Extract Exif data from JPEG IMAGES
+ * @package AjaXplorer_Plugins
+ * @subpackage Meta
  */
 class ExifMetaManager extends AJXP_Plugin {
 	

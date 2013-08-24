@@ -21,6 +21,10 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * @package AjaXplorer_Plugins
+ * @subpackage Feed
+ */
 class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
 {
 
@@ -31,31 +35,35 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         parent::init($options);
     }
 
+    public function performChecks(){
+        if(!isSet($this->options)) return;
+        $test = AJXP_Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
+        if(!count($test)){
+            throw new Exception("Please define an SQL connexion in the core configuration");
+        }
+    }
+
+
     /**
      * @param string $hookName
      * @param mixed $data
      * @param string $repositoryId
      * @param string $repositoryScope
+     * @param string $repositoryOwner
      * @param string $userId
      * @param string $userGroup
      * @return void
      */
-    public function persistEvent($hookName, $data, $repositoryId, $repositoryScope, $userId, $userGroup)
+    public function persistEvent($hookName, $data, $repositoryId, $repositoryScope, $repositoryOwner, $userId, $userGroup)
     {
-        $value = array(
-            "edate" => time(),
-            "etype"  => "event",
-            "htype"  => "node.change",
-            "user_id" => $userId,
-            "repository_id" => $repositoryId,
-            "user_group" => $userGroup,
-            "repository_scope" => ($repositoryScope !== false ? $repositoryScope : "ALL"),
-            "content" => serialize($data)
-        );
         if($this->sqlDriver["password"] == "XXXX") return;
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
-        dibi::query("INSERT INTO [ajxp_feed]", $value);
+        try{
+            dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[repository_owner],[user_group],[repository_scope],[content]) VALUES (%i,%s,%s,%s,%s,%s,%s,%s,%bin)", time(), "event", "node.change", $userId, $repositoryId, $repositoryOwner, $userGroup, ($repositoryScope !== false ? $repositoryScope : "ALL"), serialize($data));
+        }catch (DibiException $e){
+            AJXP_Logger::logAction("error: (trying to persist event)". $e->getMessage());
+        }
     }
 
     /**
@@ -71,7 +79,14 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         if($this->sqlDriver["password"] == "XXXX") return array();
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
-        $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND [repository_id] IN (%s) AND ([repository_scope] = 'ALL' OR  ([repository_scope] = 'USER' AND [user_id] = %s  ) OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )) ORDER BY [edate] DESC LIMIT $offset,$limit ", "event", $filterByRepositories, $userId, $userGroup);
+        $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND
+            ( [repository_id] IN (%s) OR [repository_owner] = %s )
+            AND (
+                [repository_scope] = 'ALL'
+                OR  ([repository_scope] = 'USER' AND [user_id] = %s  )
+                OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )
+            )
+            ORDER BY [edate] DESC LIMIT $offset,$limit ", "event", $filterByRepositories, $userId, $userId, $userGroup);
         $data = array();
         foreach($res as $n => $row){
             $object = new stdClass();
@@ -80,6 +95,7 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
             $object->author = $row->user_id;
             $object->date = $row->edate;
             $object->repository = $row->repository_id;
+            $object->event_id = $row->id;
             $data[] = $object;
         }
         return $data;
@@ -94,18 +110,15 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         if(!$notif->getNode()) return;
         $repositoryId = $notif->getNode()->getRepositoryId();
         $userId = $notif->getTarget();
-        $value = array(
-            "edate" => time(),
-            "etype"  => "alert",
-            "htype"  => "notification",
-            "user_id" => $userId,
-            "repository_id" => $repositoryId,
-            "content" => serialize($notif)
-        );
         if($this->sqlDriver["password"] == "XXXX") return;
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
-        dibi::query("INSERT INTO [ajxp_feed]", $value);
+        try{
+            dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[content]) VALUES (%i,%s,%s,%s,%s,%bin)",
+            time(), "alert", "notification", $userId, $repositoryId, serialize($notif));
+        }catch (DibiException $e){
+            AJXP_Logger::logAction("error: (trying to persist alert)". $e->getMessage());
+        }
     }
 
     /**
@@ -127,10 +140,42 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         foreach($res as $n => $row){
             $test = unserialize($row->content);
             if(is_a($test, "AJXP_Notification")){
+                $test->alert_id = $row->id;
                 $data[] = $test;
             }
         }
         return $data;
+    }
+
+    /**
+     * @param $occurrences
+     * @param $alertId
+     */
+    public function dismissAlertById($alertId, $occurrences = 1){
+        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
+        dibi::connect($this->sqlDriver);
+        $userId = AuthService::getLoggedUser()->getId();
+        if($occurrences == 1){
+            dibi::query("DELETE FROM [ajxp_feed] WHERE [id] = %i AND [user_id] = %s", $alertId, $userId);
+        }else{
+            $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [id] = %i AND [user_id] = %s", $alertId, $userId);
+            foreach($res as $n => $row){
+                $startEventRow = $row;
+                break;
+            }
+            $startEventNotif = new AJXP_Notification();
+            $startEventNotif = unserialize($startEventRow->content);
+            $url = $startEventNotif->getNode()->getUrl();
+            $date = $startEventRow->edate;
+            $newRes = dibi::query("SELECT [id] FROM [ajxp_feed] WHERE [etype] = %s AND [user_id] = %s AND [edate] <= %s AND content LIKE %s ORDER BY [edate] DESC LIMIT 0,$occurrences", "alert", $userId, $date, "%\"$url\"%");
+            $a = $newRes->fetchPairs();
+            dibi::query("DELETE FROM [ajxp_feed] WHERE [id] IN (%s)",  $a);
+        }
+    }
+
+    public function installSQLTables($param){
+        $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
+        return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
     }
 
 }

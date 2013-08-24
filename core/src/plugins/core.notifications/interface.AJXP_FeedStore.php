@@ -20,7 +20,11 @@
  */
 
 defined('AJXP_EXEC') or die('Access not allowed');
- 
+
+/**
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
+ */
 interface AJXP_FeedStore{
 
     /**
@@ -29,11 +33,12 @@ interface AJXP_FeedStore{
      * @param string $data
      * @param string $repositoryId
      * @param string $repositoryScope
+     * @param string $repositoryOwner
      * @param string $userId
      * @param string $userGroup
      * @return void
      */
-    public function persistEvent($hookName, $data, $repositoryId, $repositoryScope, $userId, $userGroup);
+    public function persistEvent($hookName, $data, $repositoryId, $repositoryScope, $repositoryOwner, $userId, $userGroup);
 
     /**
      * @abstract
@@ -61,4 +66,10 @@ interface AJXP_FeedStore{
      */
     public function loadAlerts($userId, $repositoryIdFilter = null);
 
+
+    /**
+     * @param $alertId
+     * @param $occurrences
+     */
+    public function dismissAlertById($alertId, $occurrences = 1);
 }

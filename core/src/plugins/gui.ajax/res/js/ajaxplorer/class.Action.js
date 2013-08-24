@@ -242,6 +242,9 @@ Class.create("Action", {
 			if( !this.context.allowedMimes.include("*") && !this.context.allowedMimes.include(crtAjxpMime)){
 				return this.hideForContext();
 			}
+            if( this.context.allowedMimes.include("^"+crtAjxpMime)){
+                return this.hideForContext();
+            }
 		}
 		if(this.context.recycle){
 			if(this.context.recycle == 'only' && !crtIsRecycle){
@@ -269,8 +272,7 @@ Class.create("Action", {
 			window.listenerContext = this;
 			this.options.listeners["selectionChange"].evalScripts();			
 		}
-		if(arguments.length < 1 
-			|| this.contextHidden 
+		if(this.contextHidden
 			|| !this.context.selection) {	
 			return;
 		}
@@ -319,6 +321,20 @@ Class.create("Action", {
 			if(selectionContext.behaviour == 'hidden') return this.hide();
 			else return this.disable();
 		}
+        if(selectionContext.allowedMimes.size() && userSelection && Object.toJSON(selectionContext.allowedMimes).indexOf("^") !== -1){
+            var forbiddenValueFound = false;
+            selectionContext.allowedMimes.each(function(m){
+                if(m.indexOf("^") == -1) return;
+                if(userSelection.hasMime([m.replace("^", "")])){
+                    forbiddenValueFound = true;
+                    throw $break;
+                }
+            });
+            if(forbiddenValueFound){
+                if(selectionContext.behaviour == 'hidden') return this.hide();
+       			else return this.disable();
+            }
+        }
 		this.show();
 		this.enable();
 		
@@ -520,12 +536,18 @@ Class.create("Action", {
 	 */
 	setIconSrc : function(newSrc, iconClass){
 		this.options.src = newSrc;
+        var previousIconClass;
+        if(iconClass){
+            previousIconClass = this.options.icon_class;
+            this.options.icon_class = iconClass;
+            if(iconClass && $(this.options.name +'_button')&& $(this.options.name +'_button').down('span.ajxp_icon_span')){
+                $(this.options.name +'_button').down('span.ajxp_icon_span').removeClassName(previousIconClass);
+                $(this.options.name +'_button').down('span.ajxp_icon_span').addClassName(iconClass);
+            }
+        }
 		if($(this.options.name +'_button_icon')){
 			$(this.options.name +'_button_icon').src = resolveImageSource(this.options.src,this.__DEFAULT_ICON_PATH, 22);
 		}
-        if(iconClass){
-            this.options.icon_class = iconClass;
-        }
 	},
 	
 	/**
@@ -595,8 +617,11 @@ Class.create("Action", {
 	 * Changes show/hide state
 	 */
 	showForContext: function(){
-		this.show();
-		this.contextHidden = false;
+        this.contextHidden = false;
+        this.show();
+        if(this.selectionContext){
+            this.fireSelectionChange();
+        }
 	},
 	
 	/**

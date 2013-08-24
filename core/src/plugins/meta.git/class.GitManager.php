@@ -21,6 +21,11 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Manage versioning using Git
+ * @package AjaXplorer_Plugins
+ * @subpackage Meta
+ */
 class GitManager extends AJXP_Plugin
 {
 

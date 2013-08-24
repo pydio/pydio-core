@@ -23,10 +23,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 include_once(AJXP_BIN_FOLDER."/securimage/securimage.php");
 
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * Encapsulation of the securimage external library, to generate a Captcha Image on brute force login attempt.
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class CaptchaProvider{
 	/**

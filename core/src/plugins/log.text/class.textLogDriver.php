@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Standard logger. Writes logs into text files
+ * @package AjaXplorer_Plugins
+ * @subpackage Log
  */
 class textLogDriver extends AbstractLogDriver {
 	
@@ -222,7 +223,7 @@ class textLogDriver extends AbstractLogDriver {
 	 * @param Integer $month The month to list.
 	 * @return null
 	 */
-	function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs"){
+	function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs", $print = true){
 		$dir = $this->storageDir;
 		if(!is_dir($this->storageDir)) return ;
 		$logs = array();
@@ -257,9 +258,9 @@ class textLogDriver extends AbstractLogDriver {
 				$result = $logs;
 			}
 		}
-		krsort($result);
-		foreach($result as $log) print($log);
-		return ;		
+		krsort($result, SORT_STRING);
+        if($print) foreach($result as $log) print($log);
+		return $result;
 	}
 	
 	/**

@@ -21,6 +21,12 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Sql-based plugin to manage messages queues
+ *
+ * @package AjaXplorer_Plugins
+ * @subpackage Mq
+ */
 class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchanger
 {
 
@@ -29,6 +35,13 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
    		$this->sqlDriver = $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
    	}
 
+    public function performChecks(){
+        if(!isSet($this->options)) return;
+        $test = AJXP_Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
+        if(!count($test)){
+            throw new Exception("Please define an SQL connexion in the core configuration");
+        }
+    }
 
 
     /**
@@ -223,7 +236,8 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
             "object_id" => $index,
             "serialized_data" => serialize($message)
         );
-        dibi::query("INSERT INTO [ajxp_simple_store]", $values);
+        dibi::query("INSERT INTO [ajxp_simple_store] ([object_id],[store_id],[serialized_data],[binary_data],[related_object_id]) VALUES (%s,%s,%bin,%bin,%s)",
+            $values["object_id"], $values["store_id"], $values["serialized_data"], $values["binary_data"], $values["related_object_id"]);
     }
 
     /**
@@ -241,4 +255,10 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
         $message->messageTS = microtime();
         $this->channels[$channel]["MESSAGES"][] = $message;
     }
+
+    public function installSQLTables($param){
+        $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
+        return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+    }
+
 }

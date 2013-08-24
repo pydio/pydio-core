@@ -18,6 +18,9 @@
         <global_param description="CONF_MESSAGE[Password used when generating the encfs6.xml file]"
                       label="CONF_MESSAGE[Encfs Password]" name="ENCFS_XML_PASSWORD"
                       type="string" mandatory="true" />
+        <global_param description="CONF_MESSAGE[User ID for the web accessing user (apache, www-data,...).]"
+                      label="CONF_MESSAGE[UID]" name="ENCFS_UID"
+                      type="integer" mandatory="true" default="33"/>
     </server_settings>
     <class_definition classname="EncfsMounter" filename="plugins/cypher.encfs/class.EncfsMounter.php"/>
     <registry_contributions>

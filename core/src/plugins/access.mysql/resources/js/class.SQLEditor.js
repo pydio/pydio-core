@@ -166,11 +166,11 @@ Class.create("SQLEditor", {
 	displayReplicationChooser : function(){
 		var chooser = $('replication_chooser').cloneNode(true).setStyle({display:'block'});
 		this.oForm.insert(chooser);
-		var button = chooser.select('input[id="toNext"]')[0];
+		var button = chooser.down('input[id="toNext"]');
 		button.observe('click', function(e){
 			Event.stop(e);
-			this.newTableName = chooser.select('input[id="table_name"]')[0].value;
-			var fieldsNumber = parseInt(chooser.select('input[id="fields_number"]')[0].value);
+			this.newTableName = chooser.down('input[id="table_name"]').getValue();
+			var fieldsNumber = parseInt(chooser.down('input[id="fields_number"]').getValue());
 			if(this.newTableName && fieldsNumber){
 				chooser.remove();
 				this.displayTableEditorForm(fieldsNumber);
@@ -178,7 +178,7 @@ Class.create("SQLEditor", {
 				alert('Missing parameters!');
 			}
 		}.bind(this));
-		cancelButton = chooser.select('input[id="can"]')[0];
+		var cancelButton = chooser.down('input[id="can"]');
 		cancelButton.observe('click', function(e){
 			hideLightBox();
 			modal.close();
@@ -270,7 +270,7 @@ Class.create("SQLEditor", {
 			this.oForm.insert(this.createFieldSet('Step 2: Edit columns for table \"'+this.newTableName+'"', templateTable));
 		}
 		var fManager = new FormManager();
-		fManager.replicateRow(templateRow, numberReplicates, this.oForm);
+		fManager.replicateRow(templateRow, numberReplicates - 1 , this.oForm);
 		if(fields && values){
 			fManager.fetchMultipleValueToForm(this.oForm, fields, values);
 		}

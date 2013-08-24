@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Test cookie
+ * @package AjaXplorer_Plugins
+ * @subpackage Editor
  */
 class LightGuiPlugin extends AJXP_Plugin {
 

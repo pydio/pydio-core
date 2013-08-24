@@ -24,11 +24,31 @@ define('AJXP_SANITIZE_HTML', 1);
 define('AJXP_SANITIZE_HTML_STRICT', 2);
 define('AJXP_SANITIZE_ALPHANUM', 3);
 define('AJXP_SANITIZE_EMAILCHARS', 4);
-/**
- * @package info.ajaxplorer.core
- */
+
+// THESE ARE DEFINED IN bootstrap_context.php
+// REPEAT HERE FOR BACKWARD COMPATIBILITY.
+if(!defined('PBKDF2_HASH_ALGORITHM')){
+
+    define("PBKDF2_HASH_ALGORITHM", "sha256");
+    define("PBKDF2_ITERATIONS", 1000);
+    define("PBKDF2_SALT_BYTE_SIZE", 24);
+    define("PBKDF2_HASH_BYTE_SIZE", 24);
+
+    define("HASH_SECTIONS", 4);
+    define("HASH_ALGORITHM_INDEX", 0);
+    define("HASH_ITERATION_INDEX", 1);
+    define("HASH_SALT_INDEX", 2);
+    define("HASH_PBKDF2_INDEX", 3);
+
+    define("USE_OPENSSL_RANDOM", false);
+
+}
+
+
 /**
  * Various functions used everywhere, static library
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class AJXP_Utils
 {
@@ -164,14 +184,32 @@ class AJXP_Utils
      */
     public static function getAjxpTmpDir()
     {
-        if (ConfService::getCoreConf("AJXP_TMP_DIR") != null) {
-            return ConfService::getCoreConf("AJXP_TMP_DIR");
+        $conf = ConfService::getCoreConf("AJXP_TMP_DIR");
+        if (!empty($conf)) {
+            return $conf;
         }
         if (defined("AJXP_TMP_DIR") && AJXP_TMP_DIR != "") {
             return AJXP_TMP_DIR;
         }
         return realpath(sys_get_temp_dir());
     }
+
+    public static function detectApplicationFirstRun(){
+        return !file_exists(AJXP_CACHE_DIR."/first_run_passed");
+    }
+
+    public static function setApplicationFirstRunPassed(){
+        @file_put_contents(AJXP_CACHE_DIR."/first_run_passed", "true");
+    }
+
+    public static function forwardSlashDirname($path){
+        return (DIRECTORY_SEPARATOR === "\\" ? str_replace("\\", "/", dirname($path)): dirname($path));
+    }
+
+    public static function forwardSlashBasename($path){
+        return (DIRECTORY_SEPARATOR === "\\" ? str_replace("\\", "/", basename($path)): basename($path));
+    }
+
 
     /**
      * Parse a Comma-Separated-Line value
@@ -257,13 +295,16 @@ class AJXP_Utils
             if ($repository == null) {
                 $repository = ConfService::getRepositoryByAlias($repoId);
                 if ($repository != null) {
-                    $parameters["repository_id"] = ($repository->isWriteable()?$repository->getUniqueId():$repository->getId());
+                    $parameters["repository_id"] = $repository->getId();
                 }
+            }else{
+                $parameters["repository_id"] = $repository->getId();
             }
             require_once(AJXP_BIN_FOLDER . "/class.SystemTextEncoding.php");
             if (AuthService::usersEnabled()) {
                 $loggedUser = AuthService::getLoggedUser();
                 if ($loggedUser != null && $loggedUser->canSwitchTo($parameters["repository_id"])) {
+                    $output["FORCE_REGISTRY_RELOAD"] = true;
                     $output["EXT_REP"] = SystemTextEncoding::toUTF8(urldecode($parameters["folder"]));
                     $loggedUser->setArrayPref("history", "last_repository", $parameters["repository_id"]);
                     $loggedUser->setPref("pending_folder", SystemTextEncoding::toUTF8(AJXP_Utils::decodeSecureMagic($parameters["folder"])));
@@ -296,6 +337,9 @@ class AJXP_Utils
         if (ConfService::getConf("JS_DEBUG") && isSet($parameters["clear_plugins_cache"])) {
             @unlink(AJXP_PLUGINS_CACHE_FILE);
             @unlink(AJXP_PLUGINS_REQUIRES_FILE);
+        }
+        if (AJXP_SERVER_DEBUG && isSet($parameters["extract_application_hooks"])){
+            self::extractHooksToDoc();
         }
 
         if (isSet($parameters["external_selector_type"])) {
@@ -603,6 +647,42 @@ class AJXP_Utils
         }
     }
 
+
+    //Relative Date Function
+
+    public static function relativeDate($time, $messages) {
+
+        $today = strtotime(date('M j, Y'));
+        $reldays = ($time - $today)/86400;
+        $relTime = date($messages['date_relative_time_format'], $time);
+
+        if ($reldays >= 0 && $reldays < 1) {
+            return  str_replace("TIME", $relTime, $messages['date_relative_today']);
+        } else if ($reldays >= 1 && $reldays < 2) {
+            return  str_replace("TIME", $relTime, $messages['date_relative_tomorrow']);
+        } else if ($reldays >= -1 && $reldays < 0) {
+            return  str_replace("TIME", $relTime, $messages['date_relative_yesterday']);
+        }
+
+        if (abs($reldays) < 7) {
+
+            if ($reldays > 0) {
+                $reldays = floor($reldays);
+                return  str_replace("%s", $reldays, $messages['date_relative_days_ahead']);
+                //return 'In ' . $reldays . ' day' . ($reldays != 1 ? 's' : '');
+            } else {
+                $reldays = abs(floor($reldays));
+                return  str_replace("%s", $reldays, $messages['date_relative_days_ago']);
+                //return $reldays . ' day' . ($reldays != 1 ? 's' : '') . ' ago';
+            }
+
+        }
+
+        return str_replace("DATE", date($messages["date_relative_date_format"], $time ? $time : time()), $messages["date_relative_date"]);
+
+    }
+
+
     /**
      * Replace specific chars by their XML Entities, for use inside attributes value
      * @static
@@ -656,7 +736,43 @@ class AJXP_Utils
     }
 
     /**
+     * @static
+     * @param $from
+     * @param $to
+     * @return string
+     */
+    static public function getTravelPath($from, $to)
+    {
+        $from     = explode('/', $from);
+        $to       = explode('/', $to);
+        $relPath  = $to;
+
+        foreach($from as $depth => $dir) {
+            // find first non-matching dir
+            if($dir === $to[$depth]) {
+                // ignore this directory
+                array_shift($relPath);
+            } else {
+                // get number of remaining dirs to $from
+                $remaining = count($from) - $depth;
+                if($remaining > 1) {
+                    // add traversals up to first matching dir
+                    $padLength = (count($relPath) + $remaining - 1) * -1;
+                    $relPath = array_pad($relPath, $padLength, '..');
+                    break;
+                } else {
+                    $relPath[0] = './' . $relPath[0];
+                }
+            }
+        }
+        return implode('/', $relPath);
+    }
+
+
+    /**
      * Build the current server URL
+     * @param bool $withURI
+     * @internal param bool $witchURI
      * @static
      * @return string
      */
@@ -710,6 +826,122 @@ class AJXP_Utils
         }
 
         return $text;
+    }
+
+    static function getHooksFile(){
+        return AJXP_INSTALL_PATH."/".AJXP_DOCS_FOLDER."/hooks.json";
+    }
+
+    static function extractHooksToDoc(){
+
+        $docFile = self::getHooksFile();
+        if(is_file($docFile)){
+            copy($docFile, $docFile.".bak");
+            $existingHooks = json_decode(file_get_contents($docFile), true);
+        }else{
+            $existingHooks = array();
+        }
+        $allPhpFiles = glob_recursive(AJXP_INSTALL_PATH."/*.php");
+        $hooks = array();
+        foreach($allPhpFiles as $phpFile){
+            $fileContent = file($phpFile);
+            foreach($fileContent as $lineNumber => $line){
+                if(preg_match_all('/AJXP_Controller::applyHook\("([^"]+)", (.*)\)/', $line, $matches)){
+                    $names = $matches[1];
+                    $params = $matches[2];
+                    foreach($names as $index => $hookName){
+                        if(!isSet($hooks[$hookName])) $hooks[$hookName] = array("TRIGGERS" => array(), "LISTENERS" => array());
+                        $hooks[$hookName]["TRIGGERS"][] = array("FILE" => substr($phpFile, strlen(AJXP_INSTALL_PATH)), "LINE" => $lineNumber);
+                        $hooks[$hookName]["PARAMETER_SAMPLE"] = $params[$index];
+                    }
+                }
+
+            }
+        }
+        $registryHooks = AJXP_PluginsService::getInstance()->searchAllManifests("//hooks/serverCallback", "xml", false, false, true);
+        $regHooks = array();
+        foreach($registryHooks as $xmlHook){
+            $name = $xmlHook->getAttribute("hookName");
+            $method = $xmlHook->getAttribute("methodName");
+            $pluginId = $xmlHook->getAttribute("pluginId");
+            if($pluginId == "") $pluginId = $xmlHook->parentNode->parentNode->parentNode->getAttribute("id");
+            if(!isSet($regHooks[$name])) $regHooks[$name] = array();
+            $regHooks[$name][] = array("PLUGIN_ID" => $pluginId, "METHOD" => $method);
+        }
+
+        foreach($hooks as $h => $data) {
+
+            if(isSet($regHooks[$h])){
+                $data["LISTENERS"] = $regHooks[$h];
+            }
+            if(isSet($existingHooks[$h])){
+                $existingHooks[$h]["TRIGGERS"] = $data["TRIGGERS"];
+                $existingHooks[$h]["LISTENERS"] = $data["LISTENERS"];
+                $existingHooks[$h]["PARAMETER_SAMPLE"] = $data["PARAMETER_SAMPLE"];
+            }else{
+                $existingHooks[$h] = $data;
+            }
+        }
+        file_put_contents($docFile, self::prettyPrintJSON(json_encode($existingHooks)));
+
+    }
+
+    /**
+     * Indents a flat JSON string to make it more human-readable.
+     *
+     * @param string $json The original JSON string to process.
+     *
+     * @return string Indented version of the original JSON string.
+     */
+    function prettyPrintJSON($json) {
+
+        $result      = '';
+        $pos         = 0;
+        $strLen      = strlen($json);
+        $indentStr   = '  ';
+        $newLine     = "\n";
+        $prevChar    = '';
+        $outOfQuotes = true;
+
+        for ($i=0; $i<=$strLen; $i++) {
+
+            // Grab the next character in the string.
+            $char = substr($json, $i, 1);
+
+            // Are we inside a quoted string?
+            if ($char == '"' && $prevChar != '\\') {
+                $outOfQuotes = !$outOfQuotes;
+
+                // If this character is the end of an element,
+                // output a new line and indent the next line.
+            } else if(($char == '}' || $char == ']') && $outOfQuotes) {
+                $result .= $newLine;
+                $pos --;
+                for ($j=0; $j<$pos; $j++) {
+                    $result .= $indentStr;
+                }
+            }
+
+            // Add the character to the result string.
+            $result .= $char;
+
+            // If the last character was the beginning of an element,
+            // output a new line and indent the next line.
+            if (($char == ',' || $char == '{' || $char == '[') && $outOfQuotes) {
+                $result .= $newLine;
+                if ($char == '{' || $char == '[') {
+                    $pos ++;
+                }
+
+                for ($j = 0; $j < $pos; $j++) {
+                    $result .= $indentStr;
+                }
+            }
+
+            $prevChar = $char;
+        }
+
+        return $result;
     }
 
     /**
@@ -1037,7 +1269,7 @@ class AJXP_Utils
      * @param string $format
      * @throws Exception
      */
-    static function saveSerialFile($filePath, $value, $createDir = true, $silent = false, $format="ser")
+    static function saveSerialFile($filePath, $value, $createDir = true, $silent = false, $format="ser", $jsonPrettyPrint = false)
     {
         $filePath = AJXP_VarsFilter::filter($filePath);
         if ($createDir && !is_dir(dirname($filePath))){
@@ -1051,7 +1283,10 @@ class AJXP_Utils
         try {
             $fp = fopen($filePath, "w");
             if($format == "ser") $content = serialize($value);
-            else if($format == "json") $content = json_encode($value);
+            else if($format == "json") {
+                $content = json_encode($value);
+                if($jsonPrettyPrint) $content = self::prettyPrintJSON($content);
+            }
             fwrite($fp, $content);
             fclose($fp);
         } catch (Exception $e) {
@@ -1319,18 +1554,201 @@ class AJXP_Utils
     }
 
     public static function cleanDibiDriverParameters($params){
+        if(!is_array($params)) return $params;
         $value = $params["group_switch_value"];
         if(isSet($value)){
-            foreach($params as $k => $v){
-                if(strpos($k, $value."_") === 0){
-                    $params[substr($k, strlen($value."_"))] = $v;
-                    unset($params[$k]);
+            if($value == "core"){
+                $bootStorage = ConfService::getBootConfStorageImpl();
+                $configs = $bootStorage->loadPluginConfig("core", "conf");
+                $params = $configs["DIBI_PRECONFIGURATION"];
+                if(!is_array($params)){
+                     throw new Exception("Empty SQL default connexion, there is something wrong with your setup! You may have switch to an SQL-based plugin without defining a connexion.");
                 }
+            }else{
+                unset($params["group_switch_value"]);
             }
-            unset($params["group_switch_value"]);
+            foreach($params as $k => $v){
+                $params[array_pop(explode("_", $k, 2))] = AJXP_VarsFilter::filter($v);
+                unset($params[$k]);
+            }
         }
         return $params;
     }
 
+    public static function runCreateTablesQuery($p, $file){
+        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
+        $result = array();
+        if($p["driver"] == "sqlite" || $p["driver"] == "sqlite3"){
+            if(!file_exists(dirname($p["database"]))){
+                @mkdir(dirname($p["database"]), 0755, true);
+            }
+            dibi::connect($p);
+            $file = dirname($file) ."/". str_replace(".sql", ".sqlite", basename($file) );
+            $sql = file_get_contents($file);
+            dibi::begin();
+            $parts = explode("CREATE TABLE", $sql);
+            foreach($parts as $createPart){
+                if(empty($createPart)) continue;
+                $sqlPart = trim("CREATE TABLE".$createPart);
+                try{
+                    dibi::nativeQuery($sqlPart);
+                    $resKey = str_replace("\n", "", substr($sqlPart, 0, 50))."...";
+                    $result[] = "OK: $resKey executed successfully";
+                }catch (DibiException $e){
+                    $result[] = "ERROR! $sqlPart failed";
+                }
+            }
+            $message = implode("\n", $result);
+            dibi::commit();
+            dibi::disconnect();
+        }else{
+            dibi::connect($p);
+            $sql = file_get_contents($file);
+            $parts = explode("CREATE TABLE", $sql);
+            foreach($parts as $createPart){
+                if(empty($createPart)) continue;
+                $sqlPart = trim("CREATE TABLE".$createPart);
+                try{
+                    dibi::nativeQuery($sqlPart);
+                    $resKey = str_replace("\n", "", substr($sqlPart, 0, 50))."...";
+                    $result[] = "OK: $resKey executed successfully";
+                }catch (DibiException $e){
+                    $result[] = "ERROR! $sqlPart failed";
+                }
+            }
+            $message = implode("\n", $result);
+            dibi::disconnect();
+        }
+        if(strpos($message, "ERROR!")) return $message;
+        else return "SUCCESS:".$message;
+
+    }
+
+
+    /*
+     * PBKDF2 key derivation function as defined by RSA's PKCS #5: https://www.ietf.org/rfc/rfc2898.txt
+     * $algorithm - The hash algorithm to use. Recommended: SHA256
+     * $password - The password.
+     * $salt - A salt that is unique to the password.
+     * $count - Iteration count. Higher is better, but slower. Recommended: At least 1000.
+     * $key_length - The length of the derived key in bytes.
+     * $raw_output - If true, the key is returned in raw binary format. Hex encoded otherwise.
+     * Returns: A $key_length-byte key derived from the password and salt.
+     *
+     * Test vectors can be found here: https://www.ietf.org/rfc/rfc6070.txt
+     *
+     * This implementation of PBKDF2 was originally created by https://defuse.ca
+     * With improvements by http://www.variations-of-shadow.com
+     */
+    static function pbkdf2_apply($algorithm, $password, $salt, $count, $key_length, $raw_output = false) {
+
+        $algorithm = strtolower($algorithm);
+
+        if(!in_array($algorithm, hash_algos(), true))
+            die('PBKDF2 ERROR: Invalid hash algorithm.');
+        if($count <= 0 || $key_length <= 0)
+            die('PBKDF2 ERROR: Invalid parameters.');
+
+        $hash_length = strlen(hash($algorithm, "", true));
+        $block_count = ceil($key_length / $hash_length);
+
+        $output = "";
+
+        for($i = 1; $i <= $block_count; $i++) {
+            // $i encoded as 4 bytes, big endian.
+            $last = $salt . pack("N", $i);
+            // first iteration
+            $last = $xorsum = hash_hmac($algorithm, $last, $password, true);
+
+            // perform the other $count - 1 iterations
+            for ($j = 1; $j < $count; $j++) {
+                $xorsum ^= ($last = hash_hmac($algorithm, $last, $password, true));
+            }
+
+            $output .= $xorsum;
+        }
+
+        if($raw_output)
+            return substr($output, 0, $key_length);
+        else
+            return bin2hex(substr($output, 0, $key_length));
+    }
+
+
+    // Compares two strings $a and $b in length-constant time.
+    static function pbkdf2_slow_equals($a, $b) {
+        $diff = strlen($a) ^ strlen($b);
+        for($i = 0; $i < strlen($a) && $i < strlen($b); $i++)
+        {
+            $diff |= ord($a[$i]) ^ ord($b[$i]);
+        }
+
+        return $diff === 0;
+    }
+
+    static function pbkdf2_validate_password($password, $correct_hash) {
+        $params = explode(":", $correct_hash);
+
+        if(count($params) < HASH_SECTIONS){
+            if(strlen($correct_hash) == 32 && count($params) == 1){
+                return md5($password) == $correct_hash;
+            }
+            return false;
+        }
+
+        $pbkdf2 = base64_decode($params[HASH_PBKDF2_INDEX]);
+        return self::pbkdf2_slow_equals(
+            $pbkdf2,
+             self::pbkdf2_apply(
+                $params[HASH_ALGORITHM_INDEX],
+                $password,
+                $params[HASH_SALT_INDEX],
+                (int)$params[HASH_ITERATION_INDEX],
+                strlen($pbkdf2),
+                true
+            )
+        );
+    }
+
+
+    static function pbkdf2_create_hash($password) {
+        // format: algorithm:iterations:salt:hash
+        $salt = base64_encode(mcrypt_create_iv(PBKDF2_SALT_BYTE_SIZE, MCRYPT_DEV_URANDOM));
+        return PBKDF2_HASH_ALGORITHM . ":" . PBKDF2_ITERATIONS . ":" .  $salt . ":" .
+        base64_encode(self::pbkdf2_apply(
+            PBKDF2_HASH_ALGORITHM,
+            $password,
+            $salt,
+            PBKDF2_ITERATIONS,
+            PBKDF2_HASH_BYTE_SIZE,
+            true
+        ));
+    }
+
+    /**
+     * generates a random password, uses base64: 0-9a-zA-Z
+     * @param int [optional] $length length of password, default 24 (144 Bit)
+     * @return string password
+     */
+    static function generateRandomString($length = 24) {
+        if(function_exists('openssl_random_pseudo_bytes') && USE_OPENSSL_RANDOM) {
+            $password = base64_encode(openssl_random_pseudo_bytes($length, $strong));
+            if($strong == TRUE)
+                return substr(str_replace(array("/","+"), "", $password), 0, $length); //base64 is about 33% longer, so we need to truncate the result
+        }
+
+        //fallback to mt_rand if php < 5.3 or no openssl available
+        $characters = '0123456789';
+        $characters .= 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+        $charactersLength = strlen($characters)-1;
+        $password = '';
+
+        //select some random characters
+        for ($i = 0; $i < $length; $i++) {
+            $password .= $characters[mt_rand(0, $charactersLength)];
+        }
+
+        return $password;
+    }
 
 }

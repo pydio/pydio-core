@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<logdriver name="sql" label="CONF_MESSAGE[DB Storage]" description="CONF_MESSAGE[Stores the logs in an SQL database.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd" mixins="dibidriver_provider">
+<logdriver name="sql" label="CONF_MESSAGE[DB Storage]" description="CONF_MESSAGE[Stores the logs in an SQL database.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd" mixins="dibidriver_consumer">
     <client_settings>
         <resources>
             <i18n namespace="sql_logger" path="plugins/log.sql/i18n"/>
@@ -7,6 +7,7 @@
     </client_settings>
 	<server_settings>
 		<param name="SQL_DRIVER" type="group_switch:dibi" label="CONF_MESSAGE[Connexion]" description="CONF_MESSAGE[The Database Connexion]" mandatory="true"/>
+        <param type="button" name="INSTALL_SQL" choices="run_plugin_action:log.sql:installSQLTables" label="CONF_MESSAGE[SQL Tables]" description="CONF_MESSAGE[Install SQL Tables]" mandatory="false"/>
 	</server_settings>
 	<class_definition filename="plugins/log.sql/class.sqlLogDriver.php" classname="sqlLogDriver"/>	
 </logdriver>

@@ -79,7 +79,21 @@ SelectableElements = Class.create({
 			oElement.attachEvent("ondblclick", this._ondblclick);
 		}
         if(addTouch){
-            oElement.observe("touchend", this._onclick);
+            oElement.observe("touchstart", function(event){
+                var touchData = event.changedTouches[0];
+                oElement.selectableTouchStart = touchData["clientY"];
+            }.bind(this));
+            oElement.observe("touchend", function(event){
+                if(oElement.selectableTouchStart) {
+                    var touchData = event.changedTouches[0];
+                    var delta = touchData['clientY'] - oElement.selectableTouchStart;
+                    if(Math.abs(delta) > 2){
+                        return;
+                    }
+                }
+                oElement.selectableTouchStart = null;
+                this._onclick(event);
+            }.bind(this) );
         }
 
 		this.eventMouseUp = this.dragEnd.bindAsEventListener(this);
@@ -235,9 +249,11 @@ SelectableElements = Class.create({
 	// This method updates the UI of the item
 	setItemSelectedUi: function (oEl, bSelected) {
 		if (bSelected){
-			$(oEl).addClassName("selected");
-			$(oEl).addClassName("selected-focus");
-			
+            if(!this.options || !this.options.invisibleSelection){
+                $(oEl).addClassName("selected");
+                $(oEl).addClassName("selected-focus");
+            }
+
 			if(!this.skipScroll){
 				// CHECK THAT SCROLLING IS OK
 				var parent = this._htmlElement;
@@ -276,8 +292,9 @@ SelectableElements = Class.create({
 	focus: function()
 	{
 		this.hasFocus = true;
-		this.selectFirst();
-		for(var i=0; i < this._selectedItems.length;i++)
+        //this.selectFirst();
+        if(this.options && this.options.invisibleSelection) return;
+        for(var i=0; i < this._selectedItems.length;i++)
 		{
 			if(this._selectedItems[i])
 			{
@@ -289,6 +306,7 @@ SelectableElements = Class.create({
 	blur: function()
 	{
 		this.hasFocus = false;
+        if(this.options && this.options.invisibleSelection) return;
 		for(var i=0; i < this._selectedItems.length;i++)
 		{
 			if(this._selectedItems[i])
@@ -350,7 +368,9 @@ SelectableElements = Class.create({
 		}
 		var oldFireChange = this._fireChange;
 		this._fireChange = false;
-		
+
+        // Adapt to MacOS Cmd key
+        var ctrlOrCmd = e.ctrlKey || e.metaKey;
 		
 		// create a copy to compare with after changes
 		var selectedBefore = this.getSelectedItems();	// is a cloned array
@@ -368,11 +388,11 @@ SelectableElements = Class.create({
 		var aIndex = this._anchorIndex;
 	
 		// test whether the current row should be the anchor
-		if (this._selectedItems.length == 0 || (e.ctrlKey && !e.shiftKey && this._multiple)) {
+		if (this._selectedItems.length == 0 || (ctrlOrCmd && !e.shiftKey && this._multiple)) {
 			aIndex = this._anchorIndex = rIndex;
 		}
 	
-		if (!e.ctrlKey && !e.shiftKey || !this._multiple) {
+		if (!ctrlOrCmd && !e.shiftKey || !this._multiple) {
 			// deselect all
 			var items = this._selectedItems;
 			for (var i = items.length - 1; i >= 0; i--) {
@@ -387,13 +407,13 @@ SelectableElements = Class.create({
 		}
 	
 		// ctrl
-		else if (this._multiple && e.ctrlKey && !e.shiftKey) {
+		else if (this._multiple && ctrlOrCmd && !e.shiftKey) {
 			this.setItemSelected(el, !el._selected);
 			this._anchorIndex = rIndex;
 		}
 	
 		// ctrl + shift
-		else if (this._multiple && e.ctrlKey && e.shiftKey) {
+		else if (this._multiple && ctrlOrCmd && e.shiftKey) {
 			// up or down?
 			var dirUp = this.isBefore(rIndex, aIndex);
 	
@@ -409,7 +429,7 @@ SelectableElements = Class.create({
 		}
 	
 		// shift
-		else if (this._multiple && !e.ctrlKey && e.shiftKey) {
+		else if (this._multiple && !ctrlOrCmd && e.shiftKey) {
 			// up or down?
 			var dirUp = this.isBefore(rIndex, aIndex);
 	

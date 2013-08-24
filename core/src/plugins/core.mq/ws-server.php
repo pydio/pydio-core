@@ -1,14 +1,15 @@
 #!/php -q
 <?php
 // Run from command prompt > php demo.php
-require_once("../../vendor/phpws/websocket.server.php");
+require_once("vendor/phpws/websocket.server.php");
 require_once("../../core/classes/class.HttpClient.php");
 /**
  * This demo resource handler will respond to all messages sent to /echo/ on the socketserver below
  *
  * All this handler does is echoing the responds to the user
- * @author Chris
- *
+ * @author Cdujeu
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
  */
 class AjaXplorerHandler extends WebSocketUriHandler {
 
@@ -38,7 +39,7 @@ class AjaXplorerHandler extends WebSocketUriHandler {
         $msg->setData($data["CONTENT"]);
         foreach($this->getConnections() as $conn){
             if($conn == $user) continue;
-            if(!isSet($conn->currentRepository) || $conn->currentRepository != $repoId) {
+            if($repoId != "AJXP_REPO_SCOPE_ALL" && (!isSet($conn->currentRepository) || $conn->currentRepository != $repoId)) {
                 $this->say("Skipping, not the same repository");
                 continue;
             }

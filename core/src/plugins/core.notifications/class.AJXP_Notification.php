@@ -33,6 +33,8 @@ define('AJXP_NOTIF_NODE_COPY_FROM', "copy_from");
 define('AJXP_NOTIF_NODE_MOVE_FROM', "move_from");
 /**
  * Simple properties container
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
  */
 class AJXP_Notification
 {
@@ -68,6 +70,8 @@ class AJXP_Notification
      */
     var $relatedNotifications;
 
+    static $usersCaches = array();
+
     public static function autoload(){
 
     }
@@ -85,9 +89,12 @@ class AJXP_Notification
             $repoLabel = "Repository";
         }
         $uLabel = "";
-        if(strstr($tplString, "AJXP_USER") !== false && AuthService::userExists($this->getAuthor())){
+        if(array_key_exists($this->getAuthor(), self::$usersCaches)){
+            $uLabel = self::$usersCaches[$this->getAuthor()];
+        }else if(strstr($tplString, "AJXP_USER") !== false && AuthService::userExists($this->getAuthor())){
             $obj = ConfService::getConfStorageImpl()->createUserObject($this->getAuthor());
             $uLabel = $obj->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
+            self::$usersCaches[$this->getAuthor()] = $uLabel;
         }
         if(empty($uLabel)){
             $uLabel = $this->getAuthor();
@@ -104,7 +111,7 @@ class AJXP_Notification
             "AJXP_REPOSITORY_LABEL" => $em.$repoLabel.$me,
             "AJXP_LINK"             => AJXP_Utils::detectServerURL(true)."/?goto=".$repoId.$this->node->getPath(),
             "AJXP_USER"             => $uLabel,
-            "AJXP_DATE"             => date($mess["date_format"], $this->getDate()),
+            "AJXP_DATE"             => AJXP_Utils::relativeDate($this->getDate(),$mess) //date($mess["date_format"], $this->getDate()),
         );
 
         if((strstr($tplString, "AJXP_TARGET_FOLDER") !== false || strstr($tplString, "AJXP_SOURCE_FOLDER")) &&
@@ -131,6 +138,14 @@ class AJXP_Notification
         return $this->replaceVars($tpl, $mess, false);
     }
 
+    /**
+     * @return string
+     */
+    public function getDescriptionBlock(){
+        $mess = ConfService::getMessages();
+        $tpl = $mess["notification.tpl.block.".($this->getNode()->isLeaf()?"file":"folder").".".$this->action];
+        return $this->replaceVars($tpl, $mess, false);
+    }
 
     /**
      * @return string
@@ -185,11 +200,17 @@ class AJXP_Notification
         return $this->date;
     }
 
+    /**
+     * @param AJXP_Node $node
+     */
     public function setNode($node)
     {
         $this->node = $node;
     }
 
+    /**
+     * @return AJXP_Node
+     */
     public function getNode()
     {
         return $this->node;

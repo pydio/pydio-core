@@ -22,18 +22,23 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * User Interface main implementation
+ * @package AjaXplorer_Plugins
+ * @subpackage Gui
  */
 class AJXP_ClientDriver extends AJXP_Plugin 
 {
     private static $loadedBookmarks;
 
+    public function isEnabled(){
+        return true;
+    }
+
     public function loadConfigs($configData){
         parent::loadConfigs($configData);
-        if(preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])){
+        if(preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT'])){
             // Force legacy theme for the moment
-            $this->pluginConf["GUI_THEME"] = "oxygen";
+             $this->pluginConf["GUI_THEME"] = "oxygen";
         }
         if(!defined("AJXP_THEME_FOLDER")){
             define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
@@ -47,7 +52,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 	function switchAction($action, $httpVars, $fileVars)
 	{
 		if(!isSet($this->actions[$action])) return;
-        if(preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])){
+        if(preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT'])){
             // Force legacy theme for the moment
             $this->pluginConf["GUI_THEME"] = "oxygen";
         }
@@ -109,20 +114,28 @@ class AJXP_ClientDriver extends AJXP_Plugin
 			case "get_xml_registry" :
 				
 				$regDoc = AJXP_PluginsService::getXmlRegistry();
-                $changes = AJXP_Controller::filterActionsRegistry($regDoc);
+                $changes = AJXP_Controller::filterRegistryFromRole($regDoc);
                 if($changes) AJXP_PluginsService::updateXmlRegistry($regDoc);
+
+                $clone = $regDoc->cloneNode(true);
+                $clonePath = new DOMXPath($clone);
+                $serverCallbacks = $clonePath->query("//serverCallback|hooks");
+                foreach($serverCallbacks as $callback){
+                    $processing = $callback->parentNode->removeChild($callback);
+                }
+
 				if(isSet($_GET["xPath"])){
-					$regPath = new DOMXPath($regDoc);
-					$nodes = $regPath->query($_GET["xPath"]);
+					//$regPath = new DOMXPath($regDoc);
+					$nodes = $clonePath->query($_GET["xPath"]);
 					AJXP_XMLWriter::header("ajxp_registry_part", array("xPath"=>$_GET["xPath"]));
 					if($nodes->length){
-						print(AJXP_XMLWriter::replaceAjxpXmlKeywords($regDoc->saveXML($nodes->item(0))));
+						print(AJXP_XMLWriter::replaceAjxpXmlKeywords($clone->saveXML($nodes->item(0))));
 					}
 					AJXP_XMLWriter::close("ajxp_registry_part");
 				}else{
                     AJXP_Utils::safeIniSet("zlib.output_compression", "4096");
 					header('Content-Type: application/xml; charset=UTF-8');
-                    print(AJXP_XMLWriter::replaceAjxpXmlKeywords($regDoc->saveXML()));
+                    print(AJXP_XMLWriter::replaceAjxpXmlKeywords($clone->saveXML()));
 				}
 				
 			break;
@@ -143,9 +156,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 			//------------------------------------
 			case "get_boot_gui":
 
-                if(strstr($_SERVER["HTTP_USER_AGENT"], "MSIE 9.") || strstr($_SERVER["HTTP_USER_AGENT"], "MSIE 10.")){
-                    header("X-UA-Compatible: IE=9");
-                }
+                HTMLWriter::internetExplorerMainDocumentHeader();
                 HTMLWriter::charsetHeader();
 				
 				if(!is_file(TESTS_RESULT_FILE)){
@@ -173,8 +184,8 @@ class AJXP_ClientDriver extends AJXP_Plugin
 							AuthService::disconnect();
 						}else{
 							$loggedUser = AuthService::getLoggedUser();
-							if(!$loggedUser->canRead(ConfService::getCurrentRootDirIndex()) 
-									&& AuthService::getDefaultRootId() != ConfService::getCurrentRootDirIndex())
+							if(!$loggedUser->canRead(ConfService::getCurrentRepositoryId())
+									&& AuthService::getDefaultRootId() != ConfService::getCurrentRepositoryId())
 							{
 								ConfService::switchRootDir(AuthService::getDefaultRootId());
 							}
@@ -189,13 +200,24 @@ class AJXP_ClientDriver extends AJXP_Plugin
 					$START_PARAMETERS["ALERT"] = implode(", ", array_values($confErrors));
 				}
                 // PRECOMPUTE BOOT CONF
-                $START_PARAMETERS["PRELOADED_BOOT_CONF"] = $this->computeBootConf();
+                if(!preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) && !preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])){
+                    $START_PARAMETERS["PRELOADED_BOOT_CONF"] = $this->computeBootConf();
+                }
 
                 // PRECOMPUTE REGISTRY
-                $regDoc = AJXP_PluginsService::getXmlRegistry();
-                $changes = AJXP_Controller::filterActionsRegistry($regDoc);
-                if($changes) AJXP_PluginsService::updateXmlRegistry($regDoc);
-                $START_PARAMETERS["PRELOADED_REGISTRY"] = AJXP_XMLWriter::replaceAjxpXmlKeywords($regDoc->saveXML());
+                if(!isSet($START_PARAMETERS["FORCE_REGISTRY_RELOAD"])){
+                    $regDoc = AJXP_PluginsService::getXmlRegistry();
+                    $changes = AJXP_Controller::filterRegistryFromRole($regDoc);
+                    if($changes) AJXP_PluginsService::updateXmlRegistry($regDoc);
+                    $clone = $regDoc->cloneNode(true);
+                    $clonePath = new DOMXPath($clone);
+                    $serverCallbacks = $clonePath->query("//serverCallback|hooks");
+                    foreach($serverCallbacks as $callback){
+                        $callback->parentNode->removeChild($callback);
+                    }
+                    $START_PARAMETERS["PRELOADED_REGISTRY"] = AJXP_XMLWriter::replaceAjxpXmlKeywords($clone->saveXML());
+                }
+
 				$JSON_START_PARAMETERS = json_encode($START_PARAMETERS);
                 $crtTheme = $this->pluginConf["GUI_THEME"];
 				if(ConfService::getConf("JS_DEBUG")){
@@ -227,7 +249,9 @@ class AJXP_ClientDriver extends AJXP_Plugin
 			//	GET CONFIG FOR BOOT
 			//------------------------------------
 			case "get_boot_conf":
-				
+
+                $out = array();
+                AJXP_Utils::parseApplicationGetParameters($_GET, $out, $_SESSION);
                 $config = $this->computeBootConf();
 				header("Content-type:application/json;charset=UTF-8");
 				print(json_encode($config));
@@ -243,33 +267,42 @@ class AJXP_ClientDriver extends AJXP_Plugin
 
     function computeBootConf(){
         if(isSet($_GET["server_prefix_uri"])){
-            $_SESSION["AJXP_SERVER_PREFIX_URI"] = $_GET["server_prefix_uri"];
+            $_SESSION["AJXP_SERVER_PREFIX_URI"] = str_replace("_UP_", "..", $_GET["server_prefix_uri"]);
         }
         $config = array();
         $config["ajxpResourcesFolder"] = "plugins/gui.ajax/res";
-        $config["ajxpServerAccess"] = AJXP_SERVER_ACCESS;
+        if(session_name() == "AjaXplorer_Shared"){
+            $config["ajxpServerAccess"] = "index_shared.php";
+        }else{
+            $config["ajxpServerAccess"] = AJXP_SERVER_ACCESS;
+        }
         $config["zipEnabled"] = ConfService::zipEnabled();
         $config["multipleFilesDownloadEnabled"] = ConfService::getCoreConf("ZIP_CREATION");
         $config["customWording"] = array(
-            "welcomeMessage" => $this->pluginConf["CUSTOM_WELCOME_MESSAGE"],
+            "welcomeMessage" => $this->getFilteredOption("CUSTOM_WELCOME_MESSAGE"),
             "title"			 => ConfService::getCoreConf("APPLICATION_TITLE"),
-            "icon"			 => $this->pluginConf["CUSTOM_ICON"],
-            "iconWidth"		 => $this->pluginConf["CUSTOM_ICON_WIDTH"],
-            "iconHeight"     => $this->pluginConf["CUSTOM_ICON_HEIGHT"],
-            "iconOnly"       => $this->pluginConf["CUSTOM_ICON_ONLY"],
-            "titleFontSize"	 => $this->pluginConf["CUSTOM_FONT_SIZE"]
+            "icon"			 => $this->getFilteredOption("CUSTOM_ICON"),
+            "iconWidth"		 => $this->getFilteredOption("CUSTOM_ICON_WIDTH"),
+            "iconHeight"     => $this->getFilteredOption("CUSTOM_ICON_HEIGHT"),
+            "iconOnly"       => $this->getFilteredOption("CUSTOM_ICON_ONLY"),
+            "titleFontSize"	 => $this->getFilteredOption("CUSTOM_FONT_SIZE")
         );
+        $cIcBin = $this->getFilteredOption("CUSTOM_ICON_BINARY");
+        if(!empty($cIcBin)){
+            $config["customWording"]["icon_binary_url"] = "get_action=get_global_binary_param&binary_id=".$cIcBin;
+        }
         $config["usersEnabled"] = AuthService::usersEnabled();
         $config["loggedUser"] = (AuthService::getLoggedUser()!=null);
         $config["currentLanguage"] = ConfService::getLanguage();
         $config["session_timeout"] = intval(ini_get("session.gc_maxlifetime"));
-        if(!isSet($this->pluginConf["CLIENT_TIMEOUT_TIME"]) || $this->pluginConf["CLIENT_TIMEOUT_TIME"] == ""){
+        $timeoutTime = $this->getFilteredOption("CLIENT_TIMEOUT_TIME");
+        if(empty($timeoutTime)){
             $to = $config["session_timeout"];
         }else{
-            $to = $this->pluginConf["CLIENT_TIMEOUT_TIME"];
+            $to = $timeoutTime;
         }
         $config["client_timeout"] = $to;
-        $config["client_timeout_warning"] = $this->pluginConf["CLIENT_TIMEOUT_WARN"];
+        $config["client_timeout_warning"] = $this->getFilteredOption("CLIENT_TIMEOUT_WARN");
         $config["availableLanguages"] = ConfService::getConf("AVAILABLE_LANG");
         $config["usersEditable"] = ConfService::getAuthDriverImpl()->usersEditable();
         $config["ajxpVersion"] = AJXP_VERSION;
@@ -277,11 +310,13 @@ class AJXP_ClientDriver extends AJXP_Plugin
         if(stristr($_SERVER["HTTP_USER_AGENT"], "msie 6")){
             $config["cssResources"] = array("css/pngHack/pngHack.css");
         }
-        if(!empty($this->pluginConf['GOOGLE_ANALYTICS_ID'])) {
+        $analytic = $this->getFilteredOption('GOOGLE_ANALYTICS_ID');
+        if(!empty($analytic)) {
             $config["googleAnalyticsData"] = array(
-                "id"=> 		$this->pluginConf['GOOGLE_ANALYTICS_ID'],
-                "domain" => $this->pluginConf['GOOGLE_ANALYTICS_DOMAIN'],
-                "event" => 	$this->pluginConf['GOOGLE_ANALYTICS_EVENT']);
+                "id"=> 		$analytic,
+                "domain" => $this->getFilteredOption('GOOGLE_ANALYTICS_DOMAIN'),
+                "event" => 	$this->getFilteredOption('GOOGLE_ANALYTICS_EVENT')
+            );
         }
         $config["i18nMessages"] = ConfService::getMessages();
         $config["password_min_length"] = ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth");
@@ -298,6 +333,14 @@ class AJXP_ClientDriver extends AJXP_Plugin
     function nodeBookmarkMetadata(&$ajxpNode){
         $user = AuthService::getLoggedUser();
         if($user == null) return;
+        $metadata = $ajxpNode->retrieveMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+        if(is_array($metadata) && count($metadata)){
+            $ajxpNode->mergeMetadata(array(
+                     "ajxp_bookmarked" => "true",
+                     "overlay_icon"  => "bookmark.png"
+                ), true);
+            return;
+        }
         if(!isSet(self::$loadedBookmarks)){
             self::$loadedBookmarks = $user->getBookmarks();
         }
@@ -307,12 +350,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
                          "ajxp_bookmarked" => "true",
                          "overlay_icon"  => "bookmark.png"
                     ), true);
-                /*
-                 * TESTING MULTIPLE OVERLAYS
-                $ajxpNode->mergeMetadata(array(
-                         "overlay_icon"  => "shared.png"
-                    ), true);
-                */
+                $ajxpNode->setMetadata("ajxp_bookmarked", array("ajxp_bookmarked"=> "true"), true, AJXP_METADATA_SCOPE_REPOSITORY, true);
             }
         }
     }

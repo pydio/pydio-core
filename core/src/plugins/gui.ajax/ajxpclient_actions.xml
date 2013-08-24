@@ -95,10 +95,10 @@
 			<gui text="152" title="153" src="bookmark.png" iconClass="icon-star-empty" hasAccessKey="true"
 				accessKey="bookmarks_access_key">
 				<context selection="true" dir="false" recycle="hidden"
-					actionBar="false" contextMenu="true" infoPanel="false"
-					actionBarGroup="default">
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="remote">
 				</context>
-                <selectionContext dir="true" file="false" recycle="false" unique="true"/>
+                <selectionContext dir="true" file="true" recycle="false" unique="true"/>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>

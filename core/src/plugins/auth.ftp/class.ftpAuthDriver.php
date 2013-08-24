@@ -29,8 +29,9 @@ class ftpSonWrapper extends ftpAccessWrapper {
 }
 
 /**
- * @package info.ajaxplorer.plugins
  * Authenticate users against an FTP server
+ * @package AjaXplorer_Plugins
+ * @subpackage Auth
  */
 class ftpAuthDriver extends AbstractAuthDriver {
 	
@@ -40,7 +41,7 @@ class ftpAuthDriver extends AbstractAuthDriver {
 		parent::parseSpecificContributions($contribNode);
 		if($contribNode->nodeName != "actions") return ;
 		$actionXpath=new DOMXPath($contribNode->ownerDocument);
-		if(!isset($this->options["FTP_LOGIN_SCREEN"]) || $this->options["FTP_LOGIN_SCREEN"] != "TRUE"){
+		if(!isset($this->options["FTP_LOGIN_SCREEN"]) || $this->options["FTP_LOGIN_SCREEN"] != "TRUE" || $this->options["FTP_LOGIN_SCREEN"] === false){
 			// Remove "ftp_login" && "ftp_set_data" actions
 			$nodeList = $actionXpath->query('action[@name="dynamic_login"]', $contribNode);
 			if(!$nodeList->length) return ;
@@ -53,27 +54,29 @@ class ftpAuthDriver extends AbstractAuthDriver {
 			$contribNode->removeChild($node = $nodeList->item(0));
 		}else{
 			// Replace "login" by "dynamic_login"
-			$loginList = $actionXpath->query('action[@name="login"]', $contribNode);			
-			if($loginList->length){
-				unset($this->actions["login"]);
-				$contribNode->removeChild($loginList->item(0));									
+			$loginList = $actionXpath->query('action[@name="login"]', $contribNode);
+			if($loginList->length && $loginList->item(0)->getAttribute("auth_ftp_impl") == null){
+				$contribNode->removeChild($loginList->item(0));
 			}
 			$dynaLoginList = $actionXpath->query('action[@name="dynamic_login"]', $contribNode);
 			if($dynaLoginList->length){
 				$dynaLoginList->item(0)->setAttribute("name", "login");
-				$this->actions["login"] = $this->actions["dynamic_login"];
+				$dynaLoginList->item(0)->setAttribute("auth_ftp_impl", "true");
 			}
 		}
 	}
 
 	
 	function listUsers(){
-		$adminUser = $this->options["ADMIN_USER"];
+		$adminUser = $this->options["AJXP_ADMIN_LOGIN"];
+		if(isSet($this->options["ADMIN_USER"])) {
+            $adminUser = $this->options["AJXP_ADMIN_LOGIN"];
+        }
 		return array($adminUser => $adminUser);
 	}
 	
 	function userExists($login){
-		return true;
+		return true ;
 	}	
 	
 	function logoutCallback($actionName, $httpVars, $fileVars){		
@@ -83,7 +86,10 @@ class ftpAuthDriver extends AbstractAuthDriver {
 			unset($_SESSION["AJXP_DYNAMIC_FTP_DATA"]);
 		}
 		AJXP_Safe::clearCredentials();
-		$adminUser = $this->options["ADMIN_USER"];
+		$adminUser = $this->options["AJXP_ADMIN_LOGIN"];
+        if(isSet($this->options["ADMIN_USER"])) {
+              $adminUser = $this->options["AJXP_ADMIN_LOGIN"];
+          }
 		$subUsers = array();
 		if($crtUser != $adminUser && $crtUser!=""){
             ConfService::getConfStorageImpl()->deleteUser($crtUser, $subUsers);
@@ -106,9 +112,24 @@ class ftpAuthDriver extends AbstractAuthDriver {
 		}
 		$_SESSION["AJXP_DYNAMIC_FTP_DATA"] = $ftpOptions;
 	}
-		
+
+    function testParameters($params){
+        AJXP_Logger::debug("TESTING", $params);
+        $repositoryId = $params["REPOSITORY_ID"];
+        $wrapper = new ftpSonWrapper();
+        try{
+            $wrapper->initUrl("ajxp.ftp://fake:fake@$repositoryId/");
+        }catch (Exception $e){
+            if($e->getMessage() == "Cannot login to FTP server with user fake"){
+                return "SUCCESS: FTP server successfully contacted.";
+            }else{
+                return "ERROR: ".$e->getMessage();
+            }
+        }
+        return "SUCCESS: Could succesfully connect to the FTP server!";
+    }
+
 	function checkPassword($login, $pass, $seed){
-		$adminUser = $this->options["ADMIN_USER"];
 		$wrapper = new ftpSonWrapper();
 		$repoId = $this->options["REPOSITORY_ID"];
 		try{

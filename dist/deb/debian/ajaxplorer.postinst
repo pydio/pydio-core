@@ -20,5 +20,17 @@ then
 		find $VAR_DIR -type d -exec chmod $VAR_PERMS_D {} \;
 		find $VAR_DIR -type f -exec chmod $VAR_PERMS_F {} \;
 		# etc
+	else
+
+        # Upgrading an existing install
+	    rm -f $VAR_DIR/data/cache/plugins_*.ser
+	    if [ ! -f "$VAR_DIR/data/cache/first_run_passed" ]
+	    then
+
+            touch $VAR_DIR/data/cache/first_run_passed
+
+	    fi
+
 	fi
+
 fi

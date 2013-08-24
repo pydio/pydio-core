@@ -20,11 +20,10 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * Core controller for dispatching the actions.
  * It uses the XML Registry (simple version, not extended) to search all the <action> tags and find the action.
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class AJXP_Controller{
 
@@ -50,7 +49,7 @@ class AJXP_Controller{
 		if(!isSet(self::$xPath)){
 			
 			$registry = AJXP_PluginsService::getXmlRegistry( false );
-			$changes = self::filterActionsRegistry($registry);
+			$changes = self::filterRegistryFromRole($registry);
 			if($changes) AJXP_PluginsService::updateXmlRegistry($registry);
 			self::$xPath = new DOMXPath($registry);		
 		}
@@ -63,7 +62,7 @@ class AJXP_Controller{
      * @param DOMDocument $registry
      * @return bool
      */
-	public static function filterActionsRegistry(&$registry){
+	public static function filterRegistryFromRole(&$registry){
 		if(!AuthService::usersEnabled()) return false ;
 		$loggedUser = AuthService::getLoggedUser();
 		if($loggedUser == null) return false;
@@ -87,42 +86,130 @@ class AJXP_Controller{
                 $changes = true;
             }
         }
+        $parameters = $loggedUser->mergedRole->listParameters();
+        foreach($parameters as $scope => $paramsPlugs){
+            if($scope == AJXP_REPO_SCOPE_ALL || $scope == $crtRepoId || ($crtRepo->hasParent() && $scope == AJXP_REPO_SCOPE_SHARED)){
+                foreach($paramsPlugs as $plugId => $params){
+                    foreach($params as $name => $value){
+                        // Search exposed plugin_configs, replace if necessary.
+                        $searchparams = $xPath->query("plugins/*[@id='$plugId']/plugin_configs/property[@name='$name']");
+                        if(!$searchparams->length) continue;
+                        $param = $searchparams->item(0);
+                        $newCdata = $registry->createCDATASection(json_encode($value));
+                        $param->removeChild($param->firstChild);
+                        $param->appendChild($newCdata);
+                    }
+                }
+            }
+        }
 		return $changes;
 	}
+
+
+    /**
+     * @param $actionName
+     * @param $path
+     * @return bool
+     */
+    public static function findRestActionAndApply($actionName, $path){
+        $xPath = self::initXPath();
+        $actions = $xPath->query("actions/action[@name='$actionName']");
+        if(!$actions->length){
+            self::$lastActionNeedsAuth = true;
+            return false;
+        }
+        $action = $actions->item(0);
+        $restPathList = $xPath->query("processing/serverCallback/@restParams", $action);
+        if(!$restPathList->length){
+            self::$lastActionNeedsAuth = true;
+            return false;
+        }
+        $restPath = $restPathList->item(0)->nodeValue;
+        $paramNames = explode("/", trim($restPath, "/"));
+        $path = array_shift(explode("?", $path));
+        $paramValues = array_map("urldecode", explode("/", trim($path, "/"), count($paramNames)));
+        foreach($paramNames as $i => $pName){
+            if(strpos($pName, "+") !== false){
+                $paramNames[$i] = str_replace("+", "", $pName);
+                $paramValues[$i] = "/" . $paramValues[$i];
+            }
+        }
+        if(count($paramValues) < count($paramNames)){
+            $paramNames = array_slice($paramNames, 0, count($paramValues));
+        }
+        $httpVars = array_merge($_GET, $_POST, array_combine($paramNames, $paramValues));
+        return self::findActionAndApply($actionName, $httpVars, $_FILES, $action);
+
+    }
+
+    /**
+     * @static
+     * @param Array $parameters
+     * @param DOMNode $callbackNode
+     * @param DOMXPath $xPath
+     * @throws Exception
+     */
+    public static function checkParams(&$parameters, $callbackNode, $xPath){
+        if(!$callbackNode->attributes->getNamedItem('checkParams') || $callbackNode->attributes->getNamedItem('checkParams')->nodeValue != "true"){
+            return;
+        }
+        $inputParams = $xPath->query("input_param", $callbackNode);
+        $declaredParams = array();
+        foreach($inputParams as $param){
+            $name = $param->attributes->getNamedItem("name")->nodeValue;
+            $type = $param->attributes->getNamedItem("type")->nodeValue;
+            $defaultNode = $param->attributes->getNamedItem("default");
+            $mandatory = ($param->attributes->getNamedItem("mandatory")->nodeValue == "true");
+            if($mandatory && !isSet($parameters[$name])){
+                throw new Exception("Missing parameter '".$name."' of type '$type'");
+            }
+            if($defaultNode != null && !isSet($parameters[$name])){
+                $parameters[$name] = $defaultNode->nodeValue;
+            }
+            $declaredParams[] = $name;
+        }
+        foreach($parameters as $k => $n){
+            if(!in_array($k, $declaredParams)) unset($parameters[$k]);
+        }
+    }
 
     /**
      * Main method for querying the XML registry, find an action and all its associated processors,
      * and apply all the callbacks.
      * @static
-     * @param $actionName
-     * @param $httpVars
-     * @param $fileVars
+     * @param String $actionName
+     * @param array $httpVars
+     * @param array $fileVars
+     * @param DOMNode $action
      * @return bool
      */
-	public static function findActionAndApply($actionName, $httpVars, $fileVars){
-		if($actionName == "cross_copy"){
-			$pService = AJXP_PluginsService::getInstance();
-			$actives = $pService->getActivePlugins();
-			$accessPlug = $pService->getPluginsByType("access");
-			if(count($accessPlug)){
-				foreach($accessPlug as $key=>$objbect){
-					if($actives[$objbect->getId()] === true){
-						call_user_func(array($pService->getPluginById($objbect->getId()), "crossRepositoryCopy"), $httpVars);
-						break;
-					}
-				}
-			}
-			self::$lastActionNeedsAuth = true;
-			return ;
-		}
-		$xPath = self::initXPath();
-		$actions = $xPath->query("actions/action[@name='$actionName']");		
-		if(!$actions->length){
-			self::$lastActionNeedsAuth = true;
-			return false;
-		}
-		$action = $actions->item(0);
-		//Check Rights
+	public static function findActionAndApply($actionName, $httpVars, $fileVars, &$action = null){
+        $actionName = AJXP_Utils::sanitize($actionName, AJXP_SANITIZE_EMAILCHARS);
+        if($actionName == "cross_copy"){
+            $pService = AJXP_PluginsService::getInstance();
+            $actives = $pService->getActivePlugins();
+            $accessPlug = $pService->getPluginsByType("access");
+            if(count($accessPlug)){
+                foreach($accessPlug as $key=>$objbect){
+                    if($actives[$objbect->getId()] === true){
+                        call_user_func(array($pService->getPluginById($objbect->getId()), "crossRepositoryCopy"), $httpVars);
+                        break;
+                    }
+                }
+            }
+            self::$lastActionNeedsAuth = true;
+            return ;
+        }
+        $xPath = self::initXPath();
+        if($action == null){
+            $actions = $xPath->query("actions/action[@name='$actionName']");
+            if(!$actions->length){
+                self::$lastActionNeedsAuth = true;
+                return false;
+            }
+            $action = $actions->item(0);
+        }
+        //Check Rights
 		if(AuthService::usersEnabled()){
 			$loggedUser = AuthService::getLoggedUser();
 			if( AJXP_Controller::actionNeedsRight($action, $xPath, "adminOnly") && 
@@ -135,10 +222,10 @@ class AJXP_Controller{
 					exit(1);
 				}			
 			if( AJXP_Controller::actionNeedsRight($action, $xPath, "read") && 
-				($loggedUser == null || !$loggedUser->canRead(ConfService::getCurrentRootDirIndex().""))){
+				($loggedUser == null || !$loggedUser->canRead(ConfService::getCurrentRepositoryId().""))){
 					AJXP_XMLWriter::header();
 					if($actionName == "ls" & $loggedUser!=null 
-						&& $loggedUser->canWrite(ConfService::getCurrentRootDirIndex()."")){
+						&& $loggedUser->canWrite(ConfService::getCurrentRepositoryId()."")){
 						// Special case of "write only" right : return empty listing, no auth error.
 						AJXP_XMLWriter::close();
 						exit(1);					
@@ -150,7 +237,7 @@ class AJXP_Controller{
 					exit(1);
 				}
 			if( AJXP_Controller::actionNeedsRight($action, $xPath, "write") && 
-				($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRootDirIndex().""))){
+				($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRepositoryId().""))){
                     $mess = ConfService::getMessages();
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendMessage(null, $mess[207]);
@@ -164,8 +251,14 @@ class AJXP_Controller{
 		$postCalls = self::getCallbackNode($xPath, $action, 'post_processing/serverCallback[not(@capture="true")]', $actionName, $httpVars, $fileVars, true);
 		$captureCalls = self::getCallbackNode($xPath, $action, 'post_processing/serverCallback[@capture="true"]', $actionName, $httpVars, $fileVars, true);
 		$mainCall = self::getCallbackNode($xPath, $action, "processing/serverCallback",$actionName, $httpVars, $fileVars, false);
+        if($mainCall != null){
+            self::checkParams($httpVars, $mainCall, $xPath);
+        }
 		
 		if($captureCalls !== false){
+            // Make sure the ShutdownScheduler has its own OB started BEFORE, as it will presumabily be
+            // executed AFTER the end of this one.
+            AJXP_ShutdownScheduler::getInstance();
 			ob_start();
 			$params = array("pre_processor_results" => array(), "post_processor_results" => array());
 		}
@@ -210,6 +303,8 @@ class AJXP_Controller{
      * @param String $currentRepositoryId
      * @param String $actionName
      * @param Array $parameters
+     * @param string $user
+     * @param string $statusFile
      * @return null|UnixProcess
      */
 	public static function applyActionInBackground($currentRepositoryId, $actionName, $parameters, $user ="", $statusFile = ""){
@@ -238,6 +333,9 @@ class AJXP_Controller{
             if($key == "action" || $key == "get_action") continue;
 			$cmd .= " --$key=".escapeshellarg($value);
 		}
+
+        return self::runCommandInBackground($cmd, $logFile);
+        /*
 		if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows"){
             if(AJXP_SERVER_DEBUG) $cmd .= " > ".$logFile;
             if(class_exists("COM") && ConfService::getCoreConf("CLI_USE_COM")){
@@ -248,17 +346,41 @@ class AJXP_Controller{
                 $cmd .= "\n DEL ".chr(34).$tmpBat.chr(34);
                 AJXP_Logger::debug("Writing file $cmd to $tmpBat");
                 file_put_contents($tmpBat, $cmd);
- 				/* Following 1 line modified by rmeske: The windows Start command identifies the first parameter in quotes as a title for the window.  Therefore, when enclosing a command with double quotes you must include a window title first
-				START	["title"] [/Dpath] [/I] [/MIN] [/MAX] [/SEPARATE | /SHARED] [/LOW | /NORMAL | /HIGH | /REALTIME] [/WAIT] [/B] [command / program] [parameters]
-				*/
-               pclose(popen('start /b "CLI" "'.$tmpBat.'"', 'r'));
+                pclose(popen('start /b "CLI" "'.$tmpBat.'"', 'r'));
             }
 		}else{
 			$process = new UnixProcess($cmd, (AJXP_SERVER_DEBUG?$logFile:null));
 			AJXP_Logger::debug("Starting process and sending output dev null");
             return $process;
-		}		
+		}
+        */
 	}
+
+    /**
+     * @param $cmd
+     * @param $logFile
+     * @return UnixProcess|null
+     */
+    public static function runCommandInBackground($cmd, $logFile){
+        if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows"){
+              if(AJXP_SERVER_DEBUG) $cmd .= " > ".$logFile;
+              if(class_exists("COM") && ConfService::getCoreConf("CLI_USE_COM")){
+                  $WshShell   = new COM("WScript.Shell");
+                  $oExec      = $WshShell->Run("cmd /C $cmd", 0, false);
+              }else{
+                  $basePath = str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH);
+                  $tmpBat = implode(DIRECTORY_SEPARATOR, array( $basePath, "data","tmp", md5(time()).".bat"));
+                  $cmd .= "\n DEL ".chr(34).$tmpBat.chr(34);
+                  AJXP_Logger::debug("Writing file $cmd to $tmpBat");
+                  file_put_contents($tmpBat, $cmd);
+                  pclose(popen('start /b "CLI" "'.$tmpBat.'"', 'r'));
+              }
+        }else{
+            $process = new UnixProcess($cmd, (AJXP_SERVER_DEBUG?$logFile:null));
+            AJXP_Logger::debug("Starting process and sending output dev null");
+            return $process;
+        }
+    }
 
     /**
      * Find a callback node by its xpath query, filtering with the applyCondition if the xml attribute exists.
@@ -270,7 +392,7 @@ class AJXP_Controller{
      * @param array $httpVars
      * @param array $fileVars
      * @param bool $multiple
-     * @return array|bool
+     * @return DOMNode|bool
      */
 	private static function getCallbackNode($xPath, $actionNode, $query ,$actionName, $httpVars, $fileVars, $multiple = true){		
 		$callbacks = $xPath->query($query, $actionNode);

@@ -21,7 +21,8 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.auth
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
  * @class AbstractAuthDriver
  * Abstract representation of an authentication driver. Must be implemented by the auth plugin
  */
@@ -202,9 +203,18 @@ class AbstractAuthDriver extends AJXP_Plugin {
 	protected function parseSpecificContributions(&$contribNode){
 		parent::parseSpecificContributions($contribNode);
 		if($contribNode->nodeName != "actions") return ;
+        if(AJXP_Utils::detectApplicationFirstRun()){
+            $actionXpath=new DOMXPath($contribNode->ownerDocument);
+            $passChangeNodeList = $actionXpath->query('action[@name="login"]', $contribNode);
+            if(!$passChangeNodeList->length) return ;
+            unset($this->actions["login"]);
+            $passChangeNode = $passChangeNodeList->item(0);
+            $contribNode->removeChild($passChangeNode);
+        }
+
 		if(AuthService::usersEnabled() && $this->passwordsEditable()) return ;
 		// Disable password change action
-		$actionXpath=new DOMXPath($contribNode->ownerDocument);
+        if(!isSet($actionXpath)) $actionXpath=new DOMXPath($contribNode->ownerDocument);
 		$passChangeNodeList = $actionXpath->query('action[@name="pass_change"]', $contribNode);
 		if(!$passChangeNodeList->length) return ;
 		unset($this->actions["pass_change"]);
@@ -220,7 +230,7 @@ class AbstractAuthDriver extends AJXP_Plugin {
     function listUsersPaginated($baseGroup = "/", $regexp, $offset, $limit){
         return $this->listUsers($baseGroup);
     }
-    function getUsersCount(){
+    function getUsersCount($baseGroup = "/", $regexp = ""){
         return -1;
     }
 
@@ -233,6 +243,16 @@ class AbstractAuthDriver extends AJXP_Plugin {
      * @return boolean
      */
 	function userExists($login){}
+
+    /**
+     * Alternative method to be used when checking if user exists
+     * before creating a new user.
+     * @param $login
+     * @return bool
+     */
+    function userExistsWrite($login){
+        return $this->userExists($login);
+    }
 
     /**
      * @param string $login

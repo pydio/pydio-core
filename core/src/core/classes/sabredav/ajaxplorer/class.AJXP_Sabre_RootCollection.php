@@ -21,9 +21,10 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.core
+ * @package AjaXplorer
+ * @subpackage SabreDav
  */
-class AJXP_Sabre_RootCollection extends Sabre_DAV_SimpleCollection
+class AJXP_Sabre_RootCollection extends Sabre\DAV\SimpleCollection
 {
 
     function getChildren(){
@@ -37,7 +38,7 @@ class AJXP_Sabre_RootCollection extends Sabre_DAV_SimpleCollection
                 $accessType = $repository->getAccessType();
                 $driver = AJXP_PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
                 if(is_a($driver, "AjxpWrapperProvider")){
-                    $this->children[$repository->getSlug()] = new Sabre_DAV_SimpleCollection($repository->getSlug());
+                    $this->children[$repository->getSlug()] = new Sabre\DAV\SimpleCollection($repository->getSlug());
                 }
             }
         }

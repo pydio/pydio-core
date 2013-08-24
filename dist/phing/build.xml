@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-model href="F:\VBox Machines\DebianShare\phing-grammar.rng"
+<?xml-model href="phing-grammar.rng"
             type="application/xml"
             schematypens="http://relaxng.org/ns/structure/1.0" ?>
 <project name="AjaXplorer" default="build">
@@ -7,7 +7,8 @@
     <property file="build.properties"/>
     <property name="env" value="testing"/>
     <property name="skip_deploy" value="false"/>
-    <property name="build_channel" value="stable"/>
+    <property name="build_linux" value="false"/>
+    <property name="build_channel" value="testing"/>
     <property name="build.source_folder" value="${build.working_folder}/source"/>
     <property name="svn.local_folder" value="${build.working_folder}/svnwc"/>
     <taskdef classname="lib.AjxpPluginDiscriminate" name="plugindiscriminate"/>
@@ -65,25 +66,25 @@
     </target>
 
     <target name="usage" description="Describe this script usage">
-        <echo message="For releasing and deploying : phing -Denv=release -Dskip_deploy=false -Dprevious_revision=2861 -Dprevious_version=4.0.4 -Dnew_version=4.2.0"/>
+        <echo message="For releasing and deploying : phing -Denv=release -Dskip_deploy=false -Dbuild_channel=stable -Dbuild_linux=true -Dprevious_tag=XaZeR35 -Dprevious_version=4.0.4 -Dnew_version=4.2.0"/>
         <echo message="For tagging : phing tag_version -Dversion=4.2.0 -Dnext_version=4.3.0"/>
     </target>
 
     <target name="deploy" description="Send package to FTP">
         <phingcall target="ftp_deploy">
             <property name="base_folder" value="${build.working_folder}/build"/>
-            <property name="remote_folder" value="${ftp.dir}"/>
+            <property name="remote_folder" value="${scp.dir}"/>
         </phingcall>
         <phingcall target="ftp_deploy">
             <property name="base_folder" value="${build.working_folder}/build/plugins"/>
-            <property name="remote_folder" value="${ftp.dir}/plugins"/>
+            <property name="remote_folder" value="${scp.dir}/plugins"/>
         </phingcall>
     </target>
     
     <target name="deploy_upgrade" description="Send package to FTP">
         <phingcall target="ftp_deploy">
             <property name="base_folder" value="${build.working_folder}/build/upgrade"/>
-            <property name="remote_folder" value="${ftp.update_dir}"/>
+            <property name="remote_folder" value="${scp.update_dir}"/>
         </phingcall>
     </target>
         
@@ -134,8 +135,9 @@
         </if>
         <!-- EXPORT GIT CONTENT FROM core/src/ -->
         <copy todir="${INNER_DIRECTORY}">
-        	<fileset dir="${git.local_repository}/core/src">
+        	<fileset dir="${git.local_repository}/core/src" defaultexcludes="false">
         		<include name="*/**"/>
+                <exclude name=".gitignore"/>
         	</fileset>
         </copy>        	                
         <!-- PREPARE VERSION FILE -->
@@ -157,7 +159,7 @@
     	<mkdir dir="${upgrade_export}"/>
     	<mkdir dir="${upgrade_export}/UPGRADE"/>
     	<git_summarize
-    	 commit1="${previous_revision}"
+    	 commit1="${previous_tag}"
     	 commit2="${LASTREVISION}"
     	 summarizeFile="${build.working_folder}/upgrade/svn_summarize"
     	 repository="${git.local_repository}"
@@ -193,6 +195,26 @@
 			</then>
 		</if>
 		
+		<if>
+			<available type="file" file="${git.local_repository}/dist/php/${new_version}.html"/>
+			<then>
+				<copy file="${git.local_repository}/dist/php/${new_version}.html" toFile="${upgrade_export}/UPGRADE/NOTE-HTML"/>
+			</then>
+		</if>
+
+		<if>
+			<available type="file" file="${git.local_repository}/dist/php/${new_version}.sql"/>
+			<then>
+				<copy file="${git.local_repository}/dist/php/${new_version}.sql" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sql"/>
+                <if>
+              			<available type="file" file="${git.local_repository}/dist/php/${new_version}.sqlite"/>
+              			<then>
+              				<copy file="${git.local_repository}/dist/php/${new_version}.sqlite" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sqlite"/>
+              			</then>
+              		</if>
+			</then>
+		</if>
+
     </target>
     
     <target name="zip" description="Package as Zip archive">
@@ -228,9 +250,27 @@
                 includeemptydirs="true"
                 compression="gzip"
             ><fileset dir="${build.source_folder}" defaultexcludes="false"><include name="*/**"/></fileset></tar>
+        <if>
+            <equals arg1="${env}" arg2="testing"/>
+            <then>
+                <copy todir="${build.working_folder}/build/ajaxplorer-latest">
+                    <fileset dir="${build.source_folder}/${package_name}/" defaultexcludes="false"><include name="*/**"></include></fileset>
+                </copy>
+                <zip
+                        destfile="${build.working_folder}/build/ajaxplorer-latest.zip"
+                        includeemptydirs="true"
+                        ><fileset dir="${build.working_folder}/build/" defaultexcludes="false"><include name="ajaxplorer-latest/**"/></fileset></zip>
+                <tar
+                        destfile="${build.working_folder}/build/ajaxplorer-latest.tar.gz"
+                        includeemptydirs="true"
+                        compression="gzip"
+                        ><fileset dir="${build.working_folder}/build/" defaultexcludes="false"><include name="ajaxplorer-latest/**"/></fileset></tar>
+                <delete dir="${build.working_folder}/build/ajaxplorer-latest" quiet="true"/>
+            </then>
+        </if>
         <phingcall target="build_external_plugins"/>
         <if>
-        	<not><equals arg1="${env}" arg2="testing"/></not>
+        	<equals arg1="${build_linux}" arg2="true"/>
         	<then>
         		<phingcall target="linux_packages">
         			<property name="packaged_zip" value="${build.working_folder}/build/${packaged_zip}"/>
@@ -279,12 +319,41 @@
 		<mkdir dir="${build.working_folder}/rpm"/>
 		<mkdir dir="${build.working_folder}/deb"/>
 		<mkdir dir="${build.working_folder}/deb/builddeb"/>
-        <svncheckout
-                revision="HEAD"
-                repositoryurl="${svn.repository_url}${svn.dist_root}"
-                todir="${build.working_folder}/dist"
-        />
-        
+
+        <if>
+            <available type="dir" file="${svn.local_folder}"/>
+            <then>
+                <svncheckout
+                        revision="HEAD"
+                        repositoryurl="${svn.repository_url}${svn.dist_root}"
+                        todir="${build.working_folder}/dist"
+                        />
+            </then>
+            <else>
+                <copy todir="${build.working_folder}/dist">
+                    <fileset dir="${git.local_repository}/dist" defaultexcludes="false">
+                        <include name="**/*"/>
+                        <exclude name=".gitignore"/>
+                    </fileset>
+                </copy>
+                <exec command="git rev-parse --short HEAD" dir="${git.local_repository}" outputProperty="LASTREVISION"/>
+            </else>
+        </if>
+
+        <if>
+            <equals arg1="${build_channel}" arg2="stable"/>
+            <then>
+                <property name="debian_distribution" value="stable"/>
+                <property name="rpm_distribution" value="ajaxplorer-stable"/>
+            </then>
+            <else>
+                <property name="debian_distribution" value="testing"/>
+                <property name="rpm_distribution" value="ajaxplorer-testing"/>
+            </else>
+        </if>
+
+        <echo message="DEBIAN DISTRIB IS ${debian_distribution} and RPM is ${rpm_distribution}"/>
+
 		<!-- TOKEN REPLACE THE RPM SPEC FILE -->
         <copy file="${build.working_folder}/dist/rpm/ajaxplorer.spec.tpl" overwrite="true" toFile="${build.working_folder}/rpm/ajaxplorer.spec">
             <filterchain>
@@ -323,6 +392,7 @@
             <filterchain>
                 <replacetokens begintoken="##" endtoken="##">
                     <token key="KEY_ID" value="${build.signing_key_id}"/>
+                    <token key="DIST" value="${debian_distribution}"/>
                 </replacetokens>
             </filterchain>
         </reflexive>
@@ -337,6 +407,7 @@
                 <replacetokens begintoken="##" endtoken="##">
                     <token key="VERSION_NUMBER" value="${build.version}"/>
                     <token key="FORMATTED_DATE" value="${FORMATTED_DATE}"/>
+		    <token key="DIST" value="${debian_distribution}"/>
                 </replacetokens>
             </filterchain>
         </reflexive>
@@ -352,37 +423,25 @@
 			</fileset>
 		</copy>
 
-		
-		<!-- NOW DEPLOY, TO LOCAL REPO THEN TO REMOTE COPY -->
-		<if>
-			<not><equals arg1="${skip_deploy}" arg2="true"/></not>
-			<then>
-		
-				<!-- TODO: SHOULD REPORT BACK THE CHANGELOG AND COMMIT -->
-				
-				
-				<!-- UPDATE APT REPOSITORY -->		
-				<exec command="reprepro --ask-passphrase -Vb . include squeeze ${build.working_folder}/deb/ajaxplorer_${build.version}_amd64.changes" dir="${build.repositories_folder}/apt/" passthru="true"/>
-		
-				<if>
-					<equals arg1="${build_channel}" arg2="stable"/>
-					<then>
-						<!-- UPDATE EL6 RPM REPOSITORY -->		
-						<copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.noarch.rpm" toDir="${build.repositories_folder}/el6/ajaxplorer-stable/"/>
-						<exec command="createrepo ." dir="${build.repositories_folder}/el6/ajaxplorer-stable/" passthru="true"/>
-					</then>
-					<else>
-						<!-- UPDATE EL6 RPM REPOSITORY -->		
-						<copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.noarch.rpm" toDir="${build.repositories_folder}/el6/ajaxplorer-testing/"/>
-						<exec command="createrepo ." dir="${build.repositories_folder}/el6/ajaxplorer-testing/" passthru="true"/>
-					</else>
-				</if>
-		
-				<!-- UPDATE EL6 SOURCES REPOSITORY -->		
-				<copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.src.rpm" toDir="${build.repositories_folder}/el6/ajaxplorer-sources/"/>
-				<exec command="createrepo ." dir="${build.repositories_folder}/el6/ajaxplorer-sources/" passthru="true"/>
-		
-		
+
+        <!-- TODO: SHOULD REPORT BACK THE CHANGELOG AND COMMIT -->
+
+
+        <!-- UPDATE APT REPOSITORY -->
+        <exec command="reprepro --ask-passphrase -Vb . include ${debian_distribution} ${build.working_folder}/deb/ajaxplorer_${build.version}_amd64.changes" dir="${build.repositories_folder}/apt/" passthru="true"/>
+
+        <!-- UPDATE EL6 RPM REPOSITORY -->
+        <copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.noarch.rpm" toDir="${build.repositories_folder}/el6/${rpm_distribution}/"/>
+        <exec command="createrepo ." dir="${build.repositories_folder}/el6/${rpm_distribution}/" passthru="true"/>
+
+        <!-- UPDATE EL6 SOURCES REPOSITORY -->
+        <copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.src.rpm" toDir="${build.repositories_folder}/el6/ajaxplorer-sources/"/>
+        <exec command="createrepo ." dir="${build.repositories_folder}/el6/ajaxplorer-sources/" passthru="true"/>
+
+        <!-- NOW DEPLOY, TO REMOTE COPY -->
+        <if>
+            <not><equals arg1="${skip_deploy}" arg2="true"/></not>
+            <then>
 				<!-- SYNCHRONIZE -->
 				<scp 
 					username="${repository_machine.user}" 
@@ -436,6 +495,18 @@
     </target>    
     
     <target name="ftp_deploy" description="Generic FTP deployment">
+                               <scp 
+                                        username="${scp.username}" 
+                                        password="${scp.password}"
+                                        host="${scp.host}" 
+					port="${scp.port}"
+                                        todir="${remote_folder}">
+                                    <fileset dir="${base_folder}">
+                                        <include name="*.zip" />
+					<include name="*.tar.gz"/>
+                                    </fileset>
+                                </scp>
+<!--
         <ftpdeploy
           host="${ftp.host}"
           port="${ftp.port}"
@@ -448,7 +519,8 @@
               <include name="*.tar.gz"/>
           </fileset>
         </ftpdeploy>
-        <echo message="Successfully sent zip and tars from ${base_folder} to ${ftp.host}/${remote_folder}"/>
+-->
+        <echo message="Successfully sent zip and tars from ${base_folder} to ${scp.host}/${remote_folder}"/>
     </target>
 
     <target name="lint" description="Check syntax of sources">

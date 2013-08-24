@@ -5396,6 +5396,7 @@
   function PclZipUtilPathReduction($p_dir)
   {
     $v_result = "";
+    $scheme = parse_url($p_dir, PHP_URL_SCHEME) != null;
 
     // ----- Look for not empty path
     if ($p_dir != "") {
@@ -5440,7 +5441,7 @@
 		    $v_skip--;
 		  }
 		  else {
-            $v_result = $v_list[$i].($i!=(sizeof($v_list)-1)?"/".$v_result:"");
+             $v_result = $v_list[$i].(( $i == 0 && $scheme)? "/" : "").($i!=(sizeof($v_list)-1)? "/".$v_result : "");
 		  }
         }
       }

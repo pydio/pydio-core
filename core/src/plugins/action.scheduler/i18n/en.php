@@ -44,7 +44,7 @@ $mess = array(
     "14" => "Last Execution",
     "15"=> "Run all tasks",
     "15d" => "Trigger selected task now",
-    "16" => "Run tasks",
+    "16" => "Run task",
     "16d" => "Trigger scheduler and run scheduled tasks",
     "17" => "User(s)",
     "17d" => "Enter a comma separated list of users, or wildcard * to recurse the task on all users.",
@@ -55,4 +55,5 @@ $mess = array(
     "20" => "Cron Expression",
     "20d" => "Generate Crontab expression",
     "21" => "Add the following line to your CRONTAB, replacing your password real value, and the scheduling you want (here configured to run every five minutes).",
+    "22" => "Generic scheduler to perform tasks on a regular basis. Requires CLI activation and a CRONTAB or similar system.",
 );

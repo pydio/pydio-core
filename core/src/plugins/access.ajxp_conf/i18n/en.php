@@ -20,7 +20,7 @@
  */
 $mess=array(
 "1" => "Configuration Data",
-"2" => "Users",
+"2" => "Users & Groups",
 "3" => "Workspaces",
 "4" => "Logs",
 "5" => "Diagnostic",
@@ -108,8 +108,8 @@ $mess=array(
 "87" => "Successfully updated actions for this role",
 "88" => "This workspace is defined in the config file, you cannot edit its meta sources via the GUI.",
 "89" => "User specific data",
-"90" => "Repository",
-"91" => "Template",
+"90" => "New Workspace",
+"91" => "New Template",
 "92" => "Create a new template",
 "93" => "Edit",
 "94" => "Batch Edit",
@@ -139,4 +139,5 @@ $mess=array(
 "117" => "Template Driver",
 "118" => "New group",
 "group_access" => "g",
+"119" => "Set user group",
 );

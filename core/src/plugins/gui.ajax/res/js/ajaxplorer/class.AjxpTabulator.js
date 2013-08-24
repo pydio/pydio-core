@@ -26,35 +26,40 @@ Class.create("AjxpTabulator", AjxpPane, {
 	 * @param tabulatorOptions Object Widget options
 	 */
 	initialize : function($super, htmlElement, tabulatorOptions){
-		$super(htmlElement);
+		$super(htmlElement, tabulatorOptions);
 		this.tabulatorData 	= tabulatorOptions.tabInfos;		
 		// Tabulator Data : array of tabs infos
 		// { id , label, icon and element : tabElement }.
 		// tab Element must implement : showElement() and resize() methods.
 		// Add drop shadow here, otherwise the negative value gets stuck in the CSS compilation...
-		var div = new Element('div', {className:'tabulatorContainer', style:'box-shadow: inset 0px -1px 2px #999999;-webkit-box-shadow: inset 0px -1px 2px #999999;-moz-box-shadow: inset 0px -1px 2px #999999;'});
-		var table = new Element('table', {cellpadding:0,cellspacing:0,border:0,width:'100%',style:'height:25px;'});		
+		var div = new Element('div', {className:'tabulatorContainer panelHeader'});
 		$(this.htmlElement).insert({top:div});
-		div.update(table);
-		var tBody = new Element('tBody');
-		var tr = new Element('tr');
-		table.update(tBody);
-		tBody.update(tr);
 		this.tabulatorData.each(function(tabInfo){
-			var td = new Element('td').addClassName('toggleHeader');
-			td.addClassName('panelHeader');
-			td.update('<img width="16" height="16" align="absmiddle" src="'+resolveImageSource(tabInfo.icon, '/images/actions/ICON_SIZE', 16)+'"><span ajxp_message_id="'+tabInfo.label+'">'+MessageHash[tabInfo.label]+'</a>');
+			var td = new Element('span', {className:'toggleHeader', title:MessageHash[tabInfo.title] || MessageHash[tabInfo.label].stripTags()});
+            if(tabInfo.icon){
+                td.insert('<img width="16" height="16" align="absmiddle" src="'+resolveImageSource(tabInfo.icon, '/images/actions/ICON_SIZE', 16)+'">');
+            }
+            if(tabInfo.iconClass){
+                td.insert(new Element('span', {className:tabInfo.iconClass}));
+            }
+            td.insert('<span class="tab_label" ajxp_message_id="'+tabInfo.label+'">'+MessageHash[tabInfo.label]+'</span>');
 			td.observe('click', function(){
 				this.switchTabulator(tabInfo.id);
 			}.bind(this) );
-			tr.insert(td);
+			div.insert(td);
 			tabInfo.headerElement = td;
 			disableTextSelection(td);
 			this.selectedTabInfo = tabInfo; // select last one by default
 		}.bind(this));
-		if(tabulatorOptions.defaultTabId){
-			this.switchTabulator(tabulatorOptions.defaultTabId);
-		}
+        if(this.options.headerToolbarOptions){
+            var tbD = new Element('div', {id:"display_toolbar"});
+            div.insert({top:tbD});
+            var tb = new ActionsToolbar(tbD, this.options.headerToolbarOptions);
+        }
+        if(tabulatorOptions.defaultTabId){
+            this.switchTabulator(tabulatorOptions.defaultTabId);
+        }
+
 	},
 	
 	/**
@@ -67,14 +72,14 @@ Class.create("AjxpTabulator", AjxpPane, {
 			var ajxpObject = this.getAndSetAjxpObject(tabInfo);
 			if(tabInfo.id == tabId){				
 				tabInfo.headerElement.removeClassName("toggleInactive");
-				tabInfo.headerElement.select('img')[0].show();
+				if(tabInfo.headerElement.down('img')) tabInfo.headerElement.down('img').show();
 				if(ajxpObject){
 					toShow = ajxpObject;
 				}
 				this.selectedTabInfo = tabInfo;
 			}else{
 				tabInfo.headerElement.addClassName("toggleInactive");
-				tabInfo.headerElement.select('img')[0].hide();
+                if(tabInfo.headerElement.down('img')) tabInfo.headerElement.down('img').hide();
 				if(ajxpObject){
 					ajxpObject.showElement(false);
 				}
@@ -82,8 +87,16 @@ Class.create("AjxpTabulator", AjxpPane, {
 		}.bind(this));
 		if(toShow){
 			toShow.showElement(true);
+            if(this.htmlElement.up('div[ajxpClass="Splitter"]') && this.htmlElement.up('div[ajxpClass="Splitter"]').ajxpPaneObject){
+                var splitter = this.htmlElement.up('div[ajxpClass="Splitter"]').ajxpPaneObject;
+                if(splitter.splitbar.hasClassName('folded')){
+                    splitter.unfold();
+                }
+            }
 			toShow.resize();
 		}
+        this.resize();
+        this.notify("switch", tabId);
 	},
 	
 	/**
@@ -94,7 +107,40 @@ Class.create("AjxpTabulator", AjxpPane, {
 		var ajxpObject = this.getAndSetAjxpObject(this.selectedTabInfo);
 		if(ajxpObject){
 			ajxpObject.resize();
-		}
+            var left ;
+            var total = 0;
+            var cont = this.htmlElement.down('div.tabulatorContainer');
+            var innerWidth = parseInt(this.htmlElement.getWidth()) - parseInt(cont.getStyle('paddingLeft')) - parseInt(cont.getStyle('paddingRight'));
+            if(this.options.headerToolbarOptions){
+                innerWidth -= parseInt(this.htmlElement.down('div#display_toolbar').getWidth());
+            }
+            cont.removeClassName('icons_only');
+            this.htmlElement.removeClassName('tabulator-vertical');
+            this.tabulatorData.each(function(tabInfo){
+                var header = tabInfo.headerElement;
+                header.setStyle({width:'auto'});
+                var hWidth = parseInt(header.getWidth());
+                if(tabInfo == this.selectedTabInfo){
+                    left = innerWidth - hWidth;
+                }
+                total += hWidth;
+            }.bind(this));
+            if(total >= innerWidth){
+                var part = parseInt( left / ( this.tabulatorData.length -1) ) ;
+                if(part < 14){
+                    cont.addClassName('icons_only');
+                }
+                if(innerWidth < 30 ){
+                    this.htmlElement.addClassName('tabulator-vertical');
+                }
+                this.tabulatorData.each(function(tabInfo){
+                    var header = tabInfo.headerElement;
+                    if(tabInfo != this.selectedTabInfo){
+                        header.setStyle({width:part - ( parseInt(header.getStyle('paddingRight')) + parseInt(header.getStyle('paddingLeft')) ) + 'px'});
+                    }
+                }.bind(this));
+            }
+        }
 	},
 	
 	/**
@@ -115,7 +161,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 		}.bind(this));
 		this.htmlElement.update("");
         if(window[this.htmlElement.id]){
-            delete window[this.htmlElement.id];
+            try{delete window[this.htmlElement.id];}catch(e){}
         }
 		this.htmlElement = null;
 	},

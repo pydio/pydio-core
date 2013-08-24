@@ -21,7 +21,20 @@
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+/**
+ * @package AjaXplorer_Plugins
+ * @subpackage Action
+ */
 class UpdateController extends AJXP_Plugin {
+
+    public function init($options){
+        parent::init($options);
+        $u = AuthService::getLoggedUser();
+        if($u == null) return;
+        if($u->getGroupPath() != "/"){
+            $this->enabled = false;
+        }
+    }
 
 	/**
 	 * Parse
@@ -125,6 +138,9 @@ class UpdateController extends AJXP_Plugin {
                     }
                     if($errors) break;
                 }
+                print('<script type="text/javascript">replaceTop();</script>');
+                print str_repeat(' ',300);
+                flush();
 
 
             break;

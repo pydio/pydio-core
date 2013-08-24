@@ -36,10 +36,11 @@ websocket.onmessage = function(event){console.log(event.data);};
      conn.onComplete = function(transport){ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);};
      conn.sendAsync();
      }, 5);
-
+ *
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
  *
  */
-
 class MqManager extends AJXP_Plugin
 {
 
@@ -49,12 +50,36 @@ class MqManager extends AJXP_Plugin
      * @var AJXP_MessageExchanger;
      */
     private $msgExchanger = false;
+    private $useQueue = false ;
+
 
     function init($options){
         parent::init($options);
+        $this->useQueue = $this->pluginConf["USE_QUEUE"];
         try{
-            $this->msgExchanger = AJXP_PluginsService::findPlugin("core", "notifications")->getExchanger();
+            $this->msgExchanger = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_MS_INSTANCE"], "AJXP_MessageExchanger");
         }catch (Exception $e){}
+    }
+
+
+    public function sendToQueue(AJXP_Notification $notification){
+        if(!$this->useQueue){
+            AJXP_Logger::debug("SHOULD DISPATCH NOTIFICATION ON ".$notification->getNode()->getUrl()." ACTION ".$notification->getAction());
+            AJXP_Controller::applyHook("msg.notification", array(&$notification));
+        }else{
+            if($this->msgExchanger) $this->msgExchanger->publishWorkerMessage("user_notifications", $notification);
+        }
+    }
+
+    public function consumeQueue($action, $httpVars, $fileVars){
+        if($action != "consume_notification_queue" || $this->msgExchanger === false) return;
+        $queueObjects = $this->msgExchanger->consumeWorkerChannel("user_notifications");
+        if(is_array($queueObjects)){
+            AJXP_Logger::debug("Processing notification queue, ".count($queueObjects)." notifs to handle");
+            foreach($queueObjects as $notification){
+                AJXP_Controller::applyHook("msg.notification", array(&$notification));
+            }
+        }
     }
 
     /**
@@ -88,13 +113,21 @@ class MqManager extends AJXP_Plugin
 
     }
 
-    public function sendInstantMessage($xmlContent, $repositoryId){
+    public function sendInstantMessage($xmlContent, $repositoryId, $targetUserId = null, $targetGroupPath = null){
 
-        $scope = ConfService::getRepositoryById($repositoryId)->securityScope();
-        if($scope == "USER"){
-            $userId = AuthService::getLoggedUser()->getId();
-        }else if($scope == "GROUP"){
-            $gPath = AuthService::getLoggedUser()->getGroupPath();
+        if($repositoryId == AJXP_REPO_SCOPE_ALL){
+            $userId = $targetUserId;
+        }else{
+            $scope = ConfService::getRepositoryById($repositoryId)->securityScope();
+            if($scope == "USER"){
+                $userId = AuthService::getLoggedUser()->getId();
+            }else if($scope == "GROUP"){
+                $gPath = AuthService::getLoggedUser()->getGroupPath();
+            }else if(isSet($targetUserId)){
+                $userId = $targetUserId;
+            }else if(isSet($targetGroupPath)){
+                $gPath = $targetGroupPath;
+            }
         }
 
         // Publish for pollers
@@ -111,7 +144,7 @@ class MqManager extends AJXP_Plugin
         $configs = $this->getConfigs();
         if($configs["WS_SERVER_ACTIVE"]){
 
-            require_once(AJXP_INSTALL_PATH."/vendor/phpws/websocket.client.php");
+            require_once($this->getBaseDir()."/vendor/phpws/websocket.client.php");
             // Publish for websockets
             $input = array("REPO_ID" => $repositoryId, "CONTENT" => "<tree>".$xmlContent."</tree>");
             if(isSet($userId)) $input["USER_ID"] = $userId;
@@ -123,7 +156,7 @@ class MqManager extends AJXP_Plugin
                 $this->wsClient->addHeader("Admin-Key", $configs["WS_SERVER_ADMIN"]);
                 @$this->wsClient->open();
             }
-            $this->wsClient->sendMessage($msg);
+            @$this->wsClient->sendMessage($msg);
         }
 
     }
@@ -146,7 +179,11 @@ class MqManager extends AJXP_Plugin
             case "client_consume_channel":
                $user = AuthService::getLoggedUser();
                if($user == null){
-                   throw new Exception("You must be logged in");
+                   //throw new Exception("You must be logged in");
+                   AJXP_XMLWriter::header();
+                   AJXP_XMLWriter::requireAuth();
+                   AJXP_XMLWriter::close();
+                   return;
                }
                $GROUP_PATH = $user->getGroupPath();
                if($GROUP_PATH == null) $GROUP_PATH = false;
@@ -204,6 +241,65 @@ class MqManager extends AJXP_Plugin
         AJXP_XMLWriter::header();
         echo $xml;
         AJXP_XMLWriter::close();
+
+    }
+
+    public function switchWebSocketOn($params){
+
+        $wDir = $this->getPluginWorkDir(true);
+        $pidFile = $wDir.DIRECTORY_SEPARATOR."ws-pid";
+        if(file_exists($pidFile)){
+            $pId = file_get_contents($pidFile);
+            $unixProcess = new UnixProcess();
+            $unixProcess->setPid($pId);
+            $status = $unixProcess->status();
+            if($status){
+                throw new Exception("Web Socket server seems to already be running!");
+            }
+        }
+
+        $cmd = ConfService::getCoreConf("CLI_PHP")." ws-server.php -host=".$params["WS_SERVER_HOST"]." -port=".$params["WS_SERVER_PORT"]." -path=".$params["WS_SERVER_PATH"];
+        chdir(AJXP_INSTALL_PATH.DIRECTORY_SEPARATOR.AJXP_PLUGINS_FOLDER.DIRECTORY_SEPARATOR."core.mq");
+        $process = AJXP_Controller::runCommandInBackground($cmd, null);
+        if($process != null){
+            $pId = $process->getPid();
+            $wDir = $this->getPluginWorkDir(true);
+            file_put_contents($wDir.DIRECTORY_SEPARATOR."ws-pid", $pId);
+            return "SUCCESS: Started WebSocket Server with process ID $pId";
+        }
+        return "SUCCESS: Started WebSocket Server";
+    }
+
+    public function switchWebSocketOff($params){
+
+        $wDir = $this->getPluginWorkDir(true);
+        $pidFile = $wDir.DIRECTORY_SEPARATOR."ws-pid";
+        if(!file_exists($pidFile)){
+            throw new Exception("No information found about WebSocket server");
+        }else{
+            $pId = file_get_contents($pidFile);
+            $unixProcess = new UnixProcess();
+            $unixProcess->setPid($pId);
+            $unixProcess->stop();
+            unlink($pidFile);
+        }
+        return "SUCCESS: Killed WebSocket Server";
+    }
+
+    public function getWebSocketStatus(){
+
+        $wDir = $this->getPluginWorkDir(true);
+        $pidFile = $wDir.DIRECTORY_SEPARATOR."ws-pid";
+        if(!file_exists($pidFile)){
+            return "OFF";
+        }else{
+            $pId = file_get_contents($pidFile);
+            $unixProcess = new UnixProcess();
+            $unixProcess->setPid($pId);
+            $status = $unixProcess->status();
+            if($status) return "ON";
+            else return "OFF";
+        }
 
     }
 

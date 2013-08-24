@@ -12,6 +12,7 @@ js/lib/prototype/splitter.js
 js/lib/prototype/proto.history.js
 js/lib/prototype/cookiejar.js
 js/lib/prototype/protopass.js
+js/lib/prototype/resizable.js
 js/lib/leightbox/lightbox.js
 js/lib/scriptaculous/src/builder.js
 js/lib/scriptaculous/src/effects.js
@@ -19,8 +20,6 @@ js/lib/scriptaculous/src/dragdrop.js
 js/lib/scriptaculous/src/controls.js
 js/lib/scriptaculous/src/slider.js
 js/lib/prototype/proto.scroller.js
-js/lib/prototype/shadower.js
-js/lib/prototype/corners.js
 js/lib/prototype/carousel.js
 js/lib/prototype/accordion.js
 js/lib/webfx/xtree.js
@@ -38,6 +37,7 @@ js/ajaxplorer/class.RepositorySimpleLabel.js
 js/ajaxplorer/class.Breadcrumb.js
 js/ajaxplorer/class.LocationBar.js
 js/ajaxplorer/class.UserWidget.js
+js/ajaxplorer/class.LogoWidget.js
 js/ajaxplorer/class.AjxpAutoCompleter.js
 js/ajaxplorer/class.AjxpUsersCompleter.js
 js/ajaxplorer/class.TreeSelector.js
@@ -52,6 +52,7 @@ js/ajaxplorer/class.PreviewFactory.js
 js/ajaxplorer/class.FilesList.js
 js/ajaxplorer/class.FoldersTree.js
 js/ajaxplorer/class.SearchEngine.js
+js/ajaxplorer/class.FetchedResultPane.js
 js/ajaxplorer/class.InfoPanel.js
 js/ajaxplorer/class.PropertyPanel.js
 js/ajaxplorer/class.AbstractEditor.js

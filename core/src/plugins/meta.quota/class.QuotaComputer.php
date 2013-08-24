@@ -21,6 +21,11 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Computes used storage for user
+ * @package AjaXplorer_Plugins
+ * @subpackage Meta
+ */
 class QuotaComputer extends AJXP_Plugin
 {
     /**
@@ -42,20 +47,28 @@ class QuotaComputer extends AJXP_Plugin
 
     protected function getWorkingPath(){
         $repo = ConfService::getRepository();
+        $clearParent = null;
         // SPECIAL : QUOTA MUST BE COMPUTED ON PARENT REPOSITORY FOLDER
         if($repo->hasParent()){
             $parentOwner = $repo->getOwner();
-            $repo = ConfService::getRepositoryById($repo->getParentId());
-            $originalUser = AuthService::getLoggedUser();
-            $loggedUser = AuthService::getLoggedUser();
-            if(!$loggedUser->hasParent()){
-                $loggedUser->setParent($parentOwner);
+            if($parentOwner !== null){
+                $repo = ConfService::getRepositoryById($repo->getParentId());
+                $originalUser = AuthService::getLoggedUser();
+                $loggedUser = AuthService::getLoggedUser();
+                if(!$loggedUser->hasParent()){
+                    $loggedUser->setParent($parentOwner);
+                    $clearParent = null;
+                }else{
+                    $clearParent = $loggedUser->getParent();
+                }
+                $loggedUser->setResolveAsParent(true);
+                AuthService::updateUser($loggedUser);
             }
-            $loggedUser->setResolveAsParent(true);
-            AuthService::updateUser($loggedUser);
         }
         $path = $repo->getOption("PATH");
         if(iSset($originalUser)){
+            $originalUser->setParent($clearParent);
+            $originalUser->setResolveAsParent(false);
             AuthService::updateUser($originalUser);
         }
 
@@ -115,7 +128,7 @@ class QuotaComputer extends AJXP_Plugin
         $q = $this->computeDirSpace($path);
         $this->storeUsage($path, $q);
         $t = $this->getAuthorized();
-        AJXP_Controller::applyHook("msg.instant", array("<metaquota usage='{$q}' total='{$t}'/>", ConfService::getRepository()->getUniqueId()));
+        AJXP_Controller::applyHook("msg.instant", array("<metaquota usage='{$q}' total='{$t}'/>", ConfService::getRepository()->getId()));
     }
 
     protected function storeUsage($dir, $quota){
@@ -158,10 +171,10 @@ class QuotaComputer extends AJXP_Plugin
             $this->saveUserData($data);
         }
 
-        if($this->pluginConf["USAGE_SCOPE"] == "local"){
-            return intval($data["REPO_USAGES"][$repo]);
+        if($this->getFilteredOption("USAGE_SCOPE", $repo) == "local"){
+            return floatval($data["REPO_USAGES"][$repo]);
         }else{
-            return array_sum(array_map("intval", $data["REPO_USAGES"]));
+            return array_sum(array_map("floatval", $data["REPO_USAGES"]));
         }
 
     }
@@ -189,7 +202,7 @@ class QuotaComputer extends AJXP_Plugin
             $obj = new COM ( 'scripting.filesystemobject' );
             if ( is_object ( $obj ) ){
                 $ref = $obj->getfolder ( $dir );
-                $s = intval($ref->size);
+                $s = floatval($ref->size);
                 $obj = null;
             }else{
                 echo 'can not create object';
@@ -200,7 +213,7 @@ class QuotaComputer extends AJXP_Plugin
             $io = popen ( '/usr/bin/du '.$option.' ' . escapeshellarg($dir), 'r' );
            	$size = fgets ( $io, 4096);
             $size = trim(str_replace($dir, "", $size));
-            $s = intval($size);
+            $s =  floatval($size);
             if(PHP_OS == "Darwin") $s = $s * 1024;
            	//$s = intval(substr ( $size, 0, strpos ( $size, ' ' ) ));
            	pclose ( $io );
@@ -224,7 +237,7 @@ class QuotaComputer extends AJXP_Plugin
                     $total_size += $size;
                 }
             } else {
-                $size = filesize(rtrim($path, '/') . '/' . $t);
+                $size = sprintf("%u", filesize(rtrim($path, '/') . '/' . $t));
                 $total_size += $size;
             }
         }

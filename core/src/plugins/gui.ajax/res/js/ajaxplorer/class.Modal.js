@@ -277,18 +277,7 @@ Class.create("Modal", {
 			// REFRESH PNG IMAGES FOR IE!
 			refreshPNGImages(this.dialogContent);			
 		}
-		
-		if(skipShadow) return;
-		Shadower.shadow($(elementName), 
-			{
-				distance: 3,
-				angle: 130,
-				opacity: 0.5,
-				nestedShadows: 3,
-				color: '#000000',
-				shadowStyle:{display:'block'}
-			}, true);
-				
+
 	},
 	/**
 	 * Find an editor using the editorData and initialize it
@@ -400,7 +389,7 @@ Class.create("Modal", {
 		var winWidth = document.viewport.getWidth();
 		var winHeight = document.viewport.getHeight();
         var element = $(this.elementName);
-		boxWidth = element.getWidth();
+		var boxWidth = element.getWidth();
 		var boxHeight = element.getHeight();
 		
 		if(checkHeight && boxHeight > parseInt(winHeight*90/100)){
@@ -434,15 +423,6 @@ Class.create("Modal", {
 	 * Refresh appearance after the dialog box changed (shadow)
 	 */
 	refreshDialogAppearance:function(){
-		Shadower.shadow($(this.elementName), 
-			{
-				distance: 4,
-				angle: 130,
-				opacity: 0.5,
-				nestedShadows: 3,
-				color: '#000000',
-				shadowStyle:{display:'block'}
-			}, true);		
 	},
 	/**
 	 * Clear all content
@@ -521,16 +501,35 @@ Class.create("Modal", {
 	 * Create a simple tooltip
 	 * @param element HTMLElement
 	 * @param title String
+     * @param position Describe tooltip position
+     * @param className Add an arbitrary class to the tooltip
+     * @param hookTo either 'element' or 'pointer'
+     * @param updateOnShow Load the tooltip content from the "title" element passed.
 	 */
-	simpleTooltip : function(element, title){
+	simpleTooltip : function(element, title, position, className, hookTo, updateOnShow){
+        if(!position) position = 'bottom right';
+        if(!hookTo) hookTo = 'pointer';
 		element.observe("mouseover", function(event){
-			var x = Event.pointerX(event)+10;
-			var y = Event.pointerY(event)+10;
 			if(!this.tooltip){
 				this.tooltip = new Element("div", {className:"simple_tooltip"});
+                if(className) this.tooltip.addClassName(className);
 				$$('body')[0].insert(this.tooltip);
 			}
-			this.tooltip.update(title);
+            if(updateOnShow){
+                this.tooltip.update(title.cloneNode(true));
+            }else{
+                this.tooltip.update(title);
+            }
+            var baseX = hookTo == "element" ? Element.cumulativeOffset(element).left : Event.pointerX(event);
+            var baseY = hookTo == "element" ? Element.cumulativeOffset(element).top : Event.pointerY(event);
+            var x = (position.indexOf('right') != -1 ? baseX+10 : (baseX - 10 - parseInt(this.tooltip.getWidth())) );
+            var y = baseY+10;
+            if(position.indexOf('middle') != -1){
+                y -= 5 + parseInt(this.tooltip.getHeight())/2;
+            }else if(position.indexOf('bottom') != -1){
+                y -= 13 + parseInt(element.getHeight());
+            }
+
 			this.tooltip.setStyle({top:y+"px",left:x+"px"});
 			if(this.tipTimer){
 				window.clearTimeout(this.tipTimer);
@@ -597,9 +596,6 @@ Class.create("Modal", {
 			left:leftPosition+'px',
 			width:boxWidth+'px'
 		});
-		if(!Modernizr.borderradius) {
-            new Effect.Corner(this.messageBox,"5px");
-        }
 		new Effect.Appear(this.messageBox);
 		this.tempoMessageDivClosing();
 	},
@@ -658,7 +654,6 @@ Class.create("Modal", {
 	 * Close action. Remove shadow if any, call close callback if any.
 	 */
 	close: function(){	
-		Shadower.deshadow($(this.elementName));
 		if(this.closeFunction){
 			 this.closeFunction();
 			 //this.closeFunction = null;

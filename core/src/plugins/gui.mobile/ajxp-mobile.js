@@ -98,7 +98,7 @@ function initAjxpMobileActions(){
 }
 
 document.observe("ajaxplorer:gui_loaded", function(){
-	initAjxpMobileActions();
+	//initAjxpMobileActions();
 	document.addEventListener("touchmove", function(event){
 		event.preventDefault();
 	});

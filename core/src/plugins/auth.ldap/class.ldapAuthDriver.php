@@ -21,8 +21,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Authenticate users against an LDAP server
+ * @package AjaXplorer_Plugins
+ * @subpackage Auth
  */
 class ldapAuthDriver extends AbstractAuthDriver {
 
@@ -31,13 +32,30 @@ class ldapAuthDriver extends AbstractAuthDriver {
     var $ldapAdminUsername;
     var $ldapAdminPassword;
     var $ldapDN;
+    var $ldapGDN;
     var $ldapFilter;
+    var $ldapGFilter;
+    var $dynamicFilter;
     var $ldapUserAttr;
+    var $ldapGroupAttr;
 
     var $ldapconn = null;
     var $separateGroup = "";
 
+    var $hasGroupsMapping = false;
+
+
+    /**
+     * Legacy way, defined through PHP array
+     * @var array
+     */
     var $customParamsMapping = array();
+
+    /**
+     * New way, defined through GUI Options (PARAM_MAPPING replication group).
+     * @var array
+     */
+    var $paramsMapping = array();
 
     function init($options){
         parent::init($options);
@@ -46,29 +64,107 @@ class ldapAuthDriver extends AbstractAuthDriver {
         if ($options["LDAP_PORT"]) $this->ldapPort = $options["LDAP_PORT"];
         if ($options["LDAP_USER"]) $this->ldapAdminUsername = $options["LDAP_USER"];
         if ($options["LDAP_PASSWORD"]) $this->ldapAdminPassword = $options["LDAP_PASSWORD"];
-        if ($options["LDAP_DN"]) $this->ldapDN = $options["LDAP_DN"];
+        if ($options["LDAP_DN"]) $this->ldapDN = $this->parseReplicatedParams($options, array("LDAP_DN"));
+        if ($options["LDAP_GDN"]) $this->ldapGDN = $this->parseReplicatedParams($options, array("LDAP_GDN"));
         if (is_array($options["CUSTOM_DATA_MAPPING"])) $this->customParamsMapping = $options["CUSTOM_DATA_MAPPING"];
-        if (isSet($options["LDAP_FILTER"])){
+        $this->paramsMapping = $this->parseReplicatedParams($options, array("MAPPING_LDAP_PARAM", "MAPPING_LOCAL_TYPE", "MAPPING_LOCAL_PARAM"));
+        if(count($this->paramsMapping)){
+            foreach($this->paramsMapping as $param){
+                if(strtolower($param["MAPPING_LOCAL_TYPE"]) == "group_path"){
+                    $this->hasGroupsMapping = $param["MAPPING_LDAP_PARAM"];
+                    break;
+                }
+            }
+        }
+        if (!empty($options["LDAP_FILTER"])){
             $this->ldapFilter = $options["LDAP_FILTER"];
             if ($this->ldapFilter != "" &&  !preg_match("/^\(.*\)$/", $this->ldapFilter)) {
                 $this->ldapFilter = "(" . $this->ldapFilter . ")";
             }
         } else {
-            $this->ldapFilter = "(objectClass=person)";
+            if($this->hasGroupsMapping && !empty($this->ldapGFilter)){
+                $this->ldapFilter = "!(".$this->ldapGFilter.")";
+            }
         }
-        if ($options["LDAP_USERATTR"]){
+        if (!empty($options["LDAP_GROUP_FILTER"])){
+            $this->ldapGFilter = $options["LDAP_GROUP_FILTER"];
+            if ($this->ldapGFilter != "" &&  !preg_match("/^\(.*\)$/", $this->ldapGFilter)) {
+                $this->ldapGFilter = "(" . $this->ldapGFilter . ")";
+            }
+        } else {
+            $this->ldapGFilter = "(objectClass=group)";
+        }
+        if (!empty($options["LDAP_USERATTR"])){
 			$this->ldapUserAttr = strtolower($options["LDAP_USERATTR"]);
 		}else{ 
 			$this->ldapUserAttr = 'uid' ; 
 		}
-        /*
-        $this->ldapconn = $this->LDAP_Connect();
-        if ($this->ldapconn == null) AJXP_Logger::logAction('LDAP Server connexion could NOT be established');
-        */
+        if (!empty($options["LDAP_GROUPATTR"])){
+			$this->ldapGroupAttr = strtolower($options["LDAP_GROUPATTR"]);
+		}else{
+			$this->ldapGroupAttr = 'cn' ;
+		}
+    }
+
+    function parseReplicatedParams($options, $optionsNames){
+        $i = 0;
+        $data = array();
+        while(true){
+            $ok = true;
+            $occurence = array();
+            $suffix = ($i==0 ? "" : "_" . $i);
+            foreach($optionsNames as $name){
+                if(!isSet($options[$name.$suffix])) {
+                    $ok = false;
+                    break;
+                }
+                if(count($optionsNames) == 1){
+                    $occurence = $options[$name.$suffix];
+                }else{
+                    $occurence[$name] = $options[$name.$suffix];
+                }
+            }
+            if(!$ok) break;
+            $data[] = $occurence;
+            $i++;
+        }
+        return $data;
+    }
+
+    public function testLDAPConnexion($options){
+
+        $this->ldapUrl = $options["LDAP_URL"];
+        if ($options["LDAP_PORT"]) $this->ldapPort = $options["LDAP_PORT"];
+        if ($options["LDAP_USER"]) $this->ldapAdminUsername = $options["LDAP_USER"];
+        if ($options["LDAP_PASSWORD"]) $this->ldapAdminPassword = $options["LDAP_PASSWORD"];
+        if ($options["LDAP_DN"]) $this->ldapDN = $this->parseReplicatedParams($options, array("LDAP_DN"));
+        $this->startConnexion();
+        if($this->ldapconn == null){
+            return "ERROR: Cannot connect to the server";
+        }else{
+            if(!empty($options["TEST_USER"])){
+                $entries = $this->getUserEntries($options["TEST_USER"]);
+                if(!is_array($entries)) return false;
+                if(AuthService::ignoreUserCase()) {
+                    $res =  (strcasecmp($options["TEST_USER"], $entries[0][$this->ldapUserAttr][0]) == 0);
+                }else {
+                    $res =  (strcmp($options["TEST_USER"], $entries[0][$this->ldapUserAttr][0]) == 0 );
+                }
+                AJXP_Logger::debug('Auth.ldap :: checking if user '.$options["TEST_USER"].' exists  : '.$res);
+                if(!$res){
+                    return "ERROR: Could <b>correctly connect</b> to the server, but could <b>not find the specified user</b> in the directory.";
+                }else{
+                    return "SUCCESS: Could connect to the server, and could find the specified user inside the directory.";
+                }
+            }else{
+                return "SUCCESS: Correctly connected to the server";
+            }
+        }
+
     }
 
     function startConnexion(){
-        AJXP_Logger::logAction('Auth.ldap :: init');
+        AJXP_Logger::debug('Auth.ldap :: start connexion');
         if($this->ldapconn == null){
             $this->ldapconn = $this->LDAP_Connect();
             if($this->ldapconn == null) {
@@ -79,7 +175,6 @@ class ldapAuthDriver extends AbstractAuthDriver {
     }
 
     function __deconstruct(){
-        //@todo : if PHP server < 5, this method will never be closed. Maybe use a close() method ?
         if($this->ldapconn != null){
             ldap_close($this->ldapconn);
         }
@@ -89,6 +184,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
         $ldapconn = ldap_connect($this->ldapUrl, $this->ldapPort)
         or die("Cannot connect to LDAP server");
         //@todo : return error_code
+        AJXP_Logger::debug('Auth.ldap :: correctly connected to server '.$this->ldapUrl);
 
         if ($ldapconn) {
             //AJXP_Logger::logAction("auth.ldap:We are connected");
@@ -96,16 +192,18 @@ class ldapAuthDriver extends AbstractAuthDriver {
 
             if ($this->ldapAdminUsername === null){
                 //connecting anonymously
-                AJXP_Logger::logAction('Anonymous LDAP connexion');
+                AJXP_Logger::debug('Auth.ldap :: Anonymous LDAP connexion');
                 $ldapbind = @ldap_bind($ldapconn);
             } else {
-                AJXP_Logger::logAction('Standard LDAP connexion');
+                AJXP_Logger::debug('Auth.ldap :: Standard LDAP connexion');
                 $ldapbind = @ldap_bind($ldapconn, $this->ldapAdminUsername, $this->ldapAdminPassword);
             }
 
             if ($ldapbind){
+                AJXP_Logger::debug('Auth.ldap :: LDAP connexion OK');
                 return $ldapconn;
             } else {
+                AJXP_Logger::debug('Auth.ldap :: LDAP connexion FAILED');
                 return null;
             }
             
@@ -123,7 +221,15 @@ class ldapAuthDriver extends AbstractAuthDriver {
             if($this->ldapFilter == "") $filter = "(" . $this->ldapUserAttr . "=" . $login . ")";
             else  $filter = "(&" . $this->ldapFilter . "(" . $this->ldapUserAttr . "=" . $login . "))";
         }
-        $this->startConnexion();
+        if(empty($filter)){
+            if(!empty($this->dynamicFilter)) $filter = $this->dynamicFilter;
+            else $filter = $this->ldapUserAttr . "=*";
+        }else{
+            if(!empty($this->dynamicFilter)) $filter = "(&(".$this->dynamicFilter.")".$filter.")";
+        }
+        if($this->ldapconn == null){
+        	$this->startConnexion();
+        }
         $conn = array();
         if(is_array($this->ldapDN)){
             foreach($this->ldapDN as $dn){
@@ -133,17 +239,33 @@ class ldapAuthDriver extends AbstractAuthDriver {
             $conn = array($this->ldapconn);
         }
         $expected = array($this->ldapUserAttr);
-        if($login != null && !empty($this->customParamsMapping)){
-            $expected = array_merge($expected, array_keys($this->customParamsMapping));
+        if($login != null && (!empty($this->customParamsMapping) || !empty($this->paramsMapping))){
+            if(!empty($this->customParamsMapping)){
+                $expected = array_merge($expected, array_keys($this->customParamsMapping));
+            }
+            if(!empty($this->paramsMapping)){
+                $keys = array();
+                foreach($this->paramsMapping as $param) $keys[] = $param["MAPPING_LDAP_PARAM"];
+                $expected = array_merge($expected, $keys);
+            }
+        }
+        foreach ($conn as $dn => $ldapc) {
+            if (!$ldapc) {
+                unset($conn[$dn]);
+            }
+        }
+        if (count($conn) < 1) {
+            return array("count" => 0);
         }
         $ret = ldap_search($conn,$this->ldapDN,$filter, $expected);
         $allEntries = array("count" => 0);
-        foreach($ret as $resourceResult){
+        foreach($ret as $i => $resourceResult){
+            if($resourceResult === false) continue;
             if($countOnly){
-                $allEntries["count"] += ldap_count_entries($this->ldapconn, $resourceResult);
+                $allEntries["count"] += ldap_count_entries($conn[$i], $resourceResult);
                 continue;
             }
-            $entries = ldap_get_entries($this->ldapconn, $resourceResult);
+            $entries = ldap_get_entries($conn[$i], $resourceResult);
             $index = 0;
             if(!empty($entries["count"])){
                 $allEntries["count"] += $entries["count"];
@@ -166,12 +288,22 @@ class ldapAuthDriver extends AbstractAuthDriver {
     }
     function listUsersPaginated($baseGroup="/", $regexp, $offset, $limit){
 
-        if($baseGroup != "/".$this->separateGroup) return array();
+        if($this->hasGroupsMapping !== false){
+            if($baseGroup == "/"){
+                $this->dynamicFilter = $this->hasGroupsMapping."=";
+            }else{
+                $this->dynamicFilter = $this->hasGroupsMapping."=".ltrim($baseGroup, "/");
+            }
+
+        }else if(!empty($this->separateGroup) && $baseGroup != "/".$this->separateGroup) {
+            return array();
+        }
 
         if($regexp[0]=="^") $regexp = ltrim($regexp, "^")."*";
         else if($regexp[strlen($regexp)-1] == "$") $regexp = "*".rtrim($regexp, "$");
 
         $entries = $this->getUserEntries($regexp, false, $offset, $limit);
+        $this->dynamicFilter = null;
         $persons = array();
         unset($entries['count']); // remove 'count' entry
         foreach($entries as $id => $person){
@@ -181,8 +313,13 @@ class ldapAuthDriver extends AbstractAuthDriver {
         }
         return $persons;
     }
-    function getUsersCount(){
-        $res = $this->getUserEntries(null, true, null);
+    function getUsersCount($baseGroup = "/", $regexp = ""){
+        $re = null;
+        if(!empty($regexp)){
+            if($regexp[0]=="^") $re = ltrim($regexp, "^")."*";
+            else if($regexp[strlen($regexp)-1] == "$") $re = "*".rtrim($regexp, "$");
+        }
+        $res = $this->getUserEntries($re, true, null);
         return $res["count"];
     }
 
@@ -195,14 +332,57 @@ class ldapAuthDriver extends AbstractAuthDriver {
      */
     function listChildrenGroups($baseGroup = "/"){
         $arr = array();
-        if($baseGroup == "/" && !empty($this->separateGroup)) $arr[$this->separateGroup] = "LDAP Annuary";
+        if($baseGroup == "/" && !empty($this->separateGroup)) {
+            $arr[$this->separateGroup] = "LDAP Annuary";
+            return $arr;
+        }
+        if($this->hasGroupsMapping){
+            $origUsersDN = $this->ldapDN;
+            $origUsersFilter = $this->ldapFilter;
+            $origUsersAttr = $this->ldapUserAttr;
+            $this->ldapDN = $this->ldapGDN;
+            $this->ldapFilter = $this->ldapGFilter;
+            $this->ldapUserAttr = $this->ldapGroupAttr;
+
+            if($baseGroup != "/"){
+                $this->dynamicFilter = $this->hasGroupsMapping."=".ltrim($baseGroup, "/");
+            }else{
+                //STRANGE, SHOULD WORK BUT EXCLUDES ALL GROUPS
+                //$this->dynamicFilter = "!(".$this->hasGroupsMapping."=*)";
+            }
+
+            $entries = $this->getUserEntries();
+            $this->dynamicFilter = null;
+            $persons = array();
+            unset($entries['count']); // remove 'count' entry
+            foreach($entries as $id => $person){
+                $login = $person[$this->ldapUserAttr][0];
+                if(AuthService::ignoreUserCase()) $login = strtolower($login);
+                $persons[$person["dn"]] = $login;
+            }
+            $this->ldapDN = $origUsersDN;
+            $this->ldapFilter = $origUsersFilter;
+            $this->ldapUserAttr = $origUsersAttr;
+            return $persons;
+        }
+
         return $arr;
     }
 
 
     function listUsers($baseGroup = "/"){
-        if($baseGroup != "/".$this->separateGroup) return array();
-		$entries = $this->getUserEntries();
+        if($this->hasGroupsMapping !== false){
+            if($baseGroup == "/"){
+                $this->dynamicFilter = $this->hasGroupsMapping."=";
+            }else{
+                $this->dynamicFilter = $this->hasGroupsMapping."=".ltrim($baseGroup, "/");
+            }
+        }else if(!empty($this->separateGroup) && $baseGroup != "/".$this->separateGroup) {
+            return array();
+        }
+
+        $entries = $this->getUserEntries();
+        $this->dynamicFilter = null;
         $persons = array();
         unset($entries['count']); // remove 'count' entry
         foreach($entries as $id => $person){
@@ -214,13 +394,23 @@ class ldapAuthDriver extends AbstractAuthDriver {
     }
 
 	function userExists($login){
+		// Check if local storage exists for the user. If it does, assume the user
+		// exists. This prevents a barrage of ldap_connect/ldap_bind/ldap_search
+		// calls.
+		$confDriver = ConfService::getConfStorageImpl();
+		$userObject = $confDriver->instantiateAbstractUserImpl($login);
+		if ($userObject->storageExists()) {
+			//return true;
+		}
         $entries = $this->getUserEntries($login);
         if(!is_array($entries)) return false;
         if(AuthService::ignoreUserCase()) {
-            return (strcasecmp($login, $entries[0][$this->ldapUserAttr][0]) == 0);
+            $res =  (strcasecmp($login, $entries[0][$this->ldapUserAttr][0]) == 0);
         }else {
-            return (strcmp($login, $entries[0][$this->ldapUserAttr][0]) == 0 );
+            $res =  (strcmp($login, $entries[0][$this->ldapUserAttr][0]) == 0 );
         }
+        AJXP_Logger::debug('Auth.ldap :: checking if user '.$login.' exists  : '.$res);
+        return $res;
     }
 
     function checkPassword($login, $pass, $seed){
@@ -228,13 +418,15 @@ class ldapAuthDriver extends AbstractAuthDriver {
         if(empty($pass)) return false;
         $entries = $this->getUserEntries($login);
         if ($entries['count']>0) {
+            AJXP_Logger::debug('Ldap Password Check: Got user '.$login);
             if (@ldap_bind($this->ldapconn,$entries[0]["dn"],$pass)) {
-                AJXP_Logger::logAction('Ldap Password Check:Got user '.$entries[0]["cn"][0]);
+                AJXP_Logger::debug('Ldap Password Check: Got user '.$entries[0]["cn"][0]);
                 return true;
             }
+            AJXP_Logger::debug('Password Check: failed for user '.$login);
             return false;
         } else {
-            AJXP_Logger::logAction("Ldap Password Check:No user $login found");
+            AJXP_Logger::debug("Ldap Password Check : No user $login found");
             return false;
         }
     }
@@ -248,6 +440,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
 
     function updateUserObject(&$userObject){
         if(!empty($this->separateGroup)) $userObject->setGroupPath("/".$this->separateGroup);
+        // SHOULD BE DEPRECATED
         if(!empty($this->customParamsMapping)){
             $checkValues =  array_values($this->customParamsMapping);
             $prefs = $userObject->getPref("CUSTOM_PARAMS");
@@ -273,6 +466,71 @@ class ldapAuthDriver extends AbstractAuthDriver {
                 $userObject->setPref("CUSTOM_PARAMS", $prefs);
                 $userObject->save();
             }
+        }
+        if(!empty($this->paramsMapping)){
+
+            $changes = false;
+            $entries = $this->getUserEntries($userObject->getId());
+            if($entries["count"]){
+                $entry = $entries[0];
+                foreach($this->paramsMapping as $params){
+                    $key = strtolower($params['MAPPING_LDAP_PARAM']);
+                    if(isSet($entry[$key])){
+                        $value = $entry[$key][0];
+                        switch($params['MAPPING_LOCAL_TYPE']){
+                            case "role_id":
+                                if(!in_array($value, array_keys($userObject->getRoles()))){
+                                    $userObject->addRole(AuthService::getRole($value, true));
+                                    $changes = true;
+                                }
+                                break;
+                            case "group_path":
+                                $value = "/".ltrim($value, "/");
+                                if(true /*$userObject->getGroupPath() != $value*/) {
+                                    $humanName = "LDAP ".$value;
+                                    if($key == "memberof"){
+                                        // get CN from value
+                                        $hnParts = array();
+                                        $parts = explode(",", ltrim($value, '/'));
+                                        foreach($parts as $part){
+                                            list($att,$attVal) = explode("=", $part);
+                                            if(strtolower($att) == "cn") $hnParts[] = $attVal;
+                                        }
+                                        if(count($hnParts)) $humanName = implode(",", $hnParts);
+                                    }
+                                    AuthService::createGroup("/", $value, $humanName);
+                                    $userObject->setGroupPath($value, true);
+                                    $changes = true;
+                                }
+                                break;
+                            case "profile":
+                                if($userObject->getProfile() != $value){
+                                    $changes = true;
+                                    $userObject->setProfile($value);
+                                }
+                                break;
+                            case "plugin_param":
+                            default:
+                                if(strpos($params["MAPPING_LOCAL_PARAM"], "/") !== false){
+                                    list($pId, $param) = explode("/", $params["MAPPING_LOCAL_PARAM"]);
+                                }else{
+                                    $pId = $this->getId();
+                                    $param = $params["MAPPING_LOCAL_PARAM"];
+                                }
+                                if($userObject->personalRole->filterParameterValue($pId, $param, AJXP_REPO_SCOPE_ALL, "") != $value){
+                                    $userObject->personalRole->setParameterValue($pId, $param, $value);
+                                    $userObject->recomputeMergedRole();
+                                    $changes = true;
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+            if($changes){
+                $userObject->save("superuser");
+            }
+
         }
     }
 

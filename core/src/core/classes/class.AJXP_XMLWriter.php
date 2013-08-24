@@ -21,10 +21,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * XML output Generator
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class AJXP_XMLWriter
 {
@@ -407,10 +406,17 @@ class AJXP_XMLWriter
      * @static
      * @param $allBookmarks
      * @param bool $print
+     * @param string $format legacy|node_list
      * @return string
      */
-	static function writeBookmarks($allBookmarks, $print = true)
+	static function writeBookmarks($allBookmarks, $print = true, $format = "legacy")
 	{
+        if($format == "node_list") {
+            $driver = ConfService::loadRepositoryDriver();
+            if(!is_a($driver, "AjxpWrapperProvider")){
+                $driver = false;
+            }
+        }
 		$buffer = "";
 		foreach ($allBookmarks as $bookmark)
 		{
@@ -422,7 +428,16 @@ class AJXP_XMLWriter
 				$path = $bookmark;
 				$title = basename($bookmark);
 			}
-			$buffer .= "<bookmark path=\"".AJXP_Utils::xmlEntities($path)."\" title=\"".AJXP_Utils::xmlEntities($title)."\"/>";
+            if($format == "node_list"){
+                if($driver){
+                    $node = new AJXP_Node($driver->getResourceUrl($path));
+                    $buffer .= AJXP_XMLWriter::renderAjxpNode($node, true, false);
+                }else{
+                    $buffer .= AJXP_XMLWriter::renderNode($path, $title, false, array('icon' => "mime_empty.png"), true, false);
+                }
+            }else{
+                $buffer .= "<bookmark path=\"".AJXP_Utils::xmlEntities($path)."\" title=\"".AJXP_Utils::xmlEntities($title)."\"/>";
+            }
 		}
 		if($print) print $buffer;
 		else return $buffer;
@@ -488,7 +503,7 @@ class AJXP_XMLWriter
 		if(!AuthService::usersEnabled()){
 			$buffer.="<user id=\"shared\">";
 			if(!$details){
-				$buffer.="<active_repo id=\"".ConfService::getCurrentRootDirIndex()."\" write=\"1\" read=\"1\"/>";
+				$buffer.="<active_repo id=\"".ConfService::getCurrentRepositoryId()."\" write=\"1\" read=\"1\"/>";
 			}
 			$buffer.= AJXP_XMLWriter::writeRepositoriesData(null, $details);
 			$buffer.="</user>";	
@@ -496,7 +511,7 @@ class AJXP_XMLWriter
             $lock = $loggedUser->getLock();
 			$buffer.="<user id=\"".$loggedUser->id."\">";
 			if(!$details){
-				$buffer.="<active_repo id=\"".ConfService::getCurrentRootDirIndex()."\" write=\"".($loggedUser->canWrite(ConfService::getCurrentRootDirIndex())?"1":"0")."\" read=\"".($loggedUser->canRead(ConfService::getCurrentRootDirIndex())?"1":"0")."\"/>";
+				$buffer.="<active_repo id=\"".ConfService::getCurrentRepositoryId()."\" write=\"".($loggedUser->canWrite(ConfService::getCurrentRepositoryId())?"1":"0")."\" read=\"".($loggedUser->canRead(ConfService::getCurrentRepositoryId())?"1":"0")."\"/>";
 			}else{
 				$buffer .= "<ajxp_roles>";
 				foreach ($loggedUser->getRoles() as $roleId => $boolean){
@@ -574,8 +589,12 @@ class AJXP_XMLWriter
                 $label = $uObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $uId);
                 $isSharedString =  "owner='".$label."'";
             }
-
-            $xmlString = "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$rightString $streamString $slugString $isSharedString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label>".$repoObject->getClientSettings()."</repo>";
+            $descTag = "";
+            $description = $repoObject->getDescription();
+            if(!empty($description)){
+                $descTag = '<description>'.AJXP_Utils::xmlEntities($description, true).'</description>';
+            }
+            $xmlString = "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$rightString $streamString $slugString $isSharedString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings()."</repo>";
             if($toLast){
                 $lastString = $xmlString;
             }else{

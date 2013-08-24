@@ -1,0 +1,76 @@
+CREATE TABLE IF NOT EXISTS ajxp_users (
+  login text NOT NULL,
+  "password" text NOT NULL,
+  groupPath text NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ajxp_user_rights (
+  rid integer NOT NULL primary key autoincrement,
+  login text NOT NULL,
+  repo_uuid text NOT NULL,
+  rights text NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ajxp_user_prefs (
+  rid integer NOT NULL primary key autoincrement,
+  login text NOT NULL,
+  "name" text NOT NULL,
+  val blob DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ajxp_user_bookmarks (
+  rid integer NOT NULL primary key autoincrement,
+  login text NOT NULL,
+  repo_uuid text NOT NULL,
+  path text DEFAULT NULL,
+  title text DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ajxp_repo (
+  uuid text NOT NULL,
+  parent_uuid text DEFAULT NULL,
+  owner_user_id text DEFAULT NULL,
+  child_user_id text DEFAULT NULL,
+  path text DEFAULT NULL,
+  display text DEFAULT NULL,
+  accessType text DEFAULT NULL,
+  recycle text DEFAULT NULL,
+  bcreate integer DEFAULT NULL,
+  writeable integer DEFAULT NULL,
+  enabled integer DEFAULT NULL,
+  isTemplate integer DEFAULT NULL,
+  inferOptionsFromParent integer DEFAULT NULL,
+  slug text DEFAULT NULL,
+  groupPath text DEFAULT NULL
+);
+ 
+CREATE TABLE IF NOT EXISTS ajxp_repo_options (
+  oid integer NOT NULL primary key autoincrement,
+  uuid text NOT NULL,
+  "name" text NOT NULL,
+  val blob DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ajxp_roles (
+  role_id text NOT NULL,
+  serial_role blob NOT NULL,
+  searchable_repositories text
+);
+
+CREATE TABLE IF NOT EXISTS ajxp_groups (
+  groupPath text NOT NULL,
+  groupLabel text NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ajxp_plugin_configs (
+  id text NOT NULL,
+  configs longtext NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ajxp_simple_store (
+  object_id text NOT NULL,
+  store_id text NOT NULL,
+  serialized_data longtext,
+  binary_data blob,
+  related_object_id text DEFAULT NULL
+);

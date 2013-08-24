@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * AJXP_Plugin to access a remote server using the File Transfer Protocol
+ * @package AjaXplorer_Plugins
+ * @subpackage Access
  */
 class ftpAccessDriver extends fsAccessDriver {
 	
@@ -297,6 +298,34 @@ class ftpAccessDriver extends fsAccessDriver {
             $files = $user->getTemporaryData("tmp_upload");
             return (count($files)?true:false);
     }
-	
+
+    function testParameters($params){
+        if(empty($params["FTP_USER"])){
+            throw new AJXP_Exception("Even if you intend to use the credentials stored in the session, temporarily set a user and password to perform the connexion test.");
+        }
+        if($params["FTP_SECURE"]){
+            $link = @ftp_ssl_connect($params["FTP_HOST"], $params["FTP_PORT"]);
+        }else{
+            $link = @ftp_connect($params["FTP_HOST"], $params["FTP_PORT"]);
+        }
+        if(!$link) {
+            throw new AJXP_Exception("Cannot connect to FTP server (".$params["FTP_HOST"].",". $params["FTP_PORT"].")");
+        }
+        @ftp_set_option($link, FTP_TIMEOUT_SEC, 10);
+        if(!@ftp_login($link,$params["FTP_USER"],$params["FTP_PASS"])){
+            ftp_close($link);
+            throw new AJXP_Exception("Cannot login to FTP server with user ".$params["FTP_USER"]);
+        }
+        if (!$params["FTP_DIRECT"])
+        {
+            @ftp_pasv($link, true);
+            global $_SESSION;
+            $_SESSION["ftpPasv"]="true";
+        }
+        ftp_close($link);
+
+        return "SUCCESS: Could succesfully connect to the FTP server with user '".$params["FTP_USER"]."'.";
+    }
+
 	
 }

@@ -21,7 +21,8 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.conf
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
  * @class AbstractAjxpUser
  * @abstract
  * User abstraction, the "conf" driver must provides its own implementation
@@ -94,11 +95,11 @@ abstract class AbstractAjxpUser
         }else{
             $hashes = explode(",", $hashes);
         }
-        $newHash =  md5($this->id.":".time());
+        $newHash = md5($this->id.":".AJXP_Utils::generateRandomString());
         array_push($hashes, $newHash);
         $this->setPref("cookie_hash", implode(",",$hashes));
         $this->save("user");
-		return $newHash; //md5($this->id.":".$newHash.":ajxp");
+		return $newHash;
 	}
 	
 	function getId(){
@@ -125,6 +126,10 @@ abstract class AbstractAjxpUser
      * @param AJXP_Role $roleObject
      */
     function addRole($roleObject){
+        if(isSet($this->roles[$roleObject->getId()])){
+            // NOTHING SPECIAL TO DO !
+            return;
+        }
 		if(!isSet($this->rights["ajxp.roles"])) $this->rights["ajxp.roles"] = array();
 		$this->rights["ajxp.roles"][$roleObject->getId()] = true;
         uksort($this->rights["ajxp.roles"], array($this, "orderRoles"));
@@ -258,7 +263,7 @@ abstract class AbstractAjxpUser
 		
 	function addBookmark($path, $title="", $repId = -1){
 		if(!isSet($this->bookmarks)) $this->bookmarks = array();
-		if($repId == -1) $repId = ConfService::getCurrentRootDirIndex();
+		if($repId == -1) $repId = ConfService::getCurrentRepositoryId();
 		if($title == "") $title = basename($path);
 		if(!isSet($this->bookmarks[$repId])) $this->bookmarks[$repId] = array();
 		foreach ($this->bookmarks[$repId] as $v)
@@ -272,7 +277,7 @@ abstract class AbstractAjxpUser
 	}
 	
 	function removeBookmark($path){
-		$repId = ConfService::getCurrentRootDirIndex();
+		$repId = ConfService::getCurrentRepositoryId();
 		if(isSet($this->bookmarks) 
 			&& isSet($this->bookmarks[$repId])
 			&& is_array($this->bookmarks[$repId]))
@@ -288,7 +293,7 @@ abstract class AbstractAjxpUser
 	}
 	
 	function renameBookmark($path, $title){
-		$repId = ConfService::getCurrentRootDirIndex();
+		$repId = ConfService::getCurrentRepositoryId();
 		if(isSet($this->bookmarks) 
 			&& isSet($this->bookmarks[$repId])
 			&& is_array($this->bookmarks[$repId]))
@@ -308,8 +313,8 @@ abstract class AbstractAjxpUser
 	function getBookmarks()
 	{
 		if(isSet($this->bookmarks) 
-			&& isSet($this->bookmarks[ConfService::getCurrentRootDirIndex()]))
-			return $this->bookmarks[ConfService::getCurrentRootDirIndex()];
+			&& isSet($this->bookmarks[ConfService::getCurrentRepositoryId()]))
+			return $this->bookmarks[ConfService::getCurrentRepositoryId()];
 		return array();
 	}
 	
@@ -333,8 +338,9 @@ abstract class AbstractAjxpUser
         return $password;
     }
 
-    public function setGroupPath($groupPath)
+    public function setGroupPath($groupPath, $update = false)
     {
+        if(strlen($groupPath) > 1) $groupPath = rtrim($groupPath, "/");
         $this->groupPath = $groupPath;
     }
 
@@ -412,11 +418,9 @@ abstract class AbstractAjxpUser
     }
 
     protected function orderRoles($r1, $r2){
-        if(strpos($r1, "AJXP_GRP_") === 0) return -1;
-        if(strpos($r2, "AJXP_GRP_") === 0) return 1;
         if(strpos($r1, "AJXP_USR_") === 0) return 1;
         if(strpos($r2, "AJXP_USR_") === 0) return -1;
-        return 0;
+        return strcmp($r1,$r2);
     }
 
     public function setResolveAsParent($resolveAsParent)
@@ -427,6 +431,20 @@ abstract class AbstractAjxpUser
     public function getResolveAsParent()
     {
         return $this->resolveAsParent;
+    }
+
+    /**
+     * @param array $roles
+     * @return array
+     */
+    protected function filterRolesForSaving($roles){
+        $res = array();
+        foreach($roles as $rName => $status){
+            if(!$status) continue;
+            if(strpos($rName, "AJXP_GRP_/") === 0) continue;
+            $res[$rName] = true;
+        }
+        return $res;
     }
 
 }

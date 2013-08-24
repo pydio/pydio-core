@@ -11,7 +11,11 @@
                 <div id="folderPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ajxpPaneHeader="363" ajxpPaneIcon="view_tree.png" style="margin:20px;"></div>
                 <style>#sidebar_splitter{padding-bottom:20px;background-color:#A0C0A4;}</style>
             ]]></template_part>
-		</client_configs>	
+            <template_part ajxpClass="AjxpTabulator" ajxpId="topPane" ajxpOptions='{"defaultTabId": "folders","tabInfos" : [{"id":"folders","label":"130","iconClass":"icon-folder-open","element":"folder_pane"},{"id":"flagged","label":"147","iconClass":"icon-star","element":"flagged_elements"}],"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["filter"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'><![CDATA[
+                <div id="folder_pane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ></div>
+                <div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"get_bookmarks", "format":"node_list"}}'></div>
+            ]]></template_part>
+        </client_configs>
 		<actions>
 			<action name="ls" dirDefault="true">			
 				<gui text="32" title="32" src="fileopen.png"
@@ -104,7 +108,7 @@
 					</processing>
 			</action>
 			<action name="clear_expired">
-				<gui text="ajxp_shared.25" title="ajxp_shared.26" src="edit_clear_history.png" accessKey="" hasAccessKey="false">
+				<gui text="ajxp_shared.25" title="ajxp_shared.26" iconClass="icon-time" src="edit_clear_history.png" accessKey="" hasAccessKey="false">
 					<context selection="true" dir="true" recycle="false"  behaviour="hidden"
 						actionBar="true" contextMenu="true" infoPanel="false"
 						actionBarGroup="change" inZip="false">
@@ -120,7 +124,7 @@
 						};
 						conn.sendAsync();
 					]]></clientCallback>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction" developerComment="Clear expired links" restParams="/"/>
 					</processing>
 			</action>
 			

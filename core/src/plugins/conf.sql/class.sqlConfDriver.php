@@ -22,12 +22,14 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Configuration stored in an SQL Database
+ * @package AjaXplorer_Plugins
+ * @subpackage Conf
  */
 class sqlConfDriver extends AbstractConfDriver {
 		
-	
+	var $sqlDriver = array();
+
 	/**
 	 * Initialise the driver.
 	 * 
@@ -57,61 +59,67 @@ class sqlConfDriver extends AbstractConfDriver {
 		try {
 			dibi::connect($this->sqlDriver);		
 		} catch (DibiException $e) {
+            //throw $e;
 			echo get_class($e), ': ', $e->getMessage(), "\n";
 			exit(1);
 		}
 	}
-	
+
+    public function performChecks(){
+        if(!isSet($this->options)) return;
+        $test = AJXP_Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
+        if(!count($test)){
+            throw new Exception("You probably did something wrong! To fix this issue you have to remove the file \"bootsrap.json\" and rename the backup file \"bootstrap.json.bak\" into \"bootsrap.json\" in data/plugins/boot.conf/");
+        }
+    }
+
 	function _loadPluginConfig($pluginId, &$options){
 		$res_opts = dibi::query('SELECT * FROM [ajxp_plugin_configs] WHERE [id] = %s', $pluginId);
-		if (count($res_opts) > 0) {
-			$config_row = $res_opts->fetchPairs();
-			$confOpt = unserialize($config_row[$pluginId]);
-			if(is_array($confOpt)){
-				foreach($confOpt as $key => $value) $options[$key] = $value;
-			}
-		}
+        $config_row = $res_opts->fetchPairs();
+        $confOpt = unserialize($config_row[$pluginId]);
+        if(is_array($confOpt)){
+            foreach($confOpt as $key => $value) $options[$key] = $value;
+        }
 	}
 	
 	/**
 	 * 
-	 * @param String $pluginType
 	 * @param String $pluginId
 	 * @param String $options
 	 */
-	function savePluginConfig($pluginId, $options){
+	function _savePluginConfig($pluginId, $options){
 		$res_opts = dibi::query('SELECT * FROM [ajxp_plugin_configs] WHERE [id] = %s', $pluginId);
-		if(count($res_opts)){
+		if(count($res_opts->fetchAll())){
 			dibi::query('UPDATE [ajxp_plugin_configs] SET [configs] = %s WHERE [id] = %s', serialize($options), $pluginId);
 		}else{
 			dibi::query('INSERT INTO [ajxp_plugin_configs]', array('id' => $pluginId, 'configs' => serialize($options)));
 		}
 	}
-	
-	/**
-	 * Create a Repository object from a Database Result
-	 * 
-	 * The method expects the following schema:
-	 * CREATE TABLE ajxp_repo ( uuid VARCHAR(33) PRIMARY KEY, 
-	 * 							path VARCHAR(255), 
-	 * 							display VARCHAR(255), 
-	 * 							accessType VARCHAR(20), 
-	 * 							recycle VARCHAR(255) , 
-	 * 							bcreate BOOLEAN, -- For some reason 'create' is a reserved keyword
-	 * 							writeable BOOLEAN, 
-	 * 							enabled BOOLEAN );
-	 * 
-	 * Additionally, the options are stored in a separate table:
-	 * CREATE TABLE ajxp_repo_options ( oid INTEGER PRIMARY KEY, uuid VARCHAR(33), name VARCHAR(50), val VARCHAR(255) );
-	 * 
-	 * I recommend an index to increase performance of uuid lookups:
-	 * CREATE INDEX ajxp_repo_options_uuid_idx ON ajxp_repo_options ( uuid );
-	 * 
-	 * 
-	 * @param $result Result of a dibi::query() as array
-	 * @param $options_result Result of dibi::query() for options as array
-	 * @return Repository object
-	 */
+
+    /**
+     * Create a Repository object from a Database Result
+     *
+     * The method expects the following schema:
+     * CREATE TABLE ajxp_repo ( uuid VARCHAR(33) PRIMARY KEY,
+     *                             path VARCHAR(255),
+     *                             display VARCHAR(255),
+     *                             accessType VARCHAR(20),
+     *                             recycle VARCHAR(255) ,
+     *                             bcreate BOOLEAN, -- For some reason 'create' is a reserved keyword
+     *                             writeable BOOLEAN,
+     *                             enabled BOOLEAN );
+     *
+     * Additionally, the options are stored in a separate table:
+     * CREATE TABLE ajxp_repo_options ( oid INTEGER PRIMARY KEY, uuid VARCHAR(33), name VARCHAR(50), val VARCHAR(255) );
+     *
+     * I recommend an index to increase performance of uuid lookups:
+     * CREATE INDEX ajxp_repo_options_uuid_idx ON ajxp_repo_options ( uuid );
+     *
+     *
+     * @param $result Result of a dibi::query() as array
+     * @param array|\Result $options_result Result of dibi::query() for options as array
+     * @return Repository object
+     */
 	function repoFromDb($result, $options_result = Array())
 	{
 		$repo = new Repository($result['id'], $result['display'], $result['accessType']);
@@ -124,6 +132,9 @@ class sqlConfDriver extends AbstractConfDriver {
 		$repo->enabled = $result['enabled'];
 		$repo->recycle = "";
 		$repo->setSlug($result['slug']);
+        if(isSet($result['groupPath']) && !empty($result['groupPath'])){
+            $repo->setGroupPath($result['groupPath']);
+        }
         $repo->isTemplate = intval($result['isTemplate']) == 1 ? true : false;
         $repo->setInferOptionsFromParent(intval($result['inferOptionsFromParent']) == 1 ? true : false);
 
@@ -149,23 +160,24 @@ class sqlConfDriver extends AbstractConfDriver {
 	{
 
 		$repository_row = Array(
-				'uuid' => $repository->getUniqueId(),
-				'parent_uuid' => $repository->getParentId(), 
-				'owner_user_id' => $repository->getOwner(), 
-				'child_user_id' => $repository->getUniqueUser(), 
-				'path' => $repository->options['PATH'],
-				'display' => $repository->getDisplay(),
-				'accessType' => $repository->getAccessType(),
-				'recycle' => $repository->recycle, 
-				'bcreate' => $repository->getCreate(),
-				'writeable' => $repository->isWriteable(),
-				'enabled' => $repository->isEnabled(),
-				'options' => $repository->options,
-				'slug'		=> $repository->getSlug(),
-                'isTemplate'=> $repository->isTemplate,
-                'inferOptionsFromParent'=> ($repository->getInferOptionsFromParent()?1:0)
+				'uuid'                      => $repository->getUniqueId(),
+				'parent_uuid'               => $repository->getParentId(),
+				'owner_user_id'             => $repository->getOwner(),
+				'child_user_id'             => $repository->getUniqueUser(),
+				'path'                      => $repository->options['PATH'],
+				'display'                   => $repository->getDisplay(),
+				'accessType'                => $repository->getAccessType(),
+				'recycle'                   => $repository->recycle,
+				'bcreate'                   => $repository->getCreate(),
+				'writeable'                 => $repository->isWriteable(),
+				'enabled'                   => $repository->isEnabled(),
+				'options'                   => $repository->options,
+                'groupPath'                 => $repository->getGroupPath(),
+				'slug'		                => $repository->getSlug(),
+                'isTemplate'                => $repository->isTemplate,
+                'inferOptionsFromParent'    => ($repository->getInferOptionsFromParent()?1:0)
 		);
-		
+
 		return $repository_row;
 	}
 	
@@ -174,13 +186,23 @@ class sqlConfDriver extends AbstractConfDriver {
 	 * Get a list of repositories
 	 * 
 	 * The list is an associative array of Array( 'uuid' => [Repository Object] );
-	 * 
-	 * @todo Create a repository object that lazy loads options, so that these list queries don't incur the multiple queries of options.
-	 * @see AbstractConfDriver#listRepositories()
+	 * @param AbstractAjxpUser $user
+     * @return Repository[]
+     * @see AbstractConfDriver#listRepositories()
 	 */
-	function listRepositories(){
+	function listRepositories($user = null){
 
-		$res = dibi::query('SELECT * FROM [ajxp_repo]');
+        if($user != null){
+            $acls = $user->mergedRole->listAcls();
+            $limitRepositories = array_keys($acls);
+            if(!count($limitRepositories)) return array();
+            foreach($limitRepositories as $i => $k) $limitRepositories[$i] = "'$k'";
+            $query = 'SELECT * FROM [ajxp_repo] WHERE uuid IN ('.implode(",",$limitRepositories).') ORDER BY [display] ASC';
+        }else{
+            $query = 'SELECT * FROM [ajxp_repo] ORDER BY [display] ASC';
+        }
+
+		$res = dibi::query($query);
 		$all = $res->fetchAll();
 		
 		$repositories = Array();
@@ -206,8 +228,8 @@ class sqlConfDriver extends AbstractConfDriver {
 	function getRepositoryById($repositoryId){
 		$res = dibi::query('SELECT * FROM [ajxp_repo] WHERE [uuid] = %s', $repositoryId);
 		
-		if (count($res) > 0) {
-            $repo_row = $res->fetchAll();
+        $repo_row = $res->fetchAll();
+        if (count($repo_row) > 0) {
             $repo_row = $repo_row[0];
 			$res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
 			$opts = $res_opts->fetchPairs('name', 'val');
@@ -226,17 +248,17 @@ class sqlConfDriver extends AbstractConfDriver {
 	 */	
 	function getRepositoryByAlias($repositorySlug){
 		$res = dibi::query('SELECT * FROM [ajxp_repo] WHERE [slug] = %s', $repositorySlug);
-		
-		if (count($res) > 0) {
-            $repo_row = $res->fetchAll();
+
+        $repo_row = $res->fetchAll();
+        if (count($repo_row) > 0) {
             $repo_row = $repo_row[0];
             $res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
             $opts = $res_opts->fetchPairs('name', 'val');
-			$repository = $this->repoFromDb($repo_row, $opts);
-			return $repository;
-		}
-		
-		return null;		
+            $repository = $this->repoFromDb($repo_row, $opts);
+            return $repository;
+        }
+
+        return null;
 	}
 	
 	
@@ -259,13 +281,7 @@ class sqlConfDriver extends AbstractConfDriver {
                     if(!is_string($v)){
                         $v = '$phpserial$'.serialize($v);
                     }
-					dibi::query('INSERT INTO [ajxp_repo_options]', 
-						Array(
-							'uuid' => $repositoryObject->getUniqueId(),
-							'name' => $k,
-							'val' => $v
-						)
-					);
+					dibi::query('INSERT INTO [ajxp_repo_options] ([uuid],[name],[val]) VALUES (%s,%s,%bin)', $repositoryObject->getUniqueId(), $k,$v);
 				}
 				/*
 				//set maximum rights to the repositorie's creator jcg
@@ -284,13 +300,7 @@ class sqlConfDriver extends AbstractConfDriver {
                     if(!is_string($v)){
                         $v = '$phpserial$'.serialize($v);
                     }
-					dibi::query('INSERT INTO [ajxp_repo_options]', 
-						Array(
-							'uuid' => $repositoryObject->getUniqueId(),
-							'name' => $k,
-							'val' => $v
-						)
-					);
+					dibi::query('INSERT INTO [ajxp_repo_options] ([uuid],[name],[val]) VALUES (%s,%s,%bin)',$repositoryObject->getUniqueId(),$k,$v);
 				}
 			}
 		
@@ -313,6 +323,17 @@ class sqlConfDriver extends AbstractConfDriver {
 			$result_opts = dibi::query('DELETE FROM [ajxp_repo_options] WHERE [uuid] = %s', $repositoryId);
 			$result_opts_rights = dibi::query('DELETE FROM [ajxp_user_rights] WHERE [repo_uuid] = %s',$repositoryId); //jcg
 
+            if($this->sqlDriver["driver"] == "sqlite3"){
+                $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %s GROUP BY [role_id]', '%"'.$repositoryId.'";s:%');
+            }else{
+                $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [serial_role] LIKE %s GROUP BY [role_id]', '%"'.$repositoryId.'";s:%');
+            }
+            $all = $children_results->fetchAll();
+            foreach ($all as $item){
+                $role = unserialize($item["serial_role"]);
+                $role->setAcl($repositoryId, "");
+                $this->updateRole($role);
+            }
 			
 		} catch (DibiException $e) {
 			return -1;
@@ -351,7 +372,11 @@ class sqlConfDriver extends AbstractConfDriver {
             $result[$item["login"]] = $this->createUserObject($item["login"]);
         }
         // NEW METHOD : SEARCH PERSONAL ROLE
-        $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [serial_role] LIKE %s GROUP BY [role_id]', '%"'.$repositoryId.'";s:%');
+        if($this->sqlDriver["driver"] == "sqlite3"){
+            $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %s GROUP BY [role_id]', '%"'.$repositoryId.'";s:%');
+        }else{
+            $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [serial_role] LIKE %s GROUP BY [role_id]', '%"'.$repositoryId.'";s:%');
+        }
         $all = $children_results->fetchAll();
         foreach ($all as $item){
             $rId = $item["role_id"];
@@ -419,14 +444,23 @@ class sqlConfDriver extends AbstractConfDriver {
 		return $roles;
 		
 	}
-	
-	function saveRoles($roles){
+
+    /**
+     * @param AJXP_Role[] $roles
+     */
+    function saveRoles($roles){
 		dibi::query("DELETE FROM [ajxp_roles]");
 		foreach ($roles as $roleId => $roleObject){
-			dibi::query("INSERT INTO [ajxp_roles]", array(
-				'role_id' => $roleId, 
-				'serial_role' => serialize($roleObject))
-				);
+            if($this->sqlDriver["driver"] == "sqlite3"){
+                $repos = $roleObject->listAcls();
+                $repoString = serialize($repos);
+                dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories]) VALUES (%s, %bin, %s)", $roleId, serialize($roleObject), $repoString);
+            }else{
+                dibi::query("INSERT INTO [ajxp_roles]", array(
+                    'role_id' => $roleId,
+                    'serial_role' => serialize($roleObject))
+                    );
+            }
 		}
 	}
 
@@ -435,10 +469,16 @@ class sqlConfDriver extends AbstractConfDriver {
      */
     function updateRole($role, $userObject = null){
         dibi::query("DELETE FROM [ajxp_roles] WHERE [role_id]=%s", $role->getId());
-        dibi::query("INSERT INTO [ajxp_roles]", array(
-                'role_id' => $role->getId(),
-                'serial_role' => serialize($role))
-        );
+        if($this->sqlDriver["driver"] == "sqlite3"){
+            $repos = $role->listAcls();
+            $repoString = serialize($repos);
+            dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories]) VALUES (%s, %bin,%s)", $role->getId(), serialize($role), $repoString);
+        }else{
+            dibi::query("INSERT INTO [ajxp_roles]", array(
+                    'role_id' => $role->getId(),
+                    'serial_role' => serialize($role))
+            );
+        }
     }
 
     /**
@@ -454,7 +494,7 @@ class sqlConfDriver extends AbstractConfDriver {
 	
 	function countAdminUsers(){
 		$rows = dibi::query("SELECT [login] FROM ajxp_user_rights WHERE [repo_uuid] = %s AND [rights] = %s", "ajxp.admin", "1");
-		return count($rows);
+		return count($rows->fetchAll());
 	}
 
     /**
@@ -483,7 +523,17 @@ class sqlConfDriver extends AbstractConfDriver {
 
 
     function deleteGroup($groupPath){
-        dibi::query("DELETE FROM [ajxp_groups] WHERE [groupPath] = %s", $groupPath);
+        // Delete users of this group, as well as subgroups
+        $ids = array();
+		$res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %s ORDER BY [login] ASC", $groupPath."%");
+		$rows = $res->fetchAll();
+        $subUsers = array();
+        foreach($rows as $row){
+            $this->deleteUser($row["login"], $subUsers);
+            dibi::query("DELETE FROM [ajxp_users] WHERE [login] = %s", $row["login"]);
+        }
+        dibi::query("DELETE FROM [ajxp_groups] WHERE [groupPath] LIKE %s", $groupPath."%");
+        dibi::query('DELETE FROM [ajxp_roles] WHERE [role_id] = %s', 'AJXP_GRP_'.$groupPath);
     }
 
     /**
@@ -491,10 +541,16 @@ class sqlConfDriver extends AbstractConfDriver {
      * @return string[]
      */
     function getChildrenGroups($baseGroup = "/"){
-        $res = dibi::query("SELECT * FROM [ajxp_groups] WHERE [groupPath] LIKE %s", $baseGroup."%");
+        $searchGroup = $baseGroup;
+        if($baseGroup[strlen($baseGroup)-1] != "/") $searchGroup.="/";
+        $res = dibi::query("SELECT * FROM [ajxp_groups] WHERE [groupPath] LIKE %s AND [groupPath] NOT LIKE %s", $searchGroup."%", $searchGroup."%/%");
         $pairs = $res->fetchPairs("groupPath", "groupLabel");
         foreach($pairs as $path => $label){
             if(strlen($path) <= strlen($baseGroup)) unset($pairs[$path]);
+            if($baseGroup != "/"){
+                unset($pairs[$path]);
+                $pairs[substr($path, strlen($baseGroup))] = $label;
+            }
         }
         return $pairs;
     }
@@ -523,6 +579,7 @@ class sqlConfDriver extends AbstractConfDriver {
             dibi::query('DELETE FROM [ajxp_user_rights] WHERE [login] = %s', $userId);
             dibi::query('DELETE FROM [ajxp_user_prefs] WHERE [login] = %s', $userId);
             dibi::query('DELETE FROM [ajxp_user_bookmarks] WHERE [login] = %s', $userId);
+            dibi::query('DELETE FROM [ajxp_roles] WHERE [role_id] = %s', 'AJXP_USR_/'.$userId);
             dibi::commit();
             foreach ($children as $childId){
                 $this->deleteUser($childId, $deletedSubUsers);
@@ -549,7 +606,8 @@ class sqlConfDriver extends AbstractConfDriver {
             throw new Exception("Unsupported format type ".$dataType);
         }
         dibi::query("DELETE FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id]=%s", $storeID, $dataID);
-        dibi::query("INSERT INTO [ajxp_simple_store]", $values);
+        dibi::query("INSERT INTO [ajxp_simple_store] ([object_id],[store_id],[serialized_data],[binary_data],[related_object_id]) VALUES (%s,%s,%bin,%bin,%s)",
+            $dataID, $storeID, $values["serialized_data"], $values["binary_data"], $values["related_object_id"]);
     }
 
     protected function simpleStoreClear($storeID, $dataID){
@@ -574,7 +632,7 @@ class sqlConfDriver extends AbstractConfDriver {
     }
 
     protected function binaryContextToStoreID($context){
-        $storage = null;
+        $storage = "binaries";
         if(isSet($context["USER"])){
             $storage ="users_binaries.".$context["USER"];
         }else if(isSet($context["REPO"])){
@@ -634,4 +692,9 @@ class sqlConfDriver extends AbstractConfDriver {
         }
     }
 
+
+    public function installSQLTables($param){
+        $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
+        return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+    }
 }

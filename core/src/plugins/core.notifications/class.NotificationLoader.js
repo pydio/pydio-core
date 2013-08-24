@@ -22,24 +22,46 @@ Class.create("NotificationLoader", {
 
     ajxpNode : null,
     pFactory : null,
-    timer   : 30,
+    timer   : 60,
     pe  : null,
+    menuItems : null,
+    hasAlerts : false,
+    lastEventID:null,
+    lastAlertID:null,
 
     initialize: function(){
+
+        if(window.ajxpMinisite) return;
+
         var rP = new RemoteNodeProvider();
         rP.initProvider({get_action:'get_my_feed', format:'xml', connexion_discrete:true});
         this.ajxpNode = new AjxpNode("/");
         this.ajxpNode._iNodeProvider = rP;
         this.pFactory = new PreviewFactory();
         this.pFactory.sequencialLoading = false;
-        this.pFactory.setThumbSize(16);
+        this.pFactory.setThumbSize(22);
+        this.ajxpNode.observe('loaded', function(){
+            this.menuItems = this.childrenToMenuItems();
+        }.bind(this));
         this.pe = new PeriodicalExecuter(function(){
             if(window.ajaxplorer.user){
                 this.ajxpNode.reload();
             }
         }.bind(this), this.timer);
+        ajaxplorer.observe("server_message", function(message){
+            if(XPathSelectSingleNode(message, '//reload_user_feed') && ajaxplorer.user){
+                this.ajxpNode.reload();
+            }
+        }.bind(this));
+        document.observe("ajaxplorer:repository_list_refreshed", function(){
+            window.setTimeout(function(){
+                this.ajxpNode.reload();
+            }.bind(this), 100);
+        }.bind(this));
+        this.ajxpNode.reload();
     },
 
+    /*
     childrenToMenu: function(menuContainer){
         this.ajxpNode.getChildren().each(function(el){
            var div = new Element('a');
@@ -55,21 +77,135 @@ Class.create("NotificationLoader", {
         }.bind(this) );
 
     },
+    */
 
     childrenToMenuItems : function(){
         var menuItems = $A([]);
         var eventIndex = 0;
+        var alerts = false;
+        var parentAjxpNode = this.ajxpNode;
+        var alertsCounts = 0;
+        this.hasAlerts = false;
+        var newNotifs = $A();
+        var currentLastAlert = 0, currentLastEvent = 0;
+
         this.ajxpNode.getChildren().each(function(el){
+
+            // REPLACE REAL PATH NOW
+            el._path = el.getMetadata().get("real_path");
+            el.getMetadata().set("filename", el._path);
+            var isAlert = el.getMetadata().get("event_is_alert") ? true : false;
+            if(alerts && !isAlert){
+                alerts = false;
+                this.hasAlerts = true;
+                menuItems.push({separator:true, menuTitle:MessageHash['notification_center.5']});
+            }
+            if(isAlert){
+                if(parseInt(el.getMetadata().get("event_occurence")) > 0){
+                    alertsCounts += parseInt(el.getMetadata().get("event_occurence"));
+                }else{
+                    alertsCounts ++;
+                }
+                alerts = true;
+            }
+            var block = '<div class="notif_event_label">'+el.getLabel()+'</div>';
+            var detail = '';
+            if(el.getMetadata().get('event_repository_label')){
+                detail += '<div class="notif_event_repository">'+ el.getMetadata().get('event_repository_label') + '</div>';
+            }
+            detail += '<div class="notif_event_description">'+ el.getMetadata().get('event_description') + '</div>';
+            detail += '<div class="notif_event_date">'+ el.getMetadata().get('event_date') + '</div>';
+            block += detail;
+            block = '<div class="notif_event_container">'+block+'</div><br style="clear:left;"/>';
+            var moreActions = $A([{
+                name:MessageHash["notification_center.6"],
+                icon_class:"icon-circle-arrow-right",
+                callback:function(e){
+                    window.ajaxplorer.goTo(el);
+                }
+            }]);
+            if(isAlert){
+                var alertID = parseInt(el.getMetadata().get("alert_id"));
+                moreActions.push({
+                    name:MessageHash["notification_center.7"],
+                    icon_class:"icon-remove-sign",
+                    callback:function(e){
+                        Event.stop(e);
+                        Effect.Fade(e.target.up('li'));
+                        var conn = new Connexion();
+                        conn.onComplete = function(){
+                            parentAjxpNode.reload();
+                        };
+                        var params = {
+                            get_action:'dismiss_user_alert',
+                            alert_id:alertID
+                        };
+                        if(el.getMetadata().get("event_occurence")){
+                            params.occurrences = el.getMetadata().get("event_occurence");
+                        }
+                        conn.setParameters(params);
+                        conn.sendAsync();
+                    }
+                });
+                if(this.lastAlertID && alertID > this.lastAlertID ){
+                    newNotifs.push({
+                        title:el.getLabel(),
+                        body :detail.stripTags()
+                    });
+                }
+                currentLastAlert = Math.max(alertID, currentLastAlert);
+            }else{
+                var eventID = parseInt(el.getMetadata().get("event_id"));
+                if(this.lastEventID && eventID > this.lastEventID ){
+                    newNotifs.push({
+                        title:el.getLabel(),
+                        body :detail.stripTags()
+                    });
+                }
+                currentLastEvent = Math.max(eventID, currentLastEvent);
+            }
+            this.lastAlertID = currentLastAlert;
+            this.lastEventID = currentLastEvent;
             menuItems.push({
                 id: "event_" + eventIndex,
-                name:el.getMetadata().get("event_description"),
-                alt:el.getMetadata().get("event_description").stripTags(),
+                name:block,
+                alt: el.getMetadata().get("event_description_long").stripTags(),
                 pFactory : this.pFactory,
                 ajxpNode:el,
-                callback:function(e){}
+                callback:function(e){
+                    Event.stop(e);
+                },
+                moreActions: moreActions
             });
             eventIndex ++;
         }.bind(this) );
+        var button = $('get_my_feed_button');
+        if(button){
+            var badge = button.down('.badge');
+            if(!badge){
+                badge = new Element('span', {className:'badge'});
+                button.down('.icon-caret-down,img').insert({before: badge});
+            }
+            if(alertsCounts){
+                badge.update(alertsCounts);
+                badge.show();
+            }else{
+                badge.hide();
+            }
+        }
+        if(window.Notification && newNotifs.size()){
+            newNotifs.each(function(obje){
+                new Notification(
+                    obje.title,
+                    {
+                        body: obje.body,
+                        icon: 'plugins/gui.ajax/res/themes/vision/images/mimes/64/mime_empty.png',
+                        tag: 'ajaxplorer',
+                        dir: 'auto',
+                        lang: ajaxplorer.currentLanguage
+                    });
+            });
+        }
         return menuItems;
     },
 
@@ -78,7 +214,7 @@ Class.create("NotificationLoader", {
         action.builderMenuItems = $A([]);
         action.builderMenuItems.push({
             id:'event_loading',
-            name:'Loading ...',
+            name:MessageHash[466],
             alt:'',
             className:'loading_input',
             image:resolveImageSource('images/actions/22/hdd_external_unmount.png', '',  22),
@@ -92,19 +228,25 @@ Class.create("NotificationLoader", {
             if(!menuContainer) {
                 return;
             }
-            this.ajxpNode.observe("loaded", function(){
-                protoMenu.options.menuItems = this.childrenToMenuItems();
-                protoMenu.refreshList();
-                protoMenu.container.setStyle(protoMenu.computeAnchorOffset());
-            }.bind(this));
             if(!this.ajxpNode.isLoaded()){
+                this.ajxpNode.observe("loaded", function(){
+                    protoMenu.options.menuItems = this.menuItems;
+                    protoMenu.options.menuTitle = this.hasAlerts ? MessageHash['notification_center.3'] : MessageHash['notification_center.5'];
+                    protoMenu.refreshList();
+                    this.refreshProtoMenuContainerPosition(protoMenu);
+                }.bind(this));
                 this.ajxpNode.load();
+            }else{
+                protoMenu.options.menuItems = this.menuItems;
+                protoMenu.refreshList();
+                this.refreshProtoMenuContainerPosition(protoMenu);
             }
         }.bind(this);
         protoMenu.options = Object.extend(protoMenu.options, {
             position: "bottom middle",
             menuMaxHeight: 350,
             topOffset: 14,
+            menuTitle: this.hasAlerts ? MessageHash['notification_center.3'] : MessageHash['notification_center.5'],
             beforeShow: function(){
                 protoMenu.container.removeClassName('panelHeaderMenu');
                 protoMenu.container.removeClassName('toolbarmenu');
@@ -116,7 +258,7 @@ Class.create("NotificationLoader", {
                     protoMenu.options.menuItems = $A([]);
                     protoMenu.options.menuItems.push({
                         id:'event_loading',
-                        name:'Loading ...',
+                        name:MessageHash[466],
                         alt:'',
                         image:resolveImageSource('images/actions/22/hdd_external_unmount.png', '',  22),
                         icon_class:'icon-spinner event_loading',
@@ -138,10 +280,17 @@ Class.create("NotificationLoader", {
                 protoMenu.container.addClassName('rootDirChooser');
                 protoMenu.container.addClassName('events_menu');
                 protoMenu.container.id = "feed_content";
-                protoMenu.container.setStyle(protoMenu.computeAnchorOffset());
+                this.refreshProtoMenuContainerPosition(protoMenu);
                 loaderFunc();
-            }, 50);
+            }.bind(this), 50);
         }
+    },
+
+    refreshProtoMenuContainerPosition: function(protoMenu){
+        var dim = protoMenu.container.getDimensions();
+        var offset = protoMenu.computeAnchorOffset();
+        protoMenu.container.setStyle(offset);
+        protoMenu.correctWindowClipping(protoMenu.container, offset, dim);
     }
 
 });

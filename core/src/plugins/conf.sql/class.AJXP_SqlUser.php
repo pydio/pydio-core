@@ -35,7 +35,8 @@ require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
  * 
  * 		
  * @author ebrosnan
- *
+ * @package AjaXplorer_Plugins
+ * @subpackage Conf
  */
 class AJXP_SqlUser extends AbstractAjxpUser
 {
@@ -196,11 +197,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
 			// The repository supplied does not exist, so insert the right.
 			} else {
 	
-				dibi::query('INSERT INTO [ajxp_user_prefs]', Array(
-					'login' => $this->getId(),
-					'name' => $prefName,
-					'val' => $prefValue		
-				));
+				dibi::query('INSERT INTO [ajxp_user_prefs] ([login],[name],[val]) VALUES (%s, %s, %bin)', $this->getId(),$prefName,$prefValue);
 				
 				$this->log('INSERT PREFERENCE: [Login]: '.$this->getId().' [Preference]:'.$prefName.' [Value]:'.$prefValue);
 				$this->prefs[$prefName] = $prefValue;
@@ -242,7 +239,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
 	 */
 	function addBookmark($path, $title="", $repId = -1){
 		if(!isSet($this->bookmarks)) $this->bookmarks = array();
-		if($repId == -1) $repId = ConfService::getCurrentRootDirIndex();
+		if($repId == -1) $repId = ConfService::getCurrentRepositoryId();
 		if($title == "") $title = basename($path);
 		if(!isSet($this->bookmarks[$repId])) $this->bookmarks[$repId] = array();
 		foreach ($this->bookmarks[$repId] as $v)
@@ -276,7 +273,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
 	 * @see AbstractAjxpUser#removeBookmark($path)
 	 */
 	function removeBookmark($path){
-		$repId = ConfService::getCurrentRootDirIndex();
+		$repId = ConfService::getCurrentRepositoryId();
 		if(isSet($this->bookmarks) 
 			&& isSet($this->bookmarks[$repId])
 			&& is_array($this->bookmarks[$repId]))
@@ -309,7 +306,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
 	 * @see AbstractAjxpUser#renameBookmark($path, $title)
 	 */
 	function renameBookmark($path, $title){
-		$repId = ConfService::getCurrentRootDirIndex();
+		$repId = ConfService::getCurrentRepositoryId();
 		if(isSet($this->bookmarks) 
 			&& isSet($this->bookmarks[$repId])
 			&& is_array($this->bookmarks[$repId]))
@@ -461,6 +458,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
         foreach($this->rights as $rightKey => $rightValue){
             if($rightKey == "ajxp.roles"){
                 if(is_array($rightValue) && count($rightValue)){
+                    $rightValue = $this->filterRolesForSaving($rightValue);
                     $rightValue = '$phpserial$'.serialize($rightValue);
                 }else{
                     continue;
@@ -516,8 +514,25 @@ class AJXP_SqlUser extends AbstractAjxpUser
         return AJXP_Utils::saveSerialFile($dirPath."/".$id."/temp-".$key.".ser", $value);
 	}
 
-    function setGroupPath($groupPath){
-        $this->groupPath = $groupPath;
+    function setGroupPath($groupPath, $update = false){
+        if($update &&  isSet($this->groupPath) && $groupPath != $this->groupPath){
+            // Update Shared Users groups as well
+            $res = dibi::query("SELECT u.login FROM ajxp_users AS u, ajxp_user_rights AS p WHERE u.login=p.login AND p.repo_uuid = %s AND p.rights = %s AND u.groupPath != %s ", "ajxp.parent_user", $this->getId(), $groupPath);
+            foreach ($res as $row){
+                $userId = $row->login;
+                // UPDATE USER GROUP AND ROLES
+                $u = ConfService::getConfStorageImpl()->createUserObject($userId);
+                $u->setGroupPath($groupPath);
+                $r = $u->getRoles();
+                // REMOVE OLD GROUP ROLES
+                foreach(array_keys($r) as $role){
+                    if(strpos($role, "AJXP_GRP_/") === 0) $u->removeRole($role);
+                }
+                $u->recomputeMergedRole();
+                $u->save("superuser");
+            }
+        }
+        parent::setGroupPath($groupPath);
         dibi::query('UPDATE [ajxp_users] SET ', Array('groupPath'=>$groupPath), 'WHERE [login] = %s', $this->getId());
         $this->log('UPDATE GROUP: [Login]: '.$this->getId().' [Group]:'.$groupPath);
     }

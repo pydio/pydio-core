@@ -37,7 +37,7 @@ Class.create("RoleEditor", AbstractEditor, {
         // INIT TAB
         this.element.down("#pane-infos").setStyle({position:"relative"});
         $("pane-infos").resizeOnShow = function(tab){
-            fitHeightToBottom($("pane-infos"), $("role_edit_box"));
+            fitHeightToBottom($("pane-infos"), $("role_edit_box"), Prototype.Browser.IE ? 40 : 0);
         }
         $("pane-actions").resizeOnShow = function(tab){
             fitHeightToBottom($("actions-selected"), $("pane-actions"), 20);
@@ -96,27 +96,31 @@ Class.create("RoleEditor", AbstractEditor, {
         customFieldsHash.each(function(pair){
             var pName = pair.key.replace("ROLE_CUSTOM_", "");
             if(pName.endsWith("_ajxptype") || pName.endsWith("_replication") || pName.endsWith("_checkbox")) return;
-            var parts = pName.split("/");
-            var repoScope = parts[0];
-            var paramName = parts[2];
-            var pluginId = parts[1];
-            // update roleWrite
-            if(!this.roleWrite.PARAMETERS[repoScope]) this.roleWrite.PARAMETERS[repoScope] = {};
-            if(!this.roleWrite.PARAMETERS[repoScope][pluginId]) this.roleWrite.PARAMETERS[repoScope][pluginId] = {};
-            this.roleWrite.PARAMETERS[repoScope][pluginId][paramName] = pair.value;
-            // update FORMS
-            if(!fullPostData['FORMS'][repoScope]) fullPostData['FORMS'][repoScope] = {};
-            if(!fullPostData['FORMS'][repoScope][pluginId]) fullPostData['FORMS'][repoScope][pluginId] = $H({});
-            fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName, pair.value);
-            if(customFieldsHash.get(pName + "_ajxptype")){
-                fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName+"_ajxptype", customFieldsHash.get(pName + "_ajxptype"));
+            var objectValue = pair.value.evalJSON();
+            var repoScope = pName;
+            for(var pluginId in objectValue){
+                var pluginData = objectValue[pluginId];
+                for(var paramName in pluginData){
+                    // update roleWrite
+                    if(!this.roleWrite.PARAMETERS[repoScope]) this.roleWrite.PARAMETERS[repoScope] = {};
+                    if(!this.roleWrite.PARAMETERS[repoScope][pluginId]) this.roleWrite.PARAMETERS[repoScope][pluginId] = {};
+                    this.roleWrite.PARAMETERS[repoScope][pluginId][paramName] = pluginData[paramName];
+                    // update FORMS
+                    if(!fullPostData['FORMS'][repoScope]) fullPostData['FORMS'][repoScope] = {};
+                    if(!fullPostData['FORMS'][repoScope][pluginId]) fullPostData['FORMS'][repoScope][pluginId] = $H({});
+                    fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName, pluginData[paramName]);
+                    if(customFieldsHash.get(pName + "_ajxptype")){
+                        fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName+"_ajxptype", customFieldsHash.get(pName + "_ajxptype"));
+                    }
+                    if(customFieldsHash.get(pName + "_checkbox")){
+                        fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName+"_checkbox", customFieldsHash.get(pName + "_checkbox"));
+                    }
+                    if(customFieldsHash.get(pName + "_replication")){
+                        fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName+"_replication", customFieldsHash.get(pName + "_replication"));
+                    }
+                }
             }
-            if(customFieldsHash.get(pName + "_checkbox")){
-                fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName+"_checkbox", customFieldsHash.get(pName + "_checkbox"));
-            }
-            if(customFieldsHash.get(pName + "_replication")){
-                fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName+"_replication", customFieldsHash.get(pName + "_replication"));
-            }
+
         }.bind(this));
 
         fullPostData['ROLE'] = this.roleWrite;
@@ -258,6 +262,7 @@ Class.create("RoleEditor", AbstractEditor, {
 
     buildInfoPane : function(node, scope){
         var f = this.getFormManager();
+        this.element.ajxpPaneObject = this;
         if(scope == "user"){
             // MAIN INFO
             var rolesChoicesString = this.roleData.ALL.ROLES.join(",");
@@ -401,6 +406,8 @@ Class.create("RoleEditor", AbstractEditor, {
             ];
             defs = $A(defs);
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);
+            // UPDATE MAIN HEADER
+            this.element.down("span.header_label").update(this.roleData.GROUP.LABEL);
 
             // REMOVE BUTTONS
             this.element.down("#pane-infos").down("#account_actions").remove();
@@ -439,11 +446,7 @@ Class.create("RoleEditor", AbstractEditor, {
         }
 
 
-        // UPDATE FORMS ELEMENTS
-        this.element.down("#pane-infos").select("div.SF_element").each(function(element){
-            element.select("input,textarea,select").invoke("observe", "change", this.setDirty.bind(this));
-            element.select("input,textarea").invoke("observe", "keydown", this.setDirty.bind(this));
-        }.bind(this) );
+        f.observeFormChanges(this.element,  this.setDirty.bind(this));
     },
 
     initJSONResponse : function(responseJSON){
@@ -563,6 +566,7 @@ Class.create("RoleEditor", AbstractEditor, {
    		var rightsTable = rightsPane.down('#acls-selected');
         rightsTable.update("");
         var repositories = this.roleData.ALL.REPOSITORIES;
+        if(!Object.keys(repositories).length) return;
         //repositories.sortBy(function(element) {return XPathGetSingleNodeText(element, "label");});
         //var defaultRepository = XPathGetSingleNodeText(xmlData, '//pref[@name="force_default_repository"]/@value');
    		for(var repoId in repositories){

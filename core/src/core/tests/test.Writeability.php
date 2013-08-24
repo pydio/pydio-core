@@ -22,16 +22,18 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 require_once('../classes/class.AbstractTest.php');
 
 /**
- * @package info.ajaxplorer.test
  * Check the various plugins folders writeability
+ * @package AjaXplorer
+ * @subpackage Tests
  */
 class Writeability extends AbstractTest
 {
     function Writeability() { parent::AbstractTest("Required writeable folder", "One of the following folder should be writeable and is not : "); }
     function doTest() 
     { 
-    	include(AJXP_CONF_PATH."/bootstrap_plugins.php");
+    	//include(AJXP_CONF_PATH."/bootstrap_plugins.php");
     	$checks = array();
+        /*
     	if(isSet($PLUGINS["CONF_DRIVER"])){
     		$confDriver = $PLUGINS["CONF_DRIVER"];
     		if(isSet($confDriver["OPTIONS"]) && isSet($confDriver["OPTIONS"]["REPOSITORIES_FILEPATH"])){
@@ -51,8 +53,10 @@ class Writeability extends AbstractTest
     		if(isset($PLUGINS["LOG_DRIVER"]["OPTIONS"]) && isSet($PLUGINS["LOG_DRIVER"]["OPTIONS"]["LOG_PATH"])){
     			$checks[] = $PLUGINS["LOG_DRIVER"]["OPTIONS"]["LOG_PATH"];
     		}
-    	}    
+    	}
+        */
     	$checks[] = AJXP_CACHE_DIR;	
+    	$checks[] = AJXP_DATA_PATH;
     	$checked = array();
     	$success = true;
     	foreach ($checks as $check){

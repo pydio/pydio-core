@@ -20,6 +20,10 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+/**
+ * @package AjaXplorer
+ * @subpackage Core
+ */
 interface AjxpGroupPathProvider {
 
 

@@ -30,6 +30,9 @@ Class.create("AjxpMqObserver", {
 
     initialize : function(){
         "use strict";
+
+        if(window.ajxpMinisite) return;
+
         this.clientId = window.ajxpBootstrap.parameters.get("SECURE_TOKEN");
         var configs = ajaxplorer.getPluginConfigs("mq");
 
@@ -50,7 +53,11 @@ Class.create("AjxpMqObserver", {
                         this.ws.close();
 
                     } else {
-                        this.ws.send("register:" + repoId);
+                        try{
+                            this.ws.send("register:" + repoId);
+                        }catch(e){
+                            if(console) console.log('Error while sending WebSocket message: '+ e.message);
+                        }
                     }
                 }else{
                     if(repoId){
@@ -99,7 +106,7 @@ Class.create("AjxpMqObserver", {
                 conn.discrete = true;
                 conn.sendAsync();
 
-                this.pe = new PeriodicalExecuter(this.consumeChannel.bind(this), 5);
+                this.pe = new PeriodicalExecuter(this.consumeChannel.bind(this), configs.get('POLLER_FREQUENCY') || 5);
 
             }
 
@@ -117,8 +124,10 @@ Class.create("AjxpMqObserver", {
         }));
         conn.discrete = true;
         conn.onComplete = function(transport){
-            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
-            ajaxplorer.notify("server_message", transport.responseXML);
+            if(transport.responseXML){
+                ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                ajaxplorer.notify("server_message", transport.responseXML);
+            }
         };
         conn.sendAsync();
     }

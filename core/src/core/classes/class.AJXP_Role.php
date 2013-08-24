@@ -26,6 +26,10 @@ define('AJXP_REPO_SCOPE_ALL',"AJXP_REPO_SCOPE_ALL");
 define('AJXP_REPO_SCOPE_SHARED',"AJXP_REPO_SCOPE_SHARED");
 define('AJXP_PLUGINS_SCOPE_ALL',"plugin_all");
 
+/**
+ * @package AjaXplorer
+ * @subpackage Core
+ */
 class AJXP_Role implements AjxpGroupPathProvider
 {
 
@@ -187,12 +191,12 @@ class AJXP_Role implements AjxpGroupPathProvider
     public function filterParameterValue($pluginId, $parameterName, $repositoryId, $parameterValue){
         if(isSet($this->parameters[AJXP_REPO_SCOPE_ALL][$pluginId][$parameterName])){
             $v = $this->parameters[AJXP_REPO_SCOPE_ALL][$pluginId][$parameterName];
-            if($v == AJXP_VALUE_CLEAR) return "";
+            if($v === AJXP_VALUE_CLEAR) return "";
             else return $v;
         }
         if(isSet($this->parameters[$repositoryId][$pluginId][$parameterName])){
             $v = $this->parameters[$repositoryId][$pluginId][$parameterName];
-            if($v == AJXP_VALUE_CLEAR) return "";
+            if($v === AJXP_VALUE_CLEAR) return "";
             else return $v;
         }
         return $parameterValue;
@@ -232,7 +236,7 @@ class AJXP_Role implements AjxpGroupPathProvider
         if(isSet($this->actions[AJXP_REPO_SCOPE_ALL])){
             $actions = $this->actions[AJXP_REPO_SCOPE_ALL];
         }
-        if(isSet($this->actions[AJXP_REPO_SCOPE_SHARED]) && $repository->hasParent()){
+        if($repository != null && isSet($this->actions[AJXP_REPO_SCOPE_SHARED]) && $repository->hasParent()){
             $actions = array_merge($actions, $this->actions[AJXP_REPO_SCOPE_SHARED]);
         }
         if($repository != null && isSet($this->actions[$repository->getId()])){
@@ -282,6 +286,10 @@ class AJXP_Role implements AjxpGroupPathProvider
         foreach($newParams as $repoId => $data){
             foreach ($data as $pluginId => $param) {
                 foreach($param as $parameterName => $parameterValue){
+                    if($parameterValue === true || $parameterValue === false){
+                        $newRole->setParameterValue($pluginId, $parameterName, $parameterValue, $repoId);
+                        continue;
+                    }
                     if($parameterValue == AJXP_VALUE_CLEAR) continue;
                     $newRole->setParameterValue($pluginId, $parameterName, $parameterValue, $repoId);
                 }
@@ -309,15 +317,18 @@ class AJXP_Role implements AjxpGroupPathProvider
      */
     function setArrayValue(){
         $args = func_get_args();
-        $arr = array_shift($args);
-        $value = array_pop($args);
+        $arr = $args[0]; //array_shift($args);
+        $argMaxIndex = count($args)-1;
+        $value = $args[$argMaxIndex]; //array_pop($args);
         $current = &$arr;
         foreach ($args as $index => $key){
-            if($index < count($args)-1) {
-                if(!is_array($current[$key])) $current[$key] = array();
+            if($index == 0) continue;
+            if($index < $argMaxIndex -1) {
+                if(!isset($current[$key])) $current[$key] = array();
                 $current = &$current[$key];
             }else{
                 $current[$key] = $value;
+                break;
             }
         }
         return $arr;

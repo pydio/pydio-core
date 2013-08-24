@@ -97,7 +97,7 @@ Class.create("BackgroundManager", {
     updatePanelMessage : function(message){
         var imgString = '<img src="'+ajxpResourcesFolder+'/images/loadingImage.gif" width="16" align="absmiddle">';
         this.panel.update(imgString+' '+message);
-        this.panel.show();
+        Effect.Appear(this.panel);
     },
 
 	/**
@@ -172,7 +172,8 @@ Class.create("BackgroundManager", {
 	 */
 	finished:function(){		
 		this.working = false;
-		this.panel.hide();
+		//this.panel.hide();
+        Effect.SwitchOff(this.panel);
 	},
 	
 	/**
@@ -181,7 +182,8 @@ Class.create("BackgroundManager", {
 	makeCloseLink:function(){
 		var link = new Element('a', {href:'#'}).update('Close').observe('click', function(e){
 			Event.stop(e);
-			this.panel.hide();
+			//this.panel.hide();
+            Effect.SwitchOff(this.panel);
 		}.bind(this));
 		return link;
 	},

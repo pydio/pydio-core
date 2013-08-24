@@ -9,7 +9,7 @@
     </client_settings>
 	<registry_contributions>
 		<actions>
-			<action name="audio_proxy">
+			<action name="audio_proxy" contentTypedProvider="true">
 				<processing>
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>

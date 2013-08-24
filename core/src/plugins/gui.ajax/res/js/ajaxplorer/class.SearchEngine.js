@@ -66,7 +66,8 @@ Class.create("SearchEngine", AjxpPane, {
         }
 		$super($(mainElementName), this._ajxpOptions);
         this.updateSearchModeFromRegistry();
-        document.observe("ajaxplorer:registry_loaded", this.updateSearchModeFromRegistry.bind(this));
+        this.searchModeObserver = this.updateSearchModeFromRegistry.bind(this);
+        document.observe("ajaxplorer:registry_loaded", this.searchModeObserver);
 
         this._dataModel = new AjxpDataModel(true);
         this._rootNode = new AjxpNode("/", false, "Results", "folder.png");
@@ -292,6 +293,7 @@ Class.create("SearchEngine", AjxpPane, {
             this.htmlElement.update('');
         }
         document.stopObserving("ajaxplorer:repository_list_refreshed", this.refreshObserver);
+        document.stopObserving("ajaxplorer:registry_loaded", this.searchModeObserver);
 		this.htmlElement = null;
         if(ajxpId && window[ajxpId]){
             try {delete window[ajxpId];}catch(e){}
@@ -305,13 +307,12 @@ Class.create("SearchEngine", AjxpPane, {
 	 * @param checked Boolean
 	 */
 	initMetaOption : function(element, optionValue, optionLabel, checked){
-		var option = new Element('meta_opt', {value:optionValue}).update(optionLabel);
-		if(checked) option.addClassName('checked icon-ok');
+		var option = new Element('span', {value:optionValue, className:'search_meta_opt'}).update('<span class="icon-ok"></span>'+ optionLabel);
+		if(checked) option.addClassName('checked');
 		if(element.childElements().length) element.insert(', ');
 		element.insert(option);
 		option.observe('click', function(event){
 			option.toggleClassName('checked');
-			option.toggleClassName('icon-ok');
 		});
 		this.metaOptions.push(option);
 	},
@@ -367,7 +368,7 @@ Class.create("SearchEngine", AjxpPane, {
 		var folder = ajaxplorer.getContextNode().getPath();
 		if(folder == "/") folder = "";
 		window.setTimeout(function(){
-			this.searchFolderContent(folder);
+			this.searchFolderContent(folder, ajaxplorer.getContextNode().getMetadata().get("remote_indexation"));
 		}.bind(this), 0);		
 	},
 	/**
@@ -392,24 +393,8 @@ Class.create("SearchEngine", AjxpPane, {
                 this.resultsDraggable = new Draggable(this._ajxpOptions.toggleResultsVisibility, {
                     handle:"panelHeader",
                     zindex:999,
-                    starteffect : function(element){
-                        if(element.shadows) {
-                            Shadower.deshadow(element);
-                            element.hadShadow = true;
-                        }
-                    },
-                    endeffect : function(element){
-                        if(element.hadShadow){
-                            Shadower.shadow(element,{
-                                distance: 4,
-                                angle: 130,
-                                opacity: 0.5,
-                                nestedShadows: 3,
-                                color: '#000000',
-                                shadowStyle:{display:'block'}
-                            });
-                        }
-                    }
+                    starteffect : function(element){},
+                    endeffect : function(element){}
                 });
             }
             if($(this._ajxpOptions.toggleResultsVisibility).down("span.close_results")){
@@ -531,17 +516,17 @@ Class.create("SearchEngine", AjxpPane, {
 	 * Put a folder to search in the queue
 	 * @param path String
 	 */
-	appendFolderToQueue : function(path){
-		this._queue.push(path);
+	appendFolderToQueue : function(path, remoteIndexation){
+		this._queue.push({path:path,remoteIndexation:remoteIndexation?remoteIndexation:false});
 	},
 	/**
 	 * Process the next element of the queue, or finish
 	 */
 	searchNext : function(){
 		if(this._queue.length){
-			var path = this._queue.first();
+			var element = this._queue.first();
 			this._queue.shift();
-			this.searchFolderContent(path);
+			this.searchFolderContent(element.path, element.remoteIndexation);
 		}else{
 			this.updateStateFinished();
 		}
@@ -551,7 +536,7 @@ Class.create("SearchEngine", AjxpPane, {
 	 * Should reference the IAjxpNodeProvider instead!! Still a "ls" here!
 	 * @param currentFolder String
 	 */
-	searchFolderContent : function(currentFolder){
+	searchFolderContent : function(currentFolder, remote_indexation){
 		if(this._state == 'interrupt') {
 			this.updateStateFinished();
 			return;
@@ -572,16 +557,39 @@ Class.create("SearchEngine", AjxpPane, {
             this.setOnLoad($(this._resultsBoxId));
             connexion.sendAsync();
         }else{
-            /* LIST CONTENT, SEARCH CLIENT SIDE, AND RECURSE */
-            var connexion = new Connexion();
-            connexion.addParameter('get_action', 'ls');
-            connexion.addParameter('options', 'a' + (this.hasMetaSearch()?'l':''));
-            connexion.addParameter('dir', currentFolder);
-            connexion.onComplete = function(transport){
-                this._parseXmlAndSearchString(transport.responseXML, currentFolder);
-                this.searchNext();
-            }.bind(this);
-            connexion.sendAsync();
+
+            if(remote_indexation){
+
+                var connexion = new Connexion();
+                connexion.addParameter('get_action', remote_indexation);
+                connexion.addParameter('query', this.crtText);
+                connexion.addParameter('dir', currentFolder);
+                if(this.hasMetaSearch()){
+                    connexion.addParameter('fields', this.getSearchColumns().join(','));
+                }
+                connexion.onComplete = function(transport){
+                    this._parseResults(transport.responseXML, currentFolder);
+                    this.removeOnLoad($(this._resultsBoxId));
+                    this.searchNext();
+                }.bind(this);
+                this.setOnLoad($(this._resultsBoxId));
+                connexion.sendAsync();
+
+            }else{
+
+                /* LIST CONTENT, SEARCH CLIENT SIDE, AND RECURSE */
+                var connexion = new Connexion();
+                connexion.addParameter('get_action', 'ls');
+                connexion.addParameter('options', 'a' + (this.hasMetaSearch()?'l':''));
+                connexion.addParameter('dir', currentFolder);
+                connexion.onComplete = function(transport){
+                    this._parseXmlAndSearchString(transport.responseXML, currentFolder);
+                    this.searchNext();
+                }.bind(this);
+                connexion.sendAsync();
+
+            }
+
         }
 	},
 	
@@ -603,7 +611,7 @@ Class.create("SearchEngine", AjxpPane, {
 					if(!node.isLeaf())
 					{
 						var newPath = node.getPath();
-						this.appendFolderToQueue(newPath);
+						this.appendFolderToQueue(newPath, node.getMetadata().get("remote_indexation"));
 					}
 				}
 			}		
@@ -658,14 +666,20 @@ Class.create("SearchEngine", AjxpPane, {
 		}
 		if(searchFileName && ajxpNode.getLabel().toLowerCase().indexOf(this.crtText) != -1){
 			this.addResult(currentFolder, ajxpNode);
-			return;
+            if(this._fileList){
+                this._fileList.reload();
+            }
+            return;
 		}
 		if(!searchCols) return;
 		for(var i=0;i<searchCols.length;i++){
 			var meta = ajxpNode.getMetadata().get(searchCols[i]);
 			if(meta && meta.toLowerCase().indexOf(this.crtText) != -1){
 				this.addResult(currentFolder, ajxpNode, meta);
-				return;			
+                if(this._fileList){
+                    this._fileList.reload();
+                }
+                return;
 			}
 		}
 	},

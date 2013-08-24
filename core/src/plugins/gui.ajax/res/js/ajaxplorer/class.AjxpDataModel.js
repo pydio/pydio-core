@@ -535,13 +535,24 @@ Class.create("AjxpDataModel", {
 	 * @param newFileName String The name to check
 	 * @returns Boolean
 	 */
-	fileNameExists: function(newFileName) 
+	fileNameExists: function(newFileName, local, contextNode)
 	{
-        var nodeExists = false;
-        this.loadPathInfoSync(this._contextNode.getPath() + "/" + newFileName, function(foundNode){
-            nodeExists = true;
-        });
-        return nodeExists;
+        if(!contextNode){
+            contextNode = this._contextNode;
+        }
+        if(local){
+            var test = contextNode.getPath() + "/" + newFileName;
+            return contextNode.getChildren().detect(function(c){
+                return c.getPath() == test;
+            });
+        }else{
+            var nodeExists = false;
+            this.loadPathInfoSync(contextNode.getPath() + "/" + newFileName, function(foundNode){
+                nodeExists = true;
+            });
+            return nodeExists;
+        }
+
 	},
 
     applyCheckHook : function(node){

@@ -109,6 +109,9 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 		var fileName = nodeOrNodes.getPath();
 		
 		var path = 'plugins/editor.codemirror/CodeMirror/';
+        if(window.ajxpBootstrap.parameters.get("SERVER_PREFIX_URI")){
+            path = window.ajxpBootstrap.parameters.get("SERVER_PREFIX_URI")+"plugins/editor.codemirror/CodeMirror/";
+        }
 		var extension = getFileExtension(fileName);
 		var parserFile; var styleSheet;
 		var parserConfig = {};
@@ -187,7 +190,11 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 			}.bind(this)
 		};
 		
-		
+        if(window.ajxpMobile){
+              this.setFullScreen();
+              window.setTimeout(this.setFullScreen.bind(this), 500);
+        }
+
 		this.initCodeMirror(false, function(){
 			this.loadFileContent(fileName);
 		}.bind(this));
@@ -216,10 +223,6 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 
 		this.updateHistoryButtons();
 		
-		if(window.ajxpMobile){
-			this.setFullScreen();
-			//attachMobileScroll(this.textarea, "vertical");
-		}
 
         this.element.observe("editor:resize", function(event){
             if(this.goingToFullScreen) return;
@@ -248,6 +251,9 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 		this.options.indentUnit = this.indentSize;
 		this.options.textWrapping = this.textWrapping;
 		this.options.lineNumbers = this.lineNumbers;
+        if(window.ajxpBootstrap.parameters.get("SERVER_PREFIX_URI")){
+            this.options.path = window.ajxpBootstrap.parameters.get("SERVER_PREFIX_URI")+"plugins/editor.codemirror/CodeMirror/js/";
+        }
 
 		this.options.onLoad = onLoad? onLoad : function(mirror){
 			if(this.currentCode){

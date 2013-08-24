@@ -121,9 +121,9 @@ function hookToFilesList(){
             resManager.load();
         }
         $A(fList.getItems()).each(function(row){
-            if(!row.ajxpNode || row.ajxpNode.getAjxpMime() != "mp3") return;
+            if(!row.ajxpNode || (row.ajxpNode.getAjxpMime() != "mp3" && row.ajxpNode.getAjxpMime() != "wav")) return;
             addVolumeButton();
-            var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+'&get_action=audio_proxy&file='+base64_encode(row.ajxpNode.getPath())+ '&fake=extension.mp3';
+            var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+'&get_action=audio_proxy&file='+base64_encode(row.ajxpNode.getPath())+ '&fake=extension.'+row.ajxpNode.getAjxpMime();
             var player = new Element("div", {className:"ui360 ui360-micro"}).update(new Element("a", {href:url}).update(""));
             row.down("span#ajxp_label").setStyle({backgroundImage:'none'}).insert({top:player});
             threeSixtyPlayer.config.items = [player];
@@ -193,8 +193,52 @@ Class.create("SMPlayer", AbstractEditor, {
 	fullscreenMode: false,
 	
 	initialize: function($super, oFormObject){
+        this.element = oFormObject;
 	},
-		
+
+    open : function($super, ajxpNode){
+        this.currentRichPreview = this.getPreview(ajxpNode, true);
+        this.element.down(".smplayer_title").update(ajxpNode.getLabel());
+        this.element.down(".smplayer_preview_element").insert(this.currentRichPreview);
+        window.setTimeout(function(){
+            try{this.currentRichPreview.down('span.sm2-360btn').click();}catch(e){}
+        }.bind(this), 400);
+        modal.setCloseValidation(function(){
+            this.currentRichPreview.destroyElement();
+        }.bind(this));
+    },
+
+    /**
+   	 * Closes the editor
+   	 * @returns Boolean
+   	 */
+   	close : function($super){
+        this.currentRichPreview.destroyElement();
+   		return $super.close();
+   	},
+
+    getSharedPreviewTemplate: function(node){
+
+        var crtRoot = document.location.href.split("#").shift().split("?").shift();
+        var rgxtrim = new RegExp('\/+$');
+        crtRoot = crtRoot.replace(rgxtrim, '');
+
+        var tpl = new Template('<link rel="stylesheet" type="text/css" href="'+crtRoot+'/plugins/editor.soundmanager/sm/shared/mp3-player-button.css" />\n\
+&lt;script type="text/javascript" src="'+crtRoot+'/plugins/editor.soundmanager/sm/shared/soundmanager2.js"&gt;&lt;/script&gt;\n\
+&lt;script type="text/javascript" src="'+crtRoot+'/plugins/editor.soundmanager/sm/shared/mp3-player-button.js"&gt;&lt;/script&gt;\n\
+&lt;script&gt;\n \
+soundManager.setup({\n\
+      url: "'+crtRoot+'/plugins/editor.soundmanager/sm/swf/",\n\
+      debugMode : false\n\
+});\n\
+&lt;/script&gt;\n\
+<a href="#{DL_CT_LINK}&fake=ext.'+getAjxpMimeType(node)+'" class="sm2_button">'+node.getLabel()+'</a> '+node.getLabel());
+
+        return tpl;
+
+    },
+
+
 	getPreview : function(ajxpNode, rich){
         if(!window.soundManager || !window.soundManager.enabled){
             var im = new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64),align:"absmiddle"});
@@ -203,9 +247,9 @@ Class.create("SMPlayer", AbstractEditor, {
         addVolumeButton();
         var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+'&get_action=audio_proxy&file='+base64_encode(ajxpNode.getPath());
         if(rich){
-            url += '&rich_preview=true&fake=extension.mp3';
+            url += '&rich_preview=true&fake=extension.'+ajxpNode.getAjxpMime();
         }else{
-            url += '&fake=extension.mp3';
+            url += '&fake=extension.'+ajxpNode.getAjxpMime();
         }
         var container = new Element("div", {className:"ui360container"+(rich?" nobackground":"")});
         var player = new Element("div", {className:"ui360"+(rich?" ui360-vis ui360-vis-retracted":"")}).update(new Element("a", {href:url}).update(""));
@@ -222,6 +266,9 @@ Class.create("SMPlayer", AbstractEditor, {
                     }catch (e){}
                 }
             }else{
+                var addLeft = 12;
+                if(container.up('.thumbnail_selectable_cell.detailed')) addLeft = 2;
+
                 if(element.height >= 50)
                 {
                     var mT = parseInt((element.height - 50)/2) + element.margin;
@@ -232,10 +279,14 @@ Class.create("SMPlayer", AbstractEditor, {
                     var mT = 0;
                     var mB = element.height-40;
                     container.addClassName("nobackground");
-                    container.setStyle({paddingTop:mT+'px', paddingBottom:'0px', marginBottom:mB+'px'});
+                    if(mB + addLeft < 0) {
+                        container.setStyle({marginTop:(mB/2)+'px', paddingBottom:'0px', marginLeft:((mB/2)-2)+'px'});
+                    }else{
+                        container.setStyle({paddingTop:mT+'px', paddingBottom:'0px', marginBottom:mB+'px'});
+                    }
                 }
                 container.setStyle({
-                    paddingLeft:Math.ceil((element.width-50)/2)+12+"px"
+                    paddingLeft:Math.ceil((element.width-50)/2)+addLeft+"px"
                 });
             }
         };

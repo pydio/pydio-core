@@ -24,8 +24,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 require_once(AJXP_INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
 
 /**
- * @package info.ajaxplorer.plugins
  * AJXP_Wrapper encapsulating calls to the smbclient command line tool
+ * @package AjaXplorer_Plugins
+ * @subpackage Access
  */
 class smbAccessWrapper extends fsAccessWrapper {		
 
@@ -57,10 +58,10 @@ class smbAccessWrapper extends fsAccessWrapper {
 		$basePath = $repoObject->getOption("PATH");
 		$fullPath = "smb://".$credentials.$host."/";//.$basePath."/".$path;
 		if ($basePath!="") {
-           $fullPath.=trim($basePath, "/\\" )."/";
+           $fullPath.=trim($basePath, "/\\" );
        	}
        	if ($path!="") {
-           $fullPath.=$path;
+           $fullPath.= (($path[0] == "/")? "" : "/").$path;
        	}
 		
 		return $fullPath;

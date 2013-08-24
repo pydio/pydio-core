@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.video" openable="false" mimes="flv,mov,mp4,m4v,m4a,aac,ogv,webm" previewProvider="true" text="186" title="136" icon="frame_image.png" className="VideoPreviewer" label="CONF_MESSAGE[Video Player]" description="CONF_MESSAGE[Inserts a video player in the info panel, either HTML5 or Flash depending on the format.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<editor id="editor.video" openable="true" formId="videojs_previewer"
+        mimes="flv,mov,mp4,m4v,m4a,aac,ogv,webm" previewProvider="true"
+        text="video_editor.1" title="video_editor.1" icon="frame_image.png" iconClass="icon-film"
+        className="VideoPreviewer" label="CONF_MESSAGE[Video Player]"
+        description="CONF_MESSAGE[Inserts a video player in the info panel, either HTML5 or Flash depending on the format.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/editor.video/class.VideoReader.php" classname="VideoReader"/>
     <client_settings>
         <resources>
@@ -9,9 +13,12 @@
             <i18n path="plugins/editor.video/i18n" namespace="video_editor"/>
         </resources>
     </client_settings>
+    <clientForm id="videojs_previewer"><![CDATA[
+         <div id="videojs_previewer" box_width="420"></div>
+    ]]></clientForm>
 	<registry_contributions>
 		<actions>
-			<action name="read_video_data">
+			<action name="read_video_data" contentTypedProvider="true">
 				<processing>
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>

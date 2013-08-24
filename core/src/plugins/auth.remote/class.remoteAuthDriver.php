@@ -21,7 +21,6 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * AJXP_Plugin to bridge authentication between Ajxp and external CMS
  *  This class works in 2 modes (master / slave)
     It requires the following arguments:
@@ -42,6 +41,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
     The user will log in on the remote site, and the remote script will call us, as GET ajxpPath/plugins/auth.remote/login.php?object=<serialized object>&key=MD5(object.SECRET)
 
     The serialized object contains the same data as the serialAuthDriver.
+ *
+ * @package AjaXplorer_Plugins
+ * @subpackage Auth
  */
 class remoteAuthDriver extends AbstractAuthDriver {
 	
@@ -54,11 +56,44 @@ class remoteAuthDriver extends AbstractAuthDriver {
     var $urls;
 	
 	function init($options){
+
+        // Migrate new version of the options
+        if(isSet($options["CMS_TYPE"])){
+            // Transform MASTER_URL + LOGIN_URI to MASTER_HOST, MASTER_URI, LOGIN_URL, LOGOUT_URI
+            $options["SLAVE_MODE"] = "false";
+            $cmsOpts = $options["CMS_TYPE"];
+            if($cmsOpts["cms"] != "custom"){
+                $loginURI = $cmsOpts["LOGIN_URI"];
+                if(strpos($cmsOpts["MASTER_URL"], "http") === 0){
+                    $parse = parse_url($cmsOpts["MASTER_URL"]);
+                    $rootHost = $parse["host"];
+                    $rootURI = $parse["path"];
+                }else{
+                    $rootHost = "";
+                    $rootURI = $cmsOpts["MASTER_URL"];
+                }
+                $cmsOpts["MASTER_HOST"] = $rootHost;
+                $cmsOpts["LOGIN_URL"] = $cmsOpts["MASTER_URI"] = AJXP_Utils::securePath("/".$rootURI."/".$loginURI);
+                $logoutAction = $cmsOpts["LOGOUT_ACTION"];
+                switch($cmsOpts["cms"]){
+                    case "wp":
+                        $cmsOpts["LOGOUT_URL"] = ($logoutAction == "back" ? $cmsOpts["MASTER_URL"] : $cmsOpts["MASTER_URL"]."/wp-login.php?action=logout");
+                        break;
+                    case "joomla":
+                        $cmsOpts["LOGOUT_URL"] = $cmsOpts["LOGIN_URL"];
+                        break;
+                    case "drupal":
+                        $cmsOpts["LOGOUT_URL"] = ($logoutAction == "back" ? $cmsOpts["LOGIN_URL"] : $cmsOpts["MASTER_URL"]."/user/logout");
+                        break;
+                    default:
+                        break;
+                }
+            }
+            $options = array_merge($options, $cmsOpts);
+        }
+
         $this->slaveMode = $options["SLAVE_MODE"] == "true";
         if($this->slaveMode && ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")){
-        	// Make sure "login" is disabled, or it will re-appear if GUEST browsing is enabled!
-        	// OLD WAY : unset($this->actions["login"]);
-        	// NEW WAY : Modify manifest dynamically (more coplicated...)
         	$contribs = $this->xPath->query("registry_contributions/external_file");
         	foreach ($contribs as $contribNode){        		
         		if($contribNode->getAttribute('filename') == 'plugins/core.auth/standard_auth_actions.xml'){
@@ -73,14 +108,42 @@ class remoteAuthDriver extends AbstractAuthDriver {
         $this->secret = $options["SECRET"];
         $this->urls = array($options["LOGIN_URL"], $options["LOGOUT_URL"]);
 	}	
-			
+
+    function supportsUsersPagination(){
+        return true;
+    }
+						
 	function listUsers(){
 		$users = AJXP_Utils::loadSerialFile($this->usersSerFile);
         if(AuthService::ignoreUserCase()){
             $users = array_combine(array_map("strtolower", array_keys($users)), array_values($users));
         }
+        ksort($users);
         return $users;
 	}
+
+    function listUsersPaginated($baseGroup = "/", $regexp, $offset = -1 , $limit = -1){
+        $users = $this->listUsers($baseGroup);
+        $result = array();
+        $index = 0;
+        foreach($users as $usr => $pass){
+            if(!empty($regexp) && !preg_match("/$regexp/i", $usr)){
+                continue;
+            }
+            if($offset != -1 && $index < $offset) {
+                $index ++;
+                continue;
+            }
+            $result[$usr] = $pass;
+            $index ++;
+            if($limit != -1 && count($result) >= $limit) break;
+        }
+        return $result;
+    }
+    function getUsersCount($baseGroup = "/", $regexp = ""){
+        return count($this->listUsersPaginated($baseGroup, $regexp));
+    }
+
 	
 	function userExists($login){
 		$users = $this->listUsers();
@@ -93,15 +156,16 @@ class remoteAuthDriver extends AbstractAuthDriver {
 
         if(AuthService::ignoreUserCase()) $login = strtolower($login);
 		global $AJXP_GLUE_GLOBALS;
-		if(isSet($AJXP_GLUE_GLOBALS)){
+		if(isSet($AJXP_GLUE_GLOBALS) || (isSet($this->options["LOCAL_PREFIX"]) && strpos($login, $this->options["LOCAL_PREFIX"]) === 0) ){
 			$userStoredPass = $this->getUserPass($login);
 			if(!$userStoredPass) return false;
 			if($seed == "-1"){ // Seed = -1 means that password is not encoded.
-				return ($userStoredPass == $pass);
+				return  AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass);// ($userStoredPass == md5($pass));
 			}else{
 				return (md5($userStoredPass.$seed) == $pass);
 			}			
 		}else{
+            $crtSessionId = session_id();
 			session_write_close();
 			$host = "";
 			if(isSet($this->options["MASTER_HOST"])){
@@ -117,6 +181,25 @@ class remoteAuthDriver extends AbstractAuthDriver {
 			$funcName = $this->options["MASTER_AUTH_FUNCTION"];
 			require_once 'cms_auth_functions.php';
 			if(function_exists($funcName)){
+				$sessCookies = call_user_func($funcName, $host, $uri, $login, $pass, $formId);
+				if($sessCookies != ""){
+                    if(is_array($sessCookies)){
+                        $sessid = $sessCookies["AjaXplorer"];
+                        session_id($sessid);
+                        session_start();
+                        if(!$this->slaveMode){
+                            foreach($sessCookies as $k => $v){
+                                if($k == "AjaXplorer") continue;
+                                setcookie($k, urldecode($v), 0, $uri);
+                            }
+                        }
+                    }else if(is_string($sessCookies)){
+                        session_id($sessCookies);
+                        session_start();
+                    }
+					return true;
+				}
+
 				$sessid = call_user_func($funcName, $host, $uri, $login, $pass, $formId);
 				if($sessid != ""){
 					session_id($sessid);
@@ -124,7 +207,20 @@ class remoteAuthDriver extends AbstractAuthDriver {
 					return true;					
 				}
 			}
-			return  false;
+            // NOW CHECK IN LOCAL USERS LIST
+            $userStoredPass = $this->getUserPass($login);
+            if(!$userStoredPass) return false;
+            if($seed == "-1"){ // Seed = -1 means that password is not encoded.
+                $res = AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass); //($userStoredPass == md5($pass));
+            }else{
+                $res = (md5($userStoredPass.$seed) == $pass);
+            }
+            if($res){
+                session_id($crtSessionId);
+                session_start();
+                return true;
+            }
+			return false;
 		}		
 	}
 	
@@ -146,9 +242,9 @@ class remoteAuthDriver extends AbstractAuthDriver {
 		if(!is_array($users)) $users = array();
 		if(array_key_exists($login, $users)) return "exists";
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$users[$login] = $passwd;
+			$users[$login] = AJXP_Utils::pbkdf2_create_hash($passwd);
 		}else{
-			$users[$login] = md5($passwd);
+			$users[$login] = $passwd;
 		}
 		AJXP_Utils::saveSerialFile($this->usersSerFile, $users);		
 	}	
@@ -157,9 +253,9 @@ class remoteAuthDriver extends AbstractAuthDriver {
 		$users = $this->listUsers();
 		if(!is_array($users) || !array_key_exists($login, $users)) return ;
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$users[$login] = $newPass;
+			$users[$login] = AJXP_Utils::pbkdf2_create_hash($newPass);
 		}else{
-			$users[$login] = md5($newPass);
+			$users[$login] = $newPass;
 		}
 		AJXP_Utils::saveSerialFile($this->usersSerFile, $users);
 	}	
@@ -180,18 +276,11 @@ class remoteAuthDriver extends AbstractAuthDriver {
 	}
     
     function getLoginRedirect(){
-        if ($this->slaveMode) {
-            if (isset($_SESSION["AJXP_USER"])) return false;
-            return $this->urls[0];
-        } 
-        return false;
+        return parent::getLoginRedirect();
     }
     
 	function getLogoutRedirect(){
-        if ($this->slaveMode) {
-            return $this->urls[1];
-        } 
-        return false;
+        return $this->urls[1];
     }
     
 }

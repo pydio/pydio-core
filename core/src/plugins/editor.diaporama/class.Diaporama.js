@@ -30,7 +30,7 @@ Class.create("Diaporama", AbstractEditor, {
             floatingToolbar:true,
             replaceScroller:false,
             toolbarStyle: "icons_only diaporama_toolbar",
-            actions : {
+            actions : (window.ajxpMinisite || window.ajxpMobile) ? {} : {
                 'toggleSideBar' : '<a id="toggleButton"><img src="'+ajxpResourcesFolder+'/images/actions/22/view_left_close.png"  width="22" height="22" alt="" border="0"><br><span message_id="86"></span></a>'
             }
         }, options);
@@ -629,6 +629,12 @@ Class.create("Diaporama", AbstractEditor, {
 		}
 	},
 	
+    getSharedPreviewTemplate : function(node){
+
+        return new Template('<img width="#{WIDTH}" height="#{HEIGHT}" src="#{DL_CT_LINK}">');
+
+    },
+
 	/**
 	 * 
 	 * @param ajxpNode AjxpNode
@@ -707,9 +713,9 @@ Class.create("Diaporama", AbstractEditor, {
             var realLeftOffset = Math.max(off.left, theImage.parentNode.positionedOffset().left);
 			theImage.previewOpener.setStyle({
                 display:'block',
-                left: realLeftOffset + 'px',
-                width:theImage.getWidth() + "px",
-                top: (off.top + theImage.getHeight() - theImage.previewOpener.getHeight()) + "px"
+                left: (realLeftOffset + 1) + 'px',
+                width: (theImage.getWidth() - 2) + "px",
+                top: (off.top + theImage.getHeight() - theImage.previewOpener.getHeight() -1 )  + "px"
             });
 		});
 		img.observe("mouseout", function(event){

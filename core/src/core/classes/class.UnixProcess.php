@@ -20,10 +20,9 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * Utilitary to launch a process and keep track of it
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class UnixProcess{
     /**

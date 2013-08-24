@@ -21,8 +21,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Authenticates against a remote server implementing ajxp API
+ * @package AjaXplorer_Plugins
+ * @subpackage Auth
  */
 class remote_ajxpAuthDriver extends serialAuthDriver  {
 	

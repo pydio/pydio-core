@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor enabled="true" id="editor.infopanel" openable="true" order="1000" text="341" title="341"
+        iconClass="icon-list-alt"
+        icon="openother_images/actions/ICON_SIZE/unknown.png" className="InfoPanel"
+        mimes="*" formId="ip_content_info_panel" label="CONF_MESSAGE[Info Panel...]" description="CONF_MESSAGE[Info Panel]"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd"
+        >
+    <registry_contributions>
+        <actions>
+            <action name="dir_infopanel">
+                <gui text="342" title="342" src="fileopen.png" iconClass="icon-eye-close" accessKey="open_with_access" hasAccessKey="true">
+                    <context selection="true" dir="" recycle="hidden"  behaviour="hidden"
+                        actionBar="true" contextMenu="true" infoPanel="false"
+                        actionBarGroup="inline" inZip="false">
+                    </context>
+                    <selectionContext dir="true" file="false" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE" behaviour="hidden"></selectionContext></gui>
+                <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+                <processing>
+                    <clientCallback prepareModal="false"><![CDATA[
+                        var editorData = window.actionArguments[0];
+                        if(!editorData){
+                            var editorData = ajaxplorer.findEditorById('editor.infopanel');
+                        }
+                        if(editorData){
+                            ajaxplorer.loadEditorResources(editorData.resourcesManager);
+                            modal.openEditorDialog(editorData);
+                        }
+                    ]]></clientCallback>
+                    <serverCallback methodName="switchAction"></serverCallback>
+                    </processing>
+            </action>
+        </actions>
+    </registry_contributions>
+    <dependencies>
+        <activePlugin pluginName="gui.mobile"/>
+    </dependencies>
+</editor>

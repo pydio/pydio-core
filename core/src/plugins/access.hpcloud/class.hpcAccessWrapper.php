@@ -24,8 +24,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 require_once(AJXP_INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
 
 /**
- * @package info.ajaxplorer.plugins
- * Encapsulation of the PEAR webDAV client 
+ * Encapsulation of the PEAR webDAV client
+ * @package AjaXplorer_Plugins
+ * @subpackage Access
  */
 class hpcAccessWrapper extends fsAccessWrapper {
 

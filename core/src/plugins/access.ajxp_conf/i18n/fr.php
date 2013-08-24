@@ -1,26 +1,26 @@
 <?php
 /*
- * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
- * This file is part of AjaXplorer.
- *
- * AjaXplorer is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * AjaXplorer is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
- *
- * The latest code can be found at <http://www.ajaxplorer.info/>.
- */
+* Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
+* This file is part of AjaXplorer.
+*
+* AjaXplorer is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* AjaXplorer is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+*
+* The latest code can be found at <http://www.ajaxplorer.info/>.
+*/
 $mess=array(
 "1" => "Données de configuration",
-"2" => "Utilisateurs",
+"2" => "Utilisateurs & Groupes",
 "3" => "Dépôts",
 "4" => "Journal",
 "5" => "Diagnostique",
@@ -108,8 +108,8 @@ $mess=array(
 "87" => "Les actions ont été mises à jour pour ce rôle.",
 "88" => "Ce dépot est défini dans le fichier de configuration, il n'est pas possible de mettre à jour les métadonnées via l'interface.",
 "89" => "Données spécifiques de l'utilisateur",
-"90" => "Dépôt",
-"91" => "Modèle",
+"90" => "Nouveau dépôt",
+"91" => "Nouveau modèle",
 "92" => "Créer un nouveau modèle",
 "93" => "Edition",
 "94" => "Edition en masse",
@@ -139,6 +139,7 @@ $mess=array(
 "117" => "Plugin d'accès",
 "118" => "Nouveau Groupe",
 "group_access" => "G",
+"119" => "Set user group",
 /* END SENTENCE */
 );
 ?>

@@ -30,7 +30,7 @@ Class.create("EmlViewer", AbstractEditor, {
 	},
 	
 	
-	open : function($super, userSelection){
+	open : function($super, node){
 		// Move hidden download form in body, if not already there
 		var original = $("emlDownloadAttachmentForm");
 		if($("emlDownloadForm")){
@@ -44,8 +44,8 @@ Class.create("EmlViewer", AbstractEditor, {
 			$("emlDownloadForm").insert(new Element("input", {"type":"hidden", "name":"secure_token", "value":Connexion.SECURE_TOKEN}));
 			$("emlDownloadForm").insert(new Element("input", {"type":"hidden", "name":"attachment_id", "value":""}));
 		}
-		$super(userSelection);
-		var fileName = userSelection.getUniqueFileName();
+		$super(node);
+		var fileName = node.getPath();
 		this.textareaContainer = new Element('div');
 		this.contentMainContainer = this.textareaContainer;
 		this.textareaContainer.setStyle({width:'100%', overflow:'auto'});	
@@ -82,12 +82,17 @@ Class.create("EmlViewer", AbstractEditor, {
 		
 	
 	dlAttachment : function(event){
-		//console.log(event.target.__ATTACHMENT_ID);
 		var form = $("emlDownloadForm");
-		form.elements["secure_token"].value = Connexion.SECURE_TOKEN;
-		form.elements["file"].value = this.currentFile; 
-		form.elements["attachment_id"].value = event.target.up("div").__ATTACHMENT_ID;
-		form.submit();
+        form.elements["secure_token"].value = Connexion.SECURE_TOKEN;
+        form.elements["file"].value = this.currentFile;
+        form.elements["attachment_id"].value = event.target.up("div").__ATTACHMENT_ID;
+
+        var agent = navigator.userAgent;
+        if(agent && (agent.indexOf('iPhone')!=-1||agent.indexOf('iPod')!=-1||agent.indexOf('iPad')!=-1||agent.indexOf('iOs')!=-1||agent.indexOf('Safari')!=-1)){
+            document.location.href = window.ajxpServerAccessPath + "&" + form.serialize();
+        }else{
+            form.submit();
+        }
 	},
 	
 	cpAttachment : function(event){

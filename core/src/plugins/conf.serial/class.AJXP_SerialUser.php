@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
- * Implementation of the AbstractUser for serial 
+ * Implementation of the AbstractUser for serial
+ * @package AjaXplorer_Plugins
+ * @subpackage Conf
  */
 class AJXP_SerialUser extends AbstractAjxpUser
 {
@@ -43,6 +44,8 @@ class AJXP_SerialUser extends AbstractAjxpUser
 	var $registerForSave = array();
     var $create = true;
 
+    var $childrenPointer = null;
+
     /**
      * @param $id
      * @param serialConfDriver $storage
@@ -52,7 +55,24 @@ class AJXP_SerialUser extends AbstractAjxpUser
         $this->registerForSave = array();
     }
 
-    function setGroupPath($groupPath){
+    function setGroupPath($groupPath, $update = false){
+        if($update && isSet($this->groupPath) && $this->groupPath != $groupPath){
+            $children = $this->getChildrenPointer();
+            if(is_array($children)){
+                foreach($children as $userId){
+                    // UPDATE USER GROUP AND ROLES
+                    $u = ConfService::getConfStorageImpl()->createUserObject($userId);
+                    $u->setGroupPath($groupPath);
+                    $r = $u->getRoles();
+                    // REMOVE OLD GROUP ROLES
+                    foreach(array_keys($r) as $role){
+                        if(strpos($role, "AJXP_GRP_/") === 0) $u->removeRole($role);
+                    }
+                    $u->recomputeMergedRole();
+                    $u->save("superuser");
+                }
+            }
+        }
         parent::setGroupPath($groupPath);
         $groups = AJXP_Utils::loadSerialFile(AJXP_VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/groups.ser");
         $groups[$this->getId()] = $groupPath;
@@ -88,10 +108,14 @@ class AJXP_SerialUser extends AbstractAjxpUser
 			$this->setAdmin(true);
 		}
 		if(isSet($this->rights["ajxp.parent_user"])){
-			$this->setParent($this->rights["ajxp.parent_user"]);
+			//$this->setParent($this->rights["ajxp.parent_user"]);
+            parent::setParent($this->rights["ajxp.parent_user"]);
 		}
         if(isSet($this->rights["ajxp.group_path"])){
             $this->setGroupPath($this->rights["ajxp.group_path"]);
+        }
+        if(isSet($this->rights["ajxp.children_pointer"])){
+            $this->childrenPointer = $this->rights["ajxp.children_pointer"];
         }
 
         // LOAD ROLES
@@ -145,6 +169,9 @@ class AJXP_SerialUser extends AbstractAjxpUser
 		if($this->hasParent()){
 			$this->rights["ajxp.parent_user"] = $this->parentUser;
 		}
+        if(isSet($this->childrenPointer)){
+            $this->rights["ajxp.children_pointer"] = $this->childrenPointer;
+        }
         $this->rights["ajxp.group_path"] = $this->getGroupPath();
 
         if($context == "superuser"){
@@ -159,6 +186,8 @@ class AJXP_SerialUser extends AbstractAjxpUser
         $fastCheck = $this->storage->getOption("FAST_CHECKS");
         $fastCheck = ($fastCheck == "true" || $fastCheck == true);
         if(isSet($this->registerForSave["rights"]) || $this->create){
+            $filteredRights = $this->rights;
+            if(isSet($filteredRights["ajxp.roles"])) $filteredRights["ajxp.roles"] = $this->filterRolesForSaving($filteredRights["ajxp.roles"]);
             AJXP_Utils::saveSerialFile($this->getStoragePath()."/rights.ser", $this->rights, !$fastCheck);
             AJXP_Utils::saveSerialFile($this->getStoragePath()."/role.ser", $this->personalRole, !$fastCheck);
         }
@@ -182,5 +211,36 @@ class AJXP_SerialUser extends AbstractAjxpUser
         $fastCheck = ($fastCheck == "true" || $fastCheck == true);
         return AJXP_Utils::saveSerialFile($this->getStoragePath()."/".$key.".ser", $value, !$fastCheck);
 	}
+
+    /**
+     * Override parent method to keep a reference to the child users
+     * @param $parentId
+     */
+    function setParent($parentId){
+        $u = ConfService::getConfStorageImpl()->createUserObject($parentId);
+        $p = $u->getChildrenPointer();
+        if($p == null) $p = array();
+        $p[$this->getId()] = $this->getId();
+        $u->setChildrenPointer($p);
+        $u->save("superuser");
+        if(AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getId() == $parentId){
+            AuthService::updateUser($u);
+        }
+        parent::setParent($parentId);
+    }
+
+    /**
+     * @return null|Array
+     */
+    function getChildrenPointer(){
+        return $this->childrenPointer;
+    }
+
+    /**
+     * @param Array $array
+     */
+    function setChildrenPointer($array){
+        $this->childrenPointer = $array;
+    }
 
 }

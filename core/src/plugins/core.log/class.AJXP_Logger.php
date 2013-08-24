@@ -26,10 +26,9 @@ define("LOG_LEVEL_NOTICE", "Notice");
 define("LOG_LEVEL_WARNING", "Warning");
 define("LOG_LEVEL_ERROR", "Error");
 /**
- * @package info.ajaxplorer.core
+ * @package AjaXplorer_Plugins
+ * @subpackage Core
  * @static
- */
-/**
  * Provides static access to the logging mechanism
  */
 class AJXP_Logger extends AJXP_Plugin {
@@ -44,7 +43,7 @@ class AJXP_Logger extends AJXP_Plugin {
         parent::init($options);
         $this->pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_PLUGIN_INSTANCE"], "AbstractLogDriver");
         if($this->pluginInstance != false){
-            AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("log", $this->pluginInstance->getName(), "LOG_DRIVER", "log");
+            AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("log", $this->pluginInstance->getName(), $this->pluginInstance);
         }
         self::$loggerInstance = $this->pluginInstance;
     }

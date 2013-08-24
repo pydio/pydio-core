@@ -203,5 +203,9 @@ Class.create("ResourcesManager", {
 		imgNodes.each(function(node){
 			addImageLibrary(node.getAttribute('alias'), node.getAttribute('path'));
 		}.bind(this));		
+		var cssNodes = XPathSelectNodes(registry, '//client_settings/resources/css[@autoload="true"]');
+		cssNodes.each(function(node){
+			this.loadCSSResource(node.getAttribute("file"));
+		}.bind(this));
 	}
 });

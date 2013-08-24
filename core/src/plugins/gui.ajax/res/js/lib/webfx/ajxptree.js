@@ -1,6 +1,3 @@
-/**
-@todo : I18N THIS STRING
- */
 webFXTreeConfig.loadingText = "Loading...";
 
 function splitOverlayIcons(ajxpNode){
@@ -39,7 +36,7 @@ function AJXPTree(rootNode, sAction, filter) {
  	}
     this.overlayIcon = splitOverlayIcons(rootNode);
 
-	this._loadingItem = new WebFXTreeItem(webFXTreeConfig.loadingText);		
+	this._loadingItem = new WebFXTreeItem(MessageHash?MessageHash[466]:webFXTreeConfig.loadingText);
 	if(this.open) this.ajxpNode.load();
 	else{
 		this.add(this._loadingItem);
@@ -164,7 +161,7 @@ function AJXPTreeItem(ajxpNode, sAction, eParent) {
 	this.loaded = false;
 	this.errorText = "";
 
-	this._loadingItem = new WebFXTreeItem(webFXTreeConfig.loadingText);
+	this._loadingItem = new WebFXTreeItem(MessageHash?MessageHash[466]:webFXTreeConfig.loadingText);
 	if (this.open) {
 		this.ajxpNode.load();
 	}else{

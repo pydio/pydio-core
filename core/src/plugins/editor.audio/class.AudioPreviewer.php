@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Streams MP3 files to the flash client
+ * @package AjaXplorer_Plugins
+ * @subpackage Editor
  */
 class AudioPreviewer extends AJXP_Plugin {
 
@@ -49,9 +50,11 @@ class AudioPreviewer extends AJXP_Plugin {
 		if($action == "audio_proxy"){
 
             $file = AJXP_Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
+            $cType = "audio/".array_pop(explode(".", $file));
+
 			$localName = basename($file);
 
-            header("Content-Type: audio/mp3; name=\"".$localName."\"");
+            header("Content-Type: ".$cType."; name=\"".$localName."\"");
 			header("Content-Length: ".filesize($destStreamURL.$file));
 			
 			$stream = fopen("php://output", "a");

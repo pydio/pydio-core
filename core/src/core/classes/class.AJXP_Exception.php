@@ -20,10 +20,9 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
- * @package info.ajaxplorer.core
- */
-/**
  * Custom exception (legacy from php4 when there were no exceptions)
+ * @package AjaXplorer
+ * @subpackage Core
  */
 class AJXP_Exception extends Exception {
 	

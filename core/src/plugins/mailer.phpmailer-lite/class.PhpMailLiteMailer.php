@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Send notifications to user on some predefined actions
+ * @package AjaXplorer_Plugins
+ * @subpackage Mailer
  */
 class PhpMailLiteMailer extends AjxpMailer {
 
@@ -34,8 +35,11 @@ class PhpMailLiteMailer extends AjxpMailer {
 
         // NOW IF THERE ARE RECIPIENTS FOR ANY REASON, GO
 		$mail = new PHPMailerLite(true);
-		$mail->Mailer = $this->pluginConf["MAILER"];
+		$mail->Mailer = $this->getFilteredOption("MAILER");
         $from = $this->resolveFrom($from);
+        if(!is_array($from) || empty($from["adress"])){
+            throw new Exception("Cannot send email without a FROM address. Please check your core.mailer configuration.");
+        }
         if(!empty($from)){
             if($from["adress"] != $from["name"]){
                 $mail->SetFrom($from["adress"], $from["name"]);

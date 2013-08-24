@@ -29,6 +29,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 $REPOSITORIES[0] = array(
 	"DISPLAY"		=>	"Default Files",
     "DISPLAY_ID"    =>  430,
+    "DESCRIPTION_ID"=>  475,
 	"AJXP_SLUG"		=>  "default",
 	"DRIVER"		=>	"fs",
 	"DRIVER_OPTIONS"=> array(
@@ -66,6 +67,7 @@ $REPOSITORIES[0] = array(
 $REPOSITORIES[1] = array(
 	"DISPLAY"		=>	"My Files",
     "DISPLAY_ID"    =>  432,
+    "DESCRIPTION_ID"=>  476,
 	"AJXP_SLUG"		=>  "my-files",
 	"DRIVER"		=>	"fs",
 	"DRIVER_OPTIONS"=> array(
@@ -105,7 +107,7 @@ $REPOSITORIES[1] = array(
 // SHARE ELEMENTS
 $REPOSITORIES["ajxp_shared"] = array(
 	"DISPLAY"		=>	"Shared Elements",
-	"DISPLAY_ID"		=>	"363",
+	"DISPLAY_ID"		=>	"467",
 	"DRIVER"		=>	"ajxp_shared",
 	"DRIVER_OPTIONS"=> array(
 		"DEFAULT_RIGHTS" => "rw"

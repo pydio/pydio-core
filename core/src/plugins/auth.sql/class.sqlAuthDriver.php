@@ -21,8 +21,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Store authentication data in an SQL database
+ * @package AjaXplorer_Plugins
+ * @subpackage Auth
  */
 class sqlAuthDriver extends AbstractAuthDriver {
 	
@@ -41,6 +42,14 @@ class sqlAuthDriver extends AbstractAuthDriver {
 		}		
 	}
 
+    public function performChecks(){
+        if(!isSet($this->options)) return;
+        $test = AJXP_Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
+        if(!count($test)){
+            throw new Exception("You probably did something wrong! To fix this issue you have to remove the file \"bootsrap.json\" and rename the backup file \"bootstrap.json.bak\" into \"bootsrap.json\" in data/plugins/boot.conf/");
+        }
+    }
+
     function supportsUsersPagination(){
         return true;
     }
@@ -57,9 +66,15 @@ class sqlAuthDriver extends AbstractAuthDriver {
         $pairs = $res->fetchPairs('login', 'password');
    		return $pairs;
     }
-    function getUsersCount(){
-        $res = dibi::query("SELECT [login] FROM [ajxp_users]") ;
-        return $res->getRowCount();
+    function getUsersCount($baseGroup = "/", $regexp = ""){
+        if(!empty($regexp)){
+            if($regexp[0]=="^") $regexp = ltrim($regexp, "^")."%";
+            else if($regexp[strlen($regexp)-1] == "$") $regexp = "%".rtrim($regexp, "$");
+            $res = dibi::query("SELECT [login] FROM [ajxp_users] WHERE [login] LIKE '".$regexp."' AND [groupPath] LIKE %s ", $baseGroup."%") ;
+        }else{
+            $res = dibi::query("SELECT [login] FROM [ajxp_users] WHERE [groupPath] LIKE %s", $baseGroup."%");
+        }
+        return count($res->fetchAll());
     }
 
 	function listUsers($baseGroup="/"){
@@ -76,7 +91,7 @@ class sqlAuthDriver extends AbstractAuthDriver {
 	
 	function userExists($login){
 		$res = dibi::query("SELECT * FROM [ajxp_users] WHERE [login]=%s", $login);
-		return($res->getRowCount());
+		return(count($res->fetchAll()) > 0);
 	}	
 	
 	function checkPassword($login, $pass, $seed){
@@ -84,7 +99,7 @@ class sqlAuthDriver extends AbstractAuthDriver {
 		if(!$userStoredPass) return false;		
 		
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){ // Seed = -1 means that password is not encoded.
-			return ($userStoredPass == md5($pass));
+			return AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass); //($userStoredPass == md5($pass));
 		}else{
 			return (md5($userStoredPass.$seed) == $pass);
 		}
@@ -101,17 +116,18 @@ class sqlAuthDriver extends AbstractAuthDriver {
 		if($this->userExists($login)) return "exists";
 		$userData = array("login" => $login);
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$userData["password"] = md5($passwd);
+			$userData["password"] = AJXP_Utils::pbkdf2_create_hash($passwd); //md5($passwd);
 		}else{
 			$userData["password"] = $passwd;
 		}
+        $userData['groupPath'] = '/';
 		dibi::query('INSERT INTO [ajxp_users]', $userData);
 	}	
 	function changePassword($login, $newPass){
         if(!$this->userExists($login)) throw new Exception("User does not exists!");
 		$userData = array("login" => $login);
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$userData["password"] = md5($newPass);
+			$userData["password"] = AJXP_Utils::pbkdf2_create_hash($newPass); //md5($newPass);
 		}else{
 			$userData["password"] = $newPass;
 		}
@@ -127,5 +143,9 @@ class sqlAuthDriver extends AbstractAuthDriver {
 		return $pass;
 	}
 
+    public function installSQLTables($param){
+        $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
+        return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+    }
+
 }
-?>

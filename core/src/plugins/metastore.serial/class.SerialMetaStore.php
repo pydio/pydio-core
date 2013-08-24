@@ -21,9 +21,10 @@
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
- * @package info.ajaxplorer.plugins
  * Simple metadata implementation, stored in hidden files inside the
  * folders
+ * @package AjaXplorer_Plugins
+ * @subpackage Metastore
  */
 class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider {
 	
@@ -229,7 +230,9 @@ class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider {
             $metaFile = $this->globalMetaFile."_".$repositoryId;
             $metaFile = $this->updateSecurityScope($metaFile, $ajxpNode->getRepositoryId());
         }
-		if((@is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metaFile)) || call_user_func(array($this->accessDriver, "isWriteable"), dirname($metaFile)) || ($scope=="repository") ){
+		if($scope==AJXP_METADATA_SCOPE_REPOSITORY
+            || (@is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metaFile))
+            || call_user_func(array($this->accessDriver, "isWriteable"), dirname($metaFile)) ){
             if(is_array(self::$metaCache) && count(self::$metaCache)){
                 if(!isset(self::$fullMetaCache[$metaFile])){
                     self::$fullMetaCache[$metaFile] = array();

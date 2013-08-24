@@ -26,7 +26,7 @@ include_once("base.conf.php");
 if( !isSet($_GET["action"]) && !isSet($_GET["get_action"])
     && !isSet($_POST["action"]) && !isSet($_POST["get_action"])
     && defined("AJXP_FORCE_SSL_REDIRECT") && AJXP_FORCE_SSL_REDIRECT === true
-    && $_SERVER['SERVER_PORT'] != 443) {
+    && $_SERVER['HTTPS'] != "on") {
     header("HTTP/1.1 301 Moved Permanently");
     header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
     exit();
@@ -61,7 +61,9 @@ ConfService::start();
 $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
 //new AjxpSessionHandler();
-session_name("AjaXplorer");
+if(!isSet($OVERRIDE_SESSION)){
+    session_name("AjaXplorer");
+}
 session_start();
 
 if(isSet($_GET["tmp_repository_id"])){
@@ -70,7 +72,12 @@ if(isSet($_GET["tmp_repository_id"])){
 	ConfService::switchRootDir($_SESSION["SWITCH_BACK_REPO_ID"]);
 	unset($_SESSION["SWITCH_BACK_REPO_ID"]);
 }
-$action = (strpos($_SERVER["HTTP_ACCEPT"], "text/html") !== false ? "get_boot_gui" : "ping");
+$action = "ping";
+if(preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])){
+    $action = "get_boot_gui";
+}else{
+    $action = (strpos($_SERVER["HTTP_ACCEPT"], "text/html") !== false ? "get_boot_gui" : "ping");
+}
 if(isSet($_GET["action"]) || isSet($_GET["get_action"])) $action = (isset($_GET["get_action"])?$_GET["get_action"]:$_GET["action"]);
 else if(isSet($_POST["action"]) || isSet($_POST["get_action"])) $action = (isset($_POST["get_action"])?$_POST["get_action"]:$_POST["action"]);
 
@@ -110,7 +117,7 @@ if(AuthService::usersEnabled())
    	}
 
 }else{
-	AJXP_Logger::debug(ConfService::getCurrentRootDirIndex());	
+	AJXP_Logger::debug(ConfService::getCurrentRepositoryId());
 }
 
 //Set language
@@ -124,7 +131,7 @@ else if(isSet($_COOKIE["AJXP_lang"])) ConfService::setLanguage($_COOKIE["AJXP_la
 if(AuthService::usersEnabled())
 {
 	$loggedUser = AuthService::getLoggedUser();	
-	if($action == "upload" && ($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRootDirIndex()."")) && isSet($_FILES['Filedata']))
+	if($action == "upload" && ($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRepositoryId()."")) && isSet($_FILES['Filedata']))
 	{
 		header('HTTP/1.0 ' . '410 Not authorized');
 		die('Error 410 Not authorized!');
@@ -132,8 +139,7 @@ if(AuthService::usersEnabled())
 }
 
 // THIS FIRST DRIVERS DO NOT NEED ID CHECK
-$ajxpDriver = AJXP_PluginsService::findPlugin("gui", "ajax");
-//$ajxpDriver->init(ConfService::getRepository());
+//$ajxpDriver = AJXP_PluginsService::findPlugin("gui", "ajax");
 $authDriver = ConfService::getAuthDriverImpl();
 // DRIVERS BELOW NEED IDENTIFICATION CHECK
 if(!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") || AuthService::getLoggedUser()!=null){

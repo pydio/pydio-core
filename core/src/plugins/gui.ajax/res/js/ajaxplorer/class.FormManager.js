@@ -60,7 +60,7 @@ Class.create("FormManager", {
 		return paramsHash;
 	},
 	
-	createParametersInputs : function(form, parametersDefinitions, showTip, values, disabled, skipAccordion, addFieldCheckbox){
+	createParametersInputs : function(form, parametersDefinitions, showTip, values, disabled, skipAccordion, addFieldCheckbox, startAccordionClosed){
         var b=document.body;
         var groupDivs = $H({});
         var replicableGroups = $H({});
@@ -105,6 +105,77 @@ Class.create("FormManager", {
             }
 			if(type == 'string' || type == 'integer' || type == 'array' || type == "hidden"){
                 element = new Element('input', Object.extend({type: (type == "hidden" ? 'hidden' : 'text'), className:'SF_input', value:defaultValue}, commonAttributes));
+            }else if(type == 'button'){
+
+                element = new Element('div', {className:'SF_input SF_inlineButton'}).update('<span class="icon-play-circle"></span>'+param.get('description'));
+                element.observe("click", function(event){
+                    element.addClassName('SF_inlineButtonWorking');
+                    var testValues = $H();
+                    var choicesValue = param.get("choices").split(":");
+                    var firstPart = choicesValue.shift();
+                    if(firstPart == "run_client_action"){
+                        element.removeClassName('SF_inlineButtonWorking');
+                        ajaxplorer.actionBar.fireAction(choicesValue.shift());
+                        return;
+                    }
+                    testValues.set('get_action', firstPart);
+                    this.serializeParametersInputs(form, testValues, "DRIVER_OPTION_");
+                    var conn = new Connexion();
+
+                    if(choicesValue.length > 1){
+                        testValues.set("action_plugin_id", choicesValue.shift());
+                        testValues.set("action_plugin_method", choicesValue.shift());
+                    }
+                    if(name.indexOf("/") !== -1){
+                        testValues.set("button_key", getRepName(name));
+                    }
+                    conn.setMethod('post');
+                    conn.setParameters(testValues);
+                    conn.onComplete = function(transport){
+                        element.removeClassName('SF_inlineButtonWorking');
+                        if(transport.responseText.startsWith('SUCCESS:')){
+                            ajaxplorer.displayMessage("SUCCESS", transport.responseText.replace("SUCCESS:", ""));
+                        }else{
+                            ajaxplorer.displayMessage("ERROR", transport.responseText.replace("ERROR:", ""));
+                        }
+                        element.siblings().each(function(el){
+                            if(el.pe) el.pe.onTimerEvent();
+                        });
+                    };
+                    conn.sendAsync();
+                }.bind(this));
+
+            }else if(type == 'monitor'){
+
+                element = new Element('div', {className:'SF_input SF_inlineMonitoring'}).update('loading...');
+                element.pe = new PeriodicalExecuter(function(){
+                    element.addClassName('SF_inlineMonitoringWorking');
+                    var testValues = $H();
+                    this.serializeParametersInputs(form, testValues, "DRIVER_OPTION_");
+                    var conn = new Connexion();
+
+                    var choicesValue = param.get("choices").split(":");
+                    testValues.set('get_action', choicesValue.shift());
+                    if(choicesValue.length > 1){
+                        testValues.set("action_plugin_id", choicesValue.shift());
+                        testValues.set("action_plugin_method", choicesValue.shift());
+                    }
+                    if(name.indexOf("/") !== -1){
+                        testValues.set("button_key", getRepName(name));
+                    }
+                    conn.discrete = true;
+                    conn.setMethod('post');
+                    conn.setParameters(testValues);
+                    conn.onComplete = function(transport){
+                        element.removeClassName('SF_inlineMonitoringWorking');
+                        element.update(transport.responseText);
+                    };
+                    conn.sendAsync();
+
+                }.bind(this), 10);
+                // run now
+                element.pe.onTimerEvent();
+
             }else if(type == 'textarea'){
                 if(defaultValue) defaultValue = defaultValue.replace(new RegExp("__LBR__", "g"), "\n");
                 element = '<textarea class="SF_input" style="height:70px;" data-ajxp_type="'+type+'" data-ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'"'+disabledString+'>'+defaultValue+'</textarea>'
@@ -124,7 +195,7 @@ Class.create("FormManager", {
                 var choices, json_list;
                 if(Object.isString(param.get("choices"))){
                     if(param.get("choices").startsWith("json_list:")){
-                        choices = ["loading|Loading..."];
+                        choices = ["loading|"+MessageHash[466]+"..."];
                         json_list = param.get("choices").split(":")[1];
                     }else if(param.get("choices") == "AJXP_AVAILABLE_LANGUAGES"){
                         var object = window.ajxpBootstrap.parameters.get("availableLanguages");
@@ -223,6 +294,7 @@ Class.create("FormManager", {
                 element = new Element("div").update(selector);
                 var subFields = new Element("div");
                 element.insert(subFields);
+                if(form.ajxpPaneObject) subFields.ajxpPaneObject = form.ajxpPaneObject;
                 selector.FIELDS_CONTAINER = subFields;
 
                 selector.observe("change", function(e){
@@ -253,20 +325,25 @@ Class.create("FormManager", {
                 }
 
             }
-			var div = new Element('div', {className:"SF_element" + (addFieldCheckbox?" SF_elementWithCheckbox":"")});
-            if(type == "hidden") div.setStyle({display:"none"});
-
+            var div;
             // INSERT LABEL
-            div.insert(new Element('div', {className:"SF_label"}).update(label+(mandatory?'*':'')+' :'));
-            // INSERT CHECKBOX
-            if(addFieldCheckbox){
-                cBox = '<input type="checkbox" class="SF_fieldCheckBox" name="SFCB_'+name+'" '+(defaultValue?'checked':'')+'/>';
-                cBox = new Element('input', {type:'checkbox', className:'SF_fieldCheckBox', name:'SFCB_'+name});
-                cBox.checked = defaultValue?true:false;
-                div.insert(cBox);
+            if(type != "legend"){
+                div = new Element('div', {className:"SF_element" + (addFieldCheckbox?" SF_elementWithCheckbox":"")});
+                if(type == "hidden") div.setStyle({display:"none"});
+
+                div.insert(new Element('div', {className:"SF_label"}).update(label+(mandatory?'*':'')+' :'));
+                // INSERT CHECKBOX
+                if(addFieldCheckbox){
+                    cBox = '<input type="checkbox" class="SF_fieldCheckBox" name="SFCB_'+name+'" '+(defaultValue?'checked':'')+'/>';
+                    cBox = new Element('input', {type:'checkbox', className:'SF_fieldCheckBox', name:'SFCB_'+name});
+                    cBox.checked = defaultValue?true:false;
+                    div.insert(cBox);
+                }
+                // INSERT ELEMENT
+                div.insert(element);
+            }else{
+                div = new Element('div', {className:'dialogLegend'}).update(desc);
             }
-            // INSERT ELEMENT
-            div.insert(element);
             if(type == "image"){
                 div.down("span.SF_image_link.image_update").observe("click", function(){
                     this.createUploadForm(form, div.down('img'), param);
@@ -275,16 +352,17 @@ Class.create("FormManager", {
                     this.confirmExistingImageDelete(form, div.down('img'), div.down('input[name="'+param.get("name")+'"]'), param);
                 }.bind(this));
             }
-			if(desc){
+			if(desc && type != "legend"){
 				modal.simpleTooltip(div.select('.SF_label')[0], '<div class="simple_tooltip_title">'+label+'</div>'+desc);
 			}
             if(json_list){
                 var conn = new Connexion();
                 element = div.down("select");
+                if(defaultValue) element.defaultValue = defaultValue;
                 conn.setParameters({get_action:json_list});
                 conn.onComplete = function(transport){
-                    element.down("option").update("Select an action");
                     var json = transport.responseJSON;
+                    element.down("option").update(json.LEGEND ? json.LEGEND : "Select...");
                     if(json.HAS_GROUPS){
                         for(var key in json.LIST){
                             var opt = new Element("OPTGROUP", {label:key});
@@ -293,6 +371,12 @@ Class.create("FormManager", {
                                 var option = new Element("OPTION").update(json.LIST[key][index].action);
                                 element.insert(option);
                             }
+                        }
+                    }else{
+                        for (var key in json.LIST){
+                            var option = new Element("OPTION", {value:key}).update(json.LIST[key]);
+                            if(key == defaultValue) option.setAttribute("selected", "true");
+                            element.insert(option);
                         }
                     }
                 };
@@ -317,14 +401,18 @@ Class.create("FormManager", {
             }else{
                 var gDiv = groupDivs.get(group) || new Element('div', {className:'accordion_content'});
                 b.insert(div);
-                var lab = div.down('.SF_label');
                 var ref = parseInt(form.getWidth()) + (Prototype.Browser.IE?40:0);
-                lab.setStyle({fontSize:'11px'});
-                lab.setStyle({width:parseInt(39*ref/100)+'px'});
-                if( parseInt(lab.getHeight()) > Math.round(parseFloat(lab.getStyle('lineHeight')) + Math.round(parseFloat(lab.getStyle('paddingTop'))) + Math.round(parseFloat(lab.getStyle('paddingBottom')))) ){
-                    lab.next().setStyle({marginTop:lab.getStyle('lineHeight')});
+                if(ref > (Prototype.Browser.IE?40:0)){
+                    var lab = div.down('.SF_label');
+                    if(lab){
+                        lab.setStyle({fontSize:'11px'});
+                        lab.setStyle({width:parseInt(39*ref/100)+'px'});
+                        if( parseInt(lab.getHeight()) > Math.round(parseFloat(lab.getStyle('lineHeight')) + Math.round(parseFloat(lab.getStyle('paddingTop'))) + Math.round(parseFloat(lab.getStyle('paddingBottom')))) ){
+                            lab.next().setStyle({marginTop:lab.getStyle('lineHeight')});
+                        }
+                        lab.setStyle({width:'39%'});
+                    }
                 }
-                lab.setStyle({width:'39%'});
                 gDiv.insert(div);
                 groupDivs.set(group, gDiv);
             }
@@ -380,7 +468,7 @@ Class.create("FormManager", {
             },
             direction : 'vertical'
         });
-        form.SF_accordion.activate(form.down('div.accordion_toggle'));
+        if(!startAccordionClosed) form.SF_accordion.activate(form.down('div.accordion_toggle'));
         if(addFieldCheckbox){
             form.select("input.SF_fieldCheckBox").each(function(cb){
                 cb.observe("click", function(event){
@@ -425,9 +513,10 @@ Class.create("FormManager", {
             window.formManagerHiddenIFrameSubmission = function(result){
                 imgSrc.src = conn._baseUrl + "&get_action=" + param.get("loadAction")+"&tmp_file="+result.trim();
                 imgSrc.next("input[type='hidden']").setValue(result.trim());
+                this.triggerEvent(imgSrc.next("input[type='hidden']"), 'change');
                 imgSrc.next("input[type='hidden']").setAttribute("data-ajxp_type", "binary");
                 window.formManagerHiddenIFrameSubmission = null;
-            };
+            }.bind(this);
             pane.down("#formManager_uploader").submit();
             return true;
         }.bind(this) , function(){
@@ -436,10 +525,63 @@ Class.create("FormManager", {
 
     },
 
+    triggerEvent : function(element, eventName) {
+        // safari, webkit, gecko
+        if (document.createEvent)
+        {
+            var evt = document.createEvent('HTMLEvents');
+            evt.initEvent(eventName, true, true);
+            return element.dispatchEvent(evt);
+        }
+
+        // Internet Explorer
+        if (element.fireEvent) {
+            return element.fireEvent('on' + eventName);
+        }
+    },
+
+    observeFormChanges : function(form, callback, bufferize){
+        var realCallback;
+        var randId = 'timer-'+parseInt(Math.random()*1000);
+        if(bufferize){
+            realCallback = function(){
+                if(window[randId]) window.clearTimeout(window[randId]);
+                window[randId] = window.setTimeout(function(){
+                    callback();
+                }, bufferize);
+            };
+        }else{
+            realCallback = callback;
+        }
+        form.select("div.SF_element").each(function(element){
+            element.select("input,textarea,select").invoke("observe", "change", realCallback);
+            element.select("input,textarea").invoke("observe", "keydown", function(event){
+                if(event.keyCode == Event.KEY_DOWN || event.keyCode == Event.KEY_UP || event.keyCode == Event.KEY_RIGHT || event.keyCode == Event.KEY_LEFT || event.keyCode == Event.KEY_TAB){
+                    return;
+                }
+                realCallback();
+            });
+        }.bind(this) );
+        if(form.ajxpPaneObject){
+            form.ajxpPaneObject.observe("after_replicate_row", function(replicate){
+                replicate.select("div.SF_element").each(function(element){
+                    element.select("input,textarea,select").invoke("observe", "change", realCallback);
+                    element.select("input,textarea").invoke("observe", "keydown", function(event){
+                        if(event.keyCode == Event.KEY_DOWN || event.keyCode == Event.KEY_UP || event.keyCode == Event.KEY_RIGHT || event.keyCode == Event.KEY_LEFT || event.keyCode == Event.KEY_TAB){
+                            return;
+                        }
+                        realCallback();
+                    });
+                }.bind(this) );
+            });
+        }
+    },
+
     confirmExistingImageDelete : function(modalParent, imgSrc, hiddenInput, param){
         if(window.confirm('Do you want to remove the current image?')){
             hiddenInput.setValue("ajxp-remove-original");
-            imgSrc.src = "";
+            imgSrc.src = param.get('defaultImage');
+            this.triggerEvent(imgSrc.next("input[type='hidden']"), 'change');
         }
     },
 
@@ -533,6 +675,10 @@ Class.create("FormManager", {
             parametersHash.unset(key);
         });
         $H(treeKeys).each(function(pair){
+            if(parametersHash.get(pair.key + '_ajxptype') && parametersHash.get(pair.key + '_ajxptype').startsWith('group_switch:')
+                && !pair.value['group_switch_value']){
+                pair.value['group_switch_value'] = parametersHash.get(pair.key);
+            }
             parametersHash.set(pair.key, Object.toJSON(pair.value));
             parametersHash.set(pair.key+"_ajxptype", "text/json");
         });
@@ -547,6 +693,7 @@ Class.create("FormManager", {
 	 * @param form HTMLForm
 	 */
 	replicateRow : function(templateRow, number, form, values){
+        if(form.ajxpPaneObject) form.ajxpPaneObject.notify('before_replicate_row', templateRow);
         var repIndex = templateRow.getAttribute('data-ajxp-replication-index');
         if(repIndex === null){
             repIndex = 0;
@@ -565,15 +712,17 @@ Class.create("FormManager", {
 				if(form && Prototype.Browser.IE){form[newName] = input;}
                 if(values && values.get(newName)){
                     input.setValue(values.get(newName));
+                }else{
+                    input.setValue('');
                 }
 			});
-			templateRow.up().insert({bottom:tr});
+			templateRow.insert({after:tr});
             if(tr.select('.SF_replication_Add').length){
                 tr.select('.SF_replication_Add').invoke("remove");
             }
             if(index == number - 1){
-                if(templateRow.up().select('.SF_replication_Add').length){
-                    tr.insert(templateRow.up().select('.SF_replication_Add')[0]);
+                if(templateRow.select('.SF_replication_Add').length){
+                    tr.insert(templateRow.select('.SF_replication_Add')[0]);
                 }
             }
             var removeButton = new Element('a', {className:'SF_replication_Remove', title:'Remove this group'})
@@ -586,6 +735,7 @@ Class.create("FormManager", {
             });
             tr.insert(removeButton);
 		}
+        if(form.ajxpPaneObject) form.ajxpPaneObject.notify('after_replicate_row', tr);
         /*
 		templateRow.select('input', 'select', 'textarea').each(function(origInput){
 			var newName = origInput.getAttribute('name')+'_0';
@@ -648,5 +798,11 @@ Class.create("FormManager", {
 			this.fetchValueToForm(form, fields, value, index);
 			index++;
 		}.bind(this));
-	}
+	},
+
+    destroyForm : function(form){
+        form.select("div.SF_inlineMonitoring").each(function(el){
+            if(el.pe) el.pe.stop();
+        });
+    }
 });

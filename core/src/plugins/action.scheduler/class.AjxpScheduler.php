@@ -21,6 +21,10 @@
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+/**
+ * @package AjaXplorer_Plugins
+ * @subpackage Action
+ */
 class AjxpScheduler extends AJXP_Plugin{
 
     var $db;
@@ -28,6 +32,15 @@ class AjxpScheduler extends AJXP_Plugin{
     function __construct($id, $baseDir){
         parent::__construct($id, $baseDir);
 
+    }
+
+    public function init($options){
+        parent::init($options);
+        $u = AuthService::getLoggedUser();
+        if($u == null) return;
+        if($u->getGroupPath() != "/"){
+            $this->enabled = false;
+        }
     }
 
     function getDbFile(){
@@ -265,9 +278,11 @@ class AjxpScheduler extends AJXP_Plugin{
     }
 
     function placeConfigNode(&$configTree){
+        $mess = ConfService::getMessages();
         if(isSet($configTree["admin"])){
             $configTree["admin"]["CHILDREN"]["scheduler"] = array(
-                "LABEL" => "Scheduler",
+                "LABEL" => $mess["action.scheduler.18"],
+                "DESCRIPTION" => $mess["action.scheduler.22"],
                 "ICON" => "scheduler/ICON_SIZE/player_time.png",
                 "LIST" => array($this, "listTasks"));
         }
@@ -276,7 +291,7 @@ class AjxpScheduler extends AJXP_Plugin{
     function listTasks($action, $httpVars, $postProcessData){
 
         $mess =ConfService::getMessages();
-        AJXP_XMLWriter::renderHeaderNode("tree", "Scheduler", false, array("icon" => "scheduler/ICON_SIZE/player_time.png"));
+        AJXP_XMLWriter::renderHeaderNode("/admin/scheduler", "Scheduler", false, array("icon" => "scheduler/ICON_SIZE/player_time.png"));
         AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="list"  template_name="action.scheduler_list">
      			<column messageId="action.scheduler.12" attributeName="ajxp_label" sortType="String"/>
      			<column messageId="action.scheduler.2" attributeName="schedule" sortType="String"/>

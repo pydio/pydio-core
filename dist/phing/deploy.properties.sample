@@ -1,0 +1,28 @@
+installPath=
+admin_user=admin
+admin_password=password
+
+# SAMBA CONFIGS
+ws.samba.host=
+ws.samba.share=
+ws.samba.user=
+ws.samba.password=
+
+#FTP server
+ws.ftp.host=
+ws.ftp.user=
+ws.ftp.password=
+ws.ftp.path=
+
+#sFTP server
+ws.sftp.host=
+ws.sftp.port=
+ws.sftp.user=
+ws.sftp.password=
+ws.sftp.path=
+
+#WebDAV
+ws.webdav.host=
+ws.webdav.user=
+ws.webdav.password=
+ws.webdav.uri=

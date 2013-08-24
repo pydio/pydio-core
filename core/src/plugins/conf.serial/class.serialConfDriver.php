@@ -22,8 +22,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package info.ajaxplorer.plugins
  * Implementation of the configuration driver on serial files
+ * @package AjaXplorer_Plugins
+ * @subpackage Conf
  */
 class serialConfDriver extends AbstractConfDriver {
 
@@ -44,6 +45,7 @@ class serialConfDriver extends AbstractConfDriver {
 	}
 
 	function performChecks(){
+        if(!isSet($this->options)) return;
         if(isSet($this->options["FAST_CHECKS"]) && $this->options["FAST_CHECKS"] === true) return;
 		$this->performSerialFileCheck($this->repoSerialFile, "repositories file");
 		$this->performSerialFileCheck($this->usersSerialDir, "users file", true);
@@ -85,7 +87,7 @@ class serialConfDriver extends AbstractConfDriver {
 		}
 	}
 
-	function savePluginConfig($pluginId, $options){
+	function _savePluginConfig($pluginId, $options){
 		$data = AJXP_Utils::loadSerialFile($this->pluginsConfigsFile);
         foreach ($options as $k=>$v){
             if(is_string($v)){
@@ -97,9 +99,20 @@ class serialConfDriver extends AbstractConfDriver {
 	}
 
 	// SAVE / EDIT / CREATE / DELETE REPOSITORY
-	function listRepositories(){
-		return AJXP_Utils::loadSerialFile($this->repoSerialFile);
-
+    /**
+     * @param AbstractAjxpUser $user
+     * @return Array
+     */
+    function listRepositories($user = null){
+		$all = AJXP_Utils::loadSerialFile($this->repoSerialFile);
+        if($user != null){
+            foreach($all as $repoId => $repoObject){
+                if(!ConfService::repositoryIsAccessible($repoId, $repoObject, $user)){
+                    unset($all[$repoId]);
+                }
+            }
+        }
+        return $all;
 	}
 
 	function listRoles($roleIds = array(), $excludeReserved = false){
@@ -264,13 +277,38 @@ class serialConfDriver extends AbstractConfDriver {
         $result = array();
         $authDriver = ConfService::getAuthDriverImpl();
         $confDriver = ConfService::getConfStorageImpl();
-        $users = $authDriver->listUsers();
-        foreach (array_keys($users) as $id){
-            $object = $confDriver->createUserObject($id);
-            if($object->hasParent() && $object->getParent() == $userId){
-                $result[] = $object;
+        $parent = $confDriver->createUserObject($userId);
+        $pointer = $parent->getChildrenPointer(); // SERIAL USER SPECIFIC METHOD
+        if(!is_array($pointer)){ // UPDATE FIRST TIME
+            $users = $authDriver->listUsers();
+            $pointer = array();
+            foreach (array_keys($users) as $id){
+                $object = $confDriver->createUserObject($id);
+                if($object->hasParent() && $object->getParent() == $userId){
+                    $result[] = $object;
+                    $pointer[$object->getId()] = $object->getId();
+                }
+            }
+            $parent->setChildrenPointer($pointer);
+            $parent->save("superuser");
+        }else{
+            foreach($pointer as $childId){
+                if(!AuthService::userExists($childId)) {
+                    $clean = true;
+                    unset($pointer[$childId]);
+                    continue;
+                }
+                $object = $confDriver->createUserObject($childId);
+                if($object->hasParent() && $object->getParent() == $userId){
+                    $result[] = $object;
+                }
+            }
+            if($clean){
+                $parent->setChildrenPointer($pointer);
+                $parent->save("superuser");
             }
         }
+
         return $result;
     }
 
@@ -399,13 +437,28 @@ class serialConfDriver extends AbstractConfDriver {
             rmdir($user->getStoragePath());
         }
 
-        $authDriver = ConfService::getAuthDriverImpl();
-        $users = $authDriver->listUsers();
+        // DELETE CHILDREN USING POINTER IF POSSIBLE
+        $users = $this->getUserChildren($userId); // $authDriver->listUsers();
         foreach (array_keys($users) as $id){
             $object = $this->createUserObject($id);
             if($object->hasParent() && $object->getParent() == $userId){
                 $this->deleteUser($id, $deletedSubUsers);
                 $deletedSubUsers[] = $id;
+            }
+        }
+
+
+        // CLEAR PARENT POINTER IF NECESSARY
+        if($user->hasParent()){
+            $parentObject = $this->createUserObject($user->getParent());
+            $pointer = $parentObject->getChildrenPointer();
+            if($pointer !== null){
+                unset($pointer[$userId]);
+                $parentObject->setChildrenPointer($pointer);
+                $parentObject->save("superuser");
+                if(AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getId() == $parentObject->getId()){
+                    AuthService::updateUser($parentObject);
+                }
             }
         }
 
@@ -471,11 +524,16 @@ class serialConfDriver extends AbstractConfDriver {
      */
     function loadBinary($context, $ID, $outputStream = null)
     {
-        if(is_file($this->getBinaryPathStorage($context)."/".$ID)){
+        $fileName = $this->getBinaryPathStorage($context)."/".$ID;
+        if(is_file($fileName)){
             if($outputStream == null){
                 header("Content-Type: ".AJXP_Utils::getImageMimeType($ID));
                 // PROBLEM AT STARTUP
-                readfile($this->getBinaryPathStorage($context)."/".$ID);
+                header('Pragma:');
+                header('Cache-Control: public');
+                header("Last-Modified: " . gmdate("D, d M Y H:i:s", filemtime($fileName)) . " GMT");
+                header("Expires: " . gmdate("D, d M Y H:i:s", filemtime($fileName)+5*24*3600) . " GMT");
+                readfile($fileName);
             }else if(is_resource($outputStream)) {
                 fwrite($outputStream, file_get_contents($this->getBinaryPathStorage($context)."/".$ID));
             }

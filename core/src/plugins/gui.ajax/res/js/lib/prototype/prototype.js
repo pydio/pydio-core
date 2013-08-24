@@ -15,6 +15,7 @@ var Prototype = {
     var isOpera = Object.prototype.toString.call(window.opera) == '[object Opera]';
     return {
       IE:             !!window.attachEvent && !isOpera,
+      IE10:           ua.indexOf('MSIE 10') > -1,
       Opera:          isOpera,
       WebKit:         ua.indexOf('AppleWebKit/') > -1,
       Gecko:          ua.indexOf('Gecko') > -1 && ua.indexOf('KHTML') === -1,
@@ -1522,8 +1523,12 @@ Ajax.Request = Class.create(Ajax.Base, {
         this.options.asynchronous);
 
       if (this.options.asynchronous) this.respondToReadyState.bind(this).defer(1);
+      else if(this.options.msxmldoctype && Prototype.Browser.IE10) {
+          try {this.transport.responseType = 'msxml-document'; } catch(e){}
+      }
 
-      this.transport.onreadystatechange = this.onStateChange.bind(this);
+
+        this.transport.onreadystatechange = this.onStateChange.bind(this);
       this.setRequestHeaders();
 
       this.body = this.method == 'post' ? (this.options.postBody || params) : null;

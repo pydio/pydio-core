@@ -22,4 +22,3 @@ $mess=array(
 "Video Player" => "Video Player",
 "Inserts a video player in the info panel, either HTML5 or Flash depending on the format." => "Inserts a video player in the info panel, either HTML5 or Flash depending on the format.",
 );
-?>
