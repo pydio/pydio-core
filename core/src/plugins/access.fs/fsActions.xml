@@ -41,7 +41,7 @@
         <action name="create">
             <gui text="154" title="155" src="folder_new.png" iconClass="icon-plus" accessKey="folder_access_key" hasAccessKey="true">
                 <context selection="false" dir="true" recycle="hidden" actionBar="true"
-                         contextMenu="true" infoPanel="false" actionBarGroup="put" inZip="false"/>
+                         contextMenu="false" infoPanel="false" actionBarGroup="put" inZip="false"/>
             </gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
             <subMenu>

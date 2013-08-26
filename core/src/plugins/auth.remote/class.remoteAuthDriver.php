@@ -77,7 +77,7 @@ class remoteAuthDriver extends AbstractAuthDriver {
                 $logoutAction = $cmsOpts["LOGOUT_ACTION"];
                 switch($cmsOpts["cms"]){
                     case "wp":
-                        $cmsOpts["LOGOUT_URL"] = ($logoutAction == "back" ? $cmsOpts["LOGIN_URL"] : $cmsOpts["MASTER_URL"]."/wp-login.php?action=logout");
+                        $cmsOpts["LOGOUT_URL"] = ($logoutAction == "back" ? $cmsOpts["MASTER_URL"] : $cmsOpts["MASTER_URL"]."/wp-login.php?action=logout");
                         break;
                     case "joomla":
                         $cmsOpts["LOGOUT_URL"] = $cmsOpts["LOGIN_URL"];
@@ -108,14 +108,42 @@ class remoteAuthDriver extends AbstractAuthDriver {
         $this->secret = $options["SECRET"];
         $this->urls = array($options["LOGIN_URL"], $options["LOGOUT_URL"]);
 	}	
-			
+
+    function supportsUsersPagination(){
+        return true;
+    }
+						
 	function listUsers(){
 		$users = AJXP_Utils::loadSerialFile($this->usersSerFile);
         if(AuthService::ignoreUserCase()){
             $users = array_combine(array_map("strtolower", array_keys($users)), array_values($users));
         }
+        ksort($users);
         return $users;
 	}
+
+    function listUsersPaginated($baseGroup = "/", $regexp, $offset = -1 , $limit = -1){
+        $users = $this->listUsers($baseGroup);
+        $result = array();
+        $index = 0;
+        foreach($users as $usr => $pass){
+            if(!empty($regexp) && !preg_match("/$regexp/i", $usr)){
+                continue;
+            }
+            if($offset != -1 && $index < $offset) {
+                $index ++;
+                continue;
+            }
+            $result[$usr] = $pass;
+            $index ++;
+            if($limit != -1 && count($result) >= $limit) break;
+        }
+        return $result;
+    }
+    function getUsersCount($baseGroup = "/", $regexp = ""){
+        return count($this->listUsersPaginated($baseGroup, $regexp));
+    }
+
 	
 	function userExists($login){
 		$users = $this->listUsers();
@@ -128,7 +156,7 @@ class remoteAuthDriver extends AbstractAuthDriver {
 
         if(AuthService::ignoreUserCase()) $login = strtolower($login);
 		global $AJXP_GLUE_GLOBALS;
-		if(isSet($AJXP_GLUE_GLOBALS)){
+		if(isSet($AJXP_GLUE_GLOBALS) || (isSet($this->options["LOCAL_PREFIX"]) && strpos($login, $this->options["LOCAL_PREFIX"]) === 0) ){
 			$userStoredPass = $this->getUserPass($login);
 			if(!$userStoredPass) return false;
 			if($seed == "-1"){ // Seed = -1 means that password is not encoded.
@@ -153,6 +181,25 @@ class remoteAuthDriver extends AbstractAuthDriver {
 			$funcName = $this->options["MASTER_AUTH_FUNCTION"];
 			require_once 'cms_auth_functions.php';
 			if(function_exists($funcName)){
+				$sessCookies = call_user_func($funcName, $host, $uri, $login, $pass, $formId);
+				if($sessCookies != ""){
+                    if(is_array($sessCookies)){
+                        $sessid = $sessCookies["AjaXplorer"];
+                        session_id($sessid);
+                        session_start();
+                        if(!$this->slaveMode){
+                            foreach($sessCookies as $k => $v){
+                                if($k == "AjaXplorer") continue;
+                                setcookie($k, urldecode($v), 0, $uri);
+                            }
+                        }
+                    }else if(is_string($sessCookies)){
+                        session_id($sessCookies);
+                        session_start();
+                    }
+					return true;
+				}
+
 				$sessid = call_user_func($funcName, $host, $uri, $login, $pass, $formId);
 				if($sessid != ""){
 					session_id($sessid);

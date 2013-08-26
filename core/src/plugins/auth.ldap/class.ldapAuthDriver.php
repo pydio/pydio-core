@@ -347,8 +347,8 @@ class ldapAuthDriver extends AbstractAuthDriver {
             if($baseGroup != "/"){
                 $this->dynamicFilter = $this->hasGroupsMapping."=".ltrim($baseGroup, "/");
             }else{
-                //STRANGE, SHOULD WORK BUT EXCLUDES ALL GROUPS
-                //$this->dynamicFilter = "!(".$this->hasGroupsMapping."=*)";
+                //STRANGE, SHOULD WORK BUT CAN EXCLUDES ALL GROUPS
+                $this->dynamicFilter = "!(".$this->hasGroupsMapping."=*)";
             }
 
             $entries = $this->getUserEntries();
@@ -357,7 +357,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
             unset($entries['count']); // remove 'count' entry
             foreach($entries as $id => $person){
                 $login = $person[$this->ldapUserAttr][0];
-                if(AuthService::ignoreUserCase()) $login = strtolower($login);
+                //if(AuthService::ignoreUserCase()) $login = strtolower($login);
                 $persons[$person["dn"]] = $login;
             }
             $this->ldapDN = $origUsersDN;
@@ -375,7 +375,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
             if($baseGroup == "/"){
                 $this->dynamicFilter = $this->hasGroupsMapping."=";
             }else{
-                $this->dynamicFilter = $this->hasGroupsMapping."=".ltrim($baseGroup, "/");
+                $this->dynamicFilter = $this->hasGroupsMapping."=".array_pop(explode("/", $baseGroup));
             }
         }else if(!empty($this->separateGroup) && $baseGroup != "/".$this->separateGroup) {
             return array();
@@ -477,30 +477,48 @@ class ldapAuthDriver extends AbstractAuthDriver {
                     $key = strtolower($params['MAPPING_LDAP_PARAM']);
                     if(isSet($entry[$key])){
                         $value = $entry[$key][0];
+                        if($key == "memberof"){
+                            $memberValues = array();
+                            // get CN from value
+                            foreach($entry[$key] as $possibleValue){
+                                $hnParts = array();
+                                $parts = explode(",", ltrim($possibleValue, '/'));
+                                foreach($parts as $part){
+                                    list($att,$attVal) = explode("=", $part);
+                                    if(strtolower($att) == "cn")  $hnParts[] = $attVal;
+                                }
+                                if(count($hnParts)) {
+                                    $memberValues[] = implode(",", $hnParts);
+                                }
+                            }
+                        }
                         switch($params['MAPPING_LOCAL_TYPE']){
                             case "role_id":
-                                if(!in_array($value, array_keys($userObject->getRoles()))){
-                                    $userObject->addRole(AuthService::getRole($value, true));
-                                    $changes = true;
+                                if($key == "memberof"){
+                                    foreach($memberValues as $uniqValue){
+                                        if(!in_array($uniqValue, array_keys($userObject->getRoles()))){
+                                            $userObject->addRole(AuthService::getRole($uniqValue, true));
+                                            $changes = true;
+                                        }
+                                    }
                                 }
                                 break;
                             case "group_path":
-                                $value = "/".ltrim($value, "/");
-                                if(true /*$userObject->getGroupPath() != $value*/) {
-                                    $humanName = "LDAP ".$value;
-                                    if($key == "memberof"){
-                                        // get CN from value
-                                        $hnParts = array();
-                                        $parts = explode(",", ltrim($value, '/'));
-                                        foreach($parts as $part){
-                                            list($att,$attVal) = explode("=", $part);
-                                            if(strtolower($att) == "cn") $hnParts[] = $attVal;
-                                        }
-                                        if(count($hnParts)) $humanName = implode(",", $hnParts);
+                                if($key == "memberof"){
+                                    $filter = $params["MAPPING_LOCAL_PARAM"];
+                                    if(strpos($filter, "preg:") !== false){
+                                        $matchFilter = "/".str_replace("preg:", "", $filter)."/i";
+                                    }else{
+                                        $valueFilters = array_map("trim", explode(",", $filter));
                                     }
-                                    AuthService::createGroup("/", $value, $humanName);
-                                    $userObject->setGroupPath($value, true);
-                                    $changes = true;
+                                    foreach($memberValues as $uniqValue){
+                                        if(isSet($matchFilter) && !preg_match($matchFilter, $uniqValue)) continue;
+                                        if(isSet($valueFilters) && !in_array($uniqValue, $matchFilter)) continue;
+                                        $humanName = $uniqValue;
+                                        AuthService::createGroup("/", $uniqValue, $humanName);
+                                        $userObject->setGroupPath("/".$uniqValue, true);
+                                        $changes = true;
+                                    }
                                 }
                                 break;
                             case "profile":

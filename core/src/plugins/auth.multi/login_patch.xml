@@ -9,10 +9,24 @@
 	}else{
 		modal.showDialogForm('Log In', ($('login_form')?'login_form':'login_form_dynamic'), 
 		function(oForm){
+            $("generic_dialog_box").setStyle({
+                top:$("progressBox").getStyle('top'),
+                left:$("progressBox").getStyle('left')
+            });
+            if(!Modernizr.input.placeholder) oForm.addClassName('no_placeholder');
+            $("generic_dialog_box").down(".titleString").hide();
+            $("generic_dialog_box").down("#modalCloseBtn").hide();
+            $("generic_dialog_box").down(".dialogTitle").setAttribute("style", $("progressBox").down(".dialogTitle").getAttribute("style"));
+            if(!$("generic_dialog_box").down("#progressCustomMessage")){
+                if($("progressBox").down("#progressCustomMessage")) $("generic_dialog_box").down(".dialogContent").insert({top:$("progressBox").down("#progressCustomMessage").cloneNode(true)});
+            }
+            oForm.setStyle({display:'block'});
+            oForm.up(".dialogContent").setStyle({backgroundImage:'none', borderWidth:0});
+
 			if(!$('auth_source')){
 				var auth_chooser = '<div class="SF_element"> \
 					<div class="SF_label"><ajxp:message ajxp_message_id="396">'+MessageHash[396]+'</ajxp:message></div> \
-					<div class="SF_input"><select id="auth_source" name="auth_source" style="width: 100px; padding:0px;" class="dialogFocus"></select></div> \
+					<div class="SF_input"><select id="auth_source" name="auth_source" style="width: 210px; height:28px; padding:3px 0px; font-size:14px;" class="dialogFocus"></select></div> \
 				</div>';
 				oForm.down('div.SF_element').insert({before:auth_chooser});
 				$H(authSources).each(function(pair){
@@ -33,7 +47,17 @@
 				});
 				oForm.down('input[type="text"]').key_enter_attached = true;
 			}
-		}, 
+            var authConfs = ajaxplorer.getPluginConfigs("auth");
+            if(authConfs && authConfs.get("SECURE_LOGIN_FORM")){
+                try{
+                    oForm.down('input[name="remember_me"]').up("div.SF_element").remove();
+                    oForm.down('input[name="userid"]').setAttribute("autocomplete", "off");
+                    oForm.down('input[name="password"]').setAttribute("autocomplete", "off");
+                    oForm.setAttribute("autocomplete", "off");
+                }catch(e){}
+            }
+            modal.refreshDialogPosition();
+		},
 		function(){
 			var oForm = modal.getForm();
 			var connexion = new Connexion();
@@ -46,7 +70,7 @@
 			}
 			connexion.addParameter('login_seed', oForm.login_seed.value);
 			connexion.addParameter('auth_source', selectedSource);
-			connexion.addParameter('remember_me', (oForm.remember_me.checked?"true":"false"));
+			connexion.addParameter('remember_me', (oForm.remember_me && oForm.remember_me.checked?"true":"false"));
 			if(oForm.login_seed.value != '-1'){
 				connexion.addParameter('password', hex_md5(hex_md5(oForm.password.value)+oForm.login_seed.value));
 			}else{

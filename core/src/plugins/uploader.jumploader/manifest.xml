@@ -6,6 +6,9 @@
             <i18n namespace="jumploader" path="plugins/uploader.jumploader/i18n"/>
         </resources>
     </client_settings>
+    <server_settings>
+        <global_param name="JUMPLOADER_INSTALL" type="button" label="CONF_MESSAGE[Install Applet]" description="CONF_MESSAGE[Install Applet]" choices="run_plugin_action:uploader.jumploader:jumploaderInstallApplet"/>
+    </server_settings>
 	<registry_contributions>
 		<actions>
 			<action name="upload">

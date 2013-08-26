@@ -58,7 +58,7 @@ function wordpress_remote_auth($host, $uri, $login, $pass, $formId = ""){
 	);
 	$newCookies = extractResponseCookies($client);
 	if(isSet($newCookies["AjaXplorer"])){
-		return $newCookies["AjaXplorer"];
+		return $newCookies;
 	}
 	return "";
 }
@@ -111,7 +111,7 @@ function joomla_remote_auth($host, $uri, $login, $pass, $formId = ""){
 	$res2 = $client->post($postUri, $postData);
 	$newCookies = extractResponseCookies($client);
 	if(isSet($newCookies["AjaXplorer"])){
-		return $newCookies["AjaXplorer"];
+		return $newCookies;
 	}
 	return "";
 }
@@ -147,7 +147,7 @@ function drupal_remote_auth($host, $uri, $login, $pass, $formId = ""){
 	$res2 = $client->post($postUri, $postData);
 	$newCookies = extractResponseCookies($client);
 	if(isSet($newCookies["AjaXplorer"])){
-		return $newCookies["AjaXplorer"];
+		return $newCookies;
 	}
 	return "";
 }

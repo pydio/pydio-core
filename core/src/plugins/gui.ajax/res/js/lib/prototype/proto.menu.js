@@ -164,10 +164,17 @@ Proto.Menu = Class.create({
 				}).update(text)
 			);		
 		}
+        var registeredKeys = $A();
 		this.options.menuItems.each(function(item) {
-			
+
+            if(!item.separator){
+                var key = item.name;
+                if(registeredKeys.indexOf(key) !== -1) return;
+                registeredKeys.push(key);
+            }
+
 			var newItem = new Element('li', {className: item.separator ? 'separator' : ''});
-			
+
 			if(item.moreActions){
 				var actionsContainer = new Element('div', {
                     className:'menuActions moreActions',

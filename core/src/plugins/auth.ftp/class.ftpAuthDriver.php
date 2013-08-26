@@ -126,7 +126,7 @@ class ftpAuthDriver extends AbstractAuthDriver {
                 return "ERROR: ".$e->getMessage();
             }
         }
-        return "SUCCESS; Could succesfully connect to the FTP server!";
+        return "SUCCESS: Could succesfully connect to the FTP server!";
     }
 
 	function checkPassword($login, $pass, $seed){

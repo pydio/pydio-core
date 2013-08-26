@@ -253,13 +253,13 @@ class multiAuthDriver extends AbstractAuthDriver {
             return $aGroups + $bGroups;
         }
         if($this->getCurrentDriver()){
-            return $this->drivers[$this->currentDriver]->listChildrenGroups($baseGroup);
-        }else{
-            $groups = array();
-            foreach($this->drivers as $d){
-                $groups = array_merge($groups, $d->listChildrenGroups($baseGroup));
-            }
+//            return $this->drivers[$this->currentDriver]->listChildrenGroups($baseGroup);
         }
+        $groups = array();
+        foreach($this->drivers as $d){
+            $groups = array_merge($groups, $d->listChildrenGroups($baseGroup));
+        }
+        return $groups;
     }
 
 

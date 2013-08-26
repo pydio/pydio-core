@@ -52,6 +52,9 @@ $REPOSITORIES[0] = array(
 			),
             "meta.filehasher"   => array(),
             "meta.watch"        => array(),
+            "meta.quota"        => array(
+                "DEFAULT_QUOTA" => "8G"
+            ),
             "meta.exif"   => array(
                 "meta_fields" => "COMPUTED_GPS.GPS_Latitude,COMPUTED_GPS.GPS_Longitude",
                 "meta_labels" => "Latitude,Longitude"
@@ -88,6 +91,9 @@ $REPOSITORIES[1] = array(
 				"meta_labels"		=> "Tags",
                 "meta_visibility"   => "hidden"
 			),
+            "meta.quota"        => array(
+                "DEFAULT_QUOTA" => "8G"
+            ),
             "meta.filehasher"   => array(),
             "meta.watch"        => array(),
             "meta.exif"   => array(

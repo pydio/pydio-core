@@ -29,7 +29,7 @@
  * Windows users may define an empty string
  * define("AJXP_LOCALE", "");
  */
-//define("AJXP_LOCALE", "en_EN.UTF-8");
+define("AJXP_LOCALE", "fr_FR.UTF-8");
 //define("AJXP_LOCALE", "");
 
 
