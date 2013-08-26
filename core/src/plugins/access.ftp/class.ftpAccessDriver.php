@@ -199,7 +199,7 @@ class ftpAccessDriver extends fsAccessDriver {
 					return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $errorMessage));
 				}else{
 					AJXP_Logger::debug("Return success");
-					return array("SUCCESS" => true);
+					return array("SUCCESS" => true, "PREVENT_NOTIF" => true);
 				}
 				
 			break;
