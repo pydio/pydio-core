@@ -278,7 +278,9 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	 * @return AbstractAjxpUser
 	 */
 	function createUserObject($userId){
-		$abstractUser = $this->instantiateAbstractUserImpl($userId);
+        $userId = AuthService::filterUserSensitivity($userId);
+
+        $abstractUser = $this->instantiateAbstractUserImpl($userId);
 		if(!$abstractUser->storageExists()){
 			AuthService::updateDefaultRights($abstractUser);
 		}

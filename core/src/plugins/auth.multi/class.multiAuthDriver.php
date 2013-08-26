@@ -60,7 +60,7 @@ class multiAuthDriver extends AbstractAuthDriver {
 				throw new Exception("Cannot find plugin $name for type 'auth'");
 			}
 			$instance->init($options);
-            if($this->masterSlaveMode && $name != $this->getOption("MASTER_DRIVER")){
+            if($name != $this->getOption("MASTER_DRIVER")){
                 $this->slaveName = $name;
             }
 			$this->drivers[$name] = $instance;
@@ -223,11 +223,11 @@ class multiAuthDriver extends AbstractAuthDriver {
             return array_merge($masterUsers, $slaveUsers);
         }
 		if($this->getCurrentDriver()){
-			return $this->getCurrentDriver()->listUsers($baseGroup);
+//			return $this->getCurrentDriver()->listUsers($baseGroup);
 		}
 		$allUsers = array();
 		foreach($this->drivers as $driver){
-			$allUsers = array_merge($driver->listUsers($baseGroup));
+			$allUsers = array_merge($allUsers, $driver->listUsers($baseGroup));
 		}
 		return $allUsers;
 	}
