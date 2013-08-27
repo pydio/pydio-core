@@ -106,6 +106,9 @@ abstract class AbstractAjxpUser
 		return $this->id;
 	}
 
+    function setId($id){
+        $this->id = $id ;
+    }
     /**
      * @return bool
      */

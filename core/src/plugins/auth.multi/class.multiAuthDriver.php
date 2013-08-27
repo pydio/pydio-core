@@ -234,9 +234,17 @@ class multiAuthDriver extends AbstractAuthDriver {
 
     function updateUserObject(&$userObject){
         $s = $this->getAuthScheme($userObject->getId());
-        if(isSet($this->drivers[$s])){
-            $this->drivers[$s]->updateUserObject($userObject);
+        $test = $this->extractRealId($userObject->getId());
+        if($test != $userObject->getId()) {
+            $restore = $userObject->getId();
+            $userObject->setId($test);
         }
+        if(!empty($s) && isSet($this->drivers[$s])){
+            $this->drivers[$s]->updateUserObject($userObject);
+        }else if(!empty($this->currentDriver) && isSet($this->drivers[$this->currentDriver])){
+            $this->drivers[$this->currentDriver]->updateUserObject($userObject);
+        }
+        if(isSet($restore)) $userObject->setId($restore);
     }
 
     /**
