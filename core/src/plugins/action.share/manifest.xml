@@ -3,6 +3,8 @@
     <server_settings>
         <global_param name="USE_REWRITE_RULE" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Use web server RewriteEngine mechanism to generate prettier URLs]" label="CONF_MESSAGE[Use Rewrite Rule]" type="boolean" default="false"/>
         <global_param name="HASH_MIN_LENGTH" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Minimum length of the generated hash]" label="CONF_MESSAGE[Hash minimum length]" type="integer" default="6"/>
+        <global_param name="FILE_MAX_EXPIRATION" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Maximum share expiration limit for file, 0 = unlimited]" label="CONF_MESSAGE[Maximum file expiration limit]" type="integer" default="0" expose="true"/>
+        <global_param name="FILE_MAX_DOWNLOAD" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Maximum download limit for file, 0 = unlimited]" label="CONF_MESSAGE[Maximum file download limit]" type="integer" default="0" expose="true"/>
         <global_param name="AVOID_SHARED_FOLDER_SAME_LABEL" group="CONF_MESSAGE[Folder Sharing]" description="CONF_MESSAGE[Disallow users to create shared folders if a workspace already exists with the same label]" label="CONF_MESSAGE[Avoid labels duplication]" type="boolean" default="true"/>
         <!--
         <global_param name="SHARED_USERS_LIST_MINIMUM" group="CONF_MESSAGE[Shared users configurations]" description="CONF_MESSAGE[Minimum number of characters to start getting results by auto-completion when sharing a folder with other users]" label="CONF_MESSAGE[Autocomplete minimum chars]" type="integer" default="2" expose="true"/>
