@@ -570,7 +570,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
                                         if(isSet($matchFilter) && !preg_match($matchFilter, $uniqValue)) continue;
                                         if(isSet($valueFilters) && !in_array($uniqValue, $matchFilter)) continue;
                                         if($userObject->personalRole->filterParameterValue("auth.ldap", "MEMBER_OF", AJXP_REPO_SCOPE_ALL, "") == $fullDN){
-                                            break;
+                                            //break;
                                         }
                                         $humanName = $uniqValue;
                                         $branch = array();
