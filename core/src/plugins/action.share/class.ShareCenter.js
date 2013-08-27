@@ -221,7 +221,7 @@ Class.create("ShareCenter", {
             };
             oForm.down('#repo_label').setValue(getBaseName(this.currentNode.getPath()));
             if(!$('share_folder_form').autocompleter){
-                var pref = ajaxplorer.getPluginConfigs("ajxp_plugin[@name='share']").get("SHARED_USERS_TMP_PREFIX");
+                var pref = ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("SHARED_USERS_TMP_PREFIX");
                 $('share_folder_form').autocompleter = new AjxpUsersCompleter(
                     $("shared_user"),
                     $("shared_users_summary"),
@@ -383,11 +383,11 @@ Class.create("ShareCenter", {
                     }.bind(this));
                     this.updateDialogButtons(oForm.down("div.dialogButtons"), "file");
                 }else{
-                    this.maxexpiration = parseInt(ajaxplorer.getPluginConfigs("ajxp_plugin[@name='share']").get("FILE_MAX_EXPIRATION"));
+                    this.maxexpiration = parseInt(ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("FILE_MAX_EXPIRATION"));
                     if(this.maxexpiration > 0){
                         oForm.down("[name='expiration']").setValue(this.maxexpiration);
                     }
-                    this.maxdownload = parseInt(ajaxplorer.getPluginConfigs("ajxp_plugin[@name='share']").get("FILE_MAX_DOWNLOAD"));
+                    this.maxdownload = parseInt(ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("FILE_MAX_DOWNLOAD"));
                     if(this.maxdownload > 0){
                         oForm.down("[name='downloadlimit']").setValue(this.maxdownload);
                     }
