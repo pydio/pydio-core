@@ -376,7 +376,14 @@ class serialConfDriver extends AbstractConfDriver {
 
     function createGroup($groupPath, $groupLabel){
         $groups = AJXP_Utils::loadSerialFile(AJXP_VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser");
-        $groups["AJXP_GROUP:$groupLabel"] = $groupPath;
+        $reverse = array_flip($groups);
+        if(isSet($reverse[$groupPath])){
+            $oldLabel = $reverse[$groupPath];
+            unset($groups[$oldLabel]);
+            $groups["AJXP_GROUP:$groupLabel"] = $groupPath;
+        }else{
+            $groups["AJXP_GROUP:$groupLabel"] = $groupPath;
+        }
         AJXP_Utils::saveSerialFile(AJXP_VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser", $groups);
     }
 

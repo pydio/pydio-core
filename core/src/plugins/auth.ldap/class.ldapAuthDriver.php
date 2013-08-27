@@ -36,6 +36,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
     var $ldapFilter;
     var $ldapGFilter;
     var $dynamicFilter;
+    var $dynamicExpected;
     var $ldapUserAttr;
     var $ldapGroupAttr;
 
@@ -249,6 +250,9 @@ class ldapAuthDriver extends AbstractAuthDriver {
                 $expected = array_merge($expected, $keys);
             }
         }
+        if(is_array($this->dynamicExpected)){
+            $expected = array_merge($expected, $this->dynamicExpected);
+        }
         foreach ($conn as $dn => $ldapc) {
             if (!$ldapc) {
                 unset($conn[$dn]);
@@ -290,7 +294,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
 
         if($this->hasGroupsMapping !== false){
             if($baseGroup == "/"){
-                $this->dynamicFilter = $this->hasGroupsMapping."=";
+                $this->dynamicFilter = "!(".$this->hasGroupsMapping."=*)";
             }else{
                 $this->dynamicFilter = $this->hasGroupsMapping."=".ltrim($baseGroup, "/");
             }
@@ -347,8 +351,8 @@ class ldapAuthDriver extends AbstractAuthDriver {
             if($baseGroup != "/"){
                 $this->dynamicFilter = $this->hasGroupsMapping."=".ltrim($baseGroup, "/");
             }else{
-                //STRANGE, SHOULD WORK BUT EXCLUDES ALL GROUPS
-                //$this->dynamicFilter = "!(".$this->hasGroupsMapping."=*)";
+                //STRANGE, SHOULD WORK BUT CAN EXCLUDES ALL GROUPS
+                $this->dynamicFilter = "!(".$this->hasGroupsMapping."=*)";
             }
 
             $entries = $this->getUserEntries();
@@ -357,8 +361,17 @@ class ldapAuthDriver extends AbstractAuthDriver {
             unset($entries['count']); // remove 'count' entry
             foreach($entries as $id => $person){
                 $login = $person[$this->ldapUserAttr][0];
-                if(AuthService::ignoreUserCase()) $login = strtolower($login);
+                //if(AuthService::ignoreUserCase()) $login = strtolower($login);
                 $persons[$person["dn"]] = $login;
+
+                $branch = array();
+                $this->buildGroupBranch($login, $branch);
+                $parent = "/";
+                if(count($branch)){
+                    $parent = "/".implode("/", array_reverse($branch));
+                }
+                AuthService::createGroup($parent, $person["dn"], $login);
+
             }
             $this->ldapDN = $origUsersDN;
             $this->ldapFilter = $origUsersFilter;
@@ -375,7 +388,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
             if($baseGroup == "/"){
                 $this->dynamicFilter = $this->hasGroupsMapping."=";
             }else{
-                $this->dynamicFilter = $this->hasGroupsMapping."=".ltrim($baseGroup, "/");
+                $this->dynamicFilter = $this->hasGroupsMapping."=".array_pop(explode("/", $baseGroup));
             }
         }else if(!empty($this->separateGroup) && $baseGroup != "/".$this->separateGroup) {
             return array();
@@ -438,6 +451,47 @@ class ldapAuthDriver extends AbstractAuthDriver {
         return false;
     }
 
+    function buildGroupBranch($groupAttrValue, &$branch = array()){
+        // Load group data. Detect memberOf. Load parent group.
+        $origUsersDN = $this->ldapDN;
+        $origUsersFilter = $this->ldapFilter;
+        $origUsersAttr = $this->ldapUserAttr;
+        $this->ldapDN = $this->ldapGDN;
+        $this->ldapFilter = $this->ldapGFilter;
+        $this->ldapUserAttr = $this->ldapGroupAttr;
+
+        $this->dynamicFilter = $this->ldapGroupAttr."=".$groupAttrValue;
+        $this->dynamicExpected = array($this->hasGroupsMapping);
+
+        $entries = $this->getUserEntries();
+        $this->dynamicFilter = null;
+        $this->dynamicExpected = null;
+        $persons = array();
+        unset($entries['count']); // remove 'count' entry
+        $groupData = $entries[0];
+
+        $memberOf = $groupData[strtolower($this->hasGroupsMapping)][0];
+
+        $this->ldapDN = $origUsersDN;
+        $this->ldapFilter = $origUsersFilter;
+        $this->ldapUserAttr = $origUsersAttr;
+
+        if(!empty($memberOf)){
+            $parts = explode(",", ltrim($memberOf, '/'));
+            foreach($parts as $part){
+                list($att,$attVal) = explode("=", $part);
+                if(strtolower($att) == "cn")  $parentCN = $attVal;
+            }
+            if(!empty($parentCN)){
+                $branch[] = $memberOf;
+                $this->buildGroupBranch($parentCN, $branch);
+            }
+
+        }
+
+
+    }
+
     function updateUserObject(&$userObject){
         if(!empty($this->separateGroup)) $userObject->setGroupPath("/".$this->separateGroup);
         // SHOULD BE DEPRECATED
@@ -477,36 +531,73 @@ class ldapAuthDriver extends AbstractAuthDriver {
                     $key = strtolower($params['MAPPING_LDAP_PARAM']);
                     if(isSet($entry[$key])){
                         $value = $entry[$key][0];
+                        if($key == "memberof"){
+                            $memberValues = array();
+                            // get CN from value
+                            foreach($entry[$key] as $possibleValue){
+                                $hnParts = array();
+                                $parts = explode(",", ltrim($possibleValue, '/'));
+                                foreach($parts as $part){
+                                    list($att,$attVal) = explode("=", $part);
+                                    if(strtolower($att) == "cn")  $hnParts[] = $attVal;
+                                }
+                                if(count($hnParts)) {
+                                    $memberValues[implode(",", $hnParts)] = $possibleValue;
+                                }
+                            }
+                        }
                         switch($params['MAPPING_LOCAL_TYPE']){
                             case "role_id":
-                                if(!in_array($value, array_keys($userObject->getRoles()))){
-                                    $userObject->addRole(AuthService::getRole($value, true));
-                                    $changes = true;
+                                if($key == "memberof"){
+                                    foreach($memberValues as $uniqValue => $fullDN){
+                                        if(!in_array($uniqValue, array_keys($userObject->getRoles()))){
+                                            $userObject->addRole(AuthService::getRole($uniqValue, true));
+                                            $userObject->recomputeMergedRole();
+                                            $changes = true;
+                                        }
+                                    }
                                 }
                                 break;
                             case "group_path":
-                                $value = "/".ltrim($value, "/");
-                                if(true /*$userObject->getGroupPath() != $value*/) {
-                                    $humanName = "LDAP ".$value;
-                                    if($key == "memberof"){
-                                        // get CN from value
-                                        $hnParts = array();
-                                        $parts = explode(",", ltrim($value, '/'));
-                                        foreach($parts as $part){
-                                            list($att,$attVal) = explode("=", $part);
-                                            if(strtolower($att) == "cn") $hnParts[] = $attVal;
-                                        }
-                                        if(count($hnParts)) $humanName = implode(",", $hnParts);
+                                if($key == "memberof"){
+                                    $filter = $params["MAPPING_LOCAL_PARAM"];
+                                    if(strpos($filter, "preg:") !== false){
+                                        $matchFilter = "/".str_replace("preg:", "", $filter)."/i";
+                                    }else{
+                                        $valueFilters = array_map("trim", explode(",", $filter));
                                     }
-                                    AuthService::createGroup("/", $value, $humanName);
-                                    $userObject->setGroupPath($value, true);
-                                    $changes = true;
+                                    foreach($memberValues as $uniqValue => $fullDN){
+                                        if(isSet($matchFilter) && !preg_match($matchFilter, $uniqValue)) continue;
+                                        if(isSet($valueFilters) && !in_array($uniqValue, $matchFilter)) continue;
+                                        if($userObject->personalRole->filterParameterValue("auth.ldap", "MEMBER_OF", AJXP_REPO_SCOPE_ALL, "") == $fullDN){
+                                            break;
+                                        }
+                                        $humanName = $uniqValue;
+                                        $branch = array();
+                                        $this->buildGroupBranch($uniqValue, $branch);
+                                        $parent = "/";
+                                        if(count($branch)){
+                                            $parent = "/".implode("/", array_reverse($branch));
+                                        }
+                                        AuthService::createGroup($parent, $fullDN, $humanName);
+                                        $userObject->setGroupPath(rtrim($parent, "/")."/".$fullDN, true);
+                                        // Update Roles from groupPath
+                                        $b = array_reverse($branch);
+                                        $b[] = $fullDN;
+                                        for($i=1;$i<=count($b);$i++){
+                                            $userObject->addRole(AuthService::getRole("AJXP_GRP_/".implode("/", array_slice($b, 0, $i)), true));
+                                        }
+                                        $userObject->personalRole->setParameterValue("auth.ldap", "MEMBER_OF", $fullDN);
+                                        $userObject->recomputeMergedRole();
+                                        $changes = true;
+                                    }
                                 }
                                 break;
                             case "profile":
                                 if($userObject->getProfile() != $value){
                                     $changes = true;
                                     $userObject->setProfile($value);
+                                    AuthService::updateAutoApplyRole($userObject);
                                 }
                                 break;
                             case "plugin_param":
