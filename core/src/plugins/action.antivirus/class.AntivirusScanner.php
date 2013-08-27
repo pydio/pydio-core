@@ -17,13 +17,14 @@ class AntivirusScanner extends AJXP_Plugin {
      * @param AJXP_Node $newNode
      * Main function, it is called by the hook.
      */
-    public function scanFile ($oldNode, $newNode) {
-
-        $this->callSet($newNode);			//initializes attributes
+    public function scanFile ($oldNode = null, $newNode = null) {
 
         if($oldNode!=null || $newNode == null){
             return;
         }
+
+        $this->callSet($newNode);			//initializes attributes
+
 
         // This block scans or doesn't scan the file. This is based on plugin parameters
         if($this->file_size < $this->scan_max_size) {
