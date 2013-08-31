@@ -60,7 +60,7 @@ class multiAuthDriver extends AbstractAuthDriver {
 				throw new Exception("Cannot find plugin $name for type 'auth'");
 			}
 			$instance->init($options);
-            if($this->masterSlaveMode && $name != $this->getOption("MASTER_DRIVER")){
+            if($name != $this->getOption("MASTER_DRIVER")){
                 $this->slaveName = $name;
             }
 			$this->drivers[$name] = $instance;
@@ -223,20 +223,30 @@ class multiAuthDriver extends AbstractAuthDriver {
             return array_merge($masterUsers, $slaveUsers);
         }
 		if($this->getCurrentDriver()){
-			return $this->getCurrentDriver()->listUsers($baseGroup);
+//			return $this->getCurrentDriver()->listUsers($baseGroup);
 		}
 		$allUsers = array();
 		foreach($this->drivers as $driver){
-			$allUsers = array_merge($driver->listUsers($baseGroup));
+			$allUsers = array_merge($allUsers, $driver->listUsers($baseGroup));
 		}
 		return $allUsers;
 	}
 
     function updateUserObject(&$userObject){
         $s = $this->getAuthScheme($userObject->getId());
-        if(isSet($this->drivers[$s])){
-            $this->drivers[$s]->updateUserObject($userObject);
+        if(!$this->masterSlaveMode){
+            $test = $this->extractRealId($userObject->getId());
+            if($test != $userObject->getId()) {
+                $restore = $userObject->getId();
+                $userObject->setId($test);
+            }
         }
+        if(!empty($s) && isSet($this->drivers[$s])){
+            $this->drivers[$s]->updateUserObject($userObject);
+        }else if(!empty($this->currentDriver) && isSet($this->drivers[$this->currentDriver])){
+            $this->drivers[$this->currentDriver]->updateUserObject($userObject);
+        }
+        if(isSet($restore)) $userObject->setId($restore);
     }
 
     /**
@@ -253,13 +263,13 @@ class multiAuthDriver extends AbstractAuthDriver {
             return $aGroups + $bGroups;
         }
         if($this->getCurrentDriver()){
-            return $this->drivers[$this->currentDriver]->listChildrenGroups($baseGroup);
-        }else{
-            $groups = array();
-            foreach($this->drivers as $d){
-                $groups = array_merge($groups, $d->listChildrenGroups($baseGroup));
-            }
+//            return $this->drivers[$this->currentDriver]->listChildrenGroups($baseGroup);
         }
+        $groups = array();
+        foreach($this->drivers as $d){
+            $groups = array_merge($groups, $d->listChildrenGroups($baseGroup));
+        }
+        return $groups;
     }
 
 
