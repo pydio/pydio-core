@@ -92,6 +92,7 @@ class AJXP_Utils
         //
         // REMOVE ALL "../" TENTATIVES
         //
+        $path = str_replace(chr(0), "", $path);
         $dirs = explode('/', $path);
         for ($i = 0; $i < count($dirs); $i++)
         {
