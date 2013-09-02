@@ -259,7 +259,7 @@ class JumploaderProcessor extends AJXP_Plugin {
                 }
             }
 
-            if( (!$all_in_place || $partitions_length != intval($fileLength))){
+            if( (!$all_in_place || $partitions_length != floatval($fileLength))){
                 echo "Error: Upload validation error!";
                 /* we delete all the uploaded partitions */
                 if($httpVars["partitionCount"] > 1){

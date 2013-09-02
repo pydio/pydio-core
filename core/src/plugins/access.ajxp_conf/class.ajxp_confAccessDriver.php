@@ -647,7 +647,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $basePath = AuthService::getLoggedUser()->getGroupPath();
                 if(empty ($basePath)) $basePath = "/";
                 if(!empty($httpVars["group_path"])){
-                    $newUser->setGroupPath( rtrim($basePath, "/")."/".ltrim($httpVars["group_path"], "/"));
+                    $newUser->setGroupPath(rtrim($basePath, "/")."/".ltrim($httpVars["group_path"], "/"));
                 }else{
                     $newUser->setGroupPath($basePath);
                 }

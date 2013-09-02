@@ -1231,7 +1231,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             if($this->getFilteredOption("USE_XSENDFILE", $this->repository->getId()) && $this->wrapperClassName == "fsAccessWrapper"){
                 if(!$realfileSystem) $filePathOrData = fsAccessWrapper::getRealFSReference($filePathOrData);
                 $filePathOrData = str_replace("\\", "/", $filePathOrData);
-                header("X-Sendfile: ".SystemTextEncoding::toUTF8($filePathOrData));
+                $server_name = $_SERVER["SERVER_SOFTWARE"];
+                $regex = '/^(lighttpd\/1.4).([0-9]{2}$|[0-9]{3}$|[0-9]{4}$)+/';
+                if(preg_match($regex, $server_name))
+                	$header_sendfile = "X-LIGHTTPD-send-file";
+                else
+                	$header_sendfile = "X-Sendfile";
+                header($header_sendfile.": ".SystemTextEncoding::toUTF8($filePathOrData));
                 header("Content-type: application/octet-stream");
                 header('Content-Disposition: attachment; filename="' . basename($filePathOrData) . '"');
                 return;
