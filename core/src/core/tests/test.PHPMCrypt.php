@@ -28,7 +28,7 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHPMCrypt extends AbstractTest
 {
-    function PHPMCrypt() { parent::AbstractTest("MCrypt enabled", "MCrypt is required all security functions."); }
+    function PHPMCrypt() { parent::AbstractTest("MCrypt enabled", "MCrypt is required by all security functions."); }
     function doTest() 
     { 
         $this->failedLevel = "error";
