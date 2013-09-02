@@ -344,7 +344,11 @@ Class.create("AjxpBootstrap", {
 	 */
 	insertBasicSkeleton : function(desktopNode){
         var elem = new Element("div", {style:"position: absolute;z-index: 10000; bottom: 0; right: 0; color: #666;font-family: Arial;font-size: 11px;text-align: right;padding: 3px; padding-right: 10px;"});
-        elem.update('AjaXplorer Community - Free non supported version &copy; C. du Jeu 2008-2013 - <a target="_blank" href="http://ajaxplorer.info/">http://ajaxplorer.info/</a>');
+        if(document.viewport.getWidth() < 500){
+            elem.update('AjaXplorer Community &copy; C. du Jeu 2008-2013');
+        }else{
+            elem.update('AjaXplorer Community - Free non supported version &copy; C. du Jeu 2008-2013 - <a target="_blank" href="http://ajaxplorer.info/">http://ajaxplorer.info/</a>');
+        }
         $(desktopNode).insert({after:elem});
         disableTextSelection(elem);
 		if($('all_forms')) return;
