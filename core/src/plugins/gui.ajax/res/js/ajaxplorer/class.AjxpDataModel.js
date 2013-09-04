@@ -205,10 +205,20 @@ Class.create("AjxpDataModel", {
 		if(this._contextNode && this._contextNode == ajxpDataNode && this._currentRep  == ajxpDataNode.getPath() && !forceEvent){
 			return; // No changes
 		}
-		this._contextNode = ajxpDataNode;
+        if(!ajxpDataNode) return;
+        if(this._contextNodeReplacedObserver && this._contextNode){
+            this._contextNode.stopObserving("node_replaced", this._contextNodeReplacedObserver);
+        }
+        this._contextNode = ajxpDataNode;
 		this._currentRep = ajxpDataNode.getPath();
         this.publish("context_changed", ajxpDataNode);
+        if(!this._contextNodeReplacedObserver) this._contextNodeReplacedObserver = this.contextNodeReplaced.bind(this);
+        ajxpDataNode.observe("node_replaced", this._contextNodeReplacedObserver);
 	},
+
+    contextNodeReplaced: function(newNode){
+        this.setContextNode(newNode);
+    },
 
     /**
      *

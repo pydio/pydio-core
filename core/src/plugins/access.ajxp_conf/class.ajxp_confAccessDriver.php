@@ -252,6 +252,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		}
 		$mess = ConfService::getMessages();
         $currentUserIsGroupAdmin = (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/");
+        if($currentUserIsGroupAdmin && ConfService::getAuthDriverImpl()->isAjxpAdmin(AuthService::getLoggedUser()->getId())){
+            $currentUserIsGroupAdmin = false;
+        }
 		
 		switch($action)
 		{			

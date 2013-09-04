@@ -28,10 +28,10 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHPMCrypt extends AbstractTest
 {
-    function PHPMCrypt() { parent::AbstractTest("MCrypt enabled", "MCrypt is required for generating publiclets"); }
+    function PHPMCrypt() { parent::AbstractTest("MCrypt enabled", "MCrypt is required by all security functions."); }
     function doTest() 
     { 
-        $this->failedLevel = "warning";
+        $this->failedLevel = "error";
         if (!function_exists("mcrypt_create_iv")){
         	$this->testedParams["MCrypt Enabled"] = "No";
         	return FALSE;

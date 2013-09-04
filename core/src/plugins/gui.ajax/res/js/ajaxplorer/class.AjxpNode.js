@@ -166,6 +166,7 @@ Class.create("AjxpNode", {
 		this._isLeaf = ajxpNode._isLeaf;
         if(ajxpNode.getPath() && this._path != ajxpNode.getPath()){
             this._path = ajxpNode.getPath();
+            var pathChanged = true;
         }
 		if(ajxpNode._label){
 			this._label = ajxpNode._label;
@@ -179,9 +180,6 @@ Class.create("AjxpNode", {
 		this._isRoot = ajxpNode._isRoot;
 		this._isLoaded = ajxpNode._isLoaded;
 		this.fake = ajxpNode.fake;
-		ajxpNode.getChildren().each(function(child){
-			this.addChild(child);
-		}.bind(this) );		
 		var meta = ajxpNode.getMetadata();
         if(metaMerge == "override") this._metadata = $H();
 		meta.each(function(pair){
@@ -194,7 +192,16 @@ Class.create("AjxpNode", {
                 this._metadata.set(pair.key, pair.value);
             }
 		}.bind(this) );
-		this.notify("node_replaced", this);		
+        if(pathChanged && !this._isLeaf && this.getChildren().length){
+            window.setTimeout(function(){
+                this.reload(this._iNodeProvider);
+            }.bind(this), 100);
+            return;
+        }
+        ajxpNode.getChildren().each(function(child){
+            this.addChild(child);
+        }.bind(this) );
+        this.notify("node_replaced", this);
 	},
 	/**
 	 * Finds a child node by its path
