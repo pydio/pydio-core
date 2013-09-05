@@ -264,7 +264,7 @@
 							option.update(pair.value);
 							selector.insert(option);
 						});
-						selector.setValue(userLang);		
+						selector.setValue(userLang);
 						selector.observe("change", function(){
 							var value = selector.getValue();
 							if(ajaxplorer.user){
@@ -298,19 +298,19 @@
 					    <div class="dialogLegend"  style="margin-left:50px; font-size: 15px;">AJXP_MESSAGE[190]</div>
 						<select id="language_selector" style="margin-left:50px; margin-bottom: 20px;"></select>
 					</div>
-				]]></clientForm>				
+				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
-			</processing>		
+			</processing>
 		</action>
 		<action name="webdav_preferences">
 			<gui text="403" title="403" src="drive_remote.png" iconClass="icon-cog" accessKey="" hasAccessKey="false">
 				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
 			</gui>
             <rightsContext noUser="false" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
-			<processing>				
+			<processing>
 				<clientCallback prepareModal="true" dialogOpenForm="webdav_pref_form" dialogOkButtonOnly="true" dialogSkipButtons="false">
 					<dialogOnOpen><![CDATA[
-					if(!ajaxplorer.user) return;					
+					if(!ajaxplorer.user) return;
 					var cont = $('webdav_repo_list');
 					cont.update('');
 					var even = false;
@@ -405,11 +405,11 @@
 						<div class="dialogLegend" id="perworkspace-urls-toggle" style="margin-bottom: 2px; padding:5px;" ajxp_message_id="405">
 						<span class="icon-caret-right"></span>AJXP_MESSAGE[465]</div>
 						<div id="webdav_repo_list" style="display:none; height: 200px; overflow:auto;"></div>
-						<input type="hidden" name="get_action" value="webdav_preferences">									
-					</div>					
-				]]></clientForm>				
+						<input type="hidden" name="get_action" value="webdav_preferences">
+					</div>
+				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
-			</processing>		
+			</processing>
 		</action>
         <action name="switch_to_settings">
             <gui src="drive_remote.png" text="165" title="165" accessKey="settings_access_key" hasAccessKey="true" iconClass="icon-cogs" >

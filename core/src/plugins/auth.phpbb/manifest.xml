@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-USAGE : 
-In /conf/conf.php 
+USAGE :
+In /conf/conf.php
 
 $AUTH_DRIVER = array(
 	"NAME"			=> "phpbb",
@@ -39,5 +39,5 @@ $AUTH_DRIVER = array(
 	</registry_contributions>
 	<dependencies>
 		<pluginClass pluginName="auth.serial"/>
-	</dependencies>			
+	</dependencies>
 </authdriver>

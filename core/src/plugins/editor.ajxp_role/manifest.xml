@@ -76,9 +76,9 @@
                     <div id="parameters-selected"></div>
                 </div>
 			</div>
-		</div>				
+		</div>
 	]]></clientForm>
 	<dependencies>
 		<activePlugin pluginName="access.ajxp_conf"/>
-	</dependencies>					
+	</dependencies>
 </editor>

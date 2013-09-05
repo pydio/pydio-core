@@ -6,21 +6,21 @@
 			<i18n namespace="meta.exif" path="plugins/meta.exif/i18n" />
 			<js file="plugins/meta.exif/class.ExifCellRenderer.js" className="ExifCellRenderer" autoload="true"/>
 		</resources>
-	</client_settings>	
+	</client_settings>
 	<server_settings>
 		<param name="meta_fields" type="string" label="CONF_MESSAGE[Info Panel Fields]" description="CONF_MESSAGE[Comma separated list of fields, use syntax 'EXIF_SECTION.ExifName'.]" mandatory="false" default="COMPUTED_GPS.GPS_Latitude,COMPUTED_GPS.GPS_Longitude"/>
 		<param name="meta_labels" type="string" label="CONF_MESSAGE[Info Panel Labels]" description="CONF_MESSAGE[Associated list of labels, be sure to define as many as fields!]" mandatory="false" default="Latitude,Longitude"/>
-	</server_settings>	
+	</server_settings>
 	<registry_contributions>
 		<hooks>
 			<serverCallback hookName="node.info" methodName="extractMeta" applyCondition="$apply=($args[2]!='minimal');"></serverCallback>
 		</hooks>
 		<client_configs>
-			<component_config className="InfoPanel">			
+			<component_config className="InfoPanel">
 				<infoPanelExtension mime="jpg,jpeg,tiff,riff" attributes="">
 					<html></html>
 				</infoPanelExtension>
-			</component_config>			
+			</component_config>
 		</client_configs>
 		<actions>
 			<action name="extract_exif">
@@ -33,5 +33,5 @@
 	<dependencies>
 		<!-- Wrapper type plugins only -->
 		<pluginClass pluginName="access.fs|access.ftp|access.demo|access.remote_fs"/>
-	</dependencies>				
+	</dependencies>
 </meta>

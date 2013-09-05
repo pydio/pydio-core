@@ -22,7 +22,7 @@
 						actionBarGroup="user">
 					</context>
 				</gui>
-				<rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""></rightsContext>			
+				<rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""></rightsContext>
 				<processing>
 					<clientCallback prepareModal="false"><![CDATA[
 						clearRememberData();
@@ -40,5 +40,5 @@
 	</registry_contributions>
 	<dependencies>
 		<pluginClass pluginName="access.smb"/>
-	</dependencies>	
+	</dependencies>
 </authdriver>

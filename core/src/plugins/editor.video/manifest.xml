@@ -39,5 +39,5 @@
 	<dependencies>
 		<!-- Stream Wrapper must be implemented -->
 		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
-	</dependencies>				
+	</dependencies>
 </editor>

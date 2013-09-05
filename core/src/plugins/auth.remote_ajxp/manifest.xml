@@ -19,5 +19,5 @@
 	</registry_contributions>
 	<dependencies>
 		<pluginClass pluginName="auth.serial"/>
-	</dependencies>	
+	</dependencies>
 </authdriver>

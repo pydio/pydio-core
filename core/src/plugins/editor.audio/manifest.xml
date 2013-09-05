@@ -25,7 +25,7 @@
 						var editorClass = Class.getByName(editor.editorClass);
 						if(editorClass){
 							editorClass.prototype.createFolderPlayer(ajaxplorer.getContextNode());
-						}					
+						}
 					}
 					]]></clientCallback>
 					<serverCallback methodName="switchAction"></serverCallback>
@@ -33,10 +33,10 @@
 			</action>
 			<!-- This one will happen a post-processing filter when ls is called with parameter playlist=true -->
 			<action name="ls">
-				<pre_processing>					
+				<pre_processing>
 					<serverCallback methodName="preProcessAction" applyCondition="$apply=isSet($httpVars['playlist']);"/>
 				</pre_processing>
-				<post_processing>					
+				<post_processing>
 					<serverCallback methodName="switchAction" applyCondition="$apply=isSet($httpVars['playlist']);" capture="true"/>
 				</post_processing>
 			</action>
@@ -45,5 +45,5 @@
 	<dependencies>
 		<!-- Stream Wrapper must be implemented -->
 		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
-	</dependencies>				
+	</dependencies>
 </editor>

@@ -22,6 +22,6 @@
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
-		</action>		
+		</action>
 	</actions>
 </registry_contributions>

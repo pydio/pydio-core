@@ -162,7 +162,7 @@
 				</div>
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_widget"}'>
 					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions='{"fit":"height","fitParent":"browser"}'  style="margin:0px;"></div>
-				</div>				
+				</div>
 			]]></template>
             <template name="widget_vision" element="ajxp_widget" position="top" theme="vision"><![CDATA[
 				<div id="toolbars">

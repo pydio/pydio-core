@@ -19,7 +19,7 @@
 	<registry_contributions>
 		<hooks>
 			<serverCallback hookName="node.change" methodName="deleteImagickCache"></serverCallback>
-		</hooks>			
+		</hooks>
 		<actions>
 			<action name="imagick_data_proxy" contentTypedProvider="true">
 				<processing>
@@ -42,5 +42,5 @@
 		<pluginResources pluginName="editor.diaporama"/>
 		<!-- Stream Wrapper must be implemented -->
 		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
-	</dependencies>				
+	</dependencies>
 </editor>

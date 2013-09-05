@@ -30,7 +30,7 @@
 			}
 			return true;
 		]]></activeCondition>
-	</processing>	
+	</processing>
 	<clientForm id="openlayer_box"><![CDATA[
 		<div id="openlayer_box" action="ol_view" box_width="80%" box_height="90%" box_padding="0">
 			<div class="action_bar" style="border-bottom:1px solid #DDDDDD;position:relative;">
@@ -73,10 +73,10 @@
                 <img width="16" id="resetFilter" height="16" border="0" align="absmiddle" src="AJXP_THEME_FOLDER/images/actions/16/fileclose.png" title="AJXP_MESSAGE[openlayer.10]">
                 </span>
 			</div>
-		</div>				
+		</div>
 	]]></clientForm>
 	<dependencies>
 		<!-- Stream Wrapper must be implemented -->
 		<activePlugin pluginName="access.wms|meta.exif"/>
-	</dependencies>				
+	</dependencies>
 </editor>

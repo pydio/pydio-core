@@ -32,9 +32,9 @@
                 <div id="pane-metas" style="padding:20px;">
                 </div>
 			</div>
-		</div>				
+		</div>
 	]]></clientForm>
 	<dependencies>
 		<activePlugin pluginName="access.ajxp_conf"/>
-	</dependencies>					
+	</dependencies>
 </editor>
