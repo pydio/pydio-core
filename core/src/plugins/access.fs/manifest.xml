@@ -31,7 +31,7 @@
 			</component_config>
 			<component_config className="FoldersTree">
 				<property name="display" value="dz"/>
-			</component_config>			
+			</component_config>
 		</client_configs>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
         <hooks>

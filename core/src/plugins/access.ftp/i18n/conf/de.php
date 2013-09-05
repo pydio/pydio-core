@@ -41,4 +41,3 @@ $mess=array(
 "Pass Ftp data through Auth driver" => "FTP-Daten durch Auth Treiber erlauben",
 "In conjunction with a correctly configured auth.ftp driver, this allow to transform ajaxplorer into a simple netFtp client." => "In Zusammenarbeit mit einem korrekt konfigurierten Auth.ftp-Treiber, kann Ajaxplorer als einfacher netFTP Client genutzt werden.",
 );
-?>

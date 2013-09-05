@@ -52,5 +52,4 @@ $mess=array(
 "31"=> "Description",
 "32"=> "RàZ",
 "33"=> "Remise à zéro du compteur",
-); 
-?>
+);

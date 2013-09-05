@@ -19,7 +19,7 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
  // spanish translation: Ion Rey Bakaikoa <ionrei@gmail.com>, 2010
-// spanish corrections: Cristóbal Sabroe Yde <cristyde at gmail.com>, 2010 
+// spanish corrections: Cristóbal Sabroe Yde <cristyde at gmail.com>, 2010
 $mess=array(
 "1" => "Usuarios compartidos",
 "2" => "Repositorios compartidos",
@@ -54,5 +54,4 @@ $mess=array(
 "31"=> "Descripción",
 "32"=> "Resetear",
 "33"=> "Resetear el contador de descargas",
-); 
-?>
+);

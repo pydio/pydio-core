@@ -27,50 +27,48 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @class demoAccessDriver
  * AJXP_Plugin to access a filesystem with all write actions disabled
  */
-class demoAccessDriver extends fsAccessDriver 
+class demoAccessDriver extends fsAccessDriver
 {
-	/**
-	* @var Repository
-	*/
-	var $repository;
-		
-	function switchAction($action, $httpVars, $fileVars){
-		if(!isSet($this->actions[$action])) return;
-		$errorMessage = "This is a demo, all 'write' actions are disabled!";
-		switch($action)
-		{			
-			//------------------------------------
-			//	WRITE ACTIONS
-			//------------------------------------
-			case "put_content":
-			case "copy":
-			case "move":
-			case "rename":
-			case "delete":
-			case "mkdir":
-			case "mkfile":
-			case "chmod":
-			case "compress":
-				return AJXP_XMLWriter::sendMessage(null, $errorMessage, false);
-			break;
-			
-			//------------------------------------
-			//	UPLOAD
-			//------------------------------------	
-			case "upload":
-				
-				return array("ERROR" => array("CODE" => "", "MESSAGE" => $errorMessage));				
-				
-			break;			
-			
-			default:
-			break;
-		}
+    /**
+    * @var Repository
+    */
+    public $repository;
 
-		return parent::switchAction($action, $httpVars, $fileVars);
-		
-	}
-	    
+    public function switchAction($action, $httpVars, $fileVars)
+    {
+        if(!isSet($this->actions[$action])) return;
+        $errorMessage = "This is a demo, all 'write' actions are disabled!";
+        switch ($action) {
+            //------------------------------------
+            //	WRITE ACTIONS
+            //------------------------------------
+            case "put_content":
+            case "copy":
+            case "move":
+            case "rename":
+            case "delete":
+            case "mkdir":
+            case "mkfile":
+            case "chmod":
+            case "compress":
+                return AJXP_XMLWriter::sendMessage(null, $errorMessage, false);
+            break;
+
+            //------------------------------------
+            //	UPLOAD
+            //------------------------------------
+            case "upload":
+
+                return array("ERROR" => array("CODE" => "", "MESSAGE" => $errorMessage));
+
+            break;
+
+            default:
+            break;
+        }
+
+        return parent::switchAction($action, $httpVars, $fileVars);
+
+    }
+
 }
-
-?>

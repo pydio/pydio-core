@@ -52,5 +52,4 @@ $mess=array(
 "31"=> "Description",
 "32"=> "Reset",
 "33"=> "Reset download counter",
-); 
-?>
+);

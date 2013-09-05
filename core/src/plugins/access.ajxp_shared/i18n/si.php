@@ -53,5 +53,4 @@ $mess=array(
 "31"=> "Opis",
 "32"=> "Ponastavi",
 "33"=> "Ponastavi števec prenosov",
-); 
-?>
+);
