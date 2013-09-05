@@ -17,6 +17,15 @@ Please DO NOT send emails to Charles, but use the forum located on http://forum.
 
 ### How to contribute / Developer Resources
 
+#### Coding guidelines
+
+To enforce some coding standards we are using PHP-CS-Fixer
+```
+wget http://cs.sensiolabs.org/get/php-cs-fixer.phar
+php php-cs-fixer.phar fix -v --fixers=indentation,linefeed,trailing_spaces,visibility,short_tag,braces,php_closing_tag,controls_spaces,eof_ending ajaxplorer-core/
+```
+See https://github.com/fabpot/PHP-CS-Fixer#usage
+
 #### Fixing the Core
 
 If you think you have found a bug and a way to fix it neatly in the code, use a Pull Request to report this change back to us! 
