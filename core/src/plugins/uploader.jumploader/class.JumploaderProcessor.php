@@ -26,8 +26,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Uploader
  */
-class JumploaderProcessor extends AJXP_Plugin {
-
+class JumploaderProcessor extends AJXP_Plugin
+{
     /**
      * Handle UTF8 Decoding
      *
@@ -37,19 +37,20 @@ class JumploaderProcessor extends AJXP_Plugin {
     private static $remote = false;
     private static $partitions = array();
 
-    public function preProcess($action, &$httpVars, &$fileVars){
+    public function preProcess($action, &$httpVars, &$fileVars)
+    {
         if(isSet($httpVars["simple_uploader"]) || isSet($httpVars["xhr_uploader"])) return;
         $repository = ConfService::getRepository();
         $driver = ConfService::loadDriverForRepository($repository);
 
-        if(method_exists($driver, "storeFileToCopy")){
+        if (method_exists($driver, "storeFileToCopy")) {
             self::$remote = true;
         }
 
-        if($repository->detectStreamWrapper(false)){
+        if ($repository->detectStreamWrapper(false)) {
             $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
             $streamData = $plugin->detectStreamWrapper(true);
-            if($streamData["protocol"] == "ajxp.ftp" || $streamData["protocol"]=="ajxp.remotefs"){
+            if ($streamData["protocol"] == "ajxp.ftp" || $streamData["protocol"]=="ajxp.remotefs") {
                 AJXP_Logger::debug("Skip decoding");
                 self::$skipDecoding = true;
             }
@@ -62,7 +63,7 @@ class JumploaderProcessor extends AJXP_Plugin {
         $realName = $fileVars["userfile_0"]["name"];
 
         /* if fileId is not set, request for cross-session resume (only if the protocol is not ftp)*/
-        if(!isSet($httpVars["fileId"])) {
+        if (!isSet($httpVars["fileId"])) {
             AJXP_LOGGER::debug("Cross-Session Resume request");
 
             $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
@@ -71,7 +72,7 @@ class JumploaderProcessor extends AJXP_Plugin {
             $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir;
             $fileHash = md5($httpVars["fileName"]);
 
-            if(!self::$remote){
+            if (!self::$remote) {
                 $resumeIndexes = array ();
                 $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($destStreamURL));
                 $it->setMaxDepth(0);
@@ -99,7 +100,7 @@ class JumploaderProcessor extends AJXP_Plugin {
                 $nextResumeIndex = max($resumeIndexes) + 1;
                 AJXP_LOGGER :: debug("Next Resume Index: " . $nextResumeIndex);
 
-                if(isSet($resumeFileId)) {
+                if (isSet($resumeFileId)) {
                     AJXP_LOGGER::debug("ResumeFileId is set. Returning values: fileId: " . $resumeFileId . ", partitionIndex: " . $nextResumeIndex);
                     $httpVars["resumeFileId"] = $resumeFileId;
                     $httpVars["resumePartitionIndex"] = $nextResumeIndex;
@@ -109,7 +110,7 @@ class JumploaderProcessor extends AJXP_Plugin {
         }
 
         /* if the file has to be partitioned */
-        if(isSet($httpVars["partitionCount"]) && intval($httpVars["partitionCount"]) > 1){
+        if (isSet($httpVars["partitionCount"]) && intval($httpVars["partitionCount"]) > 1) {
             AJXP_LOGGER::debug("Partitioned upload");
             $fileId = $httpVars["fileId"];
             $fileHash = md5($realName);
@@ -122,17 +123,18 @@ class JumploaderProcessor extends AJXP_Plugin {
             $httpVars["lastPartition"] = false;
         }
         /* if we received the last partition */
-        if(intval($index) == intval($httpVars["partitionCount"])-1){
+        if (intval($index) == intval($httpVars["partitionCount"])-1) {
             $httpVars["lastPartition"] = true;
             $httpVars["partitionRealName"] = $realName;
         }
     }
 
-    public function postProcess($action, $httpVars, $postProcessData){
+    public function postProcess($action, $httpVars, $postProcessData)
+    {
         if(isSet($httpVars["simple_uploader"]) || isSet($httpVars["xhr_uploader"])) return;
 
         /* If set resumeFileId and resumePartitionIndex, cross-session resume is requested. */
-        if(isSet($httpVars["resumeFileId"]) && isSet($httpVars["resumePartitionIndex"])) {
+        if (isSet($httpVars["resumeFileId"]) && isSet($httpVars["resumePartitionIndex"])) {
             header("HTTP/1.1 200 OK");
 
             print("fileId: " . $httpVars["resumeFileId"] . "\n");
@@ -141,12 +143,12 @@ class JumploaderProcessor extends AJXP_Plugin {
             return;
         }
 
-        /*if(self::$skipDecoding){
+        /*if (self::$skipDecoding) {
 
         }*/
 
-        if(isset($postProcessData["processor_result"]["ERROR"])){
-            if(isset($httpVars["lastPartition"]) && isset($httpVars["partitionCount"])){
+        if (isset($postProcessData["processor_result"]["ERROR"])) {
+            if (isset($httpVars["lastPartition"]) && isset($httpVars["partitionCount"])) {
                 /* we get the stream url (where all the partitions have been uploaded so far) */
                 $repository = ConfService::getRepository();
                 $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
@@ -154,19 +156,18 @@ class JumploaderProcessor extends AJXP_Plugin {
                 $streamData = $plugin->detectStreamWrapper(true);
                 $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir."/";
 
-                if($httpVars["partitionCount"] > 1){
+                if ($httpVars["partitionCount"] > 1) {
                     /* we fetch the information that help us to construct the temp files name */
                     $fileId = $httpVars["fileId"];
                     $fileHash = md5($httpVars["fileName"]);
 
                     /* deletion of all the partitions that have been uploaded */
-                    for($i = 0; $i < $httpVars["partitionCount"]; $i++){
-                        if(file_exists($destStreamURL."$fileHash.$fileId.$i")){
+                    for ($i = 0; $i < $httpVars["partitionCount"]; $i++) {
+                        if (file_exists($destStreamURL."$fileHash.$fileId.$i")) {
                             unlink($destStreamURL."$fileHash.$fileId.$i");
                         }
                     }
-                }
-                else{
+                } else {
                     $fileName = $httpVars["fileName"];
                     unlink($destStreamURL.$fileName);
                 }
@@ -175,18 +176,18 @@ class JumploaderProcessor extends AJXP_Plugin {
             return;
         }
 
-        if(!isSet($httpVars["partitionRealName"]) && !isSet($httpVars["lastPartition"])) {
+        if (!isSet($httpVars["partitionRealName"]) && !isSet($httpVars["lastPartition"])) {
             return ;
         }
 
         $repository = ConfService::getRepository();
         $driver = ConfService::loadDriverForRepository($repository);
 
-        if(!$repository->detectStreamWrapper(false)){
+        if (!$repository->detectStreamWrapper(false)) {
             return false;
         }
 
-        if($httpVars["lastPartition"]){
+        if ($httpVars["lastPartition"]) {
             $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
             $streamData = $plugin->detectStreamWrapper(true);
             $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
@@ -204,82 +205,72 @@ class JumploaderProcessor extends AJXP_Plugin {
             $partitionCount = $httpVars["partitionCount"];
             $fileLength = $_POST["fileLength"];
 
-            if(self::$remote){
+            if (self::$remote) {
                 $partitions = array();
                 $newPartitions = array();
                 $index_first_partition = -1;
                 $i = 0;
-                do{
+                do {
                     $currentFileName = $driver->getFileNameToCopy();
                     $partitions[] = $driver->getNextFileToCopy();
 
-                    if($index_first_partition < 0 && strstr($currentFileName, $fileHash) != false){
+                    if ($index_first_partition < 0 && strstr($currentFileName, $fileHash) != false) {
                         $index_first_partition = $i;
-                    }
-
-                    else if($index_first_partition < 0){
+                    } else if ($index_first_partition < 0) {
                         $newPartitions[] = array_pop($partitions);
                     }
-                }while($driver->hasFilesToCopy());
+                } while ($driver->hasFilesToCopy());
             }
 
             /* if partitionned */
-            if($partitionCount > 1){
-                if(self::$remote){
-                    for( $i = 0; $all_in_place && $i < $partitionCount; $i++){
+            if ($partitionCount > 1) {
+                if (self::$remote) {
+                    for ($i = 0; $all_in_place && $i < $partitionCount; $i++) {
                         $partition_file = "$fileHash.$fileId.$i";
-                        if( strstr($partitions[$i]["name"], $partition_file) != false ){
+                        if ( strstr($partitions[$i]["name"], $partition_file) != false ) {
                             $partitions_length += filesize( $partitions[$i]["tmp_name"] );
-                        }
-                        else{ $all_in_place = false; }
+                        } else { $all_in_place = false; }
                     }
-                }
-
-                else{
-                    for( $i = 0; $all_in_place && $i < $partitionCount; $i++ ) {
+                } else {
+                    for ($i = 0; $all_in_place && $i < $partitionCount; $i++) {
                         $partition_file = $destStreamURL."$fileHash.$fileId.$i";
-                        if( file_exists( $partition_file ) ) {
+                        if ( file_exists( $partition_file ) ) {
                             $partitions_length += filesize( $partition_file );
                         } else { $all_in_place = false; }
                     }
                 }
-            }
-
-            else{
-                if(self::$remote){
-                    if( strstr($newPartitions[count($newPartitions)-1]["name"], $userfile_name) != false){
+            } else {
+                if (self::$remote) {
+                    if ( strstr($newPartitions[count($newPartitions)-1]["name"], $userfile_name) != false) {
                         $partitions_length += filesize( $newPartitions[count($newPartitions)-1]["tmp_name"] );
                     }
-                }
-
-                else{
-                    if(file_exists($destStreamURL.$userfile_name)){
+                } else {
+                    if (file_exists($destStreamURL.$userfile_name)) {
                         $partitions_length += filesize($destStreamURL.$userfile_name);
                     }
                 }
             }
 
-            if( (!$all_in_place || $partitions_length != floatval($fileLength))){
+            if ( (!$all_in_place || $partitions_length != floatval($fileLength))) {
                 echo "Error: Upload validation error!";
                 /* we delete all the uploaded partitions */
-                if($httpVars["partitionCount"] > 1){
-                    for($i = 0; $i < $partitionCount; $i++){
-                        if(file_exists($destStreamURL."$fileHash.$fileId.$i")){
+                if ($httpVars["partitionCount"] > 1) {
+                    for ($i = 0; $i < $partitionCount; $i++) {
+                        if (file_exists($destStreamURL."$fileHash.$fileId.$i")) {
                             unlink($destStreamURL."$fileHash.$fileId.$i");
                         }
                     }
-                }
-                else{
+                } else {
                     $fileName = $httpVars["partitionRealName"];
                     unlink($destStreamURL.$fileName);
                 }
                 return;
             }
 
-            if(count($subs) > 0 && !self::$remote){
+            if (count($subs) > 0 && !self::$remote) {
                 $curDir = "";
 
-                if(substr($curDir, -1) == "/"){
+                if (substr($curDir, -1) == "/") {
                     $curDir = substr($curDir, 0, -1);
                 }
 
@@ -289,12 +280,12 @@ class JumploaderProcessor extends AJXP_Plugin {
                     $dirname=AJXP_Utils::decodeSecureMagic($spath, AJXP_SANITIZE_HTML_STRICT);
                     $dirname = substr($dirname, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
                     //$this->filterUserSelectionToHidden(array($dirname));
-                    if(AJXP_Utils::isHidden($dirname)){
+                    if (AJXP_Utils::isHidden($dirname)) {
                         $folderForbidden = true;
                         break;
                     }
 
-                    if(file_exists($destStreamURL."$curDir/$dirname")) {
+                    if (file_exists($destStreamURL."$curDir/$dirname")) {
                         // if the folder exists, traverse
                         AJXP_Logger::debug("$curDir/$dirname existing, traversing for $userfile_name out of", $httpVars["relativePath"]);
                         $curDir .= "/".$dirname;
@@ -304,8 +295,7 @@ class JumploaderProcessor extends AJXP_Plugin {
                     AJXP_Logger::debug($destStreamURL.$curDir);
                     $dirMode = 0775;
                     $chmodValue = $repository->getOption("CHMOD_VALUE");
-                    if(isSet($chmodValue) && $chmodValue != "")
-                    {
+                    if (isSet($chmodValue) && $chmodValue != "") {
                         $dirMode = octdec(ltrim($chmodValue, "0"));
                         if ($dirMode & 0400) $dirMode |= 0100; // User is allowed to read, allow to list the directory
                         if ($dirMode & 0040) $dirMode |= 0010; // Group is allowed to read, allow to list the directory
@@ -318,7 +308,7 @@ class JumploaderProcessor extends AJXP_Plugin {
                 }
             }
 
-            if(!$folderForbidden){
+            if (!$folderForbidden) {
                 $fileId = $httpVars["fileId"];
                 AJXP_Logger::debug("Should now rebuild file!", $httpVars);
                 // Now move the final file to the right folder
@@ -329,17 +319,17 @@ class JumploaderProcessor extends AJXP_Plugin {
                 $target .= (self::$remote)? basename($relPath) : $relPath;
                 $current = $destStreamURL.basename($relPath);
 
-                if($httpVars["partitionCount"] > 1){
-                    if(self::$remote){
+                if ($httpVars["partitionCount"] > 1) {
+                    if (self::$remote) {
                         $test = AJXP_Utils::getAjxpTmpDir()."/".$httpVars["partitionRealName"];
                         $newDest = fopen(AJXP_Utils::getAjxpTmpDir()."/".$httpVars["partitionRealName"], "w");
                         $newFile = array();
                         $length = 0;
-                        for($i = 0, $count = count($partitions); $i < $count; $i++){
+                        for ($i = 0, $count = count($partitions); $i < $count; $i++) {
                             $currentFile = $partitions[$i];
                             $currentFileName = $currentFile["tmp_name"];
                             $part = fopen($currentFileName, "r");
-                            while(!feof($part)){
+                            while (!feof($part)) {
                                 $length += fwrite($newDest, fread($part, 4096));
                             }
                             fclose($part);
@@ -352,15 +342,13 @@ class JumploaderProcessor extends AJXP_Plugin {
                         $newFile["tmp_name"] = AJXP_Utils::getAjxpTmpDir()."/".$httpVars["partitionRealName"];
                         $newFile["destination"] = $partitions[0]["destination"];
                         $newPartitions[] = $newFile;
-                    }
-
-                    else{
+                    } else {
                         $newDest = fopen($destStreamURL.$httpVars["partitionRealName"], "w");
                         $fileHash = md5($httpVars["partitionRealName"]);
 
-                        for ($i = 0; $i < $httpVars["partitionCount"] ; $i++){
+                        for ($i = 0; $i < $httpVars["partitionCount"] ; $i++) {
                             $part = fopen($destStreamURL."$fileHash.$fileId.$i", "r");
-                            while(!feof($part)){
+                            while (!feof($part)) {
                                 fwrite($newDest, fread($part, 4096));
                             }
                             fclose($part);
@@ -371,45 +359,39 @@ class JumploaderProcessor extends AJXP_Plugin {
                     fclose($newDest);
                 }
 
-                if(!self::$remote){
+                if (!self::$remote) {
                     $err = copy($current, $target);
-                }
-
-                else{
-                    for($i=0, $count=count($newPartitions); $i<$count; $i++){
+                } else {
+                    for ($i=0, $count=count($newPartitions); $i<$count; $i++) {
                         $driver->storeFileToCopy($newPartitions[$i]);
                     }
                 }
 
-                if($err !== false){
+                if ($err !== false) {
                     if(!self::$remote) unlink($current);
                     AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($target), false));
-                }
-
-                else if($current == $target){
+                } else if ($current == $target) {
                     AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($target), false));
                 }
-            }
-
-            else{
+            } else {
                 // Remove the file, as it should not have been uploaded!
                 if(!self::$remote) unlink($current);
             }
         }
     }
 
-    public function jumploaderInstallApplet($params){
-        if(is_file($this->getBaseDir()."/jumploader_z.jar")){
+    public function jumploaderInstallApplet($params)
+    {
+        if (is_file($this->getBaseDir()."/jumploader_z.jar")) {
             return "ERROR: The applet is already installed!";
         }
         $fileData = AJXP_Utils::getRemoteContent("http://jumploader.com/jumploader_z.jar");
-        if(!is_writable($this->getBaseDir())){
+        if (!is_writable($this->getBaseDir())) {
             file_put_contents(AJXP_CACHE_DIR."/jumploader_z.jar", $fileData);
             return "ERROR: The applet was downloaded, but the folder plugins/uploader.jumploader is not writeable. Applet is located in the cache folder, please put it manually in the plugin folder.";
-        }else{
+        } else {
             file_put_contents($this->getBaseDir()."/jumploader_z.jar", $fileData);
             return "SUCCESS: Installed applet successfully!";
         }
     }
 }
-?>

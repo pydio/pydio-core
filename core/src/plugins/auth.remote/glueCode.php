@@ -34,8 +34,8 @@
  * @subpackage Auth
  */
 global $AJXP_GLUE_GLOBALS;
-if(!isSet($AJXP_GLUE_GLOBALS)){
-	$AJXP_GLUE_GLOBALS = array();
+if (!isSet($AJXP_GLUE_GLOBALS)) {
+    $AJXP_GLUE_GLOBALS = array();
 }
 if (!isSet($CURRENTPATH)) {
     $CURRENTPATH=realpath(dirname(__FILE__));
@@ -60,15 +60,14 @@ $secret = $AJXP_GLUE_GLOBALS["secret"];
 
 $confPlugs = ConfService::getConf("PLUGINS");
 $authPlug = ConfService::getAuthDriverImpl();
-if ($authPlug->getOption("SECRET") == "")
-{
-    if (basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME'])){
+if ($authPlug->getOption("SECRET") == "") {
+    if (basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME'])) {
        die("This file must be included and cannot be called directly");
     }
-    if ($_SERVER['PHP_SELF'] != $authPlug->getOption("LOGIN_URL")){
+    if ($_SERVER['PHP_SELF'] != $authPlug->getOption("LOGIN_URL")) {
        $plugInAction = "WRONG_URL";
     }
-} else if ($secret != $authPlug->getOption("SECRET")){
+} else if ($secret != $authPlug->getOption("SECRET")) {
     $plugInAction = "WRONG_SECRET";
 }
 
@@ -76,26 +75,27 @@ if ($authPlug->getOption("SECRET") == "")
  * @param array $loginData
  * @param AbstractAjxpUser $userObject
  */
-function ajxp_gluecode_updateRole($loginData, &$userObject){
+function ajxp_gluecode_updateRole($loginData, &$userObject)
+{
     $authPlug = ConfService::getAuthDriverImpl();
     $rolesMap = $authPlug->getOption("ROLES_MAP");
     if(!isSet($rolesMap) || strlen($rolesMap) == 0) return;
     // String like {key:value,key2:value2,key3:value3}
     $rolesMap = explode(",", $rolesMap);
     $newMap = array();
-    foreach($rolesMap as $value){
+    foreach ($rolesMap as $value) {
         $parts = explode(":", trim($value));
         $roleId = trim($parts[1]);
         $roleObject = AuthService::getRole($roleId);
-        if($roleObject != null){
+        if ($roleObject != null) {
             $newMap[trim($parts[0])] = $roleObject;
             $userObject->removeRole($roleId);
         }
     }
     $rolesMap = $newMap;
-    if(isset($loginData["roles"]) && is_array($loginData["roles"])){
-        foreach($loginData["roles"] as $role){
-            if(isSet($rolesMap[$role])) {
+    if (isset($loginData["roles"]) && is_array($loginData["roles"])) {
+        foreach ($loginData["roles"] as $role) {
+            if (isSet($rolesMap[$role])) {
                 $userObject->addRole($rolesMap[$role]);
             }
         }
@@ -103,91 +103,82 @@ function ajxp_gluecode_updateRole($loginData, &$userObject){
 }
 
 
-switch($plugInAction)
-{
-	case 'login':
-	    $login = $AJXP_GLUE_GLOBALS["login"]; $autoCreate = $AJXP_GLUE_GLOBALS["autoCreate"];
-	    if (is_array($login))
-	    {
-	        $newSession = new SessionSwitcher("AjaXplorer");
-	        $creation = false;
-	        if($autoCreate && !AuthService::userExists($login["name"], "w")){
-		        $creation = true;
-		        $isAdmin = (isSet($login["right"]) && $login["right"] == "admin");
-	        	AuthService::createUser($login["name"], $login["password"], $isAdmin);
-	        }
-	        if(isSet($AJXP_GLUE_GLOBALS["checkPassword"]) && $AJXP_GLUE_GLOBALS["checkPassword"] === TRUE){
-		        $result = AuthService::logUser($login["name"], $login["password"], false, false, -1);
-	        }else{
-	        	$result = AuthService::logUser($login["name"], $login["password"], true);
-	        }
-		   	// Update default rights (this could go in the trunk...)
-		   	if($result == 1){
-			   	$userObject = AuthService::getLoggedUser();
-			   	if($userObject->isAdmin()){
-			   		AuthService::updateAdminRights($userObject);
-			   	}else{
-					AuthService::updateDefaultRights($userObject);
-			   	}
+switch ($plugInAction) {
+    case 'login':
+        $login = $AJXP_GLUE_GLOBALS["login"]; $autoCreate = $AJXP_GLUE_GLOBALS["autoCreate"];
+        if (is_array($login)) {
+            $newSession = new SessionSwitcher("AjaXplorer");
+            $creation = false;
+            if ($autoCreate && !AuthService::userExists($login["name"], "w")) {
+                $creation = true;
+                $isAdmin = (isSet($login["right"]) && $login["right"] == "admin");
+                AuthService::createUser($login["name"], $login["password"], $isAdmin);
+            }
+            if (isSet($AJXP_GLUE_GLOBALS["checkPassword"]) && $AJXP_GLUE_GLOBALS["checkPassword"] === TRUE) {
+                $result = AuthService::logUser($login["name"], $login["password"], false, false, -1);
+            } else {
+                $result = AuthService::logUser($login["name"], $login["password"], true);
+            }
+               // Update default rights (this could go in the trunk...)
+               if ($result == 1) {
+                   $userObject = AuthService::getLoggedUser();
+                   if ($userObject->isAdmin()) {
+                       AuthService::updateAdminRights($userObject);
+                   } else {
+                    AuthService::updateDefaultRights($userObject);
+                   }
                 if($creation) ajxp_gluecode_updateRole($login, $userObject);
-				$userObject->save("superuser");
-		   	}	        
-	    }
-	    break;
-	case 'logout':
-	    $newSession = new SessionSwitcher("AjaXplorer");
-	    global $_SESSION;
-	    $_SESSION = array();
-	    $result = TRUE;
-	    break;
-	case 'addUser':
-	    $user = $AJXP_GLUE_GLOBALS["user"];
-	    if (is_array($user))
-	    {
-	        $isAdmin = (isSet($user["right"]) && $user["right"] == "admin");
-	        AuthService::createUser($user["name"], $user["password"], $isAdmin);
-            if(isSet($user["roles"])){
+                $userObject->save("superuser");
+               }
+        }
+        break;
+    case 'logout':
+        $newSession = new SessionSwitcher("AjaXplorer");
+        global $_SESSION;
+        $_SESSION = array();
+        $result = TRUE;
+        break;
+    case 'addUser':
+        $user = $AJXP_GLUE_GLOBALS["user"];
+        if (is_array($user)) {
+            $isAdmin = (isSet($user["right"]) && $user["right"] == "admin");
+            AuthService::createUser($user["name"], $user["password"], $isAdmin);
+            if (isSet($user["roles"])) {
                 $confDriver = ConfService::getConfStorageImpl();
                 $userObject = $confDriver->createUserObject($user["name"]);
                 ajxp_gluecode_updateRole($user, $userObject);
                 $userObject->save("superuser");
             }
-	        $result = TRUE;
-	    }
-	    break;
-	case 'delUser':
-	    $userName = $AJXP_GLUE_GLOBALS["userName"];
-	    if (strlen($userName))
-	    {	        
-	        AuthService::deleteUser($userName);
-	        $result = TRUE;
-	    }
-	    break;
-	case 'updateUser':
-	    $user = $AJXP_GLUE_GLOBALS["user"];
-	    if (is_array($user))
-	    {
-	        if (AuthService::updatePassword($user["name"], $user["password"]))
-	        {
-	        	$isAdmin =  (isSet($user["right"]) && $user["right"] == "admin");
-				$confDriver = ConfService::getConfStorageImpl();
-				$userObject = $confDriver->createUserObject($user["name"]);
-				$userObject->setAdmin($isAdmin);
+            $result = TRUE;
+        }
+        break;
+    case 'delUser':
+        $userName = $AJXP_GLUE_GLOBALS["userName"];
+        if (strlen($userName)) {
+            AuthService::deleteUser($userName);
+            $result = TRUE;
+        }
+        break;
+    case 'updateUser':
+        $user = $AJXP_GLUE_GLOBALS["user"];
+        if (is_array($user)) {
+            if (AuthService::updatePassword($user["name"], $user["password"])) {
+                $isAdmin =  (isSet($user["right"]) && $user["right"] == "admin");
+                $confDriver = ConfService::getConfStorageImpl();
+                $userObject = $confDriver->createUserObject($user["name"]);
+                $userObject->setAdmin($isAdmin);
                 ajxp_gluecode_updateRole($user, $userObject);
-				$userObject->save("superuser");
-	            $result = TRUE;
-	        }
-	        else $result = FALSE;
-	    }
-	    break;
-	case 'installDB':
-	    $user = $AJXP_GLUE_GLOBALS["user"]; $reset = $AJXP_GLUE_GLOBALS["reset"];
-	    $result = TRUE;
-	    break;            
-	default:
-	    $result = FALSE;
+                $userObject->save("superuser");
+                $result = TRUE;
+            } else $result = FALSE;
+        }
+        break;
+    case 'installDB':
+        $user = $AJXP_GLUE_GLOBALS["user"]; $reset = $AJXP_GLUE_GLOBALS["reset"];
+        $result = TRUE;
+        break;
+    default:
+        $result = FALSE;
 }
 
 $AJXP_GLUE_GLOBALS["result"] = $result;
-    
-?>

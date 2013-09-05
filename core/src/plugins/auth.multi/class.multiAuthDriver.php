@@ -25,193 +25,209 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Auth
  */
-class multiAuthDriver extends AbstractAuthDriver {
-	
-	var $driverName = "multi";
-	var $driversDef = array();
-	var $currentDriver;
+class multiAuthDriver extends AbstractAuthDriver
+{
+    public $driverName = "multi";
+    public $driversDef = array();
+    public $currentDriver;
 
-    var $masterSlaveMode = false;
-    var $masterName;
-    var $slaveName;
-    var $baseName;
+    public $masterSlaveMode = false;
+    public $masterName;
+    public $slaveName;
+    public $baseName;
 
-    static $schemesCache = null;
+    public static $schemesCache = null;
 
-	/**
-	 * @var $drivers AbstractAuthDriver[]
-	 */
-	var $drivers =  array();
-	
-	public function init($options){
-		//parent::init($options);
-		$this->options = $options;
-		$this->driversDef = $this->getOption("DRIVERS");
+    /**
+     * @var $drivers AbstractAuthDriver[]
+     */
+    public $drivers =  array();
+
+    public function init($options)
+    {
+        //parent::init($options);
+        $this->options = $options;
+        $this->driversDef = $this->getOption("DRIVERS");
         $this->masterSlaveMode = ($this->getOption("MODE") == "MASTER_SLAVE");
         $this->masterName = $this->getOption("MASTER_DRIVER");
         $this->baseName = $this->getOption("USER_BASE_DRIVER");
-		foreach($this->driversDef as $def){
-			$name = $def["NAME"];
-			$options = $def["OPTIONS"];
-			$options["TRANSMIT_CLEAR_PASS"] = $this->options["TRANSMIT_CLEAR_PASS"];
-			$options["LOGIN_REDIRECT"] = $this->options["LOGIN_REDIRECT"];			
-			$instance = AJXP_PluginsService::findPlugin("auth", $name);
-			if(!is_object($instance)){
-				throw new Exception("Cannot find plugin $name for type 'auth'");
-			}
-			$instance->init($options);
-            if($name != $this->getOption("MASTER_DRIVER")){
+        foreach ($this->driversDef as $def) {
+            $name = $def["NAME"];
+            $options = $def["OPTIONS"];
+            $options["TRANSMIT_CLEAR_PASS"] = $this->options["TRANSMIT_CLEAR_PASS"];
+            $options["LOGIN_REDIRECT"] = $this->options["LOGIN_REDIRECT"];
+            $instance = AJXP_PluginsService::findPlugin("auth", $name);
+            if (!is_object($instance)) {
+                throw new Exception("Cannot find plugin $name for type 'auth'");
+            }
+            $instance->init($options);
+            if ($name != $this->getOption("MASTER_DRIVER")) {
                 $this->slaveName = $name;
             }
-			$this->drivers[$name] = $instance;
-		}
-		// THE "LOAD REGISTRY CONTRIBUTIONS" METHOD
-		// WILL BE CALLED LATER, TO BE SURE THAT THE
-		// SESSION IS ALREADY STARTED.
-	}
-	
-	public function getRegistryContributions( $extendedVersion = true ){
-		// AJXP_Logger::debug("get contributions NOW");
-		$this->loadRegistryContributions();
-		return parent::getRegistryContributions( $extendedVersion );
-	}
-		
-	private function detectCurrentDriver(){
-		//if(isSet($this->currentDriver)) return;
-		$authSource = $this->getOption("MASTER_DRIVER");
-		if(isSet($_POST["auth_source"])){
-			$_SESSION["AJXP_MULTIAUTH_SOURCE"] = $_POST["auth_source"];
-			$authSource = $_POST["auth_source"];
-			AJXP_Logger::debug("Auth source from POST");
-		}else if(isSet($_SESSION["AJXP_MULTIAUTH_SOURCE"])){
-			$authSource = $_SESSION["AJXP_MULTIAUTH_SOURCE"];
-			AJXP_Logger::debug("Auth source from SESSION");
-		}else {
-			AJXP_Logger::debug("Auth source from MASTER");
-		}
-		$this->setCurrentDriverName($authSource);		
-	}
-	
-	protected function parseSpecificContributions(&$contribNode){
-		parent::parseSpecificContributions($contribNode);
+            $this->drivers[$name] = $instance;
+        }
+        // THE "LOAD REGISTRY CONTRIBUTIONS" METHOD
+        // WILL BE CALLED LATER, TO BE SURE THAT THE
+        // SESSION IS ALREADY STARTED.
+    }
+
+    public function getRegistryContributions( $extendedVersion = true )
+    {
+        // AJXP_Logger::debug("get contributions NOW");
+        $this->loadRegistryContributions();
+        return parent::getRegistryContributions( $extendedVersion );
+    }
+
+    private function detectCurrentDriver()
+    {
+        //if(isSet($this->currentDriver)) return;
+        $authSource = $this->getOption("MASTER_DRIVER");
+        if (isSet($_POST["auth_source"])) {
+            $_SESSION["AJXP_MULTIAUTH_SOURCE"] = $_POST["auth_source"];
+            $authSource = $_POST["auth_source"];
+            AJXP_Logger::debug("Auth source from POST");
+        } else if (isSet($_SESSION["AJXP_MULTIAUTH_SOURCE"])) {
+            $authSource = $_SESSION["AJXP_MULTIAUTH_SOURCE"];
+            AJXP_Logger::debug("Auth source from SESSION");
+        } else {
+            AJXP_Logger::debug("Auth source from MASTER");
+        }
+        $this->setCurrentDriverName($authSource);
+    }
+
+    protected function parseSpecificContributions(&$contribNode)
+    {
+        parent::parseSpecificContributions($contribNode);
         if($this->masterSlaveMode) return;
-		if($contribNode->nodeName != "actions") return ;
-		// Replace callback code
-		$actionXpath=new DOMXPath($contribNode->ownerDocument);
-		$loginCallbackNodeList = $actionXpath->query('action[@name="login"]/processing/clientCallback', $contribNode);
-		if(!$loginCallbackNodeList->length) return ;
-		$xmlContent = file_get_contents(AJXP_INSTALL_PATH."/plugins/auth.multi/login_patch.xml");
-		$sources = array();
-		foreach($this->getOption("DRIVERS") as $driverDef){
-			$dName = $driverDef["NAME"];
-			if(isSet($driverDef["LABEL"])){
-				$dLabel = $driverDef["LABEL"];
-			}else{
-				$dLabel = $driverDef["NAME"];
-			}
-			$sources[$dName] = $dLabel;
-		}
-		$xmlContent = str_replace("AJXP_MULTIAUTH_SOURCES", json_encode($sources), $xmlContent);
-		$xmlContent = str_replace("AJXP_MULTIAUTH_MASTER", $this->getOption("MASTER_DRIVER"), $xmlContent);
-		$xmlContent = str_replace("AJXP_USER_ID_SEPARATOR", $this->getOption("USER_ID_SEPARATOR"), $xmlContent);
+        if($contribNode->nodeName != "actions") return ;
+        // Replace callback code
+        $actionXpath=new DOMXPath($contribNode->ownerDocument);
+        $loginCallbackNodeList = $actionXpath->query('action[@name="login"]/processing/clientCallback', $contribNode);
+        if(!$loginCallbackNodeList->length) return ;
+        $xmlContent = file_get_contents(AJXP_INSTALL_PATH."/plugins/auth.multi/login_patch.xml");
+        $sources = array();
+        foreach ($this->getOption("DRIVERS") as $driverDef) {
+            $dName = $driverDef["NAME"];
+            if (isSet($driverDef["LABEL"])) {
+                $dLabel = $driverDef["LABEL"];
+            } else {
+                $dLabel = $driverDef["NAME"];
+            }
+            $sources[$dName] = $dLabel;
+        }
+        $xmlContent = str_replace("AJXP_MULTIAUTH_SOURCES", json_encode($sources), $xmlContent);
+        $xmlContent = str_replace("AJXP_MULTIAUTH_MASTER", $this->getOption("MASTER_DRIVER"), $xmlContent);
+        $xmlContent = str_replace("AJXP_USER_ID_SEPARATOR", $this->getOption("USER_ID_SEPARATOR"), $xmlContent);
         $patchDoc = new DOMDocument();
         $patchDoc->loadXML($xmlContent);
-		$patchNode = $patchDoc->documentElement;
-		$imported = $contribNode->ownerDocument->importNode($patchNode, true);
-		$loginCallback = $loginCallbackNodeList->item(0);
-		$loginCallback->parentNode->replaceChild($imported, $loginCallback);
-		//var_dump($contribNode->ownerDocument->saveXML($contribNode));
-	}
-		
-	protected function setCurrentDriverName($name){
-		$this->currentDriver = $name;
-	}
-	
-	protected function getCurrentDriver(){
-		$this->detectCurrentDriver();
-		if(isSet($this->currentDriver) && isSet($this->drivers[$this->currentDriver])){
-			return $this->drivers[$this->currentDriver];
-		}else{
-			return false;
-		}
-	}
-	
-	protected function extractRealId($userId){
-		$parts = explode($this->getOption("USER_ID_SEPARATOR"), $userId);
-		if(count($parts) == 2){
-			return $parts[1];
-		}
-		return $userId;
-	}
+        $patchNode = $patchDoc->documentElement;
+        $imported = $contribNode->ownerDocument->importNode($patchNode, true);
+        $loginCallback = $loginCallbackNodeList->item(0);
+        $loginCallback->parentNode->replaceChild($imported, $loginCallback);
+        //var_dump($contribNode->ownerDocument->saveXML($contribNode));
+    }
 
-	public function performChecks(){
-		foreach($this->drivers as $driver){
-			$driver->performChecks();
-		}
-	}
+    protected function setCurrentDriverName($name)
+    {
+        $this->currentDriver = $name;
+    }
 
-    function getAuthScheme($login){
-        if(!isSet(multiAuthDriver::$schemesCache)){
-            foreach($this->drivers as $scheme => $d){
+    protected function getCurrentDriver()
+    {
+        $this->detectCurrentDriver();
+        if (isSet($this->currentDriver) && isSet($this->drivers[$this->currentDriver])) {
+            return $this->drivers[$this->currentDriver];
+        } else {
+            return false;
+        }
+    }
+
+    protected function extractRealId($userId)
+    {
+        $parts = explode($this->getOption("USER_ID_SEPARATOR"), $userId);
+        if (count($parts) == 2) {
+            return $parts[1];
+        }
+        return $userId;
+    }
+
+    public function performChecks()
+    {
+        foreach ($this->drivers as $driver) {
+            $driver->performChecks();
+        }
+    }
+
+    public function getAuthScheme($login)
+    {
+        if (!isSet(multiAuthDriver::$schemesCache)) {
+            foreach ($this->drivers as $scheme => $d) {
                 if($d->userExists($login)) return $scheme;
             }
-        } else if(isSet(multiAuthDriver::$schemesCache[$login])){
+        } else if (isSet(multiAuthDriver::$schemesCache[$login])) {
             return multiAuthDriver::$schemesCache[$login];
         }
         return null;
     }
 
-    function supportsAuthSchemes(){
+    public function supportsAuthSchemes()
+    {
         return true;
     }
 
-    function addToCache($usersList, $scheme){
-        if(!isset(multiAuthDriver::$schemesCache)){
+    public function addToCache($usersList, $scheme)
+    {
+        if (!isset(multiAuthDriver::$schemesCache)) {
             multiAuthDriver::$schemesCache = array();
         }
-        foreach($usersList as $userName){
+        foreach ($usersList as $userName) {
             multiAuthDriver::$schemesCache[$userName] = $scheme;
         }
     }
 
-    function supportsUsersPagination(){
-        if(!empty($this->baseName)){
+    public function supportsUsersPagination()
+    {
+        if (!empty($this->baseName)) {
             return $this->drivers[$this->baseName]->supportsUsersPagination();
-        }else{
+        } else {
             return $this->drivers[$this->masterName]->supportsUsersPagination() && $this->drivers[$this->slaveName]->supportsUsersPagination();
         }
     }
 
-    function listUsersPaginated($baseGroup="/", $regexp, $offset, $limit){
-        if(!empty($this->baseName)){
+    public function listUsersPaginated($baseGroup="/", $regexp, $offset, $limit)
+    {
+        if (!empty($this->baseName)) {
             return $this->drivers[$this->baseName]->listUsersPaginated($baseGroup, $regexp, $offset, $limit);
-        }else{
+        } else {
             $keys = array_keys($this->drivers);
             return $this->drivers[$keys[0]]->listUsersPaginated($baseGroup, $regexp, $offset, $limit) +  $this->drivers[$keys[1]]->listUsersPaginated($baseGroup, $regexp, $offset, $limit);
         }
     }
 
-    function getUsersCount($baseGroup = "/", $regexp = ""){
-        if(empty($this->baseName)){
-            if($this->masterSlaveMode){
+    public function getUsersCount($baseGroup = "/", $regexp = "")
+    {
+        if (empty($this->baseName)) {
+            if ($this->masterSlaveMode) {
                 return $this->drivers[$this->slaveName]->getUsersCount($baseGroup, $regexp) +  $this->drivers[$this->masterName]->getUsersCount($baseGroup, $regexp);
-            }else{
+            } else {
                 $keys = array_keys($this->drivers);
                 return $this->drivers[$keys[0]]->getUsersCount($baseGroup, $regexp) +  $this->drivers[$keys[1]]->getUsersCount($baseGroup, $regexp);
             }
-        }else{
+        } else {
             return $this->drivers[$this->baseName]->getUsersCount($baseGroup, $regexp);
         }
     }
 
-    function isAjxpAdmin($login){
+    public function isAjxpAdmin($login)
+    {
         $keys = array_keys($this->drivers);
         return ($this->drivers[$keys[0]]->getOption("AJXP_ADMIN_LOGIN") === $login) ||  ($this->drivers[$keys[1]]->getOption("AJXP_ADMIN_LOGIN") === $login);
     }
 
-	function listUsers($baseGroup="/"){
-        if($this->masterSlaveMode){
-            if(!empty($this->baseName)) {
+    public function listUsers($baseGroup="/")
+    {
+        if ($this->masterSlaveMode) {
+            if (!empty($this->baseName)) {
                 $users = $this->drivers[$this->baseName]->listUsers($baseGroup);
                 $this->addToCache(array_keys($users), $this->baseName);
                 return $users;
@@ -222,28 +238,29 @@ class multiAuthDriver extends AbstractAuthDriver {
             $this->addToCache(array_keys($slaveUsers), $this->masterName);
             return array_merge($masterUsers, $slaveUsers);
         }
-		if($this->getCurrentDriver()){
+        if ($this->getCurrentDriver()) {
 //			return $this->getCurrentDriver()->listUsers($baseGroup);
-		}
-		$allUsers = array();
-		foreach($this->drivers as $driver){
-			$allUsers = array_merge($allUsers, $driver->listUsers($baseGroup));
-		}
-		return $allUsers;
-	}
+        }
+        $allUsers = array();
+        foreach ($this->drivers as $driver) {
+            $allUsers = array_merge($allUsers, $driver->listUsers($baseGroup));
+        }
+        return $allUsers;
+    }
 
-    function updateUserObject(&$userObject){
+    public function updateUserObject(&$userObject)
+    {
         $s = $this->getAuthScheme($userObject->getId());
-        if(!$this->masterSlaveMode){
+        if (!$this->masterSlaveMode) {
             $test = $this->extractRealId($userObject->getId());
-            if($test != $userObject->getId()) {
+            if ($test != $userObject->getId()) {
                 $restore = $userObject->getId();
                 $userObject->setId($test);
             }
         }
-        if(!empty($s) && isSet($this->drivers[$s])){
+        if (!empty($s) && isSet($this->drivers[$s])) {
             $this->drivers[$s]->updateUserObject($userObject);
-        }else if(!empty($this->currentDriver) && isSet($this->drivers[$this->currentDriver])){
+        } else if (!empty($this->currentDriver) && isSet($this->drivers[$this->currentDriver])) {
             $this->drivers[$this->currentDriver]->updateUserObject($userObject);
         }
         if(isSet($restore)) $userObject->setId($restore);
@@ -255,174 +272,185 @@ class multiAuthDriver extends AbstractAuthDriver {
      * @param string $baseGroup
      * @return string[]
      */
-    function listChildrenGroups($baseGroup = "/"){
-        if($this->masterSlaveMode){
+    public function listChildrenGroups($baseGroup = "/")
+    {
+        if ($this->masterSlaveMode) {
             if(!empty($this->baseName)) return $this->drivers[$this->baseName]->listChildrenGroups($baseGroup);
             $aGroups = $this->drivers[$this->masterName]->listChildrenGroups($baseGroup);
             $bGroups = $this->drivers[$this->slaveName]->listChildrenGroups($baseGroup);
             return $aGroups + $bGroups;
         }
-        if($this->getCurrentDriver()){
+        if ($this->getCurrentDriver()) {
 //            return $this->drivers[$this->currentDriver]->listChildrenGroups($baseGroup);
         }
         $groups = array();
-        foreach($this->drivers as $d){
+        foreach ($this->drivers as $d) {
             $groups = array_merge($groups, $d->listChildrenGroups($baseGroup));
         }
         return $groups;
     }
 
 
-    function preLogUser($remoteSessionId){
-        if($this->masterSlaveMode){
+    public function preLogUser($remoteSessionId)
+    {
+        if ($this->masterSlaveMode) {
             $this->drivers[$this->slaveName]->preLogUser($remoteSessionId);
-            if(AuthService::getLoggedUser() == null){
+            if (AuthService::getLoggedUser() == null) {
                 return $this->drivers[$this->masterName]->preLogUser($remoteSessionId);
             }
             return;
         }
 
-		if($this->getCurrentDriver()){
-			return $this->getCurrentDriver()->preLogUser($remoteSessionId);
-		}else{
-			throw new Exception("No driver instanciated in multi driver!");
-		}		
-	}	
+        if ($this->getCurrentDriver()) {
+            return $this->getCurrentDriver()->preLogUser($remoteSessionId);
+        } else {
+            throw new Exception("No driver instanciated in multi driver!");
+        }
+    }
 
-    function userExistsWrite($login){
-        if($this->masterSlaveMode){
-            if($this->drivers[$this->slaveName]->userExists($login)){
+    public function userExistsWrite($login)
+    {
+        if ($this->masterSlaveMode) {
+            if ($this->drivers[$this->slaveName]->userExists($login)) {
                 return true;
             }
             return false;
-        }else{
+        } else {
             return $this->userExists($login);
         }
     }
 
-	function userExists($login){
-        if($this->masterSlaveMode){
-            if($this->drivers[$this->slaveName]->userExists($login)){
+    public function userExists($login)
+    {
+        if ($this->masterSlaveMode) {
+            if ($this->drivers[$this->slaveName]->userExists($login)) {
                 return true;
             }
-            if($this->drivers[$this->masterName]->userExists($login)){
+            if ($this->drivers[$this->masterName]->userExists($login)) {
                 return true;
             }
             return false;
         }
-		$login = $this->extractRealId($login);
-		AJXP_Logger::debug("user exists ".$login);
-		if($this->getCurrentDriver()){
-			return $this->getCurrentDriver()->userExists($login);
-		}else{
-			throw new Exception("No driver instanciated in multi driver!");
-		}		
-	}	
-	
-	function checkPassword($login, $pass, $seed){
-        if($this->masterSlaveMode){
-            if($this->drivers[$this->masterName]->userExists($login)){
+        $login = $this->extractRealId($login);
+        AJXP_Logger::debug("user exists ".$login);
+        if ($this->getCurrentDriver()) {
+            return $this->getCurrentDriver()->userExists($login);
+        } else {
+            throw new Exception("No driver instanciated in multi driver!");
+        }
+    }
+
+    public function checkPassword($login, $pass, $seed)
+    {
+        if ($this->masterSlaveMode) {
+            if ($this->drivers[$this->masterName]->userExists($login)) {
                 // check master, and refresh slave if necessary
-                if($this->drivers[$this->masterName]->checkPassword($login, $pass, $seed)){
-                    if($this->drivers[$this->slaveName]->userExists($login)){
+                if ($this->drivers[$this->masterName]->checkPassword($login, $pass, $seed)) {
+                    if ($this->drivers[$this->slaveName]->userExists($login)) {
                         $this->drivers[$this->slaveName]->changePassword($login, $pass);
-                    }else{
+                    } else {
                         $this->drivers[$this->slaveName]->createUser($login, $pass);
                     }
                     return true;
-                }else{
+                } else {
                     return false;
                 }
-            }else{
+            } else {
                 $res = $this->drivers[$this->slaveName]->checkPassword($login, $pass, $seed);
                 return $res;
             }
         }
 
-		$login = $this->extractRealId($login);
-		AJXP_Logger::debug("check pass ".$login);
-		if($this->getCurrentDriver()){
-			return $this->getCurrentDriver()->checkPassword($login, $pass, $seed);
-		}else{
-			throw new Exception("No driver instanciated in multi driver!");
-		}		
-	}
-	
-	function usersEditable(){
+        $login = $this->extractRealId($login);
+        AJXP_Logger::debug("check pass ".$login);
+        if ($this->getCurrentDriver()) {
+            return $this->getCurrentDriver()->checkPassword($login, $pass, $seed);
+        } else {
+            throw new Exception("No driver instanciated in multi driver!");
+        }
+    }
+
+    public function usersEditable()
+    {
         if($this->masterSlaveMode) return true;
 
-		if($this->getCurrentDriver()){
-			return $this->getCurrentDriver()->usersEditable();
-		}else{
-			throw new Exception("No driver instanciated in multi driver!");
-		}		
-	}
-	
-	function passwordsEditable(){
+        if ($this->getCurrentDriver()) {
+            return $this->getCurrentDriver()->usersEditable();
+        } else {
+            throw new Exception("No driver instanciated in multi driver!");
+        }
+    }
+
+    public function passwordsEditable()
+    {
         if($this->masterSlaveMode) return true;
 
-		if($this->getCurrentDriver()){
-			return $this->getCurrentDriver()->passwordsEditable();
-		}else{
-			//throw new Exception("No driver instanciated in multi driver!");
-			AJXP_Logger::debug("passEditable no current driver set??");
-			return false;
-		}		
-	}
-	
-	function createUser($login, $passwd){
-        if($this->masterSlaveMode){
+        if ($this->getCurrentDriver()) {
+            return $this->getCurrentDriver()->passwordsEditable();
+        } else {
+            //throw new Exception("No driver instanciated in multi driver!");
+            AJXP_Logger::debug("passEditable no current driver set??");
+            return false;
+        }
+    }
+
+    public function createUser($login, $passwd)
+    {
+        if ($this->masterSlaveMode) {
             return $this->drivers[$this->slaveName]->createUser($login, $passwd);
         }
 
-		$login = $this->extractRealId($login);		
-		if($this->getCurrentDriver()){
-			return $this->getCurrentDriver()->createUser($login, $passwd);
-		}else{
-			throw new Exception("No driver instanciated in multi driver!");
-		}				
-	}	
-	
-	function changePassword($login, $newPass){
-        if($this->masterSlaveMode){
+        $login = $this->extractRealId($login);
+        if ($this->getCurrentDriver()) {
+            return $this->getCurrentDriver()->createUser($login, $passwd);
+        } else {
+            throw new Exception("No driver instanciated in multi driver!");
+        }
+    }
+
+    public function changePassword($login, $newPass)
+    {
+        if ($this->masterSlaveMode) {
             return $this->drivers[$this->slaveName]->changePassword($login, $newPass);
         }
 
-		if($this->getCurrentDriver() && $this->getCurrentDriver()->usersEditable()){
-			return $this->getCurrentDriver()->changePassword($login, $newPass);
-		}else{
-			throw new Exception("No driver instanciated in multi driver!");
-		}		
-	}	
+        if ($this->getCurrentDriver() && $this->getCurrentDriver()->usersEditable()) {
+            return $this->getCurrentDriver()->changePassword($login, $newPass);
+        } else {
+            throw new Exception("No driver instanciated in multi driver!");
+        }
+    }
 
-	function deleteUser($login){
-        if($this->masterSlaveMode){
+    public function deleteUser($login)
+    {
+        if ($this->masterSlaveMode) {
             return $this->drivers[$this->slaveName]->deleteUser($login);
         }
 
-		if($this->getCurrentDriver()){
-			return $this->getCurrentDriver()->deleteUser($login);
-		}else{
-			throw new Exception("No driver instanciated in multi driver!");
-		}		
-	}
+        if ($this->getCurrentDriver()) {
+            return $this->getCurrentDriver()->deleteUser($login);
+        } else {
+            throw new Exception("No driver instanciated in multi driver!");
+        }
+    }
 
-	function getUserPass($login){
-        if($this->masterSlaveMode){
+    public function getUserPass($login)
+    {
+        if ($this->masterSlaveMode) {
             return $this->drivers[$this->slaveName]->getUserPass($login);
         }
 
-		if($this->getCurrentDriver()){
-			return $this->getCurrentDriver()->getUserPass($login);
-		}else{
-			throw new Exception("No driver instanciated in multi driver!");
-		}		
-	}
-	
-	function filterCredentials($userId, $pwd){
+        if ($this->getCurrentDriver()) {
+            return $this->getCurrentDriver()->getUserPass($login);
+        } else {
+            throw new Exception("No driver instanciated in multi driver!");
+        }
+    }
+
+    public function filterCredentials($userId, $pwd)
+    {
         if($this->masterSlaveMode) return array($userId, $pwd);
-		return array($this->extractRealId($userId), $pwd);
-	}	
+        return array($this->extractRealId($userId), $pwd);
+    }
 
 }
-?>

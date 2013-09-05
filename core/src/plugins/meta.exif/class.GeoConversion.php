@@ -48,13 +48,13 @@
 
 Class GeoConversion{
 
-   var $negative = FALSE;
-   var $real = FALSE;
-   var $negative_path = '';
+   public $negative = FALSE;
+   public $real = FALSE;
+   public $negative_path = '';
 
    private function is_negative(&$string)
    {
-      if($string[0] == '-'){
+      if ($string[0] == '-') {
         $this->negative = TRUE;
         $string = str_replace('-','',$string);
         $this->negative_path = '-';
@@ -64,11 +64,11 @@ Class GeoConversion{
 
    private function replace_special_chars(&$string,$decimal)
    {
-       for($I = 0 ; $I < strlen($string) ; $I++){
+       for ($I = 0 ; $I < strlen($string) ; $I++) {
          $not_decimal = $decimal == FALSE ? ($string[$I] != '.') : TRUE;
-         if(!is_numeric($string[$I]) && $not_decimal && $string[$I] != ' '){
+         if (!is_numeric($string[$I]) && $not_decimal && $string[$I] != ' ') {
            $string[$I] = ';';
-         } else if($string[$I] == ' ') {
+         } else if ($string[$I] == ' ') {
            $string[$I] = '';
          }
        }
@@ -80,14 +80,14 @@ Class GeoConversion{
        $dados = explode(';',$DMS);
        return array('D' => $dados[0],'M' => $dados[1],'S' => $dados[2]);
    }
-   
+
    private function SepDMm($DMm)
    {
        $this->replace_special_chars($DMm,TRUE);
        $dados = explode(';',$DMm);
        return array('D' => $dados[0],'M' => $dados[1],'m' => $dados[2]);
    }
-   
+
    private function SepDd($Dd)
    {
        $this->replace_special_chars($Dd,TRUE);
@@ -105,23 +105,23 @@ Class GeoConversion{
        $array_DMm['m'] = $array_DMS['S']/60;
        $array_DMm['M'] = $array_DMS['M'];
        $array_DMm['D'] = $array_DMS['D'];
-       
+
        return $this->negative_path.$array_DMm['D'].'º'.($array_DMm['M'] + $array_DMm['m']);
    }
-   
+
    public function DMm2Dd($DMm)
    {
        $this->is_negative($DMm);
 
        $array_Dd = array('D' => '','d' => '');
        $array_DMm = $this->SepDMm($DMm);
-       
+
        $array_Dd['d'] = ($array_DMm['M'].'.'.$array_DMm['m'])/60;
        $array_Dd['D'] =  $array_DMm['D'];
 
        return $this->negative_path.($array_Dd['D'] + $array_Dd['d']);
    }
-   
+
    public function DMS2Dd($DMS)
    {
        $this->is_negative($DMS);
@@ -129,41 +129,41 @@ Class GeoConversion{
        $DMm = $this->DMS2DMm($DMS);
        return $this->DMm2Dd($DMm);
    }
-   
+
    public function DMm2DMS($DMm)
    {
        $this->is_negative($DMm);
 
        $array_DMS = array('D' => '', 'M' => '', 'S' => '');
        $array_DMm = $this->SepDMm($DMm);
-       
+
        $str_S = ((0).".".$array_DMm['m']) * 60;
 
        $array_DMS['S'] = $str_S;
        $array_DMS['M'] = $array_DMm['M'];
        $array_DMS['D'] = $array_DMm['D'];
-       
+
        return $array_DMS['D'].'°'.$array_DMS['M'].'\''.$array_DMS['S'].'"';
    }
-   
+
    public function Dd2DMm($Dd)
    {
        $this->is_negative($Dd);
 
        $array_DMm = array('D' => '','M' => '','m' => '');
        $array_Dd = $this->SepDd($Dd);
-       
+
        $str_Mm = ((0).".".$array_Dd['d']) * 60;
-       
+
        $dados_Mm = explode(".",$str_Mm);
 
        $array_DMm['m'] = $dados_Mm[1];
        $array_DMm['M'] = $dados_Mm[0];
        $array_DMm['D'] = $array_Dd['D'];
-       
+
        return $this->negative_path.$array_DMm['D']."º ".$array_DMm['M'].".".$array_DMm['m'];
    }
-   
+
    public function Dd2DMS($Dd)
    {
        $this->is_negative($Dd);
@@ -172,4 +172,3 @@ Class GeoConversion{
        return $this->DMm2DMS($DMm);
    }
 }
-?>

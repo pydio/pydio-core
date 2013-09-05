@@ -28,73 +28,77 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class hpcAccessDriver extends fsAccessDriver
 {
-	/**
-	* @var Repository
-	*/
-	public $repository;
-	public $driverConf;
-	protected $wrapperClassName;
-	protected $urlBase;
+    /**
+    * @var Repository
+    */
+    public $repository;
+    public $driverConf;
+    protected $wrapperClassName;
+    protected $urlBase;
 
-    public function performChecks(){
+    public function performChecks()
+    {
         // Check CURL, OPENSSL & AWS LIBRARY & PHP5.3
-        if(version_compare(phpversion(), "5.3.0") < 0){
+        if (version_compare(phpversion(), "5.3.0") < 0) {
             throw new Exception("Php version 5.3+ is required for this plugin (must support namespaces)");
         }
-   	}
+       }
 
-		
-	function initRepository(){
 
+    public function initRepository()
+    {
         include_once("libraryLoader.php");
 
-		if(is_array($this->pluginConf)){
-			$this->driverConf = $this->pluginConf;
-		}else{
-			$this->driverConf = array();
-		}
+        if (is_array($this->pluginConf)) {
+            $this->driverConf = $this->pluginConf;
+        } else {
+            $this->driverConf = array();
+        }
 
-		$path = $this->repository->getOption("PATH");
-		$recycle = $this->repository->getOption("RECYCLE_BIN");
+        $path = $this->repository->getOption("PATH");
+        $recycle = $this->repository->getOption("RECYCLE_BIN");
         ConfService::setConf("PROBE_REAL_SIZE", false);
-		$wrapperData = $this->detectStreamWrapper(true);
-		$this->wrapperClassName = $wrapperData["classname"];
-		$this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
-		if($recycle != ""){
-			RecycleBinManager::init($this->urlBase, "/".$recycle);
-		}
-	}
-	
-	/**
-	 * Parse 
-	 * @param DOMNode $contribNode
-	 */
-	protected function parseSpecificContributions(&$contribNode){
-		parent::parseSpecificContributions($contribNode);
-		if($contribNode->nodeName != "actions") return ;
-		$this->disableArchiveBrowsingContributions($contribNode);
-	}	
+        $wrapperData = $this->detectStreamWrapper(true);
+        $this->wrapperClassName = $wrapperData["classname"];
+        $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+        if ($recycle != "") {
+            RecycleBinManager::init($this->urlBase, "/".$recycle);
+        }
+    }
 
-    function isWriteable($dir, $type="dir"){
+    /**
+     * Parse
+     * @param DOMNode $contribNode
+     */
+    protected function parseSpecificContributions(&$contribNode)
+    {
+        parent::parseSpecificContributions($contribNode);
+        if($contribNode->nodeName != "actions") return ;
+        $this->disableArchiveBrowsingContributions($contribNode);
+    }
+
+    public function isWriteable($dir, $type="dir")
+    {
         return true;
     }
 
-    function loadNodeInfo(AJXP_Node &$node, $parentNode = false, $details = false){
+    public function loadNodeInfo(AJXP_Node &$node, $parentNode = false, $details = false)
+    {
         parent::loadNodeInfo($node, $parentNode, $details);
-        if(!$node->isLeaf()){
+        if (!$node->isLeaf()) {
             $node->setLabel(rtrim($node->getLabel(), "/"));
         }
     }
 
-    function filesystemFileSize($filePath){
+    public function filesystemFileSize($filePath)
+    {
         $bytesize = filesize($filePath);
         return $bytesize;
     }
 
-    function isRemote(){
+    public function isRemote()
+    {
         return true;
     }
 
-}	
-
-?>
+}

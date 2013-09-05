@@ -26,27 +26,28 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-class CoreUploaderLoader extends AJXP_Plugin{
-
+class CoreUploaderLoader extends AJXP_Plugin
+{
     public $AUTO_LOAD_TYPE = true;
 
-    public function getConfigs(){
+    public function getConfigs()
+    {
         $data = parent::getConfigs();
         $this->filterData($data);
         return $data;
     }
-	public function loadConfigs($data){
-
+    public function loadConfigs($data)
+    {
         $this->filterData($data);
         parent::loadConfigs($data);
 
-	}
+    }
 
-	private function filterData(&$data){
-
+    private function filterData(&$data)
+    {
         $confMaxSize = AJXP_Utils::convertBytes($data["UPLOAD_MAX_SIZE"]);
         $UploadMaxSize = min(AJXP_Utils::convertBytes(ini_get('upload_max_filesize')), AJXP_Utils::convertBytes(ini_get('post_max_size')));
-        if(intval($confMaxSize) != 0) {
+        if (intval($confMaxSize) != 0) {
             $UploadMaxSize = min ($UploadMaxSize, $confMaxSize);
         }
         $data["UPLOAD_MAX_SIZE"] = $UploadMaxSize;

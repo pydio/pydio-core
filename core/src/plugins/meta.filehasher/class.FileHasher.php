@@ -35,43 +35,47 @@ class FileHasher extends AJXP_Plugin
     */
     protected $metaStore;
 
-    public static function rsyncEnabled(){
+    public static function rsyncEnabled()
+    {
         return function_exists("rsync_generate_signature");
     }
 
-    public function parseSpecificContributions(&$contribNode){
+    public function parseSpecificContributions(&$contribNode)
+    {
         parent::parseSpecificContributions($contribNode);
-        if(!self::rsyncEnabled() && $contribNode->nodeName == "actions"){
+        if (!self::rsyncEnabled() && $contribNode->nodeName == "actions") {
             // REMOVE rsync actions, this will advertise the fact that
             // rsync is not enabled.
             $xp = new DOMXPath($contribNode->ownerDocument);
             $children = $xp->query("action", $contribNode);
-            foreach($children as $child){
+            foreach ($children as $child) {
                 $contribNode->removeChild($child);
             }
         }
     }
 
-   	public function initMeta($accessDriver){
-   		$this->accessDriver = $accessDriver;
+       public function initMeta($accessDriver)
+       {
+           $this->accessDriver = $accessDriver;
         $store = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
-        //if($store === false){
+        //if ($store === false) {
         //   throw new Exception("The 'meta.simple_lock' plugin requires at least one active 'metastore' plugin");
         //}
         $this->metaStore = $store;
         $this->metaStore->initMeta($accessDriver);
     }
 
-    public function switchActions($actionName, $httpVars, $fileVars){
+    public function switchActions($actionName, $httpVars, $fileVars)
+    {
         //$urlBase = $this->accessDriver
         $repository = ConfService::getRepository();
-        if(!$repository->detectStreamWrapper(true)){
+        if (!$repository->detectStreamWrapper(true)) {
             return false;
         }
         $streamData = $repository->streamData;
         $this->streamData = $streamData;
         $destStreamURL = $streamData["protocol"]."://".$repository->getId();
-        switch($actionName){
+        switch ($actionName) {
             case "filehasher_signature":
                 $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                 if(!file_exists($destStreamURL.$file)) break;
@@ -85,7 +89,7 @@ class FileHasher extends AJXP_Plugin
             case "filehasher_patch":
                 // HANDLE UPLOAD DATA
             AJXP_Logger::debug("Received signature file, should compute delta now");
-                if(!isSet($fileVars) && !is_array($fileVars["userfile_0"])) {
+                if (!isSet($fileVars) && !is_array($fileVars["userfile_0"])) {
                     throw new Exception("These action should find uploaded data");
                 }
                 $uploadedData = tempnam(AJXP_Utils::getAjxpTmpDir(), $actionName."-sig");
@@ -93,7 +97,7 @@ class FileHasher extends AJXP_Plugin
 
                 $fileUrl = $destStreamURL.AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                 $file = call_user_func(array($this->streamData["classname"], "getRealFSReference"), $fileUrl, true);
-                if($actionName == "filehasher_delta"){
+                if ($actionName == "filehasher_delta") {
                     $signatureFile = $uploadedData;
                     $deltaFile = tempnam(AJXP_Utils::getAjxpTmpDir(), $actionName."-delta");
                     AJXP_Logger::debug("Received signature file, should compute delta now");
@@ -104,7 +108,7 @@ class FileHasher extends AJXP_Plugin
                     readfile($deltaFile);
                     unlink($signatureFile);
                     unlink($deltaFile);
-                }else{
+                } else {
                     $patched = $file.".rdiff_patched";
                     $deltaFile = $uploadedData;
                     rsync_patch_file($file, $deltaFile, $patched);
@@ -121,10 +125,11 @@ class FileHasher extends AJXP_Plugin
     /**
      * @param AJXP_Node $node
      */
-    public function getFileHash($node){
-        if($node->isLeaf()){
+    public function getFileHash($node)
+    {
+        if ($node->isLeaf()) {
             $md5 = null;
-            if($this->metaStore != false){
+            if ($this->metaStore != false) {
 
                 $hashMeta = $this->metaStore->retrieveMetadata(
                    $node,
@@ -138,7 +143,7 @@ class FileHasher extends AJXP_Plugin
                     && $hashMeta["md5_mtime"] >= $mtime){
                     $md5 = $hashMeta["md5"];
                 }
-                if($md5 == null){
+                if ($md5 == null) {
                     $md5 = md5_file($node->getUrl());
                     $hashMeta = array(
                         "md5" => $md5,
@@ -147,7 +152,7 @@ class FileHasher extends AJXP_Plugin
                     $this->metaStore->setMetadata($node, FileHasher::METADATA_HASH_NAMESPACE, $hashMeta, false, AJXP_METADATA_SCOPE_GLOBAL);
                 }
 
-            }else{
+            } else {
 
                 $md5 = md5_file($node->getUrl());
 
@@ -156,14 +161,16 @@ class FileHasher extends AJXP_Plugin
         }
     }
 
-    public function invalidateHash($oldNode = null, $newNode = null, $copy = false){
+    public function invalidateHash($oldNode = null, $newNode = null, $copy = false)
+    {
         if($this->metaStore == false) return;
         if($oldNode == null) return;
         $this->metaStore->removeMetadata($oldNode, FileHasher::METADATA_HASH_NAMESPACE, false, AJXP_METADATA_SCOPE_GLOBAL);
     }
 
 
-    public function generateSignature($masterFile, $targetFile){
+    public function generateSignature($masterFile, $targetFile)
+    {
         rsync_generate_signature($masterFile, $targetFile);
     }
 }

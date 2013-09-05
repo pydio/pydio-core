@@ -30,15 +30,17 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchanger
 {
 
-    function init($options){
-   		parent::init($options);
-   		$this->sqlDriver = $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
-   	}
+    public function init($options)
+    {
+           parent::init($options);
+           $this->sqlDriver = $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
+       }
 
-    public function performChecks(){
+    public function performChecks()
+    {
         if(!isSet($this->options)) return;
         $test = AJXP_Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
-        if(!count($test)){
+        if (!count($test)) {
             throw new Exception("Please define an SQL connexion in the core configuration");
         }
     }
@@ -51,31 +53,33 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
     private $clientsGCTime = 10;
     private $sqlDriver;
 
-    function loadChannel($channelName, $create = false){
-        if(isSet($this->channels) && is_array($this->channels[$channelName])) {
+    public function loadChannel($channelName, $create = false)
+    {
+        if (isSet($this->channels) && is_array($this->channels[$channelName])) {
             return;
         }
-        if(is_file($this->getPluginWorkDir()."/queues/channel-$channelName")){
+        if (is_file($this->getPluginWorkDir()."/queues/channel-$channelName")) {
             if(!isset($this->channels)) $this->channels = array();
             $data = AJXP_Utils::loadSerialFile($this->getPluginWorkDir()."/queues/channel-$channelName");
-            if(is_array($data)) {
+            if (is_array($data)) {
                 if(!is_array($data["MESSAGES"])) $data["MESSAGES"] = array();
                 if(!is_array($data["CLIENTS"])) $data["CLIENTS"] = array();
                 $this->channels[$channelName] = $data;
                 return;
             }
         }
-        if($create){
+        if ($create) {
             if(!isSet($this->channels)) $this->channels = array();
             $this->channels[$channelName] = array("CLIENTS" => array(),
                 "MESSAGES" => array());
         }
     }
 
-    function __destruct(){
-        if(isSet($this->channels) && is_array($this->channels)){
-            foreach($this->channels as $channelName => $data){
-                if(is_array($data)){
+    public function __destruct()
+    {
+        if (isSet($this->channels) && is_array($this->channels)) {
+            foreach ($this->channels as $channelName => $data) {
+                if (is_array($data)) {
                     AJXP_Utils::saveSerialFile($this->getPluginWorkDir()."/queues/channel-$channelName", $data);
                 }
             }
@@ -88,10 +92,11 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
      * @param $clientId
      * @return mixed
      */
-    function suscribeToChannel($channelName, $clientId){
+    public function suscribeToChannel($channelName, $clientId)
+    {
         $this->loadChannel($channelName, true);
         $user = AuthService::getLoggedUser();
-        if($user == null){
+        if ($user == null) {
             throw new Exception("You must be logged in");
         }
         $GROUP_PATH = $user->getGroupPath();
@@ -101,7 +106,7 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
             "USER_ID" => $user->getId(),
             "GROUP_PATH" => $GROUP_PATH
         );
-        foreach($this->channels[$channelName]["MESSAGES"] as &$object){
+        foreach ($this->channels[$channelName]["MESSAGES"] as &$object) {
             $object->messageRC[$clientId] = $clientId;
         }
     }
@@ -111,20 +116,22 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
      * @param $clientId
      * @return mixed
      */
-    function unsuscribeFromChannel($channelName, $clientId){
+    public function unsuscribeFromChannel($channelName, $clientId)
+    {
         $this->loadChannel($channelName);
         if(!isSet($this->channels) || !isSet($this->channels[$channelName])) return;
         if(!array_key_exists($clientId,  $this->channels[$channelName]["CLIENTS"])) return;
         unset($this->channels[$channelName]["CLIENTS"][$clientId]);
-        foreach($this->channels[$channelName]["MESSAGES"] as $index => &$object){
+        foreach ($this->channels[$channelName]["MESSAGES"] as $index => &$object) {
             unset($object->messageRC[$clientId]);
-            if(count($object->messageRC)== 0){
+            if (count($object->messageRC)== 0) {
                 unset($this->channels[$channelName]["MESSAGES"][$index]);
             }
         }
     }
 
-    function publishToChannel($channelName, $messageObject){
+    public function publishToChannel($channelName, $messageObject)
+    {
         $this->loadChannel($channelName);
         if(!isSet($this->channels) || !isSet($this->channels[$channelName])) return;
         if(!count($this->channels[$channelName]["CLIENTS"])) return;
@@ -141,19 +148,20 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
      * @param $userGroup
      * @return mixed
      */
-    function consumeInstantChannel($channelName, $clientId, $userId, $userGroup){
+    public function consumeInstantChannel($channelName, $clientId, $userId, $userGroup)
+    {
         $this->loadChannel($channelName);
         if(!isSet($this->channels) || !isSet($this->channels[$channelName])) return;
         // Check dead clients
-        if(is_array($this->channels[$channelName]["CLIENTS"])){
+        if (is_array($this->channels[$channelName]["CLIENTS"])) {
             $toRemove = array();
-            foreach($this->channels[$channelName]["CLIENTS"] as $cId => $cData){
+            foreach ($this->channels[$channelName]["CLIENTS"] as $cId => $cData) {
                 $cAlive = $cData["ALIVE"];
                 if( $cId != $clientId &&  time() - $cAlive > $this->clientsGCTime * 60) $toRemove[] = $cId;
             }
             if(count($toRemove)) foreach($toRemove as $c) $this->unsuscribeFromChannel($channelName, $c);
         }
-        if(!array_key_exists($clientId,  $this->channels[$channelName]["CLIENTS"])) {
+        if (!array_key_exists($clientId,  $this->channels[$channelName]["CLIENTS"])) {
             // Auto Suscribe
             $this->suscribeToChannel($channelName, $clientId);
         }
@@ -161,30 +169,30 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
 
         /*
         $user = AuthService::getLoggedUser();
-        if($user == null){
+        if ($user == null) {
             throw new Exception("You must be logged in");
         }
         $GROUP_PATH = $user->getGroupPath();
         if($GROUP_PATH == null) $GROUP_PATH = false;
         */
         $result = array();
-        foreach($this->channels[$channelName]["MESSAGES"] as $index => $object){
-            if(!isSet($object->messageRC[$clientId])){
+        foreach ($this->channels[$channelName]["MESSAGES"] as $index => $object) {
+            if (!isSet($object->messageRC[$clientId])) {
                 continue;
             }
-            if(isSet($object->userId) && $object->userId != $userId){
+            if (isSet($object->userId) && $object->userId != $userId) {
                 // Skipping, restricted to userId
                 continue;
             }
-            if(isSet($object->groupPath) && $object->groupPath != $userGroup){
+            if (isSet($object->groupPath) && $object->groupPath != $userGroup) {
                 // Skipping, restricted to groupPath
                 continue;
             }
             $result[] = $object;
             unset($object->messageRC[$clientId]);
-            if(count($object->messageRC) <= 0){
+            if (count($object->messageRC) <= 0) {
                 unset($this->channels[$channelName]["MESSAGES"][$index]);
-            }else{
+            } else {
                 $this->channels[$channelName]["MESSAGES"][$index] = $object;
             }
         }
@@ -208,11 +216,11 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
         $rows = $results->fetchAll();
         $arr = array();
         $deleted = array();
-        foreach($rows as $row){
+        foreach ($rows as $row) {
             $arr[] = unserialize($row["serialized_data"]);
             $deleted[] = $row["object_id"];
         }
-        if(count($deleted)){
+        if (count($deleted)) {
             dibi::query("DELETE FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id] IN (%s)", "queues.$channelName", $deleted);
         }
         return $arr;
@@ -256,7 +264,8 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
         $this->channels[$channel]["MESSAGES"][] = $message;
     }
 
-    public function installSQLTables($param){
+    public function installSQLTables($param)
+    {
         $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
         return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
     }

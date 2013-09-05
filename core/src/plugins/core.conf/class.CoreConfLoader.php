@@ -24,8 +24,8 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-class CoreConfLoader extends AJXP_Plugin{
-
+class CoreConfLoader extends AJXP_Plugin
+{
     /**
      * @var AbstractConfDriver
      */
@@ -34,9 +34,10 @@ class CoreConfLoader extends AJXP_Plugin{
     /**
      * @return AbstractConfDriver
      */
-    public function getConfImpl(){
-        if(!isSet(self::$confImpl) || (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"]) && self::$confImpl->getId() != $this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"])){
-            if(isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"])){
+    public function getConfImpl()
+    {
+        if (!isSet(self::$confImpl) || (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"]) && self::$confImpl->getId() != $this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"])) {
+            if (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"])) {
                 self::$confImpl = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_INSTANCE_CONFIG"], "AbstractConfDriver");
                 AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("conf", self::$confImpl->getName());
             }

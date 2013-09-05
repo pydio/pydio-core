@@ -25,8 +25,8 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-interface AJXP_MessageExchanger{
-
+interface AJXP_MessageExchanger
+{
     /**
      * @abstract
      * @param $channelName
@@ -41,7 +41,7 @@ interface AJXP_MessageExchanger{
      * @param $clientId
      * @return mixed
      */
-    function unsuscribeFromChannel($channelName, $clientId);
+    public function unsuscribeFromChannel($channelName, $clientId);
 
     /**
      * @abstract

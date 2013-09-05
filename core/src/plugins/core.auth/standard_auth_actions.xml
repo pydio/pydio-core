@@ -9,7 +9,7 @@
 					actionBarGroup="user">
 				</context>
 			</gui>
-			<rightsContext noUser="false" userLogged="hidden" guestLogged="show" read="false" write="false" adminOnly=""></rightsContext>			
+			<rightsContext noUser="false" userLogged="hidden" guestLogged="show" read="false" write="false" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var loginRedirect = AJXP_LOGIN_REDIRECT;
@@ -19,7 +19,7 @@
 					    modal.setCloseValidation(function(){
 					        return (ajaxplorer && ajaxplorer.user && ajaxplorer.user.id == "guest")
 					    });
-						modal.showDialogForm('Log In', ($('login_form')?'login_form':'login_form_dynamic'), 
+						modal.showDialogForm('Log In', ($('login_form')?'login_form':'login_form_dynamic'),
 						function(oForm){
 						    $("generic_dialog_box").setStyle({
 						        top:$("progressBox").getStyle('top'),
@@ -60,7 +60,7 @@
                                 }catch(e){}
                             }
                             modal.refreshDialogPosition();
-						}, 
+						},
 						function(){
 							var oForm = modal.getForm();
 							var connexion = new Connexion();
@@ -92,7 +92,7 @@
 							connexion.sendAsync();
 							oForm.userid.value = '';
 							oForm.password.value = '';
-							return false;				
+							return false;
 						}, function(){}, true);
 					}
 					]]></clientCallback>
@@ -119,7 +119,7 @@
 					]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
-		</action>		
+		</action>
 		<action name="pass_change">
 			<gui text="194" title="194" src="yast_security.png" iconClass="icon-key" accessKey="" hasAccessKey="false">
 				<context selection="false" dir="" recycle="true" actionBarGroup="utils" ajxpWidgets="UserWidget::logging_string"></context>
@@ -138,7 +138,7 @@
 						connexion.onComplete = function(transport){
 							$('pass_seed').value = transport.responseText;
 						};
-						connexion.sendSync();			
+						connexion.sendSync();
 						new Protopass($('user_change_ownpass1'), {
 							barContainer:$('pwd_strength_container'),
 							barPosition:'bottom'
@@ -160,7 +160,7 @@
 							}
 							if($('user_change_ownpass_old').value == ''){
 								alert(MessageHash[239]);
-								return false;					
+								return false;
 							}
 							passSeed = $('pass_seed').value;
 							if(passSeed == '-1'){
@@ -169,7 +169,7 @@
 							}else{
 								userPass = hex_md5($('user_change_ownpass1').value);
 								userOldPass = hex_md5( hex_md5($('user_change_ownpass_old').value)+$('pass_seed').value);
-							}				
+							}
 							var onComplete = function(transport){
 								var addition = '';
 								var logout = false;
@@ -205,7 +205,7 @@
 					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
 				</clientCallback>
 				<clientForm id="pass_change_form"><![CDATA[
-					<div id="pass_change_form" action="pass_change_form" box_width="210">					
+					<div id="pass_change_form" action="pass_change_form" box_width="210">
 						<input type="hidden" name="pass_seed" id="pass_seed" value="">
 						<div class="SF_element">
 							<div class="SF_label" ajxp_message_id="237">AJXP_MESSAGE[237] : </div><input id="user_change_ownpass_old" type="password" class="dialogFocus SF_input"/>
@@ -213,15 +213,15 @@
 						<div class="SF_element">
 							<div class="SF_label" ajxp_message_id="198">AJXP_MESSAGE[198] : </div><input id="user_change_ownpass1" value="" type="password" class="SF_input"/>
 						</div>
-						<div class="SF_element">						
+						<div class="SF_element">
 							<div class="SF_label" ajxp_message_id="199">AJXP_MESSAGE[199] : </div><input id="user_change_ownpass2" value="" type="password" class="SF_input"/>
 						</div>
-						<div class="SF_element" id="pwd_strength_container"></div>						
+						<div class="SF_element" id="pwd_strength_container"></div>
 					</div>
-				]]></clientForm>				
+				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
-			</processing>				
-		</action>		
+			</processing>
+		</action>
 		<action name="logout" expireDefault="true">
 			<gui text="164" title="169" src="decrypted.png" iconClass="icon-signout"
 				accessKey="" hasAccessKey="false">
@@ -229,7 +229,7 @@
 					contextMenu="false" actionBar="true" actionBarGroup="minisite" ajxpWidgets="UserWidget::logging_string">
 				</context>
 			</gui>
-			<rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""></rightsContext>			
+			<rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
 					clearRememberData();

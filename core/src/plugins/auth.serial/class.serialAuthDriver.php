@@ -25,61 +25,67 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Auth
  */
-class serialAuthDriver extends AbstractAuthDriver {
-	
-	var $usersSerFile;
-	var $driverName = "serial";
-	
-	function init($options){
-		parent::init($options);
-		$this->usersSerFile = AJXP_VarsFilter::filter($this->getOption("USERS_FILEPATH"));
-	}
+class serialAuthDriver extends AbstractAuthDriver
+{
+    public $usersSerFile;
+    public $driverName = "serial";
 
-	function performChecks(){
+    public function init($options)
+    {
+        parent::init($options);
+        $this->usersSerFile = AJXP_VarsFilter::filter($this->getOption("USERS_FILEPATH"));
+    }
+
+    public function performChecks()
+    {
         if(!isset($this->options)) return;
-        if(isset($this->options["FAST_CHECKS"]) && $this->options["FAST_CHECKS"] === true){
+        if (isset($this->options["FAST_CHECKS"]) && $this->options["FAST_CHECKS"] === true) {
             return;
         }
-		$usersDir = dirname($this->usersSerFile);
-		if(!is_dir($usersDir) || !is_writable($usersDir)){
-			throw new Exception("Parent folder for users file is either inexistent or not writeable.");
-		}
-		if(is_file($this->usersSerFile) && !is_writable($this->usersSerFile)){
-			throw new Exception("Users file exists but is not writeable!");
-		}
-	}
+        $usersDir = dirname($this->usersSerFile);
+        if (!is_dir($usersDir) || !is_writable($usersDir)) {
+            throw new Exception("Parent folder for users file is either inexistent or not writeable.");
+        }
+        if (is_file($this->usersSerFile) && !is_writable($this->usersSerFile)) {
+            throw new Exception("Users file exists but is not writeable!");
+        }
+    }
 
-    protected function _listAllUsers(){
+    protected function _listAllUsers()
+    {
         $users = AJXP_Utils::loadSerialFile($this->usersSerFile);
-        if(AuthService::ignoreUserCase()){
+        if (AuthService::ignoreUserCase()) {
             $users = array_combine(array_map("strtolower", array_keys($users)), array_values($users));
         }
         ConfService::getConfStorageImpl()->filterUsersByGroup($users, "/", true);
         return $users;
     }
-	
-	function listUsers($baseGroup = "/"){
+
+    public function listUsers($baseGroup = "/")
+    {
         $users = AJXP_Utils::loadSerialFile($this->usersSerFile);
-        if(AuthService::ignoreUserCase()){
+        if (AuthService::ignoreUserCase()) {
             $users = array_combine(array_map("strtolower", array_keys($users)), array_values($users));
         }
         ConfService::getConfStorageImpl()->filterUsersByGroup($users, $baseGroup, false);
         ksort($users);
         return $users;
-	}
+    }
 
-    function supportsUsersPagination(){
+    public function supportsUsersPagination()
+    {
         return true;
     }
-    function listUsersPaginated($baseGroup = "/", $regexp, $offset = -1 , $limit = -1){
+    public function listUsersPaginated($baseGroup = "/", $regexp, $offset = -1 , $limit = -1)
+    {
         $users = $this->listUsers($baseGroup);
         $result = array();
         $index = 0;
-        foreach($users as $usr => $pass){
-            if(!empty($regexp) && !preg_match("/$regexp/i", $usr)){
+        foreach ($users as $usr => $pass) {
+            if (!empty($regexp) && !preg_match("/$regexp/i", $usr)) {
                 continue;
             }
-            if($offset != -1 && $index < $offset) {
+            if ($offset != -1 && $index < $offset) {
                 $index ++;
                 continue;
             }
@@ -89,74 +95,81 @@ class serialAuthDriver extends AbstractAuthDriver {
         }
         return $result;
     }
-    function getUsersCount($baseGroup = "/", $regexp = ""){
+    public function getUsersCount($baseGroup = "/", $regexp = "")
+    {
         return count($this->listUsersPaginated($baseGroup, $regexp));
     }
 
-	
-	function userExists($login){
-        if(AuthService::ignoreUserCase()) $login = strtolower($login);
-		$users = $this->_listAllUsers();
-		if(!is_array($users) || !array_key_exists($login, $users)) return false;
-		return true;
-	}	
-	
-	function checkPassword($login, $pass, $seed){
-        if(AuthService::ignoreUserCase()) $login = strtolower($login);
-		$userStoredPass = $this->getUserPass($login);
-		if(!$userStoredPass) return false;
-		if($seed == "-1"){ // Seed = -1 means that password is not encoded.
-			return AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass);//($userStoredPass == md5($pass));
-		}else{
-			return (md5($userStoredPass.$seed) == $pass);
-		}
-	}
-	
-	function usersEditable(){
-		return true;
-	}
-	function passwordsEditable(){
-		return true;
-	}
-	
-	function createUser($login, $passwd){
-        if(AuthService::ignoreUserCase()) $login = strtolower($login);
-		$users = $this->_listAllUsers();
-		if(!is_array($users)) $users = array();
-		if(array_key_exists($login, $users)) return "exists";
-		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$users[$login] = AJXP_Utils::pbkdf2_create_hash($passwd);//md5($passwd);
-		}else{
-			$users[$login] = $passwd;
-		}
-		AJXP_Utils::saveSerialFile($this->usersSerFile, $users);		
-	}	
-	function changePassword($login, $newPass){
-        if(AuthService::ignoreUserCase()) $login = strtolower($login);
-		$users = $this->_listAllUsers();
-		if(!is_array($users) || !array_key_exists($login, $users)) return ;
-		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$users[$login] = AJXP_Utils::pbkdf2_create_hash($newPass);//md5($newPass);
-		}else{
-			$users[$login] = $newPass;
-		}
-		AJXP_Utils::saveSerialFile($this->usersSerFile, $users);
-	}	
-	function deleteUser($login){
-        if(AuthService::ignoreUserCase()) $login = strtolower($login);
-		$users = $this->_listAllUsers();
-		if(is_array($users) && array_key_exists($login, $users))
-		{
-			unset($users[$login]);
-			AJXP_Utils::saveSerialFile($this->usersSerFile, $users);
-		}		
-	}
 
-	function getUserPass($login){
-		if(!$this->userExists($login)) return false;
-		$users = $this->_listAllUsers();
-		return $users[$login];
-	}
+    public function userExists($login)
+    {
+        if(AuthService::ignoreUserCase()) $login = strtolower($login);
+        $users = $this->_listAllUsers();
+        if(!is_array($users) || !array_key_exists($login, $users)) return false;
+        return true;
+    }
+
+    public function checkPassword($login, $pass, $seed)
+    {
+        if(AuthService::ignoreUserCase()) $login = strtolower($login);
+        $userStoredPass = $this->getUserPass($login);
+        if(!$userStoredPass) return false;
+        if ($seed == "-1") { // Seed = -1 means that password is not encoded.
+            return AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass);//($userStoredPass == md5($pass));
+        } else {
+            return (md5($userStoredPass.$seed) == $pass);
+        }
+    }
+
+    public function usersEditable()
+    {
+        return true;
+    }
+    public function passwordsEditable()
+    {
+        return true;
+    }
+
+    public function createUser($login, $passwd)
+    {
+        if(AuthService::ignoreUserCase()) $login = strtolower($login);
+        $users = $this->_listAllUsers();
+        if(!is_array($users)) $users = array();
+        if(array_key_exists($login, $users)) return "exists";
+        if ($this->getOption("TRANSMIT_CLEAR_PASS") === true) {
+            $users[$login] = AJXP_Utils::pbkdf2_create_hash($passwd);//md5($passwd);
+        } else {
+            $users[$login] = $passwd;
+        }
+        AJXP_Utils::saveSerialFile($this->usersSerFile, $users);
+    }
+    public function changePassword($login, $newPass)
+    {
+        if(AuthService::ignoreUserCase()) $login = strtolower($login);
+        $users = $this->_listAllUsers();
+        if(!is_array($users) || !array_key_exists($login, $users)) return ;
+        if ($this->getOption("TRANSMIT_CLEAR_PASS") === true) {
+            $users[$login] = AJXP_Utils::pbkdf2_create_hash($newPass);//md5($newPass);
+        } else {
+            $users[$login] = $newPass;
+        }
+        AJXP_Utils::saveSerialFile($this->usersSerFile, $users);
+    }
+    public function deleteUser($login)
+    {
+        if(AuthService::ignoreUserCase()) $login = strtolower($login);
+        $users = $this->_listAllUsers();
+        if (is_array($users) && array_key_exists($login, $users)) {
+            unset($users[$login]);
+            AJXP_Utils::saveSerialFile($this->usersSerFile, $users);
+        }
+    }
+
+    public function getUserPass($login)
+    {
+        if(!$this->userExists($login)) return false;
+        $users = $this->_listAllUsers();
+        return $users[$login];
+    }
 
 }
-?>

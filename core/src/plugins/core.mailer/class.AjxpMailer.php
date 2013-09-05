@@ -28,62 +28,65 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class AjxpMailer extends AJXP_Plugin
 {
 
-    var $mailCache;
+    public $mailCache;
 
-    public function init($options){
+    public function init($options)
+    {
         parent::init($options);
-        if(AJXP_SERVER_DEBUG){
+        if (AJXP_SERVER_DEBUG) {
             $this->mailCache = $this->getPluginWorkDir(true)."/mailbox";
         }
         $pConf = $this->pluginConf["UNIQUE_MAILER_INSTANCE"];
-        if(!empty($pConf)){
+        if (!empty($pConf)) {
             $p = ConfService::instanciatePluginFromGlobalParams($pConf, "AjxpMailer");
             AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType($p->getType(), $p->getName(), $p);
         }
     }
 
-    public function processNotification(AJXP_Notification &$notification){
+    public function processNotification(AJXP_Notification &$notification)
+    {
         $mailers = AJXP_PluginsService::getInstance()->getPluginsByType("mailer");
-        if(count($mailers)){
+        if (count($mailers)) {
             $mailer = array_pop($mailers);
-            try{
+            try {
                 $mailer->sendMail(
                     array($notification->getTarget()),
                     $notification->getDescriptionShort(),
                     $notification->getDescriptionLong(),
                     $notification->getAuthor()
                 );
-            }catch (Exception $e){
+            } catch (Exception $e) {
                 AJXP_Logger::logAction("ERROR : ".$e->getMessage());
             }
         }
     }
 
-    public function sendMail($recipients, $subject, $body, $from = null){
+    public function sendMail($recipients, $subject, $body, $from = null)
+    {
         $prepend = ConfService::getCoreConf("SUBJECT_PREPEND", "mailer");
         $append = ConfService::getCoreConf("SUBJECT_APPEND", "mailer");
         $layout = ConfService::getCoreConf("BODY_LAYOUT", "mailer");
         if(!empty($prepend)) $subject = $prepend ." ". $subject;
         if(!empty($append)) $subject .= " ".$append;
-        if(strpos($layout, "AJXP_MAIL_BODY") !== false){
+        if (strpos($layout, "AJXP_MAIL_BODY") !== false) {
             $body = str_replace("AJXP_MAIL_BODY", $body, $layout);
         }
         $this->sendMailImpl($recipients, $subject, $body, $from = null);
-        if(AJXP_SERVER_DEBUG){
+        if (AJXP_SERVER_DEBUG) {
             $line = "------------------------------------------------------------------------\n";
             file_put_contents($this->mailCache, "Sending mail from ".print_r($from, true)." to ".print_r($recipients, true)."\n\n$subject\n\n$body\n".$line, FILE_APPEND);
         }
     }
 
-    protected function sendMailImpl($recipients, $subject, $body, $from = null){
-
+    protected function sendMailImpl($recipients, $subject, $body, $from = null)
+    {
     }
 
-    public function sendMailAction($actionName, $httpVars, $fileVars){
-
+    public function sendMailAction($actionName, $httpVars, $fileVars)
+    {
         $mess = ConfService::getMessages();
         $mailers = AJXP_PluginsService::getInstance()->getActivePluginsForType("mailer");
-        if(!count($mailers)){
+        if (!count($mailers)) {
             throw new Exception($mess["core.mailer.3"]);
         }
 
@@ -98,28 +101,29 @@ class AjxpMailer extends AJXP_Plugin
         $subject = $httpVars["subject"];
         $body = $httpVars["message"];
 
-        if(count($emails)){
+        if (count($emails)) {
             $mailer->sendMail($emails, $subject, $body, $from);
             AJXP_XMLWriter::header();
             AJXP_XMLWriter::sendMessage(str_replace("%s", count($emails), $mess["core.mailer.1"]), null);
             AJXP_XMLWriter::close();
-        }else{
+        } else {
             AJXP_XMLWriter::header();
             AJXP_XMLWriter::sendMessage(null, $mess["core.mailer.2"]);
             AJXP_XMLWriter::close();
         }
     }
 
-    function resolveFrom($fromAdress = null){
+    public function resolveFrom($fromAdress = null)
+    {
         $fromResult = array();
-        if($fromAdress != null){
+        if ($fromAdress != null) {
             $arr = $this->resolveAdresses(array($fromAdress));
             if(count($arr)) $fromResult = $arr[0];
-        }else if(AuthService::getLoggedUser() != null){
+        } else if (AuthService::getLoggedUser() != null) {
             $arr = $this->resolveAdresses(array(AuthService::getLoggedUser()));
             if(count($arr)) $fromResult = $arr[0];
         }
-        if(!count($fromResult)){
+        if (!count($fromResult)) {
             $f = ConfService::getCoreConf("FROM", "mailer");
             $fName = ConfService::getCoreConf("FROM_NAME", "mailer");
             $fromResult = array("adress" => $f, "name" => $fName );
@@ -132,30 +136,31 @@ class AjxpMailer extends AJXP_Plugin
      * @return array
      *
      */
-    function resolveAdresses($recipients){
+    public function resolveAdresses($recipients)
+    {
         $realRecipients = array();
         // Recipients can be either AbstractAjxpUser objects, either array(adress, name), either "adress".
-        foreach($recipients as $recipient){
-            if(is_object($recipient) && is_a($recipient, "AbstractAjxpUser")){
+        foreach ($recipients as $recipient) {
+            if (is_object($recipient) && is_a($recipient, "AbstractAjxpUser")) {
                 $resolved = $this->abstractUserToAdress($recipient);
-                if($resolved !== false){
+                if ($resolved !== false) {
                     $realRecipients[] = $resolved;
                 }
-            }else if(is_array($recipient)){
-                if(array_key_exists("adress", $recipient)){
-                    if(!array_key_exists("name", $recipient)){
+            } else if (is_array($recipient)) {
+                if (array_key_exists("adress", $recipient)) {
+                    if (!array_key_exists("name", $recipient)) {
                         $recipient["name"] = $recipient["name"];
                     }
                     $realRecipients[] = $recipient;
                 }
-            }else if(is_string($recipient)){
-                if(strpos($recipient, ":") !== false){
+            } else if (is_string($recipient)) {
+                if (strpos($recipient, ":") !== false) {
                     $parts = explode(":", $recipient, 2);
                     $realRecipients[] = array("name" => $parts[0], "adress" => $parts[2]);
-                }else{
-                    if($this->validateEmail($recipient)){
+                } else {
+                    if ($this->validateEmail($recipient)) {
                         $realRecipients[] = array("name" => $recipient, "adress" => $recipient);
-                    }else if(AuthService::userExists($recipient)){
+                    } else if (AuthService::userExists($recipient)) {
                         $user = ConfService::getConfStorageImpl()->createUserObject($recipient);
                         $res = $this->abstractUserToAdress($user);
                         if($res !== false) $realRecipients[] = $res;
@@ -167,11 +172,12 @@ class AjxpMailer extends AJXP_Plugin
         return $realRecipients;
     }
 
-    function abstractUserToAdress(AbstractAjxpUser $user){
+    public function abstractUserToAdress(AbstractAjxpUser $user)
+    {
         // TODO
         // SHOULD CHECK THAT THIS USER IS "AUTHORIZED" TO AVOID SPAM
         $userEmail = $user->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
-        if(empty($userEmail)) {
+        if (empty($userEmail)) {
             return false;
         }
         $displayName = $user->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
@@ -180,8 +186,9 @@ class AjxpMailer extends AJXP_Plugin
     }
 
 
-    function validateEmail($email){
-        if(function_exists("filter_var")){
+    public function validateEmail($email)
+    {
+        if (function_exists("filter_var")) {
             return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
         }
 

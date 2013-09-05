@@ -26,40 +26,43 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Boot
  */
-class BootConfLoader extends AbstractConfDriver {
-
+class BootConfLoader extends AbstractConfDriver
+{
     private static $internalConf;
     private static $jsonConf;
     private static $jsonPath;
 
-    private function getInternalConf(){
-        if(!isSet(BootConfLoader::$internalConf)){
-            if(file_exists(AJXP_CONF_PATH."/bootstrap_plugins.php")){
+    private function getInternalConf()
+    {
+        if (!isSet(BootConfLoader::$internalConf)) {
+            if (file_exists(AJXP_CONF_PATH."/bootstrap_plugins.php")) {
                 include(AJXP_CONF_PATH."/bootstrap_plugins.php");
-                if(isSet($PLUGINS)){
+                if (isSet($PLUGINS)) {
                     BootConfLoader::$internalConf = $PLUGINS;
                 }
-            }else{
+            } else {
                 BootConfLoader::$internalConf = array();
             }
         }
         return BootConfLoader::$internalConf;
     }
 
-    public function init($options){
+    public function init($options)
+    {
         parent::init($options);
-        try{
+        try {
             $this->getPluginWorkDir(true);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             die("Impossible write into the AJXP_DATA_PATH folder: Make sure to grant write access to this folder for your webserver!");
         }
     }
 
-    public function loadManifest(){
+    public function loadManifest()
+    {
         parent::loadManifest();
-        if(!AJXP_Utils::detectApplicationFirstRun()){
+        if (!AJXP_Utils::detectApplicationFirstRun()) {
             $actions = $this->xPath->query("server_settings|registry_contributions");
-            foreach($actions as $ac){
+            foreach ($actions as $ac) {
                 $ac->parentNode->removeChild($ac);
             }
             $this->reloadXPath();
@@ -72,25 +75,25 @@ class BootConfLoader extends AbstractConfDriver {
      * @param $httpVars
      * @param $fileVars
      */
-    public function loadInstallerForm($action, $httpVars, $fileVars){
-
+    public function loadInstallerForm($action, $httpVars, $fileVars)
+    {
         AJXP_XMLWriter::header("admin_data");
         $fullManifest = $this->getManifestRawContent("", "xml");
         $xPath = new DOMXPath($fullManifest->ownerDocument);
         $addParams = "";
         $pInstNodes = $xPath->query("server_settings/global_param[contains(@type, 'plugin_instance:')]");
-        foreach($pInstNodes as $pInstNode){
+        foreach ($pInstNodes as $pInstNode) {
             $type = $pInstNode->getAttribute("type");
             $instType = str_replace("plugin_instance:", "", $type);
             $fieldName = $pInstNode->getAttribute("name");
             $pInstNode->setAttribute("type", "group_switch:".$fieldName);
             $typePlugs = AJXP_PluginsService::getInstance()->getPluginsByType($instType);
-            foreach($typePlugs as $typePlug){
+            foreach ($typePlugs as $typePlug) {
                 if($typePlug->getId() == "auth.multi") continue;
                 $checkErrorMessage = "";
-                try{
+                try {
                     $typePlug->performChecks();
-                }catch (Exception $e){
+                } catch (Exception $e) {
                     $checkErrorMessage = " (Warning : ".$e->getMessage().")";
                 }
                 $tParams = AJXP_XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/param"));
@@ -114,8 +117,8 @@ class BootConfLoader extends AbstractConfDriver {
      * @param $httpVars
      * @param $fileVars
      */
-    public function applyInstallerForm($action, $httpVars, $fileVars){
-
+    public function applyInstallerForm($action, $httpVars, $fileVars)
+    {
         $data = array();
         AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "");
         $tot = "toto";
@@ -128,12 +131,12 @@ class BootConfLoader extends AbstractConfDriver {
 
         $storageType = $data["STORAGE_TYPE"]["type"];
         $coreConfLIVECONFIG = array();
-        if($storageType == "db"){
+        if ($storageType == "db") {
             // REWRITE BOOTSTRAP.JSON
             $coreConf["DIBI_PRECONFIGURATION"] = $data["STORAGE_TYPE"]["db_type"];
-            if(isSet($coreConf["DIBI_PRECONFIGURATION"]["sqlite3_driver"])){
+            if (isSet($coreConf["DIBI_PRECONFIGURATION"]["sqlite3_driver"])) {
                 $dbFile = AJXP_VarsFilter::filter($coreConf["DIBI_PRECONFIGURATION"]["sqlite3_database"]);
-                if(!file_exists(dirname($dbFile))){
+                if (!file_exists(dirname($dbFile))) {
                     mkdir(dirname($dbFile), 0755, true);
                 }
             }
@@ -150,12 +153,12 @@ class BootConfLoader extends AbstractConfDriver {
 
             // INSTALL ALL SQL TABLES
             $sqlPlugs = array("conf.sql", "auth.sql", "feed.sql", "log.sql", "mq.sql");
-            foreach($sqlPlugs as $plugId){
+            foreach ($sqlPlugs as $plugId) {
                 $plug = AJXP_PluginsService::findPluginById($plugId);
                 $plug->installSQLTables(array("SQL_DRIVER" => $data["STORAGE_TYPE"]["db_type"]));
             }
 
-        }else{
+        } else {
 
             $coreConf["UNIQUE_INSTANCE_CONFIG"] = array_merge($coreConf["UNIQUE_INSTANCE_CONFIG"], array(
                 "instance_name"=> "conf.serial",
@@ -169,7 +172,7 @@ class BootConfLoader extends AbstractConfDriver {
         }
 
         $oldBoot = $this->getPluginWorkDir(true)."/bootstrap.json";
-        if(is_file($oldBoot)){
+        if (is_file($oldBoot)) {
             copy($oldBoot, $oldBoot.".bak");
             unlink($oldBoot);
         }
@@ -178,7 +181,7 @@ class BootConfLoader extends AbstractConfDriver {
 
 
         // Write new bootstrap and reload conf plugin!
-        if($storageType == "db"){
+        if ($storageType == "db") {
             $coreConf["UNIQUE_INSTANCE_CONFIG"]["SQL_DRIVER"] = $coreConf["DIBI_PRECONFIGURATION"];
             $coreAuth["MASTER_INSTANCE_CONFIG"]["SQL_DRIVER"] = $coreConf["DIBI_PRECONFIGURATION"];
         }
@@ -186,7 +189,7 @@ class BootConfLoader extends AbstractConfDriver {
         $newAuthPlugin = ConfService::instanciatePluginFromGlobalParams($coreAuth["MASTER_INSTANCE_CONFIG"], "AbstractAuthDriver");
 
 
-        if($storageType == "db"){
+        if ($storageType == "db") {
             $sqlPlugs = array(
                 "core.notifications/UNIQUE_FEED_INSTANCE" => "feed.sql",
                 "core.log/UNIQUE_PLUGIN_INSTANCE" => "log.sql",
@@ -204,7 +207,7 @@ class BootConfLoader extends AbstractConfDriver {
             "APPLICATION_WELCOME" => "gui.ajax/CUSTOM_WELCOME_MESSAGE"
         );
         $mailerEnabled = $data["MAILER_ENABLE"]["status"];
-        if($mailerEnabled == "yes"){
+        if ($mailerEnabled == "yes") {
             // Enable core.mailer
             $data["MAILER_SYSTEM"] = $data["MAILER_ENABLE"]["MAILER_SYSTEM"];
             $data["MAILER_ADMIN"] = $data["MAILER_ENABLE"]["MAILER_ADMIN"];
@@ -214,7 +217,7 @@ class BootConfLoader extends AbstractConfDriver {
             ));
         }
 
-        foreach($direct as $key => $value){
+        foreach ($direct as $key => $value) {
             list($pluginId, $param) = explode("/", $value);
             $options = array();
             $newConfigPlugin->_loadPluginConfig($pluginId, $options);
@@ -222,8 +225,8 @@ class BootConfLoader extends AbstractConfDriver {
             $newConfigPlugin->_savePluginConfig($pluginId, $options);
         }
 
-        if(isSet($sqlPlugs)){
-            foreach($sqlPlugs as $core => $value){
+        if (isSet($sqlPlugs)) {
+            foreach ($sqlPlugs as $core => $value) {
                 list($pluginId, $param) = explode("/",$core);
                 $options = array();
                 $newConfigPlugin->_loadPluginConfig($pluginId, $options);
@@ -252,7 +255,7 @@ class BootConfLoader extends AbstractConfDriver {
 
         $loginP = "USER_LOGIN";
         $i = 0;
-        while(isSet($data[$loginP]) && !empty($data[$loginP])){
+        while (isSet($data[$loginP]) && !empty($data[$loginP])) {
             $pass  = $data[str_replace("_LOGIN", "_PASS",  $loginP)];
             $pass2 = $data[str_replace("_LOGIN", "_PASS2", $loginP)];
             $name  = $data[str_replace("_LOGIN", "_NAME",  $loginP)];
@@ -278,16 +281,17 @@ class BootConfLoader extends AbstractConfDriver {
 
     }
 
-    public function testConnexions($action, $httpVars, $fileVars){
+    public function testConnexions($action, $httpVars, $fileVars)
+    {
         $data = array();
         AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "DRIVER_OPTION_");
 
-        if($action == "boot_test_sql_connexion"){
+        if ($action == "boot_test_sql_connexion") {
 
             $p = AJXP_Utils::cleanDibiDriverParameters($data["STORAGE_TYPE"]["db_type"]);
-            if($p["driver"] == "sqlite3"){
+            if ($p["driver"] == "sqlite3") {
                 $dbFile = AJXP_VarsFilter::filter($p["database"]);
-                if(!file_exists(dirname($dbFile))){
+                if (!file_exists(dirname($dbFile))) {
                     mkdir(dirname($dbFile), 0755, true);
                 }
             }
@@ -298,7 +302,7 @@ class BootConfLoader extends AbstractConfDriver {
             dibi::disconnect();
             echo 'SUCCESS:Connexion established!';
 
-        }else if($action == "boot_test_mailer"){
+        } else if ($action == "boot_test_mailer") {
 
             $mailerPlug = AJXP_PluginsService::findPluginById("mailer.phpmailer-lite");
             $mailerPlug->loadConfigs(array("MAILER" => $data["MAILER_ENABLE"]["MAILER_SYSTEM"]));
@@ -313,10 +317,10 @@ class BootConfLoader extends AbstractConfDriver {
         }
     }
 
-    function _loadPluginConfig($pluginId, &$options)
+    public function _loadPluginConfig($pluginId, &$options)
     {
         $internal = self::getInternalConf();
-        if($pluginId == "core.conf" && isSet($internal["CONF_DRIVER"])){
+        if ($pluginId == "core.conf" && isSet($internal["CONF_DRIVER"])) {
             // Reformat
             $options["UNIQUE_INSTANCE_CONFIG"] = array(
                 "instance_name" => "conf.".$internal["CONF_DRIVER"]["NAME"],
@@ -326,7 +330,7 @@ class BootConfLoader extends AbstractConfDriver {
             $options["UNIQUE_INSTANCE_CONFIG"] = array_merge($options["UNIQUE_INSTANCE_CONFIG"], $internal["CONF_DRIVER"]["OPTIONS"]);
             return;
 
-        }else if($pluginId == "core.auth" && isSet($internal["AUTH_DRIVER"])){
+        } else if ($pluginId == "core.auth" && isSet($internal["AUTH_DRIVER"])) {
 
             $options = $this->authLegacyToBootConf($internal["AUTH_DRIVER"]);
             return;
@@ -334,18 +338,19 @@ class BootConfLoader extends AbstractConfDriver {
         }
         $jsonPath = $this->getPluginWorkDir(false)."/bootstrap.json";
         $jsonData = AJXP_Utils::loadSerialFile($jsonPath, false, "json");
-        if(is_array($jsonData) && isset($jsonData[$pluginId])){
+        if (is_array($jsonData) && isset($jsonData[$pluginId])) {
             $options = array_merge($options, $jsonData[$pluginId]);
         }
     }
 
-    protected function authLegacyToBootConf($legacy){
+    protected function authLegacyToBootConf($legacy)
+    {
         $data = array();
         $kOpts = array("LOGIN_REDIRECT","TRANSMIT_CLEAR_PASS", "AUTOCREATE_AJXPUSER");
-        foreach($kOpts as $k){
+        foreach ($kOpts as $k) {
             if(isSet($legacy["OPTIONS"][$k])) $data[$k] = $legacy["OPTIONS"][$k];
         }
-        if($legacy["NAME"] == "multi"){
+        if ($legacy["NAME"] == "multi") {
             $drivers = $legacy["OPTIONS"]["DRIVERS"];
             $master = $legacy["OPTIONS"]["MASTER_DRIVER"];
             $slave = array_pop(array_diff(array_keys($drivers), array($master)));
@@ -356,7 +361,7 @@ class BootConfLoader extends AbstractConfDriver {
             $data["MASTER_INSTANCE_CONFIG"] = array_merge($legacy["OPTIONS"]["DRIVERS"][$master]["OPTIONS"], array("instance_name" => "auth.".$master));
             $data["SLAVE_INSTANCE_CONFIG"] = array_merge($legacy["OPTIONS"]["DRIVERS"][$slave]["OPTIONS"], array("instance_name" => "auth.".$slave));
 
-        }else{
+        } else {
             $data["MASTER_INSTANCE_CONFIG"] = array_merge($legacy["OPTIONS"], array("instance_name" => "auth.".$legacy["NAME"]));
         }
         return $data;
@@ -366,29 +371,29 @@ class BootConfLoader extends AbstractConfDriver {
      * @param String $pluginId
      * @param String $options
      */
-    function _savePluginConfig($pluginId, $options)
+    public function _savePluginConfig($pluginId, $options)
     {
         $jsonPath = $this->getPluginWorkDir(true)."/bootstrap.json";
         $jsonData = AJXP_Utils::loadSerialFile($jsonPath, false, "json");
         if(!is_array($jsonData)) $jsonData = array();
         $jsonData[$pluginId] = $options;
-        if($pluginId == "core.conf" || $pluginId == "core.auth"){
+        if ($pluginId == "core.conf" || $pluginId == "core.auth") {
             $testKey = ($pluginId == "core.conf" ? "UNIQUE_INSTANCE_CONFIG" : "MASTER_INSTANCE_CONFIG" );
             $current = array();
             $this->_loadPluginConfig($pluginId, $current);
-            if(isSet($current[$testKey]["instance_name"]) && $current[$testKey]["instance_name"] != $options[$testKey]["instance_name"]){
+            if (isSet($current[$testKey]["instance_name"]) && $current[$testKey]["instance_name"] != $options[$testKey]["instance_name"]) {
                 $forceDisconnexion = $pluginId;
             }
         }
-        if(file_exists($jsonPath)){
+        if (file_exists($jsonPath)) {
             copy($jsonPath, $jsonPath.".bak");
         }
         AJXP_Utils::saveSerialFile($jsonPath, $jsonData, true, false, "json", true);
-        if(isSet($forceDisconnexion)){
-            if($pluginId == "core.conf"){
+        if (isSet($forceDisconnexion)) {
+            if ($pluginId == "core.conf") {
                 // DISCONNECT
                 AuthService::disconnect();
-            }else if($pluginId == "core.auth"){
+            } else if ($pluginId == "core.auth") {
                 // DELETE admin_counted file and DISCONNECT
                 @unlink(AJXP_CACHE_DIR."/admin_counted");
             }
@@ -400,7 +405,7 @@ class BootConfLoader extends AbstractConfDriver {
      * @param AbstractAjxpUser $user
      * @return Array
      */
-    function listRepositories($user = null)
+    public function listRepositories($user = null)
     {
         // TODO: Implement listRepositories() method.
     }
@@ -411,7 +416,7 @@ class BootConfLoader extends AbstractConfDriver {
      * @param String $repositoryId
      * @return Repository
      */
-    function getRepositoryById($repositoryId)
+    public function getRepositoryById($repositoryId)
     {
         // TODO: Implement getRepositoryById() method.
     }
@@ -422,7 +427,7 @@ class BootConfLoader extends AbstractConfDriver {
      * @param String $repositorySlug
      * @return Repository
      */
-    function getRepositoryByAlias($repositorySlug)
+    public function getRepositoryByAlias($repositorySlug)
     {
         // TODO: Implement getRepositoryByAlias() method.
     }
@@ -434,7 +439,7 @@ class BootConfLoader extends AbstractConfDriver {
      * @param Boolean $update
      * @return -1 if failed
      */
-    function saveRepository($repositoryObject, $update = false)
+    public function saveRepository($repositoryObject, $update = false)
     {
         // TODO: Implement saveRepository() method.
     }
@@ -444,7 +449,7 @@ class BootConfLoader extends AbstractConfDriver {
      *
      * @param String $repositoryId
      */
-    function deleteRepository($repositoryId)
+    public function deleteRepository($repositoryId)
     {
         // TODO: Implement deleteRepository() method.
     }
@@ -455,12 +460,12 @@ class BootConfLoader extends AbstractConfDriver {
      * @param boolean $excludeReserved,
      * @return array AjxpRole[]
      */
-    function listRoles($roleIds = array(), $excludeReserved = false)
+    public function listRoles($roleIds = array(), $excludeReserved = false)
     {
         // TODO: Implement listRoles() method.
     }
 
-    function saveRoles($roles)
+    public function saveRoles($roles)
     {
         // TODO: Implement saveRoles() method.
     }
@@ -469,7 +474,7 @@ class BootConfLoader extends AbstractConfDriver {
      * @param AJXP_Role $role
      * @return void
      */
-    function updateRole($role)
+    public function updateRole($role)
     {
         // TODO: Implement updateRole() method.
     }
@@ -478,7 +483,7 @@ class BootConfLoader extends AbstractConfDriver {
      * @param AJXP_Role|String $role
      * @return void
      */
-    function deleteRole($role)
+    public function deleteRole($role)
     {
         // TODO: Implement deleteRole() method.
     }
@@ -486,7 +491,7 @@ class BootConfLoader extends AbstractConfDriver {
     /**
      * Specific queries
      */
-    function countAdminUsers()
+    public function countAdminUsers()
     {
         // TODO: Implement countAdminUsers() method.
     }
@@ -497,7 +502,7 @@ class BootConfLoader extends AbstractConfDriver {
      * @param String $ID
      * @return String $ID
      */
-    function saveBinary($context, $fileName, $ID = null)
+    public function saveBinary($context, $fileName, $ID = null)
     {
         // TODO: Implement saveBinary() method.
     }
@@ -508,7 +513,7 @@ class BootConfLoader extends AbstractConfDriver {
      * @param Stream $outputStream
      * @return boolean
      */
-    function loadBinary($context, $ID, $outputStream = null)
+    public function loadBinary($context, $ID, $outputStream = null)
     {
         // TODO: Implement loadBinary() method.
     }
@@ -518,7 +523,7 @@ class BootConfLoader extends AbstractConfDriver {
      * @param String $ID
      * @return boolean
      */
-    function deleteBinary($context, $ID)
+    public function deleteBinary($context, $ID)
     {
         // TODO: Implement deleteBinary() method.
     }
@@ -529,7 +534,7 @@ class BootConfLoader extends AbstractConfDriver {
      * @param String $userId
      * @param Array $deletedSubUsers
      */
-    function deleteUser($userId, &$deletedSubUsers)
+    public function deleteUser($userId, &$deletedSubUsers)
     {
         // TODO: Implement deleteUser() method.
     }
@@ -540,12 +545,12 @@ class BootConfLoader extends AbstractConfDriver {
      * @param string $userId
      * @return AbstractAjxpUser
      */
-    function instantiateAbstractUserImpl($userId)
+    public function instantiateAbstractUserImpl($userId)
     {
         // TODO: Implement instantiateAbstractUserImpl() method.
     }
 
-    function getUserClassFileName()
+    public function getUserClassFileName()
     {
         // TODO: Implement getUserClassFileName() method.
     }
@@ -554,7 +559,7 @@ class BootConfLoader extends AbstractConfDriver {
      * @param $userId
      * @return AbstractAjxpUser[]
      */
-    function getUserChildren($userId)
+    public function getUserChildren($userId)
     {
         // TODO: Implement getUserChildren() method.
     }
@@ -563,7 +568,7 @@ class BootConfLoader extends AbstractConfDriver {
      * @param string $repositoryId
      * @return array()
      */
-    function getUsersForRepository($repositoryId)
+    public function getUsersForRepository($repositoryId)
     {
         // TODO: Implement getUsersForRepository() method.
     }
@@ -574,7 +579,7 @@ class BootConfLoader extends AbstractConfDriver {
      * @param bool $fullTree
      * @return void
      */
-    function filterUsersByGroup(&$flatUsersList, $baseGroup = "/", $fullTree = false)
+    public function filterUsersByGroup(&$flatUsersList, $baseGroup = "/", $fullTree = false)
     {
         // TODO: Implement filterUsersByGroup() method.
     }
@@ -584,7 +589,7 @@ class BootConfLoader extends AbstractConfDriver {
      * @param string $groupLabel
      * @return mixed
      */
-    function createGroup($groupPath, $groupLabel)
+    public function createGroup($groupPath, $groupLabel)
     {
         // TODO: Implement createGroup() method.
     }
@@ -593,7 +598,7 @@ class BootConfLoader extends AbstractConfDriver {
      * @param $groupPath
      * @return void
      */
-    function deleteGroup($groupPath)
+    public function deleteGroup($groupPath)
     {
         // TODO: Implement deleteGroup() method.
     }
@@ -603,7 +608,7 @@ class BootConfLoader extends AbstractConfDriver {
      * @param string $groupLabel
      * @return void
      */
-    function relabelGroup($groupPath, $groupLabel)
+    public function relabelGroup($groupPath, $groupLabel)
     {
         // TODO: Implement relabelGroup() method.
     }
@@ -612,7 +617,7 @@ class BootConfLoader extends AbstractConfDriver {
      * @param string $baseGroup
      * @return string[]
      */
-    function getChildrenGroups($baseGroup = "/")
+    public function getChildrenGroups($baseGroup = "/")
     {
         // TODO: Implement getChildrenGroups() method.
     }

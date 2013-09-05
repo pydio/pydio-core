@@ -30,9 +30,9 @@ define('AJXP_METADATA_SCOPE_REPOSITORY', 2);
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-interface MetaStoreProvider {
-
-	public function init($options);
+interface MetaStoreProvider
+{
+    public function init($options);
     public function initMeta($accessDriver);
 
     /**
@@ -73,8 +73,6 @@ interface MetaStoreProvider {
      * @param AJXP_Node $ajxpNode
      * @return void
      */
-	public function enrichNode(&$ajxpNode);
+    public function enrichNode(&$ajxpNode);
 
 }
-
-?>
