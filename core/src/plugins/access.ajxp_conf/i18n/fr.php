@@ -142,4 +142,3 @@ $mess=array(
 "119" => "Set user group",
 /* END SENTENCE */
 );
-?>
