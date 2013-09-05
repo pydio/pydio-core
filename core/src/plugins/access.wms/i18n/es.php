@@ -8,5 +8,3 @@ $mess=array(
 "5" => "Palábras Clave",
 "6" => "Proyección",
 )
-
-?>

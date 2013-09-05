@@ -24,5 +24,3 @@ $mess = array(
     "2" => "Actualize a pasta actual",
     "3" => "A Transferência do ficheiro deverá começar automaticamente"
 );
-
-?>

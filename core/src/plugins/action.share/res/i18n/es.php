@@ -81,4 +81,3 @@ $mess = array(
 "77"=> "Please enable JavaScript to access this application",
 "78"=> "Warning, you should only use standard alphanumerical characters for user names. The identifier '%CURRENT%' will be replaced by '%NEW%'",
 );
-

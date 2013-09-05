@@ -28,4 +28,3 @@ $mess=array(
 "File Creation Mask" => "File Creation Mask",
 "Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." => "Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc.",
 );
-?>

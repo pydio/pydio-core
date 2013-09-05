@@ -28,4 +28,3 @@ $mess=array(
 "File Creation Mask" => "Máscara de Criação do Ficheiro",
 "Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." => "Opcionalmente aplicar um chmod para corrigir permissões. Os valores devem ser numéricos, do género: 0777, 0644, etc.",
 );
-?>

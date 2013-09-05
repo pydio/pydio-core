@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <driver name="mysql" className="class.mysqlDriver.php">
 	<actions>
-		<action name="ls" dirDefault="true">			
+		<action name="ls" dirDefault="true">
 			<gui text="32" title="32" src="fileopen.png"
 				accessKey="folder_access_key">
 				<context selection="true" dir="" recycle="false"
@@ -16,7 +16,7 @@
 			</rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var path;					
+					var path;
 					if(window.actionArguments && window.actionArguments.length>0){
 						path = window.actionArguments[0];
 						if(Object.isString(path)){path = new AjxpNode(path,false,getBaseName(path));}
@@ -28,7 +28,7 @@
 					}
 					if(path){
 						ajaxplorer.updateContextData(path);
-					}						
+					}
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
@@ -50,13 +50,13 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
-		<action name="mkdir">			
+		<action name="mkdir">
 			<gui text="sql.1" title="sql.1" src="sql_images/actions/ICON_SIZE/table_new.png" accessKey="folder_access_key" hasAccessKey="false">
 				<context selection="false" dir="true" recycle="hidden" actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="put" inZip="false"/>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
-				<clientCallback prepareModal="true"><![CDATA[					
+				<clientCallback prepareModal="true"><![CDATA[
 					var sTitle = MessageHash[187];
 					var loadFunc = function(oForm){
 						ajaxplorer.actionBar.sqlEditor = new SQLEditor(oForm);
@@ -91,7 +91,7 @@
 		</action>
 		<action name="edit_table">
 			<gui text="269" title="270" src="sql_images/actions/ICON_SIZE/table_edit.png" accessKey="edit_access_key" hasAccessKey="false">
-				<context selection="false" dir="true" recycle="hidden" 
+				<context selection="false" dir="true" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="put" inZip="false" root="false">
 				</context>
@@ -188,7 +188,7 @@
 						<td class="sqlLabelTd">Number of fields : </td><td class="sqlFieldTd"><input style="width:30px !important;" type="text" id="fields_number"/></td>
 						</tr>
 					</table>
-					<div class="dialogButtons">					
+					<div class="dialogButtons">
 						<input type="button" id="can" value="Cancel" class="dialogButton"/>
 						<input type="button" id="toNext" value="Next &gt;&gt;" class="dialogButton"/>
 					</div>
@@ -200,7 +200,7 @@
 		</action>
 		<action name="edit_record">
 			<gui text="51" title="276" src="sql_images/actions/ICON_SIZE/table_record_edit.png" accessKey="edit_access_key" hasAccessKey="false">
-				<context selection="true" dir="" recycle="hidden" 
+				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="change" inZip="false" root="false">
 				</context>
@@ -208,7 +208,7 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var userSelection =  ajaxplorer.getUserSelection();					
+					var userSelection =  ajaxplorer.getUserSelection();
 					var loadFunc = function(oForm){
 						ajaxplorer.actionBar.sqlEditor = new SQLEditor(oForm);
 						ajaxplorer.actionBar.sqlEditor.createRecordEditor(userSelection);
@@ -216,11 +216,11 @@
 					var completeFunc = function(){
 						ajaxplorer.actionBar.sqlEditor.submitRecordForm();
 						return false;
-					};					
+					};
 					modal.showDialogForm('Edit Online', 'mysql_edit_record', loadFunc, completeFunc, null);
 					]]></clientCallback>
 				<clientForm id="mysql_edit_record"><![CDATA[
-					<div id="mysql_edit_record" action="edit_record" box_width="600">					
+					<div id="mysql_edit_record" action="edit_record" box_width="600">
 					</div>
 				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>

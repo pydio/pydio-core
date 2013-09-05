@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
-	<head>	
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <style type="text/css">
             * {
                 font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
@@ -112,10 +112,10 @@
                 }
             }
         </style>
-	</head>
-	<body>
-    <?php if($AJXP_LINK_HAS_PASSWORD){ ?>
-		<form action='' method='post' name="submit_password">
+    </head>
+    <body>
+    <?php if ($AJXP_LINK_HAS_PASSWORD) { ?>
+        <form action='' method='post' name="submit_password">
             <div id="main_dl_container">
                 <h1><?php
                     if(!empty($CUSTOM_SHAREPAGE_TITLE)) echo(str_replace(array("AJXP_APPLICATION_TITLE","AJXP_FILENAME"), array(ConfService::getCoreConf("APPLICATION_TITLE"), $AJXP_LINK_BASENAME), $CUSTOM_SHAREPAGE_TITLE));
@@ -132,7 +132,7 @@
                     if(!empty($CUSTOM_SHAREPAGE_LEGEND_PASS)) echo(str_replace(array("AJXP_APPLICATION_TITLE","AJXP_FILENAME"), array(ConfService::getCoreConf("APPLICATION_TITLE"), $AJXP_LINK_BASENAME), $CUSTOM_SHAREPAGE_LEGEND_PASS));
                     else echo sprintf($messages[4], $AJXP_LINK_BASENAME) ?></h2>
             </div>
-		</form>
+        </form>
     <?php } else { ?>
         <div id="main_dl_container">
             <h1><?php
@@ -140,7 +140,7 @@
                 else echo sprintf($messages[1], ConfService::getCoreConf("APPLICATION_TITLE"))
                 ?></h1>
             <a class="button_link" href="?dl=true" style="position: relative;display: block;height: 200px;width: 203px;margin: 0 auto;">
-                <?php if(!empty($CUSTOM_SHAREPAGE_BUTTON)) {
+                <?php if (!empty($CUSTOM_SHAREPAGE_BUTTON)) {
                 echo('<img src="'.$CUSTOM_SHAREPAGE_BUTTON.'" >');
             } else { ?>
                 <img src="dl.png">
@@ -160,7 +160,7 @@
         $bgName = $varBase . $index;
         $bgAttName = $varBase . 'ATTRIBUTES_' .  $index;
         $bgs = array();
-        while(isSet($$bgName) && !empty($$bgName)){
+        while (isSet($$bgName) && !empty($$bgName)) {
             $bgs[] = "background-image:url('".$$bgName."');" . (isSet($$bgAttName) ? $$bgAttName : '');
             $index ++;
             $bgName = $varBase . $index;
@@ -168,10 +168,10 @@
         }
         echo 'backgrounds = ' . json_encode($bgs) . ';';
         ?>
-    if(backgrounds.length){
+    if (backgrounds.length) {
         var i = Math.floor( Math.random() * backgrounds.length);
         document.body.setAttribute("style", backgrounds[i]);
     }
     </script>
-	</body>
+    </body>
 </html>

@@ -27,4 +27,3 @@ $mess=array(
 "5" => "Ključne besede",
 "6" => "Projekcija",
 );
-?>

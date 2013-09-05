@@ -13,12 +13,12 @@
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
 # of the License, or (at your option) any later version.
-#  
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-#  
+#
 ###################################################################
 
 define ('SMB4PHP_VERSION', '0.8');
@@ -26,7 +26,7 @@ define ('SMB4PHP_VERSION', '0.8');
 ###################################################################
 # CONFIGURATION SECTION - Change for your needs
 ###################################################################
-if(!defined('SMB4PHP_SMBCLIENT')){
+if (!defined('SMB4PHP_SMBCLIENT')) {
     define ('SMB4PHP_SMBCLIENT', 'smbclient');
 }
 define ('SMB4PHP_SMBOPTIONS', 'TCP_NODELAY IPTOS_LOWDELAY SO_KEEPALIVE SO_RCVBUF=8192 SO_SNDBUF=8192');
@@ -42,10 +42,11 @@ $GLOBALS['__smb_cache'] = array ('stat' => array (), 'dir' => array ());
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
-class smb {
-
-    function parse_url ($url) {
-		$pu = smb::smbparseUrl(trim($url));
+class smb
+{
+    public function parse_url ($url)
+    {
+        $pu = smb::smbparseUrl(trim($url));
         //self::debug("URL: " . print_r($pu,true));
         foreach (array ('domain', 'user', 'pass', 'host', 'port', 'path') as $i) {
             if (! isset($pu[$i])) $pu[$i] = '';
@@ -62,36 +63,37 @@ class smb {
        /* $i = 0; $atcount = 0;
         //self::debug("COUNT: " . strlen($pu['host']));
         while ($i < strlen($pu['host'])) {
-			if($pu['host'][$i] == '@'){$atcount++;} 
-			$i++;
-		}
-		//self::debug("ATCOUNT: " . $atcount);
-        if($atcount > 0){
-			while($pu['host'][$i] != '@'){$i--; continue;}
-			$pu['pass'] = $pu['pass'] . '@' . substr($pu['host'], 0, $i);
-			$pu['host'] = substr($pu['host'], $i + 1);
-			
-		}
-		
-		*/
-		//self::debug("PU: " . print_r($pu, true));
-		//self::debug("HOST: " . $pu['host']);
+            if ($pu['host'][$i] == '@') {$atcount++;}
+            $i++;
+        }
+        //self::debug("ATCOUNT: " . $atcount);
+        if ($atcount > 0) {
+            while ($pu['host'][$i] != '@') {$i--; continue;}
+            $pu['pass'] = $pu['pass'] . '@' . substr($pu['host'], 0, $i);
+            $pu['host'] = substr($pu['host'], $i + 1);
+
+        }
+
+        */
+        //self::debug("PU: " . print_r($pu, true));
+        //self::debug("HOST: " . $pu['host']);
         return $pu;
     }
 
-    static function debug($str, $array = null){
+    public static function debug($str, $array = null)
+    {
         if(!AJXP_SERVER_DEBUG) return;
         // blur credentials!
         $pos1 = strpos($str, "://");
-        if($pos1 !== false) {
+        if ($pos1 !== false) {
             $pos1 += 3;
             $pos2 = strrpos($str, "@", $pos1) + 1;
             $str = substr($str, 0, $pos1) . "***:***@" . substr($str, $pos2);
         }
-        if($array != null){
+        if ($array != null) {
             if(!is_array($array)) $array = array($array);
-            foreach($array as $k=>$v){
-                if(is_string($v) && strpos($v, "://") != false){
+            foreach ($array as $k=>$v) {
+                if (is_string($v) && strpos($v, "://") != false) {
                     $pos1 = strpos($v, "://") + 3;
                     $pos2 = strrpos($v, "@", $pos1) + 1;
                     $array[$k] = substr($v, 0, $pos1) . "***:***@" . substr($v, $pos2);
@@ -102,22 +104,24 @@ class smb {
     }
 
 
-    function look ($purl) {
+    public function look ($purl)
+    {
         return smb::client ('-L ' . escapeshellarg ($purl['host']), $purl);
     }
 
 
-    function execute ($command, $purl) {
+    public function execute ($command, $purl)
+    {
         return smb::client ('-d 0 '
               . escapeshellarg ('//' . $purl['host'] . '/' . $purl['share'])
               . ' -c ' . escapeshellarg ($command), $purl
         );
     }
 
-    function client ($params, $purl) {
+    public function client ($params, $purl)
+    {
+        //var_dump($params);
 
-    	//var_dump($params);
-    	
         static $regexp = array (
         '^added interface ip=(.*) bcast=(.*) nmask=(.*)$' => 'skip',
         'Anonymous login successful' => 'skip',
@@ -154,7 +158,7 @@ class smb {
             putenv("USER={$purl['user']}%{$purl['pass']}");
             $auth = '';
         } else {
-			//$purl['pass'] = preg_replace('/@/', '\@', $purl['pass']);
+            //$purl['pass'] = preg_replace('/@/', '\@', $purl['pass']);
             $auth = ($purl['user'] <> '' ? (' -U ' . escapeshellarg ($purl['user'] . '__SEP__' . $purl['pass'])) : '');
             $auth = str_replace("__SEP__", "%", $auth);
             //self::debug($auth);
@@ -166,7 +170,7 @@ class smb {
         $options = '-O ' . escapeshellarg(SMB4PHP_SMBOPTIONS);
         //self::debug($auth);
         self::debug("SMBCLIENT", " -N {$options} {$port} {$options} {$params} 2>/dev/null [auth data]");
-	//self::debug("I just ran an smbclient call");
+    //self::debug("I just ran an smbclient call");
         //$output = popen (SMB4PHP_SMBCLIENT." -N {$options} {$port} {$options} {$params} 2>/dev/null {$auth}", 'r');
         $info = array ();
 
@@ -177,30 +181,30 @@ class smb {
             2 => array("pipe", "w") 	// stderr is a pipe to write to
         );
         $env = null;
-        if(defined('AJXP_LOCALE')){
+        if (defined('AJXP_LOCALE')) {
             $env = array("LC_ALL" => AJXP_LOCALE);
         }
         $process = proc_open($cmd, $descriptorspec, $pipes, null, $env);
-        if(is_resource($process)){
+        if (is_resource($process)) {
             fclose($pipes[0]);
             $error = stream_get_contents($pipes[2]);
             fclose($pipes[2]);
-            if($error != ""){
+            if ($error != "") {
                 $error = strtolower($error);
                 // common error
-                if(strstr($error, "command not found")!==false){
+                if (strstr($error, "command not found")!==false) {
                     fclose($pipes[1]);
                     throw new Exception($error);
-                }else if(strstr($error, "domain")!==false && strstr($error, "os")!==false ){
+                } else if (strstr($error, "domain")!==false && strstr($error, "os")!==false ) {
                     self::debug("Smbclient alternate stream : ".$error);
-                }else{
+                } else {
                     AJXP_Logger::logAction("ERROR", array("Smbclient error" => $error));
                 }
             }
             $output = $pipes[1];
         }
 
-        if(isset($output) && is_resource($output)){
+        if (isset($output) && is_resource($output)) {
 
             while ($line = fgets ($output, 4096)) {
                 list ($tag, $regs, $i) = array ('skip', array (), array ());
@@ -247,7 +251,7 @@ class smb {
                             : array();
                         break;
                     case 'error':
-                        if(strstr($regs[1], "NO_SUCH_FILE") == 0){
+                        if (strstr($regs[1], "NO_SUCH_FILE") == 0) {
                             return "NOT_FOUND";
                         }
                         trigger_error($regs[1], E_USER_ERROR);
@@ -266,23 +270,23 @@ class smb {
         }
         //self::debug(print_r($info, true));
         return $info;
-		//return;
+        //return;
     }
 
 
     # stats
 
-    function url_stat ($url, $flags = STREAM_URL_STAT_LINK) {
-		global $__count;
-        if ($s = smb::getstatcache($url)) { 
-        	self::debug("Using statcache for $url");
-        	return $s; 
+    public function url_stat ($url, $flags = STREAM_URL_STAT_LINK)
+    {
+        global $__count;
+        if ($s = smb::getstatcache($url)) {
+            self::debug("Using statcache for $url");
+            return $s;
         }
         self::debug("Getting statcache for $url");
         //self::debug("Hey: " $url['user']);
         list ($stat, $pu) = array (array (), smb::parse_url ($url));
-        switch ($pu['type']) 
-        {
+        switch ($pu['type']) {
             case 'host':
                 if ($o = smb::look ($pu))
                 //self::debug($_SESSION["AJXP_SESSION_REMOTE_USER"]);
@@ -291,117 +295,122 @@ class smb {
                   trigger_error ("url_stat(): list failed for host '{$host}'", E_USER_WARNING);
                 break;
             case 'share':
-				if($_SESSION["COUNT"] == 0) {
-					$_SESSION["COUNT"] = 1;
-					//self::debug("OH HEY");
-					//$__count++;
-					//self::debug($__count);
-				if ($o = smb::look ($pu)) {
-					$_SESSION["disk"] = $o['disk'];
-					self::debug(print_r($_SESSION["disk"], true));
-				 //self::debug(print_r($_ENV, true));
+                if ($_SESSION["COUNT"] == 0) {
+                    $_SESSION["COUNT"] = 1;
+                    //self::debug("OH HEY");
+                    //$__count++;
+                    //self::debug($__count);
+                if ($o = smb::look ($pu)) {
+                    $_SESSION["disk"] = $o['disk'];
+                    self::debug(print_r($_SESSION["disk"], true));
+                 //self::debug(print_r($_ENV, true));
                    $found = FALSE;
                    $lshare = strtolower ($pu['share']);  # fix by Eric Leung
-                   if(is_array($o) && isSet($o['disk']) && is_array($o['disk'])){
-	                   foreach ($o['disk'] as $s) if ($lshare == strtolower($s)) {
-	                       $found = TRUE;
-	                       //self::debug("DISK: " . $s);
-	                       $stat = stat ("/tmp");
-	                       break;
-	                   }
+                   if (is_array($o) && isSet($o['disk']) && is_array($o['disk'])) {
+                       foreach ($o['disk'] as $s) if ($lshare == strtolower($s)) {
+                           $found = TRUE;
+                           //self::debug("DISK: " . $s);
+                           $stat = stat ("/tmp");
+                           break;
+                       }
                    }
                    if (! $found)
                       //trigger_error ("url_stat(): disk resource '{$share}' not found in '{$host}'", E_USER_WARNING);
                       return null;
                  }
                 break;
-			} else {
-				//self::debug($__count);
-				//self::debug("WORKING");
-				$found = FALSE;
+            } else {
+                //self::debug($__count);
+                //self::debug("WORKING");
+                $found = FALSE;
                    $lshare = strtolower ($pu['share']);  # fix by Eric Leung
-                   if(is_array($_SESSION["disk"]) && isSet($_SESSION["disk"]) && is_array($_SESSION["disk"])){
-	                   foreach ($_SESSION["disk"] as $s) if ($lshare == strtolower($s)) {
-	                       $found = TRUE;
-	                       //self::debug("oh boy");
-	                       $stat = stat ("/tmp");
-	                       break;
-	                   }
+                   if (is_array($_SESSION["disk"]) && isSet($_SESSION["disk"]) && is_array($_SESSION["disk"])) {
+                       foreach ($_SESSION["disk"] as $s) if ($lshare == strtolower($s)) {
+                           $found = TRUE;
+                           //self::debug("oh boy");
+                           $stat = stat ("/tmp");
+                           break;
+                       }
                    }
                    if (! $found)
                       //trigger_error ("url_stat(): disk resource '{$share}' not found in '{$host}'", E_USER_WARNING);
                       return null;
                 break;
              }
-            case 'path':          	
+            case 'path':
                 //self::debug('before exe'.print_r($pu, true));
-            	$o = smb::execute ('dir "'.$pu['path'].'"', $pu);
+                $o = smb::execute ('dir "'.$pu['path'].'"', $pu);
                 if ($o != null) {
-                	if($o == "NOT_FOUND"){
-                		return null;
-                	}
+                    if ($o == "NOT_FOUND") {
+                        return null;
+                    }
                     $p = explode ("\\", $pu['path']);
-                    $name = $p[count($p)-1];                    
+                    $name = $p[count($p)-1];
                     if (isset ($o['info'][$name])) {
                        $stat = smb::addstatcache ($url, $o['info'][$name]);
                     } else {
-						$stat = stat("/tmp");
+                        $stat = stat("/tmp");
                        //trigger_error ("url_stat(): path '{$pu['path']}' not found", E_USER_WARNING);
                     }
                 } else {
-			//$stat = stat("/tmp");
+            //$stat = stat("/tmp");
                     trigger_error ("url_stat(): dir failed for path '{$pu['path']}'", E_USER_WARNING);
                 }
                 break;
             default: trigger_error ('error in URL', E_USER_ERROR);
         }
-	
+
         return $stat;
     }
 
-    function addstatcache ($url, $info) {
+    public function addstatcache ($url, $info)
+    {
         global $__smb_cache;
         $url = smb::cleanUrl($url);
         $is_file = (strpos ($info['attr'],'D') === FALSE);
-        if(stripos(PHP_OS, "win") !== false){
+        if (stripos(PHP_OS, "win") !== false) {
             $s = ($is_file) ? stat (__FILE__) : stat (dirname(__FILE__));
-        }else{
+        } else {
             $s = ($is_file) ? stat ('/etc/passwd') : stat ('/tmp');
         }
-        if($is_file){
-        	$s[2] = $s['mode'] = 0666;
-        	$s[2] = $s['mode'] |= 0100000;
+        if ($is_file) {
+            $s[2] = $s['mode'] = 0666;
+            $s[2] = $s['mode'] |= 0100000;
         }
         $s[7] = $s['size'] = $info['size'];
         $s[8] = $s[9] = $s[10] = $s['atime'] = $s['mtime'] = $s['ctime'] = $info['time'];
         return $__smb_cache['stat'][$url] = $s;
     }
 
-    function getstatcache ($url) {
+    public function getstatcache ($url)
+    {
         global $__smb_cache;
         $url = smb::cleanUrl($url);
         return isset ($__smb_cache['stat'][$url]) ? $__smb_cache['stat'][$url] : FALSE;
     }
 
-    function clearstatcache ($url='') {
+    public function clearstatcache ($url='')
+    {
         global $__smb_cache;
         $url = smb::cleanUrl($url);
         if ($url == '') $__smb_cache['stat'] = array (); else unset ($__smb_cache['stat'][$url]);
     }
 
-    static function cleanUrl($url){
-    	$url = str_replace("smb://", "smb:/__/__", $url);
-    	while (strstr($url, "//")!==FALSE) {
-    		$url = str_replace("//", "/", $url);
-    	}
-    	$url = str_replace("smb:/__/__", "smb://", $url);
-    	return $url;
+    public static function cleanUrl($url)
+    {
+        $url = str_replace("smb://", "smb:/__/__", $url);
+        while (strstr($url, "//")!==FALSE) {
+            $url = str_replace("//", "/", $url);
+        }
+        $url = str_replace("smb:/__/__", "smb://", $url);
+        return $url;
     }
-    
+
 
     # commands
 
-    function unlink ($url) {
+    public function unlink ($url)
+    {
         $url = smb::cleanUrl($url);
         $pu = smb::parse_url($url);
         if ($pu['type'] <> 'path') trigger_error('unlink(): error in URL', E_USER_ERROR);
@@ -410,7 +419,8 @@ class smb {
         return true;
     }
 
-    function rename ($url_from, $url_to) {
+    public function rename ($url_from, $url_to)
+    {
         $url_from = smb::cleanUrl($url_from);
         $url_to = smb::cleanUrl($url_to);
 
@@ -429,8 +439,9 @@ class smb {
         return smb::execute ('rename "'.$from['path'].'" "'.$to['path'].'"', $to);
     }
 
-    function mkdir ($url, $mode, $options) {
-		//self::debug("hmmmmm");
+    public function mkdir ($url, $mode, $options)
+    {
+        //self::debug("hmmmmm");
         $url = smb::cleanUrl($url);
         $pu = smb::parse_url($url);
 
@@ -439,90 +450,91 @@ class smb {
         return smb::execute ('mkdir "'.$pu['path'].'"', $pu);
     }
 
-    function rmdir ($url) {
+    public function rmdir ($url)
+    {
         $url = smb::cleanUrl($url);
         $pu = smb::parse_url($url);
         if ($pu['type'] <> 'path') trigger_error('rmdir(): error in URL', E_USER_ERROR);
         smb::clearstatcache ($url);
         return smb::execute ('rmdir "'.$pu['path'].'"', $pu);
     }
-    
-    
-    function smbparseUrl ($url){
-		
-		$pass = $_SESSION["AJXP_SESSION_REMOTE_PASS"];
-		//$pass = $pass["password"];
-		$pu['scheme'] = 'smb';
-		$temp = substr($url, 6);
-		//echo $temp . "\n";
+
+
+    public function smbparseUrl ($url)
+    {
+        $pass = $_SESSION["AJXP_SESSION_REMOTE_PASS"];
+        //$pass = $pass["password"];
+        $pu['scheme'] = 'smb';
+        $temp = substr($url, 6);
+        //echo $temp . "\n";
         $pu['user'] = "";
-        if(strstr($temp, ":") !== false){
+        if (strstr($temp, ":") !== false) {
             $i = 0;
-            while($temp[$i] != ':'){
+            while ($temp[$i] != ':') {
                 $i++;
             }
             $pu['user'] = substr($temp, 0 , $i);
         }
-		//echo $pu['user'] . "\n";
+        //echo $pu['user'] . "\n";
 
-		$temp = substr($temp, $i + 1);
-		//self::debug($temp);
-		$i = 0;
-		$j = 0;
-		$k = 1;
-		//self::debug("PASS: " . $pass);
-		$pu['pass'] = '';
-		while($pass != $pu['pass']){
-			$i = 0;
-			$j = 0;
-			while($temp[$i] != '@' || $j <= $k){
-				if($temp[$i] == '@')$j++;
-				if($j == $k) break;
-				if($i >= strlen($temp)) {
-					exit("Parse error: bad password");
-				}
-				$i++;
-			}
-			$k++;
-			$pu['pass'] = substr($temp, 0 , $i);
-			//self::debug("PASS: " . $pu['pass']);
-			//echo $pu['pass'] . "\n";
-			//echo "J: " . $j . " K: " . $k . "\n";
+        $temp = substr($temp, $i + 1);
+        //self::debug($temp);
+        $i = 0;
+        $j = 0;
+        $k = 1;
+        //self::debug("PASS: " . $pass);
+        $pu['pass'] = '';
+        while ($pass != $pu['pass']) {
+            $i = 0;
+            $j = 0;
+            while ($temp[$i] != '@' || $j <= $k) {
+                if($temp[$i] == '@')$j++;
+                if($j == $k) break;
+                if ($i >= strlen($temp)) {
+                    exit("Parse error: bad password");
+                }
+                $i++;
+            }
+            $k++;
+            $pu['pass'] = substr($temp, 0 , $i);
+            //self::debug("PASS: " . $pu['pass']);
+            //echo $pu['pass'] . "\n";
+            //echo "J: " . $j . " K: " . $k . "\n";
 
-	
-		}
-		$temp = substr($temp, $i+1);
-		//echo $temp;
-		$i = 0;
-		while($temp[$i] != '/'){
-			$i++;
-		}
-		$pu['host'] = substr($temp, 0 , $i);
-		$pu['path'] = substr($temp, $i);
 
-		//echo $pu['pass'] . "\n";
-		return $pu;
-	}
+        }
+        $temp = substr($temp, $i+1);
+        //echo $temp;
+        $i = 0;
+        while ($temp[$i] != '/') {
+            $i++;
+        }
+        $pu['host'] = substr($temp, 0 , $i);
+        $pu['path'] = substr($temp, $i);
+
+        //echo $pu['pass'] . "\n";
+        return $pu;
+    }
 }
 
 ###################################################################
 # SMB_STREAM_WRAPPER - class to be registered for smb:// URLs
 ###################################################################
 
-class smb_stream_wrapper extends smb {
-
+class smb_stream_wrapper extends smb
+{
     # variables
 
-    var $stream, $url, $parsed_url = array (), $mode, $tmpfile;
-    var $need_flush = FALSE;
-    var $dir = array (), $dir_index = -1;
+    public $stream, $url, $parsed_url = array (), $mode, $tmpfile;
+    public $need_flush = FALSE;
+    public $dir = array (), $dir_index = -1;
 
 
     # directories
 
-    function dir_opendir ($url, $options) {
-    	
-    	$d = $this->getdircache ($url);
+    public function dir_opendir ($url, $options)
+    {
+        $d = $this->getdircache ($url);
         if (is_array($d)) {
             $this->dir = $d;
             $this->dir_index = 0;
@@ -542,23 +554,23 @@ class smb_stream_wrapper extends smb {
                 break;
             case 'share':
             case 'path':
-            	$o = smb::execute ('dir "'.$pu['path'].'\*"', $pu);
+                $o = smb::execute ('dir "'.$pu['path'].'\*"', $pu);
                 if (is_array($o)) {
-                	if(isSet($o['info'])){
-	                   $this->dir = array_keys($o['info']);	                   
-	                   $this->dir_index = 0;
-	                   $this->adddircache ($url, $this->dir);
-	                   foreach ($o['info'] as $name => $info) {
-	                   		self::debug("Adding to statcache ".$url.'/'.$name);
-	                       //smb::addstatcache($url . '/' . urlencode($name), $info);
-	                       smb::addstatcache($url .'/'. $name, $info);
-	                   }
-                	}else{
-                		$this->dir = array();
-                		$this->dir_index = 0;
-                		$this->adddircache($url, $this->dir);
-                	}
-                } else {                	
+                    if (isSet($o['info'])) {
+                       $this->dir = array_keys($o['info']);
+                       $this->dir_index = 0;
+                       $this->adddircache ($url, $this->dir);
+                       foreach ($o['info'] as $name => $info) {
+                               self::debug("Adding to statcache ".$url.'/'.$name);
+                           //smb::addstatcache($url . '/' . urlencode($name), $info);
+                           smb::addstatcache($url .'/'. $name, $info);
+                       }
+                    } else {
+                        $this->dir = array();
+                        $this->dir_index = 0;
+                        $this->adddircache($url, $this->dir);
+                    }
+                } else {
                    trigger_error ("dir_opendir(): dir failed for path '{$pu['path']}'", E_USER_WARNING);
                 }
                 break;
@@ -568,30 +580,33 @@ class smb_stream_wrapper extends smb {
         return TRUE;
     }
 
-    function dir_readdir () { return ($this->dir_index < count($this->dir)) ? $this->dir[$this->dir_index++] : FALSE; }
+    public function dir_readdir () { return ($this->dir_index < count($this->dir)) ? $this->dir[$this->dir_index++] : FALSE; }
 
-    function dir_rewinddir () { $this->dir_index = 0; }
+    public function dir_rewinddir () { $this->dir_index = 0; }
 
-    function dir_closedir () { $this->dir = array(); $this->dir_index = -1; return TRUE; }
+    public function dir_closedir () { $this->dir = array(); $this->dir_index = -1; return TRUE; }
 
 
     # cache
 
-    function adddircache ($url, $content) {
-        global $__smb_cache;        
+    public function adddircache ($url, $content)
+    {
+        global $__smb_cache;
         $url = smb::cleanUrl($url);
         self::debug("Adding to dir cache", array("url"=>$url));
         return $__smb_cache['dir'][$url] = $content;
     }
 
-    function getdircache ($url) {
+    public function getdircache ($url)
+    {
         global $__smb_cache;
         $url = smb::cleanUrl($url);
         self::debug("Testing dir cache", array("url"=>$url));
         return isset ($__smb_cache['dir'][$url]) ? $__smb_cache['dir'][$url] : FALSE;
     }
 
-    function cleardircache ($url='') {
+    public function cleardircache ($url='')
+    {
         global $__smb_cache;
         $url = smb::cleanUrl($url);
         if ($url == '') $__smb_cache['dir'] = array (); else unset ($__smb_cache['dir'][$url]);
@@ -600,7 +615,8 @@ class smb_stream_wrapper extends smb {
 
     # streams
 
-    function stream_open ($url, $mode, $options, $opened_path) {
+    public function stream_open ($url, $mode, $options, $opened_path)
+    {
         $url = smb::cleanUrl($url);
         $this->url = $url;
         $this->mode = $mode;
@@ -612,21 +628,21 @@ class smb_stream_wrapper extends smb {
             case 'r+':
             case 'rb':
             case 'a':
-            case 'a+':  
-            	// REFERENCE STREAM BUT DO NOT OPEN IT UNTIL READING IS REALLY NECESSARY!
-            	/*
-            	$this->tmpfile = tempnam('/tmp', 'smb.down.');
+            case 'a+':
+                // REFERENCE STREAM BUT DO NOT OPEN IT UNTIL READING IS REALLY NECESSARY!
+                /*
+                $this->tmpfile = tempnam('/tmp', 'smb.down.');
                 smb::execute ('get "'.$pu['path'].'" "'.$this->tmpfile.'"', $pu);
                 $this->stream = fopen ($this->tmpfile, $mode);
                 */
-            	$this->defer_stream_read = true;
+                $this->defer_stream_read = true;
                 break;
             case 'w':
             case 'w+':
             case 'wb':
             case 'x':
-            case 'x+':  
-            	$this->cleardircache();
+            case 'x+':
+                $this->cleardircache();
                 $this->tmpfile = tempnam('/tmp', 'smb.up.');
                 $this->stream = fopen ($this->tmpfile, $mode);
                 $this->need_flush = TRUE;
@@ -636,29 +652,32 @@ class smb_stream_wrapper extends smb {
         return TRUE;
     }
 
-    function stream_close () { 
-    	if(isSet($this->stream)){
-	    	return fclose($this->stream); 
-    	}else{
-    		// Stream was in fact never opened!
-    		return true;
-    	}
+    public function stream_close ()
+    {
+        if (isSet($this->stream)) {
+            return fclose($this->stream);
+        } else {
+            // Stream was in fact never opened!
+            return true;
+        }
     }
 
-    function stream_read ($count) { return fread($this->getStream(), $count); }
+    public function stream_read ($count) { return fread($this->getStream(), $count); }
 
-    function stream_write ($data) { 
-    	$this->need_flush = TRUE; 
-    	return fwrite($this->getStream(), $data); 
+    public function stream_write ($data)
+    {
+        $this->need_flush = TRUE;
+        return fwrite($this->getStream(), $data);
     }
 
-    function stream_eof () { return feof($this->getStream()); }
+    public function stream_eof () { return feof($this->getStream()); }
 
-    function stream_tell () { return ftell($this->getStream()); }
+    public function stream_tell () { return ftell($this->getStream()); }
 
-    function stream_seek ($offset, $whence=null) { return fseek($this->getStream(), $offset, $whence); }
+    public function stream_seek ($offset, $whence=null) { return fseek($this->getStream(), $offset, $whence); }
 
-    function stream_flush () {
+    public function stream_flush ()
+    {
         if ($this->mode <> 'r' && $this->need_flush) {
             smb::clearstatcache ($this->url);
             smb::execute ('put "'.$this->tmpfile.'" "'.$this->parsed_url['path'].'"', $this->parsed_url);
@@ -666,27 +685,29 @@ class smb_stream_wrapper extends smb {
         }
     }
 
-    function stream_stat () { return smb::url_stat ($this->url); }
+    public function stream_stat () { return smb::url_stat ($this->url); }
 
-    function __destruct () {
+    public function __destruct ()
+    {
         if ($this->tmpfile <> '') {
             if ($this->need_flush) $this->stream_flush ();
             unlink ($this->tmpfile);
 
         }
     }
-    
-    private function getStream(){
-    	if(isSet($this->stream)){
-    		return $this->stream;
-    	}
-    	if(isSet($this->defer_stream_read)){
-    		$this->tmpfile = tempnam('/tmp', 'smb.down');
-    		self::debug("Creating real tmp file now");
-    		smb::execute ('get "'.$this->parsed_url['path'].'" "'.$this->tmpfile.'"', $this->parsed_url);
-    		$this->stream = fopen($this->tmpfile, $this->mode);
-    	}
-    	return $this->stream;
+
+    private function getStream()
+    {
+        if (isSet($this->stream)) {
+            return $this->stream;
+        }
+        if (isSet($this->defer_stream_read)) {
+            $this->tmpfile = tempnam('/tmp', 'smb.down');
+            self::debug("Creating real tmp file now");
+            smb::execute ('get "'.$this->parsed_url['path'].'" "'.$this->tmpfile.'"', $this->parsed_url);
+            $this->stream = fopen($this->tmpfile, $this->mode);
+        }
+        return $this->stream;
     }
 
 }
@@ -697,5 +718,3 @@ class smb_stream_wrapper extends smb {
 
 stream_wrapper_register('smb', 'smb_stream_wrapper')
     or die ('Failed to register protocol');
-    
-?>

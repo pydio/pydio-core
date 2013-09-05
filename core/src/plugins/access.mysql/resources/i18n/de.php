@@ -24,4 +24,3 @@ $mess=array(
 "3"	=> "Suchen",
 "4"	=> "Löschen"
 );
-?>

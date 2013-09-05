@@ -29,7 +29,7 @@
 			</component_config>
 			<component_config className="FoldersTree">
 				<property name="display" value="d"/>
-			</component_config>			
+			</component_config>
 		</client_configs>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
@@ -37,6 +37,6 @@
 	</registry_contributions>
 	<dependencies>
 		<pluginClass pluginName="access.fs"/>
-	</dependencies>	
+	</dependencies>
     <class_stream_wrapper filename="plugins/access.sftp/class.sftpAccessWrapper.php" classname="sftpAccessWrapper" protocol="ajxp.sftp"/>
 </ajxpdriver>

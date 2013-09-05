@@ -26,4 +26,3 @@ $mess=array(
 "File location" => "Localização do ficheiro",
 "Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder." => "Onde guardar o ficheiro de Metadata : LOCAL significa que será criado um ficheiro oculto em cada pasta, GLOBAL significa que será criado um ficheiro na pasta 'AJXP_DATA_PATH/plugins/action.share'.",
 );
-?>

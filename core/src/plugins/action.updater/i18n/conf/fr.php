@@ -30,4 +30,3 @@ $mess=array(
 "Update Channel" => "Canal",
 "Check stable or dev channel" => "Canal stable ou développement",
 );
-?>

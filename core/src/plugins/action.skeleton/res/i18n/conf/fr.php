@@ -28,4 +28,3 @@ $mess=array(
 "Button Target Url" => "Cible du bouton",
 "The target URL of the button that will be added to the application" => "URL du bouton ajouté à l'application.",
 );
-?>

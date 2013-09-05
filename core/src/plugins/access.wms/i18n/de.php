@@ -8,5 +8,3 @@ $mess=array(
 "5" => "Stichwörter",
 "6" => "Vorschau",
 )
-
-?>

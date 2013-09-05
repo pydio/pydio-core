@@ -25,4 +25,3 @@ $mess=array(
 "3"	=> "Najdi",
 "4"	=> "Počisti"
 );
-?>

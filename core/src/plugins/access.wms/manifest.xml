@@ -9,7 +9,7 @@
 	</server_settings>
 	<client_settings icon="plugins/access.wms/images/world.png">
 		<resources>
-			<i18n namespace="wms" path="plugins/access.wms/i18n" />		
+			<i18n namespace="wms" path="plugins/access.wms/i18n" />
 			<img_library alias="wms_images" path="plugins/access.wms/images"/>
 		</resources>
 	</client_settings>
@@ -56,12 +56,12 @@
 							</div>
 						</div>
 					]]></html>
-				</infoPanel>		
+				</infoPanel>
 			</component_config>
-			
-		</client_configs>	
+
+		</client_configs>
 		<actions>
-			<action name="ls" dirDefault="true">			
+			<action name="ls" dirDefault="true">
 				<gui text="32" title="32" src="fileopen.png"
 					accessKey="folder_access_key">
 					<context selection="true" dir="" recycle="false"
@@ -76,7 +76,7 @@
 				</rightsContext>
 				<processing>
 					<clientCallback prepareModal="true"><![CDATA[
-						var path;					
+						var path;
 						if(window.actionArguments && window.actionArguments.length>0){
 							path = window.actionArguments[0];
 							if(Object.isString(path)){path = new AjxpNode(path,false,getBaseName(path));}
@@ -88,7 +88,7 @@
 						}
 						if(path){
 							ajaxplorer.updateContextData(path);
-						}						
+						}
 						]]></clientCallback>
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
@@ -97,7 +97,7 @@
 				<processing>
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
-			</action>			
+			</action>
 			<action name="open_with" fileDefault="true">
 				<gui text="316" title="316" src="fileopen.png" accessKey="open_with_access" hasAccessKey="true">
 					<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
@@ -107,14 +107,14 @@
 					<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="wms_layer" behaviour="hidden"></selectionContext></gui>
 				<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 				<subMenu>
-					<dynamicBuilder><![CDATA[						
+					<dynamicBuilder><![CDATA[
 						var context = window.builderContext;
-						context.builderMenuItems = $A([]);					
+						context.builderMenuItems = $A([]);
 						var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
 						var editors = ajaxplorer.findEditorsForMime(selectedMime);
 						if(editors.length){
 							var index = 0;
-							editors.each(function(el){							
+							editors.each(function(el){
 								if(!el.openable) return;
 								context.builderMenuItems.push({
 									name:el.text,
@@ -124,7 +124,7 @@
 									callback:function(e){this.apply([el]);}.bind(context)
 								} );
 								index++;
-							} );					
+							} );
 						}
 						if(!index){
 							context.builderMenuItems.push({
@@ -132,19 +132,19 @@
 								alt:MessageHash[324],
 								image:resolveImageSource('button_cancel.png', '/images/actions/ICON_SIZE', 22),
 								callback:function(e){}
-							} );					
+							} );
 						}
 					]]></dynamicBuilder>
-				</subMenu>			
-				<processing>			
-					<clientCallback prepareModal="false"><![CDATA[		
+				</subMenu>
+				<processing>
+					<clientCallback prepareModal="false"><![CDATA[
 						var editorData = window.actionArguments[0];
 						if(!editorData){
 							var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
 							var editors = ajaxplorer.findEditorsForMime(selectedMime);
 							if(editors.length){
-								editorData = editors[0];							
-							}					
+								editorData = editors[0];
+							}
 						}
 						if(editorData){
 							ajaxplorer.loadEditorResources(editorData.resourcesManager);
@@ -154,8 +154,8 @@
 					<serverCallback methodName="switchAction"></serverCallback>
 					</processing>
 			</action>
-						
+
 		</actions>
-	</registry_contributions>	
+	</registry_contributions>
 	<class_definition filename="plugins/access.wms/class.WmsBrowser.php" classname="WmsBrowser"/>
 </ajxpdriver>

@@ -24,4 +24,3 @@ $mess=array(
 "3"	=> "Search",
 "4"	=> "Clear"
 );
-?>
