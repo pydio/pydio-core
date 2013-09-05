@@ -12,8 +12,8 @@ namespace Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-interface IExtendedCollection extends ICollection {
-
+interface IExtendedCollection extends ICollection
+{
     /**
      * Creates a new collection
      *
@@ -22,7 +22,6 @@ interface IExtendedCollection extends ICollection {
      * @param array $properties
      * @return void
      */
-    function createExtendedCollection($name, array $resourceType, array $properties);
+    public function createExtendedCollection($name, array $resourceType, array $properties);
 
 }
-

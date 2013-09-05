@@ -11,8 +11,8 @@ namespace Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-abstract class Property implements PropertyInterface {
-
+abstract class Property implements PropertyInterface
+{
     /**
      * Unserializes the property.
      *
@@ -21,11 +21,10 @@ abstract class Property implements PropertyInterface {
      * @param \DOMElement $prop
      * @return DAV\IProperty
      */
-    static function unserialize(\DOMElement $prop) {
-
+    public static function unserialize(\DOMElement $prop)
+    {
         throw new Exception('Unserialize has not been implemented for this class');
 
     }
 
 }
-

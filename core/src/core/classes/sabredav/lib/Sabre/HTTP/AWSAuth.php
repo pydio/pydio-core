@@ -11,8 +11,8 @@ namespace Sabre\HTTP;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class AWSAuth extends AbstractAuth {
-
+class AWSAuth extends AbstractAuth
+{
     /**
      * The signature supplied by the HTTP client
      *
@@ -49,8 +49,8 @@ class AWSAuth extends AbstractAuth {
      *
      * @return bool
      */
-    public function init() {
-
+    public function init()
+    {
         $authHeader = $this->httpRequest->getHeader('Authorization');
         $authHeader = explode(' ',$authHeader);
 
@@ -70,8 +70,8 @@ class AWSAuth extends AbstractAuth {
      *
      * @return string
      */
-    public function getAccessKey() {
-
+    public function getAccessKey()
+    {
         return $this->accessKey;
 
     }
@@ -82,8 +82,8 @@ class AWSAuth extends AbstractAuth {
      * @param string $secretKey
      * @return bool
      */
-    public function validate($secretKey) {
-
+    public function validate($secretKey)
+    {
         $contentMD5 = $this->httpRequest->getHeader('Content-MD5');
 
         if ($contentMD5) {
@@ -137,8 +137,8 @@ class AWSAuth extends AbstractAuth {
      *
      * @return void
      */
-    public function requireLogin() {
-
+    public function requireLogin()
+    {
         $this->httpResponse->setHeader('WWW-Authenticate','AWS');
         $this->httpResponse->sendStatus(401);
 
@@ -156,8 +156,8 @@ class AWSAuth extends AbstractAuth {
      * @param string $dateHeader
      * @return bool
      */
-    protected function validateRFC2616Date($dateHeader) {
-
+    protected function validateRFC2616Date($dateHeader)
+    {
         $date = Util::parseHTTPDate($dateHeader);
 
         // Unknown format
@@ -184,11 +184,11 @@ class AWSAuth extends AbstractAuth {
      *
      * @return string
      */
-    protected function getAmzHeaders() {
-
+    protected function getAmzHeaders()
+    {
         $amzHeaders = array();
         $headers = $this->httpRequest->getHeaders();
-        foreach($headers as $headerName => $headerValue) {
+        foreach ($headers as $headerName => $headerValue) {
             if (strpos(strtolower($headerName),'x-amz-')===0) {
                 $amzHeaders[strtolower($headerName)] = str_replace(array("\r\n"),array(' '),$headerValue) . "\n";
             }
@@ -196,7 +196,7 @@ class AWSAuth extends AbstractAuth {
         ksort($amzHeaders);
 
         $headerStr = '';
-        foreach($amzHeaders as $h=>$v) {
+        foreach ($amzHeaders as $h=>$v) {
             $headerStr.=$h.':'.$v;
         }
 
@@ -211,8 +211,8 @@ class AWSAuth extends AbstractAuth {
      * @param string $message
      * @return string
      */
-    private function hmacsha1($key, $message) {
-
+    private function hmacsha1($key, $message)
+    {
         $blocksize=64;
         if (strlen($key)>$blocksize)
             $key=pack('H*', sha1($key));

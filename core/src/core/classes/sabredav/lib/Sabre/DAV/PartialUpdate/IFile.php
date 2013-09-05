@@ -13,8 +13,8 @@ use Sabre\DAV;
  * @author Jean-Tiare LE BIGOT (http://www.jtlebi.fr/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-interface IFile extends DAV\IFile {
-
+interface IFile extends DAV\IFile
+{
     /**
      * Updates the data at a given offset
      *
@@ -34,7 +34,6 @@ interface IFile extends DAV\IFile {
      * @param integer $offset
      * @return string|null
      */
-    function putRange($data, $offset);
+    public function putRange($data, $offset);
 
 }
-

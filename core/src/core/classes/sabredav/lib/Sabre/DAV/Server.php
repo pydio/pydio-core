@@ -10,8 +10,8 @@ use Sabre\HTTP;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Server {
-
+class Server
+{
     /**
      * Infinity is used for some request supporting the HTTP Depth header and indicates that the operation should traverse the entire tree
      */
@@ -147,7 +147,7 @@ class Server {
      *
      * @var bool
      */
-    static public $exposeVersion = true;
+    public static $exposeVersion = true;
 
     /**
      * Sets up the server
@@ -164,8 +164,8 @@ class Server {
      *
      * @param Tree|INode|array|null $treeOrNode The tree object
      */
-    public function __construct($treeOrNode = null) {
-
+    public function __construct($treeOrNode = null)
+    {
         if ($treeOrNode instanceof Tree) {
             $this->tree = $treeOrNode;
         } elseif ($treeOrNode instanceof INode) {
@@ -174,7 +174,7 @@ class Server {
 
             // If it's an array, a list of nodes was passed, and we need to
             // create the root node.
-            foreach($treeOrNode as $node) {
+            foreach ($treeOrNode as $node) {
                 if (!($node instanceof INode)) {
                     throw new Exception('Invalid argument passed to constructor. If you\'re passing an array, all the values must implement Sabre\\DAV\\INode');
                 }
@@ -199,8 +199,8 @@ class Server {
      *
      * @return void
      */
-    public function exec() {
-
+    public function exec()
+    {
         try {
 
             // If nginx (pre-1.2) is used as a proxy server, and SabreDAV as an
@@ -245,7 +245,7 @@ class Server {
                 $error->appendChild($DOM->createElement('s:sabredav-version',$h(Version::VERSION)));
             }
 
-            if($e instanceof Exception) {
+            if ($e instanceof Exception) {
 
                 $httpCode = $e->getHTTPCode();
                 $e->serialize($this,$error);
@@ -273,8 +273,8 @@ class Server {
      * @param string $uri
      * @return void
      */
-    public function setBaseUri($uri) {
-
+    public function setBaseUri($uri)
+    {
         // If the baseUri does not end with a slash, we must add it
         if ($uri[strlen($uri)-1]!=='/')
             $uri.='/';
@@ -288,8 +288,8 @@ class Server {
      *
      * @return string
      */
-    public function getBaseUri() {
-
+    public function getBaseUri()
+    {
         if (is_null($this->baseUri)) $this->baseUri = $this->guessBaseUri();
         return $this->baseUri;
 
@@ -303,8 +303,8 @@ class Server {
      *
      * @return string
      */
-    public function guessBaseUri() {
-
+    public function guessBaseUri()
+    {
         $pathInfo = $this->httpRequest->getRawServerValue('PATH_INFO');
         $uri = $this->httpRequest->getRawServerValue('REQUEST_URI');
 
@@ -323,7 +323,7 @@ class Server {
             $decodedUri = URLUtil::decodePath($uri);
 
             // A simple sanity check:
-            if(substr($decodedUri,strlen($decodedUri)-strlen($pathInfo))===$pathInfo) {
+            if (substr($decodedUri,strlen($decodedUri)-strlen($pathInfo))===$pathInfo) {
                 $baseUri = substr($decodedUri,0,strlen($decodedUri)-strlen($pathInfo));
                 return rtrim($baseUri,'/') . '/';
             }
@@ -345,8 +345,8 @@ class Server {
      * @param ServerPlugin $plugin
      * @return void
      */
-    public function addPlugin(ServerPlugin $plugin) {
-
+    public function addPlugin(ServerPlugin $plugin)
+    {
         $this->plugins[$plugin->getPluginName()] = $plugin;
         $plugin->initialize($this);
 
@@ -360,13 +360,13 @@ class Server {
      * @param string $name
      * @return ServerPlugin
      */
-    public function getPlugin($name) {
-
+    public function getPlugin($name)
+    {
         if (isset($this->plugins[$name]))
             return $this->plugins[$name];
 
         // This is a fallback and deprecated.
-        foreach($this->plugins as $plugin) {
+        foreach ($this->plugins as $plugin) {
             if (get_class($plugin)===$name) return $plugin;
         }
 
@@ -379,8 +379,8 @@ class Server {
      *
      * @return array
      */
-    public function getPlugins() {
-
+    public function getPlugins()
+    {
         return $this->plugins;
 
     }
@@ -402,8 +402,8 @@ class Server {
      * @param int $priority
      * @return void
      */
-    public function subscribeEvent($event, $callback, $priority = 100) {
-
+    public function subscribeEvent($event, $callback, $priority = 100)
+    {
         if (!isset($this->eventSubscriptions[$event])) {
             $this->eventSubscriptions[$event] = array();
         }
@@ -424,11 +424,11 @@ class Server {
      * @param array $arguments
      * @return bool
      */
-    public function broadcastEvent($eventName,$arguments = array()) {
-
+    public function broadcastEvent($eventName,$arguments = array())
+    {
         if (isset($this->eventSubscriptions[$eventName])) {
 
-            foreach($this->eventSubscriptions[$eventName] as $subscriber) {
+            foreach ($this->eventSubscriptions[$eventName] as $subscriber) {
 
                 $result = call_user_func_array($subscriber,$arguments);
                 if ($result===false) return false;
@@ -448,8 +448,8 @@ class Server {
      * @param string $uri
      * @return void
      */
-    public function invokeMethod($method, $uri) {
-
+    public function invokeMethod($method, $uri)
+    {
         $method = strtoupper($method);
 
         if (!$this->broadcastEvent('beforeMethod',array($method, $uri))) return;
@@ -492,8 +492,8 @@ class Server {
      * @param string $uri
      * @return void
      */
-    protected function httpOptions($uri) {
-
+    protected function httpOptions($uri)
+    {
         $methods = $this->getAllowedMethods($uri);
 
         $this->httpResponse->setHeader('Allow',strtoupper(implode(', ',$methods)));
@@ -520,8 +520,8 @@ class Server {
      * @param string $uri
      * @return bool
      */
-    protected function httpGet($uri) {
-
+    protected function httpGet($uri)
+    {
         $node = $this->tree->getNodeForPath($uri,0);
 
         if (!$this->checkPreconditions(true)) return false;
@@ -658,8 +658,8 @@ class Server {
      * @param string $uri
      * @return void
      */
-    protected function httpHead($uri) {
-
+    protected function httpHead($uri)
+    {
         $node = $this->tree->getNodeForPath($uri);
         /* This information is only collection for File objects.
          * Ideally we want to throw 405 Method Not Allowed for every
@@ -684,8 +684,8 @@ class Server {
      * @param string $uri
      * @return void
      */
-    protected function httpDelete($uri) {
-
+    protected function httpDelete($uri)
+    {
         if (!$this->broadcastEvent('beforeUnbind',array($uri))) return;
         $this->tree->delete($uri);
         $this->broadcastEvent('afterUnbind',array($uri));
@@ -711,8 +711,8 @@ class Server {
      * @param string $uri
      * @return void
      */
-    protected function httpPropfind($uri) {
-
+    protected function httpPropfind($uri)
+    {
         $requestedProperties = $this->parsePropFindRequest($this->httpRequest->getBody(true));
 
         $depth = $this->getHTTPDepth(1);
@@ -750,8 +750,8 @@ class Server {
      * @param string $uri
      * @return void
      */
-    protected function httpPropPatch($uri) {
-
+    protected function httpPropPatch($uri)
+    {
         $newProperties = $this->parsePropPatchRequest($this->httpRequest->getBody(true));
 
         $result = $this->updateProperties($uri, $newProperties);
@@ -765,8 +765,8 @@ class Server {
             // request was succesful, and don't need to return the
             // multi-status.
             $ok = true;
-            foreach($result as $code=>$prop) {
-                if ((int)$code > 299) {
+            foreach ($result as $code=>$prop) {
+                if ((int) $code > 299) {
                     $ok = false;
                 }
             }
@@ -799,8 +799,8 @@ class Server {
      * @param string $uri
      * @return bool
      */
-    protected function httpPut($uri) {
-
+    protected function httpPut($uri)
+    {
         $body = $this->httpRequest->getBody();
 
         // Intercepting Content-Range
@@ -920,8 +920,8 @@ class Server {
      * @param string $uri
      * @return void
      */
-    protected function httpMkcol($uri) {
-
+    protected function httpMkcol($uri)
+    {
         $requestBody = $this->httpRequest->getBody(true);
 
         if ($requestBody) {
@@ -943,7 +943,7 @@ class Server {
             }
 
             $properties = array();
-            foreach($dom->firstChild->childNodes as $childNode) {
+            foreach ($dom->firstChild->childNodes as $childNode) {
 
                 if (XMLUtil::toClarkNotation($childNode)!=='{DAV:}set') continue;
                 $properties = array_merge($properties, XMLUtil::parseProperties($childNode, $this->propertyMap));
@@ -987,8 +987,8 @@ class Server {
      * @param string $uri
      * @return bool
      */
-    protected function httpMove($uri) {
-
+    protected function httpMove($uri)
+    {
         $moveInfo = $this->getCopyAndMoveInfo();
 
         // If the destination is part of the source tree, we must fail
@@ -1024,8 +1024,8 @@ class Server {
      * @param string $uri
      * @return bool
      */
-    protected function httpCopy($uri) {
-
+    protected function httpCopy($uri)
+    {
         $copyInfo = $this->getCopyAndMoveInfo();
         // If the destination is part of the source tree, we must fail
         if ($copyInfo['destination']==$uri)
@@ -1057,8 +1057,8 @@ class Server {
      * @param string $uri
      * @return void
      */
-    protected function httpReport($uri) {
-
+    protected function httpReport($uri)
+    {
         $body = $this->httpRequest->getBody(true);
         $dom = XMLUtil::loadDOMDocument($body);
 
@@ -1082,8 +1082,8 @@ class Server {
      * @param string $uri
      * @return array
      */
-    public function getAllowedMethods($uri) {
-
+    public function getAllowedMethods($uri)
+    {
         $methods = array(
             'OPTIONS',
             'GET',
@@ -1117,8 +1117,8 @@ class Server {
      *
      * @return string
      */
-    public function getRequestUri() {
-
+    public function getRequestUri()
+    {
         return $this->calculateUri($this->httpRequest->getUri());
 
     }
@@ -1130,8 +1130,8 @@ class Server {
      * @throws Exception\Forbidden A permission denied exception is thrown whenever there was an attempt to supply a uri outside of the base uri
      * @return string
      */
-    public function calculateUri($uri) {
-
+    public function calculateUri($uri)
+    {
         if ($uri[0]!='/' && strpos($uri,'://')) {
 
             $uri = parse_url($uri,PHP_URL_PATH);
@@ -1167,8 +1167,8 @@ class Server {
      * @param mixed $default
      * @return int
      */
-    public function getHTTPDepth($default = self::DEPTH_INFINITY) {
-
+    public function getHTTPDepth($default = self::DEPTH_INFINITY)
+    {
         // If its not set, we'll grab the default
         $depth = $this->httpRequest->getHeader('Depth');
 
@@ -1180,7 +1180,7 @@ class Server {
         // If its an unknown value. we'll grab the default
         if (!ctype_digit($depth)) return $default;
 
-        return (int)$depth;
+        return (int) $depth;
 
     }
 
@@ -1198,8 +1198,8 @@ class Server {
      *
      * @return array|null
      */
-    public function getHTTPRange() {
-
+    public function getHTTPRange()
+    {
         $range = $this->httpRequest->getHeader('range');
         if (is_null($range)) return null;
 
@@ -1242,8 +1242,8 @@ class Server {
      *
      * @return array
      */
-    public function getHTTPPrefer() {
-
+    public function getHTTPPrefer()
+    {
         $result = array(
             'return-asynch'         => false,
             'return-minimal'        => false,
@@ -1259,16 +1259,16 @@ class Server {
                 explode(',', $prefer)
             );
 
-            foreach($parameters as $parameter) {
+            foreach ($parameters as $parameter) {
 
                 // Right now our regex only supports the tokens actually
                 // specified in the draft. We may need to expand this if new
                 // tokens get registered.
-                if(!preg_match('/^(?P<token>[a-z0-9-]+)(?:=(?P<value>[0-9]+))?$/', $parameter, $matches)) {
+                if (!preg_match('/^(?P<token>[a-z0-9-]+)(?:=(?P<value>[0-9]+))?$/', $parameter, $matches)) {
                     continue;
                 }
 
-                switch($matches['token']) {
+                switch ($matches['token']) {
 
                     case 'return-asynch' :
                     case 'return-minimal' :
@@ -1308,8 +1308,8 @@ class Server {
      *
      * @return array
      */
-    public function getCopyAndMoveInfo() {
-
+    public function getCopyAndMoveInfo()
+    {
         // Collecting the relevant HTTP headers
         if (!$this->httpRequest->getHeader('Destination')) throw new Exception\BadRequest('The destination header was not supplied');
         $destination = $this->calculateUri($this->httpRequest->getHeader('Destination'));
@@ -1367,8 +1367,8 @@ class Server {
      * @param string $path
      * @param array $propertyNames
      */
-    public function getProperties($path, $propertyNames) {
-
+    public function getProperties($path, $propertyNames)
+    {
         $result = $this->getPropertiesForPath($path,$propertyNames,0);
         return $result[0][200];
 
@@ -1386,10 +1386,10 @@ class Server {
      * @param array $propertyNames
      * @return array
      */
-    public function getPropertiesForChildren($path, $propertyNames) {
-
+    public function getPropertiesForChildren($path, $propertyNames)
+    {
         $result = array();
-        foreach($this->getPropertiesForPath($path,$propertyNames,1) as $k=>$row) {
+        foreach ($this->getPropertiesForPath($path,$propertyNames,1) as $k=>$row) {
 
             // Skipping the parent path
             if ($k === 0) continue;
@@ -1413,8 +1413,8 @@ class Server {
      * @param string $path
      * @return array
      */
-    public function getHTTPHeaders($path) {
-
+    public function getHTTPHeaders($path)
+    {
         $propertyMap = array(
             '{DAV:}getcontenttype'   => 'Content-Type',
             '{DAV:}getcontentlength' => 'Content-Length',
@@ -1425,7 +1425,7 @@ class Server {
         $properties = $this->getProperties($path,array_keys($propertyMap));
 
         $headers = array();
-        foreach($propertyMap as $property=>$header) {
+        foreach ($propertyMap as $property=>$header) {
             if (!isset($properties[$property])) continue;
 
             if (is_scalar($properties[$property])) {
@@ -1456,8 +1456,8 @@ class Server {
      * @param int $depth
      * @return array
      */
-    public function getPropertiesForPath($path, $propertyNames = array(), $depth = 0) {
-
+    public function getPropertiesForPath($path, $propertyNames = array(), $depth = 0)
+    {
         if ($depth!=0) $depth = 1;
 
         $path = rtrim($path,'/');
@@ -1478,7 +1478,7 @@ class Server {
         // sensible list.
         $allProperties = count($propertyNames)==0;
 
-        foreach($nodes as $myPath=>$node) {
+        foreach ($nodes as $myPath=>$node) {
 
             $currentPropertyNames = $propertyNames;
 
@@ -1526,7 +1526,7 @@ class Server {
                     // So as we loop through this list, we will only take the
                     // properties that were actually requested and discard the
                     // rest.
-                    foreach($currentPropertyNames as $k=>$currentPropertyName) {
+                    foreach ($currentPropertyNames as $k=>$currentPropertyName) {
                         if (isset($nodeProperties[$currentPropertyName])) {
                             unset($currentPropertyNames[$k]);
                             $newProperties[200][$currentPropertyName] = $nodeProperties[$currentPropertyName];
@@ -1537,17 +1537,17 @@ class Server {
 
             }
 
-            foreach($currentPropertyNames as $prop) {
+            foreach ($currentPropertyNames as $prop) {
 
                 if (isset($newProperties[200][$prop])) continue;
 
-                switch($prop) {
+                switch ($prop) {
                     case '{DAV:}getlastmodified'       : if ($node->getLastModified()) $newProperties[200][$prop] = new Property\GetLastModified($node->getLastModified()); break;
                     case '{DAV:}getcontentlength'      :
                         if ($node instanceof IFile) {
                             $size = $node->getSize();
                             if (!is_null($size)) {
-                                $newProperties[200][$prop] = (int)$node->getSize();
+                                $newProperties[200][$prop] = (int) $node->getSize();
                             }
                         }
                         break;
@@ -1567,14 +1567,14 @@ class Server {
                     case '{DAV:}getcontenttype'        : if ($node instanceof IFile && $ct = $node->getContentType())  $newProperties[200][$prop] = $ct; break;
                     case '{DAV:}supported-report-set'  :
                         $reports = array();
-                        foreach($this->plugins as $plugin) {
+                        foreach ($this->plugins as $plugin) {
                             $reports = array_merge($reports, $plugin->getSupportedReportSet($myPath));
                         }
                         $newProperties[200][$prop] = new Property\SupportedReportSet($reports);
                         break;
                     case '{DAV:}resourcetype' :
                         $newProperties[200]['{DAV:}resourcetype'] = new Property\ResourceType();
-                        foreach($this->resourceTypeMapping as $className => $resourceType) {
+                        foreach ($this->resourceTypeMapping as $className => $resourceType) {
                             if ($node instanceof $className) $newProperties[200]['{DAV:}resourcetype']->add($resourceType);
                         }
                         break;
@@ -1625,8 +1625,8 @@ class Server {
      * @param string   $etag
      * @return bool
      */
-    public function createFile($uri,$data, &$etag = null) {
-
+    public function createFile($uri,$data, &$etag = null)
+    {
         list($dir,$name) = URLUtil::splitPath($uri);
 
         if (!$this->broadcastEvent('beforeBind',array($uri))) return false;
@@ -1653,8 +1653,8 @@ class Server {
      * @param string $uri
      * @return void
      */
-    public function createDirectory($uri) {
-
+    public function createDirectory($uri)
+    {
         $this->createCollection($uri,array('{DAV:}collection'),array());
 
     }
@@ -1672,8 +1672,8 @@ class Server {
      * @param array $properties A list of properties
      * @return array|null
      */
-    public function createCollection($uri, array $resourceType, array $properties) {
-
+    public function createCollection($uri, array $resourceType, array $properties)
+    {
         list($parentUri,$newName) = URLUtil::splitPath($uri);
 
         // Making sure {DAV:}collection was specified as resourceType
@@ -1785,8 +1785,8 @@ class Server {
      * @param array $properties
      * @return array
      */
-    public function updateProperties($uri, array $properties) {
-
+    public function updateProperties($uri, array $properties)
+    {
         // we'll start by grabbing the node, this will throw the appropriate
         // exceptions if it doesn't.
         $node = $this->tree->getNodeForPath($uri);
@@ -1800,8 +1800,8 @@ class Server {
         $hasError = false;
 
         // Running through all properties to make sure none of them are protected
-        if (!$hasError) foreach($properties as $propertyName => $value) {
-            if(in_array($propertyName, $this->protectedProperties)) {
+        if (!$hasError) foreach ($properties as $propertyName => $value) {
+            if (in_array($propertyName, $this->protectedProperties)) {
                 $result[403][$propertyName] = null;
                 unset($remainingProperties[$propertyName]);
                 $hasError = true;
@@ -1821,7 +1821,7 @@ class Server {
         // property is 403 Forbidden
         if (!$hasError && count($remainingProperties) && !($node instanceof IProperties)) {
             $hasError = true;
-            foreach($properties as $propertyName=> $value) {
+            foreach ($properties as $propertyName=> $value) {
                 $result[403][$propertyName] = null;
             }
             $remainingProperties = array();
@@ -1836,14 +1836,14 @@ class Server {
 
                 if ($updateResult===true) {
                     // success
-                    foreach($remainingProperties as $propertyName=>$value) {
+                    foreach ($remainingProperties as $propertyName=>$value) {
                         $result[200][$propertyName] = null;
                     }
 
                 } elseif ($updateResult===false) {
                     // The node failed to update the properties for an
                     // unknown reason
-                    foreach($remainingProperties as $propertyName=>$value) {
+                    foreach ($remainingProperties as $propertyName=>$value) {
                         $result[403][$propertyName] = null;
                     }
 
@@ -1851,7 +1851,7 @@ class Server {
 
                     // The node has detailed update information
                     // We need to merge the results with the earlier results.
-                    foreach($updateResult as $status => $props) {
+                    foreach ($updateResult as $status => $props) {
                         if (is_array($props)) {
                             if (!isset($result[$status]))
                                 $result[$status] = array();
@@ -1868,14 +1868,14 @@ class Server {
 
         }
 
-        foreach($remainingProperties as $propertyName=>$value) {
+        foreach ($remainingProperties as $propertyName=>$value) {
             // if there are remaining properties, it must mean
             // there's a dependency failure
             $result[424][$propertyName] = null;
         }
 
         // Removing empty array values
-        foreach($result as $status=>$props) {
+        foreach ($result as $status=>$props) {
 
             if (count($props)===0) unset($result[$status]);
 
@@ -1910,8 +1910,8 @@ class Server {
      * @param bool $handleAsGET
      * @return bool
      */
-    public function checkPreconditions($handleAsGET = false) {
-
+    public function checkPreconditions($handleAsGET = false)
+    {
         $uri = $this->getRequestUri();
         $node = null;
         $lastMod = null;
@@ -1935,7 +1935,7 @@ class Server {
                 // There can be multiple etags
                 $ifMatch = explode(',',$ifMatch);
                 $haveMatch = false;
-                foreach($ifMatch as $ifMatchItem) {
+                foreach ($ifMatch as $ifMatchItem) {
 
                     // Stripping any extra spaces
                     $ifMatchItem = trim($ifMatchItem,' ');
@@ -1981,7 +1981,7 @@ class Server {
                     $ifNoneMatch = explode(',', $ifNoneMatch);
                     $etag = $node->getETag();
 
-                    foreach($ifNoneMatch as $ifNoneMatchItem) {
+                    foreach ($ifNoneMatch as $ifNoneMatchItem) {
 
                         // Stripping any extra spaces
                         $ifNoneMatchItem = trim($ifNoneMatchItem,' ');
@@ -2068,21 +2068,21 @@ class Server {
      * @param bool strip404s
      * @return string
      */
-    public function generateMultiStatus(array $fileProperties, $strip404s = false) {
-
+    public function generateMultiStatus(array $fileProperties, $strip404s = false)
+    {
         $dom = new \DOMDocument('1.0','utf-8');
         //$dom->formatOutput = true;
         $multiStatus = $dom->createElement('d:multistatus');
         $dom->appendChild($multiStatus);
 
         // Adding in default namespaces
-        foreach($this->xmlNamespaces as $namespace=>$prefix) {
+        foreach ($this->xmlNamespaces as $namespace=>$prefix) {
 
             $multiStatus->setAttribute('xmlns:' . $prefix,$namespace);
 
         }
 
-        foreach($fileProperties as $entry) {
+        foreach ($fileProperties as $entry) {
 
             $href = $entry['href'];
             unset($entry['href']);
@@ -2113,14 +2113,14 @@ class Server {
      * @param string $body xml body
      * @return array list of properties in need of updating or deletion
      */
-    public function parsePropPatchRequest($body) {
-
+    public function parsePropPatchRequest($body)
+    {
         //We'll need to change the DAV namespace declaration to something else in order to make it parsable
         $dom = XMLUtil::loadDOMDocument($body);
 
         $newProperties = array();
 
-        foreach($dom->firstChild->childNodes as $child) {
+        foreach ($dom->firstChild->childNodes as $child) {
 
             if ($child->nodeType !== XML_ELEMENT_NODE) continue;
 
@@ -2130,7 +2130,7 @@ class Server {
 
             $innerProperties = XMLUtil::parseProperties($child, $this->propertyMap);
 
-            foreach($innerProperties as $propertyName=>$propertyValue) {
+            foreach ($innerProperties as $propertyName=>$propertyValue) {
 
                 if ($operation==='{DAV:}remove') {
                     $propertyValue = null;
@@ -2155,8 +2155,8 @@ class Server {
      * @param string $body
      * @return array
      */
-    public function parsePropFindRequest($body) {
-
+    public function parsePropFindRequest($body)
+    {
         // If the propfind body was empty, it means IE is requesting 'all' properties
         if (!$body) return array();
 
@@ -2169,4 +2169,3 @@ class Server {
     // }}}
 
 }
-

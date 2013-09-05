@@ -12,11 +12,11 @@ use Sabre\CalDAV\Plugin;
  * so the value is currently hardcoded.
  *
  * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/) 
+ * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class SupportedCalendarData extends DAV\Property {
-
+class SupportedCalendarData extends DAV\Property
+{
     /**
      * Serializes the property in a DOMDocument
      *
@@ -24,8 +24,8 @@ class SupportedCalendarData extends DAV\Property {
      * @param \DOMElement $node
      * @return void
      */
-    public function serialize(DAV\Server $server,\DOMElement $node) {
-
+    public function serialize(DAV\Server $server,\DOMElement $node)
+    {
         $doc = $node->ownerDocument;
 
         $prefix = isset($server->xmlNamespaces[Plugin::NS_CALDAV])?$server->xmlNamespaces[Plugin::NS_CALDAV]:'cal';

@@ -13,8 +13,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Principal extends DAV\Property implements DAV\Property\IHref {
-
+class Principal extends DAV\Property implements DAV\Property\IHref
+{
     /**
      * To specify a not-logged-in user, use the UNAUTHENTICATED principal
      */
@@ -63,8 +63,8 @@ class Principal extends DAV\Property implements DAV\Property\IHref {
      * @param int $type
      * @param string|null $href
      */
-    public function __construct($type, $href = null) {
-
+    public function __construct($type, $href = null)
+    {
         $this->type = $type;
 
         if ($type===self::HREF && is_null($href)) {
@@ -79,8 +79,8 @@ class Principal extends DAV\Property implements DAV\Property\IHref {
      *
      * @return int
      */
-    public function getType() {
-
+    public function getType()
+    {
         return $this->type;
 
     }
@@ -90,8 +90,8 @@ class Principal extends DAV\Property implements DAV\Property\IHref {
      *
      * @return string
      */
-    public function getHref() {
-
+    public function getHref()
+    {
         return $this->href;
 
     }
@@ -103,10 +103,10 @@ class Principal extends DAV\Property implements DAV\Property\IHref {
      * @param \DOMElement $node
      * @return void
      */
-    public function serialize(DAV\Server $server, \DOMElement $node) {
-
+    public function serialize(DAV\Server $server, \DOMElement $node)
+    {
         $prefix = $server->xmlNamespaces['DAV:'];
-        switch($this->type) {
+        switch ($this->type) {
 
             case self::UNAUTHENTICATED :
                 $node->appendChild(
@@ -134,14 +134,14 @@ class Principal extends DAV\Property implements DAV\Property\IHref {
      * @param \DOMElement $dom
      * @return Principal
      */
-    static public function unserialize(\DOMElement $dom) {
-
+    public static function unserialize(\DOMElement $dom)
+    {
         $parent = $dom->firstChild;
-        while(!DAV\XMLUtil::toClarkNotation($parent)) {
+        while (!DAV\XMLUtil::toClarkNotation($parent)) {
             $parent = $parent->nextSibling;
         }
 
-        switch(DAV\XMLUtil::toClarkNotation($parent)) {
+        switch (DAV\XMLUtil::toClarkNotation($parent)) {
 
             case '{DAV:}unauthenticated' :
                 return new self(self::UNAUTHENTICATED);

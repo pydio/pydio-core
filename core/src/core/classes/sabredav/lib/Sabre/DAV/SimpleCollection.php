@@ -12,8 +12,8 @@ namespace Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class SimpleCollection extends Collection {
-
+class SimpleCollection extends Collection
+{
     /**
      * List of childnodes
      *
@@ -37,10 +37,10 @@ class SimpleCollection extends Collection {
      * @param string $name
      * @param array $children
      */
-    public function __construct($name,array $children = array()) {
-
+    public function __construct($name,array $children = array())
+    {
         $this->name = $name;
-        foreach($children as $child) {
+        foreach ($children as $child) {
 
             if (!($child instanceof INode)) throw new Exception('Only instances of Sabre\DAV\INode are allowed to be passed in the children argument');
             $this->addChild($child);
@@ -55,8 +55,8 @@ class SimpleCollection extends Collection {
      * @param INode $child
      * @return void
      */
-    public function addChild(INode $child) {
-
+    public function addChild(INode $child)
+    {
         $this->children[$child->getName()] = $child;
 
     }
@@ -66,8 +66,8 @@ class SimpleCollection extends Collection {
      *
      * @return string
      */
-    public function getName() {
-
+    public function getName()
+    {
         return $this->name;
 
     }
@@ -85,8 +85,8 @@ class SimpleCollection extends Collection {
      * @throws Exception\NotFound
      * @return INode
      */
-    public function getChild($name) {
-
+    public function getChild($name)
+    {
         if (isset($this->children[$name])) return $this->children[$name];
         throw new Exception\NotFound('File not found: ' . $name . ' in \'' . $this->getName() . '\'');
 
@@ -97,12 +97,11 @@ class SimpleCollection extends Collection {
      *
      * @return array
      */
-    public function getChildren() {
-
+    public function getChildren()
+    {
         return array_values($this->children);
 
     }
 
 
 }
-

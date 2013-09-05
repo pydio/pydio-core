@@ -12,11 +12,11 @@ use Sabre\DAVACL;
  * principals.
  *
  * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/) 
+ * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class User extends DAVACL\Principal implements DAV\ICollection {
-
+class User extends DAVACL\Principal implements DAV\ICollection
+{
     /**
      * Creates a new file in the directory
      *
@@ -25,8 +25,8 @@ class User extends DAVACL\Principal implements DAV\ICollection {
      * @throws DAV\Exception\Forbidden
      * @return void
      */
-    public function createFile($name, $data = null) {
-
+    public function createFile($name, $data = null)
+    {
         throw new DAV\Exception\Forbidden('Permission denied to create file (filename ' . $name . ')');
 
     }
@@ -38,8 +38,8 @@ class User extends DAVACL\Principal implements DAV\ICollection {
      * @throws DAV\Exception\Forbidden
      * @return void
      */
-    public function createDirectory($name) {
-
+    public function createDirectory($name)
+    {
         throw new DAV\Exception\Forbidden('Permission denied to create directory');
 
     }
@@ -50,8 +50,8 @@ class User extends DAVACL\Principal implements DAV\ICollection {
      * @param string $name
      * @return DAV\INode
      */
-    public function getChild($name) {
-
+    public function getChild($name)
+    {
         $principal = $this->principalBackend->getPrincipalByPath($this->getPrincipalURL() . '/' . $name);
         if (!$principal) {
             throw new DAV\Exception\NotFound('Node with name ' . $name . ' was not found');
@@ -71,8 +71,8 @@ class User extends DAVACL\Principal implements DAV\ICollection {
      *
     * @return DAV\INode[]
      */
-    public function getChildren() {
-
+    public function getChildren()
+    {
         $r = array();
         if ($this->principalBackend->getPrincipalByPath($this->getPrincipalURL() . '/calendar-proxy-read')) {
             $r[] = new ProxyRead($this->principalBackend, $this->principalProperties);
@@ -91,8 +91,8 @@ class User extends DAVACL\Principal implements DAV\ICollection {
      * @param string $name
      * @return bool
      */
-    public function childExists($name) {
-
+    public function childExists($name)
+    {
         try {
             $this->getChild($name);
             return true;
@@ -114,8 +114,8 @@ class User extends DAVACL\Principal implements DAV\ICollection {
      *
      * @return array
      */
-    public function getACL() {
-
+    public function getACL()
+    {
         $acl = parent::getACL();
         $acl[] = array(
             'privilege' => '{DAV:}read',

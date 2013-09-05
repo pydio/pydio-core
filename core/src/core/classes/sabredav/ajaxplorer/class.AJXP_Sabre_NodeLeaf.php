@@ -47,8 +47,8 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre\DAV\IFile
      * @param resource $data
      * @return string|null
      */
-    function put($data){
-
+    public function put($data)
+    {
         // Warning, passed by ref
         $p = $this->path;
 
@@ -71,7 +71,8 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre\DAV\IFile
      *
      * @return mixed
      */
-    function get(){
+    public function get()
+    {
         $ajxpNode = new AJXP_Node($this->getUrl());
         AJXP_Controller::applyHook("node.read", array(&$ajxpNode));
         return fopen($this->getUrl(), "r");
@@ -84,12 +85,12 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre\DAV\IFile
      *
      * @return void|string
      */
-    function getContentType(){
-
+    public function getContentType()
+    {
          //Get mimetype with fileinfo PECL extension
         $fp = fopen($this->getUrl(), "r");
         $fileMime = null;
-        if(class_exists("finfo")) {
+        if (class_exists("finfo")) {
             $finfo = new finfo(FILEINFO_MIME);
             $fileMime = $finfo->buffer(fread($fp, 100));
         } elseif (function_exists("mime_content_type")) {
@@ -101,7 +102,7 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre\DAV\IFile
             else {
                 $regex = "/^([\w\+\-\.\/]+)\s+(\w+\s)*($fileExt\s)/i";
                 $lines = file( AJXP_CONF_PATH ."/mime.types");
-                foreach($lines as $line) {
+                foreach ($lines as $line) {
                     if(substr($line, 0, 1) == '#')
                         continue; // skip comments
                     $line = rtrim($line) . " ";
@@ -114,8 +115,7 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre\DAV\IFile
         fclose($fp);
         return $fileMime;
         /*
-        if ( $this->options->useMimeExts && ezcBaseFeatures::hasExtensionSupport( 'fileinfo' ) )
-        {
+        if ( $this->options->useMimeExts && ezcBaseFeatures::hasExtensionSupport( 'fileinfo' ) ) {
             $fInfo = new fInfo( FILEINFO_MIME );
             $mimeType = $fInfo->file( $this->getUrl() );
 
@@ -145,7 +145,8 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre\DAV\IFile
      *
      * @return String|null
      */
-    function getETag(){
+    public function getETag()
+    {
         clearstatcache();
         return '"'.md5(
             $this->path
@@ -159,7 +160,8 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre\DAV\IFile
      *
      * @return int
      */
-    function getSize(){
+    public function getSize()
+    {
         return filesize($this->getUrl());
     }
 

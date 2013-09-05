@@ -13,8 +13,8 @@ use Sabre\CalDAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Invite extends DAV\Property implements CalDAV\Notifications\INotificationType {
-
+class Invite extends DAV\Property implements CalDAV\Notifications\INotificationType
+{
     /**
      * A unique id for the message
      *
@@ -134,8 +134,8 @@ class Invite extends DAV\Property implements CalDAV\Notifications\INotificationT
      *
      * @param array $values All the options
      */
-    public function __construct(array $values) {
-
+    public function __construct(array $values)
+    {
         $required = array(
             'id',
             'etag',
@@ -146,13 +146,13 @@ class Invite extends DAV\Property implements CalDAV\Notifications\INotificationT
             'hostUrl',
             'organizer',
         );
-        foreach($required as $item) {
+        foreach ($required as $item) {
             if (!isset($values[$item])) {
                 throw new \InvalidArgumentException($item . ' is a required constructor option');
             }
         }
 
-        foreach($values as $key=>$value) {
+        foreach ($values as $key=>$value) {
             if (!property_exists($this, $key)) {
                 throw new \InvalidArgumentException('Unknown option: ' . $key);
             }
@@ -171,8 +171,8 @@ class Invite extends DAV\Property implements CalDAV\Notifications\INotificationT
      * @param \DOMElement $node
      * @return void
      */
-    public function serialize(DAV\Server $server, \DOMElement $node) {
-
+    public function serialize(DAV\Server $server, \DOMElement $node)
+    {
         $prop = $node->ownerDocument->createElement('cs:invite-notification');
         $node->appendChild($prop);
 
@@ -186,8 +186,8 @@ class Invite extends DAV\Property implements CalDAV\Notifications\INotificationT
      * @param \DOMElement $node
      * @return void
      */
-    public function serializeBody(DAV\Server $server, \DOMElement $node) {
-
+    public function serializeBody(DAV\Server $server, \DOMElement $node)
+    {
         $doc = $node->ownerDocument;
 
         $dt = $doc->createElement('cs:dtstamp');
@@ -207,7 +207,7 @@ class Invite extends DAV\Property implements CalDAV\Notifications\INotificationT
         $prop->appendChild($href);
 
         $nodeName = null;
-        switch($this->type) {
+        switch ($this->type) {
 
             case SharingPlugin::STATUS_ACCEPTED :
                 $nodeName = 'cs:invite-accepted';
@@ -302,8 +302,8 @@ class Invite extends DAV\Property implements CalDAV\Notifications\INotificationT
      *
      * @return string
      */
-    public function getId() {
-
+    public function getId()
+    {
         return $this->id;
 
     }
@@ -315,8 +315,8 @@ class Invite extends DAV\Property implements CalDAV\Notifications\INotificationT
      *
      * @return string
      */
-    public function getETag() {
-
+    public function getETag()
+    {
         return $this->etag;
 
     }

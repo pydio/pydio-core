@@ -15,8 +15,8 @@ use Sabre\DAVACL;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL {
-
+class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL
+{
     /**
      * This is an array with calendar information
      *
@@ -37,8 +37,8 @@ class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL {
      * @param Backend\BackendInterface $caldavBackend
      * @param array $calendarInfo
      */
-    public function __construct(Backend\BackendInterface $caldavBackend, $calendarInfo) {
-
+    public function __construct(Backend\BackendInterface $caldavBackend, $calendarInfo)
+    {
         $this->caldavBackend = $caldavBackend;
         $this->calendarInfo = $calendarInfo;
 
@@ -49,8 +49,8 @@ class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL {
      *
      * @return string
      */
-    public function getName() {
-
+    public function getName()
+    {
         return $this->calendarInfo['uri'];
 
     }
@@ -61,8 +61,8 @@ class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL {
      * @param array $mutations
      * @return array
      */
-    public function updateProperties($mutations) {
-
+    public function updateProperties($mutations)
+    {
         return $this->caldavBackend->updateCalendar($this->calendarInfo['id'],$mutations);
 
     }
@@ -73,11 +73,11 @@ class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL {
      * @param array $requestedProperties
      * @return array
      */
-    public function getProperties($requestedProperties) {
-
+    public function getProperties($requestedProperties)
+    {
         $response = array();
 
-        foreach($requestedProperties as $prop) switch($prop) {
+        foreach ($requestedProperties as $prop) switch ($prop) {
 
             case '{urn:ietf:params:xml:ns:caldav}supported-calendar-data' :
                 $response[$prop] = new Property\SupportedCalendarData();
@@ -105,15 +105,15 @@ class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL {
      * @param string $name
      * @return \Sabre\CalDAV\ICalendarObject
      */
-    public function getChild($name) {
-
+    public function getChild($name)
+    {
         $obj = $this->caldavBackend->getCalendarObject($this->calendarInfo['id'],$name);
 
         if (!$obj) throw new DAV\Exception\NotFound('Calendar object not found');
 
         $obj['acl'] = $this->getACL();
         // Removing the irrelivant
-        foreach($obj['acl'] as $key=>$acl) {
+        foreach ($obj['acl'] as $key=>$acl) {
             if ($acl['privilege'] === '{' . Plugin::NS_CALDAV . '}read-free-busy') {
                 unset($obj['acl'][$key]);
             }
@@ -128,14 +128,14 @@ class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL {
      *
      * @return array
      */
-    public function getChildren() {
-
+    public function getChildren()
+    {
         $objs = $this->caldavBackend->getCalendarObjects($this->calendarInfo['id']);
         $children = array();
-        foreach($objs as $obj) {
+        foreach ($objs as $obj) {
             $obj['acl'] = $this->getACL();
             // Removing the irrelivant
-            foreach($obj['acl'] as $key=>$acl) {
+            foreach ($obj['acl'] as $key=>$acl) {
                 if ($acl['privilege'] === '{' . Plugin::NS_CALDAV . '}read-free-busy') {
                     unset($obj['acl'][$key]);
                 }
@@ -152,8 +152,8 @@ class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL {
      * @param string $name
      * @return bool
      */
-    public function childExists($name) {
-
+    public function childExists($name)
+    {
         $obj = $this->caldavBackend->getCalendarObject($this->calendarInfo['id'],$name);
         if (!$obj)
             return false;
@@ -170,8 +170,8 @@ class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL {
      * @param string $name
      * @return void
      */
-    public function createDirectory($name) {
-
+    public function createDirectory($name)
+    {
         throw new DAV\Exception\MethodNotAllowed('Creating collections in calendar objects is not allowed');
 
     }
@@ -185,8 +185,8 @@ class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL {
      * @param resource $calendarData
      * @return string|null
      */
-    public function createFile($name,$calendarData = null) {
-
+    public function createFile($name,$calendarData = null)
+    {
         if (is_resource($calendarData)) {
             $calendarData = stream_get_contents($calendarData);
         }
@@ -199,8 +199,8 @@ class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL {
      *
      * @return void
      */
-    public function delete() {
-
+    public function delete()
+    {
         $this->caldavBackend->deleteCalendar($this->calendarInfo['id']);
 
     }
@@ -212,8 +212,8 @@ class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL {
      * @param string $newName
      * @return void
      */
-    public function setName($newName) {
-
+    public function setName($newName)
+    {
         throw new DAV\Exception\MethodNotAllowed('Renaming calendars is not yet supported');
 
     }
@@ -223,8 +223,8 @@ class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL {
      *
      * @return void
      */
-    public function getLastModified() {
-
+    public function getLastModified()
+    {
         return null;
 
     }
@@ -236,8 +236,8 @@ class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL {
      *
      * @return string|null
      */
-    public function getOwner() {
-
+    public function getOwner()
+    {
         return $this->calendarInfo['principaluri'];
 
     }
@@ -249,8 +249,8 @@ class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL {
      *
      * @return string|null
      */
-    public function getGroup() {
-
+    public function getGroup()
+    {
         return null;
 
     }
@@ -267,8 +267,8 @@ class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL {
      *
      * @return array
      */
-    public function getACL() {
-
+    public function getACL()
+    {
         return array(
             array(
                 'privilege' => '{DAV:}read',
@@ -313,8 +313,8 @@ class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL {
      * @param array $acl
      * @return void
      */
-    public function setACL(array $acl) {
-
+    public function setACL(array $acl)
+    {
         throw new DAV\Exception\MethodNotAllowed('Changing ACL is not yet supported');
 
     }
@@ -331,13 +331,13 @@ class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL {
      *
      * @return array|null
      */
-    public function getSupportedPrivilegeSet() {
-
+    public function getSupportedPrivilegeSet()
+    {
         $default = DAVACL\Plugin::getDefaultSupportedPrivilegeSet();
 
         // We need to inject 'read-free-busy' in the tree, aggregated under
         // {DAV:}read.
-        foreach($default['aggregates'] as &$agg) {
+        foreach ($default['aggregates'] as &$agg) {
 
             if ($agg['privilege'] !== '{DAV:}read') continue;
 
@@ -367,8 +367,8 @@ class Calendar implements ICalendar, DAV\IProperties, DAVACL\IACL {
      * @param array $filters
      * @return array
      */
-    public function calendarQuery(array $filters) {
-
+    public function calendarQuery(array $filters)
+    {
         return $this->caldavBackend->calendarQuery($this->calendarInfo['id'], $filters);
 
     }

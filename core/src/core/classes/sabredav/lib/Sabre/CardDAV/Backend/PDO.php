@@ -14,8 +14,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class PDO extends AbstractBackend {
-
+class PDO extends AbstractBackend
+{
     /**
      * PDO connection
      *
@@ -40,8 +40,8 @@ class PDO extends AbstractBackend {
      * @param string $addressBooksTableName
      * @param string $cardsTableName
      */
-    public function __construct(\PDO $pdo, $addressBooksTableName = 'addressbooks', $cardsTableName = 'cards') {
-
+    public function __construct(\PDO $pdo, $addressBooksTableName = 'addressbooks', $cardsTableName = 'cards')
+    {
         $this->pdo = $pdo;
         $this->addressBooksTableName = $addressBooksTableName;
         $this->cardsTableName = $cardsTableName;
@@ -54,14 +54,14 @@ class PDO extends AbstractBackend {
      * @param string $principalUri
      * @return array
      */
-    public function getAddressBooksForUser($principalUri) {
-
+    public function getAddressBooksForUser($principalUri)
+    {
         $stmt = $this->pdo->prepare('SELECT id, uri, displayname, principaluri, description, ctag FROM '.$this->addressBooksTableName.' WHERE principaluri = ?');
         $stmt->execute(array($principalUri));
 
         $addressBooks = array();
 
-        foreach($stmt->fetchAll() as $row) {
+        foreach ($stmt->fetchAll() as $row) {
 
             $addressBooks[] = array(
                 'id'  => $row['id'],
@@ -92,13 +92,13 @@ class PDO extends AbstractBackend {
      * @see Sabre\DAV\IProperties::updateProperties
      * @return bool|array
      */
-    public function updateAddressBook($addressBookId, array $mutations) {
-
+    public function updateAddressBook($addressBookId, array $mutations)
+    {
         $updates = array();
 
-        foreach($mutations as $property=>$newValue) {
+        foreach ($mutations as $property=>$newValue) {
 
-            switch($property) {
+            switch ($property) {
                 case '{DAV:}displayname' :
                     $updates['displayname'] = $newValue;
                     break;
@@ -119,7 +119,7 @@ class PDO extends AbstractBackend {
         }
 
         $query = 'UPDATE ' . $this->addressBooksTableName . ' SET ctag = ctag + 1 ';
-        foreach($updates as $key=>$value) {
+        foreach ($updates as $key=>$value) {
             $query.=', `' . $key . '` = :' . $key . ' ';
         }
         $query.=' WHERE id = :addressbookid';
@@ -141,8 +141,8 @@ class PDO extends AbstractBackend {
      * @param array $properties
      * @return void
      */
-    public function createAddressBook($principalUri, $url, array $properties) {
-
+    public function createAddressBook($principalUri, $url, array $properties)
+    {
         $values = array(
             'displayname' => null,
             'description' => null,
@@ -150,9 +150,9 @@ class PDO extends AbstractBackend {
             'uri' => $url,
         );
 
-        foreach($properties as $property=>$newValue) {
+        foreach ($properties as $property=>$newValue) {
 
-            switch($property) {
+            switch ($property) {
                 case '{DAV:}displayname' :
                     $values['displayname'] = $newValue;
                     break;
@@ -177,8 +177,8 @@ class PDO extends AbstractBackend {
      * @param int $addressBookId
      * @return void
      */
-    public function deleteAddressBook($addressBookId) {
-
+    public function deleteAddressBook($addressBookId)
+    {
         $stmt = $this->pdo->prepare('DELETE FROM ' . $this->cardsTableName . ' WHERE addressbookid = ?');
         $stmt->execute(array($addressBookId));
 
@@ -206,8 +206,8 @@ class PDO extends AbstractBackend {
      * @param mixed $addressbookId
      * @return array
      */
-    public function getCards($addressbookId) {
-
+    public function getCards($addressbookId)
+    {
         $stmt = $this->pdo->prepare('SELECT id, carddata, uri, lastmodified FROM ' . $this->cardsTableName . ' WHERE addressbookid = ?');
         $stmt->execute(array($addressbookId));
 
@@ -226,8 +226,8 @@ class PDO extends AbstractBackend {
      * @param string $cardUri
      * @return array
      */
-    public function getCard($addressBookId, $cardUri) {
-
+    public function getCard($addressBookId, $cardUri)
+    {
         $stmt = $this->pdo->prepare('SELECT id, carddata, uri, lastmodified FROM ' . $this->cardsTableName . ' WHERE addressbookid = ? AND uri = ? LIMIT 1');
         $stmt->execute(array($addressBookId, $cardUri));
 
@@ -262,8 +262,8 @@ class PDO extends AbstractBackend {
      * @param string $cardData
      * @return string|null
      */
-    public function createCard($addressBookId, $cardUri, $cardData) {
-
+    public function createCard($addressBookId, $cardUri, $cardData)
+    {
         $stmt = $this->pdo->prepare('INSERT INTO ' . $this->cardsTableName . ' (carddata, uri, lastmodified, addressbookid) VALUES (?, ?, ?, ?)');
 
         $result = $stmt->execute(array($cardData, $cardUri, time(), $addressBookId));
@@ -300,8 +300,8 @@ class PDO extends AbstractBackend {
      * @param string $cardData
      * @return string|null
      */
-    public function updateCard($addressBookId, $cardUri, $cardData) {
-
+    public function updateCard($addressBookId, $cardUri, $cardData)
+    {
         $stmt = $this->pdo->prepare('UPDATE ' . $this->cardsTableName . ' SET carddata = ?, lastmodified = ? WHERE uri = ? AND addressbookid =?');
         $stmt->execute(array($cardData, time(), $cardUri, $addressBookId));
 
@@ -319,8 +319,8 @@ class PDO extends AbstractBackend {
      * @param string $cardUri
      * @return bool
      */
-    public function deleteCard($addressBookId, $cardUri) {
-
+    public function deleteCard($addressBookId, $cardUri)
+    {
         $stmt = $this->pdo->prepare('DELETE FROM ' . $this->cardsTableName . ' WHERE addressbookid = ? AND uri = ?');
         $stmt->execute(array($addressBookId, $cardUri));
 

@@ -16,11 +16,11 @@ use Sabre\DAV;
  * on the file extension.
  *
  * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/) 
+ * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class GuessContentType extends DAV\ServerPlugin {
-
+class GuessContentType extends DAV\ServerPlugin
+{
     /**
      * List of recognized file extensions
      *
@@ -50,8 +50,8 @@ class GuessContentType extends DAV\ServerPlugin {
      * @param DAV\Server $server
      * @return void
      */
-    public function initialize(DAV\Server $server) {
-
+    public function initialize(DAV\Server $server)
+    {
         // Using a relatively low priority (200) to allow other extensions
         // to set the content-type first.
         $server->subscribeEvent('afterGetProperties',array($this,'afterGetProperties'),200);
@@ -65,8 +65,8 @@ class GuessContentType extends DAV\ServerPlugin {
      * @param array $properties
      * @return void
      */
-    public function afterGetProperties($path, &$properties) {
-
+    public function afterGetProperties($path, &$properties)
+    {
         if (array_key_exists('{DAV:}getcontenttype', $properties[404])) {
 
             list(, $fileName) = DAV\URLUtil::splitPath($path);
@@ -87,8 +87,8 @@ class GuessContentType extends DAV\ServerPlugin {
      * @param string $fileName
      * @return string
      */
-    protected function getContentType($fileName) {
-
+    protected function getContentType($fileName)
+    {
         // Just grabbing the extension
         $extension = strtolower(substr($fileName,strrpos($fileName,'.')+1));
         if (isset($this->extensionMap[$extension]))

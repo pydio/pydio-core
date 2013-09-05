@@ -13,8 +13,8 @@ namespace Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class StringUtil {
-
+class StringUtil
+{
     /**
      * Checks if a needle occurs in a haystack ;)
      *
@@ -24,9 +24,9 @@ class StringUtil {
      * @param string $matchType
      * @return bool
      */
-    static public function textMatch($haystack, $needle, $collation, $matchType = 'contains') {
-
-        switch($collation) {
+    public static function textMatch($haystack, $needle, $collation, $matchType = 'contains')
+    {
+        switch ($collation) {
 
             case 'i;ascii-casemap' :
                 // default strtolower takes locale into consideration
@@ -49,7 +49,7 @@ class StringUtil {
 
         }
 
-        switch($matchType) {
+        switch ($matchType) {
 
             case 'contains' :
                 return strpos($haystack, $needle)!==false;
@@ -76,8 +76,8 @@ class StringUtil {
      * @param string $input
      * @return string
      */
-    static public function ensureUTF8($input) {
-
+    public static function ensureUTF8($input)
+    {
         $encoding = mb_detect_encoding($input , array('UTF-8','ISO-8859-1'), true);
 
         if ($encoding === 'ISO-8859-1') {

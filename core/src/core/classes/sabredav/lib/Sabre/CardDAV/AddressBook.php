@@ -14,8 +14,8 @@ use Sabre\DAVACL;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class AddressBook extends DAV\Collection implements IAddressBook, DAV\IProperties, DAVACL\IACL {
-
+class AddressBook extends DAV\Collection implements IAddressBook, DAV\IProperties, DAVACL\IACL
+{
     /**
      * This is an array with addressbook information
      *
@@ -36,8 +36,8 @@ class AddressBook extends DAV\Collection implements IAddressBook, DAV\IPropertie
      * @param Backend\BackendInterface $carddavBackend
      * @param array $addressBookInfo
      */
-    public function __construct(Backend\BackendInterface $carddavBackend, array $addressBookInfo) {
-
+    public function __construct(Backend\BackendInterface $carddavBackend, array $addressBookInfo)
+    {
         $this->carddavBackend = $carddavBackend;
         $this->addressBookInfo = $addressBookInfo;
 
@@ -48,8 +48,8 @@ class AddressBook extends DAV\Collection implements IAddressBook, DAV\IPropertie
      *
      * @return string
      */
-    public function getName() {
-
+    public function getName()
+    {
         return $this->addressBookInfo['uri'];
 
     }
@@ -60,8 +60,8 @@ class AddressBook extends DAV\Collection implements IAddressBook, DAV\IPropertie
      * @param string $name
      * @return \ICard
      */
-    public function getChild($name) {
-
+    public function getChild($name)
+    {
         $obj = $this->carddavBackend->getCard($this->addressBookInfo['id'],$name);
         if (!$obj) throw new DAV\Exception\NotFound('Card not found');
         return new Card($this->carddavBackend,$this->addressBookInfo,$obj);
@@ -73,11 +73,11 @@ class AddressBook extends DAV\Collection implements IAddressBook, DAV\IPropertie
      *
      * @return array
      */
-    public function getChildren() {
-
+    public function getChildren()
+    {
         $objs = $this->carddavBackend->getCards($this->addressBookInfo['id']);
         $children = array();
-        foreach($objs as $obj) {
+        foreach ($objs as $obj) {
             $children[] = new Card($this->carddavBackend,$this->addressBookInfo,$obj);
         }
         return $children;
@@ -92,8 +92,8 @@ class AddressBook extends DAV\Collection implements IAddressBook, DAV\IPropertie
      * @param string $name
      * @return void
      */
-    public function createDirectory($name) {
-
+    public function createDirectory($name)
+    {
         throw new DAV\Exception\MethodNotAllowed('Creating collections in addressbooks is not allowed');
 
     }
@@ -109,8 +109,8 @@ class AddressBook extends DAV\Collection implements IAddressBook, DAV\IPropertie
      * @param resource $vcardData
      * @return string|null
      */
-    public function createFile($name,$vcardData = null) {
-
+    public function createFile($name,$vcardData = null)
+    {
         if (is_resource($vcardData)) {
             $vcardData = stream_get_contents($vcardData);
         }
@@ -126,8 +126,8 @@ class AddressBook extends DAV\Collection implements IAddressBook, DAV\IPropertie
      *
      * @return void
      */
-    public function delete() {
-
+    public function delete()
+    {
         $this->carddavBackend->deleteAddressBook($this->addressBookInfo['id']);
 
     }
@@ -138,8 +138,8 @@ class AddressBook extends DAV\Collection implements IAddressBook, DAV\IPropertie
      * @param string $newName
      * @return void
      */
-    public function setName($newName) {
-
+    public function setName($newName)
+    {
         throw new DAV\Exception\MethodNotAllowed('Renaming addressbooks is not yet supported');
 
     }
@@ -149,8 +149,8 @@ class AddressBook extends DAV\Collection implements IAddressBook, DAV\IPropertie
      *
      * @return void
      */
-    public function getLastModified() {
-
+    public function getLastModified()
+    {
         return null;
 
     }
@@ -190,8 +190,8 @@ class AddressBook extends DAV\Collection implements IAddressBook, DAV\IPropertie
      * @param array $mutations
      * @return bool|array
      */
-    public function updateProperties($mutations) {
-
+    public function updateProperties($mutations)
+    {
         return $this->carddavBackend->updateAddressBook($this->addressBookInfo['id'], $mutations);
 
     }
@@ -207,10 +207,10 @@ class AddressBook extends DAV\Collection implements IAddressBook, DAV\IPropertie
      * @param array $properties
      * @return array
      */
-    public function getProperties($properties) {
-
+    public function getProperties($properties)
+    {
         $response = array();
-        foreach($properties as $propertyName) {
+        foreach ($properties as $propertyName) {
 
             if (isset($this->addressBookInfo[$propertyName])) {
 
@@ -231,8 +231,8 @@ class AddressBook extends DAV\Collection implements IAddressBook, DAV\IPropertie
      *
      * @return string|null
      */
-    public function getOwner() {
-
+    public function getOwner()
+    {
         return $this->addressBookInfo['principaluri'];
 
     }
@@ -244,8 +244,8 @@ class AddressBook extends DAV\Collection implements IAddressBook, DAV\IPropertie
      *
      * @return string|null
      */
-    public function getGroup() {
-
+    public function getGroup()
+    {
         return null;
 
     }
@@ -262,8 +262,8 @@ class AddressBook extends DAV\Collection implements IAddressBook, DAV\IPropertie
      *
      * @return array
      */
-    public function getACL() {
-
+    public function getACL()
+    {
         return array(
             array(
                 'privilege' => '{DAV:}read',
@@ -288,8 +288,8 @@ class AddressBook extends DAV\Collection implements IAddressBook, DAV\IPropertie
      * @param array $acl
      * @return void
      */
-    public function setACL(array $acl) {
-
+    public function setACL(array $acl)
+    {
         throw new DAV\Exception\MethodNotAllowed('Changing ACL is not yet supported');
 
     }
@@ -306,8 +306,8 @@ class AddressBook extends DAV\Collection implements IAddressBook, DAV\IPropertie
      *
      * @return array|null
      */
-    public function getSupportedPrivilegeSet() {
-
+    public function getSupportedPrivilegeSet()
+    {
         return null;
 
     }

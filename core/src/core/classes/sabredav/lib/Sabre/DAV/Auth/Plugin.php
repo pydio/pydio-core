@@ -16,8 +16,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Plugin extends DAV\ServerPlugin {
-
+class Plugin extends DAV\ServerPlugin
+{
     /**
      * Reference to main server object
      *
@@ -45,8 +45,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param Backend\BackendInterface $authBackend
      * @param string $realm
      */
-    public function __construct(Backend\BackendInterface $authBackend, $realm) {
-
+    public function __construct(Backend\BackendInterface $authBackend, $realm)
+    {
         $this->authBackend = $authBackend;
         $this->realm = $realm;
 
@@ -58,8 +58,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param DAV\Server $server
      * @return void
      */
-    public function initialize(DAV\Server $server) {
-
+    public function initialize(DAV\Server $server)
+    {
         $this->server = $server;
         $this->server->subscribeEvent('beforeMethod',array($this,'beforeMethod'),10);
 
@@ -73,8 +73,8 @@ class Plugin extends DAV\ServerPlugin {
      *
      * @return string
      */
-    public function getPluginName() {
-
+    public function getPluginName()
+    {
         return 'auth';
 
     }
@@ -86,8 +86,8 @@ class Plugin extends DAV\ServerPlugin {
      *
      * @return string|null
      */
-    public function getCurrentUser() {
-
+    public function getCurrentUser()
+    {
         $userInfo = $this->authBackend->getCurrentUser();
         if (!$userInfo) return null;
 
@@ -103,8 +103,8 @@ class Plugin extends DAV\ServerPlugin {
      * @throws Sabre\DAV\Exception\NotAuthenticated
      * @return bool
      */
-    public function beforeMethod($method, $uri) {
-
+    public function beforeMethod($method, $uri)
+    {
         $this->authBackend->authenticate($this->server,$this->realm);
 
     }

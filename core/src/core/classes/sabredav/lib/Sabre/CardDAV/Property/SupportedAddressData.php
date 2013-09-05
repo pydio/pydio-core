@@ -12,11 +12,11 @@ use Sabre\CardDAV;
  * in the CardDAV namespace.
  *
  * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/) 
+ * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class SupportedAddressData extends DAV\Property {
-
+class SupportedAddressData extends DAV\Property
+{
     /**
      * supported versions
      *
@@ -29,8 +29,8 @@ class SupportedAddressData extends DAV\Property {
      *
      * @param array|null $supportedData
      */
-    public function __construct(array $supportedData = null) {
-
+    public function __construct(array $supportedData = null)
+    {
         if (is_null($supportedData)) {
             $supportedData = array(
                 array('contentType' => 'text/vcard', 'version' => '3.0'),
@@ -49,8 +49,8 @@ class SupportedAddressData extends DAV\Property {
      * @param \DOMElement $node
      * @return void
      */
-    public function serialize(DAV\Server $server,\DOMElement $node) {
-
+    public function serialize(DAV\Server $server,\DOMElement $node)
+    {
         $doc = $node->ownerDocument;
 
         $prefix =
@@ -58,7 +58,7 @@ class SupportedAddressData extends DAV\Property {
             $server->xmlNamespaces[CardDAV\Plugin::NS_CARDDAV] :
             'card';
 
-        foreach($this->supportedData as $supported) {
+        foreach ($this->supportedData as $supported) {
 
             $caldata = $doc->createElementNS(CardDAV\Plugin::NS_CARDDAV, $prefix . ':address-data-type');
             $caldata->setAttribute('content-type',$supported['contentType']);

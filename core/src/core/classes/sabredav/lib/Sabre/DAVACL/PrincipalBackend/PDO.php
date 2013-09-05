@@ -16,8 +16,8 @@ use Sabre\DAVACL;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class PDO extends AbstractBackend {
-
+class PDO extends AbstractBackend
+{
     /**
      * pdo
      *
@@ -79,8 +79,8 @@ class PDO extends AbstractBackend {
      * @param string $tableName
      * @param string $groupMembersTableName
      */
-    public function __construct(\PDO $pdo, $tableName = 'principals', $groupMembersTableName = 'groupmembers') {
-
+    public function __construct(\PDO $pdo, $tableName = 'principals', $groupMembersTableName = 'groupmembers')
+    {
         $this->pdo = $pdo;
         $this->tableName = $tableName;
         $this->groupMembersTableName = $groupMembersTableName;
@@ -104,20 +104,20 @@ class PDO extends AbstractBackend {
      * @param string $prefixPath
      * @return array
      */
-    public function getPrincipalsByPrefix($prefixPath) {
-
+    public function getPrincipalsByPrefix($prefixPath)
+    {
         $fields = array(
             'uri',
         );
 
-        foreach($this->fieldMap as $key=>$value) {
+        foreach ($this->fieldMap as $key=>$value) {
             $fields[] = $value['dbField'];
         }
         $result = $this->pdo->query('SELECT '.implode(',', $fields).'  FROM '. $this->tableName);
 
         $principals = array();
 
-        while($row = $result->fetch(\PDO::FETCH_ASSOC)) {
+        while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
 
             // Checking if the principal is in the prefix
             list($rowPrefix) = DAV\URLUtil::splitPath($row['uri']);
@@ -126,7 +126,7 @@ class PDO extends AbstractBackend {
             $principal = array(
                 'uri' => $row['uri'],
             );
-            foreach($this->fieldMap as $key=>$value) {
+            foreach ($this->fieldMap as $key=>$value) {
                 if ($row[$value['dbField']]) {
                     $principal[$key] = $row[$value['dbField']];
                 }
@@ -147,14 +147,14 @@ class PDO extends AbstractBackend {
      * @param string $path
      * @return array
      */
-    public function getPrincipalByPath($path) {
-
+    public function getPrincipalByPath($path)
+    {
         $fields = array(
             'id',
             'uri',
         );
 
-        foreach($this->fieldMap as $key=>$value) {
+        foreach ($this->fieldMap as $key=>$value) {
             $fields[] = $value['dbField'];
         }
         $stmt = $this->pdo->prepare('SELECT '.implode(',', $fields).'  FROM '. $this->tableName . ' WHERE uri = ?');
@@ -167,7 +167,7 @@ class PDO extends AbstractBackend {
             'id'  => $row['id'],
             'uri' => $row['uri'],
         );
-        foreach($this->fieldMap as $key=>$value) {
+        foreach ($this->fieldMap as $key=>$value) {
             if ($row[$value['dbField']]) {
                 $principal[$key] = $row[$value['dbField']];
             }
@@ -224,10 +224,10 @@ class PDO extends AbstractBackend {
      * @param array $mutations
      * @return array|bool
      */
-    public function updatePrincipal($path, $mutations) {
-
+    public function updatePrincipal($path, $mutations)
+    {
         $updateAble = array();
-        foreach($mutations as $key=>$value) {
+        foreach ($mutations as $key=>$value) {
 
             // We are not aware of this field, we must fail.
             if (!isset($this->fieldMap[$key])) {
@@ -240,7 +240,7 @@ class PDO extends AbstractBackend {
                 );
 
                 // Adding the rest to the response as a 424
-                foreach($mutations as $subKey=>$subValue) {
+                foreach ($mutations as $subKey=>$subValue) {
                     if ($subKey !== $key) {
                         $response[424][$subKey] = null;
                     }
@@ -256,7 +256,7 @@ class PDO extends AbstractBackend {
         $query = "UPDATE " . $this->tableName . " SET ";
 
         $first = true;
-        foreach($updateAble as $key => $value) {
+        foreach ($updateAble as $key => $value) {
             if (!$first) {
                 $query.= ', ';
             }
@@ -300,13 +300,13 @@ class PDO extends AbstractBackend {
      * @param array $searchProperties
      * @return array
      */
-    public function searchPrincipals($prefixPath, array $searchProperties) {
-
+    public function searchPrincipals($prefixPath, array $searchProperties)
+    {
         $query = 'SELECT uri FROM ' . $this->tableName . ' WHERE 1=1 ';
         $values = array();
-        foreach($searchProperties as $property => $value) {
+        foreach ($searchProperties as $property => $value) {
 
-            switch($property) {
+            switch ($property) {
 
                 case '{DAV:}displayname' :
                     $query.=' AND displayname LIKE ?';
@@ -327,7 +327,7 @@ class PDO extends AbstractBackend {
         $stmt->execute($values);
 
         $principals = array();
-        while($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
 
             // Checking if the principal is in the prefix
             list($rowPrefix) = DAV\URLUtil::splitPath($row['uri']);
@@ -347,8 +347,8 @@ class PDO extends AbstractBackend {
      * @param string $principal
      * @return array
      */
-    public function getGroupMemberSet($principal) {
-
+    public function getGroupMemberSet($principal)
+    {
         $principal = $this->getPrincipalByPath($principal);
         if (!$principal) throw new DAV\Exception('Principal not found');
 
@@ -369,8 +369,8 @@ class PDO extends AbstractBackend {
      * @param string $principal
      * @return array
      */
-    public function getGroupMembership($principal) {
-
+    public function getGroupMembership($principal)
+    {
         $principal = $this->getPrincipalByPath($principal);
         if (!$principal) throw new DAV\Exception('Principal not found');
 
@@ -394,8 +394,8 @@ class PDO extends AbstractBackend {
      * @param array $members
      * @return void
      */
-    public function setGroupMemberSet($principal, array $members) {
-
+    public function setGroupMemberSet($principal, array $members)
+    {
         // Grabbing the list of principal id's.
         $stmt = $this->pdo->prepare('SELECT id, uri FROM '.$this->tableName.' WHERE uri IN (? ' . str_repeat(', ? ', count($members)) . ');');
         $stmt->execute(array_merge(array($principal), $members));
@@ -403,7 +403,7 @@ class PDO extends AbstractBackend {
         $memberIds = array();
         $principalId = null;
 
-        while($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             if ($row['uri'] == $principal) {
                 $principalId = $row['id'];
             } else {
@@ -416,7 +416,7 @@ class PDO extends AbstractBackend {
         $stmt = $this->pdo->prepare('DELETE FROM '.$this->groupMembersTableName.' WHERE principal_id = ?;');
         $stmt->execute(array($principalId));
 
-        foreach($memberIds as $memberId) {
+        foreach ($memberIds as $memberId) {
 
             $stmt = $this->pdo->prepare('INSERT INTO '.$this->groupMembersTableName.' (principal_id, member_id) VALUES (?, ?);');
             $stmt->execute(array($principalId, $memberId));

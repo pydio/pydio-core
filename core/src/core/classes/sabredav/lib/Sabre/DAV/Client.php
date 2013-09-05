@@ -14,8 +14,8 @@ namespace Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Client {
-
+class Client
+{
     /**
      * The propertyMap is a key-value array.
      *
@@ -78,8 +78,8 @@ class Client {
      *
      * @param array $settings
      */
-    public function __construct(array $settings) {
-
+    public function __construct(array $settings)
+    {
         if (!isset($settings['baseUri'])) {
             throw new \InvalidArgumentException('A baseUri must be provided');
         }
@@ -91,7 +91,7 @@ class Client {
             'proxy',
         );
 
-        foreach($validSettings as $validSetting) {
+        foreach ($validSettings as $validSetting) {
             if (isset($settings[$validSetting])) {
                 $this->$validSetting = $settings[$validSetting];
             }
@@ -115,7 +115,8 @@ class Client {
      *
      * @param string $certificates
      */
-    public function addTrustedCertificates($certificates) {
+    public function addTrustedCertificates($certificates)
+    {
         $this->trustedCertificates = $certificates;
     }
 
@@ -124,7 +125,8 @@ class Client {
      *
      * @param boolean $value
      */
-    public function setVerifyPeer($value) {
+    public function setVerifyPeer($value)
+    {
         $this->verifyPeer = $value;
     }
 
@@ -149,13 +151,13 @@ class Client {
      * @param int $depth
      * @return array
      */
-    public function propFind($url, array $properties, $depth = 0) {
-
+    public function propFind($url, array $properties, $depth = 0)
+    {
         $body = '<?xml version="1.0"?>' . "\n";
         $body.= '<d:propfind xmlns:d="DAV:">' . "\n";
         $body.= '  <d:prop>' . "\n";
 
-        foreach($properties as $property) {
+        foreach ($properties as $property) {
 
             list(
                 $namespace,
@@ -188,7 +190,7 @@ class Client {
         }
 
         $newResult = array();
-        foreach($result as $href => $statusList) {
+        foreach ($result as $href => $statusList) {
 
             $newResult[$href] = isset($statusList[200])?$statusList[200]:array();
 
@@ -211,12 +213,12 @@ class Client {
      * @param array $properties
      * @return void
      */
-    public function propPatch($url, array $properties) {
-
+    public function propPatch($url, array $properties)
+    {
         $body = '<?xml version="1.0"?>' . "\n";
         $body.= '<d:propertyupdate xmlns:d="DAV:">' . "\n";
 
-        foreach($properties as $propName => $propValue) {
+        foreach ($properties as $propName => $propValue) {
 
             list(
                 $namespace,
@@ -273,15 +275,15 @@ class Client {
      *
      * @return array
      */
-    public function options() {
-
+    public function options()
+    {
         $result = $this->request('OPTIONS');
         if (!isset($result['headers']['dav'])) {
             return array();
         }
 
         $features = explode(',', $result['headers']['dav']);
-        foreach($features as &$v) {
+        foreach ($features as &$v) {
             $v = trim($v);
         }
         return $features;
@@ -306,8 +308,8 @@ class Client {
      * @param array $headers
      * @return array
      */
-    public function request($method, $url = '', $body = null, $headers = array()) {
-
+    public function request($method, $url = '', $body = null, $headers = array())
+    {
         $url = $this->getAbsoluteUrl($url);
 
         $curlSettings = array(
@@ -320,11 +322,11 @@ class Client {
             CURLOPT_MAXREDIRS => 5,
         );
 
-        if($this->verifyPeer !== null) {
+        if ($this->verifyPeer !== null) {
             $curlSettings[CURLOPT_SSL_VERIFYPEER] = $this->verifyPeer;
         }
 
-        if($this->trustedCertificates) {
+        if ($this->trustedCertificates) {
             $curlSettings[CURLOPT_CAINFO] = $this->trustedCertificates;
         }
 
@@ -348,7 +350,7 @@ class Client {
 
         // Adding HTTP headers
         $nHeaders = array();
-        foreach($headers as $key=>$value) {
+        foreach ($headers as $key=>$value) {
 
             $nHeaders[] = $key . ': ' . $value;
 
@@ -393,7 +395,7 @@ class Client {
         $headerBlob = explode("\r\n", $headerBlob);
 
         $headers = array();
-        foreach($headerBlob as $header) {
+        foreach ($headerBlob as $header) {
             $parts = explode(':', $header, 2);
             if (count($parts)==2) {
                 $headers[strtolower(trim($parts[0]))] = trim($parts[1]);
@@ -456,8 +458,8 @@ class Client {
      * @return array
      */
     // @codeCoverageIgnoreStart
-    protected function curlRequest($url, $settings) {
-
+    protected function curlRequest($url, $settings)
+    {
         $curl = curl_init($url);
         curl_setopt_array($curl, $settings);
 
@@ -478,8 +480,8 @@ class Client {
      * @param string $url
      * @return string
      */
-    protected function getAbsoluteUrl($url) {
-
+    protected function getAbsoluteUrl($url)
+    {
         // If the url starts with http:// or https://, the url is already absolute.
         if (preg_match('/^http(s?):\/\//', $url)) {
             return $url;
@@ -522,8 +524,8 @@ class Client {
      * @param string $body xml body
      * @return array
      */
-    public function parseMultiStatus($body) {
-
+    public function parseMultiStatus($body)
+    {
         $body = XMLUtil::convertDAVNamespace($body);
 
         $responseXML = simplexml_load_string($body, null, LIBXML_NOBLANKS | LIBXML_NOCDATA);
@@ -535,18 +537,18 @@ class Client {
 
         $propResult = array();
 
-        foreach($responseXML->xpath('d:response') as $response) {
+        foreach ($responseXML->xpath('d:response') as $response) {
             $response->registerXPathNamespace('d', 'urn:DAV');
             $href = $response->xpath('d:href');
-            $href = (string)$href[0];
+            $href = (string) $href[0];
 
             $properties = array();
 
-            foreach($response->xpath('d:propstat') as $propStat) {
+            foreach ($response->xpath('d:propstat') as $propStat) {
 
                 $propStat->registerXPathNamespace('d', 'urn:DAV');
                 $status = $propStat->xpath('d:status');
-                list($httpVersion, $statusCode, $message) = explode(' ', (string)$status[0],3);
+                list($httpVersion, $statusCode, $message) = explode(' ', (string) $status[0],3);
 
                 $properties[$statusCode] = XMLUtil::parseProperties(dom_import_simplexml($propStat), $this->propertyMap);
 

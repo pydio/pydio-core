@@ -22,11 +22,11 @@ namespace Sabre\HTTP;
  *
  *
  * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/) 
+ * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class DigestAuth extends AbstractAuth {
-
+class DigestAuth extends AbstractAuth
+{
     /**
      * These constants are used in setQOP();
      */
@@ -42,8 +42,8 @@ class DigestAuth extends AbstractAuth {
     /**
      * Initializes the object
      */
-    public function __construct() {
-
+    public function __construct()
+    {
         $this->nonce = uniqid();
         $this->opaque = md5($this->realm);
         parent::__construct();
@@ -57,8 +57,8 @@ class DigestAuth extends AbstractAuth {
      *
      * @return void
      */
-    public function init() {
-
+    public function init()
+    {
         $digest = $this->getDigest();
         $this->digestParts = $this->parseDigest($digest);
 
@@ -80,8 +80,8 @@ class DigestAuth extends AbstractAuth {
      * @param int $qop
      * @return void
      */
-    public function setQOP($qop) {
-
+    public function setQOP($qop)
+    {
         $this->qop = $qop;
 
     }
@@ -94,8 +94,8 @@ class DigestAuth extends AbstractAuth {
      * @param string $A1
      * @return bool
      */
-    public function validateA1($A1) {
-
+    public function validateA1($A1)
+    {
         $this->A1 = $A1;
         return $this->validate();
 
@@ -108,8 +108,8 @@ class DigestAuth extends AbstractAuth {
      * @param string $password
      * @return bool
      */
-    public function validatePassword($password) {
-
+    public function validatePassword($password)
+    {
         $this->A1 = md5($this->digestParts['username'] . ':' . $this->realm . ':' . $password);
         return $this->validate();
 
@@ -120,8 +120,8 @@ class DigestAuth extends AbstractAuth {
      *
      * @return string
      */
-    public function getUsername() {
-
+    public function getUsername()
+    {
         return $this->digestParts['username'];
 
     }
@@ -131,8 +131,8 @@ class DigestAuth extends AbstractAuth {
      *
      * @return bool
      */
-    protected function validate() {
-
+    protected function validate()
+    {
         $A2 = $this->httpRequest->getMethod() . ':' . $this->digestParts['uri'];
 
         if ($this->digestParts['qop']=='auth-int') {
@@ -164,10 +164,10 @@ class DigestAuth extends AbstractAuth {
      *
      * @return void
      */
-    public function requireLogin() {
-
+    public function requireLogin()
+    {
         $qop = '';
-        switch($this->qop) {
+        switch ($this->qop) {
             case self::QOP_AUTH    : $qop = 'auth'; break;
             case self::QOP_AUTHINT : $qop = 'auth-int'; break;
             case self::QOP_AUTH | self::QOP_AUTHINT : $qop = 'auth,auth-int'; break;
@@ -188,8 +188,8 @@ class DigestAuth extends AbstractAuth {
      *
      * @return mixed
      */
-    public function getDigest() {
-
+    public function getDigest()
+    {
         // mod_php
         $digest = $this->httpRequest->getRawServerValue('PHP_AUTH_DIGEST');
         if ($digest) return $digest;
@@ -220,8 +220,8 @@ class DigestAuth extends AbstractAuth {
      * @param string $digest
      * @return mixed
      */
-    protected function parseDigest($digest) {
-
+    protected function parseDigest($digest)
+    {
         // protect against missing data
         $needed_parts = array('nonce'=>1, 'nc'=>1, 'cnonce'=>1, 'qop'=>1, 'username'=>1, 'uri'=>1, 'response'=>1);
         $data = array();

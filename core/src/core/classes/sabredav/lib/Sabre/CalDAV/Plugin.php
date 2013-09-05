@@ -16,8 +16,8 @@ use Sabre\VObject;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Plugin extends DAV\ServerPlugin {
-
+class Plugin extends DAV\ServerPlugin
+{
     /**
      * This is the official CalDAV namespace
      */
@@ -62,8 +62,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param Schedule\IMip $imipHandler
      * @return void
      */
-    public function setIMipHandler(Schedule\IMip $imipHandler) {
-
+    public function setIMipHandler(Schedule\IMip $imipHandler)
+    {
         $this->imipHandler = $imipHandler;
 
     }
@@ -78,8 +78,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $uri
      * @return array
      */
-    public function getHTTPMethods($uri) {
-
+    public function getHTTPMethods($uri)
+    {
         // The MKCALENDAR is only available on unmapped uri's, whose
         // parents extend IExtendedCollection
         list($parent, $name) = DAV\URLUtil::splitPath($uri);
@@ -102,8 +102,8 @@ class Plugin extends DAV\ServerPlugin {
      *
      * @return array
      */
-    public function getFeatures() {
-
+    public function getFeatures()
+    {
         return array('calendar-access', 'calendar-proxy');
 
     }
@@ -116,8 +116,8 @@ class Plugin extends DAV\ServerPlugin {
      *
      * @return string
      */
-    public function getPluginName() {
-
+    public function getPluginName()
+    {
         return 'caldav';
 
     }
@@ -132,8 +132,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $uri
      * @return array
      */
-    public function getSupportedReportSet($uri) {
-
+    public function getSupportedReportSet($uri)
+    {
         $node = $this->server->tree->getNodeForPath($uri);
 
         $reports = array();
@@ -154,8 +154,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param DAV\Server $server
      * @return void
      */
-    public function initialize(DAV\Server $server) {
-
+    public function initialize(DAV\Server $server)
+    {
         $this->server = $server;
 
         $server->subscribeEvent('unknownMethod',array($this,'unknownMethod'));
@@ -216,8 +216,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $uri
      * @return bool
      */
-    public function unknownMethod($method, $uri) {
-
+    public function unknownMethod($method, $uri)
+    {
         switch ($method) {
             case 'MKCALENDAR' :
                 $this->httpMkCalendar($uri);
@@ -255,9 +255,9 @@ class Plugin extends DAV\ServerPlugin {
      * @param \DOMNode $dom
      * @return bool
      */
-    public function report($reportName,$dom) {
-
-        switch($reportName) {
+    public function report($reportName,$dom)
+    {
+        switch ($reportName) {
             case '{'.self::NS_CALDAV.'}calendar-multiget' :
                 $this->calendarMultiGetReport($dom);
                 return false;
@@ -280,8 +280,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $uri
      * @return void
      */
-    public function httpMkCalendar($uri) {
-
+    public function httpMkCalendar($uri)
+    {
         // Due to unforgivable bugs in iCal, we're completely disabling MKCALENDAR support
         // for clients matching iCal in the user agent
         //$ua = $this->server->httpRequest->getHeader('User-Agent');
@@ -296,10 +296,10 @@ class Plugin extends DAV\ServerPlugin {
 
             $dom = DAV\XMLUtil::loadDOMDocument($body);
 
-            foreach($dom->firstChild->childNodes as $child) {
+            foreach ($dom->firstChild->childNodes as $child) {
 
                 if (DAV\XMLUtil::toClarkNotation($child)!=='{DAV:}set') continue;
-                foreach(DAV\XMLUtil::parseProperties($child,$this->server->propertyMap) as $k=>$prop) {
+                foreach (DAV\XMLUtil::parseProperties($child,$this->server->propertyMap) as $k=>$prop) {
                     $properties[$k] = $prop;
                 }
 
@@ -327,8 +327,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param array $returnedProperties
      * @return void
      */
-    public function beforeGetProperties($path, DAV\INode $node, &$requestedProperties, &$returnedProperties) {
-
+    public function beforeGetProperties($path, DAV\INode $node, &$requestedProperties, &$returnedProperties)
+    {
         if ($node instanceof DAVACL\IPrincipal) {
 
             // calendar-home-set property
@@ -375,7 +375,7 @@ class Plugin extends DAV\ServerPlugin {
                 $readList = array();
                 $writeList = array();
 
-                foreach($membership as $group) {
+                foreach ($membership as $group) {
 
                     $groupNode = $this->server->tree->getNodeForPath($group);
 
@@ -455,8 +455,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param \DOMNode $dom
      * @return void
      */
-    public function calendarMultiGetReport($dom) {
-
+    public function calendarMultiGetReport($dom)
+    {
         $properties = array_keys(DAV\XMLUtil::parseProperties($dom->firstChild));
         $hrefElems = $dom->getElementsByTagNameNS('urn:DAV','href');
 
@@ -469,7 +469,7 @@ class Plugin extends DAV\ServerPlugin {
             $expandElem = $expand->item(0);
             $start = $expandElem->getAttribute('start');
             $end = $expandElem->getAttribute('end');
-            if(!$start || !$end) {
+            if (!$start || !$end) {
                 throw new DAV\Exception\BadRequest('The "start" and "end" attributes are required for the CALDAV:expand element');
             }
             $start = VObject\DateTimeParser::parseDateTime($start);
@@ -487,7 +487,7 @@ class Plugin extends DAV\ServerPlugin {
 
         }
 
-        foreach($hrefElems as $elem) {
+        foreach ($hrefElems as $elem) {
             $uri = $this->server->calculateUri($elem->nodeValue);
             list($objProps) = $this->server->getPropertiesForPath($uri,$properties);
 
@@ -519,8 +519,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param \DOMNode $dom
      * @return void
      */
-    public function calendarQueryReport($dom) {
-
+    public function calendarQueryReport($dom)
+    {
         $parser = new CalendarQueryParser($dom);
         $parser->parse();
 
@@ -590,7 +590,7 @@ class Plugin extends DAV\ServerPlugin {
 
             $nodePaths = $node->calendarQuery($parser->filters);
 
-            foreach($nodePaths as $path) {
+            foreach ($nodePaths as $path) {
 
                 list($properties) =
                     $this->server->getPropertiesForPath($this->server->getRequestUri() . '/' . $path, $parser->requestedProperties);
@@ -624,12 +624,12 @@ class Plugin extends DAV\ServerPlugin {
      * @param \DOMNode $dom
      * @return void
      */
-    protected function freeBusyQueryReport(\DOMNode $dom) {
-
+    protected function freeBusyQueryReport(\DOMNode $dom)
+    {
         $start = null;
         $end = null;
 
-        foreach($dom->firstChild->childNodes as $childNode) {
+        foreach ($dom->firstChild->childNodes as $childNode) {
 
             $clark = DAV\XMLUtil::toClarkNotation($childNode);
             if ($clark == '{' . self::NS_CALDAV . '}time-range') {
@@ -712,8 +712,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param resource $data
      * @return void
      */
-    public function beforeWriteContent($path, DAV\IFile $node, &$data) {
-
+    public function beforeWriteContent($path, DAV\IFile $node, &$data)
+    {
         if (!$node instanceof ICalendarObject)
             return;
 
@@ -732,8 +732,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param DAV\ICollection $parentNode
      * @return void
      */
-    public function beforeCreateFile($path, &$data, DAV\ICollection $parentNode) {
-
+    public function beforeCreateFile($path, &$data, DAV\ICollection $parentNode)
+    {
         if (!$parentNode instanceof Calendar)
             return;
 
@@ -751,8 +751,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $path
      * @return void
      */
-    public function beforeMethod($method, $path) {
-
+    public function beforeMethod($method, $path)
+    {
         if ($method!=='GET') return;
 
         try {
@@ -770,7 +770,7 @@ class Plugin extends DAV\ServerPlugin {
         $dom->formatOutput = true;
 
         $root = $dom->createElement('cs:notification');
-        foreach($this->server->xmlNamespaces as $namespace => $prefix) {
+        foreach ($this->server->xmlNamespaces as $namespace => $prefix) {
             $root->setAttribute('xmlns:' . $prefix, $namespace);
         }
 
@@ -795,8 +795,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $path
      * @return void
      */
-    protected function validateICalendar(&$data, $path) {
-
+    protected function validateICalendar(&$data, $path)
+    {
         // If it's a stream, we convert it to a string first.
         if (is_resource($data)) {
             $data = stream_get_contents($data);
@@ -826,8 +826,8 @@ class Plugin extends DAV\ServerPlugin {
 
         $foundType = null;
         $foundUID = null;
-        foreach($vobj->getComponents() as $component) {
-            switch($component->name) {
+        foreach ($vobj->getComponents() as $component) {
+            switch ($component->name) {
                 case 'VTIMEZONE' :
                     continue 2;
                 case 'VEVENT' :
@@ -841,12 +841,12 @@ class Plugin extends DAV\ServerPlugin {
                         if (!isset($component->UID)) {
                             throw new DAV\Exception\BadRequest('Every ' . $component->name . ' component must have an UID');
                         }
-                        $foundUID = (string)$component->UID;
+                        $foundUID = (string) $component->UID;
                     } else {
                         if ($foundType !== $component->name) {
                             throw new DAV\Exception\BadRequest('A calendar object must only contain 1 component. We found a ' . $component->name . ' as well as a ' . $foundType);
                         }
-                        if ($foundUID !== (string)$component->UID) {
+                        if ($foundUID !== (string) $component->UID) {
                             throw new DAV\Exception\BadRequest('Every ' . $component->name . ' in this object must have identical UIDs');
                         }
                     }
@@ -876,8 +876,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $outboxUri
      * @return void
      */
-    public function outboxRequest(Schedule\IOutbox $outboxNode, $outboxUri) {
-
+    public function outboxRequest(Schedule\IOutbox $outboxNode, $outboxUri)
+    {
         // Parsing the request body
         try {
             $vObject = VObject\Reader::read($this->server->httpRequest->getBody(true));
@@ -889,7 +889,7 @@ class Plugin extends DAV\ServerPlugin {
         // component. The combination of both determines what type of request
         // this is.
         $componentType = null;
-        foreach($vObject->getComponents() as $component) {
+        foreach ($vObject->getComponents() as $component) {
             if ($component->name !== 'VTIMEZONE') {
                 $componentType = $component->name;
                 break;
@@ -900,7 +900,7 @@ class Plugin extends DAV\ServerPlugin {
         }
 
         // Validating the METHOD
-        $method = strtoupper((string)$vObject->METHOD);
+        $method = strtoupper((string) $vObject->METHOD);
         if (!$method) {
             throw new DAV\Exception\BadRequest('A METHOD property must be specified in iTIP messages');
         }
@@ -936,8 +936,8 @@ class Plugin extends DAV\ServerPlugin {
      *
      * @return void
      */
-    protected function handleEventNotification(Schedule\IOutbox $outboxNode, VObject\Component $vObject) {
-
+    protected function handleEventNotification(Schedule\IOutbox $outboxNode, VObject\Component $vObject)
+    {
         $originator = $this->server->httpRequest->getHeader('Originator');
         $recipients = $this->server->httpRequest->getHeader('Recipient');
 
@@ -949,7 +949,7 @@ class Plugin extends DAV\ServerPlugin {
         }
 
         $recipients = explode(',',$recipients);
-        foreach($recipients as $k=>$recipient) {
+        foreach ($recipients as $k=>$recipient) {
 
             $recipient = trim($recipient);
             if (!preg_match('/^mailto:(.*)@(.*)$/i', $recipient)) {
@@ -972,7 +972,7 @@ class Plugin extends DAV\ServerPlugin {
         }
 
         $found = false;
-        foreach($addresses as $address) {
+        foreach ($addresses as $address) {
 
             // Trimming the / on both sides, just in case..
             if (rtrim(strtolower($originator),'/') === rtrim(strtolower($address),'/')) {
@@ -989,7 +989,7 @@ class Plugin extends DAV\ServerPlugin {
         // If the Originator header was a url, and not a mailto: address..
         // we're going to try to pull the mailto: from the vobject body.
         if (strtolower(substr($originator,0,7)) !== 'mailto:') {
-            $originator = (string)$vObject->VEVENT->ORGANIZER;
+            $originator = (string) $vObject->VEVENT->ORGANIZER;
 
         }
         if (strtolower(substr($originator,0,7)) !== 'mailto:') {
@@ -1024,10 +1024,10 @@ class Plugin extends DAV\ServerPlugin {
      * @param array $recipients
      * @param VObject\Component $vObject
      * @param string $principal Principal url
-     * @return array 
+     * @return array
      */
-    protected function iMIPMessage($originator, array $recipients, VObject\Component $vObject, $principal) {
-
+    protected function iMIPMessage($originator, array $recipients, VObject\Component $vObject, $principal)
+    {
         if (!$this->imipHandler) {
             $resultStatus = '5.2;This server does not support this operation';
         } else {
@@ -1036,7 +1036,7 @@ class Plugin extends DAV\ServerPlugin {
         }
 
         $result = array();
-        foreach($recipients as $recipient) {
+        foreach ($recipients as $recipient) {
             $result[$recipient] = $resultStatus;
         }
 
@@ -1054,20 +1054,20 @@ class Plugin extends DAV\ServerPlugin {
      * @param array $recipients
      * @return string
      */
-    public function generateScheduleResponse(array $recipients) {
-
+    public function generateScheduleResponse(array $recipients)
+    {
         $dom = new \DOMDocument('1.0','utf-8');
         $dom->formatOutput = true;
         $xscheduleResponse = $dom->createElement('cal:schedule-response');
         $dom->appendChild($xscheduleResponse);
 
-        foreach($this->server->xmlNamespaces as $namespace=>$prefix) {
+        foreach ($this->server->xmlNamespaces as $namespace=>$prefix) {
 
             $xscheduleResponse->setAttribute('xmlns:' . $prefix, $namespace);
 
         }
 
-        foreach($recipients as $recipient=>$status) {
+        foreach ($recipients as $recipient=>$status) {
             $xresponse = $dom->createElement('cal:response');
 
             $xrecipient = $dom->createElement('cal:recipient');
@@ -1094,12 +1094,12 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $request
      * @return string
      */
-    protected function handleFreeBusyRequest(Schedule\IOutbox $outbox, VObject\Component $vObject) {
-
+    protected function handleFreeBusyRequest(Schedule\IOutbox $outbox, VObject\Component $vObject)
+    {
         $vFreeBusy = $vObject->VFREEBUSY;
         $organizer = $vFreeBusy->organizer;
 
-        $organizer = (string)$organizer;
+        $organizer = (string) $organizer;
 
         // Validating if the organizer matches the owner of the inbox.
         $owner = $outbox->getOwner();
@@ -1118,8 +1118,8 @@ class Plugin extends DAV\ServerPlugin {
         }
 
         $attendees = array();
-        foreach($vFreeBusy->ATTENDEE as $attendee) {
-            $attendees[]= (string)$attendee;
+        foreach ($vFreeBusy->ATTENDEE as $attendee) {
+            $attendees[]= (string) $attendee;
         }
 
 
@@ -1131,21 +1131,21 @@ class Plugin extends DAV\ServerPlugin {
         $endRange = $vFreeBusy->DTEND->getDateTime();
 
         $results = array();
-        foreach($attendees as $attendee) {
+        foreach ($attendees as $attendee) {
             $results[] = $this->getFreeBusyForEmail($attendee, $startRange, $endRange, $vObject);
         }
 
         $dom = new \DOMDocument('1.0','utf-8');
         $dom->formatOutput = true;
         $scheduleResponse = $dom->createElement('cal:schedule-response');
-        foreach($this->server->xmlNamespaces as $namespace=>$prefix) {
+        foreach ($this->server->xmlNamespaces as $namespace=>$prefix) {
 
             $scheduleResponse->setAttribute('xmlns:' . $prefix,$namespace);
 
         }
         $dom->appendChild($scheduleResponse);
 
-        foreach($results as $result) {
+        foreach ($results as $result) {
             $response = $dom->createElement('cal:response');
 
             $recipient = $dom->createElement('cal:recipient');
@@ -1193,8 +1193,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param VObject\Component $request
      * @return array
      */
-    protected function getFreeBusyForEmail($email, \DateTime $start, \DateTime $end, VObject\Component $request) {
-
+    protected function getFreeBusyForEmail($email, \DateTime $start, \DateTime $end, VObject\Component $request)
+    {
         $caldavNS = '{' . Plugin::NS_CALDAV . '}';
 
         $aclPlugin = $this->server->getPlugin('acl');
@@ -1225,7 +1225,7 @@ class Plugin extends DAV\ServerPlugin {
 
         // Grabbing the calendar list
         $objects = array();
-        foreach($this->server->tree->getNodeForPath($homeSet)->getChildren() as $node) {
+        foreach ($this->server->tree->getNodeForPath($homeSet)->getChildren() as $node) {
             if (!$node instanceof ICalendar) {
                 continue;
             }
@@ -1274,7 +1274,7 @@ class Plugin extends DAV\ServerPlugin {
         $result = $generator->getResult();
 
         $vcalendar->VFREEBUSY->ATTENDEE = 'mailto:' . $email;
-        $vcalendar->VFREEBUSY->UID = (string)$request->VFREEBUSY->UID;
+        $vcalendar->VFREEBUSY->UID = (string) $request->VFREEBUSY->UID;
         $vcalendar->VFREEBUSY->ORGANIZER = clone $request->VFREEBUSY->ORGANIZER;
 
         return array(
@@ -1293,8 +1293,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $output
      * @return bool
      */
-    public function htmlActionsPanel(DAV\INode $node, &$output) {
-
+    public function htmlActionsPanel(DAV\INode $node, &$output)
+    {
         if (!$node instanceof UserCalendars)
             return;
 
@@ -1320,8 +1320,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param array $postVars
      * @return bool
      */
-    public function browserPostAction($uri, $action, array $postVars) {
-
+    public function browserPostAction($uri, $action, array $postVars)
+    {
         if ($action!=='mkcalendar')
             return;
 

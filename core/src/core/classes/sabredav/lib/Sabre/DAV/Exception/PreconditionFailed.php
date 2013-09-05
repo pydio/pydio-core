@@ -12,11 +12,11 @@ use Sabre\DAV;
  * request to not execute (the condition of the header failed)
  *
  * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/) 
+ * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class PreconditionFailed extends DAV\Exception {
-
+class PreconditionFailed extends DAV\Exception
+{
     /**
      * When this exception is thrown, the header-name might be set.
      *
@@ -33,8 +33,8 @@ class PreconditionFailed extends DAV\Exception {
      * @param string $message
      * @param string $header
      */
-    public function __construct($message, $header=null) {
-
+    public function __construct($message, $header=null)
+    {
         parent::__construct($message);
         $this->header = $header;
 
@@ -45,8 +45,8 @@ class PreconditionFailed extends DAV\Exception {
      *
      * @return int
      */
-    public function getHTTPCode() {
-
+    public function getHTTPCode()
+    {
         return 412;
 
     }
@@ -58,8 +58,8 @@ class PreconditionFailed extends DAV\Exception {
      * @param \DOMElement $errorNode
      * @return void
      */
-    public function serialize(DAV\Server $server,\DOMElement $errorNode) {
-
+    public function serialize(DAV\Server $server,\DOMElement $errorNode)
+    {
         if ($this->header) {
             $prop = $errorNode->ownerDocument->createElement('s:header');
             $prop->nodeValue = $this->header;

@@ -9,8 +9,8 @@ namespace Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class XMLUtil {
-
+class XMLUtil
+{
     /**
      * Returns the 'clark notation' for an element.
      *
@@ -29,8 +29,8 @@ class XMLUtil {
      * @param \DOMNode $dom
      * @return string
      */
-    static function toClarkNotation(\DOMNode $dom) {
-
+    public static function toClarkNotation(\DOMNode $dom)
+    {
         if ($dom->nodeType !== XML_ELEMENT_NODE) return null;
 
         // Mapping back to the real namespace, in case it was dav
@@ -51,8 +51,8 @@ class XMLUtil {
      * @throws InvalidArgumentException
      * @return array
      */
-    static function parseClarkNotation($str) {
-
+    public static function parseClarkNotation($str)
+    {
         if (!preg_match('/^{([^}]*)}(.*)$/',$str,$matches)) {
             throw new \InvalidArgumentException('\'' . $str . '\' is not a valid clark-notation formatted string');
         }
@@ -74,8 +74,8 @@ class XMLUtil {
      * @param string $xmlDocument
      * @return array|string|null
      */
-    static function convertDAVNamespace($xmlDocument) {
-
+    public static function convertDAVNamespace($xmlDocument)
+    {
         // This is used to map the DAV: namespace to urn:DAV. This is needed, because the DAV:
         // namespace is actually a violation of the XML namespaces specification, and will cause errors
         return preg_replace("/xmlns(:[A-Za-z0-9_]*)?=(\"|\')DAV:(\\2)/","xmlns\\1=\\2urn:DAV\\2",$xmlDocument);
@@ -92,8 +92,8 @@ class XMLUtil {
      * @throws Sabre\DAV\Exception\BadRequest
      * @return DOMDocument
      */
-    static function loadDOMDocument($xml) {
-
+    public static function loadDOMDocument($xml)
+    {
         if (empty($xml))
             throw new Exception\BadRequest('Empty XML document sent');
 
@@ -121,7 +121,7 @@ class XMLUtil {
 
         // We don't generally care about any whitespace
         $dom->preserveWhiteSpace = false;
-        
+
         $dom->loadXML(self::convertDAVNamespace($xml),LIBXML_NOWARNING | LIBXML_NOERROR);
 
         if ($error = libxml_get_last_error()) {
@@ -158,14 +158,14 @@ class XMLUtil {
      * @param array $propertyMap
      * @return array
      */
-    static function parseProperties(\DOMElement $parentNode, array $propertyMap = array()) {
-
+    public static function parseProperties(\DOMElement $parentNode, array $propertyMap = array())
+    {
         $propList = array();
-        foreach($parentNode->childNodes as $propNode) {
+        foreach ($parentNode->childNodes as $propNode) {
 
             if (self::toClarkNotation($propNode)!=='{DAV:}prop') continue;
 
-            foreach($propNode->childNodes as $propNodeData) {
+            foreach ($propNode->childNodes as $propNodeData) {
 
                 /* If there are no elements in here, we actually get 1 text node, this special case is dedicated to netdrive */
                 if ($propNodeData->nodeType != XML_ELEMENT_NODE) continue;

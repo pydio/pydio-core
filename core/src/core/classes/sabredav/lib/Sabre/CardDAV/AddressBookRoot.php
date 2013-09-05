@@ -10,11 +10,11 @@ use Sabre\DAVACL;
  * This object lists a collection of users, which can contain addressbooks.
  *
  * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/) 
+ * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class AddressBookRoot extends DAVACL\AbstractPrincipalCollection {
-
+class AddressBookRoot extends DAVACL\AbstractPrincipalCollection
+{
     /**
      * Principal Backend
      *
@@ -43,8 +43,8 @@ class AddressBookRoot extends DAVACL\AbstractPrincipalCollection {
      * @param Backend\BackendInterface $carddavBackend
      * @param string $principalPrefix
      */
-    public function __construct(DAVACL\PrincipalBackend\BackendInterface $principalBackend,Backend\BackendInterface $carddavBackend, $principalPrefix = 'principals') {
-
+    public function __construct(DAVACL\PrincipalBackend\BackendInterface $principalBackend,Backend\BackendInterface $carddavBackend, $principalPrefix = 'principals')
+    {
         $this->carddavBackend = $carddavBackend;
         parent::__construct($principalBackend, $principalPrefix);
 
@@ -55,8 +55,8 @@ class AddressBookRoot extends DAVACL\AbstractPrincipalCollection {
      *
      * @return string
      */
-    public function getName() {
-
+    public function getName()
+    {
         return Plugin::ADDRESSBOOK_ROOT;
 
     }
@@ -71,8 +71,8 @@ class AddressBookRoot extends DAVACL\AbstractPrincipalCollection {
      * @param array $principal
      * @return \Sabre\DAV\INode
      */
-    public function getChildForPrincipal(array $principal) {
-
+    public function getChildForPrincipal(array $principal)
+    {
         return new UserAddressBooks($this->carddavBackend, $principal['uri']);
 
     }

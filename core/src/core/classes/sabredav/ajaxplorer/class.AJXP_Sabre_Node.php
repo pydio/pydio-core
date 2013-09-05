@@ -42,10 +42,11 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
     protected $url;
     protected $path;
 
-    function __construct($path, $repository, $accessDriver = null){
+    public function __construct($path, $repository, $accessDriver = null)
+    {
         $this->repository = $repository;
         $this->path = $path;
-        if($accessDriver != null){
+        if ($accessDriver != null) {
             $this->accessDriver = $accessDriver;
         }
     }
@@ -54,13 +55,14 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
      * @return AjxpWrapperProvider
      * @throws Sabre\DAV\Exception\FileNotFound
      */
-    function getAccessDriver(){
-        if(!isset($this->accessDriver)){
+    public function getAccessDriver()
+    {
+        if (!isset($this->accessDriver)) {
             $RID = $this->repository->getId();
             ConfService::switchRootDir($RID);
             ConfService::getConfStorageImpl();
             $this->accessDriver = ConfService::loadRepositoryDriver();
-            if(!$this->accessDriver instanceof AjxpWrapperProvider){
+            if (!$this->accessDriver instanceof AjxpWrapperProvider) {
                 throw new Sabre\DAV\Exception\FileNotFound( $RID );
             }
             $this->accessDriver->detectStreamWrapper(true);
@@ -71,8 +73,9 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
     /**
      * @return String
      */
-    function getUrl(){
-        if(!isSet($this->url)){
+    public function getUrl()
+    {
+        if (!isSet($this->url)) {
             $this->url = $this->getAccessDriver()->getResourceUrl($this->path);
         }
         return $this->url;
@@ -83,15 +86,15 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
      *
      * @return void
      */
-    function delete(){
-
+    public function delete()
+    {
         ob_start();
-        try{
+        try {
             AJXP_Controller::findActionAndApply("delete", array(
                 "dir"       => dirname($this->path),
                 "file_0"    => $this->path
             ), array());
-        }catch(Exception $e){
+        } catch (Exception $e) {
 
         }
         ob_get_flush();
@@ -106,7 +109,8 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
      *
      * @return string
      */
-    function getName(){
+    public function getName()
+    {
         return basename($this->getUrl());
     }
 
@@ -116,7 +120,8 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
      * @param string $name The new name
      * @return void
      */
-    function setName($name){
+    public function setName($name)
+    {
         $data = $this->getResourceData();
         ob_start();
         AJXP_Controller::findActionAndApply("rename", array(
@@ -134,7 +139,8 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
      *
      * @return int
      */
-    function getLastModified(){
+    public function getLastModified()
+    {
         return filemtime($this->getUrl());
     }
 
@@ -146,11 +152,11 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
      * @see Sabre\DAV\IProperties::updateProperties
      * @return bool|array
      */
-    public function updateProperties($properties) {
-
+    public function updateProperties($properties)
+    {
         $resourceData = $this->getResourceData();
 
-        foreach($properties as $propertyName=>$propertyValue) {
+        foreach ($properties as $propertyName=>$propertyValue) {
 
             // If it was null, we need to delete the property
             if (is_null($propertyValue)) {
@@ -177,15 +183,15 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
      * @param array $properties
      * @return array
      */
-    function getProperties($properties) {
-
+    public function getProperties($properties)
+    {
         $resourceData = $this->getResourceData();
 
         // if the array was empty, we need to return everything
         if (!$properties) return $resourceData['properties'];
 
         $props = array();
-        foreach($properties as $property) {
+        foreach ($properties as $property) {
             if (isset($resourceData['properties'][$property])) $props[$property] = $resourceData['properties'][$property];
         }
 
@@ -193,20 +199,21 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
 
     }
 
-    protected function putResourceData($array, $newURL = null){
-
+    protected function putResourceData($array, $newURL = null)
+    {
         $metaStore = $this->getMetastore();
-        if($metaStore != false){
+        if ($metaStore != false) {
             $metaStore->setMetadata(new AJXP_Node(($newURL!=null?$newURL:$this->getUrl())), "SABRE_DAV", $array, false, AJXP_METADATA_SCOPE_GLOBAL);
         }
 
     }
 
 
-    protected function getResourceData(){
+    protected function getResourceData()
+    {
         $metaStore = $this->getMetastore();
         $data = array();
-        if($metaStore != false){
+        if ($metaStore != false) {
             $data = $metaStore->retrieveMetadata(new AJXP_Node($this->getUrl()), "SABRE_DAV", false, AJXP_METADATA_SCOPE_GLOBAL);
         }
         if (!isset($data['properties'])) $data['properties'] = array();
@@ -217,7 +224,8 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
     /**
      * @return MetaStoreProvider|bool
      */
-    protected function getMetastore(){
+    protected function getMetastore()
+    {
         $metaStore = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
         if($metaStore === false) return false;
         $metaStore->initMeta($this->getAccessDriver());

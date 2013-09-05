@@ -11,22 +11,22 @@ use Sabre\DAVACL;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class SharedCalendar extends Calendar implements ISharedCalendar {
-
+class SharedCalendar extends Calendar implements ISharedCalendar
+{
     /**
      * Constructor
      *
      * @param Backend\BackendInterface $caldavBackend
      * @param array $calendarInfo
      */
-    public function __construct(Backend\BackendInterface $caldavBackend, $calendarInfo) {
-
+    public function __construct(Backend\BackendInterface $caldavBackend, $calendarInfo)
+    {
         $required = array(
             '{http://calendarserver.org/ns/}shared-url',
             '{http://sabredav.org/ns}owner-principal',
             '{http://sabredav.org/ns}read-only',
         );
-        foreach($required as $r) {
+        foreach ($required as $r) {
             if (!isset($calendarInfo[$r])) {
                 throw new \InvalidArgumentException('The ' . $r . ' property must be specified for SharedCalendar(s)');
             }
@@ -42,8 +42,8 @@ class SharedCalendar extends Calendar implements ISharedCalendar {
      *
      * @return string
      */
-    public function getSharedUrl() {
-
+    public function getSharedUrl()
+    {
         return $this->calendarInfo['{http://calendarserver.org/ns/}shared-url'];
 
     }
@@ -55,8 +55,8 @@ class SharedCalendar extends Calendar implements ISharedCalendar {
      *
      * @return string|null
      */
-    public function getOwner() {
-
+    public function getOwner()
+    {
         return $this->calendarInfo['{http://sabredav.org/ns}owner-principal'];
 
     }
@@ -73,8 +73,8 @@ class SharedCalendar extends Calendar implements ISharedCalendar {
      *
      * @return array
      */
-    public function getACL() {
-
+    public function getACL()
+    {
         // The top-level ACL only contains access information for the true
         // owner of the calendar, so we need to add the information for the
         // sharee.
@@ -107,8 +107,8 @@ class SharedCalendar extends Calendar implements ISharedCalendar {
      *
      * @return array
      */
-    public function getShares() {
-
+    public function getShares()
+    {
         return $this->caldavBackend->getShares($this->calendarInfo['id']);
 
     }

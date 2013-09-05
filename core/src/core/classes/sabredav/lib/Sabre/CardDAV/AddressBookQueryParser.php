@@ -14,8 +14,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class AddressBookQueryParser {
-
+class AddressBookQueryParser
+{
     const TEST_ANYOF = 'anyof';
     const TEST_ALLOF = 'allof';
 
@@ -68,8 +68,8 @@ class AddressBookQueryParser {
      *
      * @param \DOMDocument $dom
      */
-    public function __construct(\DOMDocument $dom) {
-
+    public function __construct(\DOMDocument $dom)
+    {
         $this->dom = $dom;
 
         $this->xpath = new \DOMXPath($dom);
@@ -82,8 +82,8 @@ class AddressBookQueryParser {
      *
      * @return void
      */
-    public function parse() {
-
+    public function parse()
+    {
         $filterNode = null;
 
         $limit = $this->xpath->evaluate('number(/card:addressbook-query/card:limit/card:nresults)');
@@ -114,7 +114,7 @@ class AddressBookQueryParser {
         $propFilters = array();
 
         $propFilterNodes = $this->xpath->query('card:prop-filter', $filter);
-        for($ii=0; $ii < $propFilterNodes->length; $ii++) {
+        for ($ii=0; $ii < $propFilterNodes->length; $ii++) {
 
             $propFilters[] = $this->parsePropFilterNode($propFilterNodes->item($ii));
 
@@ -134,8 +134,8 @@ class AddressBookQueryParser {
      * @param \DOMElement $propFilterNode
      * @return array
      */
-    protected function parsePropFilterNode(\DOMElement $propFilterNode) {
-
+    protected function parsePropFilterNode(\DOMElement $propFilterNode)
+    {
         $propFilter = array();
         $propFilter['name'] = $propFilterNode->getAttribute('name');
         $propFilter['test'] = $propFilterNode->getAttribute('test');
@@ -148,7 +148,7 @@ class AddressBookQueryParser {
         $propFilter['param-filters'] = array();
 
 
-        for($ii=0;$ii<$paramFilterNodes->length;$ii++) {
+        for ($ii=0;$ii<$paramFilterNodes->length;$ii++) {
 
             $propFilter['param-filters'][] = $this->parseParamFilterNode($paramFilterNodes->item($ii));
 
@@ -156,7 +156,7 @@ class AddressBookQueryParser {
         $propFilter['text-matches'] = array();
         $textMatchNodes = $this->xpath->query('card:text-match', $propFilterNode);
 
-        for($ii=0;$ii<$textMatchNodes->length;$ii++) {
+        for ($ii=0;$ii<$textMatchNodes->length;$ii++) {
 
             $propFilter['text-matches'][] = $this->parseTextMatchNode($textMatchNodes->item($ii));
 
@@ -172,8 +172,8 @@ class AddressBookQueryParser {
      * @param \DOMElement $paramFilterNode
      * @return array
      */
-    public function parseParamFilterNode(\DOMElement $paramFilterNode) {
-
+    public function parseParamFilterNode(\DOMElement $paramFilterNode)
+    {
         $paramFilter = array();
         $paramFilter['name'] = $paramFilterNode->getAttribute('name');
         $paramFilter['is-not-defined'] = $this->xpath->query('card:is-not-defined', $paramFilterNode)->length>0;
@@ -194,8 +194,8 @@ class AddressBookQueryParser {
      * @param \DOMElement $textMatchNode
      * @return array
      */
-    public function parseTextMatchNode(\DOMElement $textMatchNode) {
-
+    public function parseTextMatchNode(\DOMElement $textMatchNode)
+    {
         $matchType = $textMatchNode->getAttribute('match-type');
         if (!$matchType) $matchType = 'contains';
 

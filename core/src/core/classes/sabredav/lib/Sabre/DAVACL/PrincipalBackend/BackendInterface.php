@@ -13,8 +13,8 @@ namespace Sabre\DAVACL\PrincipalBackend;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-interface BackendInterface {
-
+interface BackendInterface
+{
     /**
      * Returns a list of principals based on a prefix.
      *
@@ -31,7 +31,7 @@ interface BackendInterface {
      * @param string $prefixPath
      * @return array
      */
-    function getPrincipalsByPrefix($prefixPath);
+    public function getPrincipalsByPrefix($prefixPath);
 
     /**
      * Returns a specific principal, specified by it's path.
@@ -41,7 +41,7 @@ interface BackendInterface {
      * @param string $path
      * @return array
      */
-    function getPrincipalByPath($path);
+    public function getPrincipalByPath($path);
 
     /**
      * Updates one ore more webdav properties on a principal.
@@ -91,7 +91,7 @@ interface BackendInterface {
      * @param array $mutations
      * @return array|bool
      */
-    function updatePrincipal($path, $mutations);
+    public function updatePrincipal($path, $mutations);
 
     /**
      * This method is used to search for principals matching a set of
@@ -121,7 +121,7 @@ interface BackendInterface {
      * @param array $searchProperties
      * @return array
      */
-    function searchPrincipals($prefixPath, array $searchProperties);
+    public function searchPrincipals($prefixPath, array $searchProperties);
 
     /**
      * Returns the list of members for a group-principal
@@ -129,7 +129,7 @@ interface BackendInterface {
      * @param string $principal
      * @return array
      */
-    function getGroupMemberSet($principal);
+    public function getGroupMemberSet($principal);
 
     /**
      * Returns the list of groups a principal is a member of
@@ -137,7 +137,7 @@ interface BackendInterface {
      * @param string $principal
      * @return array
      */
-    function getGroupMembership($principal);
+    public function getGroupMembership($principal);
 
     /**
      * Updates the list of group members for a group principal.
@@ -148,6 +148,6 @@ interface BackendInterface {
      * @param array $members
      * @return void
      */
-    function setGroupMemberSet($principal, array $members);
+    public function setGroupMemberSet($principal, array $members);
 
 }

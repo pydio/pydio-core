@@ -12,11 +12,11 @@ use Sabre\DAV;
  * Make sure apache is properly configured for this to work.
  *
  * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/) 
+ * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Apache implements BackendInterface {
-
+class Apache implements BackendInterface
+{
     /**
      * Current apache user
      *
@@ -34,8 +34,8 @@ class Apache implements BackendInterface {
      * @param string $realm
      * @return bool
      */
-    public function authenticate(DAV\Server $server, $realm) {
-
+    public function authenticate(DAV\Server $server, $realm)
+    {
         $remoteUser = $server->httpRequest->getRawServerValue('REMOTE_USER');
         if (is_null($remoteUser)) {
             throw new DAV\Exception('We did not receive the $_SERVER[REMOTE_USER] property. This means that apache might have been misconfigured');
@@ -53,11 +53,10 @@ class Apache implements BackendInterface {
      *
      * @return array|null
      */
-    public function getCurrentUser() {
-
+    public function getCurrentUser()
+    {
         return $this->remoteUser;
 
     }
 
 }
-

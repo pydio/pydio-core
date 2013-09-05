@@ -17,8 +17,8 @@ use Sabre\DAVACL;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Node extends DAV\File implements INode, DAVACL\IACL {
-
+class Node extends DAV\File implements INode, DAVACL\IACL
+{
     /**
      * The notification backend
      *
@@ -47,8 +47,8 @@ class Node extends DAV\File implements INode, DAVACL\IACL {
      * @param string $principalUri
      * @param CalDAV\Notifications\INotificationType $notification
      */
-    public function __construct(CalDAV\Backend\NotificationSupport $caldavBackend, $principalUri, INotificationType $notification) {
-
+    public function __construct(CalDAV\Backend\NotificationSupport $caldavBackend, $principalUri, INotificationType $notification)
+    {
         $this->caldavBackend = $caldavBackend;
         $this->principalUri = $principalUri;
         $this->notification = $notification;
@@ -60,8 +60,8 @@ class Node extends DAV\File implements INode, DAVACL\IACL {
      *
      * @return id
      */
-    public function getName() {
-
+    public function getName()
+    {
         return $this->notification->getId() . '.xml';
 
     }
@@ -73,8 +73,8 @@ class Node extends DAV\File implements INode, DAVACL\IACL {
      *
      * @return string
      */
-    public function getETag() {
-
+    public function getETag()
+    {
         return $this->notification->getETag();
 
     }
@@ -85,8 +85,8 @@ class Node extends DAV\File implements INode, DAVACL\IACL {
      *
      * @return INotificationType
      */
-    public function getNotificationType() {
-
+    public function getNotificationType()
+    {
         return $this->notification;
 
     }
@@ -96,8 +96,8 @@ class Node extends DAV\File implements INode, DAVACL\IACL {
      *
      * @return void
      */
-    public function delete() {
-
+    public function delete()
+    {
         $this->caldavBackend->deleteNotification($this->getOwner(), $this->notification);
 
     }
@@ -109,8 +109,8 @@ class Node extends DAV\File implements INode, DAVACL\IACL {
      *
      * @return string|null
      */
-    public function getOwner() {
-
+    public function getOwner()
+    {
         return $this->principalUri;
 
     }
@@ -122,8 +122,8 @@ class Node extends DAV\File implements INode, DAVACL\IACL {
      *
      * @return string|null
      */
-    public function getGroup() {
-
+    public function getGroup()
+    {
         return null;
 
     }
@@ -140,8 +140,8 @@ class Node extends DAV\File implements INode, DAVACL\IACL {
      *
      * @return array
      */
-    public function getACL() {
-
+    public function getACL()
+    {
         return array(
             array(
                 'principal' => $this->getOwner(),
@@ -165,8 +165,8 @@ class Node extends DAV\File implements INode, DAVACL\IACL {
      * @param array $acl
      * @return void
      */
-    public function setACL(array $acl) {
-
+    public function setACL(array $acl)
+    {
         throw new DAV\Exception\NotImplemented('Updating ACLs is not implemented here');
 
     }
@@ -183,8 +183,8 @@ class Node extends DAV\File implements INode, DAVACL\IACL {
      *
      * @return array|null
      */
-    public function getSupportedPrivilegeSet() {
-
+    public function getSupportedPrivilegeSet()
+    {
         return null;
 
     }

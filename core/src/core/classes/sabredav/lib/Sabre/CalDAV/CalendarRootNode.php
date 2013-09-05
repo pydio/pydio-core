@@ -14,8 +14,8 @@ use Sabre\DAVACL\PrincipalBackend;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class CalendarRootNode extends \Sabre\DAVACL\AbstractPrincipalCollection {
-
+class CalendarRootNode extends \Sabre\DAVACL\AbstractPrincipalCollection
+{
     /**
      * CalDAV backend
      *
@@ -37,8 +37,8 @@ class CalendarRootNode extends \Sabre\DAVACL\AbstractPrincipalCollection {
      * @param Backend\BackendInterface $caldavBackend
      * @param string $principalPrefix
      */
-    public function __construct(PrincipalBackend\BackendInterface $principalBackend,Backend\BackendInterface $caldavBackend, $principalPrefix = 'principals') {
-
+    public function __construct(PrincipalBackend\BackendInterface $principalBackend,Backend\BackendInterface $caldavBackend, $principalPrefix = 'principals')
+    {
         parent::__construct($principalBackend, $principalPrefix);
         $this->caldavBackend = $caldavBackend;
 
@@ -52,8 +52,8 @@ class CalendarRootNode extends \Sabre\DAVACL\AbstractPrincipalCollection {
      *
      * @return string
      */
-    public function getName() {
-
+    public function getName()
+    {
         return Plugin::CALENDAR_ROOT;
 
     }
@@ -68,8 +68,8 @@ class CalendarRootNode extends \Sabre\DAVACL\AbstractPrincipalCollection {
      * @param array $principal
      * @return \Sabre\DAV\INode
      */
-    public function getChildForPrincipal(array $principal) {
-
+    public function getChildForPrincipal(array $principal)
+    {
         return new UserCalendars($this->caldavBackend, $principal);
 
     }

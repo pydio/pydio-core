@@ -12,8 +12,8 @@ namespace Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-abstract class File extends Node implements IFile {
-
+abstract class File extends Node implements IFile
+{
     /**
      * Updates the data
      *
@@ -22,8 +22,8 @@ abstract class File extends Node implements IFile {
      * @param resource $data
      * @return void
      */
-    public function put($data) {
-
+    public function put($data)
+    {
         throw new Exception\Forbidden('Permission denied to change data');
 
     }
@@ -35,8 +35,8 @@ abstract class File extends Node implements IFile {
      *
      * @return mixed
      */
-    public function get() {
-
+    public function get()
+    {
         throw new Exception\Forbidden('Permission denied to read this file');
 
     }
@@ -46,8 +46,8 @@ abstract class File extends Node implements IFile {
      *
      * @return int
      */
-    public function getSize() {
-
+    public function getSize()
+    {
         return 0;
 
     }
@@ -62,8 +62,8 @@ abstract class File extends Node implements IFile {
      *
      * @return string|null
      */
-    public function getETag() {
-
+    public function getETag()
+    {
         return null;
 
     }
@@ -75,11 +75,10 @@ abstract class File extends Node implements IFile {
      *
      * @return string|null
      */
-    public function getContentType() {
-
+    public function getContentType()
+    {
         return null;
 
     }
 
 }
-

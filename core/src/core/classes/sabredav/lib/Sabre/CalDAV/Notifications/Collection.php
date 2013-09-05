@@ -20,8 +20,8 @@ use Sabre\DAVACL;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Collection extends DAV\Collection implements ICollection, DAVACL\IACL {
-
+class Collection extends DAV\Collection implements ICollection, DAVACL\IACL
+{
     /**
      * The notification backend
      *
@@ -42,8 +42,8 @@ class Collection extends DAV\Collection implements ICollection, DAVACL\IACL {
      * @param CalDAV\Backend\NotificationSupport $caldavBackend
      * @param string $principalUri
      */
-    public function __construct(CalDAV\Backend\NotificationSupport $caldavBackend, $principalUri) {
-
+    public function __construct(CalDAV\Backend\NotificationSupport $caldavBackend, $principalUri)
+    {
         $this->caldavBackend = $caldavBackend;
         $this->principalUri = $principalUri;
 
@@ -54,12 +54,12 @@ class Collection extends DAV\Collection implements ICollection, DAVACL\IACL {
      *
      * @return array
      */
-    public function getChildren() {
-
+    public function getChildren()
+    {
         $children = array();
         $notifications = $this->caldavBackend->getNotificationsForPrincipal($this->principalUri);
 
-        foreach($notifications as $notification) {
+        foreach ($notifications as $notification) {
 
             $children[] = new Node(
                 $this->caldavBackend,
@@ -77,8 +77,8 @@ class Collection extends DAV\Collection implements ICollection, DAVACL\IACL {
      *
      * @return string
      */
-    public function getName() {
-
+    public function getName()
+    {
         return 'notifications';
 
     }
@@ -90,8 +90,8 @@ class Collection extends DAV\Collection implements ICollection, DAVACL\IACL {
      *
      * @return string|null
      */
-    public function getOwner() {
-
+    public function getOwner()
+    {
         return $this->principalUri;
 
     }
@@ -103,8 +103,8 @@ class Collection extends DAV\Collection implements ICollection, DAVACL\IACL {
      *
      * @return string|null
      */
-    public function getGroup() {
-
+    public function getGroup()
+    {
         return null;
 
     }
@@ -121,8 +121,8 @@ class Collection extends DAV\Collection implements ICollection, DAVACL\IACL {
      *
      * @return array
      */
-    public function getACL() {
-
+    public function getACL()
+    {
         return array(
             array(
                 'principal' => $this->getOwner(),
@@ -146,8 +146,8 @@ class Collection extends DAV\Collection implements ICollection, DAVACL\IACL {
      * @param array $acl
      * @return void
      */
-    public function setACL(array $acl) {
-
+    public function setACL(array $acl)
+    {
         throw new DAV\Exception\NotImplemented('Updating ACLs is not implemented here');
 
     }
@@ -164,8 +164,8 @@ class Collection extends DAV\Collection implements ICollection, DAVACL\IACL {
      *
      * @return array|null
      */
-    public function getSupportedPrivilegeSet() {
-
+    public function getSupportedPrivilegeSet()
+    {
         return null;
 
     }

@@ -17,8 +17,8 @@ use Sabre\HTTP;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-abstract class AbstractBasic implements BackendInterface {
-
+abstract class AbstractBasic implements BackendInterface
+{
     /**
      * This variable holds the currently logged in username.
      *
@@ -45,7 +45,8 @@ abstract class AbstractBasic implements BackendInterface {
      *
      * @return string|null
      */
-    public function getCurrentUser() {
+    public function getCurrentUser()
+    {
         return $this->currentUser;
     }
 
@@ -61,8 +62,8 @@ abstract class AbstractBasic implements BackendInterface {
      * @throws DAV\Exception\NotAuthenticated
      * @return bool
      */
-    public function authenticate(DAV\Server $server, $realm) {
-
+    public function authenticate(DAV\Server $server, $realm)
+    {
         $auth = new HTTP\BasicAuth();
         $auth->setHTTPRequest($server->httpRequest);
         $auth->setHTTPResponse($server->httpResponse);
@@ -84,4 +85,3 @@ abstract class AbstractBasic implements BackendInterface {
 
 
 }
-

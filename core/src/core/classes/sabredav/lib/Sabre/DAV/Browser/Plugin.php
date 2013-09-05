@@ -17,8 +17,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Plugin extends DAV\ServerPlugin {
-
+class Plugin extends DAV\ServerPlugin
+{
     /**
      * List of default icons for nodes.
      *
@@ -78,8 +78,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param bool $enablePost
      * @param bool $enableAssets
      */
-    public function __construct($enablePost=true, $enableAssets = true) {
-
+    public function __construct($enablePost=true, $enableAssets = true)
+    {
         $this->enablePost = $enablePost;
         $this->enableAssets = $enableAssets;
 
@@ -91,8 +91,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param DAV\Server $server
      * @return void
      */
-    public function initialize(DAV\Server $server) {
-
+    public function initialize(DAV\Server $server)
+    {
         $this->server = $server;
         $this->server->subscribeEvent('beforeMethod',array($this,'httpGetInterceptor'));
         $this->server->subscribeEvent('onHTMLActionsPanel', array($this, 'htmlActionsPanel'),200);
@@ -106,8 +106,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $uri
      * @return bool
      */
-    public function httpGetInterceptor($method, $uri) {
-
+    public function httpGetInterceptor($method, $uri)
+    {
         if ($method !== 'GET') return true;
 
         // We're not using straight-up $_GET, because we want everything to be
@@ -148,8 +148,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $uri
      * @return bool
      */
-    public function httpPOSTHandler($method, $uri) {
-
+    public function httpPOSTHandler($method, $uri)
+    {
         if ($method!='POST') return;
         $contentType = $this->server->httpRequest->getHeader('Content-Type');
         list($contentType) = explode(';', $contentType);
@@ -164,7 +164,7 @@ class Plugin extends DAV\ServerPlugin {
 
         if ($this->server->broadcastEvent('onBrowserPostAction', array($uri, $postVars['sabreAction'], $postVars))) {
 
-            switch($postVars['sabreAction']) {
+            switch ($postVars['sabreAction']) {
 
                 case 'mkcol' :
                     if (isset($postVars['name']) && trim($postVars['name'])) {
@@ -204,8 +204,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $value
      * @return string
      */
-    public function escapeHTML($value) {
-
+    public function escapeHTML($value)
+    {
         return htmlspecialchars($value,ENT_QUOTES,'UTF-8');
 
     }
@@ -216,8 +216,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $path
      * @return string
      */
-    public function generateDirectoryIndex($path) {
-
+    public function generateDirectoryIndex($path)
+    {
         $version = '';
         if (DAV\Server::$exposeVersion) {
             $version = DAV\Version::VERSION ."-". DAV\Version::STABILITY;
@@ -270,7 +270,7 @@ class Plugin extends DAV\ServerPlugin {
 
         }
 
-        foreach($files as $file) {
+        foreach ($files as $file) {
 
             // This is the current directory, we can skip it
             if (rtrim($file['href'],'/')==$path) continue;
@@ -286,10 +286,10 @@ class Plugin extends DAV\ServerPlugin {
                 // resourcetype can have multiple values
                 if (!is_array($type)) $type = array($type);
 
-                foreach($type as $k=>$v) {
+                foreach ($type as $k=>$v) {
 
                     // Some name mapping is preferred
-                    switch($v) {
+                    switch ($v) {
                         case '{DAV:}collection' :
                             $type[$k] = 'Collection';
                             break;
@@ -327,7 +327,7 @@ class Plugin extends DAV\ServerPlugin {
             }
             if (!$type) $type = 'Unknown';
 
-            $size = isset($file[200]['{DAV:}getcontentlength'])?(int)$file[200]['{DAV:}getcontentlength']:'';
+            $size = isset($file[200]['{DAV:}getcontentlength'])?(int) $file[200]['{DAV:}getcontentlength']:'';
             $lastmodified = isset($file[200]['{DAV:}getlastmodified'])?$file[200]['{DAV:}getlastmodified']->getTime()->format(\DateTime::ATOM):'';
 
             $fullPath = DAV\URLUtil::encodePath('/' . trim($this->server->getBaseUri() . ($path?$path . '/':'') . $name,'/'));
@@ -341,7 +341,7 @@ class Plugin extends DAV\ServerPlugin {
 
             if ($this->enableAssets) {
                 $node = $this->server->tree->getNodeForPath(($path?$path.'/':'') . $name);
-                foreach(array_reverse($this->iconMap) as $class=>$iconName) {
+                foreach (array_reverse($this->iconMap) as $class=>$iconName) {
 
                     if ($node instanceof $class) {
                         $icon = '<a href="' . $fullPath . '"><img src="' . $this->getAssetUrl($iconName . $this->iconExtension) . '" alt="" width="24" /></a>';
@@ -393,8 +393,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param mixed $output
      * @return void
      */
-    public function htmlActionsPanel(DAV\INode $node, &$output) {
-
+    public function htmlActionsPanel(DAV\INode $node, &$output)
+    {
         if (!$node instanceof DAV\ICollection)
             return;
 
@@ -427,8 +427,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $assetName
      * @return string
      */
-    protected function getAssetUrl($assetName) {
-
+    protected function getAssetUrl($assetName)
+    {
         return $this->server->getBaseUri() . '?sabreAction=asset&assetName=' . urlencode($assetName);
 
     }
@@ -439,8 +439,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $assetName
      * @return string
      */
-    protected function getLocalAssetPath($assetName) {
-
+    protected function getLocalAssetPath($assetName)
+    {
         $assetDir = __DIR__ . '/assets/';
         $path = $assetDir . $assetName;
 
@@ -457,14 +457,14 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $assetName
      * @return void
      */
-    protected function serveAsset($assetName) {
-
+    protected function serveAsset($assetName)
+    {
         $assetPath = $this->getLocalAssetPath($assetName);
         if (!file_exists($assetPath)) {
             throw new DAV\Exception\NotFound('Could not find an asset with this name');
         }
         // Rudimentary mime type detection
-        switch(strtolower(substr($assetPath,strpos($assetPath,'.')+1))) {
+        switch (strtolower(substr($assetPath,strpos($assetPath,'.')+1))) {
 
         case 'ico' :
             $mime = 'image/vnd.microsoft.icon';

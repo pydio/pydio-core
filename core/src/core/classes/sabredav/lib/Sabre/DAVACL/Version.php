@@ -9,8 +9,8 @@ namespace Sabre\DAVACL;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Version {
-
+class Version
+{
     /**
      * Full version number
      */

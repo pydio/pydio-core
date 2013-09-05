@@ -18,8 +18,8 @@ namespace Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class URLUtil {
-
+class URLUtil
+{
     /**
      * Encodes the path of a url.
      *
@@ -28,8 +28,8 @@ class URLUtil {
      * @param string $path
      * @return string
      */
-    static function encodePath($path) {
-
+    public static function encodePath($path)
+    {
         return preg_replace_callback('/([^A-Za-z0-9_\-\.~\(\)\/])/',function($match) {
 
             return '%'.sprintf('%02x',ord($match[0]));
@@ -46,8 +46,8 @@ class URLUtil {
      * @param string $pathSegment
      * @return string
      */
-    static function encodePathSegment($pathSegment) {
-
+    public static function encodePathSegment($pathSegment)
+    {
         return preg_replace_callback('/([^A-Za-z0-9_\-\.~\(\)])/',function($match) {
 
             return '%'.sprintf('%02x',ord($match[0]));
@@ -61,8 +61,8 @@ class URLUtil {
      * @param string $path
      * @return string
      */
-    static function decodePath($path) {
-
+    public static function decodePath($path)
+    {
         return self::decodePathSegment($path);
 
     }
@@ -73,12 +73,12 @@ class URLUtil {
      * @param string $path
      * @return string
      */
-    static function decodePathSegment($path) {
-
+    public static function decodePathSegment($path)
+    {
         $path = rawurldecode($path);
         $encoding = mb_detect_encoding($path, array('UTF-8','ISO-8859-1'));
 
-        switch($encoding) {
+        switch ($encoding) {
 
             case 'ISO-8859-1' :
                 $path = utf8_encode($path);
@@ -107,10 +107,10 @@ class URLUtil {
      * @param string $path
      * @return array
      */
-    static function splitPath($path) {
-
+    public static function splitPath($path)
+    {
         $matches = array();
-        if(preg_match('/^(?:(?:(.*)(?:\/+))?([^\/]+))(?:\/?)$/u',$path,$matches)) {
+        if (preg_match('/^(?:(?:(.*)(?:\/+))?([^\/]+))(?:\/?)$/u',$path,$matches)) {
             return array($matches[1],$matches[2]);
         } else {
             return array(null,null);

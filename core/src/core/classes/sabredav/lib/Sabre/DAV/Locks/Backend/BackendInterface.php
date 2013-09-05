@@ -12,8 +12,8 @@ use Sabre\DAV\Locks;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-interface BackendInterface {
-
+interface BackendInterface
+{
     /**
      * Returns a list of Sabre\DAV\Locks\LockInfo objects
      *
@@ -48,4 +48,3 @@ interface BackendInterface {
     public function unlock($uri,Locks\LockInfo $lockInfo);
 
 }
-

@@ -27,17 +27,17 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class AJXP_Sabre_RootCollection extends Sabre\DAV\SimpleCollection
 {
 
-    function getChildren(){
-
+    public function getChildren()
+    {
         $this->children = array();
         $u = AuthService::getLoggedUser();
-        if($u != null){
+        if ($u != null) {
             $repos = ConfService::getAccessibleRepositories($u);
             // Refilter to make sure the driver is an AjxpWebdavProvider
-            foreach($repos as $repository){
+            foreach ($repos as $repository) {
                 $accessType = $repository->getAccessType();
                 $driver = AJXP_PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
-                if(is_a($driver, "AjxpWrapperProvider")){
+                if (is_a($driver, "AjxpWrapperProvider")) {
                     $this->children[$repository->getSlug()] = new Sabre\DAV\SimpleCollection($repository->getSlug());
                 }
             }
@@ -45,12 +45,14 @@ class AJXP_Sabre_RootCollection extends Sabre\DAV\SimpleCollection
         return $this->children;
     }
 
-    function childExists($name){
+    public function childExists($name)
+    {
         $c = $this->getChildren();
         return array_key_exists($name, $c);
     }
 
-    function getChild($name){
+    public function getChild($name)
+    {
         $c = $this->getChildren();
         return $c[$name];
     }

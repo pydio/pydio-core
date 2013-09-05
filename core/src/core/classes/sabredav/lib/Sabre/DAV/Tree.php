@@ -9,8 +9,8 @@ namespace Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-abstract class Tree {
-
+abstract class Tree
+{
     /**
      * This function must return an INode object for a path
      * If a Path doesn't exist, thrown a Exception_NotFound
@@ -19,7 +19,7 @@ abstract class Tree {
      * @throws Exception\NotFound
      * @return INode
      */
-    abstract function getNodeForPath($path);
+    abstract public function getNodeForPath($path);
 
     /**
      * This function allows you to check if a node exists.
@@ -30,8 +30,8 @@ abstract class Tree {
      * @param string $path
      * @return bool
      */
-    public function nodeExists($path) {
-
+    public function nodeExists($path)
+    {
         try {
 
             $this->getNodeForPath($path);
@@ -52,8 +52,8 @@ abstract class Tree {
      * @param string $destinationPath The full destination path
      * @return void
      */
-    public function copy($sourcePath, $destinationPath) {
-
+    public function copy($sourcePath, $destinationPath)
+    {
         $sourceNode = $this->getNodeForPath($sourcePath);
 
         // grab the dirname and basename components
@@ -73,8 +73,8 @@ abstract class Tree {
      * @param string $destinationPath The full destination path, so not just the destination parent node
      * @return int
      */
-    public function move($sourcePath, $destinationPath) {
-
+    public function move($sourcePath, $destinationPath)
+    {
         list($sourceDir, $sourceName) = URLUtil::splitPath($sourcePath);
         list($destinationDir, $destinationName) = URLUtil::splitPath($destinationPath);
 
@@ -96,8 +96,8 @@ abstract class Tree {
      * @param string $path
      * @return void
      */
-    public function delete($path) {
-
+    public function delete($path)
+    {
         $node = $this->getNodeForPath($path);
         $node->delete();
 
@@ -112,8 +112,8 @@ abstract class Tree {
      * @param string $path
      * @return array
      */
-    public function getChildren($path) {
-
+    public function getChildren($path)
+    {
         $node = $this->getNodeForPath($path);
         return $node->getChildren();
 
@@ -137,9 +137,8 @@ abstract class Tree {
      * @param string $path
      * @return void
      */
-    public function markDirty($path) {
-
-
+    public function markDirty($path)
+    {
     }
 
     /**
@@ -150,8 +149,8 @@ abstract class Tree {
      * @param string $destinationName
      * @return void
      */
-    protected function copyNode(INode $source,ICollection $destinationParent,$destinationName = null) {
-
+    protected function copyNode(INode $source,ICollection $destinationParent,$destinationName = null)
+    {
         if (!$destinationName) $destinationName = $source->getName();
 
         if ($source instanceof IFile) {
@@ -173,7 +172,7 @@ abstract class Tree {
             $destinationParent->createDirectory($destinationName);
 
             $destination = $destinationParent->getChild($destinationName);
-            foreach($source->getChildren() as $child) {
+            foreach ($source->getChildren() as $child) {
 
                 $this->copyNode($child,$destination);
 
@@ -190,4 +189,3 @@ abstract class Tree {
     }
 
 }
-

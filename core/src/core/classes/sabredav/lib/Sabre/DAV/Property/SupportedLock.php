@@ -14,8 +14,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class SupportedLock extends DAV\Property {
-
+class SupportedLock extends DAV\Property
+{
     /**
      * supportsLocks
      *
@@ -28,8 +28,8 @@ class SupportedLock extends DAV\Property {
      *
      * @param mixed $supportsLocks
      */
-    public function __construct($supportsLocks) {
-
+    public function __construct($supportsLocks)
+    {
         $this->supportsLocks = $supportsLocks;
 
     }
@@ -41,8 +41,8 @@ class SupportedLock extends DAV\Property {
      * @param \DOMElement $prop
      * @return void
      */
-    public function serialize(DAV\Server $server,\DOMElement $prop) {
-
+    public function serialize(DAV\Server $server,\DOMElement $prop)
+    {
         $doc = $prop->ownerDocument;
 
         if (!$this->supportsLocks) return null;
@@ -75,4 +75,3 @@ class SupportedLock extends DAV\Property {
     }
 
 }
-

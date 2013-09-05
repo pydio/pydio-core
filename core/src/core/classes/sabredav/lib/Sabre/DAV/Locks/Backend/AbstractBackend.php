@@ -15,7 +15,6 @@ use Sabre\DAV\Locks;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-abstract class AbstractBackend implements BackendInterface {
-
+abstract class AbstractBackend implements BackendInterface
+{
 }
-

@@ -12,8 +12,8 @@ namespace Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-abstract class Collection extends Node implements ICollection {
-
+abstract class Collection extends Node implements ICollection
+{
     /**
      * Returns a child object, by its name.
      *
@@ -28,9 +28,9 @@ abstract class Collection extends Node implements ICollection {
      * @throws Exception\NotFound
      * @return INode
      */
-    public function getChild($name) {
-
-        foreach($this->getChildren() as $child) {
+    public function getChild($name)
+    {
+        foreach ($this->getChildren() as $child) {
 
             if ($child->getName()==$name) return $child;
 
@@ -47,14 +47,14 @@ abstract class Collection extends Node implements ICollection {
      * @param string $name
      * @return bool
      */
-    public function childExists($name) {
-
+    public function childExists($name)
+    {
         try {
 
             $this->getChild($name);
             return true;
 
-        } catch(Exception\NotFound $e) {
+        } catch (Exception\NotFound $e) {
 
             return false;
 
@@ -86,8 +86,8 @@ abstract class Collection extends Node implements ICollection {
      * @param resource|string $data Initial payload
      * @return null|string
      */
-    public function createFile($name, $data = null) {
-
+    public function createFile($name, $data = null)
+    {
         throw new Exception\Forbidden('Permission denied to create file (filename ' . $name . ')');
 
     }
@@ -99,12 +99,11 @@ abstract class Collection extends Node implements ICollection {
      * @throws Exception\Forbidden
      * @return void
      */
-    public function createDirectory($name) {
-
+    public function createDirectory($name)
+    {
         throw new Exception\Forbidden('Permission denied to create directory');
 
     }
 
 
 }
-

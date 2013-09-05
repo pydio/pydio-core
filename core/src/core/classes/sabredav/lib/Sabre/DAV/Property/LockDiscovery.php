@@ -13,8 +13,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class LockDiscovery extends DAV\Property {
-
+class LockDiscovery extends DAV\Property
+{
     /**
      * locks
      *
@@ -35,7 +35,7 @@ class LockDiscovery extends DAV\Property {
      * It was reported that showing the lockroot in the response can break
      * Office 2000 compatibility.
      */
-    static public $hideLockRoot = false;
+    public static $hideLockRoot = false;
 
     /**
      * __construct
@@ -43,8 +43,8 @@ class LockDiscovery extends DAV\Property {
      * @param array $locks
      * @param bool $revealLockToken
      */
-    public function __construct($locks, $revealLockToken = false) {
-
+    public function __construct($locks, $revealLockToken = false)
+    {
         $this->locks = $locks;
         $this->revealLockToken = $revealLockToken;
 
@@ -57,11 +57,11 @@ class LockDiscovery extends DAV\Property {
      * @param \DOMElement $prop
      * @return void
      */
-    public function serialize(DAV\Server $server, \DOMElement $prop) {
-
+    public function serialize(DAV\Server $server, \DOMElement $prop)
+    {
         $doc = $prop->ownerDocument;
 
-        foreach($this->locks as $lock) {
+        foreach ($this->locks as $lock) {
 
             $activeLock = $doc->createElementNS('DAV:','d:activelock');
             $prop->appendChild($activeLock);
@@ -101,4 +101,3 @@ class LockDiscovery extends DAV\Property {
     }
 
 }
-

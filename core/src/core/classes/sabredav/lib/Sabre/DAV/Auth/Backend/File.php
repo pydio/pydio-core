@@ -10,11 +10,11 @@ use Sabre\DAV;
  * The backend file must conform to Apache's htdigest format
  *
  * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/) 
+ * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class File extends AbstractDigest {
-
+class File extends AbstractDigest
+{
     /**
      * List of users
      *
@@ -29,8 +29,8 @@ class File extends AbstractDigest {
      *
      * @param string|null $filename
      */
-    public function __construct($filename=null) {
-
+    public function __construct($filename=null)
+    {
         if (!is_null($filename))
             $this->loadFile($filename);
 
@@ -43,9 +43,9 @@ class File extends AbstractDigest {
      * @param string $filename
      * @return void
      */
-    public function loadFile($filename) {
-
-        foreach(file($filename,FILE_IGNORE_NEW_LINES) as $line) {
+    public function loadFile($filename)
+    {
+        foreach (file($filename,FILE_IGNORE_NEW_LINES) as $line) {
 
             if (substr_count($line, ":") !== 2)
                 throw new DAV\Exception('Malformed htdigest file. Every line should contain 2 colons');
@@ -68,8 +68,8 @@ class File extends AbstractDigest {
      * @param string $username
      * @return string
      */
-    public function getDigestHash($realm, $username) {
-
+    public function getDigestHash($realm, $username)
+    {
         return isset($this->users[$realm . ':' . $username])?$this->users[$realm . ':' . $username]:false;
 
     }

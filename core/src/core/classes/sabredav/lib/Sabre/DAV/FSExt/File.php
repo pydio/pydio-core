@@ -10,8 +10,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class File extends Node implements DAV\PartialUpdate\IFile {
-
+class File extends Node implements DAV\PartialUpdate\IFile
+{
     /**
      * Updates the data
      *
@@ -20,8 +20,8 @@ class File extends Node implements DAV\PartialUpdate\IFile {
      * @param resource|string $data
      * @return string
      */
-    public function put($data) {
-
+    public function put($data)
+    {
         file_put_contents($this->path,$data);
         return '"' . md5_file($this->path) . '"';
 
@@ -37,8 +37,8 @@ class File extends Node implements DAV\PartialUpdate\IFile {
      * param resource|string $data
      * @return void
      */
-    public function putRange($data, $offset) {
-
+    public function putRange($data, $offset)
+    {
         $f = fopen($this->path, 'c');
         fseek($f,$offset-1);
         if (is_string($data)) {
@@ -56,8 +56,8 @@ class File extends Node implements DAV\PartialUpdate\IFile {
      *
      * @return resource
      */
-    public function get() {
-
+    public function get()
+    {
         return fopen($this->path,'r');
 
     }
@@ -67,8 +67,8 @@ class File extends Node implements DAV\PartialUpdate\IFile {
      *
      * @return bool
      */
-    public function delete() {
-
+    public function delete()
+    {
         unlink($this->path);
         return parent::delete();
 
@@ -84,8 +84,8 @@ class File extends Node implements DAV\PartialUpdate\IFile {
      *
      * @return string|null
      */
-    public function getETag() {
-
+    public function getETag()
+    {
         return '"' . md5_file($this->path). '"';
 
     }
@@ -97,8 +97,8 @@ class File extends Node implements DAV\PartialUpdate\IFile {
      *
      * @return string|null
      */
-    public function getContentType() {
-
+    public function getContentType()
+    {
         return null;
 
     }
@@ -108,11 +108,10 @@ class File extends Node implements DAV\PartialUpdate\IFile {
      *
      * @return int
      */
-    public function getSize() {
-
+    public function getSize()
+    {
         return filesize($this->path);
 
     }
 
 }
-

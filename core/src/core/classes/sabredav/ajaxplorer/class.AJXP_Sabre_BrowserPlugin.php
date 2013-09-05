@@ -29,13 +29,14 @@ class AJXP_Sabre_BrowserPlugin extends Sabre\DAV\Browser\Plugin
 
     protected $repositoryLabel;
 
-    function __construct($currentRepositoryLabel = null){
+    public function __construct($currentRepositoryLabel = null)
+    {
         parent::__construct(false, true);
         $this->repositoryLabel = $currentRepositoryLabel;
     }
 
-    function generateDirectoryIndex($path){
-
+    public function generateDirectoryIndex($path)
+    {
         $html = parent::generateDirectoryIndex($path);
         $html = str_replace("image/vnd.microsoft.icon", "image/png", $html);
 
@@ -43,7 +44,7 @@ class AJXP_Sabre_BrowserPlugin extends Sabre\DAV\Browser\Plugin
         $html = preg_replace("/<title>(.*)<\/title>/i", '<title>'.$title.'</title>', $html);
 
         $repoString = "</h1>";
-        if(!empty($this->repositoryLabel)){
+        if (!empty($this->repositoryLabel)) {
             $repoString = " - ".$this->repositoryLabel."</h1><h2>Index of ".$this->escapeHTML($path)."/</h2>";
         }
         $html = preg_replace("/<h1>(.*)<\/h1>/i", "<h1>".$title.$repoString, $html);
@@ -54,8 +55,9 @@ class AJXP_Sabre_BrowserPlugin extends Sabre\DAV\Browser\Plugin
 
     }
 
-    function getLocalAssetPath($name){
-        if($name != "favicon.ico") {
+    public function getLocalAssetPath($name)
+    {
+        if ($name != "favicon.ico") {
             return parent::getLocalAssetPath($name);
         }
         return AJXP_INSTALL_PATH."/plugins/gui.ajax/res/themes/umbra/images/html-folder.png";

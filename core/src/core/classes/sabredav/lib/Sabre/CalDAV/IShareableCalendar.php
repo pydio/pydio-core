@@ -9,8 +9,8 @@ namespace Sabre\CalDAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-interface IShareableCalendar extends ICalendar {
-
+interface IShareableCalendar extends ICalendar
+{
     /**
      * Updates the list of shares.
      *
@@ -29,7 +29,7 @@ interface IShareableCalendar extends ICalendar {
      * @param array $remove
      * @return void
      */
-    function updateShares(array $add, array $remove);
+    public function updateShares(array $add, array $remove);
 
     /**
      * Returns the list of people whom this calendar is shared with.
@@ -43,6 +43,6 @@ interface IShareableCalendar extends ICalendar {
      *
      * @return array
      */
-    function getShares();
+    public function getShares();
 
 }

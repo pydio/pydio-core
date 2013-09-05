@@ -18,7 +18,6 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-interface ICollection extends DAV\ICollection {
-
-
+interface ICollection extends DAV\ICollection
+{
 }

@@ -16,8 +16,8 @@ use Sabre\DAVACL;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Outbox extends DAV\Collection implements IOutbox {
-
+class Outbox extends DAV\Collection implements IOutbox
+{
     /**
      * The principal Uri
      *
@@ -30,8 +30,8 @@ class Outbox extends DAV\Collection implements IOutbox {
      *
      * @param string $principalUri
      */
-    public function __construct($principalUri) {
-
+    public function __construct($principalUri)
+    {
         $this->principalUri = $principalUri;
 
     }
@@ -43,8 +43,8 @@ class Outbox extends DAV\Collection implements IOutbox {
      *
      * @return string
      */
-    public function getName() {
-
+    public function getName()
+    {
         return 'outbox';
 
     }
@@ -54,8 +54,8 @@ class Outbox extends DAV\Collection implements IOutbox {
      *
      * @return \Sabre\DAV\INode[]
      */
-    public function getChildren() {
-
+    public function getChildren()
+    {
         return array();
 
     }
@@ -67,8 +67,8 @@ class Outbox extends DAV\Collection implements IOutbox {
      *
      * @return string|null
      */
-    public function getOwner() {
-
+    public function getOwner()
+    {
         return $this->principalUri;
 
     }
@@ -80,8 +80,8 @@ class Outbox extends DAV\Collection implements IOutbox {
      *
      * @return string|null
      */
-    public function getGroup() {
-
+    public function getGroup()
+    {
         return null;
 
     }
@@ -98,8 +98,8 @@ class Outbox extends DAV\Collection implements IOutbox {
      *
      * @return array
      */
-    public function getACL() {
-
+    public function getACL()
+    {
         return array(
             array(
                 'privilege' => '{' . CalDAV\Plugin::NS_CALDAV . '}schedule-query-freebusy',
@@ -128,8 +128,8 @@ class Outbox extends DAV\Collection implements IOutbox {
      * @param array $acl
      * @return void
      */
-    public function setACL(array $acl) {
-
+    public function setACL(array $acl)
+    {
         throw new DAV\Exception\MethodNotAllowed('You\'re not allowed to update the ACL');
 
     }
@@ -146,8 +146,8 @@ class Outbox extends DAV\Collection implements IOutbox {
      *
      * @return array|null
      */
-    public function getSupportedPrivilegeSet() {
-
+    public function getSupportedPrivilegeSet()
+    {
         $default = DAVACL\Plugin::getDefaultSupportedPrivilegeSet();
         $default['aggregates'][] = array(
             'privilege' => '{' . CalDAV\Plugin::NS_CALDAV . '}schedule-query-freebusy',
