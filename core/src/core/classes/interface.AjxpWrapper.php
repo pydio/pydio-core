@@ -28,13 +28,13 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 interface AjxpWrapper
 {
-	/**
-	 * Get a "usable" reference to a file : the real file or a tmp copy.
-	 *
-	 * @param unknown_type $path
-	 */
+    /**
+     * Get a "usable" reference to a file : the real file or a tmp copy.
+     *
+     * @param unknown_type $path
+     */
     public static function getRealFSReference($path);
-    
+
     /**
      * Read a file (by chunks) and copy the data directly inside the given stream.
      *
@@ -42,14 +42,14 @@ interface AjxpWrapper
      * @param unknown_type $stream
      */
     public static function copyFileInStream($path, $stream);
-    
+
     /**
      * Chmod implementation for this type of access.
      *
      * @param unknown_type $path
      * @param unknown_type $chmodValue
      */
-    public static function changeMode($path, $chmodValue);	
+    public static function changeMode($path, $chmodValue);
 
     /**
      * Describe whether the current wrapper operates on a remote server or not.
@@ -203,5 +203,4 @@ interface AjxpWrapper
      * @return array
      */
     public function url_stat($path , $flags);
-} 
-?>
+}

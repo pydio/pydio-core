@@ -26,27 +26,28 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer
  * @subpackage Core
  */
-class AJXP_Node{
+class AJXP_Node
+{
     /**
      * @var string URL of the node in the form ajxp.protocol://repository_id/path/to/node
      */
-	protected $_url;
+    protected $_url;
     /**
      * @var array The node metadata
      */
-	protected $_metadata = array();
+    protected $_metadata = array();
     /**
      * @var string Associated wrapper
      */
-	protected $_wrapperClassName;
+    protected $_wrapperClassName;
     /**
      * @var array Parsed url fragments
      */
-	protected $urlParts = array();
+    protected $urlParts = array();
     /**
      * @var string A local representation of a real file, if possible
      */
-	protected $realFilePointer;
+    protected $realFilePointer;
     /**
      * @var bool Whether the core information of the node is already loaded or not
      */
@@ -73,12 +74,14 @@ class AJXP_Node{
      * @param string $url URL of the node in the form ajxp.protocol://repository_id/path/to/node
      * @param array $metadata Node metadata
      */
-	public function __construct($url, $metadata = array()){
+    public function __construct($url, $metadata = array())
+    {
         $this->setUrl($url);
-		$this->_metadata = $metadata;
-	}
+        $this->_metadata = $metadata;
+    }
 
-    public function __sleep(){
+    public function __sleep()
+    {
         $t = array_diff(array_keys(get_class_vars("AJXP_Node")), array("_accessDriver", "_repository", "_metaStore"));
         return $t;
     }
@@ -87,19 +90,21 @@ class AJXP_Node{
      * @param String $url of the node in the form ajxp.protocol://repository_id/path/to/node
      * @return void
      */
-    public function setUrl($url){
+    public function setUrl($url)
+    {
         $this->_url = $url;
         // Clean url
         $testExp = explode("//", $url);
-        if(count($testExp) > 1){
+        if (count($testExp) > 1) {
             $this->_url = array_shift($testExp)."//";
             $this->_url .= implode("/", $testExp);
         }
         $this->parseUrl();
     }
 
-    public function getRepository(){
-        if(!isSet($this->_repository)){
+    public function getRepository()
+    {
+        if (!isSet($this->_repository)) {
             $this->_repository = ConfService::getRepositoryById($this->urlParts["host"]);
         }
         return $this->_repository;
@@ -108,10 +113,11 @@ class AJXP_Node{
     /**
      * @return AbstractAccessDriver
      */
-    public function getDriver(){
-        if(!isSet($this->_accessDriver)){
+    public function getDriver()
+    {
+        if (!isSet($this->_accessDriver)) {
             $repo = $this->getRepository();
-            if($repo != null){
+            if ($repo != null) {
                 $this->_accessDriver = ConfService::loadDriverForRepository($repo);
             }
         }
@@ -121,22 +127,25 @@ class AJXP_Node{
     /**
      * @param AbstractAccessDriver
      */
-    public function setDriver($accessDriver){
+    public function setDriver($accessDriver)
+    {
         $this->_accessDriver = $accessDriver;
     }
 
     /**
      * @return MetaStoreProvider
      */
-    protected function getMetaStore(){
-        if(!isSet($this->_metaStore)){
+    protected function getMetaStore()
+    {
+        if (!isSet($this->_metaStore)) {
             $this->getDriver();
             $this->_metaStore = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
         }
         return $this->_metaStore;
     }
 
-    public function hasMetaStore(){
+    public function hasMetaStore()
+    {
         return ($this->getMetaStore() != false);
     }
 
@@ -147,12 +156,13 @@ class AJXP_Node{
      * @param int $scope
      * @param bool $indexable
      */
-    public function setMetadata($nameSpace, $metaData, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false){
+    public function setMetadata($nameSpace, $metaData, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false)
+    {
         $metaStore = $this->getMetaStore();
-        if($metaStore !== false){
+        if ($metaStore !== false) {
             $metaStore->setMetadata($this, $nameSpace, $metaData, $private, $scope);
             //$this->mergeMetadata($metaData);
-            if($indexable){
+            if ($indexable) {
                 if(!isSet($this->_indexableMetaKeys[$private ? "user":"shared"]))$this->_indexableMetaKeys[$private ? "user":"shared"] = array();
                 $this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace] = $nameSpace;
             }
@@ -167,11 +177,12 @@ class AJXP_Node{
      * @param int $scope
      * @param bool $indexable
      */
-    public function removeMetadata($nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false){
+    public function removeMetadata($nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false)
+    {
         $metaStore = $this->getMetaStore();
-        if($metaStore !== false){
+        if ($metaStore !== false) {
             $metaStore->removeMetadata($this, $nameSpace, $private, $scope);
-            if($indexable && isSet($this->_indexableMetaKeys[$private ? "user":"shared"]) && isset($this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace])){
+            if ($indexable && isSet($this->_indexableMetaKeys[$private ? "user":"shared"]) && isset($this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace])) {
                 unset($this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace]);
             }
             AJXP_Controller::applyHook("node.meta_change", array(&$this));
@@ -184,11 +195,12 @@ class AJXP_Node{
      * @param bool $private
      * @param int $scope
      */
-    public function retrieveMetadata($nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false){
+    public function retrieveMetadata($nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false)
+    {
         $metaStore = $this->getMetaStore();
-        if($metaStore !== false){
+        if ($metaStore !== false) {
             $data = $metaStore->retrieveMetadata($this, $nameSpace, $private, $scope);
-            if(!empty($data) && $indexable){
+            if (!empty($data) && $indexable) {
                 if(!isSet($this->_indexableMetaKeys[$private ? "user":"shared"]))$this->_indexableMetaKeys[$private ? "user":"shared"] = array();
                 $this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace] = $nameSpace;
             }
@@ -201,14 +213,16 @@ class AJXP_Node{
      * @param bool $boolean Leaf or Collection?
      * @return void
      */
-    public function setLeaf($boolean){
+    public function setLeaf($boolean)
+    {
         $this->_metadata["is_file"] = $boolean;
     }
 
     /**
      * @return bool
      */
-    public function isLeaf(){
+    public function isLeaf()
+    {
         return isSet($this->_metadata["is_file"])?$this->_metadata["is_file"]:true;
     }
 
@@ -216,14 +230,16 @@ class AJXP_Node{
      * @param $label String Main label, will set the metadata "text" key.
      * @return void
      */
-    public function setLabel($label){
+    public function setLabel($label)
+    {
         $this->_metadata["text"] = $label;
     }
 
     /**
      * @return string Try to get the metadata "text" key, or the basename of the node path.
      */
-    public function getLabel(){
+    public function getLabel()
+    {
         return isSet($this->_metadata["text"])? $this->_metadata["text"] : basename($this->urlParts["path"]);
     }
 
@@ -231,7 +247,8 @@ class AJXP_Node{
      * List all set metadata keys
      * @return array
      */
-    public function listMetaKeys(){
+    public function listMetaKeys()
+    {
         return array_keys($this->_metadata);
     }
 
@@ -243,11 +260,12 @@ class AJXP_Node{
      * @param mixed $details A specification of expected metadata fields, or minimal
      * @return void
      */
-    public function loadNodeInfo($forceRefresh = false, $contextNode = false, $details = false){
+    public function loadNodeInfo($forceRefresh = false, $contextNode = false, $details = false)
+    {
         if($this->nodeInfoLoaded && !$forceRefresh) return;
-        if(!empty($this->_wrapperClassName)){
+        if (!empty($this->_wrapperClassName)) {
             $registered = AJXP_PluginsService::getInstance()->getRegisteredWrappers();
-            if(!isSet($registered[$this->getScheme()])){
+            if (!isSet($registered[$this->getScheme()])) {
                 $this->getDriver()->detectStreamWrapper(true);
             }
         }
@@ -260,42 +278,47 @@ class AJXP_Node{
      * This will last the time of the script and will be removed afterward.
      * @return string
      */
-	public function getRealFile(){
-		if(!isset($this->realFilePointer)){
-			$this->realFilePointer = call_user_func(array($this->_wrapperClassName, "getRealFSReference"), $this->_url, true);
-			$isRemote = call_user_func(array($this->_wrapperClassName, "isRemote"));
-			if($isRemote){
-				register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $this->realFilePointer);
-			}
-		}
-		return $this->realFilePointer;
-	}
+    public function getRealFile()
+    {
+        if (!isset($this->realFilePointer)) {
+            $this->realFilePointer = call_user_func(array($this->_wrapperClassName, "getRealFSReference"), $this->_url, true);
+            $isRemote = call_user_func(array($this->_wrapperClassName, "isRemote"));
+            if ($isRemote) {
+                register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $this->realFilePointer);
+            }
+        }
+        return $this->realFilePointer;
+    }
 
     /**
      * @return string URL of the node in the form ajxp.protocol://repository_id/path/to/node
      */
-	public function getUrl(){
-		return $this->_url;
-	}
+    public function getUrl()
+    {
+        return $this->_url;
+    }
 
     /**
      * @return string The path from the root of the repository
      */
-	public function getPath(){
-		return $this->urlParts["path"];
-	}
+    public function getPath()
+    {
+        return $this->urlParts["path"];
+    }
 
     /**
      * @return string The scheme part of the url
      */
-	public function getScheme(){
-		return $this->urlParts["scheme"];
-	}
+    public function getScheme()
+    {
+        return $this->urlParts["scheme"];
+    }
 
     /**
      * @return string The repository identifer
      */
-    public function getRepositoryId(){
+    public function getRepositoryId()
+    {
         return $this->urlParts["host"];
     }
 
@@ -305,42 +328,43 @@ class AJXP_Node{
      * @param bool $mergeValues
      * @return void
      */
-	public function mergeMetadata($metadata, $mergeValues = false){
-        if($mergeValues){
-            foreach($metadata as $key => $value){
-                if(isSet($this->_metadata[$key])){
+    public function mergeMetadata($metadata, $mergeValues = false)
+    {
+        if ($mergeValues) {
+            foreach ($metadata as $key => $value) {
+                if (isSet($this->_metadata[$key])) {
                     $existingValue = explode(",", $this->_metadata[$key]);
-                    if(!in_array($value, $existingValue)){
+                    if (!in_array($value, $existingValue)) {
                         array_push($existingValue, $value);
                         $this->_metadata[$key] = implode(",", $existingValue);
                     }
-                }else{
+                } else {
                     $this->_metadata[$key] = $value;
                 }
             }
-        }else{
+        } else {
             $this->_metadata = array_merge($this->_metadata, $metadata);
         }
-	}
+    }
 
     /**
      * Magic getter for metadata
      * @param $varName
      * @return array|null|string
      */
-	public function __get($varName){
-		
-		if(strtolower($varName) == "wrapperclassname") return $this->_wrapperClassName;
-		if(strtolower($varName) == "url") return $this->_url;
-		if(strtolower($varName) == "metadata") return $this->_metadata;
-		if(strtolower($varName) == "indexablemetakeys") return $this->_indexableMetaKeys;
+    public function __get($varName)
+    {
+        if(strtolower($varName) == "wrapperclassname") return $this->_wrapperClassName;
+        if(strtolower($varName) == "url") return $this->_url;
+        if(strtolower($varName) == "metadata") return $this->_metadata;
+        if(strtolower($varName) == "indexablemetakeys") return $this->_indexableMetaKeys;
 
-		if(isSet($this->_metadata[$varName])){
-			return $this->_metadata[$varName];
-		}else{
-			return null;
-		}
-	}
+        if (isSet($this->_metadata[$varName])) {
+            return $this->_metadata[$varName];
+        } else {
+            return null;
+        }
+    }
 
     /**
      * Magic setter for metadata
@@ -348,34 +372,36 @@ class AJXP_Node{
      * @param $metaValue
      * @return
      */
-	public function __set($metaName, $metaValue){
-		if(strtolower($metaName) == "metadata"){
-			$this->_metadata = $metaValue;
-			return;
-		}
+    public function __set($metaName, $metaValue)
+    {
+        if (strtolower($metaName) == "metadata") {
+            $this->_metadata = $metaValue;
+            return;
+        }
         if($metaValue == null) unset($this->_metadata[$metaName]);
         else $this->_metadata[$metaName] = $metaValue;
-	}
+    }
 
     /**
-     * Safe parseUrl implementation 
+     * Safe parseUrl implementation
      * @return void
      */
-	protected function parseUrl(){
-        if(strstr($this->_url, "#") !== false){
+    protected function parseUrl()
+    {
+        if (strstr($this->_url, "#") !== false) {
             $url = str_replace("#", "__HASH__", $this->_url);
             $this->urlParts = parse_url($url);
-            foreach($this->urlParts as $partKey => $partValue){
+            foreach ($this->urlParts as $partKey => $partValue) {
                 $this->urlParts[$partKey] = str_replace("__HASH__", "#", $partValue);
             }
-        }else{
+        } else {
             $this->urlParts = parse_url($this->_url);
         }
 
-		if(strstr($this->urlParts["scheme"], "ajxp.")!==false){
-			$pServ = AJXP_PluginsService::getInstance();
-			$this->_wrapperClassName = $pServ->getWrapperClassName($this->urlParts["scheme"]);
-		}
-	}
-	
+        if (strstr($this->urlParts["scheme"], "ajxp.")!==false) {
+            $pServ = AJXP_PluginsService::getInstance();
+            $this->_wrapperClassName = $pServ->getWrapperClassName($this->urlParts["scheme"]);
+        }
+    }
+
 }

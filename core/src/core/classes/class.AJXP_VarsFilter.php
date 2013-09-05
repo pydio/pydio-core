@@ -26,8 +26,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer
  * @subpackage Core
  */
-class AJXP_VarsFilter {
-
+class AJXP_VarsFilter
+{
     /**
      * Filter the very basic keywords from the XML  : AJXP_USER, AJXP_INSTALL_PATH, AJXP_DATA_PATH
      * Calls the vars.filter hooks.
@@ -35,46 +35,47 @@ class AJXP_VarsFilter {
      * @param $value
      * @return mixed|string
      */
-	public static function filter($value){
-		if(is_string($value) && strpos($value, "AJXP_USER")!==false){
-			if(AuthService::usersEnabled()){
-				$loggedUser = AuthService::getLoggedUser();
-				if($loggedUser != null){
-                    if($loggedUser->hasParent() && $loggedUser->getResolveAsParent()){
+    public static function filter($value)
+    {
+        if (is_string($value) && strpos($value, "AJXP_USER")!==false) {
+            if (AuthService::usersEnabled()) {
+                $loggedUser = AuthService::getLoggedUser();
+                if ($loggedUser != null) {
+                    if ($loggedUser->hasParent() && $loggedUser->getResolveAsParent()) {
                         $loggedUserId = $loggedUser->getParent();
-                    }else{
+                    } else {
                         $loggedUserId = $loggedUser->getId();
                     }
-					$value = str_replace("AJXP_USER", $loggedUserId, $value);
-				}else{
-					return "";
-				}
-			}else{
-				$value = str_replace("AJXP_USER", "shared", $value);
-			}
-		}
-		if(is_string($value) && strpos($value, "AJXP_GROUP_PATH")!==false){
-			if(AuthService::usersEnabled()){
-				$loggedUser = AuthService::getLoggedUser();
-				if($loggedUser != null){
-					$gPath = $loggedUser->getGroupPath();
+                    $value = str_replace("AJXP_USER", $loggedUserId, $value);
+                } else {
+                    return "";
+                }
+            } else {
+                $value = str_replace("AJXP_USER", "shared", $value);
+            }
+        }
+        if (is_string($value) && strpos($value, "AJXP_GROUP_PATH")!==false) {
+            if (AuthService::usersEnabled()) {
+                $loggedUser = AuthService::getLoggedUser();
+                if ($loggedUser != null) {
+                    $gPath = $loggedUser->getGroupPath();
                     $value = str_replace("AJXP_GROUP_PATH_FLAT", str_replace("/", "_", trim($gPath, "/")), $value);
                     $value = str_replace("AJXP_GROUP_PATH", $gPath, $value);
-				}else{
-					return "";
-				}
-			}else{
+                } else {
+                    return "";
+                }
+            } else {
                 $value = str_replace(array("AJXP_GROUP_PATH", "AJXP_GROUP_PATH_FLAT"), "shared", $value);
             }
-		}
-		if(is_string($value) && strpos($value, "AJXP_INSTALL_PATH") !== false){
-			$value = str_replace("AJXP_INSTALL_PATH", AJXP_INSTALL_PATH, $value);
-		}
-		if(is_string($value) && strpos($value, "AJXP_DATA_PATH") !== false){
-			$value = str_replace("AJXP_DATA_PATH", AJXP_DATA_PATH, $value);
-		}
+        }
+        if (is_string($value) && strpos($value, "AJXP_INSTALL_PATH") !== false) {
+            $value = str_replace("AJXP_INSTALL_PATH", AJXP_INSTALL_PATH, $value);
+        }
+        if (is_string($value) && strpos($value, "AJXP_DATA_PATH") !== false) {
+            $value = str_replace("AJXP_DATA_PATH", AJXP_DATA_PATH, $value);
+        }
         $tab = array(&$value);
-		AJXP_Controller::applyIncludeHook("vars.filter", $tab);
-		return $value;
-	}
+        AJXP_Controller::applyIncludeHook("vars.filter", $tab);
+        return $value;
+    }
 }

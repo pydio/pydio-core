@@ -25,7 +25,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer
  * @subpackage Core
  */
-class AJXP_PluginsService{
+class AJXP_PluginsService
+{
     private static $instance;
     private $registry = array();
     private $required_files = array();
@@ -49,12 +50,13 @@ class AJXP_PluginsService{
      * @param AbstractConfDriver $confStorage
      * @param bool $rewriteCache Force a cache rewriting
      */
-    public function loadPluginsRegistry($pluginFolder, $confStorage, $rewriteCache = false){
-        if(!$rewriteCache && (!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false)){
+    public function loadPluginsRegistry($pluginFolder, $confStorage, $rewriteCache = false)
+    {
+        if (!$rewriteCache && (!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false)) {
             $reqs = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_REQUIRES_FILE);
-            if(count($reqs)){
-                foreach ($reqs as $filename){
-                    if(!is_file($filename)){
+            if (count($reqs)) {
+                foreach ($reqs as $filename) {
+                    if (!is_file($filename)) {
                         // CACHE IS OUT OF SYNC WITH REQUIRES
                         $this->loadPluginsRegistry($pluginFolder, $confStorage, true);
                         return;
@@ -64,9 +66,9 @@ class AJXP_PluginsService{
                 $res = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
                 $this->registry = $res;
                 // Refresh streamWrapperPlugins
-                foreach ($this->registry as $pType => $plugs){
-                    foreach ($plugs as $plugin){
-                        if(method_exists($plugin, "detectStreamWrapper") && $plugin->detectStreamWrapper(false) !== false){
+                foreach ($this->registry as $pType => $plugs) {
+                    foreach ($plugs as $plugin) {
+                        if (method_exists($plugin, "detectStreamWrapper") && $plugin->detectStreamWrapper(false) !== false) {
                             $this->streamWrapperPlugins[] = $plugin->getId();
                         }
                     }
@@ -74,22 +76,22 @@ class AJXP_PluginsService{
                 return ;
             }
         }
-        if(is_string($pluginFolder)){
+        if (is_string($pluginFolder)) {
             $pluginFolder = array($pluginFolder);
         }
         $this->confStorage = $confStorage;
         $pluginsPool = array();
 
-        foreach($pluginFolder as $sourceFolder){
+        foreach ($pluginFolder as $sourceFolder) {
             $handler = @opendir($sourceFolder);
-            if($handler){
+            if ($handler) {
                 while ( ($item = readdir($handler)) !==false) {
                     if($item == "." || $item == ".." || !@is_dir($sourceFolder."/".$item) || strstr($item,".")===false) continue ;
                     $plugin = new AJXP_Plugin($item, $sourceFolder."/".$item);
                     $plugin->loadManifest();
-                    if($plugin->manifestLoaded()){
+                    if ($plugin->manifestLoaded()) {
                         $pluginsPool[$plugin->getId()] = $plugin;
-                        if(method_exists($plugin, "detectStreamWrapper") && $plugin->detectStreamWrapper(false) !== false){
+                        if (method_exists($plugin, "detectStreamWrapper") && $plugin->detectStreamWrapper(false) !== false) {
                             $this->streamWrapperPlugins[] = $plugin->getId();
                         }
                     }
@@ -97,16 +99,16 @@ class AJXP_PluginsService{
                 closedir($handler);
             }
         }
-        if(count($pluginsPool)){
+        if (count($pluginsPool)) {
             $this->checkDependencies($pluginsPool);
-            foreach ($pluginsPool as $plugin){
+            foreach ($pluginsPool as $plugin) {
                 $this->recursiveLoadPlugin($plugin, $pluginsPool);
             }
         }
-        if(!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false){
+        if (!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false) {
             AJXP_Utils::saveSerialFile(AJXP_PLUGINS_REQUIRES_FILE, $this->required_files, false, false);
             AJXP_Utils::saveSerialFile(AJXP_PLUGINS_CACHE_FILE, $this->registry, false, false);
-            if(is_file(AJXP_PLUGINS_QUERIES_CACHE)){
+            if (is_file(AJXP_PLUGINS_QUERIES_CACHE)) {
                 @unlink(AJXP_PLUGINS_QUERIES_CACHE);
             }
         }
@@ -118,25 +120,26 @@ class AJXP_PluginsService{
      * @param AJXP_Plugin $plugin
      * @param array $pluginsPool
      */
-    private function recursiveLoadPlugin($plugin, $pluginsPool){
-        if($plugin->loadingState!=""){
+    private function recursiveLoadPlugin($plugin, $pluginsPool)
+    {
+        if ($plugin->loadingState!="") {
             return ;
         }
         $dependencies = $plugin->getDependencies();
         $plugin->loadingState = "lock";
-        foreach ($dependencies as $dependencyId){
-            if(isSet($pluginsPool[$dependencyId])){
+        foreach ($dependencies as $dependencyId) {
+            if (isSet($pluginsPool[$dependencyId])) {
                 $this->recursiveLoadPlugin($pluginsPool[$dependencyId], $pluginsPool);
-            }else if(strpos($dependencyId, "+") !== false){
-                foreach(array_keys($pluginsPool) as $pId){
-                    if(strpos($pId, str_replace("+", "", $dependencyId)) === 0){
+            } else if (strpos($dependencyId, "+") !== false) {
+                foreach (array_keys($pluginsPool) as $pId) {
+                    if (strpos($pId, str_replace("+", "", $dependencyId)) === 0) {
                         $this->recursiveLoadPlugin($pluginsPool[$pId], $pluginsPool);
                     }
                 }
             }
         }
         $plugType = $plugin->getType();
-        if(!isSet($this->registry[$plugType])){
+        if (!isSet($this->registry[$plugType])) {
             $this->registry[$plugType] = array();
         }
         $plugin = $this->instanciatePluginClass($plugin);
@@ -152,11 +155,12 @@ class AJXP_PluginsService{
      * @param array $sortedPlugins
      * @return bool|void
      */
-    private function cachePlugSort($sortedPlugins){
+    private function cachePlugSort($sortedPlugins)
+    {
         if(!AJXP_PLUGINS_CACHE_FILE) return false;
         $indexes = array();
         $i = 0;
-        foreach ($sortedPlugins as $plugin){
+        foreach ($sortedPlugins as $plugin) {
             $indexes[$i] = $plugin->getId();
             $i++;
         }
@@ -170,34 +174,37 @@ class AJXP_PluginsService{
      * @param array $sortedPlugins
      * @return mixed
      */
-    private function loadPlugCache($sortedPlugins){
+    private function loadPlugCache($sortedPlugins)
+    {
         if(!AJXP_PLUGINS_CACHE_FILE) return false;
         $cache = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
         if(!count($cache)) return false;
         // Break if one plugin is not present in cache
-        foreach ($sortedPlugins as $index => $plugin){
-            if(!in_array($plugin->getId(), $cache)){return false;}
+        foreach ($sortedPlugins as $index => $plugin) {
+            if (!in_array($plugin->getId(), $cache)) {return false;}
         }
         $sorted = array();
-        foreach ($cache as $id => $plugId){
+        foreach ($cache as $id => $plugId) {
             // Walk the cache and add the plugins in right order.
-            if(isSet($sortedPlugins[$plugId])){
+            if (isSet($sortedPlugins[$plugId])) {
                 $sorted[] = $sortedPlugins[$plugId];
             }
         }
         return $sorted;
     }
 
-    public function loadFromPluginQueriesCache($key){
+    public function loadFromPluginQueriesCache($key)
+    {
         if(AJXP_SKIP_CACHE) return null;
         $test = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_QUERIES_CACHE);
-        if(!empty($test) && is_array($test) && isset($test[$key])){
+        if (!empty($test) && is_array($test) && isset($test[$key])) {
             return $test[$key];
         }
         return null;
     }
 
-    public function storeToPluginQueriesCache($key, $value){
+    public function storeToPluginQueriesCache($key, $value)
+    {
         if(AJXP_SKIP_CACHE) return;
         $test = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_QUERIES_CACHE);
         if(!is_array($test)) $test = array();
@@ -211,7 +218,8 @@ class AJXP_PluginsService{
      * @param array $pluginOptions
      * @return AJXP_Plugin
      */
-    public function softLoad($pluginId, $pluginOptions){
+    public function softLoad($pluginId, $pluginOptions)
+    {
         $plugin = new AJXP_Plugin($pluginId, AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/".$pluginId);
         $plugin->loadManifest();
         $plugin = $this->instanciatePluginClass($plugin);
@@ -226,18 +234,19 @@ class AJXP_PluginsService{
      * @param AJXP_Plugin $plugin
      * @return AJXP_Plugin
      */
-    private function instanciatePluginClass($plugin){
+    private function instanciatePluginClass($plugin)
+    {
         $definition = $plugin->getClassFile();
         if(!$definition) return $plugin;
         $filename = AJXP_INSTALL_PATH."/".$definition["filename"];
         $className = $definition["classname"];
-        if(is_file($filename)){
+        if (is_file($filename)) {
             require_once($filename);
             $newPlugin = new $className($plugin->getId(), $plugin->getBaseDir());
             $newPlugin->loadManifest();
             $this->required_files[] = $filename;
             return $newPlugin;
-        }else{
+        } else {
             return $plugin;
         }
     }
@@ -246,19 +255,20 @@ class AJXP_PluginsService{
      * @param $arrayToSort
      * @return
      */
-    private function checkDependencies(&$arrayToSort){
+    private function checkDependencies(&$arrayToSort)
+    {
         // First make sure that the given dependencies are present
-        foreach ($arrayToSort as $plugId => $plugObject){
+        foreach ($arrayToSort as $plugId => $plugObject) {
             $plugObject->updateDependencies($this);
             $dependencies = $plugObject->getDependencies();
             if(!count($dependencies)) continue;// return ;
             $found = false;
-            foreach ($dependencies as $requiredPlugId){
-                if( strpos($requiredPlugId, "+") !== false || isSet($arrayToSort[$requiredPlugId])){
+            foreach ($dependencies as $requiredPlugId) {
+                if ( strpos($requiredPlugId, "+") !== false || isSet($arrayToSort[$requiredPlugId])) {
                     $found = true; break;
                 }
             }
-            if(!$found){
+            if (!$found) {
                 unset($arrayToSort[$plugId]);
             }
         }
@@ -273,54 +283,56 @@ class AJXP_PluginsService{
      * @internal param String $pluginB
      * @return integer
      */
-    public static function sortByDependencyIds($pluginIdA, $pluginIdB){
+    public static function sortByDependencyIds($pluginIdA, $pluginIdB)
+    {
         if($pluginIdA == $pluginIdB) return 0;
         $pluginA = self::findPluginById($pluginIdA);
         $pluginB = self::findPluginById($pluginIdB);
         if($pluginA == null || $pluginB == null) return 0;
-        if($pluginA->dependsOn($pluginIdB)) {
+        if ($pluginA->dependsOn($pluginIdB)) {
             return 1;
         }
-        if($pluginB->dependsOn($pluginIdA)) {
+        if ($pluginB->dependsOn($pluginIdA)) {
             return -1;
         }
         return 0;
     }
 
-    public function getOrderByDependency($plugins, $withStatus = true){
+    public function getOrderByDependency($plugins, $withStatus = true)
+    {
         $orders = array();
         $keys = array();
         $unkowns = array();
-        if($withStatus){
-            foreach($plugins as $pid => $status){
+        if ($withStatus) {
+            foreach ($plugins as $pid => $status) {
                 if($status) $keys[] = $pid;
             }
-        }else{
+        } else {
             $keys = array_keys($plugins);
         }
         $result = array();
-        while(count($keys) > 0){
+        while (count($keys) > 0) {
             $test = array_shift($keys);
             $testObject = $this->getPluginById($test);
             $deps = $testObject->getActiveDependencies(self::getInstance());
-            if(!count($deps)){
+            if (!count($deps)) {
                 $result[] = $test;
                 continue;
             }
             $found = false;
             $inOriginalPlugins = false;
-            foreach($deps as $depId){
-                if(in_array($depId, $result)) {
+            foreach ($deps as $depId) {
+                if (in_array($depId, $result)) {
                     $found = true;
                     break;
                 }
-                if(!$inOriginalPlugins && array_key_exists($depId, $plugins) && (!$withStatus || $plugins[$depId] == true)){
+                if (!$inOriginalPlugins && array_key_exists($depId, $plugins) && (!$withStatus || $plugins[$depId] == true)) {
                     $inOriginalPlugins = true;
                 }
             }
-            if($found){
+            if ($found) {
                 $result[] = $test;
-            }else{
+            } else {
                 if($inOriginalPlugins) $keys[] = $test;
                 else {
                     unset($plugins[$test]);
@@ -339,7 +351,8 @@ class AJXP_PluginsService{
      * @param string $type
      * @return array
      */
-    public function getPluginsByType($type){
+    public function getPluginsByType($type)
+    {
         if(isSet($this->registry[$type])) return $this->registry[$type];
         else return array();
     }
@@ -350,7 +363,8 @@ class AJXP_PluginsService{
      * @param string $pluginId
      * @return AJXP_Plugin
      */
-    public function getPluginById($pluginId){
+    public function getPluginById($pluginId)
+    {
         $split = explode(".", $pluginId);
         return $this->getPluginByTypeName($split[0], $split[1]);
     }
@@ -360,9 +374,10 @@ class AJXP_PluginsService{
      * @param string $pluginId
      * @return void
      */
-    public function removePluginById($pluginId){
+    public function removePluginById($pluginId)
+    {
         $split = explode(".", $pluginId);
-        if(isSet($this->registry[$split[0]]) && isSet($this->registry[$split[0]][$split[1]])){
+        if (isSet($this->registry[$split[0]]) && isSet($this->registry[$split[0]][$split[1]])) {
             unset($this->registry[$split[0]][$split[1]]);
         }
     }
@@ -374,13 +389,14 @@ class AJXP_PluginsService{
      * or it's the task of the core class to load the necessary plugin(s) of this type.
      * @return void
      */
-    public function initActivePlugins(){
+    public function initActivePlugins()
+    {
         $detected = $this->getDetectedPlugins();
         $toActivate = array();
-        foreach ($detected as $pType => $pObjects){
+        foreach ($detected as $pType => $pObjects) {
             $coreP = $this->findPlugin("core", $pType);
             if($coreP !== false && !isSet($coreP->AUTO_LOAD_TYPE)) continue;
-            foreach ($pObjects as $pName => $pObject){
+            foreach ($pObjects as $pName => $pObject) {
                 $toActivate[$pObject->getId()] = $pObject ;
             }
         }
@@ -388,11 +404,11 @@ class AJXP_PluginsService{
         foreach ($o as $id) {
             $pObject = $toActivate[$id];
             $pObject->init(array());
-            try{
+            try {
                 $pObject->performChecks();
                 if(!$pObject->isEnabled()) continue;
                 $this->setPluginActiveInst($pObject->getType(), $pObject->getName(), true);
-            }catch (Exception $e){
+            } catch (Exception $e) {
                 //$this->errors[$pName] = "[$pName] ".$e->getMessage();
             }
 
@@ -408,7 +424,8 @@ class AJXP_PluginsService{
      * @param AJXP_Plugin $updateInstance
      * @return void
      */
-    public static function setPluginActive($type, $name, $active=true, $updateInstance = null){
+    public static function setPluginActive($type, $name, $active=true, $updateInstance = null)
+    {
         self::getInstance()->setPluginActiveInst($type, $name, $active, $updateInstance);
     }
     /**
@@ -419,30 +436,31 @@ class AJXP_PluginsService{
      * @param AJXP_Plugin $updateInstance
      * @return void
      */
-    public function setPluginActiveInst($type, $name, $active=true, $updateInstance = null){
-        if($active){
+    public function setPluginActiveInst($type, $name, $active=true, $updateInstance = null)
+    {
+        if ($active) {
             // Check active plugin dependencies
             $plug = $this->getPluginById($type.".".$name);
             if(!$plug || !$plug->isEnabled()) return;
             $deps = $plug->getActiveDependencies($this);
-            if(count($deps)){
+            if (count($deps)) {
                 $found = false;
-                foreach ($deps as $dep){
-                    if(isSet($this->activePlugins[$dep]) && $this->activePlugins[$dep] !== false){
+                foreach ($deps as $dep) {
+                    if (isSet($this->activePlugins[$dep]) && $this->activePlugins[$dep] !== false) {
                         $found = true; break;
                     }
                 }
-                if(!$found){
+                if (!$found) {
                     $this->activePlugins[$type.".".$name] = false;
                     return ;
                 }
             }
         }
         $this->activePlugins[$type.".".$name] = $active;
-        if(isSet($updateInstance) && isSet($this->registry[$type][$name])){
+        if (isSet($updateInstance) && isSet($this->registry[$type][$name])) {
             $this->registry[$type][$name] = $updateInstance;
         }
-        if(isSet($this->xmlRegistry) && !$this->tmpDeferRegistryBuild){
+        if (isSet($this->xmlRegistry) && !$this->tmpDeferRegistryBuild) {
             $this->buildXmlRegistry(($this->registryVersion == "extended"));
         }
     }
@@ -453,10 +471,11 @@ class AJXP_PluginsService{
      * @param AJXP_Plugin $updateInstance
      * @return void
      */
-    public function setPluginUniqueActiveForType($type, $name, $updateInstance = null){
+    public function setPluginUniqueActiveForType($type, $name, $updateInstance = null)
+    {
         $typePlugs = $this->getPluginsByType($type);
         $this->tmpDeferRegistryBuild = true;
-        foreach($typePlugs as $plugName => $plugObject){
+        foreach ($typePlugs as $plugName => $plugObject) {
             $this->setPluginActiveInst($type, $plugName, false);
         }
         $this->tmpDeferRegistryBuild = false;
@@ -466,7 +485,8 @@ class AJXP_PluginsService{
      * Retrieve the whole active plugins list
      * @return array
      */
-    public function getActivePlugins(){
+    public function getActivePlugins()
+    {
         return $this->activePlugins;
     }
     /**
@@ -475,13 +495,14 @@ class AJXP_PluginsService{
      * @param bool $unique
      * @return array|bool
      */
-    public function getActivePluginsForType($type, $unique = false){
+    public function getActivePluginsForType($type, $unique = false)
+    {
         $acts = array();
-        foreach($this->activePlugins as $plugId => $active){
+        foreach ($this->activePlugins as $plugId => $active) {
             if(!$active) continue;
             list($pT,$pN) = explode(".", $plugId);
-            if($pT == $type && isset($this->registry[$pT][$pN])){
-                if($unique) {
+            if ($pT == $type && isset($this->registry[$pT][$pN])) {
+                if ($unique) {
                     return $this->registry[$pT][$pN];
                     break;
                 }
@@ -497,21 +518,24 @@ class AJXP_PluginsService{
      * @param $type
      * @return array|bool
      */
-    public function getUniqueActivePluginForType($type){
+    public function getUniqueActivePluginForType($type)
+    {
         return $this->getActivePluginsForType($type, true);
     }
     /**
      * All the plugins registry, active or not
      * @return array
      */
-    public function getDetectedPlugins(){
+    public function getDetectedPlugins()
+    {
         return $this->registry;
     }
     /**
      * All the plugins that declare a stream wrapper
      * @return array
      */
-    public function getStreamWrapperPlugins(){
+    public function getStreamWrapperPlugins()
+    {
         return $this->streamWrapperPlugins;
     }
     /**
@@ -520,7 +544,8 @@ class AJXP_PluginsService{
      * @param string $wrapperClassName
      * @return void
      */
-    public function registerWrapperClass($protocol, $wrapperClassName){
+    public function registerWrapperClass($protocol, $wrapperClassName)
+    {
         $this->registeredWrappers[$protocol] = $wrapperClassName;
     }
 
@@ -529,14 +554,16 @@ class AJXP_PluginsService{
      * @param $protocol
      * @return
      */
-    public function getWrapperClassName($protocol){
+    public function getWrapperClassName($protocol)
+    {
         return $this->registeredWrappers[$protocol];
     }
     /**
      * The protocol/classnames table
      * @return array
      */
-    public function getRegisteredWrappers(){
+    public function getRegisteredWrappers()
+    {
         return $this->registeredWrappers;
     }
     /**
@@ -545,15 +572,16 @@ class AJXP_PluginsService{
      * @param bool $extendedVersion Will be passed to the plugin, for optimization purpose.
      * @return void
      */
-    public function buildXmlRegistry($extendedVersion = true){
+    public function buildXmlRegistry($extendedVersion = true)
+    {
         $actives = $this->getActivePlugins();
         $reg = new DOMDocument();
         $reg->loadXML("<ajxp_registry></ajxp_registry>");
-        foreach($actives as $activeName=>$status){
+        foreach ($actives as $activeName=>$status) {
             if($status === false) continue;
             $plug = $this->getPluginById($activeName);
             $contribs = $plug->getRegistryContributions($extendedVersion);
-            foreach($contribs as $contrib){
+            foreach ($contribs as $contrib) {
                 $parent = $contrib->nodeName;
                 $nodes = $contrib->childNodes;
                 if(!$nodes->length) continue;
@@ -571,9 +599,10 @@ class AJXP_PluginsService{
      * @param bool $extendedVersion
      * @return DOMDocument The registry
      */
-    public static function getXmlRegistry($extendedVersion = true){
+    public static function getXmlRegistry($extendedVersion = true)
+    {
         $self = self::getInstance();
-        if(!isSet($self->xmlRegistry) || ($self->registryVersion == "light" && $extendedVersion)){
+        if (!isSet($self->xmlRegistry) || ($self->registryVersion == "light" && $extendedVersion)) {
             $self->buildXmlRegistry( $extendedVersion );
             $self->registryVersion = ($extendedVersion ? "extended":"light");
         }
@@ -585,7 +614,8 @@ class AJXP_PluginsService{
      * @param $registry
      * @return void
      */
-    public static function updateXmlRegistry($registry){
+    public static function updateXmlRegistry($registry)
+    {
         $self = self::getInstance();
         $self->xmlRegistry = $registry;
     }
@@ -596,10 +626,10 @@ class AJXP_PluginsService{
      * @param DOMDocument $manifestDoc
      * @param String $mixinName
      */
-    public function patchPluginWithMixin(&$plugin, &$manifestDoc, $mixinName){
-
+    public function patchPluginWithMixin(&$plugin, &$manifestDoc, $mixinName)
+    {
         // Load behaviours if not already
-        if(!isSet($this->mixinsDoc)){
+        if (!isSet($this->mixinsDoc)) {
             $this->mixinsDoc = new DOMDocument();
             $this->mixinsDoc->load(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.ajaxplorer/ajxp_mixins.xml");
             $this->mixinsXPath = new DOMXPath($this->mixinsDoc);
@@ -608,7 +638,7 @@ class AJXP_PluginsService{
         $nodeList = $this->mixinsXPath->query($mixinName);
         if(!$nodeList->length) return;
         $mixinNode = $nodeList->item(0);
-        foreach($mixinNode->childNodes as $child){
+        foreach ($mixinNode->childNodes as $child) {
             if($child->nodeType != XML_ELEMENT_NODE) continue;
             $uuidAttr = $child->getAttribute("uuidAttr") OR "name";
             $this->mergeNodes($manifestDoc, $child->nodeName, $uuidAttr, $child->childNodes, true);
@@ -625,26 +655,27 @@ class AJXP_PluginsService{
      * @param boolean $limitToActivePlugins Whether to search only in active plugins or in all plugins
      * @return DOMNode[]
      */
-    public static function searchAllManifests($query, $stringOrNodeFormat = "string", $limitToActivePlugins = false, $limitToEnabledPlugins = false, $loadExternalFiles = false){
+    public static function searchAllManifests($query, $stringOrNodeFormat = "string", $limitToActivePlugins = false, $limitToEnabledPlugins = false, $loadExternalFiles = false)
+    {
         $buffer = "";
         $nodes = array();
         $self = self::getInstance();
-        foreach ($self->registry as $plugType){
-            foreach ($plugType as $plugName => $plugObject){
-                if($limitToActivePlugins){
+        foreach ($self->registry as $plugType) {
+            foreach ($plugType as $plugName => $plugObject) {
+                if ($limitToActivePlugins) {
                     $plugId = $plugObject->getId();
-                    if($limitToActivePlugins && (!isSet($self->activePlugins[$plugId]) || $self->activePlugins[$plugId] === false)){
+                    if ($limitToActivePlugins && (!isSet($self->activePlugins[$plugId]) || $self->activePlugins[$plugId] === false)) {
                         continue;
                     }
                 }
-                if($limitToEnabledPlugins){
+                if ($limitToEnabledPlugins) {
                     if(!$plugObject->isEnabled()) continue;
                 }
                 $res = $plugObject->getManifestRawContent($query, $stringOrNodeFormat, $loadExternalFiles);
-                if($stringOrNodeFormat == "string"){
+                if ($stringOrNodeFormat == "string") {
                     $buffer .= $res;
-                }else{
-                    foreach ($res as $node){
+                } else {
+                    foreach ($res as $node) {
                         $nodes[] = $node;
                     }
                 }
@@ -663,38 +694,39 @@ class AJXP_PluginsService{
      * @param bool $doNotOverrideChildren
      * @return void
      */
-    protected function mergeNodes(&$original, $parentName, $uuidAttr, $childrenNodes, $doNotOverrideChildren = false){
+    protected function mergeNodes(&$original, $parentName, $uuidAttr, $childrenNodes, $doNotOverrideChildren = false)
+    {
         // find or create parent
         $parentSelection = $original->getElementsByTagName($parentName);
-        if($parentSelection->length){
+        if ($parentSelection->length) {
             $parentNode = $parentSelection->item(0);
             $xPath = new DOMXPath($original);
-            foreach($childrenNodes as $child){
+            foreach ($childrenNodes as $child) {
                 if($child->nodeType != XML_ELEMENT_NODE) continue;
-                if($child->getAttribute($uuidAttr) == "*"){
+                if ($child->getAttribute($uuidAttr) == "*") {
                     $query = $parentName.'/'.$child->nodeName;
-                }else{
+                } else {
                     $query = $parentName.'/'.$child->nodeName.'[@'.$uuidAttr.' = "'.$child->getAttribute($uuidAttr).'"]';
                 }
                 $childrenSel = $xPath->query($query);
-                if($childrenSel->length){
+                if ($childrenSel->length) {
                     if($doNotOverrideChildren) continue;
-                    foreach ($childrenSel as $existingNode){
+                    foreach ($childrenSel as $existingNode) {
                         // Clone as many as needed
                         $clone = $original->importNode($child, true);
                         $this->mergeChildByTagName($clone, $existingNode);
                     }
-                }else{
+                } else {
                     $clone = $original->importNode($child, true);
                     $parentNode->appendChild($clone);
                 }
             }
-        }else{
+        } else {
             //create parentNode and append children
-            if($childrenNodes->length){
+            if ($childrenNodes->length) {
                 $parentNode = $original->importNode($childrenNodes->item(0)->parentNode, true);
                 $original->documentElement->appendChild($parentNode);
-            }else{
+            } else {
                 $parentNode = $original->createElement($parentName);
                 $original->documentElement->appendChild($parentNode);
             }
@@ -706,28 +738,29 @@ class AJXP_PluginsService{
      * @param $old
      * @return
      */
-    protected function mergeChildByTagName($new, &$old){
-        if(!$this->hasElementChild($new) || !$this->hasElementChild($old)){
+    protected function mergeChildByTagName($new, &$old)
+    {
+        if (!$this->hasElementChild($new) || !$this->hasElementChild($old)) {
             $old->parentNode->replaceChild($new, $old);
             return;
         }
-        foreach($new->childNodes as $newChild){
+        foreach ($new->childNodes as $newChild) {
             if($newChild->nodeType != XML_ELEMENT_NODE) continue;
 
             $found = null;
-            foreach($old->childNodes as $oldChild){
+            foreach ($old->childNodes as $oldChild) {
                 if($oldChild->nodeType != XML_ELEMENT_NODE) continue;
-                if($oldChild->nodeName == $newChild->nodeName){
+                if ($oldChild->nodeName == $newChild->nodeName) {
                     $found = $oldChild;
                 }
             }
-            if($found != null){
-                if($newChild->nodeName == "post_processing" || $newChild->nodeName == "pre_processing"){
+            if ($found != null) {
+                if ($newChild->nodeName == "post_processing" || $newChild->nodeName == "pre_processing") {
                     $old->appendChild($newChild->cloneNode(true));
-                }else{
+                } else {
                     $this->mergeChildByTagName($newChild, $found);
                 }
-            }else{
+            } else {
                 // CloneNode or it's messing with the current foreach loop.
                 $old->appendChild($newChild->cloneNode(true));
             }
@@ -739,9 +772,10 @@ class AJXP_PluginsService{
      * @param $node
      * @return bool
      */
-    private function hasElementChild($node){
+    private function hasElementChild($node)
+    {
         if(!$node->hasChildNodes()) return false;
-        foreach($node->childNodes as $child){
+        foreach ($node->childNodes as $child) {
             if($child->nodeType == XML_ELEMENT_NODE) return true;
         }
         return false;
@@ -752,10 +786,11 @@ class AJXP_PluginsService{
      * @param string $plugName
      * @return AJXP_Plugin
      */
-    public function getPluginByTypeName($plugType, $plugName){
-        if(isSet($this->registry[$plugType]) && isSet($this->registry[$plugType][$plugName])){
+    public function getPluginByTypeName($plugType, $plugName)
+    {
+        if (isSet($this->registry[$plugType]) && isSet($this->registry[$plugType][$plugName])) {
             return $this->registry[$plugType][$plugName];
-        }else{
+        } else {
             return false;
         }
     }
@@ -766,7 +801,8 @@ class AJXP_PluginsService{
      * @param string $name
      * @return AJXP_Plugin
      */
-    public static function findPlugin($type, $name){
+    public static function findPlugin($type, $name)
+    {
         $instance = self::getInstance();
         return $instance->getPluginByTypeName($type, $name);
     }
@@ -777,11 +813,13 @@ class AJXP_PluginsService{
      * @param $id
      * @return AJXP_Plugin
      */
-    public static function findPluginById($id){
+    public static function findPluginById($id)
+    {
         return self::getInstance()->getPluginById($id);
     }
 
-    private function __construct(){
+    private function __construct()
+    {
     }
     /**
      * Singleton method
@@ -790,7 +828,7 @@ class AJXP_PluginsService{
      */
     public static function getInstance()
     {
-        if(!isSet(self::$instance)){
+        if (!isSet(self::$instance)) {
             $c = __CLASS__;
             self::$instance = new $c;
         }
@@ -801,4 +839,3 @@ class AJXP_PluginsService{
         trigger_error("Cannot clone me, i'm a singleton!", E_USER_ERROR);
     }
 }
-?>

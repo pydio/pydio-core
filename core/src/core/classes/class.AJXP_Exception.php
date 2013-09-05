@@ -24,28 +24,27 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer
  * @subpackage Core
  */
-class AJXP_Exception extends Exception {
-	
-	function AJXP_Exception($messageString, $messageId = false){
-		if($messageId !== false && class_exists("ConfService")){
-			$messages = ConfService::getMessages();
-			if(array_key_exists($messageId, $messages)){
-				$messageString = $messages[$messageId];
-			}else{
-				$messageString = $messageId;
-			}
-		}
-		parent::__construct($messageString);
-	}
-		
-	function errorToXml($mixed)
-	{
-		if(is_a($mixed, "Exception")){
-			throw $this;
-		}else{
-			throw new AJXP_Exception($mixed);
-		}
-	}
-}
+class AJXP_Exception extends Exception
+{
+    public function AJXP_Exception($messageString, $messageId = false)
+    {
+        if ($messageId !== false && class_exists("ConfService")) {
+            $messages = ConfService::getMessages();
+            if (array_key_exists($messageId, $messages)) {
+                $messageString = $messages[$messageId];
+            } else {
+                $messageString = $messageId;
+            }
+        }
+        parent::__construct($messageString);
+    }
 
-?>
+    public function errorToXml($mixed)
+    {
+        if (is_a($mixed, "Exception")) {
+            throw $this;
+        } else {
+            throw new AJXP_Exception($mixed);
+        }
+    }
+}
