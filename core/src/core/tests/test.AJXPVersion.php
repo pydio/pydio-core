@@ -29,12 +29,10 @@ require_once('../classes/class.AbstractTest.php');
  */
 class AJXPVersion extends AbstractTest
 {
-    function AJXPVersion() { parent::AbstractTest("AjaXplorer version", "AJXP version : ".AJXP_VERSION); }
-    function doTest() 
-    { 
+    public function AJXPVersion() { parent::AbstractTest("AjaXplorer version", "AJXP version : ".AJXP_VERSION); }
+    public function doTest()
+    {
         $this->failedLevel = "info";
         return FALSE;
     }
 };
-
-?>

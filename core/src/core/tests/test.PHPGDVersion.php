@@ -28,17 +28,15 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHPGDVersion extends AbstractTest
 {
-    function PHPGDVersion() { parent::AbstractTest("PHP GD version", "GD is required for generating thumbnails"); }
-    function doTest() 
-    { 
+    public function PHPGDVersion() { parent::AbstractTest("PHP GD version", "GD is required for generating thumbnails"); }
+    public function doTest()
+    {
         $this->failedLevel = "warning";
-        if (!function_exists("gd_info") || !function_exists("imagecopyresized") || !function_exists("imagecopyresampled")){
-        	$this->testedParams["GD Enabled"] = "No";
-        	return FALSE;
+        if (!function_exists("gd_info") || !function_exists("imagecopyresized") || !function_exists("imagecopyresampled")) {
+            $this->testedParams["GD Enabled"] = "No";
+            return FALSE;
         }
         $this->testedParams["GD Enabled"] = "Yes";
         return TRUE;
     }
 };
-
-?>

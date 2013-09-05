@@ -28,17 +28,15 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHPDomXML extends AbstractTest
 {
-    function PHPDomXML() { parent::AbstractTest("DOM Xml enabled", "Dom XML is required, you may have to install the php-xml extension."); }
-    function doTest() 
-    { 
+    public function PHPDomXML() { parent::AbstractTest("DOM Xml enabled", "Dom XML is required, you may have to install the php-xml extension."); }
+    public function doTest()
+    {
         $this->failedLevel = "error";
-        if (!class_exists("DOMDocument")){
-        	$this->testedParams["DOM Enabled"] = "No";
-        	return FALSE;
+        if (!class_exists("DOMDocument")) {
+            $this->testedParams["DOM Enabled"] = "No";
+            return FALSE;
         }
         $this->testedParams["DOM Enabled"] = "Yes";
         return TRUE;
     }
 };
-
-?>

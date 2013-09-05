@@ -28,23 +28,21 @@ require_once('../classes/class.AbstractTest.php');
  */
 class SSLEncryption extends AbstractTest
 {
-    function SSLEncryption() { parent::AbstractTest("SSL Encryption", "You are not using SSL encryption, or it was not detected by the server. Be aware that it is strongly recommended to secure all communication of data over the network."); }
-    function doTest() 
-    { 
+    public function SSLEncryption() { parent::AbstractTest("SSL Encryption", "You are not using SSL encryption, or it was not detected by the server. Be aware that it is strongly recommended to secure all communication of data over the network."); }
+    public function doTest()
+    {
         // Get the locale
         $ssl = false;
-		if(isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"){
-			$ssl = true;
-		}        
-        if (!$ssl) { 
-        	$this->failedLevel = "warning";
+        if (isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on") {
+            $ssl = true;
+        }
+        if (!$ssl) {
+            $this->failedLevel = "warning";
             $this->failedInfo .= "<p class='suggestion'><b>Suggestion</b> : if your server supports HTTPS, set the AJXP_FORCE_REDIRECT_HTTPS parameter in the <i>conf/bootstrap_conf.php</i> file.</p>";
-        	return FALSE; 
-        }else{
-        	$this->failedInfo .= "Https protocol detected"; 
-        	return TRUE;
+            return FALSE;
+        } else {
+            $this->failedInfo .= "Https protocol detected";
+            return TRUE;
         }
     }
 };
-
-?>

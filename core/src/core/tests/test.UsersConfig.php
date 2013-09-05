@@ -28,14 +28,12 @@ require_once('../classes/class.AbstractTest.php');
  */
 class UsersConfig extends AbstractTest
 {
-    function UsersConfig() { parent::AbstractTest("Users Configuration", "Current config for users"); }
-    function doTest() 
-    { 
-    	$this->testedParams["Users enabled"] = AuthService::usersEnabled();
-    	$this->testedParams["Guest enabled"] = ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth");
+    public function UsersConfig() { parent::AbstractTest("Users Configuration", "Current config for users"); }
+    public function doTest()
+    {
+        $this->testedParams["Users enabled"] = AuthService::usersEnabled();
+        $this->testedParams["Guest enabled"] = ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth");
         $this->failedLevel = "info";
         return FALSE;
     }
 };
-
-?>

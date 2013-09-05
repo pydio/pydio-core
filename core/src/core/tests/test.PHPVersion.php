@@ -28,12 +28,12 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHPVersion extends AbstractTest
 {
-    function PHPVersion() { parent::AbstractTest("PHP version", "Minimum required version is PHP 5.3.0"); }
-    function doTest() 
-    { 
-        $version = phpversion(); 
-    	$this->testedParams["PHP Version"] = $version;
-    	//return false;
+    public function PHPVersion() { parent::AbstractTest("PHP version", "Minimum required version is PHP 5.3.0"); }
+    public function doTest()
+    {
+        $version = phpversion();
+        $this->testedParams["PHP Version"] = $version;
+        //return false;
         if (floatval($version) < 5.3) return FALSE;
         $locale = setlocale(LC_CTYPE, 0);
         $dirSep = DIRECTORY_SEPARATOR;
@@ -43,5 +43,3 @@ class PHPVersion extends AbstractTest
         return TRUE;
     }
 };
-
-?>

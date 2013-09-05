@@ -28,15 +28,15 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHP_APC extends AbstractTest
 {
-    function PHP_APC() { parent::AbstractTest("PHP APC extension", "AjaXplorer framework loads a lot of PHP files at each query, and using a PHP accelerator is greatly recommanded."); }
-    function doTest()
+    public function PHP_APC() { parent::AbstractTest("PHP APC extension", "AjaXplorer framework loads a lot of PHP files at each query, and using a PHP accelerator is greatly recommanded."); }
+    public function doTest()
     {
         $this->failedLevel = "warning";
         $v = @extension_loaded('apc');
-        if (isSet($v) && (is_numeric($v) || strtolower($v) == "on")){
+        if (isSet($v) && (is_numeric($v) || strtolower($v) == "on")) {
             $this->testedParams["PHP APC extension loaded"] = "No";
             return FALSE;
-        }else if(!isSet($v)){
+        } else if (!isSet($v)) {
             $this->failedInfo = "AjaXplorer framework loads a lot of PHP files at each query, and using a PHP accelerator is greatly recommanded.";
             return FALSE;
         }
