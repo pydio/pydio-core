@@ -27,5 +27,4 @@ $mess=array(
 "3" => "Vali selle faili muutmiseks muu redaktor",
 "4" => "Tähelepanu, need redaktorid ei avalda, et oskavad sellist failitüüpi käsitleda. Tulemust ei pruugi vastata ootustele!",
 "5" => "Tühista olemas olevad seosed",
-); 
-?>
+);

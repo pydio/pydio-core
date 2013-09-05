@@ -28,4 +28,3 @@ $mess=array(
 "Roles" => "Rôles",
 "The file in which all roles definitions will be stored" => "Fichier dans lequel sont stockés les rôles.",
 );
-?>

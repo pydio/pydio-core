@@ -116,4 +116,3 @@ $mess=array(
 "Default Metasources" => "Fontes Meta pré-Definidas",
 "Comma-separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver" => "Lista de Fontes Meta e de Meta Plugins, separada por virgulas, que irá ser aplicada automaticamente a todas as Áreas de Trabalho criadas por este controlador",
 );
-?>

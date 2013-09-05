@@ -29,4 +29,3 @@ $mess=array(
 "Auto Close" => "Fermeture auto",
 "Default value for automatically closing the dialog after upload or not" => "Fermeture automatique après que les fichiers sont téléchargés.",
 );
-?>

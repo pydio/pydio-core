@@ -26,4 +26,3 @@ $mess=array(
 "Admin user" => "Utilisateur admin",
 "The ID of an existing admin for Ajaxplorer (using conf.serial)" => "Id d'un utilisateur ayant les droits d'administration.",
 );
-?>

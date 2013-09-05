@@ -12,5 +12,3 @@ $mess=array(
 "9" => "Suchen",
 "10" => "Löschen",
 )
-
-?>

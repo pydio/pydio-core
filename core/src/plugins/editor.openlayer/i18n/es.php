@@ -12,5 +12,3 @@ $mess=array(
 "9" => "Buscar",
 "10" => "Limpiar",
 )
-
-?>

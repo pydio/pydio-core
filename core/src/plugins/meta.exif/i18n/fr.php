@@ -22,4 +22,3 @@ $mess=array(
 "1" => "Geolocalisation Exif",
 "2" => "Localiser",
 );
-?>

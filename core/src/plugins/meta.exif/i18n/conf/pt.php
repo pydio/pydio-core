@@ -26,4 +26,3 @@ $mess=array(
 "Info Panel Labels" => "Informação de Etiquetas de Painel",
 "Associated list of labels, be sure to define as many as fields!" => "Lista de associação de etiquetas, certifique-se de que define todos os campos!",
 );
-?>

@@ -26,4 +26,3 @@ $mess=array(
 "Meta File" => "Fichier méta",
 "Hidden file used inside folders to save meta data" => "Nom du fichier caché pour stocker les métadonnées.",
 );
-?>

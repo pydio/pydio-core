@@ -1,4 +1,4 @@
-<?php 
+<?php
 $mess = array(
 "name" => "Email Viewer",
 "title" => "Email Viewer",
@@ -15,4 +15,3 @@ $mess = array(
 "11" => "Copy attachment on the server",
 "12" => "Cc",
 );
-?>

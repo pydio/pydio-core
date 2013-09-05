@@ -26,4 +26,3 @@ $mess=array(
 "Users Tmp Folder" => "Pasta 'tmp' dos utilizadores",
 "The folder in which all temporary files will be stored" => "Pasta em que todos os ficheiros temporários serão guardados",
 );
-?>

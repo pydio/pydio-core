@@ -25,4 +25,3 @@ $mess=array(
 "Password length" => "Passwortlänge",
 "Store Credentials in Session" => "Einstellungen in der Sitzung speichern",
 );
-?>

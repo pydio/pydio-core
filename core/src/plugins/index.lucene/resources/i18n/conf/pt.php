@@ -34,4 +34,3 @@ $mess=array(
 "Text files" => "Ficheiros de Texto",
 "List of extensions to consider as Text file and parse content" => "Lista de extensões a considerar como um Ficheiro de Texto e analisar os seu conteúdo",
 );
-?>

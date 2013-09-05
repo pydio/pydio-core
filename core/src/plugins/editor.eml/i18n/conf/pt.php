@@ -22,4 +22,3 @@ $mess=array(
 "E-Mail Viewer" => "Visualizador de E-mail",
 "E-Mail reader, supports eml format and eml mimetypes. Detects if a folder contains only E-Mail and display columns accordingly." => "Leitor de E-mails, suporta formatos EML e tipo pequeno de EML. Consegue detectar se uma pasta apenas contém e-mails e mostra-os em colunas respectivamente.",
 );
-?>

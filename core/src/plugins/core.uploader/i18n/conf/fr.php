@@ -27,4 +27,3 @@ $mess=array(
 "File Size" => "Taille par fichier",
 "Cumul. Size" => "Taille cumulée",
 );
-?>

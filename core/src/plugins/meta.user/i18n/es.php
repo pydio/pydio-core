@@ -28,7 +28,6 @@ $mess=array(
 "4" => "Poca importancia",
 "5" => "Pendiente",
 "6" => "A revisar",
-"7" => "Importante", 
+"7" => "Importante",
 "8" => "Urgente"
 );
-?>

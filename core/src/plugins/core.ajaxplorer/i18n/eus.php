@@ -535,4 +535,3 @@ $mess=array(
 /* END SENTENCE */
 /* END SENTENCE */
 );
-?>

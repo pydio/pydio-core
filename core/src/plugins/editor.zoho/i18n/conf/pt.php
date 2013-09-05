@@ -28,4 +28,3 @@ $mess=array(
 "If you use the agent, enter its URL here." => "Se usar este agente, coloque o seu URL aqui.",
 "Z-Agent URL" => "URL Z-Agent",
 );
-?>

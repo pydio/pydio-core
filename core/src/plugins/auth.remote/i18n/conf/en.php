@@ -40,4 +40,3 @@ $mess=array(
 "Auth Form ID" => "Auth Form ID",
 "The HTML ID of the form tag displayed for login on the page defined previously. Not necessary for WP, login-form by default for Joomla, and user-login-form for Drupal" => "The HTML ID of the form tag displayed for login on the page defined previously. Not necessary for WP, login-form by default for Joomla, and user-login-form for Drupal",
 );
-?>

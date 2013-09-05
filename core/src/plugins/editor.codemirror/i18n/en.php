@@ -31,5 +31,3 @@ $mess=array(
 "9"	=> "Text Search",
 "10" => "Indent size"
 );
-
-?>

@@ -19,13 +19,12 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
 // Slovenian translation: April 21 2011 by Vladimir Bohinc (vladimir.bohinc@gmail.com)
-// 
+//
 //---------------------------------------------------------------------------------------------------
 $mess = array(
-"1" => "Različice", 
-"11" => "SVN dnevnik trenutne mape", 
+"1" => "Različice",
+"11" => "SVN dnevnik trenutne mape",
 "2" => "SVN dnevnik",
 "21" => "SVN dnevnik izbrane datoteke/mape",
 "3" => "Preklopi na to različico",
 );
-?>

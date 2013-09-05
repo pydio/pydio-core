@@ -536,4 +536,3 @@ $mess=array(
 /* password strength tester */
 /* quick access keys */
 );
-?>

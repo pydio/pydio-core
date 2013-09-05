@@ -22,4 +22,3 @@ $mess=array(
 "File Hasher" => "File Hasher",
 "Compute on-demand a hash of the file content and stores it in the metadata if a metastore is provided" => "Compute on-demand a hash of the file content and stores it in the metadata if a metastore is provided",
 );
-?>

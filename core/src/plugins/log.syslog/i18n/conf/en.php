@@ -24,4 +24,3 @@ $mess=array(
 "Identifier" => "Identifier",
 "How the logs will be identified in the system logs" => "How the logs will be identified in the system logs",
 );
-?>

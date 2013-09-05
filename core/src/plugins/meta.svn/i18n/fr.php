@@ -25,4 +25,3 @@ $mess=array(
 "21" => "SVN Log des fichiers ou répertoires sélectionnés",
 "3" => "Basculer à la révision",
 );
-?>

@@ -27,4 +27,3 @@ $mess=array(
 "File Size" => "Tamanho de Ficheiro",
 "Cumul. Size" => "Tamanho comutativo.",
 );
-?>

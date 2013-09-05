@@ -28,4 +28,3 @@ $mess=array(
 "Admin user" => "Administrador",
 "The ID of an existing admin for Ajaxplorer (using conf.serial)" => "Introduzir o ID de um administrador existente do AjaXplorer (utilizando conf.serial)",
 );
-?>

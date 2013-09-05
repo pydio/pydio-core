@@ -29,4 +29,3 @@ $mess=array(
 "Auto Close" => "Auto Close",
 "Default value for automatically closing the dialog after upload or not" => "Default value for automatically closing the dialog after upload or not",
 );
-?>

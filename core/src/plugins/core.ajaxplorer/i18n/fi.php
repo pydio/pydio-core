@@ -536,4 +536,3 @@ $mess=array(
 "477" => "Select a file or folder to see its details here",
 /* END SENTENCE */
 );
-?>

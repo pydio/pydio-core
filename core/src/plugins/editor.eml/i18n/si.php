@@ -19,7 +19,7 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
 // Slovenian translation: April 21 2011 by Vladimir Bohinc (vladimir.bohinc@gmail.com)
-// 
+//
 //---------------------------------------------------------------------------------------------------
 $mess = array(
 "name" => "Pregledovalnik e-pošte",
@@ -37,4 +37,3 @@ $mess = array(
 "11" => "Kopiraj prilogo na strežnik",
 "12" => "Kk",
 );
-?>

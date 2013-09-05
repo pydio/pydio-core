@@ -7,5 +7,3 @@ $mess = array(
 "4" => "Remove lock",
 "5" => "This file is locked by another user, it is probably currently being edited, you are not allowed to modify it."
 );
-
-?>

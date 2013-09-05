@@ -25,7 +25,6 @@ $mess=array(
 "4" => "Low",
 "5" => "Todo",
 "6" => "Personal",
-"7" => "Work", 
+"7" => "Work",
 "8" => "Important"
 );
-?>

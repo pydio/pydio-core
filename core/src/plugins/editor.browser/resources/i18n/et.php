@@ -26,5 +26,4 @@ $mess=array(
 "1" => "Väline aken",
 "2" => "Väline veebilehitseja aken",
 "3" => "Avan faili välises aknas, palun oota, see teade sulgub automaatselt.",
-); 
-?>
+);

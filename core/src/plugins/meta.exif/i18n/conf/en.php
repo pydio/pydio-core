@@ -26,4 +26,3 @@ $mess=array(
 "Info Panel Labels" => "Info Panel Labels",
 "Associated list of labels, be sure to define as many as fields!" => "Associated list of labels, be sure to define as many as fields!",
 );
-?>

@@ -28,4 +28,3 @@ $mess=array(
 "3.android" => "I don't have it, send me to the Android Market now!",
 "4.android" => "I don't care, let me use the web version of %s.",
 );
-?>

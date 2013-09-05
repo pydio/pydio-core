@@ -25,7 +25,6 @@ $mess=array(
 "4" => "Baixo",
 "5" => "Para Fazer",
 "6" => "Pessoal",
-"7" => "Trabalho", 
+"7" => "Trabalho",
 "8" => "Importante"
 );
-?>

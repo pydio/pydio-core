@@ -22,4 +22,3 @@ $mess=array(
 "Light" => "Light",
 "Simple Template for Bookmarklets" => "Template ultra-simple pour la gestion du bookmarklet",
 );
-?>

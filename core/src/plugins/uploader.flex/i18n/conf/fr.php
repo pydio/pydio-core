@@ -25,4 +25,3 @@ $mess=array(
 "HTTPS Policy" => "HTTPS Policy",
 "An Https Policy file maybe used to solve Flash upload problems when in Https. Use path relative to the web root." => "Fichier 'HTTPS Policy' pour résoudre les problèmes https, utiliser un chemin relative du serveur web.",
 );
-?>

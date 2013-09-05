@@ -4,8 +4,6 @@
 //	Last update: 27.05.2013
 
 $mess = array(
-"1" => "EXIF luger", 
-"2" => "Kuva EXIF andmed", 
+"1" => "EXIF luger",
+"2" => "Kuva EXIF andmed",
 );
-
-?>

@@ -116,4 +116,3 @@ $mess=array(
 "Default Metasources" => "Default Metasources",
 "Comma-separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver" => "Comma-separated list of metastore and meta plugins, that will be automatically applied to all workspaces created with this driver",
 );
-?>

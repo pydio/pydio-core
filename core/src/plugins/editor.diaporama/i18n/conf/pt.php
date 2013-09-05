@@ -30,4 +30,3 @@ $mess=array(
 "Quality" => "Qualidade",
 "Thumbs quality" => "Qualidade das miniaturas",
 );
-?>

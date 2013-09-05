@@ -29,4 +29,3 @@ $mess=array(
 "SQL Driver" => "Driver SQL",
 "SQL configuration using the same syntax as auth.sql plugin" => "Configuración de SQL usando la misma sintaxis que el plugin auth.sql"
 );
-?>

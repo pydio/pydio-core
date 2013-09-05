@@ -30,4 +30,3 @@ $mess=array(
 "Password" => "Palavra-Chave",
 "User Password" => "Palavra-Chave do Utilizador",
 );
-?>

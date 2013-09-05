@@ -24,4 +24,3 @@ $mess=array(
 "Identifier" => "Identifiant",
 "How the logs will be identified in the system logs" => "Identifiant des logs dans les journaux systèmes",
 );
-?>

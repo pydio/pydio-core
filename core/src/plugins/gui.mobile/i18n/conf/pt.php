@@ -22,4 +22,3 @@ $mess=array(
 "Mobile" => "Móvel",
 "Template extending gui.ajax for small screen terminals." => "Modelo que extende a gui.ajax para equipamentos com ecrã pequeno.",
 );
-?>

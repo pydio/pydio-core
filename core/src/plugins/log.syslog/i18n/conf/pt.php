@@ -24,4 +24,3 @@ $mess=array(
 "Identifier" => "Identificador",
 "How the logs will be identified in the system logs" => "Como os registos irão ser identificados no Registo de Sistema",
 );
-?>

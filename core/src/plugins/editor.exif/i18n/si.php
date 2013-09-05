@@ -19,10 +19,9 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
 // Slovenian translation: April 21 2011 by Vladimir Bohinc (vladimir.bohinc@gmail.com)
-// 
+//
 //---------------------------------------------------------------------------------------------------
 $mess = array(
-"1" => "Pregledovalnik Exif", 
-"2" => "Prikaži Exif metapodatke", 
+"1" => "Pregledovalnik Exif",
+"2" => "Prikaži Exif metapodatke",
 );
-?>

@@ -22,4 +22,3 @@ $mess=array(
 "Source Viewer" => "Source Viewer",
 "Syntax Highlighter for all major code source files" => "Syntax Highlighter for all major code source files",
 );
-?>

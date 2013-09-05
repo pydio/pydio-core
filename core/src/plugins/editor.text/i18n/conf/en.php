@@ -22,4 +22,3 @@ $mess=array(
 "Text Editor" => "Text Editor",
 "Very basic text editor" => "Very basic text editor",
 );
-?>

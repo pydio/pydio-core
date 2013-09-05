@@ -28,4 +28,3 @@ $mess=array(
 "Files Permissions" => "Files Permissions",
 "" => "",
 );
-?>

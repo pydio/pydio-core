@@ -26,4 +26,3 @@ $mess=array(
 "Users Tmp Folder" => "Users Tmp Folder",
 "The folder in which all temporary files will be stored" => "The folder in which all temporary files will be stored",
 );
-?>

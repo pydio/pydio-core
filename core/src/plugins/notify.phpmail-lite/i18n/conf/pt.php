@@ -36,4 +36,3 @@ $mess=array(
 "Mailer" => "Remetente",
 "Php mailer to use (see phpmail-lite documentation).'." => "Remetente Php a usar (ver documentação do phpmail-lite).'.",
 );
-?>

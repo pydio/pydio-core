@@ -24,4 +24,3 @@ $mess=array(
 "Users" => "Users",
 "The users list" => "The users list",
 );
-?>

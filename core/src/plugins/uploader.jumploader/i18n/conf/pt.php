@@ -22,4 +22,3 @@ $mess=array(
 "Jumploader" => "Jumploader",
 "Third-party JumpLoader JAVA applet allowing to upload folders, chunk big files, etc." => "Ferramenta de Envio de ficheiro criado por terceiros, JumpLoader JAVA, permite enviar pastas, ficheiros muito grandes, etc.",
 );
-?>

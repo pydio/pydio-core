@@ -28,4 +28,3 @@ $mess=array(
 "Viewer Quality" => "Viewer Quality",
 "Quality used for generation the high scale images" => "Quality used for generation the high scale images",
 );
-?>

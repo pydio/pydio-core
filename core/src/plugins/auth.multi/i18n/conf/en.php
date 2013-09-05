@@ -28,4 +28,3 @@ $mess=array(
 "Separator" => "Separator",
 "This is necessary to discriminate users data loaded from various sources. Warning, use foldername compliant characters. For example :: does not work!" => "This is necessary to discriminate users data loaded from various sources. Warning, use foldername compliant characters. For example :: does not work!",
 );
-?>

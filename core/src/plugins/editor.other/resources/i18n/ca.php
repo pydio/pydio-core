@@ -24,5 +24,4 @@ $mess=array(
 "3" => "Triar un altre editor per obrir aquest fitxer",
 "4" => "Alerta, aquests editors do tenen el fitxer declarat com a suportat, el seu comportament pot ser impredictible!",
 "5" => "Netejar les associacions existents",
-); 
-?>
+);

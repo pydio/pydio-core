@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */// Slovenian translation: April 21 2011 by Vladimir Bohinc (vladimir.bohinc@gmail.com)
-// 
+//
 //---------------------------------------------------------------------------------------------------
 $mess=array(
 "1" => "Metapodatki",
@@ -27,7 +27,6 @@ $mess=array(
 "4" => "Nepomembno",
 "5" => "Opravilo",
 "6" => "Osebno",
-"7" => "Služba", 
+"7" => "Služba",
 "8" => "Pomembno"
 );
-?>

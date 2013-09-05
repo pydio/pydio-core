@@ -30,4 +30,3 @@ $mess=array(
 "Password" => "Passwort",
 "User Password" => "Benutzer Passwort",
 );
-?>

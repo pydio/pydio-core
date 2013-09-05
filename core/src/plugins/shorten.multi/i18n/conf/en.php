@@ -23,4 +23,3 @@ $mess=array(
 "API Key" => "API Key",
 "Bit.ly account API Key" => "Bit.ly account API Key",
 );
-?>

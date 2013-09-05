@@ -46,4 +46,3 @@ $mess=array(
 "Analytics Events" => "Eventos de Estatísticas",
 "Use Events Logging, experimental only implemented on download action in AjaXplorer" => "Usar Registo de eventos, experimental, apenas implementado na área de transferências do AjaXplorer",
 );
-?>

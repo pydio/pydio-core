@@ -22,5 +22,4 @@ $mess=array(
 "1" => "Nueva ventana",
 "2" => "Navegador en nueva ventana",
 "3" => "Abriendo el fichero en una ventana externa, espere por favor, esta ventana se cerrará automáticamente.",
-); 
-?>
+);

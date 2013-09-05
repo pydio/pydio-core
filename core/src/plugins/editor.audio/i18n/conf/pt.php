@@ -22,4 +22,3 @@ $mess=array(
 "Audio Player" => "Reprodutor de Música",
 "Inserts a flash player for reading mp3 files online, and playing a whole folder in a separate window." => "Insere um reprodutor em Flash para ler ficheiros MP3 online, e reproduz os conteúdos de uma pasta numa janela em separado.",
 );
-?>

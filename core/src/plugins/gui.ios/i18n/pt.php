@@ -28,4 +28,3 @@ $mess=array(
 "3.android" => "Ainda não tenho a aplicação, abra-me a página da Loja de Aplicações da mesma!",
 "4.android" => "Não tenho interesse na aplicação, deixe-me usar a versão Web de %s.",
 );
-?>
