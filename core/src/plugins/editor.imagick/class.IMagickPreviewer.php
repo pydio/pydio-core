@@ -271,8 +271,8 @@ class IMagickPreviewer extends AJXP_Plugin {
         if(!empty($customEnvPath)){
             putenv("PATH=".getenv("PATH").":".$customEnvPath);
         }
-        $params = ($this->extractAll?"-quality ".$viewerQuality:"-resize 250 ".$customOptions." -quality ".$thumbQuality);
-        $cmd = $this->getFilteredOption("IMAGE_MAGICK_CONVERT")." ".escapeshellarg(($masterFile).$pageLimit)." ".$params." ".escapeshellarg($tmpFileThumb);
+	$params = (isSet($this->pluginConf["IM_CUSTOM_OPTIONS"])?$this->pluginConf["IM_CUSTOM_OPTIONS"]." ":"")."-quality ".$this->pluginConf[($this->extractAll?"IM_VIEWER_QUALITY":"IM_THUMB_QUALITY")];
+	$cmd = $this->pluginConf["IMAGE_MAGICK_CONVERT"]." ".$params." ".escapeshellarg(($masterFile).$pageLimit)." ".escapeshellarg($tmpFileThumb);
 		AJXP_Logger::debug("IMagick Command : $cmd");
 		session_write_close(); // Be sure to give the hand back
 		exec($cmd, $out, $return);
