@@ -7,7 +7,7 @@
 	if(loginRedirect){
 		document.location.href=loginRedirect;
 	}else{
-		modal.showDialogForm('Log In', ($('login_form')?'login_form':'login_form_dynamic'), 
+		modal.showDialogForm('Log In', ($('login_form')?'login_form':'login_form_dynamic'),
 		function(oForm){
             $("generic_dialog_box").setStyle({
                 top:$("progressBox").getStyle('top'),
@@ -98,7 +98,7 @@
 			connexion.sendAsync();
 			oForm.userid.value = '';
 			oForm.password.value = '';
-			return false;				
+			return false;
 		});
 	}
 ]]></clientCallback>

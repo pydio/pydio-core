@@ -36,4 +36,3 @@ $mess=array(
 "Mailer" => "Mailer",
 "Php mailer to use (see phpmail-lite documentation).'." => "Php mailer to use (see phpmail-lite documentation).'.",
 );
-?>

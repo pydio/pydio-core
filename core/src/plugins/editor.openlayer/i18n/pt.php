@@ -11,6 +11,4 @@ $mess=array(
 "8" => "Filtro",
 "9" => "Procurar",
 "10" => "Limpar",
-)
-
-?>
+);

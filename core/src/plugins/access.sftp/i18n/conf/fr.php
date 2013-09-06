@@ -30,4 +30,3 @@ $mess=array(
 "Fix Permissions" => "Correction des permissions",
 "How to handle remote permissions to be used by PHP as local permissions. See manual." => "Gestion des permissions entre le serveur local et le serveur distant.",
 );
-?>

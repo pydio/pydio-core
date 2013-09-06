@@ -30,4 +30,3 @@ $mess=array(
 "User Password" => "Mot de passe utilisateur",
 "Timestamp" => "Timestamp",
 );
-?>

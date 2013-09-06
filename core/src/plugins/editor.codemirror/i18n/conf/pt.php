@@ -22,4 +22,3 @@ $mess=array(
 "Source Viewer" => "Visualizador de Código-Fonte",
 "Syntax Highlighter for all major code source files" => "Visualizador Syntax Highlighter para todos os tipos principais de código-fonte",
 );
-?>

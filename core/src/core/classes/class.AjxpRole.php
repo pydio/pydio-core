@@ -29,65 +29,71 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class AjxpRole implements AjxpGroupPathProvider
 {
-	private $id;
-	private $rights = array();
+    private $id;
+    private $rights = array();
     private $default = false;
     /**
      * @var String
      */
     protected $groupPath;
-	/**
+    /**
      * Constructor
      * @param string $id
      * @return void
      */
-	function AjxpRole($id){
-		$this->id = $id;
-	}
-	/**
+    public function AjxpRole($id)
+    {
+        $this->id = $id;
+    }
+    /**
      * @param $id
      * @return void
      */
-	function setId($id){
-		$this->id = $id;
-	}
-	/**
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+    /**
      * @return string
      */
-	function getId(){
-		return $this->id;
-	}
-	/**
+    public function getId()
+    {
+        return $this->id;
+    }
+    /**
      * Whether this role can read the given repo
      * @param string $rootDirId Repository ID
      * @return bool
      */
-	function canRead($rootDirId){
-		$right = $this->getRight($rootDirId);
-		if($right == "rw" || $right == "r") return true;
-		return false;
-	}
-	
+    public function canRead($rootDirId)
+    {
+        $right = $this->getRight($rootDirId);
+        if($right == "rw" || $right == "r") return true;
+        return false;
+    }
+
     /**
      * Whether this role can write the given repo
      * @param string $rootDirId Repository ID
      * @return bool
      */
-	function canWrite($rootDirId){
-		$right = $this->getRight($rootDirId);
-		if($right == "rw" || $right == "w") return true;
-		return false;
-	}	
-	
+    public function canWrite($rootDirId)
+    {
+        $right = $this->getRight($rootDirId);
+        if($right == "rw" || $right == "w") return true;
+        return false;
+    }
+
     /**
      * Current definitioon (r, rw, w, empty string) for the given repo
      * @param string $rootDirId Repository ID
      * @return string
      */
-	function getRight($rootDirId){
-		if(isSet($this->rights[$rootDirId])) return $this->rights[$rootDirId];
-		return "";
-	}
+    public function getRight($rootDirId)
+    {
+        if(isSet($this->rights[$rootDirId])) return $this->rights[$rootDirId];
+        return "";
+    }
 
     /**
      * Set the right
@@ -95,51 +101,56 @@ class AjxpRole implements AjxpGroupPathProvider
      * @param string $rightString ("r", "rw", "w", "")
      * @return void
      */
-	function setRight($rootDirId, $rightString){
-		$this->rights[$rootDirId] = $rightString;
-	}
-	/**
+    public function setRight($rootDirId, $rightString)
+    {
+        $this->rights[$rootDirId] = $rightString;
+    }
+    /**
      * Remove a right entry for the repository
      * @param string $rootDirId
      * @return void
      */
-	function removeRights($rootDirId){
-		if(isSet($this->rights[$rootDirId])) unset($this->rights[$rootDirId]);
-	}
-	/**
+    public function removeRights($rootDirId)
+    {
+        if(isSet($this->rights[$rootDirId])) unset($this->rights[$rootDirId]);
+    }
+    /**
      * Remove all rights
      * @return void
      */
-	function clearRights(){
-		$this->rights = array();
-	}
-	/**
+    public function clearRights()
+    {
+        $this->rights = array();
+    }
+    /**
      * Get the specific actions rights (see setSpecificActionsRights)
      * @param $rootDirId
      * @return array
      */
-	function getSpecificActionsRights($rootDirId){
-		$res = array();
-		if($rootDirId."" != "ajxp.all"){
-			$res = $this->getSpecificActionsRights("ajxp.all");
-		}
-		if(isSet($this->rights["ajxp.actions"]) && isSet($this->rights["ajxp.actions"][$rootDirId])){
-			$res = array_merge($res, $this->rights["ajxp.actions"][$rootDirId]);
-		}
-		return $res;
-	}
-	/**
+    public function getSpecificActionsRights($rootDirId)
+    {
+        $res = array();
+        if ($rootDirId."" != "ajxp.all") {
+            $res = $this->getSpecificActionsRights("ajxp.all");
+        }
+        if (isSet($this->rights["ajxp.actions"]) && isSet($this->rights["ajxp.actions"][$rootDirId])) {
+            $res = array_merge($res, $this->rights["ajxp.actions"][$rootDirId]);
+        }
+        return $res;
+    }
+    /**
      * This method allows to specifically disable some actions for a given role for one or more repository.
      * @param string $rootDirId Repository id or "ajxp.all" for all repositories
      * @param string $actionName
      * @param bool $allowed
      * @return void
      */
-	function setSpecificActionRight($rootDirId, $actionName, $allowed){		
-		if(!isSet($this->rights["ajxp.actions"])) $this->rights["ajxp.actions"] = array();
-		if(!isset($this->rights["ajxp.actions"][$rootDirId])) $this->rights["ajxp.actions"][$rootDirId] = array();
-		$this->rights["ajxp.actions"][$rootDirId][$actionName] = $allowed;
-	}
+    public function setSpecificActionRight($rootDirId, $actionName, $allowed)
+    {
+        if(!isSet($this->rights["ajxp.actions"])) $this->rights["ajxp.actions"] = array();
+        if(!isset($this->rights["ajxp.actions"][$rootDirId])) $this->rights["ajxp.actions"][$rootDirId] = array();
+        $this->rights["ajxp.actions"][$rootDirId][$actionName] = $allowed;
+    }
 
     public function setDefault($default)
     {
@@ -168,5 +179,3 @@ class AjxpRole implements AjxpGroupPathProvider
     }
 
 }
-
-?>

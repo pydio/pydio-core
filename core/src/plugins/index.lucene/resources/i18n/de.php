@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
- 
+
 $mess = array(
     "1" => "Index Inhalt",
     "2" => "Index Verzeichnisinhalt",

@@ -22,4 +22,3 @@ $mess=array(
 "Subversion Repository" => "Repositório de Sub-versões",
 "Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline." => "Extrair informações de SVN (revisão, registo de alterações, etc) caso a Área de Trabalho seja uma Cópia e o SVN esteja disponível pela linha de comandos.",
 );
-?>

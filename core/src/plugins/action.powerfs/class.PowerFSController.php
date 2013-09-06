@@ -28,28 +28,29 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class PowerFSController extends AJXP_Plugin
 {
 
-    function switchAction($action, $httpVars, $fileVars){
+    public function switchAction($action, $httpVars, $fileVars)
+    {
         if(!isSet($this->actions[$action])) return;
         $selection = new UserSelection();
         $dir = $httpVars["dir"] OR "";
         $dir = AJXP_Utils::securePath($dir);
         if($dir == "/") $dir = "";
         $selection->initFromHttpVars($httpVars);
-        if(!$selection->isEmpty()){
+        if (!$selection->isEmpty()) {
             //$this->filterUserSelectionToHidden($selection->getFiles());
         }
         $urlBase = "ajxp.fs://". ConfService::getRepository()->getId();
         $mess = ConfService::getMessages();
-        switch ($action){
+        switch ($action) {
 
             case "monitor_compression" :
 
                 $percentFile = fsAccessWrapper::getRealFSReference($urlBase.$dir."/.zip_operation_".$httpVars["ope_id"]);
                 $percent = 0;
-                if(is_file($percentFile)){
+                if (is_file($percentFile)) {
                     $percent = intval(file_get_contents($percentFile));
                 }
-                if($percent < 100){
+                if ($percent < 100) {
                     AJXP_XMLWriter::header();
                     AJXP_XMLWriter::triggerBgAction(
                         "monitor_compression",
@@ -58,12 +59,12 @@ class PowerFSController extends AJXP_Plugin
                         true,
                         1);
                     AJXP_XMLWriter::close();
-                }else{
+                } else {
                     @unlink($percentFile);
                     AJXP_XMLWriter::header();
-                    if($httpVars["on_end"] == "reload"){
+                    if ($httpVars["on_end"] == "reload") {
                         AJXP_XMLWriter::triggerBgAction("reload_node", array(), "powerfs.2", true, 2);
-                    }else{
+                    } else {
                         $archiveName =  $httpVars["archive_name"];
                         $jsCode = "
                             $('download_form').action = window.ajxpServerAccessPath;
@@ -89,10 +90,10 @@ class PowerFSController extends AJXP_Plugin
 
                 $archive = AJXP_Utils::getAjxpTmpDir()."/".$httpVars["ope_id"]."_".$httpVars["archive_name"];
                 $fsDriver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
-                if(is_file($archive)){
+                if (is_file($archive)) {
                     register_shutdown_function("unlink", $archive);
                     $fsDriver->readFile($archive, "force-download", $httpVars["archive_name"], false, null, true);
-                }else{
+                } else {
                     echo("<script>alert('Cannot find archive! Is ZIP correctly installed?');</script>");
                 }
                 break;
@@ -100,7 +101,7 @@ class PowerFSController extends AJXP_Plugin
             case "compress" :
             case "precompress" :
 
-                if(!ConfService::currentContextIsCommandLine() && ConfService::backgroundActionsSupported()){
+                if (!ConfService::currentContextIsCommandLine() && ConfService::backgroundActionsSupported()) {
                     $opeId = substr(md5(time()),0,10);
                     $httpVars["ope_id"] = $opeId;
                     AJXP_Controller::applyActionInBackground(ConfService::getRepository()->getId(), $action, $httpVars);
@@ -129,27 +130,27 @@ class PowerFSController extends AJXP_Plugin
                 $args = array();
                 $replaceSearch = array($rootDir, "\\");
                 $replaceReplace = array("", "/");
-                foreach($selection->getFiles() as $selectionFile){
+                foreach ($selection->getFiles() as $selectionFile) {
                     $args[] = '"'.substr($selectionFile, strlen($dir)+($dir=="/"?0:1)).'"';
                     $selectionFile = fsAccessWrapper::getRealFSReference($urlBase.$selectionFile);
                     $todo[] = ltrim(str_replace($replaceSearch, $replaceReplace, $selectionFile), "/");
-                    if(is_dir($selectionFile)){
+                    if (is_dir($selectionFile)) {
                         $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($selectionFile), RecursiveIteratorIterator::SELF_FIRST);
-                        foreach($objects as $name => $object){
+                        foreach ($objects as $name => $object) {
                             $todo[] = str_replace($replaceSearch, $replaceReplace, $name);
                         }
                     }
                 }
                 $cmdSeparator = ((PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows")? "&" : ";");
                 $archiveName = $httpVars["archive_name"];
-                if(!$compressLocally){
+                if (!$compressLocally) {
                     $archiveName = AJXP_Utils::getAjxpTmpDir()."/".$httpVars["ope_id"]."_".$archiveName;
                 }
                 chdir($rootDir);
                 $cmd = "zip -r ".escapeshellarg($archiveName)." ".implode(" ", $args);
                 $fsDriver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
                 $c = $fsDriver->getConfigs();
-                if(!isSet($c["SHOW_HIDDEN_FILES"]) || $c["SHOW_HIDDEN_FILES"] == false){
+                if (!isSet($c["SHOW_HIDDEN_FILES"]) || $c["SHOW_HIDDEN_FILES"] == false) {
                     $cmd .= " -x .\*";
                 }
                 $cmd .= " ".$cmdSeparator." echo ZIP_FINISHED";
@@ -165,11 +166,11 @@ class PowerFSController extends AJXP_Plugin
                         $tok = strtok($results, "\n");
                         while ($tok !== false) {
                             $toks[] = $tok;
-                            if($tok == "ZIP_FINISHED") {
+                            if ($tok == "ZIP_FINISHED") {
                                 $finishedEchoed = true;
-                            }else{
+                            } else {
                                 $test = preg_match('/(\w+): (.*) \(([^\(]+)\) \(([^\(]+)\)/', $tok, $matches);
-                                if($test !== false){
+                                if ($test !== false) {
                                     $handled[] = $matches[2];
                                 }
                             }

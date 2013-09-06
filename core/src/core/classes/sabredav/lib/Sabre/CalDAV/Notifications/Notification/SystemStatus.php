@@ -15,8 +15,8 @@ use Sabre\CalDAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class SystemStatus extends DAV\Property implements CalDAV\Notifications\INotificationType {
-
+class SystemStatus extends DAV\Property implements CalDAV\Notifications\INotificationType
+{
     const TYPE_LOW = 1;
     const TYPE_MEDIUM = 2;
     const TYPE_HIGH = 3;
@@ -68,8 +68,8 @@ class SystemStatus extends DAV\Property implements CalDAV\Notifications\INotific
      * @param string $description
      * @param string $href
      */
-    public function __construct($id, $etag, $type = self::TYPE_HIGH, $description = null, $href = null) {
-
+    public function __construct($id, $etag, $type = self::TYPE_HIGH, $description = null, $href = null)
+    {
         $this->id = $id;
         $this->type = $type;
         $this->description = $description;
@@ -88,9 +88,9 @@ class SystemStatus extends DAV\Property implements CalDAV\Notifications\INotific
      * @param \DOMElement $node
      * @return void
      */
-    public function serialize(DAV\Server $server, \DOMElement $node) {
-
-        switch($this->type) {
+    public function serialize(DAV\Server $server, \DOMElement $node)
+    {
+        switch ($this->type) {
             case self::TYPE_LOW :
                 $type = 'low';
                 break;
@@ -118,9 +118,9 @@ class SystemStatus extends DAV\Property implements CalDAV\Notifications\INotific
      * @param \DOMElement $node
      * @return void
      */
-    public function serializeBody(DAV\Server $server, \DOMElement $node) {
-
-        switch($this->type) {
+    public function serializeBody(DAV\Server $server, \DOMElement $node)
+    {
+        switch ($this->type) {
             case self::TYPE_LOW :
                 $type = 'low';
                 break;
@@ -161,8 +161,8 @@ class SystemStatus extends DAV\Property implements CalDAV\Notifications\INotific
      *
      * @return string
      */
-    public function getId() {
-
+    public function getId()
+    {
         return $this->id;
 
     }
@@ -174,8 +174,8 @@ class SystemStatus extends DAV\Property implements CalDAV\Notifications\INotific
      *
      * @return string
      */
-    public function getETag() {
-
+    public function getETag()
+    {
         return $this->etag;
 
     }

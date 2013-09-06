@@ -22,4 +22,3 @@ $mess=array(
 "Subversion Repository" => "Repository SVN",
 "Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline." => "Affichage des informations de versionning si le répertoire courant est une working-copy d'un repository SVN. La commande svn doit être accessible sur la machine locale.",
 );
-?>

@@ -45,4 +45,3 @@ $mess=array(
 "#Items per page" => "Elements par page",
 "Once in pagination mode, number of items to display per page." => "Nombre d'items par page.",
 );
-?>

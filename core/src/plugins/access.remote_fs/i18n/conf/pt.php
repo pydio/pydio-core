@@ -38,4 +38,3 @@ $mess=array(
 "Api Capabilities" => "Capacidades da API",
 "AjaXplorer plugins actions supported by remote server, thus forwarded directly instead of executed locally." => "As acções dos plugins AjaXplorer suportadas pelo servidor remoto, sendo estas redireccionadas directamente para o servidor remoto em vez de tratadas localmente.",
 );
-?>

@@ -10,7 +10,6 @@ namespace Sabre\CalDAV\Schedule;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-interface IOutbox extends \Sabre\DAV\ICollection, \Sabre\DAVACL\IACL {
-
-
+interface IOutbox extends \Sabre\DAV\ICollection, \Sabre\DAVACL\IACL
+{
 }

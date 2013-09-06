@@ -12,8 +12,8 @@ namespace Sabre\DAVACL;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class PrincipalCollection extends AbstractPrincipalCollection {
-
+class PrincipalCollection extends AbstractPrincipalCollection
+{
     /**
      * This method returns a node for a principal.
      *
@@ -24,8 +24,8 @@ class PrincipalCollection extends AbstractPrincipalCollection {
      * @param array $principal
      * @return \Sabre\DAV\INode
      */
-    public function getChildForPrincipal(array $principal) {
-
+    public function getChildForPrincipal(array $principal)
+    {
         return new Principal($this->principalBackend, $principal);
 
     }

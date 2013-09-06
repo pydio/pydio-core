@@ -24,4 +24,3 @@ $mess=array(
 "Connexion" => "Connexion",
 "The Database Connexion" => "Connexion Base de données, tableau de valeurs DIBI.",
 );
-?>

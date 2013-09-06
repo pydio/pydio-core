@@ -28,4 +28,3 @@ $mess=array(
 "Recycle Bin Folder" => "Recycle Bin Folder",
 "Leave empty if you do not want to use a recycle bin." => "Leave empty if you do not want to use a recycle bin.",
 );
-?>

@@ -140,5 +140,3 @@ if (!class_exists('DateTime')) {
 	    }
 	}
 }
-
-?>

@@ -29,4 +29,3 @@ $mess=array(
     "4" => "Esitlusdokument",
     "5" => "Tabelarvutusdokument",
 );
-?>

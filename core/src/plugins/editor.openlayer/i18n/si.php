@@ -19,7 +19,7 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
 // Slovenian translation: April 21 2011 by Vladimir Bohinc (vladimir.bohinc@gmail.com)
-// 
+//
 //---------------------------------------------------------------------------------------------------
 $mess=array(
 "1" => "Zemljevid OpenLayers",
@@ -33,4 +33,3 @@ $mess=array(
 "9" => "Najdi",
 "10" => "Počisti",
 );
-?>

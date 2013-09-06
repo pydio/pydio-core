@@ -11,8 +11,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Directory extends Node implements DAV\ICollection, DAV\IQuota {
-
+class Directory extends Node implements DAV\ICollection, DAV\IQuota
+{
     /**
      * Creates a new file in the directory
      *
@@ -37,8 +37,8 @@ class Directory extends Node implements DAV\ICollection, DAV\IQuota {
      * @param resource|string $data Initial payload
      * @return null|string
      */
-    public function createFile($name, $data = null) {
-
+    public function createFile($name, $data = null)
+    {
         // We're not allowing dots
         if ($name=='.' || $name=='..') throw new DAV\Exception\Forbidden('Permission denied to . and ..');
         $newPath = $this->path . '/' . $name;
@@ -54,8 +54,8 @@ class Directory extends Node implements DAV\ICollection, DAV\IQuota {
      * @param string $name
      * @return void
      */
-    public function createDirectory($name) {
-
+    public function createDirectory($name)
+    {
         // We're not allowing dots
         if ($name=='.' || $name=='..') throw new DAV\Exception\Forbidden('Permission denied to . and ..');
         $newPath = $this->path . '/' . $name;
@@ -73,8 +73,8 @@ class Directory extends Node implements DAV\ICollection, DAV\IQuota {
      * @throws DAV\Exception\NotFound
      * @return DAV\INode
      */
-    public function getChild($name) {
-
+    public function getChild($name)
+    {
         $path = $this->path . '/' . $name;
 
         if (!file_exists($path)) throw new DAV\Exception\NotFound('File could not be located');
@@ -98,8 +98,8 @@ class Directory extends Node implements DAV\ICollection, DAV\IQuota {
      * @param string $name
      * @return bool
      */
-    public function childExists($name) {
-
+    public function childExists($name)
+    {
         if ($name=='.' || $name=='..')
             throw new DAV\Exception\Forbidden('Permission denied to . and ..');
 
@@ -113,8 +113,8 @@ class Directory extends Node implements DAV\ICollection, DAV\IQuota {
      *
      * @return DAV\INode[]
      */
-    public function getChildren() {
-
+    public function getChildren()
+    {
         $nodes = array();
         foreach(scandir($this->path) as $node) if($node!='.' && $node!='..' && $node!='.sabredav') $nodes[] = $this->getChild($node);
         return $nodes;
@@ -126,8 +126,8 @@ class Directory extends Node implements DAV\ICollection, DAV\IQuota {
      *
      * @return bool
      */
-    public function delete() {
-
+    public function delete()
+    {
         // Deleting all children
         foreach($this->getChildren() as $child) $child->delete();
 
@@ -146,8 +146,8 @@ class Directory extends Node implements DAV\ICollection, DAV\IQuota {
      *
      * @return array
      */
-    public function getQuotaInfo() {
-
+    public function getQuotaInfo()
+    {
         return array(
             disk_total_space($this->path)-disk_free_space($this->path),
             disk_free_space($this->path)
@@ -156,4 +156,3 @@ class Directory extends Node implements DAV\ICollection, DAV\IQuota {
     }
 
 }
-

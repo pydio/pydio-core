@@ -41,4 +41,3 @@ $mess=array(
 "Pass Ftp data through Auth driver" => "Pass Ftp data through Auth driver",
 "In conjunction with a correctly configured auth.ftp driver, this allow to transform ajaxplorer into a simple netFtp client." => "In conjunction with a correctly configured auth.ftp driver, this allow to transform ajaxplorer into a simple netFtp client.",
 );
-?>

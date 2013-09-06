@@ -15,8 +15,8 @@ namespace Sabre\CardDAV\Backend;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-interface BackendInterface {
-
+interface BackendInterface
+{
     /**
      * Returns the list of addressbooks for a specific user.
      *

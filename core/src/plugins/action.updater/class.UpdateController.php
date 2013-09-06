@@ -25,26 +25,28 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Action
  */
-class UpdateController extends AJXP_Plugin {
-
-    public function init($options){
+class UpdateController extends AJXP_Plugin
+{
+    public function init($options)
+    {
         parent::init($options);
         $u = AuthService::getLoggedUser();
         if($u == null) return;
-        if($u->getGroupPath() != "/"){
+        if ($u->getGroupPath() != "/") {
             $this->enabled = false;
         }
     }
 
-	/**
-	 * Parse
-	 * @param DOMNode $contribNode
-	 */
-	protected function parseSpecificContributions(&$contribNode){
-		parent::parseSpecificContributions($contribNode);
+    /**
+     * Parse
+     * @param DOMNode $contribNode
+     */
+    protected function parseSpecificContributions(&$contribNode)
+    {
+        parent::parseSpecificContributions($contribNode);
         if($this->pluginConf["ENABLE_324_IMPORT"] == true) return;
-        
-		if($contribNode->nodeName != "actions") return ;
+
+        if($contribNode->nodeName != "actions") return ;
         $actionXpath=new DOMXPath($contribNode->ownerDocument);
         $compressNodeList = $actionXpath->query('action[@name="import_from_324"]', $contribNode);
         if(!$compressNodeList->length) return ;
@@ -57,14 +59,15 @@ class UpdateController extends AJXP_Plugin {
         unset($this->actions["import_from_324"]);
         $compressNode = $compressNodeList->item(0);
         $contribNode->removeChild($compressNode);
-	}
+    }
 
-    function switchAction($action, $httpVars, $fileVars){
+    public function switchAction($action, $httpVars, $fileVars)
+    {
         if(!isSet($this->actions[$action])) return;
         $loggedUser = AuthService::getLoggedUser();
         if(AuthService::usersEnabled() && !$loggedUser->isAdmin()) return ;
         require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.updater/class.AjaXplorerUpgrader.php");
-        if(!empty($this->pluginConf["PROXY_HOST"])){
+        if (!empty($this->pluginConf["PROXY_HOST"])) {
             AjaXplorerUpgrader::configureProxy(
                 $this->pluginConf["PROXY_HOST"],
                 $this->pluginConf["PROXY_USER"],
@@ -72,7 +75,7 @@ class UpdateController extends AJXP_Plugin {
             );
         }
 
-        switch ($action){
+        switch ($action) {
 
 
             case "import_from_324":
@@ -99,17 +102,17 @@ class UpdateController extends AJXP_Plugin {
             case "perform_upgrade" :
 
                 AJXP_Utils::safeIniSet("output_buffering", "Off");
-                if(AJXP_PACKAGING != "zip"){
+                if (AJXP_PACKAGING != "zip") {
                     print "Your installation is managed directly via os packages, you should not upgrade manually.";
                     break;
                 }
                 $res = AjaXplorerUpgrader::getUpgradePath($this->pluginConf["UPDATE_SITE"], "php", $this->pluginConf["UPDATE_CHANNEL"]);
-                if(!count($res["packages"])){
+                if (!count($res["packages"])) {
                     print("No update is necessary!");
                     break;
                 }
                 include(dirname(__FILE__)."/output_head.html");
-                foreach($res["packages"] as $index => $zipPackage){
+                foreach ($res["packages"] as $index => $zipPackage) {
                     print("<div class='main_step'>Applying upgrade ".basename($zipPackage)."</div>");
                     $u = new AjaXplorerUpgrader(
                         $zipPackage,
@@ -118,15 +121,15 @@ class UpdateController extends AJXP_Plugin {
                         explode(",",$this->pluginConf["PRESERVE_FILES"])
                     );
                     $errors = false;
-                    while($u->hasNextStep()){
+                    while ($u->hasNextStep()) {
                         set_time_limit(180);
                         print("<div class='upgrade_step'><div class='upgrade_title'>".$u->currentStepTitle."</div>");
                         $u->execute();
-                        if($u->error != null){
+                        if ($u->error != null) {
                             print("<div class='upgrade_result error'>- Error : ".$u->error."</div>");
                             $errors = true;
                             break;
-                        }else{
+                        } else {
                             print("<div class='upgrade_result success'>- ".$u->result."</div>");
                         }
                         print("</div>");

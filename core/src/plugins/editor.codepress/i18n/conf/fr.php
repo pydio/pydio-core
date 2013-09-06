@@ -22,4 +22,3 @@ $mess=array(
 "CodePress" => "CodePress",
 "Legacy Syntax Highlighter" => "Mise en forme de la syntaxe",
 );
-?>

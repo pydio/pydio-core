@@ -13,8 +13,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class AclRestrictions extends DAV\Property {
-
+class AclRestrictions extends DAV\Property
+{
     /**
      * Serializes the property into a DOMElement
      *
@@ -22,8 +22,8 @@ class AclRestrictions extends DAV\Property {
      * @param \DOMElement $elem
      * @return void
      */
-    public function serialize(DAV\Server $server,\DOMElement $elem) {
-
+    public function serialize(DAV\Server $server,\DOMElement $elem)
+    {
         $doc = $elem->ownerDocument;
 
         $elem->appendChild($doc->createElementNS('DAV:','d:grant-only'));

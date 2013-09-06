@@ -17,8 +17,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Filesystem extends DAV\Tree {
-
+class Filesystem extends DAV\Tree
+{
     /**
      * Base url on the filesystem.
      *
@@ -33,8 +33,8 @@ class Filesystem extends DAV\Tree {
      *
      * @param string $basePath
      */
-    public function __construct($basePath) {
-
+    public function __construct($basePath)
+    {
         $this->basePath = $basePath;
 
     }
@@ -45,10 +45,10 @@ class Filesystem extends DAV\Tree {
      * @param string $path
      * @return DAV\FS\Node
      */
-    public function getNodeForPath($path) {
-
+    public function getNodeForPath($path)
+    {
         $realPath = $this->getRealPath($path);
-        if (!file_exists($realPath)) { 
+        if (!file_exists($realPath)) {
             throw new DAV\Exception\NotFound('File at location ' . $realPath . ' not found');
         }
         if (is_dir($realPath)) {
@@ -65,8 +65,8 @@ class Filesystem extends DAV\Tree {
      * @param string $publicPath
      * @return string
      */
-    protected function getRealPath($publicPath) {
-
+    protected function getRealPath($publicPath)
+    {
         return rtrim($this->basePath,'/') . '/' . trim($publicPath,'/');
 
     }
@@ -81,8 +81,8 @@ class Filesystem extends DAV\Tree {
      * @param string $destination
      * @return void
      */
-    public function copy($source,$destination) {
-
+    public function copy($source,$destination)
+    {
         $source = $this->getRealPath($source);
         $destination = $this->getRealPath($destination);
         $this->realCopy($source,$destination);
@@ -96,13 +96,13 @@ class Filesystem extends DAV\Tree {
      * @param string $destination
      * @return void
      */
-    protected function realCopy($source,$destination) {
-
+    protected function realCopy($source,$destination)
+    {
         if (is_file($source)) {
             copy($source,$destination);
         } else {
             mkdir($destination);
-            foreach(scandir($source) as $subnode) {
+            foreach (scandir($source) as $subnode) {
 
                 if ($subnode=='.' || $subnode=='..') continue;
                 $this->realCopy($source.'/'.$subnode,$destination.'/'.$subnode);
@@ -121,8 +121,8 @@ class Filesystem extends DAV\Tree {
      * @param string $destination
      * @return void
      */
-    public function move($source,$destination) {
-
+    public function move($source,$destination)
+    {
         $source = $this->getRealPath($source);
         $destination = $this->getRealPath($destination);
         rename($source,$destination);
@@ -130,4 +130,3 @@ class Filesystem extends DAV\Tree {
     }
 
 }
-

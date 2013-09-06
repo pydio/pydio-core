@@ -13,11 +13,11 @@ use Sabre\CalDAV;
  * such as VEVENT, VTODO
  *
  * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/) 
+ * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class SupportedCalendarComponentSet extends DAV\Property {
-
+class SupportedCalendarComponentSet extends DAV\Property
+{
     /**
      * List of supported components, such as "VEVENT, VTODO"
      *
@@ -30,8 +30,8 @@ class SupportedCalendarComponentSet extends DAV\Property {
      *
      * @param array $components
      */
-    public function __construct(array $components) {
-
+    public function __construct(array $components)
+    {
        $this->components = $components;
 
     }
@@ -41,8 +41,8 @@ class SupportedCalendarComponentSet extends DAV\Property {
      *
      * @return array
      */
-    public function getValue() {
-
+    public function getValue()
+    {
         return $this->components;
 
     }
@@ -54,10 +54,10 @@ class SupportedCalendarComponentSet extends DAV\Property {
      * @param \DOMElement $node
      * @return void
      */
-    public function serialize(DAV\Server $server,\DOMElement $node) {
-
+    public function serialize(DAV\Server $server,\DOMElement $node)
+    {
        $doc = $node->ownerDocument;
-       foreach($this->components as $component) {
+       foreach ($this->components as $component) {
 
             $xcomp = $doc->createElement('cal:comp');
             $xcomp->setAttribute('name',$component);
@@ -73,10 +73,10 @@ class SupportedCalendarComponentSet extends DAV\Property {
      * @param \DOMElement $node
      * @return Property_SupportedCalendarComponentSet
      */
-    static function unserialize(\DOMElement $node) {
-
+    public static function unserialize(\DOMElement $node)
+    {
         $components = array();
-        foreach($node->childNodes as $childNode) {
+        foreach ($node->childNodes as $childNode) {
             if (DAV\XMLUtil::toClarkNotation($childNode)==='{' . CalDAV\Plugin::NS_CALDAV . '}comp') {
                 $components[] = $childNode->getAttribute('name');
             }

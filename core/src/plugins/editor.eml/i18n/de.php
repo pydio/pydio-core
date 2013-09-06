@@ -1,4 +1,4 @@
-<?php 
+<?php
 $mess = array(
 "name" => "E-Mail Betrachter",
 "title" => "E-Mail Betrachter",
@@ -15,4 +15,3 @@ $mess = array(
 "11" => "Kopieren des Anhangs auf den Server",
 "12" => "Cc",
 );
-?>

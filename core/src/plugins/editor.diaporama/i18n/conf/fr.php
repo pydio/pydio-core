@@ -30,4 +30,3 @@ $mess=array(
 "Quality" => "Qualité",
 "Thumbs quality" => "Qualité pour le rendu de la vignette.",
 );
-?>

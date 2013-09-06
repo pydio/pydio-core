@@ -20,8 +20,8 @@ namespace Sabre\CalDAV\Backend;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-interface NotificationSupport extends BackendInterface {
-
+interface NotificationSupport extends BackendInterface
+{
     /**
      * Returns a list of notifications for a given principal url.
      *

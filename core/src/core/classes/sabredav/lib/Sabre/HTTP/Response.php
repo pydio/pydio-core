@@ -11,8 +11,8 @@ namespace Sabre\HTTP;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Response {
-
+class Response
+{
     /**
      * The HTTP version to return in the header() line.
      *
@@ -30,8 +30,8 @@ class Response {
      * @param int $code
      * @return string
      */
-    public function getStatusMessage($code, $httpVersion = '1.1') {
-
+    public function getStatusMessage($code, $httpVersion = '1.1')
+    {
         $msg = array(
             100 => 'Continue',
             101 => 'Switching Protocols',
@@ -107,8 +107,8 @@ class Response {
      * @param int $code HTTP status code
      * @return bool
      */
-    public function sendStatus($code) {
-
+    public function sendStatus($code)
+    {
         if (!headers_sent())
             return header($this->getStatusMessage($code, $this->defaultHttpVersion));
         else return false;
@@ -123,8 +123,8 @@ class Response {
      * @param bool $replace
      * @return bool
      */
-    public function setHeader($name, $value, $replace = true) {
-
+    public function setHeader($name, $value, $replace = true)
+    {
         $value = str_replace(array("\r","\n"),array('\r','\n'),$value);
         if (!headers_sent())
             return header($name . ': ' . $value, $replace);
@@ -142,8 +142,8 @@ class Response {
      * @param array $headers
      * @return void
      */
-    public function setHeaders(array $headers) {
-
+    public function setHeaders(array $headers)
+    {
         foreach($headers as $key=>$value)
             $this->setHeader($key, $value);
 
@@ -157,8 +157,8 @@ class Response {
      * @param mixed $body
      * @return void
      */
-    public function sendBody($body) {
-
+    public function sendBody($body)
+    {
         if (is_resource($body)) {
 
             fpassthru($body);

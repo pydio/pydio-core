@@ -1,4 +1,4 @@
-<?php 
+<?php
 $mess = array(
 "name" => "Editeur Email",
 "title" => "Editeur Email",
@@ -15,4 +15,3 @@ $mess = array(
 "11" => "Copier l'attachement sur le serveur",
 "12" => "Cc",
 );
-?>

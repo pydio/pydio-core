@@ -34,5 +34,3 @@ $mess=array(
 "9"	=> "Tekstiotsing",
 "10" => "Treppimise laius"
 );
-
-?>

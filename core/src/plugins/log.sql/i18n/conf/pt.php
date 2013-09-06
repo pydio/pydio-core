@@ -24,4 +24,3 @@ $mess=array(
 "Connexion" => "Ligação",
 "The Database Connexion" => "Ligação à Base de Dados",
 );
-?>

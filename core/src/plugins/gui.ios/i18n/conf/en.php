@@ -22,4 +22,3 @@ $mess=array(
 "iOS" => "iOS",
 "Template for redirecting to iPhone application" => "Template for redirecting to iPhone application",
 );
-?>

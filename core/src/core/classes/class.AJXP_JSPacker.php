@@ -25,32 +25,32 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer
  * @subpackage Core
  */
-class AJXP_JSPacker{
-	
-	/**
-	 * Static function for packing all js and css into big files
+class AJXP_JSPacker
+{
+    /**
+     * Static function for packing all js and css into big files
      * Auto detect /js/*_list.txt files and /css/*_list.txt files and pack them.
-	 */
-	function pack(){
-
+     */
+    public function pack()
+    {
         // Make sure that the gui.* plugin is loaded
         $plug = AJXP_PluginsService::getInstance()->getPluginsByType("gui");
 
         $sList = glob(CLIENT_RESOURCES_FOLDER."/js/*_list.txt");
-        foreach ($sList as $list){
+        foreach ($sList as $list) {
             $scriptName = str_replace("_list.txt", ".js", $list);
             AJXP_JSPacker::concatListAndPack($list,
                                              $scriptName,
                                             "Normal");
         }
         $sList = glob(AJXP_THEME_FOLDER."/css/*_list.txt");
-        foreach ($sList as $list){
+        foreach ($sList as $list) {
             $scriptName = str_replace("_list.txt", ".css", $list);
             AJXP_JSPacker::concatListAndPack($list,
                                              $scriptName,
                                             "None");
         }
-	}
+    }
 
     /**
      * Perform actual compression
@@ -59,38 +59,36 @@ class AJXP_JSPacker{
      * @param $mode
      * @return bool
      */
-	function concatListAndPack($src, $out, $mode){
-		
-		if(!is_file($src) || !is_readable($src)){
-			return false;
-		}
-		
-		// Concat List into one big string	
-		$jscode = '' ;
-		$handle = @fopen($src, 'r');
-		if ($handle) {
-		    while (!feof($handle)) {
-		        $jsline = fgets($handle, 4096) ;
-		        if(rtrim($jsline,"\n") != ""){
-					$code = file_get_contents(AJXP_INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/".rtrim($jsline,"\n\r")) ;
-					if ($code) $jscode .= $code ;
-		        }
-		    }
-		    fclose($handle);
-		}
-		
-		// Pack and write to file
-		require_once("packer/class.JavaScriptPacker.php");
-		$packer = new JavaScriptPacker($jscode, $mode , true, false);
-		$packed = $packer->pack();
-		if($mode == "None"){ // css case, hack for I.E.
-			$packed = str_replace("solid#", "solid #", $packed);
-		}
-		@file_put_contents($out, $packed);
-		
-		return true;
-	}
-	
-}
+    public function concatListAndPack($src, $out, $mode)
+    {
+        if (!is_file($src) || !is_readable($src)) {
+            return false;
+        }
 
-?>
+        // Concat List into one big string
+        $jscode = '' ;
+        $handle = @fopen($src, 'r');
+        if ($handle) {
+            while (!feof($handle)) {
+                $jsline = fgets($handle, 4096) ;
+                if (rtrim($jsline,"\n") != "") {
+                    $code = file_get_contents(AJXP_INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/".rtrim($jsline,"\n\r")) ;
+                    if ($code) $jscode .= $code ;
+                }
+            }
+            fclose($handle);
+        }
+
+        // Pack and write to file
+        require_once("packer/class.JavaScriptPacker.php");
+        $packer = new JavaScriptPacker($jscode, $mode , true, false);
+        $packed = $packer->pack();
+        if ($mode == "None") { // css case, hack for I.E.
+            $packed = str_replace("solid#", "solid #", $packed);
+        }
+        @file_put_contents($out, $packed);
+
+        return true;
+    }
+
+}

@@ -20,8 +20,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class AllowedSharingModes extends DAV\Property {
-
+class AllowedSharingModes extends DAV\Property
+{
     /**
      * Whether or not a calendar can be shared with another user
      *
@@ -43,8 +43,8 @@ class AllowedSharingModes extends DAV\Property {
      * @param bool $canBePublished
      * @return void
      */
-    public function __construct($canBeShared, $canBePublished) {
-
+    public function __construct($canBeShared, $canBePublished)
+    {
         $this->canBeShared = $canBeShared;
         $this->canBePublished = $canBePublished;
 
@@ -57,8 +57,8 @@ class AllowedSharingModes extends DAV\Property {
      * @param \DOMElement $node
      * @return void
      */
-    public function serialize(DAV\Server $server, \DOMElement $node) {
-
+    public function serialize(DAV\Server $server, \DOMElement $node)
+    {
        $doc = $node->ownerDocument;
        if ($this->canBeShared) {
             $xcomp = $doc->createElement('cs:can-be-shared');

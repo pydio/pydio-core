@@ -14,8 +14,8 @@ use Sabre\CalDAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-abstract class AbstractBackend implements BackendInterface {
-
+abstract class AbstractBackend implements BackendInterface
+{
     /**
      * Updates properties for a calendar.
      *
@@ -52,8 +52,8 @@ abstract class AbstractBackend implements BackendInterface {
      * @param array $mutations
      * @return bool|array
      */
-    public function updateCalendar($calendarId, array $mutations) {
-
+    public function updateCalendar($calendarId, array $mutations)
+    {
         return false;
 
     }
@@ -107,14 +107,14 @@ abstract class AbstractBackend implements BackendInterface {
      * @param array $filters
      * @return array
      */
-    public function calendarQuery($calendarId, array $filters) {
-
+    public function calendarQuery($calendarId, array $filters)
+    {
         $result = array();
         $objects = $this->getCalendarObjects($calendarId);
 
         $validator = new \Sabre\CalDAV\CalendarQueryValidator();
 
-        foreach($objects as $object) {
+        foreach ($objects as $object) {
 
             if ($this->validateFilterForObject($object, $filters)) {
                 $result[] = $object['uri'];
@@ -134,8 +134,8 @@ abstract class AbstractBackend implements BackendInterface {
      * @param array $filters
      * @return bool
      */
-    protected function validateFilterForObject(array $object, array $filters) {
-
+    protected function validateFilterForObject(array $object, array $filters)
+    {
         // Unfortunately, setting the 'calendardata' here is optional. If
         // it was excluded, we actually need another call to get this as
         // well.

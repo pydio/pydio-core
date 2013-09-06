@@ -24,4 +24,3 @@ $mess=array(
 "3"	=> "Consultar",
 "4"	=> "Limpiar"
 );
-?>

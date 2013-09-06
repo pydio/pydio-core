@@ -11,7 +11,7 @@ subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -50,9 +50,8 @@ use \HPCloud\Bootstrap;
  * The only downside to Curl is that it is not available on all hosts.
  * Some installations of PHP do not compile support.
  */
-class CURLTransport implements Transporter {
-
-
+class CURLTransport implements Transporter
+{
   const HTTP_USER_AGENT_SUFFIX = ' (c93c0a) CURL/1.0';
 
   protected $curlInst = NULL;
@@ -65,7 +64,8 @@ class CURLTransport implements Transporter {
    */
   protected $multi = NULL;
 
-  public function __destruct() {
+  public function __destruct()
+  {
     // Destroy the multi handle.
     if (!empty($this->multi)) {
       curl_multi_close($this->multi);
@@ -73,7 +73,8 @@ class CURLTransport implements Transporter {
   }
 
   /*
-  public function curl($uri) {
+  public function curl($uri)
+  {
     //if (empty($this->curlInst)) {
       $this->curlInst = curl_init();
     //}
@@ -82,8 +83,8 @@ class CURLTransport implements Transporter {
   }
    */
 
-  public function doRequest($uri, $method = 'GET', $headers = array(), $body = NULL) {
-
+  public function doRequest($uri, $method = 'GET', $headers = array(), $body = NULL)
+  {
     $in = NULL;
     if (!empty($body)) {
       // For whatever reason, CURL seems to want POST request data to be
@@ -91,8 +92,7 @@ class CURLTransport implements Transporter {
       // needs to be in a file handle.
       if ($method == 'POST') {
         $in = $body;
-      }
-      else {
+      } else {
         // First we turn our body into a temp-backed buffer.
         $in = fopen('php://temp', 'wr', FALSE);
         fwrite($in, $body, strlen($body));
@@ -104,11 +104,11 @@ class CURLTransport implements Transporter {
 
   }
 
-  public function doRequestWithResource($uri, $method, $headers, $resource) {
+  public function doRequestWithResource($uri, $method, $headers, $resource)
+  {
     if (is_string($resource)) {
       $in = open($resource, 'rb', FALSE);
-    }
-    else {
+    } else {
       // FIXME: Is there a better way?
       // There is a bug(?) in CURL which prevents it
       // from writing the same stream twice. But we
@@ -125,8 +125,8 @@ class CURLTransport implements Transporter {
   /**
    * Internal workhorse.
    */
-  protected function handleDoRequest($uri, $method, $headers, $in = NULL) {
-
+  protected function handleDoRequest($uri, $method, $headers, $in = NULL)
+  {
     // XXX: I don't like this, but I'm getting bug reports that mistakenly
     // assume this library is broken, when in fact CURL is not installed.
     if (!function_exists('curl_init')) {
@@ -247,8 +247,7 @@ class CURLTransport implements Transporter {
     if (!$ret || $status < 200 || $status > 299 || empty($responseHeaders)) {
       if (empty($responseHeaders)) {
         $err = 'Unknown (non-HTTP) error: ' . $status;
-      }
-      else {
+      } else {
         $err = $responseHeaders[0];
       }
       //rewind($out);
@@ -288,13 +287,13 @@ class CURLTransport implements Transporter {
    *   Returns a boolean value indicating whether or not CURL could process the
    *   request.
    */
-  protected function execCurl($handle) {
+  protected function execCurl($handle)
+  {
     if (empty($this->multi)) {
       $multi = curl_multi_init();
       $this->multi = $multi;
       //echo "Creating MULTI handle.\n";
-    }
-    else {
+    } else {
       //echo "Reusing MULTI handle.\n";
       $multi = $this->multi;
     }
@@ -341,7 +340,8 @@ fclose($stderr);
    * @retval array
    *   An array of headers, one header per line.
    */
-  protected function fetchHeaders($file) {
+  protected function fetchHeaders($file)
+  {
     $buffer = array();
     while ($header = fgets($file)) {
       $header = trim($header);
@@ -359,9 +359,9 @@ fclose($stderr);
   /**
    * Set the appropriate constant on the CURL object.
    *
-   * Curl handles method name setting in a slightly counter-intuitive 
-   * way, so we have a special function for setting the method 
-   * correctly. Note that since we do not POST as www-form-*, we 
+   * Curl handles method name setting in a slightly counter-intuitive
+   * way, so we have a special function for setting the method
+   * correctly. Note that since we do not POST as www-form-*, we
    * use a custom post.
    *
    * @param resource $curl
@@ -369,7 +369,8 @@ fclose($stderr);
    * @param string $method
    *   An HTTP method name.
    */
-  protected function determineMethod($curl, $method) {
+  protected function determineMethod($curl, $method)
+  {
     $method = strtoupper($method);
 
     switch ($method) {
@@ -397,7 +398,8 @@ fclose($stderr);
 
   }
 
-  public function setHeaders($curl, $headers) {
+  public function setHeaders($curl, $headers)
+  {
     $buffer = array();
     $format = '%s: %s';
 

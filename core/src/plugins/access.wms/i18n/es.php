@@ -7,6 +7,4 @@ $mess=array(
 "4" => "Estilo",
 "5" => "Palábras Clave",
 "6" => "Proyección",
-)
-
-?>
+);

@@ -28,19 +28,17 @@ require_once('../classes/class.AbstractTest.php');
  */
 class Zlib extends AbstractTest
 {
-    function Zlib() { parent::AbstractTest("Zlib extension (ZIP)", "Extension enabled : ".(function_exists('gzopen')?"1":"0")); }
-    function doTest() 
-    { 
-    	$this->testedParams["Zlib Enabled"] = (function_exists('gzopen')?"Yes":"No");
-    	$os = PHP_OS;
-    	/*if(stristr($os, "win")!==false && $this->testedParams["Zlib Enabled"]){
-    		$this->failedLevel = "warning";
-    		$this->failedInfo = "Warning, the zip functions are erraticaly working on Windows, please don't rely too much on them!";
-    		return FALSE;
-    	}*/
+    public function Zlib() { parent::AbstractTest("Zlib extension (ZIP)", "Extension enabled : ".(function_exists('gzopen')?"1":"0")); }
+    public function doTest()
+    {
+        $this->testedParams["Zlib Enabled"] = (function_exists('gzopen')?"Yes":"No");
+        $os = PHP_OS;
+        /*if (stristr($os, "win")!==false && $this->testedParams["Zlib Enabled"]) {
+            $this->failedLevel = "warning";
+            $this->failedInfo = "Warning, the zip functions are erraticaly working on Windows, please don't rely too much on them!";
+            return FALSE;
+        }*/
         $this->failedLevel = "info";
         return false;
     }
 };
-
-?>

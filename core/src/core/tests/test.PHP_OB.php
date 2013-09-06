@@ -28,15 +28,15 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHP_OB extends AbstractTest
 {
-    function PHP_OB() { parent::AbstractTest("PHP Output Buffer disabled", "You should disable php output_buffering parameter for better performances with AjaXplorer."); }
-    function doTest()
+    public function PHP_OB() { parent::AbstractTest("PHP Output Buffer disabled", "You should disable php output_buffering parameter for better performances with AjaXplorer."); }
+    public function doTest()
     {
         $this->failedLevel = "warning";
         $v = @ini_get("output_buffering");
-        if (isSet($v) && (is_numeric($v) || strtolower($v) == "on")){
+        if (isSet($v) && (is_numeric($v) || strtolower($v) == "on")) {
             $this->testedParams["PHP Output Buffer disabled"] = "No";
             return FALSE;
-        }else if(!isSet($v)){
+        } else if (!isSet($v)) {
             $this->failedInfo = "Unable to detect the output_buffering value, please make sure that it is disabled (Off) in your php.ini or your virtual host.";
             return FALSE;
         }

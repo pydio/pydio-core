@@ -11,6 +11,4 @@ $mess=array(
 "8" => "Filter",
 "9" => "Search",
 "10" => "Clear",
-)
-
-?>
+);

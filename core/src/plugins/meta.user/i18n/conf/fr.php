@@ -30,4 +30,3 @@ $mess=array(
 "Columns visibility" => "Visibilités par défaut",
 "Set default visibility for each columns. Either by columns, using commas, or one value that will be applied to all columns. Value can be 'visible' or 'hidden'." => "Visibilité par défaut des colonnes créées par les différents champs. Utiliser 'visible' ou 'hidden', une valeur pour tous ou une liste de valeurs pour chaque champs.",
 );
-?>

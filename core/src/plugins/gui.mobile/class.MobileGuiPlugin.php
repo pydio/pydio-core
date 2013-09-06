@@ -26,9 +26,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Editor
  */
-class MobileGuiPlugin extends AJXP_Plugin {
-
-    public function performChecks(){
+class MobileGuiPlugin extends AJXP_Plugin
+{
+    public function performChecks()
+    {
         if(!AJXP_Utils::userAgentIsMobile()) throw new Exception("no");
     }
 

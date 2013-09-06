@@ -6,7 +6,7 @@
 	        <i18n namespace="httpdownloader" path="plugins/downloader.http/resources/i18n" />
 	        <img_library alias="httpdownloader_images" path="plugins/downloader.http/resources/images" />
             <css file="plugins/downloader.http/resources/downloader.css" autoload="true"/>
-		</resources>	
+		</resources>
 	</client_settings>
 	<registry_contributions>
         <extensions>
@@ -78,7 +78,7 @@
 					]]></clientForm>
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
-			</action>					
+			</action>
 			<action name="external_download_file">
 				<gui text="httpdownloader.1" title="httpdownloader.2" src="httpdownloader_images/ICON_SIZE/kget_list.png" accessKey="httpdownloader.3" hasAccessKey="false">
 					<context selection="true" dir="true" recycle="hidden"
@@ -94,7 +94,7 @@
 						var crtDir = ajaxplorer.getContextNode().getPath();
 						var bgManager = ajaxplorer.actionBar.bgManager;
 						bgManager.queueAction("external_download", new Hash({dlfile:fileName, dir:crtDir}), MessageHash["httpdownloader.6"]+ " " +getBaseName(fileName)+" " + MessageHash["httpdownloader.7"]);
-						bgManager.next();						
+						bgManager.next();
 						]]></clientCallback>
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
@@ -165,7 +165,7 @@
 				<processing>
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
-			</action>					
+			</action>
 			<action name="stop_dl">
 				<processing>
 					<serverCallback methodName="switchAction"></serverCallback>
@@ -176,13 +176,13 @@
                     <serverCallback methodName="switchAction"></serverCallback>
                 </post_processing>
             </action>
-		</actions>	
+		</actions>
 		<hooks>
 			<serverCallback hookName="node.info" methodName="detectDLParts"></serverCallback>
-		</hooks>			
+		</hooks>
 	</registry_contributions>
 	<dependencies>
 		<!-- Stream Wrapper Access -->
 		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
-	</dependencies>						
+	</dependencies>
 </ajxp_plugin>

@@ -27,4 +27,3 @@ $mess=array(
 "3"	=> "Hae",
 "4"	=> "Tyhjennä"
 );
-?>

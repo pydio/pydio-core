@@ -33,7 +33,7 @@ class casAuthDriver extends serialAuthDriver
   private $cas_port;
   private $cas_uri;
 
-  function init($options)
+  public function init($options)
   {
     parent::init($options);
     $this->cas_server = $this->getOption("CAS_SERVER");
@@ -43,20 +43,19 @@ class casAuthDriver extends serialAuthDriver
     phpCAS::setNoCasServerValidation();
   }
 
-  function usersEditable()
+  public function usersEditable()
   {
     return false;
   }
 
-  function passwordsEditable()
+  public function passwordsEditable()
   {
     return false;
   }
 
-  function preLogUser($sessionId)
+  public function preLogUser($sessionId)
   {
-    if ($_GET['get_action'] == "logout")
-    {
+    if ($_GET['get_action'] == "logout") {
       phpCAS::logout();
       return;
     }
@@ -70,7 +69,7 @@ class casAuthDriver extends serialAuthDriver
       AuthService::logUser($cas_user, "", true);
   }
 
-  function getLogoutRedirect()
+  public function getLogoutRedirect()
   {
     $_SESSION = array();
     session_destroy();

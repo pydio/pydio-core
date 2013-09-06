@@ -26,9 +26,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Editor
  */
-class LightGuiPlugin extends AJXP_Plugin {
-
-    public function performChecks(){
+class LightGuiPlugin extends AJXP_Plugin
+{
+    public function performChecks()
+    {
         if(!isSet($_COOKIE["AJXP_GUI"]) || $_COOKIE["AJXP_GUI"] != "light") throw new Exception("no");
     }
 

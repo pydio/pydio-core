@@ -14,8 +14,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class NeedPrivileges extends DAV\Exception\Forbidden {
-
+class NeedPrivileges extends DAV\Exception\Forbidden
+{
     /**
      * The relevant uri
      *
@@ -36,8 +36,8 @@ class NeedPrivileges extends DAV\Exception\Forbidden {
      * @param string $uri
      * @param array $privileges
      */
-    public function __construct($uri,array $privileges) {
-
+    public function __construct($uri,array $privileges)
+    {
         $this->uri = $uri;
         $this->privileges = $privileges;
 
@@ -54,14 +54,14 @@ class NeedPrivileges extends DAV\Exception\Forbidden {
      * @param \DOMElement $errorNode
      * @return void
      */
-    public function serialize(DAV\Server $server,\DOMElement $errorNode) {
-
+    public function serialize(DAV\Server $server,\DOMElement $errorNode)
+    {
         $doc = $errorNode->ownerDocument;
 
         $np = $doc->createElementNS('DAV:','d:need-privileges');
         $errorNode->appendChild($np);
 
-        foreach($this->privileges as $privilege) {
+        foreach ($this->privileges as $privilege) {
 
             $resource = $doc->createElementNS('DAV:','d:resource');
             $np->appendChild($resource);
@@ -80,4 +80,3 @@ class NeedPrivileges extends DAV\Exception\Forbidden {
     }
 
 }
-

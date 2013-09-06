@@ -52,5 +52,4 @@ $mess=array(
 "31"=> "Descrição",
 "32"=> "Repor",
 "33"=> "Repor Contador de Transferências",
-); 
-?>
+);

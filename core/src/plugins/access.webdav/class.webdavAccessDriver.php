@@ -30,77 +30,78 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class webdavAccessDriver extends fsAccessDriver
 {
-	/**
-	* @var Repository
-	*/
-	public $repository;
-	public $driverConf;
-	protected $wrapperClassName;
-	protected $urlBase;
+    /**
+    * @var Repository
+    */
+    public $repository;
+    public $driverConf;
+    protected $wrapperClassName;
+    protected $urlBase;
 
-    function performChecks(){
-        if(!AJXP_Utils::searchIncludePath('HTTP/WebDAV/Client.php')){
+    public function performChecks()
+    {
+        if (!AJXP_Utils::searchIncludePath('HTTP/WebDAV/Client.php')) {
             throw new Exception("The PEAR HTTP_WebDAV_Client package must be installed!");
         }
     }
 
-	function initRepository(){
+    public function initRepository()
+    {
         @include_once("HTTP/WebDAV/Client.php");
-		if(is_array($this->pluginConf)){
-			$this->driverConf = $this->pluginConf;
-		}else{
-			$this->driverConf = array();
-		}
+        if (is_array($this->pluginConf)) {
+            $this->driverConf = $this->pluginConf;
+        } else {
+            $this->driverConf = array();
+        }
 
-		if(!class_exists('HTTP_WebDAV_Client_Stream')){
-			throw new Exception("You must have Pear HTTP/WebDAV/Client package installed to use this access driver!");
-		}
-		$create = $this->repository->getOption("CREATE");
-		$path = $this->repository->getOption("PATH");
-		$recycle = $this->repository->getOption("RECYCLE_BIN");
+        if (!class_exists('HTTP_WebDAV_Client_Stream')) {
+            throw new Exception("You must have Pear HTTP/WebDAV/Client package installed to use this access driver!");
+        }
+        $create = $this->repository->getOption("CREATE");
+        $path = $this->repository->getOption("PATH");
+        $recycle = $this->repository->getOption("RECYCLE_BIN");
         ConfService::setConf("PROBE_REAL_SIZE", false);
-		/*
-		if($create == true){
-			if(!is_dir($path)) @mkdir($path);
-			if(!is_dir($path)){
-				throw new AJXP_Exception("Cannot create root path for repository (".$this->repository->getDisplay()."). Please check repository configuration or that your folder is writeable!");
-			}
-			if($recycle!= "" && !is_dir($path."/".$recycle)){
-				@mkdir($path."/".$recycle);
-				if(!is_dir($path."/".$recycle)){
-					throw new AJXP_Exception("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
-				}
-			}
-		}else{
-			if(!is_dir($path)){
-				throw new AJXP_Exception("Cannot find base path ($path) for your repository! Please check the configuration!");
-			}
-		}
-		*/
-		$wrapperData = $this->detectStreamWrapper(true);
-		$this->wrapperClassName = $wrapperData["classname"];
-		$this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
-		if(!is_dir($this->urlBase)){
-            if(webdavAccessWrapper::$lastException){
+        /*
+        if ($create == true) {
+            if(!is_dir($path)) @mkdir($path);
+            if (!is_dir($path)) {
+                throw new AJXP_Exception("Cannot create root path for repository (".$this->repository->getDisplay()."). Please check repository configuration or that your folder is writeable!");
+            }
+            if ($recycle!= "" && !is_dir($path."/".$recycle)) {
+                @mkdir($path."/".$recycle);
+                if (!is_dir($path."/".$recycle)) {
+                    throw new AJXP_Exception("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
+                }
+            }
+        } else {
+            if (!is_dir($path)) {
+                throw new AJXP_Exception("Cannot find base path ($path) for your repository! Please check the configuration!");
+            }
+        }
+        */
+        $wrapperData = $this->detectStreamWrapper(true);
+        $this->wrapperClassName = $wrapperData["classname"];
+        $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+        if (!is_dir($this->urlBase)) {
+            if (webdavAccessWrapper::$lastException) {
                 throw webdavAccessWrapper::$lastException;
             }
-			throw new AJXP_Exception("Cannot connect to the WebDAV server ($path). Please check the configuration!");
-		}
-		if($recycle != ""){
-			RecycleBinManager::init($this->urlBase, "/".$recycle);
-		}
-	}
-	
-	/**
-	 * Parse 
-	 * @param DOMNode $contribNode
-	 */
-	protected function parseSpecificContributions(&$contribNode){
-		parent::parseSpecificContributions($contribNode);
-		if($contribNode->nodeName != "actions") return ;
-		$this->disableArchiveBrowsingContributions($contribNode);
-	}	
-	
-}	
+            throw new AJXP_Exception("Cannot connect to the WebDAV server ($path). Please check the configuration!");
+        }
+        if ($recycle != "") {
+            RecycleBinManager::init($this->urlBase, "/".$recycle);
+        }
+    }
 
-?>
+    /**
+     * Parse
+     * @param DOMNode $contribNode
+     */
+    protected function parseSpecificContributions(&$contribNode)
+    {
+        parent::parseSpecificContributions($contribNode);
+        if($contribNode->nodeName != "actions") return ;
+        $this->disableArchiveBrowsingContributions($contribNode);
+    }
+
+}

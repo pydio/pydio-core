@@ -33,20 +33,20 @@
 						actionBarGroup="user">
 					</context>
 				</gui>
-				<rightsContext noUser="false" userLogged="hidden" guestLogged="show" read="false" write="false" adminOnly=""></rightsContext>			
+				<rightsContext noUser="false" userLogged="hidden" guestLogged="show" read="false" write="false" adminOnly=""></rightsContext>
 				<processing>
 					<clientCallback prepareModal="true"><![CDATA[
 						var loginRedirect = AJXP_LOGIN_REDIRECT;
 						if(loginRedirect){
 							document.location.href=loginRedirect;
 						}else{
-							modal.showDialogForm('Log In', 'ftp_login_form', 
+							modal.showDialogForm('Log In', 'ftp_login_form',
 							function(oForm){
                                 ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
 							},
 							function(){
 								var oForm = modal.getForm();
-																
+
 								var connexion = new Connexion();
 								connexion.addParameter("get_action", "set_ftp_data");
 								oForm.getElements().each(function(el){
@@ -63,12 +63,12 @@
                                     });
 									oForm.reset();
 								};
-								connexion.sendSync();								
-								return false;				
+								connexion.sendSync();
+								return false;
 							});
 						}
 						]]></clientCallback>
-						<clientForm id="ftp_login_form"><![CDATA[						
+						<clientForm id="ftp_login_form"><![CDATA[
 							<div id="ftp_login_form" action="login" box_width="350">
 							<input type="hidden" name="get_action" value="login">
 							<input type="hidden" name="login_seed" id="login_seed" value="-1">
@@ -94,19 +94,19 @@
 								<tr>
 									<td align="right"><ajxp:message ajxp_message_id="ftp_auth.4">AJXP_MESSAGE[ftp_auth.4]</ajxp:message> </td><td><input type="text" name="PATH" style="width: 100px; padding:0px;" class="" value="/"></td>
 									<td align="right" style="padding-left:10px;"><ajxp:message ajxp_message_id="ftp_auth.5">AJXP_MESSAGE[ftp_auth.5]</ajxp:message> </td><td><input type="radio" name="FTP_SECURE" style="width: 12px; padding:0px;" value="FALSE" checked><label style="display:inline-block;width:27px;"> FTP</label><input type="radio" name="FTP_SECURE" style="width: 12px; padding:0px;" value="TRUE"><label style="display:inline-block;width:27px;"> FTPS</label></td>
-								</tr>								
+								</tr>
 								<tr>
 									<td align="right"><ajxp:message ajxp_message_id="ftp_auth.6">AJXP_MESSAGE[ftp_auth.6]</ajxp:message> </td><td><input type="text" name="CHARSET" style="width: 100px; padding:0px;" class="" value=""></td>
 									<td align="right"><ajxp:message ajxp_message_id="ftp_auth.7">AJXP_MESSAGE[ftp_auth.7]</ajxp:message> </td><td><input type="radio" name="FTP_DIRECT" style="width: 12px; padding:0px;" value="TRUE"><label style="display:inline-block;width:27px;">AJXP_MESSAGE[440]</label><input type="radio" name="FTP_DIRECT" style="width: 12px; padding:0px;" value="FALSE" checked><label style="display:inline-block;width:27px;">AJXP_MESSAGE[441]</label></td>
 								</tr>
 								</table>
 							</div>
-							
+
 							</div>
 						]]></clientForm>
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
-			</action>	
+			</action>
 			<!-- OVERRIDE LOGOUT -->
 			<action name="ftp_logout" expireDefault="true">
 				<gui text="164" title="169" src="decrypted.png"
@@ -116,7 +116,7 @@
 						actionBarGroup="user" ajxpWidgets="UserWidget::logging_string">
 					</context>
 				</gui>
-				<rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""></rightsContext>			
+				<rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""></rightsContext>
 				<processing>
 					<clientCallback prepareModal="false"><![CDATA[
 						clearRememberData();

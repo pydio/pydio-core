@@ -12,10 +12,10 @@
 	<registry_contributions>
 		<actions>
 			<action name="upload">
-				<pre_processing>					
+				<pre_processing>
 					<serverCallback methodName="preProcess"/>
 				</pre_processing>
-				<post_processing>					
+				<post_processing>
 					<serverCallback methodName="postProcess" capture="true"/>
 				</post_processing>
 			</action>

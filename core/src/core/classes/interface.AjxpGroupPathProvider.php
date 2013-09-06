@@ -24,9 +24,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer
  * @subpackage Core
  */
-interface AjxpGroupPathProvider {
-
-
+interface AjxpGroupPathProvider
+{
     /**
      * @abstract
      * @return String

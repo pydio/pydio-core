@@ -18,8 +18,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class SupportedPrivilegeSet extends DAV\Property {
-
+class SupportedPrivilegeSet extends DAV\Property
+{
     /**
      * privileges
      *
@@ -32,8 +32,8 @@ class SupportedPrivilegeSet extends DAV\Property {
      *
      * @param array $privileges
      */
-    public function __construct(array $privileges) {
-
+    public function __construct(array $privileges)
+    {
         $this->privileges = $privileges;
 
     }
@@ -45,8 +45,8 @@ class SupportedPrivilegeSet extends DAV\Property {
      * @param \DOMElement $node
      * @return void
      */
-    public function serialize(DAV\Server $server,\DOMElement $node) {
-
+    public function serialize(DAV\Server $server,\DOMElement $node)
+    {
         $doc = $node->ownerDocument;
         $this->serializePriv($doc, $node, $this->privileges);
 
@@ -62,8 +62,8 @@ class SupportedPrivilegeSet extends DAV\Property {
      * @param array $privilege
      * @return void
      */
-    private function serializePriv($doc,$node,$privilege) {
-
+    private function serializePriv($doc,$node,$privilege)
+    {
         $xsp = $doc->createElementNS('DAV:','d:supported-privilege');
         $node->appendChild($xsp);
 
@@ -84,7 +84,7 @@ class SupportedPrivilegeSet extends DAV\Property {
         }
 
         if (isset($privilege['aggregates'])) {
-            foreach($privilege['aggregates'] as $subPrivilege) {
+            foreach ($privilege['aggregates'] as $subPrivilege) {
                 $this->serializePriv($doc,$xsp,$subPrivilege);
             }
         }

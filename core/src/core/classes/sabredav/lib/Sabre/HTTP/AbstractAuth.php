@@ -8,11 +8,11 @@ namespace Sabre\HTTP;
  * This class has the common functionality for BasicAuth and DigestAuth
  *
  * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/) 
+ * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-abstract class AbstractAuth {
-
+abstract class AbstractAuth
+{
     /**
      * The realm will be displayed in the dialog boxes
      *
@@ -41,8 +41,8 @@ abstract class AbstractAuth {
      * __construct
      *
      */
-    public function __construct() {
-
+    public function __construct()
+    {
         $this->httpResponse = new Response();
         $this->httpRequest = new Request();
 
@@ -54,8 +54,8 @@ abstract class AbstractAuth {
      * @param Response $response
      * @return void
      */
-    public function setHTTPResponse(Response $response) {
-
+    public function setHTTPResponse(Response $response)
+    {
         $this->httpResponse = $response;
 
     }
@@ -66,8 +66,8 @@ abstract class AbstractAuth {
      * @param Request $request
      * @return void
      */
-    public function setHTTPRequest(Request $request) {
-
+    public function setHTTPRequest(Request $request)
+    {
         $this->httpRequest = $request;
 
     }
@@ -82,8 +82,8 @@ abstract class AbstractAuth {
      * @param string $realm
      * @return void
      */
-    public function setRealm($realm) {
-
+    public function setRealm($realm)
+    {
         $this->realm = $realm;
 
     }
@@ -93,8 +93,8 @@ abstract class AbstractAuth {
      *
      * @return string
      */
-    public function getRealm() {
-
+    public function getRealm()
+    {
         return $this->realm;
 
     }

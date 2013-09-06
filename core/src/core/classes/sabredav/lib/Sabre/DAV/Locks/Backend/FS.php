@@ -21,8 +21,8 @@ use Sabre\DAV\Locks\LockInfo;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class FS extends AbstractBackend {
-
+class FS extends AbstractBackend
+{
     /**
      * The default data directory
      *
@@ -30,14 +30,14 @@ class FS extends AbstractBackend {
      */
     private $dataDir;
 
-    public function __construct($dataDir) {
-
+    public function __construct($dataDir)
+    {
         $this->dataDir = $dataDir;
 
     }
 
-    protected function getFileNameForUri($uri) {
-
+    protected function getFileNameForUri($uri)
+    {
         return $this->dataDir . '/sabredav_' . md5($uri) . '.locks';
 
     }
@@ -56,12 +56,12 @@ class FS extends AbstractBackend {
      * @param bool $returnChildLocks
      * @return array
      */
-    public function getLocks($uri, $returnChildLocks) {
-
+    public function getLocks($uri, $returnChildLocks)
+    {
         $lockList = array();
         $currentPath = '';
 
-        foreach(explode('/',$uri) as $uriPart) {
+        foreach (explode('/',$uri) as $uriPart) {
 
             // weird algorithm that can probably be improved, but we're traversing the path top down
             if ($currentPath) $currentPath.='/';
@@ -69,10 +69,10 @@ class FS extends AbstractBackend {
 
             $uriLocks = $this->getData($currentPath);
 
-            foreach($uriLocks as $uriLock) {
+            foreach ($uriLocks as $uriLock) {
 
                 // Unless we're on the leaf of the uri-tree we should ignore locks with depth 0
-                if($uri==$currentPath || $uriLock->depth!=0) {
+                if ($uri==$currentPath || $uriLock->depth!=0) {
                     $uriLock->uri = $currentPath;
                     $lockList[] = $uriLock;
                 }
@@ -82,7 +82,7 @@ class FS extends AbstractBackend {
         }
 
         // Checking if we can remove any of these locks
-        foreach($lockList as $k=>$lock) {
+        foreach ($lockList as $k=>$lock) {
             if (time() > $lock->timeout + $lock->created) unset($lockList[$k]);
         }
         return $lockList;
@@ -96,14 +96,14 @@ class FS extends AbstractBackend {
      * @param LockInfo $lockInfo
      * @return bool
      */
-    public function lock($uri, LockInfo $lockInfo) {
-
+    public function lock($uri, LockInfo $lockInfo)
+    {
         // We're making the lock timeout 30 minutes
         $lockInfo->timeout = 1800;
         $lockInfo->created = time();
 
         $locks = $this->getLocks($uri,false);
-        foreach($locks as $k=>$lock) {
+        foreach ($locks as $k=>$lock) {
             if ($lock->token == $lockInfo->token) unset($locks[$k]);
         }
         $locks[] = $lockInfo;
@@ -119,10 +119,10 @@ class FS extends AbstractBackend {
      * @param LockInfo $lockInfo
      * @return bool
      */
-    public function unlock($uri, LockInfo $lockInfo) {
-
+    public function unlock($uri, LockInfo $lockInfo)
+    {
         $locks = $this->getLocks($uri,false);
-        foreach($locks as $k=>$lock) {
+        foreach ($locks as $k=>$lock) {
 
             if ($lock->token == $lockInfo->token) {
 
@@ -142,8 +142,8 @@ class FS extends AbstractBackend {
      * @param string $uri
      * @return array
      */
-    protected function getData($uri) {
-
+    protected function getData($uri)
+    {
         $path = $this->getFilenameForUri($uri);
         if (!file_exists($path)) return array();
 
@@ -153,7 +153,7 @@ class FS extends AbstractBackend {
         $data = '';
 
         // Reading data until the eof
-        while(!feof($handle)) {
+        while (!feof($handle)) {
             $data.=fread($handle,8192);
         }
 
@@ -174,8 +174,8 @@ class FS extends AbstractBackend {
      * @param array $newData
      * @return void
      */
-    protected function putData($uri,array $newData) {
-
+    protected function putData($uri,array $newData)
+    {
         $path = $this->getFileNameForUri($uri);
 
         // opening up the file, and creating a shared lock
@@ -190,4 +190,3 @@ class FS extends AbstractBackend {
     }
 
 }
-

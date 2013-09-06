@@ -13,11 +13,11 @@ use Sabre\DAV;
  * the getDigestHash method
  *
  * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/) 
+ * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-abstract class AbstractDigest implements BackendInterface {
-
+abstract class AbstractDigest implements BackendInterface
+{
     /**
      * This variable holds the currently logged in username.
      *
@@ -47,8 +47,8 @@ abstract class AbstractDigest implements BackendInterface {
      * @throws DAV\Exception\NotAuthenticated
      * @return bool
      */
-    public function authenticate(DAV\Server $server, $realm) {
-
+    public function authenticate(DAV\Server $server, $realm)
+    {
         $digest = new HTTP\DigestAuth();
 
         // Hooking up request and response objects
@@ -92,8 +92,8 @@ abstract class AbstractDigest implements BackendInterface {
      *
      * @return string|null
      */
-    public function getCurrentUser() {
-
+    public function getCurrentUser()
+    {
         return $this->currentUser;
 
     }

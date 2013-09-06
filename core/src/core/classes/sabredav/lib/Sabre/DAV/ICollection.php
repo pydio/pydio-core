@@ -11,8 +11,8 @@ namespace Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-interface ICollection extends INode {
-
+interface ICollection extends INode
+{
     /**
      * Creates a new file in the directory
      *
@@ -37,7 +37,7 @@ interface ICollection extends INode {
      * @param resource|string $data Initial payload
      * @return null|string
      */
-    function createFile($name, $data = null);
+    public function createFile($name, $data = null);
 
     /**
      * Creates a new subdirectory
@@ -45,7 +45,7 @@ interface ICollection extends INode {
      * @param string $name
      * @return void
      */
-    function createDirectory($name);
+    public function createDirectory($name);
 
     /**
      * Returns a specific child node, referenced by its name
@@ -56,14 +56,14 @@ interface ICollection extends INode {
      * @param string $name
      * @return DAV\INode
      */
-    function getChild($name);
+    public function getChild($name);
 
     /**
      * Returns an array with all the child nodes
      *
      * @return DAV\INode[]
      */
-    function getChildren();
+    public function getChildren();
 
     /**
      * Checks if a child-node with the specified name exists
@@ -71,7 +71,6 @@ interface ICollection extends INode {
      * @param string $name
      * @return bool
      */
-    function childExists($name);
+    public function childExists($name);
 
 }
-

@@ -26,72 +26,72 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Editor
  */
-class AudioPreviewer extends AJXP_Plugin {
+class AudioPreviewer extends AJXP_Plugin
+{
+    public function preProcessAction($action, &$httpVars, &$fileVars)
+    {
+        if ($action != "ls" || !isset($httpVars["playlist"])) {
+            return ;
+        }
+        $httpVars["dir"] = base64_decode($httpVars["dir"]);
+    }
 
-	public function preProcessAction($action, &$httpVars, &$fileVars){
-		if($action != "ls" || !isset($httpVars["playlist"])){
-			return ;
-		}
-		$httpVars["dir"] = base64_decode($httpVars["dir"]);
-	}	
-	
-	public function switchAction($action, $httpVars, $postProcessData){
-		
-		if(!isSet($this->actions[$action])) return false;
-    	
-		$repository = ConfService::getRepository();
-		if(!$repository->detectStreamWrapper(false)){
-			return false;
-		}
-		$plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
-		$streamData = $plugin->detectStreamWrapper(true);		
-    	$destStreamURL = $streamData["protocol"]."://".$repository->getId()."/";
-		    	
-		if($action == "audio_proxy"){
+    public function switchAction($action, $httpVars, $postProcessData)
+    {
+        if(!isSet($this->actions[$action])) return false;
+
+        $repository = ConfService::getRepository();
+        if (!$repository->detectStreamWrapper(false)) {
+            return false;
+        }
+        $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
+        $streamData = $plugin->detectStreamWrapper(true);
+        $destStreamURL = $streamData["protocol"]."://".$repository->getId()."/";
+
+        if ($action == "audio_proxy") {
 
             $file = AJXP_Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
             $cType = "audio/".array_pop(explode(".", $file));
 
-			$localName = basename($file);
+            $localName = basename($file);
 
             header("Content-Type: ".$cType."; name=\"".$localName."\"");
-			header("Content-Length: ".filesize($destStreamURL.$file));
-			
-			$stream = fopen("php://output", "a");
-			call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL.$file, $stream);
-			fflush($stream);
-			fclose($stream);
+            header("Content-Length: ".filesize($destStreamURL.$file));
+
+            $stream = fopen("php://output", "a");
+            call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL.$file, $stream);
+            fflush($stream);
+            fclose($stream);
 
             $node = new AJXP_Node($destStreamURL.$file);
             AJXP_Controller::applyHook("node.read", array($node));
             //exit(1);
-			
-		}else if($action == "ls"){
-			if(!isSet($httpVars["playlist"])){
-				// This should not happen anyway, because of the applyCondition.				
-				AJXP_Controller::passProcessDataThrough($postProcessData);
-				return ;
-			}
-			// We transform the XML into XSPF
-			$xmlString = $postProcessData["ob_output"];
+
+        } else if ($action == "ls") {
+            if (!isSet($httpVars["playlist"])) {
+                // This should not happen anyway, because of the applyCondition.
+                AJXP_Controller::passProcessDataThrough($postProcessData);
+                return ;
+            }
+            // We transform the XML into XSPF
+            $xmlString = $postProcessData["ob_output"];
             $xmlDoc = new DOMDocument();
             $xmlDoc->loadXML($xmlString);
-			$xElement = $xmlDoc->documentElement;
-			header("Content-Type:application/xspf+xml;charset=UTF-8");
-			print('<?xml version="1.0" encoding="UTF-8"?>');
-			print('<playlist version="1" xmlns="http://xspf.org/ns/0/">');
-			print("<trackList>");
-			foreach ($xElement->childNodes as $child){
-				$isFile = ($child->getAttribute("is_file") == "true");
-				$label = $child->getAttribute("text");
+            $xElement = $xmlDoc->documentElement;
+            header("Content-Type:application/xspf+xml;charset=UTF-8");
+            print('<?xml version="1.0" encoding="UTF-8"?>');
+            print('<playlist version="1" xmlns="http://xspf.org/ns/0/">');
+            print("<trackList>");
+            foreach ($xElement->childNodes as $child) {
+                $isFile = ($child->getAttribute("is_file") == "true");
+                $label = $child->getAttribute("text");
                 $ar = explode(".", $label);
-				$ext = strtolower(end($ar));
-				if(!$isFile || $ext != "mp3") continue;
-				print("<track><location>".AJXP_SERVER_ACCESS."?secure_token=".AuthService::getSecureToken()."&get_action=audio_proxy&file=".base64_encode($child->getAttribute("filename"))."</location><title>".$label."</title></track>");
-			}
-			print("</trackList>");
-			AJXP_XMLWriter::close("playlist");
-		}
-	}	
+                $ext = strtolower(end($ar));
+                if(!$isFile || $ext != "mp3") continue;
+                print("<track><location>".AJXP_SERVER_ACCESS."?secure_token=".AuthService::getSecureToken()."&get_action=audio_proxy&file=".base64_encode($child->getAttribute("filename"))."</location><title>".$label."</title></track>");
+            }
+            print("</trackList>");
+            AJXP_XMLWriter::close("playlist");
+        }
+    }
 }
-?>

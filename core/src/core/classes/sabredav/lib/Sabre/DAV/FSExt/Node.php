@@ -13,8 +13,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-abstract class Node extends DAV\FS\Node implements DAV\IProperties {
-
+abstract class Node extends DAV\FS\Node implements DAV\IProperties
+{
     /**
      * Updates properties on this node,
      *
@@ -22,11 +22,11 @@ abstract class Node extends DAV\FS\Node implements DAV\IProperties {
      * @see Sabre\DAV\IProperties::updateProperties
      * @return bool|array
      */
-    public function updateProperties($properties) {
-
+    public function updateProperties($properties)
+    {
         $resourceData = $this->getResourceData();
 
-        foreach($properties as $propertyName=>$propertyValue) {
+        foreach ($properties as $propertyName=>$propertyValue) {
 
             // If it was null, we need to delete the property
             if (is_null($propertyValue)) {
@@ -52,15 +52,15 @@ abstract class Node extends DAV\FS\Node implements DAV\IProperties {
      * @param array $properties
      * @return array
      */
-    function getProperties($properties) {
-
+    public function getProperties($properties)
+    {
         $resourceData = $this->getResourceData();
 
         // if the array was empty, we need to return everything
         if (!$properties) return $resourceData['properties'];
 
         $props = array();
-        foreach($properties as $property) {
+        foreach ($properties as $property) {
             if (isset($resourceData['properties'][$property])) $props[$property] = $resourceData['properties'][$property];
         }
 
@@ -73,8 +73,8 @@ abstract class Node extends DAV\FS\Node implements DAV\IProperties {
      *
      * @return string
      */
-    protected function getResourceInfoPath() {
-
+    protected function getResourceInfoPath()
+    {
         list($parentDir) = DAV\URLUtil::splitPath($this->path);
         return $parentDir . '/.sabredav';
 
@@ -85,8 +85,8 @@ abstract class Node extends DAV\FS\Node implements DAV\IProperties {
      *
      * @return array
      */
-    protected function getResourceData() {
-
+    protected function getResourceData()
+    {
         $path = $this->getResourceInfoPath();
         if (!file_exists($path)) return array('properties' => array());
 
@@ -96,7 +96,7 @@ abstract class Node extends DAV\FS\Node implements DAV\IProperties {
         $data = '';
 
         // Reading data until the eof
-        while(!feof($handle)) {
+        while (!feof($handle)) {
             $data.=fread($handle,8192);
         }
 
@@ -121,8 +121,8 @@ abstract class Node extends DAV\FS\Node implements DAV\IProperties {
      * @param array $newData
      * @return void
      */
-    protected function putResourceData(array $newData) {
-
+    protected function putResourceData(array $newData)
+    {
         $path = $this->getResourceInfoPath();
 
         // opening up the file, and creating a shared lock
@@ -133,7 +133,7 @@ abstract class Node extends DAV\FS\Node implements DAV\IProperties {
         rewind($handle);
 
         // Reading data until the eof
-        while(!feof($handle)) {
+        while (!feof($handle)) {
             $data.=fread($handle,8192);
         }
 
@@ -154,8 +154,8 @@ abstract class Node extends DAV\FS\Node implements DAV\IProperties {
      * @param string $name The new name
      * @return void
      */
-    public function setName($name) {
-
+    public function setName($name)
+    {
         list($parentPath, ) = DAV\URLUtil::splitPath($this->path);
         list(, $newName) = DAV\URLUtil::splitPath($name);
         $newPath = $parentPath . '/' . $newName;
@@ -175,8 +175,8 @@ abstract class Node extends DAV\FS\Node implements DAV\IProperties {
     /**
      * @return bool
      */
-    public function deleteResourceData() {
-
+    public function deleteResourceData()
+    {
         // When we're deleting this node, we also need to delete any resource information
         $path = $this->getResourceInfoPath();
         if (!file_exists($path)) return true;
@@ -189,7 +189,7 @@ abstract class Node extends DAV\FS\Node implements DAV\IProperties {
         rewind($handle);
 
         // Reading data until the eof
-        while(!feof($handle)) {
+        while (!feof($handle)) {
             $data.=fread($handle,8192);
         }
 
@@ -204,11 +204,10 @@ abstract class Node extends DAV\FS\Node implements DAV\IProperties {
         return true;
     }
 
-    public function delete() {
-
+    public function delete()
+    {
         return $this->deleteResourceData();
 
     }
 
 }
-

@@ -6,7 +6,7 @@
 
 This is the main source code repository of AjaXplorer, containing all the PHP server and HTML5 Web GUI. It was migrated from previous Sourceforge SVN repository, which is hence deprecated. 
 
-* Latest Stable release : 5.0.0
+* Latest Stable release : 5.0.3
 * Latest Dev release : 4.3.4 (RC for AjaXplorer5)
 * License: [AGPLv3](https://www.gnu.org/licenses/agpl.html)
 * Lead developer  : Charles du Jeu (cdujeu): [Github](https://github.com/cdujeu) | [Twitter](https://twitter.com/AjaXplorer)
@@ -16,6 +16,15 @@ This is the main source code repository of AjaXplorer, containing all the PHP se
 Please DO NOT send emails to Charles, but use the forum located on http://forum.ajaxplorer.info instead. Once your problem is qualified, if it's a bug, you will be asked to enter it in the GitHub issue tracker.
 
 ### How to contribute / Developer Resources
+
+#### Coding guidelines
+
+To enforce some coding standards we are using PHP-CS-Fixer
+```
+wget http://cs.sensiolabs.org/get/php-cs-fixer.phar
+php php-cs-fixer.phar fix -v --fixers=indentation,linefeed,trailing_spaces,visibility,short_tag,braces,php_closing_tag,controls_spaces,eof_ending ajaxplorer-core/
+```
+See https://github.com/fabpot/PHP-CS-Fixer#usage
 
 #### Fixing the Core
 

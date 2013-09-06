@@ -28,4 +28,3 @@ $mess=array(
 "Separator" => "Separador",
 "This is necessary to discriminate users data loaded from various sources. Warning, use foldername compliant characters. For example :: does not work!" => "Esta função é necessária para descriminar dados dos utilizadores de várias fontes. ATENÇÃO: Use apenas caracteres padrão para o nome das pastas. Por exemplo :: não irá funcionar!",
 );
-?>

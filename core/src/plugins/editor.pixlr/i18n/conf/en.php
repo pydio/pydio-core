@@ -24,4 +24,3 @@ $mess=array(
 "Add a secure token to the target script to make sure that we are downloading an authorized image. The .htaccess file contained in the plugin must be correctly configured (apache)" => "Add a secure token to the target script to make sure that we are downloading an authorized image. The .htaccess file contained in the plugin must be correctly configured (apache)",
 "Secure Token" => "Secure Token",
 );
-?>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <guidriver name="ajxpclient">
 	<actions>
-	<!-- 
+	<!--
 		<action name="get_boot_conf" skipSecureToken="true">
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>
@@ -46,7 +46,7 @@
 					ajaxplorer.fireContextUp();
 					]]></clientCallback>
 			</processing>
-		</action>		
+		</action>
 		<action name="refresh">
 			<gui text="149" title="149" iconClass="icon-refresh" src="reload.png" hasAccessKey="true"
 				accessKey="refresh_access_key">
@@ -90,7 +90,7 @@
 					}
 					]]></clientCallback>
 				</processing>
-		</action>		
+		</action>
 		<action name="bookmark">
 			<gui text="152" title="153" src="bookmark.png" iconClass="icon-star-empty" hasAccessKey="true"
 				accessKey="bookmarks_access_key">
@@ -106,7 +106,7 @@
 					document.fire("ajaxplorer:add_bookmark");
 					]]></clientCallback>
 			</processing>
-		</action>		
+		</action>
 		<action name="delete_bookmark">
 			<gui text="154" title="155" src="folder_new.png"
 				accessKey="folder_access_key">
@@ -119,7 +119,7 @@
 					// TO DO
 					]]></clientCallback>
 			</processing>
-		</action>		
+		</action>
 		<action name="rename_bookmark">
 			<gui text="154" title="155" src="folder_new.png"
 				accessKey="folder_access_key">
@@ -133,10 +133,10 @@
 				<div id="rename_bookmark" action="get_bookmarks" box_width="200">
 				<input type="text" name="bm_title" value="" id="bm_title" class="dialogFocus">
 				<input type="hidden" name="bm_path" value="">
-				</div>				
+				</div>
 				]]></clientForm>
 			</processing>
-		</action>		
+		</action>
 		<action name="splash">
 			<gui text="166" title="167" src="info.png" iconClass="icon-question-sign" hasAccessKey="true"
 				accessKey="about_access_key">
@@ -148,9 +148,9 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 				modal.showDialogForm(
-					'Ajaxplorer', 
-					'splash_form', 
-					function(oForm){						
+					'Ajaxplorer',
+					'splash_form',
+					function(oForm){
 						var docDiv = $(oForm).down('#docDiv');
 						if(!docDiv.isLoaded){
 							var conn = new Connexion(window.ajxpServerAccessPath + '&get_action=display_doc&doc_file=CREDITS');
@@ -159,21 +159,21 @@
 								docDiv.isLoaded = true;
 								var updateLink = docDiv.down('#software_update');
 							};
-							conn.sendAsync();													
+							conn.sendAsync();
 						}
-					}, 
-					function(){hideLightBox();return false;}, 
-					null, 
-					true, true);		
+					},
+					function(){hideLightBox();return false;},
+					null,
+					true, true);
 					]]></clientCallback>
 				<clientForm id="splash_form"><![CDATA[
-					<div id="splash_form" box_width="455" box_padding="0">						
+					<div id="splash_form" box_width="455" box_padding="0">
 						<div id="docDiv" style="padding:5px;overflow:auto;height:300px;">
 							<div class="dialogButtons" style="text-align:right;padding-right:6px;"><input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_close.png" width="16" height="16" class="dialogButton"/></div>
 						</div>
-					</div>				
+					</div>
 				]]></clientForm>
 			</processing>
-		</action>		
+		</action>
 	</actions>
 </guidriver>

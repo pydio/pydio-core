@@ -6,7 +6,7 @@
 	<dependencies>
 		<pluginResources pluginName="editor.text"/>
 		<!-- Stream Wrapper Access -->
-		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>		
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
 	</dependencies>
     <client_settings>
         <resources>
@@ -18,5 +18,5 @@
     </client_settings>
 	<clientForm id="ck_box"><![CDATA[
 		<script type="text/javascript">window.CKEDITOR_BASEPATH = 'plugins/editor.ckeditor/ckeditor/';</script>
-	]]></clientForm>		
+	]]></clientForm>
 </editor>

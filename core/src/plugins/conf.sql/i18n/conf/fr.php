@@ -26,4 +26,3 @@ $mess=array(
 "Users Tmp Folder" => "Répertoire temporaire",
 "The folder in which all temporary files will be stored" => "Répertoire pour stocker les données temporaires des users.",
 );
-?>

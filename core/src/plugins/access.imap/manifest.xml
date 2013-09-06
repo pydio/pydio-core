@@ -3,8 +3,8 @@
 	<client_settings icon="plugins/access.imap/resources/images/16/mail_folder_inbox.png">
 		<resources>
             <i18n namespace="imap_access" path="plugins/access.imap/resources/i18n"/>
-			<img_library alias="imap_images" path="plugins/access.imap/resources/images"/>	
-			<js file="plugins/editor.eml/class.EmlViewer.js" className="EmlViewer" autoload="true"/>			
+			<img_library alias="imap_images" path="plugins/access.imap/resources/images"/>
+			<js file="plugins/editor.eml/class.EmlViewer.js" className="EmlViewer" autoload="true"/>
 		</resources>
 	</client_settings>
 	<server_settings>
@@ -28,7 +28,7 @@
 		<hooks>
 			<serverCallback hookName="node.info" methodName="enrichMetadata"></serverCallback>
 			<serverCallback hookName="dl.localname" methodName="attachmentDLName"></serverCallback>
-		</hooks>			
+		</hooks>
 	</registry_contributions>
     <dependencies>
         <pluginClass pluginName="access.fs"/>

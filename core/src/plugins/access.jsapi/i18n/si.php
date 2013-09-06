@@ -23,5 +23,4 @@ $mess = array(
 "1" => "Razredi in vmesniki",
 "2" => "Lastnosti in metode",
 "3" => "Izvorna koda"
-); 
-?>
+);

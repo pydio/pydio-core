@@ -24,5 +24,4 @@ $mess=array(
 "3" => "seleccione outro editor para abrir este ficheiro",
 "4" => "ATENÇÃO: Estes editores declaram que não suportam este tipo de ficheiro, o comportamento dos mesmos pode ser imprevisível!",
 "5" => "Apagar todas as associações existentes",
-); 
-?>
+);

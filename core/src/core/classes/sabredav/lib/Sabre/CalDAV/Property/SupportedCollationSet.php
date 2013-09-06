@@ -10,11 +10,11 @@ use Sabre\DAV;
  * in the CalDAV namespace.
  *
  * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/) 
+ * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class SupportedCollationSet extends DAV\Property {
-
+class SupportedCollationSet extends DAV\Property
+{
     /**
      * Serializes the property in a DOM document
      *
@@ -22,8 +22,8 @@ class SupportedCollationSet extends DAV\Property {
      * @param \DOMElement $node
      * @return void
      */
-    public function serialize(DAV\Server $server,\DOMElement $node) {
-
+    public function serialize(DAV\Server $server,\DOMElement $node)
+    {
         $doc = $node->ownerDocument;
 
         $prefix = $node->lookupPrefix('urn:ietf:params:xml:ns:caldav');

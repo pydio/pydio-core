@@ -22,5 +22,4 @@ $mess=array(
 "1" => "Janela Externa",
 "2" => "Janela Externa no Navegador",
 "3" => "A Abrir ficheiro numa janela Externa, por favor aguarde, esta janela deverá ser fechada automaticamente.",
-); 
-?>
+);

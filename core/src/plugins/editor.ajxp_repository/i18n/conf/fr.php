@@ -21,4 +21,3 @@
 $mess=array(
     "Repository Editor" => "Editeur de dépôts",
 );
-?>

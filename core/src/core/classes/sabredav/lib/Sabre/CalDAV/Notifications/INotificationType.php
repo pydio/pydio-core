@@ -10,8 +10,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-interface INotificationType extends DAV\PropertyInterface {
-
+interface INotificationType extends DAV\PropertyInterface
+{
     /**
      * This method serializes the entire notification, as it is used in the
      * response body.
@@ -20,7 +20,7 @@ interface INotificationType extends DAV\PropertyInterface {
      * @param \DOMElement $node
      * @return void
      */
-    function serializeBody(DAV\Server $server, \DOMElement $node);
+    public function serializeBody(DAV\Server $server, \DOMElement $node);
 
     /**
      * Returns a unique id for this notification
@@ -30,7 +30,7 @@ interface INotificationType extends DAV\PropertyInterface {
      *
      * @return string
      */
-    function getId();
+    public function getId();
 
     /**
      * Returns the ETag for this notification.
@@ -39,6 +39,6 @@ interface INotificationType extends DAV\PropertyInterface {
      *
      * @return string
      */
-    function getETag();
+    public function getETag();
 
 }

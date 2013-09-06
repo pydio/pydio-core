@@ -23,4 +23,3 @@ $mess=array(
 "Let user create repositories" => "Benutzer dürfen Repositories erstellen",
 "Remember guest preferences" => "Gasteinstellungen merken",
 );
-?>

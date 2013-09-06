@@ -13,8 +13,8 @@ namespace Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class UUIDUtil {
-
+class UUIDUtil
+{
     /**
      * Returns a pseudo-random v4 UUID
      *
@@ -23,8 +23,8 @@ class UUIDUtil {
      * @see http://www.php.net/manual/en/function.uniqid.php#94959
      * @return string
      */
-    static function getUUID() {
-
+    public static function getUUID()
+    {
         return sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
             // 32 bits for "time_low"
             mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),
@@ -52,8 +52,8 @@ class UUIDUtil {
      * @param string $uuid
      * @return bool
      */
-    static function validateUUID($uuid) {
-
+    public static function validateUUID($uuid)
+    {
         return preg_match(
             '/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i',
             $uuid

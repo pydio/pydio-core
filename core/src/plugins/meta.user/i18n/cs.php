@@ -25,7 +25,6 @@ $mess=array(
 "4" => "Nedůležité",
 "5" => "Úkoly",
 "6" => "Osobní",
-"7" => "Práce", 
+"7" => "Práce",
 "8" => "Důležité"
 );
-?>

@@ -36,4 +36,3 @@ $mess=array(
 "User attribute" => "User attribute",
 "Username attribute" => "Username attribute",
 );
-?>

@@ -11,8 +11,8 @@ namespace Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class ObjectTree extends Tree {
-
+class ObjectTree extends Tree
+{
     /**
      * The root node
      *
@@ -34,8 +34,8 @@ class ObjectTree extends Tree {
      *
      * @param ICollection $rootNode
      */
-    public function __construct(ICollection $rootNode) {
-
+    public function __construct(ICollection $rootNode)
+    {
         $this->rootNode = $rootNode;
 
     }
@@ -46,8 +46,8 @@ class ObjectTree extends Tree {
      * @param string $path
      * @return INode
      */
-    public function getNodeForPath($path) {
-
+    public function getNodeForPath($path)
+    {
         $path = trim($path,'/');
         if (isset($this->cache[$path])) return $this->cache[$path];
 
@@ -84,8 +84,8 @@ class ObjectTree extends Tree {
      * @param string $path
      * @return bool
      */
-    public function nodeExists($path) {
-
+    public function nodeExists($path)
+    {
         try {
 
             // The root always exists
@@ -111,11 +111,11 @@ class ObjectTree extends Tree {
      * @param string $path
      * @return array
      */
-    public function getChildren($path) {
-
+    public function getChildren($path)
+    {
         $node = $this->getNodeForPath($path);
         $children = $node->getChildren();
-        foreach($children as $child) {
+        foreach ($children as $child) {
 
             $this->cache[trim($path,'/') . '/' . $child->getName()] = $child;
 
@@ -142,12 +142,12 @@ class ObjectTree extends Tree {
      * @param string $path
      * @return void
      */
-    public function markDirty($path) {
-
+    public function markDirty($path)
+    {
         // We don't care enough about sub-paths
         // flushing the entire cache
         $path = trim($path,'/');
-        foreach($this->cache as $nodePath=>$node) {
+        foreach ($this->cache as $nodePath=>$node) {
             if ($nodePath == $path || strpos($nodePath,$path.'/')===0)
                 unset($this->cache[$nodePath]);
 
@@ -156,4 +156,3 @@ class ObjectTree extends Tree {
     }
 
 }
-

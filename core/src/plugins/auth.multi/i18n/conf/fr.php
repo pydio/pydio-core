@@ -28,4 +28,3 @@ $mess=array(
 "Separator" => "Séparateur",
 "This is necessary to discriminate users data loaded from various sources. Warning, use foldername compliant characters. For example :: does not work!" => "Séparateur pour stocker les données des utilisateurs avec en les différenciant correctement selon les drivers.",
 );
-?>

@@ -24,4 +24,3 @@ $mess=array(
 "Wms Server" => "Wms Server",
 "Wms server url" => "Wms server url",
 );
-?>

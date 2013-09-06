@@ -14,8 +14,8 @@ use Sabre\DAV\Locks\LockInfo;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class PDO extends AbstractBackend {
-
+class PDO extends AbstractBackend
+{
     /**
      * The PDO connection object
      *
@@ -36,8 +36,8 @@ class PDO extends AbstractBackend {
      * @param PDO $pdo
      * @param string $tableName
      */
-    public function __construct(\PDO $pdo, $tableName = 'locks') {
-
+    public function __construct(\PDO $pdo, $tableName = 'locks')
+    {
         $this->pdo = $pdo;
         $this->tableName = $tableName;
 
@@ -56,8 +56,8 @@ class PDO extends AbstractBackend {
      * @param bool $returnChildLocks
      * @return array
      */
-    public function getLocks($uri, $returnChildLocks) {
-
+    public function getLocks($uri, $returnChildLocks)
+    {
         // NOTE: the following 10 lines or so could be easily replaced by
         // pure sql. MySQL's non-standard string concatenation prevents us
         // from doing this though.
@@ -72,7 +72,7 @@ class PDO extends AbstractBackend {
 
         $currentPath='';
 
-        foreach($uriParts as $part) {
+        foreach ($uriParts as $part) {
 
             if ($currentPath) $currentPath.='/';
             $currentPath.=$part;
@@ -95,7 +95,7 @@ class PDO extends AbstractBackend {
         $result = $stmt->fetchAll();
 
         $lockList = array();
-        foreach($result as $row) {
+        foreach ($result as $row) {
 
             $lockInfo = new LockInfo();
             $lockInfo->owner = $row['owner'];
@@ -120,8 +120,8 @@ class PDO extends AbstractBackend {
      * @param LockInfo $lockInfo
      * @return bool
      */
-    public function lock($uri, LockInfo $lockInfo) {
-
+    public function lock($uri, LockInfo $lockInfo)
+    {
         // We're making the lock timeout 30 minutes
         $lockInfo->timeout = 30*60;
         $lockInfo->created = time();
@@ -129,7 +129,7 @@ class PDO extends AbstractBackend {
 
         $locks = $this->getLocks($uri,false);
         $exists = false;
-        foreach($locks as $lock) {
+        foreach ($locks as $lock) {
             if ($lock->token == $lockInfo->token) $exists = true;
         }
 
@@ -154,8 +154,8 @@ class PDO extends AbstractBackend {
      * @param LockInfo $lockInfo
      * @return bool
      */
-    public function unlock($uri, LockInfo $lockInfo) {
-
+    public function unlock($uri, LockInfo $lockInfo)
+    {
         $stmt = $this->pdo->prepare('DELETE FROM '.$this->tableName.' WHERE uri = ? AND token = ?');
         $stmt->execute(array($uri,$lockInfo->token));
 
@@ -164,4 +164,3 @@ class PDO extends AbstractBackend {
     }
 
 }
-

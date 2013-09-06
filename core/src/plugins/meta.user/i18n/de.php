@@ -19,7 +19,7 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
  //	german translation: Axel Otterstätter <axel.otterstaetter@googlemail.com>
-// 
+//
 //---------------------------------------------------------------------------------------------------
 
 $mess=array(
@@ -29,7 +29,6 @@ $mess=array(
 "4" => "Niedrig",
 "5" => "Todo",
 "6" => "Persönlich",
-"7" => "Arbeit", 
+"7" => "Arbeit",
 "8" => "Wichtig"
 );
-?>

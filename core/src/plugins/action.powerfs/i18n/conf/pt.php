@@ -23,5 +23,3 @@ $mess = array(
     "Power FS" => "Power FS",
     "This set of extensions assume that you have an administration access to your server: ability to tweak the webserver and the php configuration, ability to access the command line, etc." => "Este conjunto de extensões assume que existe um administrador com acesso ao servidor com a habilidade de fazer alterações ao mesmo, configuração PHP, linha de comandos, etc."
 );
-
-?>

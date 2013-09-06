@@ -24,5 +24,3 @@ $mess = array(
     "2" => "Reload current folder",
     "3" => "Archive download should start automatically"
 );
-
-?>

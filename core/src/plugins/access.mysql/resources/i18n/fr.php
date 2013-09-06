@@ -24,4 +24,3 @@ $mess=array(
 "3"	=> "Executer la requête",
 "4"	=> "Effacer"
 );
-?>

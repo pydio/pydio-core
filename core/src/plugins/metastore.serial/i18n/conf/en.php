@@ -26,4 +26,3 @@ $mess=array(
 "Meta File" => "Meta File",
 "Hidden file used inside folders to save meta data" => "Hidden file used inside folders to save meta data",
 );
-?>

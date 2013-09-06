@@ -20,8 +20,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class SharingPlugin extends DAV\ServerPlugin {
-
+class SharingPlugin extends DAV\ServerPlugin
+{
     /**
      * These are the various status constants used by sharing-messages.
      */
@@ -46,8 +46,8 @@ class SharingPlugin extends DAV\ServerPlugin {
      *
      * @return array
      */
-    public function getFeatures() {
-
+    public function getFeatures()
+    {
         return array('calendarserver-sharing');
 
     }
@@ -60,8 +60,8 @@ class SharingPlugin extends DAV\ServerPlugin {
      *
      * @return string
      */
-    public function getPluginName() {
-
+    public function getPluginName()
+    {
         return 'caldav-sharing';
 
     }
@@ -77,8 +77,8 @@ class SharingPlugin extends DAV\ServerPlugin {
      * @param DAV\Server $server
      * @return void
      */
-    public function initialize(DAV\Server $server) {
-
+    public function initialize(DAV\Server $server)
+    {
         $this->server = $server;
         $server->resourceTypeMapping['Sabre\\CalDAV\\ISharedCalendar'] = '{' . Plugin::NS_CALENDARSERVER . '}shared';
 
@@ -108,8 +108,8 @@ class SharingPlugin extends DAV\ServerPlugin {
      * @param array $returnedProperties
      * @return void
      */
-    public function beforeGetProperties($path, DAV\INode $node, &$requestedProperties, &$returnedProperties) {
-
+    public function beforeGetProperties($path, DAV\INode $node, &$requestedProperties, &$returnedProperties)
+    {
         if ($node instanceof IShareableCalendar) {
             if (($index = array_search('{' . Plugin::NS_CALENDARSERVER . '}invite', $requestedProperties))!==false) {
 
@@ -187,8 +187,8 @@ class SharingPlugin extends DAV\ServerPlugin {
      * @param DAV\INode $node
      * @return void
      */
-    public function afterGetProperties($path, &$properties, DAV\INode $node) {
-
+    public function afterGetProperties($path, &$properties, DAV\INode $node)
+    {
         if ($node instanceof IShareableCalendar) {
             if (isset($properties[200]['{DAV:}resourcetype'])) {
                 if (count($node->getShares())>0) {
@@ -223,8 +223,8 @@ class SharingPlugin extends DAV\ServerPlugin {
      * @param DAV\INode $node
      * @return void
      */
-    public function updateProperties(array &$mutations, array &$result, DAV\INode $node) {
-
+    public function updateProperties(array &$mutations, array &$result, DAV\INode $node)
+    {
         if (!$node instanceof IShareableCalendar)
             return;
 
@@ -237,7 +237,7 @@ class SharingPlugin extends DAV\ServerPlugin {
 
         $shares = $node->getShares();
         $remove = array();
-        foreach($shares as $share) {
+        foreach ($shares as $share) {
             $remove[] = $share['href'];
         }
         $node->updateShares(array(), $remove);
@@ -260,8 +260,8 @@ class SharingPlugin extends DAV\ServerPlugin {
      * @param string $uri
      * @return null|bool
      */
-    public function unknownMethod($method, $uri) {
-
+    public function unknownMethod($method, $uri)
+    {
         if ($method!=='POST') {
             return;
         }
@@ -293,7 +293,7 @@ class SharingPlugin extends DAV\ServerPlugin {
 
         $documentType = DAV\XMLUtil::toClarkNotation($dom->firstChild);
 
-        switch($documentType) {
+        switch ($documentType) {
 
             // Dealing with the 'share' document, which modified invitees on a
             // calendar.
@@ -361,7 +361,7 @@ class SharingPlugin extends DAV\ServerPlugin {
                     $dom->formatOutput = true;
 
                     $root = $dom->createElement('cs:shared-as');
-                    foreach($this->server->xmlNamespaces as $namespace => $prefix) {
+                    foreach ($this->server->xmlNamespaces as $namespace => $prefix) {
                         $root->setAttribute('xmlns:' . $prefix, $namespace);
                     }
 
@@ -454,8 +454,8 @@ class SharingPlugin extends DAV\ServerPlugin {
      * @param \DOMDocument $dom
      * @return array
      */
-    protected function parseShareRequest(\DOMDocument $dom) {
-
+    protected function parseShareRequest(\DOMDocument $dom)
+    {
         $xpath = new \DOMXPath($dom);
         $xpath->registerNamespace('cs', Plugin::NS_CALENDARSERVER);
         $xpath->registerNamespace('d', 'urn:DAV');
@@ -463,7 +463,7 @@ class SharingPlugin extends DAV\ServerPlugin {
         $set = array();
         $elems = $xpath->query('cs:set');
 
-        for($i=0; $i < $elems->length; $i++) {
+        for ($i=0; $i < $elems->length; $i++) {
 
             $xset = $elems->item($i);
             $set[] = array(
@@ -478,7 +478,7 @@ class SharingPlugin extends DAV\ServerPlugin {
         $remove = array();
         $elems = $xpath->query('cs:remove');
 
-        for($i=0; $i < $elems->length; $i++) {
+        for ($i=0; $i < $elems->length; $i++) {
 
             $xremove = $elems->item($i);
             $remove[] = $xpath->evaluate('string(d:href)', $xremove);
@@ -502,8 +502,8 @@ class SharingPlugin extends DAV\ServerPlugin {
      * @param \DOMDocument $dom
      * @return array
      */
-    protected function parseInviteReplyRequest(\DOMDocument $dom) {
-
+    protected function parseInviteReplyRequest(\DOMDocument $dom)
+    {
         $xpath = new \DOMXPath($dom);
         $xpath->registerNamespace('cs', Plugin::NS_CALENDARSERVER);
         $xpath->registerNamespace('d', 'urn:DAV');

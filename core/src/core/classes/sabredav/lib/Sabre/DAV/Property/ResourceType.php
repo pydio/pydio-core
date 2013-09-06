@@ -14,8 +14,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class ResourceType extends DAV\Property {
-
+class ResourceType extends DAV\Property
+{
     /**
      * resourceType
      *
@@ -28,8 +28,8 @@ class ResourceType extends DAV\Property {
      *
      * @param mixed $resourceType
      */
-    public function __construct($resourceType = array()) {
-
+    public function __construct($resourceType = array())
+    {
         if ($resourceType === DAV\Server::NODE_FILE)
             $this->resourceType = array();
         elseif ($resourceType === DAV\Server::NODE_DIRECTORY)
@@ -48,12 +48,12 @@ class ResourceType extends DAV\Property {
      * @param \DOMElement $prop
      * @return void
      */
-    public function serialize(DAV\Server $server, \DOMElement $prop) {
-
+    public function serialize(DAV\Server $server, \DOMElement $prop)
+    {
         $propName = null;
         $rt = $this->resourceType;
 
-        foreach($rt as $resourceType) {
+        foreach ($rt as $resourceType) {
             if (preg_match('/^{([^}]*)}(.*)$/',$resourceType,$propName)) {
 
                 if (isset($server->xmlNamespaces[$propName[1]])) {
@@ -74,8 +74,8 @@ class ResourceType extends DAV\Property {
      *
      * @return array
      */
-    public function getValue() {
-
+    public function getValue()
+    {
         return $this->resourceType;
 
     }
@@ -86,8 +86,8 @@ class ResourceType extends DAV\Property {
      * @param string $type
      * @return bool
      */
-    public function is($type) {
-
+    public function is($type)
+    {
         return in_array($type, $this->resourceType);
 
     }
@@ -98,8 +98,8 @@ class ResourceType extends DAV\Property {
      * @param string $type
      * @return void
      */
-    public function add($type) {
-
+    public function add($type)
+    {
         $this->resourceType[] = $type;
         $this->resourceType = array_unique($this->resourceType);
 
@@ -111,10 +111,10 @@ class ResourceType extends DAV\Property {
      * @param \DOMElement $dom
      * @return DAV\Property\ResourceType
      */
-    static public function unserialize(\DOMElement $dom) {
-
+    public static function unserialize(\DOMElement $dom)
+    {
         $value = array();
-        foreach($dom->childNodes as $child) {
+        foreach ($dom->childNodes as $child) {
 
             $value[] = DAV\XMLUtil::toClarkNotation($child);
 

@@ -22,4 +22,3 @@ $mess=array(
 "Open in..." => "Abrir em...",
 "Simple Picker to open any type of file in any available editor." => "Seleccionador Simples para abrir qualquer tipo de ficheiro em qualquer um dos editores disponíveis.",
 );
-?>

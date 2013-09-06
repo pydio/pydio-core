@@ -28,25 +28,26 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class dropboxAccessDriver extends fsAccessDriver
 {
-	/**
-	* @var Repository
-	*/
-	public $repository;
-	public $driverConf;
-	protected $wrapperClassName;
-	protected $urlBase;
-		
-	function initRepository(){
-		if(is_array($this->pluginConf)){
-			$this->driverConf = $this->pluginConf;
-		}else{
-			$this->driverConf = array();
-		}
-				
-		$wrapperData = $this->detectStreamWrapper(true);
-		AJXP_Logger::debug("Detected wrapper data", $wrapperData);
-		$this->wrapperClassName = $wrapperData["classname"];
-		$this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+    /**
+    * @var Repository
+    */
+    public $repository;
+    public $driverConf;
+    protected $wrapperClassName;
+    protected $urlBase;
+
+    public function initRepository()
+    {
+        if (is_array($this->pluginConf)) {
+            $this->driverConf = $this->pluginConf;
+        } else {
+            $this->driverConf = array();
+        }
+
+        $wrapperData = $this->detectStreamWrapper(true);
+        AJXP_Logger::debug("Detected wrapper data", $wrapperData);
+        $this->wrapperClassName = $wrapperData["classname"];
+        $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
 
         $consumerKey = $this->repository->getOption("CONSUMER_KEY");
         $consumerSecret = $this->repository->getOption("CONSUMER_SECRET");
@@ -57,7 +58,7 @@ class dropboxAccessDriver extends fsAccessDriver
 
         // TOKENS IN FILE ?
         $tokens = $this->getTokens($this->repository->getId());
-        if(!empty($tokens)){
+        if (!empty($tokens)) {
             $_SESSION["OAUTH_DROPBOX_TOKENS"] = $tokens;
             return;
         }
@@ -68,7 +69,7 @@ class dropboxAccessDriver extends fsAccessDriver
         } else {
             $state = 1;
         }
-        switch($state) {
+        switch ($state) {
 
             case 1 :
                 $tokens = $oauth->getRequestToken();
@@ -92,25 +93,27 @@ class dropboxAccessDriver extends fsAccessDriver
 
         throw new Exception("Impossible to find the tokens for accessing the dropbox repository");
 
-	}
-	
-	function performChecks(){
-		if(!AJXP_Utils::searchIncludePath('HTTP/OAuth/Consumer.php')){
-			throw new Exception("The PEAR HTTP_OAuth package must be installed!");
-		}
-	}
-	
-	function isWriteable($dir, $type = "dir"){
-		return true;
-	}
+    }
 
-    function getTokens($repositoryId){
+    public function performChecks()
+    {
+        if (!AJXP_Utils::searchIncludePath('HTTP/OAuth/Consumer.php')) {
+            throw new Exception("The PEAR HTTP_OAuth package must be installed!");
+        }
+    }
+
+    public function isWriteable($dir, $type = "dir")
+    {
+        return true;
+    }
+
+    public function getTokens($repositoryId)
+    {
         return AJXP_Utils::loadSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_tokens");
     }
-    function setTokens($repositoryId, $oauth_tokens){
+    public function setTokens($repositoryId, $oauth_tokens)
+    {
         return AJXP_Utils::saveSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_tokens", $oauth_tokens, true);
     }
 
 }
-
-?>

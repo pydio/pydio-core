@@ -25,39 +25,39 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Auth
  */
-class remote_ajxpAuthDriver extends serialAuthDriver  {
-	
-	function usersEditable(){
-		return false;
-	}
-	function passwordsEditable(){
-		return false;
-	}
-	
-	function preLogUser($sessionId){
-		
-		require_once(AJXP_BIN_FOLDER."/class.HttpClient.php");
-		$client = new HttpClient($this->getOption("REMOTE_SERVER"), $this->getOption("REMOTE_PORT"));
-		$client->setDebug(false);
-		if($this->getOption("REMOTE_USER") != ""){
-			$client->setAuthorization($this->getOption("REMOTE_USER"), $this->getOption("REMOTE_PASSWORD"));
-		}						
-		$client->setCookies(array(($this->getOption("REMOTE_SESSION_NAME") ? $this->getOption("REMOTE_SESSION_NAME") : "PHPSESSID") => $sessionId));
-		$result = $client->get($this->getOption("REMOTE_URL"), array("session_id"=>$sessionId));
-		if($result)
-		{
-			$user = $client->getContent();
-			if($this->autoCreateUser()){
-				AuthService::logUser($user, "", true);
-			}else{
-				// If not auto-create but the user exists, log him.
-				if($this->userExists($user)){
-					AuthService::logUser($user, "", true);
-				}
-			}
-		}
-					
-	}	
+class remote_ajxpAuthDriver extends serialAuthDriver
+{
+    public function usersEditable()
+    {
+        return false;
+    }
+    public function passwordsEditable()
+    {
+        return false;
+    }
+
+    public function preLogUser($sessionId)
+    {
+        require_once(AJXP_BIN_FOLDER."/class.HttpClient.php");
+        $client = new HttpClient($this->getOption("REMOTE_SERVER"), $this->getOption("REMOTE_PORT"));
+        $client->setDebug(false);
+        if ($this->getOption("REMOTE_USER") != "") {
+            $client->setAuthorization($this->getOption("REMOTE_USER"), $this->getOption("REMOTE_PASSWORD"));
+        }
+        $client->setCookies(array(($this->getOption("REMOTE_SESSION_NAME") ? $this->getOption("REMOTE_SESSION_NAME") : "PHPSESSID") => $sessionId));
+        $result = $client->get($this->getOption("REMOTE_URL"), array("session_id"=>$sessionId));
+        if ($result) {
+            $user = $client->getContent();
+            if ($this->autoCreateUser()) {
+                AuthService::logUser($user, "", true);
+            } else {
+                // If not auto-create but the user exists, log him.
+                if ($this->userExists($user)) {
+                    AuthService::logUser($user, "", true);
+                }
+            }
+        }
+
+    }
 
 }
-?>

@@ -40,4 +40,3 @@ $mess=array(
 "Auth Form ID" => "Formulário de ID de Auth",
 "The HTML ID of the form tag displayed for login on the page defined previously. Not necessary for WP, login-form by default for Joomla, and user-login-form for Drupal" => "O ID HTML do formulário será mostrado na página definida anteriormente. Não é necessário para WP, os formulários de login usados por pré definição no Joomla e nos formulários de autenticação usados pelo Drupal",
 );
-?>

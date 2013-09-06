@@ -28,4 +28,3 @@ $mess=array(
 "If you use the agent, enter its URL here." => "Si vous utilisez le mode Z-Agent, entrez son URL complète ici, de type http://domain/path/to/agent/save_zoho.php",
 "Z-Agent URL" => "URL Z-agent",
 );
-?>

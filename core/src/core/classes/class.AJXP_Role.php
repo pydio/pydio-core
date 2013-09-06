@@ -42,36 +42,40 @@ class AJXP_Role implements AjxpGroupPathProvider
     protected $actions = array();
     protected $autoApplies = array();
 
-    public function __construct($id){
+    public function __construct($id)
+    {
         $this->roleId = $id;
     }
 
-    public function migrateDeprectated($repositoriesList, AjxpRole $oldRole){
+    public function migrateDeprectated($repositoriesList, AjxpRole $oldRole)
+    {
         $repositoriesList["ajxp.all"] = "";
-        foreach($repositoriesList as $repoId => $repoObject){
+        foreach ($repositoriesList as $repoId => $repoObject) {
             $right = $oldRole->getRight($repoId);
             if(!empty($right)) $this->setAcl($repoId, $right);
             $actions = $oldRole->getSpecificActionsRights($repoId);
-            if(count($actions)){
-                foreach($actions as $act => $status){
-                    if($repoId == "ajxp.all"){
+            if (count($actions)) {
+                foreach ($actions as $act => $status) {
+                    if ($repoId == "ajxp.all") {
                         $this->setActionState(AJXP_PLUGINS_SCOPE_ALL, $act, AJXP_REPO_SCOPE_ALL, $status);
-                    }else{
+                    } else {
                         $this->setActionState(AJXP_PLUGINS_SCOPE_ALL, $act, $repoId, $status);
                     }
                 }
             }
         }
         $this->setGroupPath($oldRole->getGroupPath());
-        if($oldRole->isDefault()){
+        if ($oldRole->isDefault()) {
             $this->setAutoApplies(array("all"));
         }
     }
 
-    public function isGroupRole(){
+    public function isGroupRole()
+    {
         return strpos($this->roleId, "AJXP_GRP_") === 0;
     }
-    public function isUserRole(){
+    public function isUserRole()
+    {
         return strpos($this->roleId, "AJXP_USER_") === 0;
     }
 
@@ -81,7 +85,8 @@ class AJXP_Role implements AjxpGroupPathProvider
      * @param string $repositoryId Repository ID
      * @return bool
      */
-    function canRead($repositoryId){
+    public function canRead($repositoryId)
+    {
         $right = $this->getAcl($repositoryId);
         if($right == "rw" || $right == "r") return true;
         return false;
@@ -92,7 +97,8 @@ class AJXP_Role implements AjxpGroupPathProvider
      * @param string $repositoryId Repository ID
      * @return bool
      */
-    function canWrite($repositoryId){
+    public function canWrite($repositoryId)
+    {
         $right = $this->getAcl($repositoryId);
         if($right == "rw" || $right == "w") return true;
         return false;
@@ -104,10 +110,11 @@ class AJXP_Role implements AjxpGroupPathProvider
      * @param string $rightString
      * @return void
      */
-    public function setAcl($repositoryId, $rightString){
-        if(empty($rightString)){
+    public function setAcl($repositoryId, $rightString)
+    {
+        if (empty($rightString)) {
             if(isSet($this->acls[$repositoryId])) unset($this->acls[$repositoryId]);
-        }else{
+        } else {
             $this->acls[$repositoryId] = $rightString;
         }
         return;
@@ -116,8 +123,9 @@ class AJXP_Role implements AjxpGroupPathProvider
      * @param string $repositoryId
      * @return string
      */
-    public function getAcl($repositoryId){
-        if(isSet($this->acls[$repositoryId])) {
+    public function getAcl($repositoryId)
+    {
+        if (isSet($this->acls[$repositoryId])) {
             return $this->acls[$repositoryId];
         }
         return "";
@@ -125,11 +133,13 @@ class AJXP_Role implements AjxpGroupPathProvider
     /**
      * @return array Associative array[REPO_ID] => RIGHT_STRING (r / w / rw / AJXP_VALUE_CLEAR)
      */
-    public function listAcls(){
+    public function listAcls()
+    {
         return $this->acls;
     }
 
-    public function clearAcls(){
+    public function clearAcls()
+    {
         $this->acls = array();
     }
 
@@ -137,7 +147,8 @@ class AJXP_Role implements AjxpGroupPathProvider
      * Send all role informations as an associative array
      * @return array
      */
-    public function getDataArray(){
+    public function getDataArray()
+    {
         $roleData = array();
         $roleData["ACL"] = $this->listAcls();
         $roleData["ACTIONS"] = $this->listActionsStates();
@@ -151,8 +162,8 @@ class AJXP_Role implements AjxpGroupPathProvider
      * @see getDataArray()
      * @param array $roleData
      */
-    public function bunchUpdate($roleData){
-
+    public function bunchUpdate($roleData)
+    {
         $this->acls = $roleData["ACL"];
         $this->actions = $roleData["ACTIONS"];
         $this->parameters = $roleData["PARAMETERS"];
@@ -167,15 +178,16 @@ class AJXP_Role implements AjxpGroupPathProvider
      * @param mixed $parameterValue can be AJXP_VALUE_CLEAR (force clear previous), or empty string for clearing value (apply previous).
      * @param string|null $repositoryId
      */
-    public function setParameterValue($pluginId, $parameterName, $parameterValue, $repositoryId = null){
+    public function setParameterValue($pluginId, $parameterName, $parameterValue, $repositoryId = null)
+    {
         if($repositoryId === null) $repositoryId = AJXP_REPO_SCOPE_ALL;
-        if(empty($parameterValue) && $parameterValue !== false){
-            if(isSet($this->parameters[$repositoryId][$pluginId][$parameterName])){
+        if (empty($parameterValue) && $parameterValue !== false) {
+            if (isSet($this->parameters[$repositoryId][$pluginId][$parameterName])) {
                 unset($this->parameters[$repositoryId][$pluginId][$parameterName]);
                 if(!count($this->parameters[$repositoryId][$pluginId])) unset($this->parameters[$repositoryId][$pluginId]);
                 if(!count($this->parameters[$repositoryId])) unset($this->parameters[$repositoryId]);
             }
-        }else{
+        } else {
             $this->parameters = $this->setArrayValue($this->parameters, $repositoryId, $pluginId, $parameterName, $parameterValue);
         }
         return;
@@ -188,13 +200,14 @@ class AJXP_Role implements AjxpGroupPathProvider
      * @param mixed $parameterValue
      * @return mixed
      */
-    public function filterParameterValue($pluginId, $parameterName, $repositoryId, $parameterValue){
-        if(isSet($this->parameters[AJXP_REPO_SCOPE_ALL][$pluginId][$parameterName])){
+    public function filterParameterValue($pluginId, $parameterName, $repositoryId, $parameterValue)
+    {
+        if (isSet($this->parameters[AJXP_REPO_SCOPE_ALL][$pluginId][$parameterName])) {
             $v = $this->parameters[AJXP_REPO_SCOPE_ALL][$pluginId][$parameterName];
             if($v === AJXP_VALUE_CLEAR) return "";
             else return $v;
         }
-        if(isSet($this->parameters[$repositoryId][$pluginId][$parameterName])){
+        if (isSet($this->parameters[$repositoryId][$pluginId][$parameterName])) {
             $v = $this->parameters[$repositoryId][$pluginId][$parameterName];
             if($v === AJXP_VALUE_CLEAR) return "";
             else return $v;
@@ -204,11 +217,13 @@ class AJXP_Role implements AjxpGroupPathProvider
     /**
      * @return array Associative array of parameters : array[REPO_ID][PLUGIN_ID][PARAMETER_NAME] = PARAMETER_VALUE
      */
-    public function listParameters(){
+    public function listParameters()
+    {
         return $this->parameters;
     }
 
-    public function listAutoApplies(){
+    public function listAutoApplies()
+    {
         return $this->autoApplies;
     }
 
@@ -218,12 +233,14 @@ class AJXP_Role implements AjxpGroupPathProvider
      * @param string|null $repositoryId
      * @param string $state
      */
-    public function setActionState($pluginId, $actionName, $repositoryId = null, $state = "disabled"){
+    public function setActionState($pluginId, $actionName, $repositoryId = null, $state = "disabled")
+    {
         $this->actions = $this->setArrayValue($this->actions, $repositoryId, $pluginId, $actionName, $state);
         return;
     }
 
-    public function listActionsStates(){
+    public function listActionsStates()
+    {
         return $this->actions;
     }
 
@@ -231,15 +248,16 @@ class AJXP_Role implements AjxpGroupPathProvider
      * @param Repository $repository
      * @return array
      */
-    public function listActionsStatesFor($repository){
+    public function listActionsStatesFor($repository)
+    {
         $actions = array();
-        if(isSet($this->actions[AJXP_REPO_SCOPE_ALL])){
+        if (isSet($this->actions[AJXP_REPO_SCOPE_ALL])) {
             $actions = $this->actions[AJXP_REPO_SCOPE_ALL];
         }
-        if($repository != null && isSet($this->actions[AJXP_REPO_SCOPE_SHARED]) && $repository->hasParent()){
+        if ($repository != null && isSet($this->actions[AJXP_REPO_SCOPE_SHARED]) && $repository->hasParent()) {
             $actions = array_merge($actions, $this->actions[AJXP_REPO_SCOPE_SHARED]);
         }
-        if($repository != null && isSet($this->actions[$repository->getId()])){
+        if ($repository != null && isSet($this->actions[$repository->getId()])) {
             $actions = array_merge($actions, $this->actions[$repository->getId()]);
         }
         return $actions;
@@ -252,11 +270,12 @@ class AJXP_Role implements AjxpGroupPathProvider
      * @param boolean $inputState
      * @return boolean
      */
-    public function actionEnabled($pluginId, $actionName, $repositoryId, $inputState){
-        if(isSet($this->actions[AJXP_REPO_SCOPE_ALL][$pluginId][$actionName])){
+    public function actionEnabled($pluginId, $actionName, $repositoryId, $inputState)
+    {
+        if (isSet($this->actions[AJXP_REPO_SCOPE_ALL][$pluginId][$actionName])) {
             return $this->actions[AJXP_REPO_SCOPE_ALL][$pluginId][$actionName] == "enabled" ? true : false ;
         }
-        if(isSet($this->actions[$repositoryId][$pluginId][$actionName])){
+        if (isSet($this->actions[$repositoryId][$pluginId][$actionName])) {
             return $this->actions[$repositoryId][$pluginId][$actionName]  == "enabled" ? true : false ;
         }
         return $inputState;
@@ -265,7 +284,8 @@ class AJXP_Role implements AjxpGroupPathProvider
     /**
      * @return array
      */
-    public function listAllActionsStates(){
+    public function listAllActionsStates()
+    {
         return $this->actions;
     }
 
@@ -273,20 +293,21 @@ class AJXP_Role implements AjxpGroupPathProvider
      * @param AJXP_Role $role
      * @return AJXP_Role
      */
-    public function override(AJXP_Role $role){
+    public function override(AJXP_Role $role)
+    {
         $newRole = new AJXP_Role($role->getId());
 
         $newAcls = $this->array_merge_recursive2($role->listAcls(), $this->listAcls());
-        foreach($newAcls as $repoId => $rightString){
+        foreach ($newAcls as $repoId => $rightString) {
             if($rightString == AJXP_VALUE_CLEAR) continue;
             $newRole->setAcl($repoId, $rightString);
         }
 
         $newParams = $this->array_merge_recursive2($role->listParameters(), $this->listParameters());
-        foreach($newParams as $repoId => $data){
+        foreach ($newParams as $repoId => $data) {
             foreach ($data as $pluginId => $param) {
-                foreach($param as $parameterName => $parameterValue){
-                    if($parameterValue === true || $parameterValue === false){
+                foreach ($param as $parameterName => $parameterValue) {
+                    if ($parameterValue === true || $parameterValue === false) {
                         $newRole->setParameterValue($pluginId, $parameterName, $parameterValue, $repoId);
                         continue;
                     }
@@ -297,9 +318,9 @@ class AJXP_Role implements AjxpGroupPathProvider
         }
 
         $newActions = $this->array_merge_recursive2($role->listActionsStates(), $this->listActionsStates());
-        foreach($newActions as $repoId => $data){
+        foreach ($newActions as $repoId => $data) {
             foreach ($data as $pluginId => $action) {
-                foreach($action as $actionName => $actionState){
+                foreach ($action as $actionName => $actionState) {
                     $newRole->setActionState($pluginId, $actionName, $repoId, $actionState);
                 }
             }
@@ -315,18 +336,19 @@ class AJXP_Role implements AjxpGroupPathProvider
      * @param key3...
      * @param value
      */
-    function setArrayValue(){
+    public function setArrayValue()
+    {
         $args = func_get_args();
         $arr = $args[0]; //array_shift($args);
         $argMaxIndex = count($args)-1;
         $value = $args[$argMaxIndex]; //array_pop($args);
         $current = &$arr;
-        foreach ($args as $index => $key){
+        foreach ($args as $index => $key) {
             if($index == 0) continue;
-            if($index < $argMaxIndex -1) {
+            if ($index < $argMaxIndex -1) {
                 if(!isset($current[$key])) $current[$key] = array();
                 $current = &$current[$key];
-            }else{
+            } else {
                 $current[$key] = $value;
                 break;
             }
@@ -334,7 +356,7 @@ class AJXP_Role implements AjxpGroupPathProvider
         return $arr;
     }
 
-    function array_merge_recursive2($array1, $array2)
+    public function array_merge_recursive2($array1, $array2)
     {
         $arrays = func_get_args();
         $narrays = count($arrays);
@@ -363,8 +385,7 @@ class AJXP_Role implements AjxpGroupPathProvider
                         // if $ret[$key] is not an array you try to merge an scalar value with an array - the result is not defined (incompatible arrays)
                         // in this case the call will trigger an E_USER_WARNING and the $ret[$key] will be null.
                         $ret[$key] = $this->array_merge_recursive2($ret[$key], $value);
-                    }
-                    else {
+                    } else {
                         $ret[$key] = $value;
                     }
                // }
@@ -402,7 +423,8 @@ class AJXP_Role implements AjxpGroupPathProvider
     /**
      * @param array $specificRights
      */
-    public function setAutoApplies($specificRights){
+    public function setAutoApplies($specificRights)
+    {
         $this->autoApplies = $specificRights;
     }
 
@@ -410,7 +432,8 @@ class AJXP_Role implements AjxpGroupPathProvider
      * @param string $specificRight
      * @return boolean
      */
-    public function autoAppliesTo($specificRight){
+    public function autoAppliesTo($specificRight)
+    {
         return in_array($specificRight, $this->autoApplies);
     }
 

@@ -24,4 +24,3 @@ $mess=array(
 "Wms Server" => "Serveur WMS",
 "Wms server url" => "Url du serveur",
 );
-?>

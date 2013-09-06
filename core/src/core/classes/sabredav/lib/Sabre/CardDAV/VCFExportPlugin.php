@@ -17,8 +17,8 @@ use Sabre\VObject;
  * @author Thomas Tanghus (http://tanghus.net/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class VCFExportPlugin extends DAV\ServerPlugin {
-
+class VCFExportPlugin extends DAV\ServerPlugin
+{
     /**
      * Reference to Server class
      *
@@ -32,8 +32,8 @@ class VCFExportPlugin extends DAV\ServerPlugin {
      * @param DAV\Server $server
      * @return void
      */
-    public function initialize(DAV\Server $server) {
-
+    public function initialize(DAV\Server $server)
+    {
         $this->server = $server;
         $this->server->subscribeEvent('beforeMethod',array($this,'beforeMethod'), 90);
 
@@ -47,8 +47,8 @@ class VCFExportPlugin extends DAV\ServerPlugin {
      * @param string $uri
      * @return bool
      */
-    public function beforeMethod($method, $uri) {
-
+    public function beforeMethod($method, $uri)
+    {
         if ($method!='GET') return;
         if ($this->server->httpRequest->getQueryString()!='export') return;
 
@@ -84,11 +84,11 @@ class VCFExportPlugin extends DAV\ServerPlugin {
      * @param array $nodes
      * @return string
      */
-    public function generateVCF(array $nodes) {
-
+    public function generateVCF(array $nodes)
+    {
         $output = "";
 
-        foreach($nodes as $node) {
+        foreach ($nodes as $node) {
 
             if (!isset($node[200]['{' . Plugin::NS_CARDDAV . '}address-data'])) {
                 continue;

@@ -21,6 +21,6 @@
 	<class_definition filename="plugins/auth.cmsms/class.cmsmsAuthDriver.php" classname="cmsmsAuthDriver"/>
 	<registry_contributions>
 		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude=""/>
-		<external_file filename="plugins/auth.cmsms/action.xml" include="actions/*"/>		
+		<external_file filename="plugins/auth.cmsms/action.xml" include="actions/*"/>
 	</registry_contributions>
 </authdriver>

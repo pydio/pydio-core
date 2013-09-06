@@ -1,10 +1,75 @@
 AjaXplorer ##VERSION_NUMBER## Release Note
 
+This is a bugfix and security release. Update is highly recommended and automatic using the in-app upgrade mechanism. Most important fixes are:
+
+- Vulnerabilities fixed and security enforced: new algorithm used for hashing passwords, enforce tokens generation, etc. PHP Mcrypt extension is now more than ever required.
+- Stabilize authentification (groups, LDAP) on the 5.X branch
+- Stabilize alternative uploaders remote drivers (Jumploader)
+- Many GUI bugs fixed
+
 License : Affero GPL
 Copyright : Charles du Jeu 2013
 Demo : http://demo.ajaxplorer.info/
 Date : ##VERSION_DATE##
 Rev Number : ##REVISION##
+Contributors: thomasCresson, echampet, joubertredrat, BlackLionPT
+
+Detailed changeLog
+
+Add X-Accel-Redirect support for Nginx (a sibiling of X-Sendfile) (details)
+New ability in FormManager button: simply trigger client action. (details)
+Always pass an ID for the event (not only alerts), and keep track of the last passed ID: triggers desktop notifications if active and possible. (details)
+class.remote_fsAccessDriver.php: Fix some option loading error while using the function Ajxp_PLUGIN::init(repository, options) manifest.xml: Disabling the remote_fs driver by default class.JumploaderProcessor.php: - Cross session resume implementation (doesn't work with smb) - partitioning now works with FTP - upload validation process now working for FTP and FS (details)
+previous commit (#69597c9010cb41b77b2e76cc2aae5b46a6eb9e57) broke the ability to upload folder tree on FS now fixed (details)
+We can now use jumploader with SMB, SFTP, FS and FTP drivers (details)
+Add the property "PORT" for the sftp repository creation (could not log with the wrong port number) (details)
+now getting the file "jumploader_z.jar" and putting it into the plugin folder (details)
+can now upload mutliple files through jumploader with FTP (details)
+can now upload multiple files through Jumploader on a FTP repository (details)
+Translated every single "en.php" file (into Portuguese (Portugal)) found in the plugins directory, copying the "en.php" and changing the copies name to "pt.php" plus 3 new flags in the ".gif" format and the ".png" image saying "Drop files here". Hope this is useful! (details)
+Fixed a few typos in the translations (details)
+Fixed a few typos in the translations (details)
+Always rtrim() groupPath from /, if not /. Close #251 (details)
+Optimization: getRepositoriesList was called inside foreach loop! (details)
+Replace dirname() by forwardSlashDirname() when manipulating groupPath to avoid errors on Windows. (details)
+Fixed some url construction problems. Add ENCFS_UID as a plugin option because it was hardcoded and set to 33. (details)
+ENCFS plugin now works with Centos 6 and Debian Ubuntu (details)
+Fix #268, there was a double "basegroup filtering". (details)
+Throw comprehensive exception in cleanDibiDriverParameters (details)
+Implement a remote search feature for users. Declare specific remote_indexation attribute in nodes to force search engine to query server, even in "local" mode. Ability to open a user at the correct page (details)
+Move MAILER from global_param to param (details)
+Security enforcements: > Switch password hashing from md5 to more secure hashing (backward compatible). > Do not use the server time() as the base for the tokens (secure token & remember me cookie token) as it's too predictible > Make sure the remember me cookie has httpOnly and Secure flags. (details)
+New parameters LOCAL_PREFIX and ROLE_MAP for auth.remote plugin : map CMS roles to ajaxplorer Roles. Remote plugin must pass the "role" key in the user array. Implement pagination, as the plugin is finally serial based. (details)
+Fix #263 (details)
+Fix #253 Fix #254 (details)
+Fix #227 (duplicate menus) (details)
+Use "button" type to download the Jumploader applet and install it at the right place. (details)
+Typo in testParameters() function (details)
+A Small fix on a send header instruction to implement a header to lighttpd server version 1.4.X. More info in http://redmine.lighttpd.net/projects/lighttpd/wiki/X-LIGHTTPD-send-file (details)
+Notification problems with ftp fixed (details)
+Fix case sensitivity (details)
+LDAP: enable group(s) to role(s) mapping, and group(s) to one group mapping (defining filter) Multi Auth: fix groups listing Update Conf backends: createGroup can automatically update (details)
+Wrong commit (details)
+Fix auth.multi updateUserObject call in user-choice mode. (details)
+Fix auth.ldap groups management. Still to be tested deeply on various systems. (details)
+Fix wrong extractRealId call (details)
+Do not skip the group mapping recompute to make sure the upper rights are applied (details)
+Should fix error on deletion when action.antivirus is active (details)
+Add configurable limit for action.share plugin (details)
+Use plugin Id instead of Name in class.ShareCenter.js ajxp_plugin[@name='share'] -> ajxp_plugin[@id='action.share'] (details)
+Fix groups when creating user from inside subgroup (fix #269) (details)
+Can now upload file larger than 2G with Jumploader. (details)
+Shorter string on small screens (details)
+Make sure AJXP_ADMIN_LOGIN is not taken for a groupAdmin Fix #278 in javascript (details)
+
+
+-------------------------------------
+
+License : Affero GPL
+Copyright : Charles du Jeu 2013
+Demo : http://demo.ajaxplorer.info/
+Date : 18th July 2013
+Rev Number : #97582cc1938c708acd9479f4b2d03036be78729e
 Contributors: thomasCresson, josh4trunks, chusopr, mquandalle
 
 This is a bugfix release from v5.0.1. Update is automatic using the in-app upgrade mechanism, and is recommended. Most important fixes are:

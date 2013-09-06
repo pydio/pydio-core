@@ -32,19 +32,19 @@ global $MAIN_testsArray;
 class AbstractTest
 {
     /** The test name */
-    var $name;
+    public $name;
     /** The test information when failed */
-    var $failedInfo;
+    public $failedInfo;
     /** The test results output (used for report) */
-    var $resultOutput;
+    public $resultOutput;
     /** Tested params - When used as a diagnostic tool, can store variables used by the test*/
-    var $testedParas;
+    public $testedParas;
     /** The test level when failed (warning, info or error, default to error) */
-    var $failedLevel;
+    public $failedLevel;
     /** The test parameters */
-    var $params;
-    
-    function AbstractTest($name, $failedInfo, $params = NULL) 
+    public $params;
+
+    public function AbstractTest($name, $failedInfo, $params = NULL)
     {
         $this->name = $name;
         $this->failedInfo = $failedInfo;
@@ -54,42 +54,41 @@ class AbstractTest
         global $MAIN_testsArray;
         $MAIN_testsArray[] = $this;
     }
-    
+
     /**
      * Perform the test, should be overwritten in concrete classes
      * @abstract
      * @return Boolean
      */
-    function doTest() { return FALSE; }
-    
-    /** 
-     * Perform the test on a given repository object, should be overwritten in concrete classes 
+    public function doTest() { return FALSE; }
+
+    /**
+     * Perform the test on a given repository object, should be overwritten in concrete classes
      * @param Repository $repository
      * @return Boolean
      */
-    function doRepositoryTest($repository) { return FALSE; }
-    
+    public function doRepositoryTest($repository) { return FALSE; }
+
     /**
      * Utilitary to convert php config to numerical values.
      *
      * @param String $val
      * @return Integer
      */
-    function returnBytes($val) {
-    	$val = trim($val);
-    	$last = strtolower($val[strlen($val)-1]);
-    	switch($last) {
-    		// Le modifieur 'G' est disponible depuis PHP 5.1.0
-    		case 'g':
-    			$val *= 1024;
-    		case 'm':
-    			$val *= 1024;
-    		case 'k':
-    			$val *= 1024;
-    	}
+    public function returnBytes($val)
+    {
+        $val = trim($val);
+        $last = strtolower($val[strlen($val)-1]);
+        switch ($last) {
+            // Le modifieur 'G' est disponible depuis PHP 5.1.0
+            case 'g':
+                $val *= 1024;
+            case 'm':
+                $val *= 1024;
+            case 'k':
+                $val *= 1024;
+        }
 
-    	return $val;
+        return $val;
     }
 };
-
-?>

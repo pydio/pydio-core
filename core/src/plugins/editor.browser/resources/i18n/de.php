@@ -22,5 +22,4 @@ $mess=array(
 "1" => "Externes Fenster",
 "2" => "Externes Browser Fenster",
 "3" => "Öffne Datei im externen Fenster, bitte warten, dieses Fenster schließt sich automatisch.",
-); 
-?>
+);

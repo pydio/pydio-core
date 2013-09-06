@@ -9,14 +9,14 @@ namespace Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-interface INode {
-
+interface INode
+{
     /**
      * Deleted the current node
      *
      * @return void
      */
-    function delete();
+    public function delete();
 
     /**
      * Returns the name of the node.
@@ -25,7 +25,7 @@ interface INode {
      *
      * @return string
      */
-    function getName();
+    public function getName();
 
     /**
      * Renames the node
@@ -33,14 +33,13 @@ interface INode {
      * @param string $name The new name
      * @return void
      */
-    function setName($name);
+    public function setName($name);
 
     /**
      * Returns the last modification time, as a unix timestamp
      *
      * @return int
      */
-    function getLastModified();
+    public function getLastModified();
 
 }
-

@@ -8,11 +8,11 @@ namespace Sabre\DAV\Auth\Backend;
  * The backend file must conform to Apache's htdigest format
  *
  * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/) 
+ * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class PDO extends AbstractDigest {
-
+class PDO extends AbstractDigest
+{
     /**
      * Reference to PDO connection
      *
@@ -36,8 +36,8 @@ class PDO extends AbstractDigest {
      * @param PDO $pdo
      * @param string $tableName The PDO table name to use
      */
-    public function __construct(\PDO $pdo, $tableName = 'users') {
-
+    public function __construct(\PDO $pdo, $tableName = 'users')
+    {
         $this->pdo = $pdo;
         $this->tableName = $tableName;
 
@@ -50,8 +50,8 @@ class PDO extends AbstractDigest {
      * @param string $username
      * @return string|null
      */
-    public function getDigestHash($realm,$username) {
-
+    public function getDigestHash($realm,$username)
+    {
         $stmt = $this->pdo->prepare('SELECT username, digesta1 FROM '.$this->tableName.' WHERE username = ?');
         $stmt->execute(array($username));
         $result = $stmt->fetchAll();

@@ -10,8 +10,8 @@ namespace Sabre\HTTP;
  * @author Paul Voegler
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Util {
-
+class Util
+{
     /**
      * Parses a RFC2616-compatible date string
      *
@@ -20,8 +20,8 @@ class Util {
      * @param string $dateHeader
      * @return bool|DateTime
      */
-    static function parseHTTPDate($dateHeader) {
-
+    public static function parseHTTPDate($dateHeader)
+    {
         //RFC 2616 section 3.3.1 Full Date
         //Only the format is checked, valid ranges are checked by strtotime below
         $month = '(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)';
@@ -69,8 +69,8 @@ class Util {
      * @param \DateTime $dateTime
      * @return string
      */
-    static function toHTTPDate(\DateTime $dateTime) {
-
+    public static function toHTTPDate(\DateTime $dateTime)
+    {
         // We need to clone it, as we don't want to affect the existing
         // DateTime.
         $dateTime = clone $dateTime;

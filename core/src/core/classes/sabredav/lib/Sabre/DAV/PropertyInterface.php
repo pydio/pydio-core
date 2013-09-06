@@ -11,11 +11,10 @@ namespace Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-interface PropertyInterface {
-
+interface PropertyInterface
+{
     public function serialize(Server $server, \DOMElement $prop);
 
-    static function unserialize(\DOMElement $prop);
+    public static function unserialize(\DOMElement $prop);
 
 }
-

@@ -28,4 +28,3 @@ $mess=array(
 "Recycle Bin Folder" => "Papierkorb-Verzeichnis",
 "Leave empty if you do not want to use a recycle bin." => "Leerlassen um kein Papierkorb zu verwenden.",
 );
-?>

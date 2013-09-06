@@ -26,45 +26,43 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @subpackage Core
  * @interface AjxpWrapperProvider
  */
-interface AjxpWrapperProvider {
+interface AjxpWrapperProvider
+{
+    /**
+     * @return string
+     */
+    public function getWrapperClassName();
+    /**
+     * Convert a path (from the repository root) to a fully
+     * qualified ajaxplorer url like ajxp.protocol://repoId/path/to/node
+     * @param String $path
+     * @return String
+     */
+    public function getResourceUrl($path);
 
-	/**
-	 * @return string
-	 */
-	function getWrapperClassName();
-	/**
-	 * Convert a path (from the repository root) to a fully 
-	 * qualified ajaxplorer url like ajxp.protocol://repoId/path/to/node
-	 * @param String $path
-	 * @return String
-	 */
-	function getResourceUrl($path);
-	
-	/**
-	 * Creates a directory
-	 * @param String $path
-	 * @param String $newDirName
-	 */
-	function mkDir($path, $newDirName);	
-	
-	/**
-	 * Creates an empty file
-	 * @param String $path
-	 * @param String $newDirName
-	 */
-	function createEmptyFile($path, $newDirName);
+    /**
+     * Creates a directory
+     * @param String $path
+     * @param String $newDirName
+     */
+    public function mkDir($path, $newDirName);
+
+    /**
+     * Creates an empty file
+     * @param String $path
+     * @param String $newDirName
+     */
+    public function createEmptyFile($path, $newDirName);
 
     /**
      * @param String $from
      * @param String $to
      * @param Boolean $copy
      */
-    function nodeChanged(&$from, &$to, $copy = false);
+    public function nodeChanged(&$from, &$to, $copy = false);
 
     /**
      * @param String $node
      */
-    function nodeWillChange($node, $newSize = null);
+    public function nodeWillChange($node, $newSize = null);
 }
-
-?>

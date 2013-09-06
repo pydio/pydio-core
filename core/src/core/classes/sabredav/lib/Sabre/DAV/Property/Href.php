@@ -14,8 +14,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Href extends DAV\Property implements IHref {
-
+class Href extends DAV\Property implements IHref
+{
     /**
      * href
      *
@@ -36,8 +36,8 @@ class Href extends DAV\Property implements IHref {
      * @param string $href
      * @param bool $autoPrefix
      */
-    public function __construct($href, $autoPrefix = true) {
-
+    public function __construct($href, $autoPrefix = true)
+    {
         $this->href = $href;
         $this->autoPrefix = $autoPrefix;
 
@@ -48,8 +48,8 @@ class Href extends DAV\Property implements IHref {
      *
      * @return string
      */
-    public function getHref() {
-
+    public function getHref()
+    {
         return $this->href;
 
     }
@@ -63,8 +63,8 @@ class Href extends DAV\Property implements IHref {
      * @param \DOMElement $dom
      * @return void
      */
-    public function serialize(DAV\Server $server, \DOMElement $dom) {
-
+    public function serialize(DAV\Server $server, \DOMElement $dom)
+    {
         $prefix = $server->xmlNamespaces['DAV:'];
 
         $elem = $dom->ownerDocument->createElement($prefix . ':href');
@@ -82,8 +82,8 @@ class Href extends DAV\Property implements IHref {
      * @param \DOMElement $dom
      * @return DAV\Property\Href
      */
-    static function unserialize(\DOMElement $dom) {
-
+    public static function unserialize(\DOMElement $dom)
+    {
         if ($dom->firstChild && DAV\XMLUtil::toClarkNotation($dom->firstChild)==='{DAV:}href') {
             return new self($dom->firstChild->textContent,false);
         }

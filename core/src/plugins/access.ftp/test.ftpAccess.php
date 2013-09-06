@@ -19,7 +19,7 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
-                                 
+
 require_once(AJXP_BIN_FOLDER . '/class.AbstractTest.php');
 
 /**
@@ -28,20 +28,18 @@ require_once(AJXP_BIN_FOLDER . '/class.AbstractTest.php');
  */
 class ftpAccessTest extends AbstractTest
 {
-    function ftpAccessTest() { parent::AbstractTest("Remote FTP Filesystem Plugin", ""); }
-    
-    function doRepositoryTest($repo)
+    public function ftpAccessTest() { parent::AbstractTest("Remote FTP Filesystem Plugin", ""); }
+
+    public function doRepositoryTest($repo)
     {
-    	if($repo->accessType != "ftp") return -1;
-    	
+        if($repo->accessType != "ftp") return -1;
+
         $basePath = AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.ftp/" ;
         // Check file exists
         if (!file_exists($basePath."class.ftpAccessDriver.php")
          || !file_exists($basePath."manifest.xml"))
         { $this->failedInfo .= "Missing at least one of the plugin files (class.ftpAccessDriver.php, manifest.xml, ftpActions.xml).\nPlease reinstall from lastest release."; return FALSE; }
-        
-        return TRUE;    
+
+        return TRUE;
     }
 };
-
-?>

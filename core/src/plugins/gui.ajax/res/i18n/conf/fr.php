@@ -46,4 +46,3 @@ $mess=array(
 "Analytics Events" => "Evenements GA",
 "Use Events Logging, experimental only implemented on download action in AjaXplorer" => "Utiliser les Events google analytics, implémenté seulement pour l'action download actuellement",
 );
-?>

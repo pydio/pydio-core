@@ -13,8 +13,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class HrefList extends DAV\Property {
-
+class HrefList extends DAV\Property
+{
     /**
      * hrefs
      *
@@ -35,8 +35,8 @@ class HrefList extends DAV\Property {
      * @param array $hrefs
      * @param bool $autoPrefix
      */
-    public function __construct(array $hrefs, $autoPrefix = true) {
-
+    public function __construct(array $hrefs, $autoPrefix = true)
+    {
         $this->hrefs = $hrefs;
         $this->autoPrefix = $autoPrefix;
 
@@ -47,8 +47,8 @@ class HrefList extends DAV\Property {
      *
      * @return array
      */
-    public function getHrefs() {
-
+    public function getHrefs()
+    {
         return $this->hrefs;
 
     }
@@ -62,11 +62,11 @@ class HrefList extends DAV\Property {
      * @param \DOMElement $dom
      * @return void
      */
-    public function serialize(DAV\Server $server,\DOMElement $dom) {
-
+    public function serialize(DAV\Server $server,\DOMElement $dom)
+    {
         $prefix = $server->xmlNamespaces['DAV:'];
 
-        foreach($this->hrefs as $href) {
+        foreach ($this->hrefs as $href) {
             $elem = $dom->ownerDocument->createElement($prefix . ':href');
             $elem->nodeValue = ($this->autoPrefix?$server->getBaseUri():'') . $href;
             $dom->appendChild($elem);
@@ -83,10 +83,10 @@ class HrefList extends DAV\Property {
      * @param \DOMElement $dom
      * @return DAV\Property\HrefList
      */
-    static function unserialize(\DOMElement $dom) {
-
+    public static function unserialize(\DOMElement $dom)
+    {
         $hrefs = array();
-        foreach($dom->childNodes as $child) {
+        foreach ($dom->childNodes as $child) {
             if (DAV\XMLUtil::toClarkNotation($child)==='{DAV:}href') {
                 $hrefs[] = $child->textContent;
             }

@@ -28,4 +28,3 @@ $mess=array(
 "Recycle Bin Folder" => "Corbeille",
 "Leave empty if you do not want to use a recycle bin." => "Laisser vide si pas de corbeille",
 );
-?>

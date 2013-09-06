@@ -22,4 +22,3 @@ $mess=array(
 "File Hasher" => "Obter Hash de Ficheiro",
 "Compute on-demand a hash of the file content and stores it in the metadata if a metastore is provided" => "Calcula o Hash de um ficheiro quando requerido e guarda a informação na metadata caso esta exista",
 );
-?>

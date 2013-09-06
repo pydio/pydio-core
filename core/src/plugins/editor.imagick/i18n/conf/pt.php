@@ -28,4 +28,3 @@ $mess=array(
 "Viewer Quality" => "Qualidade de Visualização",
 "Quality used for generation the high scale images" => "Qualidade a ser usada para gerar imagens de grandes dimensões",
 );
-?>

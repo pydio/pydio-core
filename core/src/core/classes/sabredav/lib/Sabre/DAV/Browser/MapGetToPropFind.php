@@ -14,8 +14,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class MapGetToPropFind extends DAV\ServerPlugin {
-
+class MapGetToPropFind extends DAV\ServerPlugin
+{
     /**
      * reference to server class
      *
@@ -29,8 +29,8 @@ class MapGetToPropFind extends DAV\ServerPlugin {
      * @param DAV\Server $server
      * @return void
      */
-    public function initialize(DAV\Server $server) {
-
+    public function initialize(DAV\Server $server)
+    {
         $this->server = $server;
         $this->server->subscribeEvent('beforeMethod',array($this,'httpGetInterceptor'));
     }
@@ -42,8 +42,8 @@ class MapGetToPropFind extends DAV\ServerPlugin {
      * @param string $uri
      * @return bool
      */
-    public function httpGetInterceptor($method, $uri) {
-
+    public function httpGetInterceptor($method, $uri)
+    {
         if ($method!='GET') return true;
 
         $node = $this->server->tree->getNodeForPath($uri);

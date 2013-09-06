@@ -26,133 +26,139 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Log
  */
-class sysLogDriver extends textLogDriver {
+class sysLogDriver extends textLogDriver
+{
+    /**
+     * @var Integer File handle to currently open log file.
+     */
+    public $fileHandle = false;
 
-	/**
-	 * @var Integer File handle to currently open log file.
-	 */
-	var $fileHandle = false;
-	
-	/**
-	 * @var Array stack of log messages to be written when file becomes available.
-	 */
-	var $stack;
+    /**
+     * @var Array stack of log messages to be written when file becomes available.
+     */
+    public $stack;
 
     /**
      * @var String identifer
      */
-    var $signature;
+    public $signature;
 
-	/**
-	 * Close file handle on objects destructor.
-	 */
-	function __destruct(){
-		if($this->fileHandle !== false){
+    /**
+     * Close file handle on objects destructor.
+     */
+    public function __destruct()
+    {
+        if ($this->fileHandle !== false) {
             $this->close();
         }
-	}
-	
-	/**
-	 * Initialise storage: check and/or make log folder and file.
-	 */
-	function initStorage(){
-		$this->open();
-	}
-	
-	/**
-	 * Open log file for append, and flush out buffered messages to the file.
-	 */
-	function open(){
+    }
+
+    /**
+     * Initialise storage: check and/or make log folder and file.
+     */
+    public function initStorage()
+    {
+        $this->open();
+    }
+
+    /**
+     * Open log file for append, and flush out buffered messages to the file.
+     */
+    public function open()
+    {
         $this->fileHandle = openlog($this->signature, LOG_ODELAY | LOG_PID, LOG_LOCAL0 );
-        if($this->fileHandle !== false && count($this->stack)){
+        if ($this->fileHandle !== false && count($this->stack)) {
             $this->stackFlush();
         }
-	}
-	
-	/**
-	 * Initialise the text log driver.
-	 *
-	 * Sets the user defined options.
-	 * Makes sure that the folder and file exist, and makes them if they don't.
-	 * 
-	 * @param Array $options array of options specific to the logger driver.
-	 * @access public
-	 * @return null
-	 */
-	function init($options) {
+    }
 
+    /**
+     * Initialise the text log driver.
+     *
+     * Sets the user defined options.
+     * Makes sure that the folder and file exist, and makes them if they don't.
+     *
+     * @param Array $options array of options specific to the logger driver.
+     * @access public
+     * @return null
+     */
+    public function init($options)
+    {
         parent::init($options);
-		$this->severityDescription = 0;
-		$this->stack = array();
-		$this->fileHandle = false;
+        $this->severityDescription = 0;
+        $this->stack = array();
+        $this->fileHandle = false;
 
         $this->signature = $this->options["IDENTIFIER"];
 
-		$this->initStorage();
+        $this->initStorage();
 
-	}
-	
-	/**
-	 * Write text to the log file.
-	 * 
-	 * If write is not allowed because the file is not yet open, the message is buffered until
-	 * file becomes available.
-	 *
-	 * @param String $textMessage The message to write.
-	 * @param Integer $severityLevel Log severity: one of LOG_LEVEL_* (DEBUG,INFO,NOTICE,WARNING,ERROR)
-	 */
-	function write($textMessage, $severityLevel = LOG_LEVEL_DEBUG) {
+    }
 
-		$textMessage = $this->formatMessage($textMessage, $severityLevel);
+    /**
+     * Write text to the log file.
+     *
+     * If write is not allowed because the file is not yet open, the message is buffered until
+     * file becomes available.
+     *
+     * @param String $textMessage The message to write.
+     * @param Integer $severityLevel Log severity: one of LOG_LEVEL_* (DEBUG,INFO,NOTICE,WARNING,ERROR)
+     */
+    public function write($textMessage, $severityLevel = LOG_LEVEL_DEBUG)
+    {
+        $textMessage = $this->formatMessage($textMessage, $severityLevel);
         if($severityLevel == LOG_LEVEL_DEBUG) $sysLevel = LOG_DEBUG;
         elseif($severityLevel == LOG_LEVEL_INFO) $sysLevel = LOG_INFO;
         elseif($severityLevel == LOG_LEVEL_NOTICE) $sysLevel = LOG_NOTICE;
         elseif($severityLevel == LOG_LEVEL_WARNING) $sysLevel = LOG_WARNING;
         elseif($severityLevel == LOG_LEVEL_ERROR) $sysLevel = LOG_ERR;
 
-		if ($this->fileHandle !== false) {
+        if ($this->fileHandle !== false) {
 
-			if(count($this->stack)) $this->stackFlush();
+            if(count($this->stack)) $this->stackFlush();
             syslog($sysLevel, $textMessage);
 
-		}else{
-			$this->stack[] = array($sysLevel, $textMessage);
-		}
-		
-	}
-	
-	/**
-	 * Flush the stack/buffer of messages that couldn't be written earlier.
-	 *
-	 */
-	function stackFlush(){
-		// Flush stack for messages that could have been written before the file opening.
-		foreach ($this->stack as $message){
-			syslog($message[0], $message[1]);
-		}
-		$this->stack = array();
-	}
-	
-	/**
-	 * closes the handle to the log file
-	 *
-	 * @access public
-	 */
-	function close() {
-		if($this->fileHandle) closelog();
-	}
+        } else {
+            $this->stack[] = array($sysLevel, $textMessage);
+        }
 
-	/**
-	 * List available logs in XML format.
-	 * 
-	 * This method prints the response.
-	 *
-	 * @param String $nodeName Name of the XML node to use as response.
-	 * @param Integer $year The year to list.
-	 * @param Integer $month The month to list.
-	 * @return null
-	 */
-	function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs", $print = true){
+    }
+
+    /**
+     * Flush the stack/buffer of messages that couldn't be written earlier.
+     *
+     */
+    public function stackFlush()
+    {
+        // Flush stack for messages that could have been written before the file opening.
+        foreach ($this->stack as $message) {
+            syslog($message[0], $message[1]);
+        }
+        $this->stack = array();
+    }
+
+    /**
+     * closes the handle to the log file
+     *
+     * @access public
+     */
+    public function close()
+    {
+        if($this->fileHandle) closelog();
+    }
+
+    /**
+     * List available logs in XML format.
+     *
+     * This method prints the response.
+     *
+     * @param String $nodeName Name of the XML node to use as response.
+     * @param Integer $year The year to list.
+     * @param Integer $month The month to list.
+     * @return null
+     */
+    public function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs", $print = true)
+    {
         $xml = "<$nodeName icon=\"toggle_log.png\" date=\"\"
         display=\"Logs are not readable via this GUI, they are sent directly to your system logger daemon.\"
         text=\"Logs are not readable via this GUI, they are sent directly to your system logger daemon.\"
@@ -160,17 +166,16 @@ class sysLogDriver extends textLogDriver {
         filename=\"$rootPath/see\"/>";
         if($print) print $xml;
         return array($xml);
-	}
-	
-	/**
-	 * Get a log in XML format.
-	 *
-	 * @param String $date Date in m-d-y format.
-	 * @param String $nodeName The name of the node to use for each log item.
-	 * @return null
-	 */
-	function xmlLogs($parentDir, $date, $nodeName = "log", $rootPath = "/logs"){
+    }
 
-
-	}
+    /**
+     * Get a log in XML format.
+     *
+     * @param String $date Date in m-d-y format.
+     * @param String $nodeName The name of the node to use for each log item.
+     * @return null
+     */
+    public function xmlLogs($parentDir, $date, $nodeName = "log", $rootPath = "/logs")
+    {
+    }
 }

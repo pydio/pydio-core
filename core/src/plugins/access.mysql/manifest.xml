@@ -52,5 +52,5 @@
 			</component_config>
 		</client_configs>
 	</registry_contributions>
-	<class_definition filename="plugins/access.mysql/class.mysqlAccessDriver.php" classname="mysqlAccessDriver"/>	
+	<class_definition filename="plugins/access.mysql/class.mysqlAccessDriver.php" classname="mysqlAccessDriver"/>
 </ajxpdriver>

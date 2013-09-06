@@ -34,4 +34,3 @@ $mess=array(
 "URI" => "URI",
 "Script URI on the remote server" => "Script URI on the remote server",
 );
-?>

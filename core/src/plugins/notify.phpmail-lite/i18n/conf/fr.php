@@ -36,4 +36,3 @@ $mess=array(
 "Mailer" => "Engin",
 "Php mailer to use (see phpmail-lite documentation).'." => "Engin PHP pour envoyer les mails, voir la doc phpmail-lite",
 );
-?>

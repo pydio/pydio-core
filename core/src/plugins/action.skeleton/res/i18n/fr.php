@@ -27,4 +27,3 @@ $mess=array(
 "6" => "Contenu dynamique",
 "7" => "Chargement du contenu, veuillez patienter...",
 );
-?>

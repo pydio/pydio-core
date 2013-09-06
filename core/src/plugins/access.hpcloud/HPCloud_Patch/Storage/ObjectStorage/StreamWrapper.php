@@ -11,7 +11,7 @@ subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -182,7 +182,7 @@ use \HPCloud\Storage\ObjectStorage;
  * characters such as '/' to be used to designate namespaces on object
  * names. (For simplicity, this library uses only '/' as a separator).
  *
- * This allows for simulated directory listings. Requesting 
+ * This allows for simulated directory listings. Requesting
  * `scandir('swift://foo/bar/')` is really a request to "find all of the items
  * in the 'foo' container whose names start with 'bar/'".
  *
@@ -219,7 +219,7 @@ use \HPCloud\Storage\ObjectStorage;
  * -# Existing (valid) token: token, swift_endpoint
  *
  * The third method (token) can be used when the application has already
- * authenticated. In this case, a token has been generated and assigneet 
+ * authenticated. In this case, a token has been generated and assigneet
  * to an account and tenant ID.
  *
  * The following parameters may be set either in the stream context
@@ -261,8 +261,8 @@ use \HPCloud\Storage\ObjectStorage;
  * @todo The service catalog should be cached in the context like the token so that
  * it can be retrieved later.
  */
-class StreamWrapper {
-
+class StreamWrapper
+{
   const DEFAULT_SCHEME = 'swift';
 
   /**
@@ -311,7 +311,7 @@ class StreamWrapper {
   /**
    * Indicate whether the local differs from remote.
    *
-   * When the file is modified in such a way that 
+   * When the file is modified in such a way that
    * it needs to be written remotely, the isDirty flag
    * is set to TRUE.
    */
@@ -369,7 +369,8 @@ class StreamWrapper {
    * closing, and the handle can occasionally remain accessible for
    * some period of time.
    */
-  public function dir_closedir() {
+  public function dir_closedir()
+  {
     $this->dirIndex = 0;
     $this->dirListing = array();
 
@@ -404,10 +405,11 @@ class StreamWrapper {
    * @retval boolean
    *   TRUE if the directory is opened, FALSE otherwise.
    */
-  public function dir_opendir($path, $options) {
+  public function dir_opendir($path, $options)
+  {
       \AJXP_Logger::debug("OPENDIR ".$path);
     $url = $this->parseUrl($path);
-      if(isSet(self::$statCacheData["HPC_MAIN_PATH"]) && self::$statCacheData["HPC_MAIN_PATH"] == $path){
+      if (isSet(self::$statCacheData["HPC_MAIN_PATH"]) && self::$statCacheData["HPC_MAIN_PATH"] == $path) {
           \AJXP_Logger::debug(">> listing from cache");
           $this->listFromCache = true;
           return TRUE;
@@ -429,8 +431,7 @@ class StreamWrapper {
 
       if (empty($url['path'])) {
         $this->dirPrefix = '';
-      }
-      else {
+      } else {
         $this->dirPrefix = $url['path'];
       }
 
@@ -438,8 +439,7 @@ class StreamWrapper {
 
 
       $this->dirListing = $container->objectsWithPrefix($this->dirPrefix, $sep);
-    }
-    catch (\HPCloud\Exception $e) {
+    } catch (\HPCloud\Exception $e) {
       trigger_error('Directory could not be opened: ' . $e->getMessage(), E_USER_WARNING);
       return FALSE;
     }
@@ -471,9 +471,9 @@ class StreamWrapper {
    *   The name of the resource or FALSE when the directory has no more
    *   entries.
    */
-  public function dir_readdir() {
-
-      if($this->listFromCache){
+  public function dir_readdir()
+  {
+      if ($this->listFromCache) {
           $values = array_keys(self::$statCache);
           if (count($values) <= $this->dirIndex) {
               return FALSE;
@@ -500,8 +500,7 @@ class StreamWrapper {
           \AJXP_Logger::debug("Full path should be dir ".$fullpath);
           $fullpath = rtrim($fullpath, "/");
         self::$statCache[basename($fullpath)] = $this->fakeStat(true);
-    }
-  else {
+    } else {
       $fullpath = $curr->name();
         self::$statCache[basename($fullpath)] = $this->generateStat($curr, self::$statCacheData["HPC_CONTAINER"], $curr->contentLength() );
     }
@@ -522,8 +521,8 @@ class StreamWrapper {
      * Under certain conditions we have to return totally trumped-up
      * stats. This generates those.
      */
-    protected function fakeStat($dir = FALSE) {
-
+    protected function fakeStat($dir = FALSE)
+    {
         $request_time = time();
 
         // Set inode type to directory or file.
@@ -577,17 +576,18 @@ class StreamWrapper {
    * ?>
    * @endcode
    */
-  public function dir_rewinddir() {
+  public function dir_rewinddir()
+  {
     $this->dirIndex = 0;
   }
 
   /*
-  public function mkdir($path, $mode, $options) {
-
+  public function mkdir($path, $mode, $options)
+  {
   }
 
-  public function rmdir($path, $options) {
-
+  public function rmdir($path, $options)
+  {
   }
    */
 
@@ -626,7 +626,8 @@ class StreamWrapper {
    * @retval boolean
    *   TRUE on success, FALSE otherwise.
    */
-  public function rename($path_from, $path_to) {
+  public function rename($path_from, $path_to)
+  {
     $this->initializeObjectStorage();
     $src = $this->parseUrl($path_from);
     $dest = $this->parseUrl($path_to);
@@ -650,15 +651,15 @@ class StreamWrapper {
       if ($ret) {
         return $container->delete($src['path']);
       }
-    }
-    catch (\HPCloud\Exception $e) {
+    } catch (\HPCloud\Exception $e) {
       trigger_error('Rename was not completed: ' . $e->getMessage(), E_USER_WARNING);
       return FALSE;
     }
   }
 
   /*
-  public function copy($path_from, $path_to) {
+  public function copy($path_from, $path_to)
+  {
     throw new \Exception("UNDOCUMENTED.");
   }
    */
@@ -673,7 +674,8 @@ class StreamWrapper {
    * @retval resource
    *   this returns the underlying stream.
    */
-  public function stream_cast($cast_as) {
+  public function stream_cast($cast_as)
+  {
     return $this->objStream;
   }
 
@@ -698,12 +700,11 @@ class StreamWrapper {
    *
    * See stream_open().
    */
-  public function stream_close() {
-
+  public function stream_close()
+  {
     try {
       $this->writeRemote();
-    }
-    catch (\HPCloud\Exception $e) {
+    } catch (\HPCloud\Exception $e) {
       trigger_error('Error while closing: ' . $e->getMessage(), E_USER_NOTICE);
       return FALSE;
     }
@@ -726,7 +727,8 @@ class StreamWrapper {
    * @retval boolean
    *   TRUE if it has reached the end, FALSE otherwise.
    */
-  public function stream_eof() {
+  public function stream_eof()
+  {
     return feof($this->objStream);
   }
 
@@ -738,11 +740,11 @@ class StreamWrapper {
    *
    * Called when \c fflush() is called on a stream.
    */
-  public function stream_flush() {
+  public function stream_flush()
+  {
     try {
       $this->writeRemote();
-    }
-    catch (\HPCloud\Exception $e) {
+    } catch (\HPCloud\Exception $e) {
       syslog(LOG_WARNING, $e);
       trigger_error('Error while flushing: ' . $e->getMessage(), E_USER_NOTICE);
       return FALSE;
@@ -754,8 +756,8 @@ class StreamWrapper {
    *
    * Internally, this is used by flush and close.
    */
-  protected function writeRemote() {
-
+  protected function writeRemote()
+  {
     $contentType = $this->cxt('content_type');
     if (!empty($contentType)) {
       $this->obj->setContentType($contentType);
@@ -782,10 +784,10 @@ class StreamWrapper {
   /*
    * Locking is currently unsupported.
    *
-   * There is no remote support for locking a 
+   * There is no remote support for locking a
    * file.
-  public function stream_lock($operation) {
-
+  public function stream_lock($operation)
+  {
   }
    */
 
@@ -836,8 +838,8 @@ class StreamWrapper {
    * @param string $opened_path
    *   This is not used, as this wrapper deals only with remote objects.
    */
-  public function stream_open($path, $mode, $options, &$opened_path) {
-
+  public function stream_open($path, $mode, $options, &$opened_path)
+  {
     //syslog(LOG_WARNING, "I received this URL: " . $path);
 
     // If STREAM_REPORT_ERRORS is set, we are responsible for
@@ -890,8 +892,7 @@ class StreamWrapper {
 
     try {
       $this->initializeObjectStorage();
-    }
-    catch (\HPCloud\Exception $e) {
+    } catch (\HPCloud\Exception $e) {
       trigger_error('Failed to init object storage: ' . $e->getMessage(), E_USER_WARNING);
       return FALSE;
     }
@@ -927,24 +928,23 @@ class StreamWrapper {
     // server roundtrip?
       \AJXP_Logger::debug(">> Getting the container $containerName");
     try {
-        if(isSet(self::$statCacheData["HPC_CONTAINER"]) && self::$statCacheData["HPC_MAIN_PATH"] == $containerName){
+        if (isSet(self::$statCacheData["HPC_CONTAINER"]) && self::$statCacheData["HPC_MAIN_PATH"] == $containerName) {
             $this->container = self::$statCacheData["HPC_CONTAINER"];
-        }else{
+        } else {
             $this->container = $this->store->container($containerName);
             self::$statCacheData["HPC_MAIN_PATH"] = $containerName;
             self::$statCacheData["HPC_CONTAINER"] = $this->container;
         }
-    }
-    catch (\HPCloud\Transport\FileNotFoundException $e) {
+    } catch (\HPCloud\Transport\FileNotFoundException $e) {
         trigger_error('Container not found.', E_USER_WARNING);
         return FALSE;
     }
 
-    try{
+    try {
         \AJXP_Logger::debug(">> Now fetching the file");
         // Now we fetch the file. Only under certain circumstances do we generate
       // an error if the file is not found.
-      // FIXME: We should probably allow a context param that can be set to 
+      // FIXME: We should probably allow a context param that can be set to
       // mark the file as lazily fetched.
       $this->obj = $this->container->object($objectName);
       $stream = $this->obj->stream();
@@ -972,8 +972,7 @@ class StreamWrapper {
         }
 
         $this->objStream = $tmpStream;
-      }
-      else {
+      } else {
         $this->objStream = $this->obj->stream();
       }
 
@@ -992,8 +991,7 @@ class StreamWrapper {
         $this->obj = new Object($objectName);
         $this->objStream = fopen('php://temp', 'rb+');
         $this->isDirty = TRUE;
-      }
-      else {
+      } else {
         //if ($this->triggerErrors) {
           trigger_error($nf->getMessage(), E_USER_WARNING);
         //}
@@ -1042,7 +1040,8 @@ class StreamWrapper {
    * @retval string
    *   The data read.
    */
-  public function stream_read($count) {
+  public function stream_read($count)
+  {
     return fread($this->objStream, $count);
   }
 
@@ -1057,7 +1056,8 @@ class StreamWrapper {
    * allows you to fseek() inside of a file opened
    * in append mode ('a' or 'a+').
    */
-  public function stream_seek($offset, $whence) {
+  public function stream_seek($offset, $whence)
+  {
     $ret = fseek($this->objStream, $offset, $whence);
 
     // fseek returns 0 for success, -1 for failure.
@@ -1076,7 +1076,8 @@ class StreamWrapper {
    *
    * See stream_set_blocking(), stream_set_timeout(), and stream_write_buffer().
    */
-  public function stream_set_option($option, $arg1, $arg2) {
+  public function stream_set_option($option, $arg1, $arg2)
+  {
     switch ($option) {
       case STREAM_OPTION_BLOCKING:
         return stream_set_blocking($this->objStream, $arg1);
@@ -1107,7 +1108,8 @@ class StreamWrapper {
    * @retval array
    *   The stats array.
    */
-  public function stream_stat() {
+  public function stream_stat()
+  {
     $stat = fstat($this->objStream);
 
     // FIXME: Need to calculate the length of the $objStream.
@@ -1125,7 +1127,8 @@ class StreamWrapper {
    * @retval int
    *   The current position in the stream.
    */
-  public function stream_tell() {
+  public function stream_tell()
+  {
     return ftell($this->objStream);
   }
 
@@ -1133,7 +1136,7 @@ class StreamWrapper {
    * Write data to stream.
    *
    * This writes data to the local stream buffer. Data
-   * is not pushed remotely until stream_close() or 
+   * is not pushed remotely until stream_close() or
    * stream_flush() is called.
    *
    * @param string $data
@@ -1141,7 +1144,8 @@ class StreamWrapper {
    * @retval int
    *   The number of bytes written. 0 indicates and error.
    */
-  public function stream_write($data) {
+  public function stream_write($data)
+  {
     $this->isDirty = TRUE;
     return fwrite($this->objStream, $data);
   }
@@ -1167,7 +1171,8 @@ class StreamWrapper {
    * @retval boolean
    *   TRUE if the file was deleted, FALSE otherwise.
    */
-  public function unlink($path) {
+  public function unlink($path)
+  {
     $url = $this->parseUrl($path);
 
     // Host is required.
@@ -1192,8 +1197,7 @@ class StreamWrapper {
       $endpoint_url = $this->store->url() . '/' . rawurlencode($name);
       $container = new \HPCloud\Storage\ObjectStorage\Container($name, $endpoint_url, $token);
       return $container->delete($url['path']);
-    }
-    catch (\HPCLoud\Exception $e) {
+    } catch (\HPCLoud\Exception $e) {
       trigger_error('Error during unlink: ' . $e->getMessage(), E_USER_WARNING);
       return FALSE;
     }
@@ -1203,19 +1207,20 @@ class StreamWrapper {
   /**
    * @see stream_stat().
    */
-  public function url_stat($path, $flags) {
+  public function url_stat($path, $flags)
+  {
     $url = $this->parseUrl($path);
       \AJXP_Logger::debug("STATING ".$path);
 
       $base = $url["host"]; //dirname($path)."/";
       $name = basename($path);
-      if(isSet(self::$statCacheData["HPC_MAIN_PATH"]) && $path."/" == self::$statCacheData["HPC_MAIN_PATH"]){
+      if (isSet(self::$statCacheData["HPC_MAIN_PATH"]) && $path."/" == self::$statCacheData["HPC_MAIN_PATH"]) {
           return $this->fakeStat(true);
       }
-      if(isset(self::$statCache[$name]) && self::$statCacheData["HPC_MAIN_PATH"] == $base){
+      if (isset(self::$statCache[$name]) && self::$statCacheData["HPC_MAIN_PATH"] == $base) {
           return self::$statCache[$name];
       }
-      if(is_array(self::$statCache) && isSet(self::$statCache[$path])){
+      if (is_array(self::$statCache) && isSet(self::$statCache[$path])) {
           \AJXP_Logger::debug("Cached path!");
           return self::$statCache[$path];
       }
@@ -1235,10 +1240,10 @@ class StreamWrapper {
       //$container = $this->store->container($url['host']);
       $name = $url['host'];
       try {
-          if(isSet(self::$statCacheData["HPC_CONTAINER"]) && self::$statCacheData["HPC_MAIN_PATH"] == $name){
+          if (isSet(self::$statCacheData["HPC_CONTAINER"]) && self::$statCacheData["HPC_MAIN_PATH"] == $name) {
               \AJXP_Logger::debug("URL_STAT Getting container from cache");
               $container = self::$statCacheData["HPC_CONTAINER"];
-          }else{
+          } else {
               \AJXP_Logger::debug("URL_STAT Instanciating container ".$name);
               $token = $this->store->token();
               $endpoint_url = $this->store->url() . '/' . rawurlencode($name);
@@ -1247,15 +1252,13 @@ class StreamWrapper {
               self::$statCacheData["HPC_MAIN_PATH"] = $name;
               self::$statCacheData["HPC_CONTAINER"] = $container;
           }
-      }
-      catch (\HPCloud\Transport\FileNotFoundException $e) {
+      } catch (\HPCloud\Transport\FileNotFoundException $e) {
           trigger_error('Container not found.', E_USER_WARNING);
           return FALSE;
       }
       $obj = $container->remoteObject($url['path']);
 
-    }
-    catch(\HPCloud\Exception $e) {
+    } catch (\HPCloud\Exception $e) {
       // Apparently file_exists does not set STREAM_URL_STAT_QUIET.
       //if ($flags & STREAM_URL_STAT_QUIET) {
         //trigger_error('Could not stat remote file: ' . $e->getMessage(), E_USER_WARNING);
@@ -1270,8 +1273,7 @@ class StreamWrapper {
           \AJXP_Logger::debug("CACHING1 ".$path, array_keys(self::$statCache));
           self::$statCache[$path] = $s;
           return $s;
-      }
-      catch (\HPCloud\Exception $e) {
+      } catch (\HPCloud\Exception $e) {
         return FALSE;
       }
     }
@@ -1306,7 +1308,8 @@ class StreamWrapper {
    * ?>
    * @endcode
    */
-  public function object() {
+  public function object()
+  {
     return $this->obj;
   }
 
@@ -1317,7 +1320,8 @@ class StreamWrapper {
    *   An ObjectStorage object.
    * @see object()
    */
-  public function objectStorage() {
+  public function objectStorage()
+  {
     return $this->store;
   }
 
@@ -1328,7 +1332,8 @@ class StreamWrapper {
    *   A token.
    * @see object()
    */
-  public function token() {
+  public function token()
+  {
     return $this->store->token();
   }
 
@@ -1341,7 +1346,8 @@ class StreamWrapper {
    *   A service catalog.
    * @see object()
    */
-  public function serviceCatalog() {
+  public function serviceCatalog()
+  {
     return self::$serviceCatalogCache[$this->token()];
   }
 
@@ -1365,7 +1371,8 @@ class StreamWrapper {
    *   be the remote's Content-Length, and it will sometimes be
    *   the cached stat['size'] for the underlying buffer.
    */
-  protected function generateStat($object, $container, $size) {
+  protected function generateStat($object, $container, $size)
+  {
       // This is not entirely accurate. Basically, if the
     // file is marked public, it gets 100775, and if
     // it is private, it gets 100770.
@@ -1383,16 +1390,14 @@ class StreamWrapper {
     if (function_exists('posix_geteuid')) {
       $uid = posix_geteuid();
       $gid = posix_getegid();
-    }
-    else {
+    } else {
       $uid = 0;
       $gid = 0;
     }
 
     if ($object instanceof \HPCloud\Storage\ObjectStorage\RemoteObject) {
       $modTime = $object->lastModified();
-    }
-    else {
+    } else {
       $modTime = 0;
     }
     $values = array(
@@ -1428,7 +1433,8 @@ class StreamWrapper {
    * @param string $mode
    *   The mode string, e.g. `r+` or `wb`.
    */
-  protected function setMode($mode) {
+  protected function setMode($mode)
+  {
     $mode = strtolower($mode);
 
     // These are largely ignored, as the remote
@@ -1514,8 +1520,8 @@ class StreamWrapper {
    *   The discovered result, or $default if specified, or NULL if
    *   no $default is specified.
    */
-  protected function cxt($name, $default = NULL) {
-
+  protected function cxt($name, $default = NULL)
+  {
     // Lazilly populate the context array.
     if (is_resource($this->context) && empty($this->contextArray)) {
       $cxt = stream_context_get_options($this->context);
@@ -1559,7 +1565,8 @@ class StreamWrapper {
    * @retval array
    *   An array as documented in parse_url().
    */
-  protected function parseUrl($url) {
+  protected function parseUrl($url)
+  {
     $res = parse_url($url);
 
 
@@ -1568,8 +1575,7 @@ class StreamWrapper {
     foreach ($res as $key => $val) {
       if ($key == 'host') {
         $res[$key] = urldecode($val);
-      }
-      elseif ($key == 'path') {
+      } elseif ($key == 'path') {
         if (strpos($val, '/') === 0) {
           $val = substr($val, 1);
         }
@@ -1601,15 +1607,15 @@ class StreamWrapper {
    *     the deprecated swiftAuth instead of IdentityServices authentication.
    *     In general, you should avoid using this.
    *
-   * To find these params, the method first checks the supplied context. If the 
+   * To find these params, the method first checks the supplied context. If the
    * key is not found there, it checks the Bootstrap::conf().
    *
    * @fixme This should be rewritten to use ObjectStorage::newFromServiceCatalog().
    */
-  protected function initializeObjectStorage() {
-
+  protected function initializeObjectStorage()
+  {
     $token = $this->cxt('token');
-      if(empty($token) && isSet($_SESSION["HPCLOUD_TOKEN"])){
+      if (empty($token) && isSet($_SESSION["HPCLOUD_TOKEN"])) {
           $token = $_SESSION["HPCLOUD_TOKEN"];
       }
 
@@ -1623,14 +1629,14 @@ class StreamWrapper {
     $serviceCatalog = NULL;
 
     if (!empty($token) && ( isset(self::$serviceCatalogCache[$token]) || isset($_SESSION["HPCLOUD_CATALOG"])) ) {
-        if(isSet($_SESSION["HPCLOUD_CATALOG"])){
+        if (isSet($_SESSION["HPCLOUD_CATALOG"])) {
             $serviceCatalog = $_SESSION["HPCLOUD_CATALOG"];
-        }else{
+        } else {
             $serviceCatalog = self::$serviceCatalogCache[$token];
         }
-        if(empty($endpoint)){
-            for($i=0;$i<count($serviceCatalog);$i++){
-                if($serviceCatalog[$i]['type'] == "object-store"){
+        if (empty($endpoint)) {
+            for ($i=0;$i<count($serviceCatalog);$i++) {
+                if ($serviceCatalog[$i]['type'] == "object-store") {
                     $endpoint= $serviceCatalog[$i]['endpoints'][0]['publicURL'];
                     break;
                 }
@@ -1684,8 +1690,7 @@ class StreamWrapper {
 
     try {
       $this->initializeCDN($token, $serviceCatalog);
-    }
-    catch (\HPCloud\Exception $e) {
+    } catch (\HPCloud\Exception $e) {
       //fwrite(STDOUT, $e);
       throw new \HPCloud\Exception('CDN could not be initialized', 1, $e);
 
@@ -1711,7 +1716,8 @@ class StreamWrapper {
    * Also note that CDN's default behavior is to fetch over SSL CDN.
    * To disable this, set 'cdn_require_ssl' to FALSE.
    */
-  protected function initializeCDN($token, $catalog) {
+  protected function initializeCDN($token, $catalog)
+  {
     $cdn = $this->cxt('use_cdn', FALSE);
 
     // No CDN should be enabled.
@@ -1738,7 +1744,8 @@ class StreamWrapper {
     return TRUE;
   }
 
-  protected function authenticate() {
+  protected function authenticate()
+  {
     $username = $this->cxt('username');
     $password = $this->cxt('password');
 
@@ -1754,11 +1761,9 @@ class StreamWrapper {
 
     if (!empty($username) && !empty($password)) {
       $token = $ident->authenticateAsUser($username, $password, $tenantId);
-    }
-    elseif (!empty($account) && !empty($key)) {
+    } elseif (!empty($account) && !empty($key)) {
       $token = $ident->authenticateAsAccount($account, $key, $tenantId);
-    }
-    else {
+    } else {
       throw new \HPCloud\Exception('Either username/password or account/key must be provided.');
     }
     // Cache the service catalog.

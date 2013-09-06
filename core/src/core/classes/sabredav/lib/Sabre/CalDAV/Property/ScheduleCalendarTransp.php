@@ -19,8 +19,8 @@ use Sabre\CalDAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class ScheduleCalendarTransp extends DAV\Property {
-
+class ScheduleCalendarTransp extends DAV\Property
+{
     const TRANSPARENT = 'transparent';
     const OPAQUE = 'opaque';
 
@@ -31,8 +31,8 @@ class ScheduleCalendarTransp extends DAV\Property {
      *
      * @param string $value
      */
-    public function __construct($value) {
-
+    public function __construct($value)
+    {
         if ($value !== self::TRANSPARENT && $value !== self::OPAQUE) {
             throw new \InvalidArgumentException('The value must either be specified as "transparent" or "opaque"');
         }
@@ -45,8 +45,8 @@ class ScheduleCalendarTransp extends DAV\Property {
      *
      * @return string
      */
-    public function getValue() {
-
+    public function getValue()
+    {
         return $this->value;
 
     }
@@ -58,10 +58,10 @@ class ScheduleCalendarTransp extends DAV\Property {
      * @param \DOMElement $node
      * @return void
      */
-    public function serialize(DAV\Server $server,\DOMElement $node) {
-
+    public function serialize(DAV\Server $server,\DOMElement $node)
+    {
         $doc = $node->ownerDocument;
-        switch($this->value) {
+        switch ($this->value) {
             case self::TRANSPARENT :
                 $xval = $doc->createElement('cal:transparent');
                 break;
@@ -80,11 +80,11 @@ class ScheduleCalendarTransp extends DAV\Property {
      * @param \DOMElement $node
      * @return ScheduleCalendarTransp
      */
-    static function unserialize(\DOMElement $node) {
-
+    public static function unserialize(\DOMElement $node)
+    {
         $value = null;
-        foreach($node->childNodes as $childNode) {
-            switch(DAV\XMLUtil::toClarkNotation($childNode)) {
+        foreach ($node->childNodes as $childNode) {
+            switch (DAV\XMLUtil::toClarkNotation($childNode)) {
                 case '{' . CalDAV\Plugin::NS_CALDAV . '}opaque' :
                     $value = self::OPAQUE;
                     break;

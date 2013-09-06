@@ -24,4 +24,3 @@ $mess=array(
 "Connexion" => "Connexion",
 "The Database Connexion" => "The Database Connexion",
 );
-?>

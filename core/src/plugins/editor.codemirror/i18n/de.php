@@ -31,5 +31,3 @@ $mess=array(
 "9"	=> "Textsuche",
 "10"  => "Zeileneinzug"
 );
-
-?>

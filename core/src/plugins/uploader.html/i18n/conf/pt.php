@@ -29,4 +29,3 @@ $mess=array(
 "Auto Close" => "Fechar Automaticamente",
 "Default value for automatically closing the dialog after upload or not" => "Valor Pré-Definido para fechar ou não automaticamente a caixa de diálogo após terminar o envio",
 );
-?>

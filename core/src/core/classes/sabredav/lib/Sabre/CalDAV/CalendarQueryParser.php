@@ -14,8 +14,8 @@ use Sabre\VObject;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class CalendarQueryParser {
-
+class CalendarQueryParser
+{
     /**
      * List of requested properties the client wanted
      *
@@ -64,8 +64,8 @@ class CalendarQueryParser {
      *
      * @param \DOMDocument $dom
      */
-    public function __construct(\DOMDocument $dom) {
-
+    public function __construct(\DOMDocument $dom)
+    {
         $this->dom = $dom;
         $this->xpath = new \DOMXPath($dom);
         $this->xpath->registerNameSpace('cal',Plugin::NS_CALDAV);
@@ -78,8 +78,8 @@ class CalendarQueryParser {
      *
      * @return void
      */
-    public function parse() {
-
+    public function parse()
+    {
         $filterNode = null;
 
         $filter = $this->xpath->query('/cal:calendar-query/cal:filter');
@@ -109,12 +109,12 @@ class CalendarQueryParser {
      * @param \DOMElement $parentNode
      * @return array
      */
-    protected function parseCompFilters(\DOMElement $parentNode) {
-
+    protected function parseCompFilters(\DOMElement $parentNode)
+    {
         $compFilterNodes = $this->xpath->query('cal:comp-filter', $parentNode);
         $result = array();
 
-        for($ii=0; $ii < $compFilterNodes->length; $ii++) {
+        for ($ii=0; $ii < $compFilterNodes->length; $ii++) {
 
             $compFilterNode = $compFilterNodes->item($ii);
 
@@ -149,8 +149,8 @@ class CalendarQueryParser {
      * @param \DOMElement $parentNode
      * @return array
      */
-    protected function parsePropFilters(\DOMElement $parentNode) {
-
+    protected function parsePropFilters(\DOMElement $parentNode)
+    {
         $propFilterNodes = $this->xpath->query('cal:prop-filter', $parentNode);
         $result = array();
 
@@ -178,12 +178,12 @@ class CalendarQueryParser {
      * @param \DOMElement $parentNode
      * @return array
      */
-    protected function parseParamFilters(\DOMElement $parentNode) {
-
+    protected function parseParamFilters(\DOMElement $parentNode)
+    {
         $paramFilterNodes = $this->xpath->query('cal:param-filter', $parentNode);
         $result = array();
 
-        for($ii=0;$ii<$paramFilterNodes->length;$ii++) {
+        for ($ii=0;$ii<$paramFilterNodes->length;$ii++) {
 
             $paramFilterNode = $paramFilterNodes->item($ii);
             $paramFilter = array();
@@ -205,8 +205,8 @@ class CalendarQueryParser {
      * @param \DOMElement $parentNode
      * @return array|null
      */
-    protected function parseTextMatch(\DOMElement $parentNode) {
-
+    protected function parseTextMatch(\DOMElement $parentNode)
+    {
         $textMatchNodes = $this->xpath->query('cal:text-match', $parentNode);
 
         if ($textMatchNodes->length === 0)
@@ -232,8 +232,8 @@ class CalendarQueryParser {
      * @param \DOMElement $parentNode
      * @return array|null
      */
-    protected function parseTimeRange(\DOMElement $parentNode) {
-
+    protected function parseTimeRange(\DOMElement $parentNode)
+    {
         $timeRangeNodes = $this->xpath->query('cal:time-range', $parentNode);
         if ($timeRangeNodes->length === 0) {
             return null;
@@ -269,16 +269,16 @@ class CalendarQueryParser {
      * @param \DOMElement $parentNode
      * @return void
      */
-    protected function parseExpand(\DOMElement $parentNode) {
-
+    protected function parseExpand(\DOMElement $parentNode)
+    {
         $start = $parentNode->getAttribute('start');
-        if(!$start) {
+        if (!$start) {
             throw new \Sabre\DAV\Exception\BadRequest('The "start" attribute is required for the CALDAV:expand element');
         }
         $start = VObject\DateTimeParser::parseDateTime($start);
 
         $end = $parentNode->getAttribute('end');
-        if(!$end) {
+        if (!$end) {
             throw new \Sabre\DAV\Exception\BadRequest('The "end" attribute is required for the CALDAV:expand element');
         }
 

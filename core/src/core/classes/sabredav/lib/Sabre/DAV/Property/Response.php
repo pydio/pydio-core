@@ -15,8 +15,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Response extends DAV\Property implements IHref {
-
+class Response extends DAV\Property implements IHref
+{
     /**
      * Url for the response
      *
@@ -38,8 +38,8 @@ class Response extends DAV\Property implements IHref {
      * @param string $href
      * @param array $responseProperties
      */
-    public function __construct($href, array $responseProperties) {
-
+    public function __construct($href, array $responseProperties)
+    {
         $this->href = $href;
         $this->responseProperties = $responseProperties;
 
@@ -50,8 +50,8 @@ class Response extends DAV\Property implements IHref {
      *
      * @return string
      */
-    public function getHref() {
-
+    public function getHref()
+    {
         return $this->href;
 
     }
@@ -61,8 +61,8 @@ class Response extends DAV\Property implements IHref {
      *
      * @return array
      */
-    public function getResponseProperties() {
-
+    public function getResponseProperties()
+    {
         return $this->responseProperties;
 
     }
@@ -74,8 +74,8 @@ class Response extends DAV\Property implements IHref {
      * @param \DOMElement $dom
      * @return void
      */
-    public function serialize(DAV\Server $server, \DOMElement $dom) {
-
+    public function serialize(DAV\Server $server, \DOMElement $dom)
+    {
         $document = $dom->ownerDocument;
         $properties = $this->responseProperties;
 
@@ -91,7 +91,7 @@ class Response extends DAV\Property implements IHref {
 
         // The properties variable is an array containing properties, grouped by
         // HTTP status
-        foreach($properties as $httpStatus=>$propertyGroup) {
+        foreach ($properties as $httpStatus=>$propertyGroup) {
 
             // The 'href' is also in this array, and it's special cased.
             // We will ignore it
@@ -108,7 +108,7 @@ class Response extends DAV\Property implements IHref {
 
             $nsList = $server->xmlNamespaces;
 
-            foreach($propertyGroup as $propertyName=>$propertyValue) {
+            foreach ($propertyGroup as $propertyName=>$propertyValue) {
 
                 $propName = null;
                 preg_match('/^{([^}]*)}(.*)$/',$propertyName,$propName);

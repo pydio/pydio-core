@@ -31,24 +31,26 @@ define("LOG_LEVEL_ERROR", "Error");
  * @static
  * Provides static access to the logging mechanism
  */
-class AJXP_Logger extends AJXP_Plugin {
-
+class AJXP_Logger extends AJXP_Plugin
+{
     /**
      * @var AbstractLogDriver
      */
     protected $pluginInstance;
     protected static $loggerInstance;
 
-    public function init($options){
+    public function init($options)
+    {
         parent::init($options);
         $this->pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_PLUGIN_INSTANCE"], "AbstractLogDriver");
-        if($this->pluginInstance != false){
+        if ($this->pluginInstance != false) {
             AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("log", $this->pluginInstance->getName(), $this->pluginInstance);
         }
         self::$loggerInstance = $this->pluginInstance;
     }
 
-    public function getLoggerInstance(){
+    public function getLoggerInstance()
+    {
         return $this->pluginInstance;
     }
 
@@ -59,22 +61,22 @@ class AJXP_Logger extends AJXP_Plugin {
      * @param array $params
      * @return void
      */
-	public static function debug($message, $params = array()){
-		if(!class_exists("ConfService")) return ;
-		if(!ConfService::getConf("SERVER_DEBUG")) return ;
-		$logger = self::getInstance();
-		if($logger == null) return ;
-		$message .= "\t";
-		if(is_string($params)){
-			$message .= $params;
-		}
-		else if(is_array($params) && count($params)){
-			$message.=$logger->arrayToString($params);
-		}else if(!empty($params)) {
-			$message .= print_r($params, true);
-		}		
-		$logger->write($message, LOG_LEVEL_DEBUG);				
-	}
+    public static function debug($message, $params = array())
+    {
+        if(!class_exists("ConfService")) return ;
+        if(!ConfService::getConf("SERVER_DEBUG")) return ;
+        $logger = self::getInstance();
+        if($logger == null) return ;
+        $message .= "\t";
+        if (is_string($params)) {
+            $message .= $params;
+        } else if (is_array($params) && count($params)) {
+            $message.=$logger->arrayToString($params);
+        } else if (!empty($params)) {
+            $message .= print_r($params, true);
+        }
+        $logger->write($message, LOG_LEVEL_DEBUG);
+    }
 
     /**
      * Send an action log message to the current logger instance.
@@ -83,40 +85,40 @@ class AJXP_Logger extends AJXP_Plugin {
      * @param array $params
      * @return void
      */
-	public static function logAction($action, $params=array()){
-		$logger = self::getInstance();		
-		if($logger == null) return ;
-		$message = "$action\t";		
-		if(count($params)){
-			$message.=$logger->arrayToString($params);
-		}		
-		$logger->write($message, LOG_LEVEL_INFO);		
-	}
+    public static function logAction($action, $params=array())
+    {
+        $logger = self::getInstance();
+        if($logger == null) return ;
+        $message = "$action\t";
+        if (count($params)) {
+            $message.=$logger->arrayToString($params);
+        }
+        $logger->write($message, LOG_LEVEL_INFO);
+    }
 
-    public static function getClientAdress(){
-        if(isSet($_SERVER['REMOTE_ADDR'])){
+    public static function getClientAdress()
+    {
+        if (isSet($_SERVER['REMOTE_ADDR'])) {
             $msg = $_SERVER['REMOTE_ADDR'];
-        }else if(php_sapi_name() == "cli"){
+        } else if (php_sapi_name() == "cli") {
             $msg = "PHP_CLI";
-        }else{
+        } else {
             $msg = "Unknown Origin";
         }
         return $msg;
     }
-	
-	/**
-	 * returns an instance of the AbstractLogDriver object
-	 *
-	 * @access public
-	 * @static
-	 *
-	 * @return AbstractLogDriver an instance of the AJXP_Logger object
-	 */
- 	public static function getInstance()
- 	{
-        return self::$loggerInstance;
- 	}
-		
-}
 
-?>
+    /**
+     * returns an instance of the AbstractLogDriver object
+     *
+     * @access public
+     * @static
+     *
+     * @return AbstractLogDriver an instance of the AJXP_Logger object
+     */
+     public static function getInstance()
+     {
+        return self::$loggerInstance;
+     }
+
+}

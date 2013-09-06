@@ -31,4 +31,3 @@ $mess=array(
 "Prefix tables" => "Préfixes",
 "Prefix of CMSMS tables " => "Préfixes des tables CMSMS",
 );
-?>

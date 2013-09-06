@@ -31,27 +31,29 @@ class GitManager extends AJXP_Plugin
 
     private $repoBase;
 
-    public function performChecks(){
+    public function performChecks()
+    {
         $ex = AJXP_Utils::searchIncludePath("VersionControl/Git.php");
-        if(!$ex){
+        if (!$ex) {
             throw new Exception("Cannot find PEAR library VersionControl/Git");
         }
     }
 
-    public function initMeta($accessDriver){
+    public function initMeta($accessDriver)
+    {
         require_once("VersionControl/Git.php");
         $repo = ConfService::getRepository();
         $this->repoBase = $repo->getOption("PATH");
-        if(!is_dir($this->repoBase.DIRECTORY_SEPARATOR.".git")){
+        if (!is_dir($this->repoBase.DIRECTORY_SEPARATOR.".git")) {
             $git = new VersionControl_Git($this->repoBase);
             $git->initRepository();
         }
     }
 
-    public function applyActions($actionName, $httpVars, $fileVars){
-
+    public function applyActions($actionName, $httpVars, $fileVars)
+    {
         $git = new VersionControl_Git($this->repoBase);
-        switch($actionName){
+        switch ($actionName) {
             case "git_history":
                 $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                 $file = ltrim($file, "/");
@@ -61,7 +63,7 @@ class GitManager extends AJXP_Plugin
                 $ic = AJXP_Utils::mimetype($file, "image", false);
                 $index = count($res);
                 $mess = ConfService::getMessages();
-                foreach($res as &$commit){
+                foreach ($res as &$commit) {
                     unset($commit["DETAILS"]);
                     $commit["icon"] = $ic;
                     $commit["index"] = $index;
@@ -114,14 +116,14 @@ class GitManager extends AJXP_Plugin
                 $command->addArgument($commitId.":".$file);
                 $commandLine = $command->createCommandString();
 
-                if($attach == "inline"){
+                if ($attach == "inline") {
                     $fileExt = substr(strrchr(basename($file), '.'), 1);
-                    if(empty($fileExt)){
+                    if (empty($fileExt)) {
                         $fileMime = "application/octet-stream";
                     } else {
                         $regex = "/^([\w\+\-\.\/]+)\s+(\w+\s)*($fileExt\s)/i";
                         $lines = file( AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.browser/resources/other/mime.types");
-                        foreach($lines as $line) {
+                        foreach ($lines as $line) {
                             if(substr($line, 0, 1) == '#')
                                 continue; // skip comments
                             $line = rtrim($line) . " ";
@@ -132,7 +134,7 @@ class GitManager extends AJXP_Plugin
                     }
                     if(empty($fileMime)) $fileMime = "application/octet-stream";
                     HTMLWriter::generateInlineHeaders(basename($file), $size, $fileMime);
-                }else{
+                } else {
                     HTMLWriter::generateAttachmentsHeader(basename($file), $size, false, false);
                 }
                 $outputStream = fopen("php://output", "a");
@@ -149,8 +151,8 @@ class GitManager extends AJXP_Plugin
 
     }
 
-    protected function executeCommandInStreams($git, $commandLine, $outputStream, $errorStream = null){
-
+    protected function executeCommandInStreams($git, $commandLine, $outputStream, $errorStream = null)
+    {
         $descriptorspec = array(
             1 => array('pipe', 'w'),
             2 => array('pipe', 'w'),
@@ -161,13 +163,13 @@ class GitManager extends AJXP_Plugin
         //$stdout = stream_get_contents($pipes[1]);
         //$stderr = stream_get_contents($pipes[2]);
         $bufLength = 4096;
-        while( ($read = fread($pipes[1], $bufLength)) != false ){
+        while ( ($read = fread($pipes[1], $bufLength)) != false ) {
             fputs($outputStream, $read, strlen($read));
         }
         //stream_copy_to_stream($pipes[1], $outputStream);
-        if($errorStream != null){
+        if ($errorStream != null) {
             stream_copy_to_stream($pipes[2], $errorStream);
-        }else{
+        } else {
             $stderr = stream_get_contents($pipes[2]);
         }
         foreach ($pipes as $pipe) {
@@ -179,7 +181,8 @@ class GitManager extends AJXP_Plugin
 
     }
 
-    protected function gitHistory($git, $file){
+    protected function gitHistory($git, $file)
+    {
         $command = $git->getCommand("log");
         $command->setOption("follow", true);
         $command->setOption("p", true);
@@ -188,11 +191,11 @@ class GitManager extends AJXP_Plugin
         $res = $command->execute();
         $lines = explode(PHP_EOL, $res);
         $allCommits = array();
-        while(count($lines)){
+        while (count($lines)) {
             $line = array_shift($lines);
-            if(preg_match("/^commit /i", $line)) {
-                if(isSet($currentCommit)) {
-                    if(isSet($currentCommit["DETAILS"])){
+            if (preg_match("/^commit /i", $line)) {
+                if (isSet($currentCommit)) {
+                    if (isSet($currentCommit["DETAILS"])) {
                         $currentCommit["DETAILS"] = implode(PHP_EOL, $currentCommit["DETAILS"]);
                     }
                     $allCommits[] = $currentCommit;
@@ -201,36 +204,36 @@ class GitManager extends AJXP_Plugin
                 $currentCommit["ID"] = substr($line, strlen("commit "));
                 $grabMessageLines = false;
                 $grabOtherLines = false;
-            }else if(preg_match("/^diff --git a\/(.*) b\/(.*)/i", $line, $matches)){
+            } else if (preg_match("/^diff --git a\/(.*) b\/(.*)/i", $line, $matches)) {
                 $origA = $matches[1];
                 $origB = $matches[2];
                 $currentCommit["FILE"] = $origB;
-                if($origB != $origA){
-                    if(basename($origB) != basename($origA)){
+                if ($origB != $origA) {
+                    if (basename($origB) != basename($origA)) {
                         $currentCommit["EVENT"] = "RENAME";
-                    }else if(dirname($origA) != dirname($origB)){
+                    } else if (dirname($origA) != dirname($origB)) {
                         $currentCommit["EVENT"] = "MOVE";
                     }
-                }else{
+                } else {
                     $currentCommit["EVENT"] = "MODIFICATION";
                     $currentCommit["DETAILS"] = array();
                     $grabOtherLines = true;
                 }
-            }else if(preg_match("/^Date: /", $line)){
+            } else if (preg_match("/^Date: /", $line)) {
                 $currentCommit["DATE"] = trim(substr($line, strlen("Date: ")));
                 $currentCommit["ajxp_modiftime"] = strtotime(substr($line, strlen("Date: ")));
-            }else if($grabOtherLines){
+            } else if ($grabOtherLines) {
                 if(count($currentCommit["DETAILS"]) >= 10) continue;
                 $currentCommit["DETAILS"][] = $line;
-            }else if(trim($line) == ""){
+            } else if (trim($line) == "") {
                 $grabMessageLines = !$grabMessageLines;
-            }else if($grabMessageLines){
+            } else if ($grabMessageLines) {
                 if(!isSet($currentCommit["MESSAGE"])) $currentCommit["MESSAGE"] = "";
                 $currentCommit["MESSAGE"] .= trim($line);
             }
         }
         // $currentCommit
-        if(count($currentCommit["DETAILS"]) && substr($currentCommit["DETAILS"][0], 0, strlen("new file")) == "new file"){
+        if (count($currentCommit["DETAILS"]) && substr($currentCommit["DETAILS"][0], 0, strlen("new file")) == "new file") {
             $currentCommit["EVENT"] = "CREATION";
             unset($currentCommit["DETAILS"]);
         }
@@ -244,27 +247,29 @@ class GitManager extends AJXP_Plugin
      * @param AJXP_Node$toNode
      * @param boolean $copy
      */
-    public function changesHook($fromNode=null, $toNode=null, $copy=false){
+    public function changesHook($fromNode=null, $toNode=null, $copy=false)
+    {
         $this->commitChanges();
         return;
         /*
         $refNode = $fromNode;
-        if($fromNode == null && $toNode != null){
+        if ($fromNode == null && $toNode != null) {
             $refNode = $toNode;
         }
         $this->commitChanges(dirname($refNode->getPath()));
         */
     }
 
-    private function commitChanges($path = null){
+    private function commitChanges($path = null)
+    {
         $git = new VersionControl_Git($this->repoBase);
         $command = $git->getCommand("add");
         $command->addArgument(".");
-        try{
+        try {
             $cmd = $command->createCommandString();
             AJXP_Logger::debug("Git command ".$cmd);
             $res = $command->execute();
-        }catch (Exception $e){
+        } catch (Exception $e) {
             AJXP_Logger::debug("Error ".$e->getMessage());
         }
         AJXP_Logger::debug("GIT RESULT ADD : ".$res);
@@ -272,17 +277,17 @@ class GitManager extends AJXP_Plugin
         $command = $git->getCommand("commit");
         $command->setOption("a", true);
         $userId = "no user";
-        if(AuthService::getLoggedUser()!=null){
+        if (AuthService::getLoggedUser()!=null) {
             $userId = AuthService::getLoggedUser()->getId();
         }
         $command->setOption("m", $userId);
         //$command->addArgument($path);
 
-        try{
+        try {
             $cmd = $command->createCommandString();
             AJXP_Logger::debug("Git command ".$cmd);
             $res = $command->execute();
-        }catch (Exception $e){
+        } catch (Exception $e) {
             AJXP_Logger::debug("Error ".$e->getMessage());
         }
         AJXP_Logger::debug("GIT RESULT COMMIT : ".$res);

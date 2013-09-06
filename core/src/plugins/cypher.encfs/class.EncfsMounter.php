@@ -28,16 +28,18 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class EncfsMounter extends AJXP_Plugin
 {
 
-    protected function getWorkingPath(){
+    protected function getWorkingPath()
+    {
         $repo = ConfService::getRepository();
         $path = $repo->getOption("PATH");
         return $path;
     }
 
-    public function cypherAllMounted($actionName, &$httpVars, &$fileVars){
+    public function cypherAllMounted($actionName, &$httpVars, &$fileVars)
+    {
         $dirs = glob($this->getWorkingPath()."/ENCFS_CLEAR_*/.ajxp_mount");
-        if($dirs!==false && count($dirs)){
-            foreach($dirs as $mountedFile){
+        if ($dirs!==false && count($dirs)) {
+            foreach ($dirs as $mountedFile) {
                 $mountedDir = dirname($mountedFile);
                 AJXP_Logger::debug("Warning, $mountedDir was not unmounted before $actionName");
                 $this->umountFolder($mountedDir);
@@ -45,17 +47,18 @@ class EncfsMounter extends AJXP_Plugin
         }
     }
 
-    public function preProcessMove($actionName, &$httpVars, &$fileVars){
+    public function preProcessMove($actionName, &$httpVars, &$fileVars)
+    {
         $destO = AJXP_Utils::decodeSecureMagic($httpVars["dest"]);
         $dest = substr($destO, 1, strpos(ltrim($destO, "/"), "/"));
         if(empty($dest)) $dest = ltrim($destO, "/");
         $userSelection = new UserSelection();
         $userSelection->initFromHttpVars($httpVars);
-        if(!$userSelection->isEmpty()){
+        if (!$userSelection->isEmpty()) {
             $testFileO = $userSelection->getUniqueFile();
             $testFile = substr($testFileO, 1, strpos(ltrim($testFileO, "/"), "/"));
             if(empty($testFile)) $testFile = ltrim($testFileO, "/");
-            if($actionName == "move"){
+            if ($actionName == "move") {
                 if( (strstr($dest, "ENCFS_CLEAR_")!=false && strstr($testFile, "ENCFS_CLEAR_")===false)
                     || (strstr($dest, "ENCFS_CLEAR_")===false && strstr($testFile, "ENCFS_CLEAR_")!==false)
                     || (strstr($dest, "ENCFS_CLEAR_")!=false && strstr($testFile, "ENCFS_CLEAR_")!==false
@@ -64,13 +67,13 @@ class EncfsMounter extends AJXP_Plugin
                     $httpVars["force_copy_delete"] = "true";
                     AJXP_Logger::debug("One mount to another, copy/delete instead of move ($dest, $testFile)");
                 }
-            }else if( $actionName == "delete" && RecycleBinManager::recycleEnabled() ){
-                if(strstr($testFile, "ENCFS_CLEAR_")!==false){
+            } else if ( $actionName == "delete" && RecycleBinManager::recycleEnabled() ) {
+                if (strstr($testFile, "ENCFS_CLEAR_")!==false) {
                     $httpVars["force_copy_delete"] = "true";
                     AJXP_Logger::debug("One mount to another, copy/delete instead of move");
                 }
-            }else if ($actionName == "restore"){
-                if(strstr(RecycleBinManager::getFileOrigin($testFile), "ENCFS_CLEAR_")){
+            } else if ($actionName == "restore") {
+                if (strstr(RecycleBinManager::getFileOrigin($testFile), "ENCFS_CLEAR_")) {
                     $httpVars["force_copy_delete"] = "true";
                     AJXP_Logger::debug("One mount to another, copy/delete instead of move");
                 }
@@ -78,14 +81,14 @@ class EncfsMounter extends AJXP_Plugin
         }
     }
 
-    public function switchAction($actionName, $httpVars, $fileVars){
-
+    public function switchAction($actionName, $httpVars, $fileVars)
+    {
         //var_dump($httpVars);
         $xmlTemplate = $this->getFilteredOption("ENCFS_XML_TEMPLATE");
 
-        switch($actionName){
+        switch ($actionName) {
             case "encfs.cypher_folder" :
-                if(empty($xmlTemplate) || !is_file($xmlTemplate)){
+                if (empty($xmlTemplate) || !is_file($xmlTemplate)) {
                     throw new Exception("It seems that you have not set the plugin 'Enfcs XML File' configuration, or the system cannot find it!");
                 }
 
@@ -93,24 +96,24 @@ class EncfsMounter extends AJXP_Plugin
                 $workingP = rtrim($this->getWorkingPath(), "/");
                 $dir = $workingP.AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
 
-                if(dirname($dir) != $workingP){
+                if (dirname($dir) != $workingP) {
                     throw new Exception("Please cypher only folders at the root of your repository");
                 }
 
                 $pass = $httpVars["pass"];
                 $raw  = dirname($dir).DIRECTORY_SEPARATOR."ENCFS_RAW_".basename($dir);
-                if(!strstr($dir, "ENCFS_CLEAR_") && !is_dir($raw)){
+                if (!strstr($dir, "ENCFS_CLEAR_") && !is_dir($raw)) {
                     // NEW FOLDER SCENARIO
                     $clear  = dirname($dir).DIRECTORY_SEPARATOR."ENCFS_CLEAR_".basename($dir);
                     mkdir($raw);
                     $result = self::initEncFolder($raw, $xmlTemplate, $this->getFilteredOption("ENCFS_XML_PASSWORD"), $pass);
-                    if($result){
+                    if ($result) {
                         // Mount folder
                         mkdir($clear);
                         $uid = $this->getFilteredOption("ENCFS_UID");
                         self::mountFolder($raw, $clear, $pass, $uid);
                         $content = scandir($dir);
-                        foreach($content as $fileOrFolder){
+                        foreach ($content as $fileOrFolder) {
                             if($fileOrFolder == "." || $fileOrFolder == "..") continue;
                             $cmd = "mv ". escapeshellarg($dir . DIRECTORY_SEPARATOR . $fileOrFolder)." ". escapeshellarg($clear . DIRECTORY_SEPARATOR);
                             $exec = shell_exec($cmd);
@@ -118,7 +121,7 @@ class EncfsMounter extends AJXP_Plugin
                         self::umountFolder($clear);
                         rmdir($dir);
                     }
-                }else if(substr(basename($dir), 0, strlen("ENCFS_CLEAR_")) == "ENCFS_CLEAR_"){
+                } else if (substr(basename($dir), 0, strlen("ENCFS_CLEAR_")) == "ENCFS_CLEAR_") {
                     // SIMPLY UNMOUNT
                     self::umountFolder($dir);
                 }
@@ -128,7 +131,7 @@ class EncfsMounter extends AJXP_Plugin
                 $raw = str_replace("ENCFS_CLEAR_", "ENCFS_RAW_", $dir);
                 $pass = $httpVars["pass"];
                 $uid = $this->getFilteredOption("ENCFS_UID");
-                if(is_dir($raw)){
+                if (is_dir($raw)) {
                     self::mountFolder($raw, $dir, $pass, $uid);
                 }
                 break;
@@ -145,23 +148,24 @@ class EncfsMounter extends AJXP_Plugin
      * @param AJXP_Node|bool $parentNode
      * @param bool $details
      */
-    public function filterENCFS(&$ajxpNode, $parentNode = false, $details = false){
-        if(substr($ajxpNode->getLabel(), 0, strlen("ENCFS_RAW_")) == "ENCFS_RAW_"){
+    public function filterENCFS(&$ajxpNode, $parentNode = false, $details = false)
+    {
+        if (substr($ajxpNode->getLabel(), 0, strlen("ENCFS_RAW_")) == "ENCFS_RAW_") {
             $ajxpNode->hidden = true;
-        }else if(substr($ajxpNode->getLabel(), 0, strlen("ENCFS_CLEAR_")) == "ENCFS_CLEAR_"){
+        } else if (substr($ajxpNode->getLabel(), 0, strlen("ENCFS_CLEAR_")) == "ENCFS_CLEAR_") {
             $ajxpNode->ENCFS_clear_folder = true;
             $ajxpNode->overlay_icon = "cypher.encfs/overlay_ICON_SIZE.png";
-            if(is_file($ajxpNode->getUrl()."/.ajxp_mount")){
+            if (is_file($ajxpNode->getUrl()."/.ajxp_mount")) {
                 $ajxpNode->setLabel(substr($ajxpNode->getLabel(), strlen("ENCFS_CLEAR_")));
                 $ajxpNode->ENCFS_clear_folder_mounted = true;
-            }else{
+            } else {
                 $ajxpNode->setLabel(substr($ajxpNode->getLabel(), strlen("ENCFS_CLEAR_")) . " (encrypted)");
             }
         }
     }
 
-    public static function initEncFolder($raw, $originalXML, $originalSecret,  $secret){
-
+    public static function initEncFolder($raw, $originalXML, $originalSecret,  $secret)
+    {
         copy($originalXML, $raw."/".basename($originalXML));
         $descriptorspec = array(
             0 => array("pipe", "r"),  // stdin
@@ -177,26 +181,26 @@ class EncfsMounter extends AJXP_Plugin
             fwrite($pipes[0], $secret);
             fflush($pipes[0]);
             fclose($pipes[0]);
-            while($s= fgets($pipes[1], 1024)) {
+            while ($s= fgets($pipes[1], 1024)) {
                 $text .= $s;
             }
             fclose($pipes[1]);
-            while($s= fgets($pipes[2], 1024)) {
+            while ($s= fgets($pipes[2], 1024)) {
                 $error .= $s . "\n";
             }
             fclose($pipes[2]);
         }
-        if(( !empty($error) || stristr($text, "invalid password")!==false ) && file_exists($raw."/".basename($originalXML))){
+        if (( !empty($error) || stristr($text, "invalid password")!==false ) && file_exists($raw."/".basename($originalXML))) {
             unlink($raw."/".basename($originalXML));
             throw new Exception("Error while creating encfs volume");
-        }else{
+        } else {
             return true;
         }
     }
 
 
-    public static function mountFolder($raw, $clear, $secret, $uid){
-
+    public static function mountFolder($raw, $clear, $secret, $uid)
+    {
         $descriptorspec = array(
             0 => array("pipe", "r"),  // stdin
             1 => array("pipe", "w"),  // stdout
@@ -208,28 +212,29 @@ class EncfsMounter extends AJXP_Plugin
         if (is_resource($process)) {
             fwrite($pipes[0], $secret);
             fclose($pipes[0]);
-            while($s= fgets($pipes[1], 1024)) {
+            while ($s= fgets($pipes[1], 1024)) {
                 $text .= $s;
             }
             fclose($pipes[1]);
-            while($s= fgets($pipes[2], 1024)) {
+            while ($s= fgets($pipes[2], 1024)) {
                 $error .= $s . "\n";
             }
             fclose($pipes[2]);
         }
-        if(!empty($error)){
+        if (!empty($error)) {
             throw new Exception("Error mounting volume : ".$error);
         }
-        if(stristr($text, "error")){
+        if (stristr($text, "error")) {
             throw new Exception("Error mounting volume : ".$text);
         }
         // Mount should have succeeded now
-        if(!is_file($clear."/.ajxp_mount")){
+        if (!is_file($clear."/.ajxp_mount")) {
             file_put_contents($clear."/.ajxp_mount", "ajxp encfs mount");
         }
     }
 
-    public static function umountFolder($clear){
+    public static function umountFolder($clear)
+    {
         $descriptorspec = array(
             1 => array("pipe", "w"),  // stdout
             2 => array("pipe", "w")   // stderr ?? instead of a file
@@ -238,11 +243,11 @@ class EncfsMounter extends AJXP_Plugin
         $process = proc_open($command, $descriptorspec, $pipes);
         $text = ""; $error = "";
         if (is_resource($process)) {
-            while($s= fgets($pipes[1], 1024)) {
+            while ($s= fgets($pipes[1], 1024)) {
                 $text .= $s;
             }
             fclose($pipes[1]);
-            while($s= fgets($pipes[2], 1024)) {
+            while ($s= fgets($pipes[2], 1024)) {
                 $error .= $s . "\n";
             }
             fclose($pipes[2]);

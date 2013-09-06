@@ -46,4 +46,3 @@ $mess=array(
 "Analytics Events" => "Analytics Events",
 "Use Events Logging, experimental only implemented on download action in AjaXplorer" => "Use Events Logging, experimental only implemented on download action in AjaXplorer",
 );
-?>

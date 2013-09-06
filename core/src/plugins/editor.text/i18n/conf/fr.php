@@ -22,4 +22,3 @@ $mess=array(
 "Text Editor" => "Editeur Text",
 "Very basic text editor" => "editeur text basique",
 );
-?>

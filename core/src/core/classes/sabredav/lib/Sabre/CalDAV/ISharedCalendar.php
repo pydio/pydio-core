@@ -9,15 +9,15 @@ namespace Sabre\CalDAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-interface ISharedCalendar extends ICalendar {
-
+interface ISharedCalendar extends ICalendar
+{
     /**
      * This method should return the url of the owners' copy of the shared
      * calendar.
      *
      * @return string
      */
-    function getSharedUrl();
+    public function getSharedUrl();
 
     /**
      * Returns the list of people whom this calendar is shared with.
@@ -31,6 +31,6 @@ interface ISharedCalendar extends ICalendar {
      *
      * @return array
      */
-    function getShares();
+    public function getShares();
 
 }

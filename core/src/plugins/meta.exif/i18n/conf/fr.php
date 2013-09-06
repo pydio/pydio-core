@@ -26,4 +26,3 @@ $mess=array(
 "Info Panel Labels" => "Libellés InfoPanel",
 "Associated list of labels, be sure to define as many as fields!" => "Libellés associés à la liste des champs précédente.",
 );
-?>

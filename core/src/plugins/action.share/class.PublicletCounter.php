@@ -25,58 +25,64 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Action
  */
-class PublicletCounter {
-	
-	static private $counters;
-	
-	static function getCount($publiclet){
-		$counters = self::loadCounters();
-		if(isSet($counters[$publiclet])) return $counters[$publiclet];
-		return 0;
-	}
-	
-	static function increment($publiclet){
-		if(!self::isActive()) return -1 ;
-		$counters = self::loadCounters();
-		if(!isSet($counters[$publiclet])){
-			$counters[$publiclet]  = 0;
-		}
-		$counters[$publiclet] ++;
-		self::saveCounters($counters);
-		return $counters[$publiclet];
-	}
-	
-	static function reset($publiclet){
-		if(!self::isActive()) return -1 ;
-		$counters = self::loadCounters();
-		$counters[$publiclet]  = 0;
-		self::saveCounters($counters);
-	}
-	
-	static function delete($publiclet){
-		if(!self::isActive()) return -1 ;
-		$counters = self::loadCounters();
-		if(isSet($counters[$publiclet])){
-			unset($counters[$publiclet]);
-			self::saveCounters($counters);
-		}
-	}
-	
-	static private function isActive(){
-		return (is_dir(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")) && is_writable(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")));
-	}
-	
-	static private function loadCounters(){
-		if(!isSet(self::$counters)){
-			self::$counters = AJXP_Utils::loadSerialFile(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/.ajxp_publiclet_counters.ser");			
-		}
-		return self::$counters;
-	}
-	
-	static private function saveCounters($counters){
-		self::$counters = $counters;
-		AJXP_Utils::saveSerialFile(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/.ajxp_publiclet_counters.ser", $counters, false);
-	}
-	
+class PublicletCounter
+{
+    private static $counters;
+
+    public static function getCount($publiclet)
+    {
+        $counters = self::loadCounters();
+        if(isSet($counters[$publiclet])) return $counters[$publiclet];
+        return 0;
+    }
+
+    public static function increment($publiclet)
+    {
+        if(!self::isActive()) return -1 ;
+        $counters = self::loadCounters();
+        if (!isSet($counters[$publiclet])) {
+            $counters[$publiclet]  = 0;
+        }
+        $counters[$publiclet] ++;
+        self::saveCounters($counters);
+        return $counters[$publiclet];
+    }
+
+    public static function reset($publiclet)
+    {
+        if(!self::isActive()) return -1 ;
+        $counters = self::loadCounters();
+        $counters[$publiclet]  = 0;
+        self::saveCounters($counters);
+    }
+
+    public static function delete($publiclet)
+    {
+        if(!self::isActive()) return -1 ;
+        $counters = self::loadCounters();
+        if (isSet($counters[$publiclet])) {
+            unset($counters[$publiclet]);
+            self::saveCounters($counters);
+        }
+    }
+
+    private static function isActive()
+    {
+        return (is_dir(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")) && is_writable(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")));
+    }
+
+    private static function loadCounters()
+    {
+        if (!isSet(self::$counters)) {
+            self::$counters = AJXP_Utils::loadSerialFile(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/.ajxp_publiclet_counters.ser");
+        }
+        return self::$counters;
+    }
+
+    private static function saveCounters($counters)
+    {
+        self::$counters = $counters;
+        AJXP_Utils::saveSerialFile(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/.ajxp_publiclet_counters.ser", $counters, false);
+    }
+
 }
-?>

@@ -533,4 +533,3 @@ $mess=array(
 "476" => "Your personal workspace",
 "477" => "Pro zobrazení podrobností musíte označit soubor nebo složku",
 );
-?>

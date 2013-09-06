@@ -22,4 +22,3 @@ $mess=array(
 "iOS" => "iOS",
 "Template for redirecting to iPhone application" => "Template pour demander une redirection vers l'AppStore sur les iPhones, iPad",
 );
-?>

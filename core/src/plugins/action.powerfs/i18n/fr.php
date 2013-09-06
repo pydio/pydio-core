@@ -24,5 +24,3 @@ $mess = array(
     "2" => "Rechargement du répertoire",
     "3" => "Le téléchargement de l'archive devrait démarrer automatiquement"
 );
-
-?>

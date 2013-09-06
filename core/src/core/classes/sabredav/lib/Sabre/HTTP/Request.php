@@ -16,8 +16,8 @@ namespace Sabre\HTTP;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Request {
-
+class Request
+{
     /**
      * PHP's $_SERVER data
      *
@@ -48,7 +48,7 @@ class Request {
      *
      * @var resource
      */
-    static $defaultInputStream=null;
+    public static $defaultInputStream=null;
 
     /**
      * Sets up the object
@@ -59,8 +59,8 @@ class Request {
      * @param array $serverData
      * @param array $postData
      */
-    public function __construct(array $serverData = null, array $postData = null) {
-
+    public function __construct(array $serverData = null, array $postData = null)
+    {
        if ($serverData) $this->_SERVER = $serverData;
        else $this->_SERVER =& $_SERVER;
 
@@ -77,8 +77,8 @@ class Request {
      * @param string $name
      * @return string
      */
-    public function getHeader($name) {
-
+    public function getHeader($name)
+    {
         $name = strtoupper(str_replace(array('-'),array('_'),$name));
         if (isset($this->_SERVER['HTTP_' . $name])) {
             return $this->_SERVER['HTTP_' . $name];
@@ -86,7 +86,7 @@ class Request {
 
         // There's a few headers that seem to end up in the top-level
         // server array.
-        switch($name) {
+        switch ($name) {
             case 'CONTENT_TYPE' :
             case 'CONTENT_LENGTH' :
                 if (isset($this->_SERVER[$name])) {
@@ -107,12 +107,12 @@ class Request {
      *
      * @return array
      */
-    public function getHeaders() {
-
+    public function getHeaders()
+    {
         $hdrs = array();
-        foreach($this->_SERVER as $key=>$value) {
+        foreach ($this->_SERVER as $key=>$value) {
 
-            switch($key) {
+            switch ($key) {
                 case 'CONTENT_LENGTH' :
                 case 'CONTENT_TYPE' :
                     $hdrs[strtolower(str_replace('_','-',$key))] = $value;
@@ -137,8 +137,8 @@ class Request {
      *
      * @return string
      */
-    public function getMethod() {
-
+    public function getMethod()
+    {
         return $this->_SERVER['REQUEST_METHOD'];
 
     }
@@ -148,8 +148,8 @@ class Request {
      *
      * @return string
      */
-    public function getUri() {
-
+    public function getUri()
+    {
         return $this->_SERVER['REQUEST_URI'];
 
     }
@@ -159,8 +159,8 @@ class Request {
      *
      * @return string
      */
-    public function getAbsoluteUri() {
-
+    public function getAbsoluteUri()
+    {
         // Checking if the request was made through HTTPS. The last in line is for IIS
         $protocol = isset($this->_SERVER['HTTPS']) && ($this->_SERVER['HTTPS']) && ($this->_SERVER['HTTPS']!='off');
         return ($protocol?'https':'http') . '://'  . $this->getHeader('Host') . $this->getUri();
@@ -172,8 +172,8 @@ class Request {
      *
      * @return string
      */
-    public function getQueryString() {
-
+    public function getQueryString()
+    {
         return isset($this->_SERVER['QUERY_STRING'])?$this->_SERVER['QUERY_STRING']:'';
 
     }
@@ -187,8 +187,8 @@ class Request {
      * @param bool $asString
      * @return resource
      */
-    public function getBody($asString = false) {
-
+    public function getBody($asString = false)
+    {
         if (is_null($this->body)) {
             if (!is_null(self::$defaultInputStream)) {
                 $this->body = self::$defaultInputStream;
@@ -218,9 +218,9 @@ class Request {
      * @param bool $setAsDefaultInputStream
      * @return void
      */
-    public function setBody($body,$setAsDefaultInputStream = false) {
-
-        if(is_resource($body)) {
+    public function setBody($body,$setAsDefaultInputStream = false)
+    {
+        if (is_resource($body)) {
             $this->body = $body;
         } else {
 
@@ -244,8 +244,8 @@ class Request {
      *
      * @return array
      */
-    public function getPostVars() {
-
+    public function getPostVars()
+    {
         return $this->_POST;
 
     }
@@ -258,8 +258,8 @@ class Request {
      * @param string $field
      * @return string
      */
-    public function getRawServerValue($field) {
-
+    public function getRawServerValue($field)
+    {
         return isset($this->_SERVER[$field])?$this->_SERVER[$field]:null;
 
     }
@@ -269,8 +269,8 @@ class Request {
      *
      * @return string
      */
-    public function getHTTPVersion() {
-
+    public function getHTTPVersion()
+    {
         $protocol = $this->getRawServerValue('SERVER_PROTOCOL');
         if ($protocol==='HTTP/1.0') {
             return '1.0';
@@ -281,4 +281,3 @@ class Request {
     }
 
 }
-

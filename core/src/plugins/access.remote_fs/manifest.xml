@@ -12,7 +12,7 @@
 		<param name="USE_AUTH" type="boolean" label="CONF_MESSAGE[Remote Authentification]" description="CONF_MESSAGE[Whether we should authenticate to the remote server or not. If yes, will try to login as an AjaXplorer user, or with standard http auth if Http Auth URI is set.]" default="true" mandatory="true"/>
 		<param name="AUTH_USER" type="string" label="CONF_MESSAGE[Login]" description="CONF_MESSAGE[Login for http authentification]" mandatory="false"/>
 		<param name="AUTH_PASS" type="string" label="CONF_MESSAGE[Password]" description="CONF_MESSAGE[Password for http authentification]" mandatory="false"/>
-		<param name="AUTH_URI" type="string" label="CONF_MESSAGE[Http Auth URI]" description="CONF_MESSAGE[Path to the authentication script, e.g. /ajaxplorer/index.php (only if you are using basic http auth)]" default="" mandatory="false"/>		
+		<param name="AUTH_URI" type="string" label="CONF_MESSAGE[Http Auth URI]" description="CONF_MESSAGE[Path to the authentication script, e.g. /ajaxplorer/index.php (only if you are using basic http auth)]" default="" mandatory="false"/>
 		<param name="TMP_UPLOAD" type="string" label="CONF_MESSAGE[Temporary Folder]" description="CONF_MESSAGE[Temporary folder on the local server used for file uploads. For the moment, it must be placed under your ajaxplorer folder and you must create it and set it writeable by Apache.]" default="tmp" mandatory="true"/>
 		<param name="API_CAPABILITIES" type="string" label="CONF_MESSAGE[Api Capabilities]" description="CONF_MESSAGE[AjaXplorer plugins actions supported by remote server, thus forwarded directly instead of executed locally.]" default="" mandatory="false"/>
 	</server_settings>
@@ -27,8 +27,8 @@
 					<column messageId="3" attributeName="mimestring"/>
 					<column messageId="4" attributeName="ajxp_modiftime"/>
 				</columns>
-			</component_config>			
-		</client_configs>	
+			</component_config>
+		</client_configs>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*"/>
         <external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
@@ -44,6 +44,6 @@
 	<class_definition filename="plugins/access.remote_fs/class.remote_fsAccessDriver.php" classname="remote_fsAccessDriver"/>
 	<dependencies>
 		<pluginClass pluginName="access.fs"/>
-	</dependencies>	
+	</dependencies>
     <class_stream_wrapper filename="plugins/access.remote_fs/class.remote_fsAccessWrapper.php" classname="remote_fsAccessWrapper" protocol="ajxp.remotefs"/>
 </ajxpdriver>

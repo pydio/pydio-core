@@ -23,4 +23,3 @@ $mess=array(
 "Let user create repositories" => "Let user create workspaces",
 "Remember guest preferences" => "Remember guest preferences",
 );
-?>

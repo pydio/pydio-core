@@ -23,4 +23,3 @@ $mess=array(
 "Let user create repositories" => "Deixar utilizadores criarem Áreas de Trabalho",
 "Remember guest preferences" => "Guardar preferências dos Visitantes",
 );
-?>

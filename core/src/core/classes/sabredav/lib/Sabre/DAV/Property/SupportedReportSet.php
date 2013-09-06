@@ -14,8 +14,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class SupportedReportSet extends DAV\Property {
-
+class SupportedReportSet extends DAV\Property
+{
     /**
      * List of reports
      *
@@ -33,8 +33,8 @@ class SupportedReportSet extends DAV\Property {
      *
      * @param mixed $reports
      */
-    public function __construct($reports = null) {
-
+    public function __construct($reports = null)
+    {
         if (!is_null($reports))
             $this->addReport($reports);
 
@@ -49,11 +49,11 @@ class SupportedReportSet extends DAV\Property {
      * @param mixed $report
      * @return void
      */
-    public function addReport($report) {
-
+    public function addReport($report)
+    {
         if (!is_array($report)) $report = array($report);
 
-        foreach($report as $r) {
+        foreach ($report as $r) {
 
             if (!preg_match('/^{([^}]*)}(.*)$/',$r))
                 throw new DAV\Exception('Reportname must be in clark-notation');
@@ -69,8 +69,8 @@ class SupportedReportSet extends DAV\Property {
      *
      * @return array
      */
-    public function getValue() {
-
+    public function getValue()
+    {
         return $this->reports;
 
     }
@@ -82,9 +82,9 @@ class SupportedReportSet extends DAV\Property {
      * @param \DOMElement $prop
      * @return void
      */
-    public function serialize(DAV\Server $server, \DOMElement $prop) {
-
-        foreach($this->reports as $reportName) {
+    public function serialize(DAV\Server $server, \DOMElement $prop)
+    {
+        foreach ($this->reports as $reportName) {
 
             $supportedReport = $prop->ownerDocument->createElement('d:supported-report');
             $prop->appendChild($supportedReport);

@@ -28,4 +28,3 @@ $mess=array(
 "7" => "Activo",
 "8" => "Porta",
 );
-?>

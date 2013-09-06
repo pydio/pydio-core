@@ -22,4 +22,3 @@ $mess=array(
 "Map viewer" => "Cartes",
 "Geolocation feature to either display a WMS layer or simply place an exif-localized photo. Requires OpenLayers" => "Basé sur la librairie OpenLayers, affiche la géolocalisation d'une photo, ou un layer WMS.",
 );
-?>

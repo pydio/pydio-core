@@ -20,7 +20,7 @@
  */
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
- 
+
 $mess = array(
     "1" => "Upgrade",
     "2" => "Automatic version upgrade",

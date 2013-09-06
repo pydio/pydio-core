@@ -14,8 +14,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class CurrentUserPrivilegeSet extends DAV\Property {
-
+class CurrentUserPrivilegeSet extends DAV\Property
+{
     /**
      * List of privileges
      *
@@ -30,8 +30,8 @@ class CurrentUserPrivilegeSet extends DAV\Property {
      *
      * @param array $privileges
      */
-    public function __construct(array $privileges) {
-
+    public function __construct(array $privileges)
+    {
         $this->privileges = $privileges;
 
     }
@@ -43,10 +43,10 @@ class CurrentUserPrivilegeSet extends DAV\Property {
      * @param \DOMElement $node
      * @return void
      */
-    public function serialize(DAV\Server $server,\DOMElement $node) {
-
+    public function serialize(DAV\Server $server,\DOMElement $node)
+    {
         $doc = $node->ownerDocument;
-        foreach($this->privileges as $privName) {
+        foreach ($this->privileges as $privName) {
 
             $this->serializePriv($doc,$node,$privName);
 
@@ -62,8 +62,8 @@ class CurrentUserPrivilegeSet extends DAV\Property {
      * @param string $privName
      * @return void
      */
-    protected function serializePriv($doc,$node,$privName) {
-
+    protected function serializePriv($doc,$node,$privName)
+    {
         $xp  = $doc->createElementNS('DAV:','d:privilege');
         $node->appendChild($xp);
 

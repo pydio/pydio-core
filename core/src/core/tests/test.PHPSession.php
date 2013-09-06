@@ -28,32 +28,30 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHPSession extends AbstractTest
 {
-    function PHPSession() { parent::AbstractTest("PHP Session", "<b>Testing configs</b>"); }
-    function doTest() 
+    public function PHPSession() { parent::AbstractTest("PHP Session", "<b>Testing configs</b>"); }
+    public function doTest()
     {
         $handler = ini_get("session.save_handler");
-        if($handler != "files") {
+        if ($handler != "files") {
             $this->testedParams["Session Save Path"] = "Handler is not file based";
             return TRUE;
         }
-    	$tmpDir = session_save_path();
-    	$this->testedParams["Session Save Path"] = $tmpDir;
-    	if($tmpDir != ""){
-	    	$this->testedParams["Session Save Path Writeable"] = @is_writable($tmpDir);
-	    	if(!$this->testedParams["Session Save Path Writeable"]){
-	    		$this->failedLevel = "error";
-	    		$this->failedInfo = "The temporary folder used by PHP to save the session data is either incorrect or not writeable! Please check : ".session_save_path();
-	    		$this->failedInfo .= "<p class='suggestion'><b>Suggestion</b> : create your own temporary folder for sessions and set the session.save_path parameter in the conf/bootstrap_conf.php</p>";
-	    		return FALSE;
-	    	}    	
-    	}else{
-    		$this->failedLevel = "warning";
-    		$this->failedInfo = "Warning, it seems that your temporary folder used to save session data is not set. If you are encountering troubles with logging and sessions, please check session.save_path in your php.ini. Otherwise you can ignore this.";
-    		return FALSE;    		
-    	}
+        $tmpDir = session_save_path();
+        $this->testedParams["Session Save Path"] = $tmpDir;
+        if ($tmpDir != "") {
+            $this->testedParams["Session Save Path Writeable"] = @is_writable($tmpDir);
+            if (!$this->testedParams["Session Save Path Writeable"]) {
+                $this->failedLevel = "error";
+                $this->failedInfo = "The temporary folder used by PHP to save the session data is either incorrect or not writeable! Please check : ".session_save_path();
+                $this->failedInfo .= "<p class='suggestion'><b>Suggestion</b> : create your own temporary folder for sessions and set the session.save_path parameter in the conf/bootstrap_conf.php</p>";
+                return FALSE;
+            }
+        } else {
+            $this->failedLevel = "warning";
+            $this->failedInfo = "Warning, it seems that your temporary folder used to save session data is not set. If you are encountering troubles with logging and sessions, please check session.save_path in your php.ini. Otherwise you can ignore this.";
+            return FALSE;
+        }
         $this->failedLevel = "info";
         return FALSE;
     }
 };
-
-?>

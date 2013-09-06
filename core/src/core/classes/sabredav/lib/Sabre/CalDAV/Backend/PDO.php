@@ -16,8 +16,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class PDO extends AbstractBackend {
-
+class PDO extends AbstractBackend
+{
     /**
      * We need to specify a max date, because we need to stop *somewhere*
      *
@@ -72,8 +72,8 @@ class PDO extends AbstractBackend {
      * @param string $calendarTableName
      * @param string $calendarObjectTableName
      */
-    public function __construct(\PDO $pdo, $calendarTableName = 'calendars', $calendarObjectTableName = 'calendarobjects') {
-
+    public function __construct(\PDO $pdo, $calendarTableName = 'calendars', $calendarObjectTableName = 'calendarobjects')
+    {
         $this->pdo = $pdo;
         $this->calendarTableName = $calendarTableName;
         $this->calendarObjectTableName = $calendarObjectTableName;
@@ -97,8 +97,8 @@ class PDO extends AbstractBackend {
      * @param string $principalUri
      * @return array
      */
-    public function getCalendarsForUser($principalUri) {
-
+    public function getCalendarsForUser($principalUri)
+    {
         $fields = array_values($this->propertyMap);
         $fields[] = 'id';
         $fields[] = 'uri';
@@ -113,7 +113,7 @@ class PDO extends AbstractBackend {
         $stmt->execute(array($principalUri));
 
         $calendars = array();
-        while($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
 
             $components = array();
             if ($row['components']) {
@@ -130,7 +130,7 @@ class PDO extends AbstractBackend {
             );
 
 
-            foreach($this->propertyMap as $xmlName=>$dbName) {
+            foreach ($this->propertyMap as $xmlName=>$dbName) {
                 $calendar[$xmlName] = $row[$dbName];
             }
 
@@ -153,8 +153,8 @@ class PDO extends AbstractBackend {
      * @param array $properties
      * @return string
      */
-    public function createCalendar($principalUri, $calendarUri, array $properties) {
-
+    public function createCalendar($principalUri, $calendarUri, array $properties)
+    {
         $fieldNames = array(
             'principaluri',
             'uri',
@@ -184,7 +184,7 @@ class PDO extends AbstractBackend {
             $values[':transparent'] = $properties[$transp]->getValue()==='transparent';
         }
 
-        foreach($this->propertyMap as $xmlName=>$dbName) {
+        foreach ($this->propertyMap as $xmlName=>$dbName) {
             if (isset($properties[$xmlName])) {
 
                 $values[':' . $dbName] = $properties[$xmlName];
@@ -235,8 +235,8 @@ class PDO extends AbstractBackend {
      * @param array $mutations
      * @return bool|array
      */
-    public function updateCalendar($calendarId, array $mutations) {
-
+    public function updateCalendar($calendarId, array $mutations)
+    {
         $newValues = array();
         $result = array(
             200 => array(), // Ok
@@ -246,9 +246,9 @@ class PDO extends AbstractBackend {
 
         $hasError = false;
 
-        foreach($mutations as $propertyName=>$propertyValue) {
+        foreach ($mutations as $propertyName=>$propertyValue) {
 
-            switch($propertyName) {
+            switch ($propertyName) {
                 case '{' . CalDAV\Plugin::NS_CALDAV . '}schedule-calendar-transp' :
                     $fieldName = 'transparent';
                     $newValues[$fieldName] = $propertyValue->getValue()==='transparent';
@@ -272,12 +272,12 @@ class PDO extends AbstractBackend {
         // If there were any errors we need to fail the request
         if ($hasError) {
             // Properties has the remaining properties
-            foreach($mutations as $propertyName=>$propertyValue) {
+            foreach ($mutations as $propertyName=>$propertyValue) {
                 $result[424][$propertyName] = null;
             }
 
             // Removing unused statuscodes for cleanliness
-            foreach($result as $status=>$properties) {
+            foreach ($result as $status=>$properties) {
                 if (is_array($properties) && count($properties)===0) unset($result[$status]);
             }
 
@@ -289,7 +289,7 @@ class PDO extends AbstractBackend {
 
         // Now we're generating the sql query.
         $valuesSql = array();
-        foreach($newValues as $fieldName=>$value) {
+        foreach ($newValues as $fieldName=>$value) {
             $valuesSql[] = $fieldName . ' = ?';
         }
         $valuesSql[] = 'ctag = ctag + 1';
@@ -308,8 +308,8 @@ class PDO extends AbstractBackend {
      * @param string $calendarId
      * @return void
      */
-    public function deleteCalendar($calendarId) {
-
+    public function deleteCalendar($calendarId)
+    {
         $stmt = $this->pdo->prepare('DELETE FROM '.$this->calendarObjectTableName.' WHERE calendarid = ?');
         $stmt->execute(array($calendarId));
 
@@ -345,20 +345,20 @@ class PDO extends AbstractBackend {
      * @param string $calendarId
      * @return array
      */
-    public function getCalendarObjects($calendarId) {
-
+    public function getCalendarObjects($calendarId)
+    {
         $stmt = $this->pdo->prepare('SELECT id, uri, lastmodified, etag, calendarid, size FROM '.$this->calendarObjectTableName.' WHERE calendarid = ?');
         $stmt->execute(array($calendarId));
 
         $result = array();
-        foreach($stmt->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+        foreach ($stmt->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             $result[] = array(
                 'id'           => $row['id'],
                 'uri'          => $row['uri'],
                 'lastmodified' => $row['lastmodified'],
                 'etag'         => '"' . $row['etag'] . '"',
                 'calendarid'   => $row['calendarid'],
-                'size'         => (int)$row['size'],
+                'size'         => (int) $row['size'],
             );
         }
 
@@ -378,8 +378,8 @@ class PDO extends AbstractBackend {
      * @param string $objectUri
      * @return array
      */
-    public function getCalendarObject($calendarId,$objectUri) {
-
+    public function getCalendarObject($calendarId,$objectUri)
+    {
         $stmt = $this->pdo->prepare('SELECT id, uri, lastmodified, etag, calendarid, size, calendardata FROM '.$this->calendarObjectTableName.' WHERE calendarid = ? AND uri = ?');
         $stmt->execute(array($calendarId, $objectUri));
         $row = $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -392,7 +392,7 @@ class PDO extends AbstractBackend {
             'lastmodified' => $row['lastmodified'],
             'etag'         => '"' . $row['etag'] . '"',
             'calendarid'   => $row['calendarid'],
-            'size'         => (int)$row['size'],
+            'size'         => (int) $row['size'],
             'calendardata' => $row['calendardata'],
          );
 
@@ -415,8 +415,8 @@ class PDO extends AbstractBackend {
      * @param string $calendarData
      * @return string|null
      */
-    public function createCalendarObject($calendarId,$objectUri,$calendarData) {
-
+    public function createCalendarObject($calendarId,$objectUri,$calendarData)
+    {
         $extraData = $this->getDenormalizedData($calendarData);
 
         $stmt = $this->pdo->prepare('INSERT INTO '.$this->calendarObjectTableName.' (calendarid, uri, calendardata, lastmodified, etag, size, componenttype, firstoccurence, lastoccurence) VALUES (?,?,?,?,?,?,?,?,?)');
@@ -454,8 +454,8 @@ class PDO extends AbstractBackend {
      * @param string $calendarData
      * @return string|null
      */
-    public function updateCalendarObject($calendarId,$objectUri,$calendarData) {
-
+    public function updateCalendarObject($calendarId,$objectUri,$calendarData)
+    {
         $extraData = $this->getDenormalizedData($calendarData);
 
         $stmt = $this->pdo->prepare('UPDATE '.$this->calendarObjectTableName.' SET calendardata = ?, lastmodified = ?, etag = ?, size = ?, componenttype = ?, firstoccurence = ?, lastoccurence = ? WHERE calendarid = ? AND uri = ?');
@@ -481,14 +481,14 @@ class PDO extends AbstractBackend {
      * @param string $calendarData
      * @return array
      */
-    protected function getDenormalizedData($calendarData) {
-
+    protected function getDenormalizedData($calendarData)
+    {
         $vObject = VObject\Reader::read($calendarData);
         $componentType = null;
         $component = null;
         $firstOccurence = null;
         $lastOccurence = null;
-        foreach($vObject->getComponents() as $component) {
+        foreach ($vObject->getComponents() as $component) {
             if ($component->name!=='VTIMEZONE') {
                 $componentType = $component->name;
                 break;
@@ -515,13 +515,13 @@ class PDO extends AbstractBackend {
                     $lastOccurence = $firstOccurence;
                 }
             } else {
-                $it = new VObject\RecurrenceIterator($vObject, (string)$component->UID);
+                $it = new VObject\RecurrenceIterator($vObject, (string) $component->UID);
                 $maxDate = new \DateTime(self::MAX_DATE);
                 if ($it->isInfinite()) {
                     $lastOccurence = $maxDate->getTimeStamp();
                 } else {
                     $end = $it->getDtEnd();
-                    while($it->valid() && $end < $maxDate) {
+                    while ($it->valid() && $end < $maxDate) {
                         $end = $it->getDtEnd();
                         $it->next();
 
@@ -549,8 +549,8 @@ class PDO extends AbstractBackend {
      * @param string $objectUri
      * @return void
      */
-    public function deleteCalendarObject($calendarId,$objectUri) {
-
+    public function deleteCalendarObject($calendarId,$objectUri)
+    {
         $stmt = $this->pdo->prepare('DELETE FROM '.$this->calendarObjectTableName.' WHERE calendarid = ? AND uri = ?');
         $stmt->execute(array($calendarId,$objectUri));
         $stmt = $this->pdo->prepare('UPDATE '. $this->calendarTableName .' SET ctag = ctag + 1 WHERE id = ?');
@@ -610,8 +610,8 @@ class PDO extends AbstractBackend {
      * @param array $filters
      * @return array
      */
-    public function calendarQuery($calendarId, array $filters) {
-
+    public function calendarQuery($calendarId, array $filters)
+    {
         $result = array();
         $validator = new \Sabre\CalDAV\CalendarQueryValidator();
 
@@ -673,7 +673,7 @@ class PDO extends AbstractBackend {
         $stmt->execute($values);
 
         $result = array();
-        while($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             if ($requirePostFilter) {
                 if (!$this->validateFilterForObject($row, $filters)) {
                     continue;

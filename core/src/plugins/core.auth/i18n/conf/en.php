@@ -25,4 +25,3 @@ $mess=array(
 "Password length" => "Password length",
 "Store Credentials in Session" => "Store Credentials in Session",
 );
-?>

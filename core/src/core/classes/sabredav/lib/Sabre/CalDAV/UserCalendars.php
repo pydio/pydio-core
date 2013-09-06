@@ -12,8 +12,8 @@ use Sabre\DAVACL;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class UserCalendars implements DAV\IExtendedCollection, DAVACL\IACL {
-
+class UserCalendars implements DAV\IExtendedCollection, DAVACL\IACL
+{
     /**
      * CalDAV backend
      *
@@ -34,8 +34,8 @@ class UserCalendars implements DAV\IExtendedCollection, DAVACL\IACL {
      * @param Backend\BackendInterface $caldavBackend
      * @param mixed $userUri
      */
-    public function __construct(Backend\BackendInterface $caldavBackend, $principalInfo) {
-
+    public function __construct(Backend\BackendInterface $caldavBackend, $principalInfo)
+    {
         $this->caldavBackend = $caldavBackend;
         $this->principalInfo = $principalInfo;
 
@@ -46,8 +46,8 @@ class UserCalendars implements DAV\IExtendedCollection, DAVACL\IACL {
      *
      * @return string
      */
-    public function getName() {
-
+    public function getName()
+    {
         list(,$name) = DAV\URLUtil::splitPath($this->principalInfo['uri']);
         return $name;
 
@@ -59,8 +59,8 @@ class UserCalendars implements DAV\IExtendedCollection, DAVACL\IACL {
      * @param string $name
      * @return void
      */
-    public function setName($name) {
-
+    public function setName($name)
+    {
         throw new DAV\Exception\Forbidden();
 
     }
@@ -70,8 +70,8 @@ class UserCalendars implements DAV\IExtendedCollection, DAVACL\IACL {
      *
      * @return void
      */
-    public function delete() {
-
+    public function delete()
+    {
         throw new DAV\Exception\Forbidden();
 
     }
@@ -81,8 +81,8 @@ class UserCalendars implements DAV\IExtendedCollection, DAVACL\IACL {
      *
      * @return int
      */
-    public function getLastModified() {
-
+    public function getLastModified()
+    {
         return null;
 
     }
@@ -96,8 +96,8 @@ class UserCalendars implements DAV\IExtendedCollection, DAVACL\IACL {
      * @param resource $data
      * @return void
      */
-    public function createFile($filename, $data=null) {
-
+    public function createFile($filename, $data=null)
+    {
         throw new DAV\Exception\MethodNotAllowed('Creating new files in this collection is not supported');
 
     }
@@ -110,8 +110,8 @@ class UserCalendars implements DAV\IExtendedCollection, DAVACL\IACL {
      * @param string $filename
      * @return void
      */
-    public function createDirectory($filename) {
-
+    public function createDirectory($filename)
+    {
         throw new DAV\Exception\MethodNotAllowed('Creating new collections in this collection is not supported');
 
     }
@@ -123,9 +123,9 @@ class UserCalendars implements DAV\IExtendedCollection, DAVACL\IACL {
      * @todo needs optimizing
      * @return Calendar
      */
-    public function getChild($name) {
-
-        foreach($this->getChildren() as $child) {
+    public function getChild($name)
+    {
+        foreach ($this->getChildren() as $child) {
             if ($name==$child->getName())
                 return $child;
 
@@ -141,9 +141,9 @@ class UserCalendars implements DAV\IExtendedCollection, DAVACL\IACL {
      * @todo needs optimizing
      * @return bool
      */
-    public function childExists($name) {
-
-        foreach($this->getChildren() as $child) {
+    public function childExists($name)
+    {
+        foreach ($this->getChildren() as $child) {
             if ($name==$child->getName())
                 return true;
 
@@ -157,11 +157,11 @@ class UserCalendars implements DAV\IExtendedCollection, DAVACL\IACL {
      *
      * @return array
      */
-    public function getChildren() {
-
+    public function getChildren()
+    {
         $calendars = $this->caldavBackend->getCalendarsForUser($this->principalInfo['uri']);
         $objs = array();
-        foreach($calendars as $calendar) {
+        foreach ($calendars as $calendar) {
             if ($this->caldavBackend instanceof Backend\SharingSupport) {
                 if (isset($calendar['{http://calendarserver.org/ns/}shared-url'])) {
                     $objs[] = new SharedCalendar($this->caldavBackend, $calendar);
@@ -190,10 +190,10 @@ class UserCalendars implements DAV\IExtendedCollection, DAVACL\IACL {
      * @param array $properties
      * @return void
      */
-    public function createExtendedCollection($name, array $resourceType, array $properties) {
-
+    public function createExtendedCollection($name, array $resourceType, array $properties)
+    {
         $isCalendar = false;
-        foreach($resourceType as $rt) {
+        foreach ($resourceType as $rt) {
             switch ($rt) {
                 case '{DAV:}collection' :
                 case '{http://calendarserver.org/ns/}shared-owner' :
@@ -220,8 +220,8 @@ class UserCalendars implements DAV\IExtendedCollection, DAVACL\IACL {
      *
      * @return string|null
      */
-    public function getOwner() {
-
+    public function getOwner()
+    {
         return $this->principalInfo['uri'];
 
     }
@@ -233,8 +233,8 @@ class UserCalendars implements DAV\IExtendedCollection, DAVACL\IACL {
      *
      * @return string|null
      */
-    public function getGroup() {
-
+    public function getGroup()
+    {
         return null;
 
     }
@@ -251,8 +251,8 @@ class UserCalendars implements DAV\IExtendedCollection, DAVACL\IACL {
      *
      * @return array
      */
-    public function getACL() {
-
+    public function getACL()
+    {
         return array(
             array(
                 'privilege' => '{DAV:}read',
@@ -292,8 +292,8 @@ class UserCalendars implements DAV\IExtendedCollection, DAVACL\IACL {
      * @param array $acl
      * @return void
      */
-    public function setACL(array $acl) {
-
+    public function setACL(array $acl)
+    {
         throw new DAV\Exception\MethodNotAllowed('Changing ACL is not yet supported');
 
     }
@@ -310,8 +310,8 @@ class UserCalendars implements DAV\IExtendedCollection, DAVACL\IACL {
      *
      * @return array|null
      */
-    public function getSupportedPrivilegeSet() {
-
+    public function getSupportedPrivilegeSet()
+    {
         return null;
 
     }
@@ -329,8 +329,8 @@ class UserCalendars implements DAV\IExtendedCollection, DAVACL\IACL {
      * @param string $summary A description of the reply
      * @return null|string
      */
-    public function shareReply($href, $status, $calendarUri, $inReplyTo, $summary = null) {
-
+    public function shareReply($href, $status, $calendarUri, $inReplyTo, $summary = null)
+    {
         if (!$this->caldavBackend instanceof Backend\SharingSupport) {
             throw new DAV\Exception\NotImplemented('Sharing support is not implemented by this backend.');
         }

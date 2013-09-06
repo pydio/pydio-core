@@ -26,10 +26,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Editor
  */
-class FileMimeSender extends AJXP_Plugin {
-    
-    public function switchAction($action, $httpVars, $filesVars) {
-
+class FileMimeSender extends AJXP_Plugin
+{
+    public function switchAction($action, $httpVars, $filesVars)
+    {
         if(!isSet($this->actions[$action]))
             return false;
 
@@ -37,39 +37,39 @@ class FileMimeSender extends AJXP_Plugin {
 
         if(!$repository->detectStreamWrapper(true))
             return false;
-        
-        if(AuthService::usersEnabled()){
+
+        if (AuthService::usersEnabled()) {
             $loggedUser = AuthService::getLoggedUser();
-            if($loggedUser === null && ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")){
+            if ($loggedUser === null && ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) {
                 AuthService::logUser("guest", null);
                 $loggedUser = AuthService::getLoggedUser();
             }
-            if(!$loggedUser->canSwitchTo($repository->getId())){
+            if (!$loggedUser->canSwitchTo($repository->getId())) {
                 echo("You do not have permissions to access this resource");
                 return false;
             }
         }
-        
+
         $streamData = $repository->streamData;
         $destStreamURL = $streamData["protocol"] . "://" . $repository->getId();
-        
-        if($action == "open_file") {
+
+        if ($action == "open_file") {
             $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-            if(!file_exists($destStreamURL . $file)){
+            if (!file_exists($destStreamURL . $file)) {
                 echo("File does not exist");
                 return false;
             }
 
             $filesize = filesize($destStreamURL . $file);
             $fp = fopen($destStreamURL . $file, "rb");
-            
+
             //Get mimetype with fileinfo PECL extension
-            if(class_exists("finfo")) {
+            if (class_exists("finfo")) {
                 $finfo = new finfo(FILEINFO_MIME);
                 $fileMime = $finfo->buffer(fread($fp, 100));
             }
             //Get mimetype with (deprecated) mime_content_type
-            elseif(function_exists("mime_content_type")) {
+            elseif (function_exists("mime_content_type")) {
                 $fileMime = @mime_content_type($fp);
             }
             //Guess mimetype based on file extension
@@ -80,7 +80,7 @@ class FileMimeSender extends AJXP_Plugin {
                 else {
                     $regex = "/^([\w\+\-\.\/]+)\s+(\w+\s)*($fileExt\s)/i";
                     $lines = file( $this->getBaseDir()."/resources/other/mime.types");
-                    foreach($lines as $line) {
+                    foreach ($lines as $line) {
                         if(substr($line, 0, 1) == '#')
                             continue; // skip comments
                         $line = rtrim($line) . " ";
@@ -94,7 +94,7 @@ class FileMimeSender extends AJXP_Plugin {
             // If still no mimetype, give up and serve application/octet-stream
             if(empty($fileMime))
                 $fileMime = "application/octet-stream";
-                
+
             //Send headers
             HTMLWriter::generateInlineHeaders(basename($file), $filesize, $fileMime);
 
@@ -110,5 +110,3 @@ class FileMimeSender extends AJXP_Plugin {
         }
     }
 }
-
-?>

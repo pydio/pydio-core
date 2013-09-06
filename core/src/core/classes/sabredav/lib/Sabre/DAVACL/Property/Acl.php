@@ -11,8 +11,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Acl extends DAV\Property {
-
+class Acl extends DAV\Property
+{
     /**
      * List of privileges
      *
@@ -45,8 +45,8 @@ class Acl extends DAV\Property {
      * @param bool $prefixBaseUrl
      * @param array $privileges
      */
-    public function __construct(array $privileges, $prefixBaseUrl = true) {
-
+    public function __construct(array $privileges, $prefixBaseUrl = true)
+    {
         $this->privileges = $privileges;
         $this->prefixBaseUrl = $prefixBaseUrl;
 
@@ -57,8 +57,8 @@ class Acl extends DAV\Property {
      *
      * @return array
      */
-    public function getPrivileges() {
-
+    public function getPrivileges()
+    {
         return $this->privileges;
 
     }
@@ -70,10 +70,10 @@ class Acl extends DAV\Property {
      * @param \DOMElement $node
      * @return void
      */
-    public function serialize(DAV\Server $server,\DOMElement $node) {
-
+    public function serialize(DAV\Server $server,\DOMElement $node)
+    {
         $doc = $node->ownerDocument;
-        foreach($this->privileges as $ace) {
+        foreach ($this->privileges as $ace) {
 
             $this->serializeAce($doc, $node, $ace, $server);
 
@@ -87,11 +87,11 @@ class Acl extends DAV\Property {
      * @param \DOMElement $dom
      * @return Acl
      */
-    static public function unserialize(\DOMElement $dom) {
-
+    public static function unserialize(\DOMElement $dom)
+    {
         $privileges = array();
         $xaces = $dom->getElementsByTagNameNS('urn:DAV','ace');
-        for($ii=0; $ii < $xaces->length; $ii++) {
+        for ($ii=0; $ii < $xaces->length; $ii++) {
 
             $xace = $xaces->item($ii);
             $principal = $xace->getElementsByTagNameNS('urn:DAV','principal');
@@ -100,7 +100,7 @@ class Acl extends DAV\Property {
             }
             $principal = Principal::unserialize($principal->item(0));
 
-            switch($principal->getType()) {
+            switch ($principal->getType()) {
                 case Principal::HREF :
                     $principal = $principal->getHref();
                     break;
@@ -129,7 +129,7 @@ class Acl extends DAV\Property {
             $grant = $grants->item(0);
 
             $xprivs = $grant->getElementsByTagNameNS('urn:DAV','privilege');
-            for($jj=0; $jj<$xprivs->length; $jj++) {
+            for ($jj=0; $jj<$xprivs->length; $jj++) {
 
                 $xpriv = $xprivs->item($jj);
 
@@ -170,14 +170,14 @@ class Acl extends DAV\Property {
      * @param DAV\Server $server
      * @return void
      */
-    private function serializeAce($doc,$node,$ace, DAV\Server $server) {
-
+    private function serializeAce($doc,$node,$ace, DAV\Server $server)
+    {
         $xace  = $doc->createElementNS('DAV:','d:ace');
         $node->appendChild($xace);
 
         $principal = $doc->createElementNS('DAV:','d:principal');
         $xace->appendChild($principal);
-        switch($ace['principal']) {
+        switch ($ace['principal']) {
             case '{DAV:}authenticated' :
                 $principal->appendChild($doc->createElementNS('DAV:','d:authenticated'));
                 break;

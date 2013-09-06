@@ -30,4 +30,3 @@ $mess=array(
 "Columns visibility" => "Visibilidade das Colunas",
 "Set default visibility for each columns. Either by columns, using commas, or one value that will be applied to all columns. Value can be 'visible' or 'hidden'." => "Define a visibilidade de cada uma das colunas. Será aplicado a todas as colunas usando colunas, virgulas, ou um valor. O valor pode ser 'Visivel(Visible)' ou 'Escondido(hidden)'.",
 );
-?>

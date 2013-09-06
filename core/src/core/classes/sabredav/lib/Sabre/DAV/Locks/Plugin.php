@@ -18,8 +18,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Plugin extends DAV\ServerPlugin {
-
+class Plugin extends DAV\ServerPlugin
+{
     /**
      * locksBackend
      *
@@ -39,8 +39,8 @@ class Plugin extends DAV\ServerPlugin {
      *
      * @param Backend\BackendInterface $locksBackend
      */
-    public function __construct(Backend\BackendInterface $locksBackend = null) {
-
+    public function __construct(Backend\BackendInterface $locksBackend = null)
+    {
         $this->locksBackend = $locksBackend;
 
     }
@@ -53,8 +53,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param DAV\Server $server
      * @return void
      */
-    public function initialize(DAV\Server $server) {
-
+    public function initialize(DAV\Server $server)
+    {
         $this->server = $server;
         $server->subscribeEvent('unknownMethod',array($this,'unknownMethod'));
         $server->subscribeEvent('beforeMethod',array($this,'beforeMethod'),50);
@@ -70,8 +70,8 @@ class Plugin extends DAV\ServerPlugin {
      *
      * @return string
      */
-    public function getPluginName() {
-
+    public function getPluginName()
+    {
         return 'locks';
 
     }
@@ -86,9 +86,9 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $uri
      * @return bool
      */
-    public function unknownMethod($method, $uri) {
-
-        switch($method) {
+    public function unknownMethod($method, $uri)
+    {
+        switch ($method) {
 
             case 'LOCK'   : $this->httpLock($uri); return false;
             case 'UNLOCK' : $this->httpUnlock($uri); return false;
@@ -105,11 +105,11 @@ class Plugin extends DAV\ServerPlugin {
      * @param array $newProperties
      * @return bool
      */
-    public function afterGetProperties($path, &$newProperties) {
+    public function afterGetProperties($path, &$newProperties)
+    {
+        foreach ($newProperties[404] as $propName=>$discard) {
 
-        foreach($newProperties[404] as $propName=>$discard) {
-
-            switch($propName) {
+            switch ($propName) {
 
                 case '{DAV:}supportedlock' :
                     $val = false;
@@ -142,9 +142,9 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $uri
      * @return bool
      */
-    public function beforeMethod($method, $uri) {
-
-        switch($method) {
+    public function beforeMethod($method, $uri)
+    {
+        switch ($method) {
 
             case 'DELETE' :
                 $lastLock = null;
@@ -190,8 +190,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $uri
      * @return array
      */
-    public function getHTTPMethods($uri) {
-
+    public function getHTTPMethods($uri)
+    {
         if ($this->locksBackend)
             return array('LOCK','UNLOCK');
 
@@ -207,8 +207,8 @@ class Plugin extends DAV\ServerPlugin {
      *
      * @return array
      */
-    public function getFeatures() {
-
+    public function getFeatures()
+    {
         return array(2);
 
     }
@@ -226,8 +226,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param bool $returnChildLocks
      * @return array
      */
-    public function getLocks($uri, $returnChildLocks = false) {
-
+    public function getLocks($uri, $returnChildLocks = false)
+    {
         $lockList = array();
 
         if ($this->locksBackend)
@@ -251,8 +251,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $uri
      * @return void
      */
-    protected function httpLock($uri) {
-
+    protected function httpLock($uri)
+    {
         $lastLock = null;
         if (!$this->validateLock($uri,$lastLock)) {
 
@@ -326,8 +326,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $uri
      * @return void
      */
-    protected function httpUnlock($uri) {
-
+    protected function httpUnlock($uri)
+    {
         $lockToken = $this->server->httpRequest->getHeader('Lock-Token');
 
         // If the locktoken header is not supplied, we need to throw a bad request exception
@@ -339,7 +339,7 @@ class Plugin extends DAV\ServerPlugin {
         // header
         if ($lockToken[0]!=='<') $lockToken = '<' . $lockToken . '>';
 
-        foreach($locks as $lock) {
+        foreach ($locks as $lock) {
 
             if ('<opaquelocktoken:' . $lock->token . '>' == $lockToken) {
 
@@ -367,8 +367,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param LockInfo $lockInfo
      * @return bool
      */
-    public function lockNode($uri,LockInfo $lockInfo) {
-
+    public function lockNode($uri,LockInfo $lockInfo)
+    {
         if (!$this->server->broadcastEvent('beforeLock',array($uri,$lockInfo))) return;
 
         if ($this->locksBackend) return $this->locksBackend->lock($uri,$lockInfo);
@@ -385,8 +385,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param LockInfo $lockInfo
      * @return bool
      */
-    public function unlockNode($uri, LockInfo $lockInfo) {
-
+    public function unlockNode($uri, LockInfo $lockInfo)
+    {
         if (!$this->server->broadcastEvent('beforeUnlock',array($uri,$lockInfo))) return;
         if ($this->locksBackend) return $this->locksBackend->unlock($uri,$lockInfo);
 
@@ -400,13 +400,13 @@ class Plugin extends DAV\ServerPlugin {
      *
      * @return int
      */
-    public function getTimeoutHeader() {
-
+    public function getTimeoutHeader()
+    {
         $header = $this->server->httpRequest->getHeader('Timeout');
 
         if ($header) {
 
-            if (stripos($header,'second-')===0) $header = (int)(substr($header,7));
+            if (stripos($header,'second-')===0) $header = (int) (substr($header,7));
             else if (strtolower($header)=='infinite') $header = LockInfo::TIMEOUT_INFINITE;
             else throw new DAV\Exception\BadRequest('Invalid HTTP timeout header');
 
@@ -426,8 +426,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param LockInfo $lockInfo
      * @return string
      */
-    protected function generateLockResponse(LockInfo $lockInfo) {
-
+    protected function generateLockResponse(LockInfo $lockInfo)
+    {
         $dom = new \DOMDocument('1.0','utf-8');
         $dom->formatOutput = true;
 
@@ -453,8 +453,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param bool $checkChildLocks If set to true, this function will also look for any locks set on child resources of the supplied urls. This is needed for for example deletion of entire trees.
      * @return bool
      */
-    protected function validateLock($urls = null,&$lastLock = null, $checkChildLocks = false) {
-
+    protected function validateLock($urls = null,&$lastLock = null, $checkChildLocks = false)
+    {
         if (is_null($urls)) {
             $urls = array($this->server->getRequestUri());
         } elseif (is_string($urls)) {
@@ -466,7 +466,7 @@ class Plugin extends DAV\ServerPlugin {
         $conditions = $this->getIfConditions();
 
         // We're going to loop through the urls and make sure all lock conditions are satisfied
-        foreach($urls as $url) {
+        foreach ($urls as $url) {
 
             $locks = $this->getLocks($url, $checkChildLocks);
 
@@ -480,7 +480,7 @@ class Plugin extends DAV\ServerPlugin {
             // If there were no locks or conditions, we go to the next url
             if (!$locks && !$conditions) continue;
 
-            foreach($conditions as $condition) {
+            foreach ($conditions as $condition) {
 
                 if (!$condition['uri']) {
                     $conditionUri = $this->server->getRequestUri();
@@ -493,7 +493,7 @@ class Plugin extends DAV\ServerPlugin {
 
                 // The tokens array contians arrays with 2 elements. 0=true/false for normal/not condition, 1=locktoken
                 // At least 1 condition has to be satisfied
-                foreach($condition['tokens'] as $conditionToken) {
+                foreach ($condition['tokens'] as $conditionToken) {
 
                     $etagValid = true;
                     $lockValid  = true;
@@ -512,7 +512,7 @@ class Plugin extends DAV\ServerPlugin {
 
                         $lockValid = false;
                         // Match all the locks
-                        foreach($locks as $lockIndex=>$lock) {
+                        foreach ($locks as $lockIndex=>$lock) {
 
                             $lockToken = 'opaquelocktoken:' . $lock->token;
 
@@ -577,8 +577,8 @@ class Plugin extends DAV\ServerPlugin {
      *
      * @return array
      */
-    public function getIfConditions() {
-
+    public function getIfConditions()
+    {
         $header = $this->server->httpRequest->getHeader('If');
         if (!$header) return array();
 
@@ -589,7 +589,7 @@ class Plugin extends DAV\ServerPlugin {
 
         $conditions = array();
 
-        foreach($matches as $match) {
+        foreach ($matches as $match) {
 
             $condition = array(
                 'uri'   => $match['uri'],
@@ -619,8 +619,8 @@ class Plugin extends DAV\ServerPlugin {
      * @param string $body
      * @return DAV\Locks\LockInfo
      */
-    protected function parseLockRequest($body) {
-
+    protected function parseLockRequest($body)
+    {
         $xml = simplexml_load_string(
             DAV\XMLUtil::convertDAVNamespace($body),
             null,
@@ -629,7 +629,7 @@ class Plugin extends DAV\ServerPlugin {
         $lockInfo = new LockInfo();
 
         $children = $xml->children("urn:DAV");
-        $lockInfo->owner = (string)$children->owner;
+        $lockInfo->owner = (string) $children->owner;
 
         $lockInfo->token = DAV\UUIDUtil::getUUID();
         $lockInfo->scope = count($xml->xpath('d:lockscope/d:exclusive'))>0 ? LockInfo::EXCLUSIVE : LockInfo::SHARED;

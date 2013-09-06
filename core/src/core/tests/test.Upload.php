@@ -28,46 +28,44 @@ require_once('../classes/class.AbstractTest.php');
  */
 class Upload extends AbstractTest
 {
-    function Upload() { parent::AbstractTest("Upload particularities", "<b>Testing configs</b>"); }
-    function doTest() 
-    {     	
-    	$tmpDir = ini_get("upload_tmp_dir");
-    	if (!$tmpDir) $tmpDir = realpath(sys_get_temp_dir());
-        if(ConfService::getCoreConf("AJXP_TMP_DIR") != ""){
+    public function Upload() { parent::AbstractTest("Upload particularities", "<b>Testing configs</b>"); }
+    public function doTest()
+    {
+        $tmpDir = ini_get("upload_tmp_dir");
+        if (!$tmpDir) $tmpDir = realpath(sys_get_temp_dir());
+        if (ConfService::getCoreConf("AJXP_TMP_DIR") != "") {
             $tmpDir = ConfService::getCoreConf("AJXP_TMP_DIR");
         }
-    	if(defined("AJXP_TMP_DIR") && AJXP_TMP_DIR !=""){
-    		$tmpDir = AJXP_TMP_DIR;
-    	}
-    	$this->testedParams["Upload Tmp Dir Writeable"] = @is_writable($tmpDir);
-    	$this->testedParams["PHP Upload Max Size"] = $this->returnBytes(ini_get("upload_max_filesize"));
-    	$this->testedParams["PHP Post Max Size"] = $this->returnBytes(ini_get("post_max_size"));
-    	//$this->testedParams["AJXP Upload Max Size"] = $this->returnBytes($upload_max_size_per_file);
-    	foreach ($this->testedParams as $paramName => $paramValue){
-    		$this->failedInfo .= "\n$paramName=$paramValue";
-    	}
-    	if(!$this->testedParams["Upload Tmp Dir Writeable"]){
-    		$this->failedLevel = "error";
-    		$this->failedInfo = "The temporary folder used by PHP to upload files is either incorrect or not writeable! Upload will not work. Please check : ".ini_get("upload_tmp_dir");
+        if (defined("AJXP_TMP_DIR") && AJXP_TMP_DIR !="") {
+            $tmpDir = AJXP_TMP_DIR;
+        }
+        $this->testedParams["Upload Tmp Dir Writeable"] = @is_writable($tmpDir);
+        $this->testedParams["PHP Upload Max Size"] = $this->returnBytes(ini_get("upload_max_filesize"));
+        $this->testedParams["PHP Post Max Size"] = $this->returnBytes(ini_get("post_max_size"));
+        //$this->testedParams["AJXP Upload Max Size"] = $this->returnBytes($upload_max_size_per_file);
+        foreach ($this->testedParams as $paramName => $paramValue) {
+            $this->failedInfo .= "\n$paramName=$paramValue";
+        }
+        if (!$this->testedParams["Upload Tmp Dir Writeable"]) {
+            $this->failedLevel = "error";
+            $this->failedInfo = "The temporary folder used by PHP to upload files is either incorrect or not writeable! Upload will not work. Please check : ".ini_get("upload_tmp_dir");
             $this->failedInfo .= "<p class='suggestion'><b>Suggestion</b> : Set the AJXP_TMP_DIR parameter in the <i>conf/bootstrap_conf.php</i> file</p>";
-    		return FALSE;
-    	}
+            return FALSE;
+        }
         /*
-    	if($this->testedParams["AJXP Upload Max Size"] > $this->testedParams["PHP Upload Max Size"]){
-    		$this->failedLevel = "warning";
-    		$this->failedInfo .= "\nAjaxplorer cannot override the PHP setting! Unless you edit your php.ini, your upload will be limited to ".ini_get("upload_max_filesize")." per file.";
-    		return FALSE;
-    	}
-    	if($this->testedParams["AJXP Upload Max Size"] > $this->testedParams["PHP Post Max Size"]){
-    		$this->failedLevel = "warning";
-    		$this->failedInfo .= "\nAjaxplorer cannot override the PHP setting! Unless you edit your php.ini, your upload will be limited to ".ini_get("post_max_size")." per file.";
-    		return FALSE;
-    	}
+        if ($this->testedParams["AJXP Upload Max Size"] > $this->testedParams["PHP Upload Max Size"]) {
+            $this->failedLevel = "warning";
+            $this->failedInfo .= "\nAjaxplorer cannot override the PHP setting! Unless you edit your php.ini, your upload will be limited to ".ini_get("upload_max_filesize")." per file.";
+            return FALSE;
+        }
+        if ($this->testedParams["AJXP Upload Max Size"] > $this->testedParams["PHP Post Max Size"]) {
+            $this->failedLevel = "warning";
+            $this->failedInfo .= "\nAjaxplorer cannot override the PHP setting! Unless you edit your php.ini, your upload will be limited to ".ini_get("post_max_size")." per file.";
+            return FALSE;
+        }
         */
-        
+
         $this->failedLevel = "info";
         return FALSE;
     }
 };
-
-?>

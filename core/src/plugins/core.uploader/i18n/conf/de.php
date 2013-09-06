@@ -27,4 +27,3 @@ $mess=array(
 "File Size" => "Dateigröße",
 "Cumul. Size" => "Gesamtgröße",
 );
-?>

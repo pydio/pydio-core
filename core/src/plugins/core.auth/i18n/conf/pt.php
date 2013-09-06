@@ -25,4 +25,3 @@ $mess=array(
 "Password length" => "Tamanho da Palavra-Chave",
 "Store Credentials in Session" => "Guardar credenciais na Sessão",
 );
-?>

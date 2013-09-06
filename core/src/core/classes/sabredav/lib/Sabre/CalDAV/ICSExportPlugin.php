@@ -16,8 +16,8 @@ use Sabre\VObject;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class ICSExportPlugin extends DAV\ServerPlugin {
-
+class ICSExportPlugin extends DAV\ServerPlugin
+{
     /**
      * Reference to Server class
      *
@@ -31,8 +31,8 @@ class ICSExportPlugin extends DAV\ServerPlugin {
      * @param \Sabre\DAV\Server $server
      * @return void
      */
-    public function initialize(DAV\Server $server) {
-
+    public function initialize(DAV\Server $server)
+    {
         $this->server = $server;
         $this->server->subscribeEvent('beforeMethod',array($this,'beforeMethod'), 90);
 
@@ -46,8 +46,8 @@ class ICSExportPlugin extends DAV\ServerPlugin {
      * @param string $uri
      * @return bool
      */
-    public function beforeMethod($method, $uri) {
-
+    public function beforeMethod($method, $uri)
+    {
         if ($method!='GET') return;
         if ($this->server->httpRequest->getQueryString()!='export') return;
 
@@ -83,8 +83,8 @@ class ICSExportPlugin extends DAV\ServerPlugin {
      * @param array $nodes
      * @return string
      */
-    public function generateICS(array $nodes) {
-
+    public function generateICS(array $nodes)
+    {
         $calendar = new VObject\Component('vcalendar');
         $calendar->version = '2.0';
         if (DAV\Server::$exposeVersion) {
@@ -99,7 +99,7 @@ class ICSExportPlugin extends DAV\ServerPlugin {
         $timezones = array();
         $objects = array();
 
-        foreach($nodes as $node) {
+        foreach ($nodes as $node) {
 
             if (!isset($node[200]['{' . Plugin::NS_CALDAV . '}calendar-data'])) {
                 continue;
@@ -108,9 +108,9 @@ class ICSExportPlugin extends DAV\ServerPlugin {
 
             $nodeComp = VObject\Reader::read($nodeData);
 
-            foreach($nodeComp->children() as $child) {
+            foreach ($nodeComp->children() as $child) {
 
-                switch($child->name) {
+                switch ($child->name) {
                     case 'VEVENT' :
                     case 'VTODO' :
                     case 'VJOURNAL' :
@@ -120,7 +120,7 @@ class ICSExportPlugin extends DAV\ServerPlugin {
                     // VTIMEZONE is special, because we need to filter out the duplicates
                     case 'VTIMEZONE' :
                         // Naively just checking tzid.
-                        if (in_array((string)$child->TZID, $collectedTimezones)) continue;
+                        if (in_array((string) $child->TZID, $collectedTimezones)) continue;
 
                         $timezones[] = $child;
                         $collectedTimezones[] = $child->TZID;

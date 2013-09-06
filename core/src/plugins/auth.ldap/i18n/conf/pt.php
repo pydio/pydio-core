@@ -36,4 +36,3 @@ $mess=array(
 "User attribute" => "Atributo de Utilizador",
 "Username attribute" => "Atributo de Login",
 );
-?>

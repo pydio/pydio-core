@@ -24,4 +24,3 @@ $mess=array(
 "Users" => "Utilisateurs",
 "The users list" => "Liste des utilisateurs.",
 );
-?>

@@ -26,4 +26,3 @@ $mess=array(
 "1" => "Helitugevus",
 "2" => "Helimängija",
 );
-?>

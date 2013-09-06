@@ -26,14 +26,15 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Shorten
  */
-class BitlyShortener extends AJXP_Plugin {
-			
-	public function postProcess($action, $httpVars, $params){
+class BitlyShortener extends AJXP_Plugin
+{
+    public function postProcess($action, $httpVars, $params)
+    {
         $url = $params["ob_output"];
         $BITLY_USER = $this->getFilteredOption("BITLY_USER");
         $BITLY_APIKEY = $this->getFilteredOption("BITLY_APIKEY");
 
-        if(empty($BITLY_USER) || empty($BITLY_APIKEY)){
+        if (empty($BITLY_USER) || empty($BITLY_APIKEY)) {
             print($url);
             AJXP_Logger::logAction("error", "Bitly Shortener : you must drop the conf.shorten.bitly.inc file inside conf.php and set the login/api key!");
             return;
@@ -45,20 +46,21 @@ class BitlyShortener extends AJXP_Plugin {
         $bitly = 'http://api.bit.ly/shorten?version='.$version.'&longUrl='.urlencode($url).'&login='.$bitly_login.'&apiKey='.$bitly_api.'&format='.$format;
         $response = AJXP_Utils::getRemoteContent($bitly);
         $json = json_decode($response, true);
-        if(isSet($json['results'][$url]['shortUrl'])){
+        if (isSet($json['results'][$url]['shortUrl'])) {
             print($json['results'][$url]['shortUrl']);
             $this->updateMetaShort($httpVars["file"], $json['results'][$url]['shortUrl']);
-        }else{
+        } else {
             print($url);
         }
-	}
+    }
 
-    protected function updateMetaShort($file, $shortUrl){
+    protected function updateMetaShort($file, $shortUrl)
+    {
         $driver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
         $streamData = $driver->detectStreamWrapper(false);
         $baseUrl = $streamData["protocol"]."://".ConfService::getRepository()->getId();
         $node = new AJXP_Node($baseUrl.$file);
-        if($node->hasMetaStore()){
+        if ($node->hasMetaStore()) {
             $metadata = $node->retrieveMetadata(
                 "ajxp_shared",
                 true,
@@ -75,5 +77,3 @@ class BitlyShortener extends AJXP_Plugin {
     }
 
 }
-
-?>

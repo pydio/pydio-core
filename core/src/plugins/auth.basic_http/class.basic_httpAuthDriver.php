@@ -25,36 +25,39 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Auth
  */
-class basic_httpAuthDriver extends serialAuthDriver  {
-	
-	function usersEditable(){
-		return false;
-	}
-	function passwordsEditable(){
-		return false;
-	}
-	
-	function preLogUser($sessionId){
-		$localHttpLogin = $_SERVER["REMOTE_USER"];		
-		if(!isSet($localHttpLogin)) return ;
-        $localHttpPassw = (isset($_SERVER['PHP_AUTH_PW'])) ? $_SERVER['PHP_AUTH_PW'] : md5(microtime(true)) ;
-        if($this->autoCreateUser()){
-            if(!$this->userExists($localHttpLogin)){
-				$this->createUser($localHttpLogin, $localHttpPassw);
-			}
-			AuthService::logUser($localHttpLogin, $localHttpPassw, true);
-		}else{
-			// If not auto-create but the user exists, log him.
-			if($this->userExists($localHttpLogin)){
-				AuthService::logUser($localHttpLogin, "", true);
-			}
-		}
-			
+class basic_httpAuthDriver extends serialAuthDriver
+{
+    public function usersEditable()
+    {
+        return false;
+    }
+    public function passwordsEditable()
+    {
+        return false;
+    }
 
-	}
-    function getLogoutRedirect(){
-    	return AJXP_VarsFilter::filter($this->getOption("LOGOUT_URL"));
+    public function preLogUser($sessionId)
+    {
+        $localHttpLogin = $_SERVER["REMOTE_USER"];
+        if(!isSet($localHttpLogin)) return ;
+        $localHttpPassw = (isset($_SERVER['PHP_AUTH_PW'])) ? $_SERVER['PHP_AUTH_PW'] : md5(microtime(true)) ;
+        if ($this->autoCreateUser()) {
+            if (!$this->userExists($localHttpLogin)) {
+                $this->createUser($localHttpLogin, $localHttpPassw);
+            }
+            AuthService::logUser($localHttpLogin, $localHttpPassw, true);
+        } else {
+            // If not auto-create but the user exists, log him.
+            if ($this->userExists($localHttpLogin)) {
+                AuthService::logUser($localHttpLogin, "", true);
+            }
+        }
+
+
+    }
+    public function getLogoutRedirect()
+    {
+        return AJXP_VarsFilter::filter($this->getOption("LOGOUT_URL"));
     }
 
 }
-?>

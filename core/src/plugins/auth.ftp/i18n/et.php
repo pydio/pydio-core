@@ -32,4 +32,3 @@ $mess=array(
 "7" => "Aktiivne",
 "8" => "Port",
 );
-?>

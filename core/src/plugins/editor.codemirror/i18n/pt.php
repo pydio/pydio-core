@@ -31,5 +31,3 @@ $mess=array(
 "9"	=> "Procurar Texto",
 "10" => "Tamanho de Recuo"
 );
-
-?>

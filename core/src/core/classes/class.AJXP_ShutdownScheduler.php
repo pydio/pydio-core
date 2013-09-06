@@ -36,17 +36,20 @@ class AJXP_ShutdownScheduler
      * @static
      * @return AJXP_ShutdownScheduler
      */
-    public static function getInstance(){
+    public static function getInstance()
+    {
         if(self::$instance == null) self::$instance = new AJXP_ShutdownScheduler();
         return self::$instance;
     }
 
-     public function __construct() {
+     public function __construct()
+     {
          $this->callbacks = array();
          register_shutdown_function(array($this, 'callRegisteredShutdown'));
          ob_start();
      }
-    public function registerShutdownEventArray() {
+    public function registerShutdownEventArray()
+    {
         $callback = func_get_args();
 
         if (empty($callback)) {
@@ -57,13 +60,14 @@ class AJXP_ShutdownScheduler
         }
         $flattenArray = array();
         $flattenArray[0] = $callback[0];
-        if(is_array($callback[1])) {
+        if (is_array($callback[1])) {
             foreach($callback[1] as $argument) $flattenArray[] = $argument;
         }
         $this->callbacks[] = $flattenArray;
         return true;
     }
-     public function registerShutdownEvent() {
+     public function registerShutdownEvent()
+     {
          $callback = func_get_args();
 
          if (empty($callback)) {
@@ -75,9 +79,10 @@ class AJXP_ShutdownScheduler
          $this->callbacks[] = $callback;
          return true;
      }
-     public function callRegisteredShutdown() {
+     public function callRegisteredShutdown()
+     {
          session_write_close();
-        if(!headers_sent()){
+        if (!headers_sent()) {
              $size = ob_get_length();
              header("Connection: close\r\n");
              //header("Content-Encoding: none\r\n");
@@ -87,9 +92,9 @@ class AJXP_ShutdownScheduler
          flush();
          foreach ($this->callbacks as $arguments) {
              $callback = array_shift($arguments);
-             try{
+             try {
                  call_user_func_array($callback, $arguments);
-             }catch (Exception $e){
+             } catch (Exception $e) {
                  AJXP_Logger::logAction("error", array("context"=>"Applying hook ".get_class($callback[0])."::".$callback[1],  "message" => $e->getMessage()));
              }
          }

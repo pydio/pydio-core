@@ -26,8 +26,8 @@ namespace Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class TemporaryFileFilterPlugin extends ServerPlugin {
-
+class TemporaryFileFilterPlugin extends ServerPlugin
+{
     /**
      * This is the list of patterns we intercept.
      * If new patterns are added, they must be valid patterns for preg_match.
@@ -68,8 +68,8 @@ class TemporaryFileFilterPlugin extends ServerPlugin {
      *
      * @param string|null $dataDir
      */
-    public function __construct($dataDir = null) {
-
+    public function __construct($dataDir = null)
+    {
         if (!$dataDir) $dataDir = ini_get('session.save_path').'/sabredav/';
         if (!is_dir($dataDir)) mkdir($dataDir);
         $this->dataDir = $dataDir;
@@ -85,8 +85,8 @@ class TemporaryFileFilterPlugin extends ServerPlugin {
      * @param Server $server
      * @return void
      */
-    public function initialize(Server $server) {
-
+    public function initialize(Server $server)
+    {
         $this->server = $server;
         $server->subscribeEvent('beforeMethod',array($this,'beforeMethod'));
         $server->subscribeEvent('beforeCreateFile',array($this,'beforeCreateFile'));
@@ -103,12 +103,12 @@ class TemporaryFileFilterPlugin extends ServerPlugin {
      * @param string $uri
      * @return bool
      */
-    public function beforeMethod($method, $uri) {
-
+    public function beforeMethod($method, $uri)
+    {
         if (!$tempLocation = $this->isTempFile($uri))
             return true;
 
-        switch($method) {
+        switch ($method) {
             case 'GET' :
                 return $this->httpGet($tempLocation);
             case 'PUT' :
@@ -132,8 +132,8 @@ class TemporaryFileFilterPlugin extends ServerPlugin {
      * @param resource $data
      * @return bool
      */
-    public function beforeCreateFile($uri,$data) {
-
+    public function beforeCreateFile($uri,$data)
+    {
         if ($tempPath = $this->isTempFile($uri)) {
 
             $hR = $this->server->httpResponse;
@@ -153,12 +153,12 @@ class TemporaryFileFilterPlugin extends ServerPlugin {
      * @param string $path
      * @return boolean|string
      */
-    protected function isTempFile($path) {
-
+    protected function isTempFile($path)
+    {
         // We're only interested in the basename.
         list(, $tempPath) = URLUtil::splitPath($path);
 
-        foreach($this->temporaryFilePatterns as $tempFile) {
+        foreach ($this->temporaryFilePatterns as $tempFile) {
 
             if (preg_match($tempFile,$tempPath)) {
                 return $this->getDataDir() . '/sabredav_' . md5($path) . '.tempfile';
@@ -179,8 +179,8 @@ class TemporaryFileFilterPlugin extends ServerPlugin {
      * @param string $tempLocation
      * @return bool
      */
-    public function httpGet($tempLocation) {
-
+    public function httpGet($tempLocation)
+    {
         if (!file_exists($tempLocation)) return true;
 
         $hR = $this->server->httpResponse;
@@ -199,8 +199,8 @@ class TemporaryFileFilterPlugin extends ServerPlugin {
      * @param string $tempLocation
      * @return bool
      */
-    public function httpPut($tempLocation) {
-
+    public function httpPut($tempLocation)
+    {
         $hR = $this->server->httpResponse;
         $hR->setHeader('X-Sabre-Temp','true');
 
@@ -225,8 +225,8 @@ class TemporaryFileFilterPlugin extends ServerPlugin {
      * @param string $tempLocation
      * @return bool
      */
-    public function httpDelete($tempLocation) {
-
+    public function httpDelete($tempLocation)
+    {
         if (!file_exists($tempLocation)) return true;
 
         unlink($tempLocation);
@@ -248,8 +248,8 @@ class TemporaryFileFilterPlugin extends ServerPlugin {
      * @param string $uri
      * @return bool
      */
-    public function httpPropfind($tempLocation, $uri) {
-
+    public function httpPropfind($tempLocation, $uri)
+    {
         if (!file_exists($tempLocation)) return true;
 
         $hR = $this->server->httpResponse;

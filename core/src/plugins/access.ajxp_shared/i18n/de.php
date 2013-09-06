@@ -52,5 +52,4 @@ $mess=array(
 "31"=> "Beschreibung",
 "32"=> "Zurücksetzen",
 "33"=> "Download-Zähler zurücksetzen",
-); 
-?>
+);

@@ -26,48 +26,47 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Mailer
  */
-class PhpMailLiteMailer extends AjxpMailer {
-
-    protected function sendMailImpl($recipients, $subject, $body, $from = null){
-
+class PhpMailLiteMailer extends AjxpMailer
+{
+    protected function sendMailImpl($recipients, $subject, $body, $from = null)
+    {
         require_once("lib/class.phpmailer-lite.php");
         $realRecipients = $this->resolveAdresses($recipients);
 
         // NOW IF THERE ARE RECIPIENTS FOR ANY REASON, GO
-		$mail = new PHPMailerLite(true);
-		$mail->Mailer = $this->getFilteredOption("MAILER");
+        $mail = new PHPMailerLite(true);
+        $mail->Mailer = $this->getFilteredOption("MAILER");
         $from = $this->resolveFrom($from);
-        if(!is_array($from) || empty($from["adress"])){
+        if (!is_array($from) || empty($from["adress"])) {
             throw new Exception("Cannot send email without a FROM address. Please check your core.mailer configuration.");
         }
-        if(!empty($from)){
-            if($from["adress"] != $from["name"]){
+        if (!empty($from)) {
+            if ($from["adress"] != $from["name"]) {
                 $mail->SetFrom($from["adress"], $from["name"]);
-            }else{
+            } else {
                 $mail->setFrom($from["adress"]);
             }
         }
-		foreach ($realRecipients as $address){
-            if($address["adress"] == $address["name"]){
+        foreach ($realRecipients as $address) {
+            if ($address["adress"] == $address["name"]) {
                 $mail->AddAddress(trim($address["adress"]));
-            }else{
+            } else {
                 $mail->AddAddress(trim($address["adress"]), trim($address["name"]));
             }
-		}
-		$mail->WordWrap = 50;                                 // set word wrap to 50 characters
-		$mail->IsHTML(true);                                  // set email format to HTML
+        }
+        $mail->WordWrap = 50;                                 // set word wrap to 50 characters
+        $mail->IsHTML(true);                                  // set email format to HTML
         $mail->CharSet = "utf-8";
 
         $mail->Subject = $subject;
-		$mail->Body = nl2br($body);
-		$mail->AltBody = strip_tags($mail->Body);
+        $mail->Body = nl2br($body);
+        $mail->AltBody = strip_tags($mail->Body);
 
-		if(!$mail->Send())
-		{
-			$message = "Message could not be sent\n";
-			$message .= "Mailer Error: " . $mail->ErrorInfo;
-			throw new Exception($message);
-		}
+        if (!$mail->Send()) {
+            $message = "Message could not be sent\n";
+            $message .= "Mailer Error: " . $mail->ErrorInfo;
+            throw new Exception($message);
+        }
 
     }
 

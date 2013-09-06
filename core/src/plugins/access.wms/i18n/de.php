@@ -7,6 +7,4 @@ $mess=array(
 "4" => "Style",
 "5" => "Stichwörter",
 "6" => "Vorschau",
-)
-
-?>
+);

@@ -14,8 +14,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-interface IPrincipalCollection extends DAV\INode {
-
+interface IPrincipalCollection extends DAV\INode
+{
     /**
      * This method is used to search for principals matching a set of
      * properties.
@@ -37,6 +37,6 @@ interface IPrincipalCollection extends DAV\INode {
      * @param array $searchProperties
      * @return array
      */
-    function searchPrincipals(array $searchProperties);
+    public function searchPrincipals(array $searchProperties);
 
 }

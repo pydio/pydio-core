@@ -24,5 +24,4 @@ $mess=array(
 "3" => "Einen anderen Editor zum Öffnen dieser Datei wählen",
 "4" => "Achtung dieser Editor ist nicht geeignet zum Öffnen dieses Dateityps, das Verhalten ist nicht vorhersehbar!",
 "5" => "Clear existing associations",
-); 
-?>
+);

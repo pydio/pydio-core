@@ -13,13 +13,13 @@ namespace Sabre\DAV\Property;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-interface IHref {
-
+interface IHref
+{
     /**
      * getHref
      *
      * @return string
      */
-    function getHref();
+    public function getHref();
 
 }

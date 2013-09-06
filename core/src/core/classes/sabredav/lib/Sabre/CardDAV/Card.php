@@ -13,8 +13,8 @@ use Sabre\DAV;
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
  */
-class Card extends DAV\File implements ICard, DAVACL\IACL {
-
+class Card extends DAV\File implements ICard, DAVACL\IACL
+{
     /**
      * CardDAV backend
      *
@@ -43,8 +43,8 @@ class Card extends DAV\File implements ICard, DAVACL\IACL {
      * @param array $addressBookInfo
      * @param array $cardData
      */
-    public function __construct(Backend\BackendInterface $carddavBackend,array $addressBookInfo,array $cardData) {
-
+    public function __construct(Backend\BackendInterface $carddavBackend,array $addressBookInfo,array $cardData)
+    {
         $this->carddavBackend = $carddavBackend;
         $this->addressBookInfo = $addressBookInfo;
         $this->cardData = $cardData;
@@ -56,8 +56,8 @@ class Card extends DAV\File implements ICard, DAVACL\IACL {
      *
      * @return string
      */
-    public function getName() {
-
+    public function getName()
+    {
         return $this->cardData['uri'];
 
     }
@@ -67,8 +67,8 @@ class Card extends DAV\File implements ICard, DAVACL\IACL {
      *
      * @return string
      */
-    public function get() {
-
+    public function get()
+    {
         // Pre-populating 'carddata' is optional. If we don't yet have it
         // already, we fetch it from the backend.
         if (!isset($this->cardData['carddata'])) {
@@ -84,8 +84,8 @@ class Card extends DAV\File implements ICard, DAVACL\IACL {
      * @param string $cardData
      * @return string|null
      */
-    public function put($cardData) {
-
+    public function put($cardData)
+    {
         if (is_resource($cardData))
             $cardData = stream_get_contents($cardData);
 
@@ -105,8 +105,8 @@ class Card extends DAV\File implements ICard, DAVACL\IACL {
      *
      * @return void
      */
-    public function delete() {
-
+    public function delete()
+    {
         $this->carddavBackend->deleteCard($this->addressBookInfo['id'],$this->cardData['uri']);
 
     }
@@ -116,8 +116,8 @@ class Card extends DAV\File implements ICard, DAVACL\IACL {
      *
      * @return string
      */
-    public function getContentType() {
-
+    public function getContentType()
+    {
         return 'text/x-vcard; charset=utf-8';
 
     }
@@ -127,8 +127,8 @@ class Card extends DAV\File implements ICard, DAVACL\IACL {
      *
      * @return string
      */
-    public function getETag() {
-
+    public function getETag()
+    {
         if (isset($this->cardData['etag'])) {
             return $this->cardData['etag'];
         } else {
@@ -148,8 +148,8 @@ class Card extends DAV\File implements ICard, DAVACL\IACL {
      *
      * @return int
      */
-    public function getLastModified() {
-
+    public function getLastModified()
+    {
         return isset($this->cardData['lastmodified'])?$this->cardData['lastmodified']:null;
 
     }
@@ -159,8 +159,8 @@ class Card extends DAV\File implements ICard, DAVACL\IACL {
      *
      * @return int
      */
-    public function getSize() {
-
+    public function getSize()
+    {
         if (array_key_exists('size', $this->cardData)) {
             return $this->cardData['size'];
         } else {
@@ -176,8 +176,8 @@ class Card extends DAV\File implements ICard, DAVACL\IACL {
      *
      * @return string|null
      */
-    public function getOwner() {
-
+    public function getOwner()
+    {
         return $this->addressBookInfo['principaluri'];
 
     }
@@ -189,8 +189,8 @@ class Card extends DAV\File implements ICard, DAVACL\IACL {
      *
      * @return string|null
      */
-    public function getGroup() {
-
+    public function getGroup()
+    {
         return null;
 
     }
@@ -207,8 +207,8 @@ class Card extends DAV\File implements ICard, DAVACL\IACL {
      *
      * @return array
      */
-    public function getACL() {
-
+    public function getACL()
+    {
         return array(
             array(
                 'privilege' => '{DAV:}read',
@@ -232,8 +232,8 @@ class Card extends DAV\File implements ICard, DAVACL\IACL {
      * @param array $acl
      * @return void
      */
-    public function setACL(array $acl) {
-
+    public function setACL(array $acl)
+    {
         throw new DAV\Exception\MethodNotAllowed('Changing ACL is not yet supported');
 
     }
@@ -250,11 +250,10 @@ class Card extends DAV\File implements ICard, DAVACL\IACL {
      *
      * @return array|null
      */
-    public function getSupportedPrivilegeSet() {
-
+    public function getSupportedPrivilegeSet()
+    {
         return null;
 
     }
 
 }
-

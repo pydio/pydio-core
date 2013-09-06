@@ -15,5 +15,3 @@ $mess=array(
 "9" => "Otsi",
 "10" => "Puhasta",
 );
-
-?>
