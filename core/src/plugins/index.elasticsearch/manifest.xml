@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<indexer id="index.elasticsearch" label="CONF_MESSAGE[ElasticSearch Search Engine]" description="CONF_MESSAGE[ElasticSearch implementation to index all files and search a whole repository quickly.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <core_relation packaged="false" tested_version="1.0"/>
+    </plugin_info>
+
+    <class_definition filename="plugins/index.elasticsearch/class.AjxpElasticSearch.php" classname="AjxpElasticSearch"/>
+    <client_settings>
+        <resources>
+            <img_library alias="elastic_search_images" path="plugins/index.elasticsearch/resources/images"/>
+            <i18n namespace="index.elasticsearch" path="plugins/index.elasticsearch/resources/i18n" />
+        </resources>
+    </client_settings>
+    <server_settings>
+        <param name="index_content" type="boolean" label="CONF_MESSAGE[Index Content]" description="CONF_MESSAGE[Parses the file when possible and index its content (see plugin global options)]" mandatory="true" default="false"/>
+        <param name="index_meta_fields" type="string" label="CONF_MESSAGE[Index Meta Fields]" description="CONF_MESSAGE[Which additionnal fields to index and search]" mandatory="false" default=""/>
+        <param name="repository_specific_keywords" type="string" label="CONF_MESSAGE[Repository keywords]" description="CONF_MESSAGE[If your repository path is defined dynamically by specific keywords like AJXP_USER, or your own, mention them here.]" mandatory="false" default=""/>
+        <global_param name="PARSE_CONTENT_MAX_SIZE" type="string" label="CONF_MESSAGE[Parse Content Until]" description="CONF_MESSAGE[Skip content parsing and indexation for files bigger than this size (must be in Bytes)]" mandatory="true" default="500000"/>
+        <global_param name="PARSE_CONTENT_HTML" type="string" label="CONF_MESSAGE[HTML files]" description="CONF_MESSAGE[List of extensions to consider as HTML file and parse content]" mandatory="true" default="html,htm"/>
+        <global_param name="PARSE_CONTENT_TXT" type="string" label="CONF_MESSAGE[Text files]" description="CONF_MESSAGE[List of extensions to consider as Text file and parse content]" mandatory="true" default="txt"/>
+        <global_param name="UNOCONV" type="string" label="CONF_MESSAGE[Unoconv Path]" description="CONF_MESSAGE[Full path on the server to the 'unoconv' binary]" default="" mandatory="false"/>
+        <global_param name="PDFTOTEXT" type="string" label="CONF_MESSAGE[PdftoText Path]" description="CONF_MESSAGE[Full path on the server to the 'pdftotext' binary]" default="" mandatory="false"/>
+        <global_param name="QUERY_ANALYSER" type="select" choices="utf8num_insensitive|UTF8 Text/Num (case insensitive),utf8num_sensitive|UTF8 Text/Num (case sensitive),utf8_insensitive|UTF8 Text (case insensitive),utf8_sensitive|UTF8 Text (case sensitive),textnum_insensitive|Text/Num (case insensitive),textnum_sensitive|Text/Num (case sensitive),text_insensitive|Text (case insensitive),text_sensitive|Text (case sensitive)" label="CONF_MESSAGE[Query Analyzer]" description="CONF_MESSAGE[Analyzer used by Zend to parse the queries. Warning, the UTF8 analyzers require the php mbstring extension.]" default="textnum_insensitive" mandatory="false"/>
+        <global_param name="WILDCARD_LIMITATION" type="integer" label="CONF_MESSAGE[Wildcard limitation]" description="CONF_MESSAGE[For the sake of performances, it is not recommanded to use wildcard as a very first character of a query string. Lucene recommends asking the user minimum 3 characters before wildcard. Still, you can set it to 0 if necessary for your usecases.]" default="3" mandatory="false"/>
+    </server_settings>
+    <registry_contributions>
+        <hooks>
+            <serverCallback hookName="node.change" methodName="updateNodeIndex" defer="true"/>
+            <serverCallback hookName="node.meta_change" methodName="updateNodeIndexMeta" defer="true"/>
+        </hooks>
+        <actions>
+            <action name="search">
+                <rightsContext noUser="true" userLogged="only" read="true"
+                               write="false" adminOnly="false">
+                </rightsContext>
+                <processing>
+                    <serverCallback methodName="applyAction" restPath="/query/"/>
+                </processing>
+            </action>
+            <action name="search_by_keyword">
+                <rightsContext noUser="true" userLogged="only" read="true"
+                               write="false" adminOnly="false">
+                </rightsContext>
+                <processing>
+                    <serverCallback methodName="applyAction" restPath="/query/"/>
+                </processing>
+            </action>
+            <action name="check_lock">
+                <rightsContext noUser="true" userLogged="only" read="true"
+                               write="false" adminOnly="false">
+                </rightsContext>
+                <processing>
+                    <serverCallback methodName="applyAction"/>
+                </processing>
+            </action>
+            <action name="index">
+                <gui text="index.elasticsearch.1" title="index.elasticsearch.2" iconClass="icon-book" src="elastic_search_images/ICON_SIZE/ark_view.png" accessKey="folder_access_key">
+                    <context selection="false" dir="true" recycle="hidden"
+                             actionBar="true" contextMenu="true" infoPanel="false"
+                             actionBarGroup="remote" inZip="false">
+                    </context>
+                </gui>
+                <rightsContext noUser="true" userLogged="only" read="true"
+                               write="true" adminOnly="false">
+                </rightsContext>
+                <processing>
+                    <clientCallback prepareModal="false"><![CDATA[
+                        var crtDir = "/";
+                        if(!ajaxplorer.getUserSelection().isEmpty()){
+                            crtDir = ajaxplorer.getUserSelection().getUniqueNode().getPath();
+                        }
+						var bgManager = ajaxplorer.actionBar.bgManager;
+						bgManager.queueAction("index", new Hash({dir:crtDir}), MessageHash["index.lucene.8"].replace('%s', crtDir));
+						bgManager.next();
+					]]></clientCallback>
+                    <serverCallback methodName="applyAction"/>
+                </processing>
+            </action>
+        </actions>
+        <client_configs>
+            <template_part ajxpClass="AjxpTabulator" theme="vision" ajxpId="topPane" ajxpOptions='{"defaultTabId": "folders","tabInfos" : [{"id":"folders","label":"130","iconClass":"icon-folder-open","element":"folder_pane"},{"id":"shared","label":"363","iconClass":"icon-share","element":"shared_elements"},{"id":"flagged","label":"147","iconClass":"icon-star","element":"flagged_elements"}],"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["filter","vertical_splitter2-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'><![CDATA[
+                <div id="folder_pane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ></div>
+                <div id="shared_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_shared"},"reloadOnServerMessage":"tree/reload_shared_elements"}'></div>
+                <div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_bookmarked"},"reloadOnServerMessage":"tree/reload_bookmarks"}'></div>
+            ]]></template_part>
+        </client_configs>
+    </registry_contributions>
+    <dependencies>
+        <!-- Stream Wrapper Access -->
+        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+    </dependencies>
+</indexer>
