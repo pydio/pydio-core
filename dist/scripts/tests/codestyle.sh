@@ -14,9 +14,9 @@ fi
 
 PHPCSFIXERARGS="fix -v --fixers="
 # Mandatory fix
-FIXERS1="indentation,linefeed,trailing_spaces,short_tag,braces,php_closing_tag,controls_spaces,eof_ending"
+FIXERS1="indentation,linefeed,trailing_spaces,short_tag,braces,php_closing_tag,controls_spaces,eof_ending,visibility"
 # Optionnal fix & false positive
-FIXERS2="visibility"
+#FIXERS2="visibility"
 
 EXIT=0
 
@@ -32,15 +32,15 @@ else
     EXIT=1
 fi
 
-echo -e "\e[1;34mChecking optionnal formatting/coding standards\e[00m"
-$PHPCSFIXER $PHPCSFIXERARGS$FIXERS2 --dry-run .
-rc=$?
-if [[ $rc == 0 ]]
-then
-    echo -e "\e[1;32mOptionnal formatting is OK\e[00m"
-else
-    echo -e "\e[1;33mThere are errors in the formatting (or false positive)\e[00m"
-    echo -e "\e[1;33m$PHPCSFIXER $PHPCSFIXERARGS$FIXERS2 .\e[00m"
-fi
+#echo -e "\e[1;34mChecking optionnal formatting/coding standards\e[00m"
+#$PHPCSFIXER $PHPCSFIXERARGS$FIXERS2 --dry-run .
+#rc=$?
+#if [[ $rc == 0 ]]
+#then
+#    echo -e "\e[1;32mOptionnal formatting is OK\e[00m"
+#else
+#    echo -e "\e[1;33mThere are errors in the formatting (or false positive)\e[00m"
+#    echo -e "\e[1;33m$PHPCSFIXER $PHPCSFIXERARGS$FIXERS2 .\e[00m"
+#fi
 
 exit $EXIT
