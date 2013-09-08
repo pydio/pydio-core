@@ -10,7 +10,7 @@ Author URI: http://www.ajaxplorer.info/
 */
 define("AJXP_EXEC", true);
 
-class Ajxp {
+class WpAjxp {
     var $options;
     var $secret;
     var $glueCode;
@@ -201,6 +201,5 @@ class Ajxp {
 
 }
  
-$ajxp_plugin = new Ajxp();
+$ajxp_plugin = new WpAjxp();
 $ajxp_plugin->init();
-?>
