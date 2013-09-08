@@ -20,8 +20,8 @@
  */
 namespace AJXP\Tests\Suite;
 
-class Atomics extends \PHPUnit_Framework_TestSuite{
-
+class Atomics extends \PHPUnit_Framework_TestSuite
+{
     public static function suite()
     {
         $s =  new Atomics();
@@ -33,11 +33,12 @@ class Atomics extends \PHPUnit_Framework_TestSuite{
 
     }
 
-    protected function setUp(){
+    protected function setUp()
+    {
     }
 
-    protected function tearDown(){
-
+    protected function tearDown()
+    {
     }
 
 }

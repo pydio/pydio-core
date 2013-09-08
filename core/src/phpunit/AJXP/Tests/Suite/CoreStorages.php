@@ -20,8 +20,8 @@
  */
 namespace AJXP\Tests\Suite;
 
-class AJXP_Suite_CoreStorages extends PHPUnit_Framework_TestSuite{
-
+class AJXP_Suite_CoreStorages extends PHPUnit_Framework_TestSuite
+{
     public static function suite()
     {
         $s =  new AJXP_Suite_CoreStorages();
@@ -29,7 +29,8 @@ class AJXP_Suite_CoreStorages extends PHPUnit_Framework_TestSuite{
         return $s;
     }
 
-    protected function setUp(){
+    protected function setUp()
+    {
         $pServ = AJXP_PluginsService::getInstance();
         ConfService::init();
         $confPlugin = ConfService::getInstance()->confPluginSoftLoad($pServ);
@@ -38,8 +39,8 @@ class AJXP_Suite_CoreStorages extends PHPUnit_Framework_TestSuite{
     }
 
 
-    protected function tearDown(){
-
+    protected function tearDown()
+    {
     }
 
 }
