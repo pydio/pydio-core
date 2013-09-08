@@ -146,17 +146,17 @@ class ShareCenter extends AJXP_Plugin
                     }
                     print($url);
                 } else {
-                    $maxdownload = $this->getFilteredOption("FILE_MAX_DOWNLOAD", $this->repository->getId());
-                    if (!isSet($httpVars["downloadlimit"]) || $httpVars["downloadlimit"] == 0) {
-                        $httpVars["downloadlimit"] = $maxdownload;
-                    } else {
-                        $httpVars["downloadlimit"] = min($maxdownload,floor(abs($httpVars["downloadlimit"])));
+                    $maxdownload = intval($this->getFilteredOption("FILE_MAX_DOWNLOAD", $this->repository->getId()));
+                    if(!empty($httpVars["downloadlimit"])){
+                        if(!empty($maxdownload)) $httpVars["downloadlimit"] = min($maxdownload, intval($httpVars["downloadlimit"]));
+                    }else{
+                        if(!empty($maxdownload)) $httpVars["downloadlimit"] = $maxdownload;
                     }
-                    $maxexpiration = $this->getFilteredOption("FILE_MAX_EXPIRATION", $this->repository->getId());
-                    if (!isSet($httpVars["expiration"]) || $httpVars["expiration"] == 0) {
-                        $httpVars["expiration"] = $maxexpiration;
-                    } else {
-                        $httpVars["expiration"] = min($maxexpiration,floor(abs($httpVars["expiration"])));
+                    $maxexpiration = intval($this->getFilteredOption("FILE_MAX_EXPIRATION", $this->repository->getId()));
+                    if(!empty($httpVars["expiration"])){
+                        if(!empty($maxexpiration)) $httpVars["expiration"] = min($maxexpiration, intval($httpVars["expiration"]));
+                    }else{
+                        if(!empty($maxexpiration)) $httpVars["expiration"] = $maxexpiration;
                     }
 
                     $data = $this->accessDriver->makePublicletOptions($file, $httpVars["password"], $httpVars["expiration"], $httpVars["downloadlimit"], $this->repository);
