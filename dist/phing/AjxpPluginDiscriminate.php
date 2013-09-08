@@ -29,32 +29,35 @@ include_once 'phing/Task.php';
    * @author Bruce Atherton <bruce@callenish.com> (Ant)
    * @package phing.types.selectors
    */
-  class AjxpPluginDiscriminate extends Task {
-
+  class AjxpPluginDiscriminate extends Task
+  {
       private $ext;
       private $all;
 
-      public function setExt($ext){
+      public function setExt($ext)
+      {
           $this->ext = $ext;
       }
 
-      public function setAll($all){
+      public function setAll($all)
+      {
           $this->all = $all;
       }
 
 
-      public function main() {
+      public function main()
+      {
           $results = glob($this->all."/*");
-          foreach($results as $pluginDir){
-              if(!$this->isCore($pluginDir)){
+          foreach ($results as $pluginDir) {
+              if (!$this->isCore($pluginDir)) {
                   $this->log("Moving ".$pluginDir." to the external plugins", Project::MSG_INFO);
                   rename($pluginDir, $this->ext."/".basename($pluginDir));
               }
           }
       }
 
-      public function isCore($file) {
-
+      public function isCore($file)
+      {
           if(!is_dir($file)) return true;
           if(!file_exists($file."/manifest.xml")) return true;
           $content = file_get_contents($file."/manifest.xml");
@@ -62,7 +65,7 @@ include_once 'phing/Task.php';
           $dom->loadXML($content);
           $xpath = new DOMXPath($dom);
           $nodes = $xpath->query("plugin_info/core_relation");
-          if($nodes->length > 0){
+          if ($nodes->length > 0) {
               $att = $nodes->item(0)->attributes->getNamedItem("packaged")->nodeValue;
               if($att == "false") return false;
           }
