@@ -147,15 +147,15 @@ class ShareCenter extends AJXP_Plugin
                     print($url);
                 } else {
                     $maxdownload = intval($this->getFilteredOption("FILE_MAX_DOWNLOAD", $this->repository->getId()));
-                    if(!empty($httpVars["downloadlimit"])){
+                    if (!empty($httpVars["downloadlimit"])) {
                         if(!empty($maxdownload)) $httpVars["downloadlimit"] = min($maxdownload, intval($httpVars["downloadlimit"]));
-                    }else{
+                    } else {
                         if(!empty($maxdownload)) $httpVars["downloadlimit"] = $maxdownload;
                     }
                     $maxexpiration = intval($this->getFilteredOption("FILE_MAX_EXPIRATION", $this->repository->getId()));
-                    if(!empty($httpVars["expiration"])){
+                    if (!empty($httpVars["expiration"])) {
                         if(!empty($maxexpiration)) $httpVars["expiration"] = min($maxexpiration, intval($httpVars["expiration"]));
-                    }else{
+                    } else {
                         if(!empty($maxexpiration)) $httpVars["expiration"] = $maxexpiration;
                     }
 
