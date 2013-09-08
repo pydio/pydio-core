@@ -21,11 +21,11 @@
  * This is the main configuration file for configuring the core of the application.
  * In a standard usage, you should not have to change any variables.
  */
-if(function_exists("date_default_timezone_set") and function_exists("date_default_timezone_get")){
-	@date_default_timezone_set(@date_default_timezone_get());
+if (function_exists("date_default_timezone_set") and function_exists("date_default_timezone_get")) {
+    @date_default_timezone_set(@date_default_timezone_get());
 }
-if(function_exists("xdebug_disable")){
-	xdebug_disable();
+if (function_exists("xdebug_disable")) {
+    xdebug_disable();
 }
 @error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT);
 //Windows users may have to uncomment this
@@ -92,24 +92,25 @@ define("USE_OPENSSL_RANDOM", false);
 
 require(AJXP_BIN_FOLDER."/compat.php");
 
-function AjaXplorer_autoload($className){
-	$fileName = AJXP_BIN_FOLDER."/"."class.".$className.".php";
-	if(file_exists($fileName)){
-		require_once($fileName);
+function AjaXplorer_autoload($className)
+{
+    $fileName = AJXP_BIN_FOLDER."/"."class.".$className.".php";
+    if (file_exists($fileName)) {
+        require_once($fileName);
         return;
-	}
-	$fileName = AJXP_BIN_FOLDER."/"."interface.".$className.".php";
-	if(file_exists($fileName)){
-		require_once($fileName);
+    }
+    $fileName = AJXP_BIN_FOLDER."/"."interface.".$className.".php";
+    if (file_exists($fileName)) {
+        require_once($fileName);
         return;
-	}
+    }
     $corePlugClass = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.*/class.".$className.".php", GLOB_NOSORT);
-    if($corePlugClass !== false && count($corePlugClass)){
+    if ($corePlugClass !== false && count($corePlugClass)) {
         require_once($corePlugClass[0]);
         return;
     }
     $corePlugInterface = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.*/interface.".$className.".php", GLOB_NOSORT);
-    if($corePlugInterface !== false && count($corePlugInterface)){
+    if ($corePlugInterface !== false && count($corePlugInterface)) {
         require_once($corePlugInterface[0]);
         return;
     }
@@ -118,12 +119,12 @@ spl_autoload_register('AjaXplorer_autoload');
 
 AJXP_Utils::safeIniSet("session.cookie_httponly", 1);
 
-if(is_file(AJXP_CONF_PATH."/bootstrap_conf.php")){
+if (is_file(AJXP_CONF_PATH."/bootstrap_conf.php")) {
     include(AJXP_CONF_PATH."/bootstrap_conf.php");
-    if(isSet($AJXP_INISET)){
+    if (isSet($AJXP_INISET)) {
         foreach($AJXP_INISET as $key => $value) AJXP_Utils::safeIniSet($key, $value);
     }
-    if(defined('AJXP_LOCALE')){
+    if (defined('AJXP_LOCALE')) {
         setlocale(LC_ALL, AJXP_LOCALE);
     }
 }

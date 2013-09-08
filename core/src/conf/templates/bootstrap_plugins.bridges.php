@@ -48,33 +48,33 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 *********************************************************/
 $PLUGINS = array(
     "CONF_DRIVER" => array(
-   		"NAME"		=> "serial",
-   		"OPTIONS"	=> array(
-   			"REPOSITORIES_FILEPATH"	=> "AJXP_DATA_PATH/plugins/conf.serial/repo.ser",
-   			"ROLES_FILEPATH"		=> "AJXP_DATA_PATH/plugins/auth.serial/roles.ser",
-   			"USERS_DIRPATH"			=> "AJXP_DATA_PATH/plugins/auth.serial",
+           "NAME"		=> "serial",
+           "OPTIONS"	=> array(
+               "REPOSITORIES_FILEPATH"	=> "AJXP_DATA_PATH/plugins/conf.serial/repo.ser",
+               "ROLES_FILEPATH"		=> "AJXP_DATA_PATH/plugins/auth.serial/roles.ser",
+               "USERS_DIRPATH"			=> "AJXP_DATA_PATH/plugins/auth.serial",
                "FAST_CHECKS"		    => false,
-   			"CUSTOM_DATA"			=> array(
-   					"email"	    => "Email",
-   					"country"   => "Country",
+               "CUSTOM_DATA"			=> array(
+                       "email"	    => "Email",
+                       "country"   => "Country",
                        "USER_QUOTA"=> "Quota"
-   				)
-   			)
-   	),
+                   )
+               )
+       ),
     "AUTH_DRIVER" => array(
-   		"NAME"		=> "remote",
-   		"OPTIONS"	=> array(
-   			"SLAVE_MODE"  => true,
-   			"USERS_FILEPATH" => "AJXP_DATA_PATH/plugins/auth.serial/users.ser",
-   			"MASTER_AUTH_FUNCTION" => "joomla_remote_auth",
-   			"MASTER_HOST"		=> "localhost",
-   			"MASTER_URI"		=> "/joomla/",
-   			"LOGIN_URL" => "/joomla/",  // The URL to redirect (or call) upon login (typically if one of your user type: http://yourserver/path/to/ajxp, he will get redirected to this url to login into your frontend
-   			"LOGOUT_URL" => "/joomla/",  // The URL to redirect upon login out (see above)
-   			"SECRET" => "myprivatesecret",// the same as the one you put in the WP plugin option.
-   			"TRANSMIT_CLEAR_PASS"   => true // Don't touch this. It's unsafe (and useless here) to transmit clear password.
-   		)
-   	),
+           "NAME"		=> "remote",
+           "OPTIONS"	=> array(
+               "SLAVE_MODE"  => true,
+               "USERS_FILEPATH" => "AJXP_DATA_PATH/plugins/auth.serial/users.ser",
+               "MASTER_AUTH_FUNCTION" => "joomla_remote_auth",
+               "MASTER_HOST"		=> "localhost",
+               "MASTER_URI"		=> "/joomla/",
+               "LOGIN_URL" => "/joomla/",  // The URL to redirect (or call) upon login (typically if one of your user type: http://yourserver/path/to/ajxp, he will get redirected to this url to login into your frontend
+               "LOGOUT_URL" => "/joomla/",  // The URL to redirect upon login out (see above)
+               "SECRET" => "myprivatesecret",// the same as the one you put in the WP plugin option.
+               "TRANSMIT_CLEAR_PASS"   => true // Don't touch this. It's unsafe (and useless here) to transmit clear password.
+           )
+       ),
     /*
        // Same for Drupal 7.X
        "AUTH_DRIVER"  => array(

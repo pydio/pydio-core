@@ -27,29 +27,29 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 $REPOSITORIES[0] = array(
-	"DISPLAY"		=>	"Default Files",
+    "DISPLAY"		=>	"Default Files",
     "DISPLAY_ID"    =>  430,
     "DESCRIPTION_ID"=>  475,
-	"AJXP_SLUG"		=>  "default",
-	"DRIVER"		=>	"fs",
-	"DRIVER_OPTIONS"=> array(
-		"PATH"			=>	"AJXP_DATA_PATH/files",
-		"CREATE"		=>	true,
-		"RECYCLE_BIN" 	=> 	'recycle_bin',
-		"CHMOD_VALUE"   =>  '0600',
-		"DEFAULT_RIGHTS"=>  "",
-		"PAGINATION_THRESHOLD" => 500,
-		"PAGINATION_NUMBER" => 200,
-		"META_SOURCES"		=> array(
-			"metastore.serial"=> array(
-				"METADATA_FILE"	=> ".ajxp_meta",
+    "AJXP_SLUG"		=>  "default",
+    "DRIVER"		=>	"fs",
+    "DRIVER_OPTIONS"=> array(
+        "PATH"			=>	"AJXP_DATA_PATH/files",
+        "CREATE"		=>	true,
+        "RECYCLE_BIN" 	=> 	'recycle_bin',
+        "CHMOD_VALUE"   =>  '0600',
+        "DEFAULT_RIGHTS"=>  "",
+        "PAGINATION_THRESHOLD" => 500,
+        "PAGINATION_NUMBER" => 200,
+        "META_SOURCES"		=> array(
+            "metastore.serial"=> array(
+                "METADATA_FILE"	=> ".ajxp_meta",
                 "METADATA_FILE_LOCATION" => "infolders"
             ),
             "meta.user"     => array(
-				"meta_fields"		=> "tags",
-				"meta_labels"		=> "Tags",
+                "meta_fields"		=> "tags",
+                "meta_labels"		=> "Tags",
                 "meta_visibility"   => "hidden"
-			),
+            ),
             "meta.filehasher"   => array(),
             "meta.watch"        => array(),
             "meta.exif"   => array(
@@ -59,35 +59,35 @@ $REPOSITORIES[0] = array(
             "index.lucene" => array(
                 "index_meta_fields" => "tags"
             ),
-		)
-	),
+        )
+    ),
 
 );
 
 $REPOSITORIES[1] = array(
-	"DISPLAY"		=>	"My Files",
+    "DISPLAY"		=>	"My Files",
     "DISPLAY_ID"    =>  432,
     "DESCRIPTION_ID"=>  476,
-	"AJXP_SLUG"		=>  "my-files",
-	"DRIVER"		=>	"fs",
-	"DRIVER_OPTIONS"=> array(
-		"PATH"			=>	"AJXP_DATA_PATH/personal/AJXP_USER",
-		"CREATE"		=>	true,
-		"RECYCLE_BIN" 	=> 	'recycle_bin',
-		"CHMOD_VALUE"   =>  '0600',
-		"DEFAULT_RIGHTS"=>  "rw",
-		"PAGINATION_THRESHOLD" => 500,
-		"PAGINATION_NUMBER" => 200,
-		"META_SOURCES"		=> array(
-			"metastore.serial"=> array(
-				"METADATA_FILE"	=> ".ajxp_meta",
+    "AJXP_SLUG"		=>  "my-files",
+    "DRIVER"		=>	"fs",
+    "DRIVER_OPTIONS"=> array(
+        "PATH"			=>	"AJXP_DATA_PATH/personal/AJXP_USER",
+        "CREATE"		=>	true,
+        "RECYCLE_BIN" 	=> 	'recycle_bin',
+        "CHMOD_VALUE"   =>  '0600',
+        "DEFAULT_RIGHTS"=>  "rw",
+        "PAGINATION_THRESHOLD" => 500,
+        "PAGINATION_NUMBER" => 200,
+        "META_SOURCES"		=> array(
+            "metastore.serial"=> array(
+                "METADATA_FILE"	=> ".ajxp_meta",
                 "METADATA_FILE_LOCATION" => "infolders"
             ),
             "meta.user"     => array(
-				"meta_fields"		=> "tags",
-				"meta_labels"		=> "Tags",
+                "meta_fields"		=> "tags",
+                "meta_labels"		=> "Tags",
                 "meta_visibility"   => "hidden"
-			),
+            ),
             "meta.filehasher"   => array(),
             "meta.watch"        => array(),
             "meta.exif"   => array(
@@ -98,53 +98,53 @@ $REPOSITORIES[1] = array(
                 "index_meta_fields" => "tags",
                 "repository_specific_keywords" => "AJXP_USER",
             )
-		)
-	),
+        )
+    ),
 
 );
 
 // DO NOT REMOVE THIS!
 // SHARE ELEMENTS
 $REPOSITORIES["ajxp_shared"] = array(
-	"DISPLAY"		=>	"Shared Elements",
-	"DISPLAY_ID"		=>	"467",
-	"DRIVER"		=>	"ajxp_shared",
-	"DRIVER_OPTIONS"=> array(
-		"DEFAULT_RIGHTS" => "rw"
-	)
+    "DISPLAY"		=>	"Shared Elements",
+    "DISPLAY_ID"		=>	"467",
+    "DRIVER"		=>	"ajxp_shared",
+    "DRIVER_OPTIONS"=> array(
+        "DEFAULT_RIGHTS" => "rw"
+    )
 );
 
 // ADMIN REPOSITORY
 $REPOSITORIES["ajxp_conf"] = array(
-	"DISPLAY"		=>	"Settings",
-	"DISPLAY_ID"		=>	"165",
-	"DRIVER"		=>	"ajxp_conf",
-	"DRIVER_OPTIONS"=> array()
+    "DISPLAY"		=>	"Settings",
+    "DISPLAY_ID"		=>	"165",
+    "DRIVER"		=>	"ajxp_conf",
+    "DRIVER_OPTIONS"=> array()
 );
 
 $REPOSITORIES["fs_template"] = array(
-	"DISPLAY"		=>	"Sample Template",
+    "DISPLAY"		=>	"Sample Template",
     "DISPLAY_ID"    =>  431,
-	"IS_TEMPLATE"	=>  true,
-	"DRIVER"		=>	"fs",
-	"DRIVER_OPTIONS"=> array(
-		"CREATE"		=>	true,
-		"RECYCLE_BIN" 	=> 	'recycle_bin',
-		"CHMOD_VALUE"   =>  '0600',
-		"PAGINATION_THRESHOLD" => 500,
-		"PAGINATION_NUMBER" => 200,
+    "IS_TEMPLATE"	=>  true,
+    "DRIVER"		=>	"fs",
+    "DRIVER_OPTIONS"=> array(
+        "CREATE"		=>	true,
+        "RECYCLE_BIN" 	=> 	'recycle_bin',
+        "CHMOD_VALUE"   =>  '0600',
+        "PAGINATION_THRESHOLD" => 500,
+        "PAGINATION_NUMBER" => 200,
         "PURGE_AFTER"       => 0,
         "CHARSET"           => "",
-		"META_SOURCES"		=> array(
-			"metastore.serial"=> array(
-				"METADATA_FILE"	=> ".ajxp_meta",
+        "META_SOURCES"		=> array(
+            "metastore.serial"=> array(
+                "METADATA_FILE"	=> ".ajxp_meta",
                 "METADATA_FILE_LOCATION" => "infolders"
             ),
             "meta.user"     => array(
-				"meta_fields"		=> "tags",
-				"meta_labels"		=> "Tags",
+                "meta_fields"		=> "tags",
+                "meta_labels"		=> "Tags",
                 "meta_visibility"   => "hidden"
-			),
+            ),
             "meta.filehasher"   => array(),
             "meta.watch"        => array(),
             "meta.exif"   => array(
@@ -154,7 +154,7 @@ $REPOSITORIES["fs_template"] = array(
             "index.lucene" => array(
                 "index_meta_fields" => "tags"
             )
-		)
-	),
+        )
+    ),
 
 );
