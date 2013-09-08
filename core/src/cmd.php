@@ -20,7 +20,7 @@
  *
  * Description : Command line access of the framework.
  */
-if(php_sapi_name() !== "cli"){
+if (php_sapi_name() !== "cli") {
     die("This is the command line version of the framework, you are not allowed to access this page");
 }
 
@@ -49,47 +49,47 @@ require_once($confStorageDriver->getUserClassFileName());
 $optArgs = array();
 $options = array();
 $regex = '/^-(-?)([a-zA-z0-9_]*)=(.*)/';
-foreach ($argv as $key => $argument){
+foreach ($argv as $key => $argument) {
     //echo("$key => $argument \n");
-    if(preg_match($regex, $argument, $matches)){
-        if($matches[1] == "-"){
+    if (preg_match($regex, $argument, $matches)) {
+        if ($matches[1] == "-") {
             $optArgs[trim($matches[2])] = SystemTextEncoding::toUTF8(trim($matches[3]));
-        }else{
+        } else {
             $options[trim($matches[2])] = SystemTextEncoding::toUTF8(trim($matches[3]));
         }
     }
 }
 
 $optUser = $options["u"];
-if(!empty($optUser)){
+if (!empty($optUser)) {
 
-    if(isSet($options["p"])){
+    if (isSet($options["p"])) {
         $optPass = $options["p"];
-    }else{
+    } else {
         // Consider "u" is a crypted version of u:p
         $optToken = $options["t"];
         $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
         $optUser = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($optToken."\1CDAFx¨op#"), base64_decode($optUser), MCRYPT_MODE_ECB, $iv), "\0");
     }
-    if(strpos($optUser,",") !== false){
+    if (strpos($optUser,",") !== false) {
         $originalOptUser = $optUser;
         $nextUsers = explode(",", $optUser);
         $optUser = array_shift($nextUsers);
         $nextUsers = implode(",",$nextUsers);
-    }else if(strpos($optUser, "queue:") === 0){
+    } else if (strpos($optUser, "queue:") === 0) {
         $optUserQueue = substr($optUser, strlen("queue:"));
         $optUser = false;
         //echo("QUEUE : ".$optUserQueue);
-        if(is_file($optUserQueue)){
+        if (is_file($optUserQueue)) {
             $lines = file($optUserQueue);
-            if(count($lines) && !empty($lines[0])){
+            if (count($lines) && !empty($lines[0])) {
                 $allUsers = explode(",", $lines[0]);
                 $optUser = array_shift($allUsers);
                 file_put_contents($optUserQueue, implode(",", $allUsers));
             }
         }
-        if($optUser === false){
-            if(is_file($optUserQueue)){
+        if ($optUser === false) {
+            if (is_file($optUserQueue)) {
                 unlink($optUserQueue);
             }
             die("No more users inside queue");
@@ -101,7 +101,7 @@ if(!empty($optUser)){
 $optStatusFile = $options["s"] OR false;
 $optAction = $options["a"];
 $optRepoId = $options["r"] OR false;
-if(strpos($optRepoId,",") !== false){
+if (strpos($optRepoId,",") !== false) {
     $nextRepositories = explode(",", $optRepoId);
     $optRepoId = array_shift($nextRepositories);
     $nextRepositories = implode(",", $nextRepositories);
@@ -112,17 +112,17 @@ if(strpos($optRepoId,",") !== false){
 $optDetectUser = $options["detect_user"] OR false;
 $detectedUser = false;
 
-if($optRepoId !== false){
+if ($optRepoId !== false) {
     $repository = ConfService::getRepositoryById($optRepoId);
-    if($repository == null){
+    if ($repository == null) {
         $repository = ConfService::getRepositoryByAlias($optRepoId);
-        if($repository != null){
+        if ($repository != null) {
             $optRepoId =($repository->isWriteable()?$repository->getUniqueId():$repository->getId());
         }
     }
-    if($optDetectUser != false){
+    if ($optDetectUser != false) {
         $path = $repository->getOption("PATH", true);
-        if(strpos($path, "AJXP_USER") !== false){
+        if (strpos($path, "AJXP_USER") !== false) {
             $path = str_replace(
                 array("AJXP_INSTALL_PATH", "AJXP_DATA_PATH", "/"),
                 array(AJXP_INSTALL_PATH, AJXP_DATA_PATH, DIRECTORY_SEPARATOR),
@@ -132,68 +132,64 @@ if($optRepoId !== false){
             if(count($parts) == 1) $parts[1] = "";
             $first = str_replace("\\", "\\\\", $parts[0]);
             $last = str_replace("\\", "\\\\", $parts[1]);
-            if(preg_match("/$first(.*)$last.*/", $optDetectUser, $matches)){
+            if (preg_match("/$first(.*)$last.*/", $optDetectUser, $matches)) {
                 $detectedUser = $matches[1];
             }
         }
     }
     ConfService::switchRootDir($optRepoId, true);
-}else{
-    if($optStatusFile){
+} else {
+    if ($optStatusFile) {
         file_put_contents($optStatusFile, "ERROR:You must pass a -r argument specifying either a repository id or alias");
     }
     die("You must pass a -r argument specifying either a repository id or alias");
 }
 
-if(AuthService::usersEnabled() && !empty($optUser))
-{
+if (AuthService::usersEnabled() && !empty($optUser)) {
     $seed = AuthService::generateSeed();
-    if($seed != -1){
+    if ($seed != -1) {
         $optPass = md5(md5($optPass).$seed);
     }
     $loggingResult = AuthService::logUser($optUser, $optPass, isSet($optToken), false, $seed);
     // Check that current user can access current repository, try to switch otherwise.
     $loggedUser = AuthService::getLoggedUser();
-    if($loggedUser != null && $detectedUser !== false && $loggedUser->isAdmin()){
+    if ($loggedUser != null && $detectedUser !== false && $loggedUser->isAdmin()) {
         AuthService::disconnect();
         AuthService::logUser($detectedUser, "empty", true, false, "");
         $loggedUser = AuthService::getLoggedUser();
     }
 
-    if($loggedUser != null)
-    {
+    if ($loggedUser != null) {
         $currentRepoId = ConfService::getCurrentRepositoryId();
         $lastRepoId  = $loggedUser->getArrayPref("history", "last_repository");
         $defaultRepoId = AuthService::getDefaultRootId();
-        if($defaultRepoId == -1){
+        if ($defaultRepoId == -1) {
             AuthService::disconnect();
             $loggingResult = -3;
-        }else {
-            if($lastRepoId != "" && $lastRepoId!=$currentRepoId && $optRepoId===false && $loggedUser->canSwitchTo($lastRepoId)){
+        } else {
+            if ($lastRepoId != "" && $lastRepoId!=$currentRepoId && $optRepoId===false && $loggedUser->canSwitchTo($lastRepoId)) {
                 ConfService::switchRootDir($lastRepoId);
-            }else if(!$loggedUser->canSwitchTo($currentRepoId)){
+            } else if (!$loggedUser->canSwitchTo($currentRepoId)) {
                 ConfService::switchRootDir($defaultRepoId);
             }
         }
     }
-    if($loggedUser == null)
-    {
+    if ($loggedUser == null) {
         // Try prelogging user if the session expired but the logging data is in fact still present
         // For example, for basic_http auth.
         AuthService::preLogUser((isSet($httpVars["remote_session"])?$httpVars["remote_session"]:""));
         $loggedUser = AuthService::getLoggedUser();
         if($loggedUser == null) $requireAuth = true;
     }
-    if(isset($loggingResult) && $loggingResult != 1)
-    {
+    if (isset($loggingResult) && $loggingResult != 1) {
         AJXP_XMLWriter::header();
         AJXP_XMLWriter::loggingResult($loggingResult, false, false, "");
         AJXP_XMLWriter::close();
-        if($optStatusFile){
+        if ($optStatusFile) {
             file_put_contents($optStatusFile, "ERROR:No user logged");
         }
     }
-}else{
+} else {
     AJXP_Logger::debug(ConfService::getCurrentRepositoryId());
 }
 
@@ -207,50 +203,50 @@ $mess = ConfService::getMessages();
 //$ajxpDriver = AJXP_PluginsService::findPlugin("gui", "ajax");
 $authDriver = ConfService::getAuthDriverImpl();
 // DRIVERS BELOW NEED IDENTIFICATION CHECK
-if(!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") || AuthService::getLoggedUser()!=null){
+if (!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") || AuthService::getLoggedUser()!=null) {
     $confDriver = ConfService::getConfStorageImpl();
     $Driver = ConfService::loadRepositoryDriver();
 }
 AJXP_PluginsService::getInstance()->initActivePlugins();
 require_once(AJXP_BIN_FOLDER."/class.AJXP_Controller.php");
 $xmlResult = AJXP_Controller::findActionAndApply($optAction, $optArgs, array());
-if($xmlResult !== false && $xmlResult != ""){
+if ($xmlResult !== false && $xmlResult != "") {
     AJXP_XMLWriter::header();
     print($xmlResult);
     AJXP_XMLWriter::close();
-}else if(isset($requireAuth) && AJXP_Controller::$lastActionNeedsAuth){
+} else if (isset($requireAuth) && AJXP_Controller::$lastActionNeedsAuth) {
     AJXP_XMLWriter::header();
     AJXP_XMLWriter::requireAuth();
     AJXP_XMLWriter::close();
 }
 //echo("NEXT REPO ".$nextRepositories." (".$options["r"].")\n");
 //echo("NEXT USERS ".$nextUsers." ( ".$originalOptUser." )\n");
-if(!empty($nextUsers) || !empty($nextRepositories) || !empty($optUserQueue) ){
+if (!empty($nextUsers) || !empty($nextRepositories) || !empty($optUserQueue) ) {
 
-    if(!empty($nextUsers)){
+    if (!empty($nextUsers)) {
         sleep(1);
         $process = AJXP_Controller::applyActionInBackground($options["r"], $optAction, $optArgs, $nextUsers, $optStatusFile);
-        if($process != null && is_a($process, "UnixProcess") && isSet($optStatusFile)){
+        if ($process != null && is_a($process, "UnixProcess") && isSet($optStatusFile)) {
             file_put_contents($optStatusFile, "RUNNING:".$process->getPid());
         }
     }
-    if(!empty($optUserQueue)){
+    if (!empty($optUserQueue)) {
         sleep(1);
         //echo("Should go to next with $optUserQueue");
         $process = AJXP_Controller::applyActionInBackground($options["r"], $optAction, $optArgs, "queue:".$optUserQueue, $optStatusFile);
-        if($process != null && is_a($process, "UnixProcess") && isSet($optStatusFile)){
+        if ($process != null && is_a($process, "UnixProcess") && isSet($optStatusFile)) {
             file_put_contents($optStatusFile, "RUNNING:".$process->getPid());
         }
     }
-    if(!empty($nextRepositories)){
+    if (!empty($nextRepositories)) {
         sleep(1);
         $process = AJXP_Controller::applyActionInBackground($nextRepositories, $optAction, $optArgs, $originalOptUser, $optStatusFile);
-        if($process != null && is_a($process, "UnixProcess") && isSet($optStatusFile)){
+        if ($process != null && is_a($process, "UnixProcess") && isSet($optStatusFile)) {
             file_put_contents($optStatusFile, "RUNNING:".$process->getPid());
         }
     }
 
-}else if(isSet($optStatusFile)){
+} else if (isSet($optStatusFile)) {
 
     $status = explode(":", file_get_contents($optStatusFile));
     file_put_contents($optStatusFile, "FINISHED".(in_array("QUEUED", $status)?":QUEUED":""));
