@@ -280,7 +280,7 @@ class ldapAuthDriver extends AbstractAuthDriver
             if (!empty($entries["count"])) {
                 $allEntries["count"] += $entries["count"];
                 unset($entries["count"]);
-                if($limit != -1){
+                if ($limit != -1) {
                     usort($entries, array($this, "userSortFunction"));
                 }
                 foreach ($entries as $entry) {
