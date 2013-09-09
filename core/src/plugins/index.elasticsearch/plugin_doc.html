@@ -1,2 +1,127 @@
-<p>To get the last version of Elastica go to the following <a href="http://elastica.io/getting-started/installation.html">site</a> and in the "Download" part take the zip format.
-Then unzip the whole archive and copy the lib/Elastica folder into plugins/index.elasticsearch of your Ajaxplorer folder.</p>
+<p>To get the last version of Elastica go to the following <a href="http://elastica.io/getting-started/installation.html">site</a> and in the "Download" part take the zip format. Then unzip the whole archive and copy the lib/Elastica folder into plugins/index.elasticsearch of your Ajaxplorer folder.<br/><br/>
+Why ElasticSearch?<br/>
+Based on Apache Lucène and more powerful and efficient.<br/><br/>
+Why Elastica?<br/>
+This is the PHP implementation that has the most features available currently.<br/><br/>
+Install ElasticSearch on Ubuntu:<br/>
+To be able to install ElasticSearch you have to get and install the openjdk 7. In order to install the openjdk 7 you just have to run the following command lines:<br/>
+<pre>$ sudo apt-get update</pre>
+<pre>$ sudo apt-get install openjdk-7-jre-headless -y</pre><br/>
+Then download the latest package version (here it's the version 0.90.2) with the following command:<br/>
+<pre>$ wget https://downloads.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-0.90.2.deb</pre><br/>
+You just have now to run the following commands to install the package:<br/>
+<pre>$ sudo dpkg -i elasticsearch-0.90.2.deb</pre>
+<pre>$ sudo service elasticsearch start</pre>
+<pre>$ rm elasticsearch-0.90.2.deb</pre><br/>
+In order to test ElasticSearch you can do the following (in a terminal):<br/><br/>
+- Create an index called "test_index":<br/>
+<pre>$ curl -XPUT 'localhost:9200/test_index'</pre><br/>
+- Then add a document with the type "test_type" with the following command:<br/>
+<pre>$ culr -XPUT 'localhost:9200/test_index/test_type/1 -d '{"user":"test", "message":"this is a test"}'</pre>
+This will add a document with id equals to 1 containing two fields "user" and "message" that respective values are "test" and "this is a test".<br/>
+The document will be added in the index "test_index" under the type "test_type".<br/><br/>
+- You can retrieve the documents by their id:
+<pre>$ curl -XGET 'localhost:9200/test_index/test_type/1'</pre>
+If you followed the previous steps the result should be something like this:<br/>
+<pre>{
+    "_index":"test_index",
+    "_type":"test_type",
+    "_id":"1",
+    "_version":1,
+    "exists":true,
+    "_source" : {
+        "user":"test",
+        "message":"this is a test"
+    }
+}
+</pre><br/>
+- You can retrieve documents by queries (there are a lot of different queries for more information <a href="http://www.elasticsearch.org/guide/reference/query-dsl/">click here</a>):<br/>
+<pre>$ curl -XGET 'localhost:9200/test_index/test_type/_search' -d '{
+    "query":{
+        "match":{
+            "message":"this is a test"
+        }
+    }
+}'
+</pre>
+The result should be something like that:
+<pre>{
+    "took":143,
+    "timed_out":false,
+    "_shards":{
+        "total":5,
+        "successful":5,
+        "failed":0
+    },
+    "hits":{
+        "total":1,
+        "max_score":0.30685282,
+        "hits":[
+            {
+                "_index":"test_index",
+                "_type":"test_type",
+                "_id":"1",
+                "_score":0.30685282,
+                "_source" : {
+                    "user":"test",
+                    "message":"this is a test"
+                }
+            }
+        ]
+    }
+}
+</pre><br/><br/>
+Use ElasticSearch in Ajaxplorer:<br/><br/>
+To use ElasticSearch in Ajaxplorer you have to follow the steps concerning ElasticSearch and Elastica installation first. Then you can go to Ajaxplorer GUI and set ElasticSearch the same way you would set Lucène.<br/><br/>
+Go to Ajaxplorer Settings->Workspaces and Users->Workspaces, then just choose your workspace and go to repository features. Here just remove the Lucène Search Engine (if you want to set ElasticSearch) and search the meta plugin "ElasticSearch Search Engine". Then you can use the indexation and then the search function when you go to the choosen workspace.<br/><br/><br/>
+Concerning the use of Elastica:<br/><br/>
+- Here is a code snippet to index a document just like the test we previously made:
+<pre>$client = new Elastica\Client(array("host" => "localhost", "port" => "9200"));
+$index = $client->getIndex("test_index");
+
+if(!$index->exists()){
+    $index->create();
+}
+
+$index->open();
+$type = $index->getType("test_type");
+
+$data = array();
+$data["user"] = "test";
+$data["message"] = "this is a test";
+$id = 1;
+$doc = new Elastica\Document($id, $data);
+
+$type->addDocument($doc);
+$index->close()
+</pre>
+- Here is the code snippet that allows you to get docs by id and by query (this is the equivalent as the examples for the test):<br/>
+<pre>$client = new Elastica\Client(array("host" => "localhost", "port" => "9200"));
+$index = $client->getIndex("test_index");
+
+if(!$index->exists()){
+    $index->create();
+}
+
+$index->open();
+$type = $index->getType("test_type");
+
+/* document fetched by id*/
+$doc = $type->getDocument(1)
+
+/* documents fetched by query */
+$query = "this is a test";
+$matchQuery = new Elastica\Query\Match();
+$matchQuery->setField("message");
+$matchQuery->setQueryString($query);
+
+$resultSet = $type->search($matchQuery);
+$results = resultSet->getResults();
+
+/* now you can go all over the results */
+
+foreach($results as $hit){
+    /* print the data from the hit */
+    print_r($hit->getSource());
+}</pre>
+</p>

@@ -148,13 +148,13 @@ class AjxpElasticSearch extends AJXP_Plugin
             }
 
             if ($this->isIndexLocked($repoId)) {
-                throw new Exception($messages["index.elasticsearch.6"]);
+                throw new Exception($messages["index.lucene.6"]);
             }
             try {
                 $this->loadIndex($repoId, false);
             } catch (Exception $ex) {
                 $this->applyAction("index", array(), array());
-                throw new Exception($messages["index.elasticsearch.7"]);
+                throw new Exception($messages["index.lucene.7"]);
             }
 
            /*
@@ -179,81 +179,55 @@ class AjxpElasticSearch extends AJXP_Plugin
            */
             $this->currentIndex->open();
             $query = $httpVars["query"];
-            $matchQuery = new Elastica\Query\Field();
+            $fieldQuery = new Elastica\Query\Field();
 
             //}
             //$this->setDefaultAnalyzer();
             if ($query == "*") {
-                $matchQuery->setField("ajxp_node");
-                $matchQuery->setQueryString("yes");
+                $fieldQuery->setField("ajxp_node");
+                $fieldQuery->setQueryString("yes");
             } else {
-                $matchQuery->setField("basename");
-                $matchQuery->setQueryString($query);
+                $fieldQuery->setField("basename");
+                $fieldQuery->setQueryString($query);
             }
 
             /*
-                We are defining a Search object that will allow us to scroll down all the results
-                Indeed Elastica is using a scrolling system when you got too many results that will
-                fetch only some results (let's say 10 for example) instead of fetching the whole set
-                of results at once. You then have to define this search object and give it some options
-                to be able to scroll down the whole set of results.
-            */
+                We create this object search because it'll allow us to fetch the number of results we want at once.
+                We just have to set some parameters, the query type and the size of the result set.
+             */
             $search = new Elastica\Search($this->client);
             $search->addIndex($this->currentIndex)->addType($this->currentType);
 
-            /*
-                With this search request we will fetch the scroll_id that will allow us to perform
-                the scrolling.
-                The different options that are set in the array are the following:
-                    - search_type = scan : this parameter allows to scan efficiently a large result set
-                    - scroll = 10m : this parameter is the TTL of each scrolling request
-                    - size = 20 : we fetch 20 * number_of_shards results at once (80 since there are most of the time 4 shards)
-            */
-            $getScrollIdOptions = array(
-                \Elastica\Search::OPTION_SEARCH_TYPE => \Elastica\Search::OPTION_SEARCH_TYPE_SCAN,
-                \Elastica\Search::OPTION_SCROLL => "10m",
-                \Elastica\Search::OPTION_SIZE => "20");
+            $maxResults = $this->getFilteredOption("MAX_RESULTS");
+            $searchOptions = array(
+                \Elastica\Search::OPTION_SEARCH_TYPE => \Elastica\Search::OPTION_SEARCH_TYPE_QUERY_THEN_FETCH,
+                \Elastica\Search::OPTION_SIZE => $maxResults);
 
-            $result = $search->search($matchQuery, $getScrollIdOptions);
+            $result = $search->search($fieldQuery, $searchOptions);
+            $total_hits = $result->getTotalHits();
+            $hits = $result->getResults();
 
-            $scrollId = $result->getResponse()->getScrollId();
+            AJXP_XMLWriter::header();
+            for($i=0, $count=count($hits); $i < $count; $i++) {
+                $hit = $hits[$i];
+                $source = $hit->getSource();
 
-            /*
-                Now we define the parameters for the new search request using the scroll id.
-            */
-            $scrollingOptions = array(
-                \Elastica\Search::OPTION_SCROLL => '10m',
-                \Elastica\Search::OPTION_SCROLL_ID => $scrollId
-            );
-
-            $search = new \Elastica\Search($this->client);
-
-            do {
-                $hitsResults = $search->search(array(), $scrollingOptions);
-                $total_hits = $hitsResults->getTotalHits();
-                $hits = $hitsResults->getResults();
-
-                AJXP_XMLWriter::header();
-                foreach ($hits as $hit) {
-                    $source = $hit->getSource();
-
-                    if ($source["serialized_metadata"] != null) {
-                        $meta = unserialize(base64_decode($source["serialized_metadata"]));
-                        $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($source["node_url"]), $meta);
-                    } else {
-                        $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($source["node_url"]), array());
-                        $tmpNode->loadNodeInfo();
-                    }
-
-                    if (!file_exists($tmpNode->getUrl())) {
-                        $this->currentType->deleteById($hit->getId());
-                        continue;
-                    }
-
-                    $tmpNode->search_score = sprintf("%0.2f", $hit->getScore());
-                    AJXP_XMLWriter::renderAjxpNode($tmpNode);
+                if ($source["serialized_metadata"] != null) {
+                    $meta = unserialize(base64_decode($source["serialized_metadata"]));
+                    $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($source["node_url"]), $meta);
+                } else {
+                    $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($source["node_url"]), array());
+                    $tmpNode->loadNodeInfo();
                 }
-            } while ($hitsResults->count() > 0);
+
+                if (!file_exists($tmpNode->getUrl())) {
+                    $this->currentType->deleteById($hit->getId());
+                    continue;
+                }
+
+                $tmpNode->search_score = sprintf("%0.2f", $hit->getScore());
+                AJXP_XMLWriter::renderAjxpNode($tmpNode);
+            }
 
             AJXP_XMLWriter::close();
             $this->currentIndex->close();
@@ -318,7 +292,7 @@ class AjxpElasticSearch extends AJXP_Plugin
             if(empty($dir)) $dir = "/";
             $repo = ConfService::getRepository();
             if ($this->isIndexLocked($repo->getId())) {
-                throw new Exception($messages["index.elasticsearch.6"]);
+                throw new Exception($messages["index.lucene.6"]);
             }
 
             $accessType = $repo->getAccessType();
@@ -334,7 +308,7 @@ class AjxpElasticSearch extends AJXP_Plugin
             if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
                 AJXP_Controller::applyActionInBackground($repoId, "index", $httpVars);
                 AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("check_lock", array("repository_id" => $repoId), sprintf($messages["index.elasticsearch.8"], $dir), true, 2);
+                AJXP_XMLWriter::triggerBgAction("check_lock", array("repository_id" => $repoId), sprintf($messages["index.lucene.8"], $dir), true, 2);
                 AJXP_XMLWriter::close();
                 return;
             }
@@ -584,7 +558,7 @@ class AjxpElasticSearch extends AJXP_Plugin
                 if ($type != "integer" && $type != "boolean" && $type != "double") {
                     $type = "string";
                 }
-                $mapping_properties[$key] = array("type" => $type);
+                $mapping_properties[$key] = array("type" => $type, "index" => "simple");
             }
         }
 
