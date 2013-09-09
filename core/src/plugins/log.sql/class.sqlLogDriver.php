@@ -98,7 +98,7 @@ class sqlLogDriver extends AbstractLogDriver
             }
         }
 
-        $message_parts = explode("\t", $message);
+        $message_parts = explode("\t", $message, 2);
         $severity = strtoupper((string) $severity);
 
         $log_row = Array(
