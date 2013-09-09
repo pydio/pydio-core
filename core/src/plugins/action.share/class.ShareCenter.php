@@ -59,7 +59,7 @@ class ShareCenter extends AJXP_Plugin
             if ($downloadFolder == "") {
                 $disableSharing = true;
             } else if ((!is_dir($downloadFolder) || !is_writable($downloadFolder))) {
-                AJXP_Logger::debug("Disabling Public links, $downloadFolder is not writeable!", array("folder" => $downloadFolder, "is_dir" => is_dir($downloadFolder),"is_writeable" => is_writable($downloadFolder)));
+                $this->logDebug("Disabling Public links, $downloadFolder is not writeable!", array("folder" => $downloadFolder, "is_dir" => is_dir($downloadFolder),"is_writeable" => is_writable($downloadFolder)));
                 $disableSharing = true;
             } else {
                 if (AuthService::usersEnabled()) {

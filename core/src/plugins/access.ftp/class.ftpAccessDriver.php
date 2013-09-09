@@ -89,13 +89,13 @@ class ftpAccessDriver extends fsAccessDriver
                 if ($this->hasFilesToCopy()) {
                     $nextFile = $this->getFileNameToCopy();
                 }
-                AJXP_Logger::debug("Base64 : ", array("from"=>$fData["destination"], "to"=>base64_decode($fData['destination'])));
+                $this->logDebug("Base64 : ", array("from"=>$fData["destination"], "to"=>base64_decode($fData['destination'])));
                 $destPath = $this->urlBase.base64_decode($fData['destination'])."/".$fData['name'];
                 //$destPath = AJXP_Utils::decodeSecureMagic($destPath);
                 // DO NOT "SANITIZE", THE URL IS ALREADY IN THE FORM ajxp.ftp://repoId/filename
                 $destPath = SystemTextEncoding::fromPostedFileName($destPath);
                 $node = new AJXP_Node($destPath);
-                AJXP_Logger::debug("Copying file to server", array("from"=>$fData["tmp_name"], "to"=>$destPath, "name"=>$fData["name"]));
+                $this->logDebug("Copying file to server", array("from"=>$fData["tmp_name"], "to"=>$destPath, "name"=>$fData["name"]));
                 try {
                     AJXP_Controller::applyHook("node.before_change", array(&$node));
                     $fp = fopen($destPath, "w");
@@ -104,18 +104,18 @@ class ftpAccessDriver extends fsAccessDriver
                         fwrite($fp, fread($fSource, 4096));
                     }
                     fclose($fSource);
-                    AJXP_Logger::debug("Closing target : begin ftp copy");
+                    $this->logDebug("Closing target : begin ftp copy");
                     // Make sur the script does not time out!
                     @set_time_limit(240);
                     fclose($fp);
-                    AJXP_Logger::debug("FTP Upload : end of ftp copy");
+                    $this->logDebug("FTP Upload : end of ftp copy");
                     @unlink($fData["tmp_name"]);
                     AJXP_Controller::applyHook("node.change", array(&$node));
 
                 } catch (Exception $e) {
-                    AJXP_Logger::debug("Error during ftp copy", array($e->getMessage(), $e->getTrace()));
+                    $this->logDebug("Error during ftp copy", array($e->getMessage(), $e->getTrace()));
                 }
-                AJXP_Logger::debug("FTP Upload : shoud trigger next or reload nextFile=$nextFile");
+                $this->logDebug("FTP Upload : shoud trigger next or reload nextFile=$nextFile");
                 AJXP_XMLWriter::header();
                 if ($nextFile!='') {
                     AJXP_XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".SystemTextEncoding::toUTF8($nextFile)." to remote server");
@@ -127,11 +127,11 @@ class ftpAccessDriver extends fsAccessDriver
             break;
             case "upload":
                 $rep_source = AJXP_Utils::securePath("/".$httpVars['dir']);
-                AJXP_Logger::debug("Upload : rep_source ", array($rep_source));
+                $this->logDebug("Upload : rep_source ", array($rep_source));
                 $logMessage = "";
                 foreach ($filesVars as $boxName => $boxData) {
                     if(substr($boxName, 0, 9) != "userfile_")     continue;
-                    AJXP_Logger::debug("Upload : rep_source ", array($rep_source));
+                    $this->logDebug("Upload : rep_source ", array($rep_source));
                     $err = AJXP_Utils::parseFileDataErrors($boxData);
                     if ($err != null) {
                         $errorCode = $err[0];
@@ -144,26 +144,26 @@ class ftpAccessDriver extends fsAccessDriver
                     }
                     $boxData["destination"] = base64_encode($rep_source);
                     $destCopy = AJXP_XMLWriter::replaceAjxpXmlKeywords($this->repository->getOption("TMP_UPLOAD"));
-                    AJXP_Logger::debug("Upload : tmp upload folder", array($destCopy));
+                    $this->logDebug("Upload : tmp upload folder", array($destCopy));
                     if (!is_dir($destCopy)) {
                         if (! @mkdir($destCopy)) {
-                            AJXP_Logger::debug("Upload error : cannot create temporary folder", array($destCopy));
+                            $this->logDebug("Upload error : cannot create temporary folder", array($destCopy));
                             $errorCode = 413;
                             $errorMessage = "Warning, cannot create folder for temporary copy.";
                             break;
                         }
                     }
                     if (!$this->isWriteable($destCopy)) {
-                        AJXP_Logger::debug("Upload error: cannot write into temporary folder");
+                        $this->logDebug("Upload error: cannot write into temporary folder");
                         $errorCode = 414;
                         $errorMessage = "Warning, cannot write into temporary folder.";
                         break;
                     }
-                    AJXP_Logger::debug("Upload : tmp upload folder", array($destCopy));
+                    $this->logDebug("Upload : tmp upload folder", array($destCopy));
                     if (isSet($boxData["input_upload"])) {
                         try {
                             $destName = tempnam($destCopy, "");
-                            AJXP_Logger::debug("Begining reading INPUT stream");
+                            $this->logDebug("Begining reading INPUT stream");
                             $input = fopen("php://input", "r");
                             $output = fopen($destName, "w");
                             $sizeRead = 0;
@@ -176,7 +176,7 @@ class ftpAccessDriver extends fsAccessDriver
                             fclose($output);
                             $boxData["tmp_name"] = $destName;
                             $this->storeFileToCopy($boxData);
-                            AJXP_Logger::debug("End reading INPUT stream");
+                            $this->logDebug("End reading INPUT stream");
                         } catch (Exception $e) {
                             $errorCode=411;
                             $errorMessage = $e->getMessage();
@@ -197,10 +197,10 @@ class ftpAccessDriver extends fsAccessDriver
                     }
                 }
                 if (isSet($errorMessage)) {
-                    AJXP_Logger::debug("Return error $errorCode $errorMessage");
+                    $this->logDebug("Return error $errorCode $errorMessage");
                     return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $errorMessage));
                 } else {
-                    AJXP_Logger::debug("Return success");
+                    $this->logDebug("Return success");
                     return array("SUCCESS" => true, "PREVENT_NOTIF" => true);
                 }
 
@@ -262,7 +262,7 @@ class ftpAccessDriver extends fsAccessDriver
     {
         $user = AuthService::getLoggedUser();
         $files = $user->getTemporaryData("tmp_upload");
-        AJXP_Logger::debug("Saving user temporary data", array($fileData));
+        $this->logDebug("Saving user temporary data", array($fileData));
         $files[] = $fileData;
         $user->saveTemporaryData("tmp_upload", $files);
         if(strpos($_SERVER["HTTP_USER_AGENT"], "ajaxplorer-ios-client") !== false

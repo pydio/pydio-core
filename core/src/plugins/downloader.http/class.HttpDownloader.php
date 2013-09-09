@@ -90,7 +90,7 @@ class HttpDownloader extends AJXP_Plugin
                     @unlink($pidHiddenFileName);
                 }
 
-                AJXP_Logger::debug("COLLECTED HEADERS", $client->collectHeaders);
+                $this->logDebug("COLLECTED HEADERS", $client->collectHeaders);
                 $collectHeaders = $client->collectHeaders;
                 $totalSize = -1;
                 if (!empty($collectHeaders["content-disposition"]) && strstr($collectHeaders["content-disposition"], "filename")!== false) {
@@ -100,7 +100,7 @@ class HttpDownloader extends AJXP_Plugin
                 }
                 if (!empty($collectHeaders["content-length"])) {
                     $totalSize = intval($collectHeaders["content-length"]);
-                    AJXP_Logger::debug("Should download $totalSize bytes!");
+                    $this->logDebug("Should download $totalSize bytes!");
                 }
                 if ($totalSize != -1) {
                     $node = new AJXP_Node($destStreamURL.$basename);
@@ -171,7 +171,7 @@ class HttpDownloader extends AJXP_Plugin
                 $hiddenFilename = $destStreamURL.$newName;
                 $data = @unserialize(@file_get_contents($hiddenFilename));
                 header("text/plain");
-                AJXP_Logger::debug("Getting $hiddenFilename",$data);
+                $this->logDebug("Getting $hiddenFilename",$data);
                 if (isSet($data["pid"])) {
                     $process = new UnixProcess();
                     $process->setPid($data["pid"]);

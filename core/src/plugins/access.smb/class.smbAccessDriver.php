@@ -89,8 +89,8 @@ class smbAccessDriver extends fsAccessDriver
             $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile,
                 PCLZIP_ATT_FILE_NEW_SHORT_NAME => basename($item));
         }
-        AJXP_Logger::debug("Pathes", $filePaths);
-        AJXP_Logger::debug("Basedir", array($basedir));
+        $this->logDebug("Pathes", $filePaths);
+        $this->logDebug("Basedir", array($basedir));
         self::$filteringDriverInstance = $this;
         $archive = new PclZip($dest);
         $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON);

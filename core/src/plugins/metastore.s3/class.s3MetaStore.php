@@ -90,7 +90,7 @@ class s3MetaStore extends AJXP_Plugin implements MetaStoreProvider
                 'meta' => array($this->getMetaKey($nameSpace,$scope,$user) => base64_encode(serialize($metaData)))
             )
         );
-        AJXP_Logger::debug("UPDATE RESPONSE", $response);
+        $this->logDebug("UPDATE RESPONSE", $response);
     }
 
     public function removeMetadata($ajxpNode, $nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY)
@@ -144,7 +144,7 @@ class s3MetaStore extends AJXP_Plugin implements MetaStoreProvider
         if (isSet(self::$metaCache[$ajxpNode->getPath()])) {
             $data = self::$metaCache[$ajxpNode->getPath()];
         } else {
-            AJXP_Logger::debug("Should retrieve metadata for ".$ajxpNode->getPath());
+            $this->logDebug("Should retrieve metadata for ".$ajxpNode->getPath());
             $response = $aws->get_object_metadata($this->bucketName, ltrim($ajxpNode->getPath(), "/"));
             self::$metaCache[$ajxpNode->getPath()] = $response["Headers"];
             $data = self::$metaCache[$ajxpNode->getPath()];

@@ -278,7 +278,7 @@ class IMagickPreviewer extends AJXP_Plugin
         }
         $params = ($this->extractAll?"-quality ".$viewerQuality:"-resize 250 ".$customOptions." -quality ".$thumbQuality);
         $cmd = $this->getFilteredOption("IMAGE_MAGICK_CONVERT")." ".escapeshellarg(($masterFile).$pageLimit)." ".$params." ".escapeshellarg($tmpFileThumb);
-        AJXP_Logger::debug("IMagick Command : $cmd");
+        $this->logDebug("IMagick Command : $cmd");
         session_write_close(); // Be sure to give the hand back
         exec($cmd, $out, $return);
         if (is_array($out) && count($out)) {
@@ -287,7 +287,7 @@ class IMagickPreviewer extends AJXP_Plugin
         if (!$this->extractAll) {
             rename($tmpFileThumb, $targetFile);
             if ($isStream) {
-                AJXP_Logger::debug("Copy preview file to remote", $backToStreamTarget);
+                $this->logDebug("Copy preview file to remote", $backToStreamTarget);
                 copy($targetFile, $backToStreamTarget);
                 unlink($targetFile);
             }
@@ -297,16 +297,16 @@ class IMagickPreviewer extends AJXP_Plugin
                     $targetFile = str_replace(".$extension", "", $targetFile);
                 }
                 if (is_file($targetFile)) {
-                    AJXP_Logger::debug("Copy preview file to remote", $backToStreamTarget);
+                    $this->logDebug("Copy preview file to remote", $backToStreamTarget);
                     copy($targetFile, $backToStreamTarget);
                     unlink($targetFile);
                 }
-                AJXP_Logger::debug("Searching for ", str_replace(".jpg", "-0.jpg", $tmpFileThumb));
+                $this->logDebug("Searching for ", str_replace(".jpg", "-0.jpg", $tmpFileThumb));
                 $i = 0;
                 while (file_exists(str_replace(".jpg", "-$i.jpg", $tmpFileThumb))) {
                     $page = str_replace(".jpg", "-$i.jpg", $tmpFileThumb);
                     $remote_page = str_replace(".$extension", "-$i.jpg", $backToStreamTarget);
-                    AJXP_Logger::debug("Copy preview file to remote", $remote_page);
+                    $this->logDebug("Copy preview file to remote", $remote_page);
                     copy($page, $remote_page);
                     unlink($page);
                     $i++;

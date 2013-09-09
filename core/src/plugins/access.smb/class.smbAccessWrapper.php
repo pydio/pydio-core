@@ -91,7 +91,7 @@ class smbAccessWrapper extends fsAccessWrapper
             return true;
         } else {
             $this->fp = fopen($this->realPath, $mode, $options);
-            //AJXP_Logger::debug("I opened an smb stream.");
+            //$this->logDebug("I opened an smb stream.");
             return ($this->fp !== false);
         }
     }

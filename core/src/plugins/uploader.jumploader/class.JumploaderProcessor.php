@@ -51,12 +51,12 @@ class JumploaderProcessor extends AJXP_Plugin
             $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
             $streamData = $plugin->detectStreamWrapper(true);
             if ($streamData["protocol"] == "ajxp.ftp" || $streamData["protocol"]=="ajxp.remotefs") {
-                AJXP_Logger::debug("Skip decoding");
+                $this->logDebug("Skip decoding");
                 self::$skipDecoding = true;
             }
         }
-        AJXP_Logger::debug("Jumploader HttpVars", $httpVars);
-        AJXP_Logger::debug("Jumploader FileVars", $fileVars);
+        $this->logDebug("Jumploader HttpVars", $httpVars);
+        $this->logDebug("Jumploader FileVars", $fileVars);
 
         $httpVars["dir"] = base64_decode(str_replace(" ","+",$httpVars["dir"]));
         $index = $httpVars["partitionIndex"];
@@ -287,12 +287,12 @@ class JumploaderProcessor extends AJXP_Plugin
 
                     if (file_exists($destStreamURL."$curDir/$dirname")) {
                         // if the folder exists, traverse
-                        AJXP_Logger::debug("$curDir/$dirname existing, traversing for $userfile_name out of", $httpVars["relativePath"]);
+                        $this->logDebug("$curDir/$dirname existing, traversing for $userfile_name out of", $httpVars["relativePath"]);
                         $curDir .= "/".$dirname;
                         continue;
                     }
 
-                    AJXP_Logger::debug($destStreamURL.$curDir);
+                    $this->logDebug($destStreamURL.$curDir);
                     $dirMode = 0775;
                     $chmodValue = $repository->getOption("CHMOD_VALUE");
                     if (isSet($chmodValue) && $chmodValue != "") {
@@ -310,7 +310,7 @@ class JumploaderProcessor extends AJXP_Plugin
 
             if (!$folderForbidden) {
                 $fileId = $httpVars["fileId"];
-                AJXP_Logger::debug("Should now rebuild file!", $httpVars);
+                $this->logDebug("Should now rebuild file!", $httpVars);
                 // Now move the final file to the right folder
                 // Currently the file is at the base of the current
                 AJXP_LOGGER::debug("PartitionRealName", $destStreamURL.$httpVars["partitionRealName"]);

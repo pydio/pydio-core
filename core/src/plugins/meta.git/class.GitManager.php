@@ -267,12 +267,12 @@ class GitManager extends AJXP_Plugin
         $command->addArgument(".");
         try {
             $cmd = $command->createCommandString();
-            AJXP_Logger::debug("Git command ".$cmd);
+            $this->logDebug("Git command ".$cmd);
             $res = $command->execute();
         } catch (Exception $e) {
-            AJXP_Logger::debug("Error ".$e->getMessage());
+            $this->logDebug("Error ".$e->getMessage());
         }
-        AJXP_Logger::debug("GIT RESULT ADD : ".$res);
+        $this->logDebug("GIT RESULT ADD : ".$res);
 
         $command = $git->getCommand("commit");
         $command->setOption("a", true);
@@ -285,12 +285,12 @@ class GitManager extends AJXP_Plugin
 
         try {
             $cmd = $command->createCommandString();
-            AJXP_Logger::debug("Git command ".$cmd);
+            $this->logDebug("Git command ".$cmd);
             $res = $command->execute();
         } catch (Exception $e) {
-            AJXP_Logger::debug("Error ".$e->getMessage());
+            $this->logDebug("Error ".$e->getMessage());
         }
-        AJXP_Logger::debug("GIT RESULT COMMIT : ".$res);
+        $this->logDebug("GIT RESULT COMMIT : ".$res);
     }
 
 }

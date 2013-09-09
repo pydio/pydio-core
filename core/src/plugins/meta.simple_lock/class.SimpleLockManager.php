@@ -95,7 +95,7 @@ class SimpleLockManager extends AJXP_Plugin
     public function processLockMeta($node)
     {
         // Transform meta into overlay_icon
-        // AJXP_Logger::debug("SHOULD PROCESS METADATA FOR ", $node->getLabel());
+        // $this->logDebug("SHOULD PROCESS METADATA FOR ", $node->getLabel());
         $lock = $this->metaStore->retrieveMetadata(
            $node,
            SimpleLockManager::METADATA_LOCK_NAMESPACE,
@@ -123,7 +123,7 @@ class SimpleLockManager extends AJXP_Plugin
      */
     public function checkFileLock($node)
     {
-        AJXP_Logger::debug("SHOULD CHECK LOCK METADATA FOR ", $node->getLabel());
+        $this->logDebug("SHOULD CHECK LOCK METADATA FOR ", $node->getLabel());
         $lock = $this->metaStore->retrieveMetadata(
            $node,
            SimpleLockManager::METADATA_LOCK_NAMESPACE,

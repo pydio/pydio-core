@@ -66,7 +66,7 @@ class MqManager extends AJXP_Plugin
     public function sendToQueue(AJXP_Notification $notification)
     {
         if (!$this->useQueue) {
-            AJXP_Logger::debug("SHOULD DISPATCH NOTIFICATION ON ".$notification->getNode()->getUrl()." ACTION ".$notification->getAction());
+            $this->logDebug("SHOULD DISPATCH NOTIFICATION ON ".$notification->getNode()->getUrl()." ACTION ".$notification->getAction());
             AJXP_Controller::applyHook("msg.notification", array(&$notification));
         } else {
             if($this->msgExchanger) $this->msgExchanger->publishWorkerMessage("user_notifications", $notification);
@@ -78,7 +78,7 @@ class MqManager extends AJXP_Plugin
         if($action != "consume_notification_queue" || $this->msgExchanger === false) return;
         $queueObjects = $this->msgExchanger->consumeWorkerChannel("user_notifications");
         if (is_array($queueObjects)) {
-            AJXP_Logger::debug("Processing notification queue, ".count($queueObjects)." notifs to handle");
+            $this->logDebug("Processing notification queue, ".count($queueObjects)." notifs to handle");
             foreach ($queueObjects as $notification) {
                 AJXP_Controller::applyHook("msg.notification", array(&$notification));
             }
@@ -226,14 +226,14 @@ class MqManager extends AJXP_Plugin
 
     public function wsAuthenticate($action, $httpVars, $fileVars)
     {
-        AJXP_Logger::debug("Entering wsAuthenticate");
+        $this->logDebug("Entering wsAuthenticate");
         $configs = $this->getConfigs();
         if (!isSet($httpVars["key"]) || $httpVars["key"] != $configs["WS_SERVER_ADMIN"]) {
             throw new Exception("Cannot authentify admin key");
         }
         $user = AuthService::getLoggedUser();
         if ($user == null) {
-            AJXP_Logger::debug("Error Authenticating through WebSocket (not logged)");
+            $this->logDebug("Error Authenticating through WebSocket (not logged)");
             throw new Exception("You must be logged in");
         }
         $xml = AJXP_XMLWriter::getUserXML($user);
@@ -242,7 +242,7 @@ class MqManager extends AJXP_Plugin
             $groupString = "groupPath=\"".AJXP_Utils::xmlEntities($user->getGroupPath())."\"";
             $xml = str_replace("<user id=", "<user {$groupString} id=", $xml);
         }
-        AJXP_Logger::debug("Authenticating user ".$user->id." through WebSocket");
+        $this->logDebug("Authenticating user ".$user->id." through WebSocket");
         AJXP_XMLWriter::header();
         echo $xml;
         AJXP_XMLWriter::close();

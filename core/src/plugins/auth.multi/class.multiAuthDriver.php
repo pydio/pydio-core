@@ -73,7 +73,7 @@ class multiAuthDriver extends AbstractAuthDriver
 
     public function getRegistryContributions( $extendedVersion = true )
     {
-        // AJXP_Logger::debug("get contributions NOW");
+        // $this->logDebug("get contributions NOW");
         $this->loadRegistryContributions();
         return parent::getRegistryContributions( $extendedVersion );
     }
@@ -85,12 +85,12 @@ class multiAuthDriver extends AbstractAuthDriver
         if (isSet($_POST["auth_source"])) {
             $_SESSION["AJXP_MULTIAUTH_SOURCE"] = $_POST["auth_source"];
             $authSource = $_POST["auth_source"];
-            AJXP_Logger::debug("Auth source from POST");
+            $this->logDebug("Auth source from POST");
         } else if (isSet($_SESSION["AJXP_MULTIAUTH_SOURCE"])) {
             $authSource = $_SESSION["AJXP_MULTIAUTH_SOURCE"];
-            AJXP_Logger::debug("Auth source from SESSION");
+            $this->logDebug("Auth source from SESSION");
         } else {
-            AJXP_Logger::debug("Auth source from MASTER");
+            $this->logDebug("Auth source from MASTER");
         }
         $this->setCurrentDriverName($authSource);
     }
@@ -332,7 +332,7 @@ class multiAuthDriver extends AbstractAuthDriver
             return false;
         }
         $login = $this->extractRealId($login);
-        AJXP_Logger::debug("user exists ".$login);
+        $this->logDebug("user exists ".$login);
         if ($this->getCurrentDriver()) {
             return $this->getCurrentDriver()->userExists($login);
         } else {
@@ -362,7 +362,7 @@ class multiAuthDriver extends AbstractAuthDriver
         }
 
         $login = $this->extractRealId($login);
-        AJXP_Logger::debug("check pass ".$login);
+        $this->logDebug("check pass ".$login);
         if ($this->getCurrentDriver()) {
             return $this->getCurrentDriver()->checkPassword($login, $pass, $seed);
         } else {
@@ -389,7 +389,7 @@ class multiAuthDriver extends AbstractAuthDriver
             return $this->getCurrentDriver()->passwordsEditable();
         } else {
             //throw new Exception("No driver instanciated in multi driver!");
-            AJXP_Logger::debug("passEditable no current driver set??");
+            $this->logDebug("passEditable no current driver set??");
             return false;
         }
     }

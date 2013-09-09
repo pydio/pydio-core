@@ -34,11 +34,11 @@ class FlexUploadProcessor extends AJXP_Plugin
     {
         if (isSet($fileVars["Filedata"])) {
             self::$active = true;
-            AJXP_Logger::debug("Dir before base64", $httpVars);
+            $this->logDebug("Dir before base64", $httpVars);
             $httpVars["dir"] = base64_decode(urldecode($httpVars["dir"]));
             $fileVars["userfile_0"] = $fileVars["Filedata"];
             unset($fileVars["Filedata"]);
-            AJXP_Logger::debug("Setting FlexProc active");
+            $this->logDebug("Setting FlexProc active");
         }
     }
 
@@ -47,7 +47,7 @@ class FlexUploadProcessor extends AJXP_Plugin
         if (!self::$active) {
             return false;
         }
-        AJXP_Logger::debug("FlexProc is active=".self::$active, $postProcessData);
+        $this->logDebug("FlexProc is active=".self::$active, $postProcessData);
         $result = $postProcessData["processor_result"];
         if (isSet($result["SUCCESS"]) && $result["SUCCESS"] === true) {
             header('HTTP/1.0 200 OK');

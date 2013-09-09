@@ -583,13 +583,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             //------------------------------------
             case "upload":
 
-                AJXP_Logger::debug("Upload Files Data", $fileVars);
+                $this->logDebug("Upload Files Data", $fileVars);
                 $destination=$this->urlBase.AJXP_Utils::decodeSecureMagic($dir);
-                AJXP_Logger::debug("Upload inside", array("destination"=>$this->addSlugToPath($destination)));
+                $this->logDebug("Upload inside", array("destination"=>$this->addSlugToPath($destination)));
                 if (!$this->isWriteable($destination)) {
                     $errorCode = 412;
                     $errorMessage = "$mess[38] ".SystemTextEncoding::toUTF8($dir)." $mess[99].";
-                    AJXP_Logger::debug("Upload error 412", array("destination"=>$this->addSlugToPath($destination)));
+                    $this->logDebug("Upload error 412", array("destination"=>$this->addSlugToPath($destination)));
                     return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $errorMessage));
                 }
                 foreach ($fileVars as $boxName => $boxData) {
@@ -610,7 +610,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     if (isSet($httpVars["urlencoded_filename"])) {
                         $userfile_name = AJXP_Utils::sanitize(SystemTextEncoding::fromUTF8(urldecode($httpVars["urlencoded_filename"])), AJXP_SANITIZE_HTML_STRICT);
                     }
-                    AJXP_Logger::debug("User filename ".$userfile_name);
+                    $this->logDebug("User filename ".$userfile_name);
                     $userfile_name = substr($userfile_name, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
                     if (isSet($httpVars["auto_rename"])) {
                         $userfile_name = self::autoRenameForDest($destination, $userfile_name);
@@ -629,7 +629,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     }
                     if (isSet($boxData["input_upload"])) {
                         try {
-                            AJXP_Logger::debug("Begining reading INPUT stream");
+                            $this->logDebug("Begining reading INPUT stream");
                             $input = fopen("php://input", "r");
                             $output = fopen("$destination/".$userfile_name, "w");
                             $sizeRead = 0;
@@ -640,7 +640,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                             }
                             fclose($input);
                             fclose($output);
-                            AJXP_Logger::debug("End reading INPUT stream");
+                            $this->logDebug("End reading INPUT stream");
                         } catch (Exception $e) {
                             $errorCode=411;
                             $errorMessage = $e->getMessage();
@@ -661,7 +661,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     if (isSet($httpVars["appendto_urlencoded_part"])) {
                         $appendTo = AJXP_Utils::sanitize(SystemTextEncoding::fromUTF8(urldecode($httpVars["appendto_urlencoded_part"])), AJXP_SANITIZE_HTML_STRICT);
                         if (file_exists($destination ."/" . $appendTo)) {
-                            AJXP_Logger::debug("Should copy stream from $userfile_name to $appendTo");
+                            $this->logDebug("Should copy stream from $userfile_name to $appendTo");
                             $partO = fopen($destination."/".$userfile_name, "r");
                             $appendF = fopen($destination ."/". $appendTo, "a+");
                             while (!feof($partO)) {
@@ -670,7 +670,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                             }
                             fclose($partO);
                             fclose($appendF);
-                            AJXP_Logger::debug("Done, closing streams!");
+                            $this->logDebug("Done, closing streams!");
                         }
                         @unlink($destination."/".$userfile_name);
                         $userfile_name = $appendTo;
@@ -684,10 +684,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 }
 
                 if (isSet($errorMessage)) {
-                    AJXP_Logger::debug("Return error $errorCode $errorMessage");
+                    $this->logDebug("Return error $errorCode $errorMessage");
                     return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $errorMessage));
                 } else {
-                    AJXP_Logger::debug("Return success");
+                    $this->logDebug("Return success");
                     return array("SUCCESS" => true, "CREATED_NODE" => $createdNode);
                 }
                 return ;
@@ -875,7 +875,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     }
                 }
 
-                AJXP_Logger::debug("LS Time : ".intval((microtime()-$startTime)*1000)."ms");
+                $this->logDebug("LS Time : ".intval((microtime()-$startTime)*1000)."ms");
 
                 AJXP_XMLWriter::close();
                 return ;
@@ -1150,7 +1150,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             */
             if ($isFile) {
                 header("Accept-Ranges: 0-$size");
-                AJXP_Logger::debug("Sending accept range 0-$size");
+                $this->logDebug("Sending accept range 0-$size");
             }
 
             // Check if we have a range header (we are resuming a transfer)
@@ -1162,7 +1162,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         $mimeType = $fInfo->file( $realfile);
                         $splitChar = explode(";", $mimeType);
                         $mimeType = trim($splitChar[0]);
-                        AJXP_Logger::debug("Detected mime $mimeType for $realfile");
+                        $this->logDebug("Detected mime $mimeType for $realfile");
                     } else {
                         $mimeType = AJXP_Utils::getStreamingMimeType(basename($filePathOrData));
                     }
@@ -1176,7 +1176,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 $length = floatval($offsets[1]) - $offset;
                 if (!$length) $length = $size - $offset;
                 if ($length + $offset > $size || $length < 0) $length = $size - $offset;
-                AJXP_Logger::debug('Content-Range: bytes ' . $offset . '-' . $length . '/' . $size);
+                $this->logDebug('Content-Range: bytes ' . $offset . '-' . $length . '/' . $size);
                 header('HTTP/1.1 206 Partial Content');
                 header('Content-Range: bytes ' . $offset . '-' . ($offset + $length) . '/' . $size);
 
@@ -1196,7 +1196,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 $readSize = 0.0;
                 $bufferSize = 1024 * 8;
                 while (!feof($file) && $readSize < $length && connection_status() == 0) {
-                    AJXP_Logger::debug("dl reading $readSize to $length", $_SERVER["HTTP_RANGE"]);
+                    $this->logDebug("dl reading $readSize to $length", $_SERVER["HTTP_RANGE"]);
                     echo fread($file, $bufferSize);
                     $readSize += $bufferSize;
                     flush();
@@ -1252,7 +1252,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     }
             $stream = fopen("php://output", "a");
             if ($realfileSystem) {
-                AJXP_Logger::debug("realFS!", array("file"=>$filePathOrData));
+                $this->logDebug("realFS!", array("file"=>$filePathOrData));
                 $fp = fopen($filePathOrData, "rb");
                 if ($byteOffset != -1) {
                     fseek($fp, $byteOffset);
@@ -1372,9 +1372,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 }
             }
         }
-        AJXP_Logger::debug("Archive", $this->addSlugToPath($files));
+        $this->logDebug("Archive", $this->addSlugToPath($files));
         $realDestination = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase.$destDir);
-        AJXP_Logger::debug("Extract", array($realDestination, $realZipFile, $this->addSlugToPath($files), $zipLocalPath));
+        $this->logDebug("Extract", array($realDestination, $realZipFile, $this->addSlugToPath($files), $zipLocalPath));
         $result = $archive->extract(PCLZIP_OPT_BY_NAME, $files,
                                     PCLZIP_OPT_PATH, $realDestination,
                                     PCLZIP_OPT_REMOVE_PATH, $zipLocalPath);
@@ -1388,7 +1388,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 
     public function copyOrMove($destDir, $selectedFiles, &$error, &$success, $move = false)
     {
-        AJXP_Logger::debug("CopyMove", array("dest"=>$this->addSlugToPath($destDir), "selection" => $this->addSlugToPath($selectedFiles)));
+        $this->logDebug("CopyMove", array("dest"=>$this->addSlugToPath($destDir), "selection" => $this->addSlugToPath($selectedFiles)));
         $mess = ConfService::getMessages();
         if (!$this->isWriteable($this->urlBase.$destDir)) {
             $error[] = $mess[38]." ".$destDir." ".$mess[99];
@@ -1841,8 +1841,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                                     PCLZIP_ATT_FILE_NEW_SHORT_NAME => basename($item));
             }
         }
-        AJXP_Logger::debug("Pathes", $filePaths);
-        AJXP_Logger::debug("Basedir", array($basedir));
+        $this->logDebug("Pathes", $filePaths);
+        $this->logDebug("Basedir", array($basedir));
         self::$filteringDriverInstance = $this;
         $archive = new PclZip($dest);
         $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'zipPreAddCallback');

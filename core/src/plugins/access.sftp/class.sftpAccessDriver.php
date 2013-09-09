@@ -152,7 +152,7 @@ class sftpAccessDriver extends fsAccessDriver
                     list($connection, $remote_base_path) = sftpAccessWrapper::getSshConnection($realSrcFile);
                     $remoteSrc = $remote_base_path.$srcFile;
                     $remoteDest = $remote_base_path.$destDir;
-                    AJXP_Logger::debug("SSH2 CP", array("cmd" => 'cp '.$remoteSrc.' '.$remoteDest));
+                    $this->logDebug("SSH2 CP", array("cmd" => 'cp '.$remoteSrc.' '.$remoteDest));
                     ssh2_exec($connection, 'cp '.$remoteSrc.' '.$remoteDest);
                     AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), true));
                     // END OVERRIDING
@@ -222,8 +222,8 @@ class sftpAccessDriver extends fsAccessDriver
             $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $uniqpath,
                                  PCLZIP_ATT_FILE_NEW_SHORT_NAME => $basename);
         }
-        AJXP_Logger::debug("Pathes", $filePaths);
-        AJXP_Logger::debug("Basedir", array($basedir));
+        $this->logDebug("Pathes", $filePaths);
+        $this->logDebug("Basedir", array($basedir));
         $archive = new PclZip($dest);
         $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $uniqfolder, PCLZIP_OPT_NO_COMPRESSION);
         $this->recursiveRmdir($uniqfolder);

@@ -258,7 +258,7 @@ class SvnManager extends AJXP_Plugin
         } else {
             $init = $this->initDirAndSelection($httpVars, array(), true);
         }
-        AJXP_Logger::debug("Entering SVN MAnager for action $actionName", $init);
+        $this->logDebug("Entering SVN MAnager for action $actionName", $init);
         $action = 'copy';
         if ($actionName == "move" || $actionName == "rename") {
             $action = 'move';
