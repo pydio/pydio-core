@@ -20,7 +20,7 @@ class TimestampCreator extends AJXP_Plugin
         //Check if the configuration has been initiated
         if (empty($timestamp_url) || empty($timestamp_login) || !empty($timestamp_password) ) {
             throw new AJXP_Exception($mess["timestamp.4"]);
-            $this->logInfo("error", "TimeStamp : configuration is needed");
+            $this->logError("Config", "TimeStamp : configuration is needed");
             return false;
         }
 
@@ -28,7 +28,7 @@ class TimestampCreator extends AJXP_Plugin
         //Check if after being initiated, conf. fields have some values
         if (strlen($timestamp_url)<2 || strlen($timestamp_login)<2 || strlen($timestamp_password)<2 ) {
             throw new AJXP_Exception($mess["timestamp.4"]);
-            $this->logInfo("error", "TimeStamp : configuration is incorrect");
+            $this->logError("Config", "TimeStamp : configuration is incorrect");
             return false;
         }
 

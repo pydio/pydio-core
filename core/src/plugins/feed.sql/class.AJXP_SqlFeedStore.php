@@ -64,7 +64,7 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         try {
             dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[repository_owner],[user_group],[repository_scope],[content]) VALUES (%i,%s,%s,%s,%s,%s,%s,%s,%bin)", time(), "event", "node.change", $userId, $repositoryId, $repositoryOwner, $userGroup, ($repositoryScope !== false ? $repositoryScope : "ALL"), serialize($data));
         } catch (DibiException $e) {
-            $this->logInfo("error: (trying to persist event)", $e->getMessage());
+            $this->logError("DibiException", "trying to persist event", $e->getMessage());
         }
     }
 
@@ -120,7 +120,7 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
             dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[content]) VALUES (%i,%s,%s,%s,%s,%bin)",
             time(), "alert", "notification", $userId, $repositoryId, serialize($notif));
         } catch (DibiException $e) {
-            $this->logInfo("error: (trying to persist alert)", $e->getMessage());
+            $this->logError("DibiException", "trying to persist alert", $e->getMessage());
         }
     }
 

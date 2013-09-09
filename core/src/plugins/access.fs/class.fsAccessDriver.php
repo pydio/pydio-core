@@ -1247,7 +1247,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             header('Content-Disposition: attachment; filename="' . basename($accelfile) . '"');
             return;
         } else {
-            $this->logInfo("error","Problem with X-Accel-Mapping for file $filePathOrData");
+            $this->logError("X-Accel-Redirect","Problem with X-Accel-Mapping for file $filePathOrData");
         }
     }
             $stream = fopen("php://output", "a");

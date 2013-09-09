@@ -128,12 +128,12 @@ class ImagePreviewer extends AJXP_Plugin
             //$this->logDebug("Done");
             if ($pThumb->isError()) {
                 print_r($pThumb->error_array);
-                $this->logInfo("error", $pThumb->error_array);
+                $this->logError("ImagePreviewer", $pThumb->error_array);
                 return false;
             }
         } else {
             print_r($pThumb->error_array);
-            $this->logInfo("error", $pThumb->error_array);
+            $this->logError("ImagePreviewer", $pThumb->error_array);
             return false;
         }
     }

@@ -36,7 +36,7 @@ class BitlyShortener extends AJXP_Plugin
 
         if (empty($BITLY_USER) || empty($BITLY_APIKEY)) {
             print($url);
-            $this->logInfo("error", "Bitly Shortener : you must drop the conf.shorten.bitly.inc file inside conf.php and set the login/api key!");
+            $this->logError("Config", "Bitly Shortener : you must drop the conf.shorten.bitly.inc file inside conf.php and set the login/api key!");
             return;
         }
         $bitly_login = $BITLY_USER;

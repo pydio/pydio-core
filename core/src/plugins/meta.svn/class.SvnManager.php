@@ -357,7 +357,7 @@ class SvnManager extends AJXP_Plugin
                 $entries = $this->svnListNode($realDir);
                 SvnManager::$svnListCache = $entries;
             } catch (Exception $e) {
-                $this->logInfo("Error", array($e->getMessage()));
+                $this->logError("ExtractMeta", $e->getMessage());
             }
         }
         $fileId = SystemTextEncoding::toUTF8(basename($ajxpNode->getUrl()));

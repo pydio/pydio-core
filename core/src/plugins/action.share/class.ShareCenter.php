@@ -405,7 +405,7 @@ class ShareCenter extends AJXP_Plugin
                 );
                 $oldNode->removeMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
             } catch (Exception $e) {
-                $this->logInfo("ERROR : ".$e->getMessage(), $e->getTrace() );
+                $this->logError("Exception", $e->getMessage(), $e->getTrace() );
             }
         }
     }
