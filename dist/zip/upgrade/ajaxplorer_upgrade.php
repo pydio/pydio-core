@@ -11,13 +11,14 @@ $requiredVersion = $_GET["version"];
 $requiredChannel = (isSet($_GET["channel"])?$_GET["channel"]:"stable");
 $hashMethod = "md5";
 
-function preparePackages($channel, $hashMethod){
+function preparePackages($channel, $hashMethod)
+{
     $packages = glob(CRT_PATH."/".$channel."/*.zip");
     $sUrl = detectServerURL().dirname($_SERVER["REQUEST_URI"]);
     $zips = array();
-    foreach($packages as $package){
+    foreach ($packages as $package) {
         $name = basename($package);
-        if(preg_match('/ajaxplorer-core-upgrade-([^-]*)-([^-]*)\.zip/', $name, $matches)){
+        if (preg_match('/ajaxplorer-core-upgrade-([^-]*)-([^-]*)\.zip/', $name, $matches)) {
             $startV = $matches[1];
             $endV = $matches[2];
             $zips[$startV] = array($sUrl."/".$channel."/".$name, $startV, $endV, hash_file($hashMethod,$package));
@@ -27,7 +28,8 @@ function preparePackages($channel, $hashMethod){
     return $zips;
 }
 
-function detectServerURL(){
+function detectServerURL()
+{
     $protocol = ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http' );
     $port = (( $protocol === 'http' && $_SERVER['SERVER_PORT'] == 80 || $protocol === 'https' && $_SERVER['SERVER_PORT'] == 443 ) ? "" : ":".$_SERVER['SERVER_PORT']);
     $name = $_SERVER["SERVER_NAME"];
@@ -39,21 +41,21 @@ $zips = preparePackages($requiredChannel, $hashMethod);
 $upgradePath = array();
 $hashes = array();
 $note = "";
-if(isSet($zips[$requiredVersion])){
+if (isSet($zips[$requiredVersion])) {
     $nextVersion = $requiredVersion;
-    while(isSet($zips[$nextVersion])){
+    while (isSet($zips[$nextVersion])) {
         $pack = $zips[$nextVersion];
         $upgradePath[] = '"'.$pack[0].'"';
         $hashes[] = '"'.$pack[3].'"';
         $nextVersion = $pack[2];
     }
-    if(isSet($pack)){
-    	$zip = $pack[0];
-    	$sUrl = detectServerURL().dirname($_SERVER["REQUEST_URI"]);
-    	$notefile = CRT_PATH."/$requiredChannel/".str_replace(".zip", ".html", basename($zip));
-    	if(is_file($notefile)){
-    		$note = str_replace(".zip", ".html", $zip);
-    	}
+    if (isSet($pack)) {
+        $zip = $pack[0];
+        $sUrl = detectServerURL().dirname($_SERVER["REQUEST_URI"]);
+        $notefile = CRT_PATH."/$requiredChannel/".str_replace(".zip", ".html", basename($zip));
+        if (is_file($notefile)) {
+            $note = str_replace(".zip", ".html", $zip);
+        }
     }
 }
 
@@ -70,13 +72,13 @@ $urchinUrl='http://www.google-analytics.com/__utm.gif?utmwv=1&utmn='.$var_utmn.'
 $handle = fopen ($urchinUrl, "r");
 $test = fgets($handle);
 fclose($handle);
-  
-  
+
+
 header("Content-type:application/json");
-if($requiredChannel == "test"){
-	$sUrl = detectServerURL().dirname($_SERVER["REQUEST_URI"]);
-	$upgradePath = array('"'.$sUrl.'/test/ajaxplorer-core-upgrade-0.0.0-0.0.0.zip"');
-	$hashes = array('"'.md5_file(CRT_PATH."/test/ajaxplorer-core-upgrade-0.0.0-0.0.0.zip").'"');
+if ($requiredChannel == "test") {
+    $sUrl = detectServerURL().dirname($_SERVER["REQUEST_URI"]);
+    $upgradePath = array('"'.$sUrl.'/test/ajaxplorer-core-upgrade-0.0.0-0.0.0.zip"');
+    $hashes = array('"'.md5_file(CRT_PATH."/test/ajaxplorer-core-upgrade-0.0.0-0.0.0.zip").'"');
     $note = $sUrl."/test/ajaxplorer-core-upgrade-0.0.0-0.0.0.html";
 }
 print("{\"packages\":[".implode(",", $upgradePath)."],\"hashes\":[".implode(",", $hashes)."],\"hash_method\":\"md5\", \"latest_note\":\"".$note."\"}");

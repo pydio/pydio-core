@@ -23,23 +23,28 @@ namespace AJXP\Tests\Core;
 class UsersTests extends \PHPUnit_Framework_TestCase
 {
 
-    public function testUsersStorage(){
+    public function testUsersStorage()
+    {
         $this->markTestIncomplete('Not implemented');
     }
 
-    public function testPassChange(){
+    public function testPassChange()
+    {
         $this->markTestIncomplete('Not implemented');
     }
 
-    public function testUsersForRepositories(){
+    public function testUsersForRepositories()
+    {
         $this->markTestIncomplete('Not implemented');
     }
 
-    public function testGroupsStorage(){
+    public function testGroupsStorage()
+    {
         $this->markTestIncomplete('Not implemented');
     }
 
-    public function testGroupsRights(){
+    public function testGroupsRights()
+    {
         $this->markTestIncomplete('Not implemented');
     }
 

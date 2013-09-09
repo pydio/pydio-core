@@ -27,7 +27,8 @@ class UtilsTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(true);
     }
 
-    public function testFrameworkLoads(){
+    public function testFrameworkLoads()
+    {
         $this->assertEquals(\AJXP_Utils::convertBytes("2M"), 2097152);
     }
 

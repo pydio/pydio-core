@@ -48,7 +48,7 @@ class AjxpSvnSummarizeTask extends SvnBaseTask
      *
      * @throws BuildException
      */
-    function main()
+    public function main()
     {
         $this->setup('diff');
 
@@ -68,26 +68,28 @@ class AjxpSvnSummarizeTask extends SvnBaseTask
     {
         $this->revision1 = $revision;
     }
-    
+
     public function getRevision1()
     {
         return $this->revision1;
     }
-    
+
     public function setRevision2($revision)
     {
         $this->revision2 = $revision;
     }
-    
+
     public function getRevision2()
     {
         return $this->revision2;
     }
-    public function setSummarizeFile($summarizeFile){
-    	$this->summarizeFile = $summarizeFile;
+    public function setSummarizeFile($summarizeFile)
+    {
+        $this->summarizeFile = $summarizeFile;
     }
-    public function getSummarizeFile(){
-    	return $this->summarizeFile;
+    public function getSummarizeFile()
+    {
+        return $this->summarizeFile;
     }
-    
+
 }

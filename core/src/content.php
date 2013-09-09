@@ -22,4 +22,3 @@
  * Could be fixed by URL rewritting also.
  */
 include("index.php");
-?>

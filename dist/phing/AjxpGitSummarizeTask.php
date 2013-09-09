@@ -48,59 +48,59 @@ class AjxpGitSummarizeTask extends GitBaseTask
      *
      * @throws BuildException
      */
-    function main()
+    public function main()
     {
        if (null === $this->getRepository()) {
             throw new BuildException('"repository" is required parameter');
         }
 
-	    $client = $this->getGitClient(false, $this->getRepository());
-	    $command = $client->getCommand('diff-tree');
-	    $command->setOption('r');
-	    $command->setOption('name-status', true);
-	    $command->addArgument($this->getCommit1());
-	    $command->addArgument($this->getCommit2());
+        $client = $this->getGitClient(false, $this->getRepository());
+        $command = $client->getCommand('diff-tree');
+        $command->setOption('r');
+        $command->setOption('name-status', true);
+        $command->addArgument($this->getCommit1());
+        $command->addArgument($this->getCommit2());
 
         $this->log("Diffing Git repository '" . $this->getRepository() . "' "
           . " (revision: {$this->getCommit1()}:{$this->getCommit2()}");
-	    
-	 	try{
-	    	$output = $command->execute();
-	 	}catch (Exception $e){
-	 		throw new BuildException('Task execution failed.');
-	 	}
+
+         try {
+            $output = $command->execute();
+         } catch (Exception $e) {
+             throw new BuildException('Task execution failed.');
+         }
         file_put_contents($this->getSummarizeFile(), $output);
-        
+
     }
 
     public function setCommit1($revision)
     {
         $this->commit1 = $revision;
     }
-    
+
     public function getCommit1()
     {
         return $this->commit1;
     }
-    
+
     public function setCommit2($revision)
     {
         $this->commit2 = $revision;
     }
-    
+
     public function getCommit2()
     {
         return $this->commit2;
     }
-    
+
     public function setSummarizeFile($summarizeFile)
     {
-    	$this->summarizeFile = $summarizeFile;
+        $this->summarizeFile = $summarizeFile;
     }
-    
+
     public function getSummarizeFile()
     {
-    	return $this->summarizeFile;
+        return $this->summarizeFile;
     }
-        
+
 }

@@ -21,150 +21,150 @@ jimport( 'joomla.registry.registry' );
  * @subpackage	JFramework
  * @since 		3.0
  */
-class plgUserAjaxplorer extends JPlugin {
-
-	/**
-	 * Constructor
-	 *
-	 * For php4 compatability we must not use the __constructor as a constructor for plugins
-	 * because func_get_args ( void ) returns a copy of all passed arguments NOT references.
-	 * This causes problems with cross-referencing necessary for the observer design pattern.
-	 *
-	 * @param object $subject The object to observe
-	 * @param 	array  $config  An array that holds the plugin configuration
-	 * @since 1.6
-	 */
-	function plgUserAjaxplorer(& $subject, $config)
-	{
-		parent::__construct($subject, $config);
+class plgUserAjaxplorer extends JPlugin
+{
+    /**
+     * Constructor
+     *
+     * For php4 compatability we must not use the __constructor as a constructor for plugins
+     * because func_get_args ( void ) returns a copy of all passed arguments NOT references.
+     * This causes problems with cross-referencing necessary for the observer design pattern.
+     *
+     * @param object $subject The object to observe
+     * @param 	array  $config  An array that holds the plugin configuration
+     * @since 1.6
+     */
+    public function plgUserAjaxplorer(& $subject, $config)
+    {
+        parent::__construct($subject, $config);
         $this->_plugin = JPluginHelper::getPlugin( 'user', 'ajaxplorer' );
         $this->_params = new JRegistry();
         $this->_params->loadString($this->_plugin->params);
 
-		$this->secret = $this->_params->get("ajxp_secret_key") OR '';
+        $this->secret = $this->_params->get("ajxp_secret_key") OR '';
         $installPath = $this->_params->get("ajxp_install_path") OR '';
         $this->glueCode = $installPath."/plugins/auth.remote/glueCode.php";
         $this->glueCodeFound = file_exists($this->glueCode);
         $this->autoCreate = $this->_params->get("ajxp_auto_create");
-	}
+    }
 
 
-	/**
-	 * Example store user method
-	 *
-	 * Method is called after user data is stored in the database
-	 *
-	 * @param 	array		holds the new user data
-	 * @param 	boolean		true if a new user is stored
-	 * @param	boolean		true if user was succesfully stored in the database
-	 * @param	string		message
-	 */
-	function onUserAfterSave($joomlaUser, $isnew, $success, $msg)
-	{
-		global $mainframe;
+    /**
+     * Example store user method
+     *
+     * Method is called after user data is stored in the database
+     *
+     * @param 	array		holds the new user data
+     * @param 	boolean		true if a new user is stored
+     * @param	boolean		true if user was succesfully stored in the database
+     * @param	string		message
+     */
+    public function onUserAfterSave($joomlaUser, $isnew, $success, $msg)
+    {
+        global $mainframe;
 
-		// convert the user parameters passed to the event
-		// to a format the external application
-		if(!$this->glueCodeFound) return false;
-		if(!$success) return true;
-		global $AJXP_GLUE_GLOBALS;
-		$AJXP_GLUE_GLOBALS = array();
-		
-		$AJXP_GLUE_GLOBALS["secret"] = $this->secret;
-		$AJXP_GLUE_GLOBALS["user"] = array();
-		$AJXP_GLUE_GLOBALS["user"]['name']	= $joomlaUser['username'];
-		$AJXP_GLUE_GLOBALS["user"]['password']	= $joomlaUser['password'];
-		if($joomlaUser['usertype'] == "Super Administrator" || $joomlaUser['usertype'] == "Administrator" || $joomlaUser["isRoot"]
+        // convert the user parameters passed to the event
+        // to a format the external application
+        if(!$this->glueCodeFound) return false;
+        if(!$success) return true;
+        global $AJXP_GLUE_GLOBALS;
+        $AJXP_GLUE_GLOBALS = array();
+
+        $AJXP_GLUE_GLOBALS["secret"] = $this->secret;
+        $AJXP_GLUE_GLOBALS["user"] = array();
+        $AJXP_GLUE_GLOBALS["user"]['name']	= $joomlaUser['username'];
+        $AJXP_GLUE_GLOBALS["user"]['password']	= $joomlaUser['password'];
+        if($joomlaUser['usertype'] == "Super Administrator" || $joomlaUser['usertype'] == "Administrator" || $joomlaUser["isRoot"]
             || is_array($joomlaUser["groups"]) && in_array("8", $joomlaUser["groups"])){
-			$AJXP_GLUE_GLOBALS["user"]['right'] = 'admin';
-		}else{
-			$AJXP_GLUE_GLOBALS["user"]['right'] = '';
-		}
-		$AJXP_GLUE_GLOBALS["plugInAction"] = ($isnew?"addUser":"updateUser");
-		
-		
-	   	include($this->glueCode);
-		return $AJXP_GLUE_GLOBALS["result"];
-		
-	}
+            $AJXP_GLUE_GLOBALS["user"]['right'] = 'admin';
+        } else {
+            $AJXP_GLUE_GLOBALS["user"]['right'] = '';
+        }
+        $AJXP_GLUE_GLOBALS["plugInAction"] = ($isnew?"addUser":"updateUser");
 
-	/**
-	 * Example store user method
-	 *
-	 * Method is called after user data is deleted from the database
-	 *
-	 * @param 	array		holds the user data
-	 * @param	boolean		true if user was succesfully stored in the database
-	 * @param	string		message
-	 */
-	function onUserAfterDelete($joomlaUser, $succes, $msg)
-	{
-		global $mainframe;
 
-	 	// only the $user['id'] exists and carries valid information
+           include($this->glueCode);
+        return $AJXP_GLUE_GLOBALS["result"];
 
-		// Call a function in the external app to delete the user
-		// ThirdPartyApp::deleteUser($user['id']);
-		if(!$this->glueCodeFound) return false;
-		if(!$succes) return true;
-		global $AJXP_GLUE_GLOBALS;
-		$AJXP_GLUE_GLOBALS = array();
-		
-		$AJXP_GLUE_GLOBALS["secret"] = $this->secret;		
-		$AJXP_GLUE_GLOBALS["userName"] = $joomlaUser['username'];
-		$AJXP_GLUE_GLOBALS["plugInAction"] = "delUser";
-	   	include($this->glueCode);
+    }
 
-		return true;
-	}
+    /**
+     * Example store user method
+     *
+     * Method is called after user data is deleted from the database
+     *
+     * @param 	array		holds the user data
+     * @param	boolean		true if user was succesfully stored in the database
+     * @param	string		message
+     */
+    public function onUserAfterDelete($joomlaUser, $succes, $msg)
+    {
+        global $mainframe;
 
-	/**
-	 * This method should handle any login logic and report back to the subject
-	 *
-	 * @access	public
-	 * @param 	array 	holds the user data
-	 * @param 	array    extra options
-	 * @return	boolean	True on success
-	 * @since	1.6
-	 */
-	function onUserLogin($user, $options)
-	{
-		// Initialize variables
-		$success = false;
-		if(!$this->glueCodeFound) return false;
+         // only the $user['id'] exists and carries valid information
 
-		global $AJXP_GLUE_GLOBALS;
-		$AJXP_GLUE_GLOBALS = array();
-		//$plugInAction, $login, $result, $secret, $autoCreate;
-		$AJXP_GLUE_GLOBALS["secret"] = $this->secret;
-		$AJXP_GLUE_GLOBALS["autoCreate"] = $this->autoCreate;
-		$AJXP_GLUE_GLOBALS["plugInAction"] = "login";
-		$AJXP_GLUE_GLOBALS["login"] = array("name"=>$user["username"], "password"=>$user["password"]); 
-	   	include($this->glueCode);
-		return true;
-	}
+        // Call a function in the external app to delete the user
+        // ThirdPartyApp::deleteUser($user['id']);
+        if(!$this->glueCodeFound) return false;
+        if(!$succes) return true;
+        global $AJXP_GLUE_GLOBALS;
+        $AJXP_GLUE_GLOBALS = array();
 
-	/**
-	 * This method should handle any logout logic and report back to the subject
-	 *
-	 * @access public
-	 * @param array holds the user data
-	 * @return boolean True on success
-	 * @since 1.6
-	 */
-	function onUserLogout($user)
-	{
-		// Initialize variables
-		$success = false;
+        $AJXP_GLUE_GLOBALS["secret"] = $this->secret;
+        $AJXP_GLUE_GLOBALS["userName"] = $joomlaUser['username'];
+        $AJXP_GLUE_GLOBALS["plugInAction"] = "delUser";
+           include($this->glueCode);
 
-		if(!$this->glueCodeFound) return false;
-		global $AJXP_GLUE_GLOBALS;
-		$AJXP_GLUE_GLOBALS = array();
-		$AJXP_GLUE_GLOBALS["secret"] = $this->secret;		
-		$AJXP_GLUE_GLOBALS["plugInAction"] = "logout";
-	   	include($this->glueCode);
+        return true;
+    }
 
-		return $AJXP_GLUE_GLOBALS["result"];
-	}
-			
+    /**
+     * This method should handle any login logic and report back to the subject
+     *
+     * @access	public
+     * @param 	array 	holds the user data
+     * @param 	array    extra options
+     * @return	boolean	True on success
+     * @since	1.6
+     */
+    public function onUserLogin($user, $options)
+    {
+        // Initialize variables
+        $success = false;
+        if(!$this->glueCodeFound) return false;
+
+        global $AJXP_GLUE_GLOBALS;
+        $AJXP_GLUE_GLOBALS = array();
+        //$plugInAction, $login, $result, $secret, $autoCreate;
+        $AJXP_GLUE_GLOBALS["secret"] = $this->secret;
+        $AJXP_GLUE_GLOBALS["autoCreate"] = $this->autoCreate;
+        $AJXP_GLUE_GLOBALS["plugInAction"] = "login";
+        $AJXP_GLUE_GLOBALS["login"] = array("name"=>$user["username"], "password"=>$user["password"]);
+           include($this->glueCode);
+        return true;
+    }
+
+    /**
+     * This method should handle any logout logic and report back to the subject
+     *
+     * @access public
+     * @param array holds the user data
+     * @return boolean True on success
+     * @since 1.6
+     */
+    public function onUserLogout($user)
+    {
+        // Initialize variables
+        $success = false;
+
+        if(!$this->glueCodeFound) return false;
+        global $AJXP_GLUE_GLOBALS;
+        $AJXP_GLUE_GLOBALS = array();
+        $AJXP_GLUE_GLOBALS["secret"] = $this->secret;
+        $AJXP_GLUE_GLOBALS["plugInAction"] = "logout";
+           include($this->glueCode);
+
+        return $AJXP_GLUE_GLOBALS["result"];
+    }
+
 }

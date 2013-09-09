@@ -48,19 +48,19 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 *********************************************************/
 $PLUGINS = array(
     "CONF_DRIVER" => array(
-   		"NAME"		=> "serial",
-   		"OPTIONS"	=> array(
-   			"REPOSITORIES_FILEPATH"	=> "AJXP_DATA_PATH/plugins/conf.serial/repo.ser",
-   			"ROLES_FILEPATH"		=> "AJXP_DATA_PATH/plugins/auth.serial/roles.ser",
-   			"USERS_DIRPATH"			=> "AJXP_DATA_PATH/plugins/auth.serial",
+           "NAME"		=> "serial",
+           "OPTIONS"	=> array(
+               "REPOSITORIES_FILEPATH"	=> "AJXP_DATA_PATH/plugins/conf.serial/repo.ser",
+               "ROLES_FILEPATH"		=> "AJXP_DATA_PATH/plugins/auth.serial/roles.ser",
+               "USERS_DIRPATH"			=> "AJXP_DATA_PATH/plugins/auth.serial",
                "FAST_CHECKS"		    => false,
-   			"CUSTOM_DATA"			=> array(
-   					"email"	    => "Email",
-   					"country"   => "Country",
+               "CUSTOM_DATA"			=> array(
+                       "email"	    => "Email",
+                       "country"   => "Country",
                        "USER_QUOTA"=> "Quota"
-   				)
-   			)
-   	),
+                   )
+               )
+       ),
 
     /**
      * THIS CONFIGURATION WILL USE AN LDAP SERVER AS MASTER, AND A LOCAL BASE FOR CREATING TMP USERS
@@ -86,14 +86,14 @@ $PLUGINS = array(
                     )
                 ),
                 "serial" => array(
-               		"NAME"		=> "serial",
-               		"OPTIONS"	=> array(
-               			"LOGIN_REDIRECT"		=> false,
-               			"USERS_FILEPATH"		=> "AJXP_DATA_PATH/plugins/auth.serial/users.ser",
-               			"AUTOCREATE_AJXPUSER" 	=> false,
+                       "NAME"		=> "serial",
+                       "OPTIONS"	=> array(
+                           "LOGIN_REDIRECT"		=> false,
+                           "USERS_FILEPATH"		=> "AJXP_DATA_PATH/plugins/auth.serial/users.ser",
+                           "AUTOCREATE_AJXPUSER" 	=> false,
                         "FAST_CHECKS"		    => false
                     )
-               	)
+                   )
             )
         )
     ),

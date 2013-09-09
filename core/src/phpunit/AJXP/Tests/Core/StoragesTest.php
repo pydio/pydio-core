@@ -23,8 +23,8 @@ namespace AJXP\Tests\Core;
 class StoragesTest extends \PHPUnit_Framework_TestCase
 {
 
-    public function testRolesStorage(){
-
+    public function testRolesStorage()
+    {
         $r = new \AJXP_Role("phpunit_temporary_role");
         $r->setAcl(0, "rw");
         \AuthService::updateRole($r);
@@ -36,35 +36,43 @@ class StoragesTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($r2);
     }
 
-    public function testPluginsActivation(){
+    public function testPluginsActivation()
+    {
         $this->markTestIncomplete('Not implemented');
     }
 
-    public function testPluginsConfigs(){
+    public function testPluginsConfigs()
+    {
         $this->markTestIncomplete('Not implemented');
     }
 
-    public function testRepositoriesStorage(){
+    public function testRepositoriesStorage()
+    {
         $this->markTestIncomplete('Not implemented');
     }
 
-    public function testCacheItem(){
+    public function testCacheItem()
+    {
         $this->markTestIncomplete('Not implemented');
     }
 
-    public function testBinariesStorage(){
+    public function testBinariesStorage()
+    {
         $this->markTestIncomplete('Not implemented');
     }
 
-    public function testQueuesStorage(){
+    public function testQueuesStorage()
+    {
         $this->markTestIncomplete('Not implemented');
     }
 
-    public function testI18NMessages(){
+    public function testI18NMessages()
+    {
         $this->markTestIncomplete('Not implemented');
     }
 
-    public function testRegisteredExtensions(){
+    public function testRegisteredExtensions()
+    {
         $this->markTestIncomplete('Not implemented');
     }
 

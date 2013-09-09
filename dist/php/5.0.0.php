@@ -1,6 +1,6 @@
 <?php
 // FORCE bootstrap_context copy, otherwise it won't reboot
-if(is_file(AJXP_INSTALL_PATH."/conf/bootstrap_context.php".".new-".date("Ymd"))){
+if (is_file(AJXP_INSTALL_PATH."/conf/bootstrap_context.php".".new-".date("Ymd"))) {
     rename(AJXP_INSTALL_PATH."/conf/bootstrap_context.php", AJXP_INSTALL_PATH."/conf/bootstrap_context.php.orig");
     rename(AJXP_INSTALL_PATH."/conf/bootstrap_context.php".".new-".date("Ymd"), AJXP_INSTALL_PATH."/conf/bootstrap_context.php");
 }
@@ -9,8 +9,8 @@ echo "The bootstrap_context was replaced by the new version, the .orig version i
 
 // Clear i18n cache
 $i18nFiles = glob(dirname(AJXP_PLUGINS_MESSAGES_FILE)."/i18n/*.ser");
-if(is_array($i18nFiles)){
-    foreach($i18nFiles as $file){
+if (is_array($i18nFiles)) {
+    foreach ($i18nFiles as $file) {
         @unlink($file);
     }
 }
@@ -26,12 +26,12 @@ echo "Upgrading database ...";
 $confDriver = ConfService::getConfStorageImpl();
 $authDriver = ConfService::getAuthDriverImpl();
 $logger = AJXP_Logger::getInstance();
-if(is_a($confDriver, "sqlConfDriver")){
+if (is_a($confDriver, "sqlConfDriver")) {
     $test = $confDriver->getOption("SQL_DRIVER");
-    if(!isSet($test["driver"])){
+    if (!isSet($test["driver"])) {
         $test = AJXP_Utils::cleanDibiDriverParameters($confDriver->getOption("SQL_DRIVER"));
     }
-    if(is_array($test) && isSet($test["driver"])){
+    if (is_array($test) && isSet($test["driver"])) {
         $sqlInstructions = file_get_contents($this->workingFolder."/UPGRADE/DB-UPGRADE.sql");
 
         $parts = array_map("trim", explode("/* SEPARATOR */", $sqlInstructions));
@@ -41,12 +41,12 @@ if(is_a($confDriver, "sqlConfDriver")){
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($test);
         dibi::begin();
-        foreach($parts as $sqlPart){
+        foreach ($parts as $sqlPart) {
             if(empty($sqlPart)) continue;
-            try{
+            try {
                 dibi::nativeQuery($sqlPart);
                 echo "<div class='upgrade_result success'>$sqlPart ... OK</div>";
-            }catch (DibiException $e){
+            } catch (DibiException $e) {
                 $errors[] = $e->getMessage();
                 echo "<div class='upgrade_result success'>$sqlPart ... FAILED (".$e->getMessage().")</div>";
             }
@@ -54,11 +54,11 @@ if(is_a($confDriver, "sqlConfDriver")){
         dibi::commit();
         dibi::disconnect();
 
-    }else{
+    } else {
         echo "Nothing to do for the DB";
     }
 
-}else{
+} else {
     echo "Nothing to do for the DB";
 }
 
