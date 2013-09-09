@@ -280,6 +280,9 @@ class ldapAuthDriver extends AbstractAuthDriver
             if (!empty($entries["count"])) {
                 $allEntries["count"] += $entries["count"];
                 unset($entries["count"]);
+                if($limit != -1){
+                    usort($entries, array($this, "userSortFunction"));
+                }
                 foreach ($entries as $entry) {
                     if ($offset != -1 && $index < $offset) {
                         $index ++; continue;
@@ -293,10 +296,16 @@ class ldapAuthDriver extends AbstractAuthDriver
         return $allEntries;
     }
 
+    private function userSortFunction($entryA, $entryB)
+    {
+        return strcasecmp($entryA[$this->ldapUserAttr][0], $entryB[$this->ldapUserAttr][0]);
+    }
+
     public function supportsUsersPagination()
     {
         return true;
     }
+
     public function listUsersPaginated($baseGroup="/", $regexp, $offset, $limit)
     {
         if ($this->hasGroupsMapping !== false) {
@@ -583,7 +592,7 @@ class ldapAuthDriver extends AbstractAuthDriver
                                     }
                                     foreach ($memberValues as $uniqValue => $fullDN) {
                                         if(isSet($matchFilter) && !preg_match($matchFilter, $uniqValue)) continue;
-                                        if(isSet($valueFilters) && !in_array($uniqValue, $matchFilter)) continue;
+                                        if(isSet($valueFilters) && !in_array($uniqValue, $valueFilters)) continue;
                                         if ($userObject->personalRole->filterParameterValue("auth.ldap", "MEMBER_OF", AJXP_REPO_SCOPE_ALL, "") == $fullDN) {
                                             //break;
                                         }
