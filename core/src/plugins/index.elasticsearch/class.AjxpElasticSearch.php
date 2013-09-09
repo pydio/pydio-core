@@ -208,7 +208,7 @@ class AjxpElasticSearch extends AJXP_Plugin
             $hits = $result->getResults();
 
             AJXP_XMLWriter::header();
-            for($i=0, $count=count($hits); $i < $count; $i++) {
+            for ($i=0, $count=count($hits); $i < $count; $i++) {
                 $hit = $hits[$i];
                 $source = $hit->getSource();
 
