@@ -24,8 +24,8 @@ namespace AJXP\Tests\Atomics;
 class RolesTest extends \PHPUnit_Framework_TestCase
 {
 
-    public function testRolesNumericKeys(){
-
+    public function testRolesNumericKeys()
+    {
         $r1 = new \AJXP_Role("role1");
         $r2 = new \AJXP_Role("role2");
 
@@ -35,8 +35,8 @@ class RolesTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    public function testRolesAclAdditivity(){
-
+    public function testRolesAclAdditivity()
+    {
         $r1 = new \AJXP_Role("role1");
         $r2 = new \AJXP_Role("role2");
 
@@ -62,8 +62,8 @@ class RolesTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    public function testRolesParametersAdditivity(){
-
+    public function testRolesParametersAdditivity()
+    {
         $r1 = new \AJXP_Role("role1");
         $r2 = new \AJXP_Role("role2");
 
@@ -86,8 +86,8 @@ class RolesTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    public function testRolesActionsAdditivity(){
-
+    public function testRolesActionsAdditivity()
+    {
         $r1 = new \AJXP_Role("role1");
         $r2 = new \AJXP_Role("role2");
 

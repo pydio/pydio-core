@@ -62,7 +62,7 @@ class WebSocketUser implements IWebSocketUser {
         $this->socket = $socket;
 
         $address = '';
-        if (socket_getpeername($socket, &$address) === false)
+        if (socket_getpeername($socket, $address) === false)
             throw new Exception();
 
         $this->ip = $address;

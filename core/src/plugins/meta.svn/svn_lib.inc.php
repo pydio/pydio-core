@@ -99,7 +99,7 @@ define('IDX_VALUE', 1);
      *
      * @since v1.0.0
      */
-    public function GetSvnHelp()
+    function GetSvnHelp()
     {
         $command = 'svn';
         $switches = '--help';
@@ -116,7 +116,7 @@ define('IDX_VALUE', 1);
      *
      * @since v1.0.0
      */
-    public function GetSvnLookHelp()
+    function GetSvnLookHelp()
     {
         $command = 'svnlook';
         $switches = '--help';
@@ -133,7 +133,7 @@ define('IDX_VALUE', 1);
      *
      * @since v1.0.0
      */
-    public function GetSvnAdminHelp()
+    function GetSvnAdminHelp()
     {
         $command = 'svnadmin';
         $switches = '--help';
@@ -150,7 +150,7 @@ define('IDX_VALUE', 1);
      *
      * @since v1.0.0
      */
-    public function GetSvnVersionHelp()
+    function GetSvnVersionHelp()
     {
         $command = 'svnversion';
         $switches = '--help';
@@ -164,7 +164,7 @@ define('IDX_VALUE', 1);
      *
      * @since v1.0.0
      */
-    public function GetSvnVersion()
+    function GetSvnVersion()
     {
         $command = 'svn';
         $switches = '--version';
@@ -208,7 +208,7 @@ define('IDX_VALUE', 1);
      *
      * @since v1.0.0
      * */
-    public function GetHeadRevision($config)
+    function GetHeadRevision($config)
     {
         $info = GetRepositoryInfo($config);
         $rev = ParseArray($info[IDX_STDOUT], 'revision="', '">');
@@ -223,7 +223,7 @@ define('IDX_VALUE', 1);
      *
      * @since v1.0.0
      */
-    public function GetHeadDate($config)
+    function GetHeadDate($config)
     {
         $info = GetRepositoryInfo($config);
         $timestamp = ParseArray($info[IDX_STDOUT], '<date>', '</date>');
@@ -269,7 +269,7 @@ define('IDX_VALUE', 1);
      *
      * @since v1.0.0
      */
-    public function GetWebspaceRevision($config)
+    function GetWebspaceRevision($config)
     {
         $info = GetWebspaceInfo($config);
         return ParseArray($info[IDX_STDOUT], 'revision="', '">');
@@ -284,7 +284,7 @@ define('IDX_VALUE', 1);
      *
      * @since v1.0.0
      */
-    public function GetWebspaceSourcePath($config)
+    function GetWebspaceSourcePath($config)
     {
         $info = GetWebspaceInfo($config);
         $ws_path = ParseArray($info[IDX_STDOUT], '<url>', '</url>');
@@ -301,7 +301,7 @@ define('IDX_VALUE', 1);
      *
      * @since v1.0.0
      */
-    public function GetWebspaceRevisionDate($config)
+    function GetWebspaceRevisionDate($config)
     {
         $info = GetWebspaceInfo($config);
         $timestamp = ParseArray($info[IDX_STDOUT], '<date>', '</date>');
@@ -366,7 +366,7 @@ define('IDX_VALUE', 1);
      *
      * @since v1.1.0
      */
-    public function ListRepository($config, $path)
+    function ListRepository($config, $path)
     {
         //$rep_root = $config->GetRepositoryRoot();
         $rep_root = $config->getOption("REPOSITORY_ROOT").$path;
@@ -419,7 +419,7 @@ define('IDX_VALUE', 1);
      *
      * @since v1.0.0
      */
-    public function GetRepositoryPaths($config, $roots, $depth)
+    function GetRepositoryPaths($config, $roots, $depth)
     {
         $rep_root = $config->GetRepositoryRoot();
         if (!is_array($roots)) {
@@ -486,7 +486,7 @@ define('IDX_VALUE', 1);
      *
      * @since v1.0.0
      */
-    public function UpdateWebspace($config)
+    function UpdateWebspace($config)
     {
         $command = 'svn update';
         $switches = '--non-interactive';
@@ -512,7 +512,7 @@ define('IDX_VALUE', 1);
      *
      * @since v1.0.0
      */
-    public function CheckoutWebspace($config)
+    function CheckoutWebspace($config)
     {
         $trunk_path = $config->GetTrunkDir();
         $command = 'svn checkout';
@@ -555,7 +555,7 @@ define('IDX_VALUE', 1);
      *
      * @since v1.0.0
      */
-    public function SwitchWebspace($config, $path)
+    function SwitchWebspace($config, $path)
     {
         if ($path == NULL) {
             $path = $config->GetTrunkDir();
@@ -578,7 +578,7 @@ define('IDX_VALUE', 1);
      *
      * @since v1.0.0
      */
-    public function GetSvnUsr($config)
+    function GetSvnUsr($config)
     {
         $user = $config->GetSvnUser();
         $switch = '';
@@ -596,7 +596,7 @@ define('IDX_VALUE', 1);
      *
      * @since v1.0.0
      */
-    public function GetSvnPw($config)
+    function GetSvnPw($config)
     {
         $pw = $config->GetSvnPassword();
         $switch = '';
@@ -754,7 +754,7 @@ define('IDX_VALUE', 1);
      *
      * @since v1.0.0
      */
-    public function ParseArray (&$array, $startstr, $endstr = NULL)
+    function ParseArray (&$array, $startstr, $endstr = NULL)
     {
         $idx = 0;
         while ($idx < count($array) && strpos($array[$idx], $startstr) === false) {
@@ -783,7 +783,7 @@ define('IDX_VALUE', 1);
      * @version v.1.1.0
      * @since v1.0.0
      */
-    public function PrintArray($array, $name = '', $encode_html_chars = true)
+    function PrintArray($array, $name = '', $encode_html_chars = true)
     {
         if (is_array($array)) {
             if (strlen($name) > 0) {

@@ -34,4 +34,3 @@ $passed = true;
 $passed = AJXP_Utils::runTests($outputArray, $testedParams);
 print(AJXP_Utils::testResultsToTable($outputArray, $testedParams, true));
 AJXP_Utils::testResultsToFile($outputArray, $testedParams);
-?>

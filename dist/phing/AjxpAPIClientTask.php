@@ -23,29 +23,29 @@ class AjxpAPIClientTask extends Task
     private $displayResult = false;
     private $compareResult;
 
-    function main(){
-
-        if(isSet($this->user) && isSet($this->password) && isSet($this->repository)){
+    public function main()
+    {
+        if (isSet($this->user) && isSet($this->password) && isSet($this->repository)) {
             $cmd = "php {$this->cliPath}/cmd.php -a={$this->action} -u={$this->user} -p={$this->password} -r={$this->repository} {$this->params}";
-        }else{
+        } else {
             // Anon mode
             $cmd = "php {$this->cliPath}/cmd.php -a={$this->action} {$this->params}";
         }
         $result = array();
         exec($cmd, $result);
         $res = implode("", $result);
-        if(isSet($this->compareResult)){
-            if(trim($res) == $this->compareResult){
+        if (isSet($this->compareResult)) {
+            if (trim($res) == $this->compareResult) {
                 $this->log("File content is correct");
-            }else{
+            } else {
                 // Do not break build
                 //throw new BuildException("Content are not the same: '".$res."' versus '".$this->compareResult."'");
                 $this->log("Content are not the same: '".$res."' versus '".$this->compareResult."'", Project::MSG_ERR);
             }
 
-        }else{
+        } else {
             $this->log($this->repository.":".$this->action);
-            if($this->displayResult){
+            if ($this->displayResult) {
                 $this->log($res, Project::MSG_INFO);
             }
         }
@@ -55,7 +55,8 @@ class AjxpAPIClientTask extends Task
     /**
      * @return \Parameter
      */
-    function createParameter(){
+    public function createParameter()
+    {
         var_dump(func_get_args());
     }
 

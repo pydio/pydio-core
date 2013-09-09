@@ -35,10 +35,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /*********************************************************/
 /* PLUGINS DEFINITIONS
-/* Drivers will define how the application will work. For 
+/* Drivers will define how the application will work. For
 /* each type of operation, there are multiple implementation
 /* possible. Check the content of the plugins folder.
-/* CONF = users and repositories definition, 
+/* CONF = users and repositories definition,
 /* AUTH = users authentification mechanism,
 /* LOG = logs of the application.
 /*
@@ -58,16 +58,16 @@ $sqlDriver =  array(
 $PLUGINS = array(
     "AUTH_DRIVER" => array(
         "NAME"		=> "sql",
-      		"OPTIONS"	=> array(
-      			"SQL_DRIVER"	=> $sqlDriver,
+              "OPTIONS"	=> array(
+                  "SQL_DRIVER"	=> $sqlDriver,
             )
     ),
-	"CONF_DRIVER" => array(
-		"NAME"		=> "sql",
-		"OPTIONS"	=> array(
-			"SQL_DRIVER"	=> $sqlDriver,
-			)
-	),
+    "CONF_DRIVER" => array(
+        "NAME"		=> "sql",
+        "OPTIONS"	=> array(
+            "SQL_DRIVER"	=> $sqlDriver,
+            )
+    ),
     "LOG_DRIVER"    => array(
         "NAME" => "sql",
         "OPTIONS" => array(

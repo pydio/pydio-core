@@ -26,7 +26,8 @@ class TestServer extends PHPUnit_Framework_TestCase {
 
         $client->close();
         $this->assertEquals($input, $frame->getData());
-        $this->assertEquals(false, $msg->getFrames()[0]->isMasked());
+        $frames = $msg->getFrames();
+        $this->assertEquals(false, $frames[0]->isMasked());
     }
 
     function test_echoResourceHandlerResponse() {
@@ -41,7 +42,8 @@ class TestServer extends PHPUnit_Framework_TestCase {
 
         $client->close();
         $this->assertEquals($input, $msg->getData());
-        $this->assertEquals(false, $msg->getFrames()[0]->isMasked());
+        $frames = $msg->getFrames();
+        $this->assertEquals(false, $frames[0]->isMasked());
     }
 
     function test_DoubleEchoResourceHandlerResponse() {

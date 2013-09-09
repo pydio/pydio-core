@@ -24,64 +24,64 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 if ( !function_exists('sys_get_temp_dir')) {
-	function sys_get_temp_dir() {
-		if( $temp=getenv('TMP') )        return $temp;
-		if( $temp=getenv('TEMP') )        return $temp;
-		if( $temp=getenv('TMPDIR') )    return $temp;
-		$temp=tempnam(__FILE__,'');
-		if (file_exists($temp)) {
-			unlink($temp);
-			return dirname($temp);
-		}
-		return null;
-	}
+    function sys_get_temp_dir()
+    {
+        if( $temp=getenv('TMP') )        return $temp;
+        if( $temp=getenv('TEMP') )        return $temp;
+        if( $temp=getenv('TMPDIR') )    return $temp;
+        $temp=tempnam(__FILE__,'');
+        if (file_exists($temp)) {
+            unlink($temp);
+            return dirname($temp);
+        }
+        return null;
+    }
 }
 
-if( !function_exists('json_encode')){
-	
-	function json_encode($val)
-	{
-		// indexed array
-		if (is_array($val) && (!$val
-			|| array_keys($val) === range(0, count($val) - 1))) {
-			return '[' . implode(',', array_map('json_encode', $val)) . ']';
-		}
+if ( !function_exists('json_encode')) {
 
-		// associative array
-		if (is_array($val) || is_object($val)) {
-			$tmp = array();
-			foreach ($val as $k => $v) {
-				$tmp[] = json_encode((string) $k) . ':' . json_encode($v);
-			}
-			return '{' . implode(',', $tmp) . '}';
-		}
+    function json_encode($val)
+    {
+        // indexed array
+        if (is_array($val) && (!$val
+            || array_keys($val) === range(0, count($val) - 1))) {
+            return '[' . implode(',', array_map('json_encode', $val)) . ']';
+        }
 
-		if (is_string($val)) {
-			$val = str_replace(array("\\", "\x00"), array("\\\\", "\\u0000"), $val); // due to bug #40915
-			return '"' . addcslashes($val, "\x8\x9\xA\xC\xD/\"") . '"';
-		}
+        // associative array
+        if (is_array($val) || is_object($val)) {
+            $tmp = array();
+            foreach ($val as $k => $v) {
+                $tmp[] = json_encode((string) $k) . ':' . json_encode($v);
+            }
+            return '{' . implode(',', $tmp) . '}';
+        }
 
-		if (is_int($val) || is_float($val)) {
-			return rtrim(rtrim(number_format($val, 5, '.', ''), '0'), '.');
-		}
+        if (is_string($val)) {
+            $val = str_replace(array("\\", "\x00"), array("\\\\", "\\u0000"), $val); // due to bug #40915
+            return '"' . addcslashes($val, "\x8\x9\xA\xC\xD/\"") . '"';
+        }
 
-		if (is_bool($val)) {
-			return $val ? 'true' : 'false';
-		}
+        if (is_int($val) || is_float($val)) {
+            return rtrim(rtrim(number_format($val, 5, '.', ''), '0'), '.');
+        }
 
-		return 'null';
-	}
-	
-	
+        if (is_bool($val)) {
+            return $val ? 'true' : 'false';
+        }
+
+        return 'null';
+    }
+
+
 }
 
-if ( ! function_exists('glob_recursive'))
-{
+if ( ! function_exists('glob_recursive')) {
     // Does not support flag GLOB_BRACE
     function glob_recursive($pattern, $flags = 0)
     {
         $files = glob($pattern, $flags);
-        foreach (glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT) as $dir){
+        foreach (glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT) as $dir) {
             $files = array_merge($files, glob_recursive($dir.'/'.basename($pattern), $flags));
         }
         return $files;
@@ -89,54 +89,57 @@ if ( ! function_exists('glob_recursive'))
 }
 
 
-if ( !function_exists('json_decode') ){
-	function json_decode($json, $opt=null)
-	{
-		// Author: walidator.info 2009
-		$comment = false;
-		$out = '$x=';
+if ( !function_exists('json_decode') ) {
+    function json_decode($json, $opt=null)
+    {
+        // Author: walidator.info 2009
+        $comment = false;
+        $out = '$x=';
 
-		for ($i=0; $i<strlen($json); $i++)
-		{
-			if (!$comment)
-			{
-				if ($json[$i] == '{')        $out .= ' array(';
-				else if ($json[$i] == '}')    $out .= ')';
+        for ($i=0; $i<strlen($json); $i++) {
+            if (!$comment) {
+                if ($json[$i] == '{')        $out .= ' array(';
+                else if ($json[$i] == '}')    $out .= ')';
                 else if ($json[$i] == '[')    $out .= 'array(';
                 else if ($json[$i] == ']')    $out .= ')';
-				else if ($json[$i] == ':')    $out .= '=>';
-				else                         $out .= $json[$i];
-			}
-			else $out .= $json[$i];
-			if ($json[$i] == '"')    $comment = !$comment;
-		}
-		eval($out . ';');
-		return $x;
-	}
+                else if ($json[$i] == ':')    $out .= '=>';
+                else                         $out .= $json[$i];
+            } else $out .= $json[$i];
+            if ($json[$i] == '"')    $comment = !$comment;
+        }
+        eval($out . ';');
+        return $x;
+    }
 }
 
 if (!class_exists('DateTime')) {
-	class DateTime {
-	    public $date;
-	    
-	    public function __construct($date) {
-	        $this->date = strtotime($date);
-	    }
-	    
-	    public function setTimeZone($timezone) {
-	        return;
-	    }
-	    
-	    private function __getDate() {
-	        return date(DATE_ATOM, $this->date);    
-	    }
-	    
-	    public function modify($multiplier) {
-	        $this->date = strtotime($this->__getDate() . ' ' . $multiplier);
-	    }
-	    
-	    public function format($format) {
-	        return date($format, $this->date);
-	    }
-	}
+    class DateTime
+    {
+        public $date;
+
+        public function __construct($date)
+        {
+            $this->date = strtotime($date);
+        }
+
+        public function setTimeZone($timezone)
+        {
+            return;
+        }
+
+        private function __getDate()
+        {
+            return date(DATE_ATOM, $this->date);
+        }
+
+        public function modify($multiplier)
+        {
+            $this->date = strtotime($this->__getDate() . ' ' . $multiplier);
+        }
+
+        public function format($format)
+        {
+            return date($format, $this->date);
+        }
+    }
 }

@@ -34,7 +34,7 @@ require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.Shar
 
 $fakes = '
 // Non working exception class
-class AJXP_Exception extends Exception 
+class AJXP_Exception extends Exception
 {
     public function AJXP_Exception($msg) { echo "$msg"; exit(); }
 }';
