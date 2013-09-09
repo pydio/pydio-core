@@ -64,7 +64,7 @@ class AJXP_Sabre_AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
         }
 
         // Authenticates the user
-        //AJXP_Logger::logAction("authenticate: " . $userpass[0]);
+        //AJXP_Logger::info(__CLASS__,"authenticate",$userpass[0]);
 
         $confDriver = ConfService::getConfStorageImpl();
         $userObject = $confDriver->createUserObject($userpass[0]);

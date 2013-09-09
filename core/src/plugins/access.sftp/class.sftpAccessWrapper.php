@@ -33,25 +33,25 @@ require_once(AJXP_INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
  */
 function disconnectedSftp($code, $message, $language)
 {
-    AJXP_Logger::logAction("SSH2.FTP.disconnected",$message);
+    AJXP_Logger::info(__CLASS__,"SSH2.FTP.disconnected",$message);
     throw new Exception('SSH2.FTP : disconnected'.$message, $code);
 }
 
 function ignoreSftp($message)
 {
-    AJXP_Logger::logAction("SSH2.FTP.ignore",$message);
+    AJXP_Logger::info(__CLASS__,"SSH2.FTP.ignore",$message);
     throw new Exception('SSH2.FTP : ignore'.$message);
 }
 
 function debugSftp($message, $language, $always_display)
 {
-    AJXP_Logger::logAction("SSH2.FTP.debug",$message);
+    AJXP_Logger::info(__CLASS__,"SSH2.FTP.debug",$message);
     throw new Exception('SSH2.FTP : debug'.$message);
 }
 
 function macerrorSftp($packet)
 {
-    AJXP_Logger::logAction("SSH2.FTP.macerror","");
+    AJXP_Logger::info(__CLASS__,"SSH2.FTP.macerror","");
     throw new Exception('SSH2.FTP : macerror'.$packet);
 }
 
