@@ -55,47 +55,145 @@ class AJXP_Logger extends AJXP_Plugin
     }
 
     /**
-     * Use current logger instance and write a debug message
+     * Use current logger instance and write a message at the desired loglevel
      * @static
-     * @param string $message
-     * @param array $params
+     * @param string $level   The log level
+     * @param string $source  The source of the message (plugin id or classname)
+     * @param string $prefix  A quick description
+     * @param array $messages An array of messages (string or array).
      * @return void
      */
-    public static function debug($message, $params = array())
+    public static function log2($level, $source, $prefix, $messages = array())
+    {
+        $logger = self::getInstance();
+        if($logger == null) return ;
+        $res = $source."\t".$prefix;
+        $index = 0;
+        foreach ($messages as $value) {
+            $res .= "\t";
+
+            if (is_string($value)) {
+                $res .= $value;
+            } else if (is_array($value) && count($value)) {
+                $res.=$logger->arrayToString($value);
+            } else if (!empty($value)) {
+                $res .= print_r($value, true);
+            }
+        }
+        $logger->write($res, $level);
+    }
+
+    /**
+     * Use current logger instance and write a debug message
+     * @static
+     * @param string $source  The source of the message (plugin id or classname)
+     * @param string $prefix  A quick description
+     * @param string|array $messages Variable number of message args (string or array).
+     * @return void
+     */
+    public static function debug($source, $prefix = "")
     {
         if(!class_exists("ConfService")) return ;
         if(!ConfService::getConf("SERVER_DEBUG")) return ;
-        $logger = self::getInstance();
-        if($logger == null) return ;
-        $message .= "\t";
-        if (is_string($params)) {
-            $message .= $params;
-        } else if (is_array($params) && count($params)) {
-            $message.=$logger->arrayToString($params);
-        } else if (!empty($params)) {
-            $message .= print_r($params, true);
+        if (func_num_args() <= 2) {
+            self::notice(__CLASS__, "Deprecated", "You are calling debug() with ".func_num_args()." arguments, please use at least 3");
+            $args = array();
+            $args[0] = $prefix;
+            self::log2(LOG_LEVEL_DEBUG, "Deprecated", $source, $args);
+        } else {
+            $args = func_get_args();
+            array_shift($args);
+            array_shift($args);
+            self::log2(LOG_LEVEL_DEBUG, $source, $prefix, $args);
         }
-        $logger->write($message, LOG_LEVEL_DEBUG);
+    }
+
+    /**
+     * Use current logger instance and write an info message
+     * @static
+     * @param string $source  The source of the message (plugin id or classname)
+     * @param string $prefix  A quick description
+     * @param string|array $messages Variable number of message args (string or array).
+     * @return void
+     */
+    public static function info($source, $prefix, $messages)
+    {
+        $args = func_get_args();
+        array_shift($args);
+        array_shift($args);
+        self::log2(LOG_LEVEL_INFO, $source, $prefix, $args);
+    }
+
+
+    /**
+     * Use current logger instance and write a notice message
+     * @static
+     * @param string $source  The source of the message (plugin id or classname)
+     * @param string $prefix  A quick description
+     * @param string|array $messages Variable number of message args (string or array).
+     * @return void
+     */
+    public static function notice($source, $prefix, $messages)
+    {
+        $args = func_get_args();
+        array_shift($args);
+        array_shift($args);
+        self::log2(LOG_LEVEL_NOTICE, $source, $prefix, $args);
+    }
+
+    /**
+     * Use current logger instance and write a warning message
+     * @static
+     * @param string $source  The source of the message (plugin id or classname)
+     * @param string $prefix  A quick description
+     * @param string|array $messages Variable number of message args (string or array).
+     * @return void
+     */
+    public static function warning($source, $prefix, $messages)
+    {
+        $args = func_get_args();
+        array_shift($args);
+        array_shift($args);
+        self::log2(LOG_LEVEL_WARNING, $source, $prefix, $args);
+    }
+
+    /**
+     * Use current logger instance and write an error message
+     * @static
+     * @param string $source  The source of the message (plugin id or classname)
+     * @param string $prefix  A quick description
+     * @param string|array $messages Variable number of message args (string or array).
+     * @return void
+     */
+    public static function error($source, $prefix, $messages)
+    {
+        $args = func_get_args();
+        array_shift($args);
+        array_shift($args);
+        self::log2(LOG_LEVEL_ERROR, $source, $prefix, $args);
     }
 
     /**
      * Send an action log message to the current logger instance.
+     * @deprecated Deprecated since version 5.0.4
      * @static
      * @param string $action
-     * @param array $params
+     * @param string|array $params
      * @return void
      */
     public static function logAction($action, $params=array())
     {
-        $logger = self::getInstance();
-        if($logger == null) return ;
-        $message = "$action\t";
-        if (count($params)) {
-            $message.=$logger->arrayToString($params);
-        }
-        $logger->write($message, LOG_LEVEL_INFO);
+        self::notice(__CLASS__, "Deprecated", "Function logAction() is deprecated, use info() instead");
+        $args = array();
+        $args[0] = $params;
+        self::log2(LOG_LEVEL_INFO, "Deprecated", $action, $args);
     }
 
+    /**
+     * Return the client IP adress
+     * @static
+     * @return String client IP adress
+     */
     public static function getClientAdress()
     {
         if (isSet($_SERVER['REMOTE_ADDR'])) {
@@ -116,9 +214,9 @@ class AJXP_Logger extends AJXP_Plugin
      *
      * @return AbstractLogDriver an instance of the AJXP_Logger object
      */
-     public static function getInstance()
-     {
+    public static function getInstance()
+    {
         return self::$loggerInstance;
-     }
+    }
 
 }
