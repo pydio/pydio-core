@@ -361,7 +361,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
         $user->saveTemporaryData("tmp_upload", $files);
         if(strpos($_SERVER["HTTP_USER_AGENT"], "ajaxplorer-ios-client") !== false
             || strpos($_SERVER["HTTP_USER_AGENT"], "Apache-HttpClient") !== false){
-            AJXP_Logger::logAction("Up from ".$_SERVER["HTTP_USER_AGENT"] ." - direct triger of next to remote");
+            $this->logInfo("Up from", $_SERVER["HTTP_USER_AGENT"] ." - direct triger of next to remote");
             $this->uploadActions("next_to_remote", array(), array());
         }
 

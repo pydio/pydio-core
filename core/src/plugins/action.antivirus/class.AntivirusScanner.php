@@ -93,7 +93,7 @@ class AntivirusScanner extends AJXP_Plugin
                 $filename = substr($filename, 1);
                 echo 'Virus has been found in : '  . $filename .  '         File removed';
             }
-            //AJXP_Logger::logAction("Upload Virus File" . $this->path, array("file"=>SystemTextEncoding::fromUTF8($dir).DIRECTORY_SEPARATOR.$realpath));
+            //$this->logInfo("Upload Virus File" . $this->path, array("file"=>SystemTextEncoding::fromUTF8($dir).DIRECTORY_SEPARATOR.$realpath));
         }
         return;
     }

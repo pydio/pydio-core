@@ -30,7 +30,7 @@ class HttpDownloader extends AJXP_Plugin
 {
     public function switchAction($action, $httpVars, $fileVars)
     {
-        //AJXP_Logger::logAction("DL file", $httpVars);
+        //$this->logInfo("DL file", $httpVars);
 
         $repository = ConfService::getRepository();
         if (!$repository->detectStreamWrapper(false)) {

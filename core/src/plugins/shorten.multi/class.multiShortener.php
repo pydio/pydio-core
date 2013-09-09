@@ -22,7 +22,7 @@ class multiShortener extends AJXP_Plugin
                 $url = $params["ob_output"];
                 if (!isSet($type["ADFLY_TYPE"]) || !isSet($type["ADFLY_APIKEY"]) || !isSet($type["ADFLY_UID"]) || !isSet($type["ADFLY_DOMAIN"])) {
                     print($url);
-                    AJXP_Logger::logAction("error", "adFly Shortener : you must set the api key!");
+                    $this->logInfo("error", "adFly Shortener : you must set the api key!");
                     return;
                 }
                 $adfly_type = $type["ADFLY_TYPE"];
@@ -45,7 +45,7 @@ class multiShortener extends AJXP_Plugin
                 $url = $params["ob_output"];
                 if (!isSet($type["BITLY_USER"]) || !isSet($type["BITLY_APIKEY"])) {
                     print($url);
-                    AJXP_Logger::logAction("error", "Bitly Shortener : you must drop the conf.shorten.bitly.inc file inside conf.php and set the login/api key!");
+                    $this->logInfo("error", "Bitly Shortener : you must drop the conf.shorten.bitly.inc file inside conf.php and set the login/api key!");
                     return;
                 }
                 $bitly_login = $type["BITLY_USER"];
@@ -67,7 +67,7 @@ class multiShortener extends AJXP_Plugin
                 $url = $params["ob_output"];
                 if (!isSet($type["GOOGL_APIKEY"])) {
                     print($url);
-                    AJXP_Logger::logAction("error", "Goo.gl Shortener : you must set the api key!");
+                    $this->logInfo("error", "Goo.gl Shortener : you must set the api key!");
                     return;
                 }
                 $data = array(
@@ -100,7 +100,7 @@ class multiShortener extends AJXP_Plugin
                 $url = $params["ob_output"];
                 if (!isSet($type["POST_APIKEY"])) {
                     print($url);
-                    AJXP_Logger::logAction("error", "po.st Shortener : you must set the api key!");
+                    $this->logInfo("error", "po.st Shortener : you must set the api key!");
                     return;
                 }
                 $post_api = $type["POST_APIKEY"];

@@ -280,7 +280,7 @@ class SvnManager extends AJXP_Plugin
         if ($actionName != "rename") {
             $this->commitChanges($actionName, array("dir" => $httpVars["dest"]), $filesVars);
         }
-        AJXP_Logger::logAction("CopyMove/Rename (svn delegate)", array("files"=>$init["SELECTION"]));
+        $this->logInfo("CopyMove/Rename (svn delegate)", array("files"=>$init["SELECTION"]));
         AJXP_XMLWriter::header();
         AJXP_XMLWriter::sendMessage("The selected files/folders have been copied/moved (by SVN)", null);
         AJXP_XMLWriter::reloadDataNode();
@@ -312,7 +312,7 @@ class SvnManager extends AJXP_Plugin
         }
         $this->commitMessageParams = "[".implode(",",$init["SELECTION"])."]";
         $this->commitChanges($actionName, $httpVars, $filesVars);
-        AJXP_Logger::logAction("Delete (svn delegate)", array("files"=>$init["SELECTION"]));
+        $this->logInfo("Delete (svn delegate)", array("files"=>$init["SELECTION"]));
         AJXP_XMLWriter::header();
         AJXP_XMLWriter::sendMessage("The selected files/folders have been deleted (by SVN)", null);
         AJXP_XMLWriter::reloadDataNode();
@@ -357,7 +357,7 @@ class SvnManager extends AJXP_Plugin
                 $entries = $this->svnListNode($realDir);
                 SvnManager::$svnListCache = $entries;
             } catch (Exception $e) {
-                AJXP_Logger::logAction("Error", array($e->getMessage()));
+                $this->logInfo("Error", array($e->getMessage()));
             }
         }
         $fileId = SystemTextEncoding::toUTF8(basename($ajxpNode->getUrl()));

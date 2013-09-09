@@ -208,7 +208,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             //	DOWNLOAD
             //------------------------------------
             case "download":
-                AJXP_Logger::logAction("Download", array("files"=>$this->addSlugToPath($selection)));
+                $this->logInfo("Download", array("files"=>$this->addSlugToPath($selection)));
                 @set_error_handler(array("HTMLWriter", "javascriptErrorHandler"), E_ALL & ~ E_NOTICE);
                 @register_shutdown_function("restore_error_handler");
                 $zip = false;
@@ -342,7 +342,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             case "get_content":
 
                 $dlFile = $this->urlBase.$selection->getUniqueFile();
-                AJXP_Logger::logAction("Get_content", array("files"=>$this->addSlugToPath($selection)));
+                $this->logInfo("Get_content", array("files"=>$this->addSlugToPath($selection)));
                 if (AJXP_Utils::getStreamingMimeType(basename($dlFile))!==false) {
                     $this->readFile($this->urlBase.$selection->getUniqueFile(), "stream_content");
                 } else {
@@ -358,7 +358,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 // Load "code" variable directly from POST array, do not "securePath" or "sanitize"...
                 $code = $httpVars["content"];
                 $file = $selection->getUniqueFile($httpVars["file"]);
-                AJXP_Logger::logAction("Online Edition", array("file"=>$this->addSlugToPath($file)));
+                $this->logInfo("Online Edition", array("file"=>$this->addSlugToPath($file)));
                 if (isSet($httpVars["encode"]) && $httpVars["encode"] == "base64") {
                     $code = base64_decode($code);
                 } else {
@@ -421,9 +421,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     if (isSet($httpVars["force_copy_delete"])) {
                         $errorMessage = $this->delete($selection->getFiles(), $logMessages);
                         if($errorMessage) throw new AJXP_Exception(SystemTextEncoding::toUTF8($errorMessage));
-                        AJXP_Logger::logAction("Copy/Delete", array("files"=>$this->addSlugToPath($selection), "destination" => $this->addSlugToPath($dest)));
+                        $this->logInfo("Copy/Delete", array("files"=>$this->addSlugToPath($selection), "destination" => $this->addSlugToPath($dest)));
                     } else {
-                        AJXP_Logger::logAction(($action=="move"?"Move":"Copy"), array("files"=>$this->addSlugToPath($selection), "destination"=>$this->addSlugToPath($dest)));
+                        $this->logInfo(($action=="move"?"Move":"Copy"), array("files"=>$this->addSlugToPath($selection), "destination"=>$this->addSlugToPath($dest)));
                     }
                     $logMessage = join("\n", $success);
                 }
@@ -456,7 +456,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     $logMessage = join("\n", $logMessages);
                 }
                 if($errorMessage) throw new AJXP_Exception(SystemTextEncoding::toUTF8($errorMessage));
-                AJXP_Logger::logAction("Delete", array("files"=>$this->addSlugToPath($selection)));
+                $this->logInfo("Delete", array("files"=>$this->addSlugToPath($selection)));
                 if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
                 $nodesDiffs["REMOVE"] = array_merge($nodesDiffs["REMOVE"], $selection->getFiles());
 
@@ -494,7 +494,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
                 if($dest == null) $dest = dirname($file);
                 $nodesDiffs["UPDATE"][$file] = new AJXP_Node($this->urlBase.$dest."/".$filename_new);
-                AJXP_Logger::logAction("Rename", array("original"=>$this->addSlugToPath($file), "new"=>$filename_new));
+                $this->logInfo("Rename", array("original"=>$this->addSlugToPath($file), "new"=>$filename_new));
 
             break;
 
@@ -520,7 +520,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 $newNode = new AJXP_Node($this->urlBase.$dir."/".$dirname);
                 if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
                 array_push($nodesDiffs["ADD"], $newNode);
-                AJXP_Logger::logAction("Create Dir", array("dir"=>$this->addSlugToPath($dir)."/".$dirname));
+                $this->logInfo("Create Dir", array("dir"=>$this->addSlugToPath($dir)."/".$dirname));
 
             break;
 
@@ -546,7 +546,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 $logMessage = $messtmp;
                 //$reloadContextNode = true;
                 //$pendingSelection = $dir."/".$filename;
-                AJXP_Logger::logAction("Create File", array("file"=>$this->addSlugToPath($dir)."/".$filename));
+                $this->logInfo("Create File", array("file"=>$this->addSlugToPath($dir)."/".$filename));
                 $newNode = new AJXP_Node($this->urlBase.$dir."/".$filename);
                 if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
                 array_push($nodesDiffs["ADD"], $newNode);
@@ -572,7 +572,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 }
                 //$messtmp.="$mess[34] ".SystemTextEncoding::toUTF8($filename)." $mess[39] ";
                 $logMessage="Successfully changed permission to ".$chmod_value." for ".count($changedFiles)." files or folders";
-                AJXP_Logger::logAction("Chmod", array("dir"=>$this->addSlugToPath($dir), "filesCount"=>count($changedFiles)));
+                $this->logInfo("Chmod", array("dir"=>$this->addSlugToPath($dir), "filesCount"=>count($changedFiles)));
                 if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
                 $nodesDiffs["UPDATE"] = array_merge($nodesDiffs["UPDATE"], $selection->buildNodes($this));
 
@@ -680,7 +680,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     $createdNode = new AJXP_Node($destination."/".$userfile_name);
                     //AJXP_Controller::applyHook("node.change", array(null, $createdNode, false));
                     $logMessage.="$mess[34] ".SystemTextEncoding::toUTF8($userfile_name)." $mess[35] $dir";
-                    AJXP_Logger::logAction("Upload File", array("file"=>$this->addSlugToPath(SystemTextEncoding::fromUTF8($dir))."/".$userfile_name));
+                    $this->logInfo("Upload File", array("file"=>$this->addSlugToPath(SystemTextEncoding::fromUTF8($dir))."/".$userfile_name));
                 }
 
                 if (isSet($errorMessage)) {
@@ -1247,7 +1247,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             header('Content-Disposition: attachment; filename="' . basename($accelfile) . '"');
             return;
         } else {
-            AJXP_Logger::logAction("error","Problem with X-Accel-Mapping for file $filePathOrData");
+            $this->logInfo("error","Problem with X-Accel-Mapping for file $filePathOrData");
         }
     }
             $stream = fopen("php://output", "a");
@@ -1870,7 +1870,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     AJXP_Controller::applyHook("node.before_path_change", array($node));
                     unlink($dirName."/".$file);
                     AJXP_Controller::applyHook("node.change", array($node));
-                    AJXP_Logger::logAction("Purge", array("file" => $dirName."/".$file));
+                    $this->logInfo("Purge", array("file" => $dirName."/".$file));
                     print(" - Purging document : ".$dirName."/".$file."\n");
                 }
             } else {
