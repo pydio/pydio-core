@@ -690,7 +690,13 @@ Class.create("FilesList", SelectableElements, {
 			}.bind(this);
 			if(this.paginationData && this.paginationData.get('remote_order') && parseInt(this.paginationData.get('total')) > 1){
 				this._sortableTable.setPaginationBehaviour(function(params){
-					this.reload(params);
+                    this.getCurrentContextNode().getMetadata().set("remote_order", params);
+                    var oThis = this;
+                    this.crtContext.observeOnce("loaded", function(){
+                        oThis.crtContext = this ;
+                        oThis.fill(oThis.crtContext);
+                    });
+                    this.getCurrentContextNode().reload();
 				}.bind(this), this.columnsDef, this.paginationData.get('currentOrderCol')||-1, this.paginationData.get('currentOrderDir') );
 			}
 			this.disableTextSelection(this.htmlElement.down('div.sort-table'), true);

@@ -51,7 +51,7 @@ Class.create("AjxpSortable", SortableTable, {
 		this.columnsDefs = columnsDefs;
 		var found = -1;
 		for(var i=0;i<columnsDefs.length;i++){
-			if(columnsDefs[i]['field_name'] == crtOrderName){
+			if(columnsDefs[i]['attributeName'] == crtOrderName){
 				found = i;
 				break;
 			}
@@ -78,7 +78,7 @@ Class.create("AjxpSortable", SortableTable, {
 				this.descending = !this.descending;
 			}
 			var column = this.columnsDefs[cellColumn];
-			params.set('order_column', column['field_name'] || cellColumn);
+			params.set('order_column', column['attributeName'] || cellColumn);
 			params.set('order_direction', (this.descending?'desc':'asc'));
 			this.paginationLoaderFunc(params);
 		}else{
