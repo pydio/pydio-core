@@ -1532,7 +1532,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
     {
         $dir = "/$dir";
         $allNodes = array();
-        AJXP_Logger::logAction("Listing plugins"); // make sure that the logger is started!
+        $this->logInfo("Listing plugins",""); // make sure that the logger is started!
         $pServ = AJXP_PluginsService::getInstance();
         $types = $pServ->getDetectedPlugins();
         $uniqTypes = array("core");

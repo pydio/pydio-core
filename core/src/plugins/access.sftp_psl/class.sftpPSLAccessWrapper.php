@@ -111,7 +111,7 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
         try {
             $this->realPath = $this->initPath($path);
         } catch (Exception $e) {
-            AJXP_Logger::logAction("error", array("message" => "Error while opening stream $path"));
+            $this->logError("stream_open", "Error while opening stream $path");
             return false;
         }
         if ($this->realPath == -1) {

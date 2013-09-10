@@ -107,7 +107,7 @@ class ImagePreviewer extends AJXP_Plugin
             if ($diapoFolders !== false && is_array($diapoFolders)) {
                 foreach ($diapoFolders as $f) {
                     $f = basename($f);
-                    AJXP_Logger::debug("GLOB ".$f);
+                    $this->logDebug("GLOB ".$f);
                     AJXP_Cache::clearItem($f, $oldFile->getUrl());
                 }
             }
@@ -121,19 +121,19 @@ class ImagePreviewer extends AJXP_Plugin
         $pThumb = new PThumb($this->getFilteredOption("THUMBNAIL_QUALITY"));
         if (!$pThumb->isError()) {
             $pThumb->remote_wrapper = $this->streamData["classname"];
-            //AJXP_Logger::debug("Will fit thumbnail");
+            //$this->logDebug("Will fit thumbnail");
             $sizes = $pThumb->fit_thumbnail($masterFile, $size, -1, 1, true);
-            //AJXP_Logger::debug("Will print thumbnail");
+            //$this->logDebug("Will print thumbnail");
             $pThumb->print_thumbnail($masterFile,$sizes[0],$sizes[1],false, false, $targetFile);
-            //AJXP_Logger::debug("Done");
+            //$this->logDebug("Done");
             if ($pThumb->isError()) {
                 print_r($pThumb->error_array);
-                AJXP_Logger::logAction("error", $pThumb->error_array);
+                $this->logError("ImagePreviewer", $pThumb->error_array);
                 return false;
             }
         } else {
             print_r($pThumb->error_array);
-            AJXP_Logger::logAction("error", $pThumb->error_array);
+            $this->logError("ImagePreviewer", $pThumb->error_array);
             return false;
         }
     }
@@ -178,7 +178,7 @@ class ImagePreviewer extends AJXP_Plugin
                 $ajxpNode->readable_dimension = $width."px X ".$height."px";
             }
         }
-        //AJXP_Logger::debug("CURRENT NODE IN EXTRACT IMAGE METADATA ", $ajxpNode);
+        //$this->logDebug("CURRENT NODE IN EXTRACT IMAGE METADATA ", $ajxpNode);
     }
 
     protected function handleMime($filename)

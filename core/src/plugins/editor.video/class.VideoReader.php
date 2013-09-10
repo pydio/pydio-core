@@ -41,7 +41,7 @@ class VideoReader extends AJXP_Plugin
         $destStreamURL = $streamData["protocol"]."://".$repository->getId();
 
         if ($action == "read_video_data") {
-            AJXP_Logger::debug("Reading video");
+            $this->logDebug("Reading video");
             $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
             $node = new AJXP_Node($destStreamURL.$file);
             session_write_close();
@@ -60,7 +60,7 @@ class VideoReader extends AJXP_Plugin
              }
 
             if ( isset($_SERVER['HTTP_RANGE']) && $filesize != 0 ) {
-                AJXP_Logger::debug("Http range", array($_SERVER['HTTP_RANGE']));
+                $this->logDebug("Http range", array($_SERVER['HTTP_RANGE']));
                 // multiple ranges, which can become pretty complex, so ignore it for now
                 $ranges = explode('=', $_SERVER['HTTP_RANGE']);
                 $offsets = explode('-', $ranges[1]);

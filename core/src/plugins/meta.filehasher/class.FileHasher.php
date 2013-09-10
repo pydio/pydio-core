@@ -88,7 +88,7 @@ class FileHasher extends AJXP_Plugin
             case "filehasher_delta":
             case "filehasher_patch":
                 // HANDLE UPLOAD DATA
-            AJXP_Logger::debug("Received signature file, should compute delta now");
+            $this->logDebug("Received signature file, should compute delta now");
                 if (!isSet($fileVars) && !is_array($fileVars["userfile_0"])) {
                     throw new Exception("These action should find uploaded data");
                 }
@@ -100,9 +100,9 @@ class FileHasher extends AJXP_Plugin
                 if ($actionName == "filehasher_delta") {
                     $signatureFile = $uploadedData;
                     $deltaFile = tempnam(AJXP_Utils::getAjxpTmpDir(), $actionName."-delta");
-                    AJXP_Logger::debug("Received signature file, should compute delta now");
+                    $this->logDebug("Received signature file, should compute delta now");
                     rsync_generate_delta($signatureFile, $file, $deltaFile);
-                    AJXP_Logger::debug("Computed delta file, size is ".filesize($deltaFile));
+                    $this->logDebug("Computed delta file, size is ".filesize($deltaFile));
                     header("Content-Type:application/octet-stream");
                     header("Content-Length:".filesize($deltaFile));
                     readfile($deltaFile);

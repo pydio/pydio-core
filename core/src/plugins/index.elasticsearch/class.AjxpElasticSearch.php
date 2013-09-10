@@ -174,7 +174,7 @@ class AjxpElasticSearch extends AJXP_Plugin
                 }
                 $query = implode(" OR ", $sParts);
                 $query = "ajxp_scope:shared AND ($query)";
-                AJXP_Logger::debug("Query : $query");
+                $this->logDebug("Query : $query");
            } else {
            */
             $this->currentIndex->open();
@@ -261,7 +261,7 @@ class AjxpElasticSearch extends AJXP_Plugin
                 $sParts[] = "ajxp_scope:shared";
             }
             $query = implode(" AND ", $sParts);
-            AJXP_Logger::debug("Query : $query");
+            $this->logDebug("Query : $query");
             $hits = $this->currentIndex->find($query);
 
             $commitIndex = false;
@@ -347,7 +347,7 @@ class AjxpElasticSearch extends AJXP_Plugin
     public function recursiveIndexation($url)
     {
         //print("Indexing $url \n");
-        AJXP_Logger::debug("Indexing content of folder ".$url);
+        $this->logDebug("Indexing content of folder ".$url);
         if (ConfService::currentContextIsCommandLine() && $this->verboseIndexation) {
             print("Indexing content of ".$url."\n");
         }
@@ -358,16 +358,16 @@ class AjxpElasticSearch extends AJXP_Plugin
             while ( ($child = readdir($handle)) != false) {
                 if($child[0] == ".") continue;
                 $newUrl = $url."/".$child;
-                AJXP_Logger::debug("Indexing Node ".$newUrl);
+                $this->logDebug("Indexing Node ".$newUrl);
                 try {
                     $this->updateNodeIndex(null, new AJXP_Node($newUrl));
                 } catch (Exception $e) {
-                    AJXP_Logger::debug("Error Indexing Node ".$newUrl." (".$e->getMessage().")");
+                    $this->logDebug("Error Indexing Node ".$newUrl." (".$e->getMessage().")");
                 }
             }
             closedir($handle);
         } else {
-            AJXP_Logger::debug("Cannot open $url!!");
+            $this->logDebug("Cannot open $url!!");
         }
     }
 

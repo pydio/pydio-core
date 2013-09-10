@@ -91,7 +91,7 @@ class fsAccessWrapper implements AjxpWrapper
                        $tmpDir = AJXP_Utils::getAjxpTmpDir() . DIRECTORY_SEPARATOR . md5(time()-rand());
                        mkdir($tmpDir);
                        $tmpFileName = $tmpDir.DIRECTORY_SEPARATOR.basename($localPath);
-                       AJXP_Logger::debug("Tmp file $tmpFileName");
+                       $this->logDebug("Tmp file $tmpFileName");
                        register_shutdown_function(array("fsAccessWrapper", "removeTmpFile"), $tmpDir, $tmpFileName);
                     $crtZip = new PclZip(AJXP_Utils::securePath(realpath($repoObject->getOption("PATH")).$repoObject->resolveVirtualRoots($zipPath)));
                     $content = $crtZip->listContent();
@@ -103,7 +103,7 @@ class fsAccessWrapper implements AjxpWrapper
                         }
                     }
                     $res = $crtZip->extract(PCLZIP_OPT_BY_NAME, $localPath, PCLZIP_OPT_PATH, $tmpDir, PCLZIP_OPT_REMOVE_ALL_PATH);
-                    AJXP_Logger::debug("Extracted ".$path." to ".dirname($localPath));
+                    $this->logDebug("Extracted ".$path." to ".dirname($localPath));
                     if($storeOpenContext) self::$crtZip = $crtZip;
                     return $tmpFileName;
                    } else {
@@ -265,7 +265,7 @@ class fsAccessWrapper implements AjxpWrapper
         try {
             $this->realPath = AJXP_Utils::securePath(self::initPath($path, "file"));
         } catch (Exception $e) {
-            AJXP_Logger::logAction("error", array("message" => "Error while opening stream $path"));
+            $this->logError("stream_open", "Error while opening stream $path");
             return false;
         }
         if ($this->realPath == -1) {

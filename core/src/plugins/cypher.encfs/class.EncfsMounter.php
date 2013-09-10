@@ -41,7 +41,7 @@ class EncfsMounter extends AJXP_Plugin
         if ($dirs!==false && count($dirs)) {
             foreach ($dirs as $mountedFile) {
                 $mountedDir = dirname($mountedFile);
-                AJXP_Logger::debug("Warning, $mountedDir was not unmounted before $actionName");
+                $this->logDebug("Warning, $mountedDir was not unmounted before $actionName");
                 $this->umountFolder($mountedDir);
             }
         }
@@ -65,17 +65,17 @@ class EncfsMounter extends AJXP_Plugin
                         &&  $testFile != $dest)
                 ){
                     $httpVars["force_copy_delete"] = "true";
-                    AJXP_Logger::debug("One mount to another, copy/delete instead of move ($dest, $testFile)");
+                    $this->logDebug("One mount to another, copy/delete instead of move ($dest, $testFile)");
                 }
             } else if ( $actionName == "delete" && RecycleBinManager::recycleEnabled() ) {
                 if (strstr($testFile, "ENCFS_CLEAR_")!==false) {
                     $httpVars["force_copy_delete"] = "true";
-                    AJXP_Logger::debug("One mount to another, copy/delete instead of move");
+                    $this->logDebug("One mount to another, copy/delete instead of move");
                 }
             } else if ($actionName == "restore") {
                 if (strstr(RecycleBinManager::getFileOrigin($testFile), "ENCFS_CLEAR_")) {
                     $httpVars["force_copy_delete"] = "true";
-                    AJXP_Logger::debug("One mount to another, copy/delete instead of move");
+                    $this->logDebug("One mount to another, copy/delete instead of move");
                 }
             }
         }

@@ -94,7 +94,7 @@ class QuotaComputer extends AJXP_Plugin
         $soft = $this->getSoftLimit();
         $path = $this->getWorkingPath();
         $q = $this->getUsage($path);
-        AJXP_Logger::debug("QUOTA : Previous usage was $q");
+        $this->logDebug("QUOTA : Previous usage was $q");
         if ($q === false) {
             $q = $this->computeDirSpace($path);
         }
@@ -207,7 +207,7 @@ class QuotaComputer extends AJXP_Plugin
 
     private function computeDirSpace($dir)
     {
-        AJXP_Logger::debug("Computing dir space for : ".$dir);
+        $this->logDebug("Computing dir space for : ".$dir);
         $s = -1;
         if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
 

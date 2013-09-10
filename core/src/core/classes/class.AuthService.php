@@ -257,15 +257,15 @@ class AuthService
         $temporaryUser->setGroupPath($parentUser->getGroupPath());
         $temporaryUser->setParent($parentUserId);
         $temporaryUser->setResolveAsParent(true);
-        AJXP_Logger::logAction("Log in", array("temporary user" => $temporaryUserId, "owner" => $parentUserId));
+        AJXP_Logger::info(__CLASS__,"Log in", array("temporary user" => $temporaryUserId, "owner" => $parentUserId));
         self::updateUser($temporaryUser);
     }
 
     public static function clearTemporaryUser($temporaryUserId)
     {
-        AJXP_Logger::logAction("Log out", array("temporary user"), $temporaryUserId);
+        AJXP_Logger::info(__CLASS__,"Log out", array("temporary user" => $temporaryUserId));
         if (isSet($_SESSION["AJXP_USER"]) || isSet(self::$currentUser)) {
-            AJXP_Logger::logAction("Log Out");
+            AJXP_Logger::info(__CLASS__, "Log Out", "");
             unset($_SESSION["AJXP_USER"]);
             if(isSet(self::$currentUser)) unset(self::$currentUser);
             if (ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
@@ -365,7 +365,7 @@ class AuthService
         if ($authDriver->autoCreateUser() && !$user->storageExists()) {
             $user->save("superuser"); // make sure update rights now
         }
-        AJXP_Logger::logAction("Log In");
+        AJXP_Logger::info(__CLASS__, "Log In", "");
         return 1;
     }
     /**
@@ -388,7 +388,7 @@ class AuthService
     {
         if (isSet($_SESSION["AJXP_USER"]) || isSet(self::$currentUser)) {
             AuthService::clearRememberCookie();
-            AJXP_Logger::logAction("Log Out");
+            AJXP_Logger::info(__CLASS__, "Log Out", "");
             unset($_SESSION["AJXP_USER"]);
             if(isSet(self::$currentUser)) unset(self::$currentUser);
             if (ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
@@ -707,7 +707,7 @@ class AuthService
             $zObj->setPref("AJXP_WEBDAV_DATA", $wData);
             $zObj->save();
         }
-        AJXP_Logger::logAction("Update Password", array("user_id"=>$userId));
+        AJXP_Logger::info(__CLASS__,"Update Password", array("user_id"=>$userId));
         return true;
     }
     /**
@@ -755,7 +755,7 @@ class AuthService
             $user->save();
         }
         AJXP_Controller::applyHook("user.after_create", array($user));
-        AJXP_Logger::logAction("Create User", array("user_id"=>$userId));
+        AJXP_Logger::info(__CLASS__,"Create User", array("user_id"=>$userId));
         return null;
     }
     /**
@@ -792,7 +792,7 @@ class AuthService
             $authDriver->deleteUser($deletedUser);
         }
         AJXP_Controller::applyHook("user.after_delete", array($userId));
-        AJXP_Logger::logAction("Delete User", array("user_id"=>$userId, "sub_user" => implode(",", $subUsers)));
+        AJXP_Logger::info(__CLASS__,"Delete User", array("user_id"=>$userId, "sub_user" => implode(",", $subUsers)));
         return true;
     }
 

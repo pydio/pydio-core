@@ -118,8 +118,8 @@ class sftpPSLAccessDriver extends fsAccessDriver
             $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $uniqpath,
                                  PCLZIP_ATT_FILE_NEW_SHORT_NAME => $basename);
         }
-        AJXP_Logger::debug("Pathes", $filePaths);
-        AJXP_Logger::debug("Basedir", array($basedir));
+        $this->logDebug("Pathes", $filePaths);
+        $this->logDebug("Basedir", array($basedir));
         $archive = new PclZip($dest);
         $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $uniqfolder, PCLZIP_OPT_NO_COMPRESSION);
         $this->recursiveRmdir($uniqfolder);

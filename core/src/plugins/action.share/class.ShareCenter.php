@@ -59,7 +59,7 @@ class ShareCenter extends AJXP_Plugin
             if ($downloadFolder == "") {
                 $disableSharing = true;
             } else if ((!is_dir($downloadFolder) || !is_writable($downloadFolder))) {
-                AJXP_Logger::debug("Disabling Public links, $downloadFolder is not writeable!", array("folder" => $downloadFolder, "is_dir" => is_dir($downloadFolder),"is_writeable" => is_writable($downloadFolder)));
+                $this->logDebug("Disabling Public links, $downloadFolder is not writeable!", array("folder" => $downloadFolder, "is_dir" => is_dir($downloadFolder),"is_writeable" => is_writable($downloadFolder)));
                 $disableSharing = true;
             } else {
                 if (AuthService::usersEnabled()) {
@@ -405,7 +405,7 @@ class ShareCenter extends AJXP_Plugin
                 );
                 $oldNode->removeMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
             } catch (Exception $e) {
-                AJXP_Logger::logAction("ERROR : ".$e->getMessage(), $e->getTrace() );
+                $this->logError("Exception", $e->getMessage(), $e->getTrace() );
             }
         }
     }

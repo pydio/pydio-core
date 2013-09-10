@@ -504,7 +504,7 @@ class AjxpScheduler extends AJXP_Plugin
     public function fakeLongTask($action, $httpVars, $fileVars)
     {
         $minutes = (isSet($httpVars["time_length"])?intval($httpVars["time_length"]):2);
-        AJXP_Logger::debug("Running Fake task on ".AuthService::getLoggedUser()->getId());
+        $this->logDebug("Running Fake task on ".AuthService::getLoggedUser()->getId());
         print('STARTING FAKE TASK');
         sleep($minutes * 60);
         print('ENDIND FAKE TASK');

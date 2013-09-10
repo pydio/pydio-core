@@ -69,7 +69,7 @@ class smbAuthDriver extends AbstractAuthDriver
         $url = "smb://$login:$pass@".$host."/".$basePath."/";
         try {
             if (!is_dir($url)) {
-                AJXP_Logger::debug("SMB Login failure");
+                $this->logDebug("SMB Login failure");
                 $_SESSION["AJXP_SESSION_REMOTE_PASS"] = '';
                 unset($_SESSION["COUNT"]);
                 unset($_SESSION["disk"]);

@@ -293,7 +293,7 @@ class EmlParser extends AJXP_Plugin
                 $metadata["eml_time"] = $date;
             }
             $metadata["eml_".$hKey] = AJXP_Utils::xmlEntities(@htmlentities($hValue, ENT_COMPAT, "UTF-8"));
-            //AJXP_Logger::debug($hKey." - ".$hValue. " - ".$metadata["eml_".$hKey]);
+            //$this->logDebug($hKey." - ".$hValue. " - ".$metadata["eml_".$hKey]);
             if ($metadata["eml_".$hKey] == "") {
                 $metadata["eml_".$hKey] = AJXP_Utils::xmlEntities(@htmlentities($hValue));
                 if (!SystemTextEncoding::isUtf8($metadata["eml_".$hKey])) {
@@ -337,7 +337,7 @@ class EmlParser extends AJXP_Plugin
         $dom = new DOMDocument("1.0", "UTF-8");
         $dom->loadXML($outputVars["ob_output"]);
         $mobileAgent = AJXP_Utils::userAgentIsIOS() || (strpos($_SERVER["HTTP_USER_AGENT"], "ajaxplorer-ios-client")!==false);
-        AJXP_Logger::debug("MOBILE AGENT DETECTED?".$mobileAgent, $_SERVER["HTTP_USER_AGENT"]);
+        $this->logDebug("MOBILE AGENT DETECTED?".$mobileAgent, $_SERVER["HTTP_USER_AGENT"]);
         if (EmlParser::$currentListingOnlyEmails === true) {
             // Replace all text attributes by the "from" value
             $index = 1;
@@ -483,7 +483,7 @@ class EmlParser extends AJXP_Plugin
     public static function computeCacheId($mailPath)
     {
         $header = file_get_contents($mailPath."#header");
-        //AJXP_Logger::debug("Headers ", $header);
+        //$this->logDebug("Headers ", $header);
         return md5($header);
     }
 

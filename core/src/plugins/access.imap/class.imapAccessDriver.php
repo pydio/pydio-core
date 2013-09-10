@@ -171,7 +171,7 @@ class imapAccessDriver extends fsAccessDriver
         if($foldersOnly) return 0;
         // WILL USE IMAP FUNCTIONS TO COUNT;
         $tmpHandle = opendir($dirName);
-        AJXP_Logger::debug("COUNT : ".imapAccessWrapper::getCurrentDirCount());
+        $this->logDebug("COUNT : ".imapAccessWrapper::getCurrentDirCount());
         return imapAccessWrapper::getCurrentDirCount();
     }
 
