@@ -127,5 +127,5 @@ if (ConfService::getCoreConf("WEBDAV_BROWSER_LISTING")) {
 try {
     $server->exec();
 } catch ( Exception $e ) {
-    AJXP_Logger::logAction("error:".$e->getMessage());
+    AJXP_Logger::error(__CLASS__,"Exception",$e->getMessage());
 }

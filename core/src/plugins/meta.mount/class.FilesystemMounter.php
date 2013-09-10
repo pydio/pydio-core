@@ -95,7 +95,7 @@ class FilesystemMounter extends AJXP_Plugin
     public function mountFS()
     {
         list($user, $password) = $this->getCredentials();
-        AJXP_Logger::debug("FSMounter::mountFS Should mount" . $user);
+        $this->logDebug("FSMounter::mountFS Should mount" . $user);
         $repo = ConfService::getRepository();
 
         $MOUNT_TYPE = $this->options["FILESYSTEM_TYPE"];
@@ -140,7 +140,7 @@ class FilesystemMounter extends AJXP_Plugin
 
     public function umountFS()
     {
-        AJXP_Logger::debug("FSMounter::unmountFS");
+        $this->logDebug("FSMounter::unmountFS");
         list($user, $password) = $this->getCredentials();
         $MOUNT_POINT = $this->getOption("MOUNT_POINT", $user, $password);
         $MOUNT_SUDO = $this->options["MOUNT_SUDO"];

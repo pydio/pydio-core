@@ -76,7 +76,7 @@ class dropboxWrapper implements AjxpWrapper
 
     protected function metadataToStat($metaEntry)
     {
-        AJXP_Logger::debug("Stating ", $metaEntry);
+        $this->logDebug("Stating ", $metaEntry);
         $mode = 0666;
         if(intval($metaEntry["is_dir"]) == 1) $mode += 0040000;
         else $mode += 0100000;
@@ -97,7 +97,7 @@ class dropboxWrapper implements AjxpWrapper
             'blksize' => 0,
             'blocks' => 0
         );
-        AJXP_Logger::debug("Stat value", $keys);
+        $this->logDebug("Stat value", $keys);
         return $keys;
     }
 
@@ -169,7 +169,7 @@ class dropboxWrapper implements AjxpWrapper
 
     public function url_stat($path, $flags)
     {
-        AJXP_Logger::debug("STATING $path");
+        $this->logDebug("STATING $path");
         $path = $this->initPath($path);
         $meta = null;
         if (self::$crtDirContent != null) {
@@ -194,7 +194,7 @@ class dropboxWrapper implements AjxpWrapper
     {
         $path = $this->initPath($path);
         $metadata = self::$dropbox->getMetaData($path);
-        AJXP_Logger::debug("CONTENT for $path", $metadata);
+        $this->logDebug("CONTENT for $path", $metadata);
         self::$crtDirContent = $metadata["contents"];
         if (!is_array(self::$crtDirContent)) {
             return false;
@@ -250,9 +250,9 @@ class dropboxWrapper implements AjxpWrapper
             $path = $this->initPath(self::$crtWritePath);
             try {
                 $postRes = self::$dropbox->putFile($path, self::$crtTmpFile);
-                AJXP_Logger::debug("Post to $path succeeded:");
+                $this->logDebug("Post to $path succeeded:");
             } catch (Dropbox_Exception $dE) {
-                AJXP_Logger::debug("Post to $path failed :".$dE->getMessage());
+                $this->logDebug("Post to $path failed :".$dE->getMessage());
             }
         }
         unlink(self::$crtTmpFile);

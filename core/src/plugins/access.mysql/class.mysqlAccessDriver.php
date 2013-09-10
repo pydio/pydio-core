@@ -648,7 +648,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
             //$sql=mysql_real_escape_string($sql);
             $result= @mysql_query(stripslashes($sql));
             if ($result) {
-                AJXP_Logger::logAction("exec", array($sql));
+                $this->logInfo("exec", array($sql));
                 return $result;
             } else {
                 throw new AJXP_Exception($sql.":".mysql_error());

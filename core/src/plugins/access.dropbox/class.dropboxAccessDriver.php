@@ -45,7 +45,7 @@ class dropboxAccessDriver extends fsAccessDriver
         }
 
         $wrapperData = $this->detectStreamWrapper(true);
-        AJXP_Logger::debug("Detected wrapper data", $wrapperData);
+        $this->logDebug("Detected wrapper data", $wrapperData);
         $this->wrapperClassName = $wrapperData["classname"];
         $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
 

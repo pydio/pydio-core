@@ -20,6 +20,14 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+if (!defined('LOG_LEVEL_DEBUG')) {
+    define("LOG_LEVEL_DEBUG", "Debug");
+    define("LOG_LEVEL_INFO", "Info");
+    define("LOG_LEVEL_NOTICE", "Notice");
+    define("LOG_LEVEL_WARNING", "Warning");
+    define("LOG_LEVEL_ERROR", "Error");
+}
+
 /**
  * The basic concept of plugin. Only needs a manifest.xml file.
  * @package AjaXplorer
@@ -676,6 +684,73 @@ class AJXP_Plugin implements Serializable
     {
         return $this->dependencies;
     }
+    /**
+     * Write a debug log with the plugin id as source
+     * @param string $prefix  A quick description or action
+     * @param array|string $message Variable number of message args (string or array)
+     * @return void
+     */
+    public function logDebug($prefix, $message = "")
+    {
+        if(!class_exists("ConfService")) return ;
+        if(!ConfService::getConf("SERVER_DEBUG")) return ;
+        $args = func_get_args();
+        array_shift($args);
+        AJXP_Logger::log2(LOG_LEVEL_DEBUG, $this->getId(), $prefix, $args);
+    }
+
+    /**
+     * Write an info log with the plugin id as source
+     * @param string $prefix  A quick description or action
+     * @param array|string $message Variable number of message args (string or array)
+     * @return void
+     */
+    public function logInfo($prefix, $message)
+    {
+        $args = func_get_args();
+        array_shift($args);
+        AJXP_Logger::log2(LOG_LEVEL_INFO, $this->getId(), $prefix, $args);
+    }
+
+    /**
+     * Write a notice log with the plugin id as source
+     * @param string $prefix  A quick description or action
+     * @param array|string $message Variable number of message args (string or array)
+     * @return void
+     */
+    public function logNotice($prefix, $message)
+    {
+        $args = func_get_args();
+        array_shift($args);
+        AJXP_Logger::log2(LOG_LEVEL_NOTICE, $this->getId(), $prefix, $args);
+    }
+
+    /**
+     * Write a warning log with the plugin id as source
+     * @param string $prefix  A quick description or action
+     * @param array|string $message Variable number of message args (string or array)
+     * @return void
+     */
+    public function logWarning($prefix, $message)
+    {
+        $args = func_get_args();
+        array_shift($args);
+        AJXP_Logger::log2(LOG_LEVEL_WARNING, $this->getId(), $prefix, $args);
+    }
+
+    /**
+     * Write an error log with the plugin id as source
+     * @param string $prefix  A quick description or action
+     * @param array|string $message Variable number of message args (string or array)
+     * @return void
+     */
+    public function logError($prefix, $message)
+    {
+        $args = func_get_args();
+        array_shift($args);
+        AJXP_Logger::log2(LOG_LEVEL_ERROR, $this->getId(), $prefix, $args);
+    }
+
     /**
      * Detect if this plugin declares a StreamWrapper, and if yes loads it and register the stream.
      * @param bool $register

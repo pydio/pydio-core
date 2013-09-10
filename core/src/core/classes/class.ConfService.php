@@ -602,7 +602,7 @@ class ConfService
         if ($res == -1) {
             return $res;
         }
-        AJXP_Logger::logAction("Create Repository", array("repo_name"=>$oRepository->getDisplay()));
+        AJXP_Logger::info(__CLASS__,"Create Repository", array("repo_name"=>$oRepository->getDisplay()));
         $this->invalidateLoadedRepositories();
     }
 
@@ -693,7 +693,7 @@ class ConfService
         if ($res == -1) {
             return $res;
         }
-        AJXP_Logger::logAction("Edit Repository", array("repo_name"=>$oRepositoryObject->getDisplay()));
+        AJXP_Logger::info(__CLASS__,"Edit Repository", array("repo_name"=>$oRepositoryObject->getDisplay()));
         $this->invalidateLoadedRepositories();
     }
     /**
@@ -731,7 +731,7 @@ class ConfService
         if ($res == -1) {
             return $res;
         }
-        AJXP_Logger::logAction("Delete Repository", array("repo_id"=>$repoId));
+        AJXP_Logger::info(__CLASS__,"Delete Repository", array("repo_id"=>$repoId));
         $this->invalidateLoadedRepositories();
     }
 
@@ -1081,7 +1081,7 @@ class ConfService
                     $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $crtRepository->getId()));
                     $instance->beforeInitMeta($plugInstance);
                 } catch (Exception $e) {
-                    AJXP_Logger::logAction('ERROR : Cannot instanciate Meta plugin, reason : '.$e->getMessage());
+                    AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
                     $this->errors[] = $e->getMessage();
                 }
             }
@@ -1119,7 +1119,7 @@ class ConfService
                     $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $crtRepository->getId()));
                     $instance->initMeta($plugInstance);
                 } catch (Exception $e) {
-                    AJXP_Logger::logAction('ERROR : Cannot instanciate Meta plugin, reason : '.$e->getMessage());
+                    AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
                     $this->errors[] = $e->getMessage();
                 }
                 $pServ->setPluginActive($split[0], $split[1]);
@@ -1183,7 +1183,7 @@ class ConfService
                     $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $repository->getId()));
                     $instance->beforeInitMeta($plugInstance);
                 } catch (Exception $e) {
-                    AJXP_Logger::logAction('ERROR : Cannot instanciate Meta plugin, reason : '.$e->getMessage());
+                    AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
                     $this->errors[] = $e->getMessage();
                 }
             }
@@ -1213,7 +1213,7 @@ class ConfService
                     $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $repository->getId()));
                     $instance->initMeta($plugInstance);
                 } catch (Exception $e) {
-                    AJXP_Logger::logAction('ERROR : Cannot instanciate Meta plugin, reason : '.$e->getMessage());
+                    AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
                     $this->errors[] = $e->getMessage();
                 }
                 $pServ->setPluginActive($split[0], $split[1]);

@@ -82,7 +82,7 @@ class hpcAccessWrapper extends fsAccessWrapper
         try {
             $this->realPath = $this->initPath($path, "file");
         } catch (Exception $e) {
-            AJXP_Logger::logAction("error", array("message" => "Error while opening stream $path"));
+            $this->logError("stream_open", "Error while opening stream $path");
             return false;
         }
         if ($this->realPath == -1) {
@@ -105,7 +105,7 @@ class hpcAccessWrapper extends fsAccessWrapper
     public function url_stat($path, $flags)
     {
         // File and zip case
-        // AJXP_Logger::debug("Stating $path");
+        // $this->logDebug("Stating $path");
         $stat = @stat($this->initPath($path, "file"));
         if($stat == null) return null;
         if ($stat["mode"] == 0666) {
@@ -113,7 +113,7 @@ class hpcAccessWrapper extends fsAccessWrapper
         }
         $parsed = parse_url($path);
         if ($stat["mtime"] == $stat["ctime"]  && $stat["ctime"] == $stat["atime"] && $stat["atime"] == 0 && $parsed["path"] != "/") {
-            //AJXP_Logger::debug("Nullifying stats");
+            //$this->logDebug("Nullifying stats");
             return null;
         }
         return $stat;

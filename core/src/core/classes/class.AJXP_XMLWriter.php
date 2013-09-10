@@ -202,7 +202,7 @@ class AJXP_XMLWriter
             $message = "$message in $fichier (l.$ligne)";
         }
         try {
-            AJXP_Logger::logAction("error", array("message" => $message));
+            AJXP_Logger::error(__CLASS__, __FUNCTION__, array("message" => $message));
         } catch (Exception $e) {
             // This will probably trigger a double exception!
             echo "<pre>Error in error";

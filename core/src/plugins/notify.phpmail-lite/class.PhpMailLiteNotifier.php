@@ -143,7 +143,7 @@ class PhpMailLiteNotifier extends AJXP_Plugin
         $directUrl = "";
         if (!empty($this->pluginConf["SERVER_URL"])) {
             $directUrl = rtrim($this->pluginConf["SERVER_URL"], "/")."/?repository_id=".ConfService::getRepository()->getId()."&folder=". urlencode($folder);
-            AJXP_Logger::debug($directUrl);
+            $this->logDebug($directUrl);
         }
 
         $subject = array("%user", "AJXP_USER", "AJXP_FILE", "AJXP_FOLDER_URL", "AJXP_FOLDER", "AJXP_ACTION","AJXP_REPOSITORY");
@@ -156,7 +156,7 @@ class PhpMailLiteNotifier extends AJXP_Plugin
             ConfService::getRepository()->getDisplay(),
         );
         $body = str_replace($subject, $replace, $this->pluginConf["BODY"]);
-        AJXP_Logger::debug($body);
+        $this->logDebug($body);
         $mail->Subject = str_replace($subject, $replace, $this->pluginConf["SUBJECT"]);
         $mail->Body = nl2br($body);
         $mail->AltBody = strip_tags($mail->Body);

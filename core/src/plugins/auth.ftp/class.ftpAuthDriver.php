@@ -122,7 +122,7 @@ class ftpAuthDriver extends AbstractAuthDriver
 
     public function testParameters($params)
     {
-        AJXP_Logger::debug("TESTING", $params);
+        $this->logDebug("TESTING", $params);
         $repositoryId = $params["REPOSITORY_ID"];
         $wrapper = new ftpSonWrapper();
         try {

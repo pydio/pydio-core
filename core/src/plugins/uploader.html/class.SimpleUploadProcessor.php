@@ -60,7 +60,7 @@ class SimpleUploadProcessor extends AJXP_Plugin
         if (dirname($httpVars["dir"]) == "/" && basename($httpVars["dir"]) == $fileNameH) {
             $httpVars["dir"] = "/";
         }
-        AJXP_Logger::debug("SimpleUpload::preProcess", $httpVars);
+        $this->logDebug("SimpleUpload::preProcess", $httpVars);
 
         if ($headersCheck) {
             // create the object and assign property
@@ -79,7 +79,7 @@ class SimpleUploadProcessor extends AJXP_Plugin
         if (!isSet($httpVars["simple_uploader"]) && !isSet($httpVars["xhr_uploader"])) {
             return false;
         }
-        AJXP_Logger::debug("SimpleUploadProc is active");
+        $this->logDebug("SimpleUploadProc is active");
         $result = $postProcessData["processor_result"];
 
         if (isSet($httpVars["simple_uploader"])) {

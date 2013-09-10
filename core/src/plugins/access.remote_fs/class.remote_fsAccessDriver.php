@@ -146,7 +146,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
             case "trigger_remote_copy":
                 if(!$this->hasFilesToCopy()) break;
                 $toCopy = $this->getFileNameToCopy();
-                AJXP_Logger::debug("trigger_remote", $toCopy);
+                $this->logDebug("trigger_remote", $toCopy);
                 AJXP_XMLWriter::header();
                 AJXP_XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".$toCopy." to remote server");
                 AJXP_XMLWriter::close();
@@ -180,7 +180,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
                 unlink($fData["tmp_name"]);
                 $response = $httpClient->getContent();
                 AJXP_XMLWriter::header();
-                AJXP_Logger::debug("next_to_remote", $nextFile);
+                $this->logDebug("next_to_remote", $nextFile);
                 if (intval($response)>=400) {
                     AJXP_XMLWriter::sendMessage(null, "Error : ".intval($response));
                 } else {
@@ -196,11 +196,11 @@ class remote_fsAccessDriver extends AbstractAccessDriver
             case "upload":
 
                 $rep_source = AJXP_Utils::securePath("/".$httpVars['dir']);
-                AJXP_Logger::debug("Upload : rep_source ", array($rep_source));
+                $this->logDebug("Upload : rep_source ", array($rep_source));
                 $logMessage = "";
                 foreach ($filesVars as $boxName => $boxData) {
                     if(substr($boxName, 0, 9) != "userfile_")     continue;
-                    AJXP_Logger::debug("Upload : rep_source ", array($rep_source));
+                    $this->logDebug("Upload : rep_source ", array($rep_source));
                     $err = AJXP_Utils::parseFileDataErrors($boxData);
                     if ($err != null) {
                         $errorCode = $err[0];
@@ -209,26 +209,26 @@ class remote_fsAccessDriver extends AbstractAccessDriver
                     }
                     $boxData["destination"] = $rep_source;
                     $destCopy = AJXP_XMLWriter::replaceAjxpXmlKeywords($this->repository->getOption("TMP_UPLOAD"));
-                    AJXP_Logger::debug("Upload : tmp upload folder", array($destCopy));
+                    $this->logDebug("Upload : tmp upload folder", array($destCopy));
                     if (!is_dir($destCopy)) {
                         if (! @mkdir($destCopy)) {
-                            AJXP_Logger::debug("Upload error : cannot create temporary folder", array($destCopy));
+                            $this->logDebug("Upload error : cannot create temporary folder", array($destCopy));
                             $errorCode = 413;
                             $errorMessage = "Warning, cannot create folder for temporary copy.";
                             break;
                         }
                     }
                     if (!is_writeable($destCopy)) {
-                        AJXP_Logger::debug("Upload error: cannot write into temporary folder");
+                        $this->logDebug("Upload error: cannot write into temporary folder");
                         $errorCode = 414;
                         $errorMessage = "Warning, cannot write into temporary folder.";
                         break;
                     }
-                    AJXP_Logger::debug("Upload : tmp upload folder", array($destCopy));
+                    $this->logDebug("Upload : tmp upload folder", array($destCopy));
                     if (isSet($boxData["input_upload"])) {
                         try {
                             $destName = tempnam($destCopy, "");
-                            AJXP_Logger::debug("Begining reading INPUT stream");
+                            $this->logDebug("Begining reading INPUT stream");
                             $input = fopen("php://input", "r");
                             $output = fopen($destName, "w");
                             $sizeRead = 0;
@@ -241,7 +241,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
                             fclose($output);
                             $boxData["tmp_name"] = $destName;
                             $this->storeFileToCopy($boxData);
-                            AJXP_Logger::debug("End reading INPUT stream");
+                            $this->logDebug("End reading INPUT stream");
                         } catch (Exception $e) {
                             $errorCode=411;
                             $errorMessage = $e->getMessage();
@@ -262,10 +262,10 @@ class remote_fsAccessDriver extends AbstractAccessDriver
                     }
                 }
                 if (isSet($errorMessage)) {
-                    AJXP_Logger::debug("Return error $errorCode $errorMessage");
+                    $this->logDebug("Return error $errorCode $errorMessage");
                     return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $errorMessage));
                 } else {
-                    AJXP_Logger::debug("Return success");
+                    $this->logDebug("Return success");
                     return array("SUCCESS" => true);
                 }
 
@@ -314,7 +314,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
         }
         if (!isSet($_SESSION["AJXP_REMOTE_SESSION"]) || !is_array($_SESSION["AJXP_REMOTE_SESSION"]) || $refreshSessId) {
             if ($uri == "") {
-                AJXP_Logger::debug("Remote_fs : relog necessary");
+                $this->logDebug("Remote_fs : relog necessary");
                 // Retrieve a seed!
                 $httpClient->get($crtRep->getOption("URI")."?get_action=get_seed&secure_token=$remoteSecureToken");
                 $seed = $httpClient->getContent();
@@ -357,11 +357,11 @@ class remote_fsAccessDriver extends AbstractAccessDriver
         $user = AuthService::getLoggedUser();
         $files = $user->getTemporaryData("tmp_upload");
         $files[] = $fileData;
-        AJXP_Logger::debug("Storing data", $fileData);
+        $this->logDebug("Storing data", $fileData);
         $user->saveTemporaryData("tmp_upload", $files);
         if(strpos($_SERVER["HTTP_USER_AGENT"], "ajaxplorer-ios-client") !== false
             || strpos($_SERVER["HTTP_USER_AGENT"], "Apache-HttpClient") !== false){
-            AJXP_Logger::logAction("Up from ".$_SERVER["HTTP_USER_AGENT"] ." - direct triger of next to remote");
+            $this->logInfo("Up from", $_SERVER["HTTP_USER_AGENT"] ." - direct triger of next to remote");
             $this->uploadActions("next_to_remote", array(), array());
         }
 

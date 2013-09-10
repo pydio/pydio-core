@@ -56,7 +56,7 @@ class AjxpMailer extends AJXP_Plugin
                     $notification->getAuthor()
                 );
             } catch (Exception $e) {
-                AJXP_Logger::logAction("ERROR : ".$e->getMessage());
+                $this->logError("Exception", $e->getMessage(), $e->getTrace());
             }
         }
     }
