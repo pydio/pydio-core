@@ -1279,7 +1279,7 @@ Class.create("FilesList", SelectableElements, {
 		}
 		
 		// NOW PARSE LINES
-		this.parsingCache = new Hash();		
+		this.clearParsingCache();
 		var children = contextNode.getChildren();
         var renderer = this.getRenderer();// (this._displayMode == "list"?this.ajxpNodeToTableRow.bind(this):this.ajxpNodeToDiv.bind(this));
 		for (var i = 0; i < children.length ; i++) 
@@ -1446,7 +1446,53 @@ Class.create("FilesList", SelectableElements, {
 		span.setStyle({color:'#ddd'});
 		modal.setCloseAction(closeFunc);
 	},
-	
+
+    getFromCache:function(cacheKey){
+        var result;
+        if(!this.parsingCache.get(cacheKey)){
+            result = $H();
+            var columns;
+            switch(cacheKey){
+                case "visibleColumns":
+                    columns = this.getVisibleColumns();
+                    break;
+                case "hiddenColumns":
+                    columns = $A();
+                    var hColumns = this.hiddenColumns;
+                    hColumns.each(function(colName){
+                        var colObject = this.columnsDef.detect(function(element){
+                            return (element.attributeName == colName);
+                        });
+                        if(colObject) columns.push(colObject);
+                    }.bind(this));
+                    break;
+                case "tBody":
+                    var tBody = $(this._htmlElement).down("tbody");
+                    this.parsingCache.set('tBody', tBody);
+                    return tBody;
+                default :
+                    columns = this.getColumnsDef();
+                    break;
+            }
+            columns.each(function(column){
+                if(column.modifier && !column.modifierFunc) {
+                    try{
+                        column.modifierFunc = eval(column.modifier);
+                    }catch (e){}
+                }
+                result.set(column.attributeName, column);
+            });
+            this.parsingCache.set(cacheKey, result);
+        }else{
+            result = this.parsingCache.get(cacheKey);
+        }
+        return result;
+    },
+
+    clearParsingCache: function(){
+        this.parsingCache = new $H();
+    },
+
 	/**
 	 * Populate a node as a TR element
 	 * @param ajxpNode AjxpNode
@@ -1456,25 +1502,15 @@ Class.create("FilesList", SelectableElements, {
 	ajxpNodeToTableRow: function(ajxpNode, replaceItem){
 		var metaData = ajxpNode.getMetadata();
 		var newRow = new Element("tr", {id:slugString(ajxpNode.getPath())});
-		var tBody = this.parsingCache.get('tBody') || $(this._htmlElement).select("tbody")[0];
-		this.parsingCache.set('tBody', tBody);
+		var tBody = this.getFromCache('tBody');
+
 		metaData.each(function(pair){
 			//newRow.setAttribute(pair.key, pair.value);
 			if(Prototype.Browser.IE && pair.key == "ID"){
 				newRow.setAttribute("ajxp_sql_"+pair.key, pair.value);
 			}			
 		});
-		var attributeList;
-		if(!this.parsingCache.get('attributeList')){
-			attributeList = $H();
-			var visibleColumns = this.getVisibleColumns();
-			visibleColumns.each(function(column){
-				attributeList.set(column.attributeName, column);
-			});
-			this.parsingCache.set('attributeList', attributeList);
-		}else{
-			attributeList = this.parsingCache.get('attributeList');
-		}
+		var attributeList = this.getFromCache("visibleColumns");
 		var attKeys = attributeList.keys();
 		for(var i = 0; i<attKeys.length;i++ ){
 			var s = attKeys[i];			
@@ -1579,31 +1615,17 @@ Class.create("FilesList", SelectableElements, {
 				tableCell.addClassName("resizer_"+i);
 			}
 			newRow.appendChild(tableCell);
-			if(attributeList.get(s).modifier){
-				var modifier = eval(attributeList.get(s).modifier);
-				modifier(tableCell, ajxpNode, 'row');
+			if(attributeList.get(s).modifierFunc){
+                attributeList.get(s).modifierFunc(tableCell, ajxpNode, 'row', attributeList.get(s));
 			}
 		}
-        // test hidden modifiers
-        var hiddenModifiers = $A();
-        if(this.parsingCache.get("hiddenModifiers")){
-            hiddenModifiers = this.parsingCache.get("hiddenModifiers");
-        }else{
-            this.hiddenColumns.each(function(col){
-                try{
-                    this.columnsDef.each(function(colDef){
-                        if(colDef.attributeName == col && colDef.modifier){
-                           var mod = eval(colDef.modifier);
-                           hiddenModifiers.push(mod);
-                        }
-                    });
-                }catch(e){}
-            }.bind(this) );
-            this.parsingCache.set("hiddenModifiers", hiddenModifiers);
-        }
-        hiddenModifiers.each(function(mod){
-            mod(null,ajxpNode,'row', newRow);
+
+        this.getFromCache('hiddenColumns').each(function(pair){
+            if(pair.value.modifierFunc){
+                pair.value.modifierFunc(null,ajxpNode,'row', pair.value, newRow);
+            }
         });
+
 		tBody.appendChild(newRow);
         if(!replaceItem){
             if(this.even){
@@ -1675,24 +1697,12 @@ Class.create("FilesList", SelectableElements, {
         }
 
 		this._htmlElement.insert(newRow);
-			
-		var modifiers ;
-		if(!this.parsingCache.get('modifiers')){
-			modifiers = $A();
-			this.columnsDef.each(function(column){
-				if(column.modifier){
-					try{
-						modifiers.push(eval(column.modifier));
-					}catch(e){}
-				}
-			});
-			this.parsingCache.set('modifiers', modifiers);			
-		}else{
-			modifiers = this.parsingCache.get('modifiers');
-		}
-		modifiers.each(function(el){
-			el(newRow, ajxpNode, 'thumb');
-		});
+
+        this.getFromCache("columns").each(function(pair){
+            if(pair.value.modifierFunc){
+                pair.value.modifierFunc(newRow, ajxpNode, 'thumb', pair.value);
+            }
+        });
 
         this._previewFactory.enrichBasePreview(ajxpNode, newRow);
 		
@@ -1781,17 +1791,8 @@ Class.create("FilesList", SelectableElements, {
         largeRow.insert(label);
         largeRow.insert(metadataDiv);
 
-        var attributeList;
-        if(!this.parsingCache.get('attributeList')){
-            attributeList = $H();
-            var visibleColumns = this.getVisibleColumns();
-            visibleColumns.each(function(column){
-                attributeList.set(column.attributeName, column);
-            });
-            this.parsingCache.set('attributeList', attributeList);
-        }else{
-            attributeList = this.parsingCache.get('attributeList');
-        }
+        var attributeList = this.getFromCache('visibleColumns');
+
         var first = false;
         var attKeys = attributeList.keys();
         for(var i = 0; i<attKeys.length;i++ ){
@@ -1820,33 +1821,19 @@ Class.create("FilesList", SelectableElements, {
             }
             metadataDiv.insert(cell);
             first = false;
-            if(attributeList.get(s).modifier){
-                var modifier = eval(attributeList.get(s).modifier);
-                modifier(cell, ajxpNode, 'row');
+            if(attributeList.get(s).modifierFunc){
+                attributeList.get(s).modifierFunc(cell, ajxpNode, 'detail', attributeList.get(s));
             }
         }
 
         this._htmlElement.insert(largeRow);
 
+        this.getFromCache("columns").each(function(pair){
+            if(pair.value.modifierFunc){
+                pair.value.modifierFunc(newRow, ajxpNode, 'detail', pair.value);
+            }
+        });
 
-
-		var modifiers ;
-		if(!this.parsingCache.get('modifiers')){
-			modifiers = $A();
-			this.columnsDef.each(function(column){
-				if(column.modifier){
-					try{
-						modifiers.push(eval(column.modifier));
-					}catch(e){}
-				}
-			});
-			this.parsingCache.set('modifiers', modifiers);
-		}else{
-			modifiers = this.parsingCache.get('modifiers');
-		}
-		modifiers.each(function(el){
-			el(newRow, ajxpNode, 'thumb');
-		});
 
         this._previewFactory.enrichBasePreview(ajxpNode, newRow);
 
@@ -1902,7 +1889,7 @@ Class.create("FilesList", SelectableElements, {
         }
     },
 
-	partSizeCellRenderer : function(element, ajxpNode, type){
+	partSizeCellRenderer : function(element, ajxpNode, type, metadataDef){
         if(!element) return;
 		element.setAttribute("data-sorter_value", ajxpNode.getMetadata().get("bytesize"));
 		if(!ajxpNode.getMetadata().get("target_bytesize")){

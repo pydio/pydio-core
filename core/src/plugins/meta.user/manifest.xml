@@ -10,9 +10,11 @@
 	</client_settings>
 	<server_settings>
 		<!--<param name="meta_file_name" type="string" label="CONF_MESSAGE[Meta File]" description="CONF_MESSAGE[Hidden file used inside folders to save meta data]" mandatory="true" default=".ajxp_meta"/>-->
-		<param name="meta_fields" type="string" replicationGroup="group1" label="CONF_MESSAGE[Meta Fields]" description="CONF_MESSAGE[Comma separated list of fields, use standard characters here.]" mandatory="true" default="comment_field"/>
-		<param name="meta_labels" type="string" replicationGroup="group1" label="CONF_MESSAGE[Meta Labels]" description="CONF_MESSAGE[Comma separated list of labels, be sure to define as many as fields!]" mandatory="true" default="My Comments"/>
-		<param name="meta_visibility" type="string" replicationGroup="group1" label="CONF_MESSAGE[Columns visibility]" description="CONF_MESSAGE[Set default visibility for each columns. Either by columns, using commas, or one value that will be applied to all columns. Value can be 'visible' or 'hidden'.]" mandatory="false" default="visible"/>
+		<param name="meta_fields" type="string" replicationGroup="group1" label="CONF_MESSAGE[Field ID]" description="CONF_MESSAGE[Id of fiels, use standard characters here.]" mandatory="true" default="comment_field"/>
+		<param name="meta_labels" type="string" replicationGroup="group1" label="CONF_MESSAGE[Label]" description="CONF_MESSAGE[Label of the field, human friendly]" mandatory="true" default="My Comments"/>
+		<param name="meta_types" type="select" choices="string|Short text,textarea|Long text,stars_rate|Stars Rating,css_label|Color labels,comments_feed|Comments Feed,choice|Selection (set choices in Label)" replicationGroup="group1" label="CONF_MESSAGE[Field Type]" description="CONF_MESSAGE[Type of field]" mandatory="true" default="string"/>
+		<param name="meta_visibility" type="select" replicationGroup="group1" label="CONF_MESSAGE[Column visibility]" description="CONF_MESSAGE[Set default visibility.]" mandatory="true" default="visible" choices="visible|Visible,hidden|Hidden"/>
+		<param name="meta_additional" type="string" replicationGroup="group1" label="CONF_MESSAGE[Additional info]" description="CONF_MESSAGE[Depending on the field type. Currently used for selection only]" mandatory="false"/>
 	</server_settings>
 	<registry_contributions>
 		<hooks>
@@ -49,20 +51,20 @@
 							var nodeMeta = userSelection.getUniqueNode().getMetadata();
 							var metaFields = nodeMeta.get('meta_fields').split(',');
 							var metaLabels = nodeMeta.get('meta_labels').split(',');
+							var metaTypes =  nodeMeta.get('meta_types').split(',');
 							for(var i=0;i<metaFields.length;i++){
 								var value = nodeMeta.get(metaFields[i]) || '';
 								form.insert('<div class="SF_element"><div class="SF_label">'+metaLabels[i]+' : </div><input class="SF_input" name="'+metaFields[i]+'" value="'+value+'"/></div>');
-								if(metaFields[i] == 'stars_rate'){
-									var element = form.down('input[name="stars_rate"]');
+                                var element = form.down('input[name="'+metaFields[i]+'"]');
+                                var fieldType = metaTypes[i];
+								if(fieldType == 'stars_rate'){
 									MetaCellRenderer.prototype.formPanelStars(element, form);
-								}else if(metaFields[i] == 'css_label'){
-									var element = form.down('input[name="css_label"]');
+								}else if(fieldType == 'css_label'){
 									MetaCellRenderer.prototype.formPanelCssLabels(element, form);
-								}
-								// mod for textarea
-								else if(metaFields[i].substr(0,5) == 'area_'){
-									var element = form.down('input[name="'+metaFields[i]+'"]');
+								}else if(fieldType == 'textarea'){
 									MetaCellRenderer.prototype.formTextarea(element, form);
+								}else if(fieldType == 'choice'){
+								    MetaCellRenderer.prototype.formPanelSelectorFilter(element, form);
 								}
 							}
 						}
