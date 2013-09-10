@@ -818,6 +818,7 @@ class AuthService
 
     public static function createGroup($baseGroup, $groupName, $groupLabel)
     {
+        if(empty($groupName)) throw new Exception("Please provide a name for this new group!");
         if(empty($groupLabel)) $groupLabel = $groupName;
         ConfService::getConfStorageImpl()->createGroup(rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName, $groupLabel);
     }
