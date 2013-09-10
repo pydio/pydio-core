@@ -86,7 +86,7 @@ class UserMetaManager extends AJXP_Plugin
             $col->setAttribute("attributeName", $key);
             $col->setAttribute("sortType", "String");
             if(isSet($lastVisibility)) $col->setAttribute("defaultVisibilty", $lastVisibility);
-            switch($fieldType){
+            switch ($fieldType) {
                 case "stars_rate":
                     $col->setAttribute("modifier", "MetaCellRenderer.prototype.starsRateFilter");
                     $col->setAttribute("sortType", "CellSorterValue");
@@ -119,7 +119,7 @@ class UserMetaManager extends AJXP_Plugin
         $selection = $this->xPath->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
         $contrib = $selection->item(0);
         $contrib->setAttribute("attributes", implode(",", array_keys($def)));
-        if(!empty($this->fieldsAdditionalData)){
+        if (!empty($this->fieldsAdditionalData)) {
             $contrib->setAttribute("metaAdditional", json_encode($this->fieldsAdditionalData));
         }
         $contrib->setAttribute("modifier", "MetaCellRenderer.prototype.infoPanelModifier");
@@ -147,8 +147,8 @@ class UserMetaManager extends AJXP_Plugin
 
     protected function getMetaDefinition()
     {
-        if(!$this->metaOptionsParsed) {
-            if(!isSet($this->options["meta_types"]) && isSet($this->options["meta_fields"])){
+        if (!$this->metaOptionsParsed) {
+            if (!isSet($this->options["meta_types"]) && isSet($this->options["meta_fields"])) {
                 // Get type from name
                 $val = $this->options["meta_fields"];
                 if($val == "stars_rate") $this->options["meta_types"].="stars_rate";
@@ -162,12 +162,12 @@ class UserMetaManager extends AJXP_Plugin
                     $repIndex = $matches[1];
                     $this->options["meta_fields"].=",".$val;
                     $this->options["meta_labels"].=",".$this->options["meta_labels_".$repIndex];
-                    if(isSet($this->options["meta_additional_".$repIndex])){
+                    if (isSet($this->options["meta_additional_".$repIndex])) {
                         $this->fieldsAdditionalData[$val] = $this->options["meta_additional_".$repIndex];
                     }
-                    if(isSet($this->options["meta_types_".$repIndex])){
+                    if (isSet($this->options["meta_types_".$repIndex])) {
                         $this->options["meta_types"].=",".$this->options["meta_types_".$repIndex];
-                    }else{
+                    } else {
                         // Get type from name
                         if($val == "stars_rate") $this->options["meta_types"].=","."stars_rate";
                         else if($val == "css_label") $this->options["meta_types"].=","."css_label";
