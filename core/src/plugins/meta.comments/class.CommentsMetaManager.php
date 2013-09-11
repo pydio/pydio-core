@@ -42,6 +42,7 @@ class CommentsMetaManager extends AJXP_Plugin
         if($existingFeed == null){
             $existingFeed = array();
         }
+        $mess = ConfService::getMessages();
         switch($actionName){
 
             case "post_comment":
@@ -56,6 +57,7 @@ class CommentsMetaManager extends AJXP_Plugin
                 $uniqNode->removeMetadata(AJXP_META_SPACE_COMMENTS, false);
                 $uniqNode->setMetadata(AJXP_META_SPACE_COMMENTS, $existingFeed, false);
                 HTMLWriter::charsetHeader("application/json");
+                $com["hdate"] = AJXP_Utils::relativeDate($com["date"], $mess);
                 echo json_encode($com);
 
                 break;
@@ -63,6 +65,9 @@ class CommentsMetaManager extends AJXP_Plugin
             case "load_comments_feed":
 
                 HTMLWriter::charsetHeader("application/json");
+                foreach($existingFeed as &$item){
+                    $item["hdate"] = AJXP_Utils::relativeDate($item["date"], $mess);
+                }
                 echo json_encode($existingFeed);
 
                 break;
@@ -77,6 +82,7 @@ class CommentsMetaManager extends AJXP_Plugin
                         continue;
                     }
                     $reFeed[] = $fElement;
+                    $reFeed["hdate"] = AJXP_Utils::relativeDate($reFeed["date"], $mess);
                 }
                 $uniqNode->removeMetadata(AJXP_META_SPACE_COMMENTS, false);
                 $uniqNode->setMetadata(AJXP_META_SPACE_COMMENTS, $reFeed, false);

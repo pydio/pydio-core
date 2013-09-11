@@ -22,9 +22,7 @@ Class.create("CommentsPanel", {
     // Warning, method is called statically, there is no "this"
     loadInfoPanel : function(container, node){
 
-        console.log(container);
-
-        container.down("#comments_container").update("Loading comments...");
+        container.down("#comments_container");
         container.down("textarea").observe("focus", function(){
             ajaxplorer.disableAllKeyBindings();
         });
@@ -34,20 +32,38 @@ Class.create("CommentsPanel", {
 
         if(node.getMetadata().get("ajxp_has_comments_feed")){
 
-            var conn = new Connexion();
-            conn.setParameters({
-                file: node.getPath(),
-                get_action: "load_comments_feed"
-            });
-            conn.onComplete = function(transport){
-                container.down("#comments_container").update('');
-                var feed = transport.responseJSON;
-                for(var i=0;i<feed.length;i++){
-                    CommentsPanel.prototype.commentObjectToDOM($H(feed[i]), container, node);
-                }
-            };
+            var loader = function(pe){
 
-            conn.sendAsync();
+                try{
+                    if(pe && ajaxplorer.getContextHolder().getSelectedNodes()[0] != node){
+                        pe.stop();
+                        return;
+                    }
+                }catch (e){
+                    pe.stop();
+                    return;
+                }
+
+                var conn = new Connexion();
+                conn.setParameters({
+                    file: node.getPath(),
+                    get_action: "load_comments_feed"
+                });
+                conn.discrete = true;
+                conn.onComplete = function(transport){
+                    container.down("#comments_container").update('');
+                    var feed = transport.responseJSON;
+                    for(var i=0;i<feed.length;i++){
+                        CommentsPanel.prototype.commentObjectToDOM($H(feed[i]), container, node, pe?true:false);
+                    }
+                    CommentsPanel.prototype.refreshScroller(container);
+                };
+
+                conn.sendAsync();
+
+            }
+            loader();
+            var pe = new PeriodicalExecuter(loader, 5);
 
         }
 
@@ -65,6 +81,8 @@ Class.create("CommentsPanel", {
             conn.setMethod('POST');
             conn.onComplete = function(transport){
                 CommentsPanel.prototype.commentObjectToDOM($H(transport.responseJSON), container, node);
+                container.down('textarea').setValue("");
+                CommentsPanel.prototype.refreshScroller(container);
             };
 
             conn.sendAsync();
@@ -73,12 +91,15 @@ Class.create("CommentsPanel", {
 
     },
 
-    commentObjectToDOM: function(hash, container, node){
+    commentObjectToDOM: function(hash, container, node, skipAnim){
 
-        var el = new Element("div").update("<div class='comment_content'><div class='comment_delete'>X</div>"+hash.get("content")+"</div><div class='comment_legend'>By "+hash.get("author")+" on "+hash.get("date")+"</div>");
-        el.setStyle({opacity:0, display:'block'});
+        var tpl = new Template('<div class="comment_legend"><span class="icon-remove comment_delete"></span>#{author}, #{hdate}</div><div class="comment_text">#{content}</div>');
+        var el = new Element("div", {className:'comment_content'}).update(tpl.evaluate(hash._object));
+
+        if(!skipAnim) el.setStyle({opacity:0, display:'block'});
         container.down("#comments_container").insert(el);
-        new Effect.Appear(el, {duration:0.3});
+        if(!skipAnim) new Effect.Appear(el, {duration:0.3});
+
         if(hash.get("author") != ajaxplorer.user.id){
             el.down('.comment_delete').remove();
             return;
@@ -96,11 +117,23 @@ Class.create("CommentsPanel", {
                 container.down("#comments_container").update('');
                 var feed = transport.responseJSON;
                 for(var i=0;i<feed.length;i++){
-                    CommentsPanel.prototype.commentObjectToDOM($H(feed[i]), container, node);
+                    CommentsPanel.prototype.commentObjectToDOM($H(feed[i]), container, node, true);
                 }
+                CommentsPanel.prototype.refreshScroller(container);
             };
-            conn.sendAsync();
+            new Effect.Fade(el, {
+                duration: 0.3,
+                afterFinish:function(){
+                    conn.sendAsync();
+                }
+            });
         });
+
+    },
+
+    refreshScroller:function(container){
+
+        container.up('div[@ajxpClass="infoPanel"]').ajxpPaneObject.scrollbar.recalculateLayout();
 
     }
 
