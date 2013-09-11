@@ -78,11 +78,11 @@ class CommentsMetaManager extends AJXP_Plugin
         $userSelection->initFromHttpVars($httpVars);
         $uniqNode = $userSelection->getUniqueNode($this->accessDriver);
         $existingFeed = $uniqNode->retrieveMetadata(AJXP_META_SPACE_COMMENTS, false);
-        if($existingFeed == null){
+        if ($existingFeed == null) {
             $existingFeed = array();
         }
         $mess = ConfService::getMessages();
-        switch($actionName){
+        switch ($actionName) {
 
             case "post_comment":
 
@@ -104,7 +104,7 @@ class CommentsMetaManager extends AJXP_Plugin
             case "load_comments_feed":
 
                 HTMLWriter::charsetHeader("application/json");
-                foreach($existingFeed as &$item){
+                foreach ($existingFeed as &$item) {
                     $item["hdate"] = AJXP_Utils::relativeDate($item["date"], $mess);
                 }
                 echo json_encode($existingFeed);
@@ -116,8 +116,8 @@ class CommentsMetaManager extends AJXP_Plugin
                 $data = json_decode($httpVars["comment_data"], true);
                 $reFeed = array();
                 if($data["author"] != AuthService::getLoggedUser()->getId()) break;
-                foreach($existingFeed as $fElement){
-                    if($fElement["date"] == $data["date"] && $fElement["author"] == $data["author"] && $fElement["content"] == $data["content"]){
+                foreach ($existingFeed as $fElement) {
+                    if ($fElement["date"] == $data["date"] && $fElement["author"] == $data["author"] && $fElement["content"] == $data["content"]) {
                         continue;
                     }
                     $fElement["hdate"] = AJXP_Utils::relativeDate($fElement["date"], $mess);
