@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta id="meta.comments" label="CONF_MESSAGE[Comments Feed]" description="CONF_MESSAGE[Let user comment filesystem items]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<class_definition filename="plugins/meta.comments/class.CommentsMetaManager.php" classname="CommentsMetaManager"/>
+	<client_settings>
+		<resources>
+			<i18n namespace="meta.comments" path="plugins/meta.comments/i18n" />
+            <css file="plugins/meta.comments/comments_feed.css" autoload="true"/>
+			<js file="plugins/meta.comments/class.CommentsPanel.js" className="CommentsPanel" autoload="true"/>
+		</resources>
+	</client_settings>
+	<registry_contributions>
+		<hooks>
+			<serverCallback hookName="node.info" methodName="mergeMeta" applyCondition="$apply=($args[2]!='minimal');"></serverCallback>
+		</hooks>
+		<client_configs>
+			<component_config className="InfoPanel">
+				<infoPanelExtension mime="meta:ajxp_has_comments_feed" attributes="" modifier="CommentsPanel.prototype.loadInfoPanel">
+					<html><![CDATA[
+                        <div id="ajxp_comments_info_panel">
+                            <div class="panelHeader infoPanelGroup" colspan="2"><span class="icon-comments-alt" data-ajxpAction="comments" title="Users Comments"></span>Users Comments</div>
+                            <div id="comments_container"></div>
+                            <div id="comments_form">
+                                <textarea>Enter your comment here...</textarea>
+                            </div>
+                        </div>
+                    ]]></html>
+				</infoPanelExtension>
+			</component_config>
+		</client_configs>
+		<actions>
+			<action name="read_comments">
+				<processing>
+					<serverCallback methodName="switchActions"/>
+				</processing>
+			</action>
+			<action name="write_comment">
+				<processing>
+					<serverCallback methodName="switchActions"/>
+				</processing>
+			</action>
+		</actions>
+	</registry_contributions>
+	<dependencies>
+		<!-- Wrapper type plugins only -->
+		<pluginClass pluginName="access.fs|access.ftp|access.demo|access.remote_fs"/>
+	</dependencies>
+</meta>
