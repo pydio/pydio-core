@@ -20,7 +20,8 @@
                             <div class="panelHeader infoPanelGroup" colspan="2"><span class="icon-comments-alt" data-ajxpAction="comments" title="Users Comments"></span>Users Comments</div>
                             <div id="comments_container"></div>
                             <div id="comments_form">
-                                <textarea>Enter your comment here...</textarea>
+                                <textarea placeholder="Enter your comment here..."></textarea>
+                                <div><input type="button" value="Post" id="comments_submit"></div>
                             </div>
                         </div>
                     ]]></html>
@@ -28,12 +29,17 @@
 			</component_config>
 		</client_configs>
 		<actions>
-			<action name="read_comments">
+			<action name="load_comments_feed">
 				<processing>
 					<serverCallback methodName="switchActions"/>
 				</processing>
 			</action>
-			<action name="write_comment">
+			<action name="post_comment">
+				<processing>
+					<serverCallback methodName="switchActions"/>
+				</processing>
+			</action>
+			<action name="delete_comment">
 				<processing>
 					<serverCallback methodName="switchActions"/>
 				</processing>
