@@ -1117,6 +1117,9 @@ class ConfService
                 }
                 try {
                     $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $crtRepository->getId()));
+                    if (!method_exists($instance, "initMeta")) {
+                        throw new Exception("Meta Source $plugId does not implement the initMeta method.");
+                    }
                     $instance->initMeta($plugInstance);
                 } catch (Exception $e) {
                     AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
@@ -1211,6 +1214,7 @@ class ConfService
                 }
                 try {
                     $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $repository->getId()));
+                    if(!method_exists($instance, "initMeta")) throw new Exception("Meta Source $plugId does not implement the initMeta method.");
                     $instance->initMeta($plugInstance);
                 } catch (Exception $e) {
                     AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
