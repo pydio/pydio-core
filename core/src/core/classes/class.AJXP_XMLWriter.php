@@ -90,7 +90,7 @@ class AJXP_XMLWriter
     public static function renderPaginationData($count, $currentPage, $totalPages, $dirsCount = -1, $remoteSortAttributes = null)
     {
         $remoteSortString = "";
-        if(is_array($remoteSortAttributes)){
+        if (is_array($remoteSortAttributes)) {
             foreach($remoteSortAttributes as $k => $v) $remoteSortString .= " $k='$v'";
         }
         $string = '<pagination count="'.$count.'" total="'.$totalPages.'" current="'.$currentPage.'" overflowMessage="306" icon="folder.png" openicon="folder_open.png" dirsCount="'.$dirsCount.'"'.$remoteSortString.'/>';
