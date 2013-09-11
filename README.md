@@ -2,7 +2,8 @@
 
 [Homepage](http://ajaxplorer.info/) | 
 [GitHub-Repository](https://github.com/ajaxplorer/ajaxplorer-core) | 
-[Issue-Tracker](https://github.com/ajaxplorer/ajaxplorer-core)
+[Issue-Tracker](https://github.com/ajaxplorer/ajaxplorer-core) |
+[![Build Status](https://travis-ci.org/ajaxplorer/ajaxplorer-core.png?branch=master)](https://travis-ci.org/ajaxplorer/ajaxplorer-core)
 
 This is the main source code repository of AjaXplorer, containing all the PHP server and HTML5 Web GUI. It was migrated from previous Sourceforge SVN repository, which is hence deprecated. 
 
@@ -19,12 +20,10 @@ Please DO NOT send emails to Charles, but use the forum located on http://forum.
 
 #### Coding guidelines
 
-To enforce some coding standards we are using PHP-CS-Fixer
+To enforce some coding standards, please run scripts in
 ```
-wget http://cs.sensiolabs.org/get/php-cs-fixer.phar
-php php-cs-fixer.phar fix -v --fixers=indentation,linefeed,trailing_spaces,visibility,short_tag,braces,php_closing_tag,controls_spaces,eof_ending ajaxplorer-core/
+dist/scripts/tests/
 ```
-See https://github.com/fabpot/PHP-CS-Fixer#usage
 
 #### Fixing the Core
 
