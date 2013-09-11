@@ -11,6 +11,7 @@
 	<registry_contributions>
 		<hooks>
 			<serverCallback hookName="node.info" methodName="mergeMeta" applyCondition="$apply=($args[2]!='minimal');"></serverCallback>
+            <serverCallback hookName="node.change" methodName="moveMeta" defer="true"/>
 		</hooks>
 		<client_configs>
 			<component_config className="InfoPanel">

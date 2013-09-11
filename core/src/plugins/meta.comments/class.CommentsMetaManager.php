@@ -11,13 +11,25 @@ define("AJXP_META_SPACE_COMMENTS", "AJXP_META_SPACE_COMMENTS");
 
 class CommentsMetaManager extends AJXP_Plugin
 {
+    /**
+     * @var AbstractAccessDriver
+     */
     private $accessDriver;
+    /**
+     * @var MetaStoreProvider
+     */
+    private $metaStore;
 
     public function initMeta($accessDriver)
     {
         $this->accessDriver = $accessDriver;
+        $store = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
+        if ($store === false) {
+            throw new Exception("The 'meta.comments' plugin requires at least one active 'metastore' plugin");
+        }
+        $this->metaStore = $store;
     }
-        /**
+    /**
      * @param AJXP_Node $ajxpNode
      */
     public function mergeMeta($ajxpNode)
@@ -27,6 +39,33 @@ class CommentsMetaManager extends AJXP_Plugin
         }
 
     }
+
+    /**
+     *
+     * @param AJXP_Node $oldFile
+     * @param AJXP_Node $newFile
+     * @param Boolean $copy
+     */
+    public function moveMeta($oldFile, $newFile = null, $copy = false)
+    {
+        if($oldFile == null) return;
+
+        if(!$copy && $this->metaStore->inherentMetaMove()) return;
+
+        $oldMeta = $this->metaStore->retrieveMetadata($oldFile, AJXP_META_SPACE_COMMENTS);
+        if (!count($oldMeta)) {
+            return;
+        }
+        // If it's a move or a delete, delete old data
+        if (!$copy) {
+            $this->metaStore->removeMetadata($oldFile, AJXP_META_SPACE_COMMENTS);
+        }
+        // If copy or move, copy data.
+        if ($newFile != null) {
+            $this->metaStore->setMetadata($newFile, AJXP_META_SPACE_COMMENTS, $oldMeta);
+        }
+    }
+
 
     /**
      * @param String $actionName
@@ -81,8 +120,8 @@ class CommentsMetaManager extends AJXP_Plugin
                     if($fElement["date"] == $data["date"] && $fElement["author"] == $data["author"] && $fElement["content"] == $data["content"]){
                         continue;
                     }
+                    $fElement["hdate"] = AJXP_Utils::relativeDate($fElement["date"], $mess);
                     $reFeed[] = $fElement;
-                    $reFeed["hdate"] = AJXP_Utils::relativeDate($reFeed["date"], $mess);
                 }
                 $uniqNode->removeMetadata(AJXP_META_SPACE_COMMENTS, false);
                 $uniqNode->setMetadata(AJXP_META_SPACE_COMMENTS, $reFeed, false);
