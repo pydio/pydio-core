@@ -76,7 +76,7 @@ class dropboxWrapper implements AjxpWrapper
 
     protected function metadataToStat($metaEntry)
     {
-        $this->logDebug("Stating ", $metaEntry);
+        AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Stating ", $metaEntry);
         $mode = 0666;
         if(intval($metaEntry["is_dir"]) == 1) $mode += 0040000;
         else $mode += 0100000;
@@ -97,7 +97,7 @@ class dropboxWrapper implements AjxpWrapper
             'blksize' => 0,
             'blocks' => 0
         );
-        $this->logDebug("Stat value", $keys);
+        AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Stat value", $keys);
         return $keys;
     }
 
@@ -169,7 +169,7 @@ class dropboxWrapper implements AjxpWrapper
 
     public function url_stat($path, $flags)
     {
-        $this->logDebug("STATING $path");
+        AJXP_Logger::debug(__CLASS__,__FUNCTION__,"STATING $path");
         $path = $this->initPath($path);
         $meta = null;
         if (self::$crtDirContent != null) {
@@ -194,7 +194,7 @@ class dropboxWrapper implements AjxpWrapper
     {
         $path = $this->initPath($path);
         $metadata = self::$dropbox->getMetaData($path);
-        $this->logDebug("CONTENT for $path", $metadata);
+        AJXP_Logger::debug(__CLASS__,__FUNCTION__,"CONTENT for $path", $metadata);
         self::$crtDirContent = $metadata["contents"];
         if (!is_array(self::$crtDirContent)) {
             return false;
@@ -250,9 +250,9 @@ class dropboxWrapper implements AjxpWrapper
             $path = $this->initPath(self::$crtWritePath);
             try {
                 $postRes = self::$dropbox->putFile($path, self::$crtTmpFile);
-                $this->logDebug("Post to $path succeeded:");
+                AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Post to $path succeeded:");
             } catch (Dropbox_Exception $dE) {
-                $this->logDebug("Post to $path failed :".$dE->getMessage());
+                AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Post to $path failed :".$dE->getMessage());
             }
         }
         unlink(self::$crtTmpFile);

@@ -69,7 +69,7 @@ class s3AccessWrapper extends fsAccessWrapper
         try {
             $this->realPath = $this->initPath($path, "file");
         } catch (Exception $e) {
-            $this->logError("stream_open", "Error while opening stream $path");
+            AJXP_Logger::error(__CLASS__,"stream_open", "Error while opening stream $path");
             return false;
         }
         if ($this->realPath == -1) {
@@ -92,7 +92,7 @@ class s3AccessWrapper extends fsAccessWrapper
     public function url_stat($path, $flags)
     {
         // File and zip case
-        // $this->logDebug("Stating $path");
+        // AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Stating $path");
         $stat = @stat($this->initPath($path, "file"));
         if($stat == null) return null;
         if ($stat["mode"] == 0666) {
@@ -100,7 +100,7 @@ class s3AccessWrapper extends fsAccessWrapper
         }
         $parsed = parse_url($path);
         if ($stat["mtime"] == $stat["ctime"]  && $stat["ctime"] == $stat["atime"] && $stat["atime"] == 0 && $parsed["path"] != "/") {
-            //$this->logDebug("Nullifying stats");
+            //AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Nullifying stats");
             return null;
         }
         return $stat;
