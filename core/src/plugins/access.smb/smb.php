@@ -198,7 +198,7 @@ class smb
                 } else if (strstr($error, "domain")!==false && strstr($error, "os")!==false ) {
                     self::debug("Smbclient alternate stream : ".$error);
                 } else {
-                    $this->logError("Smbclient error",$error);
+                    AJXP_Logger::error(__CLASS__,"Smbclient error",$error);
                 }
             }
             $output = $pipes[1];
