@@ -137,7 +137,7 @@ class imapAccessWrapper implements AjxpWrapper
 
         // open IMAP connection
         if (self::$currentStream != null) {
-            $this->logDebug("Using currently opened stream! ".print_r(self::$currentStream, true));
+            AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Using currently opened stream! ".print_r(self::$currentStream, true));
             $this->ih = self::$currentStream;
             // Rewind everything
             $this->dir_rewinddir();
@@ -152,7 +152,7 @@ class imapAccessWrapper implements AjxpWrapper
             $this->password = $repository->getOption("PASS");
             $server = "{". $this->host . ":" . $this->port . "/".($this->pop3?"pop3/":"").($ssl?"ssl/novalidate-cert":"novalidate-cert")."}";
             self::$currentRef = $server;
-            $this->logDebug("Opening a new stream ".$server." with mailbox '".$this->mailbox."'");
+            AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Opening a new stream ".$server." with mailbox '".$this->mailbox."'");
             try {
                 $this->ih = imap_open ( $server.$this->mailbox , $this->username, $this->password, (!$this->pop3 && empty($this->mailbox)?OP_HALFOPEN:NULL), 1);
             } catch (Exception $e) {
@@ -188,10 +188,10 @@ class imapAccessWrapper implements AjxpWrapper
        beyond the header, we download the rest of the body */
     public function stream_read($count)
     {
-        //$this->logDebug("READING $count FROM $this->path", $this->currentAttachmentData);
+        //AJXP_Logger::debug(__CLASS__,__FUNCTION__,"READING $count FROM $this->path", $this->currentAttachmentData);
         if (!empty($this->currentAttachmentData)) {
             if (empty($this->data)) {
-                $this->logDebug("Attachement", $this->currentAttachmentData);
+                AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Attachement", $this->currentAttachmentData);
                 // EXTRACT ATTACHMENT AND RETURN
                 require_once AJXP_INSTALL_PATH."/plugins/editor.eml/class.EmlParser.php";
                 $emlParser = new EmlParser("", "");
@@ -392,7 +392,7 @@ class imapAccessWrapper implements AjxpWrapper
                     // GET LAST MESSAGE
                     imap_reopen($this->ih, self::$currentRef.$this->mailbox);
                     $last = imap_num_msg($this->ih);
-                    //$this->logDebug("Should get mailbox data ".self::$currentRef.$this->mailbox . $last);
+                    //AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Should get mailbox data ".self::$currentRef.$this->mailbox . $last);
                     list ( $stats, ) = imap_fetch_overview ( $this->ih, $last );
                     $this->size = $stats->size;
                     $this->time = strtotime ( $stats->date );

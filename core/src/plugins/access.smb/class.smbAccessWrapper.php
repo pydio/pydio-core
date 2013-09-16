@@ -83,7 +83,7 @@ class smbAccessWrapper extends fsAccessWrapper
         try {
             $this->realPath = $this->initPath($path, "file");
         } catch (Exception $e) {
-            $this->logError("stream_open", "Error while opening stream $path");
+            AJXP_Logger::error(__CLASS__,"stream_open", "Error while opening stream $path");
             return false;
         }
         if ($this->realPath == -1) {
@@ -91,7 +91,7 @@ class smbAccessWrapper extends fsAccessWrapper
             return true;
         } else {
             $this->fp = fopen($this->realPath, $mode, $options);
-            //$this->logDebug("I opened an smb stream.");
+            //AJXP_Logger::debug(__CLASS__,__FUNCTION__,"I opened an smb stream.");
             return ($this->fp !== false);
         }
     }
