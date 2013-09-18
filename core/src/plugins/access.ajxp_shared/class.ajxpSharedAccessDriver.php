@@ -75,7 +75,6 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
                         $this->listSharedFiles();
                     }
                     AJXP_XMLWriter::close();
-                    exit(1);
                 } else {
                     AJXP_XMLWriter::header();
                     AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_shared.8" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_shared.31" attributeName="description" sortType="String"/></columns>');
