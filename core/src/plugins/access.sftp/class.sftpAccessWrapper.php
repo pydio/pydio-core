@@ -138,7 +138,7 @@ class sftpAccessWrapper extends fsAccessWrapper
         try {
             $this->realPath = $this->initPath($path);
         } catch (Exception $e) {
-            $this->logError("stream_open", "Error while opening stream $path");
+            AJXP_Logger::error(__CLASS__,"stream_open", "Error while opening stream $path");
             return false;
         }
         $this->fp = fopen($this->realPath, $mode, $options);

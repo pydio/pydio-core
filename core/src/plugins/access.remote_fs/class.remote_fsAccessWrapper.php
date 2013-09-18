@@ -133,7 +133,7 @@ class remote_fsAccessWrapper implements AjxpWrapper
         if (isSet($this->fp) && $this->fp!=-1 && $this->fp!==false) {
             if ($this->crtMode == 'write') {
                 rewind($this->fp);
-                $this->logDebug("Http_fput", array("target"=>$this->path));
+                AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Http_fput", array("target"=>$this->path));
                 $link = $this->createHttpClient();
                 $this->crtParameters["content"] = base64_encode(implode("", file($this->postFileData)));
                 $link->post($this->path, $this->crtParameters);
@@ -247,7 +247,7 @@ class remote_fsAccessWrapper implements AjxpWrapper
         $httpClient = new HttpClient($this->host);
         $httpClient->cookie_host = $this->host;
         $httpClient->timeout = 50;
-        $this->logDebug("Creating Http client", array());
+        AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Creating Http client", array());
         //$httpClient->setDebug(true);
         if (!$this->use_auth) {
             return $httpClient;
@@ -280,7 +280,7 @@ class remote_fsAccessWrapper implements AjxpWrapper
             $remoteSessionId = $_SESSION["AJXP_REMOTE_SESSION"];
             $httpClient->setCookies(array("AjaXplorer"=>$remoteSessionId));
         }
-        $this->logDebug("Http Client created", array());
+        AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Http Client created", array());
         return $httpClient;
     }
 
