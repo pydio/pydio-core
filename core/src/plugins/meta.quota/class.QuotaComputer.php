@@ -90,9 +90,9 @@ class QuotaComputer extends AJXP_Plugin
             return null;
         }
         $delta = $newSize;
+        $path = $this->getWorkingPath();
         $quota = $this->getAuthorized();
         $soft = $this->getSoftLimit();
-        $path = $this->getWorkingPath();
         $q = $this->getUsage($path);
         $this->logDebug("QUOTA : Previous usage was $q");
         if ($q === false) {

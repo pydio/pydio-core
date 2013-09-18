@@ -145,12 +145,22 @@ class AJXP_Plugin implements Serializable
                 $repo = ConfService::getRepository();
                 if($repo != null) $repositoryScope = $repo->getId();
             }
-            return $loggedUser->mergedRole->filterParameterValue(
+            $test = $loggedUser->mergedRole->filterParameterValue(
                 $this->getId(),
                 $optionName,
                 $repositoryScope,
                 isSet($merged[$optionName]) ? $merged[$optionName] : null
             );
+            if($repo != null && $repo->hasParent()){
+                $retest = $loggedUser->mergedRole->filterParameterValue(
+                    $this->getId(),
+                    $optionName,
+                    $repo->getParentId(),
+                    isSet($merged[$optionName]) ? $merged[$optionName] : null
+                );
+                if($retest != null) $test = $retest;
+            }
+            return $test;
         } else {
             return isSet($merged[$optionName]) ? $merged[$optionName] : null;
         }
