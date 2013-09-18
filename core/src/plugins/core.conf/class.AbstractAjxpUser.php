@@ -405,7 +405,7 @@ abstract class AbstractAjxpUser
             $this->parentRole->clearAcls();
             //... but we want the parent user's role, filtered with inheritable properties only.
             $stretchedParentUserRole = AuthService::limitedRoleFromParent($this->parentUser);
-            if($stretchedParentUserRole !== null){
+            if ($stretchedParentUserRole !== null) {
                 $this->parentRole = $this->parentRole->override($stretchedParentUserRole);
             }
 

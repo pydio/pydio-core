@@ -984,7 +984,7 @@ class AuthService
         } else {
             $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[@inherit='true']", "node", false, false, true);
             if (is_array($paramNodes) && count($paramNodes)) {
-                foreach ($paramNodes as $node){
+                foreach ($paramNodes as $node) {
                     $paramName = $node->getAttribute("name");
                     $pluginId = $node->parentNode->parentNode->getAttribute("id");
                     if(isSet($inheritActions[$pluginId])) $inheritActions[$pluginId] = array();
@@ -1003,10 +1003,10 @@ class AuthService
             "PARAMETERS"=> array()));
         $params = $parentRole->listParameters();
 
-        foreach($params as $scope => $plugData){
-            foreach($plugData as $pId => $paramData){
+        foreach ($params as $scope => $plugData) {
+            foreach ($plugData as $pId => $paramData) {
                 if(!isSet($inheritActions[$pId])) continue;
-                foreach($paramData as $pName => $pValue){
+                foreach ($paramData as $pName => $pValue) {
                     $childRole->setParameterValue($pId, $pName, $pValue, $scope);
                 }
             }
