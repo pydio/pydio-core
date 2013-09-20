@@ -70,7 +70,7 @@ class AJXP_Sabre_AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
         $userObject = $confDriver->createUserObject($userpass[0]);
         $webdavData = $userObject->getPref("AJXP_WEBDAV_DATA");
         if (empty($webdavData) || !isset($webdavData["ACTIVE"]) || $webdavData["ACTIVE"] !== true) {
-            return false;
+            throw new Sabre\DAV\Exception\NotAuthenticated();
         }
         // check if there are cached credentials. prevents excessive authentication calls to external
         // auth mechanism.
@@ -89,11 +89,11 @@ class AJXP_Sabre_AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
         }
         $this->currentUser = $userpass[0];
 
-        AuthService::logUser($this->currentUser, $userpass[1], true);
-        $res = $this->updateCurrentUserRights(AuthService::getLoggedUser());
-        if ($res === false) {
-            return false;
+        $res = AuthService::logUser($this->currentUser, $userpass[1], true);
+        if ($res < 1) {
+          throw new Sabre\DAV\Exception\NotAuthenticated();
         }
+        $this->updateCurrentUserRights(AuthService::getLoggedUser());
 
         // the method used here will invalidate the cached password every minute on the minute
         if (!$cachedPasswordValid) {
@@ -113,10 +113,12 @@ class AJXP_Sabre_AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
      */
     protected function updateCurrentUserRights($user)
     {
-        if (!$user->canSwitchTo($this->repositoryId)) {
-            return false;
+        if ($this->repositoryId == null) {
+            return true;
         }
-        return true;
+        if (!$user->canSwitchTo($this->repositoryId)) {
+            throw new Sabre\DAV\Exception\NotAuthenticated();
+        }
     }
 
 
