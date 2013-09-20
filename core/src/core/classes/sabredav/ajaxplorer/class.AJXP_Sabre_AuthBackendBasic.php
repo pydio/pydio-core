@@ -21,8 +21,8 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 
-class AJXP_Sabre_AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic{
-
+class AJXP_Sabre_AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
+{
     protected $currentUser;
     private $repositoryId;
 
@@ -30,7 +30,8 @@ class AJXP_Sabre_AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic{
      * Utilitary method to detect basic header.
      * @return bool
      */
-    public static function detectBasicHeader(){
+    public static function detectBasicHeader()
+    {
         if(isSet($_SERVER["PHP_AUTH_USER"])) return true;
         if(isSet($_SERVER["HTTP_AUTHORIZATION"])) $value = $_SERVER["HTTP_AUTHORIZATION"];
         if(!isSet($value) && isSet($_SERVER["REDIRECT_HTTP_AUTHORIZATION"])) $value = $_SERVER["HTTP_AUTHORIZATION"];
@@ -38,17 +39,20 @@ class AJXP_Sabre_AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic{
         return  (strpos(strtolower($value),'basic') ===0) ;
     }
 
-    function __construct($repositoryId){
+    public function __construct($repositoryId)
+    {
         $this->repositoryId = $repositoryId;
     }
 
 
-	protected function validateUserPass($username, $password) {
-		// Warning, this can only work if TRANSMIT_CLEAR_PASS is true;
+    protected function validateUserPass($username, $password)
+    {
+        // Warning, this can only work if TRANSMIT_CLEAR_PASS is true;
         return AuthService::checkPassword($username, $password, false, -1);
-	}
+    }
 
-    public function authenticate(Sabre\DAV\Server $server, $realm){
+    public function authenticate(Sabre\DAV\Server $server, $realm)
+    {
         $auth = new Sabre\HTTP\BasicAuth();
         $auth->setHTTPRequest($server->httpRequest);
         $auth->setHTTPResponse($server->httpResponse);
@@ -60,14 +64,14 @@ class AJXP_Sabre_AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic{
         }
 
         // Authenticates the user
-		//AJXP_Logger::logAction("authenticate: " . $userpass[0]);
+        //AJXP_Logger::info(__CLASS__,"authenticate",$userpass[0]);
 
-		$confDriver = ConfService::getConfStorageImpl();
-		$userObject = $confDriver->createUserObject($userpass[0]);
-		$webdavData = $userObject->getPref("AJXP_WEBDAV_DATA");
-		if (empty($webdavData) || !isset($webdavData["ACTIVE"]) || $webdavData["ACTIVE"] !== true) {
-			return false;
-		}
+        $confDriver = ConfService::getConfStorageImpl();
+        $userObject = $confDriver->createUserObject($userpass[0]);
+        $webdavData = $userObject->getPref("AJXP_WEBDAV_DATA");
+        if (empty($webdavData) || !isset($webdavData["ACTIVE"]) || $webdavData["ACTIVE"] !== true) {
+            throw new Sabre\DAV\Exception\NotAuthenticated();
+        }
         // check if there are cached credentials. prevents excessive authentication calls to external
         // auth mechanism.
         $cachedPasswordValid = 0;
@@ -85,19 +89,19 @@ class AJXP_Sabre_AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic{
         }
         $this->currentUser = $userpass[0];
 
-		AuthService::logUser($this->currentUser, $userpass[1], true);
-		$res = $this->updateCurrentUserRights(AuthService::getLoggedUser());
-		if($res === false){
-			return false;
-		}
+        $res = AuthService::logUser($this->currentUser, $userpass[1], true);
+        if ($res < 1) {
+          throw new Sabre\DAV\Exception\NotAuthenticated();
+        }
+        $this->updateCurrentUserRights(AuthService::getLoggedUser());
 
-		// the method used here will invalidate the cached password every minute on the minute
-		if (!$cachedPasswordValid) {
-			$webdavData["TMP_PASS"] = $encryptedPass;
-			$userObject->setPref("AJXP_WEBDAV_DATA", $webdavData);
-			$userObject->save("user");
-			AuthService::updateUser($userObject);
-		}
+        // the method used here will invalidate the cached password every minute on the minute
+        if (!$cachedPasswordValid) {
+            $webdavData["TMP_PASS"] = $encryptedPass;
+            $userObject->setPref("AJXP_WEBDAV_DATA", $webdavData);
+            $userObject->save("user");
+            AuthService::updateUser($userObject);
+        }
 
         return true;
     }
@@ -107,11 +111,14 @@ class AJXP_Sabre_AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic{
      * @param AbstractAjxpUser $user
      * @return bool
      */
-    protected function updateCurrentUserRights($user){
-        if(!$user->canSwitchTo($this->repositoryId)){
-            return false;
+    protected function updateCurrentUserRights($user)
+    {
+        if ($this->repositoryId == null) {
+            return true;
         }
-        return true;
+        if (!$user->canSwitchTo($this->repositoryId)) {
+            throw new Sabre\DAV\Exception\NotAuthenticated();
+        }
     }
 
 
