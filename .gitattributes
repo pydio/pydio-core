@@ -1,1 +1,3 @@
-*.php diff=php
+* text=auto
+*.php diff=php text
+*.bat text eol=crlf
