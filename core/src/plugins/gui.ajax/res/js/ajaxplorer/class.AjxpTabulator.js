@@ -108,8 +108,8 @@ Class.create("AjxpTabulator", AjxpPane, {
     openEditorForNode:function(ajxpNode, editorData){
         this.addTab({
             id:ajxpNode.getPath(),
-            label:"131",
-            iconClass:"icon-file",
+            label:editorData.text,
+            iconClass:editorData.icon_class,
             closeable:true
         }, {
             type:"editor",
