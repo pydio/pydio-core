@@ -19,9 +19,9 @@
  */
 Class.create("TextEditor", AbstractEditor, {
 
-	initialize: function($super, oFormObject)
+	initialize: function($super, oFormObject, options)
 	{
-		$super(oFormObject);
+		$super(oFormObject, options);
 		if(!ajaxplorer.user || ajaxplorer.user.canWrite()){
 			this.canWrite = true;
 			this.actions.get("saveButton").observe('click', function(){
@@ -58,7 +58,7 @@ Class.create("TextEditor", AbstractEditor, {
 		}
 		this.element.appendChild(this.textareaContainer);
 		this.textareaContainer.appendChild(this.textarea);
-		fitHeightToBottom($(this.textarea), $(modal.elementName));
+		fitHeightToBottom($(this.textarea), $(this.editorOptions.context.elementName));
 		// LOAD FILE NOW
 		this.loadFileContent(fileName);
 		if(window.ajxpMobile){
