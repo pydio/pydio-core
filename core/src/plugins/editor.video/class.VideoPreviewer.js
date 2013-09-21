@@ -21,19 +21,46 @@ Class.create("VideoPreviewer", AbstractEditor, {
 
 	fullscreenMode: false,
 	
-	initialize: function($super, oFormObject){
+	initialize: function($super, oFormObject, options){
+        this.editorOptions = options;
         this.element = oFormObject;
     },
 
     open : function($super, ajxpNode){
         this.currentRichPreview = this.getPreview(ajxpNode, true);
-        this.element.down("#videojs_previewer").setStyle({height:'297px'});
-        this.element.down("#videojs_previewer").insert(this.currentRichPreview);
-        this.currentRichPreview.resizePreviewElement({width:380, height:260, maxHeight:260}, true);
+        if(this.element.id == "videojs_previewer"){
+            fitHeightToBottom(this.element);
+            this.element.insert(this.currentRichPreview);
+        }else{
+            this.element.down("#videojs_previewer").setStyle({height:'297px'});
+            this.element.down("#videojs_previewer").insert(this.currentRichPreview);
+            this.currentRichPreview.resizePreviewElement({width:380, height:260, maxHeight:260}, true);
+        }
         modal.setCloseValidation(function(){
             this.currentRichPreview.destroyElement();
             return true;
         }.bind(this));
+        this.element.fire("editor:updateTitle", ajxpNode.getLabel());
+    },
+
+    resize: function($super, size){
+
+        $super(size);
+        fitHeightToBottom(this.element);
+        try{
+            this.currentRichPreview.resizePreviewElement({
+                width:this.element.getWidth(),
+                height:this.element.getHeight(),
+                maxHeight:this.element.getHeight()
+            }, true);
+        }catch(e){}
+
+    },
+
+    destroy: function(){
+
+        this.currentRichPreview.destroyElement();
+
     },
 
     getSharedPreviewTemplate : function(node){
