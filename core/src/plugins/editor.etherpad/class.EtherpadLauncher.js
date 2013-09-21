@@ -23,9 +23,9 @@ Class.create("EtherpadLauncher", AbstractEditor, {
     sessionID: null,
     node: null,
 
-	initialize: function($super, oFormObject)
+	initialize: function($super, oFormObject, options)
 	{
-		$super(oFormObject);
+		$super(oFormObject, options);
 		if(!ajaxplorer.user || ajaxplorer.user.canWrite()){
 			this.canWrite = true;
 			this.actions.get("saveButton").observe('click', function(){

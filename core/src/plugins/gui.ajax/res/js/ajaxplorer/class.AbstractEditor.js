@@ -383,11 +383,13 @@ Class.create("AbstractEditor" , {
 	 * @param size int|null
 	 */
 	resize : function(size){
-		if(size){
-			this.contentMainContainer.setStyle({height:size+"px"});
-		}else{
-			fitHeightToBottom(this.contentMainContainer, this.element);
-		}
+        if(this.contentMainContainer){
+            if(size){
+                this.contentMainContainer.setStyle({height:size+"px"});
+            }else{
+                fitHeightToBottom(this.contentMainContainer, this.element);
+            }
+        }
 		this.element.fire("editor:resize", size);
 	},
 	/**

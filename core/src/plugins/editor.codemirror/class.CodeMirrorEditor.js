@@ -19,9 +19,9 @@
  */
 Class.create("CodeMirrorEditor", AbstractEditor, {
 
-	initialize: function($super, oFormObject)
+	initialize: function($super, oFormObject, options)
 	{
-		$super(oFormObject);
+		$super(oFormObject, options);
 		
 		this.textWrapping = false;
 		this.lineNumbers = true;

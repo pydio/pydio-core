@@ -88,7 +88,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             if(tabInfo.iconClass){
                 td.insert(new Element('span', {className:tabInfo.iconClass}));
             }
-            td.insert('<span class="tab_label" ajxp_message_id="'+tabInfo.label+'">'+MessageHash[tabInfo.label]+'</span>');
+            td.insert('<span class="tab_label" ajxp_message_id="'+tabInfo.label+'">'+label+'</span>');
             td.observe('click', function(){
                 this.switchTabulator(tabInfo.id);
             }.bind(this) );
@@ -176,10 +176,10 @@ Class.create("AjxpTabulator", AjxpPane, {
         }else if(paneInfo.type == 'widget'){
 
         }
-
-        this.resize();
         this.tabulatorData.push(tabInfo);
         this.switchTabulator(tabInfo.id);
+        this.resize();
+        window.setTimeout(this.resize.bind(this), 750);
     },
 
     /**
@@ -270,8 +270,9 @@ Class.create("AjxpTabulator", AjxpPane, {
 		if(!this.selectedTabInfo) return;
 		var ajxpObject = this.getAndSetAjxpObject(this.selectedTabInfo);
 		if(ajxpObject){
-            fitHeightToBottom($(this.htmlElement).down("#"+this.selectedTabInfo.element));
-            ajxpObject.resize();
+            var nodeElement = $(this.htmlElement).down("#"+this.selectedTabInfo.element);
+            fitHeightToBottom(nodeElement);
+            ajxpObject.resize(nodeElement?nodeElement.getHeight():this.htmlElement.getHeight());
             var left ;
             var total = 0;
             var cont = this.htmlElement.down('div.tabulatorContainer');
