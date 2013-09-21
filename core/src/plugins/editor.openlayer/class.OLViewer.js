@@ -1,4 +1,4 @@
-/*
+0/*
  * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
  * This file is part of AjaXplorer.
  *
@@ -19,9 +19,9 @@
  */
 Class.create("OLViewer", AbstractEditor, {
 
-	initialize: function($super, oFormObject)
+	initialize: function($super, oFormObject, options)
 	{
-		$super(oFormObject);
+		$super(oFormObject, options);
 		this.actions.get("downloadFileButton").observe('click', function(){
 			if(!this.currentFile) return;		
 			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.currentFile);
@@ -56,7 +56,8 @@ Class.create("OLViewer", AbstractEditor, {
 	resize : function ($super, size){
 		$super(size);
 		if(!this.fullScreenMode){
-			fitHeightToBottom($(this.mapDiv), $(modal.elementName));
+			fitHeightToBottom($(this.element));
+			fitHeightToBottom($(this.mapDiv), $(this.editorOptions.context.elementName));
 		}
 		if(this.olMap){
 			this.olMap.updateSize();

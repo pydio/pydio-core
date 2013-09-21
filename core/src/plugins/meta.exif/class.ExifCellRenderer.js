@@ -75,8 +75,7 @@ Class.create("ExifCellRenderer", {
 				'ol_layers' : [{type:'Google', google_type:'hybrid'}, {type:'Google', google_type:'streets'}, {type:'OSM'}],
 				'ol_center' : {latitude:parseFloat(latitude),longitude:parseFloat(longitude)}
 			}));
-			ajaxplorer.loadEditorResources(editorData.resourcesManager);
-			modal.openEditorDialog(editorData);
+            ajaxplorer.openCurrentSelectionInEditor(editorData);
 		}
 		
 	}
