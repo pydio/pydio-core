@@ -21,19 +21,27 @@ Class.create("PixlrEditor", AbstractEditor, {
 
 	fullscreenMode: false,
 	
-	initialize: function($super, oFormObject)
+	initialize: function($super, oFormObject, options)
 	{
+        this.editorOptions = options;
 		this.element =  $(oFormObject);
-		this.defaultActions = new Hash();		
+		this.defaultActions = new Hash();
 		this.createTitleSpans();
 		modal.setCloseAction(function(){this.close();}.bind(this));
 		this.container = $(oFormObject).select('div[id="pixlrContainer"]')[0];
-		fitHeightToBottom($(this.container), $(modal.elementName));
+		fitHeightToBottom($(this.container), $(options.context.elementName));
 		this.contentMainContainer = new Element("iframe", {			
 			style:"border:none;width:"+this.container.getWidth()+"px;"
 		});						
 		this.container.update(this.contentMainContainer);
 	},
+
+    resize:function($super, s){
+        $super(s);
+        fitHeightToBottom(this.element);
+        fitHeightToBottom(this.container, this.element);
+        fitHeightToBottom(this.contentMainContainer);
+    },
 		
 	save : function(pixlrUrl){
 		this.setOnLoad();
@@ -45,7 +53,11 @@ Class.create("PixlrEditor", AbstractEditor, {
 			var date = new Date();
 			this.currentNode.getParent().getMetadata().set('preview_seed', Math.round(date.getTime()*Math.random()));
 			this.removeOnLoad();
-			hideLightBox(true);			
+            if(this.editorOptions.context.__className == "Modal"){
+                hideLightBox(true);
+            }else if(this.editorOptions.context.__className == "AjxpTabulator"){
+                this.editorOptions.context.closeTab(this.currentNode.getPath());
+            }
 			ajaxplorer.actionBar.fireAction('refresh');
 		}.bind(this);
 		conn.sendAsync();
@@ -78,6 +90,7 @@ Class.create("PixlrEditor", AbstractEditor, {
 				hideLightBox(true);
 			}
 		}.bind(this) , 0.5);
+        this.element.fire("editor:updateTitle", node.getLabel());
 		return;		
 	},
 	
