@@ -293,6 +293,7 @@
                     <xs:attribute name="iconClass" use="optional"/>
                     <xs:attribute name="mimes" use="required"/>
                     <xs:attribute name="openable" use="required" type="xs:boolean"/>
+                    <xs:attribute name="modalOnly" type="xs:boolean"/>
                     <xs:attribute name="order" type="xs:integer"/>
                     <xs:attribute name="previewProvider" type="xs:boolean"/>
                     <xs:attribute name="text" use="required" type="xs:NMTOKEN"/>

@@ -19,9 +19,9 @@
  */
 Class.create("CodePressEditor", TextEditor, {
 
-	initialize: function($super, oFormObject)
+	initialize: function($super, oFormObject, options)
 	{
-		$super(oFormObject);
+		$super(oFormObject, options);
 	},
 	
 	
