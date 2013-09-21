@@ -19,9 +19,10 @@
  */
 Class.create("OtherEditorChooser", AbstractEditor, {
 
-	initialize: function($super, oFormObject)
+	initialize: function($super, oFormObject, options)
 	{
 		this.element = oFormObject;
+        this.editorOptions = options;
 	},
 
     /*
