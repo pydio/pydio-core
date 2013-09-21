@@ -26,7 +26,9 @@
  * @package info.ajaxplorer.plugins 
  */
 Class.create("AbstractEditor" , {
-	
+
+    __implements: ["IAjxpWidget"],
+
 	/**
 	 * @var Hash The default actions, initialized with fs, nofs and close
 	 */
@@ -56,7 +58,8 @@ Class.create("AbstractEditor" , {
 		this.editorOptions = Object.extend({
 			fullscreen:true, 
 			closable:true, 
-			floatingToolbar:false
+			floatingToolbar:false,
+            context: modal
 		}, options || { });		
 		this.element =  $(oContainer);
 		this.defaultActions = new Hash({
@@ -64,14 +67,56 @@ Class.create("AbstractEditor" , {
 			'nofs' : '<a id="nofsButton" class="icon-resize-small" style="display:none;"><img src="'+ajxpResourcesFolder+'/images/actions/22/window_nofullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="236"></span></a>',
 			'close':'<a id="closeButton" class="icon-remove-sign"><img src="'+ajxpResourcesFolder+'/images/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br><span message_id="86"></span></a>'
 		});
+        if(!this.editorOptions.closable){
+            this.defaultActions.unset('close');
+        }
         if(this.editorOptions.actions){
             this.defaultActions = $H(Object.extend(this.defaultActions._object, this.editorOptions.actions));
         }
 		this.createTitleSpans();
 		this.initActions();
-		modal.setCloseAction(function(){this.close();}.bind(this));
+        if(this.editorOptions.context.setCloseAction){
+            this.editorOptions.context.setCloseAction(function(){this.close();}.bind(this));
+        }
 	},
-	
+
+    /**
+     * Implement IAjxpWidget interface
+     * @param show
+     */
+    showElement : function(show){
+        if(show) {
+            this.element.show();
+            if(this.inputNode){
+                ajaxplorer.updateContextData(null, [this.inputNode], this);
+            }
+        }else {
+            this.element.hide();
+        }
+    },
+    /**
+     * Implement IAjxpWidget interface
+     * @returns {*}
+     */
+    getDomNode : function(){
+        return this.element;
+    },
+
+    /**
+     * Implement IAjxpWidget interface
+     * @returns {*}
+     */
+    destroy: function(){
+        this.close();
+    },
+
+    validateClose: function(){
+        if(this.isModified && !window.confirm(MessageHash[201])){
+            return false;
+        }
+        return true;
+    },
+
 	/**
 	 * Initialize standards editor actions
 	 */
@@ -130,12 +175,14 @@ Class.create("AbstractEditor" , {
 			this.actions.get("closeButton").observe("click", function(){
 				hideLightBox(true);
 			}.bind(this) );
-			modal.setCloseValidation(function(){
-				if(this.isModified && !window.confirm(MessageHash[201])){
-					return false;
-				}
-				return true;
-			}.bind(this) );			
+            if(this.editorOptions.context.setCloseValidation){
+                this.editorOptions.context.setCloseValidation(function(){
+                    if(this.isModified && !window.confirm(MessageHash[201])){
+                        return false;
+                    }
+                    return true;
+                }.bind(this) );
+            }
 			if(window.ajxpMobile){
 				// Make sure "Close" is the first.
 				this.actionBar.insert({top:this.actions.get("closeButton")});
@@ -169,7 +216,9 @@ Class.create("AbstractEditor" , {
 	 * Experimental : detach toolbar
 	 */
 	makeToolbarFloatable : function(){
-        this.element.up("div.dialogContent").setStyle({position:'relative'});
+        if(this.element.up("div.dialogContent")){
+            this.element.up("div.dialogContent").setStyle({position:'relative'});
+        }
 		this.actionBar.absolutize();
         var crtIndex = parseInt(this.element.getStyle("zIndex"));
         if(!crtIndex) crtIndex = 1000;
@@ -200,13 +249,17 @@ Class.create("AbstractEditor" , {
 	 * Creates the title label depending on the "modified" status
 	 */
 	createTitleSpans : function(){
-		var crtTitle = $(modal.dialogTitle).select('span.titleString')[0];
-		this.filenameSpan = new Element("span", {className:"filenameSpan"});
-		crtTitle.insert({bottom:this.filenameSpan});
-		
-		this.modifSpan = new Element("span", {className:"modifiedSpan"});
-		crtTitle.insert({bottom:this.modifSpan});		
-		
+        this.crtTitle = new Element('span');
+        this.filenameSpan = new Element("span", {className:"filenameSpan"});
+        this.crtTitle.insert({bottom:this.filenameSpan});
+        this.modifSpan = new Element("span", {className:"modifiedSpan"});
+        this.crtTitle.insert({bottom:this.modifSpan});
+        this.element.fire("editor:updateTitle", this.crtTitle);
+        if(this.editorOptions.editorData.icon_class){
+            this.element.fire("editor:updateIconClass", this.editorOptions.editorData.icon_class);
+        }else if(this.editorOptions.editorData.icon){
+            this.element.fire("editor:updateIconSrc", this.editorOptions.editorData.icon);
+        }
 	},
 	
 	/**
@@ -222,12 +275,20 @@ Class.create("AbstractEditor" , {
 	 */
 	updateTitle : function(title){
 		if(title != ""){
-			title = " - " + title;
+			//title = " - " + title;
 		}
-		this.filenameSpan.update(title);
+		if(this.filenameSpan) {
+            this.filenameSpan.update(title);
+        }
 		if(this.fullScreenMode){
 			this.refreshFullScreenTitle();
 		}
+        if(this.editorOptions.editorData.icon_class){
+            this.element.fire("editor:updateIconClass", this.editorOptions.editorData.icon_class);
+        }else if(this.editorOptions.editorData.icon){
+            this.element.fire("editor:updateIconSrc", this.editorOptions.editorData.icon);
+        }
+        this.element.fire("editor:updateTitle", this.crtTitle);
 	},
 	/**
 	 * Change editor status
@@ -235,7 +296,10 @@ Class.create("AbstractEditor" , {
 	 */
 	setModified : function(isModified){
 		this.isModified = isModified;
-		this.modifSpan.update((isModified?"*":""));
+		if(this.modifSpan) {
+            this.modifSpan.update((isModified?"*":""));
+            this.element.fire("editor:updateTitle", this.crtTitle);
+        }
 		if(this.actions.get("saveButton")){
 			if(isModified){
 				this.actions.get("saveButton").removeClassName("disabled");
@@ -257,6 +321,9 @@ Class.create("AbstractEditor" , {
 		}
 		this.originalHeight = this.contentMainContainer.getHeight();	
 		this.originalWindowTitle = document.title;
+        if(this.editorOptions.context.__className != "Modal"){
+            this.originalParentId = this.element.parentNode.id;
+        }
         this.element.fire("editor:enterFS");
 
 		this.element.absolutize();
@@ -289,7 +356,12 @@ Class.create("AbstractEditor" , {
 		if(!this.fullScreenMode) return;
 		this.element.fire("editor:exitFS");
 		Event.stopObserving(window, "resize", this.fullScreenListener);
-        var dContent = $$('.dialogContent')[0];
+        var dContent;
+        if(this.originalParentId){
+            dContent = $(this.originalParentId);
+        }else{
+            dContent = $$('.dialogContent')[0];
+        }
         dContent.setStyle({position:"relative"});
 		dContent.insert(this.element);
         this.element.relativize();
@@ -303,6 +375,7 @@ Class.create("AbstractEditor" , {
 		this.actions.get("nofsButton").hide();		
 		document.title = this.originalWindowTitle;
 		this.fullScreenMode = false;
+        this.originalParent = null;
 		this.element.fire("editor:exitFSend");
 	},
 	/**
@@ -326,7 +399,9 @@ Class.create("AbstractEditor" , {
 			this.exitFullScreen();
 		}
 		this.element.fire("editor:close");
-		modal.setCloseAction(null);
+        if(this.editorOptions.context.setCloseAction){
+            this.editorOptions.context.setCloseAction(null);
+        }
 		return false;
 	},
 	
@@ -334,7 +409,7 @@ Class.create("AbstractEditor" , {
 	 * Refreshes the title
 	 */
 	refreshFullScreenTitle : function(){
-		document.title = "AjaXplorer - "+$(modal.dialogTitle).innerHTML.stripTags().replace("&nbsp;","");
+		document.title = "AjaXplorer - "+ this.filenameSpan.innerHTML.stripTags().replace("&nbsp;","");
 	},
 	/**
 	 * Add a loading image to the given element

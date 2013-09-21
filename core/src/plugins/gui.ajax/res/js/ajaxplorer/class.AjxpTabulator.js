@@ -27,7 +27,10 @@ Class.create("AjxpTabulator", AjxpPane, {
 	 */
 	initialize : function($super, htmlElement, tabulatorOptions){
 		$super(htmlElement, tabulatorOptions);
-		this.tabulatorData 	= tabulatorOptions.tabInfos;		
+		this.tabulatorData 	= $A(tabulatorOptions.tabInfos);
+        if(tabulatorOptions.registerAsEditorOpener){
+            ajaxplorer.registerEditorOpener(this);
+        }
 		// Tabulator Data : array of tabs infos
 		// { id , label, icon and element : tabElement }.
 		// tab Element must implement : showElement() and resize() methods.
@@ -35,21 +38,18 @@ Class.create("AjxpTabulator", AjxpPane, {
 		var div = new Element('div', {className:'tabulatorContainer panelHeader'});
 		$(this.htmlElement).insert({top:div});
 		this.tabulatorData.each(function(tabInfo){
-			var td = new Element('span', {className:'toggleHeader', title:MessageHash[tabInfo.title] || MessageHash[tabInfo.label].stripTags()});
-            if(tabInfo.icon){
-                td.insert('<img width="16" height="16" align="absmiddle" src="'+resolveImageSource(tabInfo.icon, '/images/actions/ICON_SIZE', 16)+'">');
-            }
-            if(tabInfo.iconClass){
-                td.insert(new Element('span', {className:tabInfo.iconClass}));
-            }
-            td.insert('<span class="tab_label" ajxp_message_id="'+tabInfo.label+'">'+MessageHash[tabInfo.label]+'</span>');
-			td.observe('click', function(){
-				this.switchTabulator(tabInfo.id);
-			}.bind(this) );
-			div.insert(td);
-			tabInfo.headerElement = td;
-			disableTextSelection(td);
+            var tab = this._renderTab(tabInfo);
+			div.insert(tab);
 			this.selectedTabInfo = tabInfo; // select last one by default
+            var paneObject = this.getAndSetAjxpObject(tabInfo);
+            if(!tabInfo.label && paneObject){
+                paneObject.getDomNode().observe("editor:updateTitle", function(event){
+                    tabInfo.headerElement.down(".tab_label").update(event.memo);
+                }.bind(modal));
+                paneObject.getDomNode().observe("editor:updateIconClass", function(event){
+                    tabInfo.headerElement.down("span").replace(new Element('span',{className:event.memo}));
+                }.bind(modal));
+            }
 		}.bind(this));
         if(this.options.headerToolbarOptions){
             var tbD = new Element('div', {id:"display_toolbar"});
@@ -61,35 +61,199 @@ Class.create("AjxpTabulator", AjxpPane, {
         }
 
 	},
-	
+
+    _renderTab:function(tabInfo){
+
+        if(tabInfo.ajxpClass && tabInfo.ajxpOptions){
+            var td = new Element('span', {className:'toggleHeader'});
+            var klass = Class.getByName(tabInfo.ajxpClass);
+            new klass(td, tabInfo.ajxpOptions);
+            tabInfo.headerElement = td;
+            if(tabInfo.closeable){
+                td.insert(new Element('span', {className:'icon-remove tab_close_button'}));
+                td.down('.tab_close_button').observe('click', function(){
+                    this.closeTab(tabInfo.id);
+                }.bind(this));
+            }
+            return td;
+        }else{
+            var label = "";
+            if(tabInfo.label){
+                label = MessageHash[tabInfo.label] || tabInfo.label;
+            }
+            var td = new Element('span', {className:'toggleHeader', title:MessageHash[tabInfo.title] || label.stripTags()});
+            if(tabInfo.icon){
+                td.insert('<img width="16" height="16" align="absmiddle" src="'+resolveImageSource(tabInfo.icon, '/images/actions/ICON_SIZE', 16)+'">');
+            }
+            if(tabInfo.iconClass){
+                td.insert(new Element('span', {className:tabInfo.iconClass}));
+            }
+            td.insert('<span class="tab_label" ajxp_message_id="'+tabInfo.label+'">'+MessageHash[tabInfo.label]+'</span>');
+            td.observe('click', function(){
+                this.switchTabulator(tabInfo.id);
+            }.bind(this) );
+            if(tabInfo.closeable){
+                td.insert(new Element('span', {className:'icon-remove tab_close_button'}));
+                td.down('.tab_close_button').observe('click', function(){
+                    this.closeTab(tabInfo.id);
+                }.bind(this));
+            }
+            tabInfo.headerElement = td;
+            disableTextSelection(td);
+            return td;
+        }
+
+    },
+
+    openEditorForNode:function(ajxpNode, editorData){
+        this.addTab({
+            id:ajxpNode.getPath(),
+            label:"131",
+            iconClass:"icon-file",
+            closeable:true
+        }, {
+            type:"editor",
+            editorData:editorData,
+            node:ajxpNode
+        });
+    },
+
+
+    /**
+     *
+     * @param tabInfo
+     */
+    addTab: function(tabInfo, paneInfo){
+        var existing = this.tabulatorData.detect(function(internalInfo){return internalInfo.id == tabInfo.id;});
+        if(existing) {
+            this.switchTabulator(existing.id);
+            return;
+        }
+        $(this.htmlElement).down('.tabulatorContainer').insert(this._renderTab(tabInfo));
+        if(!tabInfo.element){
+            // generate a random element id
+            var randomId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+                return v.toString(16);
+            });
+            tabInfo.element = "dynamic-panel-" + randomId;
+        }
+
+        $(this.htmlElement).insert(new Element("div", {id:tabInfo.element}));
+        fitHeightToBottom($(this.htmlElement).down("#"+tabInfo.element));
+
+        if(paneInfo.type == 'editor' && paneInfo.node){
+            var editorData;
+            if(paneInfo.editorData){
+                editorData = paneInfo.editorData;
+            }else{
+                var selectedMime = getAjxpMimeType(paneInfo.node);
+                var editors = ajaxplorer.findEditorsForMime(selectedMime);
+                if(editors.length && editors[0].openable){
+                    editorData = editors[0];
+                }
+            }
+            if(editorData){
+                ajaxplorer.loadEditorResources(editorData.resourcesManager);
+                var oForm = $("all_forms").down("#"+editorData.formId).cloneNode(true);
+                $(tabInfo.element).insert(oForm);
+                var editorOptions = {
+                    closable: false,
+                    context: this,
+                    editorData: editorData
+                };
+                var editor = eval ( 'new '+editorData.editorClass+'(oForm, editorOptions)' );
+                editor.getDomNode().observe("editor:updateTitle", function(event){
+                    tabInfo.headerElement.down(".tab_label").update(event.memo);
+                }.bind(modal));
+                editor.getDomNode().observe("editor:updateIconClass", function(event){
+                    tabInfo.headerElement.down("span").replace(new Element('span',{className:event.memo}));
+                }.bind(modal));
+                editor.open(paneInfo.node);
+                tabInfo.ajxpObject = editor;
+                editor.resize();
+            }
+        }else if(paneInfo.type == 'widget'){
+
+        }
+
+        this.resize();
+        this.tabulatorData.push(tabInfo);
+        this.switchTabulator(tabInfo.id);
+    },
+
+    /**
+     *
+     * @param tabId
+     */
+    closeTab: function(tabId){
+        var ti;
+        var previousTab;
+        this.tabulatorData.each(function(tabInfo){
+            if(tabInfo.id == tabId){
+                var ajxpObject = this.getAndSetAjxpObject(tabInfo);
+                if(ajxpObject){
+                    if(ajxpObject.validateClose){
+                        var test = ajxpObject.validateClose();
+                        if(!test) return;
+                    }
+                    ajxpObject.destroy();
+                }
+                var pane = $(this.htmlElement).down('#'+tabInfo.element);
+                if(pane){
+                    pane.remove();
+                }
+                tabInfo.headerElement.stopObserving("click");
+                tabInfo.headerElement.remove();
+                ti = tabInfo;
+                throw $break;
+            }
+            previousTab = tabInfo;
+        }.bind(this));
+        if(ti){
+            this.tabulatorData = this.tabulatorData.without(ti);
+        }
+        this.resize();
+        if(previousTab) this.switchTabulator(previousTab.id);
+        else if(this.tabulatorData.length) this.switchTabulator(this.tabulatorData.first().id);
+    },
+
 	/**
 	 * Tab change
 	 * @param tabId String The id of the target tab
 	 */
 	switchTabulator:function(tabId){
 		var toShow ;
+        var toShowElement;
 		this.tabulatorData.each(function(tabInfo){
 			var ajxpObject = this.getAndSetAjxpObject(tabInfo);
+            tabInfo.headerElement.removeClassName("toggleInactiveBeforeActive");
 			if(tabInfo.id == tabId){				
 				tabInfo.headerElement.removeClassName("toggleInactive");
 				if(tabInfo.headerElement.down('img')) tabInfo.headerElement.down('img').show();
 				if(ajxpObject){
 					toShow = ajxpObject;
+                    toShowElement = tabInfo.element;
 				}
 				this.selectedTabInfo = tabInfo;
+                if(tabInfo.headerElement.previous('.toggleHeader')){
+                    tabInfo.headerElement.previous('.toggleHeader').addClassName('toggleInactiveBeforeActive');
+                }
 			}else{
 				tabInfo.headerElement.addClassName("toggleInactive");
                 if(tabInfo.headerElement.down('img')) tabInfo.headerElement.down('img').hide();
 				if(ajxpObject){
 					ajxpObject.showElement(false);
+                    if($(tabInfo.element)) $(tabInfo.element).hide();
 				}
 			}
 		}.bind(this));
 		if(toShow){
+            if($(toShowElement)) $(toShowElement).show();
 			toShow.showElement(true);
             if(this.htmlElement.up('div[ajxpClass="Splitter"]') && this.htmlElement.up('div[ajxpClass="Splitter"]').ajxpPaneObject){
                 var splitter = this.htmlElement.up('div[ajxpClass="Splitter"]').ajxpPaneObject;
-                if(splitter.splitbar.hasClassName('folded')){
+                if(splitter.splitbar.hasClassName('folded') && (Element.descendantOf(this.htmlElement, splitter.paneA) || this.htmlElement == splitter.paneA ) ){
                     splitter.unfold();
                 }
             }
@@ -106,7 +270,8 @@ Class.create("AjxpTabulator", AjxpPane, {
 		if(!this.selectedTabInfo) return;
 		var ajxpObject = this.getAndSetAjxpObject(this.selectedTabInfo);
 		if(ajxpObject){
-			ajxpObject.resize();
+            fitHeightToBottom($(this.htmlElement).down("#"+this.selectedTabInfo.element));
+            ajxpObject.resize();
             var left ;
             var total = 0;
             var cont = this.htmlElement.down('div.tabulatorContainer');
@@ -136,7 +301,7 @@ Class.create("AjxpTabulator", AjxpPane, {
                 this.tabulatorData.each(function(tabInfo){
                     var header = tabInfo.headerElement;
                     if(tabInfo != this.selectedTabInfo){
-                        header.setStyle({width:part - ( parseInt(header.getStyle('paddingRight')) + parseInt(header.getStyle('paddingLeft')) ) + 'px'});
+                        header.setStyle({width:part - ( parseInt(header.getStyle('paddingRight')) + parseInt(header.getStyle('paddingLeft')) +  parseInt(header.getStyle('borderRightWidth'))  +  parseInt(header.getStyle('borderLeftWidth')) ) + 'px'});
                     }
                 }.bind(this));
             }
@@ -174,8 +339,9 @@ Class.create("AjxpTabulator", AjxpPane, {
 	 */
 	getAndSetAjxpObject : function(tabInfo){
 		var ajxpObject = tabInfo.ajxpObject || null;
-		if($(tabInfo.element) && $(tabInfo.element).ajxpPaneObject && (!ajxpObject || ajxpObject != $(tabInfo.element).ajxpPaneObject) ){
-			ajxpObject = tabInfo.ajxpObject = $(tabInfo.element).ajxpPaneObject;
+        var nodeElement = $(tabInfo.element);
+		if(nodeElement && nodeElement.ajxpPaneObject && (!ajxpObject || ajxpObject != nodeElement.ajxpPaneObject) ){
+			ajxpObject = tabInfo.ajxpObject = nodeElement.ajxpPaneObject;
 		}
 		return ajxpObject;		
 	}

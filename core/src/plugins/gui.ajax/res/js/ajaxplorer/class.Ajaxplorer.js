@@ -696,6 +696,7 @@ Class.create("Ajaxplorer", {
 		if(xmlNode.nodeName == 'editor'){
 			Object.extend(extensionDefinition, {
 				openable : (xmlNode.getAttribute("openable") == "true"?true:false),
+				modalOnly : (xmlNode.getAttribute("modalOnly") == "true"?true:false),
 				previewProvider: (xmlNode.getAttribute("previewProvider")=="true"?true:false),
 				order: (xmlNode.getAttribute("order")?parseInt(xmlNode.getAttribute("order")):0),
 				formId : xmlNode.getAttribute("formId") || null,				
@@ -834,7 +835,41 @@ Class.create("Ajaxplorer", {
 		var registry = this._resourcesRegistry;
 		resourcesManager.load(registry);
 	},
-	
+
+    /**
+     *
+     * @param passedTarget
+     */
+    _editorOpener:null,
+    registerEditorOpener: function(ajxpWidget){
+        this._editorOpener = ajxpWidget;
+    },
+
+    openCurrentSelectionInEditor:function(editorData){
+        var selectedNode = this.getContextHolder().getUniqueNode();
+        if(!selectedNode) return;
+        if(!editorData){
+            var selectedMime = getAjxpMimeType(selectedNode);
+            var editors = this.findEditorsForMime(selectedMime);
+            if(editors.length && editors[0].openable){
+                editorData = editors[0];
+            }
+        }
+        if(editorData){
+            this.loadEditorResources(editorData.resourcesManager);
+            if(!this._editorOpener || editorData.modalOnly){
+                modal.openEditorDialog(editorData);
+            }else{
+                this._editorOpener.openEditorForNode(selectedNode, editorData);
+            }
+        }else{
+            if(this.actionBar.getActionByName("download")){
+                this.actionBar.getActionByName("download").apply();
+            }
+        }
+
+    },
+
 	/**
 	 * Inserts the main template in the GUI.
 	 */

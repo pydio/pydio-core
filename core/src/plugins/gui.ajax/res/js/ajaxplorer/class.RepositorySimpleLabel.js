@@ -39,14 +39,10 @@ Class.create("RepositorySimpleLabel", AjxpPane, {
             var repositoryList = e.memo.list;
             var repositoryId = e.memo.active;
             if(repositoryList && repositoryList.size()){
-                repositoryList.each(function(pair){
-                    var repoObject = pair.value;
-                    var key = pair.key;
-                    var selected = (key == repositoryId ? true:false);
-                    if(selected){
-                        this.htmlElement.down("div.repository_title").update(repoObject.getLabel());
-                    }
-                }.bind(this) );
+                var repoObject = repositoryList.get(repositoryId);
+                if(repoObject){
+                    this.htmlElement.down("div.repository_title").update(repoObject.getLabel());
+                }
             }
         }.bind(this));
     }

@@ -304,6 +304,11 @@ Class.create("FilesList", SelectableElements, {
 	contextObserver : function(e){
 		if(!this.crtContext) return;
 		//console.log('FILES LIST : FILL');
+        var base = getBaseName(this.crtContext.getPath());
+        if(!base){
+            try{base = ajaxplorer.user.repositories.get(ajaxplorer.repositoryId).getLabel();}catch(e){}
+        }
+        this.htmlElement.fire("editor:updateTitle", base);
         this.empty();
 		this.fill(this.crtContext);
 		this.removeOnLoad();
@@ -983,7 +988,21 @@ Class.create("FilesList", SelectableElements, {
 	 * @param show Boolean
 	 */
 	showElement : function(show){
-		
+        if(show) {
+            if(ajaxplorer) {
+                if(!this._dataModel){
+                    ajaxplorer.updateContextData(null, this.getSelectedNodes(), this);
+                }
+                ajaxplorer.focusOn(this);
+            }
+            this.htmlElement.setStyle({display:'block'});
+        }else{
+            this.blur();
+            if(!this._dataModel && ajaxplorer){
+                ajaxplorer.updateContextData(null, [], this);
+            }
+            this.htmlElement.setStyle({display:'none'});
+        }
 	},
 	
 	/**

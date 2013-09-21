@@ -73,9 +73,21 @@ Class.create("Modal", {
             closeBtn = '<img id="modalCloseBtn" style="cursor:pointer;float:right;margin-top:2px;" src="'+ajxpResourcesFolder+'/images/actions/16/window_close.png" />';
         }
 
-        hString += sTitle + '</span>';
+        hString += '<span class="string-only-title">' + sTitle + '</span></span>';
 		this.dialogTitle.update(closeBtn + hString);
 	},
+
+    /**
+     * Implement IEditorParentContext
+     * @param title
+     * @param iconClass
+     * @param iconImg
+     */
+    setContextTitle : function(title, iconClass, iconImg){
+        if(title){
+            this.dialogTitle.down(".string-only-title").update(title);
+        }
+    },
 	
 	/**
 	 * Shows a dialog box by getting the form from the hidden_forms
@@ -292,15 +304,18 @@ Class.create("Modal", {
 		modal.prepareHeader(editorData.text, resolveImageSource(editorData.icon, '/images/actions/ICON_SIZE', 16), editorData.icon_class);
 		var loadFunc = function(oForm){			
 			if(typeof(editorKlass) == "string"){
-				ajaxplorer.actionBar.editor = eval('new '+editorKlass+'(oForm)');
+				ajaxplorer.actionBar.editor = eval('new '+editorKlass+'(oForm, {editorData:editorData, context:modal})');
 			}else{
-				ajaxplorer.actionBar.editor = new editorKlass(oForm);
+				ajaxplorer.actionBar.editor = new editorKlass(oForm, {editorData:editorData, context:modal});
 			}
             if(editorArgument){
                 ajaxplorer.actionBar.editor.open(editorArgument);
             }else{
                 ajaxplorer.actionBar.editor.open(ajaxplorer.getUserSelection().getUniqueNode());
             }
+            ajaxplorer.actionBar.editor.getDomNode().observe("editor:updateTitle", function(event){
+                this.setContextTitle(event.memo);
+            }.bind(modal));
             //ajaxplorer.actionBar.editor.resize();
 		};
 		this.showDialogForm('', editorData.formId, loadFunc, null, null, true, true);			
