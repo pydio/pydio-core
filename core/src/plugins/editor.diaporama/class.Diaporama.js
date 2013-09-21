@@ -30,16 +30,16 @@ Class.create("Diaporama", AbstractEditor, {
             floatingToolbar:true,
             replaceScroller:false,
             toolbarStyle: "icons_only diaporama_toolbar",
-            actions : (window.ajxpMinisite || window.ajxpMobile) ? {} : {
+            actions : (window.ajxpMinisite || window.ajxpMobile) ? {} : {}/* : {
                 'toggleSideBar' : '<a id="toggleButton"><img src="'+ajxpResourcesFolder+'/images/actions/22/view_left_close.png"  width="22" height="22" alt="" border="0"><br><span message_id="86"></span></a>'
-            }
+            }*/
         }, options);
 		$super(oFormObject, options);
 
-        var diapoSplitter = oFormObject.down("#diaporamaSplitter");
-        var diapoInfoPanel = oFormObject.down("#diaporamaMetadataContainer");
-        diapoSplitter.parentNode.setStyle({overflow:"hidden"});
         if(this.actions.get("toggleButton")){
+            var diapoInfoPanel = oFormObject.down("#diaporamaMetadataContainer");
+            var diapoSplitter = oFormObject.down("#diaporamaSplitter");
+            diapoSplitter.parentNode.setStyle({overflow:"hidden"});
             this.splitter = new Splitter(diapoSplitter, {
                 direction:"vertical",
                 "initA":250,
@@ -57,7 +57,7 @@ Class.create("Diaporama", AbstractEditor, {
                 this.infoPanel.parseComponentConfig(el.get("all"));
             }.bind(this));
         }else{
-            diapoInfoPanel.remove();
+            //diapoInfoPanel.remove();
         }
 
 		this.nextButton = this.actions.get("nextButton");
@@ -245,7 +245,7 @@ Class.create("Diaporama", AbstractEditor, {
             if(this.splitter) this.splitter.options.fitParent = this.element.up(".dialogBox");
             this.resize();
         }.bind(this));
-		fitHeightToBottom(this.imgContainer, $(modal.elementName), 3);
+		fitHeightToBottom(this.imgContainer, $(this.editorOptions.context.elementName), 3);
 		// Fix imgContainer
 		if(Prototype.Browser.IE){
 			this.IEorigWidth = this.element.getWidth();
@@ -278,7 +278,7 @@ Class.create("Diaporama", AbstractEditor, {
 				fitHeightToBottom(this.imgContainer, this.element);
 				if(this.IEorigWidth) this.imgContainer.setStyle({width:this.element.getWidth()});
 			}else{
-				fitHeightToBottom(this.imgContainer, $(modal.elementName), 3);
+				fitHeightToBottom(this.imgContainer, $(this.editorOptions.context.elementName), 3);
 				if(this.IEorigWidth) this.imgContainer.setStyle({width:this.IEorigWidth});
 			}
 		}

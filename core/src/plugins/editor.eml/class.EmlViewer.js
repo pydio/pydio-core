@@ -19,9 +19,9 @@
  */
 Class.create("EmlViewer", AbstractEditor, {
 
-	initialize: function($super, oFormObject)
+	initialize: function($super, oFormObject, options)
 	{
-		$super(oFormObject);
+		$super(oFormObject, options);
 		this.actions.get("downloadFileButton").observe('click', function(){
 			if(!this.currentFile) return;		
 			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.currentFile);
