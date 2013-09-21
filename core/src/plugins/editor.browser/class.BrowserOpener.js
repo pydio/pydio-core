@@ -19,7 +19,10 @@
  */
 Class.create("BrowserOpener", AbstractEditor, {
 
-	initialize: function($super, oFormObject){},
+	initialize: function($super, oFormObject, options){
+        this.editorOptions = options;
+        this.element = oFormObject;
+    },
 	
 	open : function($super, node){
         if(node.getAjxpMime() == "url"){
@@ -32,11 +35,23 @@ Class.create("BrowserOpener", AbstractEditor, {
         var url = loc.substring(0, loc.lastIndexOf('/'));
         var nonSecureAccessPath = ajxpServerAccessPath.substring(0, ajxpServerAccessPath.lastIndexOf('?'));
         var open_file_url = url + "/" + nonSecureAccessPath + "?get_action=open_file&repository_id=" + repo + "&file=" + encodeURIComponent(node.getPath());
-        var myRef = window.open(open_file_url);
-        if(!Modernizr.boxshadow){
-            window.setTimeout('hideLightBox()', 1500);
+
+        if(this.editorOptions.context.__className == 'Modal'){
+            var myRef = window.open(open_file_url);
+            if(!Modernizr.boxshadow){
+                window.setTimeout('hideLightBox()', 1500);
+            }else{
+                hideLightBox();
+            }
         }else{
-            hideLightBox();
+            this.contentMainContainer = new Element('iframe', {
+                width:'100%',
+                height:'100%',
+                src:open_file_url,
+                border:0,
+                style: 'border: 0'
+            });
+            this.element.update(this.contentMainContainer);
         }
 	},
 	
@@ -46,9 +61,36 @@ Class.create("BrowserOpener", AbstractEditor, {
 		connexion.addParameter('file', fileName);	
 		connexion.onComplete = function(transp){
 			var url = transp.responseText;
-	        myRef = window.open(url, "AjaXplorer Bookmark", "location=yes,menubar=yes,resizable=yes,scrollbars=yea,toolbar=yes,status=yes");
-	        hideLightBox();
+            if(this.editorOptions.context.__className == 'Modal'){
+                myRef = window.open(url, "AjaXplorer Bookmark", "location=yes,menubar=yes,resizable=yes,scrollbars=yea,toolbar=yes,status=yes");
+                hideLightBox();
+            }else{
+                this.contentMainContainer = new Element('iframe', {
+                    width:'100%',
+                    height:'100%',
+                    src:url,
+                    border:0,
+                    style: 'border: 0'
+                });
+                this.element.update(this.contentMainContainer);
+            }
 		}.bind(this);
 		connexion.sendSync();		
-	}
+	},
+
+    /**
+     * Resizes the main container
+     * @param size int|null
+     */
+    resize : function(size){
+        if(size){
+            this.element.setStyle({height:size+"px"});
+            if(this.contentMainContainer) this.contentMainContainer.setStyle({height:size+"px"});
+        }else{
+            fitHeightToBottom(this.element);
+            if(this.contentMainContainer) fitHeightToBottom(this.contentMainContainer, this.element);
+        }
+        this.element.fire("editor:resize", size);
+    }
+
 });
