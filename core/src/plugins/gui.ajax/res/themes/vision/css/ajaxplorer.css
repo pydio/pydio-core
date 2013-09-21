@@ -2313,6 +2313,7 @@ span.toggleHeader{
     text-overflow: ellipsis;
     padding: 6px 6px;
     background-color: rgb(111, 123, 136);
+    transition: background-color 0.3s ease;
 }
 
 span.toggleHeader.toggleInactive{
@@ -2359,6 +2360,19 @@ div.tabulatorContainer.icons_only div.toolbarGroup span[class*=" icon-"]
 {
     display: inline;
     font-size: 1em;
+}
+
+div.tabulatorContainer span.tab_close_button {
+    margin-left: 6px;
+    cursor: pointer;
+}
+
+div.tabulatorContainer span.toggleInactive span.tab_close_button {
+    color: rgb(111, 123, 136);
+}
+
+div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
+    color: #ffffff;
 }
 
 .panelHeader.panelHeaderWithIcon{
@@ -3923,6 +3937,10 @@ input#webdav_password{
     margin-left: 10px !important;
 }
 
+#cpane_tabs .video-js-box{
+    margin-left: 0 !important;
+}
+
 .video-js-box.vjs-fullscreen{
     margin-left: 0 !important;
 }
@@ -4110,10 +4128,38 @@ td.ip_geo_cell{
     height: 19px;
 }
 
+#files_list_header{
+    font-size: 11px;
+    padding: 5px 3px 3px 8px;
+    letter-spacing: 1px;
+    background-color: #FFFFFF;
+    border-bottom: 1px solid rgb(187, 187, 187);
+    color: rgb(111, 123, 136);
+    border-left: 1px solid rgb(187, 187, 187);
+    border-right: 1px solid rgb(187, 187, 187);
+}
+
+#files_list_header #display_toolbar a:hover,
+#files_list_header #display_toolbar a
+{
+    color: rgb(111, 123, 136) !important;
+}
+
+#cpane_tabs span.toggleHeader{
+    padding: 6px 10px;
+}
+
+#cpane_tabs span.toggleInactive{
+    border-right: 1px dotted rgb(111, 123, 136);
+}
+
+#cpane_tabs span.toggleInactiveBeforeActive{
+    border-right: 0;
+}
+
 #breadcrumb{
     display: inline-block;
     overflow: hidden;
-    float: left;
 }
 
 #breadcrumb div.inner_bread{
@@ -4136,10 +4182,12 @@ td.ip_geo_cell{
 
 #breadcrumb span.ajxp-goto-refresh {
     display: none;
+    text-decoration: none !important;
 }
 
 #breadcrumb span.ajxp-goto:hover {
-    color: rgb(253, 252, 228);
+    /*color: rgb(253, 252, 228);*/
+    text-decoration: underline;
 }
 
 #breadcrumb span.ajxp-goto:hover span.ajxp-goto-refresh {
