@@ -21,14 +21,17 @@ Class.create("ZohoEditor", AbstractEditor, {
 
 	fullscreenMode: false,
 	
-	initialize: function($super, oFormObject)
+	initialize: function($super, oFormObject, options)
 	{
 		this.element =  $(oFormObject);
+        this.editorOptions = options;
 		this.defaultActions = new Hash();		
 		this.createTitleSpans();
-		modal.setCloseAction(function(){this.close();}.bind(this));
+        if(this.editorOptions.context.__className == "Modal"){
+            modal.setCloseAction(function(){this.close();}.bind(this));
+        }
 		this.container = $(oFormObject).select('div[id="zohoContainer"]')[0];
-		fitHeightToBottom($(this.container), $(modal.elementName));
+		fitHeightToBottom($(this.container), $(this.editorOptions.context.elementName));
 		this.contentMainContainer = new Element("iframe", {			
 			style:"border:none;width:"+this.container.getWidth()+"px;"
 		});						
@@ -70,7 +73,14 @@ Class.create("ZohoEditor", AbstractEditor, {
 		}.bind(this) , 0.5);
 		return;
 	},
-	
+
+    resize: function($super, s){
+        $super(s);
+        fitHeightToBottom(this.element);
+        fitHeightToBottom(this.container);
+        fitHeightToBottom(this.contentMainContainer);
+    },
+
 	setOnLoad: function(openMessage){
 		if(this.loading) return;
 		addLightboxMarkupToElement(this.container);
