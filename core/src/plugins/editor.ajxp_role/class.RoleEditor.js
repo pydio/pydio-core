@@ -29,9 +29,12 @@ Class.create("RoleEditor", AbstractEditor, {
     pluginsData : null,
     roleId : null,
 
-    initialize: function($super, oFormObject)
+    initialize: function($super, oFormObject, editorOptions)
 	{
-		$super(oFormObject, {fullscreen:false});
+        editorOptions = Object.extend({
+            fullscreen:false
+        }, editorOptions);
+        $super(oFormObject, editorOptions);
         fitHeightToBottom(this.element.down("#roleTabulator"), this.element.up(".dialogBox"));
         this.contentMainContainer = this.element.down("#roleTabulator");
         // INIT TAB

@@ -21,7 +21,8 @@ Class.create("AudioPreviewer", AbstractEditor, {
 
 	fullscreenMode: false,
 	
-	initialize: function($super, oFormObject){
+	initialize: function($super, oFormObject, options){
+        this.editorOptions = options;
 	},
 		
 	getPreview : function(ajxpNode, rich){

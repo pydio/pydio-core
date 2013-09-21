@@ -25,9 +25,12 @@ Class.create("PluginEditor", AbstractEditor, {
     infoPane: null,
     docPane: null,
 
-    initialize: function($super, oFormObject)
+    initialize: function($super, oFormObject, editorOptions)
     {
-        $super(oFormObject, {fullscreen:false});
+        editorOptions = Object.extend({
+            fullscreen:false
+        }, editorOptions);
+        $super(oFormObject, editorOptions);
         fitHeightToBottom(this.element.down("#pluginTabulator"), this.element.up(".dialogBox"));
         this.contentMainContainer = this.element.down("#pluginTabulator");
         // INIT TAB
