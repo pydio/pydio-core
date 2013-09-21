@@ -19,9 +19,9 @@
  */
 Class.create("AjxpCkEditor", TextEditor, {
 
-	initialize: function($super, oFormObject)
+	initialize: function($super, oFormObject, options)
 	{
-		$super(oFormObject);
+		$super(oFormObject, options);
 		this.editorConfig = {
 			resize_enabled:false,
 			toolbar : "Ajxp",
