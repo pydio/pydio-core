@@ -192,8 +192,9 @@ Class.create("SMPlayer", AbstractEditor, {
 
 	fullscreenMode: false,
 	
-	initialize: function($super, oFormObject){
+	initialize: function($super, oFormObject, options){
         this.element = oFormObject;
+        this.editorOptions = options;
 	},
 
     open : function($super, ajxpNode){
