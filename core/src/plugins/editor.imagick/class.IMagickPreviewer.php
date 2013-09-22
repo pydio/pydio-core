@@ -33,7 +33,7 @@ class IMagickPreviewer extends AJXP_Plugin {
 	protected $useOnTheFly = false;
 
     protected $imagickExtensions = array("pdf", "svg", "tif", "tiff", "psd", "xcf", "eps", "cr2");
-    protected $unoconvExtensios = array("xls", "xlsx", "ods", "doc", "docx", "odt", "ppt", "pptx", "odp", "rtf");
+    protected $unoconvExtensios = array("xls", "xlt", "xlsx", "xltx", "ods", "doc", "dot", "docx", "dotx", "odt", "ppt", "pptx", "odp", "rtf");
 
     public function loadConfigs($configsData){
         parent::loadConfigs($configsData);
@@ -238,8 +238,11 @@ class IMagickPreviewer extends AJXP_Plugin {
 		if($unoconv !== false && in_array(strtolower($extension), $officeExt)){
 			$unoDoc = str_replace(".jpg", "_unoconv.pdf", $tmpFileThumb);
 			if(!is_file($tmpFileThumb)){
-				// Create PDF Version now
-				$unoconv =  "HOME=/tmp ".$unoconv." --stdout -f pdf ".escapeshellarg($masterFile)." > ".escapeshellarg(basename($unoDoc));
+                if (stripos(PHP_OS, "win") === 0) {
+                    $unoconv = $unoconv." -o ".escapeshellarg(basename($unoDoc))." -f pdf ".escapeshellarg($masterFile);
+                } else {
+				    $unoconv =  "HOME=/tmp ".$unoconv." --stdout -f pdf ".escapeshellarg($masterFile)." > ".escapeshellarg(basename($unoDoc));
+                }
 				exec($unoconv, $out, $return);
 			}
 			if(is_file($unoDoc)){
@@ -337,4 +340,3 @@ class IMagickPreviewer extends AJXP_Plugin {
 
 	
 }
-?>
