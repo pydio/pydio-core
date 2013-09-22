@@ -57,6 +57,12 @@ Class.create("RemoteNodeProvider", {
 		// Double encode # character
 		if(node.getMetadata().get("paginationData")){
 			path += "%23" + node.getMetadata().get("paginationData").get("current");
+            conn.addParameter("remote_order", "true");
+            if(node.getMetadata().get("remote_order")){
+                node.getMetadata().get("remote_order").each(function(pair){
+                    conn.addParameter(pair.key, pair.value);
+                });
+            }
 		}
 		conn.addParameter("dir", path);
 		if(this.properties){

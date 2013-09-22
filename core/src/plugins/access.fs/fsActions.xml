@@ -35,6 +35,9 @@
                     <input_param description="One file to check" name="file" type="string" mandatory="false"/>
                     <input_param description="Details to send back" name="options" type="string" mandatory="false" default="al"/>
                     <input_param description="Recursively list all folders" name="recursive" type="boolean" mandatory="false" default="false"/>
+                    <input_param description="Trigger remote order" name="remote_order" type="boolean" mandatory="false" default="false"/>
+                    <input_param description="Remote order column" name="order_column" type="string" mandatory="false"/>
+                    <input_param description="Remote order direction" name="order_direction" type="string" mandatory="false"/>
 				</serverCallback>
 			</processing>
 		</action>

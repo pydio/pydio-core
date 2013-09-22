@@ -86,8 +86,13 @@ class AJXP_XMLWriter
      * @param integer $dirsCount
      * @return void
      */
-	static function renderPaginationData($count, $currentPage, $totalPages, $dirsCount = -1){
-		$string = '<pagination count="'.$count.'" total="'.$totalPages.'" current="'.$currentPage.'" overflowMessage="306" icon="folder.png" openicon="folder_open.png" dirsCount="'.$dirsCount.'"/>';		
+    public static function renderPaginationData($count, $currentPage, $totalPages, $dirsCount = -1, $remoteSortAttributes = null)
+    {
+        $remoteSortString = "";
+        if(is_array($remoteSortAttributes)){
+            foreach($remoteSortAttributes as $k => $v) $remoteSortString .= " $k='$v'";
+        }
+        $string = '<pagination count="'.$count.'" total="'.$totalPages.'" current="'.$currentPage.'" overflowMessage="306" icon="folder.png" openicon="folder_open.png" dirsCount="'.$dirsCount.'"'.$remoteSortString.'/>';
 		AJXP_XMLWriter::write($string, true);
 	}
 	/**
@@ -630,5 +635,3 @@ class AJXP_XMLWriter
 	}
 	
 }
-
-?>

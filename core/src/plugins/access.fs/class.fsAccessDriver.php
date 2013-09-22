@@ -739,6 +739,14 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 				$limitPerPage = $this->repository->getOption("PAGINATION_NUMBER");
 				if(!isset($limitPerPage) || intval($limitPerPage) == 0) $limitPerPage = 200;
 								
+                if ($this->getFilteredOption("REMOTE_SORTING")) {
+                    $orderDirection = isSet($httpVars["order_direction"])?strtolower($httpVars["order_direction"]):"asc";
+                    $orderField = isSet($httpVars["order_column"])?$httpVars["order_column"]:null;
+                    if ($orderField != null && !in_array($orderField, array("ajxp_label", "filesize", "ajxp_modiftime", "mimestring"))) {
+                        $orderField = "ajxp_label";
+                    }
+                }
+
 				$countFiles = $this->countFiles($path, !$lsOptions["f"]);
 				if($countFiles > $threshold){
                     if(isSet($uniqueFile)){
@@ -770,11 +778,20 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     AJXP_XMLWriter::renderAjxpHeaderNode($parentAjxpNode);
                 }
 				if(isSet($totalPages) && isSet($crtPage)){
+                    $remoteOptions = null;
+                    if ($this->getFilteredOption("REMOTE_SORTING")) {
+                        $remoteOptions = array(
+                            "remote_order" => "true",
+                            "currentOrderCol" => isSet($orderField)?$orderField:"ajxp_label",
+                            "currentOrderDir"=> isSet($orderDirection)?$orderDirection:"asc"
+                        );
+                    }
 					AJXP_XMLWriter::renderPaginationData(
 						$countFiles, 
 						$crtPage, 
 						$totalPages, 
-						$this->countFiles($path, TRUE)
+                        $this->countFiles($path, TRUE),
+                        $remoteOptions
 					);
 					if(!$lsOptions["f"]){
 						AJXP_XMLWriter::close();
@@ -789,10 +806,26 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 				}
 				closedir($handle);				
 				$fullList = array("d" => array(), "z" => array(), "f" => array());				
+
+                if (isSet($orderField) && $orderField == "ajxp_label" && $orderDirection == "desc") {
+                    $nodes = scandir($path, 1);
+                } else {
 				$nodes = scandir($path);
+                }
 				if(!empty($this->driverConf["SCANDIR_RESULT_SORTFONC"])){
 					usort($nodes, $this->driverConf["SCANDIR_RESULT_SORTFONC"]);
 				}
+                if (isSet($orderField) && $orderField != "ajxp_label") {
+                    $toSort = array();
+                    foreach ($nodes as $node) {
+                        if($orderField == "filesize") $toSort[$node] = is_file($nonPatchedPath."/".$node) ? $this->filesystemFileSize($nonPatchedPath."/".$node) : 0;
+                        else if($orderField == "ajxp_modiftime") $toSort[$node] = filemtime($nonPatchedPath."/".$node);
+                        else if($orderField == "mimestring") $toSort[$node] = pathinfo($node, PATHINFO_EXTENSION);
+                    }
+                    if($orderDirection == "asc") asort($toSort);
+                    else arsort($toSort);
+                    $nodes = array_keys($toSort);
+                }
 				//while(strlen($nodeName = readdir($handle)) > 0){
 				foreach ($nodes as $nodeName){
 					if($nodeName == "." || $nodeName == "..") continue;
@@ -843,9 +876,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                             }else{
                                 $nodeType = "z";
                             }
+                        } else $nodeType = "f";
                         }
-                        else $nodeType = "f";
-                    }
+                    // There is a special sorting, cancel the reordering of files & folders.
+                    if(isSet($orderField) && $orderField != "ajxp_label") $nodeType = "f";
 
 					$fullList[$nodeType][$nodeName] = $node;
 					$cursor ++;
@@ -1979,6 +2013,3 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     	return !(fsAccessDriver::$filteringDriverInstance->filterFile($search) 
     	|| fsAccessDriver::$filteringDriverInstance->filterFolder($search, "contains"));
     }
-
-
-?>
