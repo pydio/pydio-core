@@ -4,7 +4,7 @@
 		<server_settings uuidAttr="name">
 			<param group="MIXIN_MESSAGE[User Credentials]" name="USER" type="string" label="MIXIN_MESSAGE[User]" description="MIXIN_MESSAGE[User name - Can be overriden on a per-user basis (see users 'Personal Data' tab)]" mandatory="false"/>
 			<param group="MIXIN_MESSAGE[User Credentials]" name="PASS" type="password" label="MIXIN_MESSAGE[Password]" description="MIXIN_MESSAGE[User password - Can be overriden on a per-user basis.]" mandatory="false"/>
-			<param group="MIXIN_MESSAGE[User Credentials]" name="USE_SESSION_CREDENTIALS" type="boolean" label="MIXIN_MESSAGE[Session credentials]" description="MIXIN_MESSAGE[Try to use the current AjaXplorer user credentials for connecting. Warning, the AJXP_SESSION_SET_CREDENTIALS config must be set to true!]" mandatory="false" default="false"/>
+			<param group="MIXIN_MESSAGE[User Credentials]" name="USE_SESSION_CREDENTIALS" type="boolean" label="MIXIN_MESSAGE[Session credentials]" description="MIXIN_MESSAGE[Try to use the current Pydio user credentials for connecting. Warning, the AJXP_SESSION_SET_CREDENTIALS config must be set to true!]" mandatory="false" default="false"/>
 			<user_param name="USER" type="string" label="MIXIN_MESSAGE[User]" description="MIXIN_MESSAGE[User name]" mandatory="false"/>
 			<user_param name="PASS" type="password" label="MIXIN_MESSAGE[Password]" description="MIXIN_MESSAGE[User password]" mandatory="false"/>
 		</server_settings>

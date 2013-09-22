@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxp_plugin name="updater" label="CONF_MESSAGE[Update Engine]" description="CONF_MESSAGE[Automatic update of AjaXplorer. Since version 3.3.3]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<ajxp_plugin name="updater" label="CONF_MESSAGE[Update Engine]" description="CONF_MESSAGE[Automatic update of Pydio. Since version 3.3.3]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <server_settings>
         <global_param name="UPDATE_SITE" type="string" label="CONF_MESSAGE[Update Site]" description="CONF_MESSAGE[Where to update]" default="http://www.ajaxplorer.info/update/"/>
         <global_param name="UPDATE_CHANNEL" type="select" choices="stable|Stable,dev|Development,test|Testing (blank)" label="CONF_MESSAGE[Update Channel]" description="CONF_MESSAGE[Check stable or dev channel]" default="stable" mandatory="true"/>

@@ -15,7 +15,7 @@
                 font-weight: normal;
                 padding: 10px 0 0 5px;
                 color: rgb(111,123,136);
-                background-image: url('AJXP_PATH_TO_ROOT/plugins/gui.ajax/AjxpLogo250.png');
+                background-image: url('AJXP_PATH_TO_ROOT/plugins/gui.ajax/PydioLogo250.png');
                 background-repeat: no-repeat;
                 background-position: right 9px;
                 background-size: 170px;
