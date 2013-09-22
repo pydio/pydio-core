@@ -515,9 +515,8 @@ class sqlConfDriver extends AbstractConfDriver {
      */
     public function createGroup($groupPath, $groupLabel)
     {
-        $test = dibi::query("SELECT groupPath FROM [ajxp_groups] WHERE groupPath = %s", $groupPath);
-        $res = $test->fetchAll();
-        if(count($res)){
+        $test = dibi::query("SELECT COUNT(*) FROM [ajxp_groups] WHERE groupPath = %s", $groupPath);
+        if ($test->fetchSingle()) {
             dibi::query("UPDATE [ajxp_groups] SET [groupLabel]=%s WHERE [groupPath]=%s", $groupLabel, $groupPath);
         }else{
             dibi::query(
