@@ -37,7 +37,7 @@ class AJXP_Sabre_RootCollection extends Sabre\DAV\SimpleCollection
             foreach($repos as $repository){
                 $accessType = $repository->getAccessType();
                 $driver = AJXP_PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
-                if(is_a($driver, "AjxpWrapperProvider")){
+        if (is_a($driver, "AjxpWrapperProvider") && !$repository->getOption("AJXP_WEBDAV_DISABLED")) {
                     $this->children[$repository->getSlug()] = new Sabre\DAV\SimpleCollection($repository->getSlug());
                 }
             }
