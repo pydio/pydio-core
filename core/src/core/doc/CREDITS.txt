@@ -1,22 +1,22 @@
-<img src="plugins/gui.ajax/AjxpLogo250.png"/>
+<img src="plugins/gui.ajax/PydioLogo250.png"/>
 <div style="padding-left:10px;">Version __AJXP_VERSION__ - __AJXP_VERSION_DATE__
 
-Copyright 2007-2013 Charles du Jeu
-The latest code can be found at http://ajaxplorer.info/.
+Copyright 2007-2013 Abstrium SAS
+The latest code can be found at http://pyd.io/.
 
 ++ LICENSE ++
-AjaXplorer is free software: you can redistribute it and/or modify
+Pydio is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-AjaXplorer is distributed in the hope that it will be useful,
+Pydio is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
-along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ++ CONTRIBUTORS ++

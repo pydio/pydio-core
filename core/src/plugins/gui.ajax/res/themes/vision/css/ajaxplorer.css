@@ -200,9 +200,9 @@ div.thumbnail_cell_metadata span.metadata_chunk{
 
 .thumbnail_iconlike_shadow{
     border: 1px solid white;
-    -webkit-box-shadow: 0 0 5px #666666;
-    -moz-box-shadow: 0 0 5px #666666;
-    box-shadow: 0 0 5px #666666;
+    -webkit-box-shadow: 0 0 5px #5C5C5C;
+    -moz-box-shadow: 0 0 5px #5C5C5C;
+    box-shadow: 0 0 5px #5C5C5C;
 }
 
 .selectable_div div.selected{
@@ -332,7 +332,7 @@ div.shadow_class
     border-radius: 0 0 3px 3px;
     background-image: url('../images/grid_tl.png');
     border-top: 0;
-    color: #666666;
+    color: #5C5C5C;
 }
 
 .dialogContent input,
@@ -408,7 +408,7 @@ label.checkbox_label_left{
 
 .dialogLegend
 {
-    color: #666;
+    color: #5C5C5C;
     padding-bottom: 5px;
     line-height: 16px;
 }
@@ -454,7 +454,7 @@ span.ajxp-caret-up{
     top: -21px;
     left: 118px;
     font-size: 30px;
-    color: #666;
+    color: #5C5C5C;
 }
 
 .dialogButtonsCheckbox label{
@@ -500,7 +500,7 @@ span.ajxp-caret-up{
 
 textarea#myCode
 {
-    border: 1px solid #666;
+    border: 1px solid #5C5C5C;
     border-right-color: #ccc;
     border-left-color: #ccc;
 }
@@ -952,13 +952,11 @@ input.SF_input.SF_number{
 }
 
 #global_toolbar{
-    background-color: #666;
+    background-color: #5C5C5C;
     height: 30px;
     padding: 9px 0 0 5px;
     background-image: url("../images/white_logo.png");
     background-repeat: no-repeat;
-    background-position: 9px 7px;
-    background-size: 138px;
     box-shadow: 0 0 8px rgba(0,0,0,0.4);
 }
 
@@ -1841,7 +1839,7 @@ div.header_resizer div.ascending {
 .thumbnail_selectable_cell.detailed.droppableZone
 {
     background-color: #c3d9ff !important;
-    /*border: 1px dotted #666;*/
+    /*border: 1px dotted #5C5C5C;*/
 }
 
 .paginator
@@ -2077,7 +2075,7 @@ div#upload_files_list div, div#multiple_download_container div
     background-repeat: no-repeat;
     background-size: 0% 100%;
     border-bottom: 1px solid rgb(227, 229, 233);
-    color: #666;
+    color: #5C5C5C;
 }
 
 div#upload_files_list span.item_relative_path{
@@ -2183,7 +2181,7 @@ div#upload_files_list span.item_relative_path{
 
 
 #uploaderTextActions span:hover{
-    color: #666;
+    color: #5C5C5C;
 }
 
 
@@ -2313,6 +2311,7 @@ span.toggleHeader{
     text-overflow: ellipsis;
     padding: 6px 6px;
     background-color: rgb(111, 123, 136);
+    transition: background-color 0.3s ease;
 }
 
 span.toggleHeader.toggleInactive{
@@ -2359,6 +2358,19 @@ div.tabulatorContainer.icons_only div.toolbarGroup span[class*=" icon-"]
 {
     display: inline;
     font-size: 1em;
+}
+
+div.tabulatorContainer span.tab_close_button {
+    margin-left: 6px;
+    cursor: pointer;
+}
+
+div.tabulatorContainer span.toggleInactive span.tab_close_button {
+    color: rgb(111, 123, 136);
+}
+
+div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
+    color: #ffffff;
 }
 
 .panelHeader.panelHeaderWithIcon{
@@ -2832,7 +2844,7 @@ div.selectable_div, .table_rows_container, #tree_container, #bottomSplitPane, .a
 }
 .vsplitbar.active
 {
-    background-color: #666;
+    background-color: #5C5C5C;
 }
 
 .hsplitbar.folded{
@@ -2854,7 +2866,7 @@ div.selectable_div, .table_rows_container, #tree_container, #bottomSplitPane, .a
 }
 .hsplitbar.active
 {
-    background-color: #666;
+    background-color: #5C5C5C;
 }
 
 .hsplitbar:hover{
@@ -3016,7 +3028,7 @@ fieldset
 
 legend
 {
-    color: #666;
+    color: #5C5C5C;
 }
 
 legend a{
@@ -3066,7 +3078,7 @@ legend a.active {
 
 .user_id b
 {
-    color: #666;
+    color: #5C5C5C;
 }
 #user_admin_bar, #repo_create_form, #log_chooser
 {
@@ -3098,7 +3110,7 @@ legend a.active {
 #log_chooser b
 {
     font-size: 15px;
-    color: #666;
+    color: #5C5C5C;
 }
 
 #user_pref_form input
@@ -3263,7 +3275,7 @@ span.user_entry_check{
     width: 84%;
     background-color: #EEE;
     margin: 0 6%;
-    box-shadow: 0 0 7px #666;
+    box-shadow: 0 0 7px #5C5C5C;
     padding: 1px 4px;
     border-radius: 0 0 7px 7px;
 
@@ -3612,7 +3624,7 @@ div.menu a {
     width: 250px !important;
     /* IE */
     width:expression("250px");
-    background-color: #666;
+    background-color: #5C5C5C;
 }
 
 .rootDirChooser span.ajxp_icon_span{
@@ -3923,6 +3935,10 @@ input#webdav_password{
     margin-left: 10px !important;
 }
 
+#cpane_tabs .video-js-box{
+    margin-left: 0 !important;
+}
+
 .video-js-box.vjs-fullscreen{
     margin-left: 0 !important;
 }
@@ -4110,10 +4126,38 @@ td.ip_geo_cell{
     height: 19px;
 }
 
+#files_list_header{
+    font-size: 11px;
+    padding: 5px 3px 3px 8px;
+    letter-spacing: 1px;
+    background-color: #FFFFFF;
+    border-bottom: 1px solid rgb(187, 187, 187);
+    color: rgb(111, 123, 136);
+    border-left: 1px solid rgb(187, 187, 187);
+    border-right: 1px solid rgb(187, 187, 187);
+}
+
+#files_list_header > #display_toolbar a:hover,
+#files_list_header > #display_toolbar a
+{
+    color: rgb(111, 123, 136) !important;
+}
+
+#cpane_tabs span.toggleHeader{
+    padding: 6px 10px;
+}
+
+#cpane_tabs span.toggleInactive{
+    border-right: 1px dotted rgb(111, 123, 136);
+}
+
+#cpane_tabs span.toggleInactiveBeforeActive{
+    border-right: 0;
+}
+
 #breadcrumb{
     display: inline-block;
     overflow: hidden;
-    float: left;
 }
 
 #breadcrumb div.inner_bread{
@@ -4136,10 +4180,12 @@ td.ip_geo_cell{
 
 #breadcrumb span.ajxp-goto-refresh {
     display: none;
+    text-decoration: none !important;
 }
 
 #breadcrumb span.ajxp-goto:hover {
-    color: rgb(253, 252, 228);
+    /*color: rgb(253, 252, 228);*/
+    text-decoration: underline;
 }
 
 #breadcrumb span.ajxp-goto:hover span.ajxp-goto-refresh {

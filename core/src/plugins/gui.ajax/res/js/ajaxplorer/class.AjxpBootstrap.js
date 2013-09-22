@@ -243,7 +243,7 @@ Class.create("AjxpBootstrap", {
             }
 			html+='	<div id="progressBox" class="dialogBox" style="width: 320px;display:block;top:30%;z-index:2002;left:40%;position: absolute;background-color: #fff;padding: 0;">';
 			html+='	<div align="left" class="dialogContent" style="background-image:none; font-size: 13px;line-height: 1.5em;border-radius: 3px;padding: 0; border-width:0">';
-			var icon = customWording.icon || ajxpResourcesFolder+'/../../../AjxpLogo250.png';
+			var icon = customWording.icon || ajxpResourcesFolder+'/../../../PydioLogo250.png';
             if(customWording.icon_binary_url){
                 icon = this.parameters.get("ajxpServerAccess") + "&" + customWording.icon_binary_url;
             }
