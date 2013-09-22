@@ -513,13 +513,18 @@ class sqlConfDriver extends AbstractConfDriver {
      * @param string $groupLabel
      * @return mixed
      */
-    function createGroup($groupPath, $groupLabel){
-        dibi::query(
-            "INSERT INTO [ajxp_groups]",
-            array("groupPath" => $groupPath, "groupLabel" => $groupLabel),
-            "ON DUPLICATE KEY UPDATE %a",
-            array("groupPath" => $groupPath, "groupLabel" => $groupLabel)
-        );
+    public function createGroup($groupPath, $groupLabel)
+    {
+        $test = dibi::query("SELECT groupPath FROM [ajxp_groups] WHERE groupPath = %s", $groupPath);
+        $res = $test->fetchAll();
+        if(count($res)){
+            dibi::query("UPDATE [ajxp_groups] SET [groupLabel]=%s WHERE [groupPath]=%s", $groupLabel, $groupPath);
+        }else{
+            dibi::query(
+                "INSERT INTO [ajxp_groups]",
+                array("groupPath" => $groupPath, "groupLabel" => $groupLabel)
+            );
+        }
     }
 
     function relabelGroup($groupPath, $groupLabel){
