@@ -35,7 +35,7 @@ $mess=array(
 "An additionnal message displayed in the start up screen" => "An additionnal message displayed in the start up screen",
 "Client Session Config" => "Client Session Config",
 "Client Timeout" => "Client Timeout",
-"The length of the client session in SECONDS. By default, it's copying the server session length. In most PHP installation, it will be 1440, ie 24minutes. You can set this value to 0, this will make the client session 'infinite' by pinging the server at regular occasions (thus keeping the PHP session alive). This is not a recommanded setting for evident security reasons." => "The length of the client session in SECONDS. By default, it's copying the server session length. In most PHP installation, it will be 1440, ie 24minutes. You can set this value to 0, this will make the client session 'infinite' by pinging the server at regular occasions (thus keeping the PHP session alive). This is not a recommanded setting for evident security reasons.",
+"The length of the client session in SECONDS. By default, it's copying the server session length. In most PHP installation, it will be 1440, ie 24minutes. You can set this value to 0, this will make the client session 'infinite' by pinging the server at regular occasions (thus keeping the PHP session alive). This is not a recommanded setting for evident security reasons." => "The length of the client session in SECONDS. By default, it's copying the server session length. In most PHP installation, it will be 1440, ie 24minutes. You can set this value to -1, this will make the client session 'infinite' by pinging the server at regular occasions (thus keeping the PHP session alive). This is not a recommanded setting for evident security reasons.",
 "Warning Before" => "Warning Before",
 "Number of MINUTES before the session expiration for issuing an alert to the user" => "Number of MINUTES before the session expiration for issuing an alert to the user",
 "Google Analytics" => "Google Analytics",
@@ -46,4 +46,3 @@ $mess=array(
 "Analytics Events" => "Analytics Events",
 "Use Events Logging, experimental only implemented on download action in AjaXplorer" => "Use Events Logging, experimental only implemented on download action in AjaXplorer",
 );
-?>

@@ -301,6 +301,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
         }else{
             $to = $timeoutTime;
         }
+        if(session_name() == "AjaXplorer_Shared") $to = -1;
         $config["client_timeout"] = $to;
         $config["client_timeout_warning"] = $this->getFilteredOption("CLIENT_TIMEOUT_WARN");
         $config["availableLanguages"] = ConfService::getConf("AVAILABLE_LANG");
