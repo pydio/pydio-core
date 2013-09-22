@@ -3,7 +3,7 @@
     <server_settings>
         <global_param name="SHOW_CUSTOM_FOOTER" type="boolean" label="CONF_MESSAGE[Custom Footer]" description="CONF_MESSAGE[Show a custom footer div]" mandatory="false" default="false"/>
         <global_param name="CUSTOM_FOOTER_CONTENT" type="textarea" label="CONF_MESSAGE[Footer Content]" description="CONF_MESSAGE[Display this content in the footer]" mandatory="false" default="Your custom footer content"/>
-        <global_param expose="true" name="CUSTOM_BUTTON_TARGET" type="string" label="CONF_MESSAGE[Button Target Url]" description="CONF_MESSAGE[The target URL of the button that will be added to the application]" mandatory="true" default="http://www.ajaxplorer.info"/>
+        <global_param expose="true" name="CUSTOM_BUTTON_TARGET" type="string" label="CONF_MESSAGE[Button Target Url]" description="CONF_MESSAGE[The target URL of the button that will be added to the application]" mandatory="true" default="http://pyd.io"/>
     </server_settings>
 
     <client_settings>
