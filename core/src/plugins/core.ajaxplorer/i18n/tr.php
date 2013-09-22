@@ -1,25 +1,25 @@
 <?php
 /*
-* Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
-* This file is part of AjaXplorer.
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* This file is part of Pydio.
 *
-* AjaXplorer is free software: you can redistribute it and/or modify
+* Pydio is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Affero General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
 *
-* AjaXplorer is distributed in the hope that it will be useful,
+* Pydio is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU Affero General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+* along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://www.ajaxplorer.info/>.
+* The latest code can be found at <http://pyd.io/>.
 */
 //	Turkish translation by: Heron / date: 23 october 2011 (second revision, it feels good to help!)
-//  transilated version: AjaXplorer-core-3.3.2 (release date: 25 septembre 2011)
+//  transilated version: Pydio-core-3.3.2 (release date: 25 septembre 2011)
 
 $mess=array(
 "languageLabel" => "T&uuml;rk&#231;e",
@@ -191,9 +191,9 @@ $mess=array(
 "164" => "&#199;IKI&#350;",
 "165" => "AYARLAR",
 "166" => "HAKKINDA",
-"167" => "AjaXplorer hakk&#305;nda",
-"168" => "AjaXplorer'e ba&#287;lan",
-"169" => "AjaXplorer'le ba&#287;lant&#305;y&#305; kes",
+"167" => "Pydio hakk&#305;nda",
+"168" => "Pydio'e ba&#287;lan",
+"169" => "Pydio'le ba&#287;lant&#305;y&#305; kes",
 "170" => "Mevcut dosya",
 "parent_access_key" => "U",
 "refresh_access_key" => "Y",
@@ -416,8 +416,8 @@ $mess=array(
 "366" => "Bu kullan&#305;c&#305;n&#305;n herhangi bir faal muhafazas&#305; yok.",
 "367" => "Bu tip dosyalar&#305; y&uuml;kleme iznin yok. L&uuml;tfen ai&#351;a&#287;&#305;daki uzant&#305;lardan bir se&#231;im yap : ",
 "368" => "Se&#231;im ar&#351;ivden %s dosyaya %s ba&#351;ar&#305;yla a&#231;&#305;ld&#305;",
-"369" => "AjaXplorer Ba&#287;lant&#305;s&#305;",
-"370" => "AjaXplorer Genel Indirim",
+"369" => "Pydio Ba&#287;lant&#305;s&#305;",
+"370" => "Pydio Genel Indirim",
 "371" => "Bu indirim i&#231;in bir i&#351;ifre gerekli",
 "372" => "Mevcut Depo",
 "373" => "Hedef",
@@ -436,7 +436,7 @@ $mess=array(
 "389" => "L&uuml;tfen a&#351;a&#287;&#305;daki kodu okuyun :",
 "390" => "Kod",
 "391" => "Depolama yok",
-"392" => "Dikkat, AjaXplorer s&uuml;r&uuml;m&uuml; de&#287;i&#351;ti (&#351;imdi %s), l&uuml;tfen internet gezgini belle&#287;ini temizleyin ve her&#351;eyin d&uuml;zg&uuml;n &#231;al&#305;&#351;t&#305;&#287;&#305;na emin olmak i&#231;in sayfay&#305; g&uuml;ncelleyin!",
+"392" => "Dikkat, Pydio s&uuml;r&uuml;m&uuml; de&#287;i&#351;ti (&#351;imdi %s), l&uuml;tfen internet gezgini belle&#287;ini temizleyin ve her&#351;eyin d&uuml;zg&uuml;n &#231;al&#305;&#351;t&#305;&#287;&#305;na emin olmak i&#231;in sayfay&#305; g&uuml;ncelleyin!",
 "393" => "Dikkat, isim uzunlu&#287;u alt&#305;nda olmal&#305;d&#305;r %s, bu dosya ismi k&uuml;&#231;&uuml;lt&uuml;lecektir!",
 "394" => "&Uuml;zg&uuml;n&uuml;m, &#351;u an ge&#231;erli y&#246;nlendirici kullan&#305;m&#305;yla dosya b&#246;l&uuml;&#351;&uuml;m&uuml; m&uuml;mk&uuml;n de&#287;il (kullan&#305;c&#305;lar okunur de&#287;iller). Dosya b&#246;l&uuml;&#351;&uuml;m&uuml; yinede m&uuml;mk&uuml;n.",
 "395" => "d&uuml;&#351;&uuml;rd&uuml;&#287;&uuml;n &#246;&#287;e bir klas&#246;r gibi g&#246;r&uuml;n&uuml;yor, ve klas&#246;rler servere y&uuml;klenemez! y&uuml;klemeyi istedi&#287;inden eminmisin?",
@@ -448,7 +448,7 @@ $mess=array(
 "401" => "Sen indirebilirsin ve takipteki yaz&#305;l&#305;m&#305; komp&uuml;terindeki par&#231;alar&#305; bir kerede birle&#351;tirmek i&#231;in kurabilirsin : ",
 "402" => "http://www.hjsplit.org/",
 "403" => "WebDAV Se&#231;enekleri",
-"404" => "WebDAV protokolunu AjaXplorer depolar&#305;n&#305; 'network drive/a&#287; s&uuml;r&uuml;m&uuml;' bi&#231;iminde de&#287;i&#351;ik tabanlarda monte etmede kullanabilirsin, dahil olanlar Windows, Mac, iPhone, vsr.",
+"404" => "WebDAV protokolunu Pydio depolar&#305;n&#305; 'network drive/a&#287; s&uuml;r&uuml;m&uuml;' bi&#231;iminde de&#287;i&#351;ik tabanlarda monte etmede kullanabilirsin, dahil olanlar Windows, Mac, iPhone, vsr.",
 "405" => "Girdi&#287;in kullan&#305;c&#305; ad&#305; ve &#351;ifre ile depolara eri&#351;mek i&#231;in a&#351;a&#287;&#305;daki URL'leri kullan&#305;n. Uyar&#305;, bu &#246;zelli&#287;i 'devir i&#231;i' yap&#305;p ve &#351;ifreni girene kadar &#231;al&#305;&#351;maz.",
 "406" => "WebDav hisselerini devir i&#231;i yapmak",
 "407" => "E&#287;er bu webDav hisselerini devir i&#231;i yapman&#305;n ilk seferi ise &#351;ifreni gir, veya yeni bir &#351;ifre girmek istersen :",

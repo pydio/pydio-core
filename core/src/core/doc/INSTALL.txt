@@ -1,5 +1,5 @@
  ------------------------------------------------
-|      AjaXplorer Installation Instructions      |
+|      Pydio Installation Instructions      |
  ------------------------------------------------
  
  1 SYSTEM REQUIREMENTS & QUICK INSTALL
@@ -22,38 +22,38 @@
  
  2.1 WORKSPACES (previously "Repositories")
     
-    In AjaXplorer, a workspace is a folder that you want to browse/modify with
+    In Pydio, a workspace is a folder that you want to browse/modify with
     the application. A workspace does not have to be inside the ajaxplorer installation
     folder, since you set it with an absolute path on your server.
     
     You can set as many repositories as you want : you will be able to switch from one to 
-    another when logged to AjaXplorer, and you can precisely set rights for each users (see 
+    another when logged to Pydio, and you can precisely set rights for each users (see
     paragraph 2.2) on each workspace.
     
     By default, the basic workspace is set to the "files" folder inside the ajaxplorer
     installation folder. You can change it to whatever you want, using absolute path 
     like : /home/login/www/location, or /C:/myfolder/ on windows.
     
-    Note that a workspace does not have to be accessible to the internet, AjaXplorer will
+    Note that a workspace does not have to be accessible to the internet, Pydio will
     work as a "proxy" between your files and the web.
     
  2.2 USERS MANAGEMENT
     
-    An evoluted users management system has been developed in AjaXplorer. You are encouraged 
+    An evoluted users management system has been developed in Pydio. You are encouraged
     to use it to secure your data, but it's up to you, you can disable it totally (for example 
     if you are already working in a very secure zone, and don't need any users profiles).
     
     If you are a beginner, just change the ADMIN_PASSWORD variable before uploading on your 
     server everything should be fine. If you do not change it, you will be reminded to change 
-    the first time you log in, because otherwise anybody knowing AjaXplorer could login with 
+    the first time you log in, because otherwise anybody knowing Pydio could login with
     the standard initial password "admin"...
     
-    You can add / modify / delete users by logging in AjaXplorer as "admin" and clicking on 
+    You can add / modify / delete users by logging in Pydio as "admin" and clicking on
     "Settings" button. For each user, you will be able to give read and/or right access separately 
     on each workspace. Note that a user that has no rights on any workspace cannot log in.
     
-    For a better integration in existing systems, AjaXplorer can "prelog" a user from external 
-    data or logging system. Users must still be created in AjaXplorer, since their rights on 
+    For a better integration in existing systems, Pydio can "prelog" a user from external
+    data or logging system. Users must still be created in Pydio, since their rights on
     repositories and preferences are stored by the application. But they will not be able to 
     change their password, since they are in that case managed by an external application.
     

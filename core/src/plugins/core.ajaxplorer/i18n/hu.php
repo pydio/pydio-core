@@ -1,22 +1,22 @@
 <?php
 /*
-* Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
-* This file is part of AjaXplorer.
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* This file is part of Pydio.
 *
-* AjaXplorer is free software: you can redistribute it and/or modify
+* Pydio is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Affero General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
 *
-* AjaXplorer is distributed in the hope that it will be useful,
+* Pydio is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU Affero General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+* along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://www.ajaxplorer.info/>.
+* The latest code can be found at <http://pyd.io/>.
 */
 //  hungarian translation: Gyarmati Balázs <gyarmati.balazs@gmail.com>
 //  fixes, additions: Levente Huszkó <levente.huszko@gmail.com>
@@ -194,7 +194,7 @@ $mess=array(
 "166"=> "Infó",
 "167"=> "Infó az AjaXplorerről",
 "168" => "Kapcsolódás az AjaXplorerhez",
-"169" => "Az AjaXplorer kapcsolat bontása",
+"169" => "Az Pydio kapcsolat bontása",
 "170" => "Jelenlegi mappa",
 "parent_access_key" => "ü",
 "refresh_access_key" => "r",
@@ -418,8 +418,8 @@ $mess=array(
 "366" => "Ennek a felhasználónak nincs aktív hozzáférési mappája.",
 "367" => "Nem tölthetsz fel ilyen típusú fájlt. Válassz ezekből a kiterjesztésekből : ",
 "368" => "Sikeres kitömörítés a kiválasztott %s fájlból a %s mappába",
-"369" => "AjaXplorer Link",
-"370" => "AjaXplorer publikus letöltés",
+"369" => "Pydio Link",
+"370" => "Pydio publikus letöltés",
 "371" => "A letölthéshez jelszó kell",
 "372" => "Jelenlegi gyűjtemény",
 "373" => "Cél",
@@ -438,7 +438,7 @@ $mess=array(
 "389" => "Olvasd el az alábbi kódot :",
 "390" => "Kód",
 "391" => "Nincs gyűjtemény",
-"392" => "Figyelmeztetés, az AjaXplorer verziója megváltozott (jelenleg %s), kérlek töröld a böngésző gyorsítótárat és frissíts az oldalt, hogy minden biztosan megfelelően működjön!",
+"392" => "Figyelmeztetés, az Pydio verziója megváltozott (jelenleg %s), kérlek töröld a böngésző gyorsítótárat és frissíts az oldalt, hogy minden biztosan megfelelően működjön!",
 "393" => "Figyelmeztetés, a név hossza kevesebb, mint %s lehet, ennek a fájlnak a neve csonkítva lesz!",
 "394" => "Sajnos a pillanatnyi auth driverrel nem lehetséges a mappa megosztás (a felhasználók nem szerkeszthetők). A fájlmegosztás lehetséges.",
 "395" => "A bedobott elem egy mappának tűnik és mappákat nem lehet a szerverre feltölteni! Folytatod?",
@@ -450,7 +450,7 @@ $mess=array(
 "401" => "Az alábbi alkalmazást alkalmas a letöltött darabok egyesítéséhez : ",
 "402" => "http://www.hjsplit.org/",
 "403" => "WebDAV beállítások",
-"404" => "A WebDAV protokol arra használható, hogy az AjaXplorer gyűjteményeket, mint 'hálózati meghajtót' beállítsd különböző klienseken, mint a Windows, Mac, iPhone, stb.",
+"404" => "A WebDAV protokol arra használható, hogy az Pydio gyűjteményeket, mint 'hálózati meghajtót' beállítsd különböző klienseken, mint a Windows, Mac, iPhone, stb.",
 "405" => "Használd a következő URL címet a gyűjteményeid eléréséhez a megadott felhasználónévvel és jelszóval. Figyelem, ez csak azután működik, hogy ezt a funkciót 'aktív' állapotba állítod és beírod a jelszavad.",
 "406" => "WebDAV megosztások aktiválása",
 "407" => "Írd be a jelszavad, ha első alkalommal aktiválod a WebDAV megosztásokat, vagy ha új jelszót kívánsz megadni :",

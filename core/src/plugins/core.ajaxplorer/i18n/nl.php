@@ -1,22 +1,22 @@
 <?php
 /*
-* Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
-* This file is part of AjaXplorer.
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* This file is part of Pydio.
 *
-* AjaXplorer is free software: you can redistribute it and/or modify
+* Pydio is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Affero General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
 *
-* AjaXplorer is distributed in the hope that it will be useful,
+* Pydio is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU Affero General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+* along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://www.ajaxplorer.info/>.
+* The latest code can be found at <http://pyd.io/>.
 */
 //  Dutch translation Jasper Vermeulen
 //  + update Luk Boone 2009/05/24 (version 2.4 - 2009/03/26)
@@ -194,9 +194,9 @@ $mess=array(
 "164"=> "Log uit",
 "165"=> "Instellingen",
 "166"=> "Over",
-"167"=> "Over AjaXplorer",
-"168" => "Verbinden met AjaXplorer",
-"169" => "Verbreek verbinding met AjaXplorer",
+"167"=> "Over Pydio",
+"168" => "Verbinden met Pydio",
+"169" => "Verbreek verbinding met Pydio",
 "170" => "Huidige map",
 "parent_access_key" => "o",
 "refresh_access_key" => "r",
@@ -419,8 +419,8 @@ $mess=array(
 "366" => "Deze gebruiker heeft geen actieve opslagplaats.",
 "367" => "U wordt niet toegestaan dit type bestand te uploaden. Kies uit de volgende extensies: ",
 "368" => "Selectie succesvol uitgepakt uit archief %s naar map %s",
-"369" => "Koppeling AjaXplorer",
-"370" => "Openbare download AjaXplorer",
+"369" => "Koppeling Pydio",
+"370" => "Openbare download Pydio",
 "371" => "Een wachtwoord is vereist voor deze download",
 "372" => "Huidige opslagplaats",
 "373" => "Bestemming",
@@ -439,7 +439,7 @@ $mess=array(
 "389" => "Lees de onderstaande code:",
 "390" => "Code",
 "391" => "Geen opslagplaats",
-"392" => "Waarschuwing: de versie van AjaXplorer is gewijzigd (nu %s). Wis het cache van uw browser en vernieuw de pagina om u ervan te verzekeren dat alles functioneert!",
+"392" => "Waarschuwing: de versie van Pydio is gewijzigd (nu %s). Wis het cache van uw browser en vernieuw de pagina om u ervan te verzekeren dat alles functioneert!",
 "393" => "Waarschuwing: de lengte van de namen moet korter zijn dan %s. Deze bestandsnaam wordt afgekapt!",
 "394" => "Het spijt ons. Het delen van mappen is op dit ogenblik niet mogelijk met het huidige verificatiestuurprogramma (gebruikers zijn niet bewerkbaar). Het delen van bestanden is echter wel nog mogelijk.",
 "395" => "Het door u neergezette item is een map. Mappen kunnen niet worden geüpload naar servers! Weet u zeker dat u wilt doorgaan met de upload?",
@@ -451,7 +451,7 @@ $mess=array(
 "401" => "U kunt de volgende software downloaden en installeren om de delen samen te voegen zodra deze zich op uw computer bevinden: ",
 "402" => "http://www.hjsplit.org/",
 "403" => "WebDAV Preferences",
-"404" => "You can use the WebDAV protocol to mount your AjaXplorer repositories as a 'network drive' on various clients, including Windows, Mac, iPhone, etc.",
+"404" => "You can use the WebDAV protocol to mount your Pydio repositories as a 'network drive' on various clients, including Windows, Mac, iPhone, etc.",
 "405" => "Use the following URLS to access your repositories, with your username and the password you entered. Warning, this won't work until you set this feature as 'active' and you enter your password.",
 "406" => "Activate WebDAV shares",
 "407" => "Enter your password if it's the first time that you are activating webDAV shares, or if you want to re-type a new password :",

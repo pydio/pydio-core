@@ -1,22 +1,22 @@
 <?php
 /*
-* Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
-* This file is part of AjaXplorer.
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* This file is part of Pydio.
 *
-* AjaXplorer is free software: you can redistribute it and/or modify
+* Pydio is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Affero General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
 *
-* AjaXplorer is distributed in the hope that it will be useful,
+* Pydio is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU Affero General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+* along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://www.ajaxplorer.info/>.
+* The latest code can be found at <http://pyd.io/>.
 */
 //  French Translation by Charles du Jeu, corrected by GravuTrad
 $mess=array(
@@ -199,7 +199,7 @@ $mess=array(
 "164"=> "Déconnexion",
 "165"=> "Paramètres",
 "166"=> "A propos",
-"167"=> "A propos d'AjaXplorer",
+"167"=> "A propos d'Pydio",
 "168" => "Connexion",
 "169" => "Déconnexion",
 "170" => "Répertoire Courant :",
@@ -425,7 +425,7 @@ $mess=array(
 "367" => "Vous n'êtes pas autorisé à uploader ce type de fichier. Veuillez choisir parmi les extensions suivantes : ",
 "368" => "La sélection a été extraite de l'archive %s dans le répertoire %s",
 "369" => "Raccourci",
-"370" => "Téléchargement public AjaXplorer",
+"370" => "Téléchargement public Pydio",
 "371" => "Un mot de passe est nécessaire pour ce téléchargement",
 "372" => "Dépôt Courant",
 "373" => "Destination",
@@ -444,7 +444,7 @@ $mess=array(
 "389" => "Merci de recopier le code ci-dessous :",
 "390" => "Code",
 "391" => "Pas de dépôt",
-"392" => "Attention, la version de AjaXplorer (%s) a changé, merci de vider votre cache et rafraichir la page.",
+"392" => "Attention, la version de Pydio (%s) a changé, merci de vider votre cache et rafraichir la page.",
 "393" => "Attention, les noms de fichiers sont limités à %s caractères, celui-ci sera tronqué!",
 "394" => "Désolé, pour le moment la fonctionnalité de partage des utilisateurs ne fonctionne pour le driver d'authentification utilisé (les utilisateurs ne sont pas éditables). En revanche le partage de fichier fonctionne.",
 "395" => "L'object que vous avez deposé semble etre un dossier, ces derniers ne peuvent etre envoyés sur le serveur! Etes vous sur de vouloir envoyer ?",
@@ -456,7 +456,7 @@ $mess=array(
 "401" => "Vous pouvez télécharger et installer le logiciel suivant pour recoller les morceaux sur votre ordinateur : ",
 "402" => "http://www.hjsplit.org/",
 "403" => "Préférences WebDAV",
-"404" => "WebDAV est un protocole permettant de 'monter' vos espaces de travail AjaXplorer comme des disques durs réseaux, directement sur votre bureau. Pour activer cette fonctionnalité, cochez la case et entrez un mot de passe s'il vous est demandé.",
+"404" => "WebDAV est un protocole permettant de 'monter' vos espaces de travail Pydio comme des disques durs réseaux, directement sur votre bureau. Pour activer cette fonctionnalité, cochez la case et entrez un mot de passe s'il vous est demandé.",
 "405" => "Pour vous connecter, vous seront demandés une adresse internet, un identifiant et un mot de passe. Utilisez l'URL ci-dessous et vos identifiants standards.",
 "406" => "Activer les partages webDAV.",
 "407" => "Entrez votre mot de passe si c'est la première fois que vous activez webDAV, ou que vous désirez le changer :",

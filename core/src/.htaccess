@@ -5,7 +5,7 @@
 # and that you want the webDAV shares to be accessible via 
 # http://yourdomain/ajaxplorer/shares/repository_id/
 RewriteEngine on
-RewriteBase /ajaxplorer
+RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^shares ./dav.php [L]

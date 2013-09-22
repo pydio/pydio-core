@@ -1,28 +1,28 @@
 /*
- * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
- * This file is part of AjaXplorer.
+ * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
  *
- * AjaXplorer is free software: you can redistribute it and/or modify
+ * Pydio is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * AjaXplorer is distributed in the hope that it will be useful,
+ * Pydio is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://www.ajaxplorer.info/>.
+ * The latest code can be found at <http://pyd.io/>.
  */
 var currentLink;
 function parseLinks(){
-    var bmlink1 = '<a id="ajxp_bm_link_dl1" title="Send to AjaXplorer">\
+    var bmlink1 = '<a id="ajxp_bm_link_dl1" title="Send to Pydio">\
                 Download <img ajxp_image="true" src="'+window.ajxp_bm_target+'/plugins/gui.ajax/res/themes/umbra/images/actions/22/forward_22.png" align="absmiddle"><img align="absmiddle" ajxp_image="true" src="'+window.ajxp_bm_target+'/plugins/gui.ajax/res/themes/umbra/images/actions/32/hdd_external_unmount.png"></a>';
 	jQuery('body').append('<link rel="stylesheet" type="text/css" href="'+ajxp_bm_target+'plugins/downloader.http/bookmarklet/ajxp.css"></link>');
-	jQuery('body').append('<div id="ajxp_bm_main" style="display:none;" class="ajxp_bm_menu" ><div><a id="ajxp_bm_close" style="float:right;font-size:12px;cursor:pointer;border-left:1px solid #fff;padding-left: 10px;">X</a>AjaXplorer direct download</div><div class="ajxp_bm_menu_legend">Click on any link or image to send the link directly to your AjaXplorer account.</div><div style="display:none" id="ajxp_bm_frame_div"><iframe frameborder="0" id="ajxp_bm_iframe"></iframe></div></div><div style="position:absolute;" class="ajxp_bm_menu" id="ajxp_bm_link_menu">'+bmlink1+'<a id="ajxp_bm_link_dl2">Process link normally</a></div>').click(function(){jQuery('#ajxp_bm_link_menu').slideUp();}) ;
+	jQuery('body').append('<div id="ajxp_bm_main" style="display:none;" class="ajxp_bm_menu" ><div><a id="ajxp_bm_close" style="float:right;font-size:12px;cursor:pointer;border-left:1px solid #fff;padding-left: 10px;">X</a>Pydio direct download</div><div class="ajxp_bm_menu_legend">Click on any link or image to send the link directly to your Pydio account.</div><div style="display:none" id="ajxp_bm_frame_div"><iframe frameborder="0" id="ajxp_bm_iframe"></iframe></div></div><div style="position:absolute;" class="ajxp_bm_menu" id="ajxp_bm_link_menu">'+bmlink1+'<a id="ajxp_bm_link_dl2">Process link normally</a></div>').click(function(){jQuery('#ajxp_bm_link_menu').slideUp();}) ;
 
     jQuery('#ajxp_bm_main').css("background-color", "#ffffff").css("width", "400px").css("font-size","29px").css("line-height","auto");
     window.setTimeout(function(){

@@ -7,7 +7,7 @@
     <plugin_info>
         <plugin_author>Charles du Jeu</plugin_author>
         <plugin_version>follow</plugin_version>
-        <plugin_uri>http://ajaxplorer.info/plugins/core/ajaxplorer</plugin_uri>
+        <plugin_uri>http://pyd.io/plugins/core/ajaxplorer</plugin_uri>
         <core_relation packaged="true" tested_version="follow_core"/>
     </plugin_info>
     <client_settings>

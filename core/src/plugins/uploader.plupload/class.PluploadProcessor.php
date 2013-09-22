@@ -3,11 +3,11 @@
  * @package info.ajaxplorer
  *
  * Copyright 2007-2009 Charles du Jeu
- * This file is part of AjaXplorer.
- * The latest code can be found at http://www.ajaxplorer.info/
+ * This file is part of Pydio.
+ * The latest code can be found at http://pyd.io/
  *
  * This program is published under the LGPL Gnu Lesser General Public License.
- * You should have received a copy of the license along with AjaXplorer.
+ * You should have received a copy of the license along with Pydio.
  *
  * The main conditions are as follow :
  * You must conspicuously and appropriately publish on each copy distributed
@@ -28,7 +28,7 @@
  * least three years, to furnish the complete corresponding machine-readable source code.
  *
  * Any of the above conditions can be waived if you get permission from the copyright holder.
- * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * Pydio is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  * Description : Class for handling flex upload

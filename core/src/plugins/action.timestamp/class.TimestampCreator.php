@@ -1,6 +1,6 @@
 <?php
 /*
-Timestamp plugin by Ffdecourt (fdecourt@gmail.com) for Ajaxplorer
+Timestamp plugin by Ffdecourt (fdecourt@gmail.com) for Pydio
 This plugin allows you to add a certified timestamp by Universign.eu on your documents.
 v0.1
 */

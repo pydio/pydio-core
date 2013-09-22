@@ -148,7 +148,7 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 				modal.showDialogForm(
-					'Ajaxplorer',
+					'Pydio',
 					'splash_form',
 					function(oForm){
 						var docDiv = $(oForm).down('#docDiv');

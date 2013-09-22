@@ -3,7 +3,7 @@
     <plugin_info>
         <plugin_author>Janos Milus</plugin_author>
         <plugin_version>1.0</plugin_version>
-        <plugin_uri>http://ajaxplorer.info/plugins/auth/serial_otp</plugin_uri>
+        <plugin_uri>http://pyd.io/plugins/auth/serial_otp</plugin_uri>
         <core_relation packaged="false" tested_version="5.0.1"/>
     </plugin_info>
     <client_settings>

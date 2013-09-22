@@ -28,7 +28,7 @@
 </style>
 </head>
 <body bgcolor="#FFFFFF">
-<h2 class="style1">AjaXplorer Users Manual</h2>
+<h2 class="style1">Pydio Users Manual</h2>
 <p class="style4">AjaXplorer is an easy-to-install file explorer for   remotely managing files on a web server or operation as a simple file-sharing   system.  Its rich layout and actions make it easily accessible to virtually any   end-user.  It requires PHP and server access (either local or remote via FTP)   for installation.  It uses an AJAX based interface, providing streamlined and intuitive functionalities, similar to   that of a standard file-system explorer on any operating system.</p>
 <p class="style1"><strong>Quick Links:</strong></p>
 <p class="style4">Project: <a href="http://ajaxplorer.info/">http://ajaxplorer.info/</a><br />
@@ -214,7 +214,7 @@
   <li class="style4">Copy: Make a duplicate of selected file(s) or folders.</li>
   <li class="style4">Move: Relocate selected file(s) or folders to a different location in the current repository.</li>
   <li class="style4">Delete: Delete selected file(s) or folders from the current repository. Deleted items will move to the recycle bin, if enabled in the <a href="#c25">Settings</a>.</li>
-  <li class="style4">Logout: Terminate the active session in AjaXplorer.</li>
+  <li class="style4">Logout: Terminate the active session in Pydio.</li>
 </ul>
 <hr />
 <p class="style1">Chapter 4: Details/Search Pane</p>
@@ -238,20 +238,20 @@
 <p class="style4">Note: Admin account is required to change server settings. <strong>[default username=admin /  password=admin]</strong></p>
 <p class="style4"><strong>7.1  User Management</strong><a name="c71" id="c71"></a></p>
 <p class="style4">In the Settings window, click <strong><em>User Management</em></strong> at the top. Under the section labeled <strong><em>Create User</em></strong>, you can specify a new username/password.</p>
-<p class="style4">The <em><strong>User List</strong></em> section displays all current users on your AjaXplorer file system. To edit a user, click on their name (must be done from admin account). You can specify their <strong><em>Repositories Rights</em></strong> (read/write privileges), modify their password or delete the account.</p>
+<p class="style4">The <em><strong>User List</strong></em> section displays all current users on your Pydio file system. To edit a user, click on their name (must be done from admin account). You can specify their <strong><em>Repositories Rights</em></strong> (read/write privileges), modify their password or delete the account.</p>
 <p class="style4"><strong>7.2 Repositories Management</strong><a name="c72" id="c72"></a></p>
 <p class="style4">In the Settings window, click <strong><em>Repositories Management</em></strong> at the top. All current repositories (file spaces) will be displayed here and new repositories can be created by giving them a unique label (name) and choosing an access driver.</p>
 <p class="style4">After specifying the name and driver, you must specify the path to root folder on the server (e.g. files/).  You also have the option to specify the name for the recycle bin folder to be used for deleted files.</p>
 <p class="style4">When finished, click <strong><em>Create</em></strong> (if it is a new repository) or <strong><em>Save</em></strong> (if modifying settings for an existing repository).</p>
 <p class="style4">To delete a repository, click the red <em>X</em> next to its name under the <strong><em>Repositories List</em></strong>.</p>
 <p class="style4"><strong>7.3 Logs<a name="c73" id="c73"></a></strong></p>
-<p class="style4">The built-in logging system in AjaXplorer is useful for debugging and troubleshooting your file server. In the Settings window, click <em><strong>Logs</strong></em> and specify a log file (by date) using the dropdown menu labeled<em><strong> Choose a log file</strong></em>. Log entries are sorted by <em>Date/Time, IP address, Level, User, Action </em>(whatever was done) <em>and Parameters </em>(specific to each operation)<em>.</em></p>
+<p class="style4">The built-in logging system in Pydio is useful for debugging and troubleshooting your file server. In the Settings window, click <em><strong>Logs</strong></em> and specify a log file (by date) using the dropdown menu labeled<em><strong> Choose a log file</strong></em>. Log entries are sorted by <em>Date/Time, IP address, Level, User, Action </em>(whatever was done) <em>and Parameters </em>(specific to each operation)<em>.</em></p>
 <hr />
 <p class="style1">Chapter 8: FAQ</p>
 <p class="style4"><strong>8.1 Where are the log files?</strong><a name="c81" id="c81"></a></p>
 <p class="style4">As admin, open the “Settings” window. You probably see a <em><strong>Logs</strong></em> tab but nothing listed inside of it. If so, there is probably a write permission missing -- the “logs” folder is created inside the “server” folder. Thus the <em>/path/to/install/server/</em> folder should be writeable.</p>
 <p class="style7">8.2 My file upload size is limited, how can I change this?<a name="c82" id="c82"></a></p>
-<p class="style4">File upload size limit is not an AjaXplorer limitation, but a server configuration for PHP. If on a shared host, it is unlikely that you can access this configuration. If you are on your own server and can edit the PHP configuration file (php.ini), please have a look at the “<a href="http://www.php.net/manual/en/ini.core.php#ini.upload-max-filesize">upload_max_filesize</a>” instruction on the PHP website.</p>
+<p class="style4">File upload size limit is not an Pydio limitation, but a server configuration for PHP. If on a shared host, it is unlikely that you can access this configuration. If you are on your own server and can edit the PHP configuration file (php.ini), please have a look at the “<a href="http://www.php.net/manual/en/ini.core.php#ini.upload-max-filesize">upload_max_filesize</a>” instruction on the PHP website.</p>
 <p class="style7">8.3 I created a repository but cannot see it?<a name="c83" id="c83"></a></p>
 <p class="style4">This often happens if you have created a repository but not granted access to this repository for each user. Logged in as “admin”, open the <em><strong>Settings</strong></em> window, <em><strong>Users Management</strong></em> tab, and give read/write access to the newly created repository to whichever user you want.</p>
 <p class="style7">8.4 How do I create user-specific repositories accessible only to them?<a name="c84" id="c84"></a></p>
@@ -262,12 +262,12 @@
   Create : “Yes”<br />
   Recycle bin folder : “recycle_bin”<br />
 </p>
-<p class="style4">(Each user will have their own unique repository and the admin can view them when browsing the <em>Default Repository</em> packed with AjaXplorer.)</p>
+<p class="style4">(Each user will have their own unique repository and the admin can view them when browsing the <em>Default Repository</em> packed with Pydio.)</p>
 <p class="style7">8.5 I want to develop my own extensions but the JavaScript and CSS files are unreadable?<a name="c85" id="c85"></a></p>
-<p class="style4">Change the $JS_DEBUG variable to true in the file index.php at line 72. After doing so, AjaXplorer will load all JS files and CSS files separately, instead of the big compressed file used normally.</p>
+<p class="style4">Change the $JS_DEBUG variable to true in the file index.php at line 72. After doing so, Pydio will load all JS files and CSS files separately, instead of the big compressed file used normally.</p>
 <hr />
 <p class="style1"><strong>Chapter 9:</strong> Credits<a name="c9" id="c9"></a></p>
-<p class="style4">AjaXplorer was created by <a href="mailto: cdujeu@users.sourceforge.net">Charles du Jeu</a>. Other developers include <a href="mailto: mbaudier@users.sourceforge.net">Mathieu Baudier</a>, <a href="mailto: trescott3@users.sourceforge.net">Trent Scott</a> and <a href="mailto: stagenex@users.sourceforge.net">Stage NexVistion</a>. </p>
+<p class="style4">Pydio was created by <a href="mailto: cdujeu@users.sourceforge.net">Charles du Jeu</a>. Other developers include <a href="mailto: mbaudier@users.sourceforge.net">Mathieu Baudier</a>, <a href="mailto: trescott3@users.sourceforge.net">Trent Scott</a> and <a href="mailto: stagenex@users.sourceforge.net">Stage NexVistion</a>. </p>
 <p class="style4">Components: WebFX widgets (XLoadTree, SortableTable and Selectable), LightBox modified by Leightbox, and the very nice CodePress syntax highlighter.</p>
 <p class="style4">Please visit our website, <a href="http://ajaxplorer.info">http://ajaxplorer.info</a> for more information.</p>
 </body>

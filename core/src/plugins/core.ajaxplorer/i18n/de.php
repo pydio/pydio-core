@@ -1,22 +1,22 @@
 <?php
 /*
-* Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
-* This file is part of AjaXplorer.
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* This file is part of Pydio.
 *
-* AjaXplorer is free software: you can redistribute it and/or modify
+* Pydio is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Affero General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
 *
-* AjaXplorer is distributed in the hope that it will be useful,
+* Pydio is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU Affero General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+* along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://www.ajaxplorer.info/>.
+* The latest code can be found at <http://pyd.io/>.
 */
 //	german translation: Philip Schädler <philip.schaedler@gmail.com>
 //  	+ last update: Axel Otterstätter <axel.otterstaetter@googlemail.com>
@@ -192,9 +192,9 @@ $mess=array(
 "164"=> "Abmelden",
 "165"=> "Einstellungen",
 "166"=> "Info",
-"167"=> "Über AjaXplorer",
+"167"=> "Über Pydio",
 "168" => "Anmelden",
-"169" => "AjaXplorer verlassen",
+"169" => "Pydio verlassen",
 "170" => "Aktueller Ordner",
 "parent_access_key" => "A",
 "refresh_access_key" => "k",
@@ -417,8 +417,8 @@ $mess=array(
 "366" => "Dieser Benutzer hat kein aktives Repository.",
 "367" => "Dieser Dateityp ist beim Hochladen nicht erlaubt. Bitte nur folgende Typen verwenden: ",
 "368" => "Die Auswahl wurde erfolgreich aus dem Archive %s in das Verzeichnis %s extrahiert.",
-"369" => "AjaXplorer Link",
-"370" => "AjaXplorer Öffentlicher Download",
+"369" => "Pydio Link",
+"370" => "Pydio Öffentlicher Download",
 "371" => "Für diesen Download wird ein Passwort benötigt",
 "372" => "Aktuelles Repository",
 "373" => "Ziel",
@@ -437,7 +437,7 @@ $mess=array(
 "389" => "Bitte den untenstehenden Code lesen:",
 "390" => "Code",
 "391" => "Kein Repository",
-"392" => "Achtung, die Version des AjaXplorer hat sich geändert (jetzt %s). Bitte den Browser-Cache leeren und die Seite neu laden!",
+"392" => "Achtung, die Version des Pydio hat sich geändert (jetzt %s). Bitte den Browser-Cache leeren und die Seite neu laden!",
 "393" => "Achtung, der Name muss kürzer als %s sein, dieser Dateiname wird abgeschnitten!",
 "394" => "Entschuldigung, aber zur Zeit ist das Teilen der Verzeichnisse (sharing) aufgrund des aktuellen Authentifizierungstreiber nicht möglich (Benutzer können nicht verändert werden). Aber das Datei-Sharing funktioniert.",
 "395" => "Das fallengelassene Element scheint ein Ordner zu sein, aber Verzeichnisse können nicht zum Server hochgeladen werden! Soll der Upload trotzdem gestartet werden?",
@@ -449,7 +449,7 @@ $mess=array(
 "401" => "Die folgenden Software herunterladen und installieren, um die einzelnen Segmente zusammen zufügen: ",
 "402" => "http://www.hjsplit.org/",
 "403" => "WebDAV Voreinstellungen",
-"404" => "Das WebDAV-Protokoll kann verwendet werden, um die AjaXplorer Repositories als 'Netzwerklaufwerk' unter Windows, Mac, iPhone usw. zu nutzen.",
+"404" => "Das WebDAV-Protokoll kann verwendet werden, um die Pydio Repositories als 'Netzwerklaufwerk' unter Windows, Mac, iPhone usw. zu nutzen.",
 "405" => "Nutzen Sie die folgenden URLs um auf die Repositories mit ihrem eingegebenen Benutzernamen und Passwort zu zugreifen. Achtung, die Freigabe arbeitet nur, wenn diese auf 'Aktiv' gesetzt ist und das Passwort eingegeben wurde.",
 "406" => "Aktiviere die WebDAV-Freigaben",
 "407" => "Bitte das Passwort eingeben, wenn die WebDAV-Freigaben zum ersten Mal aktiviert werden oder ein neues Passwort verwendet werden soll:",

@@ -1,21 +1,21 @@
 /*
- * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
- * This file is part of AjaXplorer.
+ * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
  *
- * AjaXplorer is free software: you can redistribute it and/or modify
+ * Pydio is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * AjaXplorer is distributed in the hope that it will be useful,
+ * Pydio is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://www.ajaxplorer.info/>.
+ * The latest code can be found at <http://pyd.io/>.
  */
 
 /**
@@ -247,7 +247,7 @@ Class.create("AjxpBootstrap", {
             if(customWording.icon_binary_url){
                 icon = this.parameters.get("ajxpServerAccess") + "&" + customWording.icon_binary_url;
             }
-			var title = customWording.title || "AjaXplorer";
+			var title = customWording.title || "Pydio";
 			var iconWidth = customWording.iconWidth || '35px';
 			var fontSize = customWording.titleFontSize || '35px';
             var titleDivSize = (customWording.iconHeight ? 'height:' + customWording.iconHeight + ';' : '');
@@ -260,7 +260,7 @@ Class.create("AjxpBootstrap", {
             html += '<div style="height: 85px;position: relative;" id="loader_round_progress"><div class="rotating" style="width: 0;height: 0;border: 24px solid rgb(0, 123, 219);border-radius: 50px;position: absolute;clip: rect(0px, 50px, 100px, 0px);left: 131px;top: 11px;color: white;font-size: 20px;">.</div></div>';
 			html += '<div style="padding:5px;font-size: 11px;line-height: 1.5em;" class="dialogFooter" id="loader_dialog_footer">';
             if(customWording.title.toLowerCase() != "ajaxplorer"){
-				html+='	<div style="padding:4px 7px;position: relative;"><div>AjaXplorer Community Edition<span id="version_span"></span></div>';
+				html+='	<div style="padding:4px 7px;position: relative;"><div>Pydio Community Edition<span id="version_span"></span></div>';
 			}else{
 				html+='	<div style="padding:4px 7px;position: relative;"><div>Build your own box! <span id="version_span"></span></div>';
 			}
@@ -345,9 +345,9 @@ Class.create("AjxpBootstrap", {
 	insertBasicSkeleton : function(desktopNode){
         var elem = new Element("div", {style:"position: absolute;z-index: 10000; bottom: 0; right: 0; color: #666;font-family: Arial;font-size: 11px;text-align: right;padding: 3px; padding-right: 10px;"});
         if(document.viewport.getWidth() < 500){
-            elem.update('AjaXplorer Community &copy; C. du Jeu 2008-2013');
+            elem.update('Pydio Community &copy; C. du Jeu 2008-2013');
         }else{
-            elem.update('AjaXplorer Community - Free non supported version &copy; C. du Jeu 2008-2013 - <a target="_blank" href="http://ajaxplorer.info/">http://ajaxplorer.info/</a>');
+            elem.update('Pydio Community - Free non supported version &copy; C. du Jeu 2008-2013 - <a target="_blank" href="http://pyd.io/">http://pyd.io/</a>');
         }
         $(desktopNode).insert({after:elem});
         disableTextSelection(elem);

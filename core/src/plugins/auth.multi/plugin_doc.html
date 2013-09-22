@@ -40,7 +40,7 @@
 <p>The <b>USER_ID_SEPARATOR</b> is important, as it is used to store locally the users data with a discrimination on where they come from. Here, once logged, an FTP user "mylogin" would in fact be handled by the system as "ftp_-_mylogin". Thus if the serial driver already has a "mylogin" user, they are not mixed. Be aware that some folders can be created with this complex user name (for example if you use the AJXP_USER keyword for some repositories), and for this reason the separator must be compliant with folder names! The first implementation of this plugin led to a bug because the separator used (::) was making any directory creation fail.
 
 </p>
-        <p><b>New in 4.2.0</b>: the MASTER_SLAVE mode allows you to configure auth.multi in an explicit Master(read only) / Slave (writeable) mode, which is a very common case. Generally, this will be an LDAP + Serial config, allowing to load users from an LDAP/AD directory, and allowing the users to share folders and create temporary users that will be stored locally in the AjaXplorer install.
+        <p><b>New in 4.2.0</b>: the MASTER_SLAVE mode allows you to configure auth.multi in an explicit Master(read only) / Slave (writeable) mode, which is a very common case. Generally, this will be an LDAP + Serial config, allowing to load users from an LDAP/AD directory, and allowing the users to share folders and create temporary users that will be stored locally in the Pydio install.
             <br>The new options are described below :
             <ul>
                 <li><b>MODE</b> : Set as MASTER_SLAVE or USER_CHOICE</li>

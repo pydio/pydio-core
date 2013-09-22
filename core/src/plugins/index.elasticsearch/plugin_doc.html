@@ -1,4 +1,4 @@
-<p>To get the last version of Elastica go to the following <a href="http://elastica.io/getting-started/installation.html">site</a> and in the "Download" part take the zip format. Then unzip the whole archive and copy the lib/Elastica folder into plugins/index.elasticsearch of your Ajaxplorer folder.<br/><br/>
+<p>To get the last version of Elastica go to the following <a href="http://elastica.io/getting-started/installation.html">site</a> and in the "Download" part take the zip format. Then unzip the whole archive and copy the lib/Elastica folder into plugins/index.elasticsearch of your Pydio folder.<br/><br/>
 Why ElasticSearch?<br/>
 Based on Apache Lucène and more powerful and efficient.<br/><br/>
 Why Elastica?<br/>
@@ -71,9 +71,9 @@ The result should be something like that:
     }
 }
 </pre><br/><br/>
-Use ElasticSearch in Ajaxplorer:<br/><br/>
-To use ElasticSearch in Ajaxplorer you have to follow the steps concerning ElasticSearch and Elastica installation first. Then you can go to Ajaxplorer GUI and set ElasticSearch the same way you would set Lucène.<br/><br/>
-Go to Ajaxplorer Settings->Workspaces and Users->Workspaces, then just choose your workspace and go to repository features. Here just remove the Lucène Search Engine (if you want to set ElasticSearch) and search the meta plugin "ElasticSearch Search Engine". Then you can use the indexation and then the search function when you go to the choosen workspace.<br/><br/><br/>
+Use ElasticSearch in Pydio:<br/><br/>
+To use ElasticSearch in Pydio you have to follow the steps concerning ElasticSearch and Elastica installation first. Then you can go to Pydio GUI and set ElasticSearch the same way you would set Lucène.<br/><br/>
+Go to Pydio Settings->Workspaces and Users->Workspaces, then just choose your workspace and go to repository features. Here just remove the Lucène Search Engine (if you want to set ElasticSearch) and search the meta plugin "ElasticSearch Search Engine". Then you can use the indexation and then the search function when you go to the choosen workspace.<br/><br/><br/>
 Concerning the use of Elastica:<br/><br/>
 - Here is a code snippet to index a document just like the test we previously made:
 <pre>$client = new Elastica\Client(array("host" => "localhost", "port" => "9200"));

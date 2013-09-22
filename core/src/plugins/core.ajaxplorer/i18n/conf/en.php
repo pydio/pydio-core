@@ -1,28 +1,28 @@
 <?php
 /*
-* Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
-* This file is part of AjaXplorer.
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* This file is part of Pydio.
 *
-* AjaXplorer is free software: you can redistribute it and/or modify
+* Pydio is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Affero General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
 *
-* AjaXplorer is distributed in the hope that it will be useful,
+* Pydio is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU Affero General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+* along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://www.ajaxplorer.info/>.
+* The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
 "Main"      => "Main Options",
 "App Title" => "Application Title",
 "Your application title" => "This title will appear as the window title, in the splash screen.",
-"Main container for core AjaXplorer settings (application title, sharing, webdav server config, etc...)" => "Main container for core AjaXplorer settings (application title, sharing, webdav server config, etc...)",
+"Main container for core Pydio settings (application title, sharing, webdav server config, etc...)" => "Main container for core Pydio settings (application title, sharing, webdav server config, etc...)",
 "Default Language" => "Default Language",
 "Default language when a user does not have set his/her own." => "Default language when a user does not have set his/her own.",
 "Sharing" => "Sharing",
@@ -50,7 +50,7 @@ $mess=array(
 "Default realm for authentication. Please READ THE DOC to safely use this feature." => "Default realm for authentication. Please READ THE DOC to safely use this feature.",
 "Miscalleneous" => "Miscalleneous",
 "Command-line Active" => "Command-line Active",
-"Use AjaXplorer framework via the command line, allowing CRONTAB jobs or background actions." => "Use AjaXplorer framework via the command line, allowing CRONTAB jobs or background actions.",
+"Use Pydio framework via the command line, allowing CRONTAB jobs or background actions." => "Use Pydio framework via the command line, allowing CRONTAB jobs or background actions.",
 "Command-line PHP" => "Command-line PHP",
 "On specific hosts, you may have to use a specific path to access the php command line" => "On specific hosts, you may have to use a specific path to access the php command line",
 "Filename length" => "Filename length",
@@ -65,7 +65,7 @@ $mess=array(
 "Password" => "Password",
 "User password - Can be overriden on a per-user basis." => "User password - Can be overriden on a per-user basis.",
 "Session credentials" => "Session credentials",
-"Try to use the current AjaXplorer user credentials for connecting. Warning, the AJXP_SESSION_SET_CREDENTIALS config must be set to true!" => "Try to use the current AjaXplorer user credentials for connecting. Warning, the AJXP_SESSION_SET_CREDENTIALS config must be set to true!",
+"Try to use the current Pydio user credentials for connecting. Warning, the AJXP_SESSION_SET_CREDENTIALS config must be set to true!" => "Try to use the current Pydio user credentials for connecting. Warning, the AJXP_SESSION_SET_CREDENTIALS config must be set to true!",
 "User name" => "User name",
 "User password" => "User password",
 "Repository Slug" => "Repository Slug",

@@ -1,22 +1,22 @@
 <?php
 /*
-* Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
-* This file is part of AjaXplorer.
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* This file is part of Pydio.
 *
-* AjaXplorer is free software: you can redistribute it and/or modify
+* Pydio is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Affero General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
 *
-* AjaXplorer is distributed in the hope that it will be useful,
+* Pydio is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU Affero General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+* along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://www.ajaxplorer.info/>.
+* The latest code can be found at <http://pyd.io/>.
 */
 
 //  Dansk oversættelse: Mike Johnsen
@@ -193,9 +193,9 @@ $mess=array(
 "164"=> "Log ud",
 "165"=> "Indstillinger",
 "166"=> "Om",
-"167"=> "Om AjaXplorer",
-"168" => "Opret forbindelse til AjaXplorer",
-"169" => "Afbryd forbindelse fra AjaXplorer",
+"167"=> "Om Pydio",
+"168" => "Opret forbindelse til Pydio",
+"169" => "Afbryd forbindelse fra Pydio",
 "170" => "Aktuel mappe",
 "parent_access_key" => "O",
 "refresh_access_key" => "p",
@@ -418,8 +418,8 @@ $mess=array(
 "366" => "Denne bruger har ikke noget aktivt lager.",
 "367" => "Du har ikke ret til at overføre denne type fil. Du kan vælge mellem følgende typenavne: ",
 "368" => "Udpakningen af udvælgelsen fra arkiv %s til mappe %s lykkedes",
-"369" => "AjaXplorer link",
-"370" => "AjaXplorer offentlig overførsel",
+"369" => "Pydio link",
+"370" => "Pydio offentlig overførsel",
 "371" => "Denne overførsel kræver adgangskode",
 "372" => "Nuværende lager",
 "373" => "Destination",
@@ -438,7 +438,7 @@ $mess=array(
 "389" => "Læs nedenstående kode:",
 "390" => "Kode",
 "391" => "Intet lager",
-"392" => "Advarsel, AjaXplorer versionen er ændret (er nu %s), ryd browserens cache, og opdater siden for at være sikker på, at alting fungerer!",
+"392" => "Advarsel, Pydio versionen er ændret (er nu %s), ryd browserens cache, og opdater siden for at være sikker på, at alting fungerer!",
 "393" => "Advarsel, navnets længde skal være under %s, denne fils navn bliver afkortet!",
 "394" => "Desværre er det ikke muligt at dele mapper med den aktuelle autoriserede driver (brugere kan ikke redigeres). Det er dog stadig muligt at dele filer.",
 "395" => "Det du droppede ser ud til at være en mappe, og mapper kan ikke overføres til serveren! Er du sikker på, at du vil overføre?",
@@ -450,7 +450,7 @@ $mess=array(
 "401" => "Du kan downloade og installere følgende software for at samle stykkerne, når de er på din computer: ",
 "402" => "http://www.hjsplit.org/",
 "403" => "WebDAV Preferences",
-"404" => "You can use the WebDAV protocol to mount your AjaXplorer repositories as a 'network drive' on various clients, including Windows, Mac, iPhone, etc.",
+"404" => "You can use the WebDAV protocol to mount your Pydio repositories as a 'network drive' on various clients, including Windows, Mac, iPhone, etc.",
 "405" => "Use the following URLS to access your repositories, with your username and the password you entered. Warning, this won't work until you set this feature as 'active' and you enter your password.",
 "406" => "Activate WebDAV shares",
 "407" => "Enter your password if it's the first time that you are activating webDAV shares, or if you want to re-type a new password :",

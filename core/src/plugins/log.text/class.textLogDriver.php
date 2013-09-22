@@ -1,22 +1,22 @@
 <?php
 /*
- * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
- * This file is part of AjaXplorer.
+ * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
  *
- * AjaXplorer is free software: you can redistribute it and/or modify
+ * Pydio is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * AjaXplorer is distributed in the hope that it will be useful,
+ * Pydio is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://www.ajaxplorer.info/>.
+ * The latest code can be found at <http://pyd.io/>.
  */
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -87,7 +87,7 @@ class textLogDriver extends AbstractLogDriver
             }
             $this->fileHandle = @fopen($this->storageDir . $this->logFileName, "at+");
             if ($this->fileHandle === false) {
-                error_log("[AjaXplorer] Cannot open log file ".$this->storageDir . $this->logFileName);
+                error_log("[Pydio] Cannot open log file ".$this->storageDir . $this->logFileName);
             }
             if ($this->fileHandle !== false && count($this->stack)) {
                 $this->stackFlush();
@@ -151,7 +151,7 @@ class textLogDriver extends AbstractLogDriver
         if ($this->fileHandle !== false) {
             if(count($this->stack)) $this->stackFlush();
             if (@fwrite($this->fileHandle, $textMessage) === false) {
-                error_log("[AjaXplorer] There was an error writing to log file ($textMessage)");
+                error_log("[Pydio] There was an error writing to log file ($textMessage)");
             }
         } else {
             $this->stack[] = $textMessage;
@@ -182,7 +182,7 @@ class textLogDriver extends AbstractLogDriver
         $success = @fclose($this->fileHandle);
         if ($success === false) {
             // Failure to close the log file
-            // error_log("[AjaXplorer] AJXP_Logger failed to close the handle to the log file");
+            // error_log("[Pydio] AJXP_Logger failed to close the handle to the log file");
         }
 
     }

@@ -1,10 +1,10 @@
 conf.sql plugin documentation
 -----------------------------
 
-This is the conf.sql plugin. It stores AjaXplorer configuration
+This is the conf.sql plugin. It stores Pydio configuration
 information in an SQL database,
 it is responsible for storing the following information in the
-AjaXplorer application:
+Pydio application:
 
 - Repository definitions
 - User bookmarks
@@ -37,9 +37,9 @@ When you are happy with the configuration, run the create.sql script
 located inside the same directory as the plugin
 to create the database schema for the conf.sql plugin.
 
-Note that the performance of AjaXplorer is slightly degraded by the
+Note that the performance of Pydio is slightly degraded by the
 overhead of the plugin - but that's what you sacrifice for the
 flexibility.
 
-This file is part of the AjaXplorer distribution.
+This file is part of the Pydio distribution.
 Contribution by Mosen : greetings!
