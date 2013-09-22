@@ -302,7 +302,9 @@ Class.create("AjxpTabulator", AjxpPane, {
                 this.tabulatorData.each(function(tabInfo){
                     var header = tabInfo.headerElement;
                     if(tabInfo != this.selectedTabInfo){
-                        header.setStyle({width:part - ( parseInt(header.getStyle('paddingRight')) + parseInt(header.getStyle('paddingLeft')) +  parseInt(header.getStyle('borderRightWidth'))  +  parseInt(header.getStyle('borderLeftWidth')) ) + 'px'});
+                        try{
+                            header.setStyle({width:part - ( parseInt(header.getStyle('paddingRight')) + parseInt(header.getStyle('paddingLeft')) +  parseInt(header.getStyle('borderRightWidth'))  +  parseInt(header.getStyle('borderLeftWidth')) ) + 'px'});
+                        }catch(e){}
                     }
                 }.bind(this));
             }

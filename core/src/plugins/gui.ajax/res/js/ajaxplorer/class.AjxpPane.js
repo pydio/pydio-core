@@ -112,7 +112,7 @@ Class.create("AjxpPane", {
     			var expr = this.options.fitMarginBottom;
     			try{marginBottom = parseInt(eval(expr));}catch(e){}
     		}
-    		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null), expr);
+    		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null), marginBottom);
     	}
     	this.childrenPanes.invoke('resize');
 	},

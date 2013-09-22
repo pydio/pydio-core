@@ -545,7 +545,8 @@ Class.create("Splitter", AjxpPane, {
 				Math.min(np, this.paneA._max||9999, this.group._adjust - this.splitbar._adjust - 
 				Math.max(this.paneB._min+this.paneB._padAdjust, this.options.minSize)));
 		var optNameSet = this.options.set;				
-		var optNameAdjust = this.options.adjust;				
+		var optNameAdjust = this.options.adjust;
+        if(!np) np = 200;
 		this.splitbar.setStyle(this.makeStyleObject(this.options.set, np+'px'));
 		var borderAdjA = 0;
 		var borderAdjB = 0;

@@ -244,7 +244,7 @@ Class.create("ActionsToolbar", {
                     button.OBSERVERS.each(function(pair){
                         button.ACTION.stopObserving(pair.key, pair.value);
                     });
-                    button.remove();
+                    try{button.remove();}catch(e){}
                 }
             });
         }
