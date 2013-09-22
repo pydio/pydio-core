@@ -22,11 +22,6 @@ Class.create("ExifEditor", AbstractEditor, {
 	initialize: function($super, oFormObject, options)
 	{
 		$super(oFormObject, options);
-		this.actions.get("downloadFileButton").observe('click', function(){
-			if(!this.currentFile) return;		
-			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.currentFile);
-			return false;
-		}.bind(this));
 		this.element.observe("editor:resize", function(){
 			this.columnsLayout(true);
 		}.bind(this));				

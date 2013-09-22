@@ -107,7 +107,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 
     openEditorForNode:function(ajxpNode, editorData){
         this.addTab({
-            id:ajxpNode.getPath(),
+            id:editorData.id + ":/" + ajxpNode.getPath(),
             label:editorData.text,
             iconClass:editorData.icon_class,
             closeable:true
@@ -197,6 +197,7 @@ Class.create("AjxpTabulator", AjxpPane, {
                         var test = ajxpObject.validateClose();
                         if(!test) return;
                     }
+                    ajxpObject.showElement(false);
                     ajxpObject.destroy();
                 }
                 var pane = $(this.htmlElement).down('#'+tabInfo.element);

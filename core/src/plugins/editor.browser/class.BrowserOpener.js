@@ -44,6 +44,7 @@ Class.create("BrowserOpener", AbstractEditor, {
                 hideLightBox();
             }
         }else{
+            this.element.fire("editor:updateTitle", node.getLabel());
             this.contentMainContainer = new Element('iframe', {
                 width:'100%',
                 height:'100%',
@@ -65,6 +66,7 @@ Class.create("BrowserOpener", AbstractEditor, {
                 myRef = window.open(url, "Pydio Bookmark", "location=yes,menubar=yes,resizable=yes,scrollbars=yea,toolbar=yes,status=yes");
                 hideLightBox();
             }else{
+                this.element.fire("editor:updateTitle", url);
                 this.contentMainContainer = new Element('iframe', {
                     width:'100%',
                     height:'100%',

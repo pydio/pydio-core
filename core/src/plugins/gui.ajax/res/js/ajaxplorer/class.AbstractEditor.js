@@ -86,11 +86,13 @@ Class.create("AbstractEditor" , {
      */
     showElement : function(show){
         if(show) {
+            ajaxplorer.disableAllKeyBindings();
             this.element.show();
             if(this.inputNode){
                 ajaxplorer.updateContextData(null, [this.inputNode], this);
             }
         }else {
+            ajaxplorer.enableAllKeyBindings();
             this.element.hide();
         }
     },

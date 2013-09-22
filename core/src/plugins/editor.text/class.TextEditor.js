@@ -32,11 +32,6 @@ Class.create("TextEditor", AbstractEditor, {
 			this.canWrite = false;
 			this.actions.get("saveButton").hide();
 		}
-		this.actions.get("downloadFileButton").observe('click', function(){
-			if(!this.currentFile) return;		
-			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.currentFile);
-			return false;
-		}.bind(this));
 	},
 	
 	

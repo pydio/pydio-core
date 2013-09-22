@@ -62,7 +62,6 @@ Class.create("Diaporama", AbstractEditor, {
 
 		this.nextButton = this.actions.get("nextButton");
 		this.previousButton = this.actions.get("prevButton");
-		this.downloadButton = this.actions.get("downloadDiapoButton");
 		this.playButton = this.actions.get("playButton");
 		this.stopButton = this.actions.get("stopButton");		
 		this.actualSizeButton = this.actions.get('actualSizeButton');
@@ -131,15 +130,6 @@ Class.create("Diaporama", AbstractEditor, {
 			this.updateButtons();
 			return false;
 		}.bind(this);
-        if(window.ajaxplorer.actionBar.getActionByName("download")){
-            this.downloadButton.onclick = function(){
-                if(!this.currentFile) return;
-                ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+encodeURIComponent(this.currentFile));
-                return false;
-            }.bind(this);
-        }else{
-            this.downloadButton.hide();
-        }
 		this.actualSizeButton.onclick = function(){
 			this.setZoomValue(100);
 			this.resizeImage(true);
@@ -174,7 +164,6 @@ Class.create("Diaporama", AbstractEditor, {
 			this.jsImageLoading = false;
 			this.imgTag.src = this.jsImage.src;
 			this.resizeImage(true);
-			this.downloadButton.removeClassName("disabled");
 			var text = getBaseName(this.currentFile) + ' ('+this.sizes.get(this.currentFile).width+' X '+this.sizes.get(this.currentFile).height+')';
 			this.updateTitle(text);
 		}.bind(this);
@@ -513,7 +502,6 @@ Class.create("Diaporama", AbstractEditor, {
 		if(this.crtWidth){
 			this.crtRatio = this.crtHeight / this.crtWidth;
 		}
-		this.downloadButton.addClassName("disabled");
 		new Effect.Opacity(this.imgTag, {afterFinish : function(){
 			this.jsImageLoading = true;
 			this.jsImage.src  = this.baseUrl + encodeURIComponent(this.currentFile);
