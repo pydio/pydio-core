@@ -342,17 +342,7 @@
             <processing>
                 <clientCallback prepareModal="false"><![CDATA[
                     var editorData = window.actionArguments[0];
-                    if(!editorData){
-                        var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
-                        var editors = ajaxplorer.findEditorsForMime(selectedMime);
-                        if(editors.length && editors[0].openable){
-                            editorData = editors[0];
-                        }
-                    }
-                    if(editorData){
-                        ajaxplorer.loadEditorResources(editorData.resourcesManager);
-                        modal.openEditorDialog(editorData);
-                    }
+                    ajaxplorer.openCurrentSelectionInEditor(editorData);
                 ]]></clientCallback>
                 <serverCallback methodName="switchAction"></serverCallback>
                 </processing>
