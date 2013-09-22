@@ -690,7 +690,13 @@ Class.create("FilesList", SelectableElements, {
 			}.bind(this);
 			if(this.paginationData && this.paginationData.get('remote_order') && parseInt(this.paginationData.get('total')) > 1){
 				this._sortableTable.setPaginationBehaviour(function(params){
-					this.reload(params);
+                    this.getCurrentContextNode().getMetadata().set("remote_order", params);
+                    var oThis = this;
+                    this.crtContext.observeOnce("loaded", function(){
+                        oThis.crtContext = this ;
+                        oThis.fill(oThis.crtContext);
+                    });
+                    this.getCurrentContextNode().reload();
 				}.bind(this), this.columnsDef, this.paginationData.get('currentOrderCol')||-1, this.paginationData.get('currentOrderDir') );
 			}
 			this.disableTextSelection(this.htmlElement.down('div.sort-table'), true);
@@ -1970,6 +1976,7 @@ Class.create("FilesList", SelectableElements, {
 		var elList;
 		if(one_element) elList = [one_element]; 
 		else elList = this._htmlElement.select('div.thumbnail_selectable_cell');
+        var ellipsisDetected;
 		elList.each(function(element){
             if(element.up('div.thumbnail_selectable_cell.detailed')) return;
 			var node = element.ajxpNode;
@@ -1986,7 +1993,10 @@ Class.create("FilesList", SelectableElements, {
             if(image_element){
                 this._previewFactory.resizeThumbnail(image_element);
             }
-            if(label_element){
+            if(ellipsisDetected == undefined){
+                ellipsisDetected = label_element.getStyle('textOverflow') == "ellipsis";
+            }
+            if(label_element && !ellipsisDetected){
                 // RESIZE LABEL
                 var el_width = (!elementsAreSiblings ? (element.getWidth() - tSize - 10)  : (tSize + 25) ) ;
                 var charRatio = 6;

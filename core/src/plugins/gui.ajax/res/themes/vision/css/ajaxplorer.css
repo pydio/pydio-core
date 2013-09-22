@@ -221,6 +221,9 @@ div.thumbnail_cell_metadata span.metadata_chunk{
 .thumbLabel
 {
     /*overflow: hidden;*/
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .img_cont
