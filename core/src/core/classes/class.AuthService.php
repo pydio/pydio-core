@@ -951,6 +951,54 @@ class AuthService
     }
 
 	/**
+     * @param AJXP_Role $parentRole
+     * @return AJXP_Role
+     */
+    public static function limitedRoleFromParent($parentUser)
+    {
+        $parentRole = self::getRole("AJXP_USR_/".$parentUser);
+        if($parentRole === false) return null;
+
+        // Inherit actions
+        $inheritActions = array();
+        $cacheInherit = AJXP_PluginsService::getInstance()->loadFromPluginQueriesCache("//server_settings/param[@inherit='true']");
+        if ($cacheInherit !== null && is_array($cacheInherit)) {
+            $inheritActions = $cacheInherit;
+        } else {
+            $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[@inherit='true']", "node", false, false, true);
+            if (is_array($paramNodes) && count($paramNodes)) {
+                foreach ($paramNodes as $node){
+                    $paramName = $node->getAttribute("name");
+                    $pluginId = $node->parentNode->parentNode->getAttribute("id");
+                    if(isSet($inheritActions[$pluginId])) $inheritActions[$pluginId] = array();
+                    $inheritActions[$pluginId][] = $paramName;
+                }
+            }
+            AJXP_PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[@inherit='true']", $inheritActions);
+        }
+
+        // Clear ACL, Keep disabled actions, keep 'inherit' parameters.
+        $childRole =  new AJXP_Role("AJXP_PARENT_USR_/");
+        $childRole->bunchUpdate(array(
+            "ACL"       => array(),
+            "ACTIONS"   => $parentRole->listAllActionsStates(),
+            "APPLIES"   => array(),
+            "PARAMETERS"=> array()));
+        $params = $parentRole->listParameters();
+
+        foreach($params as $scope => $plugData){
+            foreach($plugData as $pId => $paramData){
+                if(!isSet($inheritActions[$pId])) continue;
+                foreach($paramData as $pName => $pValue){
+                    $childRole->setParameterValue($pId, $pName, $pValue, $scope);
+                }
+            }
+        }
+
+        return $childRole;
+    }
+
+    /**
      * Get all defined roles
      * @static
      * @param array $roleIds

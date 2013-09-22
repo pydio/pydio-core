@@ -371,10 +371,15 @@ abstract class AbstractAjxpUser
             $index ++;
         }
         if($this->hasParent() && isSet($this->parentRole)){
-            // It's a shared user, we don't want it to inherit the rights
+            // It's a shared user, we don't want it to inherit the rights...
             $this->parentRole->clearAcls();
+            //... but we want the parent user's role, filtered with inheritable properties only.
+            $stretchedParentUserRole = AuthService::limitedRoleFromParent($this->parentUser);
+            if($stretchedParentUserRole !== null){
+                $this->parentRole = $this->parentRole->override($stretchedParentUserRole);
+            }
+
             $this->mergedRole = $this->parentRole->override($this->personalRole);
-            //$this->mergedRole
         }
     }
 

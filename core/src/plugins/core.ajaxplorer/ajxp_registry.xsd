@@ -680,6 +680,7 @@
             <xs:attribute name="scope"/>
             <xs:attribute name="repoScope"/>
             <xs:attribute name="editable" type="xs:boolean" use="optional"/>
+            <xs:attribute name="inherit" type="xs:boolean" use="optional"/>
             <xs:attribute name="uploadAction" use="optional"/>
             <xs:attribute name="loadAction" use="optional"/>
             <xs:attribute name="defaultImage" use="optional"/>
