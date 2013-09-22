@@ -809,7 +809,9 @@ class AuthService
 
     }
 
-    static function createGroup($baseGroup, $groupName, $groupLabel){
+    public static function createGroup($baseGroup, $groupName, $groupLabel)
+    {
+        if(empty($groupLabel)) $groupLabel = $groupName;
         ConfService::getConfStorageImpl()->createGroup(rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName, $groupLabel);
     }
 
