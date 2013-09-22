@@ -274,6 +274,9 @@ class ldapAuthDriver extends AbstractAuthDriver {
             if(!empty($entries["count"])){
                 $allEntries["count"] += $entries["count"];
                 unset($entries["count"]);
+                if($limit != -1){
+                    usort($entries, array($this, "userSortFunction"));
+                }
                 foreach($entries as $entry){
                     if($offset != -1 && $index < $offset){
                         $index ++; continue;
@@ -287,7 +290,13 @@ class ldapAuthDriver extends AbstractAuthDriver {
         return $allEntries;
     }
 
-    function supportsUsersPagination(){
+    private function userSortFunction($entryA, $entryB)
+    {
+        return strcasecmp($entryA[$this->ldapUserAttr][0], $entryB[$this->ldapUserAttr][0]);
+    }
+
+    public function supportsUsersPagination()
+    {
         return true;
     }
     function listUsersPaginated($baseGroup="/", $regexp, $offset, $limit){
