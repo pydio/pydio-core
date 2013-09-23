@@ -481,7 +481,9 @@ Class.create("FormManager", {
                     }else{
                         fElements = $A([fElement]);
                     }
-                    fElements.invoke((state?"disable":"enable"));
+                    fElements.each(function(el){
+                        if(el && el[(state?"disable":"enable")]) el[(state?"disable":"enable")]();
+                    });
                     if(state) cbox.previous("div.SF_label").addClassName("SF_disabled");
                     else cbox.previous("div.SF_label").removeClassName("SF_disabled");
                 });

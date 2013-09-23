@@ -1995,6 +1995,7 @@ Class.create("FilesList", SelectableElements, {
 		var elList;
 		if(one_element) elList = [one_element]; 
 		else elList = this._htmlElement.select('div.thumbnail_selectable_cell');
+        var ellipsisDetected;
 		elList.each(function(element){
             if(element.up('div.thumbnail_selectable_cell.detailed')) return;
 			var node = element.ajxpNode;
@@ -2011,7 +2012,10 @@ Class.create("FilesList", SelectableElements, {
             if(image_element){
                 this._previewFactory.resizeThumbnail(image_element);
             }
-            if(label_element){
+            if(ellipsisDetected == undefined){
+                ellipsisDetected = label_element.getStyle('textOverflow') == "ellipsis";
+            }
+            if(label_element && !ellipsisDetected){
                 // RESIZE LABEL
                 var el_width = (!elementsAreSiblings ? (element.getWidth() - tSize - 10)  : (tSize + 25) ) ;
                 var charRatio = 6;
