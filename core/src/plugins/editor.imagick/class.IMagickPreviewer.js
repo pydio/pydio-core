@@ -37,7 +37,6 @@ Class.create("IMagickPreviewer", Diaporama, {
 			this.jsImageLoading = false;
 			this.imgTag.src = this.jsImage.src;
 			this.resizeImage(true);
-			this.downloadButton.removeClassName("disabled");
 			var i = 0;
 			for(i=0;i<this.items.length;i++){
 				if(this.items[i] == this.currentFile){
@@ -54,13 +53,6 @@ Class.create("IMagickPreviewer", Diaporama, {
 	open : function($super, node)
 	{
 		this.src_file = node.getPath();
-        if(window.ajaxplorer.actionBar.getActionByName("download")){
-            this.downloadButton.onclick = function(){
-                if(!this.currentFile) return;
-                ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.src_file);
-                return false;
-            }.bind(this);
-        }
 		this.currentIM = getBaseName(this.src_file);
 		// Extract the pages and load result!
 		var connexion = new Connexion();
@@ -196,7 +188,6 @@ Class.create("IMagickPreviewer", Diaporama, {
 		if(this.crtWidth){
 			this.crtRatio = this.crtHeight / this.crtWidth;
 		}
-		this.downloadButton.addClassName("disabled");
 		new Effect.Opacity(this.imgTag, {afterFinish : function(){
 			this.jsImageLoading = true;
 			this.jsImage.src  = this.baseUrl + encodeURIComponent(this.currentFile) + "&src_file=" + this.src_file;
