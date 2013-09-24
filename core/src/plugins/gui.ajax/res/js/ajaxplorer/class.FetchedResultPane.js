@@ -35,13 +35,9 @@ Class.create("FetchedResultPane", FilesList, {
 	initialize: function($super, mainElementName, ajxpOptions)
 	{
 
-        var dataModel = new AjxpDataModel(true);
-        var rNodeProvider = new RemoteNodeProvider();
-        dataModel.setAjxpNodeProvider(rNodeProvider);
-        rNodeProvider.initProvider(ajxpOptions.nodeProviderProperties);
-        this._rootNode = new AjxpNode("/", false, "Results", "folder.png", rNodeProvider);
-        dataModel.setRootNode(this._rootNode);
-        $super($(mainElementName), {
+        var dataModel = this.initDataModel(ajxpOptions);
+
+        $super($(mainElementName), Object.extend({
             dataModel:dataModel,
             columnsDef:[{attributeName:"ajxp_label", messageId:1, sortType:'String'},
                 {attributeName:"filename", messageString:'Path', sortType:'String'},
@@ -56,7 +52,7 @@ Class.create("FetchedResultPane", FilesList, {
             replaceScroller:true,
             fit:'height',
             detailThumbSize:22
-        });
+        }, ajxpOptions));
 
         dataModel.observe("selection_changed", function(){
             if(!this._dataLoaded) return;
@@ -90,6 +86,23 @@ Class.create("FetchedResultPane", FilesList, {
                 }
             }.bind(this));
         }
+
+    },
+
+    /**
+     * Can be overriden by the children.
+     * @param ajxpOptions
+     * @returns {AjxpDataModel}
+     */
+    initDataModel: function(ajxpOptions){
+
+        var dataModel = new AjxpDataModel(true);
+        var rNodeProvider = new RemoteNodeProvider();
+        dataModel.setAjxpNodeProvider(rNodeProvider);
+        rNodeProvider.initProvider(ajxpOptions.nodeProviderProperties);
+        this._rootNode = new AjxpNode("/", false, "Results", "folder.png", rNodeProvider);
+        dataModel.setRootNode(this._rootNode);
+        return dataModel;
 
     },
 

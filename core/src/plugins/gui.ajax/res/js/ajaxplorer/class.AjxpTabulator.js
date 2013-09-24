@@ -59,6 +59,12 @@ Class.create("AjxpTabulator", AjxpPane, {
         if(tabulatorOptions.defaultTabId){
             this.switchTabulator(tabulatorOptions.defaultTabId);
         }
+        document.observe("ajaxplorer:component_config_changed", function(event){
+            if(event.memo.className == "AjxpTabulator::"+htmlElement.id){
+                this.parseComponentConfig(event.memo.classConfig.get("all"));
+            }
+        }.bind(this));
+
 
 	},
 
@@ -81,7 +87,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             if(tabInfo.label){
                 label = MessageHash[tabInfo.label] || tabInfo.label;
             }
-            var td = new Element('span', {className:'toggleHeader', title:MessageHash[tabInfo.title] || label.stripTags()});
+            var td = new Element('span', {className:'toggleHeader toggleInactive', title:MessageHash[tabInfo.title] || label.stripTags()});
             if(tabInfo.icon){
                 td.insert('<img width="16" height="16" align="absmiddle" src="'+resolveImageSource(tabInfo.icon, '/images/actions/ICON_SIZE', 16)+'">');
             }
@@ -118,6 +124,19 @@ Class.create("AjxpTabulator", AjxpPane, {
         });
     },
 
+    parseComponentConfig: function(domNode){
+        XPathSelectNodes(domNode, "additional_tab").each(function(addNode){
+            var cdataContent = addNode.firstChild.nodeValue;
+            var anchor = this.htmlElement;
+            if(cdataContent && anchor){
+                anchor.insert(cdataContent);
+                var compReg = $A();
+                ajaxplorer.buildGUI(anchor.down('#'+addNode.getAttribute("id")), compReg);
+                if(compReg.length) ajaxplorer.initAjxpWidgets(compReg);
+                this.addTab(addNode.getAttribute("tabInfo").evalJSON(), addNode.getAttribute("paneInfo").evalJSON());
+            }
+        }.bind(this));
+    },
 
     /**
      *
@@ -177,9 +196,11 @@ Class.create("AjxpTabulator", AjxpPane, {
 
         }
         this.tabulatorData.push(tabInfo);
-        this.switchTabulator(tabInfo.id);
+        if(!tabInfo.dontFocus){
+            this.switchTabulator(tabInfo.id);
+            window.setTimeout(this.resize.bind(this), 750);
+        }
         this.resize();
-        window.setTimeout(this.resize.bind(this), 750);
     },
 
     /**

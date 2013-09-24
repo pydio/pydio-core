@@ -1292,6 +1292,8 @@ div.selected div.FL-inlineToolbar.FL-inlineToolbarUnique {
 tr.selected div.FL-inlineToolbar.FL-inlineToolbarUnique,
 tr div.FL-inlineToolbar.FL-inlineToolbarMultiple {
     display: inline-block;
+    position: absolute;
+    top:0;
 }
 
 div.FL-inlineToolbar a {
@@ -1314,7 +1316,6 @@ div.detailed div.FL-inlineToolbar a span.actionbar_button_label{
 
 div.detailed div.FL-inlineToolbar {
     margin-left: 50px;
-    margin-bottom: 7px;
     margin-top: 2px;
 }
 
@@ -2519,6 +2520,8 @@ span.search_meta_opt.checked > span {
 
 div.class-FetchedResultPane{
     background-color: #ebedf0;
+    border: 1px solid rgb(187,187,187);
+    border-width: 0 1px;
 }
 
 #search_results div.ajxpNodeProvider,
@@ -4129,7 +4132,9 @@ td.ip_geo_cell{
     height: 19px;
 }
 
-#files_list_header{
+#files_list_header,
+.innerTabulator  div.panelHeader
+{
     font-size: 11px;
     padding: 5px 3px 3px 8px;
     letter-spacing: 1px;
@@ -4140,8 +4145,24 @@ td.ip_geo_cell{
     border-right: 1px solid rgb(187, 187, 187);
 }
 
+.innerTabulator  div.panelHeader.tabulatorContainer
+{
+    padding: 0 0 0 4px;
+    height: auto;
+}
+
+.innerTabulator span.toggleHeader{
+    padding: 4px 7px 4px 2px;
+    border-right: 1px dotted rgb(111, 123, 136);
+    background-color: white;
+    color: rgb(111, 123, 136);
+    font-size: 11px;
+}
+
 #files_list_header > #display_toolbar a:hover,
-#files_list_header > #display_toolbar a
+#files_list_header > #display_toolbar a,
+div.innerTabulator > div.tabulatorContainer > #display_toolbar a:hover,
+div.innerTabulator > div.tabulatorContainer > #display_toolbar a
 {
     color: rgb(111, 123, 136) !important;
 }

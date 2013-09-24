@@ -415,7 +415,7 @@ var AjxpDroppables = {
 					var targetName = droppable.ajxpNode.getPath();
 					var srcName;
 					if(draggable.ajxpNode){
-						var srcName = draggable.ajxpNode.getPath();
+						srcName = draggable.ajxpNode.getPath();
 					}
                     if(WebFXtimer) clearTimeout(WebFXtimer);
                     var nodeId = null;
@@ -423,7 +423,14 @@ var AjxpDroppables = {
                         nodeId = droppable.id;
                     }
                     var copy = draggable.hasClassName("selection_ctrl_key");
-					ajaxplorer.actionBar.applyDragMove(srcName, targetName, nodeId, copy);
+                    if(droppable.applyDragMove){
+                        if(!srcName && draggable.getAttribute('user_selection')){
+                            srcName = 'ajxp-user-selection';
+                        }
+                        droppable.applyDragMove(srcName, targetName, nodeId, copy);
+                    }else{
+                        ajaxplorer.actionBar.applyDragMove(srcName, targetName, nodeId, copy);
+                    }
 				},
 		onHover:function(draggable, droppable, event)
 				{
