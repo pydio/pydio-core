@@ -15,11 +15,20 @@
                 font-weight: normal;
                 padding: 10px 0 0 5px;
                 color: rgb(111,123,136);
+                margin-right: 5px;
+            }
+            .widget_logo {
                 background-image: url('AJXP_PATH_TO_ROOT/plugins/gui.ajax/PydioLogo250.png');
                 background-repeat: no-repeat;
-                background-position: right 9px;
+                background-position: right 5px;
                 background-size: 170px;
                 margin-right: 5px;
+                position: absolute;
+                top: 0;
+                right: 0;
+                height: 90px;
+                width: 180px;
+                z-index: 50;
             }
             #ajxp_shared_folder{
                 width:100%;
@@ -49,6 +58,7 @@
                 margin-left: -8px;
                 min-width: 0;
             }
+            /*
             div#inline_toolbar a {
                 font-size: 11px;
                 border: 1px solid rgba(111, 123, 136, 0.42);
@@ -62,6 +72,7 @@
                 background-color: rgba(111, 123, 136, 0.09);
                 box-shadow: inset 1px 1px 1px white;
             }
+            */
             .ajxpNodeProvider span.actionbar_button_label {
                 display: none;
             }
@@ -127,6 +138,7 @@
     </head>
 
     <body marginheight="0" marginwidth="0" leftmargin="0" topmargin="0" class="AJXP_PRELOGED_USER">
+        <div class="widget_logo"></div>
         <div class="widget_title">AJXP_REPOSITORY_LABEL</div>
         <div id="ajxp_shared_folder" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"window"}'></div>
     </body>
