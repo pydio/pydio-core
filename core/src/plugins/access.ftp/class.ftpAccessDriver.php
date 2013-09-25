@@ -97,7 +97,7 @@ class ftpAccessDriver extends fsAccessDriver
                 $node = new AJXP_Node($destPath);
                 $this->logDebug("Copying file to server", array("from"=>$fData["tmp_name"], "to"=>$destPath, "name"=>$fData["name"]));
                 try {
-                    AJXP_Controller::applyHook("node.before_change", array(&$node));
+                    AJXP_Controller::applyHook("node.before_create", array(&$node));
                     $fp = fopen($destPath, "w");
                     $fSource = fopen($fData["tmp_name"], "r");
                     while (!feof($fSource)) {
@@ -110,7 +110,7 @@ class ftpAccessDriver extends fsAccessDriver
                     fclose($fp);
                     $this->logDebug("FTP Upload : end of ftp copy");
                     @unlink($fData["tmp_name"]);
-                    AJXP_Controller::applyHook("node.change", array(&$node));
+                    AJXP_Controller::applyHook("node.change", array(null, &$node));
 
                 } catch (Exception $e) {
                     $this->logDebug("Error during ftp copy", array($e->getMessage(), $e->getTrace()));
