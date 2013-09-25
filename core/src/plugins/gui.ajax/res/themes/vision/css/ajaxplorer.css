@@ -4147,16 +4147,20 @@ td.ip_geo_cell{
 
 .innerTabulator  div.panelHeader.tabulatorContainer
 {
-    padding: 0 0 0 4px;
-    height: auto;
+    padding: 0 0 0 0;
+    height: 26px;
 }
 
 .innerTabulator span.toggleHeader{
-    padding: 4px 7px 4px 2px;
+    padding: 4px 7px 4px 7px;
     border-right: 1px dotted rgb(111, 123, 136);
-    background-color: white;
+    background-color: #ebedf0;
     color: rgb(111, 123, 136);
     font-size: 11px;
+}
+
+.innerTabulator span.toggleHeader.toggleInactive{
+    background-color: white;
 }
 
 #files_list_header > #display_toolbar a:hover,

@@ -230,7 +230,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     // Make a temp zip and send it as download
                     $loggedUser = AuthService::getLoggedUser();
                     $file = AJXP_Utils::getAjxpTmpDir()."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpDownload.zip";
-                    $zipFile = $this->makeZip($selection->getFiles(), $file, $dir);
+                    $zipFile = $this->makeZip($selection->getFiles(), $file, empty($dir)?"/":$dir);
                     if(!$zipFile) throw new AJXP_Exception("Error while compressing");
                     register_shutdown_function("unlink", $file);
                     $localName = ($base==""?"Files":$base).".zip";
@@ -1868,7 +1868,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         foreach ($src as $item) {
             $realFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase."/".$item);
             $realFile = AJXP_Utils::securePath($realFile);
-            $basedir = trim(dirname($realFile));
             if (basename($item) == "") {
                 $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile);
             } else {
@@ -1877,10 +1876,17 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             }
         }
         $this->logDebug("Pathes", $filePaths);
-        $this->logDebug("Basedir", array($basedir));
         self::$filteringDriverInstance = $this;
         $archive = new PclZip($dest);
-        $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'zipPreAddCallback');
+
+        if($basedir == "__AJXP_ZIP_FLAT__/"){
+            $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_ALL_PATH, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'zipPreAddCallback');
+        }else{
+            $basedir = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase).trim($basedir);
+            $this->logDebug("Basedir", array($basedir));
+            $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'zipPreAddCallback');
+        }
+
         if (!$vList) {
             throw new Exception("Zip creation error : ($dest) ".$archive->errorInfo(true));
         }

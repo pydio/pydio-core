@@ -5,6 +5,7 @@
         <resources>
             <js className="CartManager" file="plugins/action.cart/class.CartManager.js" autoload="true"/>
             <js className="LocalCartNodeProvider" file="plugins/action.cart/class.LocalCartNodeProvider.js" autoload="true"/>
+            <i18n namespace="action.cart" path="plugins/action.cart/i18n"/>
         </resources>
     </client_settings>
 
@@ -16,10 +17,10 @@
         <client_configs>
             <component_config className="AjxpTabulator::topPane">
                 <additional_tab id="ajxp-cart-manager"
-                                tabInfo='{"id":"cart-manager","iconClass":"icon-suitcase","element":"ajxp-cart-manager","closeable":false,"label":"Carts","dontFocus":true}'
+                                tabInfo='{"id":"cart-manager","iconClass":"icon-suitcase","element":"ajxp-cart-manager","closeable":false,"label":"action.cart.10","dontFocus":true}'
                                 paneInfo='{"type":"widget"}'><![CDATA[
                     <div id="ajxp-cart-manager" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                        <div id="cart-manager-header" class="innerTabulator" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"browser","defaultTabId": "default-cart","tabInfos": [{"id":"default-cart","label":"Default cart","iconClass":"icon-suitcase", "element":"default-cart"}], "headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["ajxp-cart-manager"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'>
+                        <div id="cart-manager-header" class="innerTabulator" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"browser","defaultTabId": "default-cart","tabInfos": [{"id":"default-cart","label":"action.cart.9","iconClass":"icon-suitcase", "element":"default-cart"}], "headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["ajxp-cart-manager"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'>
                             <div id="default-cart" ajxpClass="CartManager" ajxpOptions='{"nodeProviderProperties":{}}'></div>
                         </div>
                     </div>
@@ -27,8 +28,39 @@
             </component_config>
         </client_configs>
         <actions>
+            <action name="create-cart">
+                <gui src="" iconClass="icon-plus" text="action.cart.5" title="action.cart.6">
+                    <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="ajxp-cart-manager"/>
+                </gui>
+                <processing>
+                    <clientCallback><![CDATA[
+                        var tabulator = $('cart-manager-header').ajxpPaneObject;
+                        if(tabulator){
+                            var newLabel = window.prompt('Provide a label for this selection cart');
+                            if(newLabel){
+                                tabulator.addTab({"id":"new-cart","label":newLabel,"iconClass":"icon-suitcase", closeable:true}, {type:"widget", widgetClass:CartManager, widgetOptions:{}});
+                            }
+                        }
+                    ]]></clientCallback>
+                </processing>
+            </action>
+            <action name="send-selection-to-cart">
+                <gui src="" text="action.cart.1" title="action.cart.2" iconClass="icon-suitcase">
+                    <context dir="true" recycle="true" selection="true" actionBar="false" contextMenu="true" actionBarGroup="change"/>
+                    <selectionContext dir="true" file="true" recycle="false" unique="false"/>
+                </gui>
+                <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="false"/>
+                <processing>
+                    <clientCallback><![CDATA[
+                        var object = $('cart-manager-header').ajxpPaneObject.getAndSetAjxpObject( $('cart-manager-header').ajxpPaneObject.selectedTabInfo );
+                        if(object){
+                            object.addCurrentSelection();
+                        }
+                    ]]></clientCallback>
+                </processing>
+            </action>
             <action name="current-cart-empty">
-                <gui src="" iconClass="icon-trash" text="1" title="2">
+                <gui src="" iconClass="icon-trash" text="action.cart.3" title="action.cart.4">
                     <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="ajxp-cart-manager"/>
                 </gui>
                 <processing>
@@ -41,14 +73,14 @@
                 </processing>
             </action>
             <action name="current-cart-download">
-                <gui src="" iconClass="icon-download-alt" text="1" title="2">
+                <gui src="" iconClass="icon-download-alt" text="action.cart.7" title="action.cart.8">
                     <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="ajxp-cart-manager"/>
                 </gui>
                 <processing>
                     <clientCallback><![CDATA[
                         var object = $('cart-manager-header').ajxpPaneObject.getAndSetAjxpObject( $('cart-manager-header').ajxpPaneObject.selectedTabInfo );
-                        if(object){
-
+                        if(object && $('download_form')){
+                            object.downloadContent();
                         }
                     ]]></clientCallback>
                 </processing>

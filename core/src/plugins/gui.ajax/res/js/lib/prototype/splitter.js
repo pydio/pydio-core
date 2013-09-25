@@ -138,7 +138,10 @@ Class.create("Splitter", AjxpPane, {
             var folded = this.getUserPreference("folded");
 			if(sizePref){
                 if(folded) this.moveSplitter(parseInt(sizePref));
-                else this.resizeAnimated(parseInt(sizePref));
+                else {
+                    this.prefoldValue = parseInt(sizePref);
+                    this.resizeAnimated(parseInt(sizePref));
+                }
 			}
             if(folded){
                 this.foldWithoutAnim();

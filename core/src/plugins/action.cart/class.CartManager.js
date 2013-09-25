@@ -34,6 +34,60 @@ Class.create("CartManager", FetchedResultPane, {
         element.applyDragMove = this.applyDragMove.bind(this);
         AjxpDroppables.add(element, this._rootNode);
 
+        ajaxplorer.observe("server_message", function(event){
+            var newValue = XPathSelectSingleNode(event, "nodes_diff/update|nodes_diff/remove");
+            if(newValue && this._dataLoaded){
+                // Remove or update selection if node has been removed!
+            }
+        }.bind(this));
+
+
+    },
+
+    downloadContent: function(){
+        var h = this.getLocalSelectionForPosting();
+        if(!$("download_form")) return;
+
+        var form = $('download_form');
+        form.action = window.ajxpServerAccessPath;
+        form.secure_token.value = Connexion.SECURE_TOKEN;
+        form.select("input").each(function(input){
+            if(input.name!='get_action' && input.name!='secure_token') input.remove();
+        });
+        h.set('dir', '__AJXP_ZIP_FLAT__/');
+        h.each(function(pair){
+            form.insert(new Element('input', {type:'hidden', name:pair.key, value:pair.value}));
+        });
+        try{
+            form.submit();
+        }catch(e){
+
+        }
+    },
+
+    addCurrentSelection: function(){
+
+        ajaxplorer.getContextHolder().getSelectedNodes().each(function(n){
+            if(n.isLeaf()){
+                this.localNodeFromRemoteNode(n);
+            }else{
+                this.recurseLeafs(n);
+            }
+        }.bind(this));
+
+    },
+
+    getLocalSelectionForPosting:function(){
+
+        var sel = new $H();
+        var i = 0;
+        this._rootNode.getChildren().each(function(n){
+            var key = "file_" + i;
+            sel.set(key, n.getPath());
+            i++;
+        });
+        return sel;
+
     },
 
     getRootNode: function(){
@@ -57,17 +111,19 @@ Class.create("CartManager", FetchedResultPane, {
 
     },
 
+    localNodeFromRemoteNode: function(n){
+
+        if(this._rootNode.findChildByPath(n.getPath())) return;
+        var newNode = new AjxpNode(n.getPath(), n.isLeaf(), n.getLabel(), n.getIcon());
+        newNode.setMetadata($H(Object.clone(n.getMetadata().toObject())));
+        this._rootNode.addChild(newNode);
+
+    },
+
     applyDragMove: function(srcName, targetName, nodeId, copy){
 
         if(srcName != 'ajxp-user-selection') return;
-
-        ajaxplorer.getContextHolder().getSelectedNodes().each(function(n){
-            if(n.isLeaf()){
-                this._rootNode.addChild(new AjxpNode(n.getPath(), n.isLeaf(), n.getLabel(), n.getIcon()));
-            }else{
-                this.recurseLeafs(n);
-            }
-        }.bind(this));
+        this.addCurrentSelection();
 
     },
 
@@ -81,7 +137,7 @@ Class.create("CartManager", FetchedResultPane, {
         if(node.isLoaded()){
             node.getChildren().each(function(n){
                 if(n.isLeaf()){
-                    this._rootNode.addChild(new AjxpNode(n.getPath(), n.isLeaf(), n.getLabel(), n.getIcon()));
+                    this.localNodeFromRemoteNode(n);
                 }else{
                     this.recurseLeafs(n);
                 }

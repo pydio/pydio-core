@@ -129,10 +129,12 @@ Class.create("AjxpTabulator", AjxpPane, {
             var cdataContent = addNode.firstChild.nodeValue;
             var anchor = this.htmlElement;
             if(cdataContent && anchor){
-                anchor.insert(cdataContent);
-                var compReg = $A();
-                ajaxplorer.buildGUI(anchor.down('#'+addNode.getAttribute("id")), compReg);
-                if(compReg.length) ajaxplorer.initAjxpWidgets(compReg);
+                if(!anchor.down('#'+addNode.getAttribute("id"))){
+                    anchor.insert(cdataContent);
+                    var compReg = $A();
+                    ajaxplorer.buildGUI(anchor.down('#'+addNode.getAttribute("id")), compReg);
+                    if(compReg.length) ajaxplorer.initAjxpWidgets(compReg);
+                }
                 this.addTab(addNode.getAttribute("tabInfo").evalJSON(), addNode.getAttribute("paneInfo").evalJSON());
             }
         }.bind(this));
@@ -193,7 +195,9 @@ Class.create("AjxpTabulator", AjxpPane, {
                 editor.resize();
             }
         }else if(paneInfo.type == 'widget'){
-
+            if(paneInfo.widgetClass && paneInfo.widgetOptions){
+                new paneInfo.widgetClass($(tabInfo.element), paneInfo.widgetOptions);
+            }
         }
         this.tabulatorData.push(tabInfo);
         if(!tabInfo.dontFocus){
@@ -235,9 +239,9 @@ Class.create("AjxpTabulator", AjxpPane, {
         if(ti){
             this.tabulatorData = this.tabulatorData.without(ti);
         }
-        this.resize();
         if(previousTab) this.switchTabulator(previousTab.id);
         else if(this.tabulatorData.length) this.switchTabulator(this.tabulatorData.first().id);
+        this.resize();
     },
 
 	/**
@@ -250,7 +254,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 		this.tabulatorData.each(function(tabInfo){
 			var ajxpObject = this.getAndSetAjxpObject(tabInfo);
             tabInfo.headerElement.removeClassName("toggleInactiveBeforeActive");
-			if(tabInfo.id == tabId){				
+			if(tabInfo.id == tabId){
 				tabInfo.headerElement.removeClassName("toggleInactive");
 				if(tabInfo.headerElement.down('img')) tabInfo.headerElement.down('img').show();
 				if(ajxpObject){
@@ -273,6 +277,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 		if(toShow){
             if($(toShowElement)) $(toShowElement).show();
 			toShow.showElement(true);
+            var reFold = false;
             if(this.htmlElement.up('div[ajxpClass="Splitter"]') && this.htmlElement.up('div[ajxpClass="Splitter"]').ajxpPaneObject){
                 var splitter = this.htmlElement.up('div[ajxpClass="Splitter"]').ajxpPaneObject;
                 if(splitter.splitbar.hasClassName('folded') && (Element.descendantOf(this.htmlElement, splitter.paneA) || this.htmlElement == splitter.paneA ) ){
@@ -284,7 +289,7 @@ Class.create("AjxpTabulator", AjxpPane, {
         this.resize();
         this.notify("switch", tabId);
 	},
-	
+
 	/**
 	 * Resizes the widget
 	 */
