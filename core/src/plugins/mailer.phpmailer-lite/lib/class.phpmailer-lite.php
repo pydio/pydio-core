@@ -1526,16 +1526,33 @@ class PHPMailerLite
 
     switch (strtolower($position)) {
       case 'phrase':
-        $encoded = preg_replace("/([^A-Za-z0-9!*+\/ -])/e", "'='.sprintf('%02X', ord('\\1'))", $encoded);
+        if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
+            $encoded = preg_replace_callback("/([^A-Za-z0-9!*+\/ -])/", function($matches){
+                return sprintf('%02X', ord($matches[1]));
+            }, $encoded);
+        } else {
+            $encoded = preg_replace("/([^A-Za-z0-9!*+\/ -])/e", "'='.sprintf('%02X', ord('\\1'))", $encoded);
+        }
         break;
       case 'comment':
-        $encoded = preg_replace("/([\(\)\"])/e", "'='.sprintf('%02X', ord('\\1'))", $encoded);
+          if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
+              $encoded = preg_replace_callback("/([\(\)\"])/", function($matches){
+                  return sprintf('%02X', ord($matches[1]));
+              }, $encoded);
+          } else {
+            $encoded = preg_replace("/([\(\)\"])/e", "'='.sprintf('%02X', ord('\\1'))", $encoded);
+          }
       case 'text':
       default:
         // Replace every high ascii, control =, ? and _ characters
-        //TODO using /e (equivalent to eval()) is probably not a good idea
-        $encoded = preg_replace('/([\000-\011\013\014\016-\037\075\077\137\177-\377])/e',
+        if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
+            $encoded = preg_replace_callback('/([\000-\011\013\014\016-\037\075\077\137\177-\377])/', function($matches){
+                return sprintf('%02X', ord($matches[1]));
+            }, $encoded);
+        } else {
+            $encoded = preg_replace('/([\000-\011\013\014\016-\037\075\077\137\177-\377])/e',
               "'='.sprintf('%02X', ord('\\1'))", $encoded);
+        }
         break;
     }
 
