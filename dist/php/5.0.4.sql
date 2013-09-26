@@ -1,0 +1,1 @@
+ALTER TABLE IF EXISTS `ajxp_feed` ADD COLUMN `index_path` MEDIUMTEXT NULL;
