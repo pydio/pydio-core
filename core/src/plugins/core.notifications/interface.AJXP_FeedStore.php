@@ -72,4 +72,19 @@ interface AJXP_FeedStore
      * @param $occurrences
      */
     public function dismissAlertById($alertId, $occurrences = 1);
+
+    /**
+     * @param string $indexPath
+     * @param mixed $data
+     * @param string $repositoryId
+     * @param string $repositoryScope
+     * @param string $repositoryOwner
+     * @param string $userId
+     * @param string $userGroup
+     * @return void
+     */
+    public function persistMetaObject($indexPath, $data, $repositoryId, $repositoryScope, $repositoryOwner, $userId, $userGroup);
+    public function findMetaObjectsByIndexPath($repositoryId, $indexPath, $userId, $userGroup, $offset = 0, $limit = 20, $orderBy = "date", $orderDir = "desc");
+    public function updateMetaObject($repositoryId, $oldPath, $newPath = null, $copy = false);
+
 }

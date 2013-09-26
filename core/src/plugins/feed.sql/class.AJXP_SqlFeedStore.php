@@ -62,7 +62,7 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         try {
-            dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[repository_owner],[user_group],[repository_scope],[content]) VALUES (%i,%s,%s,%s,%s,%s,%s,%s,%bin)", time(), "event", "node.change", $userId, $repositoryId, $repositoryOwner, $userGroup, ($repositoryScope !== false ? $repositoryScope : "ALL"), serialize($data));
+            dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[repository_owner],[user_group],[repository_scope],[content]) VALUES (%i,%s,%s,%s,%s,%s,%s,%s,%bin)", time(), "event", $hookName, $userId, $repositoryId, $repositoryOwner, $userGroup, ($repositoryScope !== false ? $repositoryScope : "ALL"), serialize($data));
         } catch (DibiException $e) {
             $this->logError("DibiException", "trying to persist event", $e->getMessage());
         }
@@ -177,6 +177,86 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
             dibi::query("DELETE FROM [ajxp_feed] WHERE [id] IN (%s)",  $a);
         }
     }
+
+    /**
+     * @param string $indexPath
+     * @param mixed $data
+     * @param string $repositoryId
+     * @param string $repositoryScope
+     * @param string $repositoryOwner
+     * @param string $userId
+     * @param string $userGroup
+     * @return void
+     */
+    public function persistMetaObject($indexPath, $data, $repositoryId, $repositoryScope, $repositoryOwner, $userId, $userGroup)
+    {
+        if($this->sqlDriver["password"] == "XXXX") return;
+        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
+        dibi::connect($this->sqlDriver);
+        try {
+            dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[index_path],[user_id],[repository_id],[repository_owner],[user_group],[repository_scope],[content]) VALUES (%i,%s,%s,%s,%s,%s,%s,%s,%s,%bin)", time(), "meta", "comment", $indexPath, $userId, $repositoryId, $repositoryOwner, $userGroup, ($repositoryScope !== false ? $repositoryScope : "ALL"), serialize($data));
+        } catch (DibiException $e) {
+            $this->logError("DibiException", "trying to persist meta", $e->getMessage());
+        }
+    }
+
+    public function findMetaObjectsByIndexPath($repositoryId, $indexPath, $userId, $userGroup, $offset = 0, $limit = 20, $orderBy = "date", $orderDir = "desc"){
+
+        if($this->sqlDriver["password"] == "XXXX") return array();
+        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
+        dibi::connect($this->sqlDriver);
+        $res = dibi::query("SELECT * FROM [ajxp_feed]
+            WHERE [etype] = %s AND [repository_id] = %s AND [index_path] LIKE %s
+            ORDER BY [edate] $orderDir
+            LIMIT $offset,$limit
+        ", "meta", $repositoryId, $indexPath."%");
+
+        $data = array();
+        foreach ($res as $n => $row) {
+            $object = new stdClass();
+            $object->path = $row->index_path;
+            $object->content = unserialize($row->content);
+            $object->author = $row->user_id;
+            $object->date = $row->edate;
+            $object->repository = $row->repository_id;
+            $object->uuid = $row->id;
+            $data[] = $object;
+        }
+        return $data;
+    }
+
+    public function updateMetaObject($repositoryId, $oldPath, $newPath = null, $copy = false){
+
+        if($oldPath != null && $newPath == null){// DELETE
+
+            if($this->sqlDriver["password"] == "XXXX") return array();
+            require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
+            dibi::connect($this->sqlDriver);
+            dibi::query("DELETE FROM [ajxp_feed] WHERE [repository_id]=%s and [index_path] LIKE %s", $repositoryId, $oldPath."%");
+
+        }else if($oldPath != null && $newPath != null){ // MOVE or COPY
+
+            if($this->sqlDriver["password"] == "XXXX") return array();
+            require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
+            dibi::connect($this->sqlDriver);
+
+            if($copy){
+
+                // ?? Do we want to duplicate metadata?
+
+            }else{
+
+                $starter = "__START__";
+                dibi::query("UPDATE [ajxp_feed] SET [index_path] = CONCAT(%s, [index_path]) WHERE [index_path] LIKE %s AND [repository_id]=%s", $starter, $oldPath."%", $repositoryId);
+                dibi::query("UPDATE [ajxp_feed] SET [index_path] = REPLACE([index_path], %s, %s) WHERE [index_path] LIKE %s AND [repository_id]=%s", $starter.$oldPath, $starter.$newPath, $starter.$oldPath."%", $repositoryId);
+                dibi::query("UPDATE [ajxp_feed] SET [index_path] = REPLACE([index_path], %s, %s) WHERE [index_path] LIKE %s AND [repository_id]=%s", $starter, '', $starter.$newPath."%", $repositoryId);
+
+            }
+
+        }
+
+    }
+
 
     public function installSQLTables($param)
     {
