@@ -51,12 +51,13 @@ Class.create("CommentsPanel", {
                 });
                 conn.discrete = true;
                 conn.onComplete = function(transport){
-                    container.down("#comments_container").update('');
+                    container.down("#comments_container").select('.comment_content').invoke("remove");
                     var feed = transport.responseJSON;
                     for(var i=0;i<feed.length;i++){
                         CommentsPanel.prototype.commentObjectToDOM($H(feed[i]), container, node, pe?true:false);
                     }
                     CommentsPanel.prototype.refreshScroller(container);
+                    $("comments_container").scrollTop = 10000;
                 };
 
                 conn.sendAsync();
@@ -67,7 +68,7 @@ Class.create("CommentsPanel", {
 
         }
 
-        container.down("#comments_submit").observe("click", function(){
+        var submitComment = function(){
 
             if(!container.down('textarea').getValue()) {
                 return;
@@ -83,18 +84,32 @@ Class.create("CommentsPanel", {
                 CommentsPanel.prototype.commentObjectToDOM($H(transport.responseJSON), container, node);
                 container.down('textarea').setValue("");
                 CommentsPanel.prototype.refreshScroller(container);
+                $("comments_container").scrollTop = 10000;
             };
 
             conn.sendAsync();
 
+        }.bind(this);
+
+        container.down("#comments_submit").observe("click", function(){
+             submitComment();
+        });
+
+        container.down('textarea').observe("keydown", function(e){
+            if(e.keyCode == Event.KEY_RETURN && e.ctrlKey){
+                submitComment();
+                return false;
+            }
+            return true;
         });
 
     },
 
     commentObjectToDOM: function(hash, container, node, skipAnim){
 
-        var tpl = new Template('<div class="comment_legend"><span class="icon-remove comment_delete"></span>#{author}, #{hdate}</div><div class="comment_text">#{content}</div>');
+        var tpl = new Template('<div class="comment_legend"><span class="icon-remove comment_delete"></span>#{author}, #{hdate}</div><div class="comment_text"><span class="comment_text_content">#{content}</span><span class="comment_file_path" ajxp-goto="#{path}">#{rpath}</span></div>');
         var el = new Element("div", {className:'comment_content'}).update(tpl.evaluate(hash._object));
+        if(!hash.get('rpath')) el.down('.comment_file_path').hide();
 
         if(!skipAnim) el.setStyle({opacity:0, display:'block'});
         container.down("#comments_container").insert(el);

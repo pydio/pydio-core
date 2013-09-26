@@ -1,11 +1,18 @@
 #comments_container{
     padding: 5px 0;
     color: #555555;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.scrolling #comments_container{
+    margin-right: 10px;
 }
 
 #comments_form{
     padding: 5px 0;
     position: relative;
+    clear: both;
 }
 
 #comments_form textarea{
@@ -36,26 +43,42 @@ div.double #comments_form textarea, div.triple #comments_form textarea{
 }
 
 .comment_delete {
-    float: right;
     cursor: pointer;
     font-size: 10px;
     color: rgb(174, 183, 192);
     display: inline-block !important;
-    padding-top: 3px;
-    padding-left: 5px;
+    padding: 5px;
 }
 
 .comment_legend {
     color: rgba(184, 184, 184, 0.6);
     font-size: 11px;
-    text-transform: lowercase;
     text-align: center;
-    top: -10px;
-    background-color: #ebedf0;
-    display: inline-block;
-    position: absolute;
-    padding: 0 6px;
-    left: 27%;
+    display: block;
+    padding: 2%;
+    float: left;
+    width: 28%;
+}
+.comment_text{
+    float:right;
+    width: 65%;
+    background-color: rgba(138,149,160,0.40);
+    border-radius: 10px;
+    padding: 0;
+}
+
+.comment_file_path{
+    display: block;
+    font-size: 11px;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.4);
+    padding: 1px;
+    color: rgba(255,255,255,1);
+}
+
+.comment_text_content{
+    display: block;
+    padding: 5px;
 }
 
 .foldedPanel_tooltip .comment_legend{
@@ -63,19 +86,19 @@ div.double #comments_form textarea, div.triple #comments_form textarea{
 }
 
 .comment_content {
-    border-top: 1px solid #ffffff;
     font-size: 13px;
     padding: 10px 5px 0 5px;
     margin: 10px 0;
     position: relative;
+    clear: both;
 }
 
 .comment_content:nth-child(even) .comment_text {
-    text-align: right;
+    float: left;
 }
 
-.scrolling div.comment_text{
-    padding-right: 10px;
+.comment_content:nth-child(even) .comment_legend {
+    float: right;
 }
 
 .foldedPanel_tooltip .comment_text{

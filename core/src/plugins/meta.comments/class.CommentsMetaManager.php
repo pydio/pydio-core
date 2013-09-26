@@ -19,15 +19,28 @@ class CommentsMetaManager extends AJXP_Plugin
      * @var MetaStoreProvider
      */
     private $metaStore;
+    /**
+     * @var AJXP_FeedStore
+     */
+    private $feedStore;
+
+    private $storageMode;
 
     public function initMeta($accessDriver)
     {
         $this->accessDriver = $accessDriver;
-        $store = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
-        if ($store === false) {
-            throw new Exception("The 'meta.comments' plugin requires at least one active 'metastore' plugin");
+        $feed = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("feed");
+        if($feed){
+            $this->storageMode = "FEED";
+            $this->feedStore = $feed;
+        }else{
+            $store = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
+            if ($store === false) {
+                throw new Exception("The 'meta.comments' plugin requires at least one active 'metastore' plugin");
+            }
+            $this->metaStore = $store;
+            $this->storageMode = "METASTORE";
         }
-        $this->metaStore = $store;
     }
     /**
      * @param AJXP_Node $ajxpNode
@@ -49,6 +62,11 @@ class CommentsMetaManager extends AJXP_Plugin
     public function moveMeta($oldFile, $newFile = null, $copy = false)
     {
         if($oldFile == null) return;
+        $feedStore = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("feed");
+        if($feedStore !== false) {
+            $feedStore->updateMetaObject(ConfService::getRepository()->getId(), $oldFile->getPath(), ($newFile!=null?$newFile->getPath():null), $copy);
+            return;
+        }
 
         if(!$copy && $this->metaStore->inherentMetaMove()) return;
 
@@ -77,6 +95,7 @@ class CommentsMetaManager extends AJXP_Plugin
         $userSelection = new UserSelection();
         $userSelection->initFromHttpVars($httpVars);
         $uniqNode = $userSelection->getUniqueNode($this->accessDriver);
+        $feedStore = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("feed");
         $existingFeed = $uniqNode->retrieveMetadata(AJXP_META_SPACE_COMMENTS, false);
         if ($existingFeed == null) {
             $existingFeed = array();
@@ -93,8 +112,19 @@ class CommentsMetaManager extends AJXP_Plugin
                     "content"   => $httpVars["content"]
                 );
                 $existingFeed[] = $com;
-                $uniqNode->removeMetadata(AJXP_META_SPACE_COMMENTS, false);
-                $uniqNode->setMetadata(AJXP_META_SPACE_COMMENTS, $existingFeed, false);
+                if($feedStore!== false){
+                    $feedStore->persistMetaObject(
+                        $uniqNode->getPath(),
+                        base64_encode($com["content"]),
+                        $uniqNode->getRepositoryId(),
+                        $uniqNode->getRepository()->securityScope(),
+                        $uniqNode->getRepository()->getOwner(),
+                        AuthService::getLoggedUser()->getId(),
+                        AuthService::getLoggedUser()->getGroupPath());
+                }else{
+                    $uniqNode->removeMetadata(AJXP_META_SPACE_COMMENTS, false);
+                    $uniqNode->setMetadata(AJXP_META_SPACE_COMMENTS, $existingFeed, false);
+                }
                 HTMLWriter::charsetHeader("application/json");
                 $com["hdate"] = AJXP_Utils::relativeDate($com["date"], $mess);
                 echo json_encode($com);
@@ -104,10 +134,36 @@ class CommentsMetaManager extends AJXP_Plugin
             case "load_comments_feed":
 
                 HTMLWriter::charsetHeader("application/json");
-                foreach ($existingFeed as &$item) {
-                    $item["hdate"] = AJXP_Utils::relativeDate($item["date"], $mess);
+                if($feedStore !== false){
+                    $data = $feedStore->findMetaObjectsByIndexPath(ConfService::getRepository()->getId(), $uniqNode->getPath(), AuthService::getLoggedUser()->getId(), AuthService::getLoggedUser()->getGroupPath(), 0, 20, "date", "asc");
+                    $theFeed = array();
+                    foreach($data as $stdObject){
+                        $rPath = substr($stdObject->path, strlen($uniqNode->getPath()));
+                        if($rPath == false && $stdObject->path == $uniqNode->getPath()) $rPath = "";
+                        $rPath = ltrim($rPath, "/");
+                        $newItem = array(
+                            "date"      =>$stdObject->date,
+                            "hdate"     => AJXP_Utils::relativeDate($stdObject->date, $mess),
+                            "author"    => $stdObject->author,
+                            "content"   => base64_decode($stdObject->content),
+                            "path"      => $stdObject->path,
+                            "rpath"     => $rPath
+                        );
+                        if(isSet($previous) && $previous["author"] == $newItem["author"] &&  $previous["path"] == $newItem["path"] && $previous["hdate"] == $newItem["hdate"] ){
+                            $theFeed[count($theFeed) - 1]["content"].= $newItem["content"];
+
+                        }else{
+                            $theFeed[] = $newItem;
+                        }
+                        $previous = $newItem;
+                    }
+                    echo json_encode($theFeed);
+                }else{
+                    foreach ($existingFeed as &$item) {
+                        $item["hdate"] = AJXP_Utils::relativeDate($item["date"], $mess);
+                    }
+                    echo json_encode($existingFeed);
                 }
-                echo json_encode($existingFeed);
 
                 break;
 
