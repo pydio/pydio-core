@@ -1,1 +1,1 @@
-ALTER TABLE IF EXISTS `ajxp_feed` ADD COLUMN `index_path` text;
+ALTER TABLE `ajxp_feed` ADD COLUMN `index_path` text;
