@@ -50,7 +50,6 @@ class ImagePreviewer extends AJXP_Plugin {
 		if($action == "preview_data_proxy"){
 			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
             if(!file_exists($destStreamURL.$file)) return;
-			
 			if(isSet($httpVars["get_thumb"]) && $this->getFilteredOption("GENERATE_THUMBNAIL", $repository->getId())){
                 $dimension = 200;
                 if(isSet($httpVars["dimension"]) && is_numeric($httpVars["dimension"])) $dimension = $httpVars["dimension"];
@@ -116,7 +115,8 @@ class ImagePreviewer extends AJXP_Plugin {
 	public function generateThumbnail($masterFile, $targetFile){
         $size = $this->currentDimension;
 		require_once(AJXP_INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
-		$pThumb = new PThumb($this->getFilteredOption("THUMBNAIL_QUALITY"));
+
+		$pThumb = new PThumb($this->getFilteredOption("THUMBNAIL_QUALITY"),$this->getFilteredOption("EXIF_ROTATION"));
 		if(!$pThumb->isError()){
 			$pThumb->remote_wrapper = $this->streamData["classname"];
             //AJXP_Logger::debug("Will fit thumbnail");
@@ -160,7 +160,8 @@ class ImagePreviewer extends AJXP_Plugin {
 				$setRemote = true;
 			}
 		}
-		if($isImage)
+
+    if($isImage)
 		{
 			if($setRemote){
 				$ajxpNode->image_type = "N/A";
@@ -168,8 +169,25 @@ class ImagePreviewer extends AJXP_Plugin {
 				$ajxpNode->image_height = "N/A";
 				$ajxpNode->readable_dimension = "";
 			}else{
-				$realFile = $ajxpNode->getRealFile();
+        require_once(AJXP_INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
+        $pThumb = new PThumb($this->getFilteredOption["THUMBNAIL_QUALITY"],$this->getFilteredOption("EXIF_ROTATION"));
+        $realFile = $ajxpNode->getRealFile();
+        
 				list($width, $height, $type, $attr) = @getimagesize($realFile);
+
+        $orientation = $pThumb->exiforientation($realFile, false);
+        if ($pThumb->rotationsupported($orientation))        
+        {
+          $ajxpNode->ort = $orientation;
+
+          if ($orientation>4)
+          {
+            $tmp=$height;
+            $height=$width;
+            $width=$tmp;
+          }
+        }
+
 				$ajxpNode->image_type = image_type_to_mime_type($type);
 				$ajxpNode->image_width = $width;
 				$ajxpNode->image_height = $height;

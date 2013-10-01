@@ -326,6 +326,7 @@ Class.create("Diaporama", AbstractEditor, {
 	},
 		
 	resizeImage : function(morph){	
+    var node = this.nodes.get(this.currentFile);
 		if(this.autoFit && morph){
 			this.computeFitToScreenFactor();
 		}
@@ -333,16 +334,39 @@ Class.create("Diaporama", AbstractEditor, {
 		this.zoomInput.value = nPercent + ' %';
 		var height = parseInt(nPercent*this.crtHeight / 100);	
 		var width = parseInt(nPercent*this.crtWidth / 100);
+
+    // apply rotation
+    this.imgBorder.removeClassName("ort-rotate-1");
+    this.imgBorder.removeClassName("ort-rotate-2");
+    this.imgBorder.removeClassName("ort-rotate-3");
+    this.imgBorder.removeClassName("ort-rotate-4");
+    this.imgBorder.removeClassName("ort-rotate-5");
+    this.imgBorder.removeClassName("ort-rotate-6");
+    this.imgBorder.removeClassName("ort-rotate-7");
+    this.imgBorder.removeClassName("ort-rotate-8");
+    var ort = node.getMetadata().get("ort");
+    if (ort)
+      this.imgBorder.addClassName("ort-rotate-"+ort);
+
 		// Center vertically
 		var marginTop=0;
 		var marginLeft=0;
 		this.containerDim = $(this.imgContainer).getDimensions();		
-		if (height < this.containerDim.height){
-			marginTop = parseInt((this.containerDim.height - height) / 2);
-		}
-		if (width < this.containerDim.width){
-			marginLeft = parseInt((this.containerDim.width - width) / 2);
-		}
+
+    if (ort>4)
+    {
+      tmp=height;
+      height=width;
+      width=tmp;
+    }
+
+    if (height < this.containerDim.height){
+  	  marginTop = parseInt((this.containerDim.height - height) / 2);
+    }
+	  if (width < this.containerDim.width){
+		  marginLeft = parseInt((this.containerDim.width - width) / 2);
+	  }
+
 		if(morph && this.imgBorder.visible()){
 			new Effect.Morph(this.imgBorder,{
 				style:{height:height+'px', width:width+'px',marginTop:marginTop+'px',marginLeft:marginLeft+'px'}, 
@@ -397,7 +421,6 @@ Class.create("Diaporama", AbstractEditor, {
         nav.centerY = (nav.bottom-nav.top)/2;
         nav.containerWidth = this.imgContainer.getWidth();
         nav.containerHeight = this.imgContainer.getHeight();
-
         var navigatorImg = overlay.next("img");
         var offset = navigatorImg.positionedOffset();
         var targetDim = navigatorImg.getDimensions();

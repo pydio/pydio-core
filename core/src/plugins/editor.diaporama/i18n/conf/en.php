@@ -29,5 +29,7 @@ $mess=array(
 "Generate thumbnails or not" => "Generate thumbnails or not",
 "Quality" => "Quality",
 "Thumbs quality" => "Thumbs quality",
+"Exif Rotation" => "Exif Rotation",
+"Rotate image using exif rotation" => "Rotate image using exif rotation"
 );
 ?>
