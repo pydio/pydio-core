@@ -18,6 +18,8 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+ 
+ // Norwegian translation by Ole Haugset
 $mess=array(
 "1" => "Konfigurasjonsdata",
 "2" => "Brukere og grupper",
