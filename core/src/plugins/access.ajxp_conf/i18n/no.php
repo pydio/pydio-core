@@ -139,5 +139,5 @@ $mess=array(
 "117" => "Mal Driver",
 "118" => "Ny gruppe",
 "group_access" => "g",
-"119" => "Set user group",
+"119" => "Sett brukergruppe",
 );
