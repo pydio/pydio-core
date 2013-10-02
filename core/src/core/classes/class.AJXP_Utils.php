@@ -1553,6 +1553,13 @@ class AJXP_Utils
                 unset($params[$k]);
             }
         }
+        switch ($params["driver"]) {
+            case "sqlite":
+            case "sqlite3":
+                $params["formatDateTime"] = "'Y-m-d H:i:s'";
+                $params["formatDate"] = "'Y-m-d'";
+                break;
+        }
         return $params;
     }
 

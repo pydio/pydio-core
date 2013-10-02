@@ -65,18 +65,6 @@ class sqlLogDriver extends AbstractLogDriver
     }
 
     /**
-     * Simple function to format Date objects to fit MySQL expected where condition
-     *
-     * @param Integer $unix_time timestamp to convert
-     * @return String Date string formatted to fit a MySQL where condition.
-     */
-    public function toMysqlDateTime($unix_time)
-    {
-        $t = date('Y-m-d G:i:s', $unix_time);
-        return $t;
-    }
-
-    /**
      * formats the error message in representable manner
      *
      * For the SQL driver we will normalise the information into our table row format.
@@ -102,7 +90,7 @@ class sqlLogDriver extends AbstractLogDriver
         $severity = strtoupper((string) $severity);
 
         $log_row = Array(
-            'logdate' => $this->toMysqlDateTime(strtotime('NOW')), // DateTime Constant introduced in PHP 5.1
+            'logdate' => new DateTime('NOW'),
             'remote_ip' => $this->inet_ptod($_SERVER['REMOTE_ADDR']),
             'severity' => $severity,
             'user' => $user,
@@ -193,12 +181,21 @@ class sqlLogDriver extends AbstractLogDriver
     {
         $xml_strings = array();
 
-        if ($this->sqlDriver["driver"] == "sqlite3") {
-            $yFunc = "strftime('%Y', [logdate])";
-            $mFunc = "strftime('%m', [logdate])";
-        } else {
-            $yFunc = "YEAR([logdate])";
-            $mFunc = "MONTH([logdate])";
+        switch ($this->sqlDriver["driver"]) {
+            case "sqlite":
+            case "sqlite3":
+                $yFunc = "strftime('%Y', [logdate])";
+                $mFunc = "strftime('%m', [logdate])";
+                $dFunc = "date([logdate])";
+                break;
+            case "mysql":
+                $yFunc = "YEAR([logdate])";
+                $mFunc = "MONTH([logdate])";
+                $dFunc = "DATE([logdate])";
+                break;
+            default:
+                echo "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
+                exit(1);
         }
 
         try {
@@ -209,10 +206,10 @@ class sqlLogDriver extends AbstractLogDriver
                 $end_time = mktime(0,0,0,$month+1,1,$year);
 
                 $q = 'SELECT
-                    DISTINCT DATE([logdate]) AS logdate
+                    DISTINCT '.$dFunc.' AS logdate
                     FROM [ajxp_log]
-                    WHERE [logdate] >= %s AND [logdate] < %s';
-                $result = dibi::query($q, $this->toMysqlDateTime($start_time), $this->toMysqlDateTime($end_time));
+                    WHERE [logdate] >= %t AND [logdate] < %t';
+                $result = dibi::query($q, $start_time, $end_time);
 
                 foreach ($result as $r) {
                     $log_time = strtotime($r['logdate']);
@@ -236,8 +233,8 @@ class sqlLogDriver extends AbstractLogDriver
                     DISTINCT '.$yFunc.' AS year,
                     '.$mFunc.' AS month
                     FROM [ajxp_log]
-                    WHERE [logdate] >= %s AND [logdate] < %s';
-                $result = dibi::query($q, $this->toMysqlDateTime($year_start_time), $this->toMysqlDateTime($year_end_time));
+                    WHERE [logdate] >= %t AND [logdate] < %t';
+                $result = dibi::query($q, $year_start_time, $year_end_time);
 
                 foreach ($result as $r) {
                     /* We always recreate a unix timestamp while looping because it provides us with a uniform way to format the date.
@@ -293,15 +290,8 @@ class sqlLogDriver extends AbstractLogDriver
         $end_time = mktime(0,0,0,date('m', $start_time), date('d', $start_time) + 1, date('Y', $start_time));
 
         try {
-            if ($this->sqlDriver["driver"] == "sqlite3") {
-                $dateEnd = date('Y-m-d', $end_time);
-                $q = 'SELECT * FROM [ajxp_log] WHERE strftime("%s", logdate) BETWEEN  strftime("%s", "'.$date.'") AND  strftime("%s", "'.$dateEnd.'") ORDER BY logdate';
-                $result = dibi::query($q);
-            } else {
-                $q = 'SELECT * FROM [ajxp_log] WHERE [logdate] BETWEEN %d AND %d';
-                $result = dibi::query($q, $this->toMysqlDateTime($start_time), $this->toMysqlDateTime($end_time));
-            }
-            //$all = $result->fetchAll();
+            $q = 'SELECT * FROM [ajxp_log] WHERE [logdate] BETWEEN %t AND %t';
+            $result = dibi::query($q, $start_time, $end_time);
             $log_items = "";
 
             foreach ($result as $r) {

@@ -62,6 +62,8 @@
             <global_param group_switch_name="dibi_provider" group_switch_label="MySQL" group_switch_value="mysql" name="mysql_username" default="" label="User" description="User name" type="string" mandatory="true"/>
             <global_param group_switch_name="dibi_provider" group_switch_label="MySQL" group_switch_value="mysql" name="mysql_password" default="" label="Password" description="User password" type="password" mandatory="true"/>
             <global_param group_switch_name="dibi_provider" group_switch_label="Sqlite 3" group_switch_value="sqlite3" name="sqlite3_driver" default="sqlite3" label="Driver" description="Driver type (do not touch)" type="hidden" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="Sqlite 3" group_switch_value="sqlite3" name="sqlite3_formatDate" default="'Y-m-d'" label="formatDate" description="formatDate (do not touch)" type="hidden" mandatory="true"/>
+            <global_param group_switch_name="dibi_provider" group_switch_label="Sqlite 3" group_switch_value="sqlite3" name="sqlite3_formatDateTime" default="'Y-m-d H:i:s'" label="formatDateTime" description="formatDateTime (do not touch)" type="hidden" mandatory="true"/>
             <global_param group_switch_name="dibi_provider" group_switch_label="Sqlite 3" group_switch_value="sqlite3" name="sqlite3_database" default="AJXP_DATA_PATH/plugins/conf.sql/ajaxplorer.db" label="File" description="Database file" type="string" mandatory="true"/>
         </server_settings>
     </dibidriver_provider>
