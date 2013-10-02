@@ -421,23 +421,15 @@ class sqlConfDriver extends AbstractConfDriver
 
     public function listRoles($roleIds = array(), $excludeReserved = false)
     {
-        $q = 'SELECT * FROM [ajxp_roles]';
         $wClauses = array();
         if (count($roleIds)) {
-            foreach ($roleIds as $id) {
-                $wClauses[] = "[role_id] = '$id'";
-            }
-        }
-        if (count($wClauses)) {
-            $wClauses = array("(".implode(" OR ", $wClauses).")");
+            // We use (%s) instead of %in to pass everyting as string ('1' instead of 1)
+            $wClauses[] = array('[role_id] IN (%s)', $roleIds);
         }
         if ($excludeReserved) {
-            $wClauses[] = "[role_id] NOT LIKE 'AJXP_%'";
+            $wClauses[] = array('[role_id] NOT LIKE %like~', 'AJXP_');
         }
-        if (count($wClauses)) {
-            $q .= " WHERE ".implode(" AND ", $wClauses);
-        }
-        $res = dibi::query($q);
+        $res = dibi::query('SELECT * FROM [ajxp_roles] %if', count($wClauses), 'WHERE %and', $wClauses);
         $all = $res->fetchAll();
 
         $roles = Array();
