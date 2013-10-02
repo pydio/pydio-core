@@ -92,8 +92,8 @@ class sqlConfDriver extends AbstractConfDriver
      */
     public function _savePluginConfig($pluginId, $options)
     {
-        $res_opts = dibi::query('SELECT * FROM [ajxp_plugin_configs] WHERE [id] = %s', $pluginId);
-        if (count($res_opts->fetchAll())) {
+        $res_opts = dibi::query('SELECT COUNT(*) FROM [ajxp_plugin_configs] WHERE [id] = %s', $pluginId);
+        if ($res_opts->fetchSingle()) {
             dibi::query('UPDATE [ajxp_plugin_configs] SET [configs] = %s WHERE [id] = %s', serialize($options), $pluginId);
         } else {
             dibi::query('INSERT INTO [ajxp_plugin_configs]', array('id' => $pluginId, 'configs' => serialize($options)));
@@ -508,8 +508,8 @@ class sqlConfDriver extends AbstractConfDriver
 
     public function countAdminUsers()
     {
-        $rows = dibi::query("SELECT [login] FROM ajxp_user_rights WHERE [repo_uuid] = %s AND [rights] = %s", "ajxp.admin", "1");
-        return count($rows->fetchAll());
+        $rows = dibi::query("SELECT COUNT(*) FROM ajxp_user_rights WHERE [repo_uuid] = %s AND [rights] = %s", "ajxp.admin", "1");
+        return $rows->fetchSingle();
     }
 
     /**

@@ -75,11 +75,11 @@ class sqlAuthDriver extends AbstractAuthDriver
         if (!empty($regexp)) {
             if($regexp[0]=="^") $regexp = ltrim($regexp, "^")."%";
             else if($regexp[strlen($regexp)-1] == "$") $regexp = "%".rtrim($regexp, "$");
-            $res = dibi::query("SELECT [login] FROM [ajxp_users] WHERE [login] LIKE '".$regexp."' AND [groupPath] LIKE %s ", $baseGroup."%") ;
+            $res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [login] LIKE '".$regexp."' AND [groupPath] LIKE %s ", $baseGroup."%") ;
         } else {
-            $res = dibi::query("SELECT [login] FROM [ajxp_users] WHERE [groupPath] LIKE %s", $baseGroup."%");
+            $res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [groupPath] LIKE %s", $baseGroup."%");
         }
-        return count($res->fetchAll());
+        return $res->fetchSingle();
     }
 
     public function listUsers($baseGroup="/")
@@ -97,8 +97,8 @@ class sqlAuthDriver extends AbstractAuthDriver
 
     public function userExists($login)
     {
-        $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [login]=%s", $login);
-        return(count($res->fetchAll()) > 0);
+        $res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [login]=%s", $login);
+        return ($res->fetchSingle() > 0);
     }
 
     public function checkPassword($login, $pass, $seed)
