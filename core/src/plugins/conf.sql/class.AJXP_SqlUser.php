@@ -428,12 +428,12 @@ class AJXP_SqlUser extends AbstractAjxpUser
             // MIGRATE NOW !
             $originalRights = $this->rights;
             $this->migrateRightsToPersonalRole();
-            $removedRights = array_diff($originalRights, $this->rights);
-            foreach($removedRights as $i => $v) $removedRights[$i] = "[repo_uuid]='$i'";
+            $removedRights = array_keys(array_diff($originalRights, $this->rights));
             $this->roles["AJXP_USR_"."/".$this->id] = $this->personalRole;
             // SAVE RIGHT AND ROLE
             if (count($removedRights)) {
-                dibi::query("DELETE FROM [ajxp_user_rights] WHERE ".implode(" OR ", $removedRights));
+                // We use (%s) instead of %in to pass everyting as string ('1' instead of 1)
+                dibi::query("DELETE FROM [ajxp_user_rights] WHERE [login] = %s AND [repo_uuid] IN (%s)", $this->getId(), $removedRights);
             }
             AuthService::updateRole($this->personalRole);
         }
