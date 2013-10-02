@@ -174,7 +174,7 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
             $date = $startEventRow->edate;
             $newRes = dibi::query("SELECT [id] FROM [ajxp_feed] WHERE [etype] = %s AND [user_id] = %s AND [edate] <= %s AND content LIKE %~like~ ORDER BY [edate] DESC %lmt", "alert", $userId, $date, "\"$url\"", $occurrences);
             $a = $newRes->fetchPairs();
-            dibi::query("DELETE FROM [ajxp_feed] WHERE [id] IN (%s)",  $a);
+            dibi::query("DELETE FROM [ajxp_feed] WHERE [id] IN %in",  $a);
         }
     }
 
