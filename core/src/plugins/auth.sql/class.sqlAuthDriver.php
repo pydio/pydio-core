@@ -61,11 +61,11 @@ class sqlAuthDriver extends AbstractAuthDriver
         if ($regexp != null) {
             if($regexp[0]=="^") $regexp = ltrim($regexp, "^")."%";
             else if($regexp[strlen($regexp)-1] == "$") $regexp = "%".rtrim($regexp, "$");
-            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [login] LIKE '".$regexp."' AND [groupPath] LIKE %s ORDER BY [login] ASC", $baseGroup."%") ;
+            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [login] LIKE '".$regexp."' AND [groupPath] LIKE %like~ ORDER BY [login] ASC", $baseGroup) ;
         } else if ($offset != -1 || $limit != -1) {
-            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %s ORDER BY [login] ASC %lmt %ofs", $baseGroup."%", $limit, $offset);
+            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %like~ ORDER BY [login] ASC %lmt %ofs", $baseGroup, $limit, $offset);
         } else {
-            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %s ORDER BY [login] ASC", $baseGroup."%");
+            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %like~ ORDER BY [login] ASC", $baseGroup);
         }
         $pairs = $res->fetchPairs('login', 'password');
            return $pairs;
@@ -75,9 +75,9 @@ class sqlAuthDriver extends AbstractAuthDriver
         if (!empty($regexp)) {
             if($regexp[0]=="^") $regexp = ltrim($regexp, "^")."%";
             else if($regexp[strlen($regexp)-1] == "$") $regexp = "%".rtrim($regexp, "$");
-            $res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [login] LIKE '".$regexp."' AND [groupPath] LIKE %s ", $baseGroup."%") ;
+            $res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [login] LIKE '".$regexp."' AND [groupPath] LIKE %like~ ", $baseGroup) ;
         } else {
-            $res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [groupPath] LIKE %s", $baseGroup."%");
+            $res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [groupPath] LIKE %like~", $baseGroup);
         }
         return $res->fetchSingle();
     }
@@ -85,7 +85,7 @@ class sqlAuthDriver extends AbstractAuthDriver
     public function listUsers($baseGroup="/")
     {
         $pairs = array();
-        $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %s ORDER BY [login] ASC", $baseGroup."%");
+        $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %like~ ORDER BY [login] ASC", $baseGroup);
         $rows = $res->fetchAll();
         foreach ($rows as $row) {
             $grp = $row["groupPath"];

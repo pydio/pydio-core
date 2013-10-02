@@ -331,9 +331,9 @@ class sqlConfDriver extends AbstractConfDriver
             $result_opts_rights = dibi::query('DELETE FROM [ajxp_user_rights] WHERE [repo_uuid] = %s',$repositoryId); //jcg
 
             if ($this->sqlDriver["driver"] == "sqlite3") {
-                $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %s GROUP BY [role_id]', '%"'.$repositoryId.'";s:%');
+                $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
             } else {
-                $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [serial_role] LIKE %s GROUP BY [role_id]', '%"'.$repositoryId.'";s:%');
+                $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [serial_role] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
             }
             $all = $children_results->fetchAll();
             foreach ($all as $item) {
@@ -381,9 +381,9 @@ class sqlConfDriver extends AbstractConfDriver
         }
         // NEW METHOD : SEARCH PERSONAL ROLE
         if ($this->sqlDriver["driver"] == "sqlite3") {
-            $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %s GROUP BY [role_id]', '%"'.$repositoryId.'";s:%');
+            $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
         } else {
-            $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [serial_role] LIKE %s GROUP BY [role_id]', '%"'.$repositoryId.'";s:%');
+            $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [serial_role] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
         }
         $all = $children_results->fetchAll();
         foreach ($all as $item) {
@@ -539,14 +539,14 @@ class sqlConfDriver extends AbstractConfDriver
     {
         // Delete users of this group, as well as subgroups
         $ids = array();
-        $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %s ORDER BY [login] ASC", $groupPath."%");
+        $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %like~ ORDER BY [login] ASC", $groupPath);
         $rows = $res->fetchAll();
         $subUsers = array();
         foreach ($rows as $row) {
             $this->deleteUser($row["login"], $subUsers);
             dibi::query("DELETE FROM [ajxp_users] WHERE [login] = %s", $row["login"]);
         }
-        dibi::query("DELETE FROM [ajxp_groups] WHERE [groupPath] LIKE %s", $groupPath."%");
+        dibi::query("DELETE FROM [ajxp_groups] WHERE [groupPath] LIKE %like~", $groupPath);
         dibi::query('DELETE FROM [ajxp_roles] WHERE [role_id] = %s', 'AJXP_GRP_'.$groupPath);
     }
 
@@ -558,7 +558,7 @@ class sqlConfDriver extends AbstractConfDriver
     {
         $searchGroup = $baseGroup;
         if($baseGroup[strlen($baseGroup)-1] != "/") $searchGroup.="/";
-        $res = dibi::query("SELECT * FROM [ajxp_groups] WHERE [groupPath] LIKE %s AND [groupPath] NOT LIKE %s", $searchGroup."%", $searchGroup."%/%");
+        $res = dibi::query("SELECT * FROM [ajxp_groups] WHERE [groupPath] LIKE %like~ AND [groupPath] NOT LIKE %s", $searchGroup, $searchGroup."%/%");
         $pairs = $res->fetchPairs("groupPath", "groupLabel");
         foreach ($pairs as $path => $label) {
             if(strlen($path) <= strlen($baseGroup)) unset($pairs[$path]);
