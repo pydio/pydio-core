@@ -19,6 +19,9 @@
             document.documentElement.className += " ajxp_theme_vision";
         });
         window.ajxpBootstrap = new AjxpBootstrap(startParameters);
+        window.onbeforeunload = function(){
+            return "Do you want to quit?";
+        };
 		</script>
 		<div id="ajxp_desktop" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"window","fitMarginBottom":"$(\"optional_bottom_div\").getHeight()"}'></div>
 		<div id="all_forms">

@@ -38,7 +38,7 @@
                         if(tabulator){
                             var newLabel = window.prompt('Provide a label for this selection cart');
                             if(newLabel){
-                                tabulator.addTab({"id":"new-cart","label":newLabel,"iconClass":"icon-suitcase", closeable:true}, {type:"widget", widgetClass:CartManager, widgetOptions:{}});
+                                tabulator.addTab({"id":"new-cart","label":newLabel,"iconClass":"icon-suitcase", closeable:true, dontFocus:true}, {type:"widget", widgetClass:CartManager, widgetOptions:{}});
                             }
                         }
                     ]]></clientCallback>

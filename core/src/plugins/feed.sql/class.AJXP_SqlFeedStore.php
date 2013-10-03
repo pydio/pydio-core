@@ -200,8 +200,8 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         }
     }
 
-    public function findMetaObjectsByIndexPath($repositoryId, $indexPath, $userId, $userGroup, $offset = 0, $limit = 20, $orderBy = "date", $orderDir = "desc"){
-
+    public function findMetaObjectsByIndexPath($repositoryId, $indexPath, $userId, $userGroup, $offset = 0, $limit = 20, $orderBy = "date", $orderDir = "desc")
+    {
         if($this->sqlDriver["password"] == "XXXX") return array();
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
@@ -225,26 +225,26 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         return $data;
     }
 
-    public function updateMetaObject($repositoryId, $oldPath, $newPath = null, $copy = false){
-
-        if($oldPath != null && $newPath == null){// DELETE
+    public function updateMetaObject($repositoryId, $oldPath, $newPath = null, $copy = false)
+    {
+        if ($oldPath != null && $newPath == null) {// DELETE
 
             if($this->sqlDriver["password"] == "XXXX") return array();
             require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
             dibi::connect($this->sqlDriver);
             dibi::query("DELETE FROM [ajxp_feed] WHERE [repository_id]=%s and [index_path] LIKE %s", $repositoryId, $oldPath."%");
 
-        }else if($oldPath != null && $newPath != null){ // MOVE or COPY
+        } else if ($oldPath != null && $newPath != null) { // MOVE or COPY
 
             if($this->sqlDriver["password"] == "XXXX") return array();
             require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
             dibi::connect($this->sqlDriver);
 
-            if($copy){
+            if ($copy) {
 
                 // ?? Do we want to duplicate metadata?
 
-            }else{
+            } else {
 
                 $starter = "__START__";
                 dibi::query("UPDATE [ajxp_feed] SET [index_path] = CONCAT(%s, [index_path]) WHERE [index_path] LIKE %s AND [repository_id]=%s", $starter, $oldPath."%", $repositoryId);
