@@ -302,7 +302,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         $localName = (basename($dir)==""?"Files":basename($dir)).".zip";
                     }
                     $file = AJXP_Utils::getAjxpTmpDir()."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpCompression.zip";
-                    $zipFile = $this->makeZip($selection->getFiles(), $file, $dir);
+                    if(isSet($httpVars["compress_flat"])) $baseDir = "__AJXP_ZIP_FLAT__/";
+                    else $baseDir = $dir;
+                    $zipFile = $this->makeZip($selection->getFiles(), $file, $baseDir);
                     if(!$zipFile) throw new AJXP_Exception("Error while compressing file $localName");
                     register_shutdown_function("unlink", $file);
                     $tmpFNAME = $this->urlBase.$dir."/".str_replace(".zip", ".tmp", $localName);

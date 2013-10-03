@@ -389,7 +389,10 @@ Class.create("SearchEngine", AjxpPane, {
 		$('stop_'+this._searchButtonName).removeClassName("disabled");
         if(this._ajxpOptions.toggleResultsVisibility){
             if(!$(this._ajxpOptions.toggleResultsVisibility).down("div.panelHeader.toggleResults")){
-                $(this._ajxpOptions.toggleResultsVisibility).insert({top:"<div class='panelHeader toggleResults'>Results<span class='close_results icon-remove-sign'></span></div>"});
+                $(this._ajxpOptions.toggleResultsVisibility).insert({top:"<div class='panelHeader toggleResults'>Results<span class='close_results icon-remove-sign'></span><div id='display_toolbar'></div></div>"});
+                this.tb = new ActionsToolbar($(this._ajxpOptions.toggleResultsVisibility).down("#display_toolbar"), {submenuClassName:"panelHeaderMenu",submenuPosition:"bottom right",submenuOffsetTop:12,toolbarsList:["ajxp-search-result-bar"],skipBubbling:true, skipCarousel:true,submenuOffsetTop:2});
+                this.tb.actionsLoaded({memo:ajaxplorer.actionBar.actions});
+                this.tb.element.select('a').invoke('show');
                 this.resultsDraggable = new Draggable(this._ajxpOptions.toggleResultsVisibility, {
                     handle:"panelHeader",
                     zindex:999,

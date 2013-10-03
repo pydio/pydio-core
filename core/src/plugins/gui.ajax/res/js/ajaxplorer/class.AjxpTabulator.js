@@ -45,16 +45,21 @@ Class.create("AjxpTabulator", AjxpPane, {
             if(!tabInfo.label && paneObject){
                 paneObject.getDomNode().observe("editor:updateTitle", function(event){
                     tabInfo.headerElement.down(".tab_label").update(event.memo);
-                }.bind(modal));
+                });
                 paneObject.getDomNode().observe("editor:updateIconClass", function(event){
                     tabInfo.headerElement.down("span").replace(new Element('span',{className:event.memo}));
-                }.bind(modal));
+                });
+            }
+            if($(tabInfo.element)){
+                $(tabInfo.element).observe("widget:updateTitle", function(event){
+                    tabInfo.headerElement.down(".tab_label").update(event.memo);
+                });
             }
 		}.bind(this));
         if(this.options.headerToolbarOptions){
             var tbD = new Element('div', {id:"display_toolbar"});
             div.insert({top:tbD});
-            var tb = new ActionsToolbar(tbD, this.options.headerToolbarOptions);
+            this.tb = new ActionsToolbar(tbD, this.options.headerToolbarOptions);
         }
         if(tabulatorOptions.defaultTabId){
             this.switchTabulator(tabulatorOptions.defaultTabId);
@@ -186,10 +191,10 @@ Class.create("AjxpTabulator", AjxpPane, {
                 var editor = eval ( 'new '+editorData.editorClass+'(oForm, editorOptions)' );
                 editor.getDomNode().observe("editor:updateTitle", function(event){
                     tabInfo.headerElement.down(".tab_label").update(event.memo);
-                }.bind(modal));
+                });
                 editor.getDomNode().observe("editor:updateIconClass", function(event){
                     tabInfo.headerElement.down("span").replace(new Element('span',{className:event.memo}));
-                }.bind(modal));
+                });
                 editor.open(paneInfo.node);
                 tabInfo.ajxpObject = editor;
                 editor.resize();
@@ -197,6 +202,9 @@ Class.create("AjxpTabulator", AjxpPane, {
         }else if(paneInfo.type == 'widget'){
             if(paneInfo.widgetClass && paneInfo.widgetOptions){
                 new paneInfo.widgetClass($(tabInfo.element), paneInfo.widgetOptions);
+                $(tabInfo.element).observe("widget:updateTitle", function(event){
+                    tabInfo.headerElement.down(".tab_label").update(event.memo);
+                });
             }
         }
         this.tabulatorData.push(tabInfo);
@@ -286,8 +294,12 @@ Class.create("AjxpTabulator", AjxpPane, {
             }
 			toShow.resize();
 		}
+        if(this.options.headerToolbarOptions){
+            ajaxplorer.actionBar.fireSelectionChange();
+        }
         this.resize();
         this.notify("switch", tabId);
+
 	},
 
 	/**
@@ -354,6 +366,9 @@ Class.create("AjxpTabulator", AjxpPane, {
 			tabInfo.headerElement.stopObserving("click");
 			ajxpObject.destroy();
 		}.bind(this));
+        if(this.tb){
+            this.tb.destroy();
+        }
 		this.htmlElement.update("");
         if(window[this.htmlElement.id]){
             try{delete window[this.htmlElement.id];}catch(e){}

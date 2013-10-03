@@ -551,7 +551,7 @@ Class.create("AjxpDataModel", {
             contextNode = this._contextNode;
         }
         if(local){
-            var test = contextNode.getPath() + "/" + newFileName;
+            var test = (contextNode.getPath()=="/"?"":contextNode.getPath()) + "/" + newFileName;
             return contextNode.getChildren().detect(function(c){
                 return c.getPath() == test;
             });

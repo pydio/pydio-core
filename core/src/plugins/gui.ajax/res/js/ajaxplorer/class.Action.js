@@ -50,6 +50,7 @@ Class.create("Action", {
 			callback:Prototype.emptyFunction,
 			prepareModal:false, 
 			listeners : [],
+            activeCondition:null,
 			formId:undefined, 
 			formCode:undefined
 			}, arguments[0] || { });
@@ -214,7 +215,7 @@ Class.create("Action", {
 		if(this.options.listeners["contextChange"]){
 			window.listenerContext = this;
 			this.options.listeners["contextChange"].evalScripts();			
-		}		
+		}
 		var rightsContext = this.rightsContext;
 		if(!rightsContext.noUser && !usersEnabled){
 			return this.hideForContext();				
@@ -272,6 +273,10 @@ Class.create("Action", {
 			window.listenerContext = this;
 			this.options.listeners["selectionChange"].evalScripts();			
 		}
+        if(this.options.activeCondition){
+            if(this.options.activeCondition() === false) return this.disable();
+            else if(this.options.activeCondition() === true) this.enable();
+        }
 		if(this.contextHidden
 			|| !this.context.selection) {	
 			return;
@@ -337,7 +342,7 @@ Class.create("Action", {
         }
 		this.show();
 		this.enable();
-		
+
 	},
 		
 	/**
@@ -381,6 +386,8 @@ Class.create("Action", {
 						}
 					}else if(processNode.nodeName == "clientListener" && processNode.firstChild){						
 						this.options.listeners[processNode.getAttribute('name')] = '<script>'+processNode.firstChild.nodeValue+'</script>';
+					}else if(processNode.nodeName == "activeCondition" && processNode.firstChild){
+						this.options.activeCondition = new Function(processNode.firstChild.nodeValue.strip());
 					}
 				}
                 if(clientFormData.formId){

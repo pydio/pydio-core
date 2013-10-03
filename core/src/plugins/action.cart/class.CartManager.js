@@ -21,15 +21,17 @@
 Class.create("CartManager", FetchedResultPane, {
 
     __maxChildren: 100,
+    __label:MessageHash["action.cart.9"],
 
     initialize: function($super, element, options){
 
         options = Object.extend({
             displayMode: 'detail',
-            selectable: false
+            selectable: true
         }, options);
         $super(element, options);
 
+        if(options.label) this.__label = options.label;
         element.ajxpNode = this._rootNode;
         element.applyDragMove = this.applyDragMove.bind(this);
         AjxpDroppables.add(element, this._rootNode);
@@ -41,11 +43,18 @@ Class.create("CartManager", FetchedResultPane, {
             }
         }.bind(this));
 
+        this.updateTitle();
 
+    },
+
+    updateTitle: function(){
+        this.htmlElement.fire("widget:updateTitle", this.__label+' ('+this._rootNode.getChildren().size()+')');
     },
 
     downloadContent: function(){
         var h = this.getLocalSelectionForPosting();
+        if(h.size() == 0) return;
+
         if(!$("download_form")) return;
 
         var form = $('download_form');
@@ -65,6 +74,40 @@ Class.create("CartManager", FetchedResultPane, {
         }
     },
 
+    compressContentAndShare: function(){
+
+        var h = this.getLocalSelectionForPosting();
+        if(h.size() == 0) return;
+        if((zipEnabled && multipleFilesDownloadEnabled))
+        {
+
+            var zipName = window.prompt(MessageHash['action.cart.14'], this.__label);
+            var index=1;
+            var buff = zipName;
+            while(ajaxplorer.getContextHolder().fileNameExists(zipName + ".zip", true, ajaxplorer.getContextHolder().getRootNode())){
+                zipName = buff + "-" + index; index ++ ;
+            }
+            h.set('get_action', 'compress');
+            h.set('compress_flat', 'true');
+            h.set('dir', '/');
+            h.set('archive_name', zipName + ".zip");
+            var conn = new Connexion();
+            conn.setMethod("POST");
+            conn.setParameters(h);
+            conn.onComplete = function(transport){
+                var success = ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                if(success){
+                    ajaxplorer.goTo('/'+zipName+'.zip');
+                    window.setTimeout(function(){
+                        ajaxplorer.actionBar.fireAction('share');
+                    }, 500);
+                }
+            }.bind(this);
+            conn.sendAsync();
+        }
+
+    },
+
     addCurrentSelection: function(){
 
         ajaxplorer.getContextHolder().getSelectedNodes().each(function(n){
@@ -73,6 +116,7 @@ Class.create("CartManager", FetchedResultPane, {
             }else{
                 this.recurseLeafs(n);
             }
+            this.updateTitle();
         }.bind(this));
 
     },
@@ -130,6 +174,7 @@ Class.create("CartManager", FetchedResultPane, {
     recurseLeafs: function(node){
 
         if(this._rootNode.getChildren().length > this.__maxChildren) {
+            this.updateTitle();
             ajaxplorer.displayMessage('ERROR', 'Stopping recursion: please do not select more than ' + this.__maxChildren + ' at once!');
             throw $break;
         }
@@ -148,6 +193,8 @@ Class.create("CartManager", FetchedResultPane, {
             }.bind(this));
             node.load();
         }
+
+        this.updateTitle();
 
     }
 
