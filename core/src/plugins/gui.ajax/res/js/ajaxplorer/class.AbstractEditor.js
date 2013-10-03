@@ -359,17 +359,20 @@ Class.create("AbstractEditor" , {
 		this.element.fire("editor:exitFS");
 		Event.stopObserving(window, "resize", this.fullScreenListener);
         var dContent;
+        var w;
         if(this.originalParentId){
             dContent = $(this.originalParentId);
+            w = 'auto';
         }else{
             dContent = $$('.dialogContent')[0];
+            w = parseInt(dContent.getWidth())+'px';
         }
         dContent.setStyle({position:"relative"});
 		dContent.insert(this.element);
         this.element.relativize();
         this.element.setStyle({position:"relative"});
 		this.element.setStyle({top:0,left:0,
-            width:parseInt(dContent.getWidth())+'px',
+            width:w,
             height:parseInt(dContent.getHeight())+"px",
             zIndex:100});
 		this.resize(this.originalHeight);
