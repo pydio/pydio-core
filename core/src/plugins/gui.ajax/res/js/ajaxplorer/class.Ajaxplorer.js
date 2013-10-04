@@ -844,6 +844,9 @@ Class.create("Ajaxplorer", {
     registerEditorOpener: function(ajxpWidget){
         this._editorOpener = ajxpWidget;
     },
+    unregisterEditorOpener: function(ajxpWidget){
+        if(this._editorOpener == ajxpWidget) this._editorOpener = null;
+    },
 
     openCurrentSelectionInEditor:function(editorData){
         var selectedNode = this.getContextHolder().getUniqueNode();

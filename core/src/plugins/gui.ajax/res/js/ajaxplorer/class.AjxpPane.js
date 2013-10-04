@@ -214,14 +214,14 @@ Class.create("AjxpPane", {
 
 
     getUserPreference : function(prefName){
-        if(!ajaxplorer || !ajaxplorer.user) return;
+        if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return;
         var gui_pref = ajaxplorer.user.getPreference("gui_preferences", true);
         if(!gui_pref || !gui_pref[this.htmlElement.id+"_"+this.__className]) return;
         return gui_pref[this.htmlElement.id+"_"+this.__className][prefName];
     },
 
     setUserPreference : function(prefName, prefValue){
-        if(!ajaxplorer || !ajaxplorer.user) return;
+        if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return;
         var guiPref = ajaxplorer.user.getPreference("gui_preferences", true);
         if(!guiPref) guiPref = {};
         if(!guiPref[this.htmlElement.id+"_"+this.__className]) guiPref[this.htmlElement.id+"_"+this.__className] = {};

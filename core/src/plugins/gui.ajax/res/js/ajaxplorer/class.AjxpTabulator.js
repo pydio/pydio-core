@@ -19,6 +19,9 @@
  */
 
 Class.create("AjxpTabulator", AjxpPane, {
+
+    tabulatorData: null,
+    tabsConfigs: null,
 	/**
 	 * Constructor
 	 * @param $super klass Superclass reference
@@ -30,6 +33,18 @@ Class.create("AjxpTabulator", AjxpPane, {
 		this.tabulatorData 	= $A(tabulatorOptions.tabInfos);
         if(tabulatorOptions.registerAsEditorOpener){
             ajaxplorer.registerEditorOpener(this);
+        }
+        if(tabulatorOptions.events){
+            var events = $H();
+            $H(tabulatorOptions.events).each(function(pair){
+                var callback = new Function(pair.value).bind(this);
+                document.observe(pair.key, callback);
+                events.set(pair.key, callback);
+            }.bind(this));
+            this.options.events = events;
+        }
+        if(tabulatorOptions.saveState){
+            this.tabsConfigs = $H();
         }
 		// Tabulator Data : array of tabs infos
 		// { id , label, icon and element : tabElement }.
@@ -55,6 +70,9 @@ Class.create("AjxpTabulator", AjxpPane, {
                     tabInfo.headerElement.down(".tab_label").update(event.memo);
                 });
             }
+            if(this.options.saveState){
+                paneObject.getDomNode().observe("widget:updateState", this.saveState.bind(this));
+            }
 		}.bind(this));
         if(this.options.headerToolbarOptions){
             var tbD = new Element('div', {id:"display_toolbar"});
@@ -69,7 +87,10 @@ Class.create("AjxpTabulator", AjxpPane, {
                 this.parseComponentConfig(event.memo.classConfig.get("all"));
             }
         }.bind(this));
-
+        if(this.options.saveState){
+            document.observe("ajaxplorer:user_logged", this.loadState.bind(this));
+            this.loadState();
+        }
 
 	},
 
@@ -150,6 +171,10 @@ Class.create("AjxpTabulator", AjxpPane, {
      * @param tabInfo
      */
     addTab: function(tabInfo, paneInfo){
+        if(this.options.saveState){
+            var confPaneInfo = Object.clone(paneInfo);
+            this.tabsConfigs.set(tabInfo.id, {TAB:Object.clone(tabInfo), PANE: confPaneInfo});
+        }
         var existing = this.tabulatorData.detect(function(internalInfo){return internalInfo.id == tabInfo.id;});
         if(existing) {
             this.switchTabulator(existing.id);
@@ -200,11 +225,16 @@ Class.create("AjxpTabulator", AjxpPane, {
                 editor.resize();
             }
         }else if(paneInfo.type == 'widget'){
+            if(paneInfo.widgetClassName) paneInfo.widgetClass = Class.getByName(paneInfo.widgetClassName);
             if(paneInfo.widgetClass && paneInfo.widgetOptions){
-                new paneInfo.widgetClass($(tabInfo.element), paneInfo.widgetOptions);
+                var widgetInstance = new paneInfo.widgetClass($(tabInfo.element), paneInfo.widgetOptions);
                 $(tabInfo.element).observe("widget:updateTitle", function(event){
                     tabInfo.headerElement.down(".tab_label").update(event.memo);
                 });
+                if(confPaneInfo){
+                    confPaneInfo.widgetClassName = widgetInstance.__className;
+                    widgetInstance.getDomNode().observe("widget:updateState", this.saveState.bind(this));
+                }
             }
         }
         this.tabulatorData.push(tabInfo);
@@ -213,6 +243,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             window.setTimeout(this.resize.bind(this), 750);
         }
         this.resize();
+        this.saveState();
     },
 
     /**
@@ -246,10 +277,15 @@ Class.create("AjxpTabulator", AjxpPane, {
         }.bind(this));
         if(ti){
             this.tabulatorData = this.tabulatorData.without(ti);
+            if(this.options.saveState){
+                this.tabsConfigs.unset(tabId);
+            }
+
         }
         if(previousTab) this.switchTabulator(previousTab.id);
         else if(this.tabulatorData.length) this.switchTabulator(this.tabulatorData.first().id);
         this.resize();
+        this.saveState();
     },
 
 	/**
@@ -369,6 +405,15 @@ Class.create("AjxpTabulator", AjxpPane, {
         if(this.tb){
             this.tb.destroy();
         }
+        if(this.options.registerAsEditorOpener){
+            ajaxplorer.registerEditorOpener(this);
+        }
+        if(this.options.events){
+            this.options.events.each(function(eName, callback){
+                document.stopObserving(eName, callback);
+            });
+        }
+
 		this.htmlElement.update("");
         if(window[this.htmlElement.id]){
             try{delete window[this.htmlElement.id];}catch(e){}
@@ -389,6 +434,47 @@ Class.create("AjxpTabulator", AjxpPane, {
 			ajxpObject = tabInfo.ajxpObject = nodeElement.ajxpPaneObject;
 		}
 		return ajxpObject;		
-	}
-	
+	},
+
+    getAjxpObjectByTabId: function(tabId){
+        var theInfo = this.tabulatorData.detect(function(tabInfo){
+            if(tabInfo.id == tabId) return tabInfo;
+        });
+        if(theInfo) return this.getAndSetAjxpObject(theInfo);
+    },
+
+    __stateLoaded : false,
+
+    saveState: function(){
+        if(!this.options.saveState || !this.__stateLoaded) return;
+        if(!ajaxplorer.user) return;
+        this.tabulatorData.each(function(tabInfo){
+            var object = this.getAndSetAjxpObject(tabInfo);
+            if(object.getStateData){
+                if(!this.tabsConfigs.get(tabInfo.id)){
+                    this.tabsConfigs.set(tabInfo.id, {});
+                }
+                this.tabsConfigs.get(tabInfo.id)['DATA'] = object.getStateData();
+            }
+        }.bind(this));
+        this.setUserPreference("tabs_state", this.tabsConfigs);
+    },
+
+    loadState: function(){
+        if(!ajaxplorer || !ajaxplorer.user) return;
+        this.__stateLoaded = true;
+        var pref = this.getUserPreference("tabs_state");
+        if(pref){
+            $H(pref).each(function(pair){
+                if(pair.value.TAB && pair.value.PANE){
+                    this.addTab(pair.value.TAB, pair.value.PANE);
+                }
+                if(pair.value.DATA){
+                    var object = this.getAjxpObjectByTabId(pair.key);
+                    if(object && object.loadStateData) object.loadStateData(pair.value.DATA);
+                }
+            }.bind(this));
+        }
+    }
+
 });

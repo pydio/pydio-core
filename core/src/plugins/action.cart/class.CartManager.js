@@ -49,6 +49,16 @@ Class.create("CartManager", FetchedResultPane, {
 
     updateTitle: function(){
         this.htmlElement.fire("widget:updateTitle", this.__label+' ('+this._rootNode.getChildren().size()+')');
+        var oEl = this.htmlElement;
+        if(this.stateChangeBuffer) window.clearTimeout(this.stateChangeBuffer);
+        this.stateChangeBuffer = window.setTimeout(function(){
+            oEl.fire("widget:updateState");
+        }, 1500);
+    },
+
+    clearContent: function(){
+        this._rootNode.clear();
+        this.updateTitle();
     },
 
     downloadContent: function(){
@@ -82,6 +92,7 @@ Class.create("CartManager", FetchedResultPane, {
         {
 
             var zipName = window.prompt(MessageHash['action.cart.14'], this.__label);
+            if(!zipName) return;
             var index=1;
             var buff = zipName;
             while(ajaxplorer.getContextHolder().fileNameExists(zipName + ".zip", true, ajaxplorer.getContextHolder().getRootNode())){
@@ -151,6 +162,9 @@ Class.create("CartManager", FetchedResultPane, {
         rNodeProvider.initProvider(ajxpOptions.nodeProviderProperties);
         this._rootNode = new AjxpNode("/ajxp-local-cart", false, "Results", "folder.png", rNodeProvider);
         dataModel.setRootNode(this._rootNode);
+        if(this._startData){
+            console.log(this._startData);
+        }
         return dataModel;
 
     },
@@ -196,6 +210,29 @@ Class.create("CartManager", FetchedResultPane, {
 
         this.updateTitle();
 
+    },
+
+    getStateData: function(){
+        var pathes = $A();
+        this._rootNode.getChildren().each(function(el){
+            pathes.push([el.getPath(), el.getLabel(), el.getIcon()]);
+        });
+        return pathes;
+    },
+
+    _startData:null,
+    loadStateData: function(data){
+        this._startData = data;
+        window.setTimeout(function(){
+            $A(data).each(function(nodeData){
+                try{
+                    var n = new AjxpNode(nodeData[0], true, nodeData[1], nodeData[2]);
+                    n.getMetadata().set('filename', nodeData[0]);
+                    this._rootNode.addChild(n);
+                }catch(e){}
+            }.bind(this));
+            this.htmlElement.fire("widget:updateTitle", this.__label+' ('+this._rootNode.getChildren().size()+')');
+        }.bind(this), 5000);
     }
 
 });

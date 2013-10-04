@@ -1083,7 +1083,8 @@ padding: 3px 5px !important;
 }
 
 .editor_action_bar span.actionbar_button_label {
-font-size: 11px !important;
+    font-size: 11px !important;
+    font-weight: bold;
 }
 
 div.editor_header > span.header_label{
@@ -1120,13 +1121,12 @@ div.editor_header > span.header_label{
 
 .action_bar.floatingBar{
     position: absolute;
-    border-radius: 3px;
+    border-radius: 20px;
     padding-right: 10px;
     padding-left: 10px;
     cursor: move;
-    opacity: 0.95;
+    opacity: 0.90;
     background-color: rgb(138, 149, 160);
-    box-shadow: 1px 1px 3px #000;
 }
 
 .action_bar span.actionbar_button_label {
@@ -1829,7 +1829,6 @@ div.header_resizer div.ascending {
 
 .selected
 {
-    color : #404040;
     text-decoration: none;
 }
 
@@ -2538,8 +2537,8 @@ div.class-FetchedResultPane div.ajxpNodeProvider:hover
     background-color: transparent !important;
 }
 
-div.class-FetchedResultPane div.ajxpNodeProvider.selected,
-#search_results div.ajxpNodeProvider.selected
+div.class-FetchedResultPane div.ajxpNodeProvider.selected-focus,
+#search_results div.ajxpNodeProvider.selected-focus
 {
     background-color: #59F !important;
 }
