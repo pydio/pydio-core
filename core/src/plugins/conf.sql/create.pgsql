@@ -55,7 +55,8 @@ CREATE INDEX ajxp_repo_options_uuid_idx ON ajxp_repo_options (uuid);
 
 CREATE TABLE IF NOT EXISTS ajxp_roles (
   role_id varchar(255) PRIMARY KEY,
-  serial_role text NOT NULL
+  serial_role bytea NOT NULL,
+  searchable_repositories text
 );
 
 CREATE TABLE IF NOT EXISTS ajxp_groups (

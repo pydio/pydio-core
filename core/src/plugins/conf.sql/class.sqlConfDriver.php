@@ -330,10 +330,17 @@ class sqlConfDriver extends AbstractConfDriver
             $result_opts = dibi::query('DELETE FROM [ajxp_repo_options] WHERE [uuid] = %s', $repositoryId);
             $result_opts_rights = dibi::query('DELETE FROM [ajxp_user_rights] WHERE [repo_uuid] = %s',$repositoryId); //jcg
 
-            if ($this->sqlDriver["driver"] == "sqlite3") {
-                $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
-            } else {
-                $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [serial_role] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
+            switch ($this->sqlDriver["driver"]) {
+                case "sqlite":
+                case "sqlite3":
+                case "postgre":
+                    $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
+                    break;
+                case "mysql":
+                    $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [serial_role] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
+                    break;
+                default:
+                    return "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
             }
             $all = $children_results->fetchAll();
             foreach ($all as $item) {
@@ -380,10 +387,17 @@ class sqlConfDriver extends AbstractConfDriver
             $result[$item["login"]] = $this->createUserObject($item["login"]);
         }
         // NEW METHOD : SEARCH PERSONAL ROLE
-        if ($this->sqlDriver["driver"] == "sqlite3") {
-            $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
-        } else {
-            $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [serial_role] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
+        switch ($this->sqlDriver["driver"]) {
+            case "sqlite":
+            case "sqlite3":
+            case "postgre":
+                $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
+                break;
+            case "mysql":
+                $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [serial_role] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
+                break;
+            default:
+                return "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
         }
         $all = $children_results->fetchAll();
         foreach ($all as $item) {
@@ -454,15 +468,17 @@ class sqlConfDriver extends AbstractConfDriver
     {
         dibi::query("DELETE FROM [ajxp_roles]");
         foreach ($roles as $roleId => $roleObject) {
-            if ($this->sqlDriver["driver"] == "sqlite3") {
-                $repos = $roleObject->listAcls();
-                $repoString = serialize($repos);
-                dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories]) VALUES (%s, %bin, %s)", $roleId, serialize($roleObject), $repoString);
-            } else {
-                dibi::query("INSERT INTO [ajxp_roles]", array(
-                    'role_id' => $roleId,
-                    'serial_role' => serialize($roleObject))
-                    );
+            switch ($this->sqlDriver["driver"]) {
+                case "sqlite":
+                case "sqlite3":
+                case "postgre":
+                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories]) VALUES (%s, %bin, %s)", $roleId, serialize($roleObject), serialize($roleObject->listAcls()));
+                    break;
+                case "mysql":
+                    dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role]) VALUES (%s, %s)", $roleId, serialize($roleObject));
+                    break;
+                default:
+                    return "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
             }
         }
     }
@@ -473,15 +489,17 @@ class sqlConfDriver extends AbstractConfDriver
     public function updateRole($role, $userObject = null)
     {
         dibi::query("DELETE FROM [ajxp_roles] WHERE [role_id]=%s", $role->getId());
-        if ($this->sqlDriver["driver"] == "sqlite3") {
-            $repos = $role->listAcls();
-            $repoString = serialize($repos);
-            dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories]) VALUES (%s, %bin,%s)", $role->getId(), serialize($role), $repoString);
-        } else {
-            dibi::query("INSERT INTO [ajxp_roles]", array(
-                    'role_id' => $role->getId(),
-                    'serial_role' => serialize($role))
-            );
+        switch ($this->sqlDriver["driver"]) {
+            case "sqlite":
+            case "sqlite3":
+            case "postgre":
+                dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[searchable_repositories]) VALUES (%s, %bin,%s)", $role->getId(), serialize($role), serialize($role->listAcls()));
+                break;
+            case "mysql":
+                dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role]) VALUES (%s, %s)", $role->getId(), serialize($role));
+                break;
+            default:
+                return "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
         }
     }
 
