@@ -6,4 +6,4 @@ CREATE TABLE IF NOT EXISTS `ajxp_log` (
 	`user`		VARCHAR(255),
 	`message`	VARCHAR(255),
 	`params`	VARCHAR(255)
-)
+);

@@ -193,6 +193,11 @@ class sqlLogDriver extends AbstractLogDriver
                 $mFunc = "MONTH([logdate])";
                 $dFunc = "DATE([logdate])";
                 break;
+            case "postgre":
+                $yFunc = "EXTRACT(YEAR FROM [logdate])";
+                $mFunc = "EXTRACT(MONTH FROM [logdate])";
+                $dFunc = "DATE([logdate])";
+                break;
             default:
                 echo "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
                 exit(1);
