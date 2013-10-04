@@ -179,7 +179,7 @@ class sqlConfDriver extends AbstractConfDriver
                 'groupPath'                 => $repository->getGroupPath(),
                 'slug'		                => $repository->getSlug(),
                 'isTemplate'                => $repository->isTemplate,
-                'inferOptionsFromParent'    => ($repository->getInferOptionsFromParent()?1:0)
+                'inferOptionsFromParent'    => $repository->getInferOptionsFromParent()
         );
 
         return $repository_row;
