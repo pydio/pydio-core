@@ -284,15 +284,29 @@ class AjaXplorerUpgrader
 
     public function upgradeDB()
     {
-        if(!is_file($this->workingFolder."/".$this->dbUpgrade.".sql")) return "Nothing to do.";
         $confDriver = ConfService::getConfStorageImpl();
         $authDriver = ConfService::getAuthDriverImpl();
         $logger = AJXP_Logger::getInstance();
         if (is_a($confDriver, "sqlConfDriver")) {
-            $test = AJXP_Utils::cleanDibiDriverParameters($confDriver->getOption("SQL_DRIVER"));
-            if(!is_array($test) || !isSet($test["driver"])) return "Nothing to do";
-            $type = $test["driver"];
-            $file = strpos($test["driver"], "sqlite") === 0 ? $this->dbUpgrade.".sqlite" : $this->dbUpgrade. ".sql";
+            $conf = AJXP_Utils::cleanDibiDriverParameters($confDriver->getOption("SQL_DRIVER"));
+            if(!is_array($conf) || !isSet($conf["driver"])) return "Nothing to do";
+            switch ($conf["driver"]) {
+                case "sqlite":
+                case "sqlite3":
+                    $ext = ".sqlite";
+                    break;
+                case "postgre":
+                    $ext = ".pgsql";
+                    break;
+                case "mysql":
+                    $ext = (is_file($this->workingFolder."/".$this->dbUpgrade.".mysql")) ? ".mysql" : ".sql";
+                    break;
+                default:
+                    return "ERROR!, DB driver "+ $conf["driver"] +" not supported yet in __FUNCTION__";
+            }
+
+            $file = $this->dbUpgrade.$ext;
+            if(!is_file($this->workingFolder."/".$file)) return "Nothing to do.";
             $sqlInstructions = file_get_contents($this->workingFolder."/".$file);
 
             $parts = array_map("trim", explode("/* SEPARATOR */", $sqlInstructions));
