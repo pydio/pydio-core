@@ -11,7 +11,7 @@
 	<clientForm id="exif_box"><![CDATA[
 		<div id="exif_box" action="editer" box_width="60%" box_height="60%" box_padding="0">
 			<div class="action_bar">
-				<a href="#" onclick="return false;" id="gpsLocateButton"><img width="22" height="22" src="plugins/meta.exif/world.png" alt="AJXP_MESSAGE[meta.exif.2]" border="0"><br><span message_id="meta.exif.2">AJXP_MESSAGE[meta.exif.2]</span></a>
+				<a href="#" onclick="return false;" class="icon-map-marker" id="gpsLocateButton"><img width="22" height="22" src="plugins/meta.exif/world.png" alt="AJXP_MESSAGE[meta.exif.2]" border="0"><br><span message_id="meta.exif.2">AJXP_MESSAGE[meta.exif.2]</span></a>
 			</div>
 		</div>
 	]]></clientForm>

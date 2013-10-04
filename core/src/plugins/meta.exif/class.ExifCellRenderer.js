@@ -39,8 +39,8 @@ Class.create("ExifCellRenderer", {
 		longiCell.setAttribute("longiDegree", split[1]);
 		var button = new Element('div', {
 			className:'fakeUploadButton',
-			style:'padding-top:3px;width:50px;margin-bottom:0px;padding-bottom:3px;'
-		}).update('<img src="plugins/meta.exif/world.png"><br>'+MessageHash['meta.exif.2']);
+			style:'padding-top:6px;width:50px;margin-bottom:0px;padding-bottom:3px;text-align:center; font-size: 11px;'
+		}).update('<img src="plugins/meta.exif/world.png" style="margin-bottom: 0;"><br>'+MessageHash['meta.exif.2']);
 		var buttonCell = new Element('td', {
 			rowspan:2,
 			align:'center',

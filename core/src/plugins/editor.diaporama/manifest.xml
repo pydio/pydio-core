@@ -27,7 +27,7 @@
 				<a href="#" class="icon-screenshot" id="actualSizeButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/zoom-original.png" alt="" border="0"><br><span message_id="327">AJXP_MESSAGE[327]</span></a>
 				<a href="#" class="icon-fullscreen" id="fitToScreenButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/zoom-fit-best.png" alt="AJXP_MESSAGE[325]" border="0"><br><span message_id="325">AJXP_MESSAGE[325]</span></a>
 			</div>
-            <div style="text-align:center; vertical-align:center;overflow:auto; background-color:#757575;" id="imageContainer">
+            <div style="text-align:center; vertical-align:center;overflow:auto; background-color:rgb(85,85,85);" id="imageContainer">
                 <div id="imageBorder" style="background-color:transparent;-webkit-box-shadow:rgb(51, 51, 51) 2px 2px 6px;-moz-box-shadow:rgb(51, 51, 51) 2px 2px 6px;box-shadow:rgb(51, 51, 51) 2px 2px 6px;"><img id="mainImage" src=""></div>
             </div>
 		</div>
