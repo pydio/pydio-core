@@ -49,6 +49,9 @@ Class.create("CartManager", FetchedResultPane, {
 
     updateTitle: function(){
         this.htmlElement.fire("widget:updateTitle", this.__label+' ('+this._rootNode.getChildren().size()+')');
+    },
+
+    triggerEvent: function(){
         var oEl = this.htmlElement;
         if(this.stateChangeBuffer) window.clearTimeout(this.stateChangeBuffer);
         this.stateChangeBuffer = window.setTimeout(function(){
@@ -59,6 +62,7 @@ Class.create("CartManager", FetchedResultPane, {
     clearContent: function(){
         this._rootNode.clear();
         this.updateTitle();
+        this.triggerEvent();
     },
 
     downloadContent: function(){
@@ -128,6 +132,7 @@ Class.create("CartManager", FetchedResultPane, {
                 this.recurseLeafs(n);
             }
             this.updateTitle();
+            this.triggerEvent();
         }.bind(this));
 
     },
@@ -160,11 +165,8 @@ Class.create("CartManager", FetchedResultPane, {
         var rNodeProvider = new LocalCartNodeProvider();
         dataModel.setAjxpNodeProvider(rNodeProvider);
         rNodeProvider.initProvider(ajxpOptions.nodeProviderProperties);
-        this._rootNode = new AjxpNode("/ajxp-local-cart", false, "Results", "folder.png", rNodeProvider);
+        this._rootNode = new AjxpNode("/ajxp-local-cart", false, "Cart", "folder.png", rNodeProvider);
         dataModel.setRootNode(this._rootNode);
-        if(this._startData){
-            console.log(this._startData);
-        }
         return dataModel;
 
     },
@@ -189,6 +191,7 @@ Class.create("CartManager", FetchedResultPane, {
 
         if(this._rootNode.getChildren().length > this.__maxChildren) {
             this.updateTitle();
+            this.triggerEvent();
             ajaxplorer.displayMessage('ERROR', 'Stopping recursion: please do not select more than ' + this.__maxChildren + ' at once!');
             throw $break;
         }
@@ -209,6 +212,7 @@ Class.create("CartManager", FetchedResultPane, {
         }
 
         this.updateTitle();
+        this.triggerEvent();
 
     },
 
@@ -220,9 +224,7 @@ Class.create("CartManager", FetchedResultPane, {
         return pathes;
     },
 
-    _startData:null,
     loadStateData: function(data){
-        this._startData = data;
         window.setTimeout(function(){
             $A(data).each(function(nodeData){
                 try{
@@ -231,8 +233,13 @@ Class.create("CartManager", FetchedResultPane, {
                     this._rootNode.addChild(n);
                 }catch(e){}
             }.bind(this));
-            this.htmlElement.fire("widget:updateTitle", this.__label+' ('+this._rootNode.getChildren().size()+')');
-        }.bind(this), 5000);
+            this.updateTitle();
+        }.bind(this), 4000);
+    },
+
+    clearStateData: function(){
+        this._rootNode.clear();
+        this.updateTitle();
     }
 
 });

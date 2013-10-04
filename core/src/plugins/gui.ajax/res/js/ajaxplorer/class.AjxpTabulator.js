@@ -170,7 +170,19 @@ Class.create("AjxpTabulator", AjxpPane, {
      *
      * @param tabInfo
      */
-    addTab: function(tabInfo, paneInfo){
+    addTab: function(tabInfo, paneInfo, skipStateSave){
+
+        if(paneInfo.nodePath && !paneInfo.node){
+            // Find node in root
+            ajaxplorer.getContextHolder().loadPathInfoAsync(paneInfo.nodePath, function(n){
+                if(n.__className && n.getPath){
+                    paneInfo.node = n;
+                    this.addTab(tabInfo, paneInfo, skipStateSave);
+                }
+            }.bind(this));
+            return;
+        }
+
         if(this.options.saveState){
             var confPaneInfo = Object.clone(paneInfo);
             this.tabsConfigs.set(tabInfo.id, {TAB:Object.clone(tabInfo), PANE: confPaneInfo});
@@ -193,9 +205,11 @@ Class.create("AjxpTabulator", AjxpPane, {
         $(this.htmlElement).insert(new Element("div", {id:tabInfo.element}));
         fitHeightToBottom($(this.htmlElement).down("#"+tabInfo.element));
 
-        if(paneInfo.type == 'editor' && paneInfo.node){
+        if(paneInfo.type == 'editor' && paneInfo.node && paneInfo.node.getPath){
             var editorData;
-            if(paneInfo.editorData){
+            if(paneInfo.editorID){
+                editorData = ajaxplorer.findEditorById(paneInfo.editorID);
+            }else if(paneInfo.editorData){
                 editorData = paneInfo.editorData;
             }else{
                 var selectedMime = getAjxpMimeType(paneInfo.node);
@@ -204,7 +218,7 @@ Class.create("AjxpTabulator", AjxpPane, {
                     editorData = editors[0];
                 }
             }
-            if(editorData){
+            if(editorData && paneInfo.node && paneInfo.node.__className){
                 ajaxplorer.loadEditorResources(editorData.resourcesManager);
                 var oForm = $("all_forms").down("#"+editorData.formId).cloneNode(true);
                 $(tabInfo.element).insert(oForm);
@@ -223,6 +237,17 @@ Class.create("AjxpTabulator", AjxpPane, {
                 editor.open(paneInfo.node);
                 tabInfo.ajxpObject = editor;
                 editor.resize();
+                // SERIALIZE CONFIG
+                if(confPaneInfo){
+                    if(confPaneInfo.editorData) {
+                        confPaneInfo.editorID = confPaneInfo.editorData.id;
+                        delete confPaneInfo['editorData'];
+                    }
+                    if(confPaneInfo.node){
+                        confPaneInfo.nodePath = confPaneInfo.node.getPath();
+                        delete confPaneInfo['node'];
+                    }
+                }
             }
         }else if(paneInfo.type == 'widget'){
             if(paneInfo.widgetClassName) paneInfo.widgetClass = Class.getByName(paneInfo.widgetClassName);
@@ -231,6 +256,7 @@ Class.create("AjxpTabulator", AjxpPane, {
                 $(tabInfo.element).observe("widget:updateTitle", function(event){
                     tabInfo.headerElement.down(".tab_label").update(event.memo);
                 });
+                // SERIALIZE CONFIG
                 if(confPaneInfo){
                     confPaneInfo.widgetClassName = widgetInstance.__className;
                     widgetInstance.getDomNode().observe("widget:updateState", this.saveState.bind(this));
@@ -243,23 +269,26 @@ Class.create("AjxpTabulator", AjxpPane, {
             window.setTimeout(this.resize.bind(this), 750);
         }
         this.resize();
-        this.saveState();
+        if(!skipStateSave) this.saveState();
     },
 
     /**
      *
      * @param tabId
      */
-    closeTab: function(tabId){
+    closeTab: function(tabId, skipSaveState){
         var ti;
         var previousTab;
         this.tabulatorData.each(function(tabInfo){
             if(tabInfo.id == tabId){
+                if(!tabInfo.closeable){
+                    throw $break;
+                }
                 var ajxpObject = this.getAndSetAjxpObject(tabInfo);
                 if(ajxpObject){
                     if(ajxpObject.validateClose){
                         var test = ajxpObject.validateClose();
-                        if(!test) return;
+                        if(!test) throw $break;
                     }
                     ajxpObject.showElement(false);
                     ajxpObject.destroy();
@@ -280,12 +309,12 @@ Class.create("AjxpTabulator", AjxpPane, {
             if(this.options.saveState){
                 this.tabsConfigs.unset(tabId);
             }
+            if(previousTab) this.switchTabulator(previousTab.id);
+            else if(this.tabulatorData.length) this.switchTabulator(this.tabulatorData.first().id);
 
+            this.resize();
+            if(!skipSaveState) this.saveState();
         }
-        if(previousTab) this.switchTabulator(previousTab.id);
-        else if(this.tabulatorData.length) this.switchTabulator(this.tabulatorData.first().id);
-        this.resize();
-        this.saveState();
     },
 
 	/**
@@ -461,13 +490,14 @@ Class.create("AjxpTabulator", AjxpPane, {
     },
 
     loadState: function(){
+        this.clearState();
         if(!ajaxplorer || !ajaxplorer.user) return;
-        this.__stateLoaded = true;
         var pref = this.getUserPreference("tabs_state");
         if(pref){
             $H(pref).each(function(pair){
                 if(pair.value.TAB && pair.value.PANE){
-                    this.addTab(pair.value.TAB, pair.value.PANE);
+                    pair.value.TAB.dontFocus = true;
+                    this.addTab(pair.value.TAB, pair.value.PANE, true);
                 }
                 if(pair.value.DATA){
                     var object = this.getAjxpObjectByTabId(pair.key);
@@ -475,6 +505,17 @@ Class.create("AjxpTabulator", AjxpPane, {
                 }
             }.bind(this));
         }
+        this.__stateLoaded = true;
+    },
+
+    clearState: function(){
+        this.tabulatorData.each(function(tabInfo){
+            var ajxpObject = this.getAndSetAjxpObject(tabInfo);
+            if(ajxpObject.clearStateData){
+                ajxpObject.clearStateData();
+            }
+            this.closeTab(tabInfo.id, true);
+        }.bind(this));
     }
 
 });

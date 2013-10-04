@@ -137,7 +137,7 @@
                                 <div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"get_bookmarks", "format":"node_list"},"reloadOnServerMessage":"tree/reload_bookmarks"}'></div>
     					    </div>
 							<div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
-                                <div id="cpane_tabs" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"browser","registerAsEditorOpener":true,"events":{"ajaxplorer:context_changed":"this.switchTabulator(this.tabulatorData.first().id);"}, "defaultTabId": "files","tabInfos" : [{"id":"files","label":"","iconClass":"icon-folder-open", "element":"files_list_pane"}]}'>
+                                <div id="cpane_tabs" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"browser","registerAsEditorOpener":true, "saveState":true,"events":{"ajaxplorer:context_changed":"this.switchTabulator(this.tabulatorData.first().id);"}, "defaultTabId": "files","tabInfos" : [{"id":"files","label":"","iconClass":"icon-folder-open", "element":"files_list_pane"}]}'>
                                     <div id="files_list_pane" ajxpClass="AjxpPane">
                                         <div id="files_list_header" ajxpClass="AjxpPane">
                                             <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>

@@ -216,19 +216,33 @@ Class.create("AjxpPane", {
     getUserPreference : function(prefName){
         if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return;
         var gui_pref = ajaxplorer.user.getPreference("gui_preferences", true);
-        if(!gui_pref || !gui_pref[this.htmlElement.id+"_"+this.__className]) return;
-        return gui_pref[this.htmlElement.id+"_"+this.__className][prefName];
+        var classkey = this.htmlElement.id+"_"+this.__className;
+        if(!gui_pref || !gui_pref[classkey]) return;
+        if(ajaxplorer.user.activeRepository && gui_pref[classkey]['repo-'+ajaxplorer.user.activeRepository]){
+            return gui_pref[classkey]['repo-'+ajaxplorer.user.activeRepository][prefName];
+        }
+        return gui_pref[classkey][prefName];
     },
 
     setUserPreference : function(prefName, prefValue){
         if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return;
         var guiPref = ajaxplorer.user.getPreference("gui_preferences", true);
         if(!guiPref) guiPref = {};
-        if(!guiPref[this.htmlElement.id+"_"+this.__className]) guiPref[this.htmlElement.id+"_"+this.__className] = {};
-        if(guiPref[this.htmlElement.id+"_"+this.__className][prefName] && guiPref[this.htmlElement.id+"_"+this.__className][prefName] == prefValue){
-            return;
+        var classkey = this.htmlElement.id+"_"+this.__className;
+        if(!guiPref[classkey]) guiPref[classkey] = {};
+        if(ajaxplorer.user.activeRepository ){
+            var repokey = 'repo-'+ajaxplorer.user.activeRepository;
+            if(!guiPref[classkey][repokey]) guiPref[classkey][repokey] = {};
+            if(guiPref[classkey][repokey][prefName] && guiPref[classkey][repokey][prefName] == prefValue){
+                return;
+            }
+            guiPref[classkey][repokey][prefName] = prefValue;
+        }else{
+            if(guiPref[classkey][prefName] && guiPref[classkey][prefName] == prefValue){
+                return;
+            }
+            guiPref[classkey][prefName] = prefValue;
         }
-        guiPref[this.htmlElement.id+"_"+this.__className][prefName] = prefValue;
         ajaxplorer.user.setPreference("gui_preferences", guiPref, true);
         ajaxplorer.user.savePreference("gui_preferences");
     }

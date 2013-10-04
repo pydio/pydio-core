@@ -174,6 +174,10 @@ Class.create("AjxpDataModel", {
         this._iAjxpNodeProvider.loadLeafNodeSync(new AjxpNode(path), callback);
     },
 
+    loadPathInfoAsync: function (path, callback){
+        this._iAjxpNodeProvider.loadLeafNodeSync(new AjxpNode(path), callback, true);
+    },
+
 	/**
 	 * Sets the root of the data store
 	 * @param ajxpRootNode AjxpNode The parent node

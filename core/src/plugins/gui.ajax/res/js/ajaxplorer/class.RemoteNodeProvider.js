@@ -86,7 +86,7 @@ Class.create("RemoteNodeProvider", {
    	 * @param node AjxpNode
    	 * @param nodeCallback Function On node loaded
    	 */
-   	loadLeafNodeSync : function(node, nodeCallback){
+   	loadLeafNodeSync : function(node, nodeCallback, aSync){
    		var conn = new Connexion();
    		conn.addParameter("get_action", "ls");
    		conn.addParameter("options", "al");
@@ -105,7 +105,8 @@ Class.create("RemoteNodeProvider", {
    				else alert('Loading error :'+ e.message);
    			}
    		}.bind(this);
-   		conn.sendSync();
+        if(aSync) conn.sendAsync();
+   		else conn.sendSync();
    	},
 
     refreshNodeAndReplace : function(node, onComplete){

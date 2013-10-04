@@ -292,16 +292,26 @@ Class.create("Diaporama", AbstractEditor, {
 		this.items = new Array();
 		this.nodes = new Hash();
 		this.sizes = new Hash();
-		$A(allItems).each(function(node){
-			var meta = node.getMetadata();
-			if(meta.get('is_image')=='1'){
+        if($A(allItems).size() > 0){
+            $A(allItems).each(function(node){
+                var meta = node.getMetadata();
+                if(meta.get('is_image')=='1'){
+                    this.nodes.set(node.getPath(),node);
+                    this.items.push(node.getPath());
+                    this.sizes.set(node.getPath(),  {height:meta.get('image_height')||'n/a',
+                        width:meta.get('image_width')||'n/a'});
+                }
+            }.bind(this));
+        }else{
+            var meta = node.getMetadata();
+            if(meta.get('is_image')=='1'){
                 this.nodes.set(node.getPath(),node);
-				this.items.push(node.getPath());
-				this.sizes.set(node.getPath(),  {height:meta.get('image_height')||'n/a', 
-												 width:meta.get('image_width')||'n/a'});
-			}
-		}.bind(this));	
-		
+                this.items.push(node.getPath());
+                this.sizes.set(node.getPath(),  {height:meta.get('image_height')||'n/a',
+                    width:meta.get('image_width')||'n/a'});
+            }
+        }
+
 		if(!sCurrentFile && this.items.length) sCurrentFile = this.items[0];
 		this.currentFile = sCurrentFile;
 		
