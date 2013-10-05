@@ -382,7 +382,8 @@ Class.create("AjxpTabulator", AjxpPane, {
             var cont = this.htmlElement.down('div.tabulatorContainer');
             var innerWidth = parseInt(this.htmlElement.getWidth()) - parseInt(cont.getStyle('paddingLeft')) - parseInt(cont.getStyle('paddingRight'));
             if(this.options.headerToolbarOptions){
-                innerWidth -= parseInt(this.htmlElement.down('div#display_toolbar').getWidth());
+                var dBar = this.htmlElement.down('div#display_toolbar');
+                innerWidth -= parseInt(dBar.getWidth()) + parseInt(dBar.getStyle('paddingRight'))  + parseInt(dBar.getStyle('paddingLeft'));
             }
             cont.removeClassName('icons_only');
             this.htmlElement.removeClassName('tabulator-vertical');

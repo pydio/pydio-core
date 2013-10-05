@@ -107,9 +107,14 @@ Class.create("CommentsPanel", {
 
     commentObjectToDOM: function(hash, container, node, skipAnim){
 
-        var tpl = new Template('<div class="comment_legend"><span class="icon-remove comment_delete"></span>#{author}, #{hdate}</div><div class="comment_text"><span class="comment_text_content">#{content}</span><span class="comment_file_path" ajxp-goto="#{path}">#{rpath}</span></div>');
+        var pFactory = new PreviewFactory();
+        var tpl = new Template('<div class="comment_legend"><span class="icon-remove comment_delete"></span>#{author}, #{hdate}</div><div class="comment_text"><span class="comment_text_content">#{content}</span></div>');
         var el = new Element("div", {className:'comment_content'}).update(tpl.evaluate(hash._object));
-        if(!hash.get('rpath')) el.down('.comment_file_path').hide();
+        if(hash.get('rpath')){
+            var link = pFactory.renderSimpleLink(hash.get('path'), hash.get('rpath'));
+            link.addClassName('comment_file_path');
+            el.down('.comment_text').insert(link);
+        }
 
         if(!skipAnim) el.setStyle({opacity:0, display:'block'});
         container.down("#comments_container").insert(el);

@@ -162,6 +162,26 @@ Class.create("PreviewFactory", {
             element.setStyle({width:tW+'px', height:tH+'px', marginTop:mT+'px', marginBottom:mB+'px'});
         }
 
-   	}
+   	},
+
+    renderSimpleLink: function(ajxpNodeOrPath, label){
+
+        var p;
+        if(typeof ajxpNodeOrPath == "string"){
+            p = ajxpNodeOrPath;
+        }else{
+            p = ajxpNodeOrPath.getPath();
+        }
+        var link = new Element('span', {className:'simple_goto_link', 'data-ajaxplorerGoto':p}).update(label?label:p);
+        link.observe("click", function(e){
+            this.goTo(p);
+        }.bind(ajaxplorer));
+        return link;
+
+    },
+
+    renderUserLink: function(userId){
+
+    }
 
 });

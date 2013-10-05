@@ -73,6 +73,7 @@ div.double #comments_form textarea, div.triple #comments_form textarea{
     text-align: center;
     border-top: 1px solid rgba(255,255,255,0.4);
     padding: 1px;
+    cursor: pointer;
     color: rgba(255,255,255,1);
 }
 
