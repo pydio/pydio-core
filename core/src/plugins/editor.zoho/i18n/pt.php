@@ -1,4 +1,4 @@
-LIKE A <?php
+<?php
 /*
  * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
@@ -25,4 +25,3 @@ $mess=array(
     "4" => "Documento de Apresentação",
     "5" => "Documento Excel",
 );
-?>

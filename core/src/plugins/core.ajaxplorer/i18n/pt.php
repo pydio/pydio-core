@@ -532,6 +532,7 @@ $mess=array(
 "476" => "A sua Área de Trabalho pessoal",
 "477" => "Seleccione um ficheiro ou pasta para ver os seus detalhes aqui",
 "478" => "No results found",
+"479" => "Forgot your password?",
 /* END SENTENCE */
 /* password strength tester */
 );

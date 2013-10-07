@@ -534,5 +534,6 @@ $mess=array(
 "476" => "Votre espace personnel",
 "477" => "Selectionnez un fichier ou un répertoire pour voir ses infos s'afficher ici",
 "478" => "Pas de résultats",
+"479" => "Mot de passe oublié?",
 /* END SENTENCE */
 );

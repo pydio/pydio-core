@@ -532,5 +532,6 @@ $mess=array(
 "476" => "Your personal workspace",
 "477" => "Pro zobrazení podrobností musíte označit soubor nebo složku",
 "478" => "No results found",
+"479" => "Forgot your password?",
 /* END SENTENCE */
 );

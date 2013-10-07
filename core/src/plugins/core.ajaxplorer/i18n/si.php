@@ -533,6 +533,7 @@ $mess=array(
 "476" => "Your personal workspace",
 "477" => "Select a file or folder to see its details here",
 "478" => "No results found",
+"479" => "Forgot your password?",
 /* END SENTENCE */
 /* password strength tester */
 /* quick access keys */
