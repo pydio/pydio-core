@@ -19,11 +19,11 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-class CartManager extends AJXP_Plugin {
-
-    public function switchAction ($actionName, $httpVars, $fileVars){
-
-        if($actionName == "search-cart-download"){
+class CartManager extends AJXP_Plugin
+{
+    public function switchAction ($actionName, $httpVars, $fileVars)
+    {
+        if ($actionName == "search-cart-download") {
 
             // Pipe SEARCH + DOWNLOAD actions.
 
@@ -32,7 +32,7 @@ class CartManager extends AJXP_Plugin {
             $httpVars["return_selection"] = true;
             unset($httpVars["get_action"]);
             $res = AJXP_Controller::findActionAndApply("search", $httpVars, $fileVars);
-            if(isSet($res) && is_array($res)){
+            if (isSet($res) && is_array($res)) {
                 $newHttpVars = array(
                     "selection_nodes"   => $res,
                     "dir"               => "__AJXP_ZIP_FLAT__/",

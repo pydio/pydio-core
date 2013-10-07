@@ -157,9 +157,9 @@ class AjxpLuceneIndexer extends AJXP_Plugin
             }
             $commitIndex = false;
 
-            if(isSet($httpVars['return_selection'])){
+            if (isSet($httpVars['return_selection'])) {
                 $returnNodes = array();
-            }else{
+            } else {
                 AJXP_XMLWriter::header();
             }
             foreach ($hits as $hit) {
@@ -176,9 +176,9 @@ class AjxpLuceneIndexer extends AJXP_Plugin
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
-                if(isSet($returnNodes)){
+                if (isSet($returnNodes)) {
                     $returnNodes[] = $tmpNode;
-                }else{
+                } else {
                     AJXP_XMLWriter::renderAjxpNode($tmpNode);
                 }
             }
@@ -221,9 +221,9 @@ class AjxpLuceneIndexer extends AJXP_Plugin
 
             $commitIndex = false;
 
-            if(isSet($httpVars['return_selection'])){
+            if (isSet($httpVars['return_selection'])) {
                 $returnNodes = array();
-            }else{
+            } else {
                 AJXP_XMLWriter::header();
             }
             foreach ($hits as $hit) {
@@ -240,9 +240,9 @@ class AjxpLuceneIndexer extends AJXP_Plugin
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
-                if(isSet($returnNodes)){
+                if (isSet($returnNodes)) {
                     $returnNodes[] = $tmpNode;
-                }else{
+                } else {
                     AJXP_XMLWriter::renderAjxpNode($tmpNode);
                 }
             }

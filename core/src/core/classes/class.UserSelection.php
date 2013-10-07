@@ -51,9 +51,9 @@ class UserSelection
     public function initFromHttpVars($passedArray=null)
     {
         if ($passedArray != null) {
-            if(isSet($passedArray["selection_nodes"]) && is_array($passedArray["selection_nodes"])){
+            if (isSet($passedArray["selection_nodes"]) && is_array($passedArray["selection_nodes"])) {
                 $this->initFromNodes($passedArray["selection_nodes"]);
-            }else{
+            } else {
                 $this->initFromArray($passedArray);
             }
         } else {
@@ -65,14 +65,14 @@ class UserSelection
     /**
      * @param AJXP_Node[] $nodes
      */
-    public function initFromNodes($nodes){
-
+    public function initFromNodes($nodes)
+    {
         $this->nodes = $nodes;
         $this->isUnique = (count($nodes) == 1);
         $this->dir = '/';
         $this->files = array();
         $this->inZip = false;
-        foreach($nodes as $n){
+        foreach ($nodes as $n) {
             $this->files[] = $n->getPath();
         }
 
@@ -183,7 +183,7 @@ class UserSelection
      */
     public function getUniqueNode(AbstractAccessDriver $accessDriver)
     {
-        if(isSet($this->nodes) && is_array($this->nodes)){
+        if (isSet($this->nodes) && is_array($this->nodes)) {
             return $this->nodes[0];
         }
         $repo = $accessDriver->repository;
@@ -207,7 +207,7 @@ class UserSelection
      */
     public function buildNodes(AbstractAccessDriver $accessDriver)
     {
-        if(isSet($this->nodes)) {
+        if (isSet($this->nodes)) {
             return $this->nodes;
         }
         $wrapperData = $accessDriver->detectStreamWrapper(false);
