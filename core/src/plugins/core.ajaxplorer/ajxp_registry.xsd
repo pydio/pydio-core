@@ -514,10 +514,8 @@
                 <xs:element minOccurs="0" ref="extensionOnInit"/>
                 <xs:element minOccurs="0" ref="clientListener"/>
                 <xs:element minOccurs="0" ref="standardFormDefinition"/>
-                <xs:choice minOccurs="0">
-                    <xs:element ref="serverCallback"/>
-                    <xs:element ref="activeCondition"/>
-                </xs:choice>
+                <xs:element minOccurs="0" ref="serverCallback"/>
+                <xs:element minOccurs="0" ref="activeCondition"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
