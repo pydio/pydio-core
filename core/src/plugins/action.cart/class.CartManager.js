@@ -65,6 +65,38 @@ Class.create("CartManager", FetchedResultPane, {
         this.triggerEvent();
     },
 
+    downloadFetchedPaneContent:function(fetchedResultPane, paneLabel){
+
+        if(!$("download_form")) return;
+        var props = Object.clone(fetchedResultPane.options.nodeProviderProperties);
+
+        // Replace "search" by "search-cart-download"
+        delete props['get_action'];
+        if(paneLabel) props["archive_name"] = slugString(paneLabel)+".zip";
+
+        var form = $('download_form');
+        form.action = window.ajxpServerAccessPath;
+        form.secure_token.value = Connexion.SECURE_TOKEN;
+        var gAction;
+        form.select("input").each(function(input){
+            if(input.name!='get_action' && input.name!='secure_token') input.remove();
+            if(input.name == 'get_action') input.value = 'search-cart-download';
+        });
+
+        $H(props).each(function(pair){
+            form.insert(new Element('input', {type:'hidden', name:pair.key, value:pair.value}));
+        });
+        try{
+            form.submit();
+        }catch(e){
+
+        }
+        // Reset download form to initial value
+        form.down('input[name="get_action"]').setValue('download');
+
+    },
+
+
     downloadContent: function(){
         var h = this.getLocalSelectionForPosting();
         if(h.size() == 0) return;
@@ -78,6 +110,7 @@ Class.create("CartManager", FetchedResultPane, {
             if(input.name!='get_action' && input.name!='secure_token') input.remove();
         });
         h.set('dir', '__AJXP_ZIP_FLAT__/');
+        h.set('archive_name', slugString(this.__label)+".zip");
         h.each(function(pair){
             form.insert(new Element('input', {type:'hidden', name:pair.key, value:pair.value}));
         });

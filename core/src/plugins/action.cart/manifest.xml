@@ -51,12 +51,18 @@
                 <processing>
                     <clientCallback><![CDATA[
                         var tabulator = $('cart-manager-header').ajxpPaneObject;
-                        var value = $('search_txt').getValue();
-                        var newLabel = "Search '"+value+"'";
-                        newLabel = window.prompt('This will save this search in your Carts. Change the name if you want to:', newLabel);
-                        if(newLabel && tabulator && value){
-                            tabulator.addTab({"id":"new-cart-"+new Date().getTime(),"label":newLabel,"iconClass":"icon-search", closeable:true, dontFocus:false},
-                            {type:"widget", widgetClass:FetchedResultPane, widgetOptions:{label:newLabel,"nodeProviderProperties":{"get_action":"search", "query":value},"reloadOnServerMessage":"tree/reload_bookmarks"}});
+                        var searchEngine;
+                        try{
+                            searchEngine = $$('[ajxpClass="SearchEngine"]')[0].ajxpPaneObject;
+                        }catch(e){};
+                        if(searchEngine){
+                            var value = searchEngine.crtText;
+                            var newLabel = "Search "+value;
+                            newLabel = window.prompt('This will save this search in your Carts. Change the name if you want to:', newLabel);
+                            if(newLabel && tabulator && value){
+                                tabulator.addTab({"id":"new-cart-"+new Date().getTime(),"label":newLabel,"iconClass":"icon-search", closeable:true, dontFocus:false},
+                                {type:"widget", widgetClass:FetchedResultPane, widgetOptions:{label:newLabel,"nodeProviderProperties":searchEngine.buildNodeProviderProperties(),"reloadOnServerMessage":"tree/reload_bookmarks"}});
+                            }
                         }
                     ]]></clientCallback>
                 </processing>
@@ -129,6 +135,30 @@
                     ]]></activeCondition>
                 </processing>
             </action>
+            <action name="search-cart-download">
+                <gui src="" iconClass="icon-download-alt" text="action.cart.7" title="action.cart.8">
+                    <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="ajxp-cart-actions"/>
+                </gui>
+                <processing>
+                    <clientCallback><![CDATA[
+                        var object = $('cart-manager-header').ajxpPaneObject.getAndSetAjxpObject( $('cart-manager-header').ajxpPaneObject.selectedTabInfo );
+                        if(object && $('download_form')){
+                            var label = $('cart-manager-header').ajxpPaneObject.selectedTabInfo.label;
+                            CartManager.prototype.downloadFetchedPaneContent(object, label);
+                        }
+                    ]]></clientCallback>
+                    <serverCallback methodName="switchAction"/>
+                    <activeCondition><![CDATA[
+                        if($('cart-manager-header') && $('cart-manager-header').ajxpPaneObject){
+                            var object = $('cart-manager-header').ajxpPaneObject.getAndSetAjxpObject( $('cart-manager-header').ajxpPaneObject.selectedTabInfo );
+                            if(!object || object.__className!='FetchedResultPane'){
+                                return false;
+                            }
+                        }
+                        return ajaxplorer.actionBar.actions.get('download') != null;
+                    ]]></activeCondition>
+                </processing>
+            </action>
             <action name="current-cart-share">
                 <gui src="" iconClass="icon-share" text="action.cart.10" title="action.cart.11">
                     <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="ajxp-cart-actions"/>
@@ -176,4 +206,5 @@
         </actions>
     </registry_contributions>
 
+    <class_definition classname="CartManager" filename="plugins/action.cart/class.CartManager.php"/>
 </ajxp_plugin>
