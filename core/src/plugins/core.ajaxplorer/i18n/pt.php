@@ -530,7 +530,7 @@ $mess=array(
 "474" => "Sem descrição disponível",
 "475" => "Ficheiros partilhados com todos os utilizadores",
 "476" => "A sua Área de Trabalho pessoal",
-"477" => "Seleccione um ficheiro ou pasta para ver os seus detalhes aqui"
+"477" => "Seleccione um ficheiro ou pasta para ver os seus detalhes aqui",
 "478" => "No results found",
 /* END SENTENCE */
 /* password strength tester */
