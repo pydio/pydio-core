@@ -157,7 +157,11 @@ class AjxpLuceneIndexer extends AJXP_Plugin
             }
             $commitIndex = false;
 
-            AJXP_XMLWriter::header();
+            if(isSet($httpVars['return_selection'])){
+                $returnNodes = array();
+            }else{
+                AJXP_XMLWriter::header();
+            }
             foreach ($hits as $hit) {
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
@@ -172,9 +176,13 @@ class AjxpLuceneIndexer extends AJXP_Plugin
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
-                AJXP_XMLWriter::renderAjxpNode($tmpNode);
+                if(isSet($returnNodes)){
+                    $returnNodes[] = $tmpNode;
+                }else{
+                    AJXP_XMLWriter::renderAjxpNode($tmpNode);
+                }
             }
-            AJXP_XMLWriter::close();
+            if(!isSet($returnNodes)) AJXP_XMLWriter::close();
             if ($commitIndex) {
                 $index->commit();
             }
@@ -213,7 +221,11 @@ class AjxpLuceneIndexer extends AJXP_Plugin
 
             $commitIndex = false;
 
-            AJXP_XMLWriter::header();
+            if(isSet($httpVars['return_selection'])){
+                $returnNodes = array();
+            }else{
+                AJXP_XMLWriter::header();
+            }
             foreach ($hits as $hit) {
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
@@ -228,9 +240,13 @@ class AjxpLuceneIndexer extends AJXP_Plugin
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
-                AJXP_XMLWriter::renderAjxpNode($tmpNode);
+                if(isSet($returnNodes)){
+                    $returnNodes[] = $tmpNode;
+                }else{
+                    AJXP_XMLWriter::renderAjxpNode($tmpNode);
+                }
             }
-            AJXP_XMLWriter::close();
+            if(!isSet($returnNodes)) AJXP_XMLWriter::close();
             if ($commitIndex) {
                 $index->commit();
             }
@@ -286,6 +302,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin
                 AJXP_XMLWriter::close();
             }
         }
+        if(isSet($returnNodes)) return $returnNodes;
 
     }
 
