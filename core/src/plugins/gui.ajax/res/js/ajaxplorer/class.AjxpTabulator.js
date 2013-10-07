@@ -414,6 +414,7 @@ Class.create("AjxpTabulator", AjxpPane, {
                 }.bind(this));
             }
         }
+        document.fire("ajaxplorer:resize-AjxpTabulator-" + this.htmlElement.id, this.htmlElement.getDimensions());
 	},
 	
 	/**
