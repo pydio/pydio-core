@@ -3312,6 +3312,10 @@ div.user_entry span.cbContainer
     cursor: pointer;
 }
 
+.share_chooser_list li.selected{
+    color: #555555;
+}
+
 div.user_entry span.cbContainer{
 
 }
