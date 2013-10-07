@@ -513,7 +513,9 @@ Class.create("SearchEngine", AjxpPane, {
         this.hasResults = true;
 	},
     addNoResultString : function(){
-        $(this._resultsBoxId).insert(new Element('div').update("No results found."));
+        if(!$(this._resultsBoxId).down('#no-results-found')){
+            $(this._resultsBoxId).insert({top: new Element('div', {id:'no-results-found'}).update(MessageHash[478])});
+        }
     },
 	/**
 	 * Put a folder to search in the queue
@@ -534,6 +536,41 @@ Class.create("SearchEngine", AjxpPane, {
 			this.updateStateFinished();
 		}
 	},
+
+    buildNodeProviderProperties: function(currentFolder, remote_indexation){
+
+        var props = {};
+        if(this._searchMode == "remote"){
+            /* REMOTE INDEXER CASE */
+            props.get_action = 'search';
+            props.query = this.crtText;
+            if(this.hasMetaSearch()){
+                props.fields =  this.getSearchColumns().join(',');
+            }
+        }else{
+
+            if(remote_indexation){
+
+                props.get_action = remote_indexation;
+                props.query = this.crtText;
+                if(this.hasMetaSearch()){
+                    props.fields =  this.getSearchColumns().join(',');
+                }
+                props.dir = currentFolder;
+
+            }else{
+
+                props.get_action = 'ls';
+                props.options = 'a' + (this.hasMetaSearch()?'l':'');
+                props.dir = currentFolder;
+
+            }
+
+        }
+        return props;
+
+    },
+
 	/**
 	 * Get a folder content and searches its children 
 	 * Should reference the IAjxpNodeProvider instead!! Still a "ls" here!
@@ -629,6 +666,9 @@ Class.create("SearchEngine", AjxpPane, {
 		var nodes = XPathSelectNodes(oXmlDoc.documentElement, "tree");
         if(!nodes.length){
             this.addNoResultString();
+        }else{
+            var noRes =  $(this._resultsBoxId).down('#no-results-found');
+            if(noRes) noRes.remove();
         }
 		for (var i = 0; i < nodes.length; i++) 
 		{

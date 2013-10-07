@@ -2554,6 +2554,11 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
     padding-top: 0;
 }
 
+#no-results-found {
+    text-align: center;
+    margin-top: 10%;
+}
+
 .infoPanelActions
 {
     padding:5px;
@@ -4240,7 +4245,7 @@ div.innerTabulator > div.tabulatorContainer > #display_toolbar a
     display: none;
 }
 
-.ipanel_no_selection_select {
+.ipanel_no_selection_select, #no-results-found {
     color: rgb(180, 184, 190);
     text-shadow: 1px 1px 0 #ffffff;
 }
