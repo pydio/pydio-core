@@ -526,7 +526,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
     {
         if ($update &&  isSet($this->groupPath) && $groupPath != $this->groupPath) {
             // Update Shared Users groups as well
-            $res = dibi::query("SELECT u.login FROM ajxp_users AS u, ajxp_user_rights AS p WHERE u.login=p.login AND p.repo_uuid = %s AND p.rights = %s AND u.groupPath != %s ", "ajxp.parent_user", $this->getId(), $groupPath);
+            $res = dibi::query("SELECT [u.login] FROM [ajxp_users] AS u, [ajxp_user_rights] AS p WHERE [u.login] = [p.login] AND [p.repo_uuid] = %s AND [p.rights] = %s AND [u.groupPath] != %s ", "ajxp.parent_user", $this->getId(), $groupPath);
             foreach ($res as $row) {
                 $userId = $row->login;
                 // UPDATE USER GROUP AND ROLES
