@@ -142,6 +142,7 @@ $mess=array(
 "118" => "Új csoport",
 "group_access" => "g",
 "119" => "Set user group",
-
+    "120" => "Go Pro",
+    "121" => "Get professional support for your install",
 /* END SENTENCE */
 );

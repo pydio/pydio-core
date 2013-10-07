@@ -16,7 +16,7 @@
 			</rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var path;					
+					var path;
 					if(window.actionArguments && window.actionArguments.length>0){
 						path = window.actionArguments[0];
 						if(Object.isString(path)){path = new AjxpNode(path,false,getBaseName(path));}
@@ -28,7 +28,7 @@
 					}
 					if(path){
 						ajaxplorer.updateContextData(path);
-					}						
+					}
 					]]></clientCallback>
 				<serverCallback methodName="switchAction" restParams="/dir+/"></serverCallback>
 			</processing>
@@ -140,15 +140,15 @@
 						<div class="SF_element">
 							<div class="SF_label" ajxp_message_id="182">AJXP_MESSAGE[182] : </div><input name="new_user_pwd" type="password" class="SF_input"/>
 						</div>
-						<div class="SF_element">						
+						<div class="SF_element">
 							<div class="SF_label" ajxp_message_id="199">AJXP_MESSAGE[199] : </div><input name="new_user_pwd_conf" type="password" class="SF_input"/>
 						</div>
 						<div class="SF_element" id="pwd_strength_container"></div>
 						<div style="clear:both; display:none;" class="dialogLegend" ajxp_message_id="89">AJXP_MESSAGE[ajxp_conf.89]</div>
 						<div id="custom_pane" class="config_subblock" style="display:none;">
-							
+
 						</div>
-					</div>				
+					</div>
 				]]></clientForm>
 				<serverCallback methodName="switchAction"
                                 developerComment="Create a user with login and password in the AUTH directory."
@@ -275,7 +275,7 @@
 						}
 						ajaxplorer.actionBar.configEditor.setForm(oForm);
 						ajaxplorer.actionBar.configEditor.initCreateRepoWizard((window.createRepoCmd?window.createRepoCmd:'repository'));
-					};				
+					};
 					modal.showDialogForm('Create Repository', 'create_repository_box', loadFunc, null, null, false, true);
 					]]></clientCallback>
 				<clientForm id="create_repository_box"><![CDATA[
@@ -299,13 +299,13 @@
 							<input type="image" src="AJXP_THEME_FOLDER/images/actions/22/forward.png" height="22" width="22" class="dialogButton" id="submit_create_repo" value="Next" class="button" onclick="return false;">
 							<input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_close.png" height="22" width="22" class="dialogButton" value="Cancel" class="button" onclick="hideLightBox();return false;">
 						</div>
-					</div>				
+					</div>
 				]]></clientForm>
 				<serverCallback methodName="switchAction" restParams="/json_data">
                     <input_param description="A JSON object containing the following mandatory keys : DISPLAY (string), DRIVER (string), DRIVER_OPTIONS (array of options) and optional keys : DISPLAY_ID (string), DESCRIPTION_ID (string), AJXP_SLUG (string), IS_TEMPLATE (boolean). &lt;br&gt;&lt;br&gt; The expected DRIVER value can be either an access type plugin name (fs, ftp, etc), or a template id by using the ajxp_template_ prefix (ajxp_template_TEMPLATE_ID). The DRIVER_OPTIONS array may depend on the used access type." name="json_data" type="JSON"/>
 				</serverCallback>
 				</processing>
-		</action>	
+		</action>
 		<action name="edit_repository_label">
 			<gui text="6" title="158" src="applix.png" iconClass="icon-pencil" accessKey="rename_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
@@ -316,7 +316,7 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
-					var callback = function(node, newValue){						
+					var callback = function(node, newValue){
 						var conn = new Connexion();
 						conn.addParameter('get_action', 'edit');
 						conn.addParameter('sub_action', 'edit_repository_label');
@@ -335,7 +335,7 @@
                     <input_param description="New Label" name="newLabel" type="string"/>
 				</serverCallback>
 				</processing>
-		</action>						
+		</action>
 		<action name="user_update_role" fileDefault="false">
 			<gui text="ajxp_conf.94" title="ajxp_conf.82" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
@@ -351,7 +351,7 @@
 						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
 						if(!ajaxplorer.actionBar.configEditor){
 							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
-						}						
+						}
 						ajaxplorer.actionBar.configEditor.setForm(oForm);
 						ajaxplorer.actionBar.configEditor.loadUsers(userSelection);
 					};
@@ -382,7 +382,7 @@
 						}else{
 							action.selectionContext.dir = false;
 							action.selectionContext.file = true;
-						}					
+						}
 					}
 				}
 				]]></clientListener>
@@ -456,7 +456,7 @@
 				</serverCallback>
 			</processing>
 		</action>
-		<action name="delete">			
+		<action name="delete">
 			<gui text="7" title="161" src="editdelete.png" iconClass="icon-trash" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false"
@@ -498,10 +498,10 @@
 		   		    	hidden.setAttribute("value", fieldValue);
 					};
 					modal.showDialogForm('Delete', 'delete_config_form', onLoad, function(){
-						var oForm = modal.getForm();						
+						var oForm = modal.getForm();
 						ajaxplorer.actionBar.submitForm(oForm);
                         if (userSelection.isMultiple()) {
-                           var i = 1; 
+                           var i = 1;
 	   		    	       var hidden = $(oForm).select('input[type="hidden"]')[0];
                            while (true) {
                               try {
@@ -518,7 +518,7 @@
                                   hidden.setAttribute("value", value);
             					  ajaxplorer.actionBar.submitForm(oForm);
                                   i++;
-                              } catch (e) 
+                              } catch (e)
                               {
                                   break;
                               }
@@ -540,8 +540,8 @@
                                  type="string"/>
 				</serverCallback>
 				</processing>
-		</action>		
-		<action name="copyAsText">			
+		</action>
+		<action name="copyAsText">
 			<gui text="302" title="303" iconClass="icon-copy" src="editcopy.png" accessKey="" hasAccessKey="false">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false"
@@ -554,12 +554,12 @@
 					var onLoad = function(oForm){
 						var userSelection =  ajaxplorer.getUserSelection();
 						var nodes = userSelection.getSelectedNodes();
-						var firstNode = userSelection.getUniqueNode();						
+						var firstNode = userSelection.getUniqueNode();
 		   		    	var copyDiv = $(oForm).select('textarea[id="text_copy"]')[0];
 		   		    	var attributes = ['date','ip','level','user','action','params'];
 			   		    var message = attributes.join("\t") + "\n\n";
-		   		    	nodes.each(function(node){	
-		   		    		var meta = node.getMetadata();	   		    		
+		   		    	nodes.each(function(node){
+		   		    		var meta = node.getMetadata();
 		   		    		for(var i=0;i<attributes.length;i++){
 		   		    			var attName = attributes[i];
 		   		    			if(attName == "ajxp_label") attName = "text";
@@ -581,7 +581,7 @@
 				</div>
 				]]></clientForm>
 				</processing>
-		</action>					
+		</action>
 	    <action name="user_update_right">
             <processing>
                 <serverCallback methodName="switchAction" restParams="/repository_id/user_id/right" checkParams="true">
@@ -595,6 +595,16 @@
             <pre_processing>
                 <serverCallback methodName="preProcessBookmarkAction"></serverCallback>
             </pre_processing>
+        </action>
+        <action name="pydio-go-pro">
+            <gui src="gopro" text="ajxp_conf.120" title="ajxp_conf.121" iconClass="icon-rocket">
+                <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="user"/>
+            </gui>
+            <processing>
+                <clientCallback><![CDATA[
+                    var win = window.open('https://pydio.com/');
+                ]]></clientCallback>
+            </processing>
         </action>
 	</actions>
 	<client_configs>
@@ -640,7 +650,7 @@
 						</div>
 					</div>
 				]]></html>
-			</infoPanel>		
+			</infoPanel>
 		</component_config>
 	</client_configs>
 </registry_contributions>
