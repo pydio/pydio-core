@@ -37,7 +37,7 @@
                                     Effect.Fade(oForm.down('#reset-by-email'), {
                                         duration:0.5,
                                         afterFinish: function(){
-                                            oForm.down('#reset-password-ask').update(MessageHash[gui.user.5]);
+                                            oForm.down('#reset-password-ask').update(MessageHash['gui.user.5']);
                                         }
                                     });
                                 };
