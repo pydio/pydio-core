@@ -428,12 +428,12 @@ class AJXP_SqlUser extends AbstractAjxpUser
             // MIGRATE NOW !
             $originalRights = $this->rights;
             $this->migrateRightsToPersonalRole();
-            $removedRights = array_diff($originalRights, $this->rights);
-            foreach($removedRights as $i => $v) $removedRights[$i] = "[repo_uuid]='$i'";
+            $removedRights = array_keys(array_diff($originalRights, $this->rights));
             $this->roles["AJXP_USR_"."/".$this->id] = $this->personalRole;
             // SAVE RIGHT AND ROLE
             if (count($removedRights)) {
-                dibi::query("DELETE FROM [ajxp_user_rights] WHERE ".implode(" OR ", $removedRights));
+                // We use (%s) instead of %in to pass everyting as string ('1' instead of 1)
+                dibi::query("DELETE FROM [ajxp_user_rights] WHERE [login] = %s AND [repo_uuid] IN (%s)", $this->getId(), $removedRights);
             }
             AuthService::updateRole($this->personalRole);
         }
@@ -526,7 +526,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
     {
         if ($update &&  isSet($this->groupPath) && $groupPath != $this->groupPath) {
             // Update Shared Users groups as well
-            $res = dibi::query("SELECT u.login FROM ajxp_users AS u, ajxp_user_rights AS p WHERE u.login=p.login AND p.repo_uuid = %s AND p.rights = %s AND u.groupPath != %s ", "ajxp.parent_user", $this->getId(), $groupPath);
+            $res = dibi::query("SELECT [u.login] FROM [ajxp_users] AS u, [ajxp_user_rights] AS p WHERE [u.login] = [p.login] AND [p.repo_uuid] = %s AND [p.rights] = %s AND [u.groupPath] != %s ", "ajxp.parent_user", $this->getId(), $groupPath);
             foreach ($res as $row) {
                 $userId = $row->login;
                 // UPDATE USER GROUP AND ROLES

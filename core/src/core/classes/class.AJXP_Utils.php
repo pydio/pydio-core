@@ -1553,57 +1553,60 @@ class AJXP_Utils
                 unset($params[$k]);
             }
         }
+        switch ($params["driver"]) {
+            case "sqlite":
+            case "sqlite3":
+                $params["formatDateTime"] = "'Y-m-d H:i:s'";
+                $params["formatDate"] = "'Y-m-d'";
+                break;
+        }
         return $params;
     }
 
     public static function runCreateTablesQuery($p, $file)
     {
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
-        $result = array();
-        if ($p["driver"] == "sqlite" || $p["driver"] == "sqlite3") {
-            if (!file_exists(dirname($p["database"]))) {
-                @mkdir(dirname($p["database"]), 0755, true);
-            }
-            dibi::connect($p);
-            $file = dirname($file) ."/". str_replace(".sql", ".sqlite", basename($file) );
-            $sql = file_get_contents($file);
-            dibi::begin();
-            $parts = explode("CREATE TABLE", $sql);
-            foreach ($parts as $createPart) {
-                if(empty($createPart)) continue;
-                $sqlPart = trim("CREATE TABLE".$createPart);
-                try {
-                    dibi::nativeQuery($sqlPart);
-                    $resKey = str_replace("\n", "", substr($sqlPart, 0, 50))."...";
-                    $result[] = "OK: $resKey executed successfully";
-                } catch (DibiException $e) {
-                    $result[] = "ERROR! $sqlPart failed";
-                }
-            }
-            $message = implode("\n", $result);
-            dibi::commit();
-            dibi::disconnect();
-        } else {
-            dibi::connect($p);
-            $sql = file_get_contents($file);
-            $parts = explode("CREATE TABLE", $sql);
-            foreach ($parts as $createPart) {
-                if(empty($createPart)) continue;
-                $sqlPart = trim("CREATE TABLE".$createPart);
-                try {
-                    dibi::nativeQuery($sqlPart);
-                    $resKey = str_replace("\n", "", substr($sqlPart, 0, 50))."...";
-                    $result[] = "OK: $resKey executed successfully";
-                } catch (DibiException $e) {
-                    $result[] = "ERROR! $sqlPart failed";
-                }
-            }
-            $message = implode("\n", $result);
-            dibi::disconnect();
-        }
-        if(strpos($message, "ERROR!")) return $message;
-        else return "SUCCESS:".$message;
 
+        switch ($p["driver"]) {
+            case "sqlite":
+            case "sqlite3":
+                if (!file_exists(dirname($p["database"]))) {
+                    @mkdir(dirname($p["database"]), 0755, true);
+                }
+                $ext = ".sqlite";
+                break;
+            case "mysql":
+                $ext = ".mysql";
+                break;
+            case "postgre":
+                $ext = ".pgsql";
+                break;
+            default:
+                return "ERROR!, DB driver "+ $p["driver"] +" not supported yet in __FUNCTION__";
+        }
+
+        $result = array();
+        $file = dirname($file) ."/". str_replace(".sql", $ext, basename($file) );
+        $sql = file_get_contents($file);
+        $parts = explode(";", $sql);
+        dibi::connect($p);
+        dibi::begin();
+        foreach ($parts as $createPart) {
+            $sqlPart = trim($createPart);
+            if (empty($sqlPart)) continue;
+            try {
+                dibi::nativeQuery($sqlPart);
+                $resKey = str_replace("\n", "", substr($sqlPart, 0, 50))."...";
+                $result[] = "OK: $resKey executed successfully";
+            } catch (DibiException $e) {
+                $result[] = "ERROR! $sqlPart failed";
+            }
+        }
+        dibi::commit();
+        dibi::disconnect();
+        $message = implode("\n", $result);
+        if (strpos($message, "ERROR!")) return $message;
+        else return "SUCCESS:".$message;
     }
 
 

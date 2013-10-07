@@ -88,7 +88,7 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
                 OR  ([repository_scope] = 'USER' AND [user_id] = %s  )
                 OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )
             )
-            ORDER BY [edate] DESC LIMIT $offset,$limit ", "event", $filterByRepositories, $userId, $userId, $userGroup);
+            ORDER BY [edate] DESC %lmt %ofs", "event", $filterByRepositories, $userId, $userId, $userGroup, $limit, $offset);
         $data = array();
         foreach ($res as $n => $row) {
             $object = new stdClass();
@@ -136,9 +136,9 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         if ($repositoryIdFilter != null) {
-            $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND [repository_id] = %s AND [user_id] = %s ORDER BY [edate] DESC LIMIT 0,100 ", "alert", $repositoryIdFilter, $userId);
+            $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND [repository_id] = %s AND [user_id] = %s ORDER BY [edate] DESC %lmt", "alert", $repositoryIdFilter, $userId, 100);
         } else {
-            $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND [user_id] = %s ORDER BY [edate] DESC LIMIT 0,100 ", "alert", $userId);
+            $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND [user_id] = %s ORDER BY [edate] DESC %lmt", "alert", $userId, 100);
         }
         $data = array();
         foreach ($res as $n => $row) {
@@ -172,9 +172,9 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
             $startEventNotif = unserialize($startEventRow->content);
             $url = $startEventNotif->getNode()->getUrl();
             $date = $startEventRow->edate;
-            $newRes = dibi::query("SELECT [id] FROM [ajxp_feed] WHERE [etype] = %s AND [user_id] = %s AND [edate] <= %s AND content LIKE %s ORDER BY [edate] DESC LIMIT 0,$occurrences", "alert", $userId, $date, "%\"$url\"%");
+            $newRes = dibi::query("SELECT [id] FROM [ajxp_feed] WHERE [etype] = %s AND [user_id] = %s AND [edate] <= %s AND content LIKE %~like~ ORDER BY [edate] DESC %lmt", "alert", $userId, $date, "\"$url\"", $occurrences);
             $a = $newRes->fetchPairs();
-            dibi::query("DELETE FROM [ajxp_feed] WHERE [id] IN (%s)",  $a);
+            dibi::query("DELETE FROM [ajxp_feed] WHERE [id] IN %in",  $a);
         }
     }
 
@@ -206,10 +206,9 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         $res = dibi::query("SELECT * FROM [ajxp_feed]
-            WHERE [etype] = %s AND [repository_id] = %s AND [index_path] LIKE %s
-            ORDER BY [edate] $orderDir
-            LIMIT $offset,$limit
-        ", "meta", $repositoryId, $indexPath."%");
+            WHERE [etype] = %s AND [repository_id] = %s AND [index_path] LIKE %like~
+            ORDER BY %by %lmt %ofs
+        ", "meta", $repositoryId, $indexPath, array('edate' => $orderDir), $limit, $offset);
 
         $data = array();
         foreach ($res as $n => $row) {
@@ -227,18 +226,14 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
 
     public function updateMetaObject($repositoryId, $oldPath, $newPath = null, $copy = false)
     {
+        if($this->sqlDriver["password"] == "XXXX") return array();
+        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
+        dibi::connect($this->sqlDriver);
         if ($oldPath != null && $newPath == null) {// DELETE
 
-            if($this->sqlDriver["password"] == "XXXX") return array();
-            require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
-            dibi::connect($this->sqlDriver);
-            dibi::query("DELETE FROM [ajxp_feed] WHERE [repository_id]=%s and [index_path] LIKE %s", $repositoryId, $oldPath."%");
+            dibi::query("DELETE FROM [ajxp_feed] WHERE [repository_id]=%s and [index_path] LIKE %like~", $repositoryId, $oldPath);
 
         } else if ($oldPath != null && $newPath != null) { // MOVE or COPY
-
-            if($this->sqlDriver["password"] == "XXXX") return array();
-            require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
-            dibi::connect($this->sqlDriver);
 
             if ($copy) {
 

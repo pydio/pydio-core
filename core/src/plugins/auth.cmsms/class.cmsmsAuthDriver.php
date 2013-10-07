@@ -87,7 +87,7 @@ class cmsmsAuthDriver extends AbstractAuthDriver
 
     public function listUsers()
     {
-        $res = dibi::query("SELECT * FROM [".$this->prefix."module_feusers_users], [".$this->prefix."module_feusers_belongs] WHERE id = userid AND groupid=".$this->groupid);
+        $res = dibi::query("SELECT * FROM [".$this->prefix."module_feusers_users], [".$this->prefix."module_feusers_belongs] WHERE id = userid AND groupid=%s", $this->groupid);
         $pairs = $res->fetchPairs('username', 'password');
         return $pairs;
     }
@@ -151,15 +151,15 @@ class cmsmsAuthDriver extends AbstractAuthDriver
         if(!is_array($users) || !array_key_exists($login, $users)) return ;
         $userData = array("username" => $login);
         $userData["password"] = md5($newPass);
-        dibi::query("UPDATE [".$this->prefix."module_feusers_users] SET ", $userData, "WHERE `username`=%s", $login);
+        dibi::query("UPDATE [".$this->prefix."module_feusers_users] SET ", $userData, "WHERE [username]=%s", $login);
     }
     public function deleteUser($login)
     {
         $uid=$this->getUserId($login);
         //suppress all references in CMSMS FEU tables
-        dibi::query("DELETE FROM [".$this->prefix."module_feusers_users] WHERE `username`=%s", $login);
-        dibi::query("DELETE FROM [".$this->prefix."module_feusers_belongs] WHERE `userid`=%s", $uid);
-        dibi::query("DELETE FROM [".$this->prefix."module_feusers_properties] WHERE `userid`=%s", $uid);
+        dibi::query("DELETE FROM [".$this->prefix."module_feusers_users] WHERE [username]=%s", $login);
+        dibi::query("DELETE FROM [".$this->prefix."module_feusers_belongs] WHERE [userid]=%s", $uid);
+        dibi::query("DELETE FROM [".$this->prefix."module_feusers_properties] WHERE [userid]=%s", $uid);
     }
 
     public function getUserPass($login)
@@ -171,14 +171,14 @@ class cmsmsAuthDriver extends AbstractAuthDriver
 
     public function getUserSeq()
     {
-    $res = dibi::query("SELECT [id] FROM [".$this->prefix."module_feusers_users_seq]");
-    $seq = $res->fetchSingle();
-    return $seq;
-}
+        $res = dibi::query("SELECT [id] FROM [".$this->prefix."module_feusers_users_seq]");
+        $seq = $res->fetchSingle();
+        return $seq;
+    }
 
     public function setUserSeq($num)
     {
-    $res = dibi::query("UPDATE [".$this->prefix."module_feusers_users_seq] SET `id`=".$num);
+        $res = dibi::query("UPDATE [".$this->prefix."module_feusers_users_seq] SET [id]=%s", $num);
     }
 
     public function getUserId($login)
