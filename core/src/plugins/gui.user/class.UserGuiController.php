@@ -36,16 +36,16 @@ class UserGuiController extends AJXP_Plugin
     protected function parseSpecificContributions(&$contribNode)
     {
         parent::parseSpecificContributions($contribNode);
-        if(substr($_SERVER["REQUEST_URI"], 0, strlen('/user')) != '/user'){
-            if($contribNode->nodeName == "client_configs") {
+        if (substr($_SERVER["REQUEST_URI"], 0, strlen('/user')) != '/user') {
+            if ($contribNode->nodeName == "client_configs") {
                 $children = $contribNode->childNodes;
-                foreach($children as $child) {
+                foreach ($children as $child) {
                     if($child->nodeType == XML_ELEMENT_NODE) $contribNode->removeChild($child);
                 }
-            }else if($contribNode->nodeName == "actions"){
+            } else if ($contribNode->nodeName == "actions") {
                 $children = $contribNode->childNodes;
-                foreach($children as $child) {
-                    if($child->nodeType == XML_ELEMENT_NODE && $child->nodeName == "action" && $child->getAttribute("name") == "login") {
+                foreach ($children as $child) {
+                    if ($child->nodeType == XML_ELEMENT_NODE && $child->nodeName == "action" && $child->getAttribute("name") == "login") {
                         $contribNode->removeChild($child);
                     }
                 }
