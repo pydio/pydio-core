@@ -5,6 +5,7 @@
     <client_settings>
         <resources>
             <js className="UserGuiController" file="plugins/gui.user/class.UserGuiController.js" autoload="true"/>
+            <i18n namespace="gui.user" path="plugins/gui.user/i18n"/>
         </resources>
     </client_settings>
 
@@ -18,35 +19,40 @@
                 </processing>
             </action>
             <action name="reset-password-ask">
-                <gui src="reset.png" iconClass="icon-key" text="1" title="2">
+                <gui src="reset.png" iconClass="icon-terminal" text="gui.user.1" title="gui.user.2">
                     <context dir="true" recycle="true" selection="false"/>
                 </gui>
                 <processing>
                     <clientCallback prepareModal="true" dialogOpenForm="reset-password-ask" dialogOkButtonOnly="true">
-                        <dialogOnOpen/>
+                        <dialogOnOpen><![CDATA[
+                            $(oForm).up('.dialogContent').previous('.dialogTitle').select('span').invoke('remove');
+                        ]]></dialogOnOpen>
                         <dialogOnComplete><![CDATA[
-                            var conn = new Connexion();
-                            conn.addParameter('email', oForm.down('#reset-by-email').getValue());
-                            conn.addParameter('get_action', 'reset-password-ask');
-                            conn.onComplete = function(){
-                                Effect.Fade(oForm.down('#reset-by-email'), {
-                                    duration:0.5,
-                                    afterFinish: function(){
-                                        oForm.down('#reset-password-ask').update('An email has been sent to your address!');
-                                    }
-                                });
-                            };
-                            conn.sendAsync();
+                            if(!oForm.BUTTON_CLICKED){
+                                var conn = new Connexion();
+                                conn.addParameter('email', oForm.down('#reset-by-email').getValue());
+                                conn.addParameter('get_action', 'reset-password-ask');
+                                conn.onComplete = function(){
+                                    oForm.BUTTON_CLICKED = true;
+                                    Effect.Fade(oForm.down('#reset-by-email'), {
+                                        duration:0.5,
+                                        afterFinish: function(){
+                                            oForm.down('#reset-password-ask').update(MessageHash[gui.user.5]);
+                                        }
+                                    });
+                                };
+                                conn.sendAsync();
+                            }
                         ]]></dialogOnComplete>
                     </clientCallback>
                     <clientForm id="reset-password-ask"><![CDATA[
-    				    <div id="reset-password-ask" box_width="240">Reset your password (you will receive an email) : <input type="text" style="width: 97%;margin: 10px 0;" id="reset-by-email" placeholder="Your email or user ID"></div>
+    				    <div id="reset-password-ask" box_width="320" style="padding:5px 12px;font-size:15px;">AJXP_MESSAGE[gui.user.3] <input type="text" style="font-size: 17px; width: 97%;margin: 10px 0;" id="reset-by-email" placeholder="AJXP_MESSAGE[gui.user.4]"></div>
                     ]]></clientForm>
                     <serverCallback methodName="processUserAccessPoint"/>
                 </processing>
             </action>
             <action name="reset-password">
-                <gui src="reset.png" iconClass="icon-key" text="1" title="2">
+                <gui src="reset.png" iconClass="icon-terminal" text="gui.user.1" title="gui.user.2">
                     <context dir="true" recycle="true" selection="false"/>
                 </gui>
                 <processing>
@@ -76,8 +82,8 @@
 									if(transport.responseText == 'PASS_ERROR'){
 										alert(MessageHash[240]);
 									}else if(transport.responseText == 'SUCCESS'){
-										ajaxplorer.displayMessage('SUCCESS', MessageHash[197]);
-										oForm.down('#reset-password').update(MessageHash[197]);
+										ajaxplorer.displayMessage('SUCCESS', MessageHash[gui.user.6]);
+										oForm.down('#reset-password').update(MessageHash[gui.user.6]);
 									}
 								}
 							};
@@ -93,7 +99,7 @@
                         ]]></dialogOnComplete>
                     </clientCallback>
                     <clientForm id="reset-password"><![CDATA[
-    				    <div id="reset-password" box_width="240">
+    				    <div id="reset-password" box_width="320" style="font-size: 15px;">
                             <div class="SF_element">
                                 <div class="SF_label">Your user ID : </div><input id="user_id" value="" type="text" class="SF_input"/>
                             </div>

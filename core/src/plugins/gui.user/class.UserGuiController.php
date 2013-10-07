@@ -28,14 +28,33 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class UserGuiController extends AJXP_Plugin
 {
-    public function performChecks()
+
+    /**
+     * Parse
+     * @param DOMNode $contribNode
+     */
+    protected function parseSpecificContributions(&$contribNode)
     {
-        // Use this method to dynamically enable/disable plugin
-        if(substr($_SERVER["REQUEST_URI"], 0, strlen('/user')) != '/user'
-            && $_GET["get_action"] !="reset-password-ask" && $_GET["get_action"] !="reset-password") {
-            throw new Exception("no");
+        parent::parseSpecificContributions($contribNode);
+        if(substr($_SERVER["REQUEST_URI"], 0, strlen('/user')) != '/user'){
+            if($contribNode->nodeName == "client_configs") {
+                $children = $contribNode->childNodes;
+                foreach($children as $child) {
+                    if($child->nodeType == XML_ELEMENT_NODE) $contribNode->removeChild($child);
+                }
+            }else if($contribNode->nodeName == "actions"){
+                $children = $contribNode->childNodes;
+                foreach($children as $child) {
+                    if($child->nodeType == XML_ELEMENT_NODE && $child->nodeName == "action" && $child->getAttribute("name") == "login") {
+                        $contribNode->removeChild($child);
+                    }
+                }
+
+            }
         }
+
     }
+
 
     public function processUserAccessPoint($action, $httpVars, $fileVars)
     {
@@ -66,8 +85,9 @@ class UserGuiController extends AJXP_Plugin
                         ConfService::getConfStorageImpl()->saveTemporaryKey("password-reset", $uuid, AJXP_Utils::decodeSecureMagic($httpVars["email"]), array());
                         $mailer = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("mailer");
                         if ($mailer !== false) {
+                            $mess = ConfService::getMessages();
                             $link = AJXP_Utils::detectServerURL()."/user/reset-password/".$uuid;
-                            $mailer->sendMail(array($email), "Password Reset", "You have asked a password reset, please click on the following link:<a href=\"$link\">$link</a>");
+                            $mailer->sendMail(array($email), $mess["gui.user.1"], $mess["gui.user.7"]."<a href=\"$link\">$link</a>");
                         } else {
                             echo 'ERROR: There is no mailer configured, please contact your administrator';
                         }
