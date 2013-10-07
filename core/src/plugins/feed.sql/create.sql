@@ -12,5 +12,5 @@ CREATE TABLE IF NOT EXISTS ajxp_feed (
   content longblob NOT NULL,
   PRIMARY KEY (id),
   KEY edate (edate,etype,htype,user_id,repository_id),
-  FULLTEXT KEY `index_path` (`index_path`)
+  INDEX (index_path(40))
 )
