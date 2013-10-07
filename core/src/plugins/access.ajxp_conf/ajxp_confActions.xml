@@ -596,6 +596,16 @@
                 <serverCallback methodName="preProcessBookmarkAction"></serverCallback>
             </pre_processing>
         </action>
+        <action name="pydio-go-pro">
+            <gui src="gopro" text="ajxp_conf.120" title="ajxp_conf.121" iconClass="icon-rocket">
+                <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="user"/>
+            </gui>
+            <processing>
+                <clientCallback><![CDATA[
+                    var win = window.open('https://pydio.com/');
+                ]]></clientCallback>
+            </processing>
+        </action>
 	</actions>
 	<client_configs>
 		<component_config className="InfoPanel">

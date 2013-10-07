@@ -67,6 +67,11 @@
                         .table_rows_container td{
                             vertical-align:top;
                         }
+                        #pydio-go-pro_button {
+                            background: #fa715c;
+                            border-radius: 4px;
+                            padding: 2px 7px 2px 3px !important;
+                        }
                     </style>
                     <script>
                         var splitter = $("vertical_splitter").ajxpPaneObject;

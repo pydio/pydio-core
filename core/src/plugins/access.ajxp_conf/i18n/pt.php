@@ -140,4 +140,6 @@ $mess=array(
 "118" => "Novo Grupo",
 "group_access" => "G",
 "119" => "Definir grupo do utilizador",
+    "120" => "Go Pro",
+    "121" => "Get professional support for your install",
 );
