@@ -121,7 +121,7 @@ class FilesystemMounter extends AJXP_Plugin
         $UNC_PATH = $this->getOption("UNC_PATH", $user, $password);
         $MOUNT_OPTIONS = $this->getOption("MOUNT_OPTIONS", $user, $password);
 
-        $cmd = ($MOUNT_SUDO?"sudo":"")." mount -t ".$MOUNT_TYPE." ".$UNC_PATH." ".$MOUNT_POINT." -o ".$MOUNT_OPTIONS;
+        $cmd = ($MOUNT_SUDO? "sudo ": ""). "mount -t " .$MOUNT_TYPE. (empty( $MOUNT_OPTIONS )? " " : " -o " .$MOUNT_OPTIONS. " " ) .$UNC_PATH. " " .$MOUNT_POINT;
         shell_exec($cmd);
         // Check it is correctly mounted now!
         $cmd = ($MOUNT_SUDO?"sudo":"")." mount | grep ".escapeshellarg($MOUNT_POINT);
