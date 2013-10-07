@@ -206,10 +206,9 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         $res = dibi::query("SELECT * FROM [ajxp_feed]
-            WHERE [etype] = %s AND [repository_id] = %s AND [index_path] LIKE %s
-            ORDER BY [edate] $orderDir
-            LIMIT $offset,$limit
-        ", "meta", $repositoryId, $indexPath."%");
+            WHERE [etype] = %s AND [repository_id] = %s AND [index_path] LIKE %like~
+            ORDER BY %by %lmt %ofs
+        ", "meta", $repositoryId, $indexPath, array('edate' => $orderDir), $limit, $offset);
 
         $data = array();
         foreach ($res as $n => $row) {
@@ -227,18 +226,14 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
 
     public function updateMetaObject($repositoryId, $oldPath, $newPath = null, $copy = false)
     {
+        if($this->sqlDriver["password"] == "XXXX") return array();
+        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
+        dibi::connect($this->sqlDriver);
         if ($oldPath != null && $newPath == null) {// DELETE
 
-            if($this->sqlDriver["password"] == "XXXX") return array();
-            require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
-            dibi::connect($this->sqlDriver);
-            dibi::query("DELETE FROM [ajxp_feed] WHERE [repository_id]=%s and [index_path] LIKE %s", $repositoryId, $oldPath."%");
+            dibi::query("DELETE FROM [ajxp_feed] WHERE [repository_id]=%s and [index_path] LIKE %like~", $repositoryId, $oldPath);
 
         } else if ($oldPath != null && $newPath != null) { // MOVE or COPY
-
-            if($this->sqlDriver["password"] == "XXXX") return array();
-            require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
-            dibi::connect($this->sqlDriver);
 
             if ($copy) {
 
