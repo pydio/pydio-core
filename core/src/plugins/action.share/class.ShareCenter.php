@@ -944,7 +944,8 @@ class ShareCenter extends AJXP_Plugin{
             if($eType == "user"){
                 $u = AJXP_Utils::decodeSecureMagic($httpVars["user_".$index], AJXP_SANITIZE_ALPHANUM);
                 if(!AuthService::userExists($u) && !isSet($httpVars["user_pass_".$index])){
-                    return 100;
+                    $index++;
+                    continue;
                 }else if(AuthService::userExists($u) && isSet($httpVars["user_pass_".$index])){
                     throw new Exception("User $u already exists, please choose another name.");
                 }

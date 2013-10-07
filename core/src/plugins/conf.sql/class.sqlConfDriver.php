@@ -357,7 +357,7 @@ class sqlConfDriver extends AbstractConfDriver
     public function getUserChildren( $userId )
     {
         $children = array();
-        $children_results = dibi::query('SELECT [login] FROM [ajxp_user_rights] WHERE [repo_uuid] = %s AND [rights] = %s', "ajxp.parent_user", $userId);
+        $children_results = dibi::query('SELECT [ajxp_users].[login] FROM [ajxp_user_rights],[ajxp_users] WHERE [repo_uuid] = %s AND [rights] = %s AND [ajxp_user_rights].[login] = [ajxp_users].[login]', "ajxp.parent_user", $userId);
         $all = $children_results->fetchAll();
         foreach ($all as $item) {
             $children[] = $this->createUserObject($item["login"]);
@@ -374,7 +374,7 @@ class sqlConfDriver extends AbstractConfDriver
     {
         $result = array();
         // OLD METHOD
-        $children_results = dibi::query('SELECT [login] FROM [ajxp_user_rights] WHERE [repo_uuid] = %s GROUP BY [login]', $repositoryId);
+        $children_results = dibi::query('SELECT [ajxp_users].[login] FROM [ajxp_user_rights],[ajxp_users] WHERE [repo_uuid] = %s AND [ajxp_user_rights].[login] = [ajxp_users].[login] GROUP BY [ajxp_user_rights].[login]', $repositoryId);
         $all = $children_results->fetchAll();
         foreach ($all as $item) {
             $result[$item["login"]] = $this->createUserObject($item["login"]);
