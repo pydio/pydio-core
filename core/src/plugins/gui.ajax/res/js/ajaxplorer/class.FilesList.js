@@ -1162,7 +1162,9 @@ Class.create("FilesList", SelectableElements, {
                 item.ajxpNode = null;
                 delete item;
                 newItem.REPLACE_OBS = this.makeItemRefreshObserver(ajxpNode, newItem, renderer);
+                newItem.REMOVE_OBS = this.makeItemRemovedObserver(ajxpNode, newItem);
                 ajxpNode.observe("node_replaced", newItem.REPLACE_OBS);
+                ajxpNode.observe("node_removed", newItem.REMOVE_OBS);
                 var dm = (this._dataModel?this._dataModel:ajaxplorer.getContextHolder());
                 if(dm.getSelectedNodes() && dm.getSelectedNodes().length)
                 {

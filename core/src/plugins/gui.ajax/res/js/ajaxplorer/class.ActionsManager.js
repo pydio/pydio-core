@@ -458,7 +458,9 @@ Class.create("ActionsManager", {
                         if(!parent && getRepName(newNode.getPath()) == "") parent = dm.getRootNode();
                         if(parent){
                             parent.addChild(newNode);
-                            dm.setSelectedNodes([newNode], {});
+                            if(dm.getContextNode() == parent){
+                                dm.setSelectedNodes([newNode], {});
+                            }
                         }
                     });
                 }
