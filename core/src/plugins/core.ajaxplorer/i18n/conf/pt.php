@@ -1,22 +1,22 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
- * This file is part of Pydio.
- *
- * Pydio is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Pydio is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
- *
- * The latest code can be found at <http://pyd.io/>.
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* This file is part of Pydio.
+*
+* Pydio is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Pydio is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+*
+* The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
 "Main"      => "Opções Principais",
@@ -115,5 +115,8 @@ $mess=array(
 "Metadata and indexation" => "Indexação e Metadata",
 "Default Metasources" => "Fontes Meta pré-Definidas",
 "Comma-separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver" => "Lista de Fontes Meta e de Meta Plugins, separada por virgulas, que irá ser aplicada automaticamente a todas as Áreas de Trabalho criadas por este controlador",
+"Absolute path to the public folder where temporary download links will be created. Setting this empty will disable the sharing feature." => "Absolute path to the public folder where temporary download links will be created. Setting this empty will disable the sharing feature.",
+"Admin email" => "Admin email",
+"Administrator email, not used for the moment" => "Administrator email, not used for the moment",
+"Alias for replacing the generated unique id of the repository" => "Alias for replacing the generated unique id of the workspace",
 );
-?>

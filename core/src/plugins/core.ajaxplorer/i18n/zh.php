@@ -524,6 +524,7 @@ $mess=array(
 "475" => "Files shared amongst all users",
 "476" => "Your personal workspace",
 "477" => "Select a file or folder to see its details here",
+"478" => "No results found",
 /* END SENTENCE */
 );
 ?>
