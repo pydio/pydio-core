@@ -247,7 +247,6 @@ $mess=array(
 "204" => "Velikost souboru \"",
 "205" => "\" překračuje povolený limit (",
 "206" => "Mb).\\nSoubor nebude nahrán.",
-/* END SENTENCE */
 "207" => "K této složce nemáte oprávnění pro zápis",
 "208" => "K této složce nemáte oprávnění pro čtení",
 "209" => "Interní chyba serveru, kontaktujte prosím správce!",
@@ -532,4 +531,6 @@ $mess=array(
 "475" => "Files shared amongst all users",
 "476" => "Your personal workspace",
 "477" => "Pro zobrazení podrobností musíte označit soubor nebo složku",
+"478" => "No results found",
+/* END SENTENCE */
 );

@@ -534,5 +534,6 @@ $mess=array(
 "475" => "Kõikide kasutajate vahel jagatud failid",
 "476" => "Sinu personaalne töölaud",
 "477" => "Select a file or folder to see its details here",
+"478" => "No results found",
 /* END SENTENCE */
 );

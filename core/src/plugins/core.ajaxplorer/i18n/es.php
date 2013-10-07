@@ -537,5 +537,6 @@ $mess=array(
 "475" => "Ficheros compartidos con todos los usuarios",
 "476" => "Su espacio de trabajo personal",
 "477" => "Select a file or folder to see its details here",
+"478" => "No results found",
 /* END SENTENCE */
 );

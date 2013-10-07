@@ -44,4 +44,5 @@ $mess=array(
 "When a folder will contain more items than this number, display will switch to pagination mode, for better performances." => "Quando uma pasta contém mais itens que o número especificado, o ecrã será alterado para modo de paginação para um melhor desempenho.",
 "#Items per page" => "#Itens por página",
 "Once in pagination mode, number of items to display per page." => "Uma vez em modo paginação, o número de itens a mostrar por página.",
+"This plugin will browse the content of a mailbox (imap or pop) and allow to grab emails attachments and copy them to another repository. Requires the PHP IMAP extension." => "This plugin will browse the content of a mailbox (imap or pop) and allow to grab emails attachments and copy them to another repository. Requires the PHP IMAP extension.",
 );

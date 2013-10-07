@@ -1,23 +1,23 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
- * This file is part of Pydio.
- *
- * Pydio is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Pydio is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
- *
- * The latest code can be found at <http://pyd.io/>.
- */
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* This file is part of Pydio.
+*
+* Pydio is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Pydio is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+*
+* The latest code can be found at <http://pyd.io/>.
+*/
 $mess=array(
 "languageLabel" => "Português (Portugal)",
 "date_format"  => "d/m/Y H:i",
@@ -256,7 +256,6 @@ $mess=array(
 "204" => "O ficheiro \"",
 "205" => "\" excede o limite de tamanho de (",
 "206" => "Mb).\\nNão será enviado.",
-/* END SENTENCE */
 "207" => "Não possui permissões de escrita para esta pasta",
 "208" => "Não possui permissões de leitura para esta pasta",
 "209" => "Erro interno no Servidor, por favor contacte o seu Administrador!",
@@ -432,7 +431,6 @@ $mess=array(
 "375" => "ATENÇÃO: Esteve inactivo mais de __IDLE__, a sua sessão será terminada em __LOGOUT__",
 "376" => "Clique em qualquer lugar para reactivar a sua Sessão",
 "378" => "ATENÇÃO: O campo da Palavra-Chave encontra-se vazio ou esta é demasiado pequena!",
-/* password strength tester */
 "379" => "Palavra Insegura!",
 "380" => "Demasiado Pequena",
 "381" => "Muito Fraca",
@@ -532,5 +530,8 @@ $mess=array(
 "474" => "Sem descrição disponível",
 "475" => "Ficheiros partilhados com todos os utilizadores",
 "476" => "A sua Área de Trabalho pessoal",
-"477" => "Seleccione um ficheiro ou pasta para ver os seus detalhes aqui"
+"477" => "Seleccione um ficheiro ou pasta para ver os seus detalhes aqui",
+"478" => "No results found",
+/* END SENTENCE */
+/* password strength tester */
 );
