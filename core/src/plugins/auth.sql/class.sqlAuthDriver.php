@@ -60,7 +60,7 @@ class sqlAuthDriver extends AbstractAuthDriver
     {
         if ($regexp != null) {
             $like = self::regexpToLike($regexp);
-            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [login] LIKE ".$like." AND [groupPath] LIKE %like~ ORDER BY [login] ASC", $regexp, $baseGroup) ;
+            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [login] LIKE %like~ AND [groupPath] LIKE %like~ ORDER BY [login] ASC", $regexp, $baseGroup) ;
         } else if ($offset != -1 || $limit != -1) {
             $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %like~ ORDER BY [login] ASC %lmt %ofs", $baseGroup, $limit, $offset);
         } else {
