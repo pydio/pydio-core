@@ -221,6 +221,7 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
             $deleted[] = $row["object_id"];
         }
         if (count($deleted)) {
+            // We use (%s) instead of %in to pass everyting as string ('1' instead of 1)
             dibi::query("DELETE FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id] IN (%s)", "queues.$channelName", $deleted);
         }
         return $arr;
