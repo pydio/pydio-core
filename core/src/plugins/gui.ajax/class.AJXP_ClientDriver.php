@@ -238,6 +238,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
                         $content = str_replace("ajaxplorer_boot.js", "ajaxplorer_boot_protolegacy.js", $content);
                     }
                     $content = AJXP_XMLWriter::replaceAjxpXmlKeywords($content, false);
+                    $content = str_replace("AJXP_REBASE", isSet($START_PARAMETERS["REBASE"])?'<base href="'.$START_PARAMETERS["REBASE"].'"/>':"", $content);
                     if ($JSON_START_PARAMETERS) {
                         $content = str_replace("//AJXP_JSON_START_PARAMETERS", "startParameters = ".$JSON_START_PARAMETERS.";", $content);
                     }
