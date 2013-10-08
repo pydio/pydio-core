@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin id="gui.user" enabled="true" description="User access point" label="User access point"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+
+    <client_settings>
+        <resources>
+            <js className="UserGuiController" file="plugins/gui.user/class.UserGuiController.js" autoload="true"/>
+        </resources>
+    </client_settings>
+
+    <class_definition classname="UserGuiController" filename="plugins/gui.user/class.UserGuiController.php"/>
+
+    <registry_contributions>
+        <actions>
+            <action name="user_access_point" skipSecureToken="true">
+                <processing>
+                    <serverCallback methodName="processUserAccessPoint"/>
+                </processing>
+            </action>
+            <action name="reset-password-ask">
+                <gui src="reset.png" iconClass="icon-key" text="1" title="2">
+                    <context dir="true" recycle="true" selection="false"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true" dialogOpenForm="reset-password-ask" dialogOkButtonOnly="true">
+                        <dialogOnOpen/>
+                        <dialogOnComplete><![CDATA[
+                            var conn = new Connexion();
+                            conn.addParameter('email', oForm.down('#reset-by-email').getValue());
+                            conn.addParameter('get_action', 'reset-password-ask');
+                            conn.onComplete = function(){
+                                Effect.Fade(oForm.down('#reset-by-email'), {
+                                    duration:0.5,
+                                    afterFinish: function(){
+                                        oForm.down('#reset-password-ask').update('An email has been sent to your address!');
+                                    }
+                                });
+                            };
+                            conn.sendAsync();
+                        ]]></dialogOnComplete>
+                    </clientCallback>
+                    <clientForm id="reset-password-ask"><![CDATA[
+    				    <div id="reset-password-ask" box_width="240">Reset your password (you will receive an email) : <input type="text" style="width: 97%;margin: 10px 0;" id="reset-by-email" placeholder="Your email or user ID"></div>
+                    ]]></clientForm>
+                    <serverCallback methodName="processUserAccessPoint"/>
+                </processing>
+            </action>
+            <action name="reset-password">
+                <gui src="reset.png" iconClass="icon-key" text="1" title="2">
+                    <context dir="true" recycle="true" selection="false"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true" dialogOpenForm="reset-password" dialogOkButtonOnly="true">
+                        <dialogOnOpen><![CDATA[
+                            new Protopass($('user_change_ownpass1'), {
+                                barContainer:$('pwd_strength_container'),
+                                barPosition:'bottom'
+                            });
+                        ]]></dialogOnOpen>
+                        <dialogOnComplete><![CDATA[
+						var userPass = null;
+						var passSeed = null;
+						if($('user_change_ownpass1') && $('user_change_ownpass1').value && $('user_change_ownpass2').value)
+						{
+							if($('user_change_ownpass1').value.length < window.ajxpBootstrap.parameters.get("password_min_length")){
+								alert(MessageHash[378]);
+								return false;
+							}
+							if($('user_change_ownpass1').value != $('user_change_ownpass2').value){
+								alert(MessageHash[238]);
+								return false;
+							}
+                            userPass = $('user_change_ownpass1').value;
+							var onComplete = function(transport){
+								if(userPass != null){
+									if(transport.responseText == 'PASS_ERROR'){
+										alert(MessageHash[240]);
+									}else if(transport.responseText == 'SUCCESS'){
+										ajaxplorer.displayMessage('SUCCESS', MessageHash[197]);
+										oForm.down('#reset-password').update(MessageHash[197]);
+									}
+								}
+							};
+							var conn = new Connexion();
+							conn.addParameter("get_action", "reset-password");
+							conn.addParameter("new_pass", userPass);
+							conn.addParameter("user_id", oForm.down('#user_id').getValue());
+							conn.addParameter("key", document.location.pathname.trim('/').split('/')[3]);
+							conn.onComplete = onComplete;
+							conn.sendAsync();
+						}
+
+                        ]]></dialogOnComplete>
+                    </clientCallback>
+                    <clientForm id="reset-password"><![CDATA[
+    				    <div id="reset-password" box_width="240">
+                            <div class="SF_element">
+                                <div class="SF_label">Your user ID : </div><input id="user_id" value="" type="text" class="SF_input"/>
+                            </div>
+                            <div class="SF_element">
+                                <div class="SF_label" ajxp_message_id="198">AJXP_MESSAGE[198] : </div><input id="user_change_ownpass1" value="" type="password" class="SF_input"/>
+                            </div>
+                            <div class="SF_element">
+                                <div class="SF_label" ajxp_message_id="199">AJXP_MESSAGE[199] : </div><input id="user_change_ownpass2" value="" type="password" class="SF_input"/>
+                            </div>
+                            <div class="SF_element" id="pwd_strength_container"></div>
+    				    </div>
+                    ]]></clientForm>
+                    <serverCallback methodName="processUserAccessPoint"/>
+                </processing>
+            </action>
+            <action name="login">
+                <processing></processing>
+            </action>
+        </actions>
+        <client_configs>
+            <template element="ajxp_desktop" name="main_vision" position="top"><![CDATA[
+				<div id="toolbars">
+					<div id="global_toolbar" ajxpClass="LogoWidget"></div>
+				</div>
+				<div id="user-gui-controller" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent": "window"}' style="background:url('plugins/gui.ajax/res/themes/vision/images/grid_t.png')"></div>
+				<!--
+				<div id="notifications" ajxpClass="FetchedResultPane" ajxpOptions='{"fit":"height", "fitParent": "window", "fixedDisplayMode":"thumb", "displayMode":"thumb", "selectable":"false", "nodeProviderProperties":{"get_action":"get_my_feed", "format":"xml", "connexion_discrete":true}}'></div>
+				-->
+				<script type="text/javascript">
+				    ajaxplorer.disableAllKeyBindings();
+				</script>
+            ]]></template>
+        </client_configs>
+    </registry_contributions>
+
+    <dependencies>
+        <activePlugin pluginName="gui.ajax|gui.mobile|gui.ios"/>
+    </dependencies>
+
+</ajxp_plugin>

@@ -10,6 +10,7 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^shares ./dav.php [L]
 RewriteRule ^api ./rest.php [L]
+RewriteRule ^user ./index.php?get_action=user_access_point [L]
 
 #Following lines seem to be necessary if PHP is working
 #with apache as CGI or FCGI. Just remove the #
