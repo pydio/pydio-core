@@ -75,5 +75,6 @@ CREATE TABLE IF NOT EXISTS ajxp_simple_store (
    serialized_data LONGTEXT NULL,
    binary_data LONGBLOB NULL,
    related_object_id VARCHAR(255) NULL,
+   insertion_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    PRIMARY KEY(object_id, store_id)
 );

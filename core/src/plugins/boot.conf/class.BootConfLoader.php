@@ -621,4 +621,39 @@ class BootConfLoader extends AbstractConfDriver
     {
         // TODO: Implement getChildrenGroups() method.
     }
+
+    /**
+     * @abstract
+     * @param String $keyType
+     * @param String $keyId
+     * @param String $userId
+     * @param Array $data
+     * @return boolean
+     */
+    public function saveTemporaryKey($keyType, $keyId, $userId, $data){}
+
+    /**
+     * @abstract
+     * @param String $keyType
+     * @param String $keyId
+     * @return array
+     */
+    public function loadTemporaryKey($keyType, $keyId){}
+
+    /**
+     * @abstract
+     * @param String $keyType
+     * @param String $keyId
+     * @return boolean
+     */
+    public function deleteTemporaryKey($keyType, $keyId){}
+
+    /**
+     * @abstract
+     * @param String $keyType
+     * @param String $expiration
+     * @return null
+     */
+    public function pruneTemporaryKeys($keyType, $expiration){}
+
 }

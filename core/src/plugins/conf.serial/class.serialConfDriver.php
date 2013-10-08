@@ -573,4 +573,81 @@ class serialConfDriver extends AbstractConfDriver
         }
     }
 
+    /**
+     * @abstract
+     * @param String $keyType
+     * @param String $keyId
+     * @param String $userId
+     * @param Array $data
+     * @return boolean
+     */
+    public function saveTemporaryKey($keyType, $keyId, $userId, $data){
+        $storage = $this->getPluginWorkDir()."/temporary_keys";
+        $list = AJXP_Utils::loadSerialFile($storage, false, "ser");
+        if(isSEt($list[$keyType])) $list[$keyType] = array();
+        $data["user_id"] = $userId;
+        $data["date"] = time();
+        $list[$keyType][$keyId] = $data;
+        AJXP_Utils::saveSerialFile($storage, $list);
+    }
+
+    /**
+     * @abstract
+     * @param String $keyType
+     * @param String $keyId
+     * @return array
+     */
+    public function loadTemporaryKey($keyType, $keyId){
+        $storage = $this->getPluginWorkDir()."/temporary_keys";
+        $list = AJXP_Utils::loadSerialFile($storage, false, "ser");
+        if(iSset($list[$keyType]) && iSset($list[$keyType][$keyId])) {
+            return $list[$keyType][$keyId];
+        }else{
+            return null;
+        }
+
+    }
+
+    /**
+     * @abstract
+     * @param String $keyType
+     * @param String $keyId
+     * @return boolean
+     */
+    public function deleteTemporaryKey($keyType, $keyId){
+        $storage = $this->getPluginWorkDir()."/temporary_keys";
+        $list = AJXP_Utils::loadSerialFile($storage, false, "ser");
+        if(iSset($list[$keyType]) && iSset($list[$keyType][$keyId])) {
+            unset($list[$keyType][$keyId]);
+            if(count($list[$keyType]) == 0){
+                unset($list[$keyType]);
+            }
+        }
+        AJXP_Utils::saveSerialFile($storage, $list);
+        return true;
+    }
+
+    /**
+     * @abstract
+     * @param String $keyType
+     * @param String $expiration
+     * @return null
+     */
+    public function pruneTemporaryKeys($keyType, $expiration){
+        $storage = $this->getPluginWorkDir()."/temporary_keys";
+        $list = AJXP_Utils::loadSerialFile($storage, false, "ser");
+        foreach($list as $type => &$keys){
+            foreach($keys as $key => $data){
+                if($data["date"] < time() - $expiration*60){
+                    unset($keys[$key]);
+                }
+            }
+            if(count($keys) == 0){
+                unset($list[$type]);
+            }
+        }
+        AJXP_Utils::saveSerialFile($storage, $list);
+    }
+
+
 }

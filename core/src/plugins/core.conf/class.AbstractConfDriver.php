@@ -274,7 +274,39 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      */
     abstract public function deleteBinary($context, $ID);
 
+    /**
+     * @abstract
+     * @param String $keyType
+     * @param String $keyId
+     * @param String $userId
+     * @param Array $data
+     * @return boolean
+     */
+    abstract public function saveTemporaryKey($keyType, $keyId, $userId, $data);
 
+    /**
+     * @abstract
+     * @param String $keyType
+     * @param String $keyId
+     * @return array
+     */
+    abstract public function loadTemporaryKey($keyType, $keyId);
+
+    /**
+     * @abstract
+     * @param String $keyType
+     * @param String $keyId
+     * @return boolean
+     */
+    abstract public function deleteTemporaryKey($keyType, $keyId);
+
+    /**
+     * @abstract
+     * @param String $keyType
+     * @param String $expiration
+     * @return null
+     */
+    abstract public function pruneTemporaryKeys($keyType, $expiration);
 
     /**
      * Instantiate a new AbstractAjxpUser

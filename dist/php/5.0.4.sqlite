@@ -1,1 +1,14 @@
 ALTER TABLE `ajxp_feed` ADD COLUMN `index_path` text;
+
+ALTER TABLE ajxp_simple_store RENAME TO ajxp_simple_store_old;
+CREATE TABLE IF NOT EXISTS ajxp_simple_store (
+   object_id VARCHAR(255) NOT NULL,
+   store_id VARCHAR(50) NOT NULL,
+   serialized_data LONGTEXT NULL,
+   binary_data LONGBLOB NULL,
+   related_object_id VARCHAR(255) NULL,
+   insertion_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   PRIMARY KEY(object_id, store_id)
+);
+INSERT INTO ajxp_simple_store SELECT object_id,store_id,serialized_data,binary_data,related_object_id,CURRENT_TIMESTAMP FROM ajxp_simple_store_old;
+DROP TABLE ajxp_simple_store_old;
