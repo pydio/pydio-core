@@ -94,9 +94,9 @@ class sqlConfDriver extends AbstractConfDriver
     {
         $res_opts = dibi::query('SELECT COUNT(*) FROM [ajxp_plugin_configs] WHERE [id] = %s', $pluginId);
         if ($res_opts->fetchSingle()) {
-            dibi::query('UPDATE [ajxp_plugin_configs] SET [configs] = %s WHERE [id] = %s', serialize($options), $pluginId);
+            dibi::query('UPDATE [ajxp_plugin_configs] SET [configs] = %bin WHERE [id] = %s', serialize($options), $pluginId);
         } else {
-            dibi::query('INSERT INTO [ajxp_plugin_configs]', array('id' => $pluginId, 'configs' => serialize($options)));
+            dibi::query('INSERT INTO [ajxp_plugin_configs] ([id],[configs]) VALUES (%s,%bin)', $pluginId, serialize($options));
         }
     }
 

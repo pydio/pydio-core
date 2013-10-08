@@ -191,7 +191,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
                 // Update an existing rights row, because only some of the rights have changed.
                 } else {
 
-                    dibi::query('UPDATE [ajxp_user_prefs] SET ', Array('val'=>$prefValue), 'WHERE [login] = %s AND [name] = %s', $this->getId(), $prefName);
+                    dibi::query('UPDATE [ajxp_user_prefs] SET [val] = %bin WHERE [login] = %s AND [name] = %s', $prefValue, $this->getId(), $prefName);
 
                     $this->log('UPDATE PREFERENCE: [Login]: '.$this->getId().' [Preference]:'.$prefName.' [Value]:'.$prefValue);
                     $this->prefs[$prefName] = $prefValue;

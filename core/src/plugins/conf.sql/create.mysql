@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS ajxp_user_prefs (
 	rid INTEGER PRIMARY KEY AUTO_INCREMENT,
 	login VARCHAR(255) NOT NULL,
 	name VARCHAR(255) NOT NULL,
-	val VARCHAR(2000)
+	val BLOB
 );
 
 CREATE TABLE IF NOT EXISTS ajxp_user_bookmarks (
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS ajxp_repo_options (
 	oid INTEGER PRIMARY KEY AUTO_INCREMENT,
 	uuid VARCHAR(33) NOT NULL,
 	name VARCHAR(50) NOT NULL,
-	val VARCHAR(2000),
+	val BLOB,
 	INDEX (uuid)
 );
 
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS ajxp_groups (
 
 CREATE TABLE IF NOT EXISTS ajxp_plugin_configs (
   id VARCHAR(50) NOT NULL,
-  configs LONGTEXT NOT NULL,
+  configs LONGBLOB NOT NULL,
   PRIMARY KEY (id)
 );
 
