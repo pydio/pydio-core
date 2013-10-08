@@ -738,7 +738,8 @@ class sqlConfDriver extends AbstractConfDriver
      * @param Array $data
      * @return boolean
      */
-    public function saveTemporaryKey($keyType, $keyId, $userId, $data){
+    public function saveTemporaryKey($keyType, $keyId, $userId, $data)
+    {
         $this->simpleStoreSet("temporakey_".$keyType, $keyId, $data, "serial", $userId);
     }
 
@@ -748,7 +749,8 @@ class sqlConfDriver extends AbstractConfDriver
      * @param String $keyId
      * @return array
      */
-    public function loadTemporaryKey($keyType, $keyId){
+    public function loadTemporaryKey($keyType, $keyId)
+    {
         $data = array();
         $userId = $this->simpleStoreGet("temporakey_".$keyType, $keyId, "serial", $data);
         $data['user_id'] = $userId;
@@ -761,7 +763,8 @@ class sqlConfDriver extends AbstractConfDriver
      * @param String $keyId
      * @return boolean
      */
-    public function deleteTemporaryKey($keyType, $keyId){
+    public function deleteTemporaryKey($keyType, $keyId)
+    {
         $this->simpleStoreClear("temporakey_".$keyType, $keyId);
     }
 
@@ -771,7 +774,8 @@ class sqlConfDriver extends AbstractConfDriver
      * @param String $expiration
      * @return null
      */
-    public function pruneTemporaryKeys($keyType, $expiration){
+    public function pruneTemporaryKeys($keyType, $expiration)
+    {
         dibi::query("DELETE FROM [ajxp_simple_store] WHERE [store_id] = %s AND [insertion_date] < (CURRENT_TIMESTAMP - %i)", "temporakey_".$keyType, $expiration*60);
     }
 

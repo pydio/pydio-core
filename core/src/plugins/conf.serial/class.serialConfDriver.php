@@ -581,7 +581,8 @@ class serialConfDriver extends AbstractConfDriver
      * @param Array $data
      * @return boolean
      */
-    public function saveTemporaryKey($keyType, $keyId, $userId, $data){
+    public function saveTemporaryKey($keyType, $keyId, $userId, $data)
+    {
         $storage = $this->getPluginWorkDir()."/temporary_keys";
         $list = AJXP_Utils::loadSerialFile($storage, false, "ser");
         if(isSEt($list[$keyType])) $list[$keyType] = array();
@@ -597,12 +598,13 @@ class serialConfDriver extends AbstractConfDriver
      * @param String $keyId
      * @return array
      */
-    public function loadTemporaryKey($keyType, $keyId){
+    public function loadTemporaryKey($keyType, $keyId)
+    {
         $storage = $this->getPluginWorkDir()."/temporary_keys";
         $list = AJXP_Utils::loadSerialFile($storage, false, "ser");
-        if(iSset($list[$keyType]) && iSset($list[$keyType][$keyId])) {
+        if (iSset($list[$keyType]) && iSset($list[$keyType][$keyId])) {
             return $list[$keyType][$keyId];
-        }else{
+        } else {
             return null;
         }
 
@@ -614,12 +616,13 @@ class serialConfDriver extends AbstractConfDriver
      * @param String $keyId
      * @return boolean
      */
-    public function deleteTemporaryKey($keyType, $keyId){
+    public function deleteTemporaryKey($keyType, $keyId)
+    {
         $storage = $this->getPluginWorkDir()."/temporary_keys";
         $list = AJXP_Utils::loadSerialFile($storage, false, "ser");
-        if(iSset($list[$keyType]) && iSset($list[$keyType][$keyId])) {
+        if (iSset($list[$keyType]) && iSset($list[$keyType][$keyId])) {
             unset($list[$keyType][$keyId]);
-            if(count($list[$keyType]) == 0){
+            if (count($list[$keyType]) == 0) {
                 unset($list[$keyType]);
             }
         }
@@ -633,16 +636,17 @@ class serialConfDriver extends AbstractConfDriver
      * @param String $expiration
      * @return null
      */
-    public function pruneTemporaryKeys($keyType, $expiration){
+    public function pruneTemporaryKeys($keyType, $expiration)
+    {
         $storage = $this->getPluginWorkDir()."/temporary_keys";
         $list = AJXP_Utils::loadSerialFile($storage, false, "ser");
-        foreach($list as $type => &$keys){
-            foreach($keys as $key => $data){
-                if($data["date"] < time() - $expiration*60){
+        foreach ($list as $type => &$keys) {
+            foreach ($keys as $key => $data) {
+                if ($data["date"] < time() - $expiration*60) {
                     unset($keys[$key]);
                 }
             }
-            if(count($keys) == 0){
+            if (count($keys) == 0) {
                 unset($list[$type]);
             }
         }

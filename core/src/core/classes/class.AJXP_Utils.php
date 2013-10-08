@@ -362,7 +362,7 @@ class AJXP_Utils
             }
             setcookie("AJXP_GUI", null);
         }
-        if(isSet($session["OVERRIDE_GUI_START_PARAMETERS"])){
+        if (isSet($session["OVERRIDE_GUI_START_PARAMETERS"])) {
             $output = array_merge($output, $session["OVERRIDE_GUI_START_PARAMETERS"]);
         }
     }
