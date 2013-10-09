@@ -39,7 +39,7 @@ if (!defined('LOG_LEVEL_DEBUG')) {
  * The object has a chance to open its stream or file from the init() method. all subsequent calls assume
  * the availability of the stream or file.
  */
-class AbstractLogDriver extends AJXP_Plugin
+abstract class AbstractLogDriver extends AJXP_Plugin
 {
     /**
      * Driver type
@@ -51,51 +51,18 @@ class AbstractLogDriver extends AJXP_Plugin
     /**
      * Write an entry to the log.
      *
-     * @param String $textMessage The message to log
-     * @param String $severityLevel The severity level, see LOG_LEVEL_ constants
+     * @param String $level Log severity: one of LOG_LEVEL_* (DEBUG,INFO,NOTICE,WARNING,ERROR)
+     * @param String $ip The client ip
+     * @param String $user The user login
+     * @param String $source The source of the message
+     * @param String $prefix  The prefix of the message
+     * @param String $message The message to log
      *
      */
-    public function write($textMessage, $severityLevel = LOG_LEVEL_DEBUG) {}
-
-
-    /**
-     * Format an array as a readable string
-     *
-     * Base implementation which can be used by other loggers to format arrays of parameters
-     * nicely.
-     *
-     * @param Array $params
-     * @return String readable list of parameters.
-     */
-    public function arrayToString($params)
+    public function write2($level, $ip, $user, $source, $prefix, $message)
     {
-        $st = "";
-        $index=0;
-        foreach ($params as $key=>$value) {
-            $index++;
-            if (!is_numeric($key)) {
-                $st.="$key=";
-            }
-            if (is_string($value) || is_numeric($value)) {
-                $st.=$value;
-            } else if (is_array($value)) {
-                $st.=$this->arrayToString($value);
-            } else if (is_bool($value)) {
-                $st.=($value?"true":"false");
-            } else if (is_a($value, "UserSelection")) {
-                $st.=$this->arrayToString($value->getFiles());
-            }
-
-            if ($index < count($params)) {
-                if (is_numeric($key)) {
-                    $st.=",";
-                } else {
-                    $st.=";";
-                }
-            }
-        }
-        return $st;
-
+        //for backward compatibility
+        $this->write($source."\t".$prefix."\t".$res, $level);
     }
 
     /**
@@ -110,7 +77,7 @@ class AbstractLogDriver extends AJXP_Plugin
      * @internal param $String [optional] $year
      * @internal param $String [optional] $month
      */
-    public function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs", $print = true){}
+    abstract public function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs", $print = true);
 
     /**
      * List log contents in XML
@@ -122,5 +89,6 @@ class AbstractLogDriver extends AJXP_Plugin
      * @return void
      * @internal param $String [optional] $nodeName
      */
-    public function xmlLogs($parentDir, $date, $nodeName = "log", $rootPath = "/logs"){}
+    abstract public function xmlLogs($parentDir, $date, $nodeName = "log", $rootPath = "/logs");
+
 }

@@ -65,22 +65,38 @@ class AJXP_Logger extends AJXP_Plugin
      */
     public static function log2($level, $source, $prefix, $messages = array())
     {
-        $logger = self::getInstance();
-        if($logger == null) return ;
-        $res = $source."\t".$prefix;
-        $index = 0;
+        $res = "";
+        $i = 0;
         foreach ($messages as $value) {
-            $res .= "\t";
+            if($i > 0) $res .= "\t";
+            $i++;
 
             if (is_string($value)) {
                 $res .= $value;
             } else if (is_array($value) && count($value)) {
-                $res.=$logger->arrayToString($value);
+                $res .= self::arrayToString($value);
             } else if (!empty($value)) {
                 $res .= print_r($value, true);
             }
         }
-        $logger->write($res, $level);
+        $res = str_replace(array("\r\n", "\n", "\r"), ' ', $res);
+        $ip = self::getClientAdress();
+        $user = self::getLoggedUser();
+        $logger = self::getInstance();
+        if ($logger != null) {
+            try {
+                $logger->write2($level, $ip, $user, $source, $prefix, $res);
+            } catch (Exception $e) {
+                error_log("Exception while logging");
+                error_log("Log message was : IP => $ip | user => $user | level => $level | source => $source | prefix => $prefix | message => ".$res);
+                error_log("Exception is:".$e->getMessage());
+                error_log("In ".$e->getFile()." line ".$e->getLine());
+                error_log($innerEx->getTraceAsString());
+            }
+        } else {
+            error_log("No logger");
+            error_log("Message was : IP => $ip | user => $user | level => $level | source => $source | prefix => $prefix | message => ".$res);
+        }
     }
 
     /**
@@ -204,6 +220,61 @@ class AJXP_Logger extends AJXP_Plugin
             $msg = "Unknown Origin";
         }
         return $msg;
+    }
+
+    /**
+     * Return the user if it exists
+     * @static
+     * @return String client login
+     */
+    public static function getLoggedUser()
+    {
+        $user = "No User";
+        if (AuthService::usersEnabled()) {
+            $logged = AuthService::getLoggedUser();
+            if ($logged != null) {
+                $user = $logged->getId();
+            } else {
+                $user = "shared";
+            }
+        }
+        return $user;
+    }
+
+    /**
+     * Format an array as a readable string
+     *
+     * @param Array $params
+     * @return String readable list of parameters.
+     */
+    public static function arrayToString($params)
+    {
+        $st = "";
+        $index=0;
+        foreach ($params as $key=>$value) {
+            $index++;
+            if (!is_numeric($key)) {
+                $st.="$key=";
+            }
+            if (is_string($value) || is_numeric($value)) {
+                $st .= $value;
+            } else if (is_array($value)) {
+                $st .= self::arrayToString($value);
+            } else if (is_bool($value)) {
+                $st .= ($value?"true":"false");
+            } else if (is_a($value, "UserSelection")) {
+                $st .= self::arrayToString($value->getFiles());
+            }
+
+            if ($index < count($params)) {
+                if (is_numeric($key)) {
+                    $st.=",";
+                } else {
+                    $st.=";";
+                }
+            }
+        }
+        return $st;
     }
 
     /**
