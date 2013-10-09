@@ -101,17 +101,37 @@ class sysLogDriver extends textLogDriver
      * If write is not allowed because the file is not yet open, the message is buffered until
      * file becomes available.
      *
-     * @param String $textMessage The message to write.
-     * @param Integer $severityLevel Log severity: one of LOG_LEVEL_* (DEBUG,INFO,NOTICE,WARNING,ERROR)
+     * @param String $level Log severity: one of LOG_LEVEL_* (DEBUG,INFO,NOTICE,WARNING,ERROR)
+     * @param String $ip The client ip
+     * @param String $user The user login
+     * @param String $source The source of the message
+     * @param String $prefix  The prefix of the message
+     * @param String $message The message to log
+     *
      */
-    public function write($textMessage, $severityLevel = LOG_LEVEL_DEBUG)
+    public function write2($level, $ip, $user, $source, $prefix, $message)
     {
-        $textMessage = $this->formatMessage($textMessage, $severityLevel);
-        if($severityLevel == LOG_LEVEL_DEBUG) $sysLevel = LOG_DEBUG;
-        elseif($severityLevel == LOG_LEVEL_INFO) $sysLevel = LOG_INFO;
-        elseif($severityLevel == LOG_LEVEL_NOTICE) $sysLevel = LOG_NOTICE;
-        elseif($severityLevel == LOG_LEVEL_WARNING) $sysLevel = LOG_WARNING;
-        elseif($severityLevel == LOG_LEVEL_ERROR) $sysLevel = LOG_ERR;
+        //syslog already take care of timestamp and log severity
+        $textMessage = "$ip\t$user\t$source\t$prefix\t$message";
+
+        switch ($level) {
+            case LOG_LEVEL_DEBUG:
+                $sysLevel = LOG_DEBUG;
+                break;
+            case LOG_LEVEL_INFO:
+                $sysLevel = LOG_INFO;
+                break;
+            case LOG_LEVEL_NOTICE:
+                $sysLevel = LOG_NOTICE;
+                break;
+            case LOG_LEVEL_WARNING:
+                $sysLevel = LOG_WARNING;
+                break;
+            case LOG_LEVEL_ERROR:
+                $sysLevel = LOG_ERR;
+                break;
+        }
+
 
         if ($this->fileHandle !== false) {
 
