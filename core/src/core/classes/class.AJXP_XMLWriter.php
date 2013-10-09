@@ -202,17 +202,12 @@ class AJXP_XMLWriter
     public static function catchError($code, $message, $fichier, $ligne, $context)
     {
         if(error_reporting() == 0) return ;
-        if (ConfService::getConf("SERVER_DEBUG")) {
-            $message = "$message in $fichier (l.$ligne)";
-        }
-        try {
-            AJXP_Logger::error(__CLASS__, __FUNCTION__, array("message" => $message));
-        } catch (Exception $e) {
-            // This will probably trigger a double exception!
-            echo "<pre>Error in error";
-            debug_print_backtrace();
-            echo "</pre>";
-            die("Recursive exception. Original error was : ".$message. " in $fichier , line $ligne");
+        AJXP_Logger::error(basename($fichier), "error l.$ligne", array("message" => $message));
+        $loggedUser = AuthService::getLoggedUser();
+        if (ConfService::getConf("SERVER_DEBUG") || $loggedUser != null && $loggedUser->isAdmin()) {
+            $message .= " in $fichier (l.$ligne)";
+        } else {
+            $message = "Oops, something happened. Ask your admin to check the logs";
         }
         if(!headers_sent()) AJXP_XMLWriter::header();
         AJXP_XMLWriter::sendMessage(null, SystemTextEncoding::toUTF8($message), true);
@@ -229,7 +224,10 @@ class AJXP_XMLWriter
         try {
             AJXP_XMLWriter::catchError($exception->getCode(), SystemTextEncoding::fromUTF8($exception->getMessage()), $exception->getFile(), $exception->getLine(), null);
         } catch (Exception $innerEx) {
-            print get_class($innerEx)." thrown within the exception handler! Message was: ".$innerEx->getMessage()." in ".$innerEx->getFile()." on line ".$innerEx->getLine()." ".$innerEx->getTraceAsString();
+            error_log(get_class($innerEx)." thrown within the exception handler!");
+            error_log("Original exception was: ".$innerEx->getMessage()." in ".$innerEx->getFile()." on line ".$innerEx->getLine());
+            error_log("New exception is: ".$innerEx->getMessage()." in ".$innerEx->getFile()." on line ".$innerEx->getLine()." ".$innerEx->getTraceAsString());
+            print("Error");
         }
     }
     /**
