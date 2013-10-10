@@ -31,7 +31,7 @@ class PHP_OB extends AbstractTest
     public function PHP_OB() { parent::AbstractTest("PHP Output Buffer disabled", "You should disable php output_buffering parameter for better performances with Pydio."); }
     public function doTest()
     {
-        $this->failedLevel = "warning";
+        $this->failedLevel = "error";
         $v = @ini_get("output_buffering");
         if (isSet($v) && (is_numeric($v) || strtolower($v) == "on")) {
             $this->testedParams["PHP Output Buffer disabled"] = "No";
