@@ -5,5 +5,5 @@ CREATE TABLE IF NOT EXISTS `ajxp_log` (
 	`severity`	ENUM('DEBUG', 'INFO', 'NOTICE', 'WARNING', 'ERROR'),
 	`user`		VARCHAR(255),
 	`message`	VARCHAR(255),
-	`params`	VARCHAR(255)
+	`params`	TEXT
 );
