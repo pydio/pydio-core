@@ -540,8 +540,8 @@ class ldapAuthDriver extends AbstractAuthDriver {
                     $key = strtolower($params['MAPPING_LDAP_PARAM']);
                     if(isSet($entry[$key])){
                         $value = $entry[$key][0];
+                        $memberValues = array();
                         if($key == "memberof"){
-                            $memberValues = array();
                             // get CN from value
                             foreach($entry[$key] as $possibleValue){
                                 $hnParts = array();
@@ -577,7 +577,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
                                     }
                                     foreach($memberValues as $uniqValue => $fullDN){
                                         if(isSet($matchFilter) && !preg_match($matchFilter, $uniqValue)) continue;
-                                        if(isSet($valueFilters) && !in_array($uniqValue, $matchFilter)) continue;
+                                        if(isSet($valueFilters) && !in_array($uniqValue, $valueFilters)) continue;
                                         if($userObject->personalRole->filterParameterValue("auth.ldap", "MEMBER_OF", AJXP_REPO_SCOPE_ALL, "") == $fullDN){
                                             //break;
                                         }
