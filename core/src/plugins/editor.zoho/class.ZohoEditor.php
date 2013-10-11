@@ -28,28 +28,29 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Editor
  */
-class ZohoEditor extends AJXP_Plugin {
-
-    public function performChecks(){
-        if(!extension_loaded("openssl")){
+class ZohoEditor extends AJXP_Plugin
+{
+    public function performChecks()
+    {
+        if (!extension_loaded("openssl")) {
             throw new Exception("Zoho plugin requires PHP 'openssl' extension, as posting the document to the Zoho server requires the Https protocol.");
         }
     }
 
 
-    public function switchAction($action, $httpVars, $filesVars){
-		
-		if(!isSet($this->actions[$action])) return false;
-    	
-		$repository = ConfService::getRepository();
-		if(!$repository->detectStreamWrapper(true)){
-			return false;
-		}
-		
-		$streamData = $repository->streamData;
-    	$destStreamURL = $streamData["protocol"]."://".$repository->getId();
-		    	
-		if($action == "post_to_zohoserver"){
+    public function switchAction($action, $httpVars, $filesVars)
+    {
+        if(!isSet($this->actions[$action])) return false;
+
+        $repository = ConfService::getRepository();
+        if (!$repository->detectStreamWrapper(true)) {
+            return false;
+        }
+
+        $streamData = $repository->streamData;
+        $destStreamURL = $streamData["protocol"]."://".$repository->getId();
+
+        if ($action == "post_to_zohoserver") {
 
             $sheetExt =  explode(",", "xls,xlsx,ods,sxc,csv,tsv");
             $presExt = explode(",", "ppt,pps,odp,sxi");
@@ -57,31 +58,31 @@ class ZohoEditor extends AJXP_Plugin {
 
             require_once(AJXP_BIN_FOLDER."/http_class/http_class.php");
 
-			$file = base64_decode($httpVars["file"]);
-			$file = SystemTextEncoding::magicDequote(AJXP_Utils::securePath($file));
-			$target = base64_decode($httpVars["parent_url"]);
-			$tmp = call_user_func(array($streamData["classname"], "getRealFSReference"), $destStreamURL.$file);			
-			$tmp = SystemTextEncoding::fromUTF8($tmp);
+            $file = base64_decode($httpVars["file"]);
+            $file = SystemTextEncoding::magicDequote(AJXP_Utils::securePath($file));
+            $target = base64_decode($httpVars["parent_url"]);
+            $tmp = call_user_func(array($streamData["classname"], "getRealFSReference"), $destStreamURL.$file);
+            $tmp = SystemTextEncoding::fromUTF8($tmp);
 
             $node = new AJXP_Node($destStreamURL.$file);
             AJXP_Controller::applyHook("node.read", array($node));
 
             $extension = strtolower(pathinfo(urlencode(basename($file)), PATHINFO_EXTENSION));
-			$httpClient = new http_class();
+            $httpClient = new http_class();
             $httpClient->request_method = "POST";
 
             $secureToken = $httpVars["secure_token"];
             $_SESSION["ZOHO_CURRENT_EDITED"] = $destStreamURL.$file;
             $_SESSION["ZOHO_CURRENT_UUID"]   = md5(rand()."-".microtime());
 
-            if($this->getFilteredOption("USE_ZOHO_AGENT", $repository->getId())){
+            if ($this->getFilteredOption("USE_ZOHO_AGENT", $repository->getId())) {
                 $saveUrl = $this->getFilteredOption("ZOHO_AGENT_URL", $repository->getId());
-            }else{
+            } else {
                 $saveUrl = $target."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/save_zoho.php";
             }
 
 
-			$params = array(
+            $params = array(
                 'id' => $_SESSION["ZOHO_CURRENT_UUID"],
                 'apikey' => $this->getFilteredOption("ZOHO_API_KEY", $repository->getId()),
                 'output' => 'url',
@@ -91,14 +92,14 @@ class ZohoEditor extends AJXP_Plugin {
                 'format' => $extension,
                 'mode' => 'normaledit',
                 'saveurl'   => $saveUrl
-			);
+            );
 
             $service = "exportwriter";
-            if(in_array($extension, $sheetExt)){
+            if (in_array($extension, $sheetExt)) {
                 $service = "sheet";
-            }else if(in_array($extension, $presExt)){
+            } else if (in_array($extension, $presExt)) {
                 $service = "show";
-            }else if(in_array($extension, $docExt)){
+            } else if (in_array($extension, $docExt)) {
                 $service = "exportwriter";
             }
             $arguments = array();
@@ -108,11 +109,11 @@ class ZohoEditor extends AJXP_Plugin {
                 "content"   => array("FileName" => $tmp, "Content-Type" => "automatic/name")
             );
             $err = $httpClient->Open($arguments);
-            if(empty($err)){
+            if (empty($err)) {
                 $err = $httpClient->SendRequest($arguments);
-                if(empty($err)){
+                if (empty($err)) {
                     $response = "";
-                    while(true){
+                    while (true) {
                         $body = "";
                         $error = $httpClient->ReadReplyBody($body, 1000);
                         if($error != "" || strlen($body) == 0) break;
@@ -121,13 +122,13 @@ class ZohoEditor extends AJXP_Plugin {
                     $result = trim($response);
                     $matchlines = explode("\n", $result);
                     $resultValues = array();
-                    foreach($matchlines as $line){
+                    foreach ($matchlines as $line) {
                         list($key, $val) = explode("=", $line, 2);
                         $resultValues[$key] = $val;
                     }
-                    if($resultValues["RESULT"] == "TRUE" && isSet($resultValues["URL"])){
+                    if ($resultValues["RESULT"] == "TRUE" && isSet($resultValues["URL"])) {
                         header("Location: ".$resultValues["URL"]);
-                    }else{
+                    } else {
                         echo "Zoho API Error ".$resultValues["ERROR_CODE"]." : ".$resultValues["WARNING"];
                         echo "<script>window.parent.setTimeout(function(){parent.hideLightBox();}, 2000);</script>";
                     }
@@ -135,21 +136,21 @@ class ZohoEditor extends AJXP_Plugin {
                 $httpClient->Close();
             }
 
-		}else if($action == "retrieve_from_zohoagent"){
+        } else if ($action == "retrieve_from_zohoagent") {
             $targetFile = $_SESSION["ZOHO_CURRENT_EDITED"];
             $id = $_SESSION["ZOHO_CURRENT_UUID"].".".pathinfo($targetFile, PATHINFO_EXTENSION);
             $node = new AJXP_Node($targetFile);
             $node->loadNodeInfo();
             AJXP_Controller::applyHook("node.before_change", array(&$node));
 
-            if($this->getFilteredOption("USE_ZOHO_AGENT",$repository->getId()) ){
-                $data = AJXP_Utils::getRemoteContent( $this->getFilteredOption("ZOHO_AGENT_URL",$repository->getId())."?ajxp_action=get_file&name=".$id);
-                if(strlen($data)){
+            if ($this->getFilteredOption("USE_ZOHO_AGENT",$repository->getId()) ) {
+                $data = AJXP_Utils::getRemoteContent( $this->getFilteredOption("ZOHO_AGENT_URL",$repository->getId())."?ajxp_action=get_file&name=".$id."&key=".$this->getFilteredOption("ZOHO_AGENT_URL", $repository->getId()));
+                if (strlen($data)) {
                     file_put_contents($targetFile, $data);
                     echo "MODIFIED";
                 }
-            }else{
-                if(is_file(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id)){
+            } else {
+                if (is_file(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id)) {
                     copy(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id, $targetFile);
                     unlink(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id);
                     echo "MODIFIED";
@@ -159,6 +160,6 @@ class ZohoEditor extends AJXP_Plugin {
         }
 
 
-	}
-	
+    }
+
 }
