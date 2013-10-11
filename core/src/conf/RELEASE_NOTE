@@ -10,6 +10,8 @@ Date : ##VERSION_DATE##
 Rev Number : ##REVISION##
 Contributors: thomasCresson, echampet, joubertredrat, BlackLionPT, FelipeSilva157, miloric, TheLexus, millsdude
 
+Fix #310, missing short form tpl for rename notification
+From now on, pass the package name "pydio-core" to upgrader - we'll maintain ajaxplorer-core and pydio-core
 Implement WebDAV Basic authentication the same way as Digest. (cherry picked from commit 94b0607) (details)
 Rebranding (cherry picked from commit ee7512b) (details)
 Massive rebranding (details)
