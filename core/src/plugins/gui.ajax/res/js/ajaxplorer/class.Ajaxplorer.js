@@ -47,7 +47,7 @@ Class.create("Ajaxplorer", {
 		this._initDefaultDisp = 'list';
 		this.histCount=0;
 		this._guiComponentsConfigs = new Hash();
-		this.appTitle = ajxpBootstrap.parameters.get("customWording").title || "AjaXplorer";
+		this.appTitle = ajxpBootstrap.parameters.get("customWording").title || "Pydio";
 	},
 	
 	/**

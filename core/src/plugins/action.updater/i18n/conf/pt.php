@@ -20,7 +20,7 @@
 */
 $mess=array(
 "Update Engine" => "Actualizar Programa",
-"Automatic update of AjaXplorer. Since version 3.3.3" => "Actualização automática do AjaXplorer. Disponível desde a versão 3.3.3",
+"Automatic update of Pydio. Since version 3.3.3" => "Actualização automática do Pydio. Disponível desde a versão 3.3.3",
 "Update Site" => "Actualizar Site",
 "Where to update" => "Onde actualizar",
 "Preserve Files" => "Preservar Ficheiros",

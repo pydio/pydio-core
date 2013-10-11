@@ -36,9 +36,9 @@ $mess=array(
 "Fix Permissions" => "Rechtefix",
 "How to handle remote permissions to be used by PHP as local permissions. See manual." => "Wie die Serverrechte durch PHP als lokale Rechte verwendet werden. Siehe Anleitung.",
 "Temporary Folder" => "Temporäres Verzeichnis",
-"Temporary folder on the local server used for file uploads. For the moment, it must be placed under your ajaxplorer folder and you must create it and set it writeable by Apache." => "Temporäres Verzeichnis auf dem lokalen Server, der für Dateiuploads genutzt wird. Zurzeit muss es im Ajaxplorer-Verzeichnis auf dem lokalen Server erstellt und für Apache beschreibbar eingerichtet werden",
+"Temporary folder on the local server used for file uploads. For the moment, it must be placed under your ajaxplorer folder and you must create it and set it writeable by Apache." => "Temporäres Verzeichnis auf dem lokalen Server, der für Dateiuploads genutzt wird. Zurzeit muss es im Pydio-Verzeichnis auf dem lokalen Server erstellt und für Apache beschreibbar eingerichtet werden",
 "Dynamic FTP" => "Dynamisches FTP",
 "Pass Ftp data through Auth driver" => "FTP-Daten durch Auth Treiber erlauben",
-"In conjunction with a correctly configured auth.ftp driver, this allow to transform ajaxplorer into a simple netFtp client." => "In Zusammenarbeit mit einem korrekt konfigurierten Auth.ftp-Treiber, kann Ajaxplorer als einfacher netFTP Client genutzt werden.",
+"In conjunction with a correctly configured auth.ftp driver, this allow to transform ajaxplorer into a simple netFtp client." => "In Zusammenarbeit mit einem korrekt konfigurierten Auth.ftp-Treiber, kann Pydio als einfacher netFTP Client genutzt werden.",
 );
 ?>

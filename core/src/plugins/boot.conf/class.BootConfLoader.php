@@ -304,7 +304,7 @@ class BootConfLoader extends AbstractConfDriver {
             $mailerPlug->loadConfigs(array("MAILER" => $data["MAILER_ENABLE"]["MAILER_SYSTEM"]));
             $mailerPlug->sendMail(
                 array($data["MAILER_ENABLE"]["MAILER_ADMIN"]),
-                "AjaXplorer Test Mail",
+                "Pydio Test Mail",
                 "Body of the test",
                 array($data["MAILER_ENABLE"]["MAILER_ADMIN"])
             );

@@ -25,7 +25,7 @@ Installing this editor is remarkably simple
 + Extract the "ckeditor" folder directly inside this plugin folder. 
   (Thus you should find ajxpInstall/plugins/editor.ckeditor/ckeditor/[CKEDITOR FILES])
 + Rename the manifest.xml.default to manifest.xml
-+ Reload AjaXplorer, you're done! If you select an HTML file, you should now be able to 
++ Reload Pydio, you're done! If you select an HTML file, you should now be able to
   "Open with..." the file with this HTML Editor!
   
 Enjoy.

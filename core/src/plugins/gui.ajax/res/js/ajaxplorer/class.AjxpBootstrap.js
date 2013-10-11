@@ -247,7 +247,7 @@ Class.create("AjxpBootstrap", {
             if(customWording.icon_binary_url){
                 icon = this.parameters.get("ajxpServerAccess") + "&" + customWording.icon_binary_url;
             }
-			var title = customWording.title || "AjaXplorer";
+			var title = customWording.title || "Pydio";
 			var iconWidth = customWording.iconWidth || '35px';
 			var fontSize = customWording.titleFontSize || '35px';
             var titleDivSize = (customWording.iconHeight ? 'height:' + customWording.iconHeight + ';' : '');

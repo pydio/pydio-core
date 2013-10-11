@@ -20,7 +20,7 @@
 */
 $mess=array(
 "Update Engine" => "Update Engine",
-"Automatic update of AjaXplorer. Since version 3.3.3" => "Automatic update of AjaXplorer. Since version 3.3.3",
+"Automatic update of Pydio. Since version 3.3.3" => "Automatic update of Pydio. Since version 3.3.3",
 "Update Site" => "Update Site",
 "Where to update" => "Where to update",
 "Preserve Files" => "Preserve Files",

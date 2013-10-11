@@ -20,6 +20,6 @@
  */
 
 $mess = array(
-   "1" => "Instalador do AjaXplorer",
-   "2" => "Bem vindo ao Instalador do AjaXplorer"
+   "1" => "Instalador do Pydio",
+   "2" => "Bem vindo ao Instalador do Pydio"
 );

@@ -19,7 +19,7 @@
  */
 
 /**
- * AjaXplorer encapsulation of Ajax.Request
+ * Pydio encapsulation of Ajax.Request
  */
 Class.create("Connexion", {
 

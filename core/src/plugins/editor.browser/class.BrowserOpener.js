@@ -46,7 +46,7 @@ Class.create("BrowserOpener", AbstractEditor, {
 		connexion.addParameter('file', fileName);	
 		connexion.onComplete = function(transp){
 			var url = transp.responseText;
-	        myRef = window.open(url, "AjaXplorer Bookmark", "location=yes,menubar=yes,resizable=yes,scrollbars=yea,toolbar=yes,status=yes");
+	        myRef = window.open(url, "Pydio Bookmark", "location=yes,menubar=yes,resizable=yes,scrollbars=yea,toolbar=yes,status=yes");
 	        hideLightBox();
 		}.bind(this);
 		connexion.sendSync();		

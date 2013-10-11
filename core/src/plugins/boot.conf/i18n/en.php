@@ -20,6 +20,6 @@
  */
 
 $mess = array(
-   "1" => "AjaXplorer Setup Wizard",
-   "2" => "Welcome in the AjaXplorer Setup Wizard"
+   "1" => "Pydio Setup Wizard",
+   "2" => "Welcome in the Pydio Setup Wizard"
 );

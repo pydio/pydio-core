@@ -20,6 +20,6 @@
 */
 $mess=array(
 "Javascript Api Browser" => "Javascript Api Browser",
-"Browse AjaXplorer Javascript classes and interfaces. Helper for developpers, but also good demonstration of how Ajaxplorer data can be fed by something different than a remote server filesystem!" => "Browse AjaXplorer Javascript classes and interfaces. Helper for developpers, but also good demonstration of how Ajaxplorer data can be fed by something different than a remote server filesystem!",
+"Browse Pydio Javascript classes and interfaces. Helper for developpers, but also good demonstration of how Ajaxplorer data can be fed by something different than a remote server filesystem!" => "Browse Pydio Javascript classes and interfaces. Helper for developpers, but also good demonstration of how Ajaxplorer data can be fed by something different than a remote server filesystem!",
 );
 ?>

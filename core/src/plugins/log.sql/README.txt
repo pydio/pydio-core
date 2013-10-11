@@ -1,7 +1,7 @@
 log.sql plugin documentation
 -----------------------------
 
-This is the log.sql plugin. It stores AjaXplorer logging
+This is the log.sql plugin. It stores Pydio logging
 information in an SQL database.
 
 configuring the plugin
@@ -29,7 +29,7 @@ When you are happy with the configuration, run the create.sql script
 located inside the same directory as the plugin
 to create the database schema for the log.sql plugin.
 
-Note that the performance of AjaXplorer is slightly degraded by the
+Note that the performance of Pydio is slightly degraded by the
 overhead of the plugin - but that's what you sacrifice for the
 flexibility.
 
@@ -54,7 +54,7 @@ The severity is normalised to ensure we only record valid log severity levels. T
 // AT THE MOMENT THE REMOTE_IP IS STORED AS IS IN THE DB
 
 
-This file is part of the AjaXplorer distribution.
+This file is part of the Pydio distribution.
 
 
 Contribution by Mosen : greetings!

@@ -19,7 +19,7 @@
  */
 
 /**
- * Encapsulation of the Prototype Autocompleter for AjaXplorer purposes.
+ * Encapsulation of the Prototype Autocompleter for Pydio purposes.
  * Should be ported for local provides
  */
 Class.create("AjxpAutocompleter", Autocompleter.Base, {

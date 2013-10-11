@@ -334,7 +334,7 @@ Class.create("AbstractEditor" , {
 	 * Refreshes the title
 	 */
 	refreshFullScreenTitle : function(){
-		document.title = "AjaXplorer - "+$(modal.dialogTitle).innerHTML.stripTags().replace("&nbsp;","");
+		document.title = "Pydio - "+$(modal.dialogTitle).innerHTML.stripTags().replace("&nbsp;","");
 	},
 	/**
 	 * Add a loading image to the given element

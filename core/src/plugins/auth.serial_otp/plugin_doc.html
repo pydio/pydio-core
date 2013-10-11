@@ -21,7 +21,7 @@
 			The authentication method can be set up per users, so it is possible that someone authenticate with password, other user authenticate with YubiKey, and someone else authenticate with both YubiKey and Google Authenticator.<br />
 			&nbsp;</p>
 		<h2>
-			AjaXplorer upgrade from 4.x to 5.x</h2>
+			Pydio upgrade from 4.x to 5.x</h2>
 		<p>
 			Before the upgrade you have to disable serial_otp module. In the <strong>bootstrap_plugins.php</strong> replace the authentication driver from serial_otp to serial. You should leave the USERS_FILEPATH unchanged because its format compatible with serial auth plugin. After the modification the relevant part of bootsrap_plugins.php should look similar to this:</p>
 		<pre>
@@ -41,7 +41,7 @@
 			<li>
 				Try wheter you are able to log in with your password</li>
 			<li>
-				Upgrade AjaXplorer</li>
+				Upgrade Pydio</li>
 			<li>
 				Try wheter you are able to log in with your password</li>
 			<li>
@@ -81,7 +81,7 @@ pear install Auth_Yubico-2.4.tgz
 			Configuration</h2>
 		<ul>
 			<li>
-				Backup your current AjaXplorer instance just for sure</li>
+				Backup your current Pydio instance just for sure</li>
 			<li>
 				Enable the Serial One-Time-Password (auth.serial_otp) modul in <em>Global configurations &gt;&gt; Core Plugins &gt;&gt; Auth</em></li>
 			<li>

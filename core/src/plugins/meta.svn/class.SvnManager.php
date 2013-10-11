@@ -132,7 +132,7 @@ class SvnManager extends AJXP_Plugin {
             // WILL COMMIT BOTH AT ONCE
             $command = "svn commit";
             $user = AuthService::getLoggedUser()->getId();
-            $switches = "-m \"AjaXplorer||$user||COMMIT_META||file:".escapeshellarg($file)."\"";
+            $switches = "-m \"Pydio||$user||COMMIT_META||file:".escapeshellarg($file)."\"";
             ExecSvnCmd($command, array($realFile, $nodeRealFile), $switches);
             ExecSvnCmd('svn update', dirname($nodeRealFile), '');
         }else{
@@ -323,7 +323,7 @@ class SvnManager extends AJXP_Plugin {
         }
 		$command = "svn commit";
 		$user = AuthService::getLoggedUser()->getId();		
-		$switches = "-m \"AjaXplorer||$user||$actionName".(isSet($this->commitMessageParams)?"||".$this->commitMessageParams:"")."\"";
+		$switches = "-m \"Pydio||$user||$actionName".(isSet($this->commitMessageParams)?"||".$this->commitMessageParams:"")."\"";
 		$res = ExecSvnCmd($command, $args, $switches);
         if(is_file($args)){
             $res2 = ExecSvnCmd('svn update', dirname($args), '');

@@ -26,6 +26,6 @@ $mess=array(
 "Repository" => "Repositório",
 "Id of the repository to use for testing connexion" => "ID da Área de Trabalho a ser usada para testar a ligação",
 "Admin user" => "Administrador",
-"The ID of an existing admin for Ajaxplorer (using conf.serial)" => "Introduzir o ID de um administrador existente do AjaXplorer (utilizando conf.serial)",
+"The ID of an existing admin for Ajaxplorer (using conf.serial)" => "Introduzir o ID de um administrador existente do Pydio (utilizando conf.serial)",
 );
 ?>

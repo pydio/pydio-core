@@ -20,6 +20,6 @@
 */
 $mess=array(
 "Javascript Api Browser" => "Navigateur d'Api Javascript",
-"Browse AjaXplorer Javascript classes and interfaces. Helper for developpers, but also good demonstration of how Ajaxplorer data can be fed by something different than a remote server filesystem!" => "Lister les classes et interfaces javascript et leur methodes, avec affichage du code. Pratique non seulement pour le développement, mais aussi comme démonstration de l'utilisation d'AjaXplorer pour browser d'autres types de données.",
+"Browse Pydio Javascript classes and interfaces. Helper for developpers, but also good demonstration of how Ajaxplorer data can be fed by something different than a remote server filesystem!" => "Lister les classes et interfaces javascript et leur methodes, avec affichage du code. Pratique non seulement pour le développement, mais aussi comme démonstration de l'utilisation d'Pydio pour browser d'autres types de données.",
 );
 ?>

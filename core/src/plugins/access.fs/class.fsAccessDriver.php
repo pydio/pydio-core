@@ -1545,7 +1545,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 	function createEmptyFile($crtDir, $newFileName, $content = "")
 	{
         if(($content == "") && preg_match("/\.html$/",$newFileName)||preg_match("/\.htm$/",$newFileName)){
-            $content = "<html>\n<head>\n<title>New Document - Created By AjaXplorer</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">\n</head>\n<body bgcolor=\"#FFFFFF\" text=\"#000000\">\n\n</body>\n</html>\n";
+            $content = "<html>\n<head>\n<title>New Document - Created By Pydio</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">\n</head>\n<body bgcolor=\"#FFFFFF\" text=\"#000000\">\n\n</body>\n</html>\n";
             AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($this->urlBase.$crtDir."/".$newFileName), strlen($content)));
         }
         AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($this->urlBase.$crtDir)));

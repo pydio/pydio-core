@@ -19,7 +19,7 @@
  */
 
 /**
- * AjaXplorer Encapsulation of the Sortable Table
+ * Pydio Encapsulation of the Sortable Table
  */
 Class.create("AjxpSortable", SortableTable, {
 

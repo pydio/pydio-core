@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="remote_fs" enabled="false" label="CONF_MESSAGE[Remote Server (via API)]" description="CONF_MESSAGE[Access a remote server implementing the AjaXplorer API (most commonly a remote server with another AjaXplorer installed)]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<ajxpdriver name="remote_fs" enabled="false" label="CONF_MESSAGE[Remote Server (via API)]" description="CONF_MESSAGE[Access a remote server implementing the Pydio API (most commonly a remote server with another Pydio installed)]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<client_settings icon="plugins/access.remote_fs/remote_fs_icon.png">
         <resources>
             <i18n namespace="remote_fs_access" path="plugins/access.remote_fs/i18n"/>
@@ -9,12 +9,12 @@
 	<server_settings>
 		<param name="HOST" type="string" label="CONF_MESSAGE[Host]" description="CONF_MESSAGE[Domain name or IP to the remote server, without http]" mandatory="true"/>
 		<param name="URI" type="string" label="CONF_MESSAGE[Uri]" description="CONF_MESSAGE[Path of the API implementor on the remote server.]" default="/ajaxplorer/content.php" mandatory="true"/>
-		<param name="USE_AUTH" type="boolean" label="CONF_MESSAGE[Remote Authentification]" description="CONF_MESSAGE[Whether we should authenticate to the remote server or not. If yes, will try to login as an AjaXplorer user, or with standard http auth if Http Auth URI is set.]" default="true" mandatory="true"/>
+		<param name="USE_AUTH" type="boolean" label="CONF_MESSAGE[Remote Authentification]" description="CONF_MESSAGE[Whether we should authenticate to the remote server or not. If yes, will try to login as an Pydio user, or with standard http auth if Http Auth URI is set.]" default="true" mandatory="true"/>
 		<param name="AUTH_USER" type="string" label="CONF_MESSAGE[Login]" description="CONF_MESSAGE[Login for http authentification]" mandatory="false"/>
 		<param name="AUTH_PASS" type="string" label="CONF_MESSAGE[Password]" description="CONF_MESSAGE[Password for http authentification]" mandatory="false"/>
 		<param name="AUTH_URI" type="string" label="CONF_MESSAGE[Http Auth URI]" description="CONF_MESSAGE[Path to the authentication script, e.g. /ajaxplorer/index.php (only if you are using basic http auth)]" default="" mandatory="false"/>		
 		<param name="TMP_UPLOAD" type="string" label="CONF_MESSAGE[Temporary Folder]" description="CONF_MESSAGE[Temporary folder on the local server used for file uploads. For the moment, it must be placed under your ajaxplorer folder and you must create it and set it writeable by Apache.]" default="tmp" mandatory="true"/>
-		<param name="API_CAPABILITIES" type="string" label="CONF_MESSAGE[Api Capabilities]" description="CONF_MESSAGE[AjaXplorer plugins actions supported by remote server, thus forwarded directly instead of executed locally.]" default="" mandatory="false"/>
+		<param name="API_CAPABILITIES" type="string" label="CONF_MESSAGE[Api Capabilities]" description="CONF_MESSAGE[Pydio plugins actions supported by remote server, thus forwarded directly instead of executed locally.]" default="" mandatory="false"/>
 	</server_settings>
 	<registry_contributions>
 		<client_configs>

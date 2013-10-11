@@ -39,6 +39,6 @@ $mess=array(
 "Temporary folder on the local server used for file uploads. For the moment, it must be placed under your ajaxplorer folder and you must create it and set it writeable by Apache." => "Répertoire temporaire pour l'upload des fichiers.",
 "Dynamic FTP" => "FTP Dynamique",
 "Pass Ftp data through Auth driver" => "Paramêtres passés par l'Auth",
-"In conjunction with a correctly configured auth.ftp driver, this allow to transform ajaxplorer into a simple netFtp client." => "A utiliser en conjonction avec Auth.ftp, utiliser les données de FTP passées par le driver auth. Ceci permet de transformer AjaXplorer en un client WebFTP générique.",
+"In conjunction with a correctly configured auth.ftp driver, this allow to transform ajaxplorer into a simple netFtp client." => "A utiliser en conjonction avec Auth.ftp, utiliser les données de FTP passées par le driver auth. Ceci permet de transformer Pydio en un client WebFTP générique.",
 );
 ?>

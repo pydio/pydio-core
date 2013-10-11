@@ -20,13 +20,13 @@
 */
 $mess=array(
 "Remote Server (via API)" => "Remote Server (via API)",
-"Access a remote server implementing the AjaXplorer API (most commonly a remote server with another AjaXplorer installed)" => "Access a remote server implementing the AjaXplorer API (most commonly a remote server with another AjaXplorer installed)",
+"Access a remote server implementing the Pydio API (most commonly a remote server with another Pydio installed)" => "Access a remote server implementing the Pydio API (most commonly a remote server with another Pydio installed)",
 "Host" => "Host",
 "Domain name or IP to the remote server, without http" => "Domain name or IP to the remote server, without http",
 "Uri" => "Uri",
 "Path of the API implementor on the remote server." => "Path of the API implementor on the remote server.",
 "Remote Authentification" => "Remote Authentification",
-"Whether we should authenticate to the remote server or not. If yes, will try to login as an AjaXplorer user, or with standard http auth if Http Auth URI is set." => "Whether we should authenticate to the remote server or not. If yes, will try to login as an AjaXplorer user, or with standard http auth if Http Auth URI is set.",
+"Whether we should authenticate to the remote server or not. If yes, will try to login as an Pydio user, or with standard http auth if Http Auth URI is set." => "Whether we should authenticate to the remote server or not. If yes, will try to login as an Pydio user, or with standard http auth if Http Auth URI is set.",
 "Login" => "Login",
 "Login for http authentification" => "Login for http authentification",
 "Password" => "Password",
@@ -36,6 +36,6 @@ $mess=array(
 "Temporary Folder" => "Temporary Folder",
 "Temporary folder on the local server used for file uploads. For the moment, it must be placed under your ajaxplorer folder and you must create it and set it writeable by Apache." => "Temporary folder on the local server used for file uploads. For the moment, it must be placed under your ajaxplorer folder and you must create it and set it writeable by Apache.",
 "Api Capabilities" => "Api Capabilities",
-"AjaXplorer plugins actions supported by remote server, thus forwarded directly instead of executed locally." => "AjaXplorer plugins actions supported by remote server, thus forwarded directly instead of executed locally.",
+"Pydio plugins actions supported by remote server, thus forwarded directly instead of executed locally." => "Pydio plugins actions supported by remote server, thus forwarded directly instead of executed locally.",
 );
 ?>

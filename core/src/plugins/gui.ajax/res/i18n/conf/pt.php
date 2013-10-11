@@ -44,6 +44,6 @@ $mess=array(
 "Analytics Domain" => "Domínio das Estatísticas",
 "Set the domain for yuor analytics reports (not mandatory!)" => "Introduza o domínio para os relatórios das estatísticas (não é obrigatório)",
 "Analytics Events" => "Eventos de Estatísticas",
-"Use Events Logging, experimental only implemented on download action in AjaXplorer" => "Usar Registo de eventos, experimental, apenas implementado na área de transferências do AjaXplorer",
+"Use Events Logging, experimental only implemented on download action in Pydio" => "Usar Registo de eventos, experimental, apenas implementado na área de transferências do Pydio",
 );
 ?>

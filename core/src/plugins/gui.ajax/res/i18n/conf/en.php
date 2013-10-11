@@ -44,5 +44,5 @@ $mess=array(
 "Analytics Domain" => "Analytics Domain",
 "Set the domain for yuor analytics reports (not mandatory!)" => "Set the domain for yuor analytics reports (not mandatory!)",
 "Analytics Events" => "Analytics Events",
-"Use Events Logging, experimental only implemented on download action in AjaXplorer" => "Use Events Logging, experimental only implemented on download action in AjaXplorer",
+"Use Events Logging, experimental only implemented on download action in Pydio" => "Use Events Logging, experimental only implemented on download action in Pydio",
 );

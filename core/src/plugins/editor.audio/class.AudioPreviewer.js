@@ -76,7 +76,7 @@ Class.create("AudioPreviewer", AbstractEditor, {
 		try{
 			var playlist_url = ajxpBootstrap.parameters.get('ajxpServerAccess')+'%26get_action=ls%26skip_history=true%26playlist=true%26dir='+base64_encode(ajxpNode.getPath());
 			newWin.document.write(template.evaluate({
-				window_title : "AjaXplorer MP3 Player",
+				window_title : "Pydio MP3 Player",
 				reading_folder : MessageHash[141],
 				playlist_url:playlist_url, 
 				current_folder:ajxpNode.getLabel()

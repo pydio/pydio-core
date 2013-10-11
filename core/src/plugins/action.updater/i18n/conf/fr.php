@@ -20,11 +20,11 @@
 */
 $mess=array(
 "Update Engine" => "Mise à jour",
-"Automatic update of AjaXplorer. Since version 3.3.3" => "Mise à jour automatique, depuis la version 3.3.3",
+"Automatic update of Pydio. Since version 3.3.3" => "Mise à jour automatique, depuis la version 3.3.3",
 "Update Site" => "Site de mise à jour",
 "Where to update" => "A priori laisser l'adresse par défaut",
 "Preserve Files" => "Fichiers à conservés",
-"Files declared here (enter pathes from the root of Ajxp installation, comma-separated) will be backed up and restored before and after upgrade." => "Les fichiers déclarés ici (entrer une liste séparée par des virgules, en partant de la racine d'AjaXplorer) seront conservés pendant une mise à jour.",
+"Files declared here (enter pathes from the root of Ajxp installation, comma-separated) will be backed up and restored before and after upgrade." => "Les fichiers déclarés ici (entrer une liste séparée par des virgules, en partant de la racine d'Pydio) seront conservés pendant une mise à jour.",
 "Enable Import From v3.2.4" => "Activer l'import v3.2.4",
 "Enable the migration action, available in the Settings repository" => "Ajoute des boutons pour importer des données depuis une version antérieur (3.2.4)",
 "Update Channel" => "Canal",

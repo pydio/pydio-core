@@ -46,7 +46,7 @@ Event.observe(window, "unload", function(){
 });
 
 /**
- * AjaXplorer encapsulation of the Prototype Draggable
+ * Pydio encapsulation of the Prototype Draggable
  */
 Class.create("AjxpDraggable", Draggable, {
 	/**

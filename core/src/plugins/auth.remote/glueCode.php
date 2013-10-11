@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  *
- * Description : Interface between AjaXplorer and external software. Handle with care!
+ * Description : Interface between Pydio and external software. Handle with care!
  * Take care when using this file. It can't be included anywhere, as it's doing global scope pollution.
  *    Typically, this is used as glue code from your CMS frontend and AJXP code.
  *    This example file switches sessions (close CMS session, open AJXP session, modify AJXP's

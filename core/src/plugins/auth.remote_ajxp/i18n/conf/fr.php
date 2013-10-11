@@ -20,13 +20,13 @@
 */
 $mess=array(
 "Remote AJXP" => "AJXP distant",
-"Use another AJXP intall to log in." => "Se connecter en négociant sur une autre installation AjaXplorer",
+"Use another AJXP intall to log in." => "Se connecter en négociant sur une autre installation Pydio",
 "Server" => "Serveur",
 "The host URL" => "L'hôte",
 "Port" => "Port",
 "The host port" => "Port",
 "User name" => "Utilisateur",
-"User on the remote host" => "AjaXplorer utilisateur défini sur le serveur distant",
+"User on the remote host" => "Pydio utilisateur défini sur le serveur distant",
 "Password" => "Mot de passe",
 "Password on the remote host" => "Mot de passe",
 "Session Name" => "Nom de la session",

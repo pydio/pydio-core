@@ -57,7 +57,7 @@ class AjxpScheduler extends AJXP_Plugin{
 
     function performChecks(){
         if(!ConfService::backgroundActionsSupported()) {
-            throw new Exception("The command line must be supported. See 'AjaXplorer Core Options'.");
+            throw new Exception("The command line must be supported. See 'Pydio Core Options'.");
         }
         if(!is_dir(dirname($this->getDbFile()))) {
             throw new Exception("Could not create the db folder!");
