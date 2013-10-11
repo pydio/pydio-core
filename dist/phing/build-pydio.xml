@@ -116,15 +116,15 @@
         <tstamp>
             <format property="VERSION_DATE" pattern="%Y-%m-%d"/>
         </tstamp>
-        <!-- TODO GET LAST COMMIT ID -->
+        <!-- GET LAST COMMIT ID -->
         <exec command="git rev-parse --short HEAD" dir="${git.local_repository}" outputProperty="LASTREVISION"/>
         <if>
         	<equals arg1="${env}" arg2="testing"/>        	
         	<then>
-        		<property name="package_name" value="ajaxplorer-${DSTAMP}-${LASTREVISION}"/>
+        		<property name="package_name" value="pydio-${DSTAMP}-${LASTREVISION}"/>
         	</then>
         	<else>
-        		<property name="package_name" value="ajaxplorer-core-${new_version}"/>
+        		<property name="package_name" value="pydio-core-${new_version}"/>
         	</else>
         </if>
         <property name="INNER_DIRECTORY" value="${build.source_folder}/${package_name}"/>
@@ -156,7 +156,7 @@
             <not><available type="dir" file="${build.working_folder}/upgrade"/></not>
             <then><mkdir dir="${build.working_folder}/upgrade"/></then>
         </if>
-    	<property name="upgrade_export" value="${build.working_folder}/upgrade/export/ajaxplorer-core-upgrade-${previous_version}-${new_version}"/>
+    	<property name="upgrade_export" value="${build.working_folder}/upgrade/export/pydio-core-upgrade-${previous_version}-${new_version}"/>
     	<mkdir dir="${upgrade_export}"/>
     	<mkdir dir="${upgrade_export}/UPGRADE"/>
     	<git_summarize
@@ -234,10 +234,10 @@
         <if>
         	<equals arg1="${env}" arg2="testing"/>        	
         	<then>
-        		<property name="package_name" value="ajaxplorer-${DSTAMP}-${LASTREVISION}"/>
+        		<property name="package_name" value="pydio-${DSTAMP}-${LASTREVISION}"/>
         	</then>
         	<else>
-        		<property name="package_name" value="ajaxplorer-core-${new_version}"/>
+        		<property name="package_name" value="pydio-core-${new_version}"/>
         	</else>
         </if>        
         <property name="packaged_zip" value="${package_name}.zip"/>
@@ -254,19 +254,19 @@
         <if>
             <equals arg1="${env}" arg2="testing"/>
             <then>
-                <copy todir="${build.working_folder}/build/ajaxplorer-latest">
+                <copy todir="${build.working_folder}/build/pydio-latest">
                     <fileset dir="${build.source_folder}/${package_name}/" defaultexcludes="false"><include name="*/**"></include></fileset>
                 </copy>
                 <zip
-                        destfile="${build.working_folder}/build/ajaxplorer-latest.zip"
+                        destfile="${build.working_folder}/build/pydio-latest.zip"
                         includeemptydirs="true"
-                        ><fileset dir="${build.working_folder}/build/" defaultexcludes="false"><include name="ajaxplorer-latest/**"/></fileset></zip>
+                        ><fileset dir="${build.working_folder}/build/" defaultexcludes="false"><include name="pydio-latest/**"/></fileset></zip>
                 <tar
-                        destfile="${build.working_folder}/build/ajaxplorer-latest.tar.gz"
+                        destfile="${build.working_folder}/build/pydio-latest.tar.gz"
                         includeemptydirs="true"
                         compression="gzip"
-                        ><fileset dir="${build.working_folder}/build/" defaultexcludes="false"><include name="ajaxplorer-latest/**"/></fileset></tar>
-                <delete dir="${build.working_folder}/build/ajaxplorer-latest" quiet="true"/>
+                        ><fileset dir="${build.working_folder}/build/" defaultexcludes="false"><include name="pydio-latest/**"/></fileset></tar>
+                <delete dir="${build.working_folder}/build/pydio-latest" quiet="true"/>
             </then>
         </if>
         <phingcall target="build_external_plugins"/>
@@ -283,7 +283,7 @@
     <target name="zip_upgrade" description="Packaging upgrade">
         <mkdir dir="${build.working_folder}/build" />
         <mkdir dir="${build.working_folder}/build/upgrade" />
-        <property name="packaged_zip" value="ajaxplorer-core-upgrade-${previous_version}-${new_version}.zip"/>
+        <property name="packaged_zip" value="pydio-core-upgrade-${previous_version}-${new_version}.zip"/>
         <zip
                 destfile="${build.working_folder}/build/upgrade/${packaged_zip}"
                 includeemptydirs="true"
@@ -345,18 +345,18 @@
             <equals arg1="${build_channel}" arg2="stable"/>
             <then>
                 <property name="debian_distribution" value="stable"/>
-                <property name="rpm_distribution" value="ajaxplorer-stable"/>
+                <property name="rpm_distribution" value="pydio-stable"/>
             </then>
             <else>
                 <property name="debian_distribution" value="testing"/>
-                <property name="rpm_distribution" value="ajaxplorer-testing"/>
+                <property name="rpm_distribution" value="pydio-testing"/>
             </else>
         </if>
 
         <echo message="DEBIAN DISTRIB IS ${debian_distribution} and RPM is ${rpm_distribution}"/>
 
 		<!-- TOKEN REPLACE THE RPM SPEC FILE -->
-        <copy file="${build.working_folder}/dist/rpm/ajaxplorer.spec.tpl" overwrite="true" toFile="${build.working_folder}/rpm/ajaxplorer.spec">
+        <copy file="${build.working_folder}/dist/rpm/pydio.spec.tpl" overwrite="true" toFile="${build.working_folder}/rpm/pydio.spec">
             <filterchain>
                 <replacetokens begintoken="##" endtoken="##">
                     <token key="VERSION_NUMBER" value="${build.version}"/>
@@ -365,14 +365,14 @@
             </filterchain>        
         </copy>
         <copy file="${packaged_zip}" toDir="${rpm.build_folder}/SOURCES" overwrite="true"/>
-		<copy file="${build.working_folder}/dist/rpm/ajaxplorer.conf" toDir="${rpm.build_folder}/SOURCES" overwrite="true"/>
-		<exec command="rpmbuild --sign -ba ${build.working_folder}/rpm/ajaxplorer.spec"
+		<copy file="${build.working_folder}/dist/rpm/pydio.conf" toDir="${rpm.build_folder}/SOURCES" overwrite="true"/>
+		<exec command="rpmbuild --sign -ba ${build.working_folder}/rpm/pydio.spec"
 			passthru="true"/>
 		<copy overwrite="true" 
-			file="${rpm.build_folder}/RPMS/noarch/ajaxplorer-${build.version}-1.noarch.rpm" 
+			file="${rpm.build_folder}/RPMS/noarch/pydio-${build.version}-1.noarch.rpm"
 			toDir="${build.working_folder}/build"/>
 		<copy overwrite="true" 
-			file="${rpm.build_folder}/SRPMS/ajaxplorer-${build.version}-1.src.rpm" 
+			file="${rpm.build_folder}/SRPMS/pydio-${build.version}-1.src.rpm"
 			toDir="${build.working_folder}/build"/>
 		
 		<!-- PREPARE DEBIAN BUILD -->
@@ -420,7 +420,7 @@
 		
 		<copy toDir="${build.working_folder}/build">
 			<fileset dir="${build.working_folder}/deb">
-				<include name="ajaxplorer_*.deb"/>
+				<include name="pydio_*.deb"/>
 			</fileset>
 		</copy>
 
@@ -429,15 +429,15 @@
 
 
         <!-- UPDATE APT REPOSITORY -->
-        <exec command="reprepro --ask-passphrase -Vb . include ${debian_distribution} ${build.working_folder}/deb/ajaxplorer_${build.version}_amd64.changes" dir="${build.repositories_folder}/apt/" passthru="true"/>
+        <exec command="reprepro --ask-passphrase -Vb . include ${debian_distribution} ${build.working_folder}/deb/pydio_${build.version}_amd64.changes" dir="${build.repositories_folder}/apt/" passthru="true"/>
 
         <!-- UPDATE EL6 RPM REPOSITORY -->
-        <copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.noarch.rpm" toDir="${build.repositories_folder}/el6/${rpm_distribution}/"/>
+        <copy file="${build.working_folder}/build/pydio-${build.version}-1.noarch.rpm" toDir="${build.repositories_folder}/el6/${rpm_distribution}/"/>
         <exec command="createrepo ." dir="${build.repositories_folder}/el6/${rpm_distribution}/" passthru="true"/>
 
         <!-- UPDATE EL6 SOURCES REPOSITORY -->
-        <copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.src.rpm" toDir="${build.repositories_folder}/el6/ajaxplorer-sources/"/>
-        <exec command="createrepo ." dir="${build.repositories_folder}/el6/ajaxplorer-sources/" passthru="true"/>
+        <copy file="${build.working_folder}/build/pydio-${build.version}-1.src.rpm" toDir="${build.repositories_folder}/el6/pydio-sources/"/>
+        <exec command="createrepo ." dir="${build.repositories_folder}/el6/pydio-sources/" passthru="true"/>
 
         <!-- NOW DEPLOY, TO REMOTE COPY -->
         <if>
