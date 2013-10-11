@@ -28,7 +28,7 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHP_OB extends AbstractTest
 {
-    function PHP_OB() { parent::AbstractTest("PHP Output Buffer disabled", "You should disable php output_buffering parameter for better performances with AjaXplorer."); }
+    function PHP_OB() { parent::AbstractTest("PHP Output Buffer disabled", "You should disable php output_buffering for better performances with Pydio."); }
     function doTest()
     {
         $this->failedLevel = "warning";

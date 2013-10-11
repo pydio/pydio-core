@@ -111,9 +111,9 @@ class PHPCLI extends AbstractTest
             if($useCOM){
                 $this->failedLevel = "warning";
                 $availability = true;
-                $this->failedInfo = "Php command line detected, but using the windows COM extension. Just make sure to <b>enable COM</b> in the AjaXplorer Core Options";
+                $this->failedInfo = "Php command line detected, but using the windows COM extension. Just make sure to <b>enable COM</b> in the Pydio Core Options";
             }else{
-                $this->failedInfo = "Php command line detected, this will allow to send some tasks in background. Enable it in the AjaXplorer Core Options";
+                $this->failedInfo = "Php command line detected, this will allow to send some tasks in background. Enable it in the Pydio Core Options";
             }
         }else{
             if(is_file($logFile)){

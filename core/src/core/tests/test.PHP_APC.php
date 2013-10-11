@@ -28,7 +28,7 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHP_APC extends AbstractTest
 {
-    function PHP_APC() { parent::AbstractTest("PHP APC extension", "AjaXplorer framework loads a lot of PHP files at each query, and using a PHP accelerator is greatly recommanded."); }
+    function PHP_APC() { parent::AbstractTest("PHP APC extension", "Pydio framework loads a lot of PHP files at each query, and using a PHP accelerator is greatly recommanded."); }
     function doTest()
     {
         $this->failedLevel = "warning";
@@ -37,7 +37,7 @@ class PHP_APC extends AbstractTest
             $this->testedParams["PHP APC extension loaded"] = "No";
             return FALSE;
         }else if(!isSet($v)){
-            $this->failedInfo = "AjaXplorer framework loads a lot of PHP files at each query, and using a PHP accelerator is greatly recommanded.";
+            $this->failedInfo = "Pydio framework loads a lot of PHP files at each query, and using a PHP accelerator is greatly recommanded.";
             return FALSE;
         }
         $this->failedInfo = "PHP APC extension detected, this is good for better performances";
