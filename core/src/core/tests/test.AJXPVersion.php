@@ -22,14 +22,14 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 require_once('../classes/class.AbstractTest.php');
 
 /**
- * @package Pydio
+ * @package AjaXplorer
  * @subpackage Tests
  * @class AJXPVersion
  * Get the current ajaxplorer version
  */
 class AJXPVersion extends AbstractTest
 {
-    public function AJXPVersion() { parent::AbstractTest("Pydio version", "AJXP version : ".AJXP_VERSION); }
+    function AJXPVersion() { parent::AbstractTest("Pydio version", "Version : ".AJXP_VERSION); }
     public function doTest()
     {
         $this->failedLevel = "info";

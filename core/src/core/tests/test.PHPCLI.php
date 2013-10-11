@@ -23,7 +23,7 @@ require_once('../classes/class.AbstractTest.php');
 
 /**
  * Check current PHP Version
- * @package Pydio
+ * @package AjaXplorer
  * @subpackage Tests
  */
 class PHPCLI extends AbstractTest

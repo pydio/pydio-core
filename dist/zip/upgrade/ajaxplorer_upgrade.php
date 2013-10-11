@@ -9,6 +9,7 @@
 define("CRT_PATH", realpath(dirname(__FILE__)));
 $requiredVersion = $_GET["version"];
 $requiredChannel = (isSet($_GET["channel"])?$_GET["channel"]:"stable");
+$basePackage = isSet($_GET["package"]) ? $_GET["package"] : "ajaxplorer-core";
 $hashMethod = "md5";
 
 function preparePackages($channel, $hashMethod)

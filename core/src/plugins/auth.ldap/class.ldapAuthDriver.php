@@ -554,8 +554,8 @@ class ldapAuthDriver extends AbstractAuthDriver
                     $key = strtolower($params['MAPPING_LDAP_PARAM']);
                     if (isSet($entry[$key])) {
                         $value = $entry[$key][0];
+                        $memberValues = array();
                         if ($key == "memberof") {
-                            $memberValues = array();
                             // get CN from value
                             foreach ($entry[$key] as $possibleValue) {
                                 $hnParts = array();

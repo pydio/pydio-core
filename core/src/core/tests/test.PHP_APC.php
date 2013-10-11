@@ -23,7 +23,7 @@ require_once('../classes/class.AbstractTest.php');
 
 /**
  * Check that DOMXml is enabled
- * @package Pydio
+ * @package AjaXplorer
  * @subpackage Tests
  */
 class PHP_APC extends AbstractTest

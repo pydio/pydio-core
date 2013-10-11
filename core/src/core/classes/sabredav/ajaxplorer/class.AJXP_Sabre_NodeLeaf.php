@@ -52,6 +52,9 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre\DAV\IFile
         // Warning, passed by ref
         $p = $this->path;
 
+        if(!AuthService::getLoggedUser()->canRead($this->repository->getId())){
+            throw new \Sabre\DAV\Exception\Forbidden() ;
+        }
         $this->getAccessDriver()->nodeWillChange($p, intval($_SERVER["CONTENT_LENGTH"]));
 
         $stream = fopen($this->getUrl(), "w");
