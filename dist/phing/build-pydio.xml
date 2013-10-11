@@ -1,0 +1,535 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="phing-grammar.rng"
+            type="application/xml"
+            schematypens="http://relaxng.org/ns/structure/1.0" ?>
+<project name="AjaXplorer" default="build">
+
+    <property file="build.properties"/>
+    <property name="env" value="testing"/>
+    <property name="skip_deploy" value="false"/>
+    <property name="build_linux" value="false"/>
+    <property name="build_channel" value="testing"/>
+    <property name="build.source_folder" value="${build.working_folder}/source"/>
+    <property name="svn.local_folder" value="${build.working_folder}/svnwc"/>
+    <taskdef classname="lib.AjxpPluginDiscriminate" name="plugindiscriminate"/>
+    <taskdef classname="lib.AjxpSvnSummarizeTask" name="svn_summarize"/>
+    <taskdef classname="lib.AjxpGitSummarizeTask" name="git_summarize"/>
+    <taskdef classname="lib.AjxpParseSvnSummarize" name="parse_diff_summarize"/>
+
+
+    <target name="build" description="Main sequence">
+        <if>
+        	<equals arg1="${env}" arg2="release"/>        	
+        	<then>
+		        <phingcall target="prepare_upgrade"/>
+		        <phingcall target="zip_upgrade"/>
+		        <if>
+		        	<not><equals arg1="${skip_deploy}" arg2="true"/></not>
+		        	<then>
+		        		<phingcall target="deploy_upgrade"/>
+		        	</then>
+		        </if>
+        	</then>
+        	<else>
+        	     <phingcall target="prepare_git"/>
+        	</else>
+        </if>
+        <phingcall target="zip"/>
+        <if>
+        	<not><equals arg1="${skip_deploy}" arg2="true"/></not>
+        	<then>
+		        <phingcall target="deploy"/>
+		        <phingcall target="clean"/>
+		    </then>
+		</if>
+    </target>
+    
+    <target name="tag_version" description="Tag svn with the version, and upgrade version number for future builds to next_version">
+		<gittag 
+		    repository="${git.local_repository}" 
+		    name="${version}"
+		    message="${version} tag"
+		/>
+		<reflexive>
+		    <fileset dir=".">
+		        <include pattern="build.properties" />
+		    </fileset>
+		    <filterchain>
+		        <replaceregexp>
+		            <regexp pattern="${version}" replace="${next_version}"/>
+		        </replaceregexp>
+		    </filterchain>
+		</reflexive>
+		<gitpush
+			repository="${git.local_repository}"			
+		/>
+    </target>
+
+    <target name="usage" description="Describe this script usage">
+        <echo message="For releasing and deploying : phing -Denv=release -Dskip_deploy=false -Dbuild_channel=stable -Dbuild_linux=true -Dprevious_tag=XaZeR35 -Dprevious_version=4.0.4 -Dnew_version=4.2.0"/>
+        <echo message="For tagging : phing tag_version -Dversion=4.2.0 -Dnext_version=4.3.0"/>
+    </target>
+
+    <target name="deploy" description="Send package to FTP">
+        <phingcall target="ftp_deploy">
+            <property name="base_folder" value="${build.working_folder}/build"/>
+            <property name="remote_folder" value="${scp.dir}"/>
+        </phingcall>
+        <phingcall target="ftp_deploy">
+            <property name="base_folder" value="${build.working_folder}/build/plugins"/>
+            <property name="remote_folder" value="${scp.dir}/plugins"/>
+        </phingcall>
+    </target>
+    
+    <target name="deploy_upgrade" description="Send package to FTP">
+        <phingcall target="ftp_deploy">
+            <property name="base_folder" value="${build.working_folder}/build/upgrade"/>
+            <property name="remote_folder" value="${scp.update_dir}"/>
+        </phingcall>
+    </target>
+        
+    <!-- GIT VERSION -->
+    <target name="git_update" description="Clone or Pull depending on local repository presence.">
+        <if>
+            <available type="dir" file="${git.local_repository}"/>
+            <then>
+            	<!-- GIT PULL -->
+                <gitpull
+                        repository="${git.local_repository}"
+                        all="true"
+                />
+            </then>
+            <else>
+            	<!-- GIT CLONE -->
+            	<exec command="git clone ${git.remote_repository} ${git.local_repository}" passthru="true" />
+                <exec command="git checkout ${git.branch}" dir="${git.local_repository}" passthru="true"/>
+            </else>
+        </if>
+    </target>
+
+    <target name="prepare_git" description="Fetch Git Master, prepare VERSION and discriminate plugins">
+        <phingcall target="git_update"/>
+        <if>
+            <not><available type="dir" file="${build.source_folder}"/></not>
+            <then><mkdir dir="${build.source_folder}"/></then>
+        </if>
+        <tstamp>
+            <format property="VERSION_DATE" pattern="%Y-%m-%d"/>
+        </tstamp>
+        <!-- GET LAST COMMIT ID -->
+        <exec command="git rev-parse --short HEAD" dir="${git.local_repository}" outputProperty="LASTREVISION"/>
+        <if>
+        	<equals arg1="${env}" arg2="testing"/>        	
+        	<then>
+        		<property name="package_name" value="pydio-${DSTAMP}-${LASTREVISION}"/>
+        	</then>
+        	<else>
+        		<property name="package_name" value="pydio-core-${new_version}"/>
+        	</else>
+        </if>
+        <property name="INNER_DIRECTORY" value="${build.source_folder}/${package_name}"/>
+        <if>
+            <available type="dir" file="${INNER_DIRECTORY}"/>
+            <then>
+                <delete dir="${INNER_DIRECTORY}"/>
+            </then>
+        </if>
+        <!-- EXPORT GIT CONTENT FROM core/src/ -->
+        <copy todir="${INNER_DIRECTORY}">
+        	<fileset dir="${git.local_repository}/core/src" defaultexcludes="false">
+        		<include name="*/**"/>
+                <exclude name=".gitignore"/>
+        	</fileset>
+        </copy>        	                
+        <!-- PREPARE VERSION FILE -->
+        <phingcall target="replace_variables">
+        	<property name="passed_directory" value="${INNER_DIRECTORY}"/>
+        </phingcall>
+        
+        <!-- DISCRIMINATE PLUGINS -->
+        <mkdir dir="${build.working_folder}/ext_plugins" />
+        <plugindiscriminate all="${INNER_DIRECTORY}/plugins" ext="${build.working_folder}/ext_plugins"/>		
+    </target>    
+    
+    <target name="prepare_upgrade" description="Building upgrade package" depends="prepare_git">
+        <if>
+            <not><available type="dir" file="${build.working_folder}/upgrade"/></not>
+            <then><mkdir dir="${build.working_folder}/upgrade"/></then>
+        </if>
+    	<property name="upgrade_export" value="${build.working_folder}/upgrade/export/pydio-core-upgrade-${previous_version}-${new_version}"/>
+    	<mkdir dir="${upgrade_export}"/>
+    	<mkdir dir="${upgrade_export}/UPGRADE"/>
+    	<git_summarize
+    	 commit1="${previous_tag}"
+    	 commit2="${LASTREVISION}"
+    	 summarizeFile="${build.working_folder}/upgrade/svn_summarize"
+    	 repository="${git.local_repository}"
+    	 />
+    	 <parse_diff_summarize
+    	 	summarizeFile="${build.working_folder}/upgrade/svn_summarize"
+    	 	sourceDir="${git.local_repository}"
+    	 	prefixPath="core/src"
+    	 	upgradeDir="${upgrade_export}"
+    	 	extPluginsFolder="${build.working_folder}/ext_plugins"
+    	 />
+        <phingcall target="replace_variables">
+        	<property name="passed_directory" value="${upgrade_export}"/>
+        </phingcall>
+        
+        <!-- COPY RELEASE NOTE -->
+		<copy file="${upgrade_export}/conf/RELEASE_NOTE" toFile="${upgrade_export}/UPGRADE/NOTE"/>
+		<copy file="${git.local_repository}/core/src/conf/VERSION" toFile="${upgrade_export}/conf/VERSION">
+	            <filterchain>
+        	        <replacetokens begintoken="##" endtoken="##">
+                	    <token key="VERSION_NUMBER" value="${build.version}"/>
+  	                  <token key="VERSION_DATE" value="${VERSION_DATE}"/>
+        	            <token key="REVISION" value="${LASTREVISION}"/>
+                	</replacetokens>
+          	    </filterchain>
+		</copy>
+		
+		<!-- ADDITIONAL UPGRADE SCRIPT -->
+		<if>
+			<available type="file" file="${git.local_repository}/dist/php/${new_version}.php"/>
+			<then>
+				<copy file="${git.local_repository}/dist/php/${new_version}.php" toFile="${upgrade_export}/UPGRADE/PHP-SCRIPT"/>
+			</then>
+		</if>
+		
+		<if>
+			<available type="file" file="${git.local_repository}/dist/php/${new_version}.html"/>
+			<then>
+				<copy file="${git.local_repository}/dist/php/${new_version}.html" toFile="${upgrade_export}/UPGRADE/NOTE-HTML"/>
+			</then>
+		</if>
+
+		<if>
+			<available type="file" file="${git.local_repository}/dist/php/${new_version}.sql"/>
+			<then>
+				<copy file="${git.local_repository}/dist/php/${new_version}.sql" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sql"/>
+                <if>
+              			<available type="file" file="${git.local_repository}/dist/php/${new_version}.sqlite"/>
+              			<then>
+              				<copy file="${git.local_repository}/dist/php/${new_version}.sqlite" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sqlite"/>
+              			</then>
+              		</if>
+			</then>
+		</if>
+
+    </target>
+    
+    <target name="zip" description="Package as Zip archive">
+        <mkdir dir="${build.working_folder}/build" />
+        <mkdir dir="${build.working_folder}/build/plugins" />
+        <tstamp/>
+        <if>
+        	<available type="dir" file="${svn.local_folder}"/>
+        	<then>
+		        <svnlastrevision workingcopy="${svn.local_folder}" propertyname="LASTREVISION"/>
+        	</then>
+        	<else>
+		        <exec command="git rev-parse --short HEAD" dir="${git.local_repository}" outputProperty="LASTREVISION"/>
+        	</else>
+        </if>
+        <if>
+        	<equals arg1="${env}" arg2="testing"/>        	
+        	<then>
+        		<property name="package_name" value="pydio-${DSTAMP}-${LASTREVISION}"/>
+        	</then>
+        	<else>
+        		<property name="package_name" value="pydio-core-${new_version}"/>
+        	</else>
+        </if>        
+        <property name="packaged_zip" value="${package_name}.zip"/>
+        <property name="packaged_tar" value="${package_name}.tar.gz"/>
+        <zip                
+                destfile="${build.working_folder}/build/${packaged_zip}"
+                includeemptydirs="true"
+                ><fileset dir="${build.source_folder}" defaultexcludes="false"><include name="*/**"/></fileset></zip>
+        <tar
+                destfile="${build.working_folder}/build/${packaged_tar}"
+                includeemptydirs="true"
+                compression="gzip"
+            ><fileset dir="${build.source_folder}" defaultexcludes="false"><include name="*/**"/></fileset></tar>
+        <if>
+            <equals arg1="${env}" arg2="testing"/>
+            <then>
+                <copy todir="${build.working_folder}/build/pydio-latest">
+                    <fileset dir="${build.source_folder}/${package_name}/" defaultexcludes="false"><include name="*/**"></include></fileset>
+                </copy>
+                <zip
+                        destfile="${build.working_folder}/build/pydio-latest.zip"
+                        includeemptydirs="true"
+                        ><fileset dir="${build.working_folder}/build/" defaultexcludes="false"><include name="pydio-latest/**"/></fileset></zip>
+                <tar
+                        destfile="${build.working_folder}/build/pydio-latest.tar.gz"
+                        includeemptydirs="true"
+                        compression="gzip"
+                        ><fileset dir="${build.working_folder}/build/" defaultexcludes="false"><include name="pydio-latest/**"/></fileset></tar>
+                <delete dir="${build.working_folder}/build/pydio-latest" quiet="true"/>
+            </then>
+        </if>
+        <phingcall target="build_external_plugins"/>
+        <if>
+        	<equals arg1="${build_linux}" arg2="true"/>
+        	<then>
+        		<phingcall target="linux_packages">
+        			<property name="packaged_zip" value="${build.working_folder}/build/${packaged_zip}"/>
+        		</phingcall>
+        	</then>
+        </if>
+    </target>
+    
+    <target name="zip_upgrade" description="Packaging upgrade">
+        <mkdir dir="${build.working_folder}/build" />
+        <mkdir dir="${build.working_folder}/build/upgrade" />
+        <property name="packaged_zip" value="pydio-core-upgrade-${previous_version}-${new_version}.zip"/>
+        <zip
+                destfile="${build.working_folder}/build/upgrade/${packaged_zip}"
+                includeemptydirs="true"
+                ><fileset dir="${build.working_folder}/upgrade/export/" defaultexcludes="false"><include name="*/**"/></fileset></zip>
+    </target>
+
+    <target name="build_external_plugins">
+        <foreach param="filename" absparam="absfilename" target="zip_plugin">
+            <fileset dir="${build.working_folder}/ext_plugins">
+                <include name="*.*"/>
+            </fileset>
+        </foreach>
+    </target>
+
+    <target name="zip_plugin" >
+        <tstamp/>
+        <property name="packaged_plugin" value="plugin-${filename}-${DSTAMP}.zip"/>
+        <property name="packaged_plugin_tar" value="plugin-${filename}-${DSTAMP}.tar.gz"/>
+        <zip
+                destfile="${build.working_folder}/build/plugins/${packaged_plugin}"
+                includeemptydirs="true"
+        ><fileset dir="${absfilename}" defaultexcludes="false"><include name="*/**"/></fileset></zip>
+        <tar
+                basedir="${absfilename}"
+                destfile="${build.working_folder}/build/plugins/${packaged_plugin_tar}"
+                includeemptydirs="true"
+                compression="gzip"
+        ><fileset dir="${absfilename}" defaultexcludes="false"><include name="*/**"/></fileset></tar>
+    </target>
+
+    <target name="linux_packages" description="Trigger RPM and Debian packages builds, release ZIP only.">
+    
+		<mkdir dir="${build.working_folder}/dist"/>
+		<mkdir dir="${build.working_folder}/rpm"/>
+		<mkdir dir="${build.working_folder}/deb"/>
+		<mkdir dir="${build.working_folder}/deb/builddeb"/>
+
+        <if>
+            <available type="dir" file="${svn.local_folder}"/>
+            <then>
+                <svncheckout
+                        revision="HEAD"
+                        repositoryurl="${svn.repository_url}${svn.dist_root}"
+                        todir="${build.working_folder}/dist"
+                        />
+            </then>
+            <else>
+                <copy todir="${build.working_folder}/dist">
+                    <fileset dir="${git.local_repository}/dist" defaultexcludes="false">
+                        <include name="**/*"/>
+                        <exclude name=".gitignore"/>
+                    </fileset>
+                </copy>
+                <exec command="git rev-parse --short HEAD" dir="${git.local_repository}" outputProperty="LASTREVISION"/>
+            </else>
+        </if>
+
+        <if>
+            <equals arg1="${build_channel}" arg2="stable"/>
+            <then>
+                <property name="debian_distribution" value="stable"/>
+                <property name="rpm_distribution" value="pydio-stable"/>
+            </then>
+            <else>
+                <property name="debian_distribution" value="testing"/>
+                <property name="rpm_distribution" value="pydio-testing"/>
+            </else>
+        </if>
+
+        <echo message="DEBIAN DISTRIB IS ${debian_distribution} and RPM is ${rpm_distribution}"/>
+
+		<!-- TOKEN REPLACE THE RPM SPEC FILE -->
+        <copy file="${build.working_folder}/dist/rpm/pydio.spec.tpl" overwrite="true" toFile="${build.working_folder}/rpm/pydio.spec">
+            <filterchain>
+                <replacetokens begintoken="##" endtoken="##">
+                    <token key="VERSION_NUMBER" value="${build.version}"/>
+                    <token key="CHANNEL" value="${build_channel}"/>
+                </replacetokens>
+            </filterchain>        
+        </copy>
+        <copy file="${packaged_zip}" toDir="${rpm.build_folder}/SOURCES" overwrite="true"/>
+		<copy file="${build.working_folder}/dist/rpm/pydio.conf" toDir="${rpm.build_folder}/SOURCES" overwrite="true"/>
+		<exec command="rpmbuild --sign -ba ${build.working_folder}/rpm/pydio.spec"
+			passthru="true"/>
+		<copy overwrite="true" 
+			file="${rpm.build_folder}/RPMS/noarch/pydio-${build.version}-1.noarch.rpm"
+			toDir="${build.working_folder}/build"/>
+		<copy overwrite="true" 
+			file="${rpm.build_folder}/SRPMS/pydio-${build.version}-1.src.rpm"
+			toDir="${build.working_folder}/build"/>
+		
+		<!-- PREPARE DEBIAN BUILD -->
+		<copy toDir="${build.working_folder}/deb/builddeb" overwrite="true">
+			<fileset dir="${build.working_folder}/dist/deb">
+				<include name="**/*"/>
+			</fileset>
+			<fileset dir="${build.source_folder}/" defaultexcludes="false">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+		
+		<!-- UPGRADE Makefile -->
+        <reflexive>
+        	<fileset dir="${build.working_folder}/deb/builddeb">
+        		<include pattern="Makefile"/>
+        	</fileset>
+            <filterchain>
+                <replacetokens begintoken="##" endtoken="##">
+                    <token key="KEY_ID" value="${build.signing_key_id}"/>
+                    <token key="DIST" value="${debian_distribution}"/>
+                </replacetokens>
+            </filterchain>
+        </reflexive>
+		
+		<!-- UPGRADE CHANGELOG -->
+		<tstamp><format property="FORMATTED_DATE" pattern="%a, %d %b %Y %H:%M:%S %z"/></tstamp>
+        <reflexive>
+        	<fileset dir="${build.working_folder}/deb/builddeb/debian">
+        		<include pattern="changelog.tpl"/>
+        	</fileset>
+            <filterchain>
+                <replacetokens begintoken="##" endtoken="##">
+                    <token key="VERSION_NUMBER" value="${build.version}"/>
+                    <token key="FORMATTED_DATE" value="${FORMATTED_DATE}"/>
+		    <token key="DIST" value="${debian_distribution}"/>
+                </replacetokens>
+            </filterchain>
+        </reflexive>
+        <loadfile property="previous_changelog" file="${build.working_folder}/deb/builddeb/debian/changelog"/>
+        <append destFile="${build.working_folder}/deb/builddeb/debian/changelog.tpl" text="${previous_changelog}"/>
+		<move file="${build.working_folder}/deb/builddeb/debian/changelog.tpl" tofile="${build.working_folder}/deb/builddeb/debian/changelog" overwrite="true"/>
+		
+		<exec command="make builddeb" dir="${build.working_folder}/deb/builddeb" passthru="true"/>
+		
+		<copy toDir="${build.working_folder}/build">
+			<fileset dir="${build.working_folder}/deb">
+				<include name="pydio_*.deb"/>
+			</fileset>
+		</copy>
+
+
+        <!-- TODO: SHOULD REPORT BACK THE CHANGELOG AND COMMIT -->
+
+
+        <!-- UPDATE APT REPOSITORY -->
+        <exec command="reprepro --ask-passphrase -Vb . include ${debian_distribution} ${build.working_folder}/deb/pydio_${build.version}_amd64.changes" dir="${build.repositories_folder}/apt/" passthru="true"/>
+
+        <!-- UPDATE EL6 RPM REPOSITORY -->
+        <copy file="${build.working_folder}/build/pydio-${build.version}-1.noarch.rpm" toDir="${build.repositories_folder}/el6/${rpm_distribution}/"/>
+        <exec command="createrepo ." dir="${build.repositories_folder}/el6/${rpm_distribution}/" passthru="true"/>
+
+        <!-- UPDATE EL6 SOURCES REPOSITORY -->
+        <copy file="${build.working_folder}/build/pydio-${build.version}-1.src.rpm" toDir="${build.repositories_folder}/el6/pydio-sources/"/>
+        <exec command="createrepo ." dir="${build.repositories_folder}/el6/pydio-sources/" passthru="true"/>
+
+        <!-- NOW DEPLOY, TO REMOTE COPY -->
+        <if>
+            <not><equals arg1="${skip_deploy}" arg2="true"/></not>
+            <then>
+				<!-- SYNCHRONIZE -->
+				<scp 
+					username="${repository_machine.user}" 
+					password="${repository_machine.password}"
+					host="${repository_machine.host}" 
+					todir="${repository_machine.folder}">
+				    <fileset dir="${build.repositories_folder}">
+				        <include name="**/*" />
+				    </fileset>
+				</scp>					
+			</then>
+		</if>
+		
+    </target>
+    
+    <target name="clean" description="Clean all working folders">
+        <foreach list="${build.source_folder},${svn.local_folder},${git.local_repository},${build.working_folder}/build,${build.working_folder}/ext_plugins,${build.working_folder}/upgrade,${build.working_folder}/dist,${build.working_folder}/deb,${build.working_folder}/rpm" param="filename" absparam="absfilename" target="delete_me">
+        </foreach>
+    </target>
+    <target name="delete_me">
+        <if>
+            <available file="${filename}"/>
+            <then>
+                <delete dir="${filename}"/>
+            </then>
+            <elseif>
+                <available file="${absfilename}"/>
+                <then>
+                    <delete file="${absfilename}"/>
+                </then>
+            </elseif>
+        </if>
+    </target>
+
+    <!-- GENERIC TASKS -->
+    
+    <target name="replace_variables" description="Replace version, revision number, etc in files">
+        <reflexive>
+        	<fileset dir="${passed_directory}">
+        		<include pattern="conf/VERSION"/>
+        		<include pattern="conf/RELEASE_NOTE"/>
+        	</fileset>
+            <filterchain>
+                <replacetokens begintoken="##" endtoken="##">
+                    <token key="VERSION_NUMBER" value="${build.version}"/>
+                    <token key="VERSION_DATE" value="${VERSION_DATE}"/>
+                    <token key="REVISION" value="${LASTREVISION}"/>
+                </replacetokens>
+            </filterchain>        	
+        </reflexive>    
+    </target>    
+    
+    <target name="ftp_deploy" description="Generic FTP deployment">
+                               <scp 
+                                        username="${scp.username}" 
+                                        password="${scp.password}"
+                                        host="${scp.host}" 
+					port="${scp.port}"
+                                        todir="${remote_folder}">
+                                    <fileset dir="${base_folder}">
+                                        <include name="*.zip" />
+					<include name="*.tar.gz"/>
+                                    </fileset>
+                                </scp>
+<!--
+        <ftpdeploy
+          host="${ftp.host}"
+          port="${ftp.port}"
+          username="${ftp.username}"
+          password="${ftp.password}"
+          passive="${ftp.passive}"
+          dir="${remote_folder}">
+          <fileset dir="${base_folder}">
+              <include name="*.zip"/>
+              <include name="*.tar.gz"/>
+          </fileset>
+        </ftpdeploy>
+-->
+        <echo message="Successfully sent zip and tars from ${base_folder} to ${scp.host}/${remote_folder}"/>
+    </target>
+
+    <target name="lint" description="Check syntax of sources">
+        <phplint>
+            <fileset dir="${build.source_folder}">
+                <include name="**/*.php"/>
+            </fileset>
+        </phplint>
+    </target>
+
+</project>
