@@ -1,4 +1,64 @@
-AjaXplorer ##VERSION_NUMBER## Release Note
+Pydio ##VERSION_NUMBER## Release Note
+
+This is a bugfix and security release. Update is highly recommended and automatic using the in-app upgrade mechanism.
+AjaXplorer now turns into Pydio, Put Your Data In Orbit.
+
+License : Affero GPL
+Copyright : Abstrium SAS / Charles du Jeu 2013
+Demo : http://demo.ajaxplorer.info/
+Date : ##VERSION_DATE##
+Rev Number : ##REVISION##
+Contributors: thomasCresson, echampet, joubertredrat, BlackLionPT, FelipeSilva157, miloric, TheLexus, millsdude
+
+Fix #310, missing short form tpl for rename notification
+From now on, pass the package name "pydio-core" to upgrader - we'll maintain ajaxplorer-core and pydio-core
+Implement WebDAV Basic authentication the same way as Digest. (cherry picked from commit 94b0607) (details)
+Rebranding (cherry picked from commit ee7512b) (details)
+Massive rebranding (details)
+Fix 281: If no group label is provided, use group name. (details)
+Fix #285 download limit broken (details)
+UID parameter added to the ftp plugin allows now users to have less permissions failures. Permissions definition for ftp and sftp fixed in AbstractAccessDriver. (details)
+Make custom sort function to make sure users are sorted (fix #279) (details)
+Fix CLIENT_SESSION_TIMEOUT legend (infinite value is -1, not 0). Force value to -1 when session is AjaXplorer_Shared, should fix #272 (details)
+Refix remote sorting that was broken. Implement it in FS for paginated case (standard attributes only, not metadata) (details)
+Do not create group with empty name. (details)
+Fix dead link to the F.A.Q. concerning the server charset encoding check warning (details)
+Shared users: inherit parent personal parameters if specifically marked as inherit (quota params only for the moment) (details)
+Permit administrator to disable WebDAV on individual repositories. This is necessary for repositories that depend on session credentials because clients such as Windows default WebDAV do not use sessions. (details)
+Ellipsis is handled by CSS, it degraded performances for Details view. (details)
+Minisite: remove the inlineToolbar, it creates big performances problems, we have to find an alternative for that in the mobile GUI as well. (details)
+Fix applied hooks in FTP driver, were sending "file deleted" instead of "file created"... (details)
+ON DUPLICATE KEY not supported by sqlite (details)
+Add office templates to the list of supported extensions. (details)
+Use preg_match_callback for php version compatibility. (details)
+Use count(*) (details)
+Missing [ on groupPath (details)
+Use COUNT(*) instead of counting the number of returned values (details)
+Do no reinvent dibi (use (%s)) (details)
+Delete from [ajxp_user_rights] only for the current user (add [login] in where clause) Also use more dibi (use (%s)) (details)
+Fix floating "No Results Found" in the search engine. (cherry picked from commit 7adbae5) (details)
+inferOptionsFromParent is a boolean (details)
+Update class.FilesystemMounter.php (details)
+Skip deleted user - avoid missing arguments on share (details)
+Fix selected list item color in auto-completer (details)
+Add "Go Pro" button in the Admin panel. (cherry picked from commit 7f6fc83) (details)
+Fix node listeners just after upload (details)
+Update zoho-agent with a key. (cherry picked from commit 1cdbca8) (details)
+Typo in option (cherry picked from commit 7657902) (details)
+Fix splitter init / Update Modernizr library (details)
+Update i18n (details)
+Missing comma (details)
+Last js/css compile (details)
+Boot compile (details)
+Fix in_array() error in ldap driver (details)
+Deport authorization check in the nodeleaf put() method. (details)
+AjaXplorer hunting (details)
+Commit RewriteBase with htaccess set to / (details)
+Pydio build (details)
+AjaXplorer occurences in installer (details)
+
+-----
+AjaXplorer 5.0.3 Release Note
 
 This is a bugfix and security release. Update is highly recommended and automatic using the in-app upgrade mechanism. Most important fixes are:
 
@@ -10,8 +70,8 @@ This is a bugfix and security release. Update is highly recommended and automati
 License : Affero GPL
 Copyright : Charles du Jeu 2013
 Demo : http://demo.ajaxplorer.info/
-Date : ##VERSION_DATE##
-Rev Number : ##REVISION##
+Date : 2013-09-02
+Tag : ajaxplorer-core-5.0.3
 Contributors: thomasCresson, echampet, joubertredrat, BlackLionPT
 
 Detailed changeLog
