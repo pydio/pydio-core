@@ -1,4 +1,4 @@
-ajaxplorer (##VERSION_NUMBER##) ##DIST##; urgency=high
+pydio (##VERSION_NUMBER##) ##DIST##; urgency=high
 
   * New release ##VERSION_NUMBER##
 
