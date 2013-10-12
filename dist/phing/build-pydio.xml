@@ -377,7 +377,7 @@
 		
 		<!-- PREPARE DEBIAN BUILD -->
 		<copy toDir="${build.working_folder}/deb/builddeb" overwrite="true">
-			<fileset dir="${build.working_folder}/dist/deb">
+			<fileset dir="${build.working_folder}/dist/deb-pydio">
 				<include name="**/*"/>
 			</fileset>
 			<fileset dir="${build.source_folder}/" defaultexcludes="false">
