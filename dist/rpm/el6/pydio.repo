@@ -1,0 +1,20 @@
+[pydio-stable]
+name=Pydio for EL6 (Stable) - $basearch
+baseurl=http://dl.ajaxplorer.info/repos/el6/pydio-stable
+enabled=1
+gpgcheck=1
+gpgkey=http://dl.ajaxplorer.info/repos/charles@ajaxplorer.info.gpg.key
+
+[pydio-testing]
+name=Pydio for EL6 (Testing) - $basearch
+baseurl=http://dl.ajaxplorer.info/repos/el6/pydio-testing
+enabled=1
+gpgcheck=1
+gpgkey=http://dl.ajaxplorer.info/repos/charles@ajaxplorer.info.gpg.key
+
+[pydio-sources]
+name=Pydio for EL6 (SRPMs) - $basearch
+baseurl=http://dl.ajaxplorer.info/repos/el6/pydio-sources
+enabled=0
+gpgcheck=1
+gpgkey=http://dl.ajaxplorer.info/repos/charles@ajaxplorer.info.gpg.key
