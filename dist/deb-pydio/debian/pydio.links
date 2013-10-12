@@ -1,0 +1,7 @@
+etc/pydio/bootstrap_conf.php		usr/share/pydio/conf/bootstrap_conf.php
+etc/pydio/bootstrap_context.php		usr/share/pydio/conf/bootstrap_context.php
+etc/pydio/bootstrap_plugins.php		usr/share/pydio/conf/bootstrap_plugins.php
+etc/pydio/bootstrap_repositories.php	usr/share/pydio/conf/bootstrap_repositories.php
+etc/pydio/extensions.conf.php		usr/share/pydio/conf/extensions.conf.php
+var/lib/pydio/data				usr/share/pydio/data
+usr/share/doc/pydio/CREDITS.txt		usr/share/pydio/core/doc/CREDITS.txt
