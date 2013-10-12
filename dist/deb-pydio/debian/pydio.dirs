@@ -1,0 +1,7 @@
+etc/pydio/
+usr/share/pydio/
+usr/share/pydio/conf/
+usr/share/pydio/core/
+usr/share/pydio/core/doc/
+usr/share/doc/pydio/
+var/lib/pydio/

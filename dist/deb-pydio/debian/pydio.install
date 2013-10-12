@@ -1,0 +1,13 @@
+*.php								usr/share/pydio
+.htaccess							usr/share/pydio
+core/classes							usr/share/pydio/core
+core/tests							usr/share/pydio/core
+plugins								usr/share/pydio
+
+conf/*.php							etc/pydio
+
+data								var/lib/pydio
+
+conf/RELEASE_NOTE						usr/share/pydio/conf/
+conf/VERSION							usr/share/pydio/conf/
+core/doc/*							usr/share/doc/pydio
