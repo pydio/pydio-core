@@ -12,14 +12,14 @@ $requiredChannel = (isSet($_GET["channel"])?$_GET["channel"]:"stable");
 $basePackage = isSet($_GET["package"]) ? $_GET["package"] : "ajaxplorer-core";
 $hashMethod = "md5";
 
-function preparePackages($channel, $hashMethod)
+function preparePackages($channel, $hashMethod, $basePackage)
 {
     $packages = glob(CRT_PATH."/".$channel."/*.zip");
     $sUrl = detectServerURL().dirname($_SERVER["REQUEST_URI"]);
     $zips = array();
     foreach ($packages as $package) {
         $name = basename($package);
-        if (preg_match('/ajaxplorer-core-upgrade-([^-]*)-([^-]*)\.zip/', $name, $matches)) {
+        if (preg_match('/'.$basePackage.'-upgrade-([^-]*)-([^-]*)\.zip/', $name, $matches)) {
             $startV = $matches[1];
             $endV = $matches[2];
             $zips[$startV] = array($sUrl."/".$channel."/".$name, $startV, $endV, hash_file($hashMethod,$package));
@@ -38,7 +38,7 @@ function detectServerURL()
 }
 
 
-$zips = preparePackages($requiredChannel, $hashMethod);
+$zips = preparePackages($requiredChannel, $hashMethod, $basePackage);
 $upgradePath = array();
 $hashes = array();
 $note = "";
@@ -68,7 +68,7 @@ $var_random=rand(1000000000,2147483647); //number under 2147483647
 $var_today=time(); //today
 $var_referer='';//$_SERVER['HTTP_REFERRER']; //referer url
 $var_uservar='-'; //enter your own user defined variable
-$var_utmp='/update/'.$_SERVER['REMOTE_ADDR']; //this example adds a fake page request to the (fake) rss directory (the viewer IP to check for absolute unique RSS readers)
+$var_utmp='/update/'.$requiredVersion.'/'.$_SERVER['REMOTE_ADDR']; //this example adds a fake page request to the (fake) rss directory (the viewer IP to check for absolute unique RSS readers)
 $urchinUrl='http://www.google-analytics.com/__utm.gif?utmwv=1&utmn='.$var_utmn.'&utmsr=-&utmsc=-&utmul=-&utmje=0&utmfl=-&utmdt=-&utmhn='.$var_utmhn.'&utmr='.$var_referer.'&utmp='.$var_utmp.'&utmac='.$var_utmac.'&utmcc=__utma%3D'.$var_cookie.'.'.$var_random.'.'.$var_today.'.'.$var_today.'.'.$var_today.'.2%3B%2B__utmb%3D'.$var_cookie.'%3B%2B__utmc%3D'.$var_cookie.'%3B%2B__utmz%3D'.$var_cookie.'.'.$var_today.'.2.2.utmccn%3D(direct)%7Cutmcsr%3D(direct)%7Cutmcmd%3D(none)%3B%2B__utmv%3D'.$var_cookie.'.'.$var_uservar.'%3B';
 $handle = fopen ($urchinUrl, "r");
 $test = fgets($handle);
@@ -78,8 +78,8 @@ fclose($handle);
 header("Content-type:application/json");
 if ($requiredChannel == "test") {
     $sUrl = detectServerURL().dirname($_SERVER["REQUEST_URI"]);
-    $upgradePath = array('"'.$sUrl.'/test/ajaxplorer-core-upgrade-0.0.0-0.0.0.zip"');
-    $hashes = array('"'.md5_file(CRT_PATH."/test/ajaxplorer-core-upgrade-0.0.0-0.0.0.zip").'"');
-    $note = $sUrl."/test/ajaxplorer-core-upgrade-0.0.0-0.0.0.html";
+    $upgradePath = array('"'.$sUrl.'/test/'.$basePackage.'-upgrade-0.0.0-0.0.0.zip"');
+    $hashes = array('"'.md5_file(CRT_PATH."/test/'.$basePackage.'-upgrade-0.0.0-0.0.0.zip").'"');
+    $note = $sUrl."/test/'.$basePackage.'-upgrade-0.0.0-0.0.0.html";
 }
 print("{\"packages\":[".implode(",", $upgradePath)."],\"hashes\":[".implode(",", $hashes)."],\"hash_method\":\"md5\", \"latest_note\":\"".$note."\"}");
