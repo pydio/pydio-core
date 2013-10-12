@@ -35,5 +35,6 @@ $mess=array(
     "folder.copy_from" => "Pasta AJXP_NODE_LABEL copiado de AJXP_SOURCE_FOLDER",
     "folder.move_to" => "Pasta AJXP_NODE_LABEL movido para AJXP_TARGET_FOLDER",
     "folder.move_from" => "Pasta AJXP_NODE_LABEL movido de AJXP_SOURCE_FOLDER",
-
+    "file.rename" => "AJXP_SOURCE_LABEL was renamed to AJXP_NODE_LABEL",
+    "folder.rename" => "AJXP_SOURCE_LABEL was renamed to AJXP_NODE_LABEL",
 );
