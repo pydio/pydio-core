@@ -33,6 +33,9 @@ sed -i 's/AJXP_INSTALL_PATH."\/data\/cache"/"\/var\/cache\/pydio"/g' conf/bootst
 sed -i 's/AJXP_INSTALL_PATH."\/data"/"\/var\/lib\/pydio"/g' conf/bootstrap_context.php
 sed -i 's/\/\/ define("AJXP_FORCE_LOGPATH/define("AJXP_FORCE_LOGPATH/g' conf/bootstrap_context.php
 
+# Update Share URL
+sed -i 's/"AJXP_INSTALL_PATH\/data\/public"/"\/var\/lib\/pydio\/public"/g' plugins/core.ajaxplorer/manifest.xml
+
 %build
 
 %install
