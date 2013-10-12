@@ -1,7 +1,7 @@
 Source: pydio
 Section: admin
 Priority: important
-Maintainer: Aurelien Requiem <aurelien.requiem@loadedtech.com.au>
+Maintainer: Charles du Jeu <charles@pyd.io>
 Build-Depends: debhelper (>=7.0.15)
 Standards-Version: 3.8.0
 
@@ -11,7 +11,5 @@ Homepage: http://pyd.io
 Depends: libapache2-mod-php5 | php5-cgi | php5, php5-gd, php5-mcrypt
 Recommends: apache2 | lighttpd | httpd
 Suggests: php5-ldap 
-Description: Web based file manager interface with plugins support
- Web based file manager interface using AJAX. Supports multiple plugins for
- fully integrated authentication.
+Description: Build your own box on your own servers with Pydio.
  .
