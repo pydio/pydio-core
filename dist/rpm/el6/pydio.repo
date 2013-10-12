@@ -1,0 +1,20 @@
+[pydio-stable]
+name=AjaXplorer for EL6 (Stable) - $basearch
+baseurl=http://dl.pyd.io/repos/el6/pydio-stable
+enabled=1
+gpgcheck=1
+gpgkey=http://dl.pyd.io/repos/charles@ajaxplorer.info.gpg.key
+
+[ajaxplorer-testing]
+name=AjaXplorer for EL6 (Testing) - $basearch
+baseurl=http://dl.pyd.io/repos/el6/pydio-testing
+enabled=1
+gpgcheck=1
+gpgkey=http://dl.pyd.io/repos/charles@ajaxplorer.info.gpg.key
+
+[ajaxplorer-sources]
+name=AjaXplorer for EL6 (SRPMs) - $basearch
+baseurl=http://dl.pyd.io/repos/el6/pydio-sources
+enabled=0
+gpgcheck=1
+gpgkey=http://dl.pyd.io/repos/charles@ajaxplorer.info.gpg.key
