@@ -34,12 +34,12 @@ function securePath($path)
 // DEFINE A SECRET KEY, DEFINE YOURS!
 define('SECRET_KEY', 'z-agent-key');
 $vars = array_merge($_GET, $_POST);
-
-if (!isSet($vars["ajxp_action"]) && isset($vars["id"]) && isset($vars["format"])) {
+$whiteList = explode(",","xls,xlsx,ods,sxc,csv,tsv,ppt,pps,odp,sxi,doc,docx,rtf,odt,sxw");
+if (!isSet($vars["ajxp_action"]) && isset($vars["id"]) && isset($vars["format"]) && in_array($vars["format"], $whiteList)) {
 
     $filezoho = $_FILES['content']["tmp_name"];
-    $cleanId = securePath($vars["id"]);
-    move_uploaded_file($filezoho, "files/".$cleanId.".".$vars["format"]);
+    $cleanId = securePath("files/".$vars["id"].".".$vars["format"]);
+    move_uploaded_file($filezoho, $cleanId);
 
 } else if ($vars["ajxp_action"] == "get_file" && isSet($vars["name"]) && isset($vars['key']) && $vars["key"] == SECRET_KEY) {
 
