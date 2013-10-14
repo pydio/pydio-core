@@ -21,7 +21,7 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package Pydio
+ * @package AjaXplorer
  * @subpackage SabreDav
  */
 class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre\DAV\IFile
@@ -52,7 +52,7 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre\DAV\IFile
         // Warning, passed by ref
         $p = $this->path;
 
-        if (!AuthService::getLoggedUser()->canRead($this->repository->getId())) {
+        if(!AuthService::getLoggedUser()->canWrite($this->repository->getId())){
             throw new \Sabre\DAV\Exception\Forbidden() ;
         }
         $this->getAccessDriver()->nodeWillChange($p, intval($_SERVER["CONTENT_LENGTH"]));
@@ -118,7 +118,8 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre\DAV\IFile
         fclose($fp);
         return $fileMime;
         /*
-        if ( $this->options->useMimeExts && ezcBaseFeatures::hasExtensionSupport( 'fileinfo' ) ) {
+        if ( $this->options->useMimeExts && ezcBaseFeatures::hasExtensionSupport( 'fileinfo' ) )
+        {
             $fInfo = new fInfo( FILEINFO_MIME );
             $mimeType = $fInfo->file( $this->getUrl() );
 
