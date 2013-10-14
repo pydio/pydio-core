@@ -17,4 +17,3 @@ $mess=array(
 "Test Connection" => "Test Connection",
 "Try to connect to RADIUS server" => "Try to connect to RADIUS server"
 );
-?>
