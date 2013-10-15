@@ -75,6 +75,6 @@ CREATE TABLE IF NOT EXISTS ajxp_simple_store (
    serialized_data text,
    binary_data bytea,
    related_object_id varchar(255),
-   timestamp DEFAULT current_timestamp,
+   insertion_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    PRIMARY KEY(object_id, store_id)
 );
