@@ -901,6 +901,55 @@ input.SF_input.SF_number{
     background-color: #D8B0B0 !important;
 }
 
+.SF_horizontal_labelRow{
+    clear: both;
+}
+
+.SF_horizontal_labelRow div.SF_label{
+    float:left;
+    text-align: left;
+    padding: 0 5px 0 3px;
+    margin-right: 5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.SF_horizontal_fieldsRow{
+    clear: both;
+}
+.SF_horizontal_fieldsRow input{
+    float: left;
+    margin-right: 5px;
+    font-size: 13px;
+    padding: 3px 4px 3px 2px !important;
+}
+
+.SF_horizontal_fieldsRow input.SF_number{
+    text-align: left;
+}
+
+.SF_horizontal_actions {
+    float: left;
+    padding: 5px 2px;
+    font-size: 15px;
+}
+
+.SF_horizontal_pastilles{
+    float: left;
+    padding: 3px 2px;
+    font-size: 11px;
+}
+
+.SF_horizontal_actions span{
+    cursor: pointer;
+    margin-right: 0;
+}
+
+.SF_horizontal_pastilles span{
+    margin-right: 10px;
+}
+
 /****************
 /* LOGIN BOX
 /****************/

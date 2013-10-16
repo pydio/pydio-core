@@ -122,7 +122,7 @@ class MetaWatchRegister extends AJXP_Plugin
      * @param $userId
      * @param bool $clearUsers
      */
-    public function removeWatchFromFolder($node, $userId, $clearUsers = false)
+    public function removeWatchFromFolder($node, $userId, $clearUsers = false, $targetUserId = false)
     {
         if ($clearUsers) {
             $usersMeta = $this->metaStore->retrieveMetadata(
@@ -131,13 +131,35 @@ class MetaWatchRegister extends AJXP_Plugin
                 false,
                 AJXP_METADATA_SCOPE_REPOSITORY
             );
+
             // WEIRD / WILL IT REMOVE OTHER PEOPLE WATCHES??
             if (isSet($usersMeta) && (isSet($usersMeta[self::$META_WATCH_USERS_CHANGE][$userId]) || isSet($usersMeta[self::$META_WATCH_USERS_READ][$userId]))) {
-                $this->metaStore->removeMetadata(
-                    $node,
-                    self::$META_WATCH_USERS_NAMESPACE,
-                    false,
-                    AJXP_METADATA_SCOPE_REPOSITORY);
+
+                if ($targetUserId != false) {
+                    if (isSet($usersMeta[self::$META_WATCH_USERS_CHANGE][$userId])) {
+                        $c = $usersMeta[self::$META_WATCH_USERS_CHANGE][$userId];
+                        if(in_array($targetUserId, $c)) $c = array_diff($c, array($targetUserId));
+                        if(count($c)) $usersMeta[self::$META_WATCH_USERS_CHANGE][$userId] = $c;
+                        else unset($usersMeta[self::$META_WATCH_USERS_CHANGE][$userId]);
+                    }
+                    if (isSet($usersMeta[self::$META_WATCH_USERS_READ][$userId])) {
+                        $c = $usersMeta[self::$META_WATCH_USERS_READ][$userId];
+                        if(in_array($targetUserId, $c)) $c = array_diff($c, array($targetUserId));
+                        if(count($c)) $usersMeta[self::$META_WATCH_USERS_READ][$userId] = $c;
+                        else unset($usersMeta[self::$META_WATCH_USERS_READ][$userId]);
+                    }
+                    $this->metaStore->setMetadata($node, self::$META_WATCH_USERS_NAMESPACE, $usersMeta, false, AJXP_METADATA_SCOPE_REPOSITORY);
+
+                } else {
+
+                    $this->metaStore->removeMetadata(
+                        $node,
+                        self::$META_WATCH_USERS_NAMESPACE,
+                        false,
+                        AJXP_METADATA_SCOPE_REPOSITORY);
+
+                }
+
             }
         } else {
 
@@ -166,7 +188,7 @@ class MetaWatchRegister extends AJXP_Plugin
      * @param string $ns Watch namespace
      * @return string|bool the type of watch
      */
-    public function hasWatchOnNode($node, $userId, $ns = "META_WATCH")
+    public function hasWatchOnNode($node, $userId, $ns = "META_WATCH", &$result = array())
     {
         $meta = $this->metaStore->retrieveMetadata(
             $node,
@@ -176,9 +198,11 @@ class MetaWatchRegister extends AJXP_Plugin
         );
         if ($ns == self::$META_WATCH_USERS_NAMESPACE) {
             if (isSet($meta[self::$META_WATCH_USERS_READ]) && isSet($meta[self::$META_WATCH_USERS_READ][$userId])) {
+                $result = $meta[self::$META_WATCH_USERS_READ][$userId];
                 return self::$META_WATCH_USERS_READ;
             }
             if (isSet($meta[self::$META_WATCH_USERS_CHANGE]) && isSet($meta[self::$META_WATCH_USERS_CHANGE][$userId])) {
+                $result = $meta[self::$META_WATCH_USERS_CHANGE][$userId];
                 return self::$META_WATCH_USERS_CHANGE;
             }
             return false;
