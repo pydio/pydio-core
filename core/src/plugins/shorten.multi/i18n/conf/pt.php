@@ -24,4 +24,6 @@ $mess=array(
 "Bit.ly account API Key" => "Chave API da conta Bit.ly",
 "Shorten Download Links before sending them back to the user." => "Shorten Download Links before sending them back to the user.",
 "Shorten Download Links before sending them back to the user. Requires a Bit.ly account." => "Shorten Download Links before sending them back to the user. Requires a Bit.ly account.",
+"Yourls domain" => "Yourls domain",
+"Use IDN" => "Use IDN",
 );

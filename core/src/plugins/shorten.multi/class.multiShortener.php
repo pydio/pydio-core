@@ -114,6 +114,41 @@ class multiShortener extends AJXP_Plugin
                 }
                 break;
 
+            case 4:
+                $url = $params["ob_output"];
+                if (!isSet($type["YOURLS_DOMAIN"])) {
+                    print($url);
+                    $this->logError("Config", "yourls Shortener : you must set the domain name");
+                    return;
+                }
+                if (!isSet($type["YOURLS_APIKEY"])) {
+                    print($url);
+                    $this->logError("Config", "yourls Shortener : you must set the api key");
+                    return;
+                }
+                $useidn = false;
+                if (isSet($type["YOURLS_USEIDN"])) {
+                    $useidn = $type["YOURLS_USEIDN"];
+                }
+                $yourls_domain = $type["YOURLS_DOMAIN"];
+                $yourls_api = $type["YOURLS_APIKEY"];
+                $yourls = 'http://'.$yourls_domain.'/yourls-api.php?signature='.$yourls_api.'&action=shorturl&format=simple&url='.urlencode($url);
+                $response = AJXP_Utils::getRemoteContent($yourls);
+                if (isSet($response)) {
+                    $shorturl = $response;
+                    if ($useidn) {
+                        // WARNING: idn_to_utf8 requires php-idn module.
+                        // WARNING: http_build_url requires php-pecl-http module.
+                        $purl = parse_url($shorturl);
+                        $purl['host'] = idn_to_utf8($purl['host']);
+                        $shorturl = http_build_url($purl);
+                    }
+                    print($shorturl);
+                    $this->updateMetaShort($httpVars["file"], $shorturl);
+                } else {
+                    print($url);
+                }
+                break;
         }
 
 
