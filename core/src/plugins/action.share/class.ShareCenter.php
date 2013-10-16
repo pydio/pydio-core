@@ -406,7 +406,7 @@ class ShareCenter extends AJXP_Plugin
                     AJXP_METADATA_SCOPE_REPOSITORY
                 );
                 if (isSet($metadata["element"][$httpVars["element_id"]])) {
-                    if(!is_array($metadata["element"][$httpVars["element_id"]])){
+                    if (!is_array($metadata["element"][$httpVars["element_id"]])) {
                         $metadata["element"][$httpVars["element_id"]] = array();
                     }
                     $metadata["element"][$httpVars["element_id"]][$httpVars["p_name"]] = $httpVars["p_value"];

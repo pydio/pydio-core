@@ -252,7 +252,7 @@ Class.create("ShareCenter", {
                     this._currentRepositoryLabel = json['label'];
                     this._currentRepositoryLink = json['repository_url'];
                     oForm.down('input#repo_label').value = json['label'];
-                    oForm.down('textarea#repo_description').value = json['description'];
+                    oForm.down('#repo_description').value = json['description'];
                     oForm.down('#complete_indicator').hide();
                     if(json.minisite){
                         oForm.down('#share_container').setValue(json.minisite.public_link);

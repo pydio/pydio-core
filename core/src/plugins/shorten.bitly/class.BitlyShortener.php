@@ -30,10 +30,14 @@ class BitlyShortener extends AJXP_Plugin
 {
     public function postProcess($action, $httpVars, $params)
     {
-        $jsonData = json_decode($params["ob_output"]);
-
-        $url = $jsonData["publiclet_link"];
-        $elementId = $jsonData["element_id"];
+        $jsonData = json_decode($params["ob_output"], true);
+        if ($jsonData != false) {
+            $url = $jsonData["publiclet_link"] ;
+            $elementId = $jsonData["element_id"];
+        } else {
+            $url = $params["ob_output"];
+            $elementId = -1;
+        }
 
         $BITLY_USER = $this->getFilteredOption("BITLY_USER");
         $BITLY_APIKEY = $this->getFilteredOption("BITLY_APIKEY");
@@ -70,10 +74,14 @@ class BitlyShortener extends AJXP_Plugin
                 true,
                 AJXP_METADATA_SCOPE_REPOSITORY
             );
-            if(!is_array($metadata["element"][$elementId])){
-                $metadata["element"][$elementId] = array();
+            if ($elementId != -1) {
+                if (!is_array($metadata["element"][$elementId])) {
+                    $metadata["element"][$elementId] = array();
+                }
+                $metadata["element"][$elementId]["short_form_url"] = $shortUrl;
+            } else {
+                $metadata['short_form_url'] = $shortUrl;
             }
-            $metadata["element"][$elementId]["short_form_url"] = $shortUrl;
             $node->setMetadata(
                 "ajxp_shared",
                 $metadata,

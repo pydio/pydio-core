@@ -17,10 +17,13 @@ class multiShortener extends AJXP_Plugin
     {
         $type = $this->getFilteredOption("SHORTEN_TYPE");
         if(empty($type)) return;
-        $jsonData = json_decode($params["ob_output"]);
-
-        $url = $jsonData["publiclet_link"];
-        $elementId = $jsonData["element_id"];
+        $jsonData = json_decode($params["ob_output"], true);
+        if ($jsonData != false) {
+            $url = $jsonData["publiclet_link"] ;
+            $elementId = $jsonData["element_id"];
+        } else {
+            $url = $params["ob_output"];
+        }
 
         switch (intval($type["shorten_type"])) {
             case 0:
@@ -131,11 +134,14 @@ class multiShortener extends AJXP_Plugin
                 true,
                 AJXP_METADATA_SCOPE_REPOSITORY
             );
-            if(!is_array($metadata["element"][$elementId])){
-                $metadata["element"][$elementId] = array();
+            if ($elementId != -1) {
+                if (!is_array($metadata["element"][$elementId])) {
+                    $metadata["element"][$elementId] = array();
+                }
+                $metadata["element"][$elementId]["short_form_url"] = $shortUrl;
+            } else {
+                $metadata['short_form_url'] = $shortUrl;
             }
-            $metadata["element"][$elementId]["short_form_url"] = $shortUrl;
-            $metadata["short_form_url"] = $shortUrl;
             $node->setMetadata(
                 "ajxp_shared",
                 $metadata,
