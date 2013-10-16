@@ -30,7 +30,11 @@ class BitlyShortener extends AJXP_Plugin
 {
     public function postProcess($action, $httpVars, $params)
     {
-        $url = $params["ob_output"];
+        $jsonData = json_decode($params["ob_output"]);
+
+        $url = $jsonData["publiclet_link"];
+        $elementId = $jsonData["element_id"];
+
         $BITLY_USER = $this->getFilteredOption("BITLY_USER");
         $BITLY_APIKEY = $this->getFilteredOption("BITLY_APIKEY");
 
@@ -48,13 +52,13 @@ class BitlyShortener extends AJXP_Plugin
         $json = json_decode($response, true);
         if (isSet($json['results'][$url]['shortUrl'])) {
             print($json['results'][$url]['shortUrl']);
-            $this->updateMetaShort($httpVars["file"], $json['results'][$url]['shortUrl']);
+            $this->updateMetaShort($httpVars["file"], $elementId, $json['results'][$url]['shortUrl']);
         } else {
             print($url);
         }
     }
 
-    protected function updateMetaShort($file, $shortUrl)
+    protected function updateMetaShort($file, $elementId, $shortUrl)
     {
         $driver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
         $streamData = $driver->detectStreamWrapper(false);
@@ -66,7 +70,10 @@ class BitlyShortener extends AJXP_Plugin
                 true,
                 AJXP_METADATA_SCOPE_REPOSITORY
             );
-            $metadata["short_form_url"] = $shortUrl;
+            if(!is_array($metadata["element"][$elementId])){
+                $metadata["element"][$elementId] = array();
+            }
+            $metadata["element"][$elementId]["short_form_url"] = $shortUrl;
             $node->setMetadata(
                 "ajxp_shared",
                 $metadata,

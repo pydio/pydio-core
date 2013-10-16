@@ -17,9 +17,13 @@ class multiShortener extends AJXP_Plugin
     {
         $type = $this->getFilteredOption("SHORTEN_TYPE");
         if(empty($type)) return;
+        $jsonData = json_decode($params["ob_output"]);
+
+        $url = $jsonData["publiclet_link"];
+        $elementId = $jsonData["element_id"];
+
         switch (intval($type["shorten_type"])) {
             case 0:
-                $url = $params["ob_output"];
                 if (!isSet($type["ADFLY_TYPE"]) || !isSet($type["ADFLY_APIKEY"]) || !isSet($type["ADFLY_UID"]) || !isSet($type["ADFLY_DOMAIN"])) {
                     print($url);
                     $this->logError("Config", "adFly Shortener : you must set the api key!");
@@ -35,14 +39,13 @@ class multiShortener extends AJXP_Plugin
                 $response = strip_tags($response);
                 if (isSet($response)) {
                     print($response);
-                    $this->updateMetaShort($httpVars["file"], $response);
+                    $this->updateMetaShort($httpVars["file"], $elementId, $response);
                 } else {
                     print($url);
                 }
                 break;
 
             case 1:
-                $url = $params["ob_output"];
                 if (!isSet($type["BITLY_USER"]) || !isSet($type["BITLY_APIKEY"])) {
                     print($url);
                     $this->logError("Config", "Bitly Shortener : you must drop the conf.shorten.bitly.inc file inside conf.php and set the login/api key!");
@@ -57,14 +60,13 @@ class multiShortener extends AJXP_Plugin
                 $json = json_decode($response, true);
                 if (isSet($json['results'][$url]['shortUrl'])) {
                     print($json['results'][$url]['shortUrl']);
-                    $this->updateMetaShort($httpVars["file"], $json['results'][$url]['shortUrl']);
+                    $this->updateMetaShort($httpVars["file"], $elementId, $json['results'][$url]['shortUrl']);
                 } else {
                     print($url);
                 }
                 break;
 
             case 2:
-                $url = $params["ob_output"];
                 if (!isSet($type["GOOGL_APIKEY"])) {
                     print($url);
                     $this->logError("Config", "Goo.gl Shortener : you must set the api key!");
@@ -90,14 +92,13 @@ class multiShortener extends AJXP_Plugin
                 $json = (array) json_decode( $result );
                 if (isSet($json['id'])) {
                     print($json['id']);
-                    $this->updateMetaShort($httpVars["file"], $json['id']);
+                    $this->updateMetaShort($httpVars["file"], $elementId, $json['id']);
                 } else {
                     print($url);
                 }
                 break;
 
             case 3:
-                $url = $params["ob_output"];
                 if (!isSet($type["POST_APIKEY"])) {
                     print($url);
                     $this->logError("Config", "po.st Shortener : you must set the api key!");
@@ -108,7 +109,7 @@ class multiShortener extends AJXP_Plugin
                 $response = AJXP_Utils::getRemoteContent($post);
                 if (isSet($response)) {
                     print($response);
-                    $this->updateMetaShort($httpVars["file"], $response);
+                    $this->updateMetaShort($httpVars["file"], $elementId, $response);
                 } else {
                     print($url);
                 }
@@ -118,7 +119,7 @@ class multiShortener extends AJXP_Plugin
 
 
     }
-    protected function updateMetaShort($file, $shortUrl)
+    protected function updateMetaShort($file, $elementId, $shortUrl)
     {
         $driver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
         $streamData = $driver->detectStreamWrapper(false);
@@ -130,6 +131,10 @@ class multiShortener extends AJXP_Plugin
                 true,
                 AJXP_METADATA_SCOPE_REPOSITORY
             );
+            if(!is_array($metadata["element"][$elementId])){
+                $metadata["element"][$elementId] = array();
+            }
+            $metadata["element"][$elementId]["short_form_url"] = $shortUrl;
             $metadata["short_form_url"] = $shortUrl;
             $node->setMetadata(
                 "ajxp_shared",

@@ -348,7 +348,19 @@ Class.create("ShareCenter", {
         if(linkData["expire_time"]){
             actions.insert({top:new Element('span', {className:'icon-calendar'}).update(' '+linkData["expire_time"])});
         }
-        actions.insert({top:new Element('span', {className:'icon-download-alt'}).update(' downloads '+linkData['download_counter']+'/'+linkData['download_limit'])});
+        var dlC = new Element('span', {className:'icon-download-alt'}).update(' downloads '+linkData['download_counter']+'/'+linkData['download_limit']);
+        actions.insert({top:dlC});
+        dlC.observe("click", function(){
+            if(window.confirm('Do you want to reset the download counter?')){
+                var conn = new Connexion();
+                conn.setParameters({
+                    file: this.currentNode.getPath(),
+                    get_action: 'reset_counter',
+                    element_id: linkData["element_id"]
+                });
+                conn.sendAsync();
+            }
+        }.bind(this));
 
         oRow.down('[data-action="remove"]').observe("click", function(){
             this.performUnshareAction(linkData['element_id'], oRow);
@@ -357,6 +369,25 @@ Class.create("ShareCenter", {
         oRow.down('[name="link_url"]').select();
 
         this.updateDialogButtons(oRow, "file", linkData);
+
+        if(linkData['tags']){
+            oRow.down('[name="link_tag"]').setValue(linkData['tags']);
+        }
+        oRow.down('[name="link_tag"]').observe("keydown", function(event){
+            if(event.keyCode == Event.KEY_RETURN){
+                Event.stop(event);
+                var t = oRow.down('[name="link_tag"]').getValue();
+                var conn = new Connexion();
+                conn.setParameters({
+                    file: this.currentNode.getPath(),
+                    get_action: 'update_shared_element_data',
+                    p_name: 'tags',
+                    p_value: t,
+                    element_id: linkData["element_id"]
+                });
+                conn.sendAsync();
+            }
+        }.bind(this));
 
     },
 
@@ -443,6 +474,7 @@ Class.create("ShareCenter", {
             "use strict";
             if(node.isLeaf()){
 
+                if(!jsonData) return ;
                 jsonData = jsonData[0];
                 var directLink = "";
                 if(!jsonData.hasPassword){
