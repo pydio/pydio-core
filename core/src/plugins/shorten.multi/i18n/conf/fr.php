@@ -22,4 +22,6 @@ $mess=array(
 "Bit.ly account user name" => "Bit.ly account user name",
 "API Key" => "API Key",
 "Bit.ly account API Key" => "Bit.ly account API Key",
+"Yourls domain" => "Yourls domain",
+"Use IDN" => "Use IDN",
 );

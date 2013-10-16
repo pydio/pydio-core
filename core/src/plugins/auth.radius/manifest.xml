@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<authdriver name="radius" label="CONF_MESSAGE[RADIUS Authentification]" description="CONF_MESSAGE[Authenticate user by directly connecting to an RADIUS server]" mixins="authdriver_commons"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings>
+        <resources>
+            <i18n namespace="radius_auth" path="plugins/auth.radius/i18n"/>
+        </resources>
+    </client_settings>
+	<server_settings>
+		<param name="RADIUS Server" type="string" label="CONF_MESSAGE[Server]" description="CONF_MESSAGE[IP or DNS name of the RADIUS server]" mandatory="true"/>
+    <param name="RADIUS Port" type="integer" label="CONF_MESSAGE[Port]" description="CONF_MESSAGE[Port of the RADIUS server]" mandatory="true" default="1812"/>
+    <param name="RADIUS Shared Secret" type="string" label="CONF_MESSAGE[Shared secret]" description="CONF_MESSAGE[Shared secret of the RADIUS server]" mandatory="true"/>
+    <param name="RADIUS Auth Type" type="select" choices="pap|chap" label="CONF_MESSAGE[Auth type]" description="CONF_MESSAGE[Auth type to use for RADIUS server]" mandatory="true" default="chap"/>
+		<param name="RADIUS Test-User" type="string" label="CONF_MESSAGE[Test user]" description="CONF_MESSAGE[User for connection testing]" mandatory="false"/>
+		<param name="RADIUS Test-Password" type="string" label="CONF_MESSAGE[Test password]" description="CONF_MESSAGE[Password for connection testing]" mandatory="false"/>
+    <param type="button" name="TEST_RADIUS" choices="run_plugin_action:auth.radius:testRADIUSConnection" label="CONF_MESSAGE[Test Connection]" description="CONF_MESSAGE[Try to connect to RADIUS server]" mandatory="false"/>
+
+	</server_settings>
+	<class_definition filename="plugins/auth.radius/class.radiusAuthDriver.php" classname="radiusAuthDriver"/>
+	<registry_contributions>
+		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude=""/>
+	</registry_contributions>
+</authdriver>
