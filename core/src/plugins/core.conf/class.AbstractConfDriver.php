@@ -813,19 +813,22 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 }
                 $loggedUser = AuthService::getLoggedUser();
                 $crtValue = $httpVars["value"];
+                $usersOnly = isSet($httpVars["users_only"]) && $httpVars["users_only"] == "true";
                 if(!empty($crtValue)) $regexp = '^'.preg_quote($crtValue);
                 else $regexp = null;
                 $limit = min(ConfService::getCoreConf("USERS_LIST_COMPLETE_LIMIT", "conf"), 20);
                 $allUsers = AuthService::listUsers("/", $regexp, 0, $limit, false);
-                $allGroups = AuthService::listChildrenGroups("/");
+                if (!$usersOnly) {
+                    $allGroups = AuthService::listChildrenGroups("/");
+                }
                 $users = "";
                 $index = 0;
-                if ($regexp != null && !count($allUsers)) {
+                if ($regexp != null && !count($allUsers) && ConfService::getCoreConf("ALLOW_NEWUSERS_SHARING", "conf")) {
                     $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue'><span class='user_entry_label'>$crtValue (".$mess["448"].")</span></li>";
                 }
                 $mess = ConfService::getMessages();
                 if($regexp == null) $users .= "<li class='complete_group_entry' data-group='/' data-label='".$mess["447"]."'><span class='user_entry_label'>".$mess["447"]."</span></li>";
-                if (count($allGroups)) {
+                if (!$usersOnly && count($allGroups)) {
                     foreach ($allGroups as $groupId => $groupLabel) {
                         if ($regexp == null ||  preg_match("/$regexp/i", $groupLabel)) {
                             $users .= "<li class='complete_group_entry' data-group='$groupId' data-label='$groupLabel' data-entry_id='$groupId'><span class='user_entry_label'>".$groupLabel."</span></li>";

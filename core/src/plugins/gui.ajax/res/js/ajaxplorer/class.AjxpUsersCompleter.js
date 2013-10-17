@@ -78,54 +78,59 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
             tmpUsersPrefix:'',
             updateUserEntryAfterCreate:null,
             createUserPanel:null,
+            usersOnly: false,
             afterUpdateElement: function(element, selectedLi){
-                var id = Math.random();
-                var label = selectedLi.getAttribute("data-label");
-                var entryId = selectedLi.getAttribute("data-entry_id");
-                if(selectedLi.getAttribute("data-temporary") && pref && ! label.startsWith(pref)){
-                    label = pref + label;
-                }
-                var li = entryTplGenerator(selectedLi.getAttribute("data-group")?true:false,
-                    selectedLi.getAttribute("data-temporary")?true:false,
-                    selectedLi.getAttribute("data-group")?selectedLi.getAttribute("data-group"):(entryId ? entryId : label),
-                    label
-                );
+                if(listElement){
 
-                if(entryTplUpdater){
-                    entryTplUpdater(li);
-                }
+                    var id = Math.random();
+                    var label = selectedLi.getAttribute("data-label");
+                    var entryId = selectedLi.getAttribute("data-entry_id");
+                    if(selectedLi.getAttribute("data-temporary") && pref && ! label.startsWith(pref)){
+                        label = pref + label;
+                    }
+                    var li = entryTplGenerator(selectedLi.getAttribute("data-group")?true:false,
+                        selectedLi.getAttribute("data-temporary")?true:false,
+                        selectedLi.getAttribute("data-group")?selectedLi.getAttribute("data-group"):(entryId ? entryId : label),
+                        label
+                    );
 
-                if(selectedLi.getAttribute("data-temporary") && createUserPanel != null){
-                    element.readOnly = true;
-                    createUserPass.setValue(""); createUserConfirmPass.setValue("");
-                    element.setValue(MessageHash["449"].replace("%s", label));
-                    createUserPanel.select('div.dialogButtons>input').invoke("addClassName", "dialogButtons");
-                    createUserPanel.select('div.dialogButtons>input').invoke("stopObserving", "click");
-                    createUserPanel.select('div.dialogButtons>input').invoke("observe", "click", function(event){
-                        Event.stop(event);
-                        var close = false;
-                        if(event.target.name == "ok"){
-                            if( !createUserPass.value || createUserPass.value.length < ajxpBootstrap.parameters.get('password_min_length')){
-                                alert(MessageHash[378]);
-                            }else if(createUserPass.getValue() == createUserConfirmPass.getValue()){
-                                li.NEW_USER_PASSWORD = createUserPass.getValue();
-                                li.appendToList(listElement);
+                    if(entryTplUpdater){
+                        entryTplUpdater(li);
+                    }
+
+                    if(selectedLi.getAttribute("data-temporary") && createUserPanel != null){
+                        element.readOnly = true;
+                        createUserPass.setValue(""); createUserConfirmPass.setValue("");
+                        element.setValue(MessageHash["449"].replace("%s", label));
+                        createUserPanel.select('div.dialogButtons>input').invoke("addClassName", "dialogButtons");
+                        createUserPanel.select('div.dialogButtons>input').invoke("stopObserving", "click");
+                        createUserPanel.select('div.dialogButtons>input').invoke("observe", "click", function(event){
+                            Event.stop(event);
+                            var close = false;
+                            if(event.target.name == "ok"){
+                                if( !createUserPass.value || createUserPass.value.length < ajxpBootstrap.parameters.get('password_min_length')){
+                                    alert(MessageHash[378]);
+                                }else if(createUserPass.getValue() == createUserConfirmPass.getValue()){
+                                    li.NEW_USER_PASSWORD = createUserPass.getValue();
+                                    li.appendToList(listElement);
+                                    close = true;
+                                }
+                            }else if(event.target.name.startsWith("can")){
                                 close = true;
                             }
-                        }else if(event.target.name.startsWith("can")){
-                            close = true;
-                        }
-                        if(close) {
-                            element.setValue("");
-                            element.readOnly = false;
-                            Effect.BlindUp('create_shared_user', {duration:0.4});
-                            createUserPanel.select('div.dialogButtons>input').invoke("removeClassName", "dialogButtons");
-                        }
-                    });
-                    Effect.BlindDown(createUserPanel, {duration:0.6, transition:Effect.Transitions.spring, afterFinish:function(){createUserPass.focus();}});
-                }else{
-                    element.setValue("");
-                    li.appendToList(listElement);
+                            if(close) {
+                                element.setValue("");
+                                element.readOnly = false;
+                                Effect.BlindUp('create_shared_user', {duration:0.4});
+                                createUserPanel.select('div.dialogButtons>input').invoke("removeClassName", "dialogButtons");
+                            }
+                        });
+                        Effect.BlindDown(createUserPanel, {duration:0.6, transition:Effect.Transitions.spring, afterFinish:function(){createUserPass.focus();}});
+                    }else{
+                        element.setValue("");
+                        li.appendToList(listElement);
+                    }
+
                 }
             }
         }, options);
@@ -135,19 +140,23 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
         this.options.onComplete    = this.onComplete.bind(this);
         this.options.defaultParams = this.options.parameters || null;
         this.url                   = this.options.url || window.ajxpServerAccessPath + "&get_action=user_list_authorized_users";
+        if(this.options.usersOnly){
+            this.url += '&users_only=true';
+        }
 
-
-        this.options.onComplete  = function(transport){
-            var tmpElement = new Element('div');
-            tmpElement.update(transport.responseText);
-            listElement.select("div.user_entry").each(function(li){
-                var found = tmpElement.down('[data-label="'+li.getAttribute("data-entry_id")+'"]');
-                if(found) {
-                    found.remove();
-                }
-            });
-            this.updateChoices(tmpElement.innerHTML);
-        }.bind(this);
+        if(listElement){
+            this.options.onComplete  = function(transport){
+                var tmpElement = new Element('div');
+                tmpElement.update(transport.responseText);
+                listElement.select("div.user_entry").each(function(li){
+                    var found = tmpElement.down('[data-label="'+li.getAttribute("data-entry_id")+'"]');
+                    if(found) {
+                        found.remove();
+                    }
+                });
+                this.updateChoices(tmpElement.innerHTML);
+            }.bind(this);
+        }
         if(Prototype.Browser.IE){
             $(document.body).insert(update);
         }

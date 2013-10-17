@@ -48,9 +48,9 @@ Class.create("AjxpMailer", {
             hiddenRecipientString = hiddenRecipientString.join(",");
         }
         var fromString = ajaxplorer.user.id;
-        $("mailer_message").update("<div id='mailer_message'><div class='message_body'><form>" +
+        $("mailer_message").update("<div id='mailer_message' style='position: relative;'><div id='emails_autocomplete' style='position:absolute'></div><div class='message_body'><form>" +
             "<div class='grey_gradient_light_inputs mailer_input_line'><span class='mailer_input_label'>From:</span><input class='mailer_input_field' type='text' name='from' value='"+fromString+"'/></div>" +
-            "<div class='grey_gradient_light_inputs mailer_input_line'><span class='mailer_input_label'>To:</span><input class='mailer_input_field' type='text' name='to' value='"+recipientString+"'/></div>" +
+            "<div class='grey_gradient_light_inputs mailer_input_line'><span class='mailer_input_label'>To:</span><input class='mailer_input_field' type='text' name='to' id='tofield' value='"+recipientString+"'/></div>" +
             "<div class='grey_gradient_light_inputs mailer_input_line'><span class='mailer_input_label'>Subject:</span><input class='mailer_input_field' type='text' name='subject' value='"+subject+"'/></div>" +
             "<textarea name='message' class='grey_gradient_light_inputs'>"+body+"</textarea>" +
             "<input type='hidden' name='users_ids' value='"+ hiddenRecipientString +"'/> " +
@@ -61,6 +61,22 @@ Class.create("AjxpMailer", {
         }
 
         this._mailerPane = $("mailer_message");
+
+        this._autocompleter = new AjxpUsersCompleter(
+            this._mailerPane.down('#tofield'),
+            null,
+            this._mailerPane.down('#emails_autocomplete'),
+            {
+                tmpUsersPrefix:'',
+                usersOnly: true,
+                updateUserEntryAfterCreate:null,
+                createUserPanel:null,
+                indicator: null,
+                minChars:parseInt(ajaxplorer.getPluginConfigs("conf").get("USERS_LIST_COMPLETE_MIN_CHARS"))
+            }
+        );
+
+
         return $("mailer_message");
     },
 

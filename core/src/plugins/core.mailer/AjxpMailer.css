@@ -22,7 +22,7 @@
 .mailer_input_label{
     display: inline-block;
     width: 17%;
-    padding: 5px 3px;
+    padding: 7px 4px;
     background-color: #E2E2E2;
     text-align: right;
     font-weight: bold;
@@ -34,4 +34,22 @@
     margin: 1px !important;
     width: 78% !important;
     display: inline-block !important;
+}
+
+#emails_autocomplete {
+    background-color: white;
+    margin-top: 3px;
+    border: 1px solid #bbb;
+    border-radius: 2px;
+    box-shadow: 1px 1px 11px rgba(0,0,0,0.5);
+}
+
+#emails_autocomplete ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#emails_autocomplete li.complete_user_entry.selected {
+    color: black;
 }
