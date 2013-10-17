@@ -393,7 +393,7 @@ class SvnManager extends AJXP_Plugin
             $logEntry["last_revision"] = $xPath->query("commit/@revision", $entry)->item(0)->value;
             $logEntry["last_revision_author"] = $xPath->query("commit/author", $entry)->item(0)->nodeValue;
             $logEntry["last_revision_date"] = $xPath->query("commit/date", $entry)->item(0)->nodeValue;
-            $logEntry["last_revision_date"] = $xPath->query("size", $entry)->item(0)->nodeValue;
+            $logEntry["last_revision_size"] = $xPath->query("size", $entry)->item(0)->nodeValue;
             $entries[$name] = $logEntry;
         }
         return $entries;
