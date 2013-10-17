@@ -5,6 +5,7 @@
         <global_param name="HASH_MIN_LENGTH" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Minimum length of the generated hash]" label="CONF_MESSAGE[Hash minimum length]" type="integer" default="6"/>
         <global_param name="FILE_MAX_EXPIRATION" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Maximum share expiration limit for file, 0 = unlimited]" label="CONF_MESSAGE[Maximum file expiration limit]" type="integer" default="0" expose="true"/>
         <global_param name="FILE_MAX_DOWNLOAD" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Maximum download limit for file, 0 = unlimited]" label="CONF_MESSAGE[Maximum file download limit]" type="integer" default="0" expose="true"/>
+        <global_param name="EMAIL_INVITE_EXTERNAL" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Use external mailer for invitations]" label="CONF_MESSAGE[Force External Mailer]" type="boolean" default="false" expose="true"/>
         <global_param name="AVOID_SHARED_FOLDER_SAME_LABEL" group="CONF_MESSAGE[Folder Sharing]" description="CONF_MESSAGE[Disallow users to create shared folders if a workspace already exists with the same label]" label="CONF_MESSAGE[Avoid labels duplication]" type="boolean" default="true"/>
         <!--
         <global_param name="SHARED_USERS_LIST_MINIMUM" group="CONF_MESSAGE[Shared users configurations]" description="CONF_MESSAGE[Minimum number of characters to start getting results by auto-completion when sharing a folder with other users]" label="CONF_MESSAGE[Autocomplete minimum chars]" type="integer" default="2" expose="true"/>
@@ -202,7 +203,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div  style="display:none;position:relative;margin-bottom:0;" id="share_result" class="mode-minipub mode-minipriv">
+                            <div  style="display:none;position:relative;margin-bottom:0;" id="share_result" class="">
                                 <div class="dialogContentMainTitle" ajxp_message_id="share_center.29">AJXP_MESSAGE[share_center.29]</div>
                                 <div id="generate_indicator" style="position:absolute;top:2px;right:4px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
                                 <textarea id="share_container" style="padding: 4px;width: 266px;height: 33px;margin:0 10px; font-size:13px;"></textarea>
@@ -258,7 +259,7 @@
                                     <div id="handle_existing_links" class="SF_horizontal_actions SF_horizontal_pastilles"></div>
                                     <div style="clear:left;">
                                         <input type="text" placeholder="Link" name="link_url" id="share_container" class="SF_input SF_number" style="width:230px !important;">
-                                        <input type="text" placeholder="Tags" name="link_tag" value="" class="SF_input SF_number" style="width:93px !important;">
+                                        <input type="text" placeholder="Tag (Enter to save)" name="link_tag" value="" class="SF_input SF_number" style="width:93px !important;">
                                     </div>
                                     <div id="handle_existing_links" class="SF_horizontal_actions">
                                         <span data-action="remove" class="SF_horizontal_action icon-minus-sign"></span>
@@ -317,6 +318,7 @@
                                         <img src="AJXP_THEME_FOLDER/images/actions/16/editdelete.png" height="16" width="16" id="stop_sharing_indicator" valign="middle"> <span>AJXP_MESSAGE[share_center.6]</span>
                                     </div>
                                 </div>
+                                <br style="clear:both;"/>
                             </div>
                             <div id="target_user_title" class="mode-ws" style="margin-top: 25px;">
                                 <div class="dialogContentMainTitle" ajxp_message_id="share_center.30" style="display:none;">AJXP_MESSAGE[share_center.30]</div>
@@ -349,7 +351,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div  style="display:none;position:relative;margin-bottom:0;" id="share_result" class="mode-minipub mode-minipriv">
+                            <div  style="display:none;position:relative;margin-bottom:0;" id="share_result" class="">
                                 <div class="dialogContentMainTitle" ajxp_message_id="share_center.29">AJXP_MESSAGE[share_center.29]</div>
                                 <div id="generate_indicator" style="position:absolute;top:2px;right:4px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
                                 <input type="text" id="share_container" style="width: 317px; margin:0 5px; font-size:13px;"/>

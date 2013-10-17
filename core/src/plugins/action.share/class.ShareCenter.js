@@ -129,6 +129,9 @@ Class.create("ShareCenter", {
                 conn.onComplete = function(transport){
 
                     oForm.down('div#generate_indicator').hide();
+                    if(this.shareFolderMode == 'minisite_public' || this.shareFolderMode == 'minisite_private'){
+                        oForm.down("#share_result").show();
+                    }
                     var response = transport.responseText;
                     if(!response.startsWith('http')){
                         var iResponse = parseInt(response);
@@ -243,6 +246,9 @@ Class.create("ShareCenter", {
             this._currentRepositoryLink = null;
             this._currentRepositoryLabel = null;
             if(nodeMeta.get("ajxp_shared")){
+                if (this.shareFolderMode != 'workspace'){
+                    oForm.down('#share_result').show();
+                }
                 oForm.down('div#share_generate').hide();
                 oForm.down('div#share_unshare').show();
                 oForm.down('#unshare_button').observe("click", this.performUnshareAction.bind(this));
@@ -707,7 +713,7 @@ Class.create("ShareCenter", {
                 }.bind(this));
             }
         }
-        if(ajaxplorer.hasPluginOfType("mailer")){
+        var forceOldSchool = ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("EMAIL_INVITE_EXTERNAL");
             var mailerButton;
             if(dialogButtonsOrRow.hasClassName('SF_horizontal_fieldsRow')){
                 if(!dialogButtonsOrRow.down('#mailer_button')){
@@ -724,6 +730,8 @@ Class.create("ShareCenter", {
                 unShare.insert({after:mailerButton});
                 mailerButton.writeAttribute("title", MessageHash["share_center.41"]);
             }
+
+        if(ajaxplorer.hasPluginOfType("mailer") && !forceOldSchool){
             mailerButton.observe("click", function(event){
                 Event.stop(event);
                 if(shareType == "file"){
@@ -751,14 +759,24 @@ Class.create("ShareCenter", {
                 });
             }.bind(this));
         }else{
-
-            /*
-            // SEND EMAIL THE OLD WAY?
-            var email = oForm.down('a[id="email"]');
-            if (email){
-                email.setAttribute('href', 'mailto:unknown@unknown.com?Subject=UPLOAD&Body='+transport.responseText);
+            var subject = encodeURIComponent(MessageHash["share_center.44"].replace("%s", ajaxplorer.appTitle));
+            var body;
+            if(shareType == 'file'){
+                body = dialogButtonsOrRow.down('[name="link_url"]').getValue();
+                mailerButton.update('<a href="mailto:unknown@unknown.com?Subject='+subject+'&Body='+body+'"> invite</a>');
+            }else{
+                body = this.shareFolderMode != 'workspace' ?  dialogButtonsOrRow.up('.dialogContent').down('#share_container').getValue() : 'A folder was shared with you';
+                mailerButton.down('span').update('<a href="mailto:unknown@unknown.com?Subject='+subject+'&Body='+body+'"> invite</a>');
             }
-            */
+            mailerButton.down('a').observe("click", function(e){
+                var body;
+                if(shareType == 'file'){
+                    body = dialogButtonsOrRow.down('[name="link_url"]').getValue();
+                }else{
+                    body = this.shareFolderMode != 'workspace' ?  dialogButtonsOrRow.up('.dialogContent').down('#share_container').getValue() : 'A folder was shared with you';
+                }
+                e.target.href = 'mailto:unknown@unknown.com?Subject='+subject+'&Body='+body;
+            }.bind(this));
 
         }
     },
