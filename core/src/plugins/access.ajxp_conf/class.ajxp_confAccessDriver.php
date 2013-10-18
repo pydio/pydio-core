@@ -956,7 +956,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 unset($repDef["get_action"]);
                 unset($repDef["sf_checkboxes_active"]);
                 if (isSet($httpVars["json_data"])) {
-                    $options = json_decode($httpVars["json_data"], true);
+                    $repDef = json_decode($httpVars["json_data"], true);
+                    $options = $repDef["DRIVER_OPTIONS"];
                 } else {
                     $options = array();
                     $this->parseParameters($repDef, $options, null, true);
