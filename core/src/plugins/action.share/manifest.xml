@@ -325,6 +325,7 @@
                                 <div class="dialogLegend" style="margin:0 5px;" ajxp_message_id="share_center.26">AJXP_MESSAGE[share_center.26]</div>
                             </div>
                             <div id="target_user" style="margin:0 5px;position:relative;display:none;" class="mode-ws mode-minipriv">
+                                <div style="clear: both; margin-top:20px;" class="mode-minipriv">&nbsp;</div>
                                 <div class="editable_users_header">
                                     <span id="header_read" ajxp_message_id="share_center.31">AJXP_MESSAGE[share_center.31]</span>
                                     <span id="header_write" ajxp_message_id="share_center.32">AJXP_MESSAGE[share_center.32]</span>

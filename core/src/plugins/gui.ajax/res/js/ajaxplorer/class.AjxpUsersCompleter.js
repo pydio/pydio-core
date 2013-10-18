@@ -74,11 +74,12 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
         {
             paramName:'value',
             tokens:[',', '\n'],
-            frequency:0.1,
+            frequency:0.25,
             tmpUsersPrefix:'',
             updateUserEntryAfterCreate:null,
             createUserPanel:null,
             usersOnly: false,
+            existingOnly: false,
             afterUpdateElement: function(element, selectedLi){
                 if(listElement){
 
@@ -142,6 +143,9 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
         this.url                   = this.options.url || window.ajxpServerAccessPath + "&get_action=user_list_authorized_users";
         if(this.options.usersOnly){
             this.url += '&users_only=true';
+        }
+        if(this.options.existingOnly){
+            this.url += '&existing_only=true';
         }
 
         if(listElement){

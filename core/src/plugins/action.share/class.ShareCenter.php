@@ -1096,10 +1096,12 @@ class ShareCenter extends AJXP_Plugin
                     return 102;
                 }
             } else {
-                if ( !ConfService::getCoreConf("ALLOW_NEWUSERS_SHARING", "conf") || AuthService::isReservedUserId($userName)) {
+                if ( ($httpVars["create_guest_user"] != "true" && !ConfService::getCoreConf("ALLOW_NEWUSERS_SHARING", "conf")) || AuthService::isReservedUserId($userName)) {
                     return 102;
                 }
-                if(!isSet($httpVars["shared_pass"]) || $httpVars["shared_pass"] == "") return 100;
+                if (!isSet($httpVars["shared_pass"]) || $httpVars["shared_pass"] == "") {
+                    return 100;
+                }
             }
         }
 

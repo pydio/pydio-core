@@ -92,8 +92,9 @@ class AjxpMailer extends AJXP_Plugin
 
         $mailer = array_pop($mailers);
 
-        $toUsers = array_merge(explode(",", $httpVars["users_ids"]), explode(",", $httpVars["to"]));
-        $toGroups =  explode(",", $httpVars["groups_ids"]);
+        //$toUsers = array_merge(explode(",", $httpVars["users_ids"]), explode(",", $httpVars["to"]));
+        //$toGroups =  explode(",", $httpVars["groups_ids"]);
+        $toUsers = $httpVars["emails"];
 
         $emails = $this->resolveAdresses($toUsers);
         $from = $this->resolveFrom($httpVars["from"]);

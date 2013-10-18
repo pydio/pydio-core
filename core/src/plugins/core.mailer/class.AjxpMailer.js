@@ -27,40 +27,52 @@ Class.create("AjxpMailer", {
         res.loadCSSResource("plugins/core.mailer/AjxpMailer.css");
     },
 
+    selectedLoginToSpan: function(loginLabel, entryId, isGroup){
+        var field = this._mailerPane.down('#tofield');
+        var fieldParent = this._mailerPane.down('.mailer_tofield_line');
+        var el = new Element('span', {
+            className:'user',
+            'data-entry_id':entryId,
+            'data-is_group':isGroup
+        }).update(loginLabel+'<span class="icon-remove"></span>');
+
+        field.insert({before: el});
+        el.down('.icon-remove').observe('click', el.remove.bind(el));
+        field.setValue('');
+        var offset = Element.positionedOffset(field);
+        var height = fieldParent.getHeight() - parseInt(fieldParent.getStyle('marginBottom')) - parseInt(fieldParent.getStyle('marginTop')) - 5;
+        if(!fieldParent.ORIGINAL_HEIGHT) fieldParent.ORIGINAL_HEIGHT = fieldParent.getHeight();
+        if(offset.top >= height ){
+            fieldParent.setStyle({height: (parseInt(fieldParent.getHeight()) + fieldParent.ORIGINAL_HEIGHT ) + 'px'});
+        }else if(offset.top < (height - fieldParent.ORIGINAL_HEIGHT) ){
+            fieldParent.setStyle({height: (parseInt(fieldParent.getHeight()) - fieldParent.ORIGINAL_HEIGHT ) + 'px'});
+        }
+        field.focus();
+    },
+
     buildMailPane:function(subject, body, recipientsList, paneTitle){
         if(!$("mailer_message")){
             $(document.body).insert("<div id='mailer_message'></div>");
         }
-        var recipientString = '';
-        var hiddenRecipientString = [];
-        var hiddenGroupsString = [];
-        if(recipientsList){
-            recipientsList.select("div.user_entry").each(function(el){
-                recipientString += el.down("span.user_entry_label").innerHTML + ", ";
-                if(el.hasClassName("group_entry")){
-                    hiddenGroupsString.push(el.getAttribute("data-entry_id"));
-                }else{
-                    hiddenRecipientString.push(el.getAttribute("data-entry_id"));
-                }
-            });
-            recipientString = recipientString.substring(0, recipientString.length-2);
-            hiddenGroupsString = hiddenGroupsString.join(",");
-            hiddenRecipientString = hiddenRecipientString.join(",");
-        }
         var fromString = ajaxplorer.user.id;
-        $("mailer_message").update("<div id='mailer_message' style='position: relative;'><div id='emails_autocomplete' style='position:absolute'></div><div class='message_body'><form>" +
+        $("mailer_message").update("<div id='mailer_message' style='position: relative;'><div id='emails_autocomplete' style='position:absolute;z-index:1200;'></div><div class='message_body'><form>" +
             "<div class='grey_gradient_light_inputs mailer_input_line'><span class='mailer_input_label'>From:</span><input class='mailer_input_field' type='text' name='from' value='"+fromString+"'/></div>" +
-            "<div class='grey_gradient_light_inputs mailer_input_line'><span class='mailer_input_label'>To:</span><input class='mailer_input_field' type='text' name='to' id='tofield' value='"+recipientString+"'/></div>" +
+            "<div class='grey_gradient_light_inputs mailer_input_line mailer_tofield_line'><span class='mailer_input_label' style='float: left;'>To:</span><input class='mailer_input_field' type='text' name='to' id='tofield' value=''/></div>" +
             "<div class='grey_gradient_light_inputs mailer_input_line'><span class='mailer_input_label'>Subject:</span><input class='mailer_input_field' type='text' name='subject' value='"+subject+"'/></div>" +
             "<textarea name='message' class='grey_gradient_light_inputs'>"+body+"</textarea>" +
-            "<input type='hidden' name='users_ids' value='"+ hiddenRecipientString +"'/> " +
-            "<input type='hidden' name='groups_ids' value='"+ hiddenGroupsString +"'/> " +
             "</form></div></div>");
         if(paneTitle){
             $("mailer_message").insert({top:new Element("div", {className:"dialogContentMainTitle"}).update(paneTitle)});
         }
 
         this._mailerPane = $("mailer_message");
+
+        if(recipientsList){
+            recipientsList.select("div.user_entry").each(function(el){
+                var loginLabel = el.down("span.user_entry_label").innerHTML;
+                this.selectedLoginToSpan(loginLabel, el.getAttribute("data-entry_id"), el.hasClassName("group_entry"));
+            }.bind(this));
+        }
 
         this._autocompleter = new AjxpUsersCompleter(
             this._mailerPane.down('#tofield'),
@@ -69,10 +81,17 @@ Class.create("AjxpMailer", {
             {
                 tmpUsersPrefix:'',
                 usersOnly: true,
+                existingOnly: true,
                 updateUserEntryAfterCreate:null,
                 createUserPanel:null,
                 indicator: null,
-                minChars:parseInt(ajaxplorer.getPluginConfigs("conf").get("USERS_LIST_COMPLETE_MIN_CHARS"))
+                minChars:parseInt(ajaxplorer.getPluginConfigs("conf").get("USERS_LIST_COMPLETE_MIN_CHARS")),
+                afterUpdateElement: function(elem, selectedLi){
+                    this.selectedLoginToSpan(
+                        selectedLi.readAttribute('data-label'),
+                        selectedLi.readAttribute('data-entry_id'),
+                        selectedLi.hasClassName('group_entry'));
+                }.bind(this)
             }
         );
 
@@ -85,6 +104,11 @@ Class.create("AjxpMailer", {
         this._mailerPane.down("form").getElements().each(function(el){
             params.set(el.name, el.getValue());
         });
+        var aa = [];
+        this._mailerPane.down(".mailer_tofield_line").select('span.user').each(function(el){
+            aa.push(el.readAttribute('data-entry_id'));
+        });
+        params.set('emails[]', aa);
         var connexion = new Connexion();
         connexion.setMethod("post");
         connexion.setParameters(params);
