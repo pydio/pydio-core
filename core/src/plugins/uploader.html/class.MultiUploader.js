@@ -95,22 +95,22 @@ Class.create("MultiUploader", {
 		// FIX IE DISPLAY BUG
 		if(Prototype.Browser.IE){
 			$('fileInputContainerDiv').insert($('uploadBrowseButton'));
-			$('fileInputContainerDiv').insert($('uploadSendButton'));
+			//$('fileInputContainerDiv').insert($('uploadSendButton'));
 			$('uploadBrowseButton').show();
-			$('uploadSendButton').show();
+			//$('uploadSendButton').show();
 		}
         if(Prototype.Browser.IE){
             modal.closeValidation = function(){
                 $(document.body).insert($('uploadBrowseButton'));
-                $(document.body).insert($('uploadSendButton'));
+                //$(document.body).insert($('uploadSendButton'));
                 $('uploadBrowseButton').hide();
-                $('uploadSendButton').hide();
+                //$('uploadSendButton').hide();
                 return true;
             };
         }
 		// ATTACH LISTENERS ON BUTTONS (once only, that for the "observerSet")
-		var sendButton = formObject.down('#uploadSendButton');
-		if(sendButton.observerSet) return;		
+		this.sendButton = formObject.down('#uploadSendButton');
+		if(this.sendButton.observerSet) return;
 		var optionsButton = formObject.down('#uploadOptionsButton');
 		var closeButton = formObject.down('#uploadCloseButton');
         if(formObject.down('#uploader_options_pane')){
@@ -119,8 +119,8 @@ Class.create("MultiUploader", {
         if(formObject.down('#clear_list_button')){
             formObject.down('#clear_list_button').hide();
         }
-		sendButton.observerSet = true;
-		sendButton.observe("click", function(){
+		this.sendButton.observerSet = true;
+		this.sendButton.observe("click", function(){
 			ajaxplorer.actionBar.multi_selector.submitMainForm();
 		});
 		optionsButton.observe("click", function(){
@@ -268,8 +268,8 @@ Class.create("MultiUploader", {
 		new_row.appendChild(document.createTextNode(value));
 		// Add it to the list
 		this.list_target.appendChild( new_row );
-		
-	},
+        this.sendButton.removeClassName("disabled");
+    },
 	
 	getFileNames : function(){
 		
