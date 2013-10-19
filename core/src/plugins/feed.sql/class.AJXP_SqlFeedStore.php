@@ -62,7 +62,21 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         try {
-            dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[repository_owner],[user_group],[repository_scope],[content]) VALUES (%i,%s,%s,%s,%s,%s,%s,%s,%bin)", time(), "event", $hookName, $userId, $repositoryId, $repositoryOwner, $userGroup, ($repositoryScope !== false ? $repositoryScope : "ALL"), serialize($data));
+            $node = null;
+            if(is_object($data[1]) && is_a($data[1], "AJXP_Node")) $node = $data[1];
+            else if(is_object($data[0]) && is_a($data[0], "AJXP_Node")) $node = $data[0];
+            dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[repository_owner],[user_group],[repository_scope],[content],[index_path]) VALUES (%i,%s,%s,%s,%s,%s,%s,%s,%bin,%s)",
+                time(),
+                "event",
+                $hookName,
+                $userId,
+                $repositoryId,
+                $repositoryOwner,
+                $userGroup,
+                ($repositoryScope !== false ? $repositoryScope : "ALL"),
+                serialize($data),
+                ($node!=null ? $node->getUrl():'')
+            );
         } catch (DibiException $e) {
             $this->logError("DibiException", "trying to persist event", $e->getMessage());
         }
@@ -117,8 +131,15 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         try {
-            dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[content]) VALUES (%i,%s,%s,%s,%s,%bin)",
-            time(), "alert", "notification", $userId, $repositoryId, serialize($notif));
+            dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[content], [index_path]) VALUES (%i,%s,%s,%s,%s,%bin,%s)",
+                time(),
+                "alert",
+                "notification",
+                $userId,
+                $repositoryId,
+                serialize($notif),
+                ($notif->getNode()!=null ? $notif->getNode()->getUrl():'')
+            );
         } catch (DibiException $e) {
             $this->logError("DibiException", "trying to persist alert", $e->getMessage());
         }
@@ -172,9 +193,31 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
             $startEventNotif = unserialize($startEventRow->content);
             $url = $startEventNotif->getNode()->getUrl();
             $date = $startEventRow->edate;
-            $newRes = dibi::query("SELECT [id] FROM [ajxp_feed] WHERE [etype] = %s AND [user_id] = %s AND [edate] <= %s AND content LIKE %~like~ ORDER BY [edate] DESC %lmt", "alert", $userId, $date, "\"$url\"", $occurrences);
+            $newRes = dibi::query("SELECT [id] FROM [ajxp_feed] WHERE [etype] = %s AND [user_id] = %s AND [edate] <= %s AND [index_path] = %s ORDER BY [edate] DESC %lmt", "alert", $userId, $date, $url, $occurrences);
             $a = $newRes->fetchPairs();
+            if (!count($a)) {
+                // Weird, probably not upgraded!
+                $this->upgradeAlertsContentToIndexPath();
+            }
             dibi::query("DELETE FROM [ajxp_feed] WHERE [id] IN %in",  $a);
+        }
+    }
+
+
+    public function upgradeAlertsContentToIndexPath()
+    {
+        // Load alerts with empty index_path
+        $res = dibi::query("SELECT [id],[content],[index_path] FROM [ajxp_feed] WHERE [etype] = %s AND [index_path] IS NULL", "alert");
+        foreach ($res as $row) {
+            $test = unserialize($row->content);
+            if (is_a($test, "AJXP_Notification")) {
+                $url = $test->getNode()->getUrl();
+                try {
+                    dibi::query("UPDATE [ajxp_feed] SET [index_path]=%s WHERE [id] = %i", $url, $row->id);
+                } catch (Exception $e) {
+                    $this->logError("[sql]", $e->getMessage());
+                }
+            }
         }
     }
 
