@@ -512,11 +512,15 @@ Class.create("AjxpTabulator", AjxpPane, {
 
     clearState: function(){
         this.tabulatorData.each(function(tabInfo){
-            var ajxpObject = this.getAndSetAjxpObject(tabInfo);
-            if(ajxpObject.clearStateData){
-                ajxpObject.clearStateData();
+            try{
+                var ajxpObject = this.getAndSetAjxpObject(tabInfo);
+                if(ajxpObject.clearStateData){
+                    ajxpObject.clearStateData();
+                }
+                this.closeTab(tabInfo.id, true);
+            }catch(e){
+
             }
-            this.closeTab(tabInfo.id, true);
         }.bind(this));
     }
 

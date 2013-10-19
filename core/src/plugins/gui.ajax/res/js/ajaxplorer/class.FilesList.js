@@ -1198,12 +1198,22 @@ Class.create("FilesList", SelectableElements, {
                     }
                 }
                 item.ajxpNode = null;
-                new Effect.Fade(item, {afterFinish:function(){
-                    try{item.remove();}catch(e){}
-                    delete item;
-                    this.initRowsBuffered();
-                    //this.initRows();
-                }.bind(this), duration:0.2});
+                if(Prototype.Browser.IE && Prototype.Version.startsWith('1.6')){
+                    window.setTimeout(function(){
+                        item.remove();
+                        delete item;
+                        this.initRowsBuffered();
+                    }.bind(this), 10);
+                }else{
+                    new Effect.Fade(item, {afterFinish:function(){
+                        try{
+                            item.remove();
+                        }catch(e){if(console) console.log(e);}
+                        delete item;
+                        this.initRowsBuffered();
+                    }.bind(this), duration:0.2});
+
+                }
                 /*
                 item.remove();
                 delete item;

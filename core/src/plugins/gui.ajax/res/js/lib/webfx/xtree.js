@@ -306,9 +306,9 @@ WebFXTreeAbstractNode.prototype.toggle = function() {
 
 WebFXTreeAbstractNode.prototype.select = function() {
 	if($(this.id + '-anchor')) {
-        $(this.id + '-anchor').focus();
-        webFXTreeHandler.focus(this);
         try{
+            $(this.id + '-anchor').focus();
+            webFXTreeHandler.focus(this);
             if(!this.scrollContainer){
                 var root = this;
                 while (root.parentNode) { root = root.parentNode; }
@@ -494,7 +494,7 @@ WebFXTree.prototype.expand = function() {
 } ;
 
 WebFXTree.prototype.collapse = function(b) {
-	if (!b) { this.focus(); }
+	if (!b) { try{this.focus();}catch(e){} }
 	this.doCollapse();
 } ;
 
@@ -640,7 +640,7 @@ WebFXTreeItem.prototype.expand = function() {
 };
 
 WebFXTreeItem.prototype.collapse = function(b) {
-	if (!b) { this.focus(); }
+	if (!b) { try{this.focus();}catch(e){} }
 	this.doCollapse();
 	if($(this.id + '-plus')) $(this.id + '-plus').src = this.plusIcon;
 };

@@ -351,7 +351,7 @@ SelectableElements = Class.create({
 	    if(!this._fireChange)
 	    	return;
 	    if(typeof this.ondblclick == "string" && this.ondblclick != "")
-	    	this.ondblclick = new Funtion(this.ondblclick);
+	    	this.ondblclick = new Function(this.ondblclick);
 	    if(typeof this.ondblclick == "function")
 	    	this.ondblclick();
 	},
@@ -360,12 +360,33 @@ SelectableElements = Class.create({
 		//alert('Dbl Click!');
 		this.fireDblClick();
 	},
+
+    previousEventTime: null,
+    previousEventTarget: null,
+    ie10detailFilter : function(e){
+        if(!Prototype.Browser.IE10plus){
+            return true;
+        }
+        var result = true;
+        if(!this.previousEventTime){
+            result = false;
+        }
+        if(e.timeStamp - this.previousEventTime > 300 && e.target != this.previousEventTarget){
+            result = false;
+        }
+        this.previousEventTarget = e.target;
+        this.previousEventTime = e.timeStamp;
+        return result;
+    },
 	
 	click: function (e) {
 		if(e.detail && e.detail > 1)
-		{ 
-			this.fireDblClick();
+		{
+            if(this.ie10detailFilter(e)){
+                this.fireDblClick();
+            }
 		}
+
 		var oldFireChange = this._fireChange;
 		this._fireChange = false;
 

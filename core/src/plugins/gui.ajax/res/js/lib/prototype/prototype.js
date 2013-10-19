@@ -16,6 +16,7 @@ var Prototype = {
     return {
       IE:             !!window.attachEvent && !isOpera,
       IE10:           ua.indexOf('MSIE 10') > -1,
+      IE10plus:       ua.indexOf('MSIE 10') > -1 || ua.indexOf('MSIE 11') > -1 || ua.indexOf('MSIE 12') > -1 || ua.indexOf('MSIE 13') > -1,
       Opera:          isOpera,
       WebKit:         ua.indexOf('AppleWebKit/') > -1,
       Gecko:          ua.indexOf('Gecko') > -1 && ua.indexOf('KHTML') === -1,

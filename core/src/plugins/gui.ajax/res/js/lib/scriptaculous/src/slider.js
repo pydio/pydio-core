@@ -139,9 +139,13 @@ Control.Slider = Class.create({
     this.values[handleIdx] = sliderValue;
     this.value = this.values[0]; // assure backwards compat
     
-    this.handles[handleIdx].style[this.isVertical() ? 'top' : 'left'] = 
-      this.translateToPx(sliderValue);
-    
+    //this.handles[handleIdx].style[this.isVertical() ? 'top' : 'left'] = this.translateToPx(sliderValue);
+      if(handleIdx && this.handles[handleIdx]){
+          var style = {};
+          style[this.isVertical() ? 'top' : 'left'] = this.translateToPx(sliderValue);
+          this.handles[handleIdx].setStyle(style);
+      }
+
     this.drawSpans();
     if (!this.dragging || !this.event) this.updateFinished();
   },
