@@ -113,7 +113,7 @@ Class.create("AjxpDataModel", {
                 }else{
                     if(ajxpNode.getMetadata().get("paginationData") && arguments.length < 3){
                         var newPage;
-                        var currentPage = ajxpNode.getMetadata().get("current");
+                        var currentPage = ajxpNode.getMetadata().get("paginationData").get("current");
                         this.loadPathInfoSync(selPath, function(foundNode){
                             newPage = foundNode.getMetadata().get("page_position");
                         });
