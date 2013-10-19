@@ -10,6 +10,7 @@
     </client_settings>
 	<server_settings>
 		<param name="LDAP_URL" type="string" label="CONF_MESSAGE[LDAP URL]" description="CONF_MESSAGE[LDAP Server URL (IP or name)]" mandatory="true"/>
+		<param name="LDAP_PROTOCOL" type="select" choices="ldap|Standard (ldap),ldaps|SSL (ldaps)" default="ldap" label="CONF_MESSAGE[Protocol]" description="CONF_MESSAGE[Connect through ldap or ldaps]" mandatory="true"/>
 		<param name="LDAP_PORT" type="string" label="CONF_MESSAGE[LDAP Port]" description="CONF_MESSAGE[LDAP Server Port (leave blank for default)]" mandatory="false"/>
 		<param name="LDAP_USER" type="string" label="CONF_MESSAGE[LDAP bind username]" description="CONF_MESSAGE[Username (uid + dn) of LDAP bind user]" mandatory="false"/>
 		<param name="LDAP_PASSWORD" type="string" label="CONF_MESSAGE[LDAP bind password]" description="CONF_MESSAGE[Password of LDAP bind user]" mandatory="false"/>

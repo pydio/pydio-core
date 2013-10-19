@@ -63,6 +63,9 @@ class ldapAuthDriver extends AbstractAuthDriver
         parent::init($options);
         $options = $this->options;
         $this->ldapUrl = $options["LDAP_URL"];
+        if (isSet($options["LDAP_PROTOCOL"]) && $options["LDAP_PROTOCOL"] == "ldaps") {
+            $this->ldapUrl = "ldaps://".$this->ldapUrl;
+        }
         if ($options["LDAP_PORT"]) $this->ldapPort = $options["LDAP_PORT"];
         if ($options["LDAP_USER"]) $this->ldapAdminUsername = $options["LDAP_USER"];
         if ($options["LDAP_PASSWORD"]) $this->ldapAdminPassword = $options["LDAP_PASSWORD"];
@@ -137,6 +140,9 @@ class ldapAuthDriver extends AbstractAuthDriver
     public function testLDAPConnexion($options)
     {
         $this->ldapUrl = $options["LDAP_URL"];
+        if (isSet($options["LDAP_PROTOCOL"]) && $options["LDAP_PROTOCOL"] == "ldaps") {
+            $this->ldapUrl = "ldaps://".$this->ldapUrl;
+        }
         if ($options["LDAP_PORT"]) $this->ldapPort = $options["LDAP_PORT"];
         if ($options["LDAP_USER"]) $this->ldapAdminUsername = $options["LDAP_USER"];
         if ($options["LDAP_PASSWORD"]) $this->ldapAdminPassword = $options["LDAP_PASSWORD"];
