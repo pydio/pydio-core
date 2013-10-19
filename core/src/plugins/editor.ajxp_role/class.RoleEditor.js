@@ -277,7 +277,7 @@ Class.create("RoleEditor", AbstractEditor, {
             var defs = [
                 $H({"name":"login",label:MessageHash["ajxp_role_editor.21"],"type":"string", default:getBaseName(node.getPath()), readonly:true}),
                 $H({"name":"profile",label:MessageHash["ajxp_role_editor.22"],"type":"select", choices:profilesChoices, default:this.roleData.USER.PROFILE}),
-                $H({"name":"default_repository",label:MessageHash["ajxp_role_editor.23"],"type":"select", choices:repos.join(","),default:this.roleData.USER.DEFAULT_REPOSITORY}),
+                //$H({"name":"default_repository",label:MessageHash["ajxp_role_editor.23"],"type":"select", choices:repos.join(","),default:this.roleData.USER.DEFAULT_REPOSITORY}),
                 $H({"name":"roles",label:MessageHash["ajxp_role_editor.24"],"type":"select", multiple:true, choices:rolesChoicesString, default:this.roleData.USER.ROLES.join(",")})
             ];
             defs = $A(defs);
@@ -291,22 +291,6 @@ Class.create("RoleEditor", AbstractEditor, {
                 this.updateRoleAccumulator = window.setTimeout(function(){
                     this.updateRoles(rolesSelect.getValue());
                 }.bind(this) , 500);
-            }.bind(this) );
-
-            var defaultRepoSelect = this.element.down("#pane-infos").down("#account_infos").down('select[name="default_repository"]');
-            defaultRepoSelect.observe("change", function(){
-                var conn = new Connexion();
-                conn.setParameters(new Hash({
-                    get_action:'save_user_preference',
-                    user_id:this.roleId.replace("AJXP_USR_/", ""),
-                    pref_name_0:'force_default_repository',
-                    pref_value_0:defaultRepoSelect.getValue()
-                }));
-                conn.onComplete = function(transport){
-                    ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
-                    this.setClean();
-                }.bind(this);
-                conn.sendAsync();
             }.bind(this) );
 
             // BUTTONS
@@ -571,7 +555,6 @@ Class.create("RoleEditor", AbstractEditor, {
         var repositories = this.roleData.ALL.REPOSITORIES;
         if(!Object.keys(repositories).length) return;
         //repositories.sortBy(function(element) {return XPathGetSingleNodeText(element, "label");});
-        //var defaultRepository = XPathGetSingleNodeText(xmlData, '//pref[@name="force_default_repository"]/@value');
    		for(var repoId in repositories){
    			var repoLabel = repositories[repoId];
    			var readBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_read'});

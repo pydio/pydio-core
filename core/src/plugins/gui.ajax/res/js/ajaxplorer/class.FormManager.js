@@ -203,6 +203,13 @@ Class.create("FormManager", {
                         for(var key in object){
                             choices.push(key + "|" + object[key]);
                         }
+                    }else if(param.get("choices") == "AJXP_AVAILABLE_REPOSITORIES"){
+                        choices = [];
+                        if(ajaxplorer.user){
+                            ajaxplorer.user.repositories.each(function(pair){
+                                choices.push(pair.value.getId() + '|' + pair.value.getLabel());
+                            });
+                        }
                     }else{
                         choices = param.get('choices').split(",");
                     }

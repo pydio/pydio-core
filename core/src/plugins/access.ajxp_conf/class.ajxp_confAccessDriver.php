@@ -501,7 +501,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     if (isSet($userObject)) {
                         $data["USER"] = array();
                         $data["USER"]["LOCK"] = $userObject->getLock();
-                        $data["USER"]["DEFAULT_REPOSITORY"] = $userObject->getPref("force_default_repository");
                         $data["USER"]["PROFILE"] = $userObject->getProfile();
                         $data["ALL"]["PROFILES"] = array("standard|Standard","admin|Administrator","shared|Shared","guest|Guest");
                         $data["USER"]["ROLES"] = array_keys($userObject->getRoles());

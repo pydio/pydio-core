@@ -70,7 +70,7 @@ class AbstractAuthDriver extends AJXP_Plugin
                 }
                 $loggedUser = AuthService::getLoggedUser();
                 if ($loggedUser != null) {
-                       $force = $loggedUser->getPref("force_default_repository");
+                       $force = $loggedUser->mergedRole->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
                        $passId = -1;
                        if (isSet($httpVars["tmp_repository_id"])) {
                            $passId = $httpVars["tmp_repository_id"];
