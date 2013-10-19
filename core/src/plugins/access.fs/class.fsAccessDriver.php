@@ -499,7 +499,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 //$reloadContextNode = true;
                 //$pendingSelection = $filename_new;
                 if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
-                if($dest == null) $dest = dirname($file);
+                if($dest == null) $dest = AJXP_Utils::safeDirname($file);
                 $nodesDiffs["UPDATE"][$file] = new AJXP_Node($this->urlBase.$dest."/".$filename_new);
                 $this->logInfo("Rename", array("original"=>$this->addSlugToPath($file), "new"=>$filename_new));
 

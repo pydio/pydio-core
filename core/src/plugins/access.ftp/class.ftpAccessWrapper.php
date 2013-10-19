@@ -200,8 +200,8 @@ class ftpAccessWrapper implements AjxpWrapper
     {
         // We are in an opendir loop
         AJXP_Logger::debug(__CLASS__,__FUNCTION__,"URL_STAT", $path);
-        if (self::$dirContent != null && self::$dirContentLoopPath == $this->safeDirname($path)) {
-            $search = $this->safeBasename($path);
+        if (self::$dirContent != null && self::$dirContentLoopPath == AJXP_Utils::safeDirname($path)) {
+            $search = AJXP_Utils::safeBasename($path);
             //if($search == "") $search = ".";
             if (array_key_exists($search, self::$dirContent)) {
                 return self::$dirContent[$search];
@@ -213,10 +213,10 @@ class ftpAccessWrapper implements AjxpWrapper
         if ($parts["path"] == "/") {
             $basename = ".";
         } else {
-            $basename = $this->safeBasename($serverPath);
+            $basename = AJXP_Utils::safeBasename($serverPath);
         }
 
-        $serverParent = $this->safeDirname($parts["path"]);
+        $serverParent = AJXP_Utils::safeDirname($parts["path"]);
         $serverParent = AJXP_Utils::securePath($this->path."/".$serverParent);
 
         $testCd = @ftp_chdir($link, $serverPath);
@@ -270,7 +270,7 @@ class ftpAccessWrapper implements AjxpWrapper
                $folders[$key] = $value;
            }
            AJXP_Logger::debug(__CLASS__,__FUNCTION__,"OPENDIR ", $folders);
-        self::$dirContentLoopPath = $this->safeDirname($url);
+        self::$dirContentLoopPath = AJXP_Utils::safeDirname($url);
         self::$dirContent = $folders;//array_merge($folders, $files);
         self::$dirContentKeys = array_keys(self::$dirContent);
         self::$dirContentIndex = 0;
@@ -304,8 +304,8 @@ class ftpAccessWrapper implements AjxpWrapper
     protected function rawList($link, $serverPath, $target = 'd', $retry = true)
     {
         if ($target == 'f') {
-            $parentDir = $this->safeDirname($serverPath);
-            $fileName = $this->safeBasename($serverPath);
+            $parentDir = AJXP_Utils::safeDirname($serverPath);
+            $fileName = AJXP_Utils::safeBasename($serverPath);
             ftp_chdir($link, $parentDir);
             $rl_dirlist = @ftp_rawlist($link, "-a .");
             //AJXP_Logger::debug(__CLASS__,__FUNCTION__,"FILE RAWLIST FROM ".$parentDir);
@@ -568,16 +568,6 @@ class ftpAccessWrapper implements AjxpWrapper
 
         $mode = (string) ("0".$mode);
         return  $mode;
-    }
-
-    protected function safeDirname($path)
-    {
-        return (DIRECTORY_SEPARATOR === "\\" ? str_replace("\\", "/", dirname($path)): dirname($path));
-    }
-
-    protected function safeBasename($path)
-    {
-        return (DIRECTORY_SEPARATOR === "\\" ? str_replace("\\", "/", basename($path)): basename($path));
     }
 
 }

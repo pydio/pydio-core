@@ -111,6 +111,17 @@ class AJXP_Utils
         return $path;
     }
 
+    public static function safeDirname($path)
+    {
+        return (DIRECTORY_SEPARATOR === "\\" ? str_replace("\\", "/", dirname($path)): dirname($path));
+    }
+
+    public static function safeBasename($path)
+    {
+        return (DIRECTORY_SEPARATOR === "\\" ? str_replace("\\", "/", basename($path)): basename($path));
+    }
+
+
     /**
      * Function to clean a string from specific characters
      *
