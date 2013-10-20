@@ -513,24 +513,28 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     $driver = false;
                 }
 
+
                 if (isSet($httpVars["bm_action"]) && isset($httpVars["bm_path"])) {
+                    $bmPath = AJXP_Utils::decodeSecureMagic($httpVars["bm_path"]);
+
                     if ($httpVars["bm_action"] == "add_bookmark") {
                         $title = "";
-                        if(isSet($httpVars["bm_title"])) $title = $httpVars["bm_title"];
-                        if($title == "" && $httpVars["bm_path"]=="/") $title = ConfService::getCurrentRootDirDisplay();
-                        $bmUser->addBookMark(SystemTextEncoding::magicDequote($httpVars["bm_path"]), SystemTextEncoding::magicDequote($title));
+                        if(isSet($httpVars["bm_title"])) $title = AJXP_Utils::decodeSecureMagic($httpVars["bm_title"]);
+                        if($title == "" && $bmPath=="/") $title = ConfService::getCurrentRootDirDisplay();
+                        $bmUser->addBookMark($bmPath, $title);
                         if ($driver) {
-                            $node = new AJXP_Node($driver->getResourceUrl(SystemTextEncoding::magicDequote($httpVars["bm_path"])));
+                            $node = new AJXP_Node($driver->getResourceUrl($bmPath));
                             $node->setMetadata("ajxp_bookmarked", array("ajxp_bookmarked" => "true"), true, AJXP_METADATA_SCOPE_REPOSITORY, true);
                         }
                     } else if ($httpVars["bm_action"] == "delete_bookmark") {
-                        $bmUser->removeBookmark($httpVars["bm_path"]);
+                        $bmUser->removeBookmark($bmPath);
                         if ($driver) {
-                            $node = new AJXP_Node($driver->getResourceUrl(SystemTextEncoding::magicDequote($httpVars["bm_path"])));
+                            $node = new AJXP_Node($driver->getResourceUrl($bmPath));
                             $node->removeMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
                         }
                     } else if ($httpVars["bm_action"] == "rename_bookmark" && isset($httpVars["bm_title"])) {
-                        $bmUser->renameBookmark($httpVars["bm_path"], $httpVars["bm_title"]);
+                        $title = AJXP_Utils::decodeSecureMagic($httpVars["bm_title"]);
+                        $bmUser->renameBookmark($bmPath, $title);
                     }
                     AJXP_Controller::applyHook("msg.instant", array("<reload_bookmarks/>", ConfService::getRepository()->getId()));
 

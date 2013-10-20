@@ -935,7 +935,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 foreach ($repositories as $repo) {
                     if(!$repo->isTemplate) continue;
                     $repoId = $repo->getId();
-                    $repoLabel = $repo->getDisplay();
+                    $repoLabel = SystemTextEncoding::toUTF8($repo->getDisplay());
                     $repoType = $repo->getAccessType();
                     print("<template repository_id=\"$repoId\" repository_label=\"$repoLabel\" repository_type=\"$repoType\">");
                     foreach ($repo->getOptionsDefined() as $optionName) {

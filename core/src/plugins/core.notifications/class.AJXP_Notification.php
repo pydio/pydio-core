@@ -84,6 +84,7 @@ class AJXP_Notification
 
     protected function replaceVars($tplString, $mess, $rich = true)
     {
+        $tplString = SystemTextEncoding::fromUTF8($tplString);
         $repoId = $this->getNode()->getRepositoryId();
         if (ConfService::getRepositoryById($repoId) != null) {
             $repoLabel = ConfService::getRepositoryById($repoId)->getDisplay();
