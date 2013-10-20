@@ -68,9 +68,21 @@ Class.create("UserWidget", {
                 var label = '<ajxp:message ajxp_message_id="142">'+MessageHash[142]+'</ajxp:message><i ajxp_message_title_id="189" title="'+MessageHash[189]+'">'+ oUser.id +' </i>';
                 if(oUser.getPreference('USER_DISPLAY_NAME')){
                     var img = '';
+					var imgSrc = '';
+					var conn = new Connexion();
                     if(oUser.getPreference("avatar")){
-                        var conn = new Connexion();
-                        var imgSrc = conn._baseUrl + "&get_action=get_binary_param&binary_id=" + oUser.getPreference("avatar") + "&user_id=" + oUser.id;
+                        imgSrc = conn._baseUrl + "&get_action=get_binary_param&binary_id=" + oUser.getPreference("avatar") + "&user_id=" + oUser.id;
+                    } else {
+                        // Get avatar from avatar plugins
+						conn.addParameter('get_action', 'get_avatar');
+						conn.addParameter('userid', oUser.id);
+						conn.onComplete = function(transport){
+							imgSrc = transport.responseText;
+						}
+						conn.sendSync();
+                    }
+
+                    if (imgSrc != '') {
                         img = '<img src="'+imgSrc+'" alt="avatar" class="user_widget_mini">';
                     }
                     label = '<i ajxp_message_title_id="189" title="'+MessageHash[189]+'">' + img + oUser.getPreference('USER_DISPLAY_NAME') + '</i>';

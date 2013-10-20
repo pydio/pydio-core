@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin id="avatar.gravatar" enabled="false" label="CONF_MESSAGE[Gravatar]" description="CONF_MESSAGE[Get user avatar from Gravatar.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <plugin_author>Afterster</plugin_author>
+        <core_relation packaged="true" tested_version="5.0"/>
+    </plugin_info>
+    <client_settings>
+        <resources>
+            <i18n namespace="avatar_gravatar" path="plugins/avatar.gravatar/i18n" />
+        </resources>
+    </client_settings>
+    <server_settings>
+        <global_param name="GRAVATAR_TYPE" type="select" choices="blank|Blank,identicon|IdentIcon,mm|Mystery-Man,monsterid|MonsterID,retro|Retro,wavatar|Wavatar" label="CONF_MESSAGE[Gravatar type]" description="CONF_MESSAGE[Gravatar type]" mandatory="true" default="identicon"/>
+    </server_settings>
+    <registry_contributions>
+        <actions>
+            <action name="get_avatar">
+                <processing>
+                    <serverCallback methodName="receiveAction"></serverCallback>
+                </processing>
+            </action>
+        </actions>
+    </registry_contributions>
+    <class_definition filename="plugins/avatar.gravatar/class.Gravatar.php" classname="Gravatar"/>
+</ajxp_plugin>
