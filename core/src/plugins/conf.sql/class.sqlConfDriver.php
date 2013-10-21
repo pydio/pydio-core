@@ -381,7 +381,7 @@ class sqlConfDriver extends AbstractConfDriver
     {
         $result = array();
         // OLD METHOD
-        $children_results = dibi::query('SELECT [ajxp_users].[login] FROM [ajxp_user_rights],[ajxp_users] WHERE [repo_uuid] = %s AND [ajxp_user_rights].[login] = [ajxp_users].[login] GROUP BY [ajxp_user_rights].[login]', $repositoryId);
+        $children_results = dibi::query('SELECT [ajxp_users].[login] FROM [ajxp_user_rights],[ajxp_users] WHERE [repo_uuid] = %s AND [ajxp_user_rights].[login] = [ajxp_users].[login] GROUP BY [ajxp_users].[login]', $repositoryId);
         $all = $children_results->fetchAll();
         foreach ($all as $item) {
             $result[$item["login"]] = $this->createUserObject($item["login"]);
