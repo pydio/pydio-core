@@ -36,7 +36,7 @@ class AvatarProvider extends AJXP_Plugin
         if ($action == "get_avatar_url") {
             $url = "";
             $suffix = "";
-            switch($provider){
+            switch ($provider) {
                 case "gravatar":
                 default:
                     if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
