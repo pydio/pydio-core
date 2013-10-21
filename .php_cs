@@ -19,6 +19,7 @@ $finder = Symfony\CS\Finder\DefaultFinder::create()
     ->notName('svn_lib.inc.php')
     ->notName('class.AjaXplorerPublisher.php')
     ->notName('class.fsAccessDriver.php')
+    ->notName('glueCode.php')
     ->notName('compat.php')
     ->in(__DIR__)
 ;
