@@ -96,4 +96,6 @@ $mess = array(
     "91"=> "Tags (Entrez pour sauver)",
     "92"=> "Nouveau lien",
     "93"=> "Liens existants",
+    "94"=> "Code QR",
+    "95"=> "Afficher/Cacher le code QR.",
 );
