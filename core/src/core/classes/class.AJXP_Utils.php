@@ -1594,7 +1594,6 @@ class AJXP_Utils
 
     public static function runCreateTablesQuery($p, $file)
     {
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
 
         switch ($p["driver"]) {
             case "sqlite":

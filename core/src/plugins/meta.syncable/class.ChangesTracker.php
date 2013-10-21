@@ -46,7 +46,6 @@ class ChangesTracker extends AJXP_Plugin
     {
         if($actionName != "changes" || !isSet($httpVars["seq_id"])) return false;
 
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
 
         HTMLWriter::charsetHeader('application/json', 'UTF-8');
@@ -123,7 +122,6 @@ class ChangesTracker extends AJXP_Plugin
     public function updateNodesIndex($oldNode = null, $newNode = null, $copy = false)
     {
 
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         try {
             if ($newNode == null) {
                 $repoId = $this->computeIdentifier($oldNode->getRepository());

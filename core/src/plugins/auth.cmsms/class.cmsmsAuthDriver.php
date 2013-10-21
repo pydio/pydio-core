@@ -63,7 +63,6 @@ class cmsmsAuthDriver extends AbstractAuthDriver
 
     public function init($options)
     {
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         parent::init($options);
         $this->sqlDriver = $this->options["SQL_DRIVER"];
         try {

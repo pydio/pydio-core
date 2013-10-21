@@ -313,7 +313,6 @@ class AjaXplorerUpgrader
             $results = array();
             $errors = array();
 
-            require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
             dibi::connect($test);
             dibi::begin();
             foreach ($parts as $sqlPart) {

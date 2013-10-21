@@ -296,7 +296,6 @@ class BootConfLoader extends AbstractConfDriver
                 }
             }
 
-            require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
             // Should throw an exception if there was a problem.
             dibi::connect($p);
             dibi::disconnect();
