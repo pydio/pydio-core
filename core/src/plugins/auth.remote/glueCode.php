@@ -75,31 +75,35 @@ if ($authPlug->getOption("SECRET") == "") {
  * @param array $loginData
  * @param AbstractAjxpUser $userObject
  */
-function ajxp_gluecode_updateRole($loginData, &$userObject)
-{
-    $authPlug = ConfService::getAuthDriverImpl();
-    $rolesMap = $authPlug->getOption("ROLES_MAP");
-    if(!isSet($rolesMap) || strlen($rolesMap) == 0) return;
-    // String like {key:value,key2:value2,key3:value3}
-    $rolesMap = explode(",", $rolesMap);
-    $newMap = array();
-    foreach ($rolesMap as $value) {
-        $parts = explode(":", trim($value));
-        $roleId = trim($parts[1]);
-        $roleObject = AuthService::getRole($roleId);
-        if ($roleObject != null) {
-            $newMap[trim($parts[0])] = $roleObject;
-            $userObject->removeRole($roleId);
+if(!function_exists("ajxp_gluecode_updateRole")){
+
+    function ajxp_gluecode_updateRole($loginData, &$userObject)
+    {
+        $authPlug = ConfService::getAuthDriverImpl();
+        $rolesMap = $authPlug->getOption("ROLES_MAP");
+        if(!isSet($rolesMap) || strlen($rolesMap) == 0) return;
+        // String like {key:value,key2:value2,key3:value3}
+        $rolesMap = explode(",", $rolesMap);
+        $newMap = array();
+        foreach ($rolesMap as $value) {
+            $parts = explode(":", trim($value));
+            $roleId = trim($parts[1]);
+            $roleObject = AuthService::getRole($roleId);
+            if ($roleObject != null) {
+                $newMap[trim($parts[0])] = $roleObject;
+                $userObject->removeRole($roleId);
+            }
         }
-    }
-    $rolesMap = $newMap;
-    if (isset($loginData["roles"]) && is_array($loginData["roles"])) {
-        foreach ($loginData["roles"] as $role) {
-            if (isSet($rolesMap[$role])) {
-                $userObject->addRole($rolesMap[$role]);
+        $rolesMap = $newMap;
+        if (isset($loginData["roles"]) && is_array($loginData["roles"])) {
+            foreach ($loginData["roles"] as $role) {
+                if (isSet($rolesMap[$role])) {
+                    $userObject->addRole($rolesMap[$role]);
+                }
             }
         }
     }
+
 }
 
 
