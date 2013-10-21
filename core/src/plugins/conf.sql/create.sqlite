@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS ajxp_groups (
 
 CREATE TABLE IF NOT EXISTS ajxp_plugin_configs (
   id text NOT NULL,
-  configs longtext NOT NULL
+  configs longblob NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ajxp_simple_store (

@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS ajxp_user_prefs (
   rid serial PRIMARY KEY,
   login varchar(255) NOT NULL,
   name varchar(255) NOT NULL,
-  val varchar(2000)
+  val bytea
 );
 
 CREATE TABLE IF NOT EXISTS ajxp_user_bookmarks (
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS ajxp_repo_options (
   oid serial PRIMARY KEY,
   uuid varchar(33) NOT NULL,
   name varchar(50) NOT NULL,
-  val varchar(2000)
+  val bytea
 );
 
 CREATE INDEX ajxp_repo_options_uuid_idx ON ajxp_repo_options (uuid);
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS ajxp_groups (
 
 CREATE TABLE IF NOT EXISTS ajxp_plugin_configs (
   id varchar(50) PRIMARY KEY,
-  configs text NOT NULL
+  configs bytea NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ajxp_simple_store (

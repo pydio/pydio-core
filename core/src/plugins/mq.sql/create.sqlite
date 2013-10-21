@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS ajxp_simple_store (
   object_id text NOT NULL,
   store_id text NOT NULL,
-  serialized_data longtext,
+  serialized_data blob,
   binary_data blob,
   related_object_id text DEFAULT NULL
 );
