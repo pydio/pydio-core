@@ -13,5 +13,5 @@ CREATE TABLE IF NOT EXISTS ajxp_log (
   severity ajxp_log_severity,
   "user" varchar(255),
   message varchar(255),
-  params varchar(255)
+  params text
 );

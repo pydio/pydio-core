@@ -65,43 +65,6 @@ class sqlLogDriver extends AbstractLogDriver
     }
 
     /**
-     * formats the error message in representable manner
-     *
-     * For the SQL driver we will normalise the information into our table row format.
-     *
-     * @param $message String this is the message to be formatted
-     * @param $severity Severity level of the message: one of LOG_LEVEL_* (DEBUG,INFO,NOTICE,WARNING,ERROR)
-     * @return String the formatted message.
-     */
-    public function formatMessage($message, $severity)
-    {
-        // Get the user if it exists
-        $user = "No User";
-        if (AuthService::usersEnabled()) {
-            $logged = AuthService::getLoggedUser();
-            if ($logged != null) {
-                $user = $logged->getId();
-            } else {
-                $user = "shared";
-            }
-        }
-
-        $message_parts = explode("\t", $message, 2);
-        $severity = strtoupper((string) $severity);
-
-        $log_row = Array(
-            'logdate' => new DateTime('NOW'),
-            'remote_ip' => $this->inet_ptod($_SERVER['REMOTE_ADDR']),
-            'severity' => $severity,
-            'user' => $user,
-            'message' => $message_parts[0],
-            'params' => $message_parts[1]
-        );
-
-        return $log_row;
-    }
-
-    /**
      * Format a table row into an xml list of nodes for the log treeview
      *
      * @param String $node Name of the xml node
@@ -154,20 +117,26 @@ class sqlLogDriver extends AbstractLogDriver
     /**
      * Write an entry to the log.
      *
-     * @param String $textMessage The message to log
-     * @param String $severityLevel The severity level, see LOG_LEVEL_ constants
+     * @param String $level Log severity: one of LOG_LEVEL_* (DEBUG,INFO,NOTICE,WARNING,ERROR)
+     * @param String $ip The client ip
+     * @param String $user The user login
+     * @param String $source The source of the message
+     * @param String $prefix  The prefix of the message
+     * @param String $message The message to log
      *
      */
-    public function write($textMessage, $severityLevel = LOG_LEVEL_DEBUG)
+    public function write2($level, $ip, $user, $source, $prefix, $message)
     {
-        $log_row = $this->formatMessage($textMessage, $severityLevel);
-
-        try {
-            dibi::query('INSERT INTO [ajxp_log]', $log_row);
-        } catch (DibiException $e) {
-            echo get_class($e), ': ', $e->getMessage(), "\n";
-            exit(1);
-        }
+        $log_row = Array(
+            'logdate' => new DateTime('NOW'),
+            'remote_ip' => $this->inet_ptod($ip),
+            'severity' => strtoupper((string) $level),
+            'user' => $user,
+            'message' => $source,
+            'params' => $prefix."\t".$message
+        );
+        //we already handle exception for write2 in core.log
+        dibi::query('INSERT INTO [ajxp_log]', $log_row);
     }
 
     /**

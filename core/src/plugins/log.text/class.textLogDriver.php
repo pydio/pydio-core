@@ -87,7 +87,7 @@ class textLogDriver extends AbstractLogDriver
             }
             $this->fileHandle = @fopen($this->storageDir . $this->logFileName, "at+");
             if ($this->fileHandle === false) {
-                error_log("[Pydio] Cannot open log file ".$this->storageDir . $this->logFileName);
+                error_log("Cannot open log file ".$this->storageDir . $this->logFileName);
             }
             if ($this->fileHandle !== false && count($this->stack)) {
                 $this->stackFlush();
@@ -140,23 +140,27 @@ class textLogDriver extends AbstractLogDriver
      * If write is not allowed because the file is not yet open, the message is buffered until
      * file becomes available.
      *
-     * @param String $textMessage The message to write.
-     * @param int|String $severityLevel Log severity: one of LOG_LEVEL_* (DEBUG,INFO,NOTICE,WARNING,ERROR)
+     * @param String $level Log severity: one of LOG_LEVEL_* (DEBUG,INFO,NOTICE,WARNING,ERROR)
+     * @param String $ip The client ip
+     * @param String $user The user login
+     * @param String $source The source of the message
+     * @param String $prefix  The prefix of the message
+     * @param String $message The message to log
      * @return void
      */
-    public function write($textMessage, $severityLevel = LOG_LEVEL_DEBUG)
+    public function write2($level, $ip, $user, $source, $prefix, $message)
     {
-        $textMessage = $this->formatMessage($textMessage, $severityLevel);
+        $textMessage = date("m-d-y") . " " . date("H:i:s") . "\t";
+        $textMessage .= "$ip\t".strtoupper((string) $level)."\t$user\t$source\t$prefix\t$message\n";
 
         if ($this->fileHandle !== false) {
             if(count($this->stack)) $this->stackFlush();
             if (@fwrite($this->fileHandle, $textMessage) === false) {
-                error_log("[Pydio] There was an error writing to log file ($textMessage)");
+                throw new Exception("There was an error writing to log file ($this->logFileName)");
             }
         } else {
             $this->stack[] = $textMessage;
         }
-
     }
 
     /**
@@ -182,41 +186,9 @@ class textLogDriver extends AbstractLogDriver
         $success = @fclose($this->fileHandle);
         if ($success === false) {
             // Failure to close the log file
-            // error_log("[Pydio] AJXP_Logger failed to close the handle to the log file");
+            // error_log("AJXP_Logger failed to close the handle to the log file");
         }
 
-    }
-
-    /**
-     * formats the error message in representable manner
-     *
-     * @param $message String this is the message to be formatted
-     * @param $severity int Severity level of the message: one of LOG_LEVEL_* (DEBUG,INFO,NOTICE,WARNING,ERROR)
-     * @return String the formatted message.
-     */
-    public function formatMessage($message, $severity)
-    {
-        $msg = date("m-d-y") . " " . date("G:i:s") . "\t";
-
-        $msg .= AJXP_Logger::getClientAdress()."\t";
-        $msg .= strtoupper($severity)."\t";
-
-        // Get the user if it exists
-        $user = "No User";
-        if (AuthService::usersEnabled()) {
-            $logged = AuthService::getLoggedUser();
-            if ($logged != null) {
-                $user = $logged->getId();
-            } else {
-                $user = "shared";
-            }
-        }
-        $msg .= "$user\t";
-
-        //$msg .= $severity;
-        $msg .= "" . $message . "\n";
-
-        return $msg;
     }
 
     /**

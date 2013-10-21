@@ -11,7 +11,7 @@
         </resources>
     </client_settings>
     <server_settings>
-        <param name="IDENTIFIER" type="string" description="CONF_MESSAGE[How the logs will be identified in the system logs]" label="CONF_MESSAGE[Identifier]" />
+        <param name="IDENTIFIER" type="string" description="CONF_MESSAGE[How the logs will be identified in the system logs]" label="CONF_MESSAGE[Identifier]" default="pydio" />
     </server_settings>
     <dependencies>
         <pluginClass pluginName="log.text"/>
