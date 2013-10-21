@@ -93,7 +93,7 @@ function joomla_remote_auth($host, $uri, $login, $pass, $formId = "")
            }
            $form = $nodes->item(0);
            $postUri = $form->getAttribute("action");
-           $hiddens = $xPath->query('//input[@type="hidden"]', $form);
+           $hiddens = $xPath->query('.//input[@type="hidden"]', $form);
         foreach ($hiddens as $hiddenNode) {
                $postData[$hiddenNode->getAttribute("name")] = $hiddenNode->getAttribute("value");
            }
@@ -133,7 +133,7 @@ function drupal_remote_auth($host, $uri, $login, $pass, $formId = "")
     }
     $form = $nodes->item(0);
     $postUri = $form->getAttribute("action");
-    $hiddens = $xPath->query('//input[@type="hidden"]', $form);
+    $hiddens = $xPath->query('.//input[@type="hidden"]', $form);
     AJXP_Logger::debug("Carry on Drupal hiddens ". $hiddens->length);
     $postData = array(
         "name" => $login,
