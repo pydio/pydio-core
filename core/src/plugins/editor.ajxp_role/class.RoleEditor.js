@@ -202,8 +202,8 @@ Class.create("RoleEditor", AbstractEditor, {
             this.contentMainContainer.setStyle({height:size+"px"});
         }else{
             fitHeightToBottom(this.contentMainContainer, this.element.up(".dialogBox"));
-            this.tab.resize();
         }
+        this.tab.resize();
         this.element.fire("editor:resize", size);
     },
 
@@ -339,6 +339,7 @@ Class.create("RoleEditor", AbstractEditor, {
                 var strength = new Protopass(passEl1.down("input"), {
                     barContainer:pane.down('#pwd_strength_container')
                 });
+                modal.currentLightBoxModal.setStyle({display:'block'});
             }.bind(this));
             var locked = this.roleData.USER.LOCK ? true : false;
             var b1 = new Element("span", {className:'m-2'}).update((locked?MessageHash["ajxp_role_editor.27"]:MessageHash["ajxp_role_editor.26"]));

@@ -8,6 +8,11 @@ div.tabbed_editor{
 
 div.tabbed_editor input, div.tabbed_editor select{
     font-size: 13px;
+    line-height: 21px;
+}
+
+div.tabbed_editor div.SF_label{
+    padding-right: 0;
 }
 
 .ajxp_theme_vision div.tabbed_editor{
@@ -80,8 +85,7 @@ div.editor_header span.actionbar_button_label {
 div.tabbed_editor span.inherited,
 div.tabbed_editor div.inherited
 {
-    color: #888888;
-    font-style: italic;
+    color: #AAAAAA;
 }
 
 div#actions-selector,
@@ -89,7 +93,7 @@ div#parameters-selector,
 div#pane-acls > div.dialogLegend,
 div#pane-infos
 {
-    padding: 20px;
+    padding: 20px 20px 40px 20px;
 }
 
 div#pane-infos > div{
@@ -120,6 +124,7 @@ div#acls-selected
     margin-top: 0;
     overflow-y: auto;
     padding: 2px;
+    font-size: 12px;
 
 }
 
@@ -165,7 +170,7 @@ div#acls-selected label{
 #actions-selector div.SF_element,
 #parameters-selector div.SF_element
 {
-    width: 80%;
+    width: 64%;
 }
 
 div.add_button{

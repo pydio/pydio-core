@@ -201,8 +201,8 @@ Class.create("PluginEditor", AbstractEditor, {
             this.contentMainContainer.setStyle({height:size+"px"});
         }else{
             fitHeightToBottom(this.contentMainContainer, this.element.up(".dialogBox"));
-            this.tab.resize();
         }
+        this.tab.resize();
         this.element.fire("editor:resize", size);
     },
 
