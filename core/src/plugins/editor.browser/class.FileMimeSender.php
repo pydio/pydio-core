@@ -62,6 +62,7 @@ class FileMimeSender extends AJXP_Plugin
 
             $filesize = filesize($destStreamURL . $file);
             $fp = fopen($destStreamURL . $file, "rb");
+            $fileMime = "application/octet-stream";
 
             //Get mimetype with fileinfo PECL extension
             if (class_exists("finfo")) {
@@ -69,11 +70,11 @@ class FileMimeSender extends AJXP_Plugin
                 $fileMime = $finfo->buffer(fread($fp, 100));
             }
             //Get mimetype with (deprecated) mime_content_type
-            elseif (function_exists("mime_content_type")) {
+            if (strpos($fileMime, "application/octet-stream")===0 && function_exists("mime_content_type")) {
                 $fileMime = @mime_content_type($fp);
             }
             //Guess mimetype based on file extension
-            else {
+            if(strpos($fileMime, "application/octet-stream")===0 ) {
                 $fileExt = substr(strrchr(basename($file), '.'), 1);
                 if(empty($fileExt))
                     $fileMime = "application/octet-stream";

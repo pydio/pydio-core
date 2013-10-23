@@ -56,6 +56,9 @@ application/vnd.oasis.opendocument.text odt
 application/vnd.oasis.opendocument.text-master odm
 application/vnd.oasis.opendocument.text-template ott
 application/vnd.oasis.opendocument.text-web oth
+application/vnd.openxmlformats-officedocument.wordprocessingml.document docx
+application/vnd.openxmlformats-officedocument.presentationml.presentation pptx
+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet xlsx
 application/vnd.palm pdb
 application/vnd.rn-realmedia
 application/vnd.rn-realmedia rm
