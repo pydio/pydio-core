@@ -146,17 +146,23 @@ class ShareCenter extends AJXP_Plugin
                     }
                     print($url);
                 } else {
-                    $maxdownload = intval($this->getFilteredOption("FILE_MAX_DOWNLOAD", $this->repository->getId()));
-                    if (!empty($httpVars["downloadlimit"])) {
-                        if(!empty($maxdownload)) $httpVars["downloadlimit"] = min($maxdownload, intval($httpVars["downloadlimit"]));
+                    $maxdownload = abs(intval($this->getFilteredOption("FILE_MAX_DOWNLOAD", $this->repository->getId())));
+                    $download = isset($httpVars["downloadlimit"]) ? abs(intval($httpVars["downloadlimit"])) : 0;
+                    if ($maxdownload == 0) {
+                        $httpVars["downloadlimit"] = $download;
+                    } elseif ($maxdownload > 0 && $download == 0) {
+                        $httpVars["downloadlimit"] = $maxdownload;
                     } else {
-                        if(!empty($maxdownload)) $httpVars["downloadlimit"] = $maxdownload;
+                        $httpVars["downloadlimit"] = min($download,$maxdownload);
                     }
-                    $maxexpiration = intval($this->getFilteredOption("FILE_MAX_EXPIRATION", $this->repository->getId()));
-                    if (!empty($httpVars["expiration"])) {
-                        if(!empty($maxexpiration)) $httpVars["expiration"] = min($maxexpiration, intval($httpVars["expiration"]));
+                    $maxexpiration = abs(intval($this->getFilteredOption("FILE_MAX_EXPIRATION", $this->repository->getId())));
+                    $expiration = isset($httpVars["expiration"]) ? abs(intval($httpVars["expiration"])) : 0;
+                    if ($maxexpiration == 0) {
+                        $httpVars["expiration"] = $expiration;
+                    } elseif ($maxexpiration > 0 && $expiration == 0) {
+                        $httpVars["expiration"] = $maxexpiration;
                     } else {
-                        if(!empty($maxexpiration)) $httpVars["expiration"] = $maxexpiration;
+                        $httpVars["expiration"] = min($expiration,$maxexpiration);
                     }
 
                     $data = $this->accessDriver->makePublicletOptions($file, $httpVars["password"], $httpVars["expiration"], $httpVars["downloadlimit"], $this->repository);
