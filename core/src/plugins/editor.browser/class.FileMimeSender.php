@@ -74,7 +74,7 @@ class FileMimeSender extends AJXP_Plugin
                 $fileMime = @mime_content_type($fp);
             }
             //Guess mimetype based on file extension
-            if(strpos($fileMime, "application/octet-stream")===0 ) {
+            if (strpos($fileMime, "application/octet-stream")===0 ) {
                 $fileExt = substr(strrchr(basename($file), '.'), 1);
                 if(empty($fileExt))
                     $fileMime = "application/octet-stream";

@@ -349,12 +349,12 @@ Class.create("ShareCenter", {
         oRow.down('[name="link_tag"]').setValue('');
         var actions = oRow.down('.SF_horizontal_actions');
         if(linkData['has_password']){
-            actions.insert({top:new Element('span', {className:'icon-key'}).update(' password')});
+            actions.insert({top:new Element('span', {className:'icon-key simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.85"]}).update(' '+MessageHash["share_center.84"])});
         }
         if(linkData["expire_time"]){
-            actions.insert({top:new Element('span', {className:'icon-calendar'}).update(' '+linkData["expire_time"])});
+            actions.insert({top:new Element('span', {className:'icon-calendar simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.87"]}).update(' '+linkData["expire_time"])});
         }
-        var dlC = new Element('span', {className:'icon-download-alt'}).update(' downloads '+linkData['download_counter']+'/'+linkData['download_limit']);
+        var dlC = new Element('span', {className:'icon-download-alt simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.89"]}).update(' '+MessageHash["share_center.88"]+' '+linkData['download_counter']+'/'+linkData['download_limit']);
         actions.insert({top:dlC});
         dlC.observe("click", function(){
             if(window.confirm('Do you want to reset the download counter?')){
@@ -394,6 +394,10 @@ Class.create("ShareCenter", {
                 conn.sendAsync();
             }
         }.bind(this));
+
+        oRow.select('span.simple_tooltip_observer').each(function(e){
+            modal.simpleTooltip(e, e.readAttribute('data-tooltipTitle'), 'top center', 'down_arrow_tip', 'element');
+        });
 
     },
 
@@ -482,6 +486,9 @@ Class.create("ShareCenter", {
 
                 if(!jsonData) return ;
                 jsonData = jsonData[0];
+                if(count(jsonData) > 1){
+
+                }
                 var directLink = "";
                 if(!jsonData.hasPassword){
                     directLink = '\
@@ -673,7 +680,7 @@ Class.create("ShareCenter", {
             var st = (shareType == "folder" ? MessageHash["share_center.38"] : MessageHash["share_center.39"]);
             if(dialogButtonsOrRow.hasClassName('SF_horizontal_fieldsRow')){
                 if(!dialogButtonsOrRow.down('#watch_folder')) {
-                    dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:"<span class='icon-eye-close' id='watch_folder_eye'> watch<input type='checkbox' id='watch_folder' style='display:none;'></span>"});
+                    dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:"<span class='icon-eye-close simple_tooltip_observer' id='watch_folder_eye' data-tooltipTitle='"+MessageHash["share_center.83"]+"'> "+MessageHash["share_center.82"]+"<input type='checkbox' id='watch_folder' style='display:none;'></span>"});
                 }
                 var folderEye = dialogButtonsOrRow.down('#watch_folder_eye');
                 var folderCheck = dialogButtonsOrRow.down('#watch_folder');
@@ -683,7 +690,7 @@ Class.create("ShareCenter", {
                     .removeClassName('icon-eye-close')
                     .removeClassName('icon-eye-open')
                     .addClassName('icon-eye-'+ ( folderCheck.checked ? 'open' : 'close'))
-                    .update( folderCheck.checked ? ' watched' : ' no watch')
+                    .update( ' ' + MessageHash['share_center.' + (folderCheck.checked ? '81' : '82')] )
                 ;
             }else{
                 dialogButtonsOrRow.insert("<div class='dialogButtonsCheckbox'><input type='checkbox' id='watch_folder'><label for='watch_folder'>"+st+"</label></div>");
@@ -695,7 +702,7 @@ Class.create("ShareCenter", {
                         .removeClassName('icon-eye-close')
                         .removeClassName('icon-eye-open')
                         .addClassName('icon-eye-'+ ( folderCheck.checked ? 'open' : 'close'))
-                        .update( folderCheck.checked ? ' watched' : ' no watch')
+                        .update( ' ' + MessageHash['share_center.' + (folderCheck.checked ? '81' : '82')] )
                     ;
                     var conn = new Connexion();
                     conn.setParameters({
@@ -717,10 +724,10 @@ Class.create("ShareCenter", {
             var mailerButton;
             if(dialogButtonsOrRow.hasClassName('SF_horizontal_fieldsRow')){
                 if(!dialogButtonsOrRow.down('#mailer_button')){
-                    dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:"<span class='icon-envelope' id='mailer_button'> invite</span>"});
+                    dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:"<span class='icon-envelope simple_tooltip_observer' id='mailer_button' data-tooltipTitle='"+MessageHash['share_center.80']+"'> "+MessageHash['share_center.79']+"</span>"});
                 }
                 mailerButton = dialogButtonsOrRow.down('#mailer_button');
-                mailerButton.writeAttribute("title", MessageHash["share_center.41"]);
+                mailerButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.41"]);
             }else{
                 var oForm = dialogButtonsOrRow.parentNode;
                 var unShare = oForm.down("#unshare_button");
@@ -728,7 +735,7 @@ Class.create("ShareCenter", {
                 mailerButton.down("img").writeAttribute("src","plugins/gui.ajax/res/themes/umbra/images/actions/22/mail_generic.png");
                 mailerButton.down("span").update(MessageHash["share_center.40"]);
                 unShare.insert({after:mailerButton});
-                mailerButton.writeAttribute("title", MessageHash["share_center.41"]);
+                mailerButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.41"]);
             }
 
         if(ajaxplorer.hasPluginOfType("mailer") && !forceOldSchool){

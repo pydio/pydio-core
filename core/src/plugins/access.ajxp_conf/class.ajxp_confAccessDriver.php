@@ -410,11 +410,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         $bmString = '';
                         if(in_array($parentName.$key, $this->currentBookmarks)) $bmString = ' ajxp_bookmarked="true" overlay_icon="bookmark.png" ';
                         if($key == "users") $bmString .= ' remote_indexation="admin_search"';
-                        if(empty($data["CHILDREN"])){
+                        if (empty($data["CHILDREN"])) {
                             print '<tree text="'.AJXP_Utils::xmlEntities($data["LABEL"]).'" description="'.AJXP_Utils::xmlEntities($data["DESCRIPTION"]).'" icon="'.$data["ICON"].'" filename="'.$parentName.$key.'" '.$bmString.'/>';
-                        }else{
+                        } else {
                             print '<tree text="'.AJXP_Utils::xmlEntities($data["LABEL"]).'" description="'.AJXP_Utils::xmlEntities($data["DESCRIPTION"]).'" icon="'.$data["ICON"].'" filename="'.$parentName.$key.'" '.$bmString.'>';
-                            foreach($data["CHILDREN"] as $cKey => $cData){
+                            foreach ($data["CHILDREN"] as $cKey => $cData) {
                                 $bmString = '';
                                 if(in_array($parentName.$key."/".$cKey, $this->currentBookmarks)) $bmString = ' ajxp_bookmarked="true" overlay_icon="bookmark.png" ';
                                 if($cKey == "users") $bmString .= ' remote_indexation="admin_search"';
