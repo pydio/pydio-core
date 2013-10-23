@@ -838,7 +838,7 @@ class AJXP_Utils
         } else {
             $existingHooks = array();
         }
-        $allPhpFiles = glob_recursive(AJXP_INSTALL_PATH."/*.php");
+        $allPhpFiles = self::glob_recursive(AJXP_INSTALL_PATH."/*.php");
         $hooks = array();
         foreach ($allPhpFiles as $phpFile) {
             $fileContent = file($phpFile);
@@ -1751,6 +1751,16 @@ class AJXP_Utils
         }
 
         return $password;
+    }
+
+    // Does not support flag GLOB_BRACE
+    public static function glob_recursive($pattern, $flags = 0)
+    {
+        $files = glob($pattern, $flags);
+        foreach (glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT) as $dir) {
+            $files = array_merge($files, self::glob_recursive($dir.'/'.basename($pattern), $flags));
+        }
+        return $files;
     }
 
 }
