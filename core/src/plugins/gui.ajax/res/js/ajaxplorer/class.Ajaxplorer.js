@@ -360,6 +360,7 @@ Class.create("Ajaxplorer", {
 		if(!window[ajxpId]) return;
 		// First destroy current component, unregister actions, etc.			
 		var oldObj = window[ajxpId];
+        if(!oldObj.__className) oldObj = $(ajxpId).ajxpPaneObject;
 		if(oldObj.__className == ajxpClassName && oldObj.__ajxpOptionsString == ajxpOptionsString){
 			return;
 		}
@@ -398,8 +399,8 @@ Class.create("Ajaxplorer", {
 			if(!this.guiActions) this.guiActions = new Hash();
 			this.guiActions.update(obj.getActions());
 		}
-        if($(ajxpId).parentNode && $(ajxpId).parentNode.ajxpPaneObject && $(ajxpId).parentNode.ajxpPaneObject.scanChildrenPanes){
-            $(ajxpId).parentNode.ajxpPaneObject.scanChildrenPanes($(ajxpId).parentNode.ajxpPaneObject.htmlElement);
+        if($(ajxpId).up('[ajxpClass]') && $(ajxpId).up('[ajxpClass]').ajxpPaneObject && $(ajxpId).up('[ajxpClass]').ajxpPaneObject.scanChildrenPanes){
+            $(ajxpId).up('[ajxpClass]').ajxpPaneObject.scanChildrenPanes($(ajxpId).up('[ajxpClass]').ajxpPaneObject.htmlElement, true);
         }
 
             obj.__ajxpOptionsString = ajxpOptionsString;
@@ -876,13 +877,16 @@ Class.create("Ajaxplorer", {
 	/**
 	 * Inserts the main template in the GUI.
 	 */
-	initTemplates:function(passedTarget){
+	initTemplates:function(passedTarget, mainElementName){
 		if(!this._registry) return;
 		var tNodes = XPathSelectNodes(this._registry, "client_configs/template");
 		for(var i=0;i<tNodes.length;i++){
 			var target = tNodes[i].getAttribute("element");
             var themeSpecific = tNodes[i].getAttribute("theme");
             if(themeSpecific && window.ajxpBootstrap.parameters.get("theme") && window.ajxpBootstrap.parameters.get("theme") != themeSpecific){
+                continue;
+            }
+            if(mainElementName && target != mainElementName){
                 continue;
             }
 			if($(target) || $$(target).length || passedTarget){
@@ -901,7 +905,7 @@ Class.create("Ajaxplorer", {
 	findOriginalTemplatePart : function(ajxpId){
 		var tmpElement = new Element("div", {style:"display:none;"});
 		$$("body")[0].insert(tmpElement);
-		this.initTemplates(tmpElement);
+		this.initTemplates(tmpElement, window.ajxpBootstrap.parameters.get("MAIN_ELEMENT"));
 		var tPart = tmpElement.down('[id="'+ajxpId+'"]');
         if(tPart) tPart = tPart.clone(true);
 		tmpElement.remove();

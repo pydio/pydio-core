@@ -34,7 +34,7 @@ Class.create("Breadcrumb", {
 		this.element.ajxpPaneObject = this;
         this.options = options || {};
         this.element.update('Files');
-        document.observe("ajaxplorer:context_changed", function(event){
+        this.observerFunc = function(event){
             var newNode = event.memo;
             if(Object.isString(newNode)){
                 newNode = new AjxpNode(newNode);
@@ -73,8 +73,9 @@ Class.create("Breadcrumb", {
                 }
             });
 
-        }.bind(this) );
-	},
+        }.bind(this);
+        document.observe("ajaxplorer:context_changed",this.observerFunc);
+    },
 
 	/**
 	 * Resize widget
@@ -116,6 +117,7 @@ Class.create("Breadcrumb", {
 	 * Implementation of the IAjxpWidget methods
 	 */	
 	destroy : function(){
+        document.stopObserving("ajaxplorer:context_changed",this.observerFunc);
 		this.element = null;
 	},
 

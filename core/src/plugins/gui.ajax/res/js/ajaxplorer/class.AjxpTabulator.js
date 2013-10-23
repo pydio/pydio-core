@@ -189,7 +189,9 @@ Class.create("AjxpTabulator", AjxpPane, {
         }
         var existing = this.tabulatorData.detect(function(internalInfo){return internalInfo.id == tabInfo.id;});
         if(existing) {
-            this.switchTabulator(existing.id);
+            if(!existing.dontFocus) {
+                this.switchTabulator(existing.id);
+            }
             return;
         }
         $(this.htmlElement).down('.tabulatorContainer').insert(this._renderTab(tabInfo));
@@ -351,7 +353,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             if($(toShowElement)) $(toShowElement).show();
 			toShow.showElement(true);
             var reFold = false;
-            if(this.htmlElement.up('div[ajxpClass="Splitter"]') && this.htmlElement.up('div[ajxpClass="Splitter"]').ajxpPaneObject){
+            if(this.htmlElement && this.htmlElement.up('div[ajxpClass="Splitter"]') && this.htmlElement.up('div[ajxpClass="Splitter"]').ajxpPaneObject){
                 var splitter = this.htmlElement.up('div[ajxpClass="Splitter"]').ajxpPaneObject;
                 if(splitter.splitbar.hasClassName('folded') && (Element.descendantOf(this.htmlElement, splitter.paneA) || this.htmlElement == splitter.paneA ) ){
                     splitter.unfold();
@@ -371,7 +373,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 	 * Resizes the widget
 	 */
 	resize : function(){
-		if(!this.selectedTabInfo) return;
+		if(!this.selectedTabInfo || !this.htmlElement) return;
 		var ajxpObject = this.getAndSetAjxpObject(this.selectedTabInfo);
 		if(ajxpObject){
             var nodeElement = $(this.htmlElement).down("#"+this.selectedTabInfo.element);

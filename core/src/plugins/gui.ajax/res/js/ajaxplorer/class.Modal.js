@@ -529,7 +529,11 @@ Class.create("Modal", {
 				this.tooltip = new Element("div", {className:"simple_tooltip"});
                 if(className) this.tooltip.addClassName(className);
 				$$('body')[0].insert(this.tooltip);
-			}
+			}else{
+                this.tooltip.writeAttribute('class', '');
+                this.tooltip.addClassName('simple_tooltip');
+                if(className) this.tooltip.addClassName(className);
+            }
             if(updateOnShow){
                 this.tooltip.update(title.cloneNode(true));
             }else{
@@ -537,12 +541,22 @@ Class.create("Modal", {
             }
             var baseX = hookTo == "element" ? Element.cumulativeOffset(element).left : Event.pointerX(event);
             var baseY = hookTo == "element" ? Element.cumulativeOffset(element).top : Event.pointerY(event);
-            var x = (position.indexOf('right') != -1 ? baseX+10 : (baseX - 10 - parseInt(this.tooltip.getWidth())) );
             var y = baseY+10;
             if(position.indexOf('middle') != -1){
                 y -= 5 + parseInt(this.tooltip.getHeight())/2;
             }else if(position.indexOf('bottom') != -1){
                 y -= 13 + parseInt(element.getHeight());
+            }else if(position.indexOf('top') != -1){
+                y -= 18 + parseInt(this.tooltip.getHeight());
+            }
+
+            var x;
+            if(position.indexOf('center') != -1){
+                x = baseX - (this.tooltip.getWidth() - element.getWidth())/2;
+            }else if(position.indexOf('right') != -1){
+                x = baseX + 10;
+            }else{
+                x = (baseX - 10 - parseInt(this.tooltip.getWidth()));
             }
 
 			this.tooltip.setStyle({top:y+"px",left:x+"px"});

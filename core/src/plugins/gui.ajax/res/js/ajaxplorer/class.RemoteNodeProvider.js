@@ -193,9 +193,20 @@ Class.create("RemoteNodeProvider", {
 		children.each(function(childNode){
 			var child = this.parseAjxpNode(childNode);
 			if(!childrenOnly) origNode.addChild(child);
+            var cLoaded;
+            if(XPathSelectNodes(childNode, 'tree').length){
+                XPathSelectNodes(childNode, 'tree').each(function(c){
+                    var newChild = this.parseAjxpNode(c);
+                    if(newChild){
+                        child.addChild(newChild);
+                    }
+                }.bind(this));
+                cLoaded = true;
+            }
 			if(childCallback){
 				childCallback(child);
 			}
+            if(cLoaded) child.setLoaded(true);
 		}.bind(this) );
 
 		if(nodeCallback){

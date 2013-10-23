@@ -1,5 +1,13 @@
 div.tabbed_editor{
     background-color: #194172;
+    font-size: 13px;
+    border-left: 1px solid #bbbbbb;
+    border-right: 1px solid #bbbbbb;
+    line-height: initial;
+}
+
+div.tabbed_editor input, div.tabbed_editor select{
+    font-size: 13px;
 }
 
 .ajxp_theme_vision div.tabbed_editor{

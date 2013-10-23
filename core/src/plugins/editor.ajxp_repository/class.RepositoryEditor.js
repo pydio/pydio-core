@@ -86,10 +86,10 @@ Class.create("RepositoryEditor", AbstractEditor, {
         $super(node);
         if(Object.isString(node)){
             this.repositoryId = node;
-            this.element.down("span.header_label").update("New Repository");
+            this.updateTitle("New Repository");
         }else{
             this.repositoryId = getBaseName(node.getPath());
-            this.element.down("span.header_label").update(node.getMetadata().get("text"));
+            this.updateTitle(node.getMetadata().get("text"));
             var icon = resolveImageSource(node.getIcon(), "/images/mimes/64");
             this.element.down("span.header_label").setStyle(
                 {
@@ -103,6 +103,10 @@ Class.create("RepositoryEditor", AbstractEditor, {
         this.loadRepository(this.repositoryId);
     },
 
+    updateTitle: function(label){
+        this.element.down("span.header_label").update("WS: "+label);
+        this.element.fire("editor:updateTitle", "WS: "+label);
+    },
 
     loadRepository : function(repId, metaTab){
         var params = new Hash();

@@ -641,20 +641,41 @@ html.boxshadow div.errorMessage{
 .simple_tooltip
 {
     position:absolute;
-    width:200px;
+    width:150px;
     z-index:10000;
     border:1px solid #696765;
     color : #696765;
     background-color: #fff;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size: 11px;
-    padding: 0 10px 5px 10px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    -moz-box-shadow: 2px 2px 5px #AAAAAA;
-    -webkit-box-shadow: 2px 2px 5px #AAAAAA;
-    box-shadow: 2px 2px 5px #AAAAAA;
+    letter-spacing: 1px;
+    padding: 4px 5px 5px 5px;
+}
+
+
+.down_arrow_tip {
+    /*position: relative;*/
+    background: rgb(111, 123, 136);
+    color: white;
+    border: 0;
+    border-radius: 2px;
+}
+.down_arrow_tip:after {
+    top: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+.down_arrow_tip:after {
+    border-color: rgba(111, 123, 136, 0);
+    border-top-color: rgb(111, 123, 136);
+    border-width: 10px;
+    left: 50%;
+    margin-left: -10px;
 }
 
 
@@ -2689,17 +2710,13 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
 }
 
 div.foldedPanel_tooltip{
+    width: 210px !important;
     background-color: #5599FF;
     border-radius: 0;
     border-width: 0;
     border-right: 2px solid #3969B2;
     box-shadow: none;
-}
-
-div.foldedPanel_tooltip td{
-    color: white;
-    font-size: 11px;
-
+    min-height: 35px;
 }
 
 div.foldedPanel_tooltip:after {
@@ -2712,6 +2729,12 @@ div.foldedPanel_tooltip:after {
     border-color: transparent transparent transparent #3969B2;
     top: 15px;
     left: 220px;
+}
+
+div.foldedPanel_tooltip td{
+    color: white;
+    font-size: 11px;
+
 }
 
 #info_panel a

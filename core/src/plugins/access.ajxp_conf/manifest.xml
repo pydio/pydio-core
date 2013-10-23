@@ -9,6 +9,7 @@
 			<i18n namespace="ajxp_conf" path="plugins/access.ajxp_conf/i18n" />
 			<i18n namespace="ajxp_shared" path="plugins/access.ajxp_shared/i18n" />
 			<js file="plugins/access.ajxp_conf/class.ConfigEditor.js" className="ConfigEditor"/>
+            <css file="plugins/access.ajxp_conf/ajxp_conf.css" autoload="true"/>
 		</resources>
 	</client_settings>
 	<registry_contributions>
@@ -36,15 +37,6 @@
             ]]></template_part>
             <template_part ajxpClass="AjxpPane" ajxpId="info_panel" ajxpOptions='{}'><![CDATA[
                     <style>
-                        .webfx-tree-item:first-of-type{
-                            display:none;
-                        }
-                        .webfx-tree-container>.webfx-tree-item:first-of-type{
-                            display:block;
-                        }
-                        .webfx-tree-container.first_container{
-                            margin-left: -19px;
-                        }
                         .action_bar a, .menu.desktop.toolbarmenu, div.editor_header a{
                             background-color: rgb(78, 154, 179) !important;
                         }
@@ -55,22 +47,8 @@
                         #switch_to_settings_button {
                             display: none !important;
                         }
-                        .developerDoc{
-                            font-size: 12px !important;
-                            line-height: 18px !important;
-                            padding-bottom: 5px;
-                        }
-                        .developerApiAccess{
-                            display: inline-block;
-                            margin: 5px 0;
-                        }
                         .table_rows_container td{
                             vertical-align:top;
-                        }
-                        #pydio-go-pro_button {
-                            background: #fa715c;
-                            border-radius: 4px;
-                            padding: 2px 7px 2px 3px !important;
                         }
                     </style>
                     <script>
@@ -91,15 +69,33 @@
                             }
                             splitter.resizeGroup();
                         });
+                        document.observeOnce("ajaxplorer:context_changed", function(){
+                            $A($("folder_pane").ajxpPaneObject.tree.childNodes).each(function(c){c.expand();})
+                            //$("folder_pane").ajxpPaneObject.tree.expandAll();
+                        });
                     </script>
                     ]]></template_part>
             <template_part ajxpClass="AjxpTabulator" theme="vision" ajxpId="topPane" ajxpOptions='{"defaultTabId": "folders","tabInfos" : [{"id":"folders","label":"130","iconClass":"icon-folder-open","element":"folder_pane"},{"id":"flagged","label":"147","iconClass":"icon-star","element":"flagged_elements"}],"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["filter"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'><![CDATA[
-                <div id="folder_pane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ></div>
+                <div id="folder_pane" class="flat_tree_pane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ></div>
                 <div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"get_bookmarks", "format":"node_list"},"reloadOnServerMessage":"tree/reload_bookmarks"}'></div>
             ]]></template_part>
-            <component_config className="Splitter::vertical_splitter">
-                <property name="resize" value="100%"/>
-            </component_config>
+            <!--
+            <template_part ajxpId="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOption":"true"}' theme="vision"><![CDATA[
+                <div id="vertical_splitter" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA": "50%", "minA":26, "fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"A"}'>
+                    <div id="topPane" ajxpClass="AjxpTabulator" ajxpOptions='{"defaultTabId": "folders","tabInfos" : [{"id":"folders","label":"165","iconClass":"icon-cog","element":"settings_pane"},{"id":"flagged","label":"147","iconClass":"icon-star","element":"flagged_elements"}],"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["filter","vertical_splitter2-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'>
+                        <div id="settings_pane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ></div>
+                        <div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"get_bookmarks", "format":"node_list"},"reloadOnServerMessage":"tree/reload_bookmarks"}'></div>
+                    </div>
+                    <div id="cpane_container2" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
+                        <div id="cpane_tabs" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"browser","registerAsEditorOpener":true, "saveState":true,"events":{"ajaxplorer:context_changed":"this.switchTabulator(this.tabulatorData.first().id);"}, "defaultTabId": "files","tabInfos" : [{"id":"files","label":"","iconClass":"icon-folder-open", "element":"files_list_pane"}]}'>
+                            <div id="files_list_pane" ajxpClass="AjxpPane">
+                                <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "fit":"height", "fitParent":"files_lit_pane", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+			]]></template_part>
+	        -->
 		</client_configs>
 		<external_file filename="plugins/access.ajxp_conf/ajxp_confActions.xml" include="actions/*"/>
 		<external_file filename="plugins/access.ajxp_shared/manifest.xml" include='registry_contributions/actions/action[@name="clear_expired"]'/>

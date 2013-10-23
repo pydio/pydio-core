@@ -404,6 +404,9 @@
             <processing>
                 <clientCallback prepareModal="false"><![CDATA[
                     var editorData = window.actionArguments[0];
+                    ajaxplorer.openCurrentSelectionInEditor(editorData);
+                    /*
+                    var editorData = window.actionArguments[0];
                     if(!editorData){
                         var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
                         var editors = ajaxplorer.findEditorsForMime(selectedMime);
@@ -415,6 +418,7 @@
                         ajaxplorer.loadEditorResources(editorData.resourcesManager);
                         modal.openEditorDialog(editorData);
                     }
+                    */
                 ]]></clientCallback>
                 <serverCallback methodName="switchAction" developerComment="Shortcut for various actions, calling edit with subaction parameter."/>
             </processing>

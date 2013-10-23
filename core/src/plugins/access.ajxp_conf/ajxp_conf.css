@@ -1,0 +1,77 @@
+.flat_tree_pane #tree_container > .webfx-tree-item{
+    display: none;
+}
+
+.flat_tree_pane .webfx-tree-item{
+    background-color: rgba(138, 149, 160, 0.7);
+    border-bottom: 1px solid white;
+/*    height: 44px;*/
+    cursor: pointer;
+}
+
+.flat_tree_pane .webfx-tree-item.selected-webfx-tree-item-inactive{
+    background-color: #59f !important;
+    color: white !important;
+}
+
+.flat_tree_pane .webfx-tree-item.selected-webfx-tree-item-inactive a{
+    color: #fff !important;
+}
+
+.flat_tree_pane .webfx-tree-item a{
+    color: white;
+    cursor: pointer;
+}
+
+.flat_tree_pane .webfx-tree-item a span{
+/*    font-size: 16px;
+    padding-top: 6px ;
+    padding-bottom: 4px ;
+    padding-left: 50px;
+    background-position: 11px 5px !important;
+    background-size: 24px;
+    line-height: 24px;*/
+}
+
+.flat_tree_pane .webfx-tree-item img{
+    display:none;
+}
+
+.flat_tree_pane .webfx-tree-container > .webfx-tree-container > .webfx-tree-item{
+    background-color: transparent;
+}
+
+.flat_tree_pane .webfx-tree-container > .webfx-tree-container > .webfx-tree-item a {
+    color: rgb(111, 123, 136);
+}
+
+.flat_tree_pane .webfx-tree-container > .webfx-tree-container .webfx-tree-container{
+}
+
+.flat_tree_pane .webfx-tree-container > .webfx-tree-container .webfx-tree-container .webfx-tree-item{
+    background-color: #ffffff;
+    padding-left: 30px;
+}
+
+.flat_tree_pane .webfx-tree-container > .webfx-tree-container .webfx-tree-container .webfx-tree-item:last-of-type{
+    border-radius: 0 0 5px 5px;
+}
+
+.flat_tree_pane .webfx-tree-container > .webfx-tree-container > .webfx-tree-item a {
+    color: rgb(111, 123, 136);
+}
+
+.developerDoc{
+    font-size: 12px !important;
+    line-height: 18px !important;
+    padding-bottom: 5px;
+}
+.developerApiAccess{
+    display: inline-block;
+    margin: 5px 0;
+}
+#pydio-go-pro_button {
+    background: #fa715c;
+    border-radius: 4px;
+    padding: 2px 7px 2px 3px !important;
+}

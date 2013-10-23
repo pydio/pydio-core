@@ -130,7 +130,6 @@ Class.create("RoleEditor", AbstractEditor, {
 
         if(this.roleData.USER){
             this.roleData.USER.PROFILE = this.element.down("#account_infos").down("select[name='profile']").getValue();
-            this.roleData.USER.DEFAULT_REPOSITORY = this.element.down("#account_infos").down("select[name='default_repository']").getValue();
             this.roleData.USER.ROLES = this.element.down("#account_infos").down("select[name='roles']").getValue();
             fullPostData["USER"] = this.roleData.USER;
         }else if(this.roleData.GROUP){
@@ -166,6 +165,15 @@ Class.create("RoleEditor", AbstractEditor, {
 
     },
 
+    updateTitle: function(label){
+        var pref = '';
+        if(this.scope == 'role') pref = 'Role: ';
+        else if(this.scope == 'user') pref = 'User: ';
+        else if(this.scope == 'group') pref = 'Group: ';
+        this.element.down("span.header_label").update(pref+label);
+        this.element.fire("editor:updateTitle", pref+label);
+    },
+
 	open : function($super, node){
 		$super(node);
         var mime = node.getAjxpMime();
@@ -178,9 +186,9 @@ Class.create("RoleEditor", AbstractEditor, {
             this.roleId = "AJXP_USR_/" + getBaseName(node.getPath());
             scope = "user";
         }
-        this.element.down("span.header_label").update(getBaseName(node.getPath()));
         this.node = node;
         this.scope = scope;
+        this.updateTitle(getBaseName(node.getPath()));
         this.loadRoleData(true);
 	},
 
@@ -277,7 +285,6 @@ Class.create("RoleEditor", AbstractEditor, {
             var defs = [
                 $H({"name":"login",label:MessageHash["ajxp_role_editor.21"],"type":"string", default:getBaseName(node.getPath()), readonly:true}),
                 $H({"name":"profile",label:MessageHash["ajxp_role_editor.22"],"type":"select", choices:profilesChoices, default:this.roleData.USER.PROFILE}),
-                //$H({"name":"default_repository",label:MessageHash["ajxp_role_editor.23"],"type":"select", choices:repos.join(","),default:this.roleData.USER.DEFAULT_REPOSITORY}),
                 $H({"name":"roles",label:MessageHash["ajxp_role_editor.24"],"type":"select", multiple:true, choices:rolesChoicesString, default:this.roleData.USER.ROLES.join(",")})
             ];
             defs = $A(defs);
@@ -394,7 +401,7 @@ Class.create("RoleEditor", AbstractEditor, {
             defs = $A(defs);
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);
             // UPDATE MAIN HEADER
-            this.element.down("span.header_label").update(this.roleData.GROUP.LABEL);
+            this.updateTitle(this.roleData.GROUP.LABEL);
 
             // REMOVE BUTTONS
             this.element.down("#pane-infos").down("#account_actions").remove();
@@ -419,7 +426,7 @@ Class.create("RoleEditor", AbstractEditor, {
             if(param.get("name").endsWith("DISPLAY_NAME") && param.get("default")){
                 var display = param.get("default");
                 if(this.roleData.USER && this.roleData.USER.LOCK) display += " ("+ MessageHash["ajxp_role_editor.36"] +")";
-                this.element.down("span.header_label").update(display);
+                this.updateTitle(display);
             }
             updatedDefs.push(param);
         }.bind(this));

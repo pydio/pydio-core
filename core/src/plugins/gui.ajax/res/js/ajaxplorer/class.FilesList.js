@@ -1605,6 +1605,7 @@ Class.create("FilesList", SelectableElements, {
 				// Defer Drag'n'drop assignation for performances
                 if(this.options.draggable == undefined || this.options.draggable === true){
                     window.setTimeout(function(){
+                        if(!this.htmlElement) return;// can be destroyed.
                         if(ajxpNode.getAjxpMime() != "ajxp_recycle"){
                             var newDrag = new AjxpDraggable(
                                 innerSpan,

@@ -197,10 +197,12 @@ Class.create("Splitter", AjxpPane, {
         if(this.paneA.ajxpPaneObject) {
             this.paneA.ajxpPaneObject.destroy();
             this.paneA.remove();
+            this.paneA = null;
         }
         if(this.paneB.ajxpPaneObject) {
             this.paneB.ajxpPaneObject.destroy();
             this.paneB.remove();
+            this.paneB = null;
         }
     },
 
@@ -439,6 +441,7 @@ Class.create("Splitter", AjxpPane, {
             this.setUserPreference("folded", false);
             this.refreshFoldingAction(this.foldedPane);
         }.bind(this), duration: 0.8}, function(p){
+            if(!this.paneA || !this.paneB) return;
             this.moveSplitter(p, (this.options.minA?false:this.foldedPane), target);
         }.bind(this) );
         if(this.foldedPane)this.foldedPane.removeClassName('folded');
@@ -471,6 +474,7 @@ Class.create("Splitter", AjxpPane, {
         new Effect.Tween(null, current, size, {afterFinish:function(){
             this.effectWorking = false;
         }.bind(this) }, function(p){
+            if(!this.paneA || !this.paneB) return;
             this.moveSplitter(p);
         }.bind(this) );
     },

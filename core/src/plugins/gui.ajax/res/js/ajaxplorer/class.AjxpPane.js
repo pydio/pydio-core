@@ -46,8 +46,7 @@ Class.create("AjxpPane", {
         if(this.htmlElement && this.options.elementStyle){
             this.htmlElement.setStyle(this.options.elementStyle);
         }
-		this.childrenPanes = $A([]);
-		this.scanChildrenPanes(this.htmlElement);
+		this.scanChildrenPanes(this.htmlElement, true);
         if(this.options.bindSizeTo){
             if(this.options.bindSizeTo.width){
                 this.options.bindSizeTo.width.events.each(function(eventName){
@@ -143,8 +142,9 @@ Class.create("AjxpPane", {
 	 * Find and reference direct children IAjxpWidget
 	 * @param element HTMLElement
 	 */
-	scanChildrenPanes : function(element){
+	scanChildrenPanes : function(element, reset){
         if(!element.childNodes) return;
+        if(reset) this.childrenPanes = $A();
 		$A(element.childNodes).each(function(c){
 			if(c.ajxpPaneObject) {
 				if(!this.childrenPanes){

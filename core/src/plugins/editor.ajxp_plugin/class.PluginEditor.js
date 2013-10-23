@@ -89,7 +89,7 @@ Class.create("PluginEditor", AbstractEditor, {
     open : function($super, node){
         $super(node);
         this.pluginId = getBaseName(node.getMetadata().get("plugin_id"));
-        this.element.down("span.header_label").update(node.getMetadata().get("text"));
+        this.updateTitle(node.getMetadata().get("text"));
         var icon = resolveImageSource(node.getIcon(), "/images/mimes/64");
         this.element.down("span.header_label").setStyle(
             {
@@ -101,6 +101,10 @@ Class.create("PluginEditor", AbstractEditor, {
         this.loadPluginConfig();
     },
 
+    updateTitle: function(label){
+        this.element.down("span.header_label").update(label);
+        this.element.fire("editor:updateTitle", label);
+    },
 
     loadPluginConfig : function(){
         var params = new Hash();
