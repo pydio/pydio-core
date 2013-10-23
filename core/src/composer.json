@@ -1,5 +1,6 @@
 {
     "require": {
+        "sabre/dav": "1.8.1",
         "dibi/dibi": "2.0.2"
     }
 }
