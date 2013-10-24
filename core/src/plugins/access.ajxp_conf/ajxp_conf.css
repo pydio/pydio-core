@@ -3,9 +3,10 @@
 }
 
 .flat_tree_pane .webfx-tree-item{
-    background-color: rgba(138, 149, 160, 0.7);
-    border-bottom: 1px solid white;
+    background-color: #ebedf0;
+    border-bottom: 1px solid #ebedf0;
     cursor: pointer;
+    padding: 2px 0;
 }
 
 .flat_tree_pane .webfx-tree-item.selected-webfx-tree-item-inactive{
@@ -22,14 +23,20 @@
     cursor: pointer;
 }
 
-.flat_tree_pane .webfx-tree-item a span{
-/*    font-size: 16px;
-    padding-top: 6px ;
-    padding-bottom: 4px ;
-    padding-left: 50px;
-    background-position: 11px 5px !important;
-    background-size: 24px;
-    line-height: 24px;*/
+.flat_tree_pane > #tree_container >  .webfx-tree-container > .webfx-tree-item a span{
+    font-weight: bold;
+    color: rgb(111, 123, 136);
+    background-image: none !important;
+    padding-left: 4px;
+    margin-top: 5px;
+}
+
+.flat_tree_pane div.webfx-tree-container.first_container {
+    padding: 0 6px 0 4px;
+}
+
+.flat_tree_pane .scrolling div.webfx-tree-container.first_container {
+    padding: 0 20px 0 4px;
 }
 
 .flat_tree_pane .webfx-tree-item img{
@@ -40,7 +47,7 @@
 
     background-color: white;
     margin-bottom: 20px;
-    box-shadow: 0px 2px 2px rgba(0,0,0,0.3);
+    box-shadow: 1px 1px 0 rgba(0,0,0,0.25);
 
 }
 
