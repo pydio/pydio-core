@@ -24,6 +24,12 @@ and (max-width : 680px) {
         font-size: 16px;
         width: 100px !important;
     }
+    #simple_repository_label div.repository_legend{
+        visibility: hidden;
+    }
+    #workspace_toolbar {
+        padding-top: 0;
+    }
     #group_more_action_button{
         height:17px;
     }

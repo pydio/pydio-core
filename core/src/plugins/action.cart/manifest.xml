@@ -17,7 +17,7 @@
         <client_configs>
             <component_config className="AjxpTabulator::topPane">
                 <additional_tab id="ajxp-cart-manager"
-                                tabInfo='{"id":"cart-manager","iconClass":"icon-suitcase","element":"ajxp-cart-manager","closeable":false,"label":"action.cart.10","dontFocus":true}'
+                                tabInfo='{"id":"cart-manager","iconClass":"icon-suitcase","element":"ajxp-cart-manager","closeable":false,"label":"action.cart.10","title":"action.cart.15","dontFocus":true}'
                                 paneInfo='{"type":"widget"}'><![CDATA[
                     <div id="ajxp-cart-manager" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
                         <div id="cart-manager-header" class="innerTabulator" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "saveState":true, "fitParent":"browser","defaultTabId": "default-cart","tabInfos": [{"id":"default-cart","label":"action.cart.9","iconClass":"icon-suitcase", "element":"default-cart"}], "headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["ajxp-cart-manager", "ajxp-cart-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'>

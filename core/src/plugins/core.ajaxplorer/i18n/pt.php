@@ -533,6 +533,9 @@ $mess=array(
 "477" => "Seleccione um ficheiro ou pasta para ver os seus detalhes aqui",
 "478" => "No results found",
 "479" => "Forgot your password?",
+"480" => "Browse all folders of the current workspace.",
+"481" => "All your shared files and folders",
+"482" => "Quick access to your bookmarked items",
 /* END SENTENCE */
 /* password strength tester */
 );

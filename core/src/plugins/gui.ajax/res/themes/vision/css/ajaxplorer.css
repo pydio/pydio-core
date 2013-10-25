@@ -629,7 +629,7 @@ html.boxshadow div.errorMessage{
 }
 
 .simple_tooltip_observer_active{
-    text-decoration: underline;
+    /*text-decoration: underline;*/
 }
 
 .simple_tooltip_title{
@@ -653,9 +653,9 @@ html.boxshadow div.errorMessage{
 }
 
 
-.down_arrow_tip {
-    /*position: relative;*/
-    background: rgb(111, 123, 136);
+.down_arrow_tip,
+.top_arrow_tip {
+    background: rgba(69, 77, 85, 0.86);
     color: white;
     border: 0;
     border-radius: 2px;
@@ -671,13 +671,37 @@ html.boxshadow div.errorMessage{
 }
 
 .down_arrow_tip:after {
-    border-color: rgba(111, 123, 136, 0);
-    border-top-color: rgb(111, 123, 136);
-    border-width: 10px;
+    border-color: rgba(69, 77, 85, 0);
+    border-top-color: rgba(69, 77, 85, 0.86);
+    border-width: 5px;
     left: 50%;
-    margin-left: -10px;
+    margin-left: -5px;
 }
 
+.top_arrow_tip{
+    width: 100px;
+}
+.top_arrow_tip:after {
+    bottom: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+.top_arrow_tip:after {
+    border-color: rgba(111, 123, 136, 0);
+    border-bottom-color:  rgb(111, 123, 136);
+    border-width: 5px;
+    left: 50%;
+    margin-left: -5px;
+}
+
+.arrow_tip_arrow_left:after{
+    left: 8%;
+}
 
 div.accordion_toggle,
 div.dialogContentMainTitle{
@@ -2356,6 +2380,17 @@ div.tabulatorContainer{
     padding: 0;
     height: 28px;
     overflow: hidden;
+    border-radius: 0;
+}
+
+#topPane > div.tabulatorContainer{
+    border-radius: 2px 0 0 0;
+}
+
+#cpane_tabs > div.tabulatorContainer{
+    border-left-width: 1px;
+    border-left-style: solid;
+    border-left-color: rgb(111, 123, 136);
 }
 
 div.tabulatorContainer div#display_toolbar{
@@ -2589,8 +2624,7 @@ span.search_meta_opt.checked > span {
 
 div.class-FetchedResultPane{
     background-color: #ebedf0;
-    border: 1px solid rgb(187,187,187);
-    border-width: 0 1px;
+    border-left: 1px solid rgb(187,187,187);
 }
 
 #search_results div.ajxpNodeProvider,
@@ -2654,8 +2688,13 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
 }
 
 #info_panel div.panelHeader.panelHeaderWithIcon{
+    /*
     background-color: #5599FF !important;
     border-bottom: 2px solid rgb(65, 117, 194);
+    */
+    background-color: #4dc5c3;
+    border-bottom: 2px solid #399997;
+
     -webkit-transition-property: height;
     -webkit-transition-duration: 0.2s;
     -webkit-transition-timing-function: ease-out;
@@ -2665,10 +2704,13 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
     transition-property: height;
     transition-duration: 0.2s;
     transition-timing-function: ease-out;
+
     padding-left: 6px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    border-radius: 0 2px 0 0;
 }
 
 #info_panel.folded div.panelHeader{
@@ -2694,13 +2736,16 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
 #info_panel.folded div.folded_icons{
     display: block;
     position: absolute;
-    top: 19px;
-    left: 7px;
+    top: 29px;
+    left: 0px;
+    background-color: #399997;
+    width: 27px;
+    height: 100%;
 }
 
 #info_panel.folded div.folded_icons span{
     display: block;
-    margin: 17px 0;
+    margin: 10px 0 21px 0;
     font-size: 13px;
     text-align: center;
 }
@@ -2711,10 +2756,9 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
 
 div.foldedPanel_tooltip{
     width: 210px !important;
-    background-color: #5599FF;
-    border-radius: 0;
+    background-color: #399997;
+    border-radius: 2px;
     border-width: 0;
-    border-right: 2px solid #3969B2;
     box-shadow: none;
     min-height: 35px;
 }
@@ -2726,7 +2770,7 @@ div.foldedPanel_tooltip:after {
     height: 0;
     border-width: 7px;
     border-style: solid;
-    border-color: transparent transparent transparent #3969B2;
+    border-color: transparent transparent transparent #399997;
     top: 15px;
     left: 220px;
 }
@@ -2918,18 +2962,20 @@ div.selectable_div, .table_rows_container, #tree_container, #bottomSplitPane, .a
 .vsplitbar
 {
     width: 3px;
-    /*background-color: #eee;*/
+    z-index: 10;
+}
+.vsplitbar:hover
+{
     background-image: url(../images/vgrabber.gif);
     background-repeat: no-repeat;
     background-position: center;
-    background-color: white;
+    background-color: #5C5C5C;/*rgba(255,255,255,0.5);*/
 }
 .vsplitbar.active
 {
     background-color: #5C5C5C;
 }
-
-.hsplitbar.folded{
+.hsplitbar.folded, .vsplitbar.folded{
     opacity: 0;
     cursor: default !important;
 }
@@ -4223,7 +4269,7 @@ td.ip_geo_cell{
     border-bottom: 1px solid rgb(187, 187, 187);
     color: rgb(111, 123, 136);
     border-left: 1px solid rgb(187, 187, 187);
-    border-right: 1px solid rgb(187, 187, 187);
+    border-right: 0;
 }
 
 .innerTabulator  div.panelHeader.tabulatorContainer

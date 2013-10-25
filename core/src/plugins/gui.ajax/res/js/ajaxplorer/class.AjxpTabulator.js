@@ -113,7 +113,13 @@ Class.create("AjxpTabulator", AjxpPane, {
             if(tabInfo.label){
                 label = MessageHash[tabInfo.label] || tabInfo.label;
             }
-            var td = new Element('span', {className:'toggleHeader toggleInactive', title:MessageHash[tabInfo.title] || label.stripTags()});
+            var title = MessageHash[tabInfo.title] || label.stripTags();
+            var options = {className:'toggleHeader toggleInactive'};
+            if(!this.options.tabsTips){ options.title = title; }
+            var td = new Element('span', options);
+            if(this.options.tabsTips){
+                modal.simpleTooltip(td, title, this.options.tabsTips, "down_arrow_tip", "element");
+            }
             if(tabInfo.icon){
                 td.insert('<img width="16" height="16" align="absmiddle" src="'+resolveImageSource(tabInfo.icon, '/images/actions/ICON_SIZE', 16)+'">');
             }

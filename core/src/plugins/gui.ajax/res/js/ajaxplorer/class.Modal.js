@@ -547,12 +547,16 @@ Class.create("Modal", {
             }else if(position.indexOf('bottom') != -1){
                 y -= 13 + parseInt(element.getHeight());
             }else if(position.indexOf('top') != -1){
-                y -= 18 + parseInt(this.tooltip.getHeight());
+                y -= 13 + parseInt(this.tooltip.getHeight());
             }
 
             var x;
             if(position.indexOf('center') != -1){
                 x = baseX - (this.tooltip.getWidth() - element.getWidth())/2;
+                if(x < 0){
+                    x = (baseX);
+                    this.tooltip.addClassName("arrow_tip_arrow_left");
+                }
             }else if(position.indexOf('right') != -1){
                 x = baseX + 10;
             }else{

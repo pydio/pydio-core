@@ -130,8 +130,8 @@
 					</div>
 				</div>
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
-					<div id="vertical_splitter" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA":"70%", "minB":26,"fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"B"}'>
-    					<div id="vertical_splitter2" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA": "50%", "minA":26, "maxA":450, "fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"A"}'>
+					<div id="vertical_splitter" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA":"70%", "minB":26,"fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"B", "invisibleBar": true}'>
+    					<div id="vertical_splitter2" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "autoFoldOnEvent":"ajaxplorer:context_changed", "initA": "50%", "minA":26, "maxA":450, "fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"A", "invisibleBar": true}'>
     					    <div id="topPane" ajxpClass="AjxpTabulator" ajxpOptions='{"defaultTabId": "folders","tabInfos" : [{"id":"folders","label":"130","iconClass":"icon-folder-close","element":"folder_pane"},{"id":"flagged","label":"147","iconClass":"icon-star","element":"flagged_elements"}],"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["filter","vertical_splitter2-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'>
                                 <div id="folder_pane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ></div>
                                 <div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"get_bookmarks", "format":"node_list"},"reloadOnServerMessage":"tree/reload_bookmarks"}'></div>
@@ -143,7 +143,7 @@
                                             <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                                             <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_tabs"}'></div>
                                         </div>
-                                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "fit":"height", "fitParent":"files_lit_pane", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
+                                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "fit":"height", "fitParent":"files_lit_pane", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}' style="border-left: 1px solid #bbb;"></div>
                                     </div>
                                 </div>
 							</div>

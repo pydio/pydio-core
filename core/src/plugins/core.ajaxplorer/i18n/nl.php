@@ -539,5 +539,8 @@ $mess=array(
 "477" => "Select a file or folder to see its details here",
 "478" => "No results found",
 "479" => "Forgot your password?",
+"480" => "Browse all folders of the current workspace.",
+"481" => "All your shared files and folders",
+"482" => "Quick access to your bookmarked items",
 /* END SENTENCE */
 );

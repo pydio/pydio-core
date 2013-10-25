@@ -15,5 +15,6 @@ $mess = array(
     "11"=> "Compress and Share",
     "12"=> "Create archive from selection and share this archive",
     "13"=> "Provide a label for this selection cart",
-    "14"=> "This will create an archive with all files and share it. Please select enter a name for this archive:"
+    "14"=> "This will create an archive with all files and share it. Please select enter a name for this archive:",
+    "15"=> "Drop elements in selection carts to download them or share them later",
 );
