@@ -90,8 +90,6 @@ define("HASH_PBKDF2_INDEX", 3);
 // MAKE SURE YOU HAVE PHP.5.3, OPENSSL, AND THAT IT DOES NOT DEGRADE PERFORMANCES
 define("USE_OPENSSL_RANDOM", false);
 
-require(AJXP_BIN_FOLDER."/compat.php");
-
 function AjaXplorer_autoload($className)
 {
     $fileName = AJXP_BIN_FOLDER."/"."class.".$className.".php";
