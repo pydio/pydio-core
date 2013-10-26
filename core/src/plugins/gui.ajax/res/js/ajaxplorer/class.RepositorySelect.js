@@ -38,9 +38,10 @@ Class.create("RepositorySelect", {
             this.options = options;
         }
 		this.createGui();
-		document.observe("ajaxplorer:repository_list_refreshed", function(e){
-			this.refreshRepositoriesMenu(e.memo.list,e.memo.active);
-		}.bind(this) );
+        this.observer = function(e){
+            this.refreshRepositoriesMenu(e.memo.list,e.memo.active);
+        }.bind(this);
+		document.observe("ajaxplorer:repository_list_refreshed",  this.observer);
 
 	},
 	
@@ -56,6 +57,7 @@ Class.create("RepositorySelect", {
 	 */	
 	destroy : function(){
 		this.element = null;
+        document.stopObserving("ajaxplorer:repository_list_refreshed", this.observer);
 	},
 	
 	/**

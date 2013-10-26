@@ -115,15 +115,15 @@ Class.create("SearchEngine", AjxpPane, {
         if(this.htmlElement && this.htmlElement.down('#search_meta')) {
             this.htmlElement.down('#search_meta').remove();
         }
-        if($('search_form') && $('search_form').down('#search_meta')) {
-            $('search_form').down('#search_meta').remove();
+        if(this.htmlElement.down('#search_form') && this.htmlElement.down('#search_form').down('#search_meta')) {
+            this.htmlElement.down('#search_form').down('#search_meta').remove();
         }
         if(this._ajxpOptions && this._ajxpOptions.metaColumns){
             var cols = this._ajxpOptions.metaColumns;
             if(this._ajxpOptions.toggleResultsVisibility && this.htmlElement && this.htmlElement.down("#" + this._ajxpOptions.toggleResultsVisibility)){
                 this.htmlElement.down("#" + this._ajxpOptions.toggleResultsVisibility).insert({top:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});
-            }else if($('search_form')){
-                $('search_form').insert({bottom:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});
+            }else if(this.htmlElement.down('#search_form')){
+                this.htmlElement.down('#search_form').insert({bottom:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});
             }
             if(this.htmlElement.down('#search_meta_options')){
                 this.initMetaOption(this.htmlElement.down('#search_meta_options'), 'filename', MessageHash[1], true);
@@ -161,18 +161,18 @@ Class.create("SearchEngine", AjxpPane, {
             if(this._ajxpOptions.toggleResultsVisibility){
                 this.htmlElement.down("#" + this._ajxpOptions.toggleResultsVisibility).insert({top:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});
             }else{
-                $('search_form').insert({bottom:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});
+                this.htmlElement.down('#search_form').insert({bottom:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});
             }
-			this.initMetaOption($('search_meta_options'), 'filename', MessageHash[1], true);
+			this.initMetaOption(this.htmlElement.down('#search_meta_options'), 'filename', MessageHash[1], true);
 			for(var key in cols){
                 if(this.indexedFields && !this.indexedFields.include(key)) continue;
-				this.initMetaOption($('search_meta_options'), key, cols[key]);
+				this.initMetaOption(this.htmlElement.down('#search_meta_options'), key, cols[key]);
 			}
 		}else{
-			$('search_form').insert('<div style="clear:left;height:9px;"></div>');
+			this.htmlElement.down('#search_form').insert('<div style="clear:left;height:9px;"></div>');
 		}
 		
-		this._inputBox = $("search_txt");
+		this._inputBox = this.htmlElement.down("#search_txt");
 		this._resultsBoxId = 'search_results';
 		this._searchButtonName = "search_button";
 		this._runningQueries = new Array();

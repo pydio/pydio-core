@@ -82,6 +82,7 @@
             ]]></template_part>
             -->
             <template_part ajxpClass="AjxpPane" ajxpId="workspace_toolbar" ajxpOptions='{"fit":"none"}'><![CDATA[
+                <div id="search_container_settings" class="settings_search_container" style="display:none;" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}'></div>
                 <style>
                 #workspace_toolbar{display:none;}
                 #browser{padding:0}
@@ -90,7 +91,6 @@
             <template_part ajxpId="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOption":"true"}' theme="vision"><![CDATA[
                 <div id="vertical_splitter" class="settings_main_pane" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "invisibleBar":true, "initA": "30%", "minA":4, "maxA":380, "fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"A"}'>
                     <div id="leftPane"  style="background-color:#ebedf0;" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                        <div id="search_container" style="display:none;" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}'></div>
                         <div id="settings_pane" class="flat_tree_pane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ></div>
                     </div>
                     <div id="rightPane"  style="background-color:#fffff; box-shadow: rgba(0, 0, 0, 0.247059) -1px 1px 6px;" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
@@ -105,6 +105,22 @@
                         </div>
                     </div>
                 </div>
+                <script>
+                    document.observeOnce("ajaxplorer:context_changed", function(){
+                        $A($("settings_pane").ajxpPaneObject.tree.childNodes).each(function(c){
+                            if(c._webfxtree_expand) c._webfxtree_expand();
+                        })
+                        $("global_toolbar").insert({bottom: $("search_container_settings")});
+                        $("top_toolbar").hide();
+                        $("search_container_settings").show();
+                        $("browser").ajxpPaneObject.resize();
+                        document.observeOnce("ajaxplorer:repository_list_refreshed",function(){
+                            $("top_toolbar").show();
+                            $("global_toolbar").down("#search_container_settings").ajxpPaneObject.destroy();
+                            $("global_toolbar").down("#search_container_settings").remove();
+                        });
+                    });
+                </script>
 			]]></template_part>
 		</client_configs>
 		<external_file filename="plugins/access.ajxp_conf/ajxp_confActions.xml" include="actions/*"/>
