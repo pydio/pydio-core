@@ -1,90 +1,6 @@
-.flat_tree_pane #tree_container > .webfx-tree-item{
-    display: none;
-}
-
-.flat_tree_pane .webfx-tree-item{
-    background-color: #ebedf0;
-    border-bottom: 1px solid #ebedf0;
-    cursor: pointer;
-    padding: 2px 0;
-}
-
-.flat_tree_pane .webfx-tree-item.selected-webfx-tree-item-inactive{
-    background-color: #59f !important;
-    color: white !important;
-}
-
-.flat_tree_pane .webfx-tree-item.selected-webfx-tree-item-inactive a{
-    color: #fff !important;
-}
-
-.flat_tree_pane .webfx-tree-item a{
-    color: white;
-    cursor: pointer;
-}
-
-.flat_tree_pane > #tree_container >  .webfx-tree-container > .webfx-tree-item a span{
-    font-weight: bold;
-    color: rgb(111, 123, 136);
-    background-image: none !important;
-    padding-left: 4px;
-    margin-top: 5px;
-}
-
-.flat_tree_pane div.webfx-tree-container.first_container {
-    padding: 0 6px 0 4px;
-}
-
-.flat_tree_pane .scrolling div.webfx-tree-container.first_container {
-    padding: 0 20px 0 4px;
-}
-
-.flat_tree_pane .webfx-tree-item img{
-    display:none;
-}
-
-.flat_tree_pane .webfx-tree-container > .webfx-tree-container{
-
-    background-color: white;
-    margin-bottom: 20px;
-    box-shadow: 1px 1px 0 rgba(0,0,0,0.25);
-
-}
-
-.flat_tree_pane .webfx-tree-container > .webfx-tree-container > .webfx-tree-container{
-
-    margin-bottom: 0;
-    box-shadow: none;
-
-}
-
-.flat_tree_pane .webfx-tree-container > .webfx-tree-container > .webfx-tree-item{
-    background-color: transparent;
-    border-top:0;
-}
-
-.flat_tree_pane .webfx-tree-container > .webfx-tree-container > .webfx-tree-item a {
-    color: rgb(111, 123, 136);
-}
-
-.flat_tree_pane .webfx-tree-container > .webfx-tree-container .webfx-tree-container{
-}
-
-.flat_tree_pane .webfx-tree-container > .webfx-tree-container .webfx-tree-container .webfx-tree-item{
-    padding-left: 20px;
-}
-
-.flat_tree_pane .webfx-tree-container > .webfx-tree-container > .webfx-tree-container .webfx-tree-container .webfx-tree-item{
-    padding-left: 40px;
-}
-
-.flat_tree_pane .webfx-tree-container > .webfx-tree-container > .webfx-tree-container > .webfx-tree-container .webfx-tree-container .webfx-tree-item{
-    padding-left: 60px;
-}
-
-
-.flat_tree_pane .webfx-tree-container > .webfx-tree-container > .webfx-tree-item a {
-    color: rgb(111, 123, 136);
+.settings_main_pane #search_form{
+    text-align: center;
+    padding: 19px 0 10px 0;
 }
 
 .developerDoc{
@@ -100,4 +16,35 @@
     background: #fa715c;
     border-radius: 4px;
     padding: 2px 7px 2px 3px !important;
+}
+
+.settings_main_pane #files_list_header{
+    padding-top: 8px;
+}
+
+.settings_main_pane .buttons_bar_container{
+    height: 46px;
+    padding-left: 8px;
+}
+
+.settings_main_pane #breadcrumb{
+    color: rgb(111, 123, 136);
+    font-size: 14px;
+    margin: 0;
+    padding: 0;
+    width: auto;
+}
+
+.settings_main_pane #breadcrumb_container{
+    background-color: white !important;
+    margin: 4px 10px 7px 10px;
+    padding: 4px 2px 0 7px;
+    border-radius: 2px;
+    color: #888;
+}
+
+
+.flat_tabulator[data-ajxpTabsCount="1"] span.toggleHeader
+{
+    background-color: white;
 }

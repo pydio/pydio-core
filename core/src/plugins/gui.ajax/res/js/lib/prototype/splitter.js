@@ -369,6 +369,7 @@ Class.create("Splitter", AjxpPane, {
 
     refreshFoldingAction : function(pane){
         if(!pane) pane = this.foldedPane;
+        if(!this.paneA) return;
         var state = this.splitbar.hasClassName("folded");
         if(!this.getFoldingAction()) return;
         if(this.options.foldingAlternateClose){
@@ -405,7 +406,7 @@ Class.create("Splitter", AjxpPane, {
     },
 
     foldPane:function(pane){
-        if(this.effectWorking) return;
+        if(this.effectWorking || this.options.noFolding) return;
         var realFoldValue;
         if(this.options.foldingButton == "A"){
             realFoldValue = this.prefoldValue = this.options.getAdjust(this.paneA);
@@ -457,6 +458,7 @@ Class.create("Splitter", AjxpPane, {
     },
 
     foldWithoutAnim : function(){
+        if(this.options.noFolding) return;
         if(this.options.foldingButton == "A"){
             this.prefoldValue = this.options.getAdjust(this.paneA);
             this.moveSplitter(0, (!this.options.minA ? this.paneA:false), this.prefoldValue);
@@ -553,7 +555,7 @@ Class.create("Splitter", AjxpPane, {
 	 * @param np Integer
 	 */
 	moveSplitter:function(np, folding, foldingSize){
-        if(!folding && this.options.minA && np < (this.options.minA + 10)){
+        if(!folding && this.options.minA && np < (this.options.minA + 10) && !this.options.noFolding){
             np = this.options.minA;
             var forceFolded = true;
         }

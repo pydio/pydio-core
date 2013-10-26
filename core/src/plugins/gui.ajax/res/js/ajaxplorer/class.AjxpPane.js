@@ -48,9 +48,12 @@ Class.create("AjxpPane", {
         }
 		this.scanChildrenPanes(this.htmlElement, true);
         if(this.options.bindSizeTo){
+            this.boundSizeEvents = $H();
             if(this.options.bindSizeTo.width){
                 this.options.bindSizeTo.width.events.each(function(eventName){
-                    document.observe("ajaxplorer:" + eventName, this.resizeBound.bind(this));
+                    var binder = this.resizeBound.bind(this);
+                    this.boundSizeEvents.set("ajaxplorer:" + eventName, binder);
+                    document.observe("ajaxplorer:" + eventName, binder);
                 }.bind(this) );
 
             }
@@ -130,12 +133,17 @@ Class.create("AjxpPane", {
         this.childrenPanes.each(function(child){
             child.destroy();
         });
+        if(!this.htmlElement) return;
         this.htmlElement.update("");
         if(window[this.htmlElement.id]){
             try{delete window[this.htmlElement.id];}catch(e){}
         }
 		this.htmlElement = null;
-
+        if(this.boundSizeEvents){
+            this.boundSizeEvents.each(function(pair){
+                document.stopObserving(pair.key, pair.value);
+            });
+        }
 	},
 	
 	/**

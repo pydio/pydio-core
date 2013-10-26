@@ -100,6 +100,101 @@
 	text-decoration: none;
 }
 
-.webfx-tree-item:first-of-type{
-    /*display:none;*/
+.flat_tree_pane div#tree_container{
+    border: 0;
+}
+.flat_tree_pane div#tree_container > .webfx-tree-item{
+    display: none;
+}
+
+.flat_tree_pane div.webfx-tree-item{
+    background-color: transparent;
+    border-bottom: 1px solid #ebedf0;
+    cursor: pointer;
+    padding: 7px 7px;
+}
+
+.flat_tree_pane  div.webfx-tree-item a span{
+    font-size: 15px;
+}
+
+.flat_tree_pane  div.webfx-tree-item.selected-webfx-tree-item-inactive,
+.flat_tree_pane  div.webfx-tree-item.selected-webfx-tree-item{
+    background-color: #fff !important;
+}
+
+.flat_tree_pane  div.webfx-tree-item.selected-webfx-tree-item a,
+.flat_tree_pane  div.webfx-tree-item.selected-webfx-tree-item-inactive a{
+    font-weight: bold;
+    color:rgb(111, 123, 136) !important;
+}
+
+.flat_tree_pane  div.webfx-tree-item a{
+    color: white;
+    cursor: pointer;
+}
+
+.flat_tree_pane > #tree_container >  .webfx-tree-container > .webfx-tree-item{
+    margin-top: 20px;
+}
+
+.flat_tree_pane > #tree_container >  .webfx-tree-container > .webfx-tree-item a span{
+    font-weight: normal;
+    color: rgb(111, 123, 136);
+    background-image: none !important;
+    padding-left: 4px;
+    margin-top: 5px;
+    font-size: 22px;
+}
+
+.flat_tree_pane div.webfx-tree-container.first_container {
+    padding: 0;
+}
+
+.flat_tree_pane  div.scrolling div.webfx-tree-container.first_container {
+    padding: 0;
+}
+
+.flat_tree_pane  div.webfx-tree-item img{
+    display:none;
+}
+
+.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container{
+    background-color: rgba(255,255,255, 0.5);
+}
+
+.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container > .webfx-tree-container{
+
+    margin-bottom: 0;
+    box-shadow: none;
+
+}
+
+.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container > .webfx-tree-item{
+    background-color: transparent;
+    border-top:0;
+}
+
+.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container > .webfx-tree-item a {
+    color: rgb(111, 123, 136);
+}
+
+.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container  div.webfx-tree-container{
+}
+
+.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container  div.webfx-tree-container  div.webfx-tree-item{
+    padding-left: 20px;
+}
+
+.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container > .webfx-tree-container .webfx-tree-container  div.webfx-tree-item{
+    padding-left: 40px;
+}
+
+.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container > .webfx-tree-container > .webfx-tree-container  div.webfx-tree-container  div.webfx-tree-item{
+    padding-left: 60px;
+}
+
+
+.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container > .webfx-tree-item a {
+    color: rgb(111, 123, 136);
 }

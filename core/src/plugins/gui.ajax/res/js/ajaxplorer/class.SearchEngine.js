@@ -83,6 +83,7 @@ Class.create("SearchEngine", AjxpPane, {
     },
 
     updateSearchModeFromRegistry : function(){
+        if(!this.htmlElement) return;
         if($(this._resultsBoxId) && !this._rootNode){
             $(this._resultsBoxId).update('');
         }else if(this._rootNode){
@@ -119,16 +120,16 @@ Class.create("SearchEngine", AjxpPane, {
         }
         if(this._ajxpOptions && this._ajxpOptions.metaColumns){
             var cols = this._ajxpOptions.metaColumns;
-            if(this._ajxpOptions.toggleResultsVisibility && $(this._ajxpOptions.toggleResultsVisibility) && this.htmlElement){
+            if(this._ajxpOptions.toggleResultsVisibility && this.htmlElement && this.htmlElement.down("#" + this._ajxpOptions.toggleResultsVisibility)){
                 this.htmlElement.down("#" + this._ajxpOptions.toggleResultsVisibility).insert({top:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});
             }else if($('search_form')){
                 $('search_form').insert({bottom:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});
             }
-            if($('search_meta_options')){
-                this.initMetaOption($('search_meta_options'), 'filename', MessageHash[1], true);
+            if(this.htmlElement.down('#search_meta_options')){
+                this.initMetaOption(this.htmlElement.down('#search_meta_options'), 'filename', MessageHash[1], true);
                 for(var key in cols){
                     if(this.indexedFields && !this.indexedFields.include(key)) continue;
-                    this.initMetaOption($('search_meta_options'), key, cols[key], false);
+                    this.initMetaOption(this.htmlElement.down('#search_meta_options'), key, cols[key], false);
                 }
             }
         }
@@ -294,6 +295,11 @@ Class.create("SearchEngine", AjxpPane, {
         }
         document.stopObserving("ajaxplorer:repository_list_refreshed", this.refreshObserver);
         document.stopObserving("ajaxplorer:registry_loaded", this.searchModeObserver);
+        if(this.boundSizeEvents){
+            this.boundSizeEvents.each(function(pair){
+                document.stopObserving(pair.key, pair.value);
+            });
+        }
 		this.htmlElement = null;
         if(ajxpId && window[ajxpId]){
             try {delete window[ajxpId];}catch(e){}

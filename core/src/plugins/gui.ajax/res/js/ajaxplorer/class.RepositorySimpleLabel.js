@@ -33,7 +33,7 @@ Class.create("RepositorySimpleLabel", AjxpPane, {
 
         this.htmlElement.update('<div class="repository_legend">Workspace</div>');
         this.htmlElement.insert('<div class="repository_title"></div>');
-        document.observe("ajaxplorer:repository_list_refreshed", function(e){
+        this.observer = function(e){
 
             this.htmlElement.down("div.repository_title").update(this._defaultString);
             var repositoryList = e.memo.list;
@@ -44,7 +44,14 @@ Class.create("RepositorySimpleLabel", AjxpPane, {
                     this.htmlElement.down("div.repository_title").update(repoObject.getLabel());
                 }
             }
-        }.bind(this));
+        }.bind(this);
+        document.observe("ajaxplorer:repository_list_refreshed", this.observer);
+    },
+
+    destroy: function(){
+
+        document.stopObserving("ajaxplorer:repository_list_refreshed", this.observer);
+
     }
 
 });

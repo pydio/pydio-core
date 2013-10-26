@@ -112,13 +112,13 @@
 				</div>
 			]]></template>
             <template name="main_vision" element="ajxp_desktop" position="top" theme="vision"><![CDATA[
-				<div id="toolbars">
+				<div id="toolbars" ajxpClass="AjxpPane">
 					<div id="global_toolbar" ajxpClass="LogoWidget">
 					    <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over"}'></div>
 						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["user"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
 						<div id="repo_chooser" ajxpClass="RepositorySelect" ajxpOptions='{"menuPosition": "bottom middle", "menuOffsetTop":11, "menuOffsetLeft":0, "menuMaxHeight":350, "menuEvent":"over", "simpleLabel":"<span class=\"icon-sitemap\"></span><span class=\"ws-label\" ajxp_message_id=\"455\">AJXP_MESSAGE[455]</span><span class=\"icon-caret-down\"></span>"}'></div>
 					</div>
-					<div id="workspace_toolbar">
+					<div id="workspace_toolbar" ajxpClass="AjxpPane">
                         <div id="simple_repository_label" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"bindSizeTo":{"width":{"id":"topPane", "events":["resize-AjxpTabulator-cpane_tabs","actions_refreshed"], "min":150,"offset":-5}}}'></div>
 					    <div style="float:left;" ajxpClass="AjxpPane"  id="buttons_bar_cont">
 						    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put", "get"],"groupOtherToolbars":["more", "change", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>

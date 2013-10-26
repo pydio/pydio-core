@@ -244,6 +244,7 @@ div.thumbnail_cell_metadata span.metadata_chunk{
     line-height: 17px;
     white-space : nowrap;
     color: #888;
+    text-overflow: ellipsis;
 }
 
 .text_label.full{
@@ -1742,8 +1743,8 @@ img.user_widget_mini{
 /******************************/
 div.header_resizer, div#search_meta{
     overflow:hidden;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
-    opacity: 0.8;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.35);
+    opacity: 0.85;
     max-height: 26px;
 }
 
@@ -1759,11 +1760,11 @@ div.header_resizer div.header_cell{
 div.header_resizer div.header_label{
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size: 12px;
-    padding: 4px 5px 3px;
+    padding: 4px 5px 4px;
     background-color: rgb(255, 255, 255);
     color: rgb(104, 120, 136);
     letter-spacing: 1px;
-    border-bottom: 1px solid rgb(194, 196, 199);
+    border-bottom: 0;
     height: 18px;
     overflow: hidden;
 }
@@ -1794,7 +1795,7 @@ div.header_resizer div.header_cell.descending div.header_label
 div.header_resizer div.resizer{
     float:left;
     width:1px;
-    background-color: #fff;
+    background-color: #ebedf0;
     height: 26px;
     cursor:e-resize;
     border: 0;
@@ -1848,7 +1849,7 @@ div.header_resizer div.ascending {
 }
 
 .sort-table td {
-    padding: 4px 0;
+    padding: 6px 0;
 }
 
 .no-flexbox .sort-table td{
@@ -2900,9 +2901,7 @@ div.selectable_div, .table_rows_container, #tree_container, #bottomSplitPane, .a
 
 .table_rows_container td
 {
-    border-top: 1px solid #eee;
-    border-bottom: 1px solid #eee;
-    border-right: 1px solid #eee;
+    border: 0;
 }
 .table_rows_container tr:nth-child(even)>td
 {
@@ -2917,7 +2916,7 @@ div.selectable_div, .table_rows_container, #tree_container, #bottomSplitPane, .a
 
 .table_rows_container tr:last-child td
 {
-    border-bottom: 1px solid #eee;
+    border-bottom: 0;
 }
 .infoPanelTable tr:last-child td
 {
@@ -4258,6 +4257,13 @@ td.ip_geo_cell{
     height: 19px;
 }
 
+/*
+TABULATOR VARIANTS
+*/
+
+/*
+TABULATOR IN A TABULATOR
+*/
 #files_list_header,
 .innerTabulator  div.panelHeader
 {
@@ -4308,6 +4314,57 @@ div.innerTabulator > div.tabulatorContainer > #display_toolbar a
 
 #cpane_tabs span.toggleInactiveBeforeActive{
     border-right: 0;
+}
+
+
+/*
+DASHBOARD TABULATOR
+*/
+.flat_tabulator  div.panelHeader.tabulatorContainer
+{
+    padding: 0 0 0 0;
+    height: auto;
+    background-color: transparent;
+    border-bottom: 0;
+}
+
+.flat_tabulator span.toggleHeader{
+    padding: 4px 12px;
+    border-right: 0;
+    background-color: #ebedf0;
+    color: rgb(111, 123, 136);
+    font-size: 30px;
+    border-radius: 4px;
+}
+
+.flat_tabulator span.toggleHeader.toggleInactive,
+.flat_tabulator[data-ajxpTabsCount="1"] span.toggleHeader
+{
+    background-color: white;
+}
+
+.flat_tabulator span.toggleHeader.toggleInactive{
+    font-size: 30px;
+}
+
+div.flat_tabulator > div.tabulatorContainer > #display_toolbar a:hover,
+div.flat_tabulator > div.tabulatorContainer > #display_toolbar a
+{
+    color: rgb(111, 123, 136) !important;
+}
+
+
+div.flat_tabulator span.toggleInactive{
+    border-right: 0;
+}
+
+div.flat_tabulator span.toggleInactiveBeforeActive{
+    border-right: 0;
+}
+
+div.flat_tabulator > div:not(.tabulatorContainer){
+    background-color: #ebedf0;
+    border-radius: 4px;
 }
 
 #breadcrumb{

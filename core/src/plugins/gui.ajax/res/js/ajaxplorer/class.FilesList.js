@@ -304,7 +304,7 @@ Class.create("FilesList", SelectableElements, {
 	contextObserver : function(e){
 		if(!this.crtContext) return;
 		//console.log('FILES LIST : FILL');
-        var base = getBaseName(this.crtContext.getPath());
+        var base = getBaseName(this.crtContext.getLabel());
         if(!base){
             try{base = ajaxplorer.user.repositories.get(ajaxplorer.repositoryId).getLabel();}catch(e){}
         }

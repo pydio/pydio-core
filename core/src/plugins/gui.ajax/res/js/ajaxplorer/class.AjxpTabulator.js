@@ -211,7 +211,7 @@ Class.create("AjxpTabulator", AjxpPane, {
         }
 
         $(this.htmlElement).insert(new Element("div", {id:tabInfo.element}));
-        fitHeightToBottom($(this.htmlElement).down("#"+tabInfo.element));
+        fitHeightToBottom($(this.htmlElement).down("#"+tabInfo.element), null, this.options.fitMarginBottom);
 
         if(paneInfo.type == 'editor' && paneInfo.node && paneInfo.node.getPath){
             var editorData;
@@ -370,6 +370,9 @@ Class.create("AjxpTabulator", AjxpPane, {
         if(this.options.headerToolbarOptions){
             ajaxplorer.actionBar.fireSelectionChange();
         }
+        if(this.htmlElement) {
+            this.htmlElement.writeAttribute("data-ajxpTabsCount", this.tabulatorData.size());
+        }
         this.resize();
         this.notify("switch", tabId);
 
@@ -383,7 +386,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 		var ajxpObject = this.getAndSetAjxpObject(this.selectedTabInfo);
 		if(ajxpObject){
             var nodeElement = $(this.htmlElement).down("#"+this.selectedTabInfo.element);
-            fitHeightToBottom(nodeElement);
+            fitHeightToBottom(nodeElement, null, this.options.fitMarginBottom);
             ajxpObject.resize(nodeElement?nodeElement.getHeight():this.htmlElement.getHeight());
             var left ;
             var total = 0;
