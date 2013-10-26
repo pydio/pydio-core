@@ -31,7 +31,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
             fullscreen:false
         }, editorOptions);
         $super(oFormObject, editorOptions);
-        fitHeightToBottom(this.element.down("#repositoryTabulator"), this.element.up(".dialogBox"));
+        fitHeightToBottom(this.element.down("#repositoryTabulator"));
         this.contentMainContainer = this.element.down("#repositoryTabulator");
         // INIT TAB
         var infoPane = this.element.down("#pane-infos");
@@ -370,7 +370,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
      */
     resize : function(size){
         if(size){
-            this.contentMainContainer.setStyle({height:size+"px"});
+            this.contentMainContainer.setStyle({height:(size - parseInt(this.element.down('.editor_header').getHeight()) - 30) +"px"});
         }else{
             fitHeightToBottom(this.contentMainContainer, this.element.up(".dialogBox"));
         }

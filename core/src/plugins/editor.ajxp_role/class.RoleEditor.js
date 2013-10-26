@@ -35,7 +35,7 @@ Class.create("RoleEditor", AbstractEditor, {
             fullscreen:false
         }, editorOptions);
         $super(oFormObject, editorOptions);
-        fitHeightToBottom(this.element.down("#roleTabulator"), this.element.up(".dialogBox"));
+        fitHeightToBottom(this.element.down("#roleTabulator"), this.element.up("div").up("div"));
         this.contentMainContainer = this.element.down("#roleTabulator");
         // INIT TAB
         this.element.down("#pane-infos").setStyle({position:"relative"});
@@ -199,9 +199,9 @@ Class.create("RoleEditor", AbstractEditor, {
      */
     resize : function(size){
         if(size){
-            this.contentMainContainer.setStyle({height:size+"px"});
+            this.contentMainContainer.setStyle({height:(size - parseInt(this.element.down('.editor_header').getHeight()) - 30) +"px"});
         }else{
-            fitHeightToBottom(this.contentMainContainer, this.element.up(".dialogBox"));
+            fitHeightToBottom(this.contentMainContainer, this.element.up("div").up("div"));
         }
         this.tab.resize();
         this.element.fire("editor:resize", size);
@@ -618,7 +618,7 @@ Class.create("RoleEditor", AbstractEditor, {
                         continue;
                     }
                     var el = new Element("div");
-                    var remove = new Element("span", {className:"list_remove_item"}).update(MessageHash["ajxp_role_editor.41"]);
+                    var remove = new Element("span", {className:"list_remove_item"}).update('<span class="icon-minus-sign"></span> ' + MessageHash["ajxp_role_editor.41"]);
                     el.insert(remove);
                     var repoLab;
                     if(repoScope == "AJXP_REPO_SCOPE_ALL") repoLab = MessageHash["ajxp_role_editor.12d"];
@@ -713,7 +713,7 @@ Class.create("RoleEditor", AbstractEditor, {
             // UPDATE FORMS ELEMENTS
             parametersPane.select("div.SF_element").each(function(element){
                 if(!element.down("span.inherited")){
-                    var removeLink = new Element("span", {className:"list_remove_item"}).update(MessageHash["ajxp_role_editor.41"]);
+                    var removeLink = new Element("span", {className:"list_remove_item"}).update('<span class="icon-minus-sign"></span> ' + MessageHash["ajxp_role_editor.41"]);
                     element.insert(removeLink);
                     removeLink.observe("click", this.parameterListRemoveObserver(element) );
                 }

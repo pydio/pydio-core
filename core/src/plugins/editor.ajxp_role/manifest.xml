@@ -49,7 +49,7 @@
                         <div class="SF_element">
                             <div class="SF_label">AJXP_MESSAGE[ajxp_role_editor.14]</div>
                             <select class="SF_input repository_selector" disabled="true"></select>
-                            <div class="add_button disabled">AJXP_MESSAGE[ajxp_role_editor.15]</div>
+                            <div class="add_button disabled"><span class="icon-plus-sign"></span> AJXP_MESSAGE[ajxp_role_editor.15]</div>
                         </div>
                         <div style="clear:both;"></div>
                     </div>
@@ -69,7 +69,7 @@
                         <div class="SF_element">
                             <div class="SF_label">AJXP_MESSAGE[ajxp_role_editor.14]</div>
                             <select class="SF_input repository_selector" disabled="true"></select>
-                            <div class="add_button disabled">AJXP_MESSAGE[ajxp_role_editor.18]</div>
+                            <div class="add_button disabled"><span class="icon-plus-sign"></span> AJXP_MESSAGE[ajxp_role_editor.18]</div>
                         </div>
                         <div style="clear:both;"></div>
                     </div>

@@ -17,11 +17,14 @@ div.tabbed_editor div.SF_label{
 
 .ajxp_theme_vision div.tabbed_editor{
     background-color: #ebedf0;
+    padding: 10px;
+    border-radius: 4px;
+    border:0;
 }
 
 
 div.tabbed_editor div.editor_header{
-    color: white;
+    height: 44px;
 }
 
 .ajxp_theme_vision div.tabbed_editor div.editor_header{
@@ -93,7 +96,7 @@ div#parameters-selector,
 div#pane-acls > div.dialogLegend,
 div#pane-infos
 {
-    padding: 20px 20px 40px 20px;
+    padding: 20px 20px 20px 20px;
 }
 
 div#pane-infos > div{
@@ -102,8 +105,8 @@ div#pane-infos > div{
 
 div.tabbed_editor div.innerTitle{
     font-size: 24px;
-    border-bottom: 1px solid #195470;
-    color: #195470;
+    border-bottom: 1px solid #4dc5c3;
+    color: #4dc5c3;
     margin-bottom: 10px;
 }
 
@@ -130,14 +133,12 @@ div#acls-selected
 
 div#actions-selected > div{
     padding: 9px;
-    border-bottom: 1px solid #ccc;
 }
 
 div#acls-selected div.repositoryEntry{
     clear:both;
     height: 17px;
     padding: 9px 8px 5px;
-    border-bottom: 1px solid #CCC;
 }
 
 div#acls-selected div.repositoryLabel{
@@ -173,21 +174,25 @@ div#acls-selected label{
     width: 64%;
 }
 
-div.add_button{
-    position: absolute;
-    right: 14%;
-    padding: 5px;
+div.add_button,
+span.list_remove_item
+{
     display: inline-block;
     cursor: pointer;
-    color: #195470;
-    text-decoration: underline;
+    background-color: #4dc5c3;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+}
+div.add_button{
+    padding: 5px;
+    position: absolute;
+    right: 16%;
 }
 span.list_remove_item{
+    padding:0 5px;
     float:right;
-    display: inline-block;
     cursor: pointer;
-    color: #195470;
-    text-decoration: underline;
 }
 
 
@@ -197,8 +202,8 @@ div.add_button.disabled{
 
 div.role_edit-params-form{
     padding: 10px;
-    border-left: 1px solid #ccc;
-    border-right: 1px solid #ccc;
+    border: 1px solid #ebedf0;
+    border-radius: 4px;
 }
 
 div#parameters-selected{
@@ -207,7 +212,6 @@ div#parameters-selected{
 
 div#parameters-selected.non_empty{
     border: 0;
-    border-bottom: 1px solid #ccc;
 }
 
 div#parameters-selected div.SF_element{

@@ -35,7 +35,7 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
             htmlElement.insert(new Element("div", {className:"tabpanes"}));
         }
         this.panes = htmlElement.down("div.tabpanes");
-        fitHeightToBottom(this.panes, this.element);
+        fitHeightToBottom(this.panes, this.htmlElement);
         if(htmlElement.down("ul.tabrow")){
             this.tabRow = htmlElement.down("ul.tabrow");
             htmlElement.down("ul.tabrow").select("li").each(function(tab){
@@ -94,7 +94,7 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
 	 * Resizes the widget
 	 */
 	resize : function(){
-        fitHeightToBottom(this.panes, this.element);
+        fitHeightToBottom(this.panes, this.htmlElement);
         this.tabRow.select("li").each(function(tab){
             if(tab.tabPANE){
                 fitHeightToBottom(tab.tabPANE, this.panes);
