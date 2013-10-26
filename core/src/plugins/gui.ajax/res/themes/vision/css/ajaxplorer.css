@@ -184,6 +184,10 @@ textarea{
     margin-top: 1px;
 }
 
+.thumbnail_selectable_cell.detailed.metadata_empty div.thumbLabel{
+    padding-top:18px;
+}
+
 div.thumbnail_cell_metadata span.metadata_chunk span.text_label{
     margin-left: 0;
     display:inline;

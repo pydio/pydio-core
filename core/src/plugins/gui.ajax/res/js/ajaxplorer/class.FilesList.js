@@ -1833,6 +1833,7 @@ Class.create("FilesList", SelectableElements, {
 
         var first = false;
         var attKeys = attributeList.keys();
+        var addedCell = 0;
         for(var i = 0; i<attKeys.length;i++ ){
             var s = attKeys[i];
             var cell = new Element("span", {className:'metadata_chunk'});
@@ -1858,10 +1859,14 @@ Class.create("FilesList", SelectableElements, {
                 metadataDiv.insert(new Element('span', {className:'icon-angle-right'}));
             }
             metadataDiv.insert(cell);
+            addedCell++;
             first = false;
             if(attributeList.get(s).modifierFunc){
                 attributeList.get(s).modifierFunc(cell, ajxpNode, 'detail', attributeList.get(s));
             }
+        }
+        if(!addedCell){
+            largeRow.addClassName('metadata_empty');
         }
 
         this._htmlElement.insert(largeRow);

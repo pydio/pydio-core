@@ -271,17 +271,20 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         "DESCRIPTION" => "Day-to-day administration of the application : who accesses to what, create roles, etc.",
                         "CHILDREN" => array(
                             "repositories" => array(
+                                "AJXP_MIME" => "workspaces_zone",
                                 "LABEL" => $mess["ajxp_conf.3"],
                                 "DESCRIPTION" => "Create and delete workspaces, add features to them using meta sources.",
                                 "ICON" => "hdd_external_unmount.png",
                                 "LIST" => "listRepositories"),
                             "users" => array(
+                                "AJXP_MIME" => "users_zone",
                                 "LABEL" => $mess["ajxp_conf.2"],
                                 "DESCRIPTION" => "Manage users and groups",
                                 "ICON" => "users-folder.png",
                                 "LIST" => "listUsers"
                             ),
                             "roles" => array(
+                                "AJXP_MIME" => "roles_zone",
                                 "LABEL" => $mess["ajxp_conf.69"],
                                 "DESCRIPTION" => "Define profiles that can be applied at once to whole bunch of users.",
                                 "ICON" => "user-acl.png",
@@ -410,6 +413,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         $bmString = '';
                         if(in_array($parentName.$key, $this->currentBookmarks)) $bmString = ' ajxp_bookmarked="true" overlay_icon="bookmark.png" ';
                         if($key == "users") $bmString .= ' remote_indexation="admin_search"';
+                        if(isSet($data["AJXP_MIME"])) $bmString .= ' ajxp_mime="'.$data["AJXP_MIME"].'"';
                         if (empty($data["CHILDREN"])) {
                             print '<tree text="'.AJXP_Utils::xmlEntities($data["LABEL"]).'" description="'.AJXP_Utils::xmlEntities($data["DESCRIPTION"]).'" icon="'.$data["ICON"].'" filename="'.$parentName.$key.'" '.$bmString.'/>';
                         } else {
@@ -418,6 +422,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                                 $bmString = '';
                                 if(in_array($parentName.$key."/".$cKey, $this->currentBookmarks)) $bmString = ' ajxp_bookmarked="true" overlay_icon="bookmark.png" ';
                                 if($cKey == "users") $bmString .= ' remote_indexation="admin_search"';
+                                if(isSet($cData["AJXP_MIME"])) $bmString .= ' ajxp_mime="'.$cData["AJXP_MIME"].'"';
                                 print '<tree text="'.AJXP_Utils::xmlEntities($cData["LABEL"]).'" description="'.AJXP_Utils::xmlEntities($cData["DESCRIPTION"]).'" icon="'.$cData["ICON"].'" filename="'.$parentName.$key.'/'.$cKey.'" '.$bmString.'/>';
                             }
                             print '</tree>';

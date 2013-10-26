@@ -97,7 +97,7 @@
                         <div id="editor_tabs" style="margin:20px;" ajxpClass="AjxpTabulator" class="flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":20, "registerAsEditorOpener":true, "saveState":false,"events":{}, "defaultTabId": "info","tabInfos" : [{"id":"info","label":"","iconClass":"icon-list-alt", "element":"files_list_pane"}]}'>
                             <div id="files_list_pane" ajxpClass="AjxpPane">
                                 <div id="actions" class="buttons_bar_container">
-                                    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["vertical_splitter-actions", "put", "get"],"groupOtherToolbars":["more", "change", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                                    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["vertical_splitter-actions", "put", "get"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                                 </div>
                                 <div id="breadcrumb_container"><div id="breadcrumb" ajxpClass="Breadcrumb" ajxpOptions=''></div></div>
                                 <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "fit":"height", "fitParent":"editor_tabs", "fitMarginBottom":10, "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}' style="border: 0; margin:0 10px;"></div>
@@ -108,7 +108,8 @@
                 <script>
                     document.observeOnce("ajaxplorer:context_changed", function(){
                         $A($("settings_pane").ajxpPaneObject.tree.childNodes).each(function(c){
-                            if(c._webfxtree_expand) c._webfxtree_expand();
+                            c._webfxtree_expand();
+                            $(c._loadingItem).remove();
                         })
                         $("global_toolbar").insert({bottom: $("search_container_settings")});
                         $("top_toolbar").hide();

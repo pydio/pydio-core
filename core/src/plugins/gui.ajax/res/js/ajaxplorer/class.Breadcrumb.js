@@ -36,19 +36,35 @@ Class.create("Breadcrumb", {
         this.element.update('Files');
         this.observerFunc = function(event){
             var newNode = event.memo;
+            var parts = $H();
             if(Object.isString(newNode)){
                 newNode = new AjxpNode(newNode);
-            }
-            var newPath = newNode.getPath();
-            var parts = $H();
-            var crtPath = "";
-            $A(newPath.split("/")).each(function(element){
-                if(!element) return;
-                crtPath += "/" + element;
-                parts.set(crtPath, element);
-            });
-            if(getBaseName(newPath) != newNode.getLabel()){
-                parts.set(newPath, newNode.getLabel());
+                var newPath = newNode.getPath();
+
+                var crtPath = "";
+                $A(newPath.split("/")).each(function(element){
+                    if(!element) return;
+                    crtPath += "/" + element;
+                    parts.set(crtPath, element);
+                });
+                if(getBaseName(newPath) != newNode.getLabel()){
+                    parts.set(newPath, newNode.getLabel());
+                }
+            }else{
+                var parent = newNode.getParent();
+                parts.set(newNode.getPath(), newNode.getLabel());
+                while(parent != null){
+                    var lastChild = parent;
+                    parts.set(parent.getPath(), parent.getLabel());
+                    parent = parent.getParent();
+                }
+                if(parts.size() > 1){
+                    parts.unset(lastChild.getPath());
+                }
+                var keys = parts.keys().reverse();
+                var tmpParts = $H();
+                keys.each(function(k){ tmpParts.set(k, parts.get(k)); });
+                parts = tmpParts;
             }
 
             var clickPath = "<span class='icon-home ajxp-goto' data-goTo='/' title='"+MessageHash[459]+"'></span>";
