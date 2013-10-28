@@ -1,3 +1,7 @@
+.settings_main_pane{
+    width: 100%;
+}
+
 .settings_main_pane #search_form{
     text-align: center;
     padding: 19px 0 10px 0;
@@ -36,7 +40,7 @@
 }
 
 .settings_main_pane #breadcrumb_container{
-    background-color: white !important;
+    background-color: transparent !important;
     margin: 4px 10px 7px 10px;
     padding: 4px 2px 0 7px;
     border-radius: 2px;
@@ -65,4 +69,17 @@
     height: 21px;
     border-radius: 4px;
     border: 0;
+}
+
+.settings_main_pane div#vertical_splitter-actions_toolbar > div.separator,
+.settings_main_pane div#vertical_splitter-actions_toolbar span.actionbar_button_label,
+.settings_main_pane div#remote_toolbar span.actionbar_button_label
+{
+    display: none;
+}
+
+.settings_main_pane div#vertical_splitter-actions_toolbar span.ajxp_icon_span,
+.settings_main_pane div#remote_toolbar span.ajxp_icon_span
+{
+    font-size: 1.4em;
 }
