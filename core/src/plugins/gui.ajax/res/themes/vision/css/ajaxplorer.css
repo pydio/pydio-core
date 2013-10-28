@@ -1146,8 +1146,15 @@ input.SF_input.SF_number{
 }
 .action_bar.editor_action_bar{
     height: 37px;
-    background-color: #ebedf0;
-    border-bottom: 1px solid rgb(138, 149, 160);
+    background-color: transparent;
+    border-bottom: 0 solid rgb(138, 149, 160);
+    right: 29px;
+    position: absolute;
+    z-index: 10;
+}
+
+.action_bar.editor_action_bar div.separator{
+    display: none;
 }
 
 span[message_id="Text Search"] {
@@ -4088,67 +4095,37 @@ td.ip_geo_cell{
 }
 
 
-.pluginfo_list {
-    padding-left: 0;
-}
-
-.pluginfo_list li:nth-child(2n+1) {
-    background-color: #F7F7F7;
-}
-
-.pluginfo_list li {
-    list-style: none;
-    padding: 5px 2px;
-    overflow: hidden;
-}
-
-.pluginfo_key {
-    display: inline-block;
-    width: 90px;
-    font-weight: bold;
-}
-
 /************************************************/
 /*     NICE ROUNDED PURE-CSS TABS                                     */
 /*     From http://css-tricks.com/better-tabs-with-round-out-borders/ */
 /************************************************/
 .tabrow {
     list-style: none;
-    margin: 15px 0 2px 0;
+    margin: 0 0 2px 0;
     padding: 0;
     line-height: 24px;
     overflow: hidden;
     font-size: 13px;
     position: relative;
+    border-bottom: 2px solid rgb(111, 123, 136);
 }
 
 .tabpanes {
-    background-color: #ffffff;
-    border-radius: 4px;
+
 }
 
 .tabrow li {
     border: 0;
-    border-radius: 4px;
     display: inline-block;
     position: relative;
     margin: 0;
-    padding: 0 10px;
+    padding: 6px 12px;
     cursor: pointer;
     color: rgb(111, 123, 136);
 }
 .tabrow li.selected {
-    color: rgb(111, 123, 136);
-    background: #FFFFFF !important;
-}
-
-.tabPane ul.tabrow li{
-    color: rgb(111, 123, 136);
-    background: #ffffff !important;
-}
-
-.tabPane ul.tabrow li.selected{
-    background:  #ebedf0 !important;
+    color: #ffffff;
+    background: rgb(111,123,136) !important;
 }
 
 #sm2-container{
@@ -4285,28 +4262,28 @@ DASHBOARD TABULATOR
 .flat_tabulator  div.panelHeader.tabulatorContainer
 {
     padding: 0 0 0 0;
-    height: auto;
+    height: 46px;
     background-color: transparent;
     border-bottom: 0;
 }
 
 .flat_tabulator span.toggleHeader{
-    padding: 4px 12px;
+    padding: 10px 15px;
     border-right: 0;
     background-color: #ebedf0;
     color: rgb(111, 123, 136);
-    font-size: 30px;
-    border-radius: 4px;
+    font-size: 22px;
+    border-top: 3px solid #4dc5c3;
 }
 
 .flat_tabulator[data-ajxpTabsCount="1"] span.toggleHeader
 {
-    background-color: white;
+/*    background-color: white;*/
 }
 
 .flat_tabulator span.toggleHeader.toggleInactive{
-    font-size: 30px;
-    background-color: white;
+    background-color: rgba(235, 237, 240, 0.40);
+    border-top: 0;
 }
 
 div.flat_tabulator > div.tabulatorContainer > #display_toolbar a:hover,
@@ -4326,7 +4303,7 @@ div.flat_tabulator span.toggleInactiveBeforeActive{
 
 div.flat_tabulator > div:not(.tabulatorContainer){
     background-color: #ebedf0;
-    border-radius: 4px;
+    border-radius: 0 0 2px 2px;
 }
 
 #breadcrumb{

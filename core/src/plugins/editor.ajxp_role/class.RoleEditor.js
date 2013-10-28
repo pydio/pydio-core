@@ -43,16 +43,16 @@ Class.create("RoleEditor", AbstractEditor, {
             fitHeightToBottom($("pane-infos"), $("role_edit_box"), Prototype.Browser.IE ? 40 : 0);
         }
         $("pane-actions").resizeOnShow = function(tab){
-            fitHeightToBottom($("actions-selected"), $("pane-actions"), 20);
+            fitHeightToBottom($("actions-selected"), $("pane-actions"), 0);
         }
         $("pane-parameters").resizeOnShow = function(tab){
-            fitHeightToBottom($("parameters-selected"), $("pane-parameters"), 20);
+            fitHeightToBottom($("parameters-selected"), $("pane-parameters"), 0);
             $("parameters-selected").select("div.tabPane").each(function(subTab){
                 if(subTab.resizeOnShow) subTab.resizeOnShow(null, subTab);
             });
         }
         $("pane-acls").resizeOnShow = function(tab){
-            fitHeightToBottom($("acls-selected"), $("pane-acls"), 20);
+            fitHeightToBottom($("acls-selected"), $("pane-acls"), 0);
         }
         this.tab = new AjxpSimpleTabs(oFormObject.down("#roleTabulator"));
         this.pluginsData = {};

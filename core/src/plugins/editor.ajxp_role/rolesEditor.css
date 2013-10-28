@@ -6,13 +6,78 @@ div.tabbed_editor{
     line-height: initial;
 }
 
-div.tabbed_editor input, div.tabbed_editor select{
+div.tabbed_editor div.accordion_content{
+    padding-bottom: 20px;
+}
+
+div.tabbed_editor input[type="text"]{
     font-size: 13px;
     line-height: 21px;
+    padding: 0 1% !important;
+    width: 52% !important;
+    height: 30px;
+    border: 1px solid #C8CCD3;
+}
+
+div.tabbed_editor input:focus,
+div.tabbed_editor textarea:focus,
+div.tabbed_editor select:focus
+{
+    border: 1px solid #4dc5c3;
+}
+
+div.tabbed_editor select, div.tabbed_editor textarea{
+    border: 1px solid #C8CCD3;
+    font-size: 13px;
+}
+
+div.tabbed_editor select{
+    height: 30px;
+    border: 1px solid #C8CCD3;
+}
+
+div.tabbed_editor select[multiple='true']{
+    height: auto;
+}
+
+div.tabbed_editor textarea{
+    border: 1px solid #ffffff;
+    font-size: 13px;
+    margin: 8px;
+}
+
+div.tabbed_editor div.SF_input{
+    padding-top: 5px !important;
 }
 
 div.tabbed_editor div.SF_label{
     padding-right: 0;
+    font-size: 14px !important;
+    line-height: 22px;
+    color: rgb(111, 123, 136);
+}
+
+div.tabbed_editor label{
+    color: rgb(111, 123, 136);
+}
+
+div.tabbed_editor div.SF_element{
+    padding-top: 15px;
+}
+div#actions-selector div.SF_element,
+div#parameters-selector div.SF_element{
+    padding-top: 5px;
+}
+
+div#actions-selector,
+div#parameters-selector{
+    margin-bottom: 20px;
+}
+
+div.tabbed_editor div.SF_input.SF_inlineButton{
+    margin-left: 10px !important;
+    width: 53% !important;
+    padding: 7px 3px !important;
 }
 
 .ajxp_theme_vision div.tabbed_editor{
@@ -24,7 +89,8 @@ div.tabbed_editor div.SF_label{
 
 
 div.tabbed_editor div.editor_header{
-    height: 44px;
+    display: none;
+    height: 0;
 }
 
 .ajxp_theme_vision div.tabbed_editor div.editor_header{
@@ -93,40 +159,50 @@ div.tabbed_editor div.inherited
 
 div#actions-selector,
 div#parameters-selector,
-div#pane-acls > div.dialogLegend,
-div#pane-infos
+div#pane-acls > div.dialogLegend
 {
-    padding: 20px 20px 20px 20px;
+    padding-top: 10px;
 }
 
 div#pane-infos > div{
     clear: both;
 }
 
+div#pane-docs{
+    padding:0 !important;
+}
+
 div.tabbed_editor div.innerTitle{
-    font-size: 24px;
-    border-bottom: 1px solid #4dc5c3;
-    color: #4dc5c3;
+    font-size: 13px;
+    border-bottom: 0;
+    background-color: rgba(111, 123, 136, 0.52);/*rgba(255, 255, 255, 0.6);*/
     margin-bottom: 10px;
+    text-align: left;
+    padding: 12px;
+    color: #ffffff;
 }
 
 div#account_actions{
     background: none;
     text-align: right;
-    padding: 12px 5px 18px;
+    padding: 12px 5% 18px;
 }
 
 div#actions-selected,
-div#parameters-selected,
 div#acls-selected
 {
 
-    margin: 0 20px;
-    border: 1px solid #CCC;
+    margin: 20px 0 0 0;
+    border: 0;
+    background-color: #ffffff;
     border-radius: 7px;
-    margin-top: 0;
     overflow-y: auto;
     padding: 2px;
+    font-size: 12px;
+
+}
+
+div#parameters-selected{
     font-size: 12px;
 
 }
@@ -138,7 +214,7 @@ div#actions-selected > div{
 div#acls-selected div.repositoryEntry{
     clear:both;
     height: 17px;
-    padding: 9px 8px 5px;
+    padding: 11px 8px 12px;
 }
 
 div#acls-selected div.repositoryLabel{
@@ -190,9 +266,11 @@ div.add_button{
     right: 16%;
 }
 span.list_remove_item{
-    padding:0 5px;
     float:right;
     cursor: pointer;
+    top: 16px;
+    right: 0;
+    padding: 8px 5px;
 }
 
 
@@ -222,61 +300,39 @@ div#parameters-selected .SF_input{
 }
 div#parameters-selected span.list_remove_item{
     position: absolute;
-    top: 8px;
+    top: 16px;
     right: 0;
 }
 
 span.m-2 {
-    border: 1px solid #14528f;
     display: inline-block;
-    -webkit-box-shadow: inset 0 1px 1px rgba(255, 255, 255, .25);
-    -moz-box-shadow: inset 0 1px 1px rgba(255, 255, 255, .25);
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, .25);
+    font-size: 11px;
+    padding: 5px 10px 7px 9px;
+    text-align: center;
+    overflow: visible;
     color: #fff;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, .25);
-    -webkit-transition: -webkit-box-shadow .1s linear;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-    font: bold 11px "Helvetica Neue", Arial, Geneva, sans-serif;
-    padding: 4px 7px;
-    cursor: pointer;
-	text-decoration: none;
-    margin-right: 8px;
-
-    background: #2a93c5; /* Old browsers */
-    background: -moz-linear-gradient(top, #2a93c5 0%, #226c8f 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#2a93c5), color-stop(100%,#226c8f)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top, #2a93c5 0%,#226c8f 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top, #2a93c5 0%,#226c8f 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top, #2a93c5 0%,#226c8f 100%); /* IE10+ */
-    background: linear-gradient(to bottom, #2a93c5 0%,#226c8f 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2a93c5', endColorstr='#226c8f',GradientType=0 ); /* IE6-9 */
+    outline: none;
+    border-radius: 2px;
+    margin: 5px 3px 0 1px;
+    background: #4dc5c3;
+    letter-spacing: 1px;
 }
 
-span.m-2:hover {
-	-webkit-box-shadow: 0 0 5px #6496ff;
+.pluginfo_list {
+    padding: 0 !important;
 }
 
-span.m-2:active {
-	background: -webkit-gradient(
-			linear,
-			left top,
-			left bottom,
-			from(#2b70c4),
-			to(#64abe6)
-		);
-	-webkit-box-shadow: inset 0 0 5px rgba(255, 255, 255, .25);
+.pluginfo_list li:nth-child(2n+1) {
+    background-color: #F7F7F7;
 }
 
-span.m-2.disabled {
-	background: -webkit-gradient(
-			linear,
-			left top,
-			left bottom,
-			from(#64abe6),
-			to(#2b70c4)
-		);
-	-webkit-box-shadow: inset 0 1px 1px rgba(255, 255, 255, .15);
-	cursor: auto;
-	opacity: .5;
+.pluginfo_list li {
+    list-style: none;
+    padding: 10px 7px;
+    overflow: hidden;
+}
+
+.pluginfo_key {
+    display: inline-block;
+    width: 90px;
 }

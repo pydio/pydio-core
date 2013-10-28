@@ -338,7 +338,7 @@ Class.create("FormManager", {
                 div = new Element('div', {className:"SF_element" + (addFieldCheckbox?" SF_elementWithCheckbox":"")});
                 if(type == "hidden") div.setStyle({display:"none"});
 
-                div.insert(new Element('div', {className:"SF_label"}).update(label+(mandatory?'*':'')+' :'));
+                div.insert(new Element('div', {className:"SF_label"}).update(label+(mandatory?'*':'')));
                 // INSERT CHECKBOX
                 if(addFieldCheckbox){
                     cBox = '<input type="checkbox" class="SF_fieldCheckBox" name="SFCB_'+name+'" '+(defaultValue?'checked':'')+'/>';
