@@ -36,29 +36,37 @@ Class.create("PluginEditor", AbstractEditor, {
         // INIT TAB
         var infoPane = this.element.down("#pane-infos");
         var docPane = this.element.down("#pane-docs");
-
+        var oElement = this.element;
         infoPane.setStyle({position:"relative"});
         infoPane.resizeOnShow = function(tab){
-            fitHeightToBottom(infoPane, $("plugin_edit_box"), Prototype.Browser.IE ? 40 : 0);
-        }
+            fitHeightToBottom(infoPane, oElement, Prototype.Browser.IE ? 40 : 0);
+        };
         docPane.resizeOnShow = function(tab){
-            fitHeightToBottom(docPane, $("plugin_edit_box"), Prototype.Browser.IE ? 40 : 0);
-        }
+            fitHeightToBottom(docPane, oElement, Prototype.Browser.IE ? 40 : 0);
+        };
         this.tab = new AjxpSimpleTabs(oFormObject.down("#pluginTabulator"));
         this.actions.get("saveButton").observe("click", this.save.bind(this) );
-        modal.setCloseValidation(function(){
-            if(this.isDirty()){
-                var confirm = window.confirm(MessageHash["ajxp_role_editor.19"]);
-                if(!confirm) return false;
-            }
-            return true;
-        }.bind(this) );
-        modal.setCloseAction(function(){
-            this.formManager.destroyForm(this.infoPane.down("div.driver_form"));
-        }.bind(this));
+        if(!modal._editorOpener) {
+            modal.setCloseValidation(this.validateClose.bind(this));
+            modal.setCloseAction(function(){
+                this.formManager.destroyForm(this.infoPane.down("div.driver_form"));
+            }.bind(this));
+        }
         oFormObject.down(".action_bar").select("a").invoke("addClassName", "css_gradient");
         this.infoPane = infoPane;
         this.docPane = docPane;
+    },
+
+    destroy: function(){
+        this.formManager.destroyForm(this.infoPane.down("div.driver_form"));
+    },
+
+    validateClose: function(){
+        if(this.isDirty()){
+            var confirm = window.confirm(MessageHash["ajxp_role_editor.19"]);
+            if(!confirm) return false;
+        }
+        return true;
     },
 
     save : function(){

@@ -190,10 +190,9 @@ Class.create("ConfigEditor",{
             // success callback
             hideLightBox();
             var editorData = ajaxplorer.findEditorById("editor.ajxp_role");
-            ajaxplorer.loadEditorResources(editorData.resourcesManager);
             var node = new AjxpNode(currentPath + "/"+newUserName, true);
             node.getMetadata().set("ajxp_mime", "user");
-            modal.openEditorDialog(editorData, node);
+            ajaxplorer.openCurrentSelectionInEditor(editorData, node);
         }.bind(this), function(responseXML){
             // error callback;
         });
@@ -445,8 +444,11 @@ Class.create("ConfigEditor",{
                 var editors = ajaxplorer.findEditorsForMime("repository");
                 if(editors.length && editors[0].openable){
                     var editorData = editors[0];
-                    ajaxplorer.loadEditorResources(editorData.resourcesManager);
-                    modal.openEditorDialog(editorData, newRepoId);
+                    var currentPath = ajaxplorer.getContextNode().getPath();
+                    var node = new AjxpNode(currentPath+"/"+newRepoId, true);
+                    node.getMetadata().set("text", this.newRepoLabelInput.getValue());
+                    ajaxplorer.openCurrentSelectionInEditor(editorData, node);
+                    hideLightBox();
                 }
             }
 		}.bind(this), function(){});

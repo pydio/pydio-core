@@ -849,8 +849,8 @@ Class.create("Ajaxplorer", {
         if(this._editorOpener == ajxpWidget) this._editorOpener = null;
     },
 
-    openCurrentSelectionInEditor:function(editorData){
-        var selectedNode = this.getContextHolder().getUniqueNode();
+    openCurrentSelectionInEditor:function(editorData, forceNode){
+        var selectedNode =  forceNode ? forceNode : this.getContextHolder().getUniqueNode();
         if(!selectedNode) return;
         if(!editorData){
             var selectedMime = getAjxpMimeType(selectedNode);

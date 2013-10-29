@@ -541,6 +541,9 @@ Class.create("Modal", {
             }
             var baseX = hookTo == "element" ? Element.cumulativeOffset(element).left : Event.pointerX(event);
             var baseY = hookTo == "element" ? Element.cumulativeOffset(element).top : Event.pointerY(event);
+            if(hookTo == 'element'){
+                baseY -= Element.cumulativeScrollOffset(element).top;
+            }
             var y = baseY+10;
             if(position.indexOf('middle') != -1){
                 y -= 5 + parseInt(this.tooltip.getHeight())/2;

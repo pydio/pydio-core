@@ -19,10 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Repository Editor",
-"2" => "Repository editor",
+"1" => "Workspace Editor",
+"2" => "Workspace editor",
 "3" => "Driver Options",
-"4" => "Repository Features",
+"4" => "Workspace Features",
 "5" => "Select feature",
 "6" => "Edit parameters",
 "7" => "Use the selector below to activate plugins that will add more functionnalities to the workspace.",

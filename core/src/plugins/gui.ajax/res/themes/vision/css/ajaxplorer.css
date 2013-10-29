@@ -532,19 +532,19 @@ textarea#myCode
 .largeButton,
 .SF_input.SF_inlineButton
 {
-    padding: 4px 5px 3px;
-    font-size: 12px;
+    display: inline-block;
+    font-size: 11px;
+    padding: 9px 0 !important;
     text-align: center;
-    border: 1px solid #A7A7A7;
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
+    overflow: visible;
+    color: #fff;
+    outline: none;
+    border-radius: 2px;
+    margin-left: 12px;
+    background: #4dc5c3;
+    letter-spacing: 1px;
+    float: left;
     cursor: pointer;
-    text-shadow: 1px 1px 1px white;
-    box-shadow: inset 1px 1px 1px white;
-    width: 95px;
-    display: inline-block !important;
-    margin: 6px 6px;
 }
 
 .largeButton img{
@@ -707,6 +707,38 @@ html.boxshadow div.errorMessage{
 .arrow_tip_arrow_left:after{
     left: 8%;
 }
+
+.right_arrow_tip {
+    color: #ffffff;
+    border-radius: 4px;
+    background-color: rgba(69, 77, 85, 0.86);
+    border: 0;
+}
+.right_arrow_tip:after, .right_arrow_tip:before {
+    left: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+.right_arrow_tip:after {
+    border-color: rgba(69, 77, 85, 0);
+    border-left-color: rgba(69, 77, 85, 0.86);
+    border-width: 5px;
+    top: 50%;
+    margin-top: -5px;
+}
+.right_arrow_tip:before {
+    border-color: rgba(69, 77, 85, 0);
+    border-left-color: rgba(69, 77, 85, 0.86);
+    border-width: 5px;
+    top: 50%;
+    margin-top: -5px;
+}
+
 
 div.accordion_toggle,
 div.dialogContentMainTitle{
@@ -3069,15 +3101,10 @@ ADMIN STYLES
 }
 
 .metaPane{
-    background-color: #f6f6f6;
     margin-bottom:5px;
     margin-top:2px;
-    float:left;
     padding:6px 5px 8px;
     width:96%;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
 }
 
 .metaPane img,
@@ -4119,9 +4146,11 @@ td.ip_geo_cell{
     display: inline-block;
     position: relative;
     margin: 0;
-    padding: 6px 12px;
+    padding: 11px 12px;
     cursor: pointer;
     color: rgb(111, 123, 136);
+    text-align: center;
+    line-height: 16px;
 }
 .tabrow li.selected {
     color: #ffffff;

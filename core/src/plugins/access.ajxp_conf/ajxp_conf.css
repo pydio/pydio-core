@@ -83,3 +83,14 @@
 {
     font-size: 1.4em;
 }
+
+.settings_main_pane #leftPane #buttons_bar{
+    position:absolute;
+    top:5px;
+    right:11px;
+    font-size: 12px;
+}
+
+.flat_tree_pane > #tree_container > .webfx-tree-container > .webfx-tree-item:first-of-type {
+    margin-top: 32px;
+}

@@ -338,7 +338,7 @@ Class.create("FormManager", {
                 div = new Element('div', {className:"SF_element" + (addFieldCheckbox?" SF_elementWithCheckbox":"")});
                 if(type == "hidden") div.setStyle({display:"none"});
 
-                div.insert(new Element('div', {className:"SF_label"}).update(label+(mandatory?'*':'')));
+                div.insert(new Element('div', {className:"SF_label"}).update('<span>'+label+(mandatory?'*':'')+'</span>'));
                 // INSERT CHECKBOX
                 if(addFieldCheckbox){
                     cBox = '<input type="checkbox" class="SF_fieldCheckBox" name="SFCB_'+name+'" '+(defaultValue?'checked':'')+'/>';
@@ -360,7 +360,7 @@ Class.create("FormManager", {
                 }.bind(this));
             }
 			if(desc && type != "legend"){
-				modal.simpleTooltip(div.select('.SF_label')[0], '<div class="simple_tooltip_title">'+label+'</div>'+desc);
+				modal.simpleTooltip(div.down('.SF_label').down('span'), '<div class="simple_tooltip_title">'+label+'</div>'+desc, 'middle left', "right_arrow_tip", "element");
 			}
             if(json_list){
                 var conn = new Connexion();

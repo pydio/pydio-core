@@ -293,36 +293,6 @@
 				</serverCallback>
 				</processing>
 		</action>
-		<action name="edit_repository_label">
-			<gui text="6" title="158" src="applix.png" iconClass="icon-pencil" accessKey="rename_access_key" hasAccessKey="true">
-				<context selection="true" dir="" recycle="hidden" allowedMimes="workspaces_zone"
-					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="put" inZip="false">
-				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="repository_editable" behaviour="hidden"></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
-			<processing>
-				<clientCallback prepareModal="false"><![CDATA[
-					var callback = function(node, newValue){
-						var conn = new Connexion();
-						conn.addParameter('get_action', 'edit');
-						conn.addParameter('sub_action', 'edit_repository_label');
-						conn.addParameter('repository_id', node.getMetadata().get('repository_id'));
-						conn.addParameter('newLabel', newValue);
-						conn.onComplete = function(transport){
-							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
-						};
-						conn.sendSync();
-					};
-
-					if(ajaxplorer.getUserSelection() && ajaxplorer.getUserSelection().getSelectionSource() && ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition) {ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition(callback);}
-					]]></clientCallback>
-				<serverCallback methodName="switchAction" restParams="/repository_id/newLabel">
-                    <input_param description="Repository Identifier" name="repository_id" type="string"/>
-                    <input_param description="New Label" name="newLabel" type="string"/>
-				</serverCallback>
-				</processing>
-		</action>
 		<action name="user_update_role" fileDefault="false">
 			<gui text="ajxp_conf.94" title="ajxp_conf.82" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
@@ -382,32 +352,48 @@
 		</action>
 		<action name="edit" fileDefault="true">
 			<gui text="ajxp_conf.93" title="301" iconClass="icon-edit" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
-				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
+				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="get" inZip="false">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="role,group,user,user_editable,repository,repository_editable,ajxp_plugin" behaviour="hidden"></selectionContext></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="role,group,user,user_editable,repository,repository_editable,ajxp_plugin" behaviour="disable"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
             <processing>
                 <clientCallback prepareModal="false"><![CDATA[
                     var editorData = window.actionArguments[0];
                     ajaxplorer.openCurrentSelectionInEditor(editorData);
-                    /*
-                    var editorData = window.actionArguments[0];
-                    if(!editorData){
-                        var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
-                        var editors = ajaxplorer.findEditorsForMime(selectedMime);
-                        if(editors.length && editors[0].openable){
-                            editorData = editors[0];
-                        }
-                    }
-                    if(editorData){
-                        ajaxplorer.loadEditorResources(editorData.resourcesManager);
-                        modal.openEditorDialog(editorData);
-                    }
-                    */
                 ]]></clientCallback>
                 <serverCallback methodName="switchAction" developerComment="Shortcut for various actions, calling edit with subaction parameter."/>
+            </processing>
+        </action>
+        <action name="edit_repository_label">
+            <gui text="6" title="158" src="applix.png" iconClass="icon-pencil" accessKey="rename_access_key" hasAccessKey="true">
+                <context selection="true" dir="" recycle="hidden" allowedMimes="workspaces_zone"
+                         actionBar="true" contextMenu="true" infoPanel="false"
+                         actionBarGroup="get" inZip="false">
+                </context>
+                <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="repository_editable" behaviour="hidden"></selectionContext></gui>
+            <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+            <processing>
+                <clientCallback prepareModal="false"><![CDATA[
+					var callback = function(node, newValue){
+						var conn = new Connexion();
+						conn.addParameter('get_action', 'edit');
+						conn.addParameter('sub_action', 'edit_repository_label');
+						conn.addParameter('repository_id', node.getMetadata().get('repository_id'));
+						conn.addParameter('newLabel', newValue);
+						conn.onComplete = function(transport){
+							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+						};
+						conn.sendSync();
+					};
+
+					if(ajaxplorer.getUserSelection() && ajaxplorer.getUserSelection().getSelectionSource() && ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition) {ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition(callback);}
+					]]></clientCallback>
+                <serverCallback methodName="switchAction" restParams="/repository_id/newLabel">
+                    <input_param description="Repository Identifier" name="repository_id" type="string"/>
+                    <input_param description="New Label" name="newLabel" type="string"/>
+                </serverCallback>
             </processing>
         </action>
 		<action name="save_user_preference">

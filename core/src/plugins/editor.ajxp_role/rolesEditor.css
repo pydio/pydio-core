@@ -10,7 +10,9 @@ div.tabbed_editor div.accordion_content{
     padding-bottom: 20px;
 }
 
-div.tabbed_editor input[type="text"]{
+div.tabbed_editor input[type="text"],
+div.tabbed_editor input[type="password"]
+{
     font-size: 13px;
     line-height: 21px;
     padding: 0 1% !important;
@@ -208,7 +210,12 @@ div#parameters-selected{
 }
 
 div#actions-selected > div{
-    padding: 9px;
+    padding: 13px 12px;
+}
+
+
+div#actions-selected > span.list_remove_item{
+    margin-top: -8px;
 }
 
 div#acls-selected div.repositoryEntry{

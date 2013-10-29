@@ -19,13 +19,13 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-    "1" => "Repository Editor",
-    "2" => "Repository editor",
+    "1" => "Workspace Editor",
+    "2" => "Workspace editor",
     "3" => "Driver Options",
-    "4" => "Repository Features",
+    "4" => "Workspace Features",
     "5" => "Select feature",
     "6" => "Edit parameters",
-    "7" => "Use the selector below to activate plugins that will add more functionnalities to the repository.",
+    "7" => "Use the selector below to activate plugins that will add more functionnalities to the Workspace.",
     "8" => "Click on a plugin to edit its parameters, or simply remove the feature",
     "9" => "Plugins %s",
     "10" => "Meta Sources",
@@ -33,5 +33,5 @@ $mess=array(
     "12" => "Meta Plugin",
     "13" => "Are you sure you want to delete this source?",
     "14" => "Please choose a driver!",
-    "15" => "This repository is defined in the config file (see conf/bootstrap_repositories.php), you cannot edit its features via the GUI.",
+    "15" => "This Workspace is defined in the config file (see conf/bootstrap_repositories.php), you cannot edit its features via the GUI.",
 );

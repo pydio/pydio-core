@@ -37,25 +37,30 @@ Class.create("RepositoryEditor", AbstractEditor, {
         var infoPane = this.element.down("#pane-infos");
         var metaPane = this.element.down("#pane-metas");
 
+        var oElement = this.element;
         infoPane.setStyle({position:"relative"});
         infoPane.resizeOnShow = function(tab){
-            fitHeightToBottom(infoPane, $("repository_edit_box"));
-        }
+            fitHeightToBottom(infoPane, oElement);
+        };
         metaPane.resizeOnShow = function(tab){
-            fitHeightToBottom(metaPane, $("repository_edit_box"));
-        }
+            fitHeightToBottom(metaPane, oElement);
+        };
         this.tab = new AjxpSimpleTabs(oFormObject.down("#repositoryTabulator"));
         this.actions.get("saveButton").observe("click", this.save.bind(this) );
-        modal.setCloseValidation(function(){
-            if(this.isDirty()){
-                var confirm = window.confirm(MessageHash["ajxp_role_editor.19"]);
-                if(!confirm) return false;
-            }
-            return true;
-        }.bind(this) );
+        if(!modal._editorOpener) {
+            modal.setCloseValidation(this.validateClose.bind(this));
+        }
         oFormObject.down(".action_bar").select("a").invoke("addClassName", "css_gradient");
         this.infoPane = infoPane;
         this.metaPane = metaPane;
+    },
+
+    validateClose: function(){
+        if(this.isDirty()){
+            var confirm = window.confirm(MessageHash["ajxp_role_editor.19"]);
+            if(!confirm) return false;
+        }
+        return true;
     },
 
     save : function(){
@@ -75,6 +80,8 @@ Class.create("RepositoryEditor", AbstractEditor, {
             conn.onComplete = function(transport){
                 ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
                 this.loadRepository(this.repositoryId);
+                ajaxplorer.fireNodeRefresh(this.node);
+
                 this.setClean();
             }.bind(this);
             conn.sendAsync();
@@ -104,8 +111,8 @@ Class.create("RepositoryEditor", AbstractEditor, {
     },
 
     updateTitle: function(label){
-        this.element.down("span.header_label").update("WS: "+label);
-        this.element.fire("editor:updateTitle", "WS: "+label);
+        this.element.down("span.header_label").update("<span class='icon-hdd'></span> "+label);
+        this.element.fire("editor:updateTitle", "<span class='icon-hdd'></span> "+label);
     },
 
     loadRepository : function(repId, metaTab){
@@ -195,7 +202,10 @@ Class.create("RepositoryEditor", AbstractEditor, {
     },
 
     feedMetaSourceForm : function(xmlData, metaPane){
-        metaPane.update("");
+        var metaTabHead = this.metaPane.down('.tabrow');
+        var metaTabBody = this.metaPane.down('.tabpanes');
+        metaTabHead.update("");
+        metaTabBody.update("");
         var data = XPathSelectSingleNode(xmlData, 'admin_data/repository/param[@name="META_SOURCES"]');
         if(data && data.firstChild && data.firstChild.nodeValue){
             var metaSourcesData = data.firstChild.nodeValue.evalJSON();
@@ -203,8 +213,9 @@ Class.create("RepositoryEditor", AbstractEditor, {
                 var metaLabel = XPathSelectSingleNode(xmlData, 'admin_data/metasources/meta[@id="'+plugId+'"]/@label').nodeValue;
                 var metaDefNodes = XPathSelectNodes(xmlData, 'admin_data/metasources/meta[@id="'+plugId+'"]/param');
 
-                var title = new Element('div',{className:'accordion_toggle', tabIndex:0}).update("<span class=\"title\">"+metaLabel+"</span>");
-                var accordionContent = new Element("div", {className:"accordion_content", style:"padding-bottom: 10px;"});
+                var id = this.repositoryId+"-meta-"+plugId.replace(".", "-");
+                var title = new Element('li',{tabIndex:0, "data-PaneID":id}).update(metaLabel);
+                var accordionContent = new Element("div", {className:"tabPane", id:id, style:"padding-bottom: 10px;"});
                 var form = new Element("div", {className:'meta_form_container'});
                 title._plugId = plugId;
                 form._plugId = plugId;
@@ -227,8 +238,8 @@ Class.create("RepositoryEditor", AbstractEditor, {
                     saveButton = accordionContent.down("div[name='meta_source_edit']");
                 }
                 accordionContent.insert("<div  tabindex='0' name='meta_source_delete' class='largeButton' style='min-width:70px;clear:both;margin-top: 7px;margin-left: 0'><img src=\""+ajxpResourcesFolder+"/images/actions/16/editdelete.png\"><span class=\"title\">Remove</span></div>");
-                metaPane.insert(title);
-                metaPane.insert(accordionContent);
+                metaTabHead.insert(title);
+                metaTabBody.insert(accordionContent);
                 if(saveButton){
                     form.select("div.SF_element").each(function(element){
                         element.select("input,textarea,select").invoke("observe", "change", function(event){
@@ -243,54 +254,39 @@ Class.create("RepositoryEditor", AbstractEditor, {
                         }.bind(this));
                     }.bind(this) );
                 }
-                title.observe('focus', function(event){
-                    if(metaPane.SF_accordion && metaPane.SF_accordion.showAccordion!=event.target.next(0)) {
-                        metaPane.SF_accordion.activate(event.target);
-                    }
-                });
             }
-            metaPane.SF_accordion = new accordion(metaPane, {
-                classNames : {
-                    toggle : 'accordion_toggle',
-                    toggleActive : 'accordion_toggle_active',
-                    content : 'accordion_content'
-                },
-                defaultSize : {
-                    width : '360px',
-                    height: null
-                },
-                direction : 'vertical'
-            });
+            this.metaTab = new AjxpSimpleTabs(this.metaPane.down("#metaTabulator"));
             metaPane.select("div.largeButton").invoke("observe", "click", this.metaActionClick.bind(this));
         }
+        if(!metaPane.down('div.metaPane')){
 
-        var addForm = new Element("div", {className:"metaPane"});
-        var formEl = new Element("div", {className:"SF_element"}).update("<div class='SF_label'>"+MessageHash['ajxp_repository_editor.12']+" :</div>");
-        this.metaSelector = new Element("select", {name:'new_meta_source', className:'SF_input'});
-        var choices = XPathSelectNodes(xmlData, 'admin_data/metasources/meta');
-        this.metaSelector.insert(new Element("option", {value:"", selected:"true"}));
-        var prevType = "";
-        var currentGroup;
-        for(var i=0;i<choices.length;i++){
-            var id = choices[i].getAttribute("id");
-            var type = id.split(".").shift();
-            var label = choices[i].getAttribute("label");
-            if(!currentGroup || type != prevType){
-                currentGroup = new Element("optgroup", {label:MessageHash["ajxp_repository_editor.9"].replace("%s", type)});
-                this.metaSelector.insert(currentGroup);
+            var addForm = new Element("div", {className:"metaPane"});
+            var formEl = new Element("div", {className:"SF_element"}).update("<div class='SF_label'>"+MessageHash['ajxp_repository_editor.12']+" :</div>");
+            this.metaSelector = new Element("select", {name:'new_meta_source', className:'SF_input'});
+            var choices = XPathSelectNodes(xmlData, 'admin_data/metasources/meta');
+            this.metaSelector.insert(new Element("option", {value:"", selected:"true"}));
+            var prevType = "";
+            var currentGroup;
+            for(var i=0;i<choices.length;i++){
+                var id = choices[i].getAttribute("id");
+                var type = id.split(".").shift();
+                var label = choices[i].getAttribute("label");
+                if(!currentGroup || type != prevType){
+                    currentGroup = new Element("optgroup", {label:MessageHash["ajxp_repository_editor.9"].replace("%s", type)});
+                    this.metaSelector.insert(currentGroup);
+                }
+                prevType = type;
+                currentGroup.insert(new Element("option",{value:id}).update(label));
             }
-            prevType = type;
-            currentGroup.insert(new Element("option",{value:id}).update(label));
+            addForm.insert(formEl);
+            addForm.insert('<div style="clear: both"></div>');
+            formEl.insert(this.metaSelector);
+            metaPane.insert({top:addForm});
+            addForm.insert({before: new Element("div", {className:"dialogLegend"}).update(MessageHash["ajxp_repository_editor.7"])});
+            var addFormDetail = new Element("div");
+            addForm.insert(addFormDetail);
+
         }
-        addForm.insert(formEl);
-        formEl.insert(this.metaSelector);
-        metaPane.insert({top:addForm});
-        addForm.insert({before: new Element("div", {className:"innerTitle"}).update(MessageHash["ajxp_repository_editor.5"])});
-        addForm.insert({before: new Element("div", {className:"dialogLegend"}).update(MessageHash["ajxp_repository_editor.7"])});
-        addForm.insert({after : new Element("div", {className:"dialogLegend"}).update(MessageHash["ajxp_repository_editor.8"])});
-        addForm.insert({after : new Element("div", {className:"innerTitle"}).update(MessageHash["ajxp_repository_editor.6"])});
-        var addFormDetail = new Element("div");
-        addForm.insert(addFormDetail);
 
         this.metaSelector.observe("change", function(){
             var plugId = this.metaSelector.getValue();
@@ -310,6 +306,12 @@ Class.create("RepositoryEditor", AbstractEditor, {
             addFormDetail.down(".largeButton").observe("click", this.metaActionClick.bind(this));
         }.bind(this));
 
+        this.metaPane.setStyle({overflowY:'hidden'});
+        this.metaPane.resizeOnShow = function(tab){
+            fitHeightToBottom(this.metaPane.down("#metaTabulator"), null, 30);
+            this.metaTab.resize();
+        }.bind(this);
+        this.metaTab.resize();
     },
 
     metaActionClick : function(event){
@@ -375,6 +377,10 @@ Class.create("RepositoryEditor", AbstractEditor, {
             fitHeightToBottom(this.contentMainContainer, this.element.up(".dialogBox"));
         }
         this.tab.resize();
+        if(this.metaTab){
+            fitHeightToBottom(this.metaPane.down("#metaTabulator"), null, 30);
+            this.metaTab.resize();
+        }
         this.element.fire("editor:resize", size);
     },
 

@@ -37,34 +37,46 @@ Class.create("RoleEditor", AbstractEditor, {
         $super(oFormObject, editorOptions);
         fitHeightToBottom(this.element.down("#roleTabulator"), this.element.up("div").up("div"));
         this.contentMainContainer = this.element.down("#roleTabulator");
+
+        var paneInfo = this.element.down("#pane-infos");
+        var paneActions = this.element.down("#pane-actions");
+        var paneParameters = this.element.down("#pane-parameters");
+        var paneAcls = this.element.down("#pane-acls");
+        var oElement = this.element;
+
         // INIT TAB
         this.element.down("#pane-infos").setStyle({position:"relative"});
-        $("pane-infos").resizeOnShow = function(tab){
-            fitHeightToBottom($("pane-infos"), $("role_edit_box"), Prototype.Browser.IE ? 40 : 0);
-        }
-        $("pane-actions").resizeOnShow = function(tab){
-            fitHeightToBottom($("actions-selected"), $("pane-actions"), 0);
-        }
-        $("pane-parameters").resizeOnShow = function(tab){
-            fitHeightToBottom($("parameters-selected"), $("pane-parameters"), 0);
-            $("parameters-selected").select("div.tabPane").each(function(subTab){
+
+        paneInfo.resizeOnShow = function(tab){
+            fitHeightToBottom(paneInfo, oElement, Prototype.Browser.IE ? 40 : 0);
+        };
+        paneActions.resizeOnShow = function(tab){
+            fitHeightToBottom(paneActions.down("#actions-selected"), paneActions, 0);
+        };
+        paneParameters.resizeOnShow = function(tab){
+            fitHeightToBottom(paneParameters.down("#parameters-selected"), paneParameters, 0);
+            paneParameters.down("#parameters-selected").select("div.tabPane").each(function(subTab){
                 if(subTab.resizeOnShow) subTab.resizeOnShow(null, subTab);
             });
-        }
-        $("pane-acls").resizeOnShow = function(tab){
-            fitHeightToBottom($("acls-selected"), $("pane-acls"), 0);
-        }
+        };
+        paneAcls.resizeOnShow = function(tab){
+            fitHeightToBottom(paneAcls.down("#acls-selected"), paneAcls, 0);
+        };
         this.tab = new AjxpSimpleTabs(oFormObject.down("#roleTabulator"));
         this.pluginsData = {};
         this.actions.get("saveButton").observe("click", this.save.bind(this) );
-        modal.setCloseValidation(function(){
-            if(this.isDirty()){
-                var confirm = window.confirm(MessageHash["ajxp_role_editor.19"]);
-                if(!confirm) return false;
-            }
-            return true;
-        }.bind(this) );
+        if(modal._editorOpener){
+            modal.setCloseValidation(this.validateClose.bind(this));
+        }
         oFormObject.down(".action_bar").select("a").invoke("addClassName", "css_gradient");
+    },
+
+    validateClose: function(){
+        if(this.isDirty()){
+            var confirm = window.confirm(MessageHash["ajxp_role_editor.19"]);
+            if(!confirm) return false;
+        }
+        return true;
     },
 
     save : function(){
@@ -154,7 +166,7 @@ Class.create("RoleEditor", AbstractEditor, {
                 if(this.roleData.USER)response.USER = this.roleData.USER;
                 if(this.roleData.GROUP)response.GROUP = this.roleData.GROUP;
                 this.initJSONResponse(response);
-                ajaxplorer.fireContextRefresh();
+                ajaxplorer.fireNodeRefresh(this.node);
                 this.setClean();
             }else{
                 ajaxplorer.displayMessage("ERROR", response.ERROR);
@@ -167,9 +179,9 @@ Class.create("RoleEditor", AbstractEditor, {
 
     updateTitle: function(label){
         var pref = '';
-        if(this.scope == 'role') pref = 'Role: ';
-        else if(this.scope == 'user') pref = 'User: ';
-        else if(this.scope == 'group') pref = 'Group: ';
+        if(this.scope == 'role') pref = '<span class="icon-th"></span> ';
+        else if(this.scope == 'user') pref = '<span class="icon-user"></span> ';
+        else if(this.scope == 'group') pref = '<span class="icon-group"></span> ';
         this.element.down("span.header_label").update(pref+label);
         this.element.fire("editor:updateTitle", pref+label);
     },
@@ -617,7 +629,7 @@ Class.create("RoleEditor", AbstractEditor, {
                     if(Object.isArray(actionsData[repoScope][pluginId])) {
                         continue;
                     }
-                    var el = new Element("div");
+                    var el = new Element("div", {className:"list_remove_div"});
                     var remove = new Element("span", {className:"list_remove_item"}).update('<span class="icon-minus-sign"></span> ' + MessageHash["ajxp_role_editor.41"]);
                     el.insert(remove);
                     var repoLab;
@@ -691,8 +703,9 @@ Class.create("RoleEditor", AbstractEditor, {
 
                 var pane = new Element("div", {id:"params-form-" + id, className:"role_edit-params-form"});
                 parametersPane.insert(pane);
+                var paneParameters = this.element.down('#parameters-selected');
                 pane.resizeOnShow = function(passedTab, passedPane){
-                    fitHeightToBottom(passedPane, $("parameters-selected"));
+                    fitHeightToBottom(passedPane, paneParameters);
                 };
                 var formParams = formManager.parseParameters(xml, 'standard_form/repoScope[@id="'+id+'"]/*');
                 for(var k=0;k<formParams.length;k++){

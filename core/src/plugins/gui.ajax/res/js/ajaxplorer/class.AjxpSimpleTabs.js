@@ -95,7 +95,25 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
 	 */
 	resize : function(){
         fitHeightToBottom(this.panes, this.htmlElement);
+        var tRW = this.tabRow.getWidth();
+        var padding = 0;
+        var lis = this.tabRow.select("li");
+        var currentSum = 0;
+        lis.each(function(t){
+            t.setStyle({width:'auto', maxWidth:'none'});
+            currentSum += t.getWidth();
+        });
+        if(currentSum > tRW){
+            if(lis.size()){
+                padding = parseInt(lis.first().getStyle('paddingLeft')) + parseInt(this.tabRow.down('li').getStyle('paddingRight'));
+            }
+            var maxWidth = Math.round(tRW / lis.size()) - padding - 2;
+        }
+
         this.tabRow.select("li").each(function(tab){
+            if(maxWidth) {
+                tab.setStyle({maxWidth:maxWidth+'px'});
+            }
             if(tab.tabPANE){
                 fitHeightToBottom(tab.tabPANE, this.panes);
                 if(tab.hasClassName("selected") && tab.tabPANE.resizeOnShow){
