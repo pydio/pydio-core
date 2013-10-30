@@ -2614,6 +2614,39 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
     color: rgb(143, 162, 182);
     letter-spacing: 1px;
     border-bottom: 1px solid rgb(194, 196, 199);
+    max-height: 140px !important;
+    box-shadow: none !important;
+}
+
+#search_meta input.c3,
+#search_meta span.c3
+{
+    width: 21%;
+    margin-left: 0;
+    margin-right: 0;
+    border: 1px solid #ACB2BB;
+    background-color: rgba(235, 237, 240, 0.35);
+    padding: 2px 3px;
+}
+
+#search_meta input.c3:focus{
+    background-color: white;
+}
+
+#search_meta span.c4 {
+    display: inline-block;
+    width: 18%;
+    text-align: left;
+}
+
+#search_meta span.c6 {
+    display: inline-block;
+    width: 14%;
+    text-align: center;
+}
+
+.advanced_search {
+    margin-top: 10px;
 }
 
 .searchScore{

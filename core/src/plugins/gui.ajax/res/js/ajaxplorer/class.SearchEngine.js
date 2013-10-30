@@ -119,21 +119,65 @@ Class.create("SearchEngine", AjxpPane, {
             this.htmlElement.down('#search_form').down('#search_meta').remove();
         }
         if(this._ajxpOptions && this._ajxpOptions.metaColumns){
-            var cols = this._ajxpOptions.metaColumns;
             if(this._ajxpOptions.toggleResultsVisibility && this.htmlElement && this.htmlElement.down("#" + this._ajxpOptions.toggleResultsVisibility)){
-                this.htmlElement.down("#" + this._ajxpOptions.toggleResultsVisibility).insert({top:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});
+                this.htmlElement.down("#" + this._ajxpOptions.toggleResultsVisibility).insert({top:'<div id="search_meta"></div>'});
             }else if(this.htmlElement.down('#search_form')){
-                this.htmlElement.down('#search_form').insert({bottom:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});
+                this.htmlElement.down('#search_form').insert({bottom:'<div id="search_meta"></div>'});
             }
-            if(this.htmlElement.down('#search_meta_options')){
-                this.initMetaOption(this.htmlElement.down('#search_meta_options'), 'filename', MessageHash[1], true);
-                for(var key in cols){
-                    if(this.indexedFields && !this.indexedFields.include(key)) continue;
-                    this.initMetaOption(this.htmlElement.down('#search_meta_options'), key, cols[key], false);
-                }
+            if(this.htmlElement.down('#search_meta')){
+                this.initMetadataForm(this.htmlElement.down('#search_meta'), this._ajxpOptions.metaColumns);
             }
         }
 
+    },
+
+    initMetadataForm: function(formPanel, metadataColumns){
+
+        formPanel.insert('<div id="basic_search"><span class="icon-caret-right"></span> '+MessageHash[344]+' : <span id="search_meta_options"></span></div>');
+
+        this.initMetaOption(formPanel.down('#search_meta_options'), 'filename', MessageHash[1], true);
+        for(var key in metadataColumns){
+            if(this.indexedFields && !this.indexedFields.include(key)) continue;
+            this.initMetaOption(formPanel.down('#search_meta_options'), key, metadataColumns[key], false);
+        }
+
+        var docPropertyTemplate = '<div class="advanced_search"><span class="icon-caret-right"></span> Document Property '+
+            '<div style="line-height: 27px;padding: 6px 5px;">'+
+            '<span class="c4"><span class="icon-file"></span> File </span><input id="ajxp_mime" class="c3" type="text" placeholder="Extension"><span class="c6">or</span><span class="c3" id="ajxp_folder"><span class="icon-folder-open"></span>Folder</span>'+
+            '<br><span class="c4"><span class="icon-calendar"></span> After </span><input id="ajxp_modiftime_from" class="c3" type="text" placeholder="YYYY/MM/DD"><span class="c6">until</span><input class="c3" type="text"  id="ajxp_modiftime_to" placeholder="YYYY/MM/DD">'+
+            '<br><span class="c4"><span class="icon-folder-open"></span> Size</span><input  id="ajxp_bytesize_from" type="text" class="c3" placeholder="1k,1M,1G..."><span class="c6"> to </span><input  id="ajxp_modiftime_to" type="text" class="c3" placeholder="1k,1M,1G..."></div>'+
+            '</div>';
+        formPanel.insert(docPropertyTemplate);
+
+        formPanel.select('input').each(function(el){
+            el.observe('focus', ajaxplorer.disableAllKeyBindings.bind(ajaxplorer));
+            el.observe('blur', ajaxplorer.enableAllKeyBindings.bind(ajaxplorer));
+        });
+
+    },
+
+    parseMetadataForm: function(){
+        var formPanel = this.htmlElement.down('#search_meta');
+        var metadata = $H();
+        formPanel.select('input').each(function(el){
+            if(!el.getValue()) return;
+            metadata.set(el.id, el.getValue());
+        });
+        if(metadata.get('ajxp_modiftime_from') || metadata.get('ajxp_modiftime_to')){
+            if(!metadata.get('ajxp_modiftime_from')) metadata.set('ajxp_modiftime_from','1970/01/01');
+            if(!metadata.get('ajxp_modiftime_to')) metadata.set('ajxp_modiftime_to','2150/01/01');
+            metadata.set('ajxp_modiftime', '['+metadata.get('ajxp_modiftime_from').replace(/\//g, '')+' TO '+metadata.get('ajxp_modiftime_to').replace(/\//g, '')+']');
+            metadata.unset('ajxp_modiftime_from');
+            metadata.unset('ajxp_modiftime_to');
+        }
+        if(metadata.get('ajxp_bytesize_from') || metadata.get('ajxp_bytesize_to')){
+            if(!metadata.get('ajxp_bytesize_from')) metadata.set('ajxp_bytesize_from',0);
+            if(!metadata.get('ajxp_bytesize_to')) metadata.set('ajxp_bytesize_to',1024*1024*1024*1024);
+            metadata.set('ajxp_bytesize', '['+metadata.get('ajxp_bytesize_from')+' TO '+metadata.get('ajxp_bytesize_to')+']');
+            metadata.unset('ajxp_bytesize_to');
+            metadata.unset('ajxp_bytesize_from');
+        }
+        return metadata;
     },
 
 	/**
@@ -157,17 +201,17 @@ Class.create("SearchEngine", AjxpPane, {
             this.htmlElement.down('#search_meta').remove();
         }
 		if(this._ajxpOptions && this._ajxpOptions.metaColumns){
-            var cols = this._ajxpOptions.metaColumns;
-            if(this._ajxpOptions.toggleResultsVisibility){
-                this.htmlElement.down("#" + this._ajxpOptions.toggleResultsVisibility).insert({top:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});
-            }else{
-                this.htmlElement.down('#search_form').insert({bottom:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});
+
+            if(this._ajxpOptions.toggleResultsVisibility && this.htmlElement && this.htmlElement.down("#" + this._ajxpOptions.toggleResultsVisibility)){
+                this.htmlElement.down("#" + this._ajxpOptions.toggleResultsVisibility).insert({top:'<div id="search_meta"></div>'});
+            }else if(this.htmlElement.down('#search_form')){
+                this.htmlElement.down('#search_form').insert({bottom:'<div id="search_meta"></div>'});
             }
-			this.initMetaOption(this.htmlElement.down('#search_meta_options'), 'filename', MessageHash[1], true);
-			for(var key in cols){
-                if(this.indexedFields && !this.indexedFields.include(key)) continue;
-				this.initMetaOption(this.htmlElement.down('#search_meta_options'), key, cols[key]);
-			}
+
+            if(this.htmlElement.down('#search_meta')){
+                this.initMetadataForm(this.htmlElement.down('#search_meta'), this._ajxpOptions.metaColumns);
+            }
+
 		}else{
 			this.htmlElement.down('#search_form').insert('<div style="clear:left;height:9px;"></div>');
 		}
@@ -366,9 +410,21 @@ Class.create("SearchEngine", AjxpPane, {
 	 * Perform search
 	 */
 	search : function(){
-		var text = this._inputBox.value;
-		if(text == '') return;
-		this.crtText = text.toLowerCase();
+		var text = this._inputBox.value.toLowerCase();
+        var searchQuery;
+        var metadata = this.parseMetadataForm();
+        if(metadata){
+            var parts = $A();
+            if(text) parts.push('basename:'+text);
+            metadata.each(function(pair){
+                parts.push(pair.key+':'+pair.value);
+            });
+            searchQuery = parts.join(" AND ");
+        }else{
+            searchQuery = text;
+        }
+		if(searchQuery == '') return;
+		this.crtText = searchQuery;
 		this.updateStateSearching();
 		this.clearResults();
 		var folder = ajaxplorer.getContextNode().getPath();

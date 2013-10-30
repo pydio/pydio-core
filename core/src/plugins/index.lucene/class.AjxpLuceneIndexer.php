@@ -105,6 +105,32 @@ class AjxpLuceneIndexer extends AJXP_Plugin
 
     }
 
+    protected function filterSearchRangesKeywords($query)
+    {
+        if(strpos($query, "AJXP_SEARCH_RANGE_TODAY") !== false){
+            $t1 = date("Ymd");
+            $t2 = date("Ymd");
+            $query = str_replace("AJXP_SEARCH_RANGE_TODAY", "[$t1 TO  $t2]", $query);
+        }else if(strpos($query, "AJXP_SEARCH_RANGE_YESTERDAY") !== false){
+            $t1 = date("Ymd", mktime(0,0,0,date('m'), date('d')-1, date('Y')));
+            $t2 = date("Ymd", mktime(0,0,0,date('m'), date('d')-1, date('Y')));
+            $query = str_replace("AJXP_SEARCH_RANGE_YESTERDAY", "[$t1 TO $t2]", $query);
+        }else if(strpos($query, "AJXP_SEARCH_RANGE_LAST_WEEK") !== false){
+            $t1 = date("Ymd", mktime(0,0,0,date('m'), date('d')-7, date('Y')));
+            $t2 = date("Ymd", mktime(0,0,0,date('m'), date('d'), date('Y')));
+            $query = str_replace("AJXP_SEARCH_RANGE_LAST_WEEK", "[$t1 TO $t2]", $query);
+        }else if(strpos($query, "AJXP_SEARCH_RANGE_LAST_MONTH") !== false){
+            $t1 = date("Ymd", mktime(0,0,0,date('m')-1, date('d'), date('Y')));
+            $t2 = date("Ymd", mktime(0,0,0,date('m'), date('d'), date('Y')));
+            $query = str_replace("AJXP_SEARCH_RANGE_LAST_MONTH", "[$t1 TO $t2]", $query);
+        }else if(strpos($query, "AJXP_SEARCH_RANGE_LAST_YEAR") !== false){
+            $t1 = date("Ymd", mktime(0,0,0,date('m'), date('d'), date('Y')-1));
+            $t2 = date("Ymd", mktime(0,0,0,date('m'), date('d'), date('Y')));
+            $query = str_replace("AJXP_SEARCH_RANGE_LAST_YEAR", "[$t1 TO $t2]", $query);
+        }
+        return $query;
+    }
+
     public function applyAction($actionName, $httpVars, $fileVars)
     {
         $messages = ConfService::getMessages();
@@ -145,7 +171,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin
                 $this->logDebug("Query : $query");
             } else {
                 $index->setDefaultSearchField("basename");
-                $query = $httpVars["query"];
+                $query = $this->filterSearchRangesKeywords($httpVars["query"]);
             }
             $this->setDefaultAnalyzer();
             if ($query == "*") {
@@ -471,6 +497,14 @@ class AjxpLuceneIndexer extends AJXP_Plugin
         $doc->addField(Zend_Search_Lucene_Field::Text("basename", basename($ajxpNode->getPath())), SystemTextEncoding::getEncoding());
         $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_node", "yes"), SystemTextEncoding::getEncoding());
         $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_scope", "shared"));
+        $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_modiftime", date("Ymd", $ajxpNode->ajxp_modiftime)));
+        $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_bytesize", $ajxpNode->bytesize));
+        if(empty($ajxpNode->ajxp_mime)){
+            $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_mime", pathinfo($ajxpNode->getLabel(), PATHINFO_EXTENSION)));
+        }else{
+            $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_mime", $ajxpNode->ajxp_mime));
+        }
+
 
         // Store a cached copy of the metadata
         $serializedMeta = base64_encode(serialize($ajxpNode->metadata));
