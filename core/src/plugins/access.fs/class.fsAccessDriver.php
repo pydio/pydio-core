@@ -1719,7 +1719,19 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $num = 0;
         //$verbose = true;
         $recurse = array();
-        if(!is_dir($dstdir)) mkdir($dstdir);
+        if(!is_dir($dstdir)) {
+            $dirMode = 0755;
+            $chmodValue = $this->repository->getOption("CHMOD_VALUE");
+            if (isSet($chmodValue) && $chmodValue != "") {
+                $dirMode = octdec(ltrim($chmodValue, "0"));
+                if ($dirMode & 0400) $dirMode |= 0100; // User is allowed to read, allow to list the directory
+                if ($dirMode & 0040) $dirMode |= 0010; // Group is allowed to read, allow to list the directory
+                if ($dirMode & 0004) $dirMode |= 0001; // Other are allowed to read, allow to list the directory
+            }
+            $old = umask(0);
+            mkdir($dstdir, $dirMode);
+            umask($old);
+        }
         if ($curdir = opendir($srcdir)) {
             while ($file = readdir($curdir)) {
                 if ($file != '.' && $file != '..') {
