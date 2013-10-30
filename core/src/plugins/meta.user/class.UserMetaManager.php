@@ -71,6 +71,7 @@ class UserMetaManager extends AJXP_Plugin
         $contrib = $selection->item(0);
         $even = false;
         $searchables = array();
+        $searchablesRenderers = array();
         $index = 0;
         $fieldType = "text";
         foreach ($def as $key=> $data) {
@@ -90,10 +91,14 @@ class UserMetaManager extends AJXP_Plugin
                 case "stars_rate":
                     $col->setAttribute("modifier", "MetaCellRenderer.prototype.starsRateFilter");
                     $col->setAttribute("sortType", "CellSorterValue");
+                    $searchables[$key] = $label;
+                    $searchablesRenderers[$key] = "MetaCellRenderer.prototype.starsRateFilter";
                     break;
                 case "css_label":
                     $col->setAttribute("modifier", "MetaCellRenderer.prototype.cssLabelsFilter");
                     $col->setAttribute("sortType", "CellSorterValue");
+                    $searchables[$key] = $label;
+                    $searchablesRenderers[$key] = "MetaCellRenderer.prototype.cssLabelsFilter";
                     break;
                 case "textarea":
                     $searchables[$key] = $label;
@@ -106,6 +111,7 @@ class UserMetaManager extends AJXP_Plugin
                     $col->setAttribute("modifier", "MetaCellRenderer.prototype.selectorsFilter");
                     $col->setAttribute("sortType", "CellSorterValue");
                     $col->setAttribute("metaAdditional", $this->fieldsAdditionalData[$key]);
+                    $searchablesRenderers[$key] = "MetaCellRenderer.prototype.selectorsFilter";
                     break;
                 default:
                     break;
@@ -133,6 +139,9 @@ class UserMetaManager extends AJXP_Plugin
         foreach ($selection as $tag) {
             $v = $tag->attributes->getNamedItem("ajxpOptions")->nodeValue;
             $metaV = count($searchables)? '"metaColumns":'.json_encode($searchables): "";
+            if (count($searchablesRenderers)) {
+                $metaV .= ',"metaColumnsRenderers":'.json_encode($searchablesRenderers);
+            }
             if (!empty($v) && trim($v) != "{}") {
                 $v = str_replace("}", ", ".$metaV."}", $v);
             } else {

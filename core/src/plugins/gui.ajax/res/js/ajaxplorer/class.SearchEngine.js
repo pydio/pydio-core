@@ -133,35 +133,114 @@ Class.create("SearchEngine", AjxpPane, {
 
     initMetadataForm: function(formPanel, metadataColumns){
 
-        formPanel.insert('<div id="basic_search"><span class="icon-caret-right"></span> '+MessageHash[344]+' : <span id="search_meta_options"></span></div>');
 
-        this.initMetaOption(formPanel.down('#search_meta_options'), 'filename', MessageHash[1], true);
+
+        formPanel.insert('<div id="basic_search"><span class="toggle_button open">Advanced <span class="icon-caret-down"></span></span>' +
+            '<span class="toggle_button close">Basic <span class="icon-caret-up"></span></span> ' +
+            '<span class="search_label open">'+MessageHash[344]+' : </span><span class="search_label close">Advanced Filter <span id="refresh_search_button" class="icon-refresh" title="Apply filter now"></span></span><span id="search_meta_options"></span></div>' +
+            '<div>' +
+            '<div class="scroller_track"><div class="scroller_handle"></div></div> ' +
+            '<div id="search_meta_detailed"><div class="advanced_search_section_title"><span class="icon-circle"></span> Metadata</div><div class="advanced_search_section"></div></div>' +
+            '</div>');
+
+        var oThis = this;
+        formPanel.select('.toggle_button').invoke('observe', 'click', function(){
+            formPanel.toggleClassName('toggle_open');
+            window.setTimeout(function(){
+                oThis.resize();
+            }, 150);
+            if(formPanel.hasClassName('toggle_open') && !formPanel.down('#basename').getValue() && oThis._inputBox.getValue()){
+                formPanel.down('#basename').setValue(oThis._inputBox.getValue());
+                formPanel.down('#basename').up('.advanced_search_section').addClassName('visible');
+            }
+        });
+
+        var simpleMeta = formPanel.down('#search_meta_options');
+        var advancedMeta = formPanel.down('#search_meta_detailed').down('.advanced_search_section');
+
+        this.initMetaOption(simpleMeta, advancedMeta, 'filename', MessageHash[1], true);
         for(var key in metadataColumns){
             if(this.indexedFields && !this.indexedFields.include(key)) continue;
-            this.initMetaOption(formPanel.down('#search_meta_options'), key, metadataColumns[key], false);
+            this.initMetaOption(simpleMeta, advancedMeta, key, metadataColumns[key], false);
         }
 
-        var docPropertyTemplate = '<div class="advanced_search"><span class="icon-caret-right"></span> Document Property '+
-            '<div style="line-height: 27px;padding: 6px 5px;">'+
+        var docPropertyTemplate = '<div class="advanced_search">' +
+            '<div class="advanced_search_section_title"><span class="icon-circle"></span> Date range</div>'+
+            '<div class="advanced_search_section">'+
+            '<span class="c4"><span class="icon-calendar"></span> After </span><input id="ajxp_modiftime_from" class="c3" type="text" placeholder="YYYY/MM/DD"><span class="c6">until</span><input class="c3" type="text"  id="ajxp_modiftime_to" placeholder="YYYY/MM/DD">'+
+            '<div id="modiftime_fixed_radio"><span id="ajxp_modiftime_fixed" class="c3" data-value="AJXP_SEARCH_RANGE_TODAY" type="text">Today</span>' +
+            '<span id="ajxp_modiftime_fixed" class="c3" data-value="AJXP_SEARCH_RANGE_YESTERDAY" type="text">Yesterday</span>' +
+            '<span id="ajxp_modiftime_fixed" class="c3" data-value="AJXP_SEARCH_RANGE_LAST_WEEK" type="text">Last week</span>' +
+            '<span id="ajxp_modiftime_fixed" class="c3" data-value="AJXP_SEARCH_RANGE_LAST_MONTH" type="text">Last month</span>' +
+            '<span id="ajxp_modiftime_fixed" class="c3" data-value="AJXP_SEARCH_RANGE_LAST_YEAR" type="text">Last Year</span></div>'+
+            '</div>'+
+            '<div class="advanced_search_section_title"><span class="icon-circle"></span> Document Property</div>'+
+            '<div class="advanced_search_section">'+
             '<span class="c4"><span class="icon-file"></span> File </span><input id="ajxp_mime" class="c3" type="text" placeholder="Extension"><span class="c6">or</span><span class="c3" id="ajxp_folder"><span class="icon-folder-open"></span>Folder</span>'+
-            '<br><span class="c4"><span class="icon-calendar"></span> After </span><input id="ajxp_modiftime_from" class="c3" type="text" placeholder="YYYY/MM/DD"><span class="c6">until</span><input class="c3" type="text"  id="ajxp_modiftime_to" placeholder="YYYY/MM/DD">'+
-            '<br><span class="c4"><span class="icon-folder-open"></span> Size</span><input  id="ajxp_bytesize_from" type="text" class="c3" placeholder="1k,1M,1G..."><span class="c6"> to </span><input  id="ajxp_modiftime_to" type="text" class="c3" placeholder="1k,1M,1G..."></div>'+
-            '</div>';
-        formPanel.insert(docPropertyTemplate);
+            '<br><span class="c4"><span class="icon-cloud-download"></span> Size</span><input  id="ajxp_bytesize_from" type="text" class="c3" placeholder="1k,1M,1G..."><span class="c6"> to </span><input  id="ajxp_modiftime_to" type="text" class="c3" placeholder="1k,1M,1G..."></div>'+
+            '</div>' +
+            '';
+        formPanel.down('#search_meta_detailed').insert({top:docPropertyTemplate});
 
         formPanel.select('input').each(function(el){
             el.observe('focus', ajaxplorer.disableAllKeyBindings.bind(ajaxplorer));
             el.observe('blur', ajaxplorer.enableAllKeyBindings.bind(ajaxplorer));
+            el.observe('keydown', function(event){
+                if(event.keyCode == Event.KEY_RETURN){
+                    oThis.search();
+                }
+            });
         });
+        var radios = formPanel.down('#modiftime_fixed_radio').select('span.c3');
+        radios.each(function(el){
+            el.observe('click', function(e){
+                if(el.hasClassName('selected')){
+                    el.removeClassName('selected');
+                }else{
+                    radios.invoke('removeClassName', 'selected');
+                    el.addClassName('selected');
+                }
+                formPanel.down('#ajxp_modiftime_from').disabled = formPanel.down('#ajxp_modiftime_to').disabled = el.hasClassName('selected');
+                oThis.search();
+            });
+        });
+
+        formPanel.down('#ajxp_folder').observe('click', function(e){
+            formPanel.down('#ajxp_folder').toggleClassName('selected');
+            formPanel.down('#ajxp_mime').disabled = formPanel.down('#ajxp_folder').hasClassName('selected');
+            oThis.search();
+        });
+
+        formPanel.down('#refresh_search_button').observe('click', function(e){
+            this.search();
+        }.bind(this));
+
+        formPanel.select('.advanced_search_section_title').invoke('observe', 'click', function(ev){
+            Event.findElement(ev, '.advanced_search_section_title').next('.advanced_search_section').toggleClassName('visible');
+            oThis.resize();
+        });
+
+        this.scrollbar = new Control.ScrollBar(formPanel.down('#search_meta_detailed'),formPanel.down('.scroller_track'));
 
     },
 
     parseMetadataForm: function(){
         var formPanel = this.htmlElement.down('#search_meta');
+        if(!formPanel.hasClassName('toggle_open')){
+            return false;
+        }
         var metadata = $H();
-        formPanel.select('input').each(function(el){
-            if(!el.getValue()) return;
-            metadata.set(el.id, el.getValue());
+        formPanel.select('input,span.c3.selected').each(function(el){
+            if(el.tagName.toLowerCase() == 'input'){
+                if(!el.getValue() || el.disabled) return;
+                metadata.set(el.id, el.getValue());
+            }else{
+                if(el.id == 'ajxp_folder'){
+                    metadata.set('ajxp_mime', 'ajxp_folder');
+                }else if(el.id == 'ajxp_modiftime_fixed'){
+                    metadata.set('ajxp_modiftime', el.readAttribute('data-value'));
+                }
+            }
         });
         if(metadata.get('ajxp_modiftime_from') || metadata.get('ajxp_modiftime_to')){
             if(!metadata.get('ajxp_modiftime_from')) metadata.set('ajxp_modiftime_from','1970/01/01');
@@ -177,6 +256,7 @@ Class.create("SearchEngine", AjxpPane, {
             metadata.unset('ajxp_bytesize_to');
             metadata.unset('ajxp_bytesize_from');
         }
+
         return metadata;
     },
 
@@ -319,6 +399,16 @@ Class.create("SearchEngine", AjxpPane, {
         }else{
             fitHeightToBottom($(this._resultsBoxId), null, (this._ajxpOptions.fitMarginBottom?this._ajxpOptions.fitMarginBottom:0));
         }
+
+        if(this.htmlElement.down('#search_meta')){
+            var formPanel = this.htmlElement.down('#search_meta');
+            fitHeightToBottom(formPanel.down('#search_meta_detailed'), formPanel);
+            if(this.scrollbar) {
+                this.scrollbar.track.setStyle({height:formPanel.down('#search_meta_detailed').getHeight()+'px'});
+                this.scrollbar.recalculateLayout();
+            }
+        }
+
         if(this._fileList){
             this._fileList.resize();
         }
@@ -356,7 +446,7 @@ Class.create("SearchEngine", AjxpPane, {
 	 * @param optionLabel String
 	 * @param checked Boolean
 	 */
-	initMetaOption : function(element, optionValue, optionLabel, checked){
+	initMetaOption : function(element, advancedPanel, optionValue, optionLabel, checked){
 		var option = new Element('span', {value:optionValue, className:'search_meta_opt'}).update('<span class="icon-ok"></span>'+ optionLabel);
 		if(checked) option.addClassName('checked');
 		if(element.childElements().length) element.insert(', ');
@@ -364,6 +454,18 @@ Class.create("SearchEngine", AjxpPane, {
 		option.observe('click', function(event){
 			option.toggleClassName('checked');
 		});
+        var fName = (optionValue == 'filename'?'basename':'ajxp_meta_'+optionValue);
+        advancedPanel.insert('<div><span class="c4" style="width: 25%;"><span class="icon-tag"></span> '+optionLabel+'</span><input style="width: 35%;" type="text" class="c3" id="'+fName+'"></div>');
+
+        /*
+        if(this._ajxpOptions.metaColumnsRenderers && this._ajxpOptions.metaColumnsRenderers[optionValue]){
+            var input = advancedPanel.down('#'+fName);
+            var func = eval(this._ajxpOptions.metaColumnsRenderers[optionValue]);
+            if(Object.isFunction(func)){
+                func(input);
+            }
+        }
+        */
 		this.metaOptions.push(option);
 	},
 	/**
@@ -415,7 +517,6 @@ Class.create("SearchEngine", AjxpPane, {
         var metadata = this.parseMetadataForm();
         if(metadata){
             var parts = $A();
-            if(text) parts.push('basename:'+text);
             metadata.each(function(pair){
                 parts.push(pair.key+':'+pair.value);
             });

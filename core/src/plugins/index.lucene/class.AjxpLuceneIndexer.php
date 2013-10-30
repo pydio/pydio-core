@@ -499,7 +499,8 @@ class AjxpLuceneIndexer extends AJXP_Plugin
         $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_scope", "shared"));
         $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_modiftime", date("Ymd", $ajxpNode->ajxp_modiftime)));
         $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_bytesize", $ajxpNode->bytesize));
-        if (empty($ajxpNode->ajxp_mime)) {
+        $ajxpMime = $ajxpNode->ajxp_mime;
+        if (empty($ajxpMime)) {
             $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_mime", pathinfo($ajxpNode->getLabel(), PATHINFO_EXTENSION)));
         } else {
             $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_mime", $ajxpNode->ajxp_mime));
