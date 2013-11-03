@@ -795,25 +795,6 @@ div.oneFieldForm input.SF_input{
 /********************/
 /* PROGRESS BAR     */
 /********************/
-#progressBox
-{
-    display: block;
-    z-index: 2002;
-    top: 20%;
-    -moz-border-radius : 5px;
-    border-radius : 5px;
-    width: 305px;
-    padding: 3px;
-    display: block;
-    top: 30%;
-    z-index: 2002;
-    left: 40%;
-    position: absolute;
-    -webkit-box-shadow: 5px 5px 60px #222;
-    -moz-box-shadow:  5px 5px 60px #222;
-    box-shadow: 5px 5px 60px #222;
-}
-
 .pg_cancel_button{
     background-color: #C33;
     display: inline-block;
@@ -4198,6 +4179,39 @@ div.dialogBox div.dialogBox.css_boxshadow{
     -webkit-box-shadow: 2px 2px 10px #4C5B6B;
     box-shadow: 2px 2px 10px #4C5B6B;
     border: 1px solid white;
+}
+
+div.dialogBox.form-login_form{
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.23);
+    -webkit-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.23);
+    -moz-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.23);
+}
+
+#progressBox
+{
+    display: block;
+    z-index: 2002;
+    top: 20%;
+    -moz-border-radius : 5px;
+    border-radius : 5px;
+    width: 305px;
+    padding: 3px;
+    display: block;
+    top: 30%;
+    z-index: 2002;
+    left: 40%;
+    position: absolute;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.23);
+    -webkit-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.23);
+    -moz-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.23);
+}
+
+div.overlay.form-login_form,
+div.overlay.form-switch_language_form
+{
+    opacity: 1 !important;
+    background-image: url('../images/grid_t.png');
+    background-color: white !important;
 }
 
 /****************************************/

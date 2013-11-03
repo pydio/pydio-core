@@ -48,8 +48,8 @@ Class.create("Modal", {
 	initForms: function(){
 		this.elementName = 'generic_dialog_box';
 		this.htmlElement = $(this.elementName);
-		this.dialogTitle = this.htmlElement.select(".dialogTitle")[0];
-		this.dialogContent = this.htmlElement.select(".dialogContent")[0];
+		this.dialogTitle = this.htmlElement.down(".dialogTitle");
+		this.dialogContent = this.htmlElement.down(".dialogContent");
 		this.currentForm;
 		this.cachedForms = new Hash();
 		this.iframeIndex = 0;	
@@ -101,7 +101,7 @@ Class.create("Modal", {
 	 */
 	showDialogForm: function(sTitle, sFormId, fOnLoad, fOnComplete, fOnCancel, bOkButtonOnly, skipButtons, useNextButtons){
 		this.clearContent(this.dialogContent);
-		//this.dialogTitle.innerHTML = sTitle;
+		this.htmlElement.className = 'dialogBox form-'+sFormId;
 		var newForm;
 		if($(sFormId).tagName == 'FORM') // WE PASSED A PREFETCHED HIDDEN FORM
 		{
@@ -112,7 +112,7 @@ Class.create("Modal", {
 		{
 			var formDiv = $(sFormId);
 			//var formDiv = $('all_forms').select('[id="'+sFormId+'"]')[0];	
-			var newForm = document.createElement('form');
+			newForm = document.createElement('form');
 			newForm.id = 'modal_action_form';
 			newForm.setAttribute('name','modal_action_form');
 			newForm.appendChild(formDiv.cloneNode(true));
@@ -173,7 +173,8 @@ Class.create("Modal", {
 				$(sFormId).getAttribute("box_height"),
 				null,
 				($(sFormId).getAttribute("box_resize") && $(sFormId).getAttribute("box_resize") == "true"),
-                overlayStyle
+                overlayStyle,
+                sFormId
         );
 		if($(newForm).select(".dialogFocus").length)
 		{
@@ -218,7 +219,7 @@ Class.create("Modal", {
 	 * @param boxHeight String Height in pixel or in percent
 	 * @param skipShadow Boolean Do not add a shadow
 	 */
-	showContent: function(elementName, boxWidth, boxHeight, skipShadow, boxAutoResize, overlayStyle){
+	showContent: function(elementName, boxWidth, boxHeight, skipShadow, boxAutoResize, overlayStyle, formId){
 		ajaxplorer.disableShortcuts();
 		ajaxplorer.disableNavigation();
 		ajaxplorer.blurAll();
@@ -276,7 +277,7 @@ Class.create("Modal", {
             Event.observe(window, "resize", this.currentResizeListener);
         }
 			
-		displayLightBoxById(elementName, overlayStyle);
+		displayLightBoxById(elementName, overlayStyle, (formId?'form-'+formId:null));
 		
 		// FORCE ABSOLUTE FOR SAFARI
 		$(elementName).style.position = 'absolute';
@@ -656,11 +657,11 @@ Class.create("Modal", {
 	 * Bootloader helper
 	 * @param state Integer Current loading step
 	 */
-	updateLoadingProgress: function(state){	
+	updateLoadingProgress: function(state){
 		this.loadingStep --;
 		var percent = (1 - (this.loadingStep / this.loadingStepsCount));
 		if(window.loaderProgress){
-			window.loaderProgress.setPercentage(parseInt(percent)*100, false);
+			window.loaderProgress.setPercentage(parseFloat(percent)*100, true);
 		}
 		if(state && $('progressState')){
 			$('progressState').update(state);

@@ -146,6 +146,11 @@ lightbox.prototype = {
                 }
                 $('overlay').setStyle(this.overlayStyle);
             }
+            if(this.overlayClass){
+                $('overlay').className = 'overlay '+this.overlayClass;
+            }else{
+                $('overlay').className = 'overlay';
+            }
 		}
 		if(this.content != null)
 		{
@@ -220,10 +225,11 @@ function initialize(){
 	
 }
 
-function displayLightBoxById(id, overlayStyle)
+function displayLightBoxById(id, overlayStyle, overlayClass)
 {
 	valid = new lightbox(id);
     if(overlayStyle) valid.overlayStyle = overlayStyle;
+    if(overlayClass) valid.overlayClass = overlayClass;
 	valid.activate();
 	currentLightBox = valid;	
 	if(id != 'copymove_div')

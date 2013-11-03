@@ -290,11 +290,11 @@ Class.create("AjxpBootstrap", {
 			boxImage	: window.ajxpResourcesFolder+'/images/progress_box.gif',			// boxImage : image around the progress bar
 			barImage	: window.ajxpResourcesFolder+'/images/progress_bar.gif',	// Image to use in the progressbar. Can be an array of images too.
 			height		: 11,										// Height of the progressbar - don't forget to adjust your image too!!!
-			onTick		: function(pbObj) { 
-				if(pbObj.getPercentage() == 100){
+			onTick		: function(pbObj) {
+				if(pbObj.getPercentage() >= 80){
                     new Effect.Parallel([
-                            new Effect.Opacity($('loader_round_progress'),{sync:true,from:1,to:0,duration:0.4}),
-                            new Effect.Opacity($('loader_dialog_footer'),{sync:true,from:1,to:0,duration:0.4})
+                            new Effect.Opacity($('loader_round_progress'),{sync:true,from:1,to:0,duration:0.6}),
+                            new Effect.Opacity($('loader_dialog_footer'),{sync:true,from:1,to:0,duration:0.6})
                         ],
                         {afterFinish : function(){
                             $('loading_overlay').remove();
