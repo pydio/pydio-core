@@ -52,7 +52,8 @@ function wordpress_remote_auth($host, $uri, $login, $pass, $formId = "")
     $client = new HttpClient($host);
     $client->setHandleRedirects(false);
     $client->setHeadersOnly(true);
-    $res = $client->post($uri."/wp-login.php", array(
+    $client->setCookies(array("wordpress_test_cookie"=>"WP+Cookie+check"));
+    $res = $client->post($uri, array(
         "log" => $login,
         "pwd" => $pass,
         "wp-submit" => "Log In",
