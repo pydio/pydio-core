@@ -66,7 +66,7 @@ class SimpleLockManager extends AJXP_Plugin
             throw new Exception("You have no right on this action.");
         }
         $selection = new UserSelection();
-        $selection->initFromHttpVars();
+        $selection->initFromHttpVars($httpVars);
         $currentFile = $selection->getUniqueFile();
         $wrapperData = $this->accessDriver->detectStreamWrapper(false);
         $urlBase = $wrapperData["protocol"]."://".$this->accessDriver->repository->getId();

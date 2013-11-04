@@ -95,7 +95,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
             case "delete" :
                 $mime = $httpVars["ajxp_mime"];
                 $selection = new UserSelection();
-                $selection->initFromHttpVars();
+                $selection->initFromHttpVars($httpVars);
                 $files = $selection->getFiles();
                 AJXP_XMLWriter::header();
                 foreach ($files as $index => $element) {
@@ -129,7 +129,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
             case "reset_download_counter" :
 
                 $selection = new UserSelection();
-                $selection->initFromHttpVars();
+                $selection->initFromHttpVars($httpVars);
                 $elements = $selection->getFiles();
                 foreach ($elements as $element) {
                     PublicletCounter::reset(str_replace(".php", "", basename($element)));

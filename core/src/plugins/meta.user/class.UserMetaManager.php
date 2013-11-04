@@ -220,11 +220,10 @@ class UserMetaManager extends AJXP_Plugin
             throw new Exception("You have no right on this action.");
         }
         $selection = new UserSelection();
-        $selection->initFromHttpVars();
+        $selection->initFromHttpVars($httpVars);
         $currentFile = $selection->getUniqueFile();
         $urlBase = $this->accessDriver->getResourceUrl($currentFile);
         $ajxpNode = new AJXP_Node($urlBase);
-
 
         $newValues = array();
         $def = $this->getMetaDefinition();
