@@ -96,4 +96,6 @@ $mess = array(
     "91"=> "Tags (Enter to save)",
     "92"=> "New link",
     "93"=> "Existing links",
+    "94"=> "QR Code",
+    "95"=> "Show/Hide QR Code.",
 );
