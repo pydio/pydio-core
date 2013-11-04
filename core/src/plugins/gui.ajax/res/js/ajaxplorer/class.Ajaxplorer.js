@@ -360,7 +360,10 @@ Class.create("Ajaxplorer", {
 		if(!window[ajxpId]) return;
 		// First destroy current component, unregister actions, etc.			
 		var oldObj = window[ajxpId];
-        if(!oldObj.__className) oldObj = $(ajxpId).ajxpPaneObject;
+        if(!oldObj.__className) {
+            if(!$(ajxpId)) return;
+            oldObj = $(ajxpId).ajxpPaneObject;
+        }
 		if(oldObj.__className == ajxpClassName && oldObj.__ajxpOptionsString == ajxpOptionsString){
 			return;
 		}
