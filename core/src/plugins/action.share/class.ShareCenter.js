@@ -200,6 +200,8 @@ Class.create("ShareCenter", {
                 // Reorganize
                 var repoFieldset = oForm.down('div#target_repository');
             }
+            
+            this.createQRCode = ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("CREATE_QRCODE");
 
             var ppass = new Protopass($('shared_pass'), {
                 barContainer : $('pass_strength_container'),
@@ -721,22 +723,22 @@ Class.create("ShareCenter", {
             }
         }
         var forceOldSchool = ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("EMAIL_INVITE_EXTERNAL");
-            var mailerButton;
-            if(dialogButtonsOrRow.hasClassName('SF_horizontal_fieldsRow')){
-                if(!dialogButtonsOrRow.down('#mailer_button')){
-                    dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:"<span class='icon-envelope simple_tooltip_observer' id='mailer_button' data-tooltipTitle='"+MessageHash['share_center.80']+"'> "+MessageHash['share_center.79']+"</span>"});
-                }
-                mailerButton = dialogButtonsOrRow.down('#mailer_button');
-                mailerButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.41"]);
-            }else{
-                var oForm = dialogButtonsOrRow.parentNode;
-                var unShare = oForm.down("#unshare_button");
-                mailerButton = unShare.cloneNode(true);
-                mailerButton.down("img").writeAttribute("src","plugins/gui.ajax/res/themes/umbra/images/actions/22/mail_generic.png");
-                mailerButton.down("span").update(MessageHash["share_center.40"]);
-                unShare.insert({after:mailerButton});
-                mailerButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.41"]);
+        var mailerButton;
+        if(dialogButtonsOrRow.hasClassName('SF_horizontal_fieldsRow')){
+            if(!dialogButtonsOrRow.down('#mailer_button')){
+                dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:"<span class='icon-envelope simple_tooltip_observer' id='mailer_button' data-tooltipTitle='"+MessageHash['share_center.80']+"'> "+MessageHash['share_center.79']+"</span>"});
             }
+            mailerButton = dialogButtonsOrRow.down('#mailer_button');
+            mailerButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.41"]);
+        }else{
+            var oForm = dialogButtonsOrRow.parentNode;
+            var unShare = oForm.down("#unshare_button");
+            mailerButton = unShare.cloneNode(true);
+            mailerButton.down("img").writeAttribute("src","plugins/gui.ajax/res/themes/umbra/images/actions/22/mail_generic.png");
+            mailerButton.down("span").update(MessageHash["share_center.40"]);
+            unShare.insert({after:mailerButton});
+            mailerButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.41"]);
+        }
 
         if(ajaxplorer.hasPluginOfType("mailer") && !forceOldSchool){
             mailerButton.observe("click", function(event){
@@ -785,6 +787,45 @@ Class.create("ShareCenter", {
                 e.target.href = 'mailto:unknown@unknown.com?Subject='+subject+'&Body='+body;
             }.bind(this));
 
+        }
+        
+        if (this.createQRCode) {
+            if(dialogButtonsOrRow.hasClassName('SF_horizontal_fieldsRow')){
+                if(!dialogButtonsOrRow.down('#qrcode_button')){
+                    dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:"<span class='icon-qrcode simple_tooltip_observer' id='qrcode_button' data-tooltipTitle='"+MessageHash['share_center.94']+"'> "+MessageHash['share_center.95']+"</span>"});
+                }
+                qrcodeButton = dialogButtonsOrRow.down('#qrcode_button');
+                qrcodeButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.95"]);
+            }else{
+                var oForm = dialogButtonsOrRow.parentNode;
+                var unShare = oForm.down("#unshare_button");
+                qrcodeButton = unShare.cloneNode(true);
+                qrcodeButton.down("img").writeAttribute("src","plugins/gui.ajax/res/themes/umbra/images/actions/22/qr-code.png");
+                qrcodeButton.down("span").update(MessageHash["share_center.94"]);
+                unShare.insert({after:qrcodeButton});
+                qrcodeButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.95"]);
+            }
+            var qrcodediv = document.getElementById('share_qrcode');
+            qrcodediv.innerHTML = '';
+            
+            qrcodeButton.observe("click", function(event){
+                Event.stop(event);
+                if(shareType == "file"){
+                    var url = dialogButtonsOrRow.down('[name="link_url"]').getValue();
+                }else{
+                    var url = this._currentRepositoryLink;
+                }
+                
+                if (qrcodediv.innerHTML == '') {
+                    var qrcode = new QRCode("share_qrcode", {
+                        width: 128,
+                        height: 128
+                    });
+                    qrcode.makeCode(url);
+                } else {
+                    qrcodediv.innerHTML = '';
+                }
+            }.bind(this));
         }
     },
 
