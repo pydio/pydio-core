@@ -24,6 +24,7 @@ define('AJXP_SANITIZE_HTML', 1);
 define('AJXP_SANITIZE_HTML_STRICT', 2);
 define('AJXP_SANITIZE_ALPHANUM', 3);
 define('AJXP_SANITIZE_EMAILCHARS', 4);
+define('AJXP_SANITIZE_FILENAME', 5);
 
 // THESE ARE DEFINED IN bootstrap_context.php
 // REPEAT HERE FOR BACKWARD COMPATIBILITY.
@@ -133,13 +134,18 @@ class AJXP_Utils
      */
     public static function sanitize($s, $level = AJXP_SANITIZE_HTML, $expand = 'script|style|noframes|select|option')
     {
-        /**/ //prep the string
-        $s = ' ' . $s;
         if ($level == AJXP_SANITIZE_ALPHANUM) {
             return preg_replace("/[^a-zA-Z0-9_\-\.]/", "", $s);
         } else if ($level == AJXP_SANITIZE_EMAILCHARS) {
             return preg_replace("/[^a-zA-Z0-9_\-\.@!%\+=|~\?]/", "", $s);
+        } else if ($level == AJXP_SANITIZE_FILENAME) {
+            $s = str_replace(chr(0), "", $s);
+            $s = preg_replace("/[\"\/\|\?\\\]/", "", $s);
+            return $s;
         }
+
+        /**/ //prep the string
+        $s = ' ' . $s;
 
         //begin removal
         /**/ //remove comment blocks

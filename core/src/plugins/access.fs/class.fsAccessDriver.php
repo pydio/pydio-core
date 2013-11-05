@@ -512,7 +512,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             case "mkdir";
 
                 $messtmp="";
-                $dirname=AJXP_Utils::decodeSecureMagic($httpVars["dirname"], AJXP_SANITIZE_HTML_STRICT);
+                $dirname=AJXP_Utils::decodeSecureMagic($httpVars["dirname"], AJXP_SANITIZE_FILENAME);
                 $dirname = substr($dirname, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
                 $this->filterUserSelectionToHidden(array($dirname));
                 AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($dir."/".$dirname), -2));
@@ -538,7 +538,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             case "mkfile";
 
                 $messtmp="";
-                $filename=AJXP_Utils::decodeSecureMagic($httpVars["filename"], AJXP_SANITIZE_HTML_STRICT);
+                $filename=AJXP_Utils::decodeSecureMagic($httpVars["filename"], AJXP_SANITIZE_FILENAME);
                 $filename = substr($filename, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
                 $this->filterUserSelectionToHidden(array($filename));
                 $content = "";
@@ -614,9 +614,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     } catch (Exception $e) {
                         return array("ERROR" => array("CODE" => 411, "MESSAGE" => "Forbidden"));
                     }
-                    $userfile_name=AJXP_Utils::sanitize(SystemTextEncoding::fromPostedFileName($userfile_name), AJXP_SANITIZE_HTML_STRICT);
+                    $userfile_name=AJXP_Utils::sanitize(SystemTextEncoding::fromPostedFileName($userfile_name), AJXP_SANITIZE_FILENAME);
                     if (isSet($httpVars["urlencoded_filename"])) {
-                        $userfile_name = AJXP_Utils::sanitize(SystemTextEncoding::fromUTF8(urldecode($httpVars["urlencoded_filename"])), AJXP_SANITIZE_HTML_STRICT);
+                        $userfile_name = AJXP_Utils::sanitize(SystemTextEncoding::fromUTF8(urldecode($httpVars["urlencoded_filename"])), AJXP_SANITIZE_FILENAME);
                     }
                     $this->logDebug("User filename ".$userfile_name);
                     $userfile_name = substr($userfile_name, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
@@ -667,7 +667,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         }
                     }
                     if (isSet($httpVars["appendto_urlencoded_part"])) {
-                        $appendTo = AJXP_Utils::sanitize(SystemTextEncoding::fromUTF8(urldecode($httpVars["appendto_urlencoded_part"])), AJXP_SANITIZE_HTML_STRICT);
+                        $appendTo = AJXP_Utils::sanitize(SystemTextEncoding::fromUTF8(urldecode($httpVars["appendto_urlencoded_part"])), AJXP_SANITIZE_FILENAME);
                         if (file_exists($destination ."/" . $appendTo)) {
                             $this->logDebug("Should copy stream from $userfile_name to $appendTo");
                             $partO = fopen($destination."/".$userfile_name, "r");
@@ -1458,7 +1458,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     {
         $nom_fic=basename($filePath);
         $mess = ConfService::getMessages();
-        $filename_new=AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($filename_new), AJXP_SANITIZE_HTML_STRICT);
+        $filename_new=AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($filename_new), AJXP_SANITIZE_FILENAME);
         $filename_new = substr($filename_new, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
         $old=$this->urlBase."/$filePath";
         if (!$this->isWriteable($old)) {

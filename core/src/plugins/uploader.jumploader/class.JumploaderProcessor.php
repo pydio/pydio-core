@@ -277,7 +277,7 @@ class JumploaderProcessor extends AJXP_Plugin
                 // Create the folder tree as necessary
                 foreach ($subs as $key => $spath) {
                     $messtmp="";
-                    $dirname=AJXP_Utils::decodeSecureMagic($spath, AJXP_SANITIZE_HTML_STRICT);
+                    $dirname=AJXP_Utils::decodeSecureMagic($spath, AJXP_SANITIZE_FILENAME);
                     $dirname = substr($dirname, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
                     //$this->filterUserSelectionToHidden(array($dirname));
                     if (AJXP_Utils::isHidden($dirname)) {
