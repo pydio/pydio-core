@@ -1166,6 +1166,12 @@ input.SF_input.SF_number{
     z-index: 10;
 }
 
+#codemirror_box div.action_bar.editor_action_bar{
+    right: 0;
+    border-bottom: 1px solid rgb(138, 149, 160);
+    padding-left: 10px;
+}
+
 .action_bar.editor_action_bar div.separator{
     display: none;
 }

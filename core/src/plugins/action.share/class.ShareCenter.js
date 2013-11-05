@@ -21,6 +21,7 @@ Class.create("ShareCenter", {
 
     currentNode : null,
     shareFolderMode : "workspace",
+    _currentFolderWatchValue:false,
 
     performShareAction : function(){
         var userSelection = ajaxplorer.getUserSelection();
@@ -50,6 +51,7 @@ Class.create("ShareCenter", {
                 this.shareRepository();
             }
         }else{
+            this.createQRCode = ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("CREATE_QRCODE");
             this.shareFile(userSelection);
         }
     },
@@ -104,6 +106,7 @@ Class.create("ShareCenter", {
             if(oForm.down("#watch_folder")){
                 conn.addParameter("self_watch_folder",oForm.down("#watch_folder").checked?"true":"false");
             }
+            if(this._currentFolderWatchValue) conn.addParameter("self_watch_folder", "true");
             if(this.shareFolderMode == "workspace"){
                 conn.onComplete = function(transport){
                     var response = parseInt(transport.responseText);
@@ -155,7 +158,7 @@ Class.create("ShareCenter", {
                         oForm.down("#share_unshare").show();
                         oForm.down("#share_generate").hide();
                         oForm.down('#unshare_button').observe("click", this.performUnshareAction.bind(this));
-                        this.updateDialogButtons(oForm.next("div.dialogButtons"), "folder");
+                        this.updateDialogButtons(oForm.down('#share_result').down("div.SF_horizontal_fieldsRow"), "folder");
                     }
 
                 }.bind(this);
@@ -279,18 +282,31 @@ Class.create("ShareCenter", {
                         updateUserEntryAfterCreate(newItem, (u.RIGHT?u.RIGHT:""), u.WATCH);
                         newItem.appendToList($('shared_users_summary'));
                     });
-                    if(json["element_watch"]){
-                        oForm.down("#watch_folder").checked = true;
-                    }
+                    this._currentFolderWatchValue = json['element_watch'];
                     if(reload){
                         removeLightboxFromElement(oForm.up(".dialogContent"));
                         ajaxplorer.fireNodeRefresh(this.currentNode);
                     }
+
+                    if(this.shareFolderMode != "workspace"){
+                        this.updateDialogButtons(oForm.down('#share_result').down("div.SF_horizontal_fieldsRow"), "folder");
+                    }else{
+                        var El = new Element('div', {className:"SF_horizontal_fieldsRow"}).update('<div class="SF_horizontal_actions SF_horizontal_pastilles" style="padding-top: 12px;padding-left: 7px;"></div>');
+                        $("share_folder_form").next("div.dialogButtons").insert({top:El});
+                        this.updateDialogButtons(El, "folder");
+                    }
+                    oForm.select('span.simple_tooltip_observer').each(function(e){
+                        modal.simpleTooltip(e, e.readAttribute('data-tooltipTitle'), 'top center', 'down_arrow_tip', 'element');
+                    });
+
                 }.bind(this));
             }else{
                 $('shared_user').observeOnce("focus", function(){
                     $('share_folder_form').autocompleter.activate();
                 });
+                if(this.shareFolderMode != "workspace"){
+                    oForm.down("#generate_publiclet").observe("click", function(){submitFunc(oForm);} );
+                }
             }
             if(ajaxplorer.hasPluginOfType("meta", "watch")){
                 oForm.down('#target_user').down('#header_watch').show();
@@ -310,10 +326,6 @@ Class.create("ShareCenter", {
                     event.target.setStyle({fontWeight: checked ? 'bold' : 'normal'});
                 });
             });
-            this.updateDialogButtons($("share_folder_form").next("div.dialogButtons"), "folder");
-            if(this.shareFolderMode != "workspace"){
-                oForm.down("#generate_publiclet").observe("click", function(){submitFunc(oForm);} );
-            }
 
             if(!reload){
                 window.setTimeout(modal.refreshDialogPosition.bind(modal), 400);
@@ -687,7 +699,7 @@ Class.create("ShareCenter", {
                 var folderEye = dialogButtonsOrRow.down('#watch_folder_eye');
                 var folderCheck = dialogButtonsOrRow.down('#watch_folder');
 
-                folderCheck.checked = (jsonData && jsonData['element_watch']);
+                folderCheck.checked = ((jsonData && jsonData['element_watch']) || this._currentFolderWatchValue);
                 folderEye
                     .removeClassName('icon-eye-close')
                     .removeClassName('icon-eye-open')
@@ -697,7 +709,7 @@ Class.create("ShareCenter", {
             }else{
                 dialogButtonsOrRow.insert("<div class='dialogButtonsCheckbox'><input type='checkbox' id='watch_folder'><label for='watch_folder'>"+st+"</label></div>");
             }
-            if(shareType == "file"){
+            if(folderEye){
                 folderEye.observe('click', function(){
                     folderCheck.checked = !folderCheck.checked;
                     folderEye
@@ -706,35 +718,47 @@ Class.create("ShareCenter", {
                         .addClassName('icon-eye-'+ ( folderCheck.checked ? 'open' : 'close'))
                         .update( ' ' + MessageHash['share_center.' + (folderCheck.checked ? '81' : '82')] )
                     ;
-                    var conn = new Connexion();
-                    conn.setParameters({
-                        get_action: "toggle_link_watch",
-                        set_watch : folderCheck.checked ?  "true" : "false",
-                        file : this.currentNode.getPath()
-                    });
-                    if(jsonData && jsonData['element_id']){
-                        conn.addParameter("element_id", jsonData['element_id']);
+                    this._currentFolderWatchValue = folderCheck.checked;
+                    if(shareType == "file" || this.shareFolderMode != "workspace"){
+                        var conn = new Connexion();
+                        conn.setParameters({
+                            get_action: "toggle_link_watch",
+                            set_watch : folderCheck.checked ?  "true" : "false",
+                            file : this.currentNode.getPath()
+                        });
+                        if(shareType != "file"){
+                            conn.addParameter('element_type', 'folder');
+                        }
+                        if(jsonData && jsonData['element_id']){
+                            conn.addParameter("element_id", jsonData['element_id']);
+                        }else if(this._currentRepositoryId){
+                            conn.addParameter("repository_id", this._currentRepositoryId);
+                        }
+                        conn.onComplete = function(transport){
+                            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                        }
+                        conn.sendAsync();
                     }
-                    conn.onComplete = function(transport){
-                        ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
-                    }
-                    conn.sendAsync();
                 }.bind(this));
             }
         }
         var forceOldSchool = ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("EMAIL_INVITE_EXTERNAL");
         var mailerButton;
+        var oForm;
         if(dialogButtonsOrRow.hasClassName('SF_horizontal_fieldsRow')){
             if(!dialogButtonsOrRow.down('#mailer_button')){
                 dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:"<span class='icon-envelope simple_tooltip_observer' id='mailer_button' data-tooltipTitle='"+MessageHash['share_center.80']+"'> "+MessageHash['share_center.79']+"</span>"});
             }
             mailerButton = dialogButtonsOrRow.down('#mailer_button');
             mailerButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.41"]);
+            oForm = dialogButtonsOrRow.up('.dialogContent');
         }else{
-            var oForm = dialogButtonsOrRow.parentNode;
+            oForm = dialogButtonsOrRow.parentNode;
             var unShare = oForm.down("#unshare_button");
             mailerButton = unShare.cloneNode(true);
-            mailerButton.down("img").writeAttribute("src","plugins/gui.ajax/res/themes/umbra/images/actions/22/mail_generic.png");
+            if(mailerButton.down("img")) {
+                mailerButton.down("img").writeAttribute("src","plugins/gui.ajax/res/themes/umbra/images/actions/22/mail_generic.png");
+            }
             mailerButton.down("span").update(MessageHash["share_center.40"]);
             unShare.insert({after:mailerButton});
             mailerButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.41"]);
@@ -743,18 +767,22 @@ Class.create("ShareCenter", {
         if(ajaxplorer.hasPluginOfType("mailer") && !forceOldSchool){
             mailerButton.observe("click", function(event){
                 Event.stop(event);
+                var s, message;
                 if(shareType == "file"){
-                    var s = MessageHash["share_center.42"];
+                    s = MessageHash["share_center.42"];
                     if(s) s = s.replace("%s", ajaxplorer.appTitle);
-                    var message = s + "\n\n " + dialogButtonsOrRow.down('[name="link_url"]').getValue();
+                    message = s + "\n\n " + dialogButtonsOrRow.down('[name="link_url"]').getValue();
                 }else{
-                    var s = MessageHash["share_center.43"];
+                    s = MessageHash["share_center.43"];
                     if(s) s = s.replace("%s", ajaxplorer.appTitle);
-                    var message = s + "\n\n " + "<a href='" + this._currentRepositoryLink+"'>" + MessageHash["share_center.46"].replace("%s1", this._currentRepositoryLabel).replace("%s2", ajaxplorer.appTitle) + "</a>";
+                    message = s + "\n\n " + "<a href='" + this._currentRepositoryLink+"'>" + MessageHash["share_center.46"].replace("%s1", this._currentRepositoryLabel).replace("%s2", ajaxplorer.appTitle) + "</a>";
+                }
+                if(dialogButtonsOrRow.down('.share_qrcode') && dialogButtonsOrRow.down('.share_qrcode').visible() && dialogButtonsOrRow.down('.share_qrcode > img')){
+                    message += "\n\n Use a QRCode reader to scan the image \n\n" + dialogButtonsOrRow.down('.share_qrcode').innerHTML;
                 }
                 var mailer = new AjxpMailer();
                 var usersList = null;
-                if(shareType == 'folder') {
+                if(shareType == 'folder' && oForm) {
                     usersList = oForm.down(".editable_users_list");
                 }
                 modal.showSimpleModal(
@@ -788,8 +816,10 @@ Class.create("ShareCenter", {
             }.bind(this));
 
         }
-        
-        if (this.createQRCode) {
+
+        var qrcodediv = dialogButtonsOrRow.down('.share_qrcode');
+        if (this.createQRCode && qrcodediv) {
+
             if(dialogButtonsOrRow.hasClassName('SF_horizontal_fieldsRow')){
                 if(!dialogButtonsOrRow.down('#qrcode_button')){
                     dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:"<span class='icon-qrcode simple_tooltip_observer' id='qrcode_button' data-tooltipTitle='"+MessageHash['share_center.94']+"'> "+MessageHash['share_center.95']+"</span>"});
@@ -805,26 +835,28 @@ Class.create("ShareCenter", {
                 unShare.insert({after:qrcodeButton});
                 qrcodeButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.95"]);
             }
-            var qrcodediv = document.getElementById('share_qrcode');
-            qrcodediv.innerHTML = '';
-            
+            qrcodediv.update('');
+            var randId = 'share_qrcode-' + new Date().getTime();
+            qrcodediv.id = randId;
+
             qrcodeButton.observe("click", function(event){
                 Event.stop(event);
-                if(shareType == "file"){
-                    var url = dialogButtonsOrRow.down('[name="link_url"]').getValue();
-                }else{
-                    var url = this._currentRepositoryLink;
-                }
-                
                 if (qrcodediv.innerHTML == '') {
-                    var qrcode = new QRCode("share_qrcode", {
+                    var url;
+                    if(shareType == "file"){
+                        url = dialogButtonsOrRow.down('[name="link_url"]').getValue();
+                    }else{
+                        url = this._currentRepositoryLink;
+                    }
+                    var qrcode = new QRCode(randId, {
                         width: 128,
                         height: 128
                     });
                     qrcode.makeCode(url);
-                } else {
-                    qrcodediv.innerHTML = '';
                 }
+                if(qrcodediv.visible()) qrcodediv.hide();
+                else qrcodediv.show();
+
             }.bind(this));
         }
     },

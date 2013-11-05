@@ -212,7 +212,14 @@ class ShareCenter extends AJXP_Plugin
 
                 $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                 $watchValue = $httpVars["set_watch"] == "true" ? true : false;
-                $node = new AJXP_Node($this->urlBase.$file);
+                $folder = false;
+                if (isSet($httpVars["element_type"]) && $httpVars["element_type"] == "folder") {
+                    $folder = true;
+                    $node = new AJXP_Node($this->baseProtocol."://".$httpVars["repository_id"]."/");
+                } else {
+                    $node = new AJXP_Node($this->urlBase.$file);
+                }
+
                 $metadata = $node->retrieveMetadata(
                     "ajxp_shared",
                     true,
@@ -224,20 +231,34 @@ class ShareCenter extends AJXP_Plugin
                 }
 
                 if ($this->watcher !== false) {
-                    if ($watchValue) {
-                        $this->watcher->setWatchOnFolder(
-                            $node,
-                            AuthService::getLoggedUser()->getId(),
-                            MetaWatchRegister::$META_WATCH_USERS_READ,
-                            array($elementId)
-                        );
+                    if (!$folder) {
+                        if ($watchValue) {
+                            $this->watcher->setWatchOnFolder(
+                                $node,
+                                AuthService::getLoggedUser()->getId(),
+                                MetaWatchRegister::$META_WATCH_USERS_READ,
+                                array($elementId)
+                            );
+                        } else {
+                            $this->watcher->removeWatchFromFolder(
+                                $node,
+                                AuthService::getLoggedUser()->getId(),
+                                true,
+                                $elementId
+                            );
+                        }
                     } else {
-                        $this->watcher->removeWatchFromFolder(
-                            $node,
-                            AuthService::getLoggedUser()->getId(),
-                            true,
-                            $elementId
-                        );
+                        if ($watchValue) {
+                            $this->watcher->setWatchOnFolder(
+                                $node,
+                                AuthService::getLoggedUser()->getId(),
+                                MetaWatchRegister::$META_WATCH_BOTH
+                            );
+                        } else {
+                            $this->watcher->removeWatchFromFolder(
+                                $node,
+                                AuthService::getLoggedUser()->getId());
+                        }
                     }
                 }
                 $mess = ConfService::getMessages();
