@@ -1477,7 +1477,7 @@ class AJXP_Utils
                     } else if ($type == "array") {
                         $value = explode(",", $value);
                     } else if ($type == "password" && $userId!=null) {
-                        if (trim($value != "") && function_exists('mcrypt_encrypt')) {
+                        if (trim($value) != "" && function_exists('mcrypt_encrypt')) {
                             // The initialisation vector is only required to avoid a warning, as ECB ignore IV
                             $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
                             // We encode as base64 so if we need to store the result in a database, it can be stored in text column
