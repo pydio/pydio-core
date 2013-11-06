@@ -1478,10 +1478,8 @@ class AJXP_Utils
                         $value = explode(",", $value);
                     } else if ($type == "password" && $userId!=null) {
                         if (trim($value) != "" && function_exists('mcrypt_encrypt')) {
-                            // The initialisation vector is only required to avoid a warning, as ECB ignore IV
-                            $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
                             // We encode as base64 so if we need to store the result in a database, it can be stored in text column
-                            $value = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($userId."\1CDAFx¨op#"), $value, MCRYPT_MODE_ECB, $iv));
+                            $value = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($userId."\1CDAFx¨op#"), $value, MCRYPT_MODE_ECB));
                         }
                     } else if ($type == "binary" && $binariesContext !== null) {
                         if (!empty($value)) {
