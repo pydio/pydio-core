@@ -10,7 +10,7 @@
         <actions>
             <action name="scheduler_menu">
                 <gui text="action.scheduler.18" iconClass="icon-time" title="action.scheduler.18d" src="scheduler/ICON_SIZE/player_time.png" hasAccessKey="false">
-                    <context selection="false" dir="" recycle="hidden"
+                    <context selection="false" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="false" infoPanel="false" actionBarGroup="put"/>
                 </gui>
                 <subMenu>
@@ -23,7 +23,7 @@
             </action>
             <action name="scheduler_generateCronExpression">
                 <gui text="action.scheduler.20" title="action.scheduler.20d" iconClass="icon-paste" src="scheduler/22/shellscript.png" hasAccessKey="false">
-                    <context selection="false" dir="" recycle="hidden"
+                    <context selection="false" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="false" contextMenu="true" infoPanel="true"
                              actionBarGroup="user"/>
                 </gui>
@@ -53,7 +53,7 @@
             </action>
             <action name="scheduler_runAll">
                 <gui text="action.scheduler.15" title="action.scheduler.16d" iconClass="icon-play-circle" src="scheduler/22/media_playback_start.png" hasAccessKey="false">
-                    <context selection="false" dir="" recycle="hidden"
+                    <context selection="false" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="false" contextMenu="true" infoPanel="true"
                              actionBarGroup="user"/>
                 </gui>
@@ -71,7 +71,7 @@
             </action>
             <action name="scheduler_runTask">
                 <gui text="action.scheduler.16" title="action.scheduler.15d" iconClass="icon-play" src="scheduler/22/task_run.png" hasAccessKey="false">
-                    <context selection="true" dir="" recycle="hidden"
+                    <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
                              actionBarGroup="change"/>
                     <selectionContext dir="false" behaviour="hidden" file="true" recycle="false" unique="true" allowedMimes="scheduler_task"/>
@@ -100,7 +100,7 @@
             </action>
             <action name="scheduler_addTask">
                 <gui text="action.scheduler.8" title="action.scheduler.9" iconClass="icon-plus" src="scheduler/22/task_add.png" hasAccessKey="false">
-                    <context selection="false" dir="" recycle="hidden"
+                    <context selection="false" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="false" contextMenu="true" infoPanel="true"
                              actionBarGroup="put">
                     </context>
@@ -176,7 +176,7 @@
             </action>
             <action name="scheduler_editTask">
                 <gui text="action.scheduler.10" title="action.scheduler.11" iconClass="icon-edit" src="scheduler/ICON_SIZE/task.png" hasAccessKey="false">
-                    <context selection="true" dir="" recycle="hidden"
+                    <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
                              actionBarGroup="change"/>
                     <selectionContext dir="false" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="scheduler_task"/>
@@ -190,7 +190,7 @@
             </action>
             <action name="scheduler_removeTask">
                 <gui text="action.scheduler.19" title="action.scheduler.12" iconClass="icon-trash" src="scheduler/22/task_delete.png" hasAccessKey="false">
-                    <context selection="true" dir="" recycle="hidden"
+                    <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
                              actionBarGroup="change"/>
                     <selectionContext dir="false" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="scheduler_task"/>

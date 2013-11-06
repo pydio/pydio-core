@@ -295,10 +295,11 @@ class AjxpScheduler extends AJXP_Plugin
         $mess = ConfService::getMessages();
         if (isSet($configTree["admin"])) {
             $configTree["admin"]["CHILDREN"]["scheduler"] = array(
-                "LABEL" => $mess["action.scheduler.18"],
-                "DESCRIPTION" => $mess["action.scheduler.22"],
-                "ICON" => "scheduler/ICON_SIZE/player_time.png",
-                "LIST" => array($this, "listTasks"));
+                "LABEL"         => $mess["action.scheduler.18"],
+                "AJXP_MIME"     => "scheduler_zone",
+                "DESCRIPTION"   => $mess["action.scheduler.22"],
+                "ICON"          => "scheduler/ICON_SIZE/player_time.png",
+                "LIST"          => array($this, "listTasks"));
         }
     }
 
