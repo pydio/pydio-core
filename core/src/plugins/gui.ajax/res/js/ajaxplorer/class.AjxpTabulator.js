@@ -451,8 +451,8 @@ Class.create("AjxpTabulator", AjxpPane, {
             ajaxplorer.registerEditorOpener(this);
         }
         if(this.options.events){
-            this.options.events.each(function(eName, callback){
-                document.stopObserving(eName, callback);
+            this.options.events.each(function(pair){
+                document.stopObserving(pair.key, pair.value);
             });
         }
 
