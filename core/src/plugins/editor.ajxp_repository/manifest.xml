@@ -28,7 +28,7 @@
 	            <div id="pane-infos">
 	            </div>
                 <div id="pane-metas" style="padding:10px 0;">
-                    <div id="metaTabulator">
+                    <div id="metaTabulator" style="clear:both;">
                         <ul class="tabrow"></ul>
                         <div class="tabpanes"></div>
                     </div>

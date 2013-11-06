@@ -234,10 +234,10 @@ Class.create("RepositoryEditor", AbstractEditor, {
                 accordionContent.insert(form);
                 var saveButton = null;
                 if(insertSave){
-                    accordionContent.insert("<div tabindex='0' name='meta_source_edit' class='largeButton SF_disabled' style='min-width:70px;clear:both;margin-top: 7px;margin-left: 0'><img src=\""+ajxpResourcesFolder+"/images/actions/16/filesave.png\"><span class=\"title\">Save</span></div>");
+                    accordionContent.insert("<div tabindex='0' name='meta_source_edit' class='largeButton SF_disabled' style='min-width:70px; margin-top: 20px;margin-right: 0;'><span class='icon-save'></span> <span class=\"title\">Save</span></div>");
                     saveButton = accordionContent.down("div[name='meta_source_edit']");
                 }
-                accordionContent.insert("<div  tabindex='0' name='meta_source_delete' class='largeButton' style='min-width:70px;clear:both;margin-top: 7px;margin-left: 0'><img src=\""+ajxpResourcesFolder+"/images/actions/16/editdelete.png\"><span class=\"title\">Remove</span></div>");
+                accordionContent.insert("<div  tabindex='0' name='meta_source_delete' class='largeButton' style='min-width:70px; margin-top: 20px;margin-right: 0;'><span class='icon-trash'></span> <span class=\"title\">Remove</span></div>");
                 metaTabHead.insert(title);
                 metaTabBody.insert(accordionContent);
                 if(saveButton){
@@ -301,7 +301,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
             }
             modal.refreshDialogAppearance();
             modal.refreshDialogPosition();
-            addFormDetail.insert("<div class='largeButton' style='width:100px;clear:both;margin-top: 7px;margin-left: 0'><img src=\""+ajxpResourcesFolder+"/images/actions/16/filesave.png\"><span class=\"title\">"+MessageHash['ajxp_repository_editor.11']+"</span></div>");
+            addFormDetail.insert("<div class='largeButton' style='width:100px;margin-top: 20px;margin-left: 0'><span class='icon-plus-sign'></span> <span>"+MessageHash['ajxp_repository_editor.11']+"</span></div>");
             addFormDetail.down(".largeButton")._form = addForm;
             addFormDetail.down(".largeButton").observe("click", this.metaActionClick.bind(this));
         }.bind(this));
