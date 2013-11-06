@@ -182,7 +182,7 @@ class AJXP_Utils
     }
 
     /**
-     * Perform standard urldecode, sanitization, securepath and magicDequote
+     * Perform standard urldecode, sanitization and securepath
      * @static
      * @param $data
      * @param int $sanitizeLevel
@@ -190,7 +190,7 @@ class AJXP_Utils
      */
     public static function decodeSecureMagic($data, $sanitizeLevel = AJXP_SANITIZE_HTML)
     {
-        return SystemTextEncoding::fromUTF8(AJXP_Utils::sanitize(AJXP_Utils::securePath(SystemTextEncoding::magicDequote($data)), $sanitizeLevel));
+        return SystemTextEncoding::fromUTF8(AJXP_Utils::sanitize(AJXP_Utils::securePath($data), $sanitizeLevel));
     }
     /**
      * Try to load the tmp dir from the CoreConf AJXP_TMP_DIR, or the constant AJXP_TMP_DIR,
@@ -1463,7 +1463,6 @@ class AJXP_Utils
         $replicationGroups = array();
         $switchesGroups = array();
         foreach ($repDef as $key => $value) {
-            $value = SystemTextEncoding::magicDequote($value);
             if( ( ( !empty($prefix) &&  strpos($key, $prefix)!== false && strpos($key, $prefix)==0 ) || empty($prefix) )
                 && strpos($key, "ajxptype") === false
                 && strpos($key, "_original_binary") === false

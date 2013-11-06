@@ -450,7 +450,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $gName = AJXP_Utils::sanitize(AJXP_Utils::decodeSecureMagic(basename($httpVars["group_path"])), AJXP_SANITIZE_ALPHANUM);
                 } else {
                     $basePath = substr($httpVars["dir"], strlen("/data/users"));
-                    $gName    = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($httpVars["group_name"]), AJXP_SANITIZE_ALPHANUM);
+                    $gName    = AJXP_Utils::sanitize($httpVars["group_name"], AJXP_SANITIZE_ALPHANUM);
                 }
                 $gLabel   = AJXP_Utils::decodeSecureMagic($httpVars["group_label"]);
                 AuthService::createGroup($basePath, $gName, $gLabel);
@@ -461,7 +461,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             break;
 
             case "create_role":
-                $roleId = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($httpVars["role_id"]), AJXP_SANITIZE_HTML_STRICT);
+                $roleId = AJXP_Utils::sanitize($httpVars["role_id"], AJXP_SANITIZE_HTML_STRICT);
                 if (!strlen($roleId)) {
                     throw new Exception($mess[349]);
                 }
@@ -480,7 +480,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             break;
 
             case "edit_role" :
-                $roleId = SystemTextEncoding::magicDequote($httpVars["role_id"]);
+                $roleId = $httpVars["role_id"];
                 $roleGroup = false;
                 if (strpos($roleId, "AJXP_GRP_") === 0) {
                     $groupPath = substr($roleId, strlen("AJXP_GRP_"));
@@ -550,7 +550,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             case "post_json_role" :
 
-                $roleId = SystemTextEncoding::magicDequote($httpVars["role_id"]);
+                $roleId = $httpVars["role_id"];
                 $roleGroup = false;
                 if (strpos($roleId, "AJXP_GRP_") === 0) {
                     $groupPath = substr($roleId, strlen("AJXP_GRP_"));
@@ -650,7 +650,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     AJXP_XMLWriter::close();
                     return;
                 }
-                $new_user_login = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($httpVars["new_user_login"]), AJXP_SANITIZE_EMAILCHARS);
+                $new_user_login = AJXP_Utils::sanitize($httpVars["new_user_login"], AJXP_SANITIZE_EMAILCHARS);
                 if (AuthService::userExists($new_user_login, "w") || AuthService::isReservedUserId($new_user_login)) {
                     AJXP_XMLWriter::header();
                     AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.43"]);
@@ -919,7 +919,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $i = 0;
                 while (isSet($httpVars["pref_name_".$i]) && isSet($httpVars["pref_value_".$i])) {
                     $prefName = AJXP_Utils::sanitize($httpVars["pref_name_".$i], AJXP_SANITIZE_ALPHANUM);
-                    $prefValue = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote(($httpVars["pref_value_".$i])));
+                    $prefValue = AJXP_Utils::sanitize($httpVars["pref_value_".$i]);
                     if($prefName == "password") continue;
                     if ($prefName != "pending_folder" && $userObject == null) {
                         $i++;

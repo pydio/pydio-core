@@ -43,7 +43,7 @@ class PixlrEditor extends AJXP_Plugin
     if ($action == "post_to_server") {
 
       $file = base64_decode($httpVars["file"]);
-      $file = SystemTextEncoding::magicDequote(AJXP_Utils::securePath($file));
+      $file = AJXP_Utils::securePath($file);
       $target = base64_decode($httpVars["parent_url"])."/plugins/editor.pixlr";
       $tmp = call_user_func(array($streamData["classname"], "getRealFSReference"), $destStreamURL.$file);
       $tmp = SystemTextEncoding::fromUTF8($tmp);
