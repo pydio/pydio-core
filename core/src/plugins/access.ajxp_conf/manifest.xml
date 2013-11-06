@@ -95,13 +95,13 @@
                         <div id="buttons_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["vertical_splitter-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                     </div>
                     <div id="rightPane"  style="background-color:#fffff; box-shadow: rgba(0, 0, 0, 0.247059) -1px 1px 6px;" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                        <div id="editor_tabs" ajxpClass="AjxpTabulator" class="flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":10, "registerAsEditorOpener":true, "saveState":false,"events":{}, "defaultTabId": "info","tabInfos" : [{"id":"info","label":"","iconClass":"icon-list-alt", "element":"files_list_pane"}]}'>
+                        <div id="editor_tabs" ajxpClass="AjxpTabulator" class="flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":true, "saveState":false,"events":{}, "defaultTabId": "info","tabInfos" : [{"id":"info","label":"","iconClass":"icon-list-alt", "element":"files_list_pane"}]}'>
                             <div id="files_list_pane" ajxpClass="AjxpPane">
                                 <div id="breadcrumb_container"><div id="breadcrumb" ajxpClass="Breadcrumb" ajxpOptions=''></div></div>
                                 <div id="actions" class="buttons_bar_container">
                                     <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put", "get", "remote"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                                 </div>
-                                <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "fit":"height", "fitParent":"editor_tabs", "fitMarginBottom":0, "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
+                                <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "fit":"height", "fitParent":"editor_tabs", "fitMarginBottom":10, "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
                             </div>
                         </div>
                     </div>
@@ -113,12 +113,11 @@
                             $(c._loadingItem).remove();
                         })
                         $("global_toolbar").insert({bottom: $("search_container_settings")});
-                        $("top_toolbar").hide();
+                        window.setTimeout(function(){ $("get_my_feed_button").hide(); }, 10);
                         $("search_container_settings").show();
                         $("browser").ajxpPaneObject.resize();
                         document.observeOnce("ajaxplorer:repository_list_refreshed",function(){
                             if(ajaxplorer.repositoryId == 'ajxp_conf') return;
-                            $("top_toolbar").show();
                             $("global_toolbar").down("#search_container_settings").ajxpPaneObject.destroy();
                             $("global_toolbar").down("#search_container_settings").remove();
                         });

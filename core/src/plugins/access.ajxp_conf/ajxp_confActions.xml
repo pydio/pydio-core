@@ -579,7 +579,7 @@
             </gui>
             <processing>
                 <clientCallback><![CDATA[
-                    var win = window.open('https://pydio.com/');
+                    var win = window.open('https://pydio.com/?referrer=settings');
                 ]]></clientCallback>
             </processing>
         </action>
