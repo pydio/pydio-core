@@ -451,7 +451,10 @@ Class.create("Splitter", AjxpPane, {
             if(!this.paneA || !this.paneB) return;
             this.moveSplitter(p, (this.options.minA?false:this.foldedPane), target);
         }.bind(this) );
-        if(this.foldedPane)this.foldedPane.removeClassName('folded');
+        if(this.foldedPane){
+            var fPane = this.foldedPane;
+            window.setTimeout(function(){fPane.removeClassName('folded');}, 200);
+        }
         if(this.options.autoFoldOnEvent){
             document.observeOnce(this.options.autoFoldOnEvent, this.fold.bind(this));
         }

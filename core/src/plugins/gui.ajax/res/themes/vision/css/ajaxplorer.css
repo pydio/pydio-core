@@ -2385,17 +2385,23 @@ div#upload_files_list span.item_relative_path{
 /***** SCROLLER ******/
 .scroller_track{
     position: absolute;
-    width: 10px;
-    background-color: #F1F1F1;
+    width: 7px;
+    background-color: transparent;
     cursor: ns-resize;
     right: 0;
     z-index: 1000;
     opacity: 0.7;
-    border-left: 1px solid #CCC;
+    padding-right: 3px;
 }
 .scroller_handle{
     -webkit-border-radius: 5px;
     border-radius: 5px;
+    background: rgb(190, 190, 190)!important;
+    transition: background-color 0.3s ease;
+}
+
+.scroller_handle:hover{
+    background: rgb(110, 110, 110)!important;
 }
 
 /*
@@ -4300,10 +4306,11 @@ td.ip_geo_cell{
     overflow: hidden;
     font-size: 13px;
     position: relative;
-    border-bottom: 2px solid rgb(111, 123, 136);
+    border-bottom: 1px solid rgba(111, 123, 136, 1);
 }
 
 .tabpanes {
+    background-color: #f8f8f8;
 
 }
 
@@ -4312,15 +4319,16 @@ td.ip_geo_cell{
     display: inline-block;
     position: relative;
     margin: 0;
-    padding: 11px 12px;
+    padding: 14px 20px;
     cursor: pointer;
     color: rgb(111, 123, 136);
     text-align: center;
     line-height: 16px;
 }
 .tabrow li.selected {
-    color: #ffffff;
-    background: rgb(111,123,136) !important;
+    color: rgb(111, 123, 136);
+    border-bottom: 3px solid rgba(111, 123, 136, 1) !important;
+    background-color: transparent !important;
 }
 
 #sm2-container{
@@ -4457,18 +4465,18 @@ DASHBOARD TABULATOR
 .flat_tabulator  div.panelHeader.tabulatorContainer
 {
     padding: 0 0 0 0;
-    height: 46px;
+    height: 73px;
     background-color: transparent;
-    border-bottom: 0;
+    border-bottom: 1px solid rgb(111, 123, 136);
 }
 
 .flat_tabulator span.toggleHeader{
-    padding: 10px 15px;
+    padding: 44px 20px 8px;
     border-right: 0;
-    background-color: #ebedf0;
-    color: rgb(111, 123, 136);
-    font-size: 22px;
-    border-top: 3px solid #4dc5c3;
+    background-color: #ffffff;
+    font-size: 15px;
+    border-bottom: 3px solid #4dc5c3;
+    color: #4dc5c3;
 }
 
 .flat_tabulator[data-ajxpTabsCount="1"] span.toggleHeader
@@ -4477,8 +4485,10 @@ DASHBOARD TABULATOR
 }
 
 .flat_tabulator span.toggleHeader.toggleInactive{
-    background-color: rgba(235, 237, 240, 0.40);
-    border-top: 0;
+    background-color: #ffffff;
+    border-bottom: 3px solid #ffffff;
+    color: rgb(111, 123, 136);
+    font-size: 15px;
 }
 
 div.flat_tabulator > div.tabulatorContainer > #display_toolbar a:hover,
@@ -4492,12 +4502,16 @@ div.flat_tabulator span.toggleInactive{
     border-right: 0;
 }
 
+div.flat_tabulator span.toggleInactive span.tab_close_button{
+    opacity: 0.25;
+}
+
 div.flat_tabulator span.toggleInactiveBeforeActive{
     border-right: 0;
 }
 
 div.flat_tabulator > div:not(.tabulatorContainer){
-    background-color: #ebedf0;
+    background-color: #ffffff;
     border-radius: 0 0 2px 2px;
 }
 

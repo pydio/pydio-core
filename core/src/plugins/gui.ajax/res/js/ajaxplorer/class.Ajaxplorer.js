@@ -310,6 +310,8 @@ Class.create("Ajaxplorer", {
 	refreshTemplateParts : function(){
 		var parts = XPathSelectNodes(this._registry, "client_configs/template_part");
 		var toUpdate = {};
+        var restoreUpdate = {};
+
 		if(!this.templatePartsToRestore){
 			this.templatePartsToRestore = $A();
 		}
@@ -339,11 +341,14 @@ Class.create("Ajaxplorer", {
                 var ajxpOptionsString = part.getAttribute("ajxpOptions");
                 var cdataContent = part.innerHTML;
                 var ajxpClass = Class.getByName(ajxpClassName);
-                toUpdate[key] = [ajxpClass, ajxpClassName, ajxpOptionsString, cdataContent];
+                restoreUpdate[key] = [ajxpClass, ajxpClassName, ajxpOptionsString, cdataContent];
             }
 		}.bind(this));
 		
-		for(var id in toUpdate){
+		for(var id in restoreUpdate){
+			this.refreshGuiComponent(id, restoreUpdate[id][0], restoreUpdate[id][1], restoreUpdate[id][2], restoreUpdate[id][3]);
+		}
+		for(id in toUpdate){
 			this.refreshGuiComponent(id, toUpdate[id][0], toUpdate[id][1], toUpdate[id][2], toUpdate[id][3]);
 		}
 		this.templatePartsToRestore = futurePartsToRestore;
