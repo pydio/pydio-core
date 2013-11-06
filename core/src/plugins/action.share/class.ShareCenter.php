@@ -598,7 +598,15 @@ class ShareCenter extends AJXP_Plugin
         }
         @chmod($downloadFolder."/".$hash.".php", 0755);
         PublicletCounter::reset($hash);
-        return array($hash, $this->buildPublicletLink($hash));
+        $url = $this->buildPublicletLink($hash);
+        $this->logInfo("New Share", array(
+            "file" => "'".$copy->display.":/".$data['FILE_PATH']."'",
+            "url" => $url,
+            "expiration" => $data['EXPIRE_TIME'],
+            "limit" => $data['DOWNLOAD_LIMIT'],
+            "repo_uuid" => $copy->uuid
+        ));
+        return array($hash, $url);
     }
 
     /**
