@@ -226,6 +226,9 @@ Class.create("SearchEngine", AjxpPane, {
 
     parseMetadataForm: function(){
         var formPanel = this.htmlElement.down('#search_meta');
+        if(!formPanel) {
+            return false;
+        }
         if(!formPanel.hasClassName('toggle_open')){
             return false;
         }

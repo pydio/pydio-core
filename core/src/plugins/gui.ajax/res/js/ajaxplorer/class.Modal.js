@@ -323,7 +323,7 @@ Class.create("Modal", {
 	},
 
     showSimpleModal : function(element, content, okCallback, cancelCallback, position){
-        var box = new Element("div", {className:"dialogBox css_boxshadow"});
+        var box = new Element("div", {className:"dialogBox css_boxshadow", style:'display:block;'});
         box.insert(content);
         content.addClassName("dialogContent");
         addLightboxMarkupToElement(element);

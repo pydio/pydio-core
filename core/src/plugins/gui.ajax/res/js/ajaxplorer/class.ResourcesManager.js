@@ -138,13 +138,17 @@ Class.create("ResourcesManager", {
         if(ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')){
             fileName = ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')+fileName;
         }
-		var cssNode = new Element('link', {
-			type : 'text/css',
-			rel  : 'stylesheet',
-			href : fileName+"?v="+window.ajxpBootstrap.parameters.get("ajxpVersion"),
-			media : 'screen'
-		});
-		head.insert(cssNode);
+        fileName = fileName+"?v="+window.ajxpBootstrap.parameters.get("ajxpVersion");
+        var select = head.down('[href="'+fileName+'"]');
+        if(!select){
+            var cssNode = new Element('link', {
+                type : 'text/css',
+                rel  : 'stylesheet',
+                href : fileName,
+                media : 'screen'
+            });
+            head.insert(cssNode);
+        }
 	},
 	/**
 	 * Insert the HTML snipper and evaluate scripts
