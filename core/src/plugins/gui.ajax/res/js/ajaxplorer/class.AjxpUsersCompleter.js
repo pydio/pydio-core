@@ -72,6 +72,27 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
             var createActionPanel = new Element('div', {id:'create_sub_user'}).update('<div class="dialogContentMainTitle">Create user</div>');
         }
 
+        if(listElement && ajaxplorer.actionBar.actions.get('user_team_create')){
+            var butt = new Element('span', {className:'icon-save user_team_save'});
+            listElement.insert({after:butt});
+            modal.simpleTooltip(butt, 'Save the current users list as a personal team', 'top center', 'down_arrow_tip', 'element'),
+            butt.observe('click', function(){
+                var label = window.prompt('Please select a team label');
+                if(!label) return;
+                var params = $H({
+                    'user_ids[]':[],
+                    team_label:label,
+                    get_action:'user_team_create'
+                });
+                listElement.select('div.user_entry').each(function(el){
+                    params.get('user_ids[]').push(el.readAttribute('data-entry_id'));
+                });
+                var c = new Connexion();
+                c.setParameters(params);
+                c.sendAsync();
+            });
+        }
+
         options = Object.extend(
         {
             paramName:'value',

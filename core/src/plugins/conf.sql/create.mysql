@@ -78,3 +78,11 @@ CREATE TABLE IF NOT EXISTS ajxp_simple_store (
    insertion_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    PRIMARY KEY(object_id, store_id)
 );
+
+CREATE TABLE IF NOT EXISTS ajxp_user_teams {
+    team_id VARCHAR(255) NOT NULL,
+    user_id varchar(255) NOT NULL,
+    team_label VARCHAR(255) NOT NULL,
+    owner_id varchar(255) NOT NULL,
+    PRIMARY KEY(team_id, user_id)
+}

@@ -70,7 +70,11 @@ Class.create("AjxpMailer", {
         if(recipientsList){
             recipientsList.select("div.user_entry").each(function(el){
                 var loginLabel = el.down("span.user_entry_label").innerHTML;
-                this.selectedLoginToSpan(loginLabel, el.getAttribute("data-entry_id"), el.hasClassName("group_entry"));
+                this.selectedLoginToSpan(
+                    loginLabel,
+                    el.getAttribute("data-entry_id") || selectedLi.readAttribute('data-group') ,
+                    el.hasClassName("complete_group_entry")
+                );
             }.bind(this));
         }
 
@@ -89,8 +93,8 @@ Class.create("AjxpMailer", {
                 afterUpdateElement: function(elem, selectedLi){
                     this.selectedLoginToSpan(
                         selectedLi.readAttribute('data-label'),
-                        selectedLi.readAttribute('data-entry_id'),
-                        selectedLi.hasClassName('group_entry'));
+                        selectedLi.readAttribute('data-entry_id') || selectedLi.readAttribute('data-group') ,
+                        selectedLi.hasClassName('complete_group_entry'));
                 }.bind(this)
             }
         );

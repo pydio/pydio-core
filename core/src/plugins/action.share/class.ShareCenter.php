@@ -1096,7 +1096,23 @@ class ShareCenter extends AJXP_Plugin
                 $users[] = $u;
             } else {
                 $u = AJXP_Utils::decodeSecureMagic($httpVars["user_".$index]);
-                $groups[] = $u;
+                if (strpos($u, "/AJXP_TEAM/") === 0) {
+                    $confDriver = ConfService::getConfStorageImpl();
+                    if (method_exists($confDriver, "teamIdToUsers")) {
+                        $teamUsers = $confDriver->teamIdToUsers(str_replace("/AJXP_TEAM/", "", $u));
+                        foreach ($teamUsers as $userId) {
+                            $users[] = $userId;
+                            $uRights[$userId] = $rightString;
+                            if ($this->watcher !== false) {
+                                $uWatches[$userId] = $uWatch;
+                            }
+                        }
+                    }
+                    $index++;
+                    continue;
+                } else {
+                    $groups[] = $u;
+                }
             }
             $uRights[$u] = $rightString;
             $uPasses[$u] = isSet($httpVars["user_pass_".$index])?$httpVars["user_pass_".$index]:"";

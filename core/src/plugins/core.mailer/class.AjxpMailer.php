@@ -140,6 +140,17 @@ class AjxpMailer extends AJXP_Plugin
     public function resolveAdresses($recipients)
     {
         $realRecipients = array();
+        foreach ($recipients as $recipient) {
+            if (is_string($recipient) && strpos($recipient, "/AJXP_TEAM/") === 0) {
+                $confDriver = ConfService::getConfStorageImpl();
+                if (method_exists($confDriver, "teamIdToUsers")) {
+                    $newRecs = $confDriver->teamIdToUsers(str_replace("/AJXP_TEAM/", "", $recipient));
+                }
+            }
+        }
+        if (isSet($newRecs)) {
+            $recipients = array_merge($recipients, $newRecs);
+        }
         // Recipients can be either AbstractAjxpUser objects, either array(adress, name), either "adress".
         foreach ($recipients as $recipient) {
             if (is_object($recipient) && is_a($recipient, "AbstractAjxpUser")) {

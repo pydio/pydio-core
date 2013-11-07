@@ -785,4 +785,92 @@ class sqlConfDriver extends AbstractConfDriver
         $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
         return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
     }
+
+    public function supportsUserTeams()
+    {
+        return true;
+    }
+
+    public function listUserTeams()
+    {
+        if (AuthService::getLoggedUser() == null) {
+            return array();
+        }
+        $res = dibi::query("SELECT * FROM [ajxp_user_teams] WHERE [owner_id] = %s ORDER BY [team_id]", AuthService::getLoggedUser()->getId());
+        $data = $res->fetchAll();
+        $all = array();
+        foreach ($data as $row) {
+            $teamId = $row["team_id"];
+            $userId = $row["user_id"];
+            $teamLabel = $row["team_label"];
+            if(!isSet($all[$teamId])) $all[$teamId] = array("LABEL" => $teamLabel, "USERS" => array());
+            $all[$teamId]["USERS"][$userId] = $userId;
+        }
+        return $all;
+    }
+
+    public function teamIdToUsers($teamId)
+    {
+        $res = array();
+        $teams = $this->listUserTeams();
+        $teamData = $teams[$teamId];
+        foreach ($teamData["USERS"] as $userId) {
+            if (AuthService::userExists($userId)) {
+                $res[] = $userId;
+            } else {
+                $this->removeUserFromTeam($teamId, $userId);
+            }
+        }
+        return $res;
+    }
+
+    private function addUserToTeam($teamId, $userId, $teamLabel = null)
+    {
+        if ($teamLabel == null) {
+            $res = dibi::query("SELECT [team_label] FROM [ajxp_user_teams] WHERE [team_id] = %s AND  [owner_id] = %s",
+                $teamId, AuthService::getLoggedUser()->getId());
+            $teamLabel = $res->fetchSingle();
+        }
+        dibi::query("INSERT INTO [ajxp_user_teams] ([team_id],[user_id],[team_label],[owner_id]) VALUES (%s,%s,%s,%s)",
+            $teamId, $userId, $teamLabel, AuthService::getLoggedUser()->getId()
+        );
+    }
+
+    private function removeUserFromTeam($teamId, $userId = null)
+    {
+        if ($userId == null) {
+            dibi::query("DELETE FROM [ajxp_user_teams] WHERE [team_id] = %s AND  [owner_id] = %s",
+                $teamId, AuthService::getLoggedUser()->getId()
+            );
+        } else {
+            dibi::query("DELETE FROM [ajxp_user_teams] WHERE [team_id] = %s AND  [user_id] = %s AND [owner_id] = %s",
+                $teamId, $userId, AuthService::getLoggedUser()->getId()
+            );
+        }
+    }
+
+    public function userTeamsActions($actionName, $httpVars, $fileVars)
+    {
+        switch ($actionName) {
+            case "user_team_create":
+                $userIds = $httpVars["user_ids"];
+                $teamLabel = $httpVars["team_label"];
+                $teamId = AJXP_Utils::slugify($teamLabel)."-".intval(rand(0,1000));
+                foreach ($userIds as $userId) {
+                    $this->addUserToTeam($teamId, $userId, $teamLabel);
+                }
+                echo 'Created Team $teamId';
+                break;
+            case "user_team_delete":
+                $this->removeUserFromTeam($httpVars["team_id"], null);
+                break;
+            case "user_team_add_user":
+                $this->addUserToTeam($httpVars["team_id"], $httpVars["user_id"], null);
+                break;
+            case "user_team_delete_user":
+                $this->removeUserFromTeam($httpVars["team_id"], $httpVars["user_id"]);
+                break;
+        }
+    }
+
 }

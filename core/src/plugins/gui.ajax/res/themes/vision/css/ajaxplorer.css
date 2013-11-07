@@ -2391,7 +2391,7 @@ div#upload_files_list span.item_relative_path{
     right: 0;
     z-index: 1000;
     opacity: 0.7;
-    padding-right: 3px;
+    padding-right: 1px;
 }
 .scroller_handle{
     -webkit-border-radius: 5px;
@@ -3717,6 +3717,19 @@ div.autocomplete ul li
     padding:7px;
     cursor:pointer;
 }
+span.user_team_save{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 3px 4px;
+    background-color: rgba(0, 0, 0, 0.53);
+    border-radius: 4px 0 0 0;
+    color: white;
+    font-size: 12px;
+    z-index: 10;
+    cursor: pointer;
+}
+
 
 /************************/
 /* CONTEXT MENU STYLES  */
