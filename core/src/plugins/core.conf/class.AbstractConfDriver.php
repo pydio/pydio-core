@@ -603,10 +603,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
                 $data = array();
 
-                if($action == "user_create_user"){
+                if ($action == "user_create_user") {
                     AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "NEW_");
 
-                    if(AuthService::userExists($data["new_user_id"])){
+                    if (AuthService::userExists($data["new_user_id"])) {
                         throw new Exception('Please choose another user id');
                     }
                     AJXP_Controller::applyHook("user.before_create", array($data["new_user_id"]));
@@ -620,7 +620,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     $userObject->setGroupPath($loggedUser->getGroupPath());
                     $userObject->setProfile("shared");
 
-                }else{
+                } else {
                     $userObject = AuthService::getLoggedUser();
                     AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "PREFERENCES_");
                 }
@@ -648,14 +648,14 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 if ($rChanges) {
                     AuthService::updateRole($userObject->personalRole, $userObject);
                     $userObject->recomputeMergedRole();
-                    if($action == "custom_data_edit"){
+                    if ($action == "custom_data_edit") {
                         AuthService::updateUser($userObject);
                     }
                 }
 
-                if($action == "user_create_user"){
+                if ($action == "user_create_user") {
                     AJXP_Controller::applyHook("user.after_create", array($userObject));
-                    if(isset($data["send_email"]) && $data["send_email"] == true && !empty($data["email"])){
+                    if (isset($data["send_email"]) && $data["send_email"] == true && !empty($data["email"])) {
                         $mailer = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("mailer");
                         if ($mailer !== false) {
                             $mess = ConfService::getMessages();
@@ -669,7 +669,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     }
 
                     echo "SUCCESS";
-                }else{
+                } else {
                     AJXP_XMLWriter::header();
                     AJXP_XMLWriter::sendMessage($mess["241"], null);
                     AJXP_XMLWriter::close();
@@ -870,7 +870,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
                 $userId = $httpVars["user_id"];
                 $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
-                if($userObject == null || !$userObject->hasParent() || $userObject->getParent() != AuthService::getLoggedUser()->getId()){
+                if ($userObject == null || !$userObject->hasParent() || $userObject->getParent() != AuthService::getLoggedUser()->getId()) {
                     throw new Exception("You are not allowed to edit this user");
                 }
                 AuthService::deleteUser($userId);
