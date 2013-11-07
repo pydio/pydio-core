@@ -327,7 +327,7 @@ Class.create("Modal", {
         box.insert(content);
         content.addClassName("dialogContent");
         addLightboxMarkupToElement(element);
-        if(Prototype.Browser.IE){
+        if(Prototype.Browser.IE && !Prototype.Browser.IE10plus){
             $("all_forms").insert(box);
             var outBox = element.up(".dialogBox");
             if(outBox){
@@ -347,13 +347,13 @@ Class.create("Modal", {
             }
         }else{
             $(element).down("#element_overlay").insert({after:box});
-        }
-        $(element).down("#element_overlay").setStyle({opacity:0.9});
-        if(element.up('div.dialogBox')){
-            Effect.BlindDown(box, {
-                duration:0.6,
-                transition:Effect.Transitions.sinoidal
-            });
+            $(element).down("#element_overlay").setStyle({opacity:0.9});
+            if(element.up('div.dialogBox')){
+                Effect.BlindDown(box, {
+                    duration:0.6,
+                    transition:Effect.Transitions.sinoidal
+                });
+            }
         }
         this.currentLightBoxElement = $(element);
         this.currentLightBoxModal = box;
