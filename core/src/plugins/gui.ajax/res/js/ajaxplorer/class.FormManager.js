@@ -181,6 +181,16 @@ Class.create("FormManager", {
                 element = '<textarea class="SF_input" style="height:70px;" data-ajxp_type="'+type+'" data-ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'"'+disabledString+'>'+defaultValue+'</textarea>'
 		    }else if(type == 'password'){
 				element = '<input type="password" autocomplete="off" data-ajxp_type="'+type+'" data-ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" value="'+defaultValue+'"'+disabledString+' class="SF_input">';
+			}else if(type == 'password-create'){
+                element = new Element('input', {
+                    type:'text',
+                    autocomplete:'off',
+                    'data-ajxp_type':'password',
+                    'data-ajxp_mandatory': (mandatory?'true':'false'),
+                    name:name,
+                    value:defaultValue,
+                    className:'SF_input'
+                });
 			}else if(type == 'boolean'){
 				var selectTrue, selectFalse;
 				if(defaultValue !== undefined){
@@ -358,6 +368,27 @@ Class.create("FormManager", {
                 div.down("span.SF_image_link.image_remove").observe("click", function(){
                     this.confirmExistingImageDelete(form, div.down('img'), div.down('input[name="'+param.get("name")+'"]'), param);
                 }.bind(this));
+            }else if(type=='password-create'){
+                var button = new Element('span', {className:'icon-refresh ajxpPasswordGenerate'});
+                element.insert({after:button});
+                element.up('.SF_element').setStyle({position:'relative'});
+                button.observe('click', function(){
+                    element.setValue(Math.random().toString(36).slice(-10));
+                });
+                button.setStyle({
+                    position: 'absolute',
+                    right: '19px',
+                    top: '12px',
+                    fontSize: '14px',
+                    cursor: 'pointer'
+                });
+                var fObs = function(){
+                    var val = element.getValue();
+                    if(val) button.hide();
+                    else button.show();
+                };
+                element.observe('keyup', fObs);
+                element.observe('blur', fObs);
             }
 			if(desc && type != "legend"){
 				modal.simpleTooltip(div.down('.SF_label').down('span'), '<div class="simple_tooltip_title">'+label+'</div>'+desc, 'middle left', "right_arrow_tip", "element");

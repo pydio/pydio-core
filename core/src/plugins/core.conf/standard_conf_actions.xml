@@ -143,6 +143,11 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
+		<action name="user_delete_user">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
 		<action name="get_bookmarks">
             <gui text="145" title="145" src="edit_user.png" iconClass="icon-star" accessKey="" hasAccessKey="false">
                 <context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="filter" contextMenu="false" infoPanel="false"/>
@@ -215,39 +220,97 @@
       			</gui>
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
-      				<clientCallback prepareModal="true" dialogOpenForm="custom_data_edit" dialogOkButtonOnly="false" dialogSkipButtons="false">
-      					<dialogOnOpen><![CDATA[
-      					    var f = new FormManager();
-                              var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), "user/preferences/pref[@exposed]|//param[contains(@scope,'user')]");
-                              f.createParametersInputs(oForm.down('#custom_data_edit'), definitions, true, ajaxplorer.user.preferences, false, true);
-      					]]></dialogOnOpen>
-      					<dialogOnComplete hideDialog="true"><![CDATA[
-      					    var params = $H();
-      					    var f = new FormManager();
-                              f.serializeParametersInputs(oForm.down('#custom_data_edit'), params, 'PREFERENCES_');
-                              var conn = new Connexion();
-                              params.set("get_action", "custom_data_edit");
-                              conn.setParameters(params);
-                              conn.setMethod("POST");
-                              conn.onComplete = function(transport){
-                                  ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
-                                  document.observeOnce("ajaxplorer:registry_part_loaded", function(event){
-                                      if(event.memo != "user/preferences") return;
-                                      ajaxplorer.logXmlUser(ajaxplorer.getXmlRegistry());
-                                  });
-                                  ajaxplorer.loadXmlRegistry(false, "user/preferences");
-                              };
-                              conn.sendAsync();
-      					]]></dialogOnComplete>
-      					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
-      				</clientCallback>
-      				<clientForm id="custom_data_edit"><![CDATA[
-      					<div id="custom_data_edit" action="custom_data_edit" box_width="250">
-      					</div>
-      				]]></clientForm>
-      				<serverCallback methodName="switchAction"></serverCallback>
-      			</processing>
-      		</action>
+                <clientCallback prepareModal="true" dialogOpenForm="custom_data_edit" dialogOkButtonOnly="false" dialogSkipButtons="false">
+                    <dialogOnOpen><![CDATA[
+                        var f = new FormManager();
+                          var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), "user/preferences/pref[@exposed]|//param[contains(@scope,'user')]");
+                          f.createParametersInputs(oForm.down('#custom_data_edit'), definitions, true, ajaxplorer.user.preferences, false, true);
+                          modal.refreshDialogPosition();
+                    ]]></dialogOnOpen>
+                    <dialogOnComplete hideDialog="true"><![CDATA[
+                        var params = $H();
+                        var f = new FormManager();
+                          f.serializeParametersInputs(oForm.down('#custom_data_edit'), params, 'PREFERENCES_');
+                          var conn = new Connexion();
+                          params.set("get_action", "custom_data_edit");
+                          conn.setParameters(params);
+                          conn.setMethod("POST");
+                          conn.onComplete = function(transport){
+                              ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                              document.observeOnce("ajaxplorer:registry_part_loaded", function(event){
+                                  if(event.memo != "user/preferences") return;
+                                  ajaxplorer.logXmlUser(ajaxplorer.getXmlRegistry());
+                              });
+                              ajaxplorer.loadXmlRegistry(false, "user/preferences");
+                          };
+                          conn.sendAsync();
+                    ]]></dialogOnComplete>
+                    <dialogOnCancel><![CDATA[]]></dialogOnCancel>
+                </clientCallback>
+                <clientForm id="custom_data_edit"><![CDATA[
+                    <div id="custom_data_edit" action="custom_data_edit" box_width="320">
+                    </div>
+                ]]></clientForm>
+                <serverCallback methodName="switchAction"></serverCallback>
+            </processing>
+        </action>
+        <action name="user_create_user">
+      			<gui text="442" title="443" src="edit_user.png" iconClass="icon-reorder" accessKey="" hasAccessKey="false">
+      				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false"/>
+      			</gui>
+                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
+            <processing>
+                <clientCallback prepareModal="true" dialogOpenForm="user_create_user" dialogOkButtonOnly="false" dialogSkipButtons="false">
+                    <dialogOnOpen><![CDATA[
+                        var params = $A(ajaxplorer.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(','));
+                        for(var i=0;i<params.length;i++){
+                            params[i] = "user/preferences/pref[@exposed]|//param[@name='"+params[i]+"']";
+                        }
+                        var f = new FormManager();
+                        var def1 = $A();
+                        def1.push($H({
+                            description: "User ID",
+                            editable: "true",
+                            expose: "true",
+                            label: "User ID",
+                            name: "new_user_id",
+                            scope: "user",
+                            type: "string"
+                        }),$H({
+                            description: "New user password",
+                            editable: "true",
+                            expose: "true",
+                            label: "Password",
+                            name: "new_password",
+                            scope: "user",
+                            type: "password-create"
+                        }));
+                        var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), params.join('|'));
+                        definitions.each(function(el){ def1.push(el); });
+                        f.createParametersInputs(oForm.down('#user_create_user'), def1, true, $H(), false, true);
+                        modal.refreshDialogPosition();
+                    ]]></dialogOnOpen>
+                    <dialogOnComplete hideDialog="true"><![CDATA[
+                        var params = $H();
+                        var f = new FormManager();
+                          f.serializeParametersInputs(oForm.down('#user_create_user'), params, 'NEW_');
+                          var conn = new Connexion();
+                          params.set("get_action", "user_create_user");
+                          conn.setParameters(params);
+                          conn.setMethod("POST");
+                          conn.onComplete = function(transport){
+                          };
+                          conn.sendAsync();
+                    ]]></dialogOnComplete>
+                    <dialogOnCancel><![CDATA[]]></dialogOnCancel>
+                </clientCallback>
+                <clientForm id="user_create_user"><![CDATA[
+                    <div id="user_create_user" action="custom_data_edit" box_width="320">
+                    </div>
+                ]]></clientForm>
+                <serverCallback methodName="switchAction"></serverCallback>
+            </processing>
+        </action>
 		<action name="switch_language">
 			<gui text="190" title="190" src="flag.png" accessKey="" hasAccessKey="false" iconClass="icon-flag">
 				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false"></context>

@@ -1,6 +1,5 @@
 #mailer_message{
     border: 0 !important;
-    width: 380px;
 }
 
 #mailer_message div.message_body input{
@@ -9,7 +8,7 @@
 }
 
 #mailer_message div.message_body textarea{
-    width: 374px;
+    width: 334px;
     height: 120px;
     padding: 2px;
 }

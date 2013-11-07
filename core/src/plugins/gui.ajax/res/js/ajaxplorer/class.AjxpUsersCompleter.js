@@ -68,6 +68,8 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
             var createUserPanel = options.createUserPanel.panel;
             var createUserPass = options.createUserPanel.pass;
             var createUserConfirmPass = options.createUserPanel.confirmPass;
+        }else{
+            var createActionPanel = new Element('div', {id:'create_sub_user'}).update('<div class="dialogContentMainTitle">Create user</div>');
         }
 
         options = Object.extend(
@@ -127,9 +129,106 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
                             }
                         });
                         Effect.BlindDown(createUserPanel, {duration:0.6, transition:Effect.Transitions.spring, afterFinish:function(){createUserPass.focus();}});
+
+                    }else if(selectedLi.getAttribute("data-temporary") && createActionPanel){
+
+                        element.readOnly = true;
+                        var params = $A(ajaxplorer.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(','));
+                        for(var i=0;i<params.length;i++){
+                            params[i] = "user/preferences/pref[@exposed]|//param[@name='"+params[i]+"']";
+                        }
+                        var f = new FormManager();
+                        var def1 = $A();
+                        def1.push($H({
+                            description: "User ID",
+                            editable: false,
+                            expose: "true",
+                            label: "User ID",
+                            name: "new_user_id",
+                            scope: "user",
+                            type: "string",
+                            mandatory: "true"
+                        }),$H({
+                            description: "New user password",
+                            editable: "true",
+                            expose: "true",
+                            label: "Password",
+                            name: "new_password",
+                            scope: "user",
+                            type: "password-create",
+                            mandatory: "true"
+                        }),$H({
+                            description: "Send a welcome mail containing the password to the user (email must be set)",
+                            editable: "true",
+                            expose: "true",
+                            label: "Send password by email",
+                            name: "send_email",
+                            scope: "user",
+                            type: "boolean",
+                            default: false,
+                            mandatory: true
+                        }));
+                        var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), params.join('|'));
+                        definitions.each(function(el){ def1.push(el); });
+                        var defaultValues = $H();
+                        defaultValues.set('lang', ajaxplorer.currentLanguage);
+                        defaultValues.set('new_user_id', label);
+                        f.createParametersInputs(createActionPanel, def1, true, defaultValues, false, true);
+
+                        var parent = listElement.up('div.dialogContent') || listElement.up('div');
+                        modal.showSimpleModal(parent, createActionPanel, function(){
+                            var params = $H();
+                            var f = new FormManager();
+                            var missing = f.serializeParametersInputs(createActionPanel, params, 'NEW_');
+                            if(missing){
+                                return false;
+                            }
+                            var conn = new Connexion();
+                            params.set("get_action", "user_create_user");
+                            conn.setParameters(params);
+                            conn.setMethod("POST");
+                            var success = false;
+                            conn.onComplete = function(transport){
+                                if(transport.responseText == 'SUCCESS'){
+                                    var id = createActionPanel.down('[name="new_user_id"]').getValue();
+                                    var label = id;
+                                    if(createActionPanel.down('[name="USER_DISPLAY_NAME"]')){
+                                        label = createActionPanel.down('[name="USER_DISPLAY_NAME"]').getValue();
+                                        if(!label) label = id;
+                                    }
+                                    element.setValue("");
+                                    var li = entryTplGenerator(false,
+                                        false,
+                                        id,
+                                        label
+                                    );
+                                    if(entryTplUpdater){
+                                        entryTplUpdater(li);
+                                    }
+                                    li.appendToList(listElement);
+                                    success = true;
+                                }else{
+                                    ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                                    success = false;
+                                }
+                            };
+                            conn.sendSync();
+                            if(success) {
+                                element.readOnly = false;
+                            }
+                            return success;
+
+                        }, function(){
+                            element.setValue("");
+                            element.readOnly = false;
+                            return true;
+                        });
+
                     }else{
+
                         element.setValue("");
                         li.appendToList(listElement);
+
                     }
 
                 }

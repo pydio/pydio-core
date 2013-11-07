@@ -113,6 +113,24 @@ abstract class AbstractConfDriver extends AJXP_Plugin
             }
         }
 
+        // CREATE A NEW USER
+        if (!ConfService::getCoreConf("USER_CREATE_USERS", "conf")) {
+            unset($this->actions["user_create_user"]);
+            $actionXpath=new DOMXPath($contribNode->ownerDocument);
+            $publicUrlNodeList = $actionXpath->query('action[@name="user_create_user"]', $contribNode);
+            if ($publicUrlNodeList->length) {
+                $publicUrlNode = $publicUrlNodeList->item(0);
+                $contribNode->removeChild($publicUrlNode);
+            }
+            unset($this->actions["user_delete_user"]);
+            $actionXpath=new DOMXPath($contribNode->ownerDocument);
+            $publicUrlNodeList = $actionXpath->query('action[@name="user_delete_user"]', $contribNode);
+            if ($publicUrlNodeList->length) {
+                $publicUrlNode = $publicUrlNodeList->item(0);
+                $contribNode->removeChild($publicUrlNode);
+            }
+        }
+
     }
 
     // NEW FUNCTIONS FOR  LOADING/SAVING PLUGINS CONFIGS
@@ -581,10 +599,31 @@ abstract class AbstractConfDriver extends AJXP_Plugin
             //	SAVE USER PREFERENCE
             //------------------------------------
             case "custom_data_edit":
+            case "user_create_user":
 
-                $userObject = AuthService::getLoggedUser();
                 $data = array();
-                AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "PREFERENCES_");
+
+                if($action == "user_create_user"){
+                    AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "NEW_");
+
+                    if(AuthService::userExists($data["new_user_id"])){
+                        throw new Exception('Please choose another user id');
+                    }
+                    AJXP_Controller::applyHook("user.before_create", array($data["new_user_id"]));
+
+                    AuthService::createUser($data["new_user_id"], $data["new_password"]);
+                    $userObject = ConfService::getConfStorageImpl()->createUserObject($data["new_user_id"]);
+                    $loggedUser = AuthService::getLoggedUser();
+                    $userObject->setParent($loggedUser->getId());
+                    $userObject->save('superuser');
+                    $userObject->personalRole->clearAcls();
+                    $userObject->setGroupPath($loggedUser->getGroupPath());
+                    $userObject->setProfile("shared");
+
+                }else{
+                    $userObject = AuthService::getLoggedUser();
+                    AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "PREFERENCES_");
+                }
 
                 $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
                 $rChanges = false;
@@ -609,15 +648,35 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 if ($rChanges) {
                     AuthService::updateRole($userObject->personalRole, $userObject);
                     $userObject->recomputeMergedRole();
-                    AuthService::updateUser($userObject);
+                    if($action == "custom_data_edit"){
+                        AuthService::updateUser($userObject);
+                    }
                 }
 
+                if($action == "user_create_user"){
+                    AJXP_Controller::applyHook("user.after_create", array($userObject));
+                    if(isset($data["send_email"]) && $data["send_email"] == true && !empty($data["email"])){
+                        $mailer = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("mailer");
+                        if ($mailer !== false) {
+                            $mess = ConfService::getMessages();
+                            $link = AJXP_Utils::detectServerURL();
+                            $apptitle = ConfService::getCoreConf("APPLICATION_NAME");
+                            $subject = "Welcome on Pydio!";
+                            $body = "An account was just created for you by %s on $apptitle. <br>Go to <a href='$link'>$link</a> and use the following credentials to login: %s, %s. ";
+                            $body = sprintf($body, AuthService::getLoggedUser()->getId(), $data["new_user_id"], $data["new_password"]);
+                            $mailer->sendMail(array($data["email"]), $subject, $body);
+                        }
+                    }
 
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::sendMessage($mess["241"], null);
-                AJXP_XMLWriter::close();
+                    echo "SUCCESS";
+                }else{
+                    AJXP_XMLWriter::header();
+                    AJXP_XMLWriter::sendMessage($mess["241"], null);
+                    AJXP_XMLWriter::close();
+                }
 
             break;
+
 
             //------------------------------------
             // WEBDAV PREFERENCES
@@ -807,6 +866,18 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
             break;
 
+            case "user_delete_user":
+
+                $userId = $httpVars["user_id"];
+                $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
+                if($userObject == null || !$userObject->hasParent() || $userObject->getParent() != AuthService::getLoggedUser()->getId()){
+                    throw new Exception("You are not allowed to edit this user");
+                }
+                AuthService::deleteUser($userId);
+                echo "SUCCESS";
+
+            break;
+
             case "user_list_authorized_users" :
 
                 $defaultFormat = "html";
@@ -828,7 +899,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 }
                 $users = "";
                 $index = 0;
-                if ($regexp != null && !count($allUsers) && ConfService::getCoreConf("ALLOW_NEWUSERS_SHARING", "conf") && !$existingOnly) {
+                if ($regexp != null && (!count($allUsers) || !array_key_exists($crtValue, $allUsers))  && ConfService::getCoreConf("USER_CREATE_USERS", "conf") && !$existingOnly) {
                     $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue'><span class='user_entry_label'>$crtValue (".$mess["448"].")</span></li>";
                 } else if ($existingOnly && !empty($crtValue)) {
                     $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue' data-entry_id='$crtValue'><span class='user_entry_label'>$crtValue</span></li>";

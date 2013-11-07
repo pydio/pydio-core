@@ -237,11 +237,12 @@ Class.create("ShareCenter", {
                     {
                         tmpUsersPrefix:pref,
                         updateUserEntryAfterCreate:updateUserEntryAfterCreate,
+                        /*
                         createUserPanel:{
                             panel : $("create_shared_user"),
                             pass  : $("shared_pass"),
                             confirmPass: $("shared_pass_confirm")
-                        },
+                        },*/
                         indicator: $("complete_indicator"),
                         minChars:parseInt(ajaxplorer.getPluginConfigs("conf").get("USERS_LIST_COMPLETE_MIN_CHARS"))
                     }

@@ -348,6 +348,13 @@ Class.create("Modal", {
         }else{
             $(element).down("#element_overlay").insert({after:box});
         }
+        $(element).down("#element_overlay").setStyle({opacity:0.9});
+        if(element.up('div.dialogBox')){
+            Effect.BlindDown(box, {
+                duration:0.6,
+                transition:Effect.Transitions.sinoidal
+            });
+        }
         this.currentLightBoxElement = $(element);
         this.currentLightBoxModal = box;
         this.addSubmitCancel(content, cancelCallback, (cancelCallback==null), position);
@@ -357,10 +364,17 @@ Class.create("Modal", {
                     Event.stop(event);
                     var res = okCallback();
                     if(res){
-                        box.remove();
-                        removeLightboxFromElement(element);
-                        this.currentLightBoxElement = null;
-                        this.currentLightBoxModal = null;
+                        Effect.BlindUp(box, {
+                            duration:0.4,
+                            afterFinish:function(){
+                                content.down('div.dialogButtons').remove();
+                                $(element).down("#element_overlay").setStyle({opacity:0});
+                                box.remove();
+                                removeLightboxFromElement(element);
+                                this.currentLightBoxElement = null;
+                                this.currentLightBoxModal = null;
+                            }.bind(this)
+                        });
                     }
                 }.bind(this));
             }else{
@@ -369,10 +383,17 @@ Class.create("Modal", {
                     Event.stop(event);
                     var res = cancelCallback();
                     if(res){
-                        box.remove();
-                        removeLightboxFromElement(element);
-                        this.currentLightBoxElement = null;
-                        this.currentLightBoxModal = null;
+                        Effect.BlindUp(box, {
+                            duration:0.4,
+                            afterFinish:function(){
+                                content.down('div.dialogButtons').remove();
+                                $(element).down("#element_overlay").setStyle({opacity:0});
+                                box.remove();
+                                removeLightboxFromElement(element);
+                                this.currentLightBoxElement = null;
+                                this.currentLightBoxModal = null;
+                            }.bind(this)
+                        });
                     }
                 }.bind(this));
             }

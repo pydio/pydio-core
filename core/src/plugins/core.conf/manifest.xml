@@ -32,7 +32,8 @@
         <global_param description="CONF_MESSAGE[Minimum number of characters to trigger the auto completion feature]" label="CONF_MESSAGE[Users completer min chars]" name="USERS_LIST_COMPLETE_MIN_CHARS" type="integer" default="3" expose="true"/>
         <global_param description="CONF_MESSAGE[Do not display real login in parenthesis]" label="CONF_MESSAGE[Hide real login]" name="USERS_LIST_HIDE_LOGIN" type="boolean" default="false"/>
         <global_param name="ALLOW_CROSSUSERS_SHARING" group="CONF_MESSAGE[Sharing]" type="boolean" label="CONF_MESSAGE[See existing users]" description="CONF_MESSAGE[Allow the users to pick an existing user when sharing a folder]" mandatory="false" default="true"/>
-        <global_param name="ALLOW_NEWUSERS_SHARING" group="CONF_MESSAGE[Sharing]" type="boolean" label="CONF_MESSAGE[Create external users]" description="CONF_MESSAGE[Allow the users to create a new user when sharing a folder]" mandatory="false" default="true"/>
+        <global_param name="USER_CREATE_USERS" group="CONF_MESSAGE[Sharing]" type="boolean" label="CONF_MESSAGE[Create external users]" description="CONF_MESSAGE[Allow the users to create a new user when sharing a folder]" mandatory="false" default="true"/>
+        <global_param name="NEWUSERS_EDIT_PARAMETERS" group="CONF_MESSAGE[Sharing]" type="string" label="CONF_MESSAGE[External users parameters]" description="CONF_MESSAGE[List of parameters to be edited when creating a new shared user.]" mandatory="false" default="email,USER_DISPLAY_NAME,lang" expose="true"/>
         <global_param type="plugin_instance:conf" name="UNIQUE_INSTANCE_CONFIG" group="CONF_MESSAGE[Instance Param]" label="CONF_MESSAGE[Instance]" description="CONF_MESSAGE[Choose the configuration plugin]" mandatory="true" default="conf.serial"/>
     </server_settings>
 </ajxpcore>

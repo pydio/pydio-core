@@ -65,6 +65,15 @@
     padding: 0 !important;
     margin: 0 !important;
 }
+
+div.dialogBox div#element_overlay{
+
+    background-color: rgb(53, 72, 90);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+
+}
+
 #element_overlay img{
     margin-top:30%;
 }

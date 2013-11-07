@@ -3588,6 +3588,10 @@ span.user_entry_check{
     top: -1px;
 }
 
+#create_sub_user{
+    padding: 8px 14px;
+}
+
 .editable_users_header{
     float: right;
     margin-top: 2px;
@@ -3703,7 +3707,7 @@ div.autocomplete ul
 }
 div.autocomplete ul li.selected
 {
-    background-color: #73a2d7;
+    background-color: #73a2d7 !important;
 }
 div.autocomplete ul li
 {
@@ -4187,10 +4191,18 @@ div.menuActions img{
 }
 
 div.dialogBox div.dialogBox.css_boxshadow{
-    -moz-box-shadow: 2px 2px 10px #4C5B6B;
-    -webkit-box-shadow: 2px 2px 10px #4C5B6B;
-    box-shadow: 2px 2px 10px #4C5B6B;
-    border: 1px solid white;
+    box-shadow: inset 0px 0px 6px #9C9C9C;
+    border-radius: 0 !important;
+    border: 1px solid #aaa;
+    border-width: 1px 0;
+    background-color: white;
+    width: 100%;
+    left: 0;
+    top:25%;
+}
+
+div.dialogBox div.dialogBox.css_boxshadow > div{
+    background-color: transparent;
 }
 
 div.dialogBox.form-login_form{
