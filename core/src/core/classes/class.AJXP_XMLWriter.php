@@ -204,10 +204,8 @@ class AJXP_XMLWriter
         if(error_reporting() == 0) return ;
         AJXP_Logger::error(basename($fichier), "error l.$ligne", array("message" => $message));
         $loggedUser = AuthService::getLoggedUser();
-        if (ConfService::getConf("SERVER_DEBUG") || $loggedUser != null && $loggedUser->isAdmin()) {
+        if (ConfService::getConf("SERVER_DEBUG") || ( $loggedUser != null && $loggedUser->isAdmin() )) {
             $message .= " in $fichier (l.$ligne)";
-        } else {
-            $message = "Oops, something happened. Ask your admin to check the logs";
         }
         if(!headers_sent()) AJXP_XMLWriter::header();
         AJXP_XMLWriter::sendMessage(null, SystemTextEncoding::toUTF8($message), true);
