@@ -266,7 +266,7 @@
                                         <input type="text" placeholder="AJXP_MESSAGE[share_center.91]" name="link_tag" value="" class="SF_input SF_number" style="width:113px !important;">
                                     </div>
                                     <div id="handle_existing_links" class="SF_horizontal_actions">
-                                        <span data-action="remove" class="SF_horizontal_action icon-minus-sign"></span>
+                                        <span data-action="remove" class="SF_horizontal_action icon-minus-sign SF_horizontal_action_destructive"></span>
                                     </div>
                                     <div class="share_qrcode" style="display:none;"></div>
                                     <div style="clear:both"></div>
