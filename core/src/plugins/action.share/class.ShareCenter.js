@@ -155,9 +155,11 @@ Class.create("ShareCenter", {
                         this._currentRepositoryLink = response;
                         this._currentRepositoryLabel = oForm.down("#repo_label").getValue();
                         oForm.down("#share_container").select();
-                        oForm.down("#share_unshare").show();
+                        if(oForm.down("#share_unshare")) {
+                            oForm.down("#share_unshare").show();
+                            oForm.down('#unshare_button').observe("click", this.performUnshareAction.bind(this));
+                        }
                         oForm.down("#share_generate").hide();
-                        oForm.down('#unshare_button').observe("click", this.performUnshareAction.bind(this));
                         this.updateDialogButtons(oForm.down('#share_result').down("div.SF_horizontal_fieldsRow"), "folder");
                     }
 
@@ -186,14 +188,14 @@ Class.create("ShareCenter", {
                 oForm.select(".mode-ws").invoke('hide');
                 oForm.select(".mode-minipub").invoke('hide');
                 oForm.select(".mode-minipriv").invoke('show');
-                oForm.down(".editable_users_list").setStyle({height: '80px'});
+                oForm.down(".editable_users_list").setStyle({height: '100px'});
                 oForm.down("#share_generate").insert({before:oForm.down("#target_user")});
 
             }else{
                 oForm.select(".mode-minipriv").invoke('hide');
                 oForm.select(".mode-minipub").invoke('hide');
                 oForm.select(".mode-ws").invoke('show');
-                oForm.down(".editable_users_list").setStyle({height: '160px'});
+                oForm.down(".editable_users_list").setStyle({height: ''});
             }
 
 
@@ -256,8 +258,10 @@ Class.create("ShareCenter", {
                     oForm.down('#share_result').show();
                 }
                 oForm.down('div#share_generate').hide();
-                oForm.down('div#share_unshare').show();
-                oForm.down('#unshare_button').observe("click", this.performUnshareAction.bind(this));
+                if(oForm.down("#share_unshare")) {
+                    oForm.down('div#share_unshare').show();
+                    oForm.down('#unshare_button').observe("click", this.performUnshareAction.bind(this));
+                }
                 oForm.down('#complete_indicator').show();
                 this.loadSharedElementData(this.currentNode, function(json){
                     this._currentRepositoryId = json['repositoryId'];
@@ -691,25 +695,23 @@ Class.create("ShareCenter", {
     },
 
     updateDialogButtons : function(dialogButtonsOrRow, shareType, jsonData){
+
+        // WATCH BUTTON
         if(ajaxplorer.hasPluginOfType("meta", "watch")){
             var st = (shareType == "folder" ? MessageHash["share_center.38"] : MessageHash["share_center.39"]);
-            if(dialogButtonsOrRow.hasClassName('SF_horizontal_fieldsRow')){
-                if(!dialogButtonsOrRow.down('#watch_folder')) {
-                    dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:"<span class='icon-eye-close simple_tooltip_observer' id='watch_folder_eye' data-tooltipTitle='"+MessageHash["share_center.83"]+"'> "+MessageHash["share_center.82"]+"<input type='checkbox' id='watch_folder' style='display:none;'></span>"});
-                }
-                var folderEye = dialogButtonsOrRow.down('#watch_folder_eye');
-                var folderCheck = dialogButtonsOrRow.down('#watch_folder');
-
-                folderCheck.checked = ((jsonData && jsonData['element_watch']) || this._currentFolderWatchValue);
-                folderEye
-                    .removeClassName('icon-eye-close')
-                    .removeClassName('icon-eye-open')
-                    .addClassName('icon-eye-'+ ( folderCheck.checked ? 'open' : 'close'))
-                    .update( ' ' + MessageHash['share_center.' + (folderCheck.checked ? '81' : '82')] )
-                ;
-            }else{
-                dialogButtonsOrRow.insert("<div class='dialogButtonsCheckbox'><input type='checkbox' id='watch_folder'><label for='watch_folder'>"+st+"</label></div>");
+            if(!dialogButtonsOrRow.down('#watch_folder')) {
+                dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:"<span class='icon-eye-close simple_tooltip_observer' id='watch_folder_eye' data-tooltipTitle='"+MessageHash["share_center.83"]+"'> "+MessageHash["share_center.82"]+"<input type='checkbox' id='watch_folder' style='display:none;'></span>"});
             }
+            var folderEye = dialogButtonsOrRow.down('#watch_folder_eye');
+            var folderCheck = dialogButtonsOrRow.down('#watch_folder');
+
+            folderCheck.checked = ((jsonData && jsonData['element_watch']) || this._currentFolderWatchValue);
+            folderEye
+                .removeClassName('icon-eye-close')
+                .removeClassName('icon-eye-open')
+                .addClassName('icon-eye-'+ ( folderCheck.checked ? 'open' : 'close'))
+                .update( ' ' + MessageHash['share_center.' + (folderCheck.checked ? '81' : '82')] )
+            ;
             if(folderEye){
                 folderEye.observe('click', function(){
                     folderCheck.checked = !folderCheck.checked;
@@ -743,27 +745,16 @@ Class.create("ShareCenter", {
                 }.bind(this));
             }
         }
+
+        // MAILER BUTTON
         var forceOldSchool = ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("EMAIL_INVITE_EXTERNAL");
         var mailerButton;
-        var oForm;
-        if(dialogButtonsOrRow.hasClassName('SF_horizontal_fieldsRow')){
-            if(!dialogButtonsOrRow.down('#mailer_button')){
-                dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:"<span class='icon-envelope simple_tooltip_observer' id='mailer_button' data-tooltipTitle='"+MessageHash['share_center.80']+"'> "+MessageHash['share_center.79']+"</span>"});
-            }
-            mailerButton = dialogButtonsOrRow.down('#mailer_button');
-            mailerButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.41"]);
-            oForm = dialogButtonsOrRow.up('.dialogContent');
-        }else{
-            oForm = dialogButtonsOrRow.parentNode;
-            var unShare = oForm.down("#unshare_button");
-            mailerButton = unShare.cloneNode(true);
-            if(mailerButton.down("img")) {
-                mailerButton.down("img").writeAttribute("src","plugins/gui.ajax/res/themes/umbra/images/actions/22/mail_generic.png");
-            }
-            mailerButton.down("span").update(MessageHash["share_center.40"]);
-            unShare.insert({after:mailerButton});
-            mailerButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.41"]);
+        if(!dialogButtonsOrRow.down('#mailer_button')){
+            dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:"<span class='icon-envelope simple_tooltip_observer' id='mailer_button' data-tooltipTitle='"+MessageHash['share_center.80']+"'> "+MessageHash['share_center.79']+"</span>"});
         }
+        mailerButton = dialogButtonsOrRow.down('#mailer_button');
+        mailerButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.41"]);
+        var oForm = dialogButtonsOrRow.up('.dialogContent');
 
         if(ajaxplorer.hasPluginOfType("mailer") && !forceOldSchool){
             mailerButton.observe("click", function(event){
@@ -818,24 +809,15 @@ Class.create("ShareCenter", {
 
         }
 
+        // QRCODE BUTTON
         var qrcodediv = dialogButtonsOrRow.down('.share_qrcode');
         if (this.createQRCode && qrcodediv) {
 
-            if(dialogButtonsOrRow.hasClassName('SF_horizontal_fieldsRow')){
-                if(!dialogButtonsOrRow.down('#qrcode_button')){
-                    dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:"<span class='icon-qrcode simple_tooltip_observer' id='qrcode_button' data-tooltipTitle='"+MessageHash['share_center.94']+"'> "+MessageHash['share_center.95']+"</span>"});
-                }
-                qrcodeButton = dialogButtonsOrRow.down('#qrcode_button');
-                qrcodeButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.95"]);
-            }else{
-                var oForm = dialogButtonsOrRow.parentNode;
-                var unShare = oForm.down("#unshare_button");
-                qrcodeButton = unShare.cloneNode(true);
-                qrcodeButton.down("img").writeAttribute("src","plugins/gui.ajax/res/themes/umbra/images/actions/22/qr-code.png");
-                qrcodeButton.down("span").update(MessageHash["share_center.94"]);
-                unShare.insert({after:qrcodeButton});
-                qrcodeButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.95"]);
+            if(!dialogButtonsOrRow.down('#qrcode_button')){
+                dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:"<span class='icon-qrcode simple_tooltip_observer' id='qrcode_button' data-tooltipTitle='"+MessageHash['share_center.94']+"'> "+MessageHash['share_center.95']+"</span>"});
             }
+            var qrcodeButton = dialogButtonsOrRow.down('#qrcode_button');
+            qrcodeButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.95"]);
             qrcodediv.update('');
             var randId = 'share_qrcode-' + new Date().getTime();
             qrcodediv.id = randId;
@@ -860,6 +842,17 @@ Class.create("ShareCenter", {
 
             }.bind(this));
         }
+
+        // STOP SHARING BUTTON
+        if(shareType == 'folder'){
+            var stopButton = new Element('span', {
+                className:'icon-remove simple_tooltip_observer SF_horizontal_action_destructive',
+                'data-tooltipTitle':MessageHash['share_center.97']
+            }).update(' '+MessageHash['share_center.96']);
+            dialogButtonsOrRow.down('.SF_horizontal_actions').insert(stopButton);
+            stopButton.observe("click", this.performUnshareAction.bind(this));
+        }
+
     },
 
     checkPositiveNumber : function(str){

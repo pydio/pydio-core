@@ -97,5 +97,7 @@ $mess = array(
     "92"=> "Nouveau lien",
     "93"=> "Liens existants",
     "94"=> "Code QR",
-    "95"=> "Afficher/Cacher le code QR.",
+    "95"=> "code QR",
+    "96"=> "arrêter le partage",
+    "97"=> "Arrêter le partage de ce répertoire avec d'autres utilisateurs.",
 );

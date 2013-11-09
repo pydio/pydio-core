@@ -558,6 +558,8 @@ Class.create("Modal", {
             }
             if(updateOnShow){
                 this.tooltip.update(title.cloneNode(true));
+            }else if(element.readAttribute('data-simpleTooltipTitle')){
+                this.tooltip.update(element.readAttribute('data-simpleTooltipTitle'));
             }else{
                 this.tooltip.update(title);
             }

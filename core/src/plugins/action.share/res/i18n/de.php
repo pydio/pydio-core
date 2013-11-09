@@ -95,5 +95,7 @@ $mess = array(
 "92"=> "New link",
 "93"=> "Existing links",
 "94"=> "QR Code",
-"95"=> "Show/Hide QR Code.",
+"95"=> "QR code",
+"96"=> "stop sharing",
+"97"=> "Stop sharing this folder with other users",
 );

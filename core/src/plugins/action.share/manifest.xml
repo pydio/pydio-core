@@ -319,15 +319,10 @@
                                     </div>
                                 </div>
                                 <br style="clear:both;"/>
-                                <div style="display:none;padding-top: 10px;" id="share_unshare">
-                                    <div id="unshare_button" class="largeButton" title="AJXP_MESSAGE[share_center.7]" >
-                                        <span><span class="icon-remove" id="stop_sharing_indicator"></span> AJXP_MESSAGE[share_center.6]</span>
-                                    </div>
-                                </div>
                             </div>
-                            <div id="target_user_title" class="mode-ws" style="margin-top: 25px;">
+                            <div id="target_user_title" class="mode-ws" style="margin-top: 15px;">
                                 <div class="dialogContentMainTitle" ajxp_message_id="share_center.30" style="display:none;">AJXP_MESSAGE[share_center.30]</div>
-                                <div class="dialogLegend" style="margin:0 5px;" ajxp_message_id="share_center.26">AJXP_MESSAGE[share_center.26]</div>
+                                <div class="dialogLegend" style="margin:0 5px; padding-bottom:0" ajxp_message_id="share_center.26">AJXP_MESSAGE[share_center.26]</div>
                             </div>
                             <div id="target_user" style="margin:0 5px;position:relative;display:none;" class="mode-ws mode-minipriv">
                                 <div style="clear: both; margin-top:20px;" class="mode-minipriv">&nbsp;</div>

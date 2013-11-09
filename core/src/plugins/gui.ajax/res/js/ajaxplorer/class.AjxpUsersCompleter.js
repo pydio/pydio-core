@@ -29,7 +29,7 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
             li.addClassName("user_entry_temp");
         }
         li.writeAttribute("data-entry_id", entryId);
-        li.insert({bottom:'<span style="display: none;" class="delete_user_entry">&nbsp;</span>'});
+        li.insert({bottom:'<span style="display: none;" class="delete_user_entry icon-remove-sign">&nbsp;</span>'});
 
         if(!skipObservers){
             li.setStyle({opacity:0});
@@ -73,9 +73,9 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
         }
 
         if(listElement && ajaxplorer.actionBar.actions.get('user_team_create')){
-            var butt = new Element('span', {className:'icon-save user_team_save'});
+            var butt = new Element('span', {className:'icon-save user_team_save', 'data-simpleTooltipTitle':'Save the current users list as a personal team'});
             listElement.insert({after:butt});
-            modal.simpleTooltip(butt, 'Save the current users list as a personal team', 'top center', 'down_arrow_tip', 'element'),
+            modal.simpleTooltip(butt, '', 'top center', 'down_arrow_tip', 'element'),
             butt.observe('click', function(){
                 var label = window.prompt('Please select a team label');
                 if(!label) return;

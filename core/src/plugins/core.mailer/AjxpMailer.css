@@ -8,7 +8,7 @@
 }
 
 #mailer_message div.message_body textarea{
-    width: 334px;
+    width: 98%;
     height: 120px;
     padding: 2px;
 }
@@ -42,6 +42,9 @@
     border: 1px solid #bbb;
     border-radius: 2px;
     box-shadow: 1px 1px 11px rgba(0,0,0,0.5);
+    min-width: 200px;
+    max-height: 180px;
+    overflow-y: auto;
 }
 
 #emails_autocomplete ul {
