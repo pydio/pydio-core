@@ -339,7 +339,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin
         if (ConfService::currentContextIsCommandLine() && $this->verboseIndexation) {
             print("Indexing content of ".$url."\n");
         }
-        @set_time_limit(60);
+        if(!ConfService::currentContextIsCommandLine()) @set_time_limit(60);
         $handle = opendir($url);
         if ($handle !== false) {
             while ( ($child = readdir($handle)) != false) {
