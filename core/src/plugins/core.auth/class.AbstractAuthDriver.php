@@ -50,8 +50,8 @@ class AbstractAuthDriver extends AJXP_Plugin
                 if (AuthService::suspectBruteForceLogin() && (!isSet($httpVars["captcha_code"]) || !CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]))) {
                     $loggingResult = -4;
                 } else {
-                    $userId = (isSet($httpVars["userid"])?$httpVars["userid"]:null);
-                    $userPass = (isSet($httpVars["password"])?$httpVars["password"]:null);
+                    $userId = (isSet($httpVars["userid"])?trim($httpVars["userid"]):null);
+                    $userPass = (isSet($httpVars["password"])?trim($httpVars["password"]):null);
                     $rememberMe = ((isSet($httpVars["remember_me"]) && $httpVars["remember_me"] == "true")?true:false);
                     $cookieLogin = (isSet($httpVars["cookie_login"])?true:false);
                     $loggingResult = AuthService::logUser($userId, $userPass, false, $cookieLogin, $httpVars["login_seed"]);
