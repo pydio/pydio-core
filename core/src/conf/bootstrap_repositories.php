@@ -104,12 +104,13 @@ $REPOSITORIES[1] = array(
 );
 
 // DO NOT REMOVE THIS!
-// SHARE ELEMENTS
-$REPOSITORIES["ajxp_shared"] = array(
-    "DISPLAY"		=>	"Shared Elements",
-    "DISPLAY_ID"		=>	"467",
-    "DRIVER"		=>	"ajxp_shared",
-    "DRIVER_OPTIONS"=> array(
+// USER DASHBOARD
+$REPOSITORIES["ajxp_user"] = array(
+    "DISPLAY"		    =>	"My Dashboard",
+    "DISPLAY_ID"		=>	"user_dash.title",
+    "DESCRIPTION_ID"	=>	"user_dash.desc",
+    "DRIVER"		    =>	"ajxp_user",
+    "DRIVER_OPTIONS"    => array(
         "DEFAULT_RIGHTS" => "rw"
     )
 );
