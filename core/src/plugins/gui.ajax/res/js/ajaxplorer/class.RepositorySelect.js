@@ -126,7 +126,7 @@ Class.create("RepositorySelect", {
 				var key = pair.key;
 				var selected = (key == repositoryId ? true:false);
 
-                if(repoObject.getAccessType() == "ajxp_conf" || repoObject.getAccessType() == "ajxp_shared"){
+                if(repoObject.getAccessType().startsWith('ajxp_')){
                     return;
                 }
 

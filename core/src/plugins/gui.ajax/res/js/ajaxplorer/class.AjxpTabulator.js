@@ -383,6 +383,9 @@ Class.create("AjxpTabulator", AjxpPane, {
 	 */
 	resize : function(){
 		if(!this.selectedTabInfo || !this.htmlElement) return;
+        if(this.htmlElement.hasClassName('horizontal_tabulator')){
+            fitHeightToBottom(this.htmlElement.down('div.tabulatorContainer'), null, this.options.fitMarginBottom);
+        }
 		var ajxpObject = this.getAndSetAjxpObject(this.selectedTabInfo);
 		if(ajxpObject){
             var nodeElement = $(this.htmlElement).down("#"+this.selectedTabInfo.element);
@@ -427,7 +430,18 @@ Class.create("AjxpTabulator", AjxpPane, {
         }
         document.fire("ajaxplorer:resize-AjxpTabulator-" + this.htmlElement.id, this.htmlElement.getDimensions());
 	},
-	
+
+    showElement: function(show){
+        if(!this.htmlElement) return;
+        if(show) {
+            this.htmlElement.show();
+            this.resize();
+        }
+        else {
+            this.htmlElement.hide();
+        }
+    },
+
 	/**
 	 * Implementation of the IAjxpWidget methods
 	 */

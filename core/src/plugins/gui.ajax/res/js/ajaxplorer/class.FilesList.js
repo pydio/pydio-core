@@ -1243,7 +1243,7 @@ Class.create("FilesList", SelectableElements, {
         if(this._sortableTable){
             var sortColumn = this.crtContext.getMetadata().get("filesList.sortColumn");
          	var descending = this.crtContext.getMetadata().get("filesList.descending");
-            if(sortColumn == undefined) {
+            if(sortColumn == undefined || !this.columnsDef[sortColumn]) {
                 sortColumn = 0;
             }
             if(sortColumn != undefined){
@@ -1338,7 +1338,7 @@ Class.create("FilesList", SelectableElements, {
 			this._sortableTable.sortColumn = -1;
 			this._sortableTable.updateHeaderArrows();
 		}
-		if(contextNode.getMetadata().get("filesList.sortColumn")){
+		if(contextNode.getMetadata().get("filesList.sortColumn") && this.columnsDef[contextNode.getMetadata().get("filesList.sortColumn")]){
 			var sortColumn = parseInt(contextNode.getMetadata().get("filesList.sortColumn"));
 			var descending = contextNode.getMetadata().get("filesList.descending");
 			this._sortableTable.sort(sortColumn, descending);

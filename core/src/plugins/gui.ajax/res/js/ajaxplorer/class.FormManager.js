@@ -617,6 +617,15 @@ Class.create("FormManager", {
         }
     },
 
+    disableShortcutsOnForm: function(form){
+        form.select("input,textarea,select").invoke("observe", "focus", function(){
+            ajaxplorer.disableAllKeyBindings();
+        });
+        form.select("input,textarea,select").invoke("observe", "blur", function(){
+            ajaxplorer.enableAllKeyBindings();
+        });
+    },
+
     confirmExistingImageDelete : function(modalParent, imgSrc, hiddenInput, param){
         if(window.confirm('Do you want to remove the current image?')){
             hiddenInput.setValue("ajxp-remove-original");

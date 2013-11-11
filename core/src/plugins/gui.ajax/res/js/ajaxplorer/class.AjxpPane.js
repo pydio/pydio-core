@@ -172,7 +172,9 @@ Class.create("AjxpPane", {
 	showElement : function(show){
 		if(show){
 			this.htmlElement.show();
+            if(this.childrenPanes) this.childrenPanes.invoke('showElement', show);
 		}else{
+            if(this.childrenPanes) this.childrenPanes.invoke('showElement', show);
 			this.htmlElement.hide();
 		}
 	},

@@ -51,14 +51,25 @@ Class.create("FetchedResultPane", FilesList, {
             draggable: false,
             replaceScroller:true,
             fit:'height',
-            detailThumbSize:22
+            detailThumbSize:22,
+            updateGlobalContext:false
         }, ajxpOptions));
 
-        dataModel.observe("selection_changed", function(){
-            if(!this._dataLoaded) return;
-             var selectedNode = this._dataModel.getSelectedNodes()[0];
-             if(selectedNode) ajaxplorer.goTo(selectedNode);
-         }.bind(this));
+        if(this.options.updateGlobalContext){
+            dataModel.observe("selection_changed", function(){
+                if(!this._dataLoaded) return;
+                var selectedNodes = this._dataModel.getSelectedNodes();
+                if(selectedNodes){
+                    ajaxplorer.getContextHolder().setSelectedNodes(selectedNodes, this);
+                }
+            }.bind(this));
+        }else{
+            dataModel.observe("selection_changed", function(){
+                if(!this._dataLoaded) return;
+                var selectedNode = this._dataModel.getSelectedNodes()[0];
+                if(selectedNode) ajaxplorer.goTo(selectedNode);
+            }.bind(this));
+        }
 
         document.observe("ajaxplorer:repository_list_refreshed", function(){
             this._rootNode.clear();
@@ -76,17 +87,21 @@ Class.create("FetchedResultPane", FilesList, {
         if(ajxpOptions.reloadOnServerMessage){
             ajaxplorer.observe("server_message", function(event){
                 var newValue = XPathSelectSingleNode(event, ajxpOptions.reloadOnServerMessage);
-                if(newValue && this._dataLoaded){
-                    this._rootNode.clear();
-                    this._dataLoaded = false;
-                    if(this.htmlElement && this.htmlElement.visible()){
-                        this._dataModel.requireContextChange(this._rootNode, true);
-                        this._dataLoaded = true;
-                    }
-                }
+                if(newValue) this.reloadDataModel();
             }.bind(this));
         }
 
+    },
+
+    reloadDataModel: function(){
+        if(this._dataLoaded){
+            this._rootNode.clear();
+            this._dataLoaded = false;
+            if(this.htmlElement && this.htmlElement.visible()){
+                this._dataModel.requireContextChange(this._rootNode, true);
+                this._dataLoaded = true;
+            }
+        }
     },
 
     /**
@@ -118,8 +133,12 @@ Class.create("FetchedResultPane", FilesList, {
             this._dataModel.requireContextChange(this._rootNode, true);
             this._dataLoaded = true;
         }
-        if(show) this.htmlElement.show();
-        else {
+        if(show) {
+            if(this._dataModel.getSelectedNodes()){
+                this._dataModel.publish("selection_changed", this._dataModel);
+            }
+            this.htmlElement.show();
+        } else {
             this._dataModel.setSelectedNodes($A());
             this.htmlElement.hide();
         }
