@@ -29,9 +29,9 @@
                     background-color: #e35d52;
                 }
                 .action_bar{
-                    background-color: rgba(111, 123, 136, 0.52);
+                    background-color: #ebedf0;
                     padding: 4px;
-                    margin: 5px;
+                    margin: 0 -5px;
                 }
                 #account_pane .action_bar{
                     text-align: right;

@@ -57,6 +57,8 @@ Class.create("UserDashboardHome", AjxpPane, {
             oFormObject.down("#notifications_center").toggleClassName('folded');
         };
         oFormObject.down("#close-icon").observe("click", clicker);
+
+        window.setTimeout(clicker, 4000);
     },
 
     resize: function($super, size){

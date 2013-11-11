@@ -4551,13 +4551,12 @@ div.flat_tabulator > div:not(.tabulatorContainer){
     width: 96% !important;
     text-align: center;
     padding: 33px 0;
-    background-color: rgba(227, 93, 82, 0.22) !important;
-    color: #e35d52 !important;
-    text-shadow: 1px 0 0 #ffffff;
+    background-color: #e35d52 !important;
+    color: #ffffff !important;
     border: 0;
     display: block;
     margin: 2%;
-    border-radius: 0;
+    border-radius: 2px;
 }
 
 .horizontal_tabulator span.toggleInactive{
