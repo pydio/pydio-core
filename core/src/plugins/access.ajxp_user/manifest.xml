@@ -4,8 +4,10 @@
 		<resources>
 			<i18n namespace="user_dash" path="plugins/access.ajxp_user/i18n" />
             <css file="plugins/editor.ajxp_role/rolesEditor.css" />
+            <js className="UserDashboardHome" file="plugins/access.ajxp_user/class.UserDashboardHome.js" autoload="true"/>
             <js className="UserProfileEditor" file="plugins/access.ajxp_user/class.UserProfileEditor.js" autoload="true"/>
             <js className="WebDAVprefsEditor" file="plugins/access.ajxp_user/class.WebDAVprefsEditor.js" autoload="true"/>
+            <css file="plugins/access.ajxp_user/dashboard.css"/>
 		</resources>
 	</client_settings>
 	<registry_contributions>
@@ -17,7 +19,7 @@
             <template_part ajxpClass="AjxpPane" ajxpId="workspace_toolbar" ajxpOptions='{"fit":"none"}'><![CDATA[
                 <div id="search_container_settings" class="settings_search_container" style="display:none;" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}'></div>
                 <style>
-                #workspace_toolbar{display:none;}
+                #workspace_toolbar, #global_toolbar{display:none;}
                 #browser{padding:0}
                 div.flat_tabulator span.toggleHeader{
                     border-color: #e35d52;
@@ -37,9 +39,6 @@
                 .action_bar a{
                     background-color: #e35d52;
                     margin-top:3px;
-                }
-                #parameters_pane, #account_pane, #webdav_pane, #shared_files_pane, #shared_pane{
-                    background-color: #f8f8f8;
                 }
                 div.class-FetchedResultPane{
                     border-left: 0;
@@ -83,7 +82,23 @@
                 </style>
             ]]></template_part>
             <template_part ajxpId="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOption":"true"}' theme="vision"><![CDATA[
-                <div id="editor_tabs" ajxpClass="AjxpTabulator" class="settings_main_pane dashboard_main_pane flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "parameters","tabInfos" : [{"id":"parameters","label":"My Profile","iconClass":"icon-cog", "element":"parameters_pane"},{"id":"shares","label":"My Shares","iconClass":"icon-share", "element":"shared_pane"},{"id":"info","label":"Address Book","iconClass":"icon-book", "element":"files_list_pane"}]}'>
+                <div id="editor_tabs" ajxpClass="AjxpTabulator" class="settings_main_pane dashboard_main_pane flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "home","tabInfos" : [{"id":"home","label":"Home","iconClass":"icon-home", "element":"home_account_pane"},{"id":"parameters","label":"My Profile","iconClass":"icon-cog", "element":"parameters_pane"},{"id":"shares","label":"My Shares","iconClass":"icon-share", "element":"shared_pane"},{"id":"info","label":"Address Book","iconClass":"icon-book", "element":"files_list_pane"}]}'>
+                    <div id="home_account_pane" ajxpClass="UserDashboardHome">
+                        <div id="notifications_center">
+                            <span class="icon-rss" id="close-icon"></span>
+                            <h1>Notifications</h1>
+                        </div>
+                        <div id="workspaces_center">
+                            <div id="logo_div"><img src="plugins/gui.ajax/PydioLogo250.png"></div>
+                            <div id="welcome"></div>
+                            <h1>Choose a workspace</h1>
+                            <ul id="workspaces_list" style="height: 100px;"></ul>
+                            <div id="workspaces_button">
+                                <input type="checkbox" name="save_ws_choice" id="save_ws_choice"><label for="save_ws_choice">Use as default workspace</label>
+                                <input type="button" name="go_to_ws" id="go_to_ws" value="Go" class="disabled">
+                            </div>
+                        </div>
+                    </div>
                     <div id="files_list_pane" ajxpClass="AjxpPane">
                         <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                         <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "fitParent":"editor_tabs", "fitMarginBottom":10, "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
@@ -126,15 +141,17 @@
                 <script>
                     document.observeOnce("ajaxplorer:context_changed", function(){
                         $("global_toolbar").insert({bottom: $("search_container_settings")});
-                        window.setTimeout(function(){ $("get_my_feed_button").hide(); }, 10);
                         $("search_container_settings").show();
                         $("browser").ajxpPaneObject.resize();
                         document.observeOnce("ajaxplorer:repository_list_refreshed",function(){
-                            if(ajaxplorer.repositoryId == 'ajxp_conf') return;
+                            if(ajaxplorer.repositoryId == 'ajxp_user') return;
                             $("global_toolbar").down("#search_container_settings").ajxpPaneObject.destroy();
                             $("global_toolbar").down("#search_container_settings").remove();
                         });
                     });
+                    window.setTimeout(function(){
+                        try{ $("browser").ajxpPaneObject.resize(); }catch(e){}
+                    }, 100);
                 </script>
 			]]></template_part>
         </client_configs>

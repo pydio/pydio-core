@@ -1,0 +1,151 @@
+#parameters_pane, #account_pane, #webdav_pane, #shared_files_pane, #shared_pane, #home_account_pane{
+    background-color: #f8f8f8;
+}
+
+#workspaces_center{
+    width: 40%;
+    margin: 0 15%;
+    min-width: 420px;
+    transition:margin 0.5s ease;
+}
+
+#workspaces_list{
+    overflow-y: auto;
+    max-height: 230px;
+    margin: 0 30px;
+    border: 1px solid rgb(111,123,136);
+    background-color: #fff;
+    border-radius: 3px;
+    list-style: none;
+    padding-left: 0;
+    color: rgb(46, 58, 70);
+
+    background: -moz-linear-gradient(top,  rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 72%, rgba(0,0,0,0.1) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0.1)), color-stop(28%,rgba(0,0,0,0)), color-stop(72%,rgba(0,0,0,0)), color-stop(100%,rgba(0,0,0,0.1))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 28%,rgba(0,0,0,0) 72%,rgba(0,0,0,0.1) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 28%,rgba(0,0,0,0) 72%,rgba(0,0,0,0.1) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 28%,rgba(0,0,0,0) 72%,rgba(0,0,0,0.1) 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 28%,rgba(0,0,0,0) 72%,rgba(0,0,0,0.1) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1a000000', endColorstr='#1a000000',GradientType=0 ); /* IE6-9 */
+
+}
+
+#home_account_pane #close-icon{
+    position: absolute;
+    margin-left: 2px;
+    margin-top: 1px;
+    cursor: pointer;
+    transition:margin 0.5s ease;
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+
+#home_account_pane #notifications_center.folded #close-icon{
+    margin-left: -19px;
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
+
+#workspaces_list h3{
+    margin: 0;
+    padding: 12px 12px 3px 10px;
+    font-weight: normal;
+    font-size: 20px;
+}
+
+#workspaces_list h4{
+    margin: 0;
+    padding: 0 10px 10px;
+    font-weight: normal;
+    font-size: 12px;
+}
+
+#workspaces_list li {
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+}
+
+#workspaces_list li.selected{
+    background-color: rgba(227, 93, 82, 0.9) !important;
+    color: white;
+}
+
+#workspaces_list li:last-of-type {
+    border-bottom: 0;
+}
+
+#home_account_pane #notifications_center {
+    float: right;
+    width: 30%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: #ebedf0;
+    color: rgb(111,123,136);
+    border-left: 1px solid rgb(111,123,136);
+    transition: width 0.5s ease;
+}
+
+#home_account_pane #notifications_center li {
+    list-style: none;
+    padding: 5px 10px;
+}
+
+#home_account_pane .notif_event_container > div{
+    padding:0;
+}
+
+#home_account_pane #notifications_center img {
+    float: left;
+    height: 22px;
+    width: 22px;
+    margin: 0 10px;
+}
+
+#home_account_pane{
+    color: rgb(111,123,136);
+}
+
+#home_account_pane h1{
+    margin-top: 0;
+    padding-top: 12px;
+    font-size: 24px;
+    text-align: center;
+    font-weight: normal;
+}
+
+#home_account_pane #welcome{
+    padding: 8px 0 0 0;
+    text-align: center;
+    font-size: 12px;
+}
+
+#workspaces_button {
+    padding: 15px 30px;
+    font-size: 14px;
+}
+
+#workspaces_button input[type="button"] {
+    float: right;
+    padding: 7px 30px;
+    color: white;
+    border: 0;
+    cursor: pointer;
+    margin-top: -5px;
+    background-color: #e35d52;
+}
+
+#workspaces_button input[type="button"].disabled{
+    opacity: 0.5;
+    cursor: default;
+}
+#logo_div{
+    text-align: center;
+    padding-top: 20px;
+}

@@ -255,8 +255,8 @@
             </processing>
         </action>
         <action name="user_create_user">
-      			<gui text="442" title="443" src="edit_user.png" iconClass="icon-reorder" accessKey="" hasAccessKey="false">
-      				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false"/>
+      			<gui text="484" title="485" src="edit_user.png" iconClass="icon-user" accessKey="" hasAccessKey="false">
+      				<context selection="false" dir="" recycle="true" actionBar="true" actionBarGroup="address_book" contextMenu="false" infoPanel="false"/>
       			</gui>
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
@@ -299,6 +299,9 @@
                           conn.setParameters(params);
                           conn.setMethod("POST");
                           conn.onComplete = function(transport){
+                               if($("address_book")){
+                                    $("address_book").ajxpPaneObject.reloadDataModel();
+                              }
                           };
                           conn.sendAsync();
                     ]]></dialogOnComplete>

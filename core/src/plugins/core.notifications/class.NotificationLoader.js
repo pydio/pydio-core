@@ -79,7 +79,7 @@ Class.create("NotificationLoader", {
     },
     */
 
-    childrenToMenuItems : function(){
+    childrenToMenuItems : function(callback){
         var menuItems = $A([]);
         var eventIndex = 0;
         var alerts = false;
@@ -166,17 +166,35 @@ Class.create("NotificationLoader", {
             }
             this.lastAlertID = currentLastAlert;
             this.lastEventID = currentLastEvent;
-            menuItems.push({
-                id: "event_" + eventIndex,
-                name:block,
-                alt: el.getMetadata().get("event_description_long").stripTags(),
-                pFactory : this.pFactory,
-                ajxpNode:el,
-                callback:function(e){
-                    Event.stop(e);
-                },
-                moreActions: moreActions
-            });
+            if(callback){
+
+                callback({
+                    id: "event_" + eventIndex,
+                    name:block,
+                    alt: el.getMetadata().get("event_description_long").stripTags(),
+                    pFactory : this.pFactory,
+                    ajxpNode:el,
+                    callback:function(e){
+                        Event.stop(e);
+                    },
+                    moreActions: moreActions
+                });
+
+            }else{
+
+                menuItems.push({
+                    id: "event_" + eventIndex,
+                    name:block,
+                    alt: el.getMetadata().get("event_description_long").stripTags(),
+                    pFactory : this.pFactory,
+                    ajxpNode:el,
+                    callback:function(e){
+                        Event.stop(e);
+                    },
+                    moreActions: moreActions
+                });
+
+            }
             eventIndex ++;
         }.bind(this) );
         var button = $('get_my_feed_button');

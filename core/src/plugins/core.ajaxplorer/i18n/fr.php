@@ -539,5 +539,7 @@ $mess=array(
 "481" => "Tous vos fichiers et répertoires partagés",
 "482" => "Accès rapide à vos éléments favoris",
 "483" => "Vous ne pouvez pas créer plus d'utilisateurs!",
+"484" => "Créer un utilisateur",
+"485" => "Création d'utilisateur",
 /* END SENTENCE */
 );

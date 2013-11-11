@@ -4541,22 +4541,23 @@ div.flat_tabulator > div:not(.tabulatorContainer){
 
 .horizontal_tabulator div.tabulatorContainer {
     float: left;
-    width: 25%;
+    width: 22%;
     padding: 0;
     background-color: #ebedf0 !important;
-    border-right: 2px solid #e35d52;
+    border-right: 1px solid rgb(111, 123, 136)
 }
 
 .horizontal_tabulator span.toggleHeader{
-    width: 100% !important;
+    width: 96% !important;
     text-align: center;
     padding: 33px 0;
-    background-color: #e35d52 !important;
-    color: white !important;
-    border-bottom: 0 !important;
+    background-color: rgba(227, 93, 82, 0.22) !important;
+    color: #e35d52 !important;
+    text-shadow: 1px 0 0 #ffffff;
+    border: 0;
     display: block;
-    margin: 5px;
-    border-radius: 2px 0 0 2px;
+    margin: 2%;
+    border-radius: 0;
 }
 
 .horizontal_tabulator span.toggleInactive{
@@ -4564,12 +4565,13 @@ div.flat_tabulator > div:not(.tabulatorContainer){
     border-width: 0 !important;
     background-color: transparent !important;
     color: rgb(111, 123, 136) !important;
+    text-shadow: none;
 }
 
 div.horizontal_tabulator > div:not(.tabulatorContainer){
     float: left;
     padding: 0 !important;
-    width:74%;
+    width:77%;
 }
 
 #breadcrumb{

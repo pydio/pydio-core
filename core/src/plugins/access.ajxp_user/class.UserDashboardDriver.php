@@ -285,7 +285,7 @@ class UserDashboardDriver extends AbstractAccessDriver
                 icon="user_shared.png"
                 openicon="user_shared.png"
                 filename="/users/'.AJXP_Utils::xmlEntities($userId).'"
-                repo_accesses="'.(count($repoAccesses) ? AJXP_Utils::xmlEntities($this->metaIcon("time"). implode(", ", $repoAccesses)):"").'"
+                repo_accesses="'.(count($repoAccesses) ? AJXP_Utils::xmlEntities($this->metaIcon("share-sign"). implode(", ", $repoAccesses)):"").'"
                 parentname="/users"
                 is_file="1"
                 ajxp_mime="shared_user"

@@ -330,7 +330,7 @@ Class.create("Ajaxplorer", {
 			var ajxpClass = Class.getByName(ajxpClassName);
 			if(ajxpClass && ajxpId && Class.objectImplements(ajxpClass, "IAjxpWidget")){				
 				toUpdate[ajxpId] = [ajxpClass, ajxpClassName, ajxpOptionsString, cdataContent];
-				this.templatePartsToRestore = this.templatePartsToRestore.without(ajxpId);
+//				this.templatePartsToRestore = this.templatePartsToRestore.without(ajxpId);
 			}
 		}
         var futurePartsToRestore = $A(Object.keys(toUpdate));

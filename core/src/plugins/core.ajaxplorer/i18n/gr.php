@@ -537,5 +537,7 @@ $mess=array(
 "481" => "All your shared files and folders",
 "482" => "Quick access to your bookmarked items",
 "483" => "You are not authorized to create more users!",
+"484" => "Create user",
+"485" => "Create a shared user",
 /* END SENTENCE */
 );
