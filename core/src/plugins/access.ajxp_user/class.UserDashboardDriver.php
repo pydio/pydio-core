@@ -171,7 +171,7 @@ class UserDashboardDriver extends AbstractAccessDriver
 
     public function listSharedFiles()
     {
-        AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist">
+        AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist">
                 <column messageId="user_dash.4" attributeName="ajxp_label" sortType="String" width="20%"/>
                 <column messageId="user_dash.17" attributeName="download_url" sortType="String" width="20%"/>
                 <column messageId="user_dash.20" attributeName="download_count" sortType="String" width="2%"/>
@@ -207,12 +207,12 @@ class UserDashboardDriver extends AbstractAccessDriver
             if(!is_a($publicletData["REPOSITORY"], "Repository")) continue;
             AJXP_XMLWriter::renderNode(str_replace(".php", "", basename($file)), "".SystemTextEncoding::toUTF8($publicletData["REPOSITORY"]->getDisplay()).":/".SystemTextEncoding::toUTF8($publicletData["FILE_PATH"]), true, array(
                 "icon"		=> "html.png",
-                "password" => ($publicletData["PASSWORD"]!=""?$publicletData["PASSWORD"]:"-"),
-                "expiration" => ($publicletData["EXPIRE_TIME"]!=0?($expired?"[!]":"").date($mess["date_format"], $publicletData["EXPIRE_TIME"]):"-"),
-                "download_count" => $publicletData["DOWNLOAD_COUNT"],
-                "download_limit" => ($publicletData["DOWNLOAD_LIMIT"] == 0 ? "-" : $publicletData["DOWNLOAD_LIMIT"] ),
+                "password" => ($publicletData["PASSWORD"]!=""?$this->metaIcon("key").$publicletData["PASSWORD"]:""),
+                "expiration" => ($publicletData["EXPIRE_TIME"]!=0?($expired?$this->metaIcon("time"):"").date($mess["date_format"], $publicletData["EXPIRE_TIME"]):""),
+                "download_count" => !empty($publicletData["DOWNLOAD_COUNT"])?$this->metaIcon("download-alt").$publicletData["DOWNLOAD_COUNT"]:"",
+                "download_limit" => ($publicletData["DOWNLOAD_LIMIT"] == 0 ? "" : $this->metaIcon("cloud-download").$publicletData["DOWNLOAD_LIMIT"] ),
                 "integrity"  => (!$publicletData["SECURITY_MODIFIED"]?$mess["user_dash.15"]:$mess["user_dash.16"]),
-                "download_url" => $downloadBase . "/".basename($file),
+                "download_url" => $this->metaIcon("link").$downloadBase . "/".basename($file),
                 "ajxp_mime" => "shared_file")
             );
         }
@@ -242,6 +242,11 @@ class UserDashboardDriver extends AbstractAccessDriver
         return $deleted;
     }
 
+    private function metaIcon($metaIcon)
+    {
+        return "<span class='icon-".$metaIcon." meta-icon'></span> ";
+    }
+
     public function listUsers()
     {
         AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String"/><column messageId="user_dash.10" attributeName="repo_accesses" sortType="String"/></columns>');
@@ -261,8 +266,10 @@ class UserDashboardDriver extends AbstractAccessDriver
         }
         ksort($userArray);
         foreach ($userArray as $userObject) {
+            //$userObject = new AJXP_SerialUser();
+            $label = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
             $isAdmin = $userObject->isAdmin();
-            $userId = AJXP_Utils::xmlEntities($userObject->getId());
+            $userId = $userObject->getId();
             $repoAccesses = array();
             foreach ($repoList as $repoObject) {
                 if ($repoObject->hasOwner() && $repoObject->getOwner() == $loggedUser->getId()) {
@@ -270,13 +277,15 @@ class UserDashboardDriver extends AbstractAccessDriver
                     if(!empty($acl)) $repoAccesses[] = $repoObject->getDisplay()." ($acl)";
                 }
             }
+            if(!empty($label)) $label .= " ($userId)";
+            else $label = $userId;
             print '<tree
-                text="'.$userId.'"
-                isAdmin="'.$mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")].'"
+                text="'.AJXP_Utils::xmlEntities($label).'"
+                isAdmin="'.AJXP_Utils::xmlEntities($mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")]).'"
                 icon="user_shared.png"
                 openicon="user_shared.png"
-                filename="/users/'.$userId.'"
-                repo_accesses="'.implode(", ", $repoAccesses).'"
+                filename="/users/'.AJXP_Utils::xmlEntities($userId).'"
+                repo_accesses="'.(count($repoAccesses) ? AJXP_Utils::xmlEntities($this->metaIcon("time"). implode(", ", $repoAccesses)):"").'"
                 parentname="/users"
                 is_file="1"
                 ajxp_mime="shared_user"
@@ -287,7 +296,7 @@ class UserDashboardDriver extends AbstractAccessDriver
     public function listRepositories()
     {
         $repos = ConfService::getRepositoriesList("all");
-        AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_conf.9" attributeName="accessType" sortType="String"/><column messageId="user_dash.9" attributeName="repo_accesses" sortType="String"/></columns>');
+        AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/><column messageId="user_dash.9" attributeName="parent_label" sortType="String"/><column messageId="user_dash.9" attributeName="repo_accesses" sortType="String"/></columns>');
         $repoArray = array();
         $childRepos = array();
         $loggedUser = AuthService::getLoggedUser();
@@ -317,20 +326,25 @@ class UserDashboardDriver extends AbstractAccessDriver
             $repoObject =& $repos[$repoIndex];
             $repoAccesses = array();
             foreach ($users as $userId => $userObject) {
-                //if(!$userObject->hasParent()) continue;
                 if($userObject->getId() == $loggedUser->getId()) continue;
                 $label = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $userId);
                 $acl = $userObject->mergedRole->getAcl($repoObject->getId());
                 if(!empty($acl)) $repoAccesses[] = $label. " (".$acl.")";
             }
+            $parent = $repoObject->getParentId();
+            $parentRepo =& $repos[$parent];
+            $parentLabel = $this->metaIcon("folder-open").$parentRepo->getDisplay();
+            $repoPath = $repoObject->getOption("PATH");
+            $parentPath = $parentRepo->getOption("PATH");
+            $parentLabel .= " (".str_replace($parentPath, "", $repoPath).")";
 
             $metaData = array(
                 "repository_id" => $repoIndex,
-                "accessType"	=> $repoObject->getAccessType(),
                 "icon"			=> "document_open_remote.png",
                 "openicon"		=> "document_open_remote.png",
                 "parentname"	=> "/repositories",
-                "repo_accesses" => implode(", ", $repoAccesses),
+                "parent_label"   => $parentLabel,
+                "repo_accesses" => count($repoAccesses) ?  $this->metaIcon("share-sign").implode(", ", $repoAccesses) : "",
                 "ajxp_mime" 	=> "shared_repository"
             );
             AJXP_XMLWriter::renderNode("/repositories/$repoIndex", $name, true, $metaData);
