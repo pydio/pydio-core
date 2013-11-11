@@ -610,10 +610,17 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                         throw new Exception('Please choose another user id');
                     }
                     AJXP_Controller::applyHook("user.before_create", array($data["new_user_id"]));
+                    $loggedUser = AuthService::getLoggedUser();
+                    $limit = $loggedUser->personalRole->filterParameterValue("core.conf", "USER_SHARED_USERS_LIMIT", AJXP_REPO_SCOPE_ALL, "");
+                    if (!empty($limit) && intval($limit) > 0) {
+                        $count = count($this->getUserChildren($loggedUser->getId()));
+                        if ($count >= $limit) {
+                            throw new Exception($mess['483']);
+                        }
+                    }
 
                     AuthService::createUser($data["new_user_id"], $data["new_password"]);
                     $userObject = ConfService::getConfStorageImpl()->createUserObject($data["new_user_id"]);
-                    $loggedUser = AuthService::getLoggedUser();
                     $userObject->setParent($loggedUser->getId());
                     $userObject->save('superuser');
                     $userObject->personalRole->clearAcls();

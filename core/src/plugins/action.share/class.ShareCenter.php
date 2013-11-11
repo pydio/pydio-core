@@ -1237,6 +1237,14 @@ class ShareCenter extends AJXP_Plugin
                 } else {
                     $pass = md5($uPasses[$userName]);
                 }
+                $limit = $loggedUser->personalRole->filterParameterValue("core.conf", "USER_SHARED_USERS_LIMIT", AJXP_REPO_SCOPE_ALL, "");
+                if (!empty($limit) && intval($limit) > 0) {
+                    $count = count(ConfService::getConfStorageImpl()->getUserChildren($loggedUser->getId()));
+                    if ($count >= $limit) {
+                        $mess = ConfService::getMessages();
+                        throw new Exception($mess['483']);
+                    }
+                }
                 AuthService::createUser($userName, $pass);
                 $userObject = $confDriver->createUserObject($userName);
                 $userObject->personalRole->clearAcls();
