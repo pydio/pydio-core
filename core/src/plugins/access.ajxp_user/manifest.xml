@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver id="access.ajxp_user" label="CONF_MESSAGE[Shared Elements]" description="CONF_MESSAGE[Browse user shared elements.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<client_settings icon="plugins/access.ajxp_user/share.png">
+		<resources>
+			<i18n namespace="user_dash" path="plugins/access.ajxp_user/i18n" />
+            <js className="UserProfileEditor" file="plugins/access.ajxp_user/class.UserProfileEditor.js" autoload="true"/>
+            <js className="WebDAVprefsEditor" file="plugins/access.ajxp_user/class.WebDAVprefsEditor.js" autoload="true"/>
+		</resources>
+	</client_settings>
+	<registry_contributions>
+		<client_configs>
+            <template_part theme="umbra" ajxpId="sidebar_splitter" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fake":"option"}'><![CDATA[
+                <div id="folderPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ajxpPaneHeader="363" ajxpPaneIcon="view_tree.png" style="margin:20px;"></div>
+                <style>#sidebar_splitter{padding-bottom:20px;background-color:#A0C0A4;}</style>
+            ]]></template_part>
+            <template_part ajxpClass="AjxpPane" ajxpId="workspace_toolbar" ajxpOptions='{"fit":"none"}'><![CDATA[
+                <div id="search_container_settings" class="settings_search_container" style="display:none;" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}'></div>
+                <style>
+                #workspace_toolbar{display:none;}
+                #browser{padding:0}
+                div.flat_tabulator span.toggleHeader{
+                    border-color: #e35d52;
+                    color: #e35d52;
+                }
+                .action_bar a{
+                    background-color: #e35d52;
+                }
+                </style>
+            ]]></template_part>
+            <template_part ajxpId="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOption":"true"}' theme="vision"><![CDATA[
+                <div id="editor_tabs" ajxpClass="AjxpTabulator" class="settings_main_pane dashboard_main_pane flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "parameters","tabInfos" : [{"id":"parameters","label":"My Profile","iconClass":"icon-cog", "element":"parameters_pane"},{"id":"info","label":"Address Book","iconClass":"icon-book", "element":"files_list_pane"},{"id":"shares","label":"My Shares","iconClass":"icon-share", "element":"shared_pane"}]}'>
+                    <div id="files_list_pane" ajxpClass="AjxpPane">
+                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                        <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "fitParent":"editor_tabs", "fitMarginBottom":10, "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
+                    </div>
+                    <div id="shared_pane" ajxpClass="AjxpPane">
+                        <div id="shared_tab" ajxpClass="AjxpTabulator" class="horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "shared-files","tabInfos" : [{"id":"shared-files","label":"Files","iconClass":"icon-file", "element":"shared_files_pane"},{"id":"shared-folders","label":"Folders","iconClass":"icon-folder-close", "element":"shared_folders_pane"}]}'>
+                            <div id="shared_files_pane" ajxpClass="AjxpPane" ajxpOptions=''>
+                                <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","public_links"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                                <div id="shared_files_pane" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"files"}}'></div>
+                            </div>
+                            <div id="shared_folders_pane" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true, "nodeProviderProperties":{"get_action":"ls","dir":"repositories"}}'></div>
+                        </div>
+                    </div>
+                    <div id="parameters_pane" ajxpClass="AjxpPane">
+                        <div id="parameters_tab" ajxpClass="AjxpTabulator" class="horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "account","tabInfos" : [{"id":"account","label":"My Account","iconClass":"icon-reorder", "element":"account_pane"},{"id":"webdav","label":"WebDAV","iconClass":"icon-cog", "element":"webdav_pane"}]}'>
+                            <div id="account_pane" ajxpClass="UserProfileEditor">
+                                <div class="action_bar">
+                                    <div class="toolbarGroup"></div>
+                                </div>
+                            </div>
+                            <div id="webdav_pane" ajxpClass="WebDAVprefsEditor" style="padding: 10px;">
+                                <div class="dialogLegend" style="margin-bottom: 2px;padding: 0 5px;" ajxp_message_id="404">AJXP_MESSAGE[404]</div>
+                                <div style="padding:10px;"><input type="checkbox" id="webdav_activator" style="width:16px;" name="webdav_activator"> <label for="webdav_activator">AJXP_MESSAGE[406]</label></div>
+                                <div class="dialogButtons" id="webdav_password_form" style="display:none;text-align: left;padding-left: 15px;height: 42px;font-size: 0.9em;padding-top: 5px;">
+                                    <div style="width: 70%; float: left; padding-right: 5px; text-align: right;">AJXP_MESSAGE[407]</div><input type="password" id="webdav_password" style="float:left;height: 24px;width: 80px;"> <input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" height="22" width="22" title="OK" id="webdav_pass_saver">
+                                </div>
+                                <div class="dialogLegend" style="margin: 5px;" ajxp_message_id="405">AJXP_MESSAGE[405]</div>
+                                <input type="text" id="webdav_main_access" value="AJXP_MESSAGE[466]" readonly/>
+                                <div class="dialogLegend" id="perworkspace-urls-toggle" style="margin-bottom: 2px; padding:5px;" ajxp_message_id="405">
+                                <span class="icon-caret-right"></span>AJXP_MESSAGE[465]</div>
+                                <div id="webdav_repo_list" style="display:none; height: 200px; overflow:auto;"></div>
+                                <input type="hidden" name="get_action" value="webdav_preferences">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    document.observeOnce("ajaxplorer:context_changed", function(){
+                        $("global_toolbar").insert({bottom: $("search_container_settings")});
+                        window.setTimeout(function(){ $("get_my_feed_button").hide(); }, 10);
+                        $("search_container_settings").show();
+                        $("browser").ajxpPaneObject.resize();
+                        document.observeOnce("ajaxplorer:repository_list_refreshed",function(){
+                            if(ajaxplorer.repositoryId == 'ajxp_conf') return;
+                            $("global_toolbar").down("#search_container_settings").ajxpPaneObject.destroy();
+                            $("global_toolbar").down("#search_container_settings").remove();
+                        });
+                    });
+                </script>
+			]]></template_part>
+        </client_configs>
+		<actions>
+			<action name="ls" dirDefault="true">
+				<gui text="32" title="32" src="fileopen.png"
+					accessKey="folder_access_key">
+					<context selection="true" dir="" recycle="false"
+						actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="false">
+					</context>
+					<selectionContext dir="true" file="false" recycle="false"
+						unique="true" allowedMimes="*">
+					</selectionContext>
+				</gui>
+				<rightsContext noUser="true" userLogged="only" read="true"
+					write="false" adminOnly="false">
+				</rightsContext>
+				<processing>
+					<clientCallback prepareModal="true"><![CDATA[
+						var path;
+						if(window.actionArguments && window.actionArguments.length>0){
+							path = window.actionArguments[0];
+							if(Object.isString(path)){path = new AjxpNode(path,false,getBaseName(path));}
+						}else{
+							userSelection = ajaxplorer.getUserSelection();
+							if(userSelection && userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime(["zip"]))){
+								path = userSelection.getUniqueNode();
+							}
+						}
+						if(path){
+							ajaxplorer.updateContextData(path);
+						}
+						]]></clientCallback>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+			<action name="stat">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+
+			<action name="copyUrl">
+				<gui text="user_dash.18" title="user_dash.19" src="editcopy.png" accessKey="" hasAccessKey="false">
+					<context selection="true" dir="" recycle="false"
+						actionBar="true" contextMenu="true" infoPanel="true"
+						actionBarGroup="public_links" inZip="false">
+					</context>
+					<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="shared_file" behaviour="disabled"/></gui>
+				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
+				<processing>
+					<clientCallback prepareModal="true"><![CDATA[
+						var onLoad = function(oForm){
+							var userSelection =  ajaxplorer.getUserSelection();
+							var firstNode = userSelection.getUniqueNode();
+			   		    	var copyDiv = $(oForm).down('input[id="text_copy"]');
+			   		    	copyDiv.setValue(firstNode.getMetadata().get('download_url'));
+			   		    	copyDiv.select();
+						};
+						modal.showDialogForm('Delete', 'copy_as_text', onLoad, function(){
+							hideLightBox(true);
+							return false;
+						},null,true);
+						]]></clientCallback>
+					<clientForm id="copy_as_text"><![CDATA[
+					<div id="copy_as_text" action="copy" box_width="280">
+						<input id="text_copy" style="width:260px;" class="dialogFocus"/>
+					</div>
+					]]></clientForm>
+					<serverCallback methodName="switchAction"/>
+					</processing>
+			</action>
+			<action name="reset_download_counter">
+				<gui text="user_dash.32" title="user_dash.33" src="eraser.png" accessKey="" hasAccessKey="false">
+					<context selection="true" dir="" recycle="false"
+						actionBar="true" contextMenu="true" infoPanel="true"
+						actionBarGroup="public_links" inZip="false">
+					</context>
+					<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="shared_file" behaviour="disabled"/></gui>
+				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
+				<processing>
+					<clientCallback prepareModal="true"><![CDATA[
+						var baseUrl = ajxpServerAccessPath + "&get_action=reset_download_counter";
+						baseUrl = ajaxplorer.getUserSelection().updateFormOrUrl(null, baseUrl);
+						var conn = new Connexion(baseUrl);
+						conn.addParameter("get_action", "reset_download_counter");
+						conn.onComplete = function(transport){
+							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+						};
+						conn.sendAsync();
+						]]></clientCallback>
+					<serverCallback methodName="switchAction"/>
+					</processing>
+			</action>
+			<action name="clear_expired">
+				<gui text="user_dash.25" title="user_dash.26" iconClass="icon-time" src="edit_clear_history.png" accessKey="" hasAccessKey="false">
+					<context selection="true" dir="true" recycle="false"  behaviour="hidden"
+						actionBar="true" contextMenu="true" infoPanel="false"
+						actionBarGroup="public_links" inZip="false">
+					</context>
+					<selectionContext dir="false" file="true" recycle="false" behaviour="disabled" unique="true" allowedMimes="shared_file"/></gui>
+				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
+				<processing>
+					<clientCallback prepareModal="true"><![CDATA[
+						var conn = new Connexion();
+						conn.addParameter("get_action", "clear_expired");
+						conn.onComplete = function(transport){
+							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+						};
+						conn.sendAsync();
+					]]></clientCallback>
+					<serverCallback methodName="switchAction" developerComment="Clear expired links" restParams="/"/>
+					</processing>
+			</action>
+
+			<action name="delete">
+				<gui text="7" title="161" src="editdelete.png" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
+					<context selection="true" dir="" recycle="false"
+						actionBar="true" contextMenu="true" infoPanel="true"
+						actionBarGroup="change" inZip="false">
+					</context>
+					<selectionContext dir="false" file="true" recycle="false" unique="false"/>
+				</gui>
+				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
+				<processing>
+					<clientCallback prepareModal="true"><![CDATA[
+						var onLoad = function(oForm){
+			   		    	$(oForm).down('span[id="delete_message"]').update(MessageHash['user_dash.11']);
+			   		    	$(oForm).down('input[name="ajxp_mime"]').value = ajaxplorer.getUserSelection().getUniqueNode().getAjxpMime();
+						};
+						modal.showDialogForm('Delete', 'delete_shared_form', onLoad, function(){
+							var oForm = modal.getForm();
+							ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+							ajaxplorer.actionBar.submitForm(oForm, true, function(transport){
+							    this.actionBar.parseXmlMessage(transport.responseXML);
+							    if(this.getContextHolder()._selectionSource && this.getContextHolder()._selectionSource.__className=='FetchedResultPane'){
+							        this.getContextHolder()._selectionSource.reloadDataModel();
+							    }
+							}.bind(ajaxplorer));
+							hideLightBox(true);
+							return false;
+						});
+						]]></clientCallback>
+					<clientForm id="delete_shared_form"><![CDATA[
+					<div id="delete_shared_form" action="delete" box_width="200">
+					<span id="delete_message"></span>
+					<input type="hidden" name="ajxp_mime" value="">
+					</div>				]]></clientForm>
+					<serverCallback methodName="switchAction"></serverCallback>
+					</processing>
+			</action>
+		</actions>
+	</registry_contributions>
+	<class_definition filename="plugins/access.ajxp_user/class.UserDashboardDriver.php" classname="UserDashboardDriver"/>
+</ajxpdriver>

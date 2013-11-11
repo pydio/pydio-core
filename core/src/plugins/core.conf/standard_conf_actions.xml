@@ -216,7 +216,7 @@
         </action>
         <action name="custom_data_edit">
       			<gui text="442" title="443" src="edit_user.png" iconClass="icon-reorder" accessKey="" hasAccessKey="false">
-      				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
+      				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false"/>
       			</gui>
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
@@ -367,9 +367,9 @@
 		</action>
 		<action name="webdav_preferences">
 			<gui text="403" title="403" src="drive_remote.png" iconClass="icon-cog" accessKey="" hasAccessKey="false">
-				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
+				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false"/>
 			</gui>
-            <rightsContext noUser="false" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+            <rightsContext noUser="false" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true" dialogOpenForm="webdav_pref_form" dialogOkButtonOnly="true" dialogSkipButtons="false">
 					<dialogOnOpen><![CDATA[
@@ -474,6 +474,19 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
+        <action name="switch_to_user_dashboard">
+            <gui src="drive_remote.png" text="user_dash.title" title="user_dash.desc" hasAccessKey="false" iconClass="icon-dashboard" >
+                <context dir="false" recycle="true" selection="false" actionBar="false" actionBarGroup="utils" ajxpWidgets="UserWidget::logging_string"/>
+            </gui>
+            <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
+            <processing>
+                <clientCallback><![CDATA[
+                    if(!ajaxplorer.repositoryId || ajaxplorer.repositoryId != "ajxp_user"){
+                        ajaxplorer.triggerRepositoryChange('ajxp_user');
+                    }
+                ]]></clientCallback>
+            </processing>
+        </action>
         <action name="switch_to_settings">
             <gui src="drive_remote.png" text="165" title="165" accessKey="settings_access_key" hasAccessKey="true" iconClass="icon-cogs" >
                 <context dir="false" recycle="true" selection="false" actionBar="true" actionBarGroup="utils" ajxpWidgets="UserWidget::logging_string"/>
@@ -487,6 +500,7 @@
                 ]]></clientCallback>
             </processing>
         </action>
+        <!--
         <action name="switch_to_shared_elements">
             <gui src="drive_remote.png" text="467" title="467" hasAccessKey="false" iconClass="icon-share" >
                 <context dir="false" recycle="true" selection="false" actionBar="false" actionBarGroup="utils" ajxpWidgets="UserWidget::logging_string"/>
@@ -500,5 +514,6 @@
                 ]]></clientCallback>
             </processing>
         </action>
+        -->
 	</actions>
 </registry_contributions>
