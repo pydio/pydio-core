@@ -535,8 +535,9 @@ $mess=array(
 "477" => "Selectionnez un fichier ou un répertoire pour voir ses infos s'afficher ici",
 "478" => "Pas de résultats",
 "479" => "Mot de passe oublié?",
-"480" => "Browse all folders of the current workspace.",
-"481" => "All your shared files and folders",
-"482" => "Quick access to your bookmarked items",
+"480" => "Voir tous les répertoires du workspace courant",
+"481" => "Tous vos fichiers et répertoires partagés",
+"482" => "Accès rapide à vos éléments favoris",
+"483" => "Vous ne pouvez pas créer plus d'utilisateurs!",
 /* END SENTENCE */
 );

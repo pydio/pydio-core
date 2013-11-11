@@ -537,6 +537,7 @@ $mess=array(
 "480" => "Browse all folders of the current workspace.",
 "481" => "All your shared files and folders",
 "482" => "Quick access to your bookmarked items",
+"483" => "You are not authorized to create more users!",
 /* END SENTENCE */
 /* password strength tester */
 /* quick access keys */
