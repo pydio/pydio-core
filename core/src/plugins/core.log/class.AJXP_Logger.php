@@ -86,6 +86,9 @@ class AJXP_Logger extends AJXP_Plugin
         if ($logger != null) {
             try {
                 $logger->write2($level, $ip, $user, $source, $prefix, $res);
+                if ( $level == LOG_LEVEL_ERROR && ConfService::getConf("ERROR_TO_ERROR_LOG")) {
+                    error_log("IP => $ip | user => $user | level => $level | source => $source | prefix => $prefix | message => ".$res);
+                }
             } catch (Exception $e) {
                 error_log("Exception while logging");
                 error_log("Log message was : IP => $ip | user => $user | level => $level | source => $source | prefix => $prefix | message => ".$res);
