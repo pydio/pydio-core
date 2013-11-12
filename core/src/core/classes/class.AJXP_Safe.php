@@ -83,10 +83,8 @@ class AJXP_Safe
     private function _encodePassword($password, $user)
     {
         if (function_exists('mcrypt_encrypt')) {
-            // The initialisation vector is only required to avoid a warning, as ECB ignore IV
-            $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
             // We encode as base64 so if we need to store the result in a database, it can be stored in text column
-            $password = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($user.$this->secretKey), $password, MCRYPT_MODE_ECB, $iv));
+            $password = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($user.$this->secretKey), $password, MCRYPT_MODE_ECB));
         }
         return $password;
     }
@@ -99,10 +97,8 @@ class AJXP_Safe
     private function _decodePassword($encoded, $user)
     {
         if (function_exists('mcrypt_decrypt')) {
-             // The initialisation vector is only required to avoid a warning, as ECB ignore IV
-             $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
              // We have encoded as base64 so if we need to store the result in a database, it can be stored in text column
-             $encoded = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($user.$this->secretKey), base64_decode($encoded), MCRYPT_MODE_ECB, $iv), "\0");
+             $encoded = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($user.$this->secretKey), base64_decode($encoded), MCRYPT_MODE_ECB), "\0");
         }
         return $encoded;
     }

@@ -370,7 +370,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if (isSet($httpVars["encode"]) && $httpVars["encode"] == "base64") {
                     $code = base64_decode($code);
                 } else {
-                    $code = SystemTextEncoding::magicDequote($code);
                     $code=str_replace("&lt;","<",$code);
                 }
                 $fileName = $this->urlBase.$file;
@@ -735,7 +734,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if (isSet($httpVars["file"])) {
                     $uniqueFile = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                 }
-                $dir = AJXP_Utils::securePath(SystemTextEncoding::magicDequote($dir));
+                $dir = AJXP_Utils::securePath($dir);
                 $path = $this->urlBase.($dir!= ""?($dir[0]=="/"?"":"/").$dir:"");
                 $nonPatchedPath = $path;
                 if ($this->wrapperClassName == "fsAccessWrapper") {
@@ -1458,7 +1457,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     {
         $nom_fic=basename($filePath);
         $mess = ConfService::getMessages();
-        $filename_new=AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($filename_new), AJXP_SANITIZE_FILENAME);
+        $filename_new=AJXP_Utils::sanitize($filename_new, AJXP_SANITIZE_FILENAME);
         $filename_new = substr($filename_new, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
         $old=$this->urlBase."/$filePath";
         if (!$this->isWriteable($old)) {

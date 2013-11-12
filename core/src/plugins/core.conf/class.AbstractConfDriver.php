@@ -578,7 +578,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 $i = 0;
                 while (isSet($httpVars["pref_name_".$i]) && isSet($httpVars["pref_value_".$i])) {
                     $prefName = AJXP_Utils::sanitize($httpVars["pref_name_".$i], AJXP_SANITIZE_ALPHANUM);
-                    $prefValue = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote(($httpVars["pref_value_".$i])));
+                    $prefValue = AJXP_Utils::sanitize($httpVars["pref_value_".$i]);
                     if($prefName == "password") continue;
                     if ($prefName != "pending_folder" && $userObject == null) {
                         $i++;
@@ -716,8 +716,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                         if (function_exists('mcrypt_encrypt')) {
                             $user = $userObject->getId();
                             $secret = (defined("AJXP_SECRET_KEY")? AJXP_SAFE_SECRET_KEY:"\1CDAFx¨op#");
-                            $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
-                            $password = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($user.$secret), $password, MCRYPT_MODE_ECB, $iv));
+                            $password = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($user.$secret), $password, MCRYPT_MODE_ECB));
                         }
                         $davData["PASS"] = $password;
                     }
