@@ -23,6 +23,36 @@ Class.create("LogoWidget", AjxpPane, {
         $super(element, options);
         var configs = ajaxplorer.getPluginConfigs("guidriver");
         this.updateConfig(configs);
+        if(options.link){
+            var linkTitle;
+            if(options.linkTitle){
+                if(MessageHash[options.linkTitle]) linkTitle = MessageHash[options.linkTitle];
+                else linkTitle = options.linkTitle;
+            }
+            if(this.image){
+                if(linkTitle) this.image.writeAttribute("title", linkTitle);
+                this.image.observe("click", function(){
+                    if(options.linkTarget && options.linkTarget == 'new'){
+                        window.open(options.link);
+                    }else{
+                        document.location.href = options.link;
+                    }
+                });
+                this.image.addClassName("linked");
+            }
+            if(this.titleDiv){
+                if(linkTitle) this.titleDiv.writeAttribute("title", linkTitle);
+                this.titleDiv.observe("click", function(){
+                    if(options.linkTarget && options.linkTarget == 'new'){
+                        window.open(options.link);
+                    }else{
+                        document.location.href = options.link;
+                    }
+                });
+                this.titleDiv.addClassName("linked");
+            }
+        }
+
     },
 
     updateConfig : function(configs){

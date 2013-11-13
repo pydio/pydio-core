@@ -52,6 +52,10 @@ a:link, a:visited, a:hover, a:active, a:focus {
     color: rgb(111, 121, 131);
 }
 
+.linked{
+    cursor: pointer;
+}
+
 body, html
 {
     margin: 0;

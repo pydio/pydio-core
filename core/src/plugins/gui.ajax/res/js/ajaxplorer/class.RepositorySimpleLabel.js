@@ -33,6 +33,22 @@ Class.create("RepositorySimpleLabel", AjxpPane, {
 
         this.htmlElement.update('<div class="repository_legend">Workspace</div>');
         this.htmlElement.insert('<div class="repository_title"></div>');
+        if(options.link){
+            var linkTitle;
+            if(options.linkTitle){
+                if(MessageHash[options.linkTitle]) linkTitle = MessageHash[options.linkTitle];
+                else linkTitle = options.linkTitle;
+                this.htmlElement.down('div.repository_title').writeAttribute("title", linkTitle);
+            }
+            this.htmlElement.down("div.repository_title").observe("click", function(){
+                if(options.linkTarget && options.linkTarget == 'new'){
+                    window.open(options.link);
+                }else{
+                    document.location.href = options.link;
+                }
+            });
+            this.htmlElement.down("div.repository_title").addClassName("linked");
+        }
         this.observer = function(e){
 
             this.htmlElement.down("div.repository_title").update(this._defaultString);
