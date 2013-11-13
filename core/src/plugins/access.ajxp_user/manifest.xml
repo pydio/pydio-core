@@ -39,6 +39,7 @@
                 .action_bar a{
                     background-color: #e35d52;
                     margin-top:3px;
+                    cursor: pointer;
                 }
                 div.class-FetchedResultPane{
                     border-left: 0;
@@ -82,58 +83,37 @@
                 </style>
             ]]></template_part>
             <template_part ajxpId="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOption":"true"}' theme="vision"><![CDATA[
-                <div id="editor_tabs" ajxpClass="AjxpTabulator" class="settings_main_pane dashboard_main_pane flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "home","tabInfos" : [{"id":"home","label":"Home","iconClass":"icon-home", "element":"home_account_pane"},{"id":"parameters","label":"My Profile","iconClass":"icon-cog", "element":"parameters_pane"},{"id":"shares","label":"My Shares","iconClass":"icon-share", "element":"shared_pane"},{"id":"info","label":"Address Book","iconClass":"icon-book", "element":"files_list_pane"}]}'>
+                <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="settings_main_pane dashboard_main_pane flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "home","tabInfos" : [{"id":"home","label":"Home","iconClass":"icon-home", "element":"home_account_pane"},{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"parameters_pane"},{"id":"info","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"files_list_pane"}]}'>
                     <div id="home_account_pane" ajxpClass="UserDashboardHome">
                         <div id="notifications_center">
                             <span class="icon-rss" id="close-icon"></span>
-                            <h1>Notifications</h1>
+                            <h1>AJXP_MESSAGE[user_dash.38]</h1>
                         </div>
                         <div id="workspaces_center">
                             <div id="logo_div"><img src="plugins/gui.ajax/PydioLogo250.png"></div>
                             <div id="welcome"></div>
-                            <h1>Choose a workspace</h1>
+                            <h1>AJXP_MESSAGE[user_dash.39]</h1>
                             <ul id="workspaces_list" style="height: 100px;"></ul>
                             <div id="workspaces_button">
-                                <input type="checkbox" name="save_ws_choice" id="save_ws_choice"><label for="save_ws_choice">Use as default workspace</label>
-                                <input type="button" name="go_to_ws" id="go_to_ws" value="Go" class="disabled">
+                                <input type="checkbox" name="save_ws_choice" id="save_ws_choice" class="disabled" disabled><label for="save_ws_choice">AJXP_MESSAGE[user_dash.41]</label>
+                                <input type="button" name="go_to_ws" id="go_to_ws" value="AJXP_MESSAGE[user_dash.42]" class="disabled">
                             </div>
                         </div>
                     </div>
                     <div id="files_list_pane" ajxpClass="AjxpPane">
-                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                        <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "fitParent":"editor_tabs", "fitMarginBottom":10, "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
-                    </div>
-                    <div id="shared_pane" ajxpClass="AjxpPane">
-                        <div id="shared_tab" ajxpClass="AjxpTabulator" class="horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "shared-files","tabInfos" : [{"id":"shared-files","label":"Shared Files","iconClass":"icon-file", "element":"shared_files_pane"},{"id":"shared-folders","label":"Shared Folders","iconClass":"icon-folder-close", "element":"shared_folders_pane"}]}'>
-                            <div id="shared_files_pane" ajxpClass="AjxpPane" ajxpOptions=''>
-                                <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","public_links"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                                <div id="shared_files_pane" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"files"}}'></div>
-                            </div>
-                            <div id="shared_folders_pane" ajxpClass="AjxpPane" ajxpOptions='{}'>
-                                <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","shared_folders"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                                <div id="shared_folders_list" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true, "nodeProviderProperties":{"get_action":"ls","dir":"repositories"}}'></div>
+                        <div id="userdashboard_addressbook_tab" ajxpClass="AjxpTabulator" class="horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "my-users","tabInfos" : [{"id":"my-users","label":"user_dash.48", "title":"user_dash.49","iconClass":"icon-user", "element":"my-users-pane"}]}'>
+                            <div id="my-users-pane" ajxpClass="AjxpPane" class="tabbed_editor">
+                                <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                                <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "fitParent":"userdashboard_main_tab", "fitMarginBottom":10, "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
                             </div>
                         </div>
                     </div>
                     <div id="parameters_pane" ajxpClass="AjxpPane">
-                        <div id="parameters_tab" ajxpClass="AjxpTabulator" class="horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "account","tabInfos" : [{"id":"account","label":"My Account","iconClass":"icon-reorder", "element":"account_pane"},{"id":"webdav","label":"WebDAV","iconClass":"icon-cog", "element":"webdav_pane"}]}'>
+                        <div id="userdashboard_parameters_tab" ajxpClass="AjxpTabulator" class="horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "account","tabInfos" : [{"id":"account","label":"user_dash.44", "title":"user_dash.45","iconClass":"icon-reorder", "element":"account_pane"}]}'>
                             <div id="account_pane" ajxpClass="UserProfileEditor" class="tabbed_editor">
                                 <div class="action_bar">
                                     <div class="toolbarGroup"></div>
                                 </div>
-                            </div>
-                            <div id="webdav_pane" ajxpClass="WebDAVprefsEditor" class="tabbed_editor">
-                                <div class="dialogLegend" style="margin-bottom: 2px;padding: 10px;" ajxp_message_id="404">AJXP_MESSAGE[404]</div>
-                                <div style="padding:10px;"><input type="checkbox" id="webdav_activator" style="width:16px;" name="webdav_activator"> <label for="webdav_activator">AJXP_MESSAGE[406]</label></div>
-                                <div class="dialogButtons" id="webdav_password_form" style="display:none;text-align: left;padding-left: 15px;height: 42px;font-size: 0.9em;padding-top: 5px;">
-                                    <div style="width: 70%; float: left; padding-right: 5px; text-align: right;">AJXP_MESSAGE[407]</div><input type="password" id="webdav_password" style="float:left;height: 24px;width: 80px;"> <input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" height="22" width="22" title="OK" id="webdav_pass_saver">
-                                </div>
-                                <div class="dialogLegend" style="margin: 10px;" ajxp_message_id="405">AJXP_MESSAGE[405]</div>
-                                <input type="text" style="width: 95% !important;" id="webdav_main_access" value="AJXP_MESSAGE[466]" readonly/>
-                                <div class="dialogLegend" id="perworkspace-urls-toggle" style="margin-bottom: 2px; padding:5px;" ajxp_message_id="405">
-                                <span class="icon-caret-right"></span>AJXP_MESSAGE[465]</div>
-                                <div id="webdav_repo_list" style="display:none; height: 200px; overflow:auto; margin: 10px;"></div>
-                                <input type="hidden" name="get_action" value="webdav_preferences">
                             </div>
                         </div>
                     </div>

@@ -200,7 +200,12 @@ Class.create("AjxpTabulator", AjxpPane, {
             }
             return;
         }
-        $(this.htmlElement).down('.tabulatorContainer').insert(this._renderTab(tabInfo));
+        if(tabInfo.position == undefined || this.tabulatorData.size() < tabInfo.position){
+            $(this.htmlElement).down('.tabulatorContainer').insert(this._renderTab(tabInfo));
+        }else{
+            var index = Math.max(tabInfo.position-1, 0);
+            $(this.htmlElement).down('.tabulatorContainer').down('span.toggleHeader', index).insert({before:this._renderTab(tabInfo)});
+        }
         if(!tabInfo.element){
             // generate a random element id
             var randomId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {

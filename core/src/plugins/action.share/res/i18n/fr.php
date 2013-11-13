@@ -100,4 +100,10 @@ $mess = array(
     "95"=> "code QR",
     "96"=> "arrêter le partage",
     "97"=> "Arrêter le partage de ce répertoire avec d'autres utilisateurs.",
+    "98"=> "Mes Partages",
+    "99"=> "Tous mes éléments partagés",
+    "100" => "Fichiers partagés",
+    "101" => "Tous mes fichiers partagés",
+    "102" => "Répertoires partagés",
+    "103" => "Tous mes répertoires partagés comme workspace ou comme minisites.",
 );

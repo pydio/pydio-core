@@ -13,7 +13,7 @@
 	</server_settings>
 	<class_definition filename="plugins/conf.sql/class.sqlConfDriver.php" classname="sqlConfDriver"/>
 	<registry_contributions>
-		<external_file filename="plugins/core.conf/standard_conf_actions.xml" include="actions/*" exclude=""/>
+		<external_file filename="plugins/core.conf/standard_conf_actions.xml" include="actions/*,client_configs/*" exclude=""/>
         <actions>
             <action name="user_team_create">
                 <processing>
@@ -36,5 +36,14 @@
                 </processing>
             </action>
         </actions>
+        <client_configs>
+            <component_config className="AjxpTabulator::userdashboard_addressbook_tab">
+                <additional_tab id="team_pane"
+                                tabInfo='{"id":"team_pane","iconClass":"icon-group","element":"team_pane","closeable":false,"label":"user_dash.50","title":"user_dash.51","dontFocus":true}'
+                                paneInfo='{"type":"widget"}'><![CDATA[
+                <div id="team_pane" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"ls","dir":"teams"}}' class="tabbed_editor"></div>
+                ]]></additional_tab>
+            </component_config>
+        </client_configs>
 	</registry_contributions>
 </confdriver>

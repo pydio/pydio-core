@@ -98,4 +98,10 @@ $mess = array(
 "95"=> "QR code",
 "96"=> "stop sharing",
 "97"=> "Stop sharing this folder with other users",
+"98"=> "My Shares",
+"99"=> "All shared elements",
+"100" => "Shared files",
+"101" => "All files shared as public links",
+"102" => "Shared folders",
+"103" => "All folders shared as workspaces or minisites.",
 );

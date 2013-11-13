@@ -77,6 +77,12 @@ class UserDashboardDriver extends AbstractAccessDriver
                         "ICON" => "user_shared.png",
                         "ICON-CLASS" => "icon-cog",
                         "DESCRIPTION" => $mess["user_dash.37"]
+                    ),
+                    "teams" => array(
+                        "LABEL" => "Teams",
+                        "ICON" => "user_shared.png",
+                        "ICON-CLASS" => "icon-group",
+                        "DESCRIPTION" => "My Teams"
                     )
                 );
                 $dir = (isset($httpVars["dir"])?$httpVars["dir"]:"");
@@ -90,6 +96,8 @@ class UserDashboardDriver extends AbstractAccessDriver
                     AJXP_XMLWriter::header();
                     if ($strippedDir == "users") {
                         $this->listUsers();
+                    } else if ($strippedDir == "teams") {
+                        $this->listTeams();
                     } else if ($strippedDir == "repositories") {
                         $this->listRepositories();
                     } else if ($strippedDir == "files") {
@@ -245,6 +253,24 @@ class UserDashboardDriver extends AbstractAccessDriver
     private function metaIcon($metaIcon)
     {
         return "<span class='icon-".$metaIcon." meta-icon'></span> ";
+    }
+
+    public function listTeams()
+    {
+        $conf = ConfService::getConfStorageImpl();
+        if(!method_exists($conf, "listUserTeams")) return;
+        AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist">
+            <column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String"/>
+            <column messageId="user_dash.10" attributeName="users" sortType="String"/>
+        </columns>');
+        $teams = $conf->listUserTeams();
+        foreach ($teams as $teamId => $team) {
+            if(empty($team["LABEL"])) continue;
+            AJXP_XMLWriter::renderNode("/teams/".$teamId, $team["LABEL"], true, array(
+                    "icon" => "users-folder.png",
+                    "users" => "<span class='icon-groups'></span> ".implode(",", array_values($team["USERS"]))
+                ), true, true);
+        }
     }
 
     public function listUsers()

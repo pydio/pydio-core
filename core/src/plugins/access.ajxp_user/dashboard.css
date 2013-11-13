@@ -1,4 +1,4 @@
-#parameters_pane, #account_pane, #webdav_pane, #shared_files_pane, #shared_pane, #home_account_pane{
+#team_pane, #parameters_pane, #account_pane, #webdav_pane, #shared_files_pane, #shared_pane, #home_account_pane{
     background-color: #f8f8f8;
 }
 
@@ -12,6 +12,7 @@
 #workspaces_list{
     overflow-y: auto;
     max-height: 230px;
+    min-height: 100px;
     margin: 0 30px;
     border: 1px solid rgb(111,123,136);
     background-color: #fff;
@@ -28,6 +29,10 @@
     background: linear-gradient(to bottom,  rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 28%,rgba(0,0,0,0) 72%,rgba(0,0,0,0.1) 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1a000000', endColorstr='#1a000000',GradientType=0 ); /* IE6-9 */
 
+}
+
+.dashboard_main_pane > div.tabulatorContainer{
+    text-align: center;
 }
 
 #home_account_pane #close-icon{

@@ -6,7 +6,7 @@ Class.create("UserDashboardHome", AjxpPane, {
 
         $super(oFormObject, editorOptions);
 
-        oFormObject.down("#welcome").update("Welcome, " + ajaxplorer.user.getPreference("USER_DISPLAY_NAME") + "!");
+        oFormObject.down("#welcome").update( MessageHash['user_dash.40'].replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME")));
 
         var wsElement = oFormObject.down('#workspaces_list');
 
@@ -23,6 +23,7 @@ Class.create("UserDashboardHome", AjxpPane, {
                 target.previousSiblings().invoke('removeClassName', 'selected');
                 target.addClassName('selected');
                 oFormObject.down('#go_to_ws').removeClassName("disabled");
+                oFormObject.down('#save_ws_choice').removeClassName("disabled").disabled = false;
                 oFormObject.down('#go_to_ws').CURRENT_REPO_ID = repoId;
             });
         });
@@ -30,35 +31,55 @@ Class.create("UserDashboardHome", AjxpPane, {
         oFormObject.down('#go_to_ws').observe("click", function(e){
             var target = e.target;
             if(!target.CURRENT_REPO_ID) return;
+            if(oFormObject.down('#save_ws_choice').checked){
+                // Save this preference now!
+                var params = $H({
+                    'PREFERENCES_DEFAULT_START_REPOSITORY':target.CURRENT_REPO_ID,
+                    'get_action':'custom_data_edit'
+                });
+                var conn = new Connexion();
+                conn.setParameters(params);
+                conn.setMethod("POST");
+                conn.onComplete = function(transport){
+                    ajaxplorer.user.setPreference('DEFAULT_START_REPOSITORY', target.CURRENT_REPO_ID, false);
+                };
+                conn.sendAsync();
+            }
             ajaxplorer.triggerRepositoryChange(target.CURRENT_REPO_ID);
         });
 
-        var notificationElement = oFormObject.down("#notifications_center");
         var notifCenter = ajaxplorer.NotificationLoaderInstance;
-        notifCenter.ajxpNode.observe("loaded", function(){
-            notifCenter.childrenToMenuItems(function(obj){
-                var a = new Element('li', {title:obj['alt']}).update(obj['name']);
-                notificationElement.insert(a);
-                var img = obj.pFactory.generateBasePreview(obj.ajxpNode);
-                a.IMAGE_ELEMENT = img;
-                a.insert({top:img});
-                obj.pFactory.enrichBasePreview(obj.ajxpNode, a);
+        var notificationElement = oFormObject.down("#notifications_center");
+
+        if(notifCenter){
+            notifCenter.ajxpNode.observe("loaded", function(){
+                notifCenter.childrenToMenuItems(function(obj){
+                    var a = new Element('li', {title:obj['alt']}).update(obj['name']);
+                    notificationElement.insert(a);
+                    var img = obj.pFactory.generateBasePreview(obj.ajxpNode);
+                    a.IMAGE_ELEMENT = img;
+                    a.insert({top:img});
+                    obj.pFactory.enrichBasePreview(obj.ajxpNode, a);
+                });
             });
-        });
 
-        var clicker = function(){
-            if(oFormObject.down("#notifications_center").hasClassName('folded')){
-                oFormObject.down("#workspaces_center").setStyle({marginLeft: '15%'});
-                oFormObject.down("#notifications_center").setStyle({width: '30%'});
-            }else{
-                oFormObject.down("#workspaces_center").setStyle({marginLeft: '30%'});
-                oFormObject.down("#notifications_center").setStyle({width: '0'});
-            }
-            oFormObject.down("#notifications_center").toggleClassName('folded');
-        };
-        oFormObject.down("#close-icon").observe("click", clicker);
+            var clicker = function(){
+                if(oFormObject.down("#notifications_center").hasClassName('folded')){
+                    oFormObject.down("#workspaces_center").setStyle({marginLeft: '15%'});
+                    oFormObject.down("#notifications_center").setStyle({width: '30%'});
+                }else{
+                    oFormObject.down("#workspaces_center").setStyle({marginLeft: '30%'});
+                    oFormObject.down("#notifications_center").setStyle({width: '0'});
+                }
+                oFormObject.down("#notifications_center").toggleClassName('folded');
+            };
+            oFormObject.down("#close-icon").observe("click", clicker);
 
-        window.setTimeout(clicker, 4000);
+            window.setTimeout(clicker, 4000);
+        }else{
+            oFormObject.down("#workspaces_center").setStyle({marginLeft: '30%'});
+            notificationElement.hide();
+        }
     },
 
     resize: function($super, size){

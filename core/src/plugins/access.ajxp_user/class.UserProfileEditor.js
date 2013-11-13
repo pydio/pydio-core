@@ -11,7 +11,7 @@ Class.create("UserProfileEditor", AjxpPane, {
         if(ajaxplorer.actionBar.getActionByName('custom_data_edit')){
 
             this._formManager = new FormManager();
-            var definitions = this._formManager.parseParameters(ajaxplorer.getXmlRegistry(), "user/preferences/pref[@exposed]|//param[contains(@scope,'user')]");
+            var definitions = this._formManager.parseParameters(ajaxplorer.getXmlRegistry(), "user/preferences/pref[@exposed='true']|//param[contains(@scope,'user') and @expose='true']");
             this._formManager.createParametersInputs(oFormObject, definitions, true, ajaxplorer.user.preferences, false, true);
             this._formManager.disableShortcutsOnForm(oFormObject);
 

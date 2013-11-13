@@ -452,10 +452,29 @@
                     ]]></html>
                 </infoPanelExtension>
             </component_config>
+            <component_config className="AjxpTabulator::userdashboard_main_tab">
+                <additional_tab id="shared_pane"
+                                tabInfo='{"id":"my-shared","iconClass":"icon-share","element":"shared_pane","closeable":false,"label":"share_center.98","title":"share_center.99","dontFocus":true,"position":3}'
+                                paneInfo='{"type":"widget"}'><![CDATA[
+                    <div id="shared_pane" ajxpClass="AjxpPane">
+                        <div id="shared_tab" ajxpClass="AjxpTabulator" class="horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "shared-files","tabInfos" : [{"id":"shared-files","label":"share_center.100", "title":"share_center.101","iconClass":"icon-file", "element":"shared_files_pane"},{"id":"shared-folders","label":"share_center.102","title":"share_center.103","iconClass":"icon-folder-close", "element":"shared_folders_pane"}]}'>
+                            <div id="shared_files_pane" ajxpClass="AjxpPane" ajxpOptions=''>
+                                <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","public_links"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                                <div id="shared_files_pane" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"files"}}'></div>
+                            </div>
+                            <div id="shared_folders_pane" ajxpClass="AjxpPane" ajxpOptions='{}'>
+                                <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","shared_folders"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                                <div id="shared_folders_list" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true, "nodeProviderProperties":{"get_action":"ls","dir":"repositories"}}'></div>
+                            </div>
+                        </div>
+                    </div>
+                ]]></additional_tab>
+            </component_config>
         </client_configs>
     </registry_contributions>
     <class_definition filename="plugins/action.share/class.ShareCenter.php" classname="ShareCenter"/>
     <dependencies>
         <activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+        <activePlugin pluginName="access.ajxp_user"/>
     </dependencies>
 </ajxp_plugin>
