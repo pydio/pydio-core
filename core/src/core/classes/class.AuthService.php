@@ -387,6 +387,9 @@ class AuthService
     public static function disconnect()
     {
         if (isSet($_SESSION["AJXP_USER"]) || isSet(self::$currentUser)) {
+            $user = isSet($_SESSION["AJXP_USER"]) ? $_SESSION["AJXP_USER"] : self::$currentUser;
+            $userId = $user->id;
+            AJXP_Controller::applyHook("user.before_disconnect", array($user));
             AuthService::clearRememberCookie();
             AJXP_Logger::info(__CLASS__, "Log Out", "");
             unset($_SESSION["AJXP_USER"]);
@@ -394,6 +397,7 @@ class AuthService
             if (ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
                 AJXP_Safe::clearCredentials();
             }
+            AJXP_Controller::applyHook("user.after_disconnect", array($userId));
         }
     }
     /**
