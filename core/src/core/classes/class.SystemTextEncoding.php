@@ -106,28 +106,16 @@ class SystemTextEncoding
     }
 
     /**
-     * This function is used when the server's PHP configuration is using magic quote
-     * @param string $text
-     * @return string
-     */
-    public static function magicDequote($text)
-    {
-        // If the PHP server enables magic quotes, remove them
-        if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc())
-            return stripslashes($text);
-        return $text;
-    }
-
-    /**
-     * Successive call of magicDequote and fromUTF8
+     * call fromUTF8
      * @static
      * @param string $filesystemElement
      * @return string
      */
-    public static function fromPostedFileName($filesystemElement)
+    public static function fromPostedFileName(&$filesystemElement)
     {
-        return SystemTextEncoding::fromUTF8(SystemTextEncoding::magicDequote($filesystemElement));
+        return SystemTextEncoding::fromUTF8($filesystemElement);
     }
+
     /**
      * Transform a string from current charset to utf8
      * @static

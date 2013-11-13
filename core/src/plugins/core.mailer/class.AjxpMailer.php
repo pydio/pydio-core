@@ -200,24 +200,7 @@ class AjxpMailer extends AJXP_Plugin
 
     public function validateEmail($email)
     {
-        if (function_exists("filter_var")) {
-            return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
-        }
-
-        $atom   = '[-a-z0-9!#$%&\'*+\\/=?^_`{|}~]';
-        $domain = '([a-z0-9]([-a-z0-9]*[a-z0-9]+)?)';
-
-        $regex = '/^' . $atom . '+' .
-            '(\.' . $atom . '+)*' .
-            '@' .
-            '(' . $domain . '{1,63}\.)+' .
-            $domain . '{2,63}$/i';
-
-        if (preg_match($regex, $email)) {
-            return true;
-        } else {
-            return false;
-        }
+        return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
     }
 
 }
