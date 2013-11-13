@@ -8,6 +8,10 @@
 			<js file="plugins/meta.comments/class.CommentsPanel.js" className="CommentsPanel" autoload="true"/>
 		</resources>
 	</client_settings>
+    <server_settings>
+        <param name="COMMENT_SIZE_LIMIT" type="integer" label="Comment limit"
+                      description="Maximum number of characters for each comment" default="1000" />
+    </server_settings>
 	<registry_contributions>
 		<hooks>
 			<serverCallback hookName="node.info" methodName="mergeMeta" applyCondition="$apply=($args[2]!='minimal');"></serverCallback>

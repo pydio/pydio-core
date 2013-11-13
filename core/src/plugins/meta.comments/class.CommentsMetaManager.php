@@ -106,16 +106,22 @@ class CommentsMetaManager extends AJXP_Plugin
             case "post_comment":
 
                 $uId = AuthService::getLoggedUser()->getId();
+                $limit = $this->getFilteredOption("COMMENT_SIZE_LIMIT");
+                if(!empty($limit)){
+                    $content = substr($httpVars["content"], 0, $limit);
+                }else{
+                    $content = $httpVars["content"];
+                }
                 $com = array(
                     "date"      => time(),
                     "author"    => $uId,
-                    "content"   => $httpVars["content"]
+                    "content"   => $content
                 );
                 $existingFeed[] = $com;
                 if ($feedStore!== false) {
                     $feedStore->persistMetaObject(
                         $uniqNode->getPath(),
-                        base64_encode($com["content"]),
+                        base64_encode($content),
                         $uniqNode->getRepositoryId(),
                         $uniqNode->getRepository()->securityScope(),
                         $uniqNode->getRepository()->getOwner(),
