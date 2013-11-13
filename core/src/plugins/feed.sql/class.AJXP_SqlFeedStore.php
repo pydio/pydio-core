@@ -90,12 +90,13 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
      * @param integer $limit
      * @return An array of stdClass objects with keys hookname, arguments, author, date, repository
      */
-    public function loadEvents($filterByRepositories, $userId, $userGroup, $offset = 0, $limit = 10)
+    public function loadEvents($filterByRepositories, $userId, $userGroup, $offset = 0, $limit = 10, $enlargeToOwned = true)
     {
         if($this->sqlDriver["password"] == "XXXX") return array();
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
-        $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND
+        if ($enlargeToOwned) {
+            $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND
             ( [repository_id] IN (%s) OR [repository_owner] = %s )
             AND (
                 [repository_scope] = 'ALL'
@@ -103,6 +104,16 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
                 OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )
             )
             ORDER BY [edate] DESC %lmt %ofs", "event", $filterByRepositories, $userId, $userId, $userGroup, $limit, $offset);
+        } else {
+            $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND
+            ( [repository_id] IN (%s))
+            AND (
+                [repository_scope] = 'ALL'
+                OR  ([repository_scope] = 'USER' AND [user_id] = %s  )
+                OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )
+            )
+            ORDER BY [edate] DESC %lmt %ofs", "event", $filterByRepositories, $userId, $userGroup, $limit, $offset);
+        }
         $data = array();
         foreach ($res as $n => $row) {
             $object = new stdClass();

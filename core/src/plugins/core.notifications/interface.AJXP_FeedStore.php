@@ -47,9 +47,10 @@ interface AJXP_FeedStore
      * @param string $userGroup
      * @param integer $offset
      * @param integer $limit
+     * @param boolean $enlargeToOwned
      * @return AJXP_Notification[]
      */
-    public function loadEvents($filterByRepositories, $userId, $userGroup, $offset = 0, $limit = 10);
+    public function loadEvents($filterByRepositories, $userId, $userGroup, $offset = 0, $limit = 10, $enlargeToOwned = true);
 
     /**
      * @abstract

@@ -17,6 +17,43 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+
+
+(function() {
+    var autoLink,
+        __slice = [].slice;
+
+    autoLink = function() {
+        var k, linkAttributes, option, options, pattern, v;
+        options = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        pattern = /(^|\s)((?:https?|ftp):\/\/[\-A-Z0-9+\u0026@#\/%?=()~_|!:,.;]*[\-A-Z0-9+\u0026@#\/%=~()_|])/gi;
+        if (!(options.length > 0)) {
+            return this.replace(pattern, "$1<a href='$2'>$2</a>");
+        }
+        option = options[0];
+        linkAttributes = ((function() {
+            var _results;
+            _results = [];
+            for (k in option) {
+                v = option[k];
+                if (k !== 'callback') {
+                    _results.push(" " + k + "='" + v + "'");
+                }
+            }
+            return _results;
+        })()).join('');
+        return this.replace(pattern, function(match, space, url) {
+            var link;
+            link = (typeof option.callback === "function" ? option.callback(url) : void 0) || ("<a href='" + url + "'" + linkAttributes + ">" + url + "</a>");
+            return "" + space + link;
+        });
+    };
+
+    String.prototype['autoLink'] = autoLink;
+
+}).call(this);
+
+
 Class.create("CommentsPanel", {
 
     // Warning, method is called statically, there is no "this"
@@ -108,6 +145,7 @@ Class.create("CommentsPanel", {
     commentObjectToDOM: function(hash, container, node, skipAnim){
 
         var pFactory = new PreviewFactory();
+        hash.set('content', hash.get('content').autoLink({target:'_blank'}));
         var tpl = new Template('<div class="comment_legend"><span class="icon-remove comment_delete"></span>#{author}, #{hdate}</div><div class="comment_text"><span class="comment_text_content">#{content}</span></div>');
         var el = new Element("div", {className:'comment_content'}).update(tpl.evaluate(hash._object));
         if(hash.get('rpath')){

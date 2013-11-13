@@ -135,7 +135,7 @@ class CommentsMetaManager extends AJXP_Plugin
 
                 HTMLWriter::charsetHeader("application/json");
                 if ($feedStore !== false) {
-                    $data = $feedStore->findMetaObjectsByIndexPath(ConfService::getRepository()->getId(), $uniqNode->getPath(), AuthService::getLoggedUser()->getId(), AuthService::getLoggedUser()->getGroupPath(), 0, 20, "date", "asc");
+                    $data = $feedStore->findMetaObjectsByIndexPath(ConfService::getRepository()->getId(), $uniqNode->getPath(), AuthService::getLoggedUser()->getId(), AuthService::getLoggedUser()->getGroupPath(), 0, 100, "date", "asc");
                     $theFeed = array();
                     foreach ($data as $stdObject) {
                         $rPath = substr($stdObject->path, strlen($uniqNode->getPath()));
@@ -150,7 +150,7 @@ class CommentsMetaManager extends AJXP_Plugin
                             "rpath"     => $rPath
                         );
                         if (isSet($previous) && $previous["author"] == $newItem["author"] &&  $previous["path"] == $newItem["path"] && $previous["hdate"] == $newItem["hdate"] ) {
-                            $theFeed[count($theFeed) - 1]["content"].= $newItem["content"];
+                            $theFeed[count($theFeed) - 1]["content"].= '<br>--<br>'.$newItem["content"];
 
                         } else {
                             $theFeed[] = $newItem;

@@ -82,6 +82,16 @@ div.double #comments_form textarea, div.triple #comments_form textarea{
     padding: 5px;
 }
 
+.comment_text_content a{
+    display: inline !important;
+    background-color: transparent !important;
+    font-size: inherit !important;
+    cursor: pointer !important;
+    margin: 0 !important;
+    border: 0 !important;
+    padding: 0 !important;
+}
+
 .foldedPanel_tooltip .comment_legend{
     display: none;
 }
