@@ -604,6 +604,13 @@ class ShareCenter extends AJXP_Plugin
             "limit" => $data['DOWNLOAD_LIMIT'],
             "repo_uuid" => $copy->uuid
         ));
+        AJXP_Controller::applyHook("node.share.create", array(
+            'type' => 'file',
+            'repository' => &$copy,
+            'accessDriver' => &$accessDriver,
+            'data' => &$data,
+            'url' => $url,
+        ));
         return array($hash, $url);
     }
 
@@ -1031,9 +1038,18 @@ class ShareCenter extends AJXP_Plugin
             return "Can't write to PUBLIC URL";
         }
         @chmod($downloadFolder."/".$hash.".php", 0755);
+        $url = $this->buildPublicletLink($hash);
 
-        return array($hash, $this->buildPublicletLink($hash));
+        AJXP_Controller::applyHook("node.share.create", array(
+            'type' => 'minisite',
+            'repository' => &$repository,
+            'accessDriver' => &$accessDriver,
+            'data' => &$data,
+            'url' => $url,
+            'new_repository' => &$newRepo
+        ));
 
+        return array($hash, $url);
     }
 
     /**
@@ -1308,6 +1324,15 @@ class ShareCenter extends AJXP_Plugin
             $grRole = AuthService::getRole("AJXP_GRP_".AuthService::filterBaseGroup($group), true);
             $grRole->setAcl($newRepo->getUniqueId(), $uRights[$group]);
             AuthService::updateRole($grRole);
+        }
+
+        if (array_key_exists("minisite", $httpVars) && $httpVars["minisite"] != true) {
+            AJXP_Controller::applyHook("node.share.create", array(
+                'type' => 'repository',
+                'repository' => &$repository,
+                'accessDriver' => &$accessDriver,
+                'new_repository' => &$newRepo
+            ));
         }
 
         return $newRepo;
