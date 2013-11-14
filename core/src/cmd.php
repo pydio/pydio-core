@@ -159,26 +159,11 @@ if (AuthService::usersEnabled() && !empty($optUser)) {
     }
 
     if ($loggedUser != null) {
-        $currentRepoId = ConfService::getCurrentRepositoryId();
-        $lastRepoId  = $loggedUser->getArrayPref("history", "last_repository");
-        $defaultRepoId = AuthService::getDefaultRootId();
-        if ($defaultRepoId == -1) {
+        $res = ConfService::switchUserToActiveRepository($loggedUser, $optRepoId);
+        if (!$res) {
             AuthService::disconnect();
-            $loggingResult = -3;
-        } else {
-            if ($lastRepoId != "" && $lastRepoId!=$currentRepoId && $optRepoId===false && $loggedUser->canSwitchTo($lastRepoId)) {
-                ConfService::switchRootDir($lastRepoId);
-            } else if (!$loggedUser->canSwitchTo($currentRepoId)) {
-                ConfService::switchRootDir($defaultRepoId);
-            }
+            $requireAuth = true;
         }
-    }
-    if ($loggedUser == null) {
-        // Try prelogging user if the session expired but the logging data is in fact still present
-        // For example, for basic_http auth.
-        AuthService::preLogUser((isSet($httpVars["remote_session"])?$httpVars["remote_session"]:""));
-        $loggedUser = AuthService::getLoggedUser();
-        if($loggedUser == null) $requireAuth = true;
     }
     if (isset($loggingResult) && $loggingResult != 1) {
         AJXP_XMLWriter::header();

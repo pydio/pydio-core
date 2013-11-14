@@ -107,9 +107,9 @@ class CommentsMetaManager extends AJXP_Plugin
 
                 $uId = AuthService::getLoggedUser()->getId();
                 $limit = $this->getFilteredOption("COMMENT_SIZE_LIMIT");
-                if(!empty($limit)){
+                if (!empty($limit)) {
                     $content = substr($httpVars["content"], 0, $limit);
-                }else{
+                } else {
                     $content = $httpVars["content"];
                 }
                 $com = array(
