@@ -158,9 +158,11 @@ class AJXP_SerialUser extends AbstractAjxpUser
             $this->roles["AJXP_USR_"."/".$this->id] = $personalRole;
         } else {
             // MIGRATE NOW !
-            $this->migrateRightsToPersonalRole();
-            AJXP_Utils::saveSerialFile($this->getStoragePath()."/role.ser", $this->personalRole, true);
-            AJXP_Utils::saveSerialFile($this->getStoragePath()."/rights.ser", $this->rights, true);
+            $changes = $this->migrateRightsToPersonalRole();
+            if ($changes) {
+                AJXP_Utils::saveSerialFile($this->getStoragePath()."/role.ser", $this->personalRole, true);
+                AJXP_Utils::saveSerialFile($this->getStoragePath()."/rights.ser", $this->rights, true);
+            }
         }
 
         $this->recomputeMergedRole();

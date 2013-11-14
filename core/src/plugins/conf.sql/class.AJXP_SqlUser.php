@@ -427,15 +427,21 @@ class AJXP_SqlUser extends AbstractAjxpUser
         } else {
             // MIGRATE NOW !
             $originalRights = $this->rights;
-            $this->migrateRightsToPersonalRole();
-            $removedRights = array_keys(array_diff($originalRights, $this->rights));
-            $this->roles["AJXP_USR_"."/".$this->id] = $this->personalRole;
+            $changes = $this->migrateRightsToPersonalRole();
             // SAVE RIGHT AND ROLE
-            if (count($removedRights)) {
-                // We use (%s) instead of %in to pass everyting as string ('1' instead of 1)
-                dibi::query("DELETE FROM [ajxp_user_rights] WHERE [login] = %s AND [repo_uuid] IN (%s)", $this->getId(), $removedRights);
+            if ($changes > 0) {
+                // There was an actual migration, let's save the changes now.
+                $removedRights = array_keys(array_diff($originalRights, $this->rights));
+                if (count($removedRights)) {
+                    // We use (%s) instead of %in to pass everything as string ('1' instead of 1)
+                    dibi::query("DELETE FROM [ajxp_user_rights] WHERE [login] = %s AND [repo_uuid] IN (%s)", $this->getId(), $removedRights);
+                }
+                AuthService::updateRole($this->personalRole);
+            } else {
+                $this->personalRole = new AJXP_Role("AJXP_USR_"."/".$this->id);
             }
-            AuthService::updateRole($this->personalRole);
+            $this->roles["AJXP_USR_"."/".$this->id] = $this->personalRole;
+
         }
         $this->recomputeMergedRole();
     }

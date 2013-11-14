@@ -413,6 +413,7 @@ abstract class AbstractAjxpUser
 
     protected function migrateRightsToPersonalRole()
     {
+        $changes = 0;
         $this->personalRole = new AJXP_Role("AJXP_USR_"."/".$this->id);
         $this->roles["AJXP_USR_"."/".$this->id] = $this->personalRole;
         foreach ($this->rights as $rightKey => $rightValue) {
@@ -420,12 +421,14 @@ abstract class AbstractAjxpUser
                 foreach ($rightValue as $repoId => $repoData) {
                     foreach ($repoData as $actionName => $actionState) {
                         $this->personalRole->setActionState("plugin.all", $actionName, $repoId, $actionState);
+                        $changes++;
                     }
                 }
                 unset($this->rights[$rightKey]);
             }
             if(strpos($rightKey, "ajxp.") === 0) continue;
             $this->personalRole->setAcl($rightKey, $rightValue);
+            $changes++;
             unset($this->rights[$rightKey]);
         }
         // Move old CUSTOM_DATA values to personal role parameter
@@ -451,7 +454,7 @@ abstract class AbstractAjxpUser
                 }
             }
         }
-
+        return $changes;
     }
 
     protected function orderRoles($r1, $r2)
