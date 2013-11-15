@@ -106,4 +106,9 @@ $mess = array(
     "101" => "Tous mes fichiers partagés",
     "102" => "Répertoires partagés",
     "103" => "Tous mes répertoires partagés comme workspace ou comme minisites.",
+    "104" => "Affichage du premier lien, il y en a %s autres",
+    "105" => "Affichage du premier lien, il y en a un autre",
+    "106" => "Voulez vous remetter à zéro le compteur?",
+    "107" => "Le nombre de téléchargement doit être compris entre 1 et %s",
+    "108" => "Utilisez un lecteur de QRCode pour scanner l'image ",
 );

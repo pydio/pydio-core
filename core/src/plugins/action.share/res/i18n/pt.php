@@ -106,4 +106,9 @@ $mess = array(
     "101" => "All files shared as public links",
     "102" => "Shared folders",
     "103" => "All folders shared as workspaces or minisites.",
+    "104" => "Displaying first link, there are %s others",
+    "105" => "Displaying first link, there is one other",
+    "106" => "Do you want to reset the download counter?",
+    "107" => "Download limit must be between 1 and %s",
+    "108" => "Use a QRCode reader to scan the image ",
 );

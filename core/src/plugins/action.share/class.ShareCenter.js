@@ -376,13 +376,16 @@ Class.create("ShareCenter", {
         var dlC = new Element('span', {className:'icon-download-alt simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.89"]}).update(' '+MessageHash["share_center.88"]+' '+linkData['download_counter']+'/'+linkData['download_limit']);
         actions.insert({top:dlC});
         dlC.observe("click", function(){
-            if(window.confirm('Do you want to reset the download counter?')){
+            if(window.confirm(MessageHash['share_center.106'])){
                 var conn = new Connexion();
                 conn.setParameters({
                     file: this.currentNode.getPath(),
                     get_action: 'reset_counter',
                     element_id: linkData["element_id"]
                 });
+                conn.onComplete =  function(transport){
+                    dlC.update(' '+MessageHash["share_center.88"]+' 0/'+linkData['download_limit']);
+                };
                 conn.sendAsync();
             }
         }.bind(this));
@@ -448,12 +451,6 @@ Class.create("ShareCenter", {
 
                         return;
 
-                        optionsPane.down("[name='downloadlimit']").setAttribute("id","currentDownloadLimitField");
-                        optionsPane.down("[name='downloadlimit']").setValue(dlString);
-                        var resetLink = new Element('a', {style:'text-decoration:underline;cursor:pointer;display:inline-block;padding:5px;', title:MessageHash['share_center.17']}).update(MessageHash['share_center.16']).observe('click', this.resetDownloadCounterCallback.bind(this));
-                        optionsPane.down("[name='downloadlimit']").insert({after:resetLink});
-
-
                     }.bind(this));
 
                 }
@@ -504,13 +501,11 @@ Class.create("ShareCenter", {
             if(node.isLeaf()){
 
                 if(!jsonData) return ;
+                var linksCount = jsonData.length;
                 jsonData = jsonData[0];
-                if(count(jsonData) > 1){
-
-                }
                 var directLink = "";
                 if(!jsonData.hasPassword){
-                    directLink = '\
+                    directLink += '\
                     <tr>\
                         <td class="infoPanelLabel">'+MessageHash['share_center.60']+'</td>\
                         <td class="infoPanelValue"><textarea style="width:100%;height: 45px;"><a href="'+ jsonData.publiclet_link +'?dl=true">Download '+node.getLabel()+'</a></textarea></td>\
@@ -553,6 +548,11 @@ Class.create("ShareCenter", {
                     </tr>\
                 ');
 
+                if(linksCount > 1){
+                    container.down('#ajxp_shared_info_panel table').insert({bottom:'<tr>\
+                        <td class="infoPanelLabel" colspan="2" style="text-align: center;font-style: italic;">'+MessageHash['share_center.'+(linksCount>2?'104':'105')].replace('%s', linksCount-1)+'</td>\
+                    </tr>'});
+                }
 
             }else{
                 var entries = [];
@@ -624,22 +624,6 @@ Class.create("ShareCenter", {
         conn.sendAsync();
     },
 
-    resetDownloadCounterCallback : function(){
-        var conn = new Connexion();
-        conn.addParameter("get_action", "reset_counter");
-        conn.addParameter("file", ajaxplorer.getUserSelection().getUniqueNode().getPath());
-        conn.onComplete = function(){
-            var input = modal.getForm().down('input#currentDownloadLimitField');
-            if(input.getValue().indexOf("/") > 0){
-                var parts = input.getValue().split("/");
-                input.setValue("0/" + parts[1]);
-            }else{
-                input.setValue("0");
-            }
-        };
-        conn.sendAsync();
-    },
-
     generatePublicLinkCallback : function(){
         var userSelection = ajaxplorer.getUserSelection();
         if(!userSelection.isUnique() || (userSelection.hasDir() && !userSelection.hasMime($A(['ajxp_browsable_archive'])))) return;
@@ -658,7 +642,7 @@ Class.create("ShareCenter", {
             return;
         }
         if(this.maxdownload > 0 && !(serialParams["downloadlimit"] > 0 && serialParams["downloadlimit"] <= this.maxdownload) ){
-            ajaxplorer.displayMessage("ERROR", "Download limit must be between 1 and " + this.maxdownload);
+            ajaxplorer.displayMessage("ERROR", MessageHash["share_center.107"].replace("%s", this.maxdownload));
             return;
         }
 
@@ -770,7 +754,7 @@ Class.create("ShareCenter", {
                     message = s + "\n\n " + "<a href='" + this._currentRepositoryLink+"'>" + MessageHash["share_center.46"].replace("%s1", this._currentRepositoryLabel).replace("%s2", ajaxplorer.appTitle) + "</a>";
                 }
                 if(dialogButtonsOrRow.down('.share_qrcode') && dialogButtonsOrRow.down('.share_qrcode').visible() && dialogButtonsOrRow.down('.share_qrcode > img')){
-                    message += "\n\n Use a QRCode reader to scan the image \n\n" + dialogButtonsOrRow.down('.share_qrcode').innerHTML;
+                    message += "\n\n "+ MessageHash["share_center.108"] + "\n\n" + dialogButtonsOrRow.down('.share_qrcode').innerHTML;
                 }
                 var mailer = new AjxpMailer();
                 var usersList = null;
@@ -794,7 +778,7 @@ Class.create("ShareCenter", {
                 body = dialogButtonsOrRow.down('[name="link_url"]').getValue();
                 mailerButton.update('<a href="mailto:unknown@unknown.com?Subject='+subject+'&Body='+body+'"> invite</a>');
             }else{
-                body = this.shareFolderMode != 'workspace' ?  dialogButtonsOrRow.up('.dialogContent').down('#share_container').getValue() : 'A folder was shared with you';
+                body = this.shareFolderMode != 'workspace' ?  dialogButtonsOrRow.up('.dialogContent').down('#share_container').getValue() : MessageHash["share_center.43"].replace("%s", ajaxplorer.appTitle);
                 mailerButton.down('span').update('<a href="mailto:unknown@unknown.com?Subject='+subject+'&Body='+body+'"> invite</a>');
             }
             mailerButton.down('a').observe("click", function(e){
@@ -802,7 +786,7 @@ Class.create("ShareCenter", {
                 if(shareType == 'file'){
                     body = dialogButtonsOrRow.down('[name="link_url"]').getValue();
                 }else{
-                    body = this.shareFolderMode != 'workspace' ?  dialogButtonsOrRow.up('.dialogContent').down('#share_container').getValue() : 'A folder was shared with you';
+                    body = this.shareFolderMode != 'workspace' ?  dialogButtonsOrRow.up('.dialogContent').down('#share_container').getValue() : MessageHash["share_center.43"].replace("%s", ajaxplorer.appTitle);
                 }
                 e.target.href = 'mailto:unknown@unknown.com?Subject='+subject+'&Body='+body;
             }.bind(this));
