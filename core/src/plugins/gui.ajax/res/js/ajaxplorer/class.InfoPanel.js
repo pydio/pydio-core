@@ -166,13 +166,13 @@ Class.create("InfoPanel", AjxpPane, {
 				}
 			}
 			
-			this.evalTemplateForMime("no_selection", null, {
+			this.evalTemplateForMime((contextNode.getPath() =="/" && this.registeredMimes.get("ajxp_root_node") ? "ajxp_root_node": "no_selection"), (contextNode.getPath() =="/" ? contextNode : null), {
 				filelist_folders_count:folderNumber,
 				filelist_files_count:filesNumber,
 				filelist_totalsize:roundSize(size, (MessageHash?MessageHash[266]:'B')),
 				current_folder:currentRep
 			});
-				try{
+            try{
 				if(!folderNumber && $(this.contentContainer).select('[id="filelist_folders_count"]').length){
 					$(this.contentContainer).select('[id="filelist_folders_count"]')[0].hide();
 				}

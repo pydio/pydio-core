@@ -19,7 +19,7 @@
 		</hooks>
 		<client_configs>
 			<component_config className="InfoPanel">
-				<infoPanelExtension mime="meta:ajxp_has_comments_feed" attributes="" modifier="CommentsPanel.prototype.loadInfoPanel">
+				<infoPanelExtension mime="meta:ajxp_has_comments_feed,ajxp_root_node" attributes="" modifier="CommentsPanel.prototype.loadInfoPanel">
 					<html><![CDATA[
                         <div id="ajxp_comments_info_panel">
                             <div class="panelHeader infoPanelGroup" colspan="2"><span class="icon-comments-alt" data-ajxpAction="comments" title="Users Comments"></span>Users Comments</div>
