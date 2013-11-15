@@ -156,7 +156,7 @@ class CommentsMetaManager extends AJXP_Plugin
                             "rpath"     => $rPath
                         );
                         if (isSet($previous) && $previous["author"] == $newItem["author"] &&  $previous["path"] == $newItem["path"] && $previous["hdate"] == $newItem["hdate"] ) {
-                            $theFeed[count($theFeed) - 1]["content"].= '<br>--<br>'.$newItem["content"];
+                            $theFeed[count($theFeed) - 1]["content"].= '<br>'.$newItem["content"];
 
                         } else {
                             $theFeed[] = $newItem;

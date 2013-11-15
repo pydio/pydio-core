@@ -920,7 +920,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 $this->logDebug("LS Time : ".intval((microtime()-$startTime)*1000)."ms");
 
                 AJXP_XMLWriter::close();
-                return ;
 
             break;
         }
