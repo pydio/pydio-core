@@ -76,3 +76,14 @@ width: 150px;
     float: left;
     margin-left: -6px !important;
 }
+
+#feed_content div.menuActions{
+    right: 10px;
+    top: 28%;
+}
+
+#feed_content div.menuActions.moreActions span{
+    font-size: 1.5em;
+    text-shadow: none;
+    margin-left: 2px;
+}
