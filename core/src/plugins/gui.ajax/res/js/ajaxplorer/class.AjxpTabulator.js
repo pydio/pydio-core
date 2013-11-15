@@ -280,6 +280,9 @@ Class.create("AjxpTabulator", AjxpPane, {
         if(!tabInfo.dontFocus){
             this.switchTabulator(tabInfo.id);
             window.setTimeout(this.resize.bind(this), 750);
+        }else{
+            var ajxpObject = this.getAndSetAjxpObject(tabInfo);
+            ajxpObject.showElement(false);
         }
         this.resize();
         if(!skipStateSave) this.saveState();
@@ -361,8 +364,10 @@ Class.create("AjxpTabulator", AjxpPane, {
 			}
 		}.bind(this));
 		if(toShow){
-            if($(toShowElement)) $(toShowElement).show();
-			toShow.showElement(true);
+            if($(toShowElement) && !$(toShowElement).visible()){
+                if($(toShowElement)) $(toShowElement).show();
+                toShow.showElement(true);
+            }
             var reFold = false;
             if(this.htmlElement && this.htmlElement.up('div[ajxpClass="Splitter"]') && this.htmlElement.up('div[ajxpClass="Splitter"]').ajxpPaneObject){
                 var splitter = this.htmlElement.up('div[ajxpClass="Splitter"]').ajxpPaneObject;
@@ -436,13 +441,17 @@ Class.create("AjxpTabulator", AjxpPane, {
         document.fire("ajaxplorer:resize-AjxpTabulator-" + this.htmlElement.id, this.htmlElement.getDimensions());
 	},
 
-    showElement: function(show){
+    showElement: function($super, show){
         if(!this.htmlElement) return;
+        this.tabulatorData.each(function(tabInfo){
+            var ajxpObject = this.getAndSetAjxpObject(tabInfo);
+            ajxpObject.showElement(show);
+        }.bind(this));
+
         if(show) {
             this.htmlElement.show();
             this.resize();
-        }
-        else {
+        } else {
             this.htmlElement.hide();
         }
     },
@@ -461,6 +470,14 @@ Class.create("AjxpTabulator", AjxpPane, {
 		this.tabulatorData.each(function(tabInfo){
 			var ajxpObject = this.getAndSetAjxpObject(tabInfo);
 			tabInfo.headerElement.stopObserving("click");
+            if(Class.objectImplements(ajxpObject, "IFocusable")){
+                ajaxplorer.unregisterFocusable(ajxpObject);
+            }
+            if(Class.objectImplements(ajxpObject, "IActionProvider") && ajxpObject.getActions()){
+                ajxpObject.getActions().each(function(act){
+                    this.guiActions.unset(act.key);// = this.guiActions.without(act);
+                }.bind(this) );
+            }
 			ajxpObject.destroy();
 		}.bind(this));
         if(this.tb){

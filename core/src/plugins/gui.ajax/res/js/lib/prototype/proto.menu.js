@@ -62,6 +62,11 @@ Proto.Menu = Class.create({
 		}
 		this.options.fade = this.options.fade && !Object.isUndefined(Effect);
 		this.container = new Element('div', {className: this.options.className, style: 'display:none'});
+
+        this.observerFunctionBound = this.observerFunction.bind(this);
+        this.mouseoverFunctionBound = this.mouseoverFunction.bind(this);
+        this.mouseoutFunctionBound = this.mouseoutFunction.bind(this);
+
 		if(this.options.mouseClick == 'right'){			
 			$(document.body).observe('contextmenu', function(e){Event.stop(e);});
 			$(document.body).insert(this.container.observe('contextmenu', Event.stop));
@@ -70,8 +75,8 @@ Proto.Menu = Class.create({
 		}		
 		if (this.ie) { $(document.body).insert(this.shim); }
 		if(this.eventToObserve == 'mouseover'){
-			this.container.observe("mouseover", this.mouseoverFunction.bind(this) );
-			this.container.observe("mouseout",this.mouseoutFunction.bind(this) );
+			this.container.observe("mouseover", this.mouseoverFunctionBound );
+			this.container.observe("mouseout",this.mouseoutFunctionBound );
 		}		
 
 		document.observe('click', function(e) {
@@ -97,7 +102,6 @@ Proto.Menu = Class.create({
 	},
 	
 	observerFunction:function(e){
-		//if (this.options.mouseClick == 'right' && Prototype.Browser.Opera && !e.ctrlKey) return;
 		if (this.options.mouseClick == 'left' && Event.findElement(e, '.protomenu_selector') && Event.findElement(e, '.protomenu_selector').hasClassName('disabled')){
 			return;
 		}
@@ -126,27 +130,27 @@ Proto.Menu = Class.create({
 			$$(selectorOrObject).invoke('removeClassName', 'protomenu_selector');
 			$$(selectorOrObject).invoke('stopObserving', 
 								this.eventToObserve,
-								this.observerFunction.bind(this));		
+								this.observerFunctionBound);
 		}else{
 			$(selectorOrObject).removeClassName('protomenu_selector');
-			$(selectorOrObject).stopObserving(this.eventToObserve, this.observerFunction.bind(this));
+			$(selectorOrObject).stopObserving(this.eventToObserve, this.observerFunctionBound);
 		}
 	},
 	
 	addElements:function(selectorOrObject){
 		if(typeof(selectorOrObject) == "string"){
-			$$(selectorOrObject).invoke('observe', this.eventToObserve, this.observerFunction.bind(this));		
+			$$(selectorOrObject).invoke('observe', this.eventToObserve, this.observerFunctionBound);
 			$$(selectorOrObject).invoke('addClassName', 'protomenu_selector');
 			if(this.eventToObserve == "mouseover"){
-					$$(selectorOrObject).invoke('observe', 'mouseover', this.mouseoverFunction.bind(this));
-					$$(selectorOrObject).invoke('observe', 'mouseout', this.mouseoutFunction.bind(this));
+					$$(selectorOrObject).invoke('observe', 'mouseover', this.mouseoverFunctionBound);
+					$$(selectorOrObject).invoke('observe', 'mouseout', this.mouseoutFunctionBound);
 			}			
 		}else{
-			$(selectorOrObject).observe(this.eventToObserve, this.observerFunction.bind(this));
+			$(selectorOrObject).observe(this.eventToObserve, this.observerFunctionBound);
 			$(selectorOrObject).addClassName('protomenu_selector');
 			if(this.eventToObserve == "mouseover"){
-				$(selectorOrObject).observe("mouseover", this.mouseoverFunction.bind(this) );
-				$(selectorOrObject).observe("mouseout", this.mouseoutFunction.bind(this));
+				$(selectorOrObject).observe("mouseover", this.mouseoverFunctionBound);
+				$(selectorOrObject).observe("mouseout", this.mouseoutFunctionBound);
 			}
 		}
 	},

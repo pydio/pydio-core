@@ -261,7 +261,7 @@ Class.create("Ajaxplorer", {
                 var obj = compRegistry[j];
                 if(Class.objectImplements(obj, "IFocusable")){
                     obj.setFocusBehaviour();
-                    this._focusables.push(obj);
+                    this.registerFocusable(obj);
                 }
                 if(Class.objectImplements(obj, "IContextMenuable")){
                     obj.setContextualMenu(this.contextMenu);
@@ -377,7 +377,7 @@ Class.create("Ajaxplorer", {
 			ajxpOptions = ajxpOptionsString.evalJSON();			
 		}
 		if(Class.objectImplements(oldObj, "IFocusable")){
-			this._focusables = this._focusables.without(oldObj);
+			this._focusables = this.unregisterFocusable(oldObj);
 		}
 		if(Class.objectImplements(oldObj, "IActionProvider")){
 			oldObj.getActions().each(function(act){
@@ -398,7 +398,7 @@ Class.create("Ajaxplorer", {
 		var obj = new ajxpClass($(ajxpId), ajxpOptions);
 		if(Class.objectImplements(obj, "IFocusable")){
 			obj.setFocusBehaviour();
-			this._focusables.push(obj);
+			this.registerFocusable(obj);
 		}
 		if(Class.objectImplements(obj, "IContextMenuable")){
 			obj.setContextualMenu(this.contextMenu);
@@ -1211,8 +1211,24 @@ Class.create("Ajaxplorer", {
 			if(f.hasFocus) this._lastFocused = f;
 			f.blur();
 		}.bind(this) );
-	},	
-	
+	},
+
+    /**
+     * @param IAjxpFocusable widget
+     */
+    registerFocusable: function(widget){
+        if(-1 == this._focusables.indexOf(widget) && widget.htmlElement){
+            this._focusables.push(widget);
+        }
+    },
+
+    /**
+     * @param IAjxpFocusable widget
+     */
+    unregisterFocusable: function(widget){
+        this._focusables = this._focusables.without(widget);
+    },
+
 	/**
 	 * Find last focused IAjxpFocusable and focus it!
 	 */
@@ -1232,7 +1248,7 @@ Class.create("Ajaxplorer", {
 				if(this.blockNavigation) return;
                 var objects = [];
                 $A(this._focusables).each(function(el){
-                    if((!el.htmlElement || el.htmlElement.visible())){
+                    if(el.htmlElement && el.htmlElement.visible()){
                         objects.push(el);
                     }
                 });

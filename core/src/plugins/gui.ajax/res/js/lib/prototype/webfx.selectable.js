@@ -292,7 +292,7 @@ SelectableElements = Class.create({
 	focus: function()
 	{
 		this.hasFocus = true;
-        //this.selectFirst();
+        if(!this._selectedItems.length) this.selectFirst();
         if(this.options && this.options.invisibleSelection) return;
         for(var i=0; i < this._selectedItems.length;i++)
 		{
@@ -358,6 +358,7 @@ SelectableElements = Class.create({
 	
 	dblClick: function (e) {
 		//alert('Dbl Click!');
+        this.hasFocus = true;
 		this.fireDblClick();
 	},
 
@@ -380,6 +381,7 @@ SelectableElements = Class.create({
     },
 	
 	click: function (e) {
+        this.hasFocus = true;
 		if(e.detail && e.detail > 1)
 		{
             if(this.ie10detailFilter(e)){

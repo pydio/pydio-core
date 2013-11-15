@@ -325,6 +325,7 @@ Class.create("SearchEngine", AjxpPane, {
             fitParent : this.options.toggleResultsVisibility,
             detailThumbSize:22
         });
+        ajaxplorer.registerFocusable(this._fileList);
 
 
         this.htmlElement.select('a', 'div[id="search_results"]').each(function(element){
@@ -347,9 +348,7 @@ Class.create("SearchEngine", AjxpPane, {
 			this._inputBox.select();
             if(this.hasResults && this._ajxpOptions.toggleResultsVisibility && !$(this._ajxpOptions.toggleResultsVisibility).visible()){
                 this.updateSearchResultPosition($(this._ajxpOptions.toggleResultsVisibility));
-                $(this._ajxpOptions.toggleResultsVisibility).setStyle({
-                    display:'block'
-                });
+                this.showToggleResult(true);
             }
 			return false;
 		}.bind(this));
@@ -375,7 +374,7 @@ Class.create("SearchEngine", AjxpPane, {
             this._inputBox.setValue("");
             this.clearResults();
             if($(this.options.toggleResultsVisibility)){
-                $(this._ajxpOptions.toggleResultsVisibility).setStyle({display:'none'});
+                this.showToggleResult(false);
             }
         }.bind(this);
 
@@ -383,6 +382,16 @@ Class.create("SearchEngine", AjxpPane, {
 
         this.resize();
 	},
+
+    showToggleResult: function(show){
+        if(show){
+            $(this._ajxpOptions.toggleResultsVisibility).setStyle({display:'block'});
+        }else{
+            $(this._ajxpOptions.toggleResultsVisibility).setStyle({display:'none'});
+        }
+        this._fileList.showElement(show);
+    },
+
 	/**
 	 * Show/Hide the widget
 	 * @param show Boolean
@@ -423,6 +432,7 @@ Class.create("SearchEngine", AjxpPane, {
 	
 	destroy : function(){
         if(this._fileList){
+            ajaxplorer.unregisterFocusable(this._fileList);
             this._fileList.destroy();
             this._fileList = null;
         }
@@ -568,16 +578,14 @@ Class.create("SearchEngine", AjxpPane, {
             }
             if($(this._ajxpOptions.toggleResultsVisibility).down("span.close_results")){
                 $(this._ajxpOptions.toggleResultsVisibility).down("span.close_results").observe("click", function(){
-                    $(this._ajxpOptions.toggleResultsVisibility).setStyle({display:"none"});
+                    this.showToggleResult(false);
                 }.bind(this));
             }
 
             if(!$(this._ajxpOptions.toggleResultsVisibility).visible()){
                 this.updateSearchResultPosition($(this._ajxpOptions.toggleResultsVisibility));
-                $(this._ajxpOptions.toggleResultsVisibility).setStyle({
-                    display:"block",
-                    position: "absolute"
-                });
+                $(this._ajxpOptions.toggleResultsVisibility).setStyle({position: "absolute"});
+                this.showToggleResult(true);
             }
             this.resize();
         }

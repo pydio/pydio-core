@@ -1166,7 +1166,7 @@ Class.create("FilesList", SelectableElements, {
                 ajxpNode.observe("node_replaced", newItem.REPLACE_OBS);
                 ajxpNode.observe("node_removed", newItem.REMOVE_OBS);
                 var dm = (this._dataModel?this._dataModel:ajaxplorer.getContextHolder());
-                if(dm.getSelectedNodes() && dm.getSelectedNodes().length)
+                if(dm.getSelectedNodes() && dm.getSelectedNodes().length && dm.getSelectionSource() == this)
                 {
                     var selectedNodes = dm.getSelectedNodes();
                     this._selectedItems = [];
@@ -1177,7 +1177,7 @@ Class.create("FilesList", SelectableElements, {
                             this.selectFile(selectedNodes[f].getPath(), true);
                         }
                     }
-                    this.hasFocus = true;
+                    if(dm.getSelectionSource() == this) this.hasFocus = true;
                 }
             //}catch(e){
 
@@ -1345,7 +1345,7 @@ Class.create("FilesList", SelectableElements, {
 			this._sortableTable.updateHeaderArrows();
 		}
         var dm = (this._dataModel?this._dataModel:ajaxplorer.getContextHolder());
-		if(dm.getSelectedNodes() && dm.getSelectedNodes().length)
+		if(dm.getSelectedNodes() && dm.getSelectedNodes().length && dm.getSelectionSource() == this)
 		{
 			var selectedNodes = dm.getSelectedNodes();
             for(var f=0;f<selectedNodes.length; f++){
@@ -1355,7 +1355,7 @@ Class.create("FilesList", SelectableElements, {
                     this.selectFile(selectedNodes[f].getPath(), true);
                 }
             }
-			this.hasFocus = true;
+            if(dm.getSelectionSource() == this) this.hasFocus = true;
 		}
 		if(this.hasFocus){
 			window.setTimeout(function(){ajaxplorer.focusOn(this);}.bind(this),200);
@@ -2130,7 +2130,7 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	fireChange: function()
 	{		
-		if(this._fireChange){
+		if(this._fireChange && this.hasFocus){
             if(this._dataModel){
                 this._dataModel.setSelectedNodes(this.getSelectedNodes());
             }else{

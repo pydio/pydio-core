@@ -91,6 +91,8 @@ Class.create("FetchedResultPane", FilesList, {
             }.bind(this));
         }
 
+        //ajaxplorer.registerFocusable(this);
+
     },
 
     reloadDataModel: function(){
