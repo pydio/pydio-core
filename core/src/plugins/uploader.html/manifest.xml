@@ -121,7 +121,7 @@
   				el.removeClassName("dropareaHover");
   				if(!window.UploaderInstanceRunning){
                     var items = event.dataTransfer.items || [];
-                    if (items[0] && (items[0].getAsEntry || items[0].webkitGetAsEntry)) {
+                    if (event.dataTransfer.files.length && items[0] && (items[0].getAsEntry || items[0].webkitGetAsEntry)) {
                         window.UploaderDroppedItems = items;
                         window.UploaderDroppedFiles = event.dataTransfer.files;
                         window.UploaderDroppedTarget = el;
