@@ -12,3 +12,10 @@ CREATE TABLE IF NOT EXISTS ajxp_simple_store (
 );
 INSERT INTO ajxp_simple_store SELECT object_id,store_id,serialized_data,binary_data,related_object_id,CURRENT_TIMESTAMP FROM ajxp_simple_store_old;
 DROP TABLE ajxp_simple_store_old;
+
+CREATE TABLE IF NOT EXISTS ajxp_user_teams (
+    team_id text NOT NULL,
+    user_id text NOT NULL,
+    team_label text NOT NULL,
+    owner_id text NOT NULL
+);
