@@ -755,7 +755,11 @@ class ShareCenter extends AJXP_Plugin
             }
         }
 
-        $tPath = (!empty($data["TRAVEL_PATH_TO_ROOT"]) ? $data["TRAVEL_PATH_TO_ROOT"] : "../..");
+        if(!empty($data["AJXP_APPLICATION_BASE"])){
+            $tPath = $data["AJXP_APPLICATION_BASE"];
+        }else{
+            $tPath = (!empty($data["TRAVEL_PATH_TO_ROOT"]) ? $data["TRAVEL_PATH_TO_ROOT"] : "../..");
+        }
         $html = str_replace("AJXP_PATH_TO_ROOT", $tPath, $html);
         HTMLWriter::internetExplorerMainDocumentHeader();
         HTMLWriter::charsetHeader();
@@ -1021,7 +1025,8 @@ class ShareCenter extends AJXP_Plugin
         if ($httpVars["disable_download"]) {
             $data["DOWNLOAD_DISABLED"] = true;
         }
-        $data["TRAVEL_PATH_TO_ROOT"] = $this->computeMinisiteToServerURL();
+        //$data["TRAVEL_PATH_TO_ROOT"] = $this->computeMinisiteToServerURL();
+        $data["AJXP_APPLICATION_BASE"] = AJXP_Utils::detectServerURL();
 
         $outputData = serialize($data);
         $hash = self::computeHash($outputData, $downloadFolder);

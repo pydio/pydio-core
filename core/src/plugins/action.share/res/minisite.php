@@ -2,12 +2,13 @@
 <html xmlns:ajxp>
     <head>
         <title>Pydio</title>
+        <base href="AJXP_PATH_TO_ROOT"/>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-        <link rel="icon" type="image/x-png" href="AJXP_PATH_TO_ROOT/plugins/gui.ajax/res/themes/vision/images/html-folder.png">
-        <link rel="stylesheet" type="text/css" href="AJXP_PATH_TO_ROOT/plugins/gui.ajax/res/themes/vision/css/allz.css">
-        <link rel="stylesheet" href="AJXP_PATH_TO_ROOT/plugins/gui.ajax/res/themes/vision/css/font-awesome.css"/>
-        <link rel="stylesheet" href="AJXP_PATH_TO_ROOT/plugins/gui.ajax/res/themes/vision/css/media.css"/>
+        <link rel="icon" type="image/x-png" href="plugins/gui.ajax/res/themes/vision/images/html-folder.png">
+        <link rel="stylesheet" type="text/css" href="plugins/gui.ajax/res/themes/vision/css/allz.css">
+        <link rel="stylesheet" href="plugins/gui.ajax/res/themes/vision/css/font-awesome.css"/>
+        <link rel="stylesheet" href="plugins/gui.ajax/res/themes/vision/css/media.css"/>
         <style type="text/css">
             #widget_title{
                 font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
@@ -28,7 +29,7 @@
             }
 
             .widget_logo {
-                background-image: url('AJXP_PATH_TO_ROOT/plugins/gui.ajax/PydioLogo250.png');
+                background-image: url('plugins/gui.ajax/PydioLogo250.png');
                 background-repeat: no-repeat;
                 background-position: right 5px;
                 background-size: 170px;
@@ -115,14 +116,14 @@
                 display: none;
             }
         </style>
-        <script language="javascript" type="text/javascript" src="AJXP_PATH_TO_ROOT/plugins/gui.ajax/res/js/ajaxplorer_boot.js"></script>
+        <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/ajaxplorer_boot.js"></script>
         <script type="text/javascript">
             var ajaxplorer, MessageHash={};
             var startParameters = {
-                "BOOTER_URL":"AJXP_PATH_TO_ROOT/index_shared.php?get_action=get_boot_conf&goto=AJXP_START_REPOSITORY&minisite_session=true",
+                "BOOTER_URL":"index_shared.php?get_action=get_boot_conf&goto=AJXP_START_REPOSITORY&minisite_session=true",
                 "EXT_REP":"\/",
                 "MAIN_ELEMENT":"ajxp_shared_folder",
-                "SERVER_PREFIX_URI": "AJXP_PATH_TO_ROOT/"
+                "SERVER_PREFIX_URI": ""
             };
             document.observe("ajaxplorer:before_gui_load", function(e){
                ajaxplorer.currentThemeUsesIconFonts = true;
