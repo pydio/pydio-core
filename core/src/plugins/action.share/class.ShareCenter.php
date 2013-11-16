@@ -189,8 +189,13 @@ class ShareCenter extends AJXP_Plugin
                     }
                     $metaArray[$hash] = array();
                     $metadata = array("element" => $metaArray);
-                    header("Content-type:application/json");
-                    echo json_encode(array("element_id" => $hash, "publiclet_link" => $url));
+                    if(isSet($httpVars["format"]) && $httpVars["format"] == "json"){
+                        header("Content-type:application/json");
+                        echo json_encode(array("element_id" => $hash, "publiclet_link" => $url));
+                    }else{
+                        header("Content-type:text/plain");
+                        echo $url;
+                    }
                     flush();
                 }
                 if ($metadata != null && $ajxpNode->hasMetaStore()) {
@@ -755,9 +760,9 @@ class ShareCenter extends AJXP_Plugin
             }
         }
 
-        if(!empty($data["AJXP_APPLICATION_BASE"])){
+        if (!empty($data["AJXP_APPLICATION_BASE"])) {
             $tPath = $data["AJXP_APPLICATION_BASE"];
-        }else{
+        } else {
             $tPath = (!empty($data["TRAVEL_PATH_TO_ROOT"]) ? $data["TRAVEL_PATH_TO_ROOT"] : "../..");
         }
         $html = str_replace("AJXP_PATH_TO_ROOT", $tPath, $html);

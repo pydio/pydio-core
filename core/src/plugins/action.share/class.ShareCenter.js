@@ -651,6 +651,7 @@ Class.create("ShareCenter", {
         conn.setParameters(serialParams);
 
         conn.addParameter('get_action','share');
+        conn.addParameter('format','json');
         var oThis = this;
         conn.onComplete = function(transport){
             var data = Object.extend({
