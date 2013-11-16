@@ -560,6 +560,7 @@ $mess=array(
 "503" => "Size",
 "504" => "1k,1M,1G",
 "505" => "to",
+"506" => "Application parameters (users, workspaces, configurations)",
 /* END SENTENCE */
 /* password strength tester */
 /* quick access keys */

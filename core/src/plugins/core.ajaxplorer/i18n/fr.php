@@ -561,5 +561,6 @@ $mess=array(
 "503"=> "Taille",
 "504"=> "1k,1M,1G",
 "505"=> "à",
+"506" => "Paramètres de l'application (utilisateurs, workspaces, configurations)",
 /* END SENTENCE */
 );
