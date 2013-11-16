@@ -189,10 +189,10 @@ class ShareCenter extends AJXP_Plugin
                     }
                     $metaArray[$hash] = array();
                     $metadata = array("element" => $metaArray);
-                    if(isSet($httpVars["format"]) && $httpVars["format"] == "json"){
+                    if (isSet($httpVars["format"]) && $httpVars["format"] == "json") {
                         header("Content-type:application/json");
                         echo json_encode(array("element_id" => $hash, "publiclet_link" => $url));
-                    }else{
+                    } else {
                         header("Content-type:text/plain");
                         echo $url;
                     }
