@@ -100,6 +100,13 @@ Class.create("UserDashboardHome", AjxpPane, {
             oFormObject.down("#workspaces_center").setStyle({marginLeft: '30%'});
             notificationElement.hide();
         }
+
+        if(ajaxplorer.actionBar.getActionByName("logout")){
+            oFormObject.down("#welcome").insert(new Element("span", {id:"disconnect_link"}).update(" (<span>"+ajaxplorer.actionBar.getActionByName("logout").options.text.toLowerCase()+"</span>)"));
+            oFormObject.down('#disconnect_link').observe("click", function(e){
+                ajaxplorer.actionBar.fireAction("logout");
+            });
+        }
     },
 
     resize: function($super, size){

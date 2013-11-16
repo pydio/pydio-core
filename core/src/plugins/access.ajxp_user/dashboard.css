@@ -154,3 +154,8 @@
     text-align: center;
     padding-top: 20px;
 }
+
+#disconnect_link span{
+    text-decoration: underline;
+    cursor: pointer;
+}
