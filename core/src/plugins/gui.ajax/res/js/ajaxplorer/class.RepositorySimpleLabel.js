@@ -29,10 +29,19 @@ Class.create("RepositorySimpleLabel", AjxpPane, {
 
     initialize : function($super, oElement, options){
 
+        options = Object.extend({
+            displayLabelLegend: true,
+            displayWorkspaceDescription: false
+        }, options);
+
         $super(oElement, options);
 
-        this.htmlElement.update('<div class="repository_legend">Workspace</div>');
+        if(this.options.displayLabelLegend) this.htmlElement.update('<div class="repository_legend">Workspace</div>');
         this.htmlElement.insert('<div class="repository_title"></div>');
+        if(this.options.displayWorkspaceDescription){
+            this.htmlElement.insert('<div class="repository_description"></div>');
+        }
+
         if(options.link){
             var linkTitle;
             if(options.linkTitle){
@@ -52,12 +61,18 @@ Class.create("RepositorySimpleLabel", AjxpPane, {
         this.observer = function(e){
 
             this.htmlElement.down("div.repository_title").update(this._defaultString);
+            if(this.options.displayWorkspaceDescription){
+                this.htmlElement.down("div.repository_description").update('');
+            }
             var repositoryList = e.memo.list;
             var repositoryId = e.memo.active;
             if(repositoryList && repositoryList.size()){
                 var repoObject = repositoryList.get(repositoryId);
                 if(repoObject){
                     this.htmlElement.down("div.repository_title").update(repoObject.getLabel());
+                    if(this.options.displayWorkspaceDescription){
+                        this.htmlElement.down("div.repository_description").update(repoObject.getDescription());
+                    }
                 }
             }
         }.bind(this);

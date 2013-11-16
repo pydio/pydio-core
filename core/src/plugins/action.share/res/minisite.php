@@ -9,14 +9,24 @@
         <link rel="stylesheet" href="AJXP_PATH_TO_ROOT/plugins/gui.ajax/res/themes/vision/css/font-awesome.css"/>
         <link rel="stylesheet" href="AJXP_PATH_TO_ROOT/plugins/gui.ajax/res/themes/vision/css/media.css"/>
         <style type="text/css">
-            .widget_title{
+            #widget_title{
                 font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
                 font-size: 30px;
                 font-weight: normal;
                 padding: 10px 0 0 5px;
-                color: rgb(111,123,136);
                 margin-right: 5px;
+                color: rgb(111,123,136);
+                line-height: 25px;
             }
+
+            #widget_title div.repository_title{
+                font-size: 30px;
+            }
+
+            #widget_title div.repository_description{
+                font-size: 12px;
+            }
+
             .widget_logo {
                 background-image: url('AJXP_PATH_TO_ROOT/plugins/gui.ajax/PydioLogo250.png');
                 background-repeat: no-repeat;
@@ -138,8 +148,6 @@
     </head>
 
     <body marginheight="0" marginwidth="0" leftmargin="0" topmargin="0" class="AJXP_PRELOGED_USER">
-        <div class="widget_logo"></div>
-        <div class="widget_title">AJXP_REPOSITORY_LABEL</div>
         <div id="ajxp_shared_folder" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"window"}'></div>
     </body>
 </html>
