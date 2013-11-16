@@ -460,7 +460,7 @@ class ShareCenter extends AJXP_Plugin
      */
     public function nodeSharedMetadata(&$ajxpNode)
     {
-        if($this->accessDriver->getId() == "access.imap") return;
+        if(empty($this->accessDriver) || $this->accessDriver->getId() == "access.imap") return;
         $metadata = $ajxpNode->retrieveMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
         if (count($metadata)) {
             $eType = $ajxpNode->isLeaf()?"file":"repository";
@@ -493,7 +493,8 @@ class ShareCenter extends AJXP_Plugin
             }
             $merge = array(
                  "ajxp_shared"      => "true",
-                 "overlay_icon"     => "shared.png"
+                 "overlay_icon"     => "shared.png",
+                 "overlay_class"    => "icon-share-sign"
             );
             if($eType == "minisite") $merge["ajxp_shared_minisite"] = $metadata["minisite"];
             $ajxpNode->mergeMetadata($merge, true);
@@ -511,7 +512,7 @@ class ShareCenter extends AJXP_Plugin
      */
     public function updateNodeSharedData($oldNode/*, $newNode = null, $copy = false*/)
     {
-        if($this->accessDriver->getId() == "access.imap") return;
+        if(empty($this->accessDriver) || $this->accessDriver->getId() == "access.imap") return;
         if($oldNode == null || !$oldNode->hasMetaStore()) return;
         $metadata = $oldNode->retrieveMetadata("ajxp_shared", true);
         if (count($metadata) && !empty($metadata["element"])) {

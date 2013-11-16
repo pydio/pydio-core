@@ -1565,7 +1565,11 @@ Class.create("FilesList", SelectableElements, {
 
                 var backgroundPosition = this.options.iconBgPosition || '4px 2px';
                 var backgroundImage = 'url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
-                if(metaData.get('overlay_icon') && Modernizr.multiplebgs){
+                if(metaData.get('overlay_class') && ajaxplorer.currentThemeUsesIconFonts){
+                    metaData.get('overlay_class').split(',').each(function(c){
+                        textLabel.insert(new Element('span', {className:c+' overlay-class-span'}));
+                    });
+                }else if(metaData.get('overlay_icon') && Modernizr.multiplebgs){
                     var ovIcs = metaData.get('overlay_icon').split(',');
                     switch(ovIcs.length){
                         case 1:
@@ -1731,6 +1735,12 @@ Class.create("FilesList", SelectableElements, {
                 backgroundPosition:bgPos.join(', '),
                 backgroundRepeat:bgRep.join(', ')
             });
+            if(ajxpNode.getMetadata().get("overlay_class") && ajaxplorer.currentThemeUsesIconFonts){
+                ajxpNode.getMetadata().get("overlay_class").split(",").each(function(ovC){
+                    ovDiv.insert(new Element('span',{className:ovC+' overlay-class-span'}));
+                });
+                ovDiv.addClassName('overlay_icon_div');
+            }
             innerSpan.insert({after:ovDiv});
         }
 
@@ -1821,7 +1831,14 @@ Class.create("FilesList", SelectableElements, {
                 backgroundPosition:bgPos.join(', '),
                 backgroundRepeat:bgRep.join(', ')
             });
-            newRow.setStyle({position:'relative'});
+            if(ajxpNode.getMetadata().get("overlay_class") && ajaxplorer.currentThemeUsesIconFonts){
+                ajxpNode.getMetadata().get("overlay_class").split(",").each(function(ovC){
+                    ovDiv.insert(new Element('span',{className:ovC+' overlay-class-span'}));
+                });
+                ovDiv.addClassName('overlay_icon_div');
+            }else{
+                newRow.setStyle({position:'relative'});
+            }
             innerSpan.insert({after:ovDiv});
         }
 

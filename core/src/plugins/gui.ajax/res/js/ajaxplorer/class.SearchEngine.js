@@ -135,12 +135,12 @@ Class.create("SearchEngine", AjxpPane, {
 
 
 
-        formPanel.insert('<div id="basic_search"><span class="toggle_button open">Advanced <span class="icon-caret-down"></span></span>' +
-            '<span class="toggle_button close">Basic <span class="icon-caret-up"></span></span> ' +
-            '<span class="search_label open">'+MessageHash[344]+' : </span><span class="search_label close">Advanced Filter <span id="refresh_search_button" class="icon-refresh" title="Apply filter now"></span></span><span id="search_meta_options"></span></div>' +
+        formPanel.insert('<div id="basic_search"><span class="toggle_button open">'+MessageHash[486]+' <span class="icon-caret-down"></span></span>' +
+            '<span class="toggle_button close">'+MessageHash[487]+' <span class="icon-caret-up"></span></span> ' +
+            '<span class="search_label open">'+MessageHash[344]+' : </span><span class="search_label close">'+MessageHash[488]+' <span id="refresh_search_button" class="icon-refresh" title="Apply filter now"></span></span><span id="search_meta_options"></span></div>' +
             '<div>' +
             '<div class="scroller_track"><div class="scroller_handle"></div></div> ' +
-            '<div id="search_meta_detailed"><div class="advanced_search_section_title"><span class="icon-circle"></span> Metadata</div><div class="advanced_search_section"></div></div>' +
+            '<div id="search_meta_detailed"><div class="advanced_search_section_title"><span class="icon-circle"></span> '+MessageHash[489]+'</div><div class="advanced_search_section"></div></div>' +
             '</div>');
 
         var oThis = this;
@@ -165,19 +165,19 @@ Class.create("SearchEngine", AjxpPane, {
         }
 
         var docPropertyTemplate = '<div class="advanced_search">' +
-            '<div class="advanced_search_section_title"><span class="icon-circle"></span> Date range</div>'+
+            '<div class="advanced_search_section_title"><span class="icon-circle"></span> '+MessageHash[490]+'</div>'+
             '<div class="advanced_search_section">'+
-            '<span class="c4"><span class="icon-calendar"></span> After </span><input id="ajxp_modiftime_from" class="c3" type="text" placeholder="YYYY/MM/DD"><span class="c6">until</span><input class="c3" type="text"  id="ajxp_modiftime_to" placeholder="YYYY/MM/DD">'+
-            '<div id="modiftime_fixed_radio"><span id="ajxp_modiftime_fixed" class="c3" data-value="AJXP_SEARCH_RANGE_TODAY" type="text">Today</span>' +
-            '<span id="ajxp_modiftime_fixed" class="c3" data-value="AJXP_SEARCH_RANGE_YESTERDAY" type="text">Yesterday</span>' +
-            '<span id="ajxp_modiftime_fixed" class="c3" data-value="AJXP_SEARCH_RANGE_LAST_WEEK" type="text">Last week</span>' +
-            '<span id="ajxp_modiftime_fixed" class="c3" data-value="AJXP_SEARCH_RANGE_LAST_MONTH" type="text">Last month</span>' +
-            '<span id="ajxp_modiftime_fixed" class="c3" data-value="AJXP_SEARCH_RANGE_LAST_YEAR" type="text">Last Year</span></div>'+
+            '<span class="c4"><span class="icon-calendar"></span> '+MessageHash[491]+' </span><input id="ajxp_modiftime_from" class="c3" type="text" placeholder="YYYY/MM/DD"><span class="c6">'+MessageHash[492]+'</span><input class="c3" type="text"  id="ajxp_modiftime_to" placeholder="YYYY/MM/DD">'+
+            '<div id="modiftime_fixed_radio"><span id="ajxp_modiftime_fixed" class="c3" data-value="AJXP_SEARCH_RANGE_TODAY" type="text">'+MessageHash[493]+'</span>' +
+            '<span id="ajxp_modiftime_fixed" class="c3" data-value="AJXP_SEARCH_RANGE_YESTERDAY" type="text">'+MessageHash[494]+'</span>' +
+            '<span id="ajxp_modiftime_fixed" class="c3" data-value="AJXP_SEARCH_RANGE_LAST_WEEK" type="text">'+MessageHash[495]+'</span>' +
+            '<span id="ajxp_modiftime_fixed" class="c3" data-value="AJXP_SEARCH_RANGE_LAST_MONTH" type="text">'+MessageHash[496]+'</span>' +
+            '<span id="ajxp_modiftime_fixed" class="c3" data-value="AJXP_SEARCH_RANGE_LAST_YEAR" type="text">'+MessageHash[497]+'</span></div>'+
             '</div>'+
-            '<div class="advanced_search_section_title"><span class="icon-circle"></span> Document Property</div>'+
+            '<div class="advanced_search_section_title"><span class="icon-circle"></span> '+MessageHash[498]+'</div>'+
             '<div class="advanced_search_section">'+
-            '<span class="c4"><span class="icon-file"></span> File </span><input id="ajxp_mime" class="c3" type="text" placeholder="Extension"><span class="c6">or</span><span class="c3" id="ajxp_folder"><span class="icon-folder-open"></span>Folder</span>'+
-            '<br><span class="c4"><span class="icon-cloud-download"></span> Size</span><input  id="ajxp_bytesize_from" type="text" class="c3" placeholder="1k,1M,1G..."><span class="c6"> to </span><input  id="ajxp_modiftime_to" type="text" class="c3" placeholder="1k,1M,1G..."></div>'+
+            '<span class="c4"><span class="icon-file"></span> '+MessageHash[499]+' </span><input id="ajxp_mime" class="c3" type="text" placeholder="'+MessageHash[500]+'"><span class="c6">'+MessageHash[501]+'</span><span class="c3" id="ajxp_folder"><span class="icon-folder-open"></span>'+MessageHash[502]+'</span>'+
+            '<br><span class="c4"><span class="icon-cloud-download"></span> '+MessageHash[503]+'</span><input  id="ajxp_bytesize_from" type="text" class="c3" placeholder="'+MessageHash[504]+'..."><span class="c6"> '+MessageHash[505]+' </span><input  id="ajxp_modiftime_to" type="text" class="c3" placeholder="'+MessageHash[504]+'..."></div>'+
             '</div>' +
             '';
         formPanel.down('#search_meta_detailed').insert({top:docPropertyTemplate});
@@ -347,7 +347,6 @@ Class.create("SearchEngine", AjxpPane, {
 			this.hasFocus = true;
 			this._inputBox.select();
             if(this.hasResults && this._ajxpOptions.toggleResultsVisibility && !$(this._ajxpOptions.toggleResultsVisibility).visible()){
-                this.updateSearchResultPosition($(this._ajxpOptions.toggleResultsVisibility));
                 this.showToggleResult(true);
             }
 			return false;
@@ -385,7 +384,9 @@ Class.create("SearchEngine", AjxpPane, {
 
     showToggleResult: function(show){
         if(show){
-            $(this._ajxpOptions.toggleResultsVisibility).setStyle({display:'block'});
+            var panel = $(this._ajxpOptions.toggleResultsVisibility);
+            panel.setStyle({display:'block'});
+            this.updateSearchResultPosition(panel);
         }else{
             $(this._ajxpOptions.toggleResultsVisibility).setStyle({display:'none'});
         }
@@ -583,7 +584,6 @@ Class.create("SearchEngine", AjxpPane, {
             }
 
             if(!$(this._ajxpOptions.toggleResultsVisibility).visible()){
-                this.updateSearchResultPosition($(this._ajxpOptions.toggleResultsVisibility));
                 $(this._ajxpOptions.toggleResultsVisibility).setStyle({position: "absolute"});
                 this.showToggleResult(true);
             }
@@ -594,8 +594,8 @@ Class.create("SearchEngine", AjxpPane, {
     updateSearchResultPosition:function(panel){
         var top = (this._inputBox.cumulativeOffset().top + this._inputBox.getHeight() + 3);
         var left = (this._inputBox.cumulativeOffset().left);
-        if((left + panel.getWidth()) > document.viewport.getWidth() + 10){
-            left = document.viewport.getWidth() - panel.getWidth() - 10;
+        if((left + this._fileList.htmlElement.getWidth()) > document.viewport.getWidth() + 10){
+            left = document.viewport.getWidth() - this._fileList.htmlElement.getWidth() - 15;
         }
         panel.setStyle({top: top + 'px', left: left + 'px'});
     },

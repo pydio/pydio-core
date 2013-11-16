@@ -83,7 +83,7 @@
 				name:childNodes[i].getAttribute('title'),
 				alt:childNodes[i].getAttribute('path'),
 				image:ajxpResourcesFolder+'/images/mimes/16/folder.png',
-                icon_class:'icon-star-empty'
+                icon_class:'icon-bookmark-empty'
 			};
 			bookmark.callback = function(e){ajaxplorer.goTo(this.alt);}.bind(bookmark);
 			bookmark.moreActions = this.getContextActions(bookmark.alt, bookmark.name);

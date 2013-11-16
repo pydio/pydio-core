@@ -149,7 +149,7 @@
 			</processing>
 		</action>
 		<action name="get_bookmarks">
-            <gui text="145" title="145" src="edit_user.png" iconClass="icon-star" accessKey="" hasAccessKey="false">
+            <gui text="145" title="145" src="edit_user.png" iconClass="icon-bookmark" accessKey="" hasAccessKey="false">
                 <context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="filter" contextMenu="false" infoPanel="false"/>
             </gui>
             <rightsContext adminOnly="false" noUser="true" read="false" userLogged="only" write="false"/>
@@ -180,6 +180,7 @@
                             var node = ajaxplorer.getContextNode();
                             node.getMetadata().set('ajxp_bookmarked', 'true');
                             node.getMetadata().set('overlay_icon', 'bookmark.png');
+                            node.getMetadata().set('overlay_class', 'icon-bookmark');
                             bmBar.addBookmark(node.getPath(), node.getLabel());
                         }.bind(this)
                     };

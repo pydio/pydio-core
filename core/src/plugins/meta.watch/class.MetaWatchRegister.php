@@ -430,7 +430,8 @@ class MetaWatchRegister extends AJXP_Plugin
             && array_key_exists(AuthService::getLoggedUser()->getId(), $meta)){
             $node->mergeMetadata(array(
                 "meta_watched" => $meta[AuthService::getLoggedUser()->getId()],
-                "overlay_icon" => "meta.watch/ICON_SIZE/watch.png"
+                "overlay_icon" => "meta.watch/ICON_SIZE/watch.png",
+                "overlay_class" => "icon-eye-open"
             ), true);
         }
     }

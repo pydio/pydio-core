@@ -106,13 +106,15 @@ class SimpleLockManager extends AJXP_Plugin
             if ($lock["lock_user"] != AuthService::getLoggedUser()->getId()) {
                 $node->mergeMetadata(array(
                     "sl_locked" => "true",
-                    "overlay_icon" => "meta_simple_lock/ICON_SIZE/lock.png"
+                    "overlay_icon" => "meta_simple_lock/ICON_SIZE/lock.png",
+                    "overlay_class" => "icon-lock"
                 ), true);
             } else {
                 $node->mergeMetadata(array(
                     "sl_locked" => "true",
                     "sl_mylock" => "true",
-                    "overlay_icon" => "meta_simple_lock/ICON_SIZE/lock_my.png"
+                    "overlay_icon" => "meta_simple_lock/ICON_SIZE/lock_my.png",
+                    "overlay_class" => "icon-lock"
                 ), true);
             }
         }

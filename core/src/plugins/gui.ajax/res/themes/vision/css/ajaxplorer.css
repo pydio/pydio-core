@@ -271,6 +271,45 @@ div.thumbnail_cell_metadata span.metadata_chunk{
     color: rgb(80, 82, 83);
     letter-spacing: 1px;
 }
+
+.overlay_icon_div{
+    position: absolute;
+    background: none !important;
+    height: 12px !important;
+    bottom: 0 !important;
+    width: auto !important;
+    top: 4px !important;
+    right: 10px !important;
+    font-size: 11px;
+}
+
+.thumbnail_selectable_cell > div > div.overlay_icon_div{
+    top: 19px !important;
+    right: 18px !important;
+    font-size: 16px;
+}
+
+span.overlay-class-span{
+    color: rgb(111,123,136);
+    margin-left: 5px;
+    padding: 0 !important;
+    margin-top: 0 !important;
+}
+
+.selected span.overlay-class-span,
+.selected-webfx-tree-item span.overlay-class-span
+{
+    color: white;
+}
+
+.overlay_icon_div span.overlay-class-span{
+    margin-left: 7px;
+}
+
+.webfx-tree-item span.overlay-class-span{
+
+}
+
 /*
 DIALOG BOXES
 */
@@ -2686,6 +2725,7 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
 #basic_search{
     padding: 4px;
     height: 17px;
+    width: 350px;
 }
 
 #search_meta.toggle_open #basic_search{

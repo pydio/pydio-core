@@ -340,7 +340,8 @@ class AJXP_ClientDriver extends AJXP_Plugin
         if (is_array($metadata) && count($metadata)) {
             $ajxpNode->mergeMetadata(array(
                      "ajxp_bookmarked" => "true",
-                     "overlay_icon"  => "bookmark.png"
+                     "overlay_icon"  => "bookmark.png",
+                     "overlay_class" => "icon-bookmark"
                 ), true);
             return;
         }
@@ -351,7 +352,8 @@ class AJXP_ClientDriver extends AJXP_Plugin
             if ($bm["PATH"] == $ajxpNode->getPath()) {
                 $ajxpNode->mergeMetadata(array(
                          "ajxp_bookmarked" => "true",
-                         "overlay_icon"  => "bookmark.png"
+                         "overlay_icon"  => "bookmark.png",
+                        "overlay_class" => "icon-bookmark"
                     ), true);
                 $ajxpNode->setMetadata("ajxp_bookmarked", array("ajxp_bookmarked"=> "true"), true, AJXP_METADATA_SCOPE_REPOSITORY, true);
             }

@@ -48,7 +48,7 @@ Class.create("CartManager", FetchedResultPane, {
     },
 
     updateTitle: function(){
-        this.htmlElement.fire("widget:updateTitle", this.__label+' ('+this._rootNode.getChildren().size()+')');
+        if(this.htmlElement) this.htmlElement.fire("widget:updateTitle", this.__label+' ('+this._rootNode.getChildren().size()+')');
     },
 
     triggerEvent: function(){
