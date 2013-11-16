@@ -111,4 +111,6 @@ $mess = array(
     "106" => "Voulez vous remetter à zéro le compteur?",
     "107" => "Le nombre de téléchargement doit être compris entre 1 et %s",
     "108" => "Utilisez un lecteur de QRCode pour scanner l'image ",
+    "80b"=> "Inviter les utilisateurs par email à visiter ce workspace",
+    "83b"=> "Changer le statut de surveillance pour recevoir ou non une alerte lorsque le workspace est consulté.",
 );

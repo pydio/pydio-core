@@ -161,11 +161,13 @@ Class.create("ShareCenter", {
                         }
                         oForm.down("#share_generate").hide();
                         this.updateDialogButtons(oForm.down('#share_result').down("div.SF_horizontal_fieldsRow"), "folder");
+                        oForm.select('span.simple_tooltip_observer').each(function(e){
+                            modal.simpleTooltip(e, e.readAttribute('data-tooltipTitle'), 'top center', 'down_arrow_tip', 'element');
+                        });
                     }
 
                 }.bind(this);
             }
-            //closeFunc(oForm);
             conn.sendAsync();
             return false;
         }.bind(this);
@@ -684,7 +686,7 @@ Class.create("ShareCenter", {
         if(ajaxplorer.hasPluginOfType("meta", "watch")){
             var st = (shareType == "folder" ? MessageHash["share_center.38"] : MessageHash["share_center.39"]);
             if(!dialogButtonsOrRow.down('#watch_folder')) {
-                dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:"<span class='icon-eye-close simple_tooltip_observer' id='watch_folder_eye' data-tooltipTitle='"+MessageHash["share_center.83"]+"'> "+MessageHash["share_center.82"]+"<input type='checkbox' id='watch_folder' style='display:none;'></span>"});
+                dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:"<span class='icon-eye-close simple_tooltip_observer' id='watch_folder_eye' data-tooltipTitle='"+MessageHash["share_center."+(shareType=='folder'?'83b':'83')]+"'> "+MessageHash["share_center.82"]+"<input type='checkbox' id='watch_folder' style='display:none;'></span>"});
             }
             var folderEye = dialogButtonsOrRow.down('#watch_folder_eye');
             var folderCheck = dialogButtonsOrRow.down('#watch_folder');
@@ -734,7 +736,7 @@ Class.create("ShareCenter", {
         var forceOldSchool = ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("EMAIL_INVITE_EXTERNAL");
         var mailerButton;
         if(!dialogButtonsOrRow.down('#mailer_button')){
-            dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:"<span class='icon-envelope simple_tooltip_observer' id='mailer_button' data-tooltipTitle='"+MessageHash['share_center.80']+"'> "+MessageHash['share_center.79']+"</span>"});
+            dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:"<span class='icon-envelope simple_tooltip_observer' id='mailer_button' data-tooltipTitle='"+MessageHash['share_center.'+(shareType=='file'?'80':'80b')]+"'> "+MessageHash['share_center.79']+"</span>"});
         }
         mailerButton = dialogButtonsOrRow.down('#mailer_button');
         mailerButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.41"]);

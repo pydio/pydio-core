@@ -111,4 +111,6 @@ $mess = array(
     "106" => "Do you want to reset the download counter?",
     "107" => "Download limit must be between 1 and %s",
     "108" => "Use a QRCode reader to scan the image ",
+    "80b"=> "Invite by email the selected users to visit this workspace",
+    "83b"=> "Toggle watch status to receive or not notifications when workspace is consulted",
 );
