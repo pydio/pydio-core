@@ -43,13 +43,23 @@ div.tabbed_editor select[multiple='true']{
 }
 
 div.tabbed_editor textarea{
-    border: 1px solid #ffffff;
     font-size: 13px;
     margin: 8px;
 }
 
 div.tabbed_editor div.SF_input{
     padding-top: 5px !important;
+}
+
+div.tabbed_editor div.SF_image_block{
+    max-width: 80px;
+    float: left;
+    margin-left: 11px;
+    border: 1px solid #C8CCD3;
+    border-radius: 2px;
+    padding: 2px 2px;
+    font-size: 11px;
+    text-align: center;
 }
 
 div.tabbed_editor div.SF_label{

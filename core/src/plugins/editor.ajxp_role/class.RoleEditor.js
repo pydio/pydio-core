@@ -301,6 +301,7 @@ Class.create("RoleEditor", AbstractEditor, {
             ];
             defs = $A(defs);
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);
+            f.disableShortcutsOnForm(this.element.down("#pane-infos").down("#account_infos"));
             var rolesSelect = this.element.down("#pane-infos").down("#account_infos").down('select[name="roles"]');
             rolesSelect.observe("change", function(){
                 this.setDirty();
@@ -395,6 +396,7 @@ Class.create("RoleEditor", AbstractEditor, {
             ];
             defs = $A(defs);
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);
+            f.disableShortcutsOnForm(this.element.down("#pane-infos").down("#account_infos"));
 
             // REMOVE BUTTONS
             this.element.down("#pane-infos").down("#account_actions").remove();
@@ -413,6 +415,7 @@ Class.create("RoleEditor", AbstractEditor, {
             ];
             defs = $A(defs);
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);
+            f.disableShortcutsOnForm(this.element.down("#pane-infos").down("#account_infos"));
             // UPDATE MAIN HEADER
             this.updateTitle(this.roleData.GROUP.LABEL);
 
@@ -450,6 +453,7 @@ Class.create("RoleEditor", AbstractEditor, {
                 this.element.down("#pane-infos").down("#account_custom").previous("div.innerTitle").update(MessageHash["ajxp_role_editor.42"]);
             }
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_custom"), updatedDefs, true, false, false, true);
+            f.disableShortcutsOnForm(this.element.down("#pane-infos").down("#account_custom"));
         }
 
 
@@ -718,6 +722,7 @@ Class.create("RoleEditor", AbstractEditor, {
                 if(pane.SF_accordion){
                     pane.SF_accordion.openAll();
                 }
+                formManager.disableShortcutsOnForm(pane);
             }
             pane.select("div.accordion_content").invoke("setStyle", {display:"block"});
             new AjxpSimpleTabs(parametersPane);

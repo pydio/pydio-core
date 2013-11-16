@@ -182,7 +182,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
             false,
             this.currentRepoIsTemplate
         );
-
+        this.formManager.disableShortcutsOnForm(this.infoPane);
         if(this.infoPane.SF_accordion){
             this.infoPane.SF_accordion.openAll();
             this.formManager.observeFormChanges(this.infoPane, this.setDirty.bind(this));
@@ -227,6 +227,8 @@ Class.create("RepositoryEditor", AbstractEditor, {
                     }
                     var paramsValues = new Hash(metaSourcesData[plugId]);
                     this.formManager.createParametersInputs(form, driverParamsHash, true, paramsValues, false, true);
+                    this.formManager.disableShortcutsOnForm(form);
+
                     insertSave = true;
                 }else{
                     form.update('<div>No parameters</div>');
@@ -298,6 +300,8 @@ Class.create("RepositoryEditor", AbstractEditor, {
                     driverParamsHash.push(this.formManager.parameterNodeToHash(metaDefNodes[i]));
                 }
                 this.formManager.createParametersInputs(addFormDetail, driverParamsHash, true, null, null, true);
+                this.formManager.disableShortcutsOnForm(addFormDetail);
+
             }
             modal.refreshDialogAppearance();
             modal.refreshDialogPosition();

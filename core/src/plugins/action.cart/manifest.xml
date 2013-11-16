@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxp_plugin enabled="false" id="action.cart" label="CONF_MESSAGE[Selection Cart]" description="CONF_MESSAGE[Select files to a cart and download/share all at once]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<ajxp_plugin enabled="true" id="action.cart" label="CONF_MESSAGE[Selection Cart]" description="CONF_MESSAGE[Select files to a cart and download/share all at once]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+
+    <plugin_info>
+        <core_relation packaged="true" tested_version="follow_core"/>
+        <plugin_author>Charles du Jeu</plugin_author>
+    </plugin_info>
 
     <client_settings>
         <resources>

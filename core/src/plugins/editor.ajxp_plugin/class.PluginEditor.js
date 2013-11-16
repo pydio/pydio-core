@@ -179,6 +179,7 @@ Class.create("PluginEditor", AbstractEditor, {
 
             if(driverParamsHash.size()){
                 this.formManager.createParametersInputs(form, driverParamsHash, true, (paramsValues.size()?paramsValues:null));
+                this.formManager.disableShortcutsOnForm(form);
             }else{
                 form.update(MessageHash['ajxp_conf.105']);
             }
