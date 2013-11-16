@@ -414,7 +414,7 @@ class AuthService
         if ($rootRole === false) {
             $rootRole = new AJXP_Role("ROOT_ROLE");
             $rootRole->setLabel("Root Role");
-            $rootRole->setAutoApplies(array("standard"));
+            $rootRole->setAutoApplies(array("standard", "admin"));
             foreach (ConfService::getRepositoriesList("all") as $repositoryId => $repoObject) {
                 if($repoObject->isTemplate) continue;
                 $gp = $repoObject->getGroupPath();
@@ -422,6 +422,19 @@ class AuthService
                     if ($repoObject->getDefaultRight() != "") {
                         $rootRole->setAcl($repositoryId, $repoObject->getDefaultRight());
                     }
+                }
+            }
+            $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[@scope]", "node", false, false, true);
+            if (is_array($paramNodes) && count($paramNodes)) {
+                foreach ($paramNodes as $xmlNode) {
+                    $default = $xmlNode->getAttribute("default");
+                    if(empty($default)) continue;
+                    $parentNode = $xmlNode->parentNode->parentNode;
+                    $pluginId = $parentNode->getAttribute("id");
+                    if (empty($pluginId)) {
+                        $pluginId = $parentNode->nodeName.".".$parentNode->getAttribute("name");
+                    }
+                    $rootRole->setParameterValue($pluginId, $xmlNode->getAttribute("name"), $default);
                 }
             }
             AuthService::updateRole($rootRole);
