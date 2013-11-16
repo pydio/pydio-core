@@ -1,5 +1,122 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+This is a development release, it is NOT meant to be deployed in production, unless you know what you are doing. Update can be done using the in-app upgrade mechanism by switching the updater to the "development" channel. Most important things are:
+
+Tons of cool features, counting a new user dashboard, a faceted search engine, the ability to save the searches, and many more.
+Performances improvements in the GUI
+Code standardization and good practive, refactoring
+Many bugs fixed
+See detailed changelog below
+
+Summary
+
+License : Affero GPL
+Copyright : Charles du Jeu 2013
+Download : https://pyd.io/download
+Demo : https://demo.pyd.io/
+Contributors: cdujeu, echampet, afterster, TheLexus
+Detailed Changelog
+
+Changelog
+
+[New features]
+Faceted search (details)
+Comments feed: facebook-like chat on each file/folder (details)
+Drag'n'drop selection cart and save searches to re-run later. Download the results at once. (details)
+New "User Dashboard" meant to replace "Shared Elements", with all user parameters and custom data, first page with workspaces selector (details)
+Create multiple public links on same files. (details)
+Add QRCode on shared folder public link (details)
+New avatar plugins (Gravatar and Libravatar) (details)
+New access point for managing users self-service operations (currently reset password) (details)
+New plugin auth.radius (details)
+Ability to create personal contacts lists ("teams") - Requires SQL-based backend. (details)
+Implementation of WebODF viewer. Only as viewer for the moment, we have to get a way to send back the modif in a standard manner, probably by replacing the Runtime implementation. (details)
+New indexation plugin based on ElasticSearch - work in progress (details)
+
+[GUI Improvements]
+Tab-based editors (details)
+Quicken start-up (details)
+Make custom sort function to make sure users are sorted (fix #279) (details)
+Refix remote sorting that was broken. Implement it in FS for paginated case (standard attributes only, not metadata) (details)
+Rework metadata modifiers and Meta.user plugin. Implement a custom SelectBox choice. Should replace and close #255. (details)
+Update Modernizr, current version seems to create problems on some IE9 (details)
+Rework share layouts. (details)
+Rework admin dashboard (details)
+Use fontawesome for overlay icons Switch icon-star to icon-bookmark Search Engine Advanced panel i18n - Fix result positioning (details)
+Expand the Shared User creation form to fill user email, full name, send an email, etc. (details)
+Define InfoPanelExtension for "ajxp_root_node" mime, used only on the root node. If none is define, we use "no_selection" instead. (details)
+
+[New parameters]
+Add a parameter to force old-school external email (details)
+Add a parameter to allow new users creation while sharing (true by default). Use AutoCompleter for AjxpMailer Send users_only in list_authorized_users to avoid retrieving groups. (details)
+Shared users: inherit parent personalRole if the parameter is marked as inherit. (details)
+Optional limit for number of shared users creation (details)
+Optionally attach a link to LogoWidget or RepositorySimpleLabel via ajxpOptions. (details)
+Coding Standards & Refactorings
+Add coding standards / Add travis configuration to check it (details)
+Rework AJXP_Logger - expose all log levels - accept a variable number of argument (details)
+Allow log plugins to handle variable number of \t (details)
+Use more dibi for AJXP_SqlFeedStore (details)
+Use %lmt and %ofs instead of LIMIT for dibi queries (details)
+Rework DateTime handling in class.sqlLogDriver.php (details)
+Do no reinvent dibi (use (%s)) (details)
+Rework "regexp" in listUsersPaginated / getUsersCount in class.sqlAuthDriver.php Now "^a" matches everything that start with a "a$" matches everything that end with a "^a$" matches exactly a (wasn't working) "a" matches everything that contains a (was matching exactly a) (details)
+Add PostgreSQL database support (details)
+Remove compat.php (details)
+Don't check for date_default_timezone_*, we're using php 5.3+ (details)
+Don't check for filter_var, we're using php 5.3+ (details)
+Remove SystemTextEncoding::magicDequote, magic_quotes are deprecated in php 5.3 and removed in 5.4 (details)
+MCRYPT_MODE_ECB doesn't require an IV (details)
+Massive cleaning of all JS objects to make sure they destroy correctly. (details)
+
+[Inner API]
+Add node.share.create hooks (details)
+Add user.before_disconnect and user.after_disconnect hooks (details)
+Better API for get_my_feed Ability to force recycle_bin creation in workspace share (details)
+Pass a return_selection parameter to search/search_keyword methods, to pipe the given nodes into another action. Initialize a UserSelection from an array of nodes instead of httpVars. (details)
+Pipe search and download actions by using nodes selections to download a whole search result at once. (details)
+serialized data can contain null bytes, store them in blob (details)
+New functions in to be implemented by conf plugins (save/load/clearTemporaryKey, pruneTemporaryKeys) (details)
+Replace AJXP_REBASE if present in the html templates and passed in START_PARAMETERS (details)
+FS: Pass __AJXP_ZIP_FLAT__ to makeZip function to force all files to be at level 0 Fix tabulator et splitter resizing issues Download Cart. (details)
+New variable AJXP_SANITIZE_FILENAME, to be less restrictive on the allowed characters than AJXP_SANITIZE_HTML_STRICT. Particularly, allow commas in filename. (details)
+New invisibleBar, and autoFoldOnEvent options on Splitter New tabsTips option on Tabulator Fix simpleTooltip positioning and style Rework layout here and there, implements the new behaviours, still to be tested and validated. (details)
+Expand and fix widgets, add a mode for horizontal tabulator positioning. (details)
+
+[Other Fixes]
+Auth.remote cms_functions: when looking for the hidden files, make sure to use ".//" to search only below the current node. (details)
+Auth.remote: test if ajxp_gluecode_updateRole function exists to avoid errors if the glueCode is inserted many times. (details)
+Update auth.remote plugin, seems wp can create problems with wordpress_test_cookie missing. (details)
+Fix #293 (details)
+Impl #259 : if windows OS , alternative unoconv call. (details)
+SQL Update script for ajxp_feed table (details)
+Use FeedStore instead of MetaStore to have recursive meta. Could be expanded to a more generic SQL-based metastore. (details)
+Add office templates to Imagick support. (details)
+Fix #309 (details)
+Implement #291 (details)
+Fix #331 (details)
+Should fix #308 - We now use index_path dedicated column (details)
+Fix IE10/11 problems (close #318), plus IE8 problems. Fix close modal by ESC key that was broken. (details)
+Replace default_repository parameter by a real role/group/user parameter. (details)
+Fix old-school uploader for IE (Send button did not appear) (details)
+Fix #332: Error when renaming on Windows. (details)
+Fix #249, #250, #252 - @Ellega can you verify ? (details)
+Test also for X_ACCELREDIRECT parameter to disable the zip automatic deletion. (details)
+Indexation: do not use set_time_limit if already CLI context (details)
+Editor.browser: go through the various mime detectors while the result is octet-stream. Office docs should have the correct mimetype. (details)
+Missing CHMOD application on directories when applying recursive copy. (details)
+Fix ResourcesManager : was loading css multiple times (details)
+Add log when sharing file (in writePubliclet) (details)
+Fix various refresh / focus problems, TAB navigation was broken. (details)
+Login: trim username and password to avoid trailing and ending white space problems (details)
+Make sure we don't have false positive for old user migrations, otherwise it can end up overriding the role (details)
+Fix minisite: > Display workspace description > Do not display label/description if no user logged. (details)
+Use HTML base tag instead of the previous complicated "travel_path_to_root" mechanism... (details)
+
+-----------
+Pydio 5.0.4
+14th, October 2013
+
 This is a bugfix and security release. Update is highly recommended and automatic using the in-app upgrade mechanism.
 AjaXplorer now turns into Pydio, Put Your Data In Orbit.
 
