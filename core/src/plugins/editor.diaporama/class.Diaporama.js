@@ -234,7 +234,11 @@ Class.create("Diaporama", AbstractEditor, {
             if(this.splitter) this.splitter.options.fitParent = this.element.up(".dialogBox");
             this.resize();
         }.bind(this));
-		fitHeightToBottom(this.imgContainer, $(this.editorOptions.context.elementName), 3);
+        if(this.editorOptions.context.elementName){
+            fitHeightToBottom(this.imgContainer, $(this.editorOptions.context.elementName), 3);
+        }else{
+            fitHeightToBottom(this.contentMainContainer);
+        }
 		// Fix imgContainer
 		if(Prototype.Browser.IE){
 			this.IEorigWidth = this.element.getWidth();
@@ -260,14 +264,19 @@ Class.create("Diaporama", AbstractEditor, {
 	
 	resize : function(size){
 		if(size){
-			this.imgContainer.setStyle({height:size});
+			this.imgContainer.setStyle({height:size+'px'});
 			if(this.IEorigWidth) this.imgContainer.setStyle({width:this.IEorigWidth});
 		}else{
 			if(this.fullScreenMode){
 				fitHeightToBottom(this.imgContainer, this.element);
 				if(this.IEorigWidth) this.imgContainer.setStyle({width:this.element.getWidth()});
 			}else{
-				fitHeightToBottom(this.imgContainer, $(this.editorOptions.context.elementName), 3);
+                if(this.editorOptions.context.elementName){
+                    fitHeightToBottom(this.imgContainer, $(this.editorOptions.context.elementName), 3);
+                }else{
+                    fitHeightToBottom($(this.htmlElement));
+                    fitHeightToBottom($(this.contentMainContainer), $(this.htmlElement));
+                }
 				if(this.IEorigWidth) this.imgContainer.setStyle({width:this.IEorigWidth});
 			}
 		}

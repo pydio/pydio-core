@@ -61,7 +61,7 @@ Class.create("AbstractEditor" , {
 			floatingToolbar:false,
             context: modal
 		}, options || { });		
-		this.element =  $(oContainer);
+		this.htmlElement = this.element =  $(oContainer);
 		this.defaultActions = new Hash({
 			'fs' : '<a id="fsButton" class="icon-resize-full"><img src="'+ajxpResourcesFolder+'/images/actions/22/window_fullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="235"></span></a>',
 			'nofs' : '<a id="nofsButton" class="icon-resize-small" style="display:none;"><img src="'+ajxpResourcesFolder+'/images/actions/22/window_nofullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="236"></span></a>',
