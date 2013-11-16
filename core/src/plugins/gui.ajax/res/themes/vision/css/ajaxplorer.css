@@ -289,6 +289,11 @@ div.thumbnail_cell_metadata span.metadata_chunk{
     font-size: 16px;
 }
 
+div.class-FetchedResultPane div.overlay_icon_div {
+    top: 16px!important;
+    font-size: 13px;
+}
+
 span.overlay-class-span{
     color: rgb(111,123,136);
     margin-left: 5px;
