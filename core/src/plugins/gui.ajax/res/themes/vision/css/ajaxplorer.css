@@ -2482,7 +2482,7 @@ div.tabulatorContainer{
 }
 
 #topPane > div.tabulatorContainer{
-    border-radius: 2px 0 0 0;
+    border-radius: 0;
 }
 
 #cpane_tabs > div.tabulatorContainer{
@@ -2955,7 +2955,7 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
     overflow: hidden;
     text-overflow: ellipsis;
 
-    border-radius: 0 2px 0 0;
+    border-radius: 0;
 }
 
 #info_panel.folded div.panelHeader{
@@ -3134,8 +3134,10 @@ div.triple div.infoPanelAllMetadata > div{
     clear:left;
     background-color: #fff;
     line-height: 18px;
+    /*
     padding-left: 3px;
     padding-right: 3px;
+    */
 }
 
 div.selectable_div, .table_rows_container, #tree_container, #bottomSplitPane, .ajxp_simple_container{
