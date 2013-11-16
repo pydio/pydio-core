@@ -90,7 +90,7 @@
                                 margin: 5px 174px !important;
                             }
                             #installer_form #save_button.disabled{
-                                color: #ccc;
+                                color: rgba(255,255,255,0.5);
                                 cursor: default;
                             }
                             .installerWelcome{
