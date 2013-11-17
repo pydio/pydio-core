@@ -663,7 +663,7 @@ class ShareCenter extends AJXP_Plugin
         if ($dlURL != "") {
             return rtrim($dlURL, "/");
         } else {
-            $fullUrl = AJXP_Utils::detectServerURL() . dirname($_SERVER['REQUEST_URI']);
+            $fullUrl = AJXP_Utils::detectServerURL(true);
             return str_replace("\\", "/", rtrim($fullUrl, "/").rtrim(str_replace(AJXP_INSTALL_PATH, "", $downloadFolder), "/"));
         }
     }
@@ -1031,7 +1031,7 @@ class ShareCenter extends AJXP_Plugin
             $data["DOWNLOAD_DISABLED"] = true;
         }
         //$data["TRAVEL_PATH_TO_ROOT"] = $this->computeMinisiteToServerURL();
-        $data["AJXP_APPLICATION_BASE"] = AJXP_Utils::detectServerURL();
+        $data["AJXP_APPLICATION_BASE"] = AJXP_Utils::detectServerURL(true);
 
         $outputData = serialize($data);
         $hash = self::computeHash($outputData, $downloadFolder);
