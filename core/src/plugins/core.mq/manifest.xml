@@ -18,7 +18,7 @@
         <global_param group="WebSocket Server" type="monitor" name="WS_STATUS" choices="run_plugin_action:core.mq:getWebSocketStatus" label="CONF_MESSAGE[WebSocket Server Status]" description="CONF_MESSAGE[Try to detect if the server is running correctly]" mandatory="false"/>
         <global_param group="WebSocket Server" type="button" name="SWITCH_WS_ON" choices="run_plugin_action:core.mq:switchWebSocketOn" label="CONF_MESSAGE[Run WebSocket Server]" description="CONF_MESSAGE[Switch the WS server ON]" mandatory="false"/>
         <global_param group="WebSocket Server" type="button" name="SWITCH_WS_OFF" choices="run_plugin_action:core.mq:switchWebSocketOff" label="CONF_MESSAGE[Stop WebSocket Server]" description="CONF_MESSAGE[Switch the WS server OFF]" mandatory="false"/>
-        <global_param group="WebSocket Server" type="integer" name="POLLER_FREQUENCY" label="CONF_MESSAGE[Alternative poller frequency]" description="CONF_MESSAGE[If WebSocket server is not running, a polling mechanism will replace it. Fix the frequency of refresh, in seconds.]" mandatory="true" default="5" expose="true"/>
+        <global_param group="WebSocket Server" type="integer" name="POLLER_FREQUENCY" label="CONF_MESSAGE[Alternative poller frequency]" description="CONF_MESSAGE[If WebSocket server is not running, a polling mechanism will replace it. Fix the frequency of refresh, in seconds.]" mandatory="true" default="15" expose="true"/>
     </server_settings>
     <class_definition classname="MqManager" filename="plugins/core.mq/class.MqManager.php"/>
     <registry_contributions>
