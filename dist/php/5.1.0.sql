@@ -1,7 +1,8 @@
+/* SEPARATOR */
 ALTER TABLE `ajxp_feed` ADD COLUMN `index_path` MEDIUMTEXT NULL;
-
+/* SEPARATOR */
 ALTER TABLE `ajxp_simple_store` ADD COLUMN `insertion_date` DATETIME DEFAULT CURRENT_TIMESTAMP;
-
+/* SEPARATOR */
 CREATE TABLE IF NOT EXISTS ajxp_user_teams {
     team_id VARCHAR(255) NOT NULL,
     user_id varchar(255) NOT NULL,

@@ -1,6 +1,8 @@
+/* SEPARATOR */
 ALTER TABLE `ajxp_feed` ADD COLUMN `index_path` text;
-
+/* SEPARATOR */
 ALTER TABLE ajxp_simple_store RENAME TO ajxp_simple_store_old;
+/* SEPARATOR */
 CREATE TABLE IF NOT EXISTS ajxp_simple_store (
   object_id text NOT NULL,
   store_id text NOT NULL,
@@ -9,9 +11,11 @@ CREATE TABLE IF NOT EXISTS ajxp_simple_store (
   related_object_id text DEFAULT NULL,
   insertion_date DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+/* SEPARATOR */
 INSERT INTO ajxp_simple_store SELECT object_id,store_id,serialized_data,binary_data,related_object_id,CURRENT_TIMESTAMP FROM ajxp_simple_store_old;
+/* SEPARATOR */
 DROP TABLE ajxp_simple_store_old;
-
+/* SEPARATOR */
 CREATE TABLE IF NOT EXISTS ajxp_user_teams (
     team_id text NOT NULL,
     user_id text NOT NULL,
