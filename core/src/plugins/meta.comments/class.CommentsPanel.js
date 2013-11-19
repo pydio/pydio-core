@@ -84,7 +84,9 @@ Class.create("CommentsPanel", {
                 var conn = new Connexion();
                 conn.setParameters({
                     file: node.getPath(),
-                    get_action: "load_comments_feed"
+                    get_action: "load_comments_feed",
+                    sort_by:"date",
+                    sort_dir: "asc"
                 });
                 conn.discrete = true;
                 conn.onComplete = function(transport){
