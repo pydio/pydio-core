@@ -353,7 +353,7 @@ class serialConfDriver extends AbstractConfDriver
     {
         $groups = AJXP_Utils::loadSerialFile(AJXP_VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser");
         foreach ($flatUsersList as $userid => $userdata) {
-            if (array_key_exists($userid, $groups)) {
+            if (is_array($groups) && array_key_exists($userid, $groups)) {
                 $path = $groups[$userid];
                 if (substr($path, 0, strlen($baseGroup)) != $baseGroup) {
                     unset($flatUsersList[$userid]);

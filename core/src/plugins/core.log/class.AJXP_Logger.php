@@ -91,7 +91,7 @@ class AJXP_Logger extends AJXP_Plugin
                 error_log("Log message was : IP => $ip | user => $user | level => $level | source => $source | prefix => $prefix | message => ".$res);
                 error_log("Exception is:".$e->getMessage());
                 error_log("In ".$e->getFile()." line ".$e->getLine());
-                error_log($innerEx->getTraceAsString());
+                error_log($e->getTraceAsString());
             }
         } else {
             error_log("No logger");

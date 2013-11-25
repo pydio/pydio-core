@@ -117,18 +117,11 @@ class AJXP_SqlUser extends AbstractAjxpUser
         $this->log('Checking for existence of AJXP_SqlUser storage...');
 
         try {
-            $dbinfo = dibi::getDatabaseInfo();
-            $dbtables = $dbinfo->getTableNames();
 
-            if (!in_array('ajxp_user_rights', $dbtables) ||
-                !in_array('ajxp_user_prefs', $dbtables) ||
-                !in_array('ajxp_user_bookmarks', $dbtables)) {
-
-                return false;
+            if (isSet($this->rights["ajxp.admin"])){
+                // already loaded!
+                return true;
             }
-
-            //$result_rights = dibi::query('SELECT [repo_uuid], [rights] FROM  [ajxp_user_rights] WHERE [login] = %s', $this->getId());
-            //$this->rights = $result_rights->fetchPairs('repo_uuid', 'rights');
             $this->load();
             if (! isSet($this->rights["ajxp.admin"])) {
                 return false;
