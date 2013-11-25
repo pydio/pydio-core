@@ -153,6 +153,7 @@ Class.create("CommentsPanel", {
         if(hash.get('rpath')){
             var link = pFactory.renderSimpleLink(hash.get('path'), hash.get('rpath'));
             link.addClassName('comment_file_path');
+            link.writeAttribute('title', MessageHash['meta.comments.4'].replace('%s', hash.get('rpath')));
             el.down('.comment_text').insert(link);
         }
         // Fake file/folder detection

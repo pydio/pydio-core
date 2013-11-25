@@ -19,10 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Exif Metadata" => "Exif Metadata",
-"Extracts the EXIF metadata of a JPG image. Used in conjunction with editor.exif" => "Extracts the EXIF metadata of a JPG image. Used in conjunction with editor.exif",
-"Info Panel Fields" => "Info Panel Fields",
-"Comma separated list of fields, use syntax 'EXIF_SECTION.ExifName'." => "Comma separated list of fields, use syntax 'EXIF_SECTION.ExifName'.",
-"Info Panel Labels" => "Info Panel Labels",
-"Associated list of labels, be sure to define as many as fields!" => "Associated list of labels, be sure to define as many as fields!",
+"Comments Feed" => "Comments Feed",
+"Display a chat-like feed on all nodes" => "Display a chat-like feed on all nodes",
 );

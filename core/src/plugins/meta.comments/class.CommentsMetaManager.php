@@ -157,7 +157,8 @@ class CommentsMetaManager extends AJXP_Plugin
                             "author"    => $stdObject->author,
                             "content"   => base64_decode($stdObject->content),
                             "path"      => $stdObject->path,
-                            "rpath"     => $rPath
+                            "rpath"     => $rPath,
+                            "uuid"      => $stdObject->uuid
                         );
                         if (isSet($previous) && $previous["author"] == $newItem["author"] &&  $previous["path"] == $newItem["path"] && $previous["hdate"] == $newItem["hdate"] ) {
                             $theFeed[count($theFeed) - 1]["content"].= '<br>'.$newItem["content"];
@@ -180,19 +181,23 @@ class CommentsMetaManager extends AJXP_Plugin
             case "delete_comment":
 
                 $data = json_decode($httpVars["comment_data"], true);
-                $reFeed = array();
-                if($data["author"] != AuthService::getLoggedUser()->getId()) break;
-                foreach ($existingFeed as $fElement) {
-                    if ($fElement["date"] == $data["date"] && $fElement["author"] == $data["author"] && $fElement["content"] == $data["content"]) {
-                        continue;
+                if ($feedStore === false) {
+                    $reFeed = array();
+                    if($data["author"] != AuthService::getLoggedUser()->getId()) break;
+                    foreach ($existingFeed as $fElement) {
+                        if ($fElement["date"] == $data["date"] && $fElement["author"] == $data["author"] && $fElement["content"] == $data["content"]) {
+                            continue;
+                        }
+                        $fElement["hdate"] = AJXP_Utils::relativeDate($fElement["date"], $mess);
+                        $reFeed[] = $fElement;
                     }
-                    $fElement["hdate"] = AJXP_Utils::relativeDate($fElement["date"], $mess);
-                    $reFeed[] = $fElement;
+                    $uniqNode->removeMetadata(AJXP_META_SPACE_COMMENTS, false);
+                    $uniqNode->setMetadata(AJXP_META_SPACE_COMMENTS, $reFeed, false);
+                    HTMLWriter::charsetHeader("application/json");
+                    echo json_encode($reFeed);
+                } else {
+                    $feedStore->dismissAlertById($data["uuid"], 1);
                 }
-                $uniqNode->removeMetadata(AJXP_META_SPACE_COMMENTS, false);
-                $uniqNode->setMetadata(AJXP_META_SPACE_COMMENTS, $reFeed, false);
-                HTMLWriter::charsetHeader("application/json");
-                echo json_encode($reFeed);
 
                 break;
 

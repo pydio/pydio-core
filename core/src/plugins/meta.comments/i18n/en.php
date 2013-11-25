@@ -1,6 +1,8 @@
 <?php
 
 $mess = array(
-"1" => "Exif GeoLocation",
-"2" => "Locate",
+"1" => "Users Comments",
+"2" => "Enter your comment here",
+"3" => "Post",
+"4" => "Go to %s",
 );
