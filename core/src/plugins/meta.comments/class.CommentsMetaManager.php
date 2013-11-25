@@ -108,9 +108,9 @@ class CommentsMetaManager extends AJXP_Plugin
                 $uId = AuthService::getLoggedUser()->getId();
                 $limit = $this->getFilteredOption("COMMENT_SIZE_LIMIT");
                 if (!empty($limit)) {
-                    $content = substr($httpVars["content"], 0, $limit);
+                    $content = substr(AJXP_Utils::decodeSecureMagic($httpVars["content"]), 0, $limit);
                 } else {
-                    $content = $httpVars["content"];
+                    $content = AJXP_Utils::decodeSecureMagic($httpVars["content"]);
                 }
                 $com = array(
                     "date"      => time(),
@@ -141,8 +141,8 @@ class CommentsMetaManager extends AJXP_Plugin
 
                 HTMLWriter::charsetHeader("application/json");
                 if ($feedStore !== false) {
-                    $sortBy = isSet($httpVars["sort_by"])?$httpVars["sort_by"]:"date";
-                    $sortDir = isSet($httpVars["sort_dir"])?$httpVars["sort_dir"]:"asc";
+                    $sortBy = isSet($httpVars["sort_by"])?AJXP_Utils::decodeSecureMagic($httpVars["sort_by"]):"date";
+                    $sortDir = isSet($httpVars["sort_dir"])?AJXP_Utils::decodeSecureMagic($httpVars["sort_dir"]):"asc";
                     $offset = isSet($httpVars["offset"]) ? intval($httpVars["offset"]) : 0;
                     $limit = isSet($httpVars["limit"]) ? intval($httpVars["limit"]) : 100;
                     $data = $feedStore->findMetaObjectsByIndexPath(ConfService::getRepository()->getId(), $uniqNode->getPath(), AuthService::getLoggedUser()->getId(), AuthService::getLoggedUser()->getGroupPath(), $offset, $limit, $sortBy, $sortDir);
