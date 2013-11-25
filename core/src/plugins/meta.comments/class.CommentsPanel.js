@@ -155,7 +155,13 @@ Class.create("CommentsPanel", {
             link.addClassName('comment_file_path');
             el.down('.comment_text').insert(link);
         }
-
+        // Fake file/folder detection
+        var basename = getBaseName(hash.get('path'));
+        if(basename.indexOf('.') != -1){
+            el.addClassName('comment_type_file');
+        }else{
+            el.addClassName('comment_type_folder');
+        }
         if(!skipAnim) el.setStyle({opacity:0, display:'block'});
         container.down("#comments_container").insert(el);
         if(!skipAnim) new Effect.Appear(el, {duration:0.3});
