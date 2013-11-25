@@ -1672,7 +1672,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         copy($realSrcFile, $destFile);
                     }
                     $this->changeMode($destFile);
-                    AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), true));
+                    AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($destFile), true));
                 } catch (Exception $e) {
                     $error[] = $e->getMessage();
                     return ;

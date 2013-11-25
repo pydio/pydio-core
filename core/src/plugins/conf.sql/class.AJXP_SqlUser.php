@@ -118,7 +118,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
 
         try {
 
-            if (isSet($this->rights["ajxp.admin"])){
+            if (isSet($this->rights["ajxp.admin"])) {
                 // already loaded!
                 return true;
             }
