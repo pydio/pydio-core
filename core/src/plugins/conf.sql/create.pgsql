@@ -1,24 +1,24 @@
-CREATE TABLE IF NOT EXISTS ajxp_users (
+CREATE TABLE ajxp_users (
   login varchar(255) PRIMARY KEY,
   password varchar(255) NOT NULL,
   "groupPath" varchar(255)
 );
 
-CREATE TABLE IF NOT EXISTS ajxp_user_rights (
+CREATE TABLE ajxp_user_rights (
   rid serial PRIMARY KEY,
   login varchar(255) NOT NULL,
   repo_uuid varchar(33) NOT NULL,
   rights text NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS ajxp_user_prefs (
+CREATE TABLE ajxp_user_prefs (
   rid serial PRIMARY KEY,
   login varchar(255) NOT NULL,
   name varchar(255) NOT NULL,
   val bytea
 );
 
-CREATE TABLE IF NOT EXISTS ajxp_user_bookmarks (
+CREATE TABLE ajxp_user_bookmarks (
   rid serial PRIMARY KEY,
   login varchar(255) NOT NULL,
   repo_uuid varchar(33) NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS ajxp_user_bookmarks (
   title varchar(255)
 );
 
-CREATE TABLE IF NOT EXISTS ajxp_repo (
+CREATE TABLE ajxp_repo (
   uuid varchar(33) PRIMARY KEY,
   parent_uuid varchar(33) default NULL,
   owner_user_id varchar(50) default NULL,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS ajxp_repo (
   "groupPath" varchar(255)
 );
 
-CREATE TABLE IF NOT EXISTS ajxp_repo_options (
+CREATE TABLE ajxp_repo_options (
   oid serial PRIMARY KEY,
   uuid varchar(33) NOT NULL,
   name varchar(50) NOT NULL,
@@ -53,23 +53,23 @@ CREATE TABLE IF NOT EXISTS ajxp_repo_options (
 
 CREATE INDEX ajxp_repo_options_uuid_idx ON ajxp_repo_options (uuid);
 
-CREATE TABLE IF NOT EXISTS ajxp_roles (
+CREATE TABLE ajxp_roles (
   role_id varchar(255) PRIMARY KEY,
   serial_role bytea NOT NULL,
   searchable_repositories text
 );
 
-CREATE TABLE IF NOT EXISTS ajxp_groups (
+CREATE TABLE ajxp_groups (
   "groupPath" varchar(255) PRIMARY KEY,
   "groupLabel" varchar(255) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS ajxp_plugin_configs (
+CREATE TABLE ajxp_plugin_configs (
   id varchar(50) PRIMARY KEY,
   configs bytea NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS ajxp_simple_store (
+CREATE TABLE ajxp_simple_store (
    object_id varchar(255) NOT NULL,
    store_id varchar(50) NOT NULL,
    serialized_data text,
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS ajxp_simple_store (
    PRIMARY KEY(object_id, store_id)
 );
 
-CREATE TABLE IF NOT EXISTS ajxp_user_teams (
+CREATE TABLE ajxp_user_teams (
     team_id VARCHAR(255) NOT NULL,
     user_id varchar(255) NOT NULL,
     team_label VARCHAR(255) NOT NULL,

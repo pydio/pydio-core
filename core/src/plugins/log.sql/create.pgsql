@@ -6,7 +6,7 @@ CREATE TYPE ajxp_log_severity AS ENUM (
   'ERROR'
 );
 
-CREATE TABLE IF NOT EXISTS ajxp_log (
+CREATE TABLE ajxp_log (
   id serial PRIMARY KEY,
   logdate timestamp,
   remote_ip varchar(32),
