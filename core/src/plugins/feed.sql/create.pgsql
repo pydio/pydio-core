@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS ajxp_feed (
+CREATE TABLE ajxp_feed (
   id serial PRIMARY KEY,
   edate integer NOT NULL,
   etype varchar(12) NOT NULL,
