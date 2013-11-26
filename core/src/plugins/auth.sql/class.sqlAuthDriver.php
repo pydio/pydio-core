@@ -120,23 +120,22 @@ class sqlAuthDriver extends AbstractAuthDriver
     public function checkPassword($login, $pass, $seed)
     {
         $userStoredPass = $this->getUserPass($login);
-        if(!$userStoredPass) return false;
+        if (!$userStoredPass) return false;
 
-		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){ // Seed = -1 means that password is not encoded.
-				if (ConfService::getCoreConf("COMPLEX_PASSWORD", "auth")) {
-						$pwAge = ConfService::getCoreConf("PASSWORD_MAXAGE", "auth");
-						$res = dibi::query("select * from [ajxp_users] where [login]=%s and date (julianday(date('now'))- %s)  <= lastChange  limit 1",$login,$pwAge);
-						if (count($res->fetchAll()) > 0) {
-								return AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass);
-						} else {
-								return false;
-						}
-				}
-
-				return AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass); //($userStoredPass == md5($pass));
-		}else{
-				return (md5($userStoredPass.$seed) == $pass);
-		}
+        if ($this->getOption("TRANSMIT_CLEAR_PASS") === true) { // Seed = -1 means that password is not encoded.
+                if (ConfService::getCoreConf("COMPLEX_PASSWORD", "auth")) {
+                        $pwAge = ConfService::getCoreConf("PASSWORD_MAXAGE", "auth");
+                        $res = dibi::query("select * from [ajxp_users] where [login]=%s and date (julianday(date('now'))- %s)  <= lastChange  limit 1",$login,$pwAge);
+                        if (count($res->fetchAll()) > 0) {
+                                return AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass);
+                        } else {
+                                return false;
+                        }
+                }
+                return AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass); //($userStoredPass == md5($pass));
+        } else {
+                return (md5($userStoredPass.$seed) == $pass);
+        }
     }
 
     public function checkLastPasswords($login, $pass)
