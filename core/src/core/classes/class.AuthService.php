@@ -706,12 +706,20 @@ class AuthService
      */
     public static function updatePassword($userId, $userPass)
     {
-        if (strlen($userPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth")) {
-            $messages = ConfService::getMessages();
-            throw new Exception($messages[378]);
+        $authDriver = ConfService::getAuthDriverImpl();
+        if($authDriver->getOption("TRANSMIT_CLEAR_PASS") === true){
+            if(ConfService::getCoreConf("COMPLEX_PASSWORD", "auth") === true){
+                if(!$authDriver->checkPasswordComplexity($userPass) || $authDriver->checkLastPasswords($userId, $userPass) || strlen($userPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth")) {
+                    $messages = ConfService::getMessages();
+                    throw new Exception($messages[378]);
+                }
+            } elseif(strlen($userPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth")){
+                $messages = ConfService::getMessages();
+                throw new Exception($messages[378]);
+            }
         }
         $userId = AuthService::filterUserSensitivity($userId);
-        $authDriver = ConfService::getAuthDriverImpl();
+
         $authDriver->changePassword($userId, $userPass);
         if ($authDriver->getOption("TRANSMIT_CLEAR_PASS") === true) {
             // We can directly update the HA1 version of the WEBDAV Digest

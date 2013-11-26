@@ -2,5 +2,12 @@ CREATE TABLE IF NOT EXISTS `ajxp_users` (
   `login` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `groupPath` varchar(255) NULL,
+  `failedLogins` int NOT NULL,
+  `lastChange` date NOT NULL,
   PRIMARY KEY  (`login`)
+);
+CREATE TABLE IF NOT EXISTS ajxp_users_passwords (
+  `login` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `date` varchar(25) NOT NULL
 );
