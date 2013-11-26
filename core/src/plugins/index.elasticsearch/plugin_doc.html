@@ -17,7 +17,7 @@ In order to test ElasticSearch you can do the following (in a terminal):<br/><br
 - Create an index called "test_index":<br/>
 <pre>$ curl -XPUT 'localhost:9200/test_index'</pre><br/>
 - Then add a document with the type "test_type" with the following command:<br/>
-<pre>$ culr -XPUT 'localhost:9200/test_index/test_type/1 -d '{"user":"test", "message":"this is a test"}'</pre>
+<pre>$ curl -XPUT 'localhost:9200/test_index/test_type/1 -d '{"user":"test", "message":"this is a test"}'</pre>
 This will add a document with id equals to 1 containing two fields "user" and "message" that respective values are "test" and "this is a test".<br/>
 The document will be added in the index "test_index" under the type "test_type".<br/><br/>
 - You can retrieve the documents by their id:
