@@ -79,7 +79,7 @@ class AJXP_Sabre_AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
         if ($success === false) {
             throw new Sabre\DAV\Exception\NotAuthenticated();
         }
-        ConfService::loadRepositoryDriver();
+        ConfService::switchRootDir($this->repositoryId);
         return true;
     }
 

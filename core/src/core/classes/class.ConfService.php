@@ -262,8 +262,8 @@ class ConfService
      */
     public function switchRootDirInst($rootDirIndex=-1, $temporary=false)
     {
-        $currentRepos = $this->getLoadedRepositories();
         if ($rootDirIndex == -1) {
+            $currentRepos = $this->getLoadedRepositories();
             if (isSet($_SESSION['REPO_ID']) && array_key_exists($_SESSION['REPO_ID'], $currentRepos)) {
                 $this->configs["REPOSITORY"] = $currentRepos[$_SESSION['REPO_ID']];
             } else {
@@ -272,6 +272,11 @@ class ConfService
                 $_SESSION['REPO_ID'] = $keys[0];
             }
         } else {
+            /*
+            if (isSet($this->configs["REPOSITORY"]) && $this->configs["REPOSITORY"] == $rootDirIndex) {
+                return;
+            }
+            */
             if ($temporary && isSet($_SESSION['REPO_ID'])) {
                 $crtId = $_SESSION['REPO_ID'];
                 if ($crtId != $rootDirIndex && !isSet($_SESSION['SWITCH_BACK_REPO_ID'])) {
@@ -283,7 +288,11 @@ class ConfService
                 $_SESSION['PREVIOUS_REPO_ID'] = $crtId;
                 //AJXP_Logger::debug("switching back to $rootDirIndex");
             }
-            $this->configs["REPOSITORY"] = $currentRepos[$rootDirIndex];
+            if (isSet($this->configs["REPOSITORIES"]) && isSet($this->configs["REPOSITORIES"][$rootDirIndex])) {
+                $this->configs["REPOSITORY"] = $this->configs["REPOSITORIES"][$rootDirIndex];
+            } else {
+                $this->configs["REPOSITORY"] = ConfService::getRepositoryById($rootDirIndex);
+            }
             $_SESSION['REPO_ID'] = $rootDirIndex;
             if(isSet($this->configs["ACCESS_DRIVER"])) unset($this->configs["ACCESS_DRIVER"]);
         }
@@ -632,9 +641,14 @@ class ConfService
      */
     public function getRepositoryByIdInst($repoId)
     {
+        /*
         $currentRepos = $this->getLoadedRepositories();
         if (isSet($currentRepos[$repoId])) {
             return $currentRepos[$repoId];
+        }
+        */
+        if (isSet($this->configs["REPOSITORIES"]) && isSet($this->configs["REPOSITORIES"][$repoId])) {
+            return $this->configs["REPOSITORIES"][$repoId];
         }
         return $this->getConfStorageImpl()->getRepositoryById($repoId);
     }
@@ -662,7 +676,9 @@ class ConfService
         $conf = $this->configs["DEFAULT_REPOSITORIES"];
         foreach ($conf as $repoId => $repoDef) {
             if ($repoDef["AJXP_SLUG"] == $repoAlias) {
-                return $this->getRepositoryByIdInst($repoId);
+                $repo = self::createRepositoryFromArray($repoId, $repoDef);
+                $repo->setWriteable(false);
+                return $repo;
             }
         }
         return null;

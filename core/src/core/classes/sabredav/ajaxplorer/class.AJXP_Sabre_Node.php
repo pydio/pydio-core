@@ -58,12 +58,12 @@ class AJXP_Sabre_Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
     public function getAccessDriver()
     {
         if (!isset($this->accessDriver)) {
-            $RID = $this->repository->getId();
-            ConfService::switchRootDir($RID);
+            //$RID = $this->repository->getId();
+            //ConfService::switchRootDir($RID);
             ConfService::getConfStorageImpl();
-            $this->accessDriver = ConfService::loadRepositoryDriver();
+            $this->accessDriver = ConfService::loadDriverForRepository($this->repository);
             if (!$this->accessDriver instanceof AjxpWrapperProvider) {
-                throw new Sabre\DAV\Exception\FileNotFound( $RID );
+                throw new Sabre\DAV\Exception\NotFound( $this->repository->getId() );
             }
             $this->accessDriver->detectStreamWrapper(true);
         }

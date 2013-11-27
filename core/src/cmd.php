@@ -189,7 +189,7 @@ $authDriver = ConfService::getAuthDriverImpl();
 // DRIVERS BELOW NEED IDENTIFICATION CHECK
 if (!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") || AuthService::getLoggedUser()!=null) {
     $confDriver = ConfService::getConfStorageImpl();
-    $Driver = ConfService::loadRepositoryDriver();
+    $Driver = ConfService::loadDriverForRepository(ConfService::getRepository());
 }
 AJXP_PluginsService::getInstance()->initActivePlugins();
 require_once(AJXP_BIN_FOLDER."/class.AJXP_Controller.php");
