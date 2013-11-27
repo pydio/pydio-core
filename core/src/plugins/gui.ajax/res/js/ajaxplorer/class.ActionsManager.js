@@ -373,7 +373,6 @@ Class.create("ActionsManager", {
 			connexion.setMethod('POST');
 		}
 		$(formName).getElements().each(function(fElement){
-			// OPERA : ADDS 'http://www.yourdomain.com/ajaxplorer/' to the action attribute value
 			var fValue = fElement.getValue();
 			if(fElement.name == 'get_action' && fValue.substr(0,4) == 'http'){			
 				fValue = getBaseName(fValue);

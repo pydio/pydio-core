@@ -44,7 +44,14 @@ Class.create("Connexion", {
 	 * @param paramValue String
 	 */
 	addParameter : function (paramName, paramValue){
-		this._parameters.set(paramName, paramValue);	
+        if(this._parameters.get(paramName) && paramName.endsWith('[]')){
+            var existing =  this._parameters.get(paramName);
+            if(Object.isString(existing)) existing = [existing];
+            existing.push(paramValue);
+            this._parameters.set(paramName, existing);
+        }else{
+            this._parameters.set(paramName, paramValue);
+        }
 	},
 	
 	/**

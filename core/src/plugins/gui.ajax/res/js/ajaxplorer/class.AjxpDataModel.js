@@ -642,41 +642,30 @@ Class.create("AjxpDataModel", {
 		// CLEAR FROM PREVIOUS ACTIONS!
 		if(oFormElement)	
 		{
-			$(oFormElement).getElementsBySelector("input").each(function(element){
-				if(element.name.indexOf("file_") != -1 || element.name=="file") element.value = "";
+			$(oFormElement).select('input[type="hidden"]').each(function(element){
+				if(element.name == "nodes[]" || element.name == "file")element.remove();
 			});
 		}
 		// UPDATE THE 'DIR' FIELDS
-		if(oFormElement && oFormElement.rep) oFormElement.rep.value = this._currentRep;
+		if(oFormElement && oFormElement['rep']) oFormElement['rep'].value = this._currentRep;
 		sUrl += '&dir='+encodeURIComponent(this._currentRep);
 		
 		// UPDATE THE 'file' FIELDS
 		if(this.isEmpty()) return sUrl;
 		var fileNames = this.getFileNames();
-		if(this.isUnique())
-		{
-			sUrl += '&'+'file='+encodeURIComponent(fileNames[0]);
-			if(oFormElement) this._addHiddenField(oFormElement, 'file', fileNames[0]);
-		}
-		else
-		{
-			for(var i=0;i<fileNames.length;i++)
-			{
-				sUrl += '&'+'file_'+i+'='+encodeURIComponent(fileNames[i]);
-				if(oFormElement) this._addHiddenField(oFormElement, 'file_'+i, fileNames[i]);
-			}
-		}
+        for(var i=0;i<fileNames.length;i++)
+        {
+            sUrl += '&'+'nodes[]='+encodeURIComponent(fileNames[i]);
+            if(oFormElement) this._addHiddenField(oFormElement, 'nodes[]', fileNames[i]);
+        }
+        if(fileNames.length == 1){
+            sUrl += '&'+'file='+encodeURIComponent(fileNames[0]);
+            if(oFormElement) this._addHiddenField(oFormElement, 'file', fileNames[0]);
+        }
 		return sUrl;
 	},
 	
 	_addHiddenField : function(oFormElement, sFieldName, sFieldValue){
-		if(oFormElement[sFieldName]) oFormElement[sFieldName].value = sFieldValue;
-		else{
-			var field = document.createElement('input');
-			field.type = 'hidden';
-			field.name = sFieldName;
-			field.value = sFieldValue;
-			oFormElement.appendChild(field);
-		}
+        oFormElement.insert(new Element('input', {type:'hidden', name:sFieldName, value:sFieldValue}));
 	}
 });

@@ -1399,6 +1399,9 @@ Class.create("FilesList", SelectableElements, {
         }
 		var pos = posSpan.cumulativeOffset();
 		var text = span.innerHTML;
+        if(!item.ajxpNode){
+            item.ajxpNode = $(item.id).ajxpNode;
+        }
 		var edit = new Element('input', {value:item.ajxpNode.getLabel('text'), id:'editbox'}).setStyle({
 			zIndex:5000, 
 			position:'absolute',

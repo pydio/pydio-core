@@ -73,6 +73,7 @@ SelectableElements = Class.create({
 		}.bind(this);
 
 		if (oElement.addEventListener){
+            if('ondblclick' in document.documentElement) oElement.addEventListener("dblclick", this._ondblclick, false);
 			oElement.addEventListener("click", this._onclick, false);
 		}else if (oElement.attachEvent){
 			oElement.attachEvent("onclick", this._onclick);
@@ -81,7 +82,7 @@ SelectableElements = Class.create({
         if(addTouch){
             oElement.observe("touchstart", function(event){
                 var touchData = event.changedTouches[0];
-                oElement.selectableTouchStart = touchData["clientY"];
+                  oElement.selectableTouchStart = touchData["clientY"];
             }.bind(this));
             oElement.observe("touchend", function(event){
                 if(oElement.selectableTouchStart) {
@@ -365,7 +366,7 @@ SelectableElements = Class.create({
     previousEventTime: null,
     previousEventTarget: null,
     ie10detailFilter : function(e){
-        if(!Prototype.Browser.IE10plus){
+        if(!Prototype.Browser.IE10){
             return true;
         }
         var result = true;

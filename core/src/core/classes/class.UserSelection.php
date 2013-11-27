@@ -105,9 +105,19 @@ class UserSelection
             }
             //return ;
         }
+        if (isSet($array["nodes"]) && is_array($array["nodes"])) {
+            $this->files = $array["nodes"];
+            $this->isUnique = count($this->files) == 1;
+        }
         if (isSet($array[$this->dirPrefix])) {
             $this->dir = AJXP_Utils::securePath($array[$this->dirPrefix]);
             if ($test = $this->detectZip($this->dir)) {
+                $this->inZip = true;
+                $this->zipFile = $test[0];
+                $this->localZipPath = $test[1];
+            }
+        } else if (!$this->isEmpty() && $this->isUnique()) {
+            if ($test = $this->detectZip($this->files[0])) {
                 $this->inZip = true;
                 $this->zipFile = $test[0];
                 $this->localZipPath = $test[1];
