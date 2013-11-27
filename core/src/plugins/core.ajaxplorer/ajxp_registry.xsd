@@ -552,6 +552,7 @@
         <xs:complexType>
             <xs:choice maxOccurs="unbounded" minOccurs="0">
                 <xs:element ref="input_param"/>
+                <xs:element ref="output"/>
             </xs:choice>
             <xs:attribute name="applyCondition"/>
             <xs:attribute name="capture" type="xs:boolean"/>
@@ -560,6 +561,7 @@
             <xs:attribute name="pluginId" use="optional" type="xs:NCName"/>
             <xs:attribute name="defer" type="xs:boolean"/>
             <xs:attribute name="restParams"/>
+            <xs:attribute name="sdkMethodName"/>
             <xs:attribute name="developerComment"/>
             <xs:attribute name="checkParams" type="xs:boolean"/>
         </xs:complexType>
@@ -695,7 +697,13 @@
             <xs:attribute name="description" use="required"/>
             <xs:attribute name="mandatory" type="xs:boolean"/>
             <xs:attribute name="name" use="required" type="xs:NCName"/>
-            <xs:attribute name="type" use="required" type="xs:Name"/>
+            <xs:attribute name="type" use="required" type="xs:all"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="output">
+        <xs:complexType>
+            <xs:attribute name="type" use="required" type="xs:all"/>
+            <xs:attribute name="description" use="optional"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="user_param">
