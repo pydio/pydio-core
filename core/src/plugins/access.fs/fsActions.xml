@@ -30,14 +30,16 @@
 						ajaxplorer.updateContextData(path);
 					}
 					]]></clientCallback>
-				<serverCallback methodName="switchAction" restParams="/dir+" checkParams="true" developerComment="Standard listing action to retrieve a list of children for a given directory.">
-                    <input_param description="Directory to browse, from the repository root" name="dir" type="string" mandatory="true"/>
+				<serverCallback methodName="switchAction" restParams="/node+" sdkMethodName="listNodes" checkParams="true" developerComment="Standard listing action to retrieve a list of children for a given directory.">
+                    <input_param description="Directory to browse, from the repository root" name="dir" type="string" mandatory="false"/>
                     <input_param description="One file to check" name="file" type="string" mandatory="false"/>
+                    <input_param description="One folder to list or one or more files to check" name="nodes" type="AJXP_NODE[]" mandatory="false"/>
                     <input_param description="Details to send back" name="options" type="string" mandatory="false" default="al"/>
                     <input_param description="Recursively list all folders" name="recursive" type="boolean" mandatory="false" default="false"/>
                     <input_param description="Trigger remote order" name="remote_order" type="boolean" mandatory="false" default="false"/>
                     <input_param description="Remote order column" name="order_column" type="string" mandatory="false"/>
                     <input_param description="Remote order direction" name="order_direction" type="string" mandatory="false"/>
+                    <output type="AJXP_NODE[]"/>
 				</serverCallback>
 			</processing>
 		</action>
@@ -85,7 +87,9 @@
 						modal.showDialogForm('Upload', uploader.formId, dialogOnOpen, null, dialogOnComplete, true, true);
 					}
 				]]></clientCallback>
-				<serverCallback methodName="switchAction" restParams="/input_stream/dir+"/>
+				<serverCallback methodName="switchAction" restParams="/input_stream/dir+" sdkMethodName="upload" checkParams="false">
+                    <input_param description="filename" name="node" type="string"/>
+				</serverCallback>
 				</processing>
 		</action>
 		<action name="empty_recycle">
@@ -191,7 +195,10 @@
 						}
 					}
 					]]></clientListener>
-				<serverCallback methodName="switchAction" restParams="/file+" />
+				<serverCallback methodName="switchAction" restParams="/node+" checkParams="false" sdkMethodName="download">
+                    <input_param description="User selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
+                    <output type="stream"/>
+				</serverCallback>
 				</processing>
 		</action>
         <action name="download_all">
@@ -274,7 +281,7 @@
 		<action name="prepare_chunk_dl">
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly="false"></rightsContext>
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
         <action name="open_with" fileDefault="true">
@@ -479,7 +486,10 @@
                 <input type="text" name="dirname" size="30" class="dialogFocus">
                 </div>
                 ]]></clientForm>
-                <serverCallback methodName="switchAction"></serverCallback>
+                <serverCallback methodName="switchAction" sdkMethodName="mkdir" checkParams="false">
+                    <input_param description="Folder parent" name="dir" type="AJXP_NODE" mandatory="true"/>
+                    <input_param description="Folder name" name="dirname" type="string" mandatory="true"/>
+                </serverCallback>
                 </processing>
         </action>
         <action name="mkfile">
@@ -509,7 +519,9 @@
                 <input type="text" name="filename" size="30" class="dialogFocus">
                 </div>
                 ]]></clientForm>
-                <serverCallback methodName="switchAction"></serverCallback>
+                <serverCallback methodName="switchAction" restParams="/node+" sdkMethodName="mkfile">
+                    <input_param description="New file path" name="node" type="AJXP_NODE"/>
+                </serverCallback>
                 </processing>
         </action>
 		<action name="rename">
@@ -526,6 +538,7 @@
 				        var orig = ajaxplorer.getUserSelection().getSelectionSource();
 				    }
 					var callback = function(node, newValue){
+					    if(!node) node = ajaxplorer.getUserSelection().getUniqueNode();
 						var filename = node.getPath();
 						var conn = new Connexion();
 						conn.addParameter('get_action', 'rename');
@@ -539,7 +552,14 @@
 						    ajaxplorer.getUserSelection().setSelectionSource(orig);
 						}
 					};
-					if(ajaxplorer.getUserSelection() && ajaxplorer.getUserSelection().getSelectionSource() && ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition) {ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition(callback);}
+					if(ajaxplorer.getUserSelection() && ajaxplorer.getUserSelection().getSelectionSource() && ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition) {
+					    ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition(callback);
+                    }else{
+                        var test = ajaxplorer._focusables.detect(function(obj){return obj.hasFocus;});
+                        if (test && test.switchCurrentLabelToEdition){
+                            test.switchCurrentLabelToEdition(callback);
+                        }
+                    }
 				]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
