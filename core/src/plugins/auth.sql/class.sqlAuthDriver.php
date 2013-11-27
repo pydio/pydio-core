@@ -145,7 +145,7 @@ class sqlAuthDriver extends AbstractAuthDriver
         // check last x passwords against new
         if ($this->getOption("PASSWORD_SECURITY") === true) {
             $passwordHistory = $this->getOption("PASSWORD_HISTORY");
-            if ( $passwordHistory < 1) {
+            if ($passwordHistory < 1) {
                 $passwordHistory = 1;
             }
             $res = dibi::query("SELECT [password] FROM [ajxp_users_passwords] WHERE [login]=%s order by date desc limit %s" , $login,$passwordHistory);
