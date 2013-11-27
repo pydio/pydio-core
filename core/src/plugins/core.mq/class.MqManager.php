@@ -97,7 +97,7 @@ class MqManager extends AJXP_Plugin
             $repo = $newNode->getRepositoryId();
             $update = false;
             $data = array();
-            if ($origNode != null) {
+            if ($origNode != null && !$copy) {
                 $update = true;
                 $data[$origNode->getPath()] = $newNode;
             } else {
@@ -105,7 +105,7 @@ class MqManager extends AJXP_Plugin
             }
             $content = AJXP_XMLWriter::writeNodesDiff(array(($update?"UPDATE":"ADD") => $data));
         }
-        if ($origNode != null && ! $update) {
+        if ($origNode != null && ! $update && !$copy) {
             $repo = $origNode->getRepositoryId();
             $content = AJXP_XMLWriter::writeNodesDiff(array("REMOVE" => array($origNode->getPath())));
         }
