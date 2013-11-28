@@ -852,9 +852,19 @@ Class.create("Ajaxplorer", {
     _editorOpener:null,
     registerEditorOpener: function(ajxpWidget){
         this._editorOpener = ajxpWidget;
+        this._editorObserver = function(tabId){
+            var tabData = ajxpWidget.tabulatorData.detect(function(tabInfo){return tabInfo.id == tabId});
+            if(tabData && tabData.ajxpNode){
+                this.getContextHolder().setSelectedNodes([tabData.ajxpNode]);
+            }
+        }.bind(this);
+        ajxpWidget.observe("switch", this._editorObserver);
     },
     unregisterEditorOpener: function(ajxpWidget){
-        if(this._editorOpener == ajxpWidget) this._editorOpener = null;
+        if(this._editorOpener == ajxpWidget) {
+            this._editorOpener.stopObserving("switch", this._editorObserver);
+            this._editorOpener = null;
+        }
     },
 
     openCurrentSelectionInEditor:function(editorData, forceNode){

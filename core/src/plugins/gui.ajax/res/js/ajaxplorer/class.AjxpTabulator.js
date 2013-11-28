@@ -249,6 +249,7 @@ Class.create("AjxpTabulator", AjxpPane, {
                 });
                 editor.open(paneInfo.node);
                 tabInfo.ajxpObject = editor;
+                tabInfo.ajxpNode = paneInfo.node;
                 editor.resize();
                 // SERIALIZE CONFIG
                 if(confPaneInfo){
