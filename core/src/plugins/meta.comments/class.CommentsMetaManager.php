@@ -133,6 +133,7 @@ class CommentsMetaManager extends AJXP_Plugin
                 }
                 HTMLWriter::charsetHeader("application/json");
                 $com["hdate"] = AJXP_Utils::relativeDate($com["date"], $mess);
+                $com["path"] = $uniqNode->getPath();
                 echo json_encode($com);
 
                 break;

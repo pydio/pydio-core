@@ -158,7 +158,7 @@ Class.create("CommentsPanel", {
         }
         // Fake file/folder detection
         var basename = getBaseName(hash.get('path'));
-        if(basename.indexOf('.') != -1){
+        if(basename && basename.indexOf('.') != -1){
             el.addClassName('comment_type_file');
         }else{
             el.addClassName('comment_type_folder');
