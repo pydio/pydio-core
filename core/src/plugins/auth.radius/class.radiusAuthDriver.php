@@ -84,7 +84,7 @@ class radiusAuthDriver extends AbstractAuthDriver
             AJXP_Logger::debug("RADIUS: Could not create request (" . radius_strerror($res) . ")");
             return false;
         }
-        if (!radius_put_string($res, RADIUS_NAS_IDENTIFIER, isset($HTTP_HOST) ? $HTTP_HOST : 'localhost')) {
+        if (!radius_put_string($res, RADIUS_NAS_IDENTIFIER, isset($_SERVER["SERVER_NAME"]) ? $_SERVER["SERVER_NAME"] : 'localhost')) {
             AJXP_Logger::debug("RADIUS: Could not put string for nas_identifier (" . radius_strerror($res) . ")");
             return false;
         }
