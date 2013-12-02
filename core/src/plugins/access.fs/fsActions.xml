@@ -195,7 +195,7 @@
 						}
 					}
 					]]></clientListener>
-				<serverCallback methodName="switchAction" restParams="/node+" checkParams="false" sdkMethodName="download">
+				<serverCallback methodName="switchAction" restParams="/file+" checkParams="false" sdkMethodName="download">
                     <input_param description="User selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
                     <output type="stream"/>
 				</serverCallback>
@@ -406,7 +406,7 @@
 		<action name="stat">
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly="false"></rightsContext>
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction" restParams="/file+"></serverCallback>
 			</processing>
 		</action>
 		<action name="lsync">
@@ -486,7 +486,7 @@
                 <input type="text" name="dirname" size="30" class="dialogFocus">
                 </div>
                 ]]></clientForm>
-                <serverCallback methodName="switchAction" sdkMethodName="mkdir" checkParams="false">
+                <serverCallback methodName="switchAction" sdkMethodName="mkdir" restParams="/file+" checkParams="false">
                     <input_param description="Folder parent" name="dir" type="AJXP_NODE" mandatory="true"/>
                     <input_param description="Folder name" name="dirname" type="string" mandatory="true"/>
                 </serverCallback>
@@ -787,7 +787,7 @@
 				<div id="delete_form" action="delete" box_width="200">
 				<span id="delete_message"></span>
 				</div>				]]></clientForm>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction" restParams="/file+"></serverCallback>
 				</processing>
 		</action>
         <action name="chmod">

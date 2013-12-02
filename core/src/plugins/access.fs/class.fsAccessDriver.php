@@ -511,7 +511,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             case "mkdir";
 
                 $messtmp="";
-                $dirname=AJXP_Utils::decodeSecureMagic($httpVars["dirname"], AJXP_SANITIZE_FILENAME);
+                if(!isSet($httpVars["dirname"])){
+                    $uniq = $selection->getUniqueFile();
+                    $dir = AJXP_Utils::safeDirname($uniq);
+                    $dirname = AJXP_Utils::safeBasename($uniq);
+                }else{
+                    $dirname=AJXP_Utils::decodeSecureMagic($httpVars["dirname"], AJXP_SANITIZE_FILENAME);
+                }
                 $dirname = substr($dirname, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
                 $this->filterUserSelectionToHidden(array($dirname));
                 AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($dir."/".$dirname), -2));
@@ -622,8 +628,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     if (isSet($httpVars["auto_rename"])) {
                         $userfile_name = self::autoRenameForDest($destination, $userfile_name);
                     }
+                    $already_existed = false;
                     try {
                         if (file_exists($destination."/".$userfile_name)) {
+                            $already_existed = true;
                             AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($destination."/".$userfile_name), $boxData["size"]));
                         } else {
                             AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($destination."/".$userfile_name), $boxData["size"]));
@@ -695,7 +703,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $errorMessage));
                 } else {
                     $this->logDebug("Return success");
-                    return array("SUCCESS" => true, "CREATED_NODE" => $createdNode);
+                    if($already_existed){
+                        return array("SUCCESS" => true, "UPDATED_NODE" => $createdNode);
+                    }else{
+                        return array("SUCCESS" => true, "CREATED_NODE" => $createdNode);
+                    }
                 }
                 return ;
 
@@ -1528,6 +1540,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         mkdir($this->urlBase."$crtDir/$newDirName", $dirMode);
         umask($old);
         $newNode = new AJXP_Node($this->urlBase.$crtDir."/".$newDirName);
+        $newNode->setLeaf(false);
         AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
         return null;
     }

@@ -41,7 +41,7 @@ class SimpleUploadProcessor extends AJXP_Plugin
 
     public function preProcess($action, &$httpVars, &$fileVars)
     {
-        if (!isSet($httpVars["input_stream"])) {
+        if (!isSet($httpVars["input_stream"]) || isSet($httpVars["force_post"])) {
             return false;
         }
 
@@ -76,7 +76,7 @@ class SimpleUploadProcessor extends AJXP_Plugin
 
     public function postProcess($action, $httpVars, $postProcessData)
     {
-        if (!isSet($httpVars["simple_uploader"]) && !isSet($httpVars["xhr_uploader"])) {
+        if (!isSet($httpVars["simple_uploader"]) && !isSet($httpVars["xhr_uploader"]) && !isSet($httpVars["force_post"])) {
             return false;
         }
         $this->logDebug("SimpleUploadProc is active");
@@ -89,9 +89,9 @@ class SimpleUploadProcessor extends AJXP_Plugin
                 print("\n if(parent.ajaxplorer.actionBar.multi_selector) parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $message)."');");
             } else {
                 print("\n if(parent.ajaxplorer.actionBar.multi_selector) parent.ajaxplorer.actionBar.multi_selector.submitNext();");
-                if ($result["CREATED_NODE"]) {
+                if (isSet($result["CREATED_NODE"]) || isSet($result["UPDATED_NODE"])) {
                     $s = '<tree>';
-                    $s .= AJXP_XMLWriter::writeNodesDiff(array("ADD"=> array($result["CREATED_NODE"])), false);
+                    $s .= AJXP_XMLWriter::writeNodesDiff(array((isSet($result["UPDATED_NODE"])?"UPDATE":"ADD")=> array($result[(isSet($result["UPDATED_NODE"])?"UPDATED":"CREATED")."_NODE"])), false);
                     $s.= '</tree>';
                     print("\n var resultString = '".$s."'; var resultXML = parent.parseXml(resultString);");
                     print("\n parent.ajaxplorer.actionBar.parseXmlMessage(resultXML);");
@@ -104,14 +104,16 @@ class SimpleUploadProcessor extends AJXP_Plugin
                 exit($message);
             } else {
                 AJXP_XMLWriter::header();
-                if (isSet($result["CREATED_NODE"])) {
-                    AJXP_XMLWriter::writeNodesDiff(array("ADD" => array($result["CREATED_NODE"])), true);
+                if (isSet($result["CREATED_NODE"]) || isSet($result["UPDATED_NODE"])) {
+                    AJXP_XMLWriter::writeNodesDiff(array((isSet($result["UPDATED_NODE"])?"UPDATE":"ADD") => array($result[(isSet($result["UPDATED_NODE"])?"UPDATED":"CREATED")."_NODE"])), true);
                 }
                 AJXP_XMLWriter::close();
                 /* for further implementation */
                 if (!$result["PREVENT_NOTIF"]) {
                     if (isset($result["CREATED_NODE"])) {
                         AJXP_Controller::applyHook("node.change", array(null, $result["CREATED_NODE"], false));
+                    }else if(isSet($result["UPDATED_NODE"])){
+                        AJXP_Controller::applyHook("node.change", array($result["UPDATED_NODE"], $result["UPDATED_NODE"], false));
                     }
                 }
                 //exit("OK");
