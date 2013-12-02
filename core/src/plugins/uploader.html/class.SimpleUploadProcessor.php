@@ -112,7 +112,7 @@ class SimpleUploadProcessor extends AJXP_Plugin
                 if (!$result["PREVENT_NOTIF"]) {
                     if (isset($result["CREATED_NODE"])) {
                         AJXP_Controller::applyHook("node.change", array(null, $result["CREATED_NODE"], false));
-                    }else if(isSet($result["UPDATED_NODE"])){
+                    } else if (isSet($result["UPDATED_NODE"])) {
                         AJXP_Controller::applyHook("node.change", array($result["UPDATED_NODE"], $result["UPDATED_NODE"], false));
                     }
                 }

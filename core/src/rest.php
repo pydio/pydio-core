@@ -54,7 +54,7 @@ $authDriver = ConfService::getAuthDriverImpl();
 
 
 $uri = $_SERVER["REQUEST_URI"];
-$scriptUri = dirname($_SERVER["SCRIPT_NAME"])."/api/";
+$scriptUri = ltrim(dirname($_SERVER["SCRIPT_NAME"]),'/')."/api/";
 $uri = substr($uri, strlen($scriptUri));
 $uri = explode("/", $uri);
 // GET REPO ID
