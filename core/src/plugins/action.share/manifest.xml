@@ -7,6 +7,7 @@
         <global_param name="FILE_MAX_DOWNLOAD" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Maximum download limit for file, 0 = unlimited]" label="CONF_MESSAGE[Maximum file download limit]" type="integer" default="0" expose="true"/>
         <global_param name="EMAIL_INVITE_EXTERNAL" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Use external mailer for invitations]" label="CONF_MESSAGE[Force External Mailer]" type="boolean" default="false" expose="true"/>
         <global_param name="CREATE_QRCODE" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Create and display QRCode for shared link]" label="CONF_MESSAGE[Create QRCode]" type="boolean" default="true" expose="true"/>
+        <global_param name="ENABLE_FOLDER_SHARING" group="CONF_MESSAGE[Folder Sharing]" description="CONF_MESSAGE[Enable folder sharing (workspace and minisite)]" label="CONF_MESSAGE[Enable folder sharing]" type="boolean" default="true" expose="true"/>
         <global_param name="AVOID_SHARED_FOLDER_SAME_LABEL" group="CONF_MESSAGE[Folder Sharing]" description="CONF_MESSAGE[Disallow users to create shared folders if a workspace already exists with the same label]" label="CONF_MESSAGE[Avoid labels duplication]" type="boolean" default="false"/>
         <!--
         <global_param name="SHARED_USERS_LIST_MINIMUM" group="CONF_MESSAGE[Shared users configurations]" description="CONF_MESSAGE[Minimum number of characters to start getting results by auto-completion when sharing a folder with other users]" label="CONF_MESSAGE[Autocomplete minimum chars]" type="integer" default="2" expose="true"/>
@@ -404,7 +405,7 @@
                         ]]>
                     </clientForm>
                     <clientListener name="init"><![CDATA[
-                        if(ajaxplorer.user && !ajaxplorer.user.canWrite()){
+                        if(ajaxplorer.user && !ajaxplorer.user.canWrite() || ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("ENABLE_FOLDER_SHARING") === false ){
                             var action = ajaxplorer.getActionBar().getActionByName('share');
                             action.selectionContext.dir = false;
                         }
