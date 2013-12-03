@@ -47,7 +47,15 @@ class FileHasher extends AJXP_Plugin
             // REMOVE rsync actions, this will advertise the fact that
             // rsync is not enabled.
             $xp = new DOMXPath($contribNode->ownerDocument);
-            $children = $xp->query("action", $contribNode);
+            $children = $xp->query("action[contains(@name, 'filehasher')]", $contribNode);
+            foreach ($children as $child) {
+                $contribNode->removeChild($child);
+            }
+        }
+        if (!$this->getFilteredOption("CACHE_XML_TREE") && $contribNode->nodeName == "actions") {
+            // REMOVE pre and post process on LS action
+            $xp = new DOMXPath($contribNode->ownerDocument);
+            $children = $xp->query("action[@name='ls']", $contribNode);
             foreach ($children as $child) {
                 $contribNode->removeChild($child);
             }
@@ -63,6 +71,44 @@ class FileHasher extends AJXP_Plugin
         }
         $this->metaStore = $store;
         $this->metaStore->initMeta($accessDriver);
+    }
+
+    private function getTreeName()
+    {
+        $base = AJXP_SHARED_CACHE_DIR."/trees/tree-".ConfService::getRepository()->getId();
+        $secuScope = ConfService::getRepository()->securityScope();
+        if ($secuScope == "USER") {
+            $base .= "-".AuthService::getLoggedUser()->getId();
+        } else if ($secuScope == "GROUP") {
+            $base .= "-".str_replace("/", "_", AuthService::getLoggedUser()->getGroupPath());
+        }
+        return $base . "-full.xml";
+    }
+
+    public function checkFullTreeCache($actionName, &$httpVars, &$fileVars)
+    {
+        $cName = $this->getTreeName();
+        if (is_file($cName)) {
+            header('Content-Type: text/xml; charset=UTF-8');
+            header('Cache-Control: no-cache');
+            if ( strstr($_SERVER['HTTP_ACCEPT_ENCODING'], 'deflate') ) {
+                header('Content-Encoding:deflate');
+                readfile($cName.".gz");
+            } else {
+                readfile($cName);
+            }
+            exit();
+        }
+    }
+
+    public function cacheFullTree($actionName, $httpVars, $postProcessData)
+    {
+        $cName = $this->getTreeName();
+        if(!is_dir(dirname($cName))) mkdir(dirname($cName));
+        $xmlString = $postProcessData["ob_output"];
+        file_put_contents($cName, $xmlString);
+        file_put_contents($cName.".gz", gzdeflate($xmlString, 9));
+        print($xmlString);
     }
 
     public function switchActions($actionName, $httpVars, $fileVars)
@@ -161,11 +207,20 @@ class FileHasher extends AJXP_Plugin
         }
     }
 
+    /**
+     * @param AJXP_Node $oldNode
+     * @param AJXP_Node $newNode
+     * @param bool $copy
+     */
     public function invalidateHash($oldNode = null, $newNode = null, $copy = false)
     {
         if($this->metaStore == false) return;
-        if($oldNode == null) return;
-        $this->metaStore->removeMetadata($oldNode, FileHasher::METADATA_HASH_NAMESPACE, false, AJXP_METADATA_SCOPE_GLOBAL);
+        if ($oldNode != null) {
+            $this->metaStore->removeMetadata($oldNode, FileHasher::METADATA_HASH_NAMESPACE, false, AJXP_METADATA_SCOPE_GLOBAL);
+        }
+        if ($this->getFilteredOption("CACHE_XML_TREE") === true && is_file($this->getTreeName())) {
+            @unlink($this->getTreeName());
+        }
     }
 
 

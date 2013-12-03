@@ -102,11 +102,12 @@ class ChangesTracker extends AJXP_Plugin
      * @param Repository $repository
      * @return String
      */
-    protected function computeIdentifier($repository){
+    protected function computeIdentifier($repository)
+    {
         $parts = array($repository->getId());
-        if($repository->securityScope() == 'USER'){
+        if ($repository->securityScope() == 'USER') {
             $parts[] = AuthService::getLoggedUser()->getId();
-        }else if($repository->securityScope() == 'GROUP'){
+        } else if ($repository->securityScope() == 'GROUP') {
             $parts[] = AuthService::getLoggedUser()->getGroupPath();
         }
         return implode("-", $parts);

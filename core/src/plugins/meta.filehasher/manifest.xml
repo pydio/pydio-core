@@ -2,6 +2,9 @@
 <meta id="meta.filehasher" label="CONF_MESSAGE[File Hasher]" description="CONF_MESSAGE[Compute on-demand a hash of the file content and stores it in the metadata if a metastore is provided]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition filename="plugins/meta.filehasher/class.FileHasher.php" classname="FileHasher"/>
+    <server_settings>
+        <param name="CACHE_XML_TREE" type="boolean" default="false" label="Cache full tree" description="Cache XML tree and invalidate on node change"/>
+    </server_settings>
    	<client_settings>
    		<resources>
    			<i18n namespace="meta.filehasher" path="plugins/meta.filehasher/i18n" />
@@ -26,6 +29,14 @@
                    <processing>
                        <serverCallback methodName="switchActions"/>
                    </processing>
+               </action>
+               <action name="ls">
+                   <pre_processing>
+                       <serverCallback methodName="checkFullTreeCache" applyCondition="$apply=isSet($httpVars['recursive']);"/>
+                   </pre_processing>
+                   <post_processing>
+                       <serverCallback methodName="cacheFullTree" capture="true" applyCondition="$apply=isSet($httpVars['recursive']);"/>
+                   </post_processing>
                </action>
            </actions>
    		<hooks>
