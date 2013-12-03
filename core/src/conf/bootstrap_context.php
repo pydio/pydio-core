@@ -28,7 +28,7 @@ if (function_exists("xdebug_disable")) {
 @error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT);
 //Windows users may have to uncomment this
 //setlocale(LC_ALL, '');
-
+@libxml_disable_entity_loader(false);
 
 list($vNmber,$vDate) = explode("__",file_get_contents(AJXP_CONF_PATH."/VERSION"));
 define("AJXP_VERSION", $vNmber);
