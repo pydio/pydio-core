@@ -30,7 +30,9 @@
 					write="false" adminOnly="false">
 				</rightsContext>
 				<processing>
-					<serverCallback methodName="applyAction" restPath="/query/"/>
+					<serverCallback methodName="applyAction" restParams="/query/" sdkMethodName="search">
+                        <input_param description="Query term" name="query" type="string"/>
+					</serverCallback>
 				</processing>
 			</action>
 			<action name="search_by_keyword">
@@ -38,7 +40,9 @@
 					write="false" adminOnly="false">
 				</rightsContext>
 				<processing>
-					<serverCallback methodName="applyAction" restPath="/query/"/>
+					<serverCallback methodName="applyAction" restParams="/query/" sdkMethodName="searchByKeyword">
+                        <input_param description="Query term" name="query" type="string"/>
+					</serverCallback>
 				</processing>
 			</action>
             <action name="check_lock">
