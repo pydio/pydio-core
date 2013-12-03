@@ -649,7 +649,8 @@ class sqlConfDriver extends AbstractConfDriver
         dibi::query("DELETE FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id]=%s", $storeID, $dataID);
     }
 
-    protected function simpleStoreGet($storeID, $dataID, $dataType = "serial", &$data)
+    //$dataType = "serial"
+    protected function simpleStoreGet($storeID, $dataID, $dataType, &$data)
     {
         $children_results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id]=%s", $storeID, $dataID);
         $value = $children_results->fetchAll();

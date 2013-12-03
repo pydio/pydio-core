@@ -1820,7 +1820,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
      * @param Boolean $recursive
      * @param String $nodeType "both", "file", "dir"
      */
-    public function chmod($path, $chmodValue, $recursive=false, $nodeType="both", &$changedFiles)
+
+    // $recursive=false, $nodeType="both"
+    public function chmod($path, $chmodValue, $recursive, $nodeType, &$changedFiles)
     {
         $realValue = octdec(ltrim($chmodValue, "0"));
         if (is_file($this->urlBase.$path)) {

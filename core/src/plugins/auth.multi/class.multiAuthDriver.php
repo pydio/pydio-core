@@ -194,7 +194,8 @@ class multiAuthDriver extends AbstractAuthDriver
         }
     }
 
-    public function listUsersPaginated($baseGroup="/", $regexp, $offset, $limit)
+    // $baseGroup = "/"
+    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit)
     {
         if (!empty($this->baseName)) {
             return $this->drivers[$this->baseName]->listUsersPaginated($baseGroup, $regexp, $offset, $limit);
