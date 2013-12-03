@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta id="meta.syncable" label="CONF_MESSAGE[Syncable Workspace]" description="CONF_MESSAGE[Track changes on this workspace to enable the synchronization with an external client]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition filename="plugins/meta.syncable/class.ChangesTracker.php" classname="ChangesTracker"/>
+    <server_settings>
+        <global_param type="button" name="INSTALL_SQL" choices="run_plugin_action:meta.syncable:installSQLTables" label="CONF_MESSAGE[SQL Tables]" description="CONF_MESSAGE[Install SQL Tables]" mandatory="false"/>
+    </server_settings>
+    <registry_contributions>
+           <actions>
+               <action name="changes">
+                   <processing>
+                       <serverCallback methodName="switchActions" restParams="/seq_id"/>
+                   </processing>
+               </action>
+           </actions>
+   		<hooks>
+   			<serverCallback hookName="node.change" methodName="updateNodesIndex" defer="true"/>
+   		</hooks>
+    </registry_contributions>
+</meta>
