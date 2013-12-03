@@ -365,7 +365,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if(!isset($httpVars["content"])) break;
                 // Load "code" variable directly from POST array, do not "securePath" or "sanitize"...
                 $code = $httpVars["content"];
-                $file = $selection->getUniqueFile($httpVars["file"]);
+                $file = $selection->getUniqueFile();
                 $this->logInfo("Online Edition", array("file"=>$this->addSlugToPath($file)));
                 if (isSet($httpVars["encode"]) && $httpVars["encode"] == "base64") {
                     $code = base64_decode($code);
