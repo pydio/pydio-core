@@ -561,7 +561,7 @@
                         }
                     }
 				]]></clientCallback>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction" restParams="/"></serverCallback>
 				</processing>
 		</action>
 		<action name="copy" ctrlDragndropDefault="true">
@@ -752,7 +752,7 @@
 					}.bind(context);
 					modal.showDialogForm('Move/Copy', 'copymove_form', onLoad, onSubmit, onCancel);
 					]]></clientCallback>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction" restParams="/"></serverCallback>
 				</processing>
 		</action>
 		<action name="delete">
