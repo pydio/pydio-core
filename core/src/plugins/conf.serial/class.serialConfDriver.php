@@ -58,16 +58,16 @@ class serialConfDriver extends AbstractConfDriver
     {
         if ($isDir) {
             if (!is_dir($file) || !is_writable($file)) {
-                throw new Exception("Folder for storing $fileLabel is either inexistent or not writeable.");
+                throw new Exception("Folder for storing $fileLabel ($file) is either inexistent or not writeable.");
             }
             return ;
         }
         $dir = dirname($file);
         if (!is_dir($dir) || !is_writable($dir)) {
-            throw new Exception("Parent folder for $fileLabel is either inexistent or not writeable.");
+            throw new Exception("Parent folder ($dir) for $fileLabel ($file) is either inexistent or not writeable.");
         }
         if (is_file($file) && !is_writable($file)) {
-            throw new Exception(ucfirst($fileLabel)." exists but is not writeable!");
+            throw new Exception(ucfirst($fileLabel)." ($file) exists but is not writeable!");
         }
     }
 
