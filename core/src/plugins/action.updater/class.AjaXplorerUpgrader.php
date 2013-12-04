@@ -156,7 +156,7 @@ class AjaXplorerUpgrader
         if ($this->debugMode && is_file($this->archive)) {
             return "Already downloaded";
         }
-        $content = AJXP_Utils::getRemoteContent($this->archiveURL, null, self::$context);
+        $content = AJXP_Utils::getRemoteContent($this->archiveURL);
         if ($content === false || strlen($content) == 0) {
             throw new Exception("Error while downloading");
         }

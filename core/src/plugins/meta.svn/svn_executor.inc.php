@@ -64,7 +64,7 @@ function &SvnExecute(&$results = NULL){
     if (isset($_SESSION[IDX_ACTION])) {
         switch ($_SESSION[IDX_ACTION]) {
             case ACTION_LIST_REPOSITORY:
-                $result = ListRepository($config);
+                $result = ListRepository($config, "");
                 $result[IDX_TITLE] = T(TK_RESULT_TITLE_REP_LIST);
                 $results[] = $result;
                 break;
@@ -74,7 +74,7 @@ function &SvnExecute(&$results = NULL){
                 $results[] = $result;
                 break;
             case ACTION_LOG:
-                $result = GetWebspaceLog($config);
+                $result = GetWebspaceLog($config, "");
                 $result[IDX_TITLE] = T(TK_RESULT_TITLE_WS_LOG);
                 $results[] = $result;
                 break;

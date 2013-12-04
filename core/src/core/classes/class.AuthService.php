@@ -101,7 +101,7 @@ class AuthService
     {
         if (self::$useSession && isSet($_SESSION["AJXP_USER"])) {
             if (is_a($_SESSION["AJXP_USER"], "__PHP_Incomplete_Class")) {
-                session_unset("AJXP_USER");
+                session_unset();
                 return null;
             }
             return $_SESSION["AJXP_USER"];

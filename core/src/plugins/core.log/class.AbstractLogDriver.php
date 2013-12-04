@@ -62,7 +62,7 @@ abstract class AbstractLogDriver extends AJXP_Plugin
     public function write2($level, $ip, $user, $source, $prefix, $message)
     {
         //for backward compatibility
-        $this->write($source."\t".$prefix."\t".$res, $level);
+        $this->write($source."\t".$prefix."\t".$message, $level);
     }
 
     /**

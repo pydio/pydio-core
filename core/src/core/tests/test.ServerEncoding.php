@@ -47,7 +47,7 @@ class ServerEncoding extends AbstractTest
         }
         // Check if we have iconv
         if (!function_exists("iconv") && floatval(phpversion()) > 5.0) { $this->failedInfo .= "Couldn't find iconv. Please use a PHP version with iconv support"; return FALSE; }
-        if (floatval(phpversion) > 5.0) {
+        if (floatval(phpversion()) > 5.0) {
             // Try converting from a known UTF-8 string to ISO8859-1 string and back to make sure it works.
             $string = "aéàç";
             $iso = iconv("UTF-8", "ISO-8859-1", $string);
