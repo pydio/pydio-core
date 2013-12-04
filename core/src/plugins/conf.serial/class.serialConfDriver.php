@@ -56,18 +56,22 @@ class serialConfDriver extends AbstractConfDriver
 
     public function performSerialFileCheck($file, $fileLabel, $isDir = false)
     {
+        // Try to replace start path to avoid seeing full paths on screen
         if ($isDir) {
             if (!is_dir($file) || !is_writable($file)) {
-                throw new Exception("Folder for storing $fileLabel is either inexistent or not writeable.");
+                $file = str_replace(AJXP_INSTALL_PATH, "", $file);
+                throw new Exception("Folder $file for storing $fileLabel is either inexistent or not writeable.");
             }
             return ;
         }
         $dir = dirname($file);
         if (!is_dir($dir) || !is_writable($dir)) {
-            throw new Exception("Parent folder for $fileLabel is either inexistent or not writeable.");
+            $dir = str_replace(AJXP_INSTALL_PATH, "", $dir);
+            throw new Exception("Folder $dir for $fileLabel is either inexistent or not writeable.");
         }
         if (is_file($file) && !is_writable($file)) {
-            throw new Exception(ucfirst($fileLabel)." exists but is not writeable!");
+            $file = str_replace(AJXP_INSTALL_PATH, "", $file);
+            throw new Exception(ucfirst($fileLabel)." ($file) exists but is not writeable!");
         }
     }
 
