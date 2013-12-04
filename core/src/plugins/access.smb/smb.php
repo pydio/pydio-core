@@ -185,6 +185,7 @@ class smb
             $env = array("LC_ALL" => AJXP_LOCALE);
         }
         $process = proc_open($cmd, $descriptorspec, $pipes, null, $env);
+		stream_set_blocking($pipes[2], 0);
         if (is_resource($process)) {
             fclose($pipes[0]);
             $error = stream_get_contents($pipes[2]);
