@@ -69,7 +69,7 @@ class textLogDriver extends AbstractLogDriver
     {
         $storageDir = $this->storageDir;
         if (!file_exists($storageDir)) {
-            @mkdir($storageDir, LOG_GROUP_RIGHTS);
+            @mkdir($storageDir);
         }
         $this->open();
     }

@@ -415,9 +415,9 @@ class WebSocketServer implements WebSocketObserver {
             return;
 
         foreach ($this->_sockets as $s) {
-            if ($currentTime - $u->getLastChanged() > $this->purgeUserTimeOut) {
-                $u->disconnect();
-                $this->onDisconnect($u);
+            if ($currentTime - $s->getLastChanged() > $this->purgeUserTimeOut) {
+                $s->disconnect();
+                $this->onDisconnect($s);
             }
         }
     }

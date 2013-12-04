@@ -84,7 +84,7 @@ class radiusAuthDriver extends AbstractAuthDriver
             AJXP_Logger::debug("RADIUS: Could not create request (" . radius_strerror($res) . ")");
             return false;
         }
-        if (!radius_put_string($res, RADIUS_NAS_IDENTIFIER, isset($HTTP_HOST) ? $HTTP_HOST : 'localhost')) {
+        if (!radius_put_string($res, RADIUS_NAS_IDENTIFIER, isset($_SERVER["SERVER_NAME"]) ? $_SERVER["SERVER_NAME"] : 'localhost')) {
             AJXP_Logger::debug("RADIUS: Could not put string for nas_identifier (" . radius_strerror($res) . ")");
             return false;
         }
@@ -96,7 +96,7 @@ class radiusAuthDriver extends AbstractAuthDriver
             AJXP_Logger::debug("RADIUS: Could not put int for framed_protocol (" . radius_strerror($res) . ")");
             return false;
         }
-        if (!radius_put_string($res, RADIUS_CALLING_STATION_ID, isset($REMOTE_HOST) ? $REMOTE_HOST : '127.0.0.1') == -1) {
+        if (!radius_put_string($res, RADIUS_CALLING_STATION_ID, isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1') == -1) {
             AJXP_Logger::debug("RADIUS: Could not put string for calling_station_id (" . radius_strerror($res) . ")");
             return false;
         }

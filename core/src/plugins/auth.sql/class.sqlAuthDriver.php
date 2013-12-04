@@ -56,7 +56,9 @@ class sqlAuthDriver extends AbstractAuthDriver
     {
         return true;
     }
-    public function listUsersPaginated($baseGroup = "/", $regexp, $offset, $limit)
+
+    // $baseGroup = "/"
+    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit)
     {
         if ($regexp != null) {
             $like = self::regexpToLike($regexp);

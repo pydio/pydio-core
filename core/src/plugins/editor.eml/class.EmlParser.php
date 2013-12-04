@@ -393,7 +393,8 @@ class EmlParser extends AJXP_Plugin
         return $decoder;
     }
 
-    public function listAttachments($file, $cacheRemoteContent = false, &$attachments,  $structure = null)
+    // $cacheRemoteContent = false
+    public function listAttachments($file, $cacheRemoteContent, &$attachments,  $structure = null)
     {
         if ($structure == null) {
             $decoder = $this->getStructureDecoder($file, $cacheRemoteContent);

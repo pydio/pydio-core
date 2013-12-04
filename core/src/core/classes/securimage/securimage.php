@@ -1392,7 +1392,7 @@ class Securimage
         $this->sqlite_handle = false;
 
         if ($this->use_sqlite_db && function_exists('sqlite_open')) {
-            $this->sqlite_handle = sqlite_open($this->sqlite_database, 0666, $error);
+            $this->sqlite_handle = sqlite_open($this->sqlite_database, 0666);
 
             if ($this->sqlite_handle !== false) {
                 $res = sqlite_query($this->sqlite_handle, "PRAGMA table_info(codes)");

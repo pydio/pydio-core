@@ -838,12 +838,12 @@ class CAS_Client
 
 	private function setStartSession($session)
 	{
-		$this->_start_session = session;
+		$this->_start_session = $session;
 	}
 
-	public function getStartSession($session)
+	public function getStartSession()
 	{
-		$this->_start_session = session;
+		return $this->_start_session;
 	}
 
 	/** @} */

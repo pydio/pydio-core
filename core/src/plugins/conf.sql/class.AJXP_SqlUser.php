@@ -508,7 +508,6 @@ class AJXP_SqlUser extends AbstractAjxpUser
      *
      * @param $key String key of data to save.
      * @param $value Value to save
-     * @return null (AJXP_Utils::saveSerialFile() returns nothing)
      */
     public function saveTemporaryData($key, $value)
     {
@@ -518,7 +517,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
             AJXP_Logger::info(__CLASS__,"setTemporaryData", array("Warning" => "The conf.sql driver is missing a mandatory option USERS_DIRPATH!"));
         }
         $id = AuthService::ignoreUserCase()?strtolower($this->getId()):$this->getId();
-        return AJXP_Utils::saveSerialFile($dirPath."/".$id."/temp-".$key.".ser", $value);
+        AJXP_Utils::saveSerialFile($dirPath."/".$id."/temp-".$key.".ser", $value);
     }
 
     public function setGroupPath($groupPath, $update = false)
