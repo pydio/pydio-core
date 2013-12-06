@@ -51,7 +51,9 @@ class ChangesTracker extends AJXP_Plugin
 
         HTMLWriter::charsetHeader('application/json', 'UTF-8');
 
-        $res = dibi::query("SELECT * FROM [ajxp_changes]
+        $res = dibi::query("SELECT
+                [seq] , [ajxp_changes].[repository_identifier] , [ajxp_changes].[node_id] , [type] , [source] ,  [target] , [ajxp_index].[bytesize], [ajxp_index].[md5], [ajxp_index].[mtime], [ajxp_index].[node_path]
+                FROM [ajxp_changes]
                 LEFT JOIN [ajxp_index]
                     ON [ajxp_changes].[node_id] = [ajxp_index].[node_id]
                 WHERE [ajxp_changes].[repository_identifier] = %s AND [seq] > %i
