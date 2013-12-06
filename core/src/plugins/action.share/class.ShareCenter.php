@@ -1084,6 +1084,10 @@ class ShareCenter extends AJXP_Plugin
         if (!isSet($httpVars["repo_label"]) || $httpVars["repo_label"] == "") {
             return 100;
         }
+        $foldersharing = $this->getFilteredOption("ENABLE_FOLDER_SHARING", $this->repository->getId());
+        if (isset($foldersharing) && $foldersharing === false) {
+            return 103;
+        }
         $loggedUser = AuthService::getLoggedUser();
         $actRights = $loggedUser->mergedRole->listActionsStatesFor($repository);
         if (isSet($actRights["share"]) && $actRights["share"] === false) {
