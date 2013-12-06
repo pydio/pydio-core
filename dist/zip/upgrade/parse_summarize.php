@@ -38,7 +38,7 @@ function copy_r( $path, $dest )
                     continue;
                 // go on
                 if ( is_dir( $path.DIRECTORY_SEPARATOR.$file ) ) {
-                    self::copy_r( $path.DIRECTORY_SEPARATOR.$file, $dest.DIRECTORY_SEPARATOR.$file );
+                    copy_r( $path.DIRECTORY_SEPARATOR.$file, $dest.DIRECTORY_SEPARATOR.$file );
                 } else {
                     copy( $path.DIRECTORY_SEPARATOR.$file, $dest.DIRECTORY_SEPARATOR.$file );
                 }
