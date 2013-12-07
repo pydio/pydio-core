@@ -130,16 +130,16 @@ echo 'Adapting Pydio configuration files'
 cp /etc/pydio/bootstrap_repositories.php /etc/pydio/bootstrap_repositories.php.orig
 cp /etc/pydio/bootstrap_context.php /etc/pydio/bootstrap_context.php.orig
 
-sed -i 's/"\/var\/lib\/pydio"/"${config_volume}\/appdata"/g' /etc/pydio/bootstrap_context.php
-sed -i 's/"AJXP_SHARED_CACHE_DIR", "\/var\/cache\/pydio"/"AJXP_SHARED_CACHE_DIR", "${config_volume}\/cache"/g' /etc/pydio/bootstrap_context.php
-sed -i 's/"\/var\/log\/pydio\/"/"${config_volume}\/log\/"/g' /etc/pydio/bootstrap_context.php
+sed -i "s#\"/var/lib/pydio\"#\"${config_volume}/appdata\"#g" /etc/pydio/bootstrap_context.php
+sed -i "s#\"AJXP_SHARED_CACHE_DIR\", \"/var/cache/pydio\"#\"AJXP_SHARED_CACHE_DIR\", \"${config_volume}/cache\"#g" /etc/pydio/bootstrap_context.php
+sed -i "s#\"/var/log/pydio/\"#\"${config_volume}/log/\"#g" /etc/pydio/bootstrap_context.php
 
-sed -i 's/"AJXP_DATA_PATH\/files"/"${data_volume}\/common"/g' /etc/pydio/bootstrap_repositories.php
-sed -i 's/"AJXP_DATA_PATH\/personal\/AJXP_USER"/"${data_volume}\/users\/AJXP_USER"/g' /etc/pydio/bootstrap_repositories.php
+sed -i "s#\"AJXP_DATA_PATH/files\"#\"${data_volume}/common\"#g" /etc/pydio/bootstrap_repositories.php
+sed -i "s#\"AJXP_DATA_PATH/personal/AJXP_USER\"#\"${data_volume}/users/AJXP_USER\"#g" /etc/pydio/bootstrap_repositories.php
 
 # Update Share URL
-sed -i 's/"AJXP_INSTALL_PATH\/data\/public"/"${data_volume}\/public"/g' /usr/share/pydio/plugins/core.ajaxplorer/manifest.xml
-sed -i 's/\/var\/lib\/pydio\/public/${data_volume}\/public/g' /etc/httpd/conf.d/pydio.conf
+sed -i "s#\"AJXP_INSTALL_PATH/data/public\"#\"${data_volume}/public\"#g" /usr/share/pydio/plugins/core.ajaxplorer/manifest.xml
+sed -i "s#/var/lib/pydio/public#${data_volume}/public#g" /etc/httpd/conf.d/pydio.conf
 
 # Start Apache
 apachectl start
