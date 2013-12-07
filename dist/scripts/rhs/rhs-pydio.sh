@@ -109,7 +109,7 @@ HTTPDCONF
 mv /etc/php.ini /etc/php.ini.orig
 sed 's/output_buffering = 4096/output_buffering = Off/g' /etc/php.ini.orig > /etc/php.ini
 sed -i 's/post_max_size = 8M/post_max_size = 200M/g' /etc/php.ini
-sed -i 's/upload_max_filesize = 2M/upload_max_filersize = 200M/g' /etc/php.ini
+sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 200M/g' /etc/php.ini
 
 # Create target folders inside the gluster volumes
 echo 'Configuring RHS nodes'
