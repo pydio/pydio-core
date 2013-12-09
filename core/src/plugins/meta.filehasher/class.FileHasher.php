@@ -134,7 +134,7 @@ class FileHasher extends AJXP_Plugin
             case "filehasher_delta":
             case "filehasher_patch":
                 // HANDLE UPLOAD DATA
-            $this->logDebug("Received signature file, should compute delta now");
+                $this->logDebug("Received signature file, should compute delta now");
                 if (!isSet($fileVars) && !is_array($fileVars["userfile_0"])) {
                     throw new Exception("These action should find uploaded data");
                 }
@@ -163,6 +163,43 @@ class FileHasher extends AJXP_Plugin
                     header("Content-Type:text/plain");
                     echo md5_file($file);
                 }
+            break;
+            case "stat_hash" :
+                $selection = new UserSelection();
+                $selection->initFromArray($httpVars);
+                clearstatcache();
+                header("Content-type:application/json");
+                if ($selection->isUnique()) {
+                    $node = $selection->getUniqueNode($this->accessDriver);
+                    $stat = @stat($node->getUrl());
+                    if (!$stat) {
+                        print '{}';
+                    } else {
+                        if($node->isLeaf()) $hash = $this->getFileHash($selection->getUniqueNode($this->accessDriver));
+                        else $hash = 'directory';
+                        $stat[13] = $stat["hash"] = $hash;
+                        print json_encode($stat);
+                    }
+                } else {
+                    $files = $selection->getFiles();
+                    print '{';
+                    foreach ($files as $index => $path) {
+                        $node = new AJXP_Node($destStreamURL.$path);
+                        $stat = @stat($destStreamURL.$path);
+                        if(!$stat) $stat = '{}';
+                        else {
+                            if(!is_dir($node->getUrl())) $hash = $this->getFileHash($node);
+                            else $hash = 'directory';
+                            $stat[13] = $stat["hash"] = $hash;
+                            $stat = json_encode($stat);
+                        }
+                        print json_encode($path).':'.$stat . (($index < count($files) -1) ? "," : "");
+                    }
+                    print '}';
+                }
+
+            break;
+
 
             break;
         }
@@ -204,6 +241,7 @@ class FileHasher extends AJXP_Plugin
 
             }
             $node->mergeMetadata(array("md5" => $md5));
+            return $md5;
         }
     }
 

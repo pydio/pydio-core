@@ -30,6 +30,12 @@
                        <serverCallback methodName="switchActions"/>
                    </processing>
                </action>
+               <action name="stat_hash">
+                   <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="true"/>
+                   <processing>
+                       <serverCallback methodName="switchActions"/>
+                   </processing>
+               </action>
                <action name="ls">
                    <pre_processing>
                        <serverCallback methodName="checkFullTreeCache" applyCondition="$apply=isSet($httpVars['recursive']);"/>
