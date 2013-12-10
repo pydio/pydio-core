@@ -5,9 +5,5 @@ php:
  - 5.4
  - 5.5
 
-before_install:
- - wget http://cs.sensiolabs.org/get/php-cs-fixer.phar
-
 script:
  - dist/scripts/tests/syntax.sh
- - dist/scripts/tests/codestyle.sh
