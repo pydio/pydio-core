@@ -312,13 +312,7 @@ Class.create("ActionsManager", {
 		}else{
 			connexion.addParameter('get_action', this.defaultActions.get('dragndrop'));
 		}
-		if(fileName != null){
-			connexion.addParameter('file', fileName);
-		}else{
-			for(var i=0; i<fileNames.length;i++){
-				connexion.addParameter('file_'+i, fileNames[i]);
-			}
-		}
+        connexion.addParameter('nodes[]', fileNames);
 		connexion.addParameter('dest', destDir);
 		connexion.addParameter('dir', ajaxplorer.getContextNode().getPath());		
 		connexion.onComplete = function(transport){this.parseXmlMessage(transport.responseXML);}.bind(this);
