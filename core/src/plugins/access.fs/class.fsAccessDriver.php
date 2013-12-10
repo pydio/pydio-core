@@ -331,14 +331,25 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             break;
 
             case "stat" :
-
                 clearstatcache();
-                $stat = @stat($this->urlBase.$selection->getUniqueFile());
                 header("Content-type:application/json");
-                if (!$stat) {
-                    print '{}';
-                } else {
-                    print json_encode($stat);
+                if($selection->isUnique()){
+                    $stat = @stat($this->urlBase.$selection->getUniqueFile());
+                    if (!$stat) {
+                        print '{}';
+                    } else {
+                        print json_encode($stat);
+                    }
+                }else{
+                    $files = $selection->getFiles();
+                    print '{';
+                    foreach($files as $index => $path){
+                        $stat = @stat($this->urlBase.$path);
+                        if(!$stat) $stat = '{}';
+                        else $stat = json_encode($stat);
+                        print json_encode($path).':'.$stat . (($index < count($files) -1) ? "," : "");
+                    }
+                    print '}';
                 }
 
             break;
@@ -405,6 +416,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             //throw new AJXP_Exception("", 113);
                 if ($selection->isEmpty()) {
                     throw new AJXP_Exception("", 113);
+                }
+                $loggedUser = AuthService::getLoggedUser();
+                if($loggedUser != null && !$loggedUser->canWrite(ConfService::getCurrentRepositoryId())){
+                    throw new AJXP_Exception("You are not allowed to write", 207);
                 }
                 $success = $error = array();
                 $dest = AJXP_Utils::decodeSecureMagic($httpVars["dest"]);
@@ -1074,10 +1089,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         foreach ($files as $file) {
             $file = basename($file);
             if (AJXP_Utils::isHidden($file) && !$showHiddenFiles) {
-                throw new Exception("Forbidden");
+                throw new Exception("$file Forbidden");
             }
             if ($this->filterFile($file) || $this->filterFolder($file)) {
-                throw new Exception("Forbidden");
+                throw new Exception("$file Forbidden");
             }
         }
     }
