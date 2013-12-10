@@ -58,6 +58,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $create = $this->repository->getOption("CREATE");
         $path = $this->repository->getOption("PATH");
         $recycle = $this->repository->getOption("RECYCLE_BIN");
+        $chmod = $this->repository->getOption("CHMOD");
+        $wrapperData = $this->detectStreamWrapper(true);
+        $this->wrapperClassName = $wrapperData["classname"];
+        $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+
         if ($create == true) {
             if(!is_dir($path)) @mkdir($path, 0755, true);
             if (!is_dir($path)) {
@@ -72,7 +77,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             $dataTemplate = $this->repository->getOption("DATA_TEMPLATE");
             if (!empty($dataTemplate) && is_dir($dataTemplate) && !is_file($path."/.ajxp_template")) {
                 $errs = array();$succ = array();
-                $this->dircopy($dataTemplate, $path, $succ, $errs, false, false);
+                $repoData = array('base_url' => $this->urlBase, 'wrapper_name' => $this->wrapperClassName, 'chmod' => $chmod, 'recycle' => $recycle);
+                $this->dircopy($dataTemplate, $path, $succ, $errs, false, false, $repoData, $repoData);
                 touch($path."/.ajxp_template");
             }
         } else {
@@ -80,9 +86,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 throw new AJXP_Exception("Cannot find base path for your repository! Please check the configuration!");
             }
         }
-        $wrapperData = $this->detectStreamWrapper(true);
-        $this->wrapperClassName = $wrapperData["classname"];
-        $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
         if ($recycle != "") {
             RecycleBinManager::init($this->urlBase, "/".$recycle);
         }
@@ -611,6 +614,12 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             //------------------------------------
             case "upload":
 
+                $repoData = array(
+                    'base_url' => $this->urlBase,
+                    'wrapper_name' => $this->wrapperClassName,
+                    'chmod'     => $this->repository->getOption('CHMOD'),
+                    'recycle'     => $this->repository->getOption('RECYCLE_BIN')
+                );
                 $this->logDebug("Upload Files Data", $fileVars);
                 $destination=$this->urlBase.AJXP_Utils::decodeSecureMagic($dir);
                 $this->logDebug("Upload inside", array("destination"=>$this->addSlugToPath($destination)));
@@ -706,7 +715,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         $userfile_name = $appendTo;
                     }
 
-                    $this->changeMode($destination."/".$userfile_name);
+                    $this->changeMode($destination."/".$userfile_name,$repoData);
                     $createdNode = new AJXP_Node($destination."/".$userfile_name);
                     //AJXP_Controller::applyHook("node.change", array(null, $createdNode, false));
                     $logMessage.="$mess[34] ".SystemTextEncoding::toUTF8($userfile_name)." $mess[35] $dir";
@@ -1383,15 +1392,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         return $tmp;// date("d,m L Y H:i:s",$tmp);
     }
 
-    public function changeMode($filePath)
-    {
-        $chmodValue = $this->repository->getOption("CHMOD_VALUE");
-        if (isSet($chmodValue) && $chmodValue != "") {
-            $chmodValue = octdec(ltrim($chmodValue, "0"));
-            call_user_func(array($this->wrapperClassName, "changeMode"), $filePath, $chmodValue);
-        }
-    }
-
     public function filesystemFileSize($filePath)
     {
         $bytesize = "-";
@@ -1462,13 +1462,19 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             $error[] = $mess[38]." ".$destDir." ".$mess[99];
             return ;
         }
+        $repoData = array(
+            'base_url' => $this->urlBase,
+            'wrapper_name' => $this->wrapperClassName,
+            'chmod'     => $this->repository->getOption('CHMOD'),
+            'recycle'     => $this->repository->getOption('RECYCLE_BIN')
+        );
 
         foreach ($selectedFiles as $selectedFile) {
             if ($move && !$this->isWriteable(dirname($this->urlBase.$selectedFile))) {
                 $error[] = "\n".$mess[38]." ".dirname($selectedFile)." ".$mess[99];
                 continue;
             }
-            $this->copyOrMoveFile($destDir, $selectedFile, $error, $success, $move);
+            $this->copyOrMoveFile($destDir, $selectedFile, $error, $success, $move, $repoData, $repoData);
         }
     }
 
@@ -1577,12 +1583,18 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         if (!$this->isWriteable($this->urlBase."$crtDir")) {
             return "$mess[38] $crtDir $mess[99]";
         }
+        $repoData = array(
+            'base_url' => $this->urlBase,
+            'wrapper_name' => $this->wrapperClassName,
+            'chmod'     => $this->repository->getOption('CHMOD'),
+            'recycle'     => $this->repository->getOption('RECYCLE_BIN')
+        );
         $fp=fopen($this->urlBase."$crtDir/$newFileName","w");
         if ($fp) {
             if ($content != "") {
                 fputs($fp, $content);
             }
-            $this->changeMode($this->urlBase."$crtDir/$newFileName");
+            $this->changeMode($this->urlBase."$crtDir/$newFileName", $repoData);
             fclose($fp);
             $newNode = new AJXP_Node($this->urlBase."$crtDir/$newFileName");
             AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
@@ -1595,6 +1607,12 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 
     public function delete($selectedFiles, &$logMessages)
     {
+        $repoData = array(
+            'base_url' => $this->urlBase,
+            'wrapper_name' => $this->wrapperClassName,
+            'chmod'     => $this->repository->getOption('CHMOD'),
+            'recycle'     => $this->repository->getOption('RECYCLE_BIN')
+        );
         $mess = ConfService::getMessages();
         foreach ($selectedFiles as $selectedFile) {
             if ($selectedFile == "" || $selectedFile == DIRECTORY_SEPARATOR) {
@@ -1605,7 +1623,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 $logMessages[]=$mess[100]." ".SystemTextEncoding::toUTF8($selectedFile);
                 continue;
             }
-            $this->deldir($fileToDelete);
+            $this->deldir($fileToDelete, $repoData);
             if (is_dir($fileToDelete)) {
                 $logMessages[]="$mess[38] ".SystemTextEncoding::toUTF8($selectedFile)." $mess[44].";
             } else {
@@ -1614,182 +1632,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             AJXP_Controller::applyHook("node.change", array(new AJXP_Node($fileToDelete)));
         }
         return null;
-    }
-
-
-
-    public function copyOrMoveFile($destDir, $srcFile, &$error, &$success, $move = false)
-    {
-        $mess = ConfService::getMessages();
-        $destFile = $this->urlBase.$destDir."/".basename($srcFile);
-        $realSrcFile = $this->urlBase.$srcFile;
-
-        if (is_dir(dirname($realSrcFile)) && (strpos($destFile, rtrim($realSrcFile, "/") . "/") === 0)) {
-            $error[] = $mess[101];
-            return;
-        }
-
-        if (!file_exists($realSrcFile)) {
-            $error[] = $mess[100].$srcFile;
-            return ;
-        }
-        if (!$move) {
-            AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($destFile), filesize($realSrcFile)));
-        }
-        if (dirname($realSrcFile)==dirname($destFile)) {
-            if ($move) {
-                $error[] = $mess[101];
-                return ;
-            } else {
-                $base = basename($srcFile);
-                $i = 1;
-                if (is_file($realSrcFile)) {
-                    $dotPos = strrpos($base, ".");
-                    if ($dotPos>-1) {
-                        $radic = substr($base, 0, $dotPos);
-                        $ext = substr($base, $dotPos);
-                    }
-                }
-                // auto rename file
-                $i = 1;
-                $newName = $base;
-                while (file_exists($this->urlBase.$destDir."/".$newName)) {
-                    $suffix = "-$i";
-                    if(isSet($radic)) $newName = $radic . $suffix . $ext;
-                    else $newName = $base.$suffix;
-                    $i++;
-                }
-                $destFile = $this->urlBase.$destDir."/".$newName;
-            }
-        }
-        if (!is_file($realSrcFile)) {
-            $errors = array();
-            $succFiles = array();
-            if ($move) {
-                AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($realSrcFile)));
-                if(file_exists($destFile)) $this->deldir($destFile);
-                $res = rename($realSrcFile, $destFile);
-            } else {
-                $dirRes = $this->dircopy($realSrcFile, $destFile, $errors, $succFiles);
-            }
-            if (count($errors) || (isSet($res) && $res!==true)) {
-                $error[] = $mess[114];
-                return ;
-            } else {
-                AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), !$move));
-            }
-        } else {
-            if ($move) {
-                AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($realSrcFile)));
-                if(file_exists($destFile)) unlink($destFile);
-                $res = rename($realSrcFile, $destFile);
-                AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), false));
-            } else {
-                try {
-                    if (call_user_func(array($this->wrapperClassName, "isRemote"))) {
-                        $src = fopen($realSrcFile, "r");
-                        $dest = fopen($destFile, "w");
-                        if ($dest !== false) {
-                            while (!feof($src)) {
-                                stream_copy_to_stream($src, $dest, 4096);
-                            }
-                            fclose($dest);
-                        }
-                        fclose($src);
-                    } else {
-                        copy($realSrcFile, $destFile);
-                    }
-                    $this->changeMode($destFile);
-                    AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), true));
-                } catch (Exception $e) {
-                    $error[] = $e->getMessage();
-                    return ;
-                }
-            }
-        }
-
-        if ($move) {
-            // Now delete original
-            // $this->deldir($realSrcFile); // both file and dir
-            $messagePart = $mess[74]." ".SystemTextEncoding::toUTF8($destDir);
-            if (RecycleBinManager::recycleEnabled() && $destDir == RecycleBinManager::getRelativeRecycle()) {
-                RecycleBinManager::fileToRecycle($srcFile);
-                $messagePart = $mess[123]." ".$mess[122];
-            }
-            if (isset($dirRes)) {
-                $success[] = $mess[117]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart." (".SystemTextEncoding::toUTF8($dirRes)." ".$mess[116].") ";
-            } else {
-                $success[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart;
-            }
-        } else {
-            if (RecycleBinManager::recycleEnabled() && $destDir == "/".$this->repository->getOption("RECYCLE_BIN")) {
-                RecycleBinManager::fileToRecycle($srcFile);
-            }
-            if (isSet($dirRes)) {
-                $success[] = $mess[117]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$mess[73]." ".SystemTextEncoding::toUTF8($destDir)." (".SystemTextEncoding::toUTF8($dirRes)." ".$mess[116].")";
-            } else {
-                $success[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$mess[73]." ".SystemTextEncoding::toUTF8($destDir);
-            }
-        }
-
-    }
-
-    // A function to copy files from one directory to another one, including subdirectories and
-    // nonexisting or newer files. Function returns number of files copied.
-    // This function is PHP implementation of Windows xcopy  A:\dir1\* B:\dir2 /D /E /F /H /R /Y
-    // Syntaxis: [$number =] dircopy($sourcedirectory, $destinationdirectory [, $verbose]);
-    // Example: $num = dircopy('A:\dir1', 'B:\dir2', 1);
-
-    public function dircopy($srcdir, $dstdir, &$errors, &$success, $verbose = false, $convertSrcFile = true)
-    {
-        $num = 0;
-        //$verbose = true;
-        $recurse = array();
-        if(!is_dir($dstdir)) {
-            $dirMode = 0755;
-            $chmodValue = $this->repository->getOption("CHMOD_VALUE");
-            if (isSet($chmodValue) && $chmodValue != "") {
-                $dirMode = octdec(ltrim($chmodValue, "0"));
-                if ($dirMode & 0400) $dirMode |= 0100; // User is allowed to read, allow to list the directory
-                if ($dirMode & 0040) $dirMode |= 0010; // Group is allowed to read, allow to list the directory
-                if ($dirMode & 0004) $dirMode |= 0001; // Other are allowed to read, allow to list the directory
-            }
-            $old = umask(0);
-            mkdir($dstdir, $dirMode);
-            umask($old);
-        }
-        if ($curdir = opendir($srcdir)) {
-            while ($file = readdir($curdir)) {
-                if ($file != '.' && $file != '..') {
-                    $srcfile = $srcdir . "/" . $file;
-                    $dstfile = $dstdir . "/" . $file;
-                    if (is_file($srcfile)) {
-                        if(is_file($dstfile)) $ow = filemtime($srcfile) - filemtime($dstfile); else $ow = 1;
-                        if ($ow > 0) {
-                            try {
-                                if($convertSrcFile) $tmpPath = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $srcfile);
-                                else $tmpPath = $srcfile;
-                                if($verbose) echo "Copying '$tmpPath' to '$dstfile'...";
-                                copy($tmpPath, $dstfile);
-                                $success[] = $srcfile;
-                                $num ++;
-                                $this->changeMode($dstfile);
-                            } catch (Exception $e) {
-                                $errors[] = $srcfile;
-                            }
-                        }
-                    } else {
-                        $recurse[] = array("src" => $srcfile, "dest"=> $dstfile);
-                    }
-                }
-            }
-            closedir($curdir);
-            foreach ($recurse as $rec) {
-                if($verbose) echo "Dircopy $srcfile";
-                $num += $this->dircopy($rec["src"], $rec["dest"], $errors, $success, $verbose, $convertSrcFile);
-            }
-        }
-        return $num;
     }
 
     public function simpleCopy($origFile, $destFile)
@@ -1804,40 +1646,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             return posix_access($real, POSIX_W_OK);
         }
         return is_writable($dir);
-    }
-
-    public function deldir($location)
-    {
-        if (is_dir($location)) {
-            AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($location)));
-            $all=opendir($location);
-            while ($file=readdir($all)) {
-                if (is_dir("$location/$file") && $file !=".." && $file!=".") {
-                    $this->deldir("$location/$file");
-                    if (file_exists("$location/$file")) {
-                        rmdir("$location/$file");
-                    }
-                    unset($file);
-                } elseif (!is_dir("$location/$file")) {
-                    if (file_exists("$location/$file")) {
-                        unlink("$location/$file");
-                    }
-                    unset($file);
-                }
-            }
-            closedir($all);
-            rmdir($location);
-        } else {
-            if (file_exists("$location")) {
-                AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($location)));
-                $test = @unlink("$location");
-                if(!$test) throw new Exception("Cannot delete file ".$location);
-            }
-        }
-        if (basename(dirname($location)) == $this->repository->getOption("RECYCLE_BIN")) {
-            // DELETING FROM RECYCLE
-            RecycleBinManager::deleteFromRecycle($location);
-        }
     }
 
     /**
@@ -1890,6 +1698,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 
     /**
      * @param String $node
+     * @param null $newSize
      */
     public function nodeWillChange($node, $newSize = null)
     {

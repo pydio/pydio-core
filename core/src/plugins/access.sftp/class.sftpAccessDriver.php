@@ -81,113 +81,23 @@ class sftpAccessDriver extends fsAccessDriver
     }
 
 
-    /**
-     * We have to override the standard copyOrMoveFile, as feof() does
-     * not seem to work with ssh2.ftp stream...
-     * Maybe something to search hear http://www.mail-archive.com/php-general@lists.php.net/msg169992.html?
-     *
-     * @param string $destDir
-     * @param string $srcFile
-     * @param array $error
-     * @param array $success
-     * @param boolean $move
-     */
-    public function copyOrMoveFile($destDir, $srcFile, &$error, &$success, $move = false)
+    protected function filecopy($srcFile, $destFile, $srcWrapperName, $destWrapperName)
     {
-        $mess = ConfService::getMessages();
-        $destFile = $this->urlBase.$destDir."/".basename($srcFile);
-        $realSrcFile = $this->urlBase.$srcFile;
-        if (!file_exists($realSrcFile)) {
-            $error[] = $mess[100].$srcFile;
-            return ;
-        }
-        if (dirname($realSrcFile)==dirname($destFile)) {
-            if ($move) {
-                $error[] = $mess[101];
-                return ;
-            } else {
-                $base = basename($srcFile);
-                $i = 1;
-                if (is_file($realSrcFile)) {
-                    $dotPos = strrpos($base, ".");
-                    if ($dotPos>-1) {
-                        $radic = substr($base, 0, $dotPos);
-                        $ext = substr($base, $dotPos);
-                    }
-                }
-                // auto rename file
-                $i = 1;
-                $newName = $base;
-                while (file_exists($this->urlBase.$destDir."/".$newName)) {
-                    $suffix = "-$i";
-                    if(isSet($radic)) $newName = $radic . $suffix . $ext;
-                    else $newName = $base.$suffix;
-                    $i++;
-                }
-                $destFile = $this->urlBase.$destDir."/".$newName;
-            }
-        }
-        if (!is_file($realSrcFile)) {
-            $errors = array();
-            $succFiles = array();
-            if ($move) {
-                if(file_exists($destFile)) $this->deldir($destFile);
-                $res = rename($realSrcFile, $destFile);
-            } else {
-                $dirRes = $this->dircopy($realSrcFile, $destFile, $errors, $succFiles);
-            }
-            if (count($errors) || (isSet($res) && $res!==true)) {
-                $error[] = $mess[114];
-                return ;
-            }
+        if ($srcWrapperName == $destWrapperName && $srcWrapperName == $this->wrapperClassName) {
+            $srcFilePath = str_replace($this->urlBase, "", $srcFile);
+            $destFilePath = str_replace($this->urlBase, "", $destFile);
+            $destDirPath = dirname($destFilePath);
+            list($connection, $remote_base_path) = sftpAccessWrapper::getSshConnection($srcFile);
+            $remoteSrc = $remote_base_path.$srcFilePath;
+            $remoteDest = $remote_base_path.$destDirPath;
+            $this->logDebug("SSH2 CP", array("cmd" => 'cp '.$remoteSrc.' '.$remoteDest));
+            ssh2_exec($connection, 'cp '.$remoteSrc.' '.$remoteDest);
+            AJXP_Controller::applyHook("node.change", array(new AJXP_Node($srcFile), new AJXP_Node($destFile), true));
         } else {
-            if ($move) {
-                AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($realSrcFile)));
-                if(file_exists($destFile)) unlink($destFile);
-                rename($realSrcFile, $destFile);
-                AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), false));
-            } else {
-                try {
-                    // BEGIN OVERRIDING
-                    list($connection, $remote_base_path) = sftpAccessWrapper::getSshConnection($realSrcFile);
-                    $remoteSrc = $remote_base_path.$srcFile;
-                    $remoteDest = $remote_base_path.$destDir;
-                    $this->logDebug("SSH2 CP", array("cmd" => 'cp '.$remoteSrc.' '.$remoteDest));
-                    ssh2_exec($connection, 'cp '.$remoteSrc.' '.$remoteDest);
-                    AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), true));
-                    // END OVERRIDING
-                } catch (Exception $e) {
-                    $error[] = $e->getMessage();
-                    return ;
-                }
-            }
+            parent::filecopy($srcFile, $destFile, $srcWrapperName, $destWrapperName);
         }
-
-        if ($move) {
-            // Now delete original
-            // $this->deldir($realSrcFile); // both file and dir
-            $messagePart = $mess[74]." ".SystemTextEncoding::toUTF8($destDir);
-            if (RecycleBinManager::recycleEnabled() && $destDir == RecycleBinManager::getRelativeRecycle()) {
-                RecycleBinManager::fileToRecycle($srcFile);
-                $messagePart = $mess[123]." ".$mess[122];
-            }
-            if (isset($dirRes)) {
-                $success[] = $mess[117]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart." (".SystemTextEncoding::toUTF8($dirRes)." ".$mess[116].") ";
-            } else {
-                $success[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart;
-            }
-        } else {
-            if (RecycleBinManager::recycleEnabled() && $destDir == "/".$this->repository->getOption("RECYCLE_BIN")) {
-                RecycleBinManager::fileToRecycle($srcFile);
-            }
-            if (isSet($dirRes)) {
-                $success[] = $mess[117]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$mess[73]." ".SystemTextEncoding::toUTF8($destDir)." (".SystemTextEncoding::toUTF8($dirRes)." ".$mess[116].")";
-            } else {
-                $success[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$mess[73]." ".SystemTextEncoding::toUTF8($destDir);
-            }
-        }
-
     }
+
 
     public function filesystemFileSize($filePath)
     {
@@ -202,6 +112,7 @@ class sftpAccessDriver extends fsAccessDriver
      * @param $src
      * @param $dest
      * @param $basedir
+     * @throws Exception
      * @return zipfile
      */
     public function makeZip ($src, $dest, $basedir)

@@ -135,50 +135,26 @@ class AbstractAccessDriver extends AJXP_Plugin
                 throw new Exception($mess[364]);
             }
         }
+        $srcRepoData= array(
+            'base_url' => $origStreamURL,
+            'wrapper_name' => $origWrapperData['classname'],
+            'recycle'   => $this->repository->getOption("RECYCLE_BIN")
+        );
+        $destRepoData=array(
+            'base_url' => $destStreamURL,
+            'wrapper_name' => $destWrapperData['classname'],
+            'chmod'         => $this->repository->getOption('CHMOD')
+        );
 
         $messages = array();
+        $errorMessages = array();
         foreach ($files as $file) {
-            $origFile = $origStreamURL.$file;
-            $localName = "";
-            AJXP_Controller::applyHook("dl.localname", array($origFile, &$localName, $origWrapperData["classname"]));
-            if (isSet($httpVars["moving_files"])) {
-                AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($origFile)));
-            }
-            $bName = basename($file);
-            if ($localName != "") {
-                $bName = $localName;
-            }
-            if (isSet($httpVars["moving_files"])) {
-                $touch = filemtime($origFile);
-            }
-            $destFile = $destStreamURL.SystemTextEncoding::fromUTF8($httpVars["dest"])."/".$bName;
-            AJXP_Controller::applyHook("node.before_create", array($destFile));
-            if (!is_file($origFile)) {
-                throw new Exception("Cannot find $origFile");
-            }
-            $origHandler = fopen($origFile, "r");
-            $destHandler = fopen($destFile, "w");
-            if ($origHandler === false || $destHandler === false) {
-                $errorMessages[] = AJXP_XMLWriter::sendMessage(null, $mess[114]." ($origFile to $destFile)", false);
-                continue;
-            }
-            while (!feof($origHandler)) {
-                fwrite($destHandler, fread($origHandler, 4096));
-            }
-            fflush($destHandler);
-            fclose($origHandler);
-            fclose($destHandler);
-            AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($destFile)));
-            if (isSet($httpVars["moving_files"])) {
-                $wrapName = $destWrapperData["classname"];
-                if (!call_user_func(array($wrapName, "isRemote"))) {
-                    $real = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $destFile, true);
-                    $r = @touch($real, $touch, $touch);
 
-                }
-                AJXP_Controller::applyHook("node.change", array(new AJXP_Node($origFile), null));
-            }
-            $messages[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($origFile))." ".(isSet($httpVars["moving_files"])?$mess[74]:$mess[73])." ".SystemTextEncoding::toUTF8($destFile);
+            $this->copyOrMoveFile(
+                AJXP_Utils::decodeSecureMagic($httpVars["dest"]),
+                $file, $errorMessages, $messages, isSet($httpVars["moving_files"]) ? true: false,
+                $srcRepoData, $destRepoData);
+
         }
         AJXP_XMLWriter::header();
         if (count($errorMessages)) {
@@ -187,6 +163,268 @@ class AbstractAccessDriver extends AJXP_Plugin
         AJXP_XMLWriter::sendMessage(join("\n", $messages), null, true);
         AJXP_XMLWriter::close();
     }
+
+    /**
+     * @param String $destDir url of destination dir
+     * @param String $srcFile url of source file
+     * @param Array $error accumulator for error messages
+     * @param Array $success accumulator for success messages
+     * @param bool $move Whether to copy or move
+     * @param array $srcRepoData Set of data concerning source repository: base_url, wrapper_name and recycle option
+     * @param array $destRepoData Set of data concerning destination repository: base_url, wrapper_name and chmod option
+     */
+    protected function copyOrMoveFile($destDir, $srcFile, &$error, &$success, $move = false, $srcRepoData = array(), $destRepoData = array())
+    {
+        $srcUrlBase = $srcRepoData['base_url'];
+        $srcWrapperName = $srcRepoData['wrapper_name'];
+        $srcRecycle = $srcRepoData['recycle'];
+        $destUrlBase = $destRepoData['base_url'];
+        $destWrapperName = $destRepoData['wrapper_name'];
+
+        $mess = ConfService::getMessages();
+        $bName = basename($srcFile);
+        $localName = '';
+        AJXP_Controller::applyHook("dl.localname", array($srcFile, &$localName, $srcWrapperName));
+        if(!empty($localName)) $bName = $localName;
+        $destFile = $destUrlBase.$destDir."/".$bName;
+        $realSrcFile = $srcUrlBase.$srcFile;
+
+        if (is_dir(dirname($realSrcFile)) && (strpos($destFile, rtrim($realSrcFile, "/") . "/") === 0)) {
+            $error[] = $mess[101];
+            return;
+        }
+
+        if (!file_exists($realSrcFile)) {
+            $error[] = $mess[100].$srcFile;
+            return ;
+        }
+        if (!$move) {
+            AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($destFile), filesize($realSrcFile)));
+        }
+        if (dirname($realSrcFile)==dirname($destFile)) {
+            if ($move) {
+                $error[] = $mess[101];
+                return ;
+            } else {
+                $base = basename($srcFile);
+                $i = 1;
+                if (is_file($realSrcFile)) {
+                    $dotPos = strrpos($base, ".");
+                    if ($dotPos>-1) {
+                        $radic = substr($base, 0, $dotPos);
+                        $ext = substr($base, $dotPos);
+                    }
+                }
+                // auto rename file
+                $i = 1;
+                $newName = $base;
+                while (file_exists($destUrlBase.$destDir."/".$newName)) {
+                    $suffix = "-$i";
+                    if(isSet($radic)) $newName = $radic . $suffix . $ext;
+                    else $newName = $base.$suffix;
+                    $i++;
+                }
+                $destFile = $destUrlBase.$destDir."/".$newName;
+            }
+        }
+        if (!is_file($realSrcFile)) {
+            $errors = array();
+            $succFiles = array();
+            if ($move) {
+                AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($realSrcFile)));
+                if(file_exists($destFile)) $this->deldir($destFile, $destRepoData);
+                $res = rename($realSrcFile, $destFile);
+            } else {
+                $dirRes = $this->dircopy($realSrcFile, $destFile, $errors, $succFiles, false, true, $srcRepoData, $destRepoData);
+            }
+            if (count($errors) || (isSet($res) && $res!==true)) {
+                $error[] = $mess[114];
+                return ;
+            } else {
+                AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), !$move));
+            }
+        } else {
+            if ($move) {
+                AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($realSrcFile)));
+                if(file_exists($destFile)) unlink($destFile);
+                $res = rename($realSrcFile, $destFile);
+                AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), false));
+            } else {
+                try {
+                    $this->filecopy($realSrcFile, $destFile, $srcWrapperName, $destWrapperName);
+                    $this->changeMode($destFile, $destRepoData);
+                    AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), true));
+                } catch (Exception $e) {
+                    $error[] = $e->getMessage();
+                    return ;
+                }
+            }
+        }
+
+        if ($move) {
+            // Now delete original
+            // $this->deldir($realSrcFile); // both file and dir
+            $messagePart = $mess[74]." ".SystemTextEncoding::toUTF8($destDir);
+            if (RecycleBinManager::recycleEnabled() && $destDir == RecycleBinManager::getRelativeRecycle()) {
+                RecycleBinManager::fileToRecycle($srcFile);
+                $messagePart = $mess[123]." ".$mess[122];
+            }
+            if (isset($dirRes)) {
+                $success[] = $mess[117]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart." (".SystemTextEncoding::toUTF8($dirRes)." ".$mess[116].") ";
+            } else {
+                $success[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart;
+            }
+        } else {
+            if (RecycleBinManager::recycleEnabled() && $destDir == "/".$srcRecycle) {
+                RecycleBinManager::fileToRecycle($srcFile);
+            }
+            if (isSet($dirRes)) {
+                $success[] = $mess[117]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$mess[73]." ".SystemTextEncoding::toUTF8($destDir)." (".SystemTextEncoding::toUTF8($dirRes)." ".$mess[116].")";
+            } else {
+                $success[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$mess[73]." ".SystemTextEncoding::toUTF8($destDir);
+            }
+        }
+
+    }
+
+    /**
+     * @param String $srcFile url of source file
+     * @param String $destFile url of destination file
+     * @param String $srcWrapperName Wrapper name
+     * @param String $destWrapperName Wrapper name
+     */
+    protected function filecopy($srcFile, $destFile, $srcWrapperName, $destWrapperName)
+    {
+        if (call_user_func(array($srcWrapperName, "isRemote")) || call_user_func(array($destWrapperName, "isRemote")) || $srcWrapperName != $destWrapperName) {
+            $src = fopen($srcFile, "r");
+            $dest = fopen($destFile, "w");
+            if ($dest !== false) {
+                while (!feof($src)) {
+                    stream_copy_to_stream($src, $dest, 4096);
+                }
+                fclose($dest);
+            }
+            fclose($src);
+        } else {
+            copy($srcFile, $destFile);
+        }
+    }
+
+    /**
+     * @param String $srcdir Url of source file
+     * @param String $dstdir Url of dest file
+     * @param Array $errors Array of errors
+     * @param Array $success Array of success
+     * @param bool $verbose Boolean
+     * @param bool $convertSrcFile Boolean
+     * @param array $srcRepoData Set of data concerning source repository: base_url, wrapper_name and recycle option
+     * @param array $destRepoData Set of data concerning destination repository: base_url, wrapper_name and chmod option
+     * @return int
+     */
+    protected function dircopy($srcdir, $dstdir, &$errors, &$success, $verbose = false, $convertSrcFile = true, $srcRepoData = array(), $destRepoData = array())
+    {
+        $num = 0;
+        //$verbose = true;
+        $recurse = array();
+        if (!is_dir($dstdir)) {
+            $dirMode = 0755;
+            $chmodValue = $destRepoData["chmod"]; //$this->repository->getOption("CHMOD_VALUE");
+            if (isSet($chmodValue) && $chmodValue != "") {
+                $dirMode = octdec(ltrim($chmodValue, "0"));
+                if ($dirMode & 0400) $dirMode |= 0100; // User is allowed to read, allow to list the directory
+                if ($dirMode & 0040) $dirMode |= 0010; // Group is allowed to read, allow to list the directory
+                if ($dirMode & 0004) $dirMode |= 0001; // Other are allowed to read, allow to list the directory
+            }
+            $old = umask(0);
+            mkdir($dstdir, $dirMode);
+            umask($old);
+        }
+        if ($curdir = opendir($srcdir)) {
+            while ($file = readdir($curdir)) {
+                if ($file != '.' && $file != '..') {
+                    $srcfile = $srcdir . "/" . $file;
+                    $dstfile = $dstdir . "/" . $file;
+                    if (is_file($srcfile)) {
+                        if(is_file($dstfile)) $ow = filemtime($srcfile) - filemtime($dstfile); else $ow = 1;
+                        if ($ow > 0) {
+                            try {
+                                if($convertSrcFile) $tmpPath = call_user_func(array($srcRepoData["wrapper_name"], "getRealFSReference"), $srcfile);
+                                else $tmpPath = $srcfile;
+                                if($verbose) echo "Copying '$tmpPath' to '$dstfile'...";
+                                copy($tmpPath, $dstfile);
+                                $success[] = $srcfile;
+                                $num ++;
+                                $this->changeMode($dstfile, $destRepoData);
+                            } catch (Exception $e) {
+                                $errors[] = $srcfile;
+                            }
+                        }
+                    } else {
+                        $recurse[] = array("src" => $srcfile, "dest"=> $dstfile);
+                    }
+                }
+            }
+            closedir($curdir);
+            foreach ($recurse as $rec) {
+                if($verbose) echo "Dircopy $srcfile";
+                $num += $this->dircopy($rec["src"], $rec["dest"], $errors, $success, $verbose, $convertSrcFile, $srcRepoData, $destRepoData);
+            }
+        }
+        return $num;
+    }
+
+    /**
+     * @param $filePath
+     * @param $repoData
+     */
+    protected function changeMode($filePath, $repoData)
+    {
+        $chmodValue = $repoData["chmod"]; //$this->repository->getOption("CHMOD_VALUE");
+        if (isSet($chmodValue) && $chmodValue != "") {
+            $chmodValue = octdec(ltrim($chmodValue, "0"));
+            call_user_func(array($repoData["wrapper_name"], "changeMode"), $filePath, $chmodValue);
+        }
+    }
+
+    /**
+     * @param $location
+     * @param $repoData
+     * @throws Exception
+     */
+    protected function deldir($location, $repoData)
+    {
+        if (is_dir($location)) {
+            AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($location)));
+            $all=opendir($location);
+            while ($file=readdir($all)) {
+                if (is_dir("$location/$file") && $file !=".." && $file!=".") {
+                    $this->deldir("$location/$file", $repoData);
+                    if (file_exists("$location/$file")) {
+                        rmdir("$location/$file");
+                    }
+                    unset($file);
+                } elseif (!is_dir("$location/$file")) {
+                    if (file_exists("$location/$file")) {
+                        unlink("$location/$file");
+                    }
+                    unset($file);
+                }
+            }
+            closedir($all);
+            rmdir($location);
+        } else {
+            if (file_exists("$location")) {
+                AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($location)));
+                $test = @unlink("$location");
+                if(!$test) throw new Exception("Cannot delete file ".$location);
+            }
+        }
+        if (isSet($repoData["recycle"]) && basename(dirname($location)) == $repoData["recycle"]) {
+            // DELETING FROM RECYCLE
+            RecycleBinManager::deleteFromRecycle($location);
+        }
+    }
+
 
     /**
      *

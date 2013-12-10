@@ -577,9 +577,6 @@
 					if(ajaxplorer.user){
 						var user = ajaxplorer.user;
 						var activeRepository = user.getActiveRepository();
-						if(ajaxplorer.getUserSelection().hasDir() && !user.canWrite()){
-							throw new Error(MessageHash[374]);
-						}
 					}
 					var context = ajaxplorer.actionBar;
 					var onLoad = function(oForm){
@@ -590,7 +587,7 @@
                                 return (!ajxpNode.isLeaf() && !ajxpNode.hasMetadataInBranch("ajxp_readonly", "true"));
                             }
                         });
-						if(!ajaxplorer.getUserSelection().hasDir() && user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
+						if(user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
 							var firstKey ;
 							var reposList = new Hash();
 							user.getCrossRepositories().each(function(pair){
@@ -658,7 +655,6 @@
 						var ajxpUser = ajaxplorer.user;
 						if(ajxpUser && !ajxpUser.canWrite() && ajxpUser.canCrossRepositoryCopy() && ajxpUser.hasCrossRepositories()){
 							action.rightsContext.write = false;
-							action.selectionContext.dir = false;
 							ajaxplorer.actionBar.defaultActions.unset('ctrldragndrop');
 							ajaxplorer.actionBar.defaultActions.unset('dragndrop');
 						}
