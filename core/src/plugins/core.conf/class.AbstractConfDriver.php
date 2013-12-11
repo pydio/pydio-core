@@ -613,7 +613,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
                 if ($action == "user_create_user") {
                     AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "NEW_");
-
+                    $data["new_user_id"] = AJXP_Utils::decodeSecureMagic($data["new_user_id"], AJXP_SANITIZE_EMAILCHARS);
                     if (AuthService::userExists($data["new_user_id"])) {
                         throw new Exception('Please choose another user id');
                     }
