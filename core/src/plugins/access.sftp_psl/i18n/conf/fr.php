@@ -1,22 +1,22 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
-* This file is part of Pydio.
+* Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
+* This file is part of AjaXplorer.
 *
-* Pydio is free software: you can redistribute it and/or modify
+* AjaXplorer is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Affero General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
 *
-* Pydio is distributed in the hope that it will be useful,
+* AjaXplorer is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU Affero General Public License for more details.
 *
 * You should have received a copy of the GNU Affero General Public License
-* along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+* along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
 "SSH File Transfer Protocol (SFTP)" => "SSH File Transfer Protocol (SFTP)",
@@ -30,3 +30,4 @@ $mess=array(
 "Fix Permissions" => "Correction des permissions",
 "How to handle remote permissions to be used by PHP as local permissions. See manual." => "Gestion des permissions entre le serveur local et le serveur distant."
 );
+?>
