@@ -1,23 +1,23 @@
 <?php
 /*
  * Copyright 2013 Nikita ROUSSEAU <warhawk3407@gmail.com>
- * This file is part of AjaXplorer.
+ * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
  *
- * AjaXplorer is free software: you can redistribute it and/or modify
+ * Pydio is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * AjaXplorer is distributed in the hope that it will be useful,
+ * Pydio is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://www.ajaxplorer.info/>.
- *
+ * The latest code can be found at <http://pyd.io/>.
  */
 defined('AJXP_EXEC') or die( 'Access not allowed' );
 
@@ -29,19 +29,21 @@ require_once(AJXP_INSTALL_PATH."/plugins/access.sftp_psl/phpseclib/SSH2.php");
  *
  * @author	warhawk3407 <warhawk3407@gmail.com>
  * @author	Charles du Jeu <contact (at) cdujeu.me>
- * @version	Release: 1.0.1
+ * @version	Release: 1.0.2
  */
 class sftpPSLAccessWrapper extends fsAccessWrapper
 {
 
-	public static function isRemote(){
+	public static function isRemote()
+	{
 		return true;
 	}
 
 	/**
 	 * Initialize the stream from the given path.
 	 */
-	protected static function initPath($path, $streamType = '', $storeOpenContext = false, $skipZip = true){
+	protected static function initPath($path, $streamType = '', $storeOpenContext = false, $skipZip = true)
+	{
 		$url = parse_url($path);
 		$repoId = $url["host"];
 		$path = $url["path"];
@@ -58,17 +60,17 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
 		$user = $credentials["user"];
 		$pass = $credentials["password"];
 
-		if($basePath[strlen($basePath)-1] == "/"){
+		if ($basePath[strlen($basePath)-1] == "/") {
 			$basePath = substr($basePath, 0, -1);
 		}
 
-		if($basePath[0] != "/"){
+		if ($basePath[0] != "/") {
 			$basePath = "/$basePath";
 		}
 
 		$path = AJXP_Utils::securePath($path);
 
-		if($path[0] == "/"){
+		if ($path[0] == "/") {
 			$path = substr($path, 1);
 		}
 
@@ -81,14 +83,15 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
 	 * @param String $path
 	 * @return string
 	 */
-	public static function getRealFSReference($path, $persistent = false){
-		if($persistent){
+	public static function getRealFSReference($path, $persistent = false)
+	{
+		if($persistent) {
 			$tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time());
 			$tmpHandle = fopen($tmpFile, "wb");
 			self::copyFileInStream($path, $tmpHandle);
 			fclose($tmpHandle);
 			return $tmpFile;
-		}else{
+		} else {
 			return self::initPath($path);
 		}
 	}
@@ -105,16 +108,16 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
 	 */
 	public function stream_open($path, $mode, $options, &$context)
 	{
-		try{
+		try {
 			$this->realPath = $this->initPath($path);
-		}catch (Exception $e){
-			AJXP_Logger::logAction("error", array("message" => "Error while opening stream $path"));
+		} catch (Exception $e) {
+			AJXP_Logger::error(__CLASS__,"stream_open", "Error while opening stream $path");
 			return false;
 		}
-		if($this->realPath == -1){
+		if ($this->realPath == -1) {
 			$this->fp = -1;
 			return true;
-		}else{
+		} else {
 			$this->fp = fopen($this->realPath, $mode, $options);
 			return ($this->fp !== false);
 		}
@@ -129,25 +132,27 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
 	 * @param unknown_type $options
 	 * @return unknown
 	 */
-	public function dir_opendir ($path , $options ){
+	public function dir_opendir ($path , $options )
+	{
 		$this->realPath = $this->initPath($path);
-		if($this->realPath[strlen($this->realPath)-1] != "/"){
+		if ($this->realPath[strlen($this->realPath)-1] != "/") {
 			$this->realPath.="/";
 		}
-		if(is_string($this->realPath)){
+		if (is_string($this->realPath)) {
 			$this->dH = opendir($this->realPath);
-		}else if($this->realPath == -1){
+		} else if ($this->realPath == -1) {
 			$this->dH = -1;
 		}
 		return $this->dH !== false;
 	}
 
-	public function unlink($path){
+	public function unlink($path)
+	{
 		$this->realPath = $this->initPath($path, "file", false, true);
 		@unlink($this->realPath);
-		if(is_file($this->realPath)){
+		if (is_file($this->realPath)) {
 			return false;
-		}else{
+		} else {
 			return true;
 		}
 	}
@@ -159,7 +164,8 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
 	 * @param mixed $flags
 	 * @return array
 	 */
-	public function url_stat($path, $flags){
+	public function url_stat($path, $flags)
+	{
 		$realPath = self::initPath($path);
 		$stat = @stat($realPath);
 		$parts = parse_url($path);
@@ -170,7 +176,8 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
 		return $stat;
 	}
 
-	public function detectRemoteUserId($repoObject){
+	public function detectRemoteUserId($repoObject)
+	{
 		$host = $repoObject->getOption("SFTP_HOST");
 		$port = $repoObject->getOption("SFTP_PORT");
 
@@ -182,10 +189,10 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
 		if ($ssh2->login($user, $pass)) {
 			$output = $ssh2->exec( 'id' );
 
-			if(trim($output != "")){
+			if (trim($output != "")) {
 				$res = sscanf($output, "uid=%i(%s) gid=%i(%s) groups=%i(%s)");
 				preg_match_all("/(\w*)=(\w*)\((\w*)\)/", $output, $matches);
-				if(count($matches[0]) == 3){
+				if (count($matches[0]) == 3) {
 					$uid = $matches[2][0];
 					$gid = $matches[2][1];
 
@@ -205,8 +212,8 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
 	 * @param String $path
 	 * @param Stream $stream
 	 */
-	public static function copyFileInStream($path, $stream){
-
+	public static function copyFileInStream($path, $stream)
+	{
 		$src = fopen(self::initPath($path), "rb");
 		while ($content = fread($src, 5120)) {
 			fputs($stream, $content, strlen($content));
@@ -221,7 +228,8 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
 	 * @param String $tmpDir
 	 * @param String $tmpFile
 	 */
-	public static function removeTmpFile($tmpDir, $tmpFile){
+	public static function removeTmpFile($tmpDir, $tmpFile)
+	{
 		if(is_file($tmpFile)) unlink($tmpFile);
 		if(is_dir($tmpDir)) rmdir($tmpDir);
 	}

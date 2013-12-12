@@ -8,7 +8,7 @@
  * Requirement:	phpseclib - PHP Secure Communications Library
  *
  * Filename:	SFTPPSL_StreamWrapper.php
- * Classname:	SFTP_StreamWrapper
+ * Classname:	SFTPPSL_StreamWrapper
  *
  * #######################################################################
  * # Protocol									sftp://
@@ -112,8 +112,8 @@ if (!class_exists('Net_SFTP')) {
  * @package	Net_SFTP_StreamWrapper
  * @link	http://www.php.net/manual/en/class.streamwrapper.php
  */
-class SFTPPSL_StreamWrapper{
-
+class SFTPPSL_StreamWrapper
+{
 	/**
 	 * SFTP Object
 	 *
@@ -144,7 +144,7 @@ class SFTPPSL_StreamWrapper{
 	 * @var Resource
 	 * @access public
 	 */
-	var $context;
+	public $context;
 
 	/**
 	 * Mode
@@ -185,7 +185,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return bool
 	 * @access public
 	 */
-	function dir_closedir()
+	public function dir_closedir()
 	{
 		$this->stream_close();
 
@@ -209,13 +209,12 @@ class SFTPPSL_StreamWrapper{
 	 * @return bool
 	 * @access public
 	 */
-	function dir_opendir($path, $options)
+	public function dir_opendir($path, $options)
 	{
 		if ( $this->stream_open($path, NULL, NULL, $opened_path) ) {
 			$this->dir_entries = $this->sftp->nlist($this->path);
 			return TRUE;
-		}
-		else {
+		} else {
 			return FALSE;
 		}
 	}
@@ -230,7 +229,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return string
 	 * @access public
 	 */
-	function dir_readdir()
+	public function dir_readdir()
 	{
 		if ($this->dir_entries === false) {
 			return FALSE;
@@ -242,8 +241,7 @@ class SFTPPSL_StreamWrapper{
 			$this->position += 1;
 
 			return $filename;
-		}
-		else {
+		} else {
 			return FALSE;
 		}
 	}
@@ -256,7 +254,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return bool
 	 * @access public
 	 */
-	function dir_rewinddir()
+	public function dir_rewinddir()
 	{
 		$this->position = 0;
 
@@ -276,7 +274,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return bool
 	 * @access public
 	 */
-	function mkdir($path, $mode, $options)
+	public function mkdir($path, $mode, $options)
 	{
 		$connection = $this->stream_open($path, NULL, NULL, $opened_path);
 		if ($connection === false) {
@@ -285,8 +283,7 @@ class SFTPPSL_StreamWrapper{
 
 		if ( $options === STREAM_MKDIR_RECURSIVE ) {
 			$mkdir = $this->sftp->mkdir($this->path, $mode, true);
-		}
-		else {
+		} else {
 			$mkdir = $this->sftp->mkdir($this->path, $mode, false);
 		}
 
@@ -306,7 +303,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return bool
 	 * @access public
 	 */
-	function rename($path_from, $path_to)
+	public function rename($path_from, $path_to)
 	{
 		$path1 = parse_url($path_from);
 		$path2 = parse_url($path_to);
@@ -351,7 +348,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return bool
 	 * @access public
 	 */
-	function rmdir($path, $options)
+	public function rmdir($path, $options)
 	{
 		$connection = $this->stream_open($path, NULL, NULL, $opened_path);
 		if ($connection === false) {
@@ -374,7 +371,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return resource
 	 * @access public
 	 */
-	function stream_cast($cast_as)
+	public function stream_cast($cast_as)
 	{
 		return $this->sftp->fsock;
 	}
@@ -387,7 +384,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return void
 	 * @access public
 	 */
-	function stream_close()
+	public function stream_close()
 	{
 		// We do not really close connections because
 		// connections are assigned to a class static variable, so the Net_SFTP object will persist
@@ -408,7 +405,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return bool
 	 * @access public
 	 */
-	function stream_eof()
+	public function stream_eof()
 	{
 		$filesize = $this->sftp->size($this->path);
 
@@ -427,7 +424,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return bool
 	 * @access public
 	 */
-	function stream_flush()
+	public function stream_flush()
 	{
 		return TRUE;
 	}
@@ -441,7 +438,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return Boolean
 	 * @access public
 	*/
-	function stream_lock($operation)
+	public function stream_lock($operation)
 	{
 		return FALSE;
 	}
@@ -461,7 +458,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return bool
 	 * @access public
 	 */
-	function stream_metadata($path, $option, $var)
+	public function stream_metadata($path, $option, $var)
 	{
 		$connection = $this->stream_open($path, NULL, NULL, $opened_path);
 		if ($connection === false) {
@@ -525,7 +522,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return bool
 	 * @access public
 	 */
-	function stream_open($path, $mode, $options, &$opened_path)
+	public function stream_open($path, $mode, $options, &$opened_path)
 	{
 		$url = parse_url($path);
 
@@ -538,13 +535,10 @@ class SFTPPSL_StreamWrapper{
 
 		$connection_uuid = md5( $host.$port.$user ); // Generate a unique ID for the current connection
 
-		if ( isset(self::$instances[$connection_uuid]) )
-		{
+		if ( isset(self::$instances[$connection_uuid]) ) {
 			// Get previously established connection
 			$this->sftp = self::$instances[$connection_uuid];
-		}
-		else
-		{
+		} else {
 			//$context = stream_context_get_options($this->context);
 
 			if (!isset($user) || !isset($pass)) {
@@ -568,8 +562,7 @@ class SFTPPSL_StreamWrapper{
 
 		if (isset($mode)) {
 			$this->mode = preg_replace('#[bt]$#', '', $mode);
-		}
-		else {
+		} else {
 			$this->mode = 'r';
 		}
 
@@ -581,8 +574,7 @@ class SFTPPSL_StreamWrapper{
 				$this->position = 0;
 				if ($filesize === FALSE) {
 					$this->sftp->touch( $this->path );
-				}
-				else {
+				} else {
 					$this->sftp->truncate( $this->path, 0 );
 				}
 				break;
@@ -590,8 +582,7 @@ class SFTPPSL_StreamWrapper{
 				if ($filesize === FALSE) {
 					$this->position = 0;
 					$this->sftp->touch( $this->path );
-				}
-				else {
+				} else {
 					$this->position = $filesize;
 				}
 				break;
@@ -622,7 +613,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return mixed
 	 * @access public
 	 */
-	function stream_read($count)
+	public function stream_read($count)
 	{
 		switch ($this->mode) {
 			case 'w':
@@ -650,7 +641,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return bool
 	 * @access public
 	 */
-	function stream_seek($offset, $whence)
+	public function stream_seek($offset, $whence)
 	{
 		$filesize = $this->sftp->size($this->path);
 
@@ -689,7 +680,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return Boolean
 	 * @access public
 	 */
-	function stream_set_option($option, $arg1, $arg2)
+	public function stream_set_option($option, $arg1, $arg2)
 	{
 		return FALSE;
 	}
@@ -702,11 +693,11 @@ class SFTPPSL_StreamWrapper{
 	 * @return mixed
 	 * @access public
 	 */
-	function stream_stat()
+	public function stream_stat()
 	{
 		$stat = $this->sftp->stat($this->path);
 
-		if( !empty($stat) ) {
+		if ( !empty($stat) ) {
 			// mode fix
 			$stat['mode'] = $stat['permissions'];
 			unset($stat['permissions']);
@@ -725,7 +716,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return Integer
 	 * @access public
 	 */
-	function stream_tell()
+	public function stream_tell()
 	{
 		return $this->position;
 	}
@@ -745,7 +736,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return bool
 	 * @access public
 	 */
-	function stream_truncate($new_size)
+	public function stream_truncate($new_size)
 	{
 		return $this->sftp->truncate( $this->path, $new_size );
 	}
@@ -759,7 +750,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return mixed
 	 * @access public
 	 */
-	function stream_write($data)
+	public function stream_write($data)
 	{
 		switch ($this->mode) {
 			case 'r':
@@ -784,7 +775,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return bool
 	 * @access public
 	 */
-	function unlink($path)
+	public function unlink($path)
 	{
 		$connection = $this->stream_open($path, NULL, NULL, $opened_path);
 		if ($connection === false) {
@@ -809,7 +800,7 @@ class SFTPPSL_StreamWrapper{
 	 * @return mixed
 	 * @access public
 	 */
-	function url_stat($path, $flags)
+	public function url_stat($path, $flags)
 	{
 		$connection = $this->stream_open($path, NULL, NULL, $opened_path);
 		if ($connection === false) {
@@ -818,14 +809,13 @@ class SFTPPSL_StreamWrapper{
 
 		if ( $flags === STREAM_URL_STAT_LINK ) {
 			$stat = $this->sftp->lstat($this->path);
-		}
-		else {
+		} else {
 			$stat = $this->sftp->stat($this->path);
 		}
 
 		$this->stream_close();
 
-		if( !empty($stat) ) {
+		if ( !empty($stat) ) {
 			// mode fix
 			$stat['mode'] = $stat['permissions'];
 			unset($stat['permissions']);
@@ -843,5 +833,3 @@ class SFTPPSL_StreamWrapper{
  */
 stream_wrapper_register('sftp', 'SFTPPSL_StreamWrapper')
 	or die ('Failed to register protocol');
-
-?>
