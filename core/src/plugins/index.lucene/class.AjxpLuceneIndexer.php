@@ -232,8 +232,8 @@ class AjxpLuceneIndexer extends AJXP_Plugin
             } else {
                 $sParts[] = "$searchField:true";
             }
-            if ($scope == "user") {
-                if (AuthService::usersEnabled() && AuthService::getLoggedUser() == null) {
+            if ($scope == "user" && AuthService::usersEnabled()) {
+                if (AuthService::getLoggedUser() == null) {
                     throw new Exception("Cannot find current user");
                 }
                 $sParts[] = "ajxp_scope:user";
