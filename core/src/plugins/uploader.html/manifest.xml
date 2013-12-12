@@ -39,6 +39,7 @@
         <!-- Stream Wrapper Access, and dependancy to uploader.flex forces the order -->
         <activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
         <pluginClass pluginName="uploader.flex"/>
+        <pluginClass pluginName="gui.ajax"/>
     </dependencies>
 	<processing>
 		<clientForm id="originalUploadForm"><![CDATA[
@@ -102,7 +103,7 @@
 		]]></dialogOnOpen>
 		<extensionOnInit><![CDATA[
 		if(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span') && (window.FileReader || window.FormData) ){
-			var dropzone = $('content_pane');
+			var dropzone = $$('[ajxpClass="FilesList"]')[0];
 			dropzone.addClassName('droparea');
 			var selector = '#content_pane,div.webfx-tree-item,.ajxpNodeProvider';
 			var dragOverFunc = function(event) {

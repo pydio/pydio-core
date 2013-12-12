@@ -190,6 +190,10 @@ Class.create("FilesList", SelectableElements, {
         if(!this._dataModel){
             this._registerObserver(document, "ajaxplorer:trigger_repository_switch", repoSwitchObserver);
         }
+        if(this.options.messageBoxReference && ajaxplorer){
+            ajaxplorer.registerAsMessageBoxReference(this.htmlElement);
+        }
+
 	},
 
     _registerObserver:function(object, eventName, handler, objectEvent){
@@ -1759,6 +1763,7 @@ Class.create("FilesList", SelectableElements, {
 		// Defer Drag'n'drop assignation for performances
 		if(!ajxpNode.isRecycle()){
 			window.setTimeout(function(){
+                if(!this.htmlElement) return;
 				var newDrag = new AjxpDraggable(newRow, {
 					revert:true,
 					ghosting:true,

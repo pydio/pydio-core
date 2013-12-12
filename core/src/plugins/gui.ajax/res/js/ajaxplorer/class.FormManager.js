@@ -327,6 +327,9 @@ Class.create("FormManager", {
                         values,
                         false,
                         true);
+                    if(selector.getAttribute('data-disableShortcutsOnForm')){
+                        this.disableShortcutsOnForm(target.FIELDS_CONTAINER);
+                    }
                 }.bind(this));
 
                 if(selector.getValue()){
@@ -618,7 +621,8 @@ Class.create("FormManager", {
     },
 
     disableShortcutsOnForm: function(form){
-        form.select("input,textarea,select").invoke("observe", "focus", function(){
+        form.select("input,textarea,select").invoke("observe", "focus", function(event){
+            if(event.target.nodeName.toLowerCase() == 'select') event.target.writeAttribute('data-disableShortcutsOnForm', 'true');
             ajaxplorer.disableAllKeyBindings();
         });
         form.select("input,textarea,select").invoke("observe", "blur", function(){

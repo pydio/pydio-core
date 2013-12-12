@@ -35,52 +35,6 @@
                     }
                 </style>
             ]]></template_part>
-            <!--
-            <template_part ajxpClass="AjxpPane" ajxpId="info_panel" ajxpOptions='{}'><![CDATA[
-                    <style>
-                        .action_bar a, .menu.desktop.toolbarmenu, div.editor_header a{
-                            background-color: rgb(78, 154, 179) !important;
-                        }
-                        .dialogTitle {
-                            background-color: rgb(78, 154, 179) !important;
-                            border-bottom: 1px solid rgb(50, 102, 119) !important;
-                        }
-                        #switch_to_settings_button {
-                            display: none !important;
-                        }
-                        .table_rows_container td{
-                            vertical-align:top;
-                        }
-                    </style>
-                    <script>
-                        var splitter = $("vertical_splitter").ajxpPaneObject;
-                        splitter.paneB._max = 1;
-                        splitter.options.maxB = 1;
-                        splitter.resizeGroup();
-                        document.observe("ajaxplorer:user_logged", function(){
-                            if(ajaxplorer.repositoryId == "ajxp_conf"){
-                                splitter.paneB._max = 1;
-                                splitter.options.maxB = 1;
-                            }else{
-                                splitter.paneB._max = 0;
-                                splitter.options.maxB = 0;
-                                if(splitter.foldedPane && splitter.foldedPane == splitter.paneB){
-                                    splitter.paneB.setStyle({width:'26px'});
-                                }
-                            }
-                            splitter.resizeGroup();
-                        });
-                        document.observeOnce("ajaxplorer:context_changed", function(){
-                            $A($("folder_pane").ajxpPaneObject.tree.childNodes).each(function(c){c.expand();})
-                            //$("folder_pane").ajxpPaneObject.tree.expandAll();
-                        });
-                    </script>
-                    ]]></template_part>
-            <template_part ajxpClass="AjxpTabulator" theme="vision" ajxpId="topPane" ajxpOptions='{"defaultTabId": "folders","tabInfos" : [{"id":"folders","label":"130","iconClass":"icon-folder-open","element":"folder_pane"},{"id":"flagged","label":"147","iconClass":"icon-star","element":"flagged_elements"}],"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["filter"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'><![CDATA[
-                <div id="folder_pane" class="flat_tree_pane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ></div>
-                <div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"get_bookmarks", "format":"node_list"},"reloadOnServerMessage":"tree/reload_bookmarks"}'></div>
-            ]]></template_part>
-            -->
             <template_part ajxpClass="AjxpPane" ajxpId="workspace_toolbar" ajxpOptions='{"fit":"none"}'><![CDATA[
                 <div id="search_container_settings" class="settings_search_container" style="display:none;" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}'></div>
                 <style>
@@ -94,7 +48,7 @@
                         <div id="settings_pane" class="flat_tree_pane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ></div>
                         <div id="buttons_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["vertical_splitter-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                     </div>
-                    <div id="rightPane"  style="background-color:#fffff; box-shadow: rgba(0, 0, 0, 0.247059) -1px 1px 6px;" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
+                    <div id="rightPane"  style="background-color:#fffff; box-shadow: rgba(0, 0, 0, 0.247059) -1px 1px 6px;" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "messageBoxReference":true}'>
                         <div id="editor_tabs" ajxpClass="AjxpTabulator" class="flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":true, "saveState":false,"events":{}, "defaultTabId": "info","tabInfos" : [{"id":"info","label":"","iconClass":"icon-list-alt", "element":"files_list_pane"}]}'>
                             <div id="files_list_pane" ajxpClass="AjxpPane">
                                 <div id="breadcrumb_container"><div id="breadcrumb" ajxpClass="Breadcrumb" ajxpOptions=''></div></div>

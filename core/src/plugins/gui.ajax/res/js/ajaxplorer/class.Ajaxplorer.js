@@ -56,7 +56,7 @@ Class.create("Ajaxplorer", {
 	 */
 	init:function(){
 		document.observe("ajaxplorer:registry_loaded", function(){
-			this.refreshExtensionsRegistry();
+            this.refreshExtensionsRegistry();
 			this.logXmlUser(this._registry);
             if(this.user){
                 var repId = this.user.getActiveRepository();
@@ -67,10 +67,12 @@ Class.create("Ajaxplorer", {
 			if(this.guiLoaded) {
 				this.refreshTemplateParts();
 				this.refreshGuiComponentConfigs();
+                this.refreshExtensionsRegistry();
 			} else {
 				document.observe("ajaxplorer:gui_loaded", function(){
 					this.refreshTemplateParts();
 					this.refreshGuiComponentConfigs();
+                    this.refreshExtensionsRegistry();
 				}.bind(this));
 			}
             this.loadActiveRepository();

@@ -82,7 +82,7 @@
                 }
                 </style>
             ]]></template_part>
-            <template_part ajxpId="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOption":"true"}' theme="vision"><![CDATA[
+            <template_part ajxpId="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOption":"true", "messageBoxReference":true}' theme="vision"><![CDATA[
                 <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="settings_main_pane dashboard_main_pane flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "home","tabInfos" : [{"id":"home","label":"Home","iconClass":"icon-home", "element":"home_account_pane"},{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"parameters_pane"},{"id":"info","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"files_list_pane"}]}'>
                     <div id="home_account_pane" ajxpClass="UserDashboardHome">
                         <div id="notifications_center">
