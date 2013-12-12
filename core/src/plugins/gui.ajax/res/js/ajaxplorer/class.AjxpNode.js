@@ -177,7 +177,7 @@ Class.create("AjxpNode", {
 		if(ajxpNode._iNodeProvider){
 			this._iNodeProvider = ajxpNode._iNodeProvider;
 		}
-		this._isRoot = ajxpNode._isRoot;
+		//this._isRoot = ajxpNode._isRoot;
 		this._isLoaded = ajxpNode._isLoaded;
 		this.fake = ajxpNode.fake;
 		var meta = ajxpNode.getMetadata();

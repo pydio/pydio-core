@@ -78,7 +78,8 @@ Class.create("Action", {
 			allowedMimes:$A([]),
             evalMetadata:'',
 			unique:true,
-			multipleOnly:false
+			multipleOnly:false,
+            enableRoot:false
 			}, arguments[2] || { });
 		this.rightsContext = Object.extend({			
 			noUser:true,
@@ -282,10 +283,10 @@ Class.create("Action", {
 			return;
 		}
 		var userSelection = arguments[0];		
-		var bSelection = false;
+		var hasRoot = false;
 		if(userSelection != null) 
 		{			
-			bSelection = !userSelection.isEmpty();
+			hasRoot = userSelection.selectionHasRootNode();
 			var bUnique = userSelection.isUnique();
 			var bFile = userSelection.hasFile();
 			var bDir = userSelection.hasDir();
@@ -304,6 +305,9 @@ Class.create("Action", {
              	else this.disable();
                 return;
             }
+        }
+        if(!selectionContext.enableRoot && hasRoot){
+            return this.disable();
         }
 		if(selectionContext.unique && !bUnique){
 			return this.disable();

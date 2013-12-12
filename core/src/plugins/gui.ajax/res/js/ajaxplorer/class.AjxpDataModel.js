@@ -356,7 +356,7 @@ Class.create("AjxpDataModel", {
 		}else{
 			this._selectionSource = source;
 		}
-        ajxpDataNodes = $A(ajxpDataNodes).without(this._rootNode);
+        //ajxpDataNodes = $A(ajxpDataNodes).without(this._rootNode);
 		this._selectedNodes = $A(ajxpDataNodes);
 		this._bEmpty = ((ajxpDataNodes && ajxpDataNodes.length)?false:true);
 		this._bFile = this._bDir = this._isRecycle = false;
@@ -429,6 +429,13 @@ Class.create("AjxpDataModel", {
             }
         });
         return test;
+    },
+
+    selectionHasRootNode : function(){
+        return (null != this._selectedNodes.detect(function(el){
+            return el.isRoot();
+        }));
+
     },
 
 	/**

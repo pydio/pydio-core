@@ -114,7 +114,7 @@
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="get,inline">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="false"/></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="false" enableRoot="true"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[

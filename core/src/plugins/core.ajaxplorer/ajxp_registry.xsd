@@ -87,6 +87,7 @@
             <xs:attribute name="file" use="required" type="xs:NCName"/>
             <xs:attribute name="image" type="xs:boolean"/>
             <xs:attribute name="multipleOnly" type="xs:boolean"/>
+            <xs:attribute name="enableRoot" type="xs:boolean"/>
             <xs:attribute name="recycle" use="required" type="xs:boolean"/>
             <xs:attribute name="unique" use="required" type="xs:boolean"/>
         </xs:complexType>
