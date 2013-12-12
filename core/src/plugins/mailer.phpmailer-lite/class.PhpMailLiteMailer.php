@@ -36,6 +36,7 @@ class PhpMailLiteMailer extends AjxpMailer
         // NOW IF THERE ARE RECIPIENTS FOR ANY REASON, GO
         $mail = new PHPMailerLite(true);
         $mail->Mailer = $this->getFilteredOption("MAILER");
+        $mail->Sendmail = $this->getFilteredOption("SENDMAIL_PATH");
         $from = $this->resolveFrom($from);
         if (!is_array($from) || empty($from["adress"])) {
             throw new Exception("Cannot send email without a FROM address. Please check your core.mailer configuration.");
