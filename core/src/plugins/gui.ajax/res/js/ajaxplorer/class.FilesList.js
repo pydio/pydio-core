@@ -1954,7 +1954,11 @@ Class.create("FilesList", SelectableElements, {
 
 	partSizeCellRenderer : function(element, ajxpNode, type, metadataDef){
         if(!element) return;
-		element.setAttribute("data-sorter_value", ajxpNode.getMetadata().get("bytesize"));
+        if(type == 'row'){
+            element.setAttribute("data-sorter_value", ajxpNode.getMetadata().get("bytesize"));
+        }else{
+            element.setAttribute("data-"+metadataDef['attributeName']+"-sorter_value", ajxpNode.getMetadata().get("bytesize"));
+        }
 		if(!ajxpNode.getMetadata().get("target_bytesize")){
 			return;
 		}

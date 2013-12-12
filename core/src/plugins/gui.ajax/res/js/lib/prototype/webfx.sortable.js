@@ -410,8 +410,13 @@ SortableTable = Class.create({
             var stringValue;
             if(this._sortTypeInfo[sType].getNodeValue){
                 stringValue = this._sortTypeInfo[sType].getNodeValue(oRow.ajxpNode, attName);
-            }else{
-                stringValue = oRow.ajxpNode.getMetadata().get(attName);
+            }else {
+                if(this._sortTypeInfo[sType].getRowValue){
+                    stringValue = this._sortTypeInfo[sType].getRowValue(oRow, nColumn, attName);
+                }
+                if(stringValue === undefined) {
+                    stringValue = oRow.ajxpNode.getMetadata().get(attName);
+                }
             }
             return this.getValueFromString(stringValue);
         }

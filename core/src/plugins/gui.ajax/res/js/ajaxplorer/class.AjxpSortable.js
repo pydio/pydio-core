@@ -205,24 +205,28 @@ Class.create("AjxpSortable", SortableTable, {
 	 * If the cell has a sorter_value attribute, use this as sorting
 	 * @param oRow HTMLElement Row
 	 * @param nColumn Integer
-	 * @returns String
+	 * @returns Integer
 	 */
-	cellSorterValue : function(oRow, nColumn){
+	cellSorterValue : function(oRow, nColumn, attName){
+        if(attName && (oRow.getAttribute('data-'+attName+'-sorter_value') || oRow.down('[data-'+attName+'-sorter_value]') )){
+            if(oRow.down('[data-'+attName+'-sorter_value]')) return parseInt( oRow.down('[data-'+attName+'-sorter_value]').getAttribute('data-'+attName+'-sorter_value') );
+            else return oRow.getAttribute('data-'+attName+'-sorter_value');
+        }
 		var tds = oRow.select('td');
 		if(tds[nColumn] && tds[nColumn].getAttribute('data-sorter_value')){
 			return parseInt(tds[nColumn].getAttribute('data-sorter_value'));
 		}
 	},
-	
+
 	/**
 	 * Sort by ajxp_modiftime
 	 * @param oRow HTMLElement Row
 	 * @param nColumn Integer
-	 * @returns String
+	 * @returns Integer
 	 */
 	sortTimes : function(oRow, nColumn){
         if(oRow.ajxpNode && oRow.ajxpNode.getMetadata().get("ajxp_modiftime")){
-            return oRow.ajxpNode.getMetadata().get("ajxp_modiftime");
+            return parseInt(oRow.ajxpNode.getMetadata().get("ajxp_modiftime"));
         }
 	}
 

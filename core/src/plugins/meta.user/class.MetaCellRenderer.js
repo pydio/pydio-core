@@ -114,6 +114,7 @@ Class.create("MetaCellRenderer", {
 				var rule = obj.findCssRule(content.strip());
 				if(rule){
 					element.addClassName(rule.cssClass);
+                    element.writeAttribute("data-"+attName+"-sorter_value", rule.sortValue);
 				}
 			}			
 		}else if(type == 'detail'){
@@ -125,6 +126,7 @@ Class.create("MetaCellRenderer", {
                 var rule = obj.findCssRule(content.strip());
                 if(rule && element.up('div')){
                     element.up('div').addClassName(rule.cssClass);
+                    element.up('div').writeAttribute("data-"+attName+"-sorter_value", rule.sortValue);
                 }
             }
 
@@ -186,7 +188,11 @@ Class.create("MetaCellRenderer", {
 		}else{
 			if(type != 'detail') element.update(obj.createStars(value, null, attributeName));
 		}
-		element.writeAttribute("data-sorter_value", value);
+        if(type == 'row'){
+            element.writeAttribute("data-sorter_value", value);
+        }else{
+            element.writeAttribute("data-"+attributeName+"-sorter_value", value);
+        }
 	},
 	
 	infoPanelModifier : function(htmlElement){
