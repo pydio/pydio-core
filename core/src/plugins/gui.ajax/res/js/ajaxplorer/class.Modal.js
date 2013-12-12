@@ -612,7 +612,7 @@ Class.create("Modal", {
 	closeMessageDiv: function(){
 		if(this.messageDivOpen)
 		{
-			new Effect.Fade(this.messageBox);
+			new Effect.MessageFade(this.messageBox);
 			this.messageDivOpen = false;
 		}
 	},
@@ -656,7 +656,7 @@ Class.create("Modal", {
 			left:leftPosition+'px',
 			width:boxWidth+'px'
 		});
-		new Effect.Appear(this.messageBox);
+		new Effect.MessageAppear(this.messageBox);
 		this.tempoMessageDivClosing();
 	},
 	/**

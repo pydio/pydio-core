@@ -32,15 +32,15 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
         li.insert({bottom:'<span style="display: none;" class="delete_user_entry icon-remove-sign">&nbsp;</span>'});
 
         if(!skipObservers){
-            li.setStyle({opacity:0});
+            /*li.setStyle({opacity:0});*/
             li.observe("mouseover", function(event){li.down('span.delete_user_entry').show();});
             li.observe("mouseout", function(event){li.down('span.delete_user_entry').hide();});
             li.down("span.delete_user_entry").observe("click", function(){
-                Effect.Fade(li, {duration:0.3, afterFinish:li.remove.bind(li)});
+                Effect.RowFade(li, {duration:0.3, afterFinish:li.remove.bind(li)});
             });
             li.appendToList = function(htmlObject){
                 htmlObject.insert({bottom:li});
-                Effect.Appear(li, {duration:0.3});
+                Effect.RowAppear(li, {duration:0.3});
             };
         }
 

@@ -1205,14 +1205,13 @@ Class.create("FilesList", SelectableElements, {
                         this.initRowsBuffered();
                     }.bind(this), 10);
                 }else{
-                    new Effect.Fade(item, {afterFinish:function(){
+                    new Effect.RowFade(item, {afterFinish:function(){
                         try{
                             item.remove();
                         }catch(e){if(console) console.log(e);}
                         delete item;
                         this.initRowsBuffered();
                     }.bind(this), duration:0.2});
-
                 }
                 /*
                 item.remove();
