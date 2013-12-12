@@ -95,15 +95,21 @@ class AJXP_SqlMessageExchanger extends AJXP_Plugin implements AJXP_MessageExchan
     public function suscribeToChannel($channelName, $clientId)
     {
         $this->loadChannel($channelName, true);
-        $user = AuthService::getLoggedUser();
-        if ($user == null) {
-            throw new Exception("You must be logged in");
+        if(AuthService::usersEnabled()){
+            $user = AuthService::getLoggedUser();
+            if ($user == null) {
+                throw new Exception("You must be logged in");
+            }
+            $GROUP_PATH = $user->getGroupPath();
+            $USER_ID = $user->getId();
+        }else{
+            $GROUP_PATH = "/";
+            $USER_ID = "shared";
         }
-        $GROUP_PATH = $user->getGroupPath();
         if($GROUP_PATH == null) $GROUP_PATH = false;
         $this->channels[$channelName]["CLIENTS"][$clientId] = array(
             "ALIVE" => time(),
-            "USER_ID" => $user->getId(),
+            "USER_ID" => $USER_ID,
             "GROUP_PATH" => $GROUP_PATH
         );
         foreach ($this->channels[$channelName]["MESSAGES"] as &$object) {
