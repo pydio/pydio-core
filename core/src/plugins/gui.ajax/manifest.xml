@@ -106,7 +106,7 @@
 					    </div>
 						<div id="searchbar_splitter" style="overflow:hidden;" ajxpClass="Splitter" ajxpOptions='{"direction":"horizontal","initA":0, "minSize":0, "startFolded": true, "foldingButton": "A"}'>
 							<div id="search_container" ajxpClass="SearchEngine" ajxpPaneHeader="87" ajxpPaneIcon="xmag.png" data-globalOptions='{"headerClose":{"icon":"panel_vertical_hide.png","splitter":"searchbar_splitter","title":86}}' style="height: 0px; overflow:hidden;"></div>
-    						<div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"list","replaceScroller":true}' style="border: 1px solid #bbb;"></div>
+    						<div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"list","replaceScroller":true, "messageBoxReference":true}' style="border: 1px solid #bbb;"></div>
 					    </div>
 					</div>
 				</div>
@@ -143,7 +143,7 @@
                                             <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                                             <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_tabs"}'></div>
                                         </div>
-                                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "fit":"height", "fitParent":"files_lit_pane", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}' style="border-left: 1px solid #bbb;"></div>
+                                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"files_lit_pane", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}' style="border-left: 1px solid #bbb;"></div>
                                     </div>
                                 </div>
 							</div>
@@ -192,7 +192,7 @@
                             <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                             <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header"}'></div>
                         </div>
-                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
+                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
                     </div>
 				</div>
 			]]></template>

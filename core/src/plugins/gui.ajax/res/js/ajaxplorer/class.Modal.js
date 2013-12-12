@@ -641,18 +641,21 @@ Class.create("Modal", {
 		if(messageType == "ERROR"){ this.messageBox.removeClassName('logMessage');  this.messageBox.addClassName('errorMessage');}
 		else { this.messageBox.removeClassName('errorMessage');  this.messageBox.addClassName('logMessage');}
 		this.messageContent.update(message);
-		var container = $('content_pane');
-		if(!container){
+
+        var container;
+        if(ajaxplorer.getMessageBoxReference()){
+            container = ajaxplorer.getMessageBoxReference();
+        }else if($('content_pane')) {
+            container = $('content_pane');
+        }else {
 			container = $(ajxpBootstrap.parameters.get("MAIN_ELEMENT"));
 		}
 		var containerOffset = Position.cumulativeOffset(container);
 		var containerDimensions = container.getDimensions();
-		var boxHeight = $(this.messageBox).getHeight();
-		var topPosition = containerOffset[1] + containerDimensions.height - boxHeight - 20;
 		var boxWidth = parseInt(containerDimensions.width * 90/100);
 		var leftPosition = containerOffset[0] + parseInt(containerDimensions.width*5/100);
 		this.messageBox.setStyle({
-			top:topPosition+'px',
+			bottom:'20px',
 			left:leftPosition+'px',
 			width:boxWidth+'px'
 		});

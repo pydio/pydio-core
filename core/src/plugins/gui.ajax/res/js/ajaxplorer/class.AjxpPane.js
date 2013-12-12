@@ -58,6 +58,9 @@ Class.create("AjxpPane", {
 
             }
         }
+        if(this.options.messageBoxReference && ajaxplorer){
+            ajaxplorer.registerAsMessageBoxReference(this.htmlElement);
+        }
 
     },
 

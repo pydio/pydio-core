@@ -57,7 +57,7 @@ Effect.CSS_ANIMATE = function(effectName, element, options){
         ["webkitAnimationEnd", "mozAnimationEnd", "oAnimationEnd", "animationEnd"].map(
             function(event){
                 element.observe(event, function(){
-                    element.removeClassName(className);
+                    element.removeClassName('animated ' + className);
                 });
                 if(endStyle) element.setStyle(endStyle);
                 if(options && options.afterFinish) element.observe(event, options.afterFinish);

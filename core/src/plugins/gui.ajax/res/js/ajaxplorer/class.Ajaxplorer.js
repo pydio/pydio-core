@@ -866,6 +866,16 @@ Class.create("Ajaxplorer", {
             this._editorOpener = null;
         }
     },
+    _messageBoxReference:null,
+    registerAsMessageBoxReference: function(element){
+        this._messageBoxReference = element;
+    },
+    clearMessageBoxReference:function(){
+        this._messageBoxReference = null;
+    },
+    getMessageBoxReference: function(){
+        return $(this._messageBoxReference);
+    },
 
     openCurrentSelectionInEditor:function(editorData, forceNode){
         var selectedNode =  forceNode ? forceNode : this.getContextHolder().getUniqueNode();
