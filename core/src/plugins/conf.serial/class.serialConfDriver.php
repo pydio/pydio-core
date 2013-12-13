@@ -241,12 +241,12 @@ class serialConfDriver extends AbstractConfDriver
                 }
             }
         }
-        $res = AJXP_Utils::saveSerialFile($this->repoSerialFile, $repositories);
-        if ($res == -1) {
-            return $res;
-        } else {
-            $this->updateAliasesIndex($repositoryObject->getUniqueId(), $repositoryObject->getSlug());
+        try{
+            AJXP_Utils::saveSerialFile($this->repoSerialFile, $repositories);
+        } catch(Exception $e){
+            return -1;
         }
+        $this->updateAliasesIndex($repositoryObject->getUniqueId(), $repositoryObject->getSlug());
     }
     /**
      * Delete a repository, given its unique ID.
