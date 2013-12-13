@@ -347,7 +347,18 @@ class ShareCenter extends AJXP_Plugin
                         }
                         $repo = ConfService::getRepositoryById($repoId);
                         if ($repo == null || $repo->getOwner() != AuthService::getLoggedUser()->getId()) {
-                            throw new Exception($messages["share_center.48"]);
+                            //throw new Exception($messages["share_center.48"]);
+                            $jsonData = array(
+                                "repositoryId"  => $repoId,
+                                "label"         => "Error - Cannot find shared data",
+                                "description"   => "Cannot find repository",
+                                "entries"       => array(),
+                                "element_watch" => false,
+                                "repository_url"=> ""
+                            );
+                            echo json_encode($jsonData);
+                            break;
+
                         }
                         if ($this->watcher != false) {
                             $elementWatch = $this->watcher->hasWatchOnNode(
@@ -526,11 +537,21 @@ class ShareCenter extends AJXP_Plugin
             // Maybe could be directly embedded in metadata, to avoid having to load here.
             $oldNode->loadNodeInfo();
             try {
-                self::deleteSharedElement(
-                    ($oldNode->isLeaf()?"file":"repository"),
-                    $metadata["element"],
-                    AuthService::getLoggedUser()
-                );
+                $type = $oldNode->isLeaf() ? "file":"repository";
+                $elementIds = array();
+                if($type == "file"){
+                    if(!is_array($metadata["element"])) $elementIds[] = $metadata["element"];
+                    else $elementIds = array_keys($metadata["element"]);
+                }else{
+                    $elementIds[]= $metadata["element"];
+                }
+                foreach($elementIds as $elementId){
+                    self::deleteSharedElement(
+                        $type,
+                        $elementId,
+                        AuthService::getLoggedUser()
+                    );
+                }
                 $oldNode->removeMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
             } catch (Exception $e) {
                 $this->logError("Exception", $e->getMessage(), $e->getTrace() );
@@ -1380,6 +1401,9 @@ class ShareCenter extends AJXP_Plugin
             $minisiteData = self::loadPublicletData($element);
             $repoId = $minisiteData["REPOSITORY"];
             $repo = ConfService::getRepositoryById($repoId);
+            if($repo == null){
+                return false;
+            }
             if (!$repo->hasOwner() || $repo->getOwner() != $loggedUser->getId()) {
                 throw new Exception($mess["ajxp_shared.12"]);
             } else {

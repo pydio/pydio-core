@@ -474,7 +474,7 @@ Class.create("ShareCenter", {
                 return false;
             },
             null,
-            true);
+            'close');
 
     },
 

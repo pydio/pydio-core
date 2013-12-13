@@ -353,17 +353,19 @@ class MetaWatchRegister extends AJXP_Plugin
             if (count($ids)) {
                 foreach($ids as $id) $this->notificationCenter->postNotification($newNotif, $id);
             }
-            $parentNode = new AJXP_Node(dirname($newNode->getUrl()));
-            $parentNode->setLeaf(false);
-            $ids = $this->getWatchesOnNode($parentNode, self::$META_WATCH_CHANGE);
-            if (count($ids)) {
-                // POST NOW : PARENT FOLDER IS AFFECTED
-                $parentNotif = new AJXP_Notification();
-                $parentNotif->setNode($parentNode);
-                $parentNotif->setAction(AJXP_NOTIF_NODE_CHANGE);
-                $this->notificationCenter->prepareNotification($newNotif);
-                $parentNotif->addRelatedNotification($newNotif);
-                foreach($ids as $id) $this->notificationCenter->postNotification($parentNotif, $id);
+            if(!$newNode->isRoot()){
+                $parentNode = new AJXP_Node(dirname($newNode->getUrl()));
+                $parentNode->setLeaf(false);
+                $ids = $this->getWatchesOnNode($parentNode, self::$META_WATCH_CHANGE);
+                if (count($ids)) {
+                    // POST NOW : PARENT FOLDER IS AFFECTED
+                    $parentNotif = new AJXP_Notification();
+                    $parentNotif->setNode($parentNode);
+                    $parentNotif->setAction(AJXP_NOTIF_NODE_CHANGE);
+                    $this->notificationCenter->prepareNotification($newNotif);
+                    $parentNotif->addRelatedNotification($newNotif);
+                    foreach($ids as $id) $this->notificationCenter->postNotification($parentNotif, $id);
+                }
             }
         }
         if($oldNode != null && $newNode != null && $oldNode->getUrl() == $newNode->getUrl()) return;
@@ -373,17 +375,19 @@ class MetaWatchRegister extends AJXP_Plugin
             if (count($ids)) {
                 foreach($ids as $id) $this->notificationCenter->postNotification($oldNotif, $id);
             }
-            $parentNode = new AJXP_Node(dirname($oldNode->getUrl()));
-            $parentNode->setLeaf(false);
-            $ids = $this->getWatchesOnNode($parentNode, self::$META_WATCH_CHANGE);
-            if (count($ids)) {
-                // POST NOW : PARENT FOLDER IS AFFECTED
-                $parentNotif = new AJXP_Notification();
-                $parentNotif->setNode($parentNode);
-                $parentNotif->setAction(AJXP_NOTIF_NODE_CHANGE);
-                $this->notificationCenter->prepareNotification($oldNotif);
-                $parentNotif->addRelatedNotification($oldNotif);
-                foreach($ids as $id) $this->notificationCenter->postNotification($parentNotif, $id);
+            if(!$oldNode->isRoot()){
+                $parentNode = new AJXP_Node(dirname($oldNode->getUrl()));
+                $parentNode->setLeaf(false);
+                $ids = $this->getWatchesOnNode($parentNode, self::$META_WATCH_CHANGE);
+                if (count($ids)) {
+                    // POST NOW : PARENT FOLDER IS AFFECTED
+                    $parentNotif = new AJXP_Notification();
+                    $parentNotif->setNode($parentNode);
+                    $parentNotif->setAction(AJXP_NOTIF_NODE_CHANGE);
+                    $this->notificationCenter->prepareNotification($oldNotif);
+                    $parentNotif->addRelatedNotification($oldNotif);
+                    foreach($ids as $id) $this->notificationCenter->postNotification($parentNotif, $id);
+                }
             }
         }
 
@@ -400,17 +404,19 @@ class MetaWatchRegister extends AJXP_Plugin
         if (count($ids)) {
             foreach($ids as $id) $this->notificationCenter->postNotification($notif, $id);
         }
-        $parentNode = new AJXP_Node(dirname($node->getUrl()));
-        $parentNode->setLeaf(false);
-        $ids = $this->getWatchesOnNode($parentNode, self::$META_WATCH_READ);
-        if (count($ids)) {
-            // POST NOW : PARENT FOLDER IS AFFECTED
-            $parentNotif = new AJXP_Notification();
-            $parentNotif->setNode($parentNode);
-            $parentNotif->setAction(AJXP_NOTIF_NODE_VIEW);
-            $this->notificationCenter->prepareNotification($notif);
-            $parentNotif->addRelatedNotification($notif);
-            foreach($ids as $id) $this->notificationCenter->postNotification($parentNotif, $id);
+        if(!$node->isRoot()){
+            $parentNode = new AJXP_Node(dirname($node->getUrl()));
+            $parentNode->setLeaf(false);
+            $ids = $this->getWatchesOnNode($parentNode, self::$META_WATCH_READ);
+            if (count($ids)) {
+                // POST NOW : PARENT FOLDER IS AFFECTED
+                $parentNotif = new AJXP_Notification();
+                $parentNotif->setNode($parentNode);
+                $parentNotif->setAction(AJXP_NOTIF_NODE_VIEW);
+                $this->notificationCenter->prepareNotification($notif);
+                $parentNotif->addRelatedNotification($notif);
+                foreach($ids as $id) $this->notificationCenter->postNotification($parentNotif, $id);
+            }
         }
 
     }

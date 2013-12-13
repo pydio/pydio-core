@@ -254,7 +254,7 @@
                                     <input type="password" name="password" value="" placeholder="AJXP_MESSAGE[share_center.23]" autocomplete="off" class="SF_input" style="width:130px !important;">
                                     <input type="text" name="expiration" value="0" placeholder="AJXP_MESSAGE[share_center.21]" class="SF_input SF_number" style="width:100px !important;">
                                     <input type="text" name="downloadlimit" value="0" placeholder="AJXP_MESSAGE[share_center.22]" class="SF_input SF_number" style="width:100px !important;">
-                                    <div class="SF_horizontal_actions"><span id="generate_publiclet" class="SF_horizontal_action icon-plus-sign"></span></div>
+                                    <div class="SF_horizontal_actions"><span id="generate_publiclet" class="SF_horizontal_action icon-plus-sign dialogFocus"></span></div>
                                 </div>
                                 <div class="SF_element" id="public_pass_container" style="display:none;height:20px;"></div>
                             </div>

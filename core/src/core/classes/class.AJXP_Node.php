@@ -306,6 +306,10 @@ class AJXP_Node
         return $this->urlParts["path"];
     }
 
+    public function isRoot(){
+        return !isset($this->urlParts["path"]) || $this->urlParts["path"] == "/";
+    }
+
     /**
      * @return string The scheme part of the url
      */
