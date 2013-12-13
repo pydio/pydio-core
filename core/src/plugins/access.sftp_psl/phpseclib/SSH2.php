@@ -2711,7 +2711,7 @@ class Net_SSH2 {
 
                             $this->channel_status[$channel] = NET_SSH2_MSG_CHANNEL_EOF;
 
-                            break;
+							break;
                         default:
                             // "Some systems may not implement signals, in which case they SHOULD ignore this message."
                             //  -- http://tools.ietf.org/html/rfc4254#section-6.9
