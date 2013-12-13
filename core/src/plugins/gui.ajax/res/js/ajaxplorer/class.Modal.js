@@ -496,11 +496,11 @@ Class.create("Modal", {
         }
 		var okButton = new Element('input', {
 			type:'image',
-			name:(bOkButtonOnly?'ok':'ok'),
-			src:ajxpResourcesFolder+'/images/actions/22/'+(bOkButtonOnly?'dialog_ok_apply':(useNextButton?'forward':'dialog_ok_apply'))+'.png',
+			name:(bOkButtonOnly ? (bOkButtonOnly =='close' ? 'close' :'ok') :'ok'),
+			src:ajxpResourcesFolder+'/images/actions/22/'+(bOkButtonOnly?(bOkButtonOnly =='close' ? 'dialog_close' :'dialog_ok_apply'):(useNextButton?'forward':'dialog_ok_apply'))+'.png',
 			height:22,
 			width:22,
-			title:MessageHash[48]});
+			title:MessageHash[(bOkButtonOnly ? (bOkButtonOnly =='close' ? 49 : 48) : 48)]});
 		okButton.addClassName('dialogButton');
 		okButton.addClassName('dialogFocus');
         contDiv.insert(okButton);
