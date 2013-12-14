@@ -314,7 +314,6 @@ Class.create("RepositoryEditor", AbstractEditor, {
 
         this.metaPane.setStyle({overflowY:'auto'});
         this.metaPane.resizeOnShow = function(tab){
-            //fitHeightToBottom(this.metaPane.down("#metaTabulator"), null, 30);
             this.metaTab.resize();
         }.bind(this);
         this.metaTab.resize();
@@ -378,13 +377,12 @@ Class.create("RepositoryEditor", AbstractEditor, {
      */
     resize : function(size){
         if(size){
-            this.contentMainContainer.setStyle({height:(size - parseInt(this.element.down('.editor_header').getHeight()) - 30) +"px"});
+            this.contentMainContainer.setStyle({height:(size - parseInt(this.element.down('.editor_header').getHeight())) +"px"});
         }else{
-            fitHeightToBottom(this.contentMainContainer, this.element.up(".dialogBox"), 30);
+            fitHeightToBottom(this.contentMainContainer, this.element.up(".dialogBox"));
         }
         this.tab.resize();
         if(this.metaTab){
-            //fitHeightToBottom(this.metaPane.down("#metaTabulator"), null, 30);
             this.metaTab.resize();
         }
         this.element.fire("editor:resize", size);

@@ -94,7 +94,7 @@ div.tabbed_editor div.SF_input.SF_inlineButton{
 
 .ajxp_theme_vision div.tabbed_editor{
     background-color: #ffffff;
-    padding: 10px;
+    padding: 0;
     border-radius: 4px;
     border:0;
 }

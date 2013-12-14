@@ -36,26 +36,26 @@
                 </style>
             ]]></template_part>
             <template_part ajxpClass="AjxpPane" ajxpId="workspace_toolbar" ajxpOptions='{"fit":"none"}'><![CDATA[
-                <div id="search_container_settings" class="settings_search_container" style="display:none;" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}'></div>
                 <style>
                 #workspace_toolbar{display:none;}
                 #browser{padding:0}
                 </style>
             ]]></template_part>
             <template_part ajxpId="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOption":"true"}' theme="vision"><![CDATA[
-                <div id="vertical_splitter" class="settings_main_pane" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "invisibleBar":true, "initA": "30%", "minA":28, "maxA":380, "fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"A"}'>
+                <div id="vertical_splitter" class="settings_main_pane" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "invisibleBar":true, "initA": "20%", "minA":28, "maxA":380, "fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"A"}'>
                     <div id="leftPane"  style="background-color:#ebedf0;" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
+                        <div id="search_container_settings" class="settings_search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":0}'></div>
                         <div id="settings_pane" class="flat_tree_pane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ></div>
                         <div id="buttons_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["vertical_splitter-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                     </div>
-                    <div id="rightPane"  style="background-color:#fffff; box-shadow: rgba(0, 0, 0, 0.247059) -1px 1px 6px;" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "messageBoxReference":true}'>
+                    <div id="rightPane"  style="background-color:#fffff; border-left: 1px solid #5C5C5C;" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "messageBoxReference":true}'>
                         <div id="editor_tabs" ajxpClass="AjxpTabulator" class="flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":true, "saveState":false,"events":{}, "defaultTabId": "info","tabInfos" : [{"id":"info","label":"","iconClass":"icon-list-alt", "element":"files_list_pane"}]}'>
                             <div id="files_list_pane" ajxpClass="AjxpPane">
                                 <div id="breadcrumb_container"><div id="breadcrumb" ajxpClass="Breadcrumb" ajxpOptions=''></div></div>
                                 <div id="actions" class="buttons_bar_container">
                                     <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put", "get", "remote"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                                 </div>
-                                <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "fit":"height", "fitParent":"editor_tabs", "fitMarginBottom":10, "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
+                                <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "fit":"height", "fitParent":"editor_tabs", "fitMarginBottom":0, "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
                             </div>
                         </div>
                     </div>
@@ -66,18 +66,10 @@
                             c._webfxtree_expand();
                             $(c._loadingItem).remove();
                         })
-                        try{
-                            $("global_toolbar").insert({bottom: $("search_container_settings")});
-                            $("search_container_settings").show();
-                        }catch(e){}
                         window.setTimeout(function(){ $("get_my_feed_button").hide(); }, 10);
                         $("browser").ajxpPaneObject.resize();
                         document.observeOnce("ajaxplorer:repository_list_refreshed",function(){
                             if(ajaxplorer.repositoryId == 'ajxp_conf') return;
-                            try{
-                                $("global_toolbar").down("#search_container_settings").ajxpPaneObject.destroy();
-                                $("global_toolbar").down("#search_container_settings").remove();
-                            }catch(e){}
                         });
                     });
                 </script>

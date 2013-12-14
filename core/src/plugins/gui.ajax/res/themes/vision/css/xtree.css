@@ -111,11 +111,16 @@
     background-color: transparent;
     border-bottom: 1px solid #ebedf0;
     cursor: pointer;
-    padding: 7px 7px;
+    padding: 6px 7px;
 }
 
 .flat_tree_pane  div.webfx-tree-item a span{
-    font-size: 15px;
+    padding-left: 33px; 
+    background-position: 13px 4px !important;
+    background-repeat: no-repeat;
+    font-size: 13px;
+    background-size: 12px;
+    padding-top: 1px;
 }
 
 .flat_tree_pane  div.webfx-tree-item.selected-webfx-tree-item-inactive,
@@ -144,7 +149,7 @@
     background-image: none !important;
     padding-left: 4px;
     margin-top: 5px;
-    font-size: 22px;
+    font-size: 13px;
 }
 
 .flat_tree_pane div.webfx-tree-container.first_container {
@@ -160,7 +165,7 @@
 }
 
 .flat_tree_pane  div.webfx-tree-container > .webfx-tree-container{
-    background-color: rgba(255,255,255, 0.5);
+    background-color: rgba(255, 255, 255, 0.44);
 }
 
 .flat_tree_pane  div.webfx-tree-container > .webfx-tree-container > .webfx-tree-container{

@@ -211,7 +211,7 @@ Class.create("RoleEditor", AbstractEditor, {
      */
     resize : function(size){
         if(size){
-            this.contentMainContainer.setStyle({height:(size - parseInt(this.element.down('.editor_header').getHeight()) - 30) +"px"});
+            this.contentMainContainer.setStyle({height:(size - parseInt(this.element.down('.editor_header').getHeight())) +"px"});
         }else{
             fitHeightToBottom(this.contentMainContainer, this.element.up("div").up("div"));
         }

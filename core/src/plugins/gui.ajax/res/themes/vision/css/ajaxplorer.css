@@ -4386,13 +4386,13 @@ td.ip_geo_cell{
 /************************************************/
 .tabrow {
     list-style: none;
-    margin: 0 0 2px 0;
+    margin: 0;
     padding: 0;
     line-height: 24px;
     overflow: hidden;
     font-size: 13px;
     position: relative;
-    border-bottom: 1px solid rgba(111, 123, 136, 1);
+    border-bottom: 1px solid #5c5c5c;
 }
 
 .tabpanes {
@@ -4404,17 +4404,16 @@ td.ip_geo_cell{
     border: 0;
     display: inline-block;
     position: relative;
-    margin: 0;
-    padding: 14px 20px;
+    padding: 12px 22px 11px;
     cursor: pointer;
-    color: rgb(111, 123, 136);
+    color: rgb(111,123,136);
     text-align: center;
     line-height: 16px;
+    margin: 0;
 }
 .tabrow li.selected {
-    color: rgb(111, 123, 136);
-    border-bottom: 3px solid rgba(111, 123, 136, 1) !important;
-    background-color: transparent !important;
+    color: #ffffff;
+    background-color: rgba(77, 197, 195, 0.79) !important;
 }
 
 #sm2-container{
@@ -4551,18 +4550,19 @@ DASHBOARD TABULATOR
 .flat_tabulator  div.panelHeader.tabulatorContainer
 {
     padding: 0 0 0 0;
-    height: 73px;
-    background-color: transparent;
-    border-bottom: 1px solid rgb(111, 123, 136);
+    height: 39px;
+    background-color: #5C5C5C;
+    border-bottom: 0;
 }
 
 .flat_tabulator span.toggleHeader{
-    padding: 44px 20px 8px;
-    border-right: 0;
-    background-color: #ffffff;
-    font-size: 15px;
-    border-bottom: 3px solid #4dc5c3;
-    color: #4dc5c3;
+    padding: 11px 20px 9px;
+    font-size: 13px;
+    border-bottom: 0 solid #399C9B;
+    color: #ffffff;
+    background-color: rgba(77, 197, 195, 0.79);
+    margin-right: 0;
+    border-right: 1px solid #5C5C5C;
 }
 
 .flat_tabulator[data-ajxpTabsCount="1"] span.toggleHeader
@@ -4571,10 +4571,10 @@ DASHBOARD TABULATOR
 }
 
 .flat_tabulator span.toggleHeader.toggleInactive{
-    background-color: #ffffff;
-    border-bottom: 3px solid #ffffff;
-    color: rgb(111, 123, 136);
-    font-size: 15px;
+    background-color: #f8f8f8;
+    border-bottom: 0;
+    color: rgb(111,123,136);
+    font-size: 13px;
 }
 
 div.flat_tabulator > div.tabulatorContainer > #display_toolbar a:hover,
@@ -4585,7 +4585,6 @@ div.flat_tabulator > div.tabulatorContainer > #display_toolbar a
 
 
 div.flat_tabulator span.toggleInactive{
-    border-right: 0;
 }
 
 div.flat_tabulator span.toggleInactive span.tab_close_button{
@@ -4593,7 +4592,6 @@ div.flat_tabulator span.toggleInactive span.tab_close_button{
 }
 
 div.flat_tabulator span.toggleInactiveBeforeActive{
-    border-right: 0;
 }
 
 div.flat_tabulator > div:not(.tabulatorContainer){

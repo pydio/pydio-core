@@ -413,7 +413,7 @@ Class.create("SearchEngine", AjxpPane, {
             fitHeightToBottom($(this._resultsBoxId), null, (this._ajxpOptions.fitMarginBottom?this._ajxpOptions.fitMarginBottom:0));
         }
 
-        if(this.htmlElement.down('#search_meta')){
+        if(this.htmlElement && this.htmlElement.down('#search_meta')){
             var formPanel = this.htmlElement.down('#search_meta');
             fitHeightToBottom(formPanel.down('#search_meta_detailed'), formPanel);
             if(this.scrollbar) {
