@@ -106,6 +106,8 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 		var path = 'plugins/editor.codemirror/CodeMirror/';
         if(window.ajxpBootstrap.parameters.get("SERVER_PREFIX_URI")){
             path = window.ajxpBootstrap.parameters.get("SERVER_PREFIX_URI")+"plugins/editor.codemirror/CodeMirror/";
+        }else if($$('base').length){
+            path = $$('base')[0].readAttribute('href')+"plugins/editor.codemirror/CodeMirror/";
         }
 		var extension = getFileExtension(fileName);
 		var parserFile; var styleSheet;
@@ -221,9 +223,15 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 
         this.element.observe("editor:resize", function(event){
             if(this.goingToFullScreen) return;
-            fitHeightToBottom($(this.element));
-            fitHeightToBottom($(this.contentMainContainer), $(this.element));
-            fitHeightToBottom(this.codeMirror.wrapping, this.contentMainContainer);
+            if(ajaxplorer._editorOpener){
+                fitHeightToBottom($(this.element));
+                fitHeightToBottom($(this.contentMainContainer), $(this.element));
+                fitHeightToBottom(this.codeMirror.wrapping, this.contentMainContainer);
+            }else{
+                fitHeightToBottom($(this.contentMainContainer), $(modal.elementName));
+                fitHeightToBottom($(this.element), $(modal.elementName));
+                fitHeightToBottom(this.codeMirror.wrapping);
+            }
         }.bind(this));
 
     },
@@ -266,7 +274,12 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 				if(fsMode){
 					fitHeightToBottom($(this.contentMainContainer));
 				}else{
-					fitHeightToBottom($(this.contentMainContainer), $(this.element));
+                    if(ajaxplorer._editorOpener){
+                        fitHeightToBottom($(this.contentMainContainer), $(this.element));
+                    }else{
+                        fitHeightToBottom($(this.contentMainContainer), $(modal.elementName));
+                        fitHeightToBottom($(this.element), $(modal.elementName));
+                    }
 				}
 			}.bind(this), this.options);			
 	},
