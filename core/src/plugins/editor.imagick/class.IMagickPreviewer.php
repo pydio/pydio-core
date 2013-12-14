@@ -241,8 +241,8 @@ class IMagickPreviewer extends AJXP_Plugin
         }
         chdir($workingDir);
         if ($unoconv !== false && in_array(strtolower($extension), $officeExt)) {
-            $unoDoc = str_replace(".jpg", "_unoconv.pdf", $tmpFileThumb);
-            if (!is_file($tmpFileThumb)) {
+            $unoDoc = preg_replace("/(-[0-9]+)?\\.jpg/", "_unoconv.pdf", $tmpFileThumb);
+            if(!is_file($unoDoc)){
                 if (stripos(PHP_OS, "win") === 0) {
                     $unoconv = $this->pluginConf["UNOCONV"]." -o ".escapeshellarg(basename($unoDoc))." -f pdf ".escapeshellarg($masterFile);
                 } else {
