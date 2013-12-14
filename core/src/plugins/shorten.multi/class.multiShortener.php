@@ -18,6 +18,7 @@ class multiShortener extends AJXP_Plugin
         $type = $this->getFilteredOption("SHORTEN_TYPE");
         if(empty($type)) return;
         $jsonData = json_decode($params["ob_output"], true);
+        $elementId = "";
         if ($jsonData != false) {
             $url = $jsonData["publiclet_link"] ;
             $elementId = $jsonData["element_id"];
@@ -148,7 +149,7 @@ class multiShortener extends AJXP_Plugin
                         $shorturl = http_build_url($purl);
                     }
                     print($shorturl);
-                    $this->updateMetaShort($httpVars["file"], $shorturl);
+                    $this->updateMetaShort($httpVars["file"], $elementId, $shorturl);
                 } else {
                     print($url);
                 }
