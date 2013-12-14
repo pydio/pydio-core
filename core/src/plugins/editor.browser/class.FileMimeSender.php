@@ -107,6 +107,7 @@ class FileMimeSender extends AJXP_Plugin
 
             $node = new AJXP_Node($destStreamURL.$file);
             AJXP_Controller::applyHook("node.read", array($node));
+            $this->logInfo('Download', 'Read content of '.$node->getUrl());
 
         }
     }
