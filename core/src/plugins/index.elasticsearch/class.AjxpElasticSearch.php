@@ -379,7 +379,6 @@ class AjxpElasticSearch extends AJXP_Plugin
      */
     public function updateNodeIndexMeta($node)
     {
-        require_once("Zend/Search/Lucene.php");
         if (!isSet($this->currentIndex)) {
             $this->currentIndex =  $this->loadIndex(ConfService::getRepository()->getId());
         }
