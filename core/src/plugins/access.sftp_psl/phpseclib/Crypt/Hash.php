@@ -1,5 +1,4 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
  * Pure-PHP implementations of keyed-hash message authentication codes (HMACs) and various cryptographic hashing functions.
@@ -47,12 +46,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @category   Crypt
- * @package    Crypt_Hash
- * @author     Jim Wigginton <terrafrost@php.net>
- * @copyright  MMVII Jim Wigginton
- * @license    http://www.opensource.org/licenses/mit-license.html  MIT License
- * @link       http://phpseclib.sourceforge.net
+ * @category  Crypt
+ * @package   Crypt_Hash
+ * @author    Jim Wigginton <terrafrost@php.net>
+ * @copyright MMVII Jim Wigginton
+ * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ * @link      http://phpseclib.sourceforge.net
  */
 
 /**#@+
@@ -76,12 +75,22 @@ define('CRYPT_HASH_MODE_HASH',     3);
 /**
  * Pure-PHP implementations of keyed-hash message authentication codes (HMACs) and various cryptographic hashing functions.
  *
+ * @package Crypt_Hash
  * @author  Jim Wigginton <terrafrost@php.net>
  * @version 0.1.0
  * @access  public
- * @package Crypt_Hash
  */
-class Crypt_Hash {
+class Crypt_Hash
+{
+    /**
+     * Hash Parameter
+     *
+     * @see Crypt_Hash::setHash()
+     * @var Integer
+     * @access private
+     */
+    var $hashParam;
+
     /**
      * Byte-length of compression blocks / key (Internal HMAC)
      *
@@ -175,6 +184,19 @@ class Crypt_Hash {
     }
 
     /**
+     * Gets the hash function.
+     *
+     * As set by the constructor or by the setHash() method.
+     *
+     * @access public
+     * @return String
+     */
+    function getHash()
+    {
+        return $this->hashParam;
+    }
+
+    /**
      * Sets the hash function.
      *
      * @access public
@@ -182,7 +204,7 @@ class Crypt_Hash {
      */
     function setHash($hash)
     {
-        $hash = strtolower($hash);
+        $this->hashParam = $hash = strtolower($hash);
         switch ($hash) {
             case 'md5-96':
             case 'sha1-96':
@@ -559,7 +581,7 @@ class Crypt_Hash {
     function _sha512($m)
     {
         if (!class_exists('Math_BigInteger')) {
-            require_once('Math/BigInteger.php');
+            include_once 'Math/BigInteger.php';
         }
 
         static $init384, $init512, $k;
