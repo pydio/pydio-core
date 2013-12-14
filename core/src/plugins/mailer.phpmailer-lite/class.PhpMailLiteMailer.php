@@ -60,7 +60,7 @@ class PhpMailLiteMailer extends AjxpMailer
         $mail->CharSet = "utf-8";
 
         $mail->Subject = $subject;
-        $mail->Body = nl2br($body);
+        $mail->Body = "<html><body>".nl2br($body)."</body></html>";
         $mail->AltBody = strip_tags($mail->Body);
 
         if (!$mail->Send()) {
