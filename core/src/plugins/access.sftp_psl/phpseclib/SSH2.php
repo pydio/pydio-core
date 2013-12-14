@@ -3569,7 +3569,7 @@ class Net_SSH2
      * @return Boolean
      * @access private
      */
-    function _is_includable($suffix)
+    function _is_includable($file)
     {
 		if (file_exists($file)) {
 			return true;
