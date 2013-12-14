@@ -22,6 +22,7 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
 
     panes:null,
     tabRow:null,
+    fitHeight: true,
 
 	/**
 	 * Constructor
@@ -31,11 +32,14 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
 	 */
 	initialize : function($super, htmlElement, tabulatorOptions){
 		$super(htmlElement);
+        if(tabulatorOptions && tabulatorOptions.autoHeight){
+            this.fitHeight = false;
+        }
         if(!htmlElement.down("div.tabpanes")){
             htmlElement.insert(new Element("div", {className:"tabpanes"}));
         }
         this.panes = htmlElement.down("div.tabpanes");
-        fitHeightToBottom(this.panes, this.htmlElement);
+        if(this.fitHeight) fitHeightToBottom(this.panes, this.htmlElement);
         if(htmlElement.down("ul.tabrow")){
             this.tabRow = htmlElement.down("ul.tabrow");
             htmlElement.down("ul.tabrow").select("li").each(function(tab){
@@ -66,14 +70,14 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
         pane.addClassName("tabPane");
         tab.tabPANE = pane;
         this.panes.insert(pane);
-        fitHeightToBottom(pane, this.panes);
+        if(this.fitHeight) fitHeightToBottom(pane, this.panes);
         pane.setStyle({overflowY:"auto"});
         tab.setSelected = function(){
             this.panes.childElements("div.tabPane").invoke("hide");
             tab.tabPANE.show();
             this.tabRow.select("li").invoke("removeClassName", "selected");
             tab.addClassName("selected");
-            pane.setStyle({height:parseInt(this.panes.getHeight())+"px"});
+            if(this.fitHeight) pane.setStyle({height:parseInt(this.panes.getHeight())+"px"});
             if(tab.tabPANE.resizeOnShow){
                 tab.tabPANE.resizeOnShow(tab,tab.tabPANE);
             }
@@ -87,6 +91,7 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
     selectTabByIndex : function(index){
         try{
             this.tabRow.select("li")[index].setSelected();
+            this.notify("switch");
         }catch(e){}
     },
 
@@ -94,7 +99,7 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
 	 * Resizes the widget
 	 */
 	resize : function(){
-        fitHeightToBottom(this.panes, this.htmlElement);
+        if(this.fitHeight) fitHeightToBottom(this.panes, this.htmlElement);
         var tRW = this.tabRow.getWidth();
         var padding = 0;
         var lis = this.tabRow.select("li");
@@ -115,7 +120,7 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
                 tab.setStyle({maxWidth:maxWidth+'px'});
             }
             if(tab.tabPANE){
-                fitHeightToBottom(tab.tabPANE, this.panes);
+                if(this.fitHeight) fitHeightToBottom(tab.tabPANE, this.panes);
                 if(tab.hasClassName("selected") && tab.tabPANE.resizeOnShow){
                     tab.tabPANE.resizeOnShow(tab, tab.tabPANE);
                 }

@@ -628,6 +628,7 @@ Class.create("FormManager", {
         form.select("input,textarea,select").invoke("observe", "blur", function(){
             ajaxplorer.enableAllKeyBindings();
         });
+        form.select(".SF_replicableGroup").invoke("writeAttribute", "data-disableShortcutsOnForm", "true");
     },
 
     confirmExistingImageDelete : function(modalParent, imgSrc, hiddenInput, param){
@@ -788,6 +789,9 @@ Class.create("FormManager", {
             });
             tr.insert(removeButton);
 		}
+        if(tr.readAttribute('data-disableShortcutsOnForm')){
+            this.disableShortcutsOnForm(tr);
+        }
         if(form.ajxpPaneObject) form.ajxpPaneObject.notify('after_replicate_row', tr);
         /*
 		templateRow.select('input', 'select', 'textarea').each(function(origInput){

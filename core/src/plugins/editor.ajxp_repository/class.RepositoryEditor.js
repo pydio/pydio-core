@@ -46,6 +46,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
             fitHeightToBottom(metaPane, oElement);
         };
         this.tab = new AjxpSimpleTabs(oFormObject.down("#repositoryTabulator"));
+        this.tab.observe("switch", this.resize.bind(this));
         this.actions.get("saveButton").observe("click", this.save.bind(this) );
         if(!modal._editorOpener) {
             modal.setCloseValidation(this.validateClose.bind(this));
@@ -236,7 +237,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
                 accordionContent.insert(form);
                 var saveButton = null;
                 if(insertSave){
-                    accordionContent.insert("<div tabindex='0' name='meta_source_edit' class='largeButton SF_disabled' style='min-width:70px; margin-top: 20px;margin-right: 0;'><span class='icon-save'></span> <span class=\"title\">Save</span></div>");
+                    accordionContent.insert("<div tabindex='0' name='meta_source_edit' class='largeButton SF_disabled' style='min-width:70px; margin-top: 20px;margin-right: 0;float: right;'><span class='icon-save'></span> <span class=\"title\">Save</span></div>");
                     saveButton = accordionContent.down("div[name='meta_source_edit']");
                 }
                 accordionContent.insert("<div  tabindex='0' name='meta_source_delete' class='largeButton' style='min-width:70px; margin-top: 20px;margin-right: 0;'><span class='icon-trash'></span> <span class=\"title\">Remove</span></div>");
@@ -257,7 +258,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
                     }.bind(this) );
                 }
             }
-            this.metaTab = new AjxpSimpleTabs(this.metaPane.down("#metaTabulator"));
+            this.metaTab = new AjxpSimpleTabs(this.metaPane.down("#metaTabulator"), {autoHeight:true});
             metaPane.select("div.largeButton").invoke("observe", "click", this.metaActionClick.bind(this));
         }
         if(!metaPane.down('div.metaPane')){
@@ -305,14 +306,15 @@ Class.create("RepositoryEditor", AbstractEditor, {
             }
             modal.refreshDialogAppearance();
             modal.refreshDialogPosition();
-            addFormDetail.insert("<div class='largeButton' style='width:100px;margin-top: 20px;margin-left: 0'><span class='icon-plus-sign'></span> <span>"+MessageHash['ajxp_repository_editor.11']+"</span></div>");
+            addFormDetail.insert("<div class='largeButton' style='width:100px;margin-top: 20px;margin-left: 0; float: right;'><span class='icon-plus-sign'></span> <span>"+MessageHash['ajxp_repository_editor.11']+"</span></div>");
             addFormDetail.down(".largeButton")._form = addForm;
             addFormDetail.down(".largeButton").observe("click", this.metaActionClick.bind(this));
+            this.resize();
         }.bind(this));
 
-        this.metaPane.setStyle({overflowY:'hidden'});
+        this.metaPane.setStyle({overflowY:'auto'});
         this.metaPane.resizeOnShow = function(tab){
-            fitHeightToBottom(this.metaPane.down("#metaTabulator"), null, 30);
+            //fitHeightToBottom(this.metaPane.down("#metaTabulator"), null, 30);
             this.metaTab.resize();
         }.bind(this);
         this.metaTab.resize();
@@ -378,11 +380,11 @@ Class.create("RepositoryEditor", AbstractEditor, {
         if(size){
             this.contentMainContainer.setStyle({height:(size - parseInt(this.element.down('.editor_header').getHeight()) - 30) +"px"});
         }else{
-            fitHeightToBottom(this.contentMainContainer, this.element.up(".dialogBox"));
+            fitHeightToBottom(this.contentMainContainer, this.element.up(".dialogBox"), 30);
         }
         this.tab.resize();
         if(this.metaTab){
-            fitHeightToBottom(this.metaPane.down("#metaTabulator"), null, 30);
+            //fitHeightToBottom(this.metaPane.down("#metaTabulator"), null, 30);
             this.metaTab.resize();
         }
         this.element.fire("editor:resize", size);
