@@ -999,14 +999,13 @@ class Net_SSH2
                 '3des-cbc',       // REQUIRED          three-key 3DES in CBC mode
                 'none'            // OPTIONAL          no encryption; NOT RECOMMENDED
             );
-/*
+
             if (!$this->_is_includable('Crypt/RC4.php')) {
                 $encryption_algorithms = array_diff(
                     $encryption_algorithms,
                     array('arcfour256', 'arcfour128', 'arcfour')
                 );
             }
-*/
             if (!$this->_is_includable('Crypt/Rijndael.php')) {
                 $encryption_algorithms = array_diff(
                     $encryption_algorithms,
@@ -3571,9 +3570,14 @@ class Net_SSH2
      */
     function _is_includable($suffix)
     {
-		if (file_exists($file)) {
-			return true;
-		}
+        foreach (explode(PATH_SEPARATOR, get_include_path()) as $prefix) {
+            $ds = substr($prefix, -1) == DIRECTORY_SEPARATOR ? '' : DIRECTORY_SEPARATOR;
+            $file = $prefix . $ds . $suffix;
+
+            if (file_exists($file)) {
+                return true;
+            }
+        }
 
         return false;
     }
