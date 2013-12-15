@@ -25,7 +25,7 @@ $mess = array(
 "21"=> "Expirar despres de (dies): ",
 "22"=> "Descàrregues permeses: ",
 "23"=> "Contrasenya opcional: ",
-"24"=> "Configureu els límits de durada i definiu una contrasenya d'accés al fitxer, llavors feu click a \"Generar\".",
+"24"=> "Set expiration limits and define a password to access the file, then click on the <span class=\"icon-plus-sign\"></span> sign  to generate web link. You can generate many links to send them to different people.",
 "25"=> "Sense Limit",
 "26" => "Choose users or groups and set their access rights. 'Write' only will create an upload-only repository.",
 "27" => "Share file",

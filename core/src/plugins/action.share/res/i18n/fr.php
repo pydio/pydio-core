@@ -26,7 +26,7 @@ $mess = array(
     "21"=> "Expire après (jours): ",
     "22"=> "Downloads autorisés: ",
     "23"=> "Mot de passe: ",
-    "24"=> "Fixer les limites d'expiration et un mot de passe optionnel, puis cliquer sur \"Génerer\".",
+    "24"=> "Fixer les limites et mot de passe optionnels, puis cliquer sur le bouton <span class=\"icon-plus-sign\"></span> pour générer le weblien. Vous pouvez générer plusieurs liens pour un même fichier.",
     "25"=> "Pas de limite",
     "26"=> "Choisir les utilisateurs et les groupes et leurs droits d'accès.",
     "27"=> "Partage de fichier",

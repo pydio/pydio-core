@@ -26,7 +26,7 @@ $mess = array(
     "21"=> "Validade (dias): ",
     "22"=> "Máximo de Transferências permitidas: ",
     "23"=> "Palavra-Chave Opcional: ",
-    "24"=> "Defina a validade e palavra-chave para aceder a um ficheiro e de seguida clique em \"Gerar\".",
+    "24"=> "Set expiration limits and define a password to access the file, then click on the <span class=\"icon-plus-sign\"></span> sign  to generate web link. You can generate many links to send them to different people.",
     "25"=> "Sem limite",
     "26"=> "Escolha os utilizadores ou grupos e defina as permissões de acesso dos mesmos. Usar só 'Escrever' irá criar uma Área de Trabalho apenas de Envio.",
     "27"=> "Partilhar ficheiro",

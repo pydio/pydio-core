@@ -25,7 +25,7 @@ $mess = array(
 "21"=> "Caducidad (en días): ",
 "22"=> "Descargas permitidas: ",
 "23"=> "Contraseña opcional: ",
-"24"=> "Establezca límite de descargas y expiración para el acceso al fichero y haga clic en \"Crear\".",
+"24"=> "Set expiration limits and define a password to access the file, then click on the <span class=\"icon-plus-sign\"></span> sign  to generate web link. You can generate many links to send them to different people.",
 "25"=> "Sin límites",
 "26"=> "Elija usuarios o grupos y ajuste sus derechos de acceso. 'Escribir' creará un repositorio únicamente para cargas.",
 "27"=> "Compartir fichero",

@@ -24,7 +24,7 @@ $mess = array(
 "21"=> "Ungültig nach (Tagen): ",
 "22"=> "Erlaubte Downloads: ",
 "23"=> "Optionales Passwort: ",
-"24"=> "Legen Sie ein Ablaufdatum und ein Passwort, zum Zugriff auf die Datei, fest. Danach auf \"Erzeugen\" klicken.",
+"24"=> "Set expiration limits and define a password to access the file, then click on the <span class=\"icon-plus-sign\"></span> sign  to generate web link. You can generate many links to send them to different people.",
 "25"=> "Kein limit",
 "26"=> "Wählen Sie die Benutzer oder Gruppen und legen Sie deren Zugriffsrechte fest. Nur Schreiben erstellt ein Nur-Upload-Repository.",
 "27"=> "Datei teilen",

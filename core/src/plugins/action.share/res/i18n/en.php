@@ -26,7 +26,7 @@ $mess = array(
     "21"=> "Expire after (days): ",
     "22"=> "Allowed Downloads: ",
     "23"=> "Optional password: ",
-    "24"=> "Set expiration limits and define a password to access the file, then click on \"Generate\".",
+    "24"=> "Set expiration limits and define a password to access the file, then click on the <span class=\"icon-plus-sign\"></span> sign  to generate web link. You can generate many links to send them to different people.",
     "25"=> "No limit",
     "26"=> "Choose users or groups and set their access rights. 'Write' only will create an upload-only workspace.",
     "27"=> "Share file",

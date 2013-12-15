@@ -243,7 +243,6 @@
                         </clientForm>
                     <clientForm id="share_form" theme="vision"><![CDATA[
                         <div id="share_form" box_width="420" action="share"><div class="dialogContentMainTitle" ajxp_message_id="share_center.92">AJXP_MESSAGE[share_center.92]</div>
-                            <div class="dialogLegend" ajxp_message_id="share_center.24" style="display:none;">AJXP_MESSAGE[share_center.24]</div>
                             <div id="share_optional_fields">
                                 <div class="SF_horizontal_labelRow">
                                     <div class="SF_label" ajxp_message_id="share_center.23" style="width:130px;" title="AJXP_MESSAGE[share_center.23]">AJXP_MESSAGE[share_center.23]</div>
@@ -258,7 +257,8 @@
                                 </div>
                                 <div class="SF_element" id="public_pass_container" style="display:none;height:20px;"></div>
                             </div>
-                            <div style="display:none;position:relative;margin-bottom:20px;clear:left; padding-top: 30px;" id="share_result">
+                            <div class="dialogLegend" ajxp_message_id="share_center.24" style="clear: both;padding: 10px 1px 0;font-size: 13px;line-height: 19px;">AJXP_MESSAGE[share_center.24]</div>
+                            <div style="display:none;position:relative;margin-bottom:20px;clear:left; padding-top: 20px;" id="share_result">
                                 <div class="dialogContentMainTitle" ajxp_message_id="share_center.93">AJXP_MESSAGE[share_center.93]</div>
                                 <div class="SF_horizontal_fieldsRow" style="display:none; margin-bottom:7px;">
                                     <div id="handle_existing_links" class="SF_horizontal_actions SF_horizontal_pastilles"></div>
