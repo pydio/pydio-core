@@ -123,6 +123,9 @@ class ShareCenter extends AJXP_Plugin
                 $subAction = (isSet($httpVars["sub_action"])?$httpVars["sub_action"]:"");
                 $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                 $ajxpNode = new AJXP_Node($this->urlBase.$file);
+                if(!file_exists($ajxpNode->getUrl())){
+                    throw new Exception("Cannot share a non-existing file: ".$ajxpNode->getUrl());
+                }
                 $metadata = null;
 
                 if ($subAction == "delegate_repo") {
@@ -673,7 +676,7 @@ class ShareCenter extends AJXP_Plugin
     public static function checkHash($outputData, $hash)
     {
         $full = md5($outputData);
-        return (!empty($hash) && strpos($full, $hash) === 0);
+        return (!empty($hash) && strpos($full, $hash."") === 0);
     }
 
     public function buildPublicDlURL()
