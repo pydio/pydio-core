@@ -120,17 +120,8 @@
                 <script>
                     document.observeOnce("ajaxplorer:context_changed", function(){
                         try{
-                            $("global_toolbar").insert({bottom: $("search_container_settings")});
-                            $("search_container_settings").show();
                             $("browser").ajxpPaneObject.resize();
                         }catch(e){}
-                        document.observeOnce("ajaxplorer:repository_list_refreshed",function(){
-                            if(ajaxplorer.repositoryId == 'ajxp_user') return;
-                            try{
-                                $("global_toolbar").down("#search_container_settings").ajxpPaneObject.destroy();
-                                $("global_toolbar").down("#search_container_settings").remove();
-                            }catch(e){}
-                        });
                     });
                     window.setTimeout(function(){
                         try{ $("browser").ajxpPaneObject.resize(); }catch(e){}

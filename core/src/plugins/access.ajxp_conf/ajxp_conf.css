@@ -96,7 +96,9 @@
 }
 
 .settings_search_container #search_form a{
-    color: #ffffff;
+    color: rgba(92, 92, 92, 0.61);
+    position: relative;
+    left: -32px;
 }
 
 .settings_search_container #search_form input{

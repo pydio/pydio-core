@@ -68,9 +68,6 @@
                         })
                         window.setTimeout(function(){ $("get_my_feed_button").hide(); }, 10);
                         $("browser").ajxpPaneObject.resize();
-                        document.observeOnce("ajaxplorer:repository_list_refreshed",function(){
-                            if(ajaxplorer.repositoryId == 'ajxp_conf') return;
-                        });
                     });
                 </script>
 			]]></template_part>
