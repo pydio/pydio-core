@@ -214,45 +214,13 @@
             </processing>
 		</action>
 		<action name="create_repository">
-			<gui text="299" title="300" iconClass="icon-sitemap" src="hdd_external_unmount.png" accessKey="ajxp_conf.repository_access_key" hasAccessKey="false">
+			<gui text="ajxp_conf.90" title="300" iconClass="icon-sitemap" src="hdd_external_unmount.png" accessKey="ajxp_conf.repository_access_key" hasAccessKey="false">
 				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden" allowedMimes="workspaces_zone"
 					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="put" inZip="false">
 				</context>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
-			<subMenu>
-				<dynamicBuilder><![CDATA[
-					var context = window.builderContext;
-					context.builderMenuItems = $A([]);
-                    context.builderMenuItems.push({
-                        name:MessageHash['ajxp_conf.90'],
-                        alt:MessageHash[300],
-                        isDefault : true,
-                        icon_class:'icon-hdd',
-                        image:resolveImageSource('images/actions/22/hdd_external_unmount.png', '',  22),
-                        callback:function(e){
-                            window.createRepoCmd = "repository";
-                            this.options.src = 'hdd_external_unmount.png';
-                            this.options.title = MessageHash[300];
-                            this.apply();
-                        }.bind(context)
-                    } );
-                    context.builderMenuItems.push({
-                        name:MessageHash['ajxp_conf.91'],
-                        alt:MessageHash['ajxp_conf.92'],
-                        isDefault : false,
-                        icon_class:'icon-th',
-                        image:resolveImageSource('images/actions/22/hdd_external_mount.png', '',  22),
-                        callback:function(e){
-                            window.createRepoCmd = "template";
-                            this.options.src = 'hdd_external_mount.png';
-                            this.options.title = MessageHash['ajxp_conf.92'];
-                            this.apply();
-                        }.bind(context)
-                    } );
-				]]></dynamicBuilder>
-			</subMenu>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var loadFunc = function(oForm){
@@ -261,7 +229,7 @@
 							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
 						}
 						ajaxplorer.actionBar.configEditor.setForm(oForm);
-						ajaxplorer.actionBar.configEditor.initCreateRepoWizard((window.createRepoCmd?window.createRepoCmd:'repository'));
+						ajaxplorer.actionBar.configEditor.initCreateRepoWizard('repository');
 					};
 					modal.showDialogForm('Create Repository', 'create_repository_box', loadFunc, null, null, false, true);
 					]]></clientCallback>
@@ -292,6 +260,28 @@
                     <input_param description="A JSON object containing the following mandatory keys : DISPLAY (string), DRIVER (string), DRIVER_OPTIONS (array of options) and optional keys : DISPLAY_ID (string), DESCRIPTION_ID (string), AJXP_SLUG (string), IS_TEMPLATE (boolean). &lt;br&gt;&lt;br&gt; The expected DRIVER value can be either an access type plugin name (fs, ftp, etc), or a template id by using the ajxp_template_ prefix (ajxp_template_TEMPLATE_ID). The DRIVER_OPTIONS array may depend on the used access type." name="json_data" type="JSON"/>
 				</serverCallback>
 				</processing>
+		</action>
+		<action name="create_repository_template">
+			<gui text="ajxp_conf.91" title="ajxp_conf.92" iconClass="icon-th" src="hdd_external_unmount.png" hasAccessKey="false">
+				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden" allowedMimes="workspaces_zone"
+					actionBar="true" contextMenu="false" infoPanel="false"
+					actionBarGroup="put" inZip="false">
+				</context>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var loadFunc = function(oForm){
+						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+						if(!ajaxplorer.actionBar.configEditor){
+							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+						}
+						ajaxplorer.actionBar.configEditor.setForm(oForm);
+						ajaxplorer.actionBar.configEditor.initCreateRepoWizard('template');
+					};
+					modal.showDialogForm('Create Repository', 'create_repository_box', loadFunc, null, null, false, true);
+                ]]></clientCallback>
+            </processing>
 		</action>
 		<action name="user_update_role" fileDefault="false">
 			<gui text="ajxp_conf.94" title="ajxp_conf.82" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">

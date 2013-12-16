@@ -172,7 +172,7 @@ class sqlConfDriver extends AbstractConfDriver
                 'display'                   => $repository->getDisplay(),
                 'accessType'                => $repository->getAccessType(),
                 'recycle'                   => $repository->recycle,
-                'bcreate'                   => $repository->getCreate(),
+                'bcreate'                   => intval($repository->getCreate()),
                 'writeable'                 => $repository->isWriteable(),
                 'enabled'                   => $repository->isEnabled(),
                 'options'                   => $repository->options,
