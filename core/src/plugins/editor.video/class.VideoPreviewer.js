@@ -130,9 +130,9 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
 				content +='	<video class="video-js" controls preload="auto" height="200">';
                 var flashName;
                 html5proxies.each(function(pair){
-                    var fname = url+'/'+ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=read_video_data'+sessidPart+'&file='+pair.value;
+                    var fname = url+'/'+ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=read_video_data'+sessidPart+'&file='+encodeURIComponent(pair.value);
                     if(!flashName){
-                        flashName = encodeURIComponent(fname);
+                        flashName = encodeURIComponent(url+'/'+ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=read_video_data'+sessidPart+'&file='+pair.value);
                     }
                     content +='		<source src="'+fname+'" type=\''+types[pair.key]+'\' />';
                 });
