@@ -1430,6 +1430,17 @@ class AJXP_Utils
     }
 
     /**
+     * Parse URL ignoring # and ?
+     * @param $path
+     * @return array
+     */
+    public static function safeParseUrl($path){
+        $parts = parse_url(str_replace(array("#", "?"), array("__AJXP_FRAGMENT__", "__AJXP_MARK__"), $path));
+        $parts["path"]= str_replace(array("__AJXP_FRAGMENT__", "__AJXP_MARK__"), array("#", "?"), $parts["path"]);
+        return $parts;
+    }
+
+    /**
      * @static
      * @param string $url
      * @return bool|mixed|string

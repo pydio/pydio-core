@@ -406,7 +406,7 @@ class ftpAccessWrapper implements AjxpWrapper
     protected function parseUrl($url, $forceLogin = false)
     {
         // URL MAY BE ajxp.ftp://username:password@host/path
-        $urlParts = parse_url($url);
+        $urlParts = AJXP_Utils::safeParseUrl($url);
         $this->repositoryId = $urlParts["host"];
         $repository = ConfService::getRepositoryById($this->repositoryId);
         if ($repository == null) {
@@ -457,7 +457,7 @@ class ftpAccessWrapper implements AjxpWrapper
             $parts = $this->parseUrl($url);
         } else {
             // parseUrl already called before (rename case).
-            $parts = parse_url($url);
+            $parts = AJXP_Utils::safeParseUrl($url);
         }
         $serverPath = AJXP_Utils::securePath("/$this->path/".$parts["path"]);
         return "ftp".($this->secure?"s":"")."://$this->user:$this->password@$this->host:$this->port".$serverPath;

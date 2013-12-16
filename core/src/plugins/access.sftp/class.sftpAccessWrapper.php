@@ -71,11 +71,15 @@ class sftpAccessWrapper extends fsAccessWrapper
      * Concretely, transform ajxp.webdav:// into webdav://
      *
      * @param string $path
+     * @param string $streamType
+     * @param bool $sftpResource
+     * @param bool $skipZip
+     * @throws Exception
      * @return mixed Real path or -1 if currentListing contains the listing : original path converted to real path
      */
     protected static function initPath($path, $streamType="", $sftpResource = false, $skipZip = false)
     {
-        $url = parse_url($path);
+        $url = AJXP_Utils::safeParseUrl($path);
         $repoId = $url["host"];
         $repoObject = ConfService::getRepositoryById($repoId);
         if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
@@ -156,7 +160,7 @@ class sftpAccessWrapper extends fsAccessWrapper
     {
         $realPath = self::initPath($path);
         $stat = @stat($realPath);
-        $parts = parse_url($path);
+        $parts = AJXP_Utils::safeParseUrl($path);
         $repoObject = ConfService::getRepositoryById($parts["host"]);
 
         AbstractAccessDriver::fixPermissions($stat, $repoObject, array($this, "detectRemoteUserId"));
@@ -286,7 +290,7 @@ class sftpAccessWrapper extends fsAccessWrapper
      */
     public static function changeMode($path, $chmodValue)
     {
-        $url = parse_url($path);
+        $url = AJXP_Utils::safeParseUrl($path);
         list($connection, $remote_base_path) = self::getSshConnection($path);
         //var_dump('chmod '.decoct($chmodValue).' '.$remote_base_path.$url['path']);
         ssh2_exec($connection,'chmod '.decoct($chmodValue).' '.$remote_base_path.$url['path']);
@@ -297,7 +301,7 @@ class sftpAccessWrapper extends fsAccessWrapper
         if ($repoObject != null) {
             $url = array();
         } else {
-            $url = parse_url($path);
+            $url = AJXP_Utils::safeParseUrl($path);
             $repoId = $url["host"];
             $repoObject = ConfService::getRepositoryById($repoId);
         }
