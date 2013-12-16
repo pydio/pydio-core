@@ -1304,8 +1304,8 @@ Class.create("FilesList", SelectableElements, {
 		}
 		var clientConfigs = contextNode.getMetadata().get("client_configs");
 		if(clientConfigs){
-			var componentData = XPathSelectSingleNode(clientConfigs, 'component_config[@className="FilesList"]');
-			if(componentData){
+			var componentData = XPathSelectSingleNode(clientConfigs, 'component_config');
+			if(componentData && componentData.getAttribute('className') && componentData.getAttribute('className')=="FilesList"){
 				refreshGUI = this.parseComponentConfig(componentData);
 			}
 		}else if(this.restoreConfig){

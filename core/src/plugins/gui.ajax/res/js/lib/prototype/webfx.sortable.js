@@ -403,6 +403,7 @@ SortableTable = Class.create({
 	},
 	
 	getRowValue: function (oRow, sType, nColumn) {
+        if(!this._sortTypeInfo[sType]) return 0;
 		// if we have defined a custom getRowValue use that
         if(this.columnsDefs){
             var colDef = this.columnsDefs[nColumn];
