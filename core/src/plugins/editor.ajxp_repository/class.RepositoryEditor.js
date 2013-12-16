@@ -165,8 +165,6 @@ Class.create("RepositoryEditor", AbstractEditor, {
         $A(repo.childNodes).each(function(child){
             if(child.nodeName != 'param') return;
             if(child.getAttribute("cdatavalue")){
-                console.log(child);
-                console.log(child.firstChild.nodeValue);
                 paramsValues.set(child.getAttribute("name"), child.firstChild.nodeValue);
             }else{
                 paramsValues.set(child.getAttribute('name'), child.getAttribute('value'));

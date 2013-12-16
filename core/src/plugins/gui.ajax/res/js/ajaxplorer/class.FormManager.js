@@ -88,10 +88,13 @@ Class.create("FormManager", {
 			var mandatory = false;
 			if(param.get('mandatory') && param.get('mandatory')=='true') mandatory = true;
             var defaultValue = '';
+            var defaultValueExists = false;
             if(values && values.get(name) !== undefined){
                 defaultValue = values.get(name);
-            }else if(param.get('default') !== undefined){
+                defaultValueExists = true;
+            }else if(!addFieldCheckbox && param.get('default') !== undefined){
                 defaultValue = param.get('default');
+                defaultValueExists = true;
             }
 			var element;
 			var disabledString = (disabled || param.get('readonly')?' disabled="true" ':'');
@@ -354,9 +357,9 @@ Class.create("FormManager", {
                 div.insert(new Element('div', {className:"SF_label"}).update('<span>'+label+(mandatory?'*':'')+'</span>'));
                 // INSERT CHECKBOX
                 if(addFieldCheckbox){
-                    cBox = '<input type="checkbox" class="SF_fieldCheckBox" name="SFCB_'+name+'" '+(defaultValue?'checked':'')+'/>';
+                    cBox = '<input type="checkbox" class="SF_fieldCheckBox" name="SFCB_'+name+'" '+(defaultValueExists?'checked':'')+'/>';
                     cBox = new Element('input', {type:'checkbox', className:'SF_fieldCheckBox', name:'SFCB_'+name});
-                    cBox.checked = defaultValue?true:false;
+                    cBox.checked = defaultValueExists;
                     div.insert(cBox);
                 }
                 // INSERT ELEMENT

@@ -1617,6 +1617,7 @@ Class.create("FilesList", SelectableElements, {
                     window.setTimeout(function(){
                         if(!this.htmlElement) return;// can be destroyed.
                         if(ajxpNode.getAjxpMime() != "ajxp_recycle"){
+                            if(!this.htmlElement) return;
                             var newDrag = new AjxpDraggable(
                                 innerSpan,
                                 {
