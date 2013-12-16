@@ -541,13 +541,16 @@ class AJXP_Plugin implements Serializable
         $nodes = $this->xPath->query("dependencies/activePlugin/@pluginName");
         foreach ($nodes as $attr) {
             $value = $attr->value;
-            if ($value == "access.AJXP_STREAM_PROVIDER") {
-                $deps = array_merge($deps, $pluginService->getStreamWrapperPlugins());
-            } else if (strpos($value, "+") !== false) {
-                $typed = $pluginService->getPluginsByType(substr($value, 0, strlen($value)-1));
-                foreach($typed as $typPlug) $deps[] = $typPlug->getId();
-            } else {
-                $deps = array_merge($deps, explode("|", $value));
+            $parts = explode("|", $value);
+            foreach($parts as $depName){
+                if ($depName == "access.AJXP_STREAM_PROVIDER") {
+                    $deps = array_merge($deps, $pluginService->getStreamWrapperPlugins());
+                } else if (strpos($depName, "+") !== false) {
+                    $typed = $pluginService->getPluginsByType(substr($depName, 0, strlen($depName)-1));
+                    foreach($typed as $typPlug) $deps[] = $typPlug->getId();
+                } else {
+                    $deps[] = $depName;// array_merge($deps, explode("|", $value));
+                }
             }
         }
         return $deps;

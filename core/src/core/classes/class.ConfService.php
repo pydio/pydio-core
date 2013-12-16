@@ -732,7 +732,7 @@ class ConfService
      * Remove a repository using the conf driver implementation
      * @static
      * @param $repoId
-     * @return void
+     * @return int
      */
     public static function deleteRepository($repoId)
     {
@@ -741,7 +741,7 @@ class ConfService
     /**
      * See static method
      * @param $repoId
-     * @return void
+     * @return int
      */
     public function deleteRepositoryInst($repoId)
     {
