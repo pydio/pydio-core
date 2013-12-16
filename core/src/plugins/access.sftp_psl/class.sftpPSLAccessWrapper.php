@@ -189,6 +189,8 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
 		if ($ssh2->login($user, $pass)) {
 			$output = $ssh2->exec( 'id' );
 
+			$ssh2->disconnect();
+
 			if (trim($output != "")) {
 				$res = sscanf($output, "uid=%i(%s) gid=%i(%s) groups=%i(%s)");
 				preg_match_all("/(\w*)=(\w*)\((\w*)\)/", $output, $matches);
@@ -199,9 +201,9 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
 					return array($uid, $gid);
 				}
 			}
-
-			$ssh2->disconnect();
 		}
+		unset($ssh2);
+
 		return array(null,null);
 	}
 
