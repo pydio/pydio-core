@@ -197,7 +197,7 @@ Class.create("Connexion", {
 		if(this.onComplete){
 			this.onComplete(transport);
 		}
-		document.fire("ajaxplorer:server_answer");
+		document.fire("ajaxplorer:server_answer", this);
 	},
 	
 	/**

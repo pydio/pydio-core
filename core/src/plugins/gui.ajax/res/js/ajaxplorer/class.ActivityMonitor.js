@@ -91,7 +91,10 @@ Class.create("ActivityMonitor", {
 	/**
 	 * Listener to clear the timer 
 	 */
-	activityObserver : function(){
+	activityObserver : function(event){
+        if(event && event.memo && event.memo.discrete){
+            return;
+        }
 		if(this._state == 'warning') return;
 		if(this.timer){
 			window.clearTimeout(this.timer);
