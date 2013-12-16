@@ -25,6 +25,7 @@
 		<param name="SFTP_PORT" type="string" label="CONF_MESSAGE[Port]" description="CONF_MESSAGE[SFTP Host port]" mandatory="true" default="22"/>
 		<param name="PATH" type="string" label="CONF_MESSAGE[Path]" description="CONF_MESSAGE[Real path to the root folder on the server]" mandatory="true" default="/"/>
 		<param name="FIX_PERMISSIONS" type="string" label="CONF_MESSAGE[Fix Permissions]" description="CONF_MESSAGE[How to handle remote permissions to be used by PHP as local permissions. See manual.]" mandatory="false" default="detect_remote_user_id"/>
+        <param name="CREATE" type="boolean" label="CONF_MESSAGE[Create]" description="CONF_MESSAGE[Create folder if it does not exists]" default="false" mandatory="false"/>
 		<global_param
 			group="MIXIN_MESSAGE[Metadata and indexation]"
 			name="DEFAULT_METASOURCES"
@@ -34,9 +35,6 @@
 			mandatory="false"
 			default="metastore.serial,meta.filehasher,index.lucene"/>
 	</server_settings>
-
-	<class_definition filename="plugins/access.sftp_psl/class.sftpPSLAccessDriver.php" classname="sftpPSLAccessDriver"/>
-	<class_stream_wrapper filename="plugins/access.sftp_psl/class.sftpPSLAccessWrapper.php" classname="sftpPSLAccessWrapper" protocol="ajxp.sftppsl"/>
 
 	<registry_contributions>
 		<client_configs>
@@ -59,7 +57,11 @@
 		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
 	</registry_contributions>
 
-	<dependencies>
+    <dependencies>
 		<pluginClass pluginName="access.fs"/>
 	</dependencies>
+
+    <class_definition filename="plugins/access.sftp_psl/class.sftpPSLAccessDriver.php" classname="sftpPSLAccessDriver"/>
+    <class_stream_wrapper filename="plugins/access.sftp_psl/class.sftpPSLAccessWrapper.php" classname="sftpPSLAccessWrapper" protocol="ajxp.sftppsl"/>
+
 </ajxpdriver>

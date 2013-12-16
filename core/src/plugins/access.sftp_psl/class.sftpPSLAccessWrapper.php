@@ -44,7 +44,7 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
 	 */
 	protected static function initPath($path, $streamType = '', $storeOpenContext = false, $skipZip = true)
 	{
-		$url = parse_url($path);
+		$url = AJXP_Utils::safeParseUrl($path);
 		$repoId = $url["host"];
 		$path = $url["path"];
 
@@ -168,7 +168,7 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
 	{
 		$realPath = self::initPath($path);
 		$stat = @stat($realPath);
-		$parts = parse_url($path);
+		$parts = AJXP_Utils::safeParseUrl($path);
 		$repoObject = ConfService::getRepositoryById($parts["host"]);
 
 		AbstractAccessDriver::fixPermissions($stat, $repoObject, array($this, "detectRemoteUserId"));
