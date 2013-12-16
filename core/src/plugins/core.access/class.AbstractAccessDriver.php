@@ -447,7 +447,6 @@ class AbstractAccessDriver extends AJXP_Plugin
             if ($fixPermPolicy == "detect_remote_user_id" && $remoteDetectionCallback != null) {
                 list($uid, $gid) = call_user_func($remoteDetectionCallback, $repoObject);
                 if ($uid != null && $gid != null) {
-                    $uid = $repoObject->getOption("UID");
                     $_SESSION[$sessionKey] = array("uid" => $uid, "gid" => $gid);
                 }
 

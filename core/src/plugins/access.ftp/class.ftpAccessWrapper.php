@@ -446,8 +446,15 @@ class ftpAccessWrapper implements AjxpWrapper
         return $urlParts;
     }
 
+    /**
+     * @return array Array(UID, GID) to be used to compute permission
+     */
     public function getRemoteUserId()
     {
+        $repoUid = ConfService::getRepository()->getOption("UID");
+        if(!empty($repoUid)){
+            return array($repoUid, "-1");
+        }
         return array($this->user, "-1");
     }
 
