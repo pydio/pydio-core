@@ -8,8 +8,6 @@
 	<server_settings>
 		<param name="CONSUMER_KEY" type="string" label="CONF_MESSAGE[Consumer Key]" description="CONF_MESSAGE[Key]" mandatory="true"/>
 		<param name="CONSUMER_SECRET" type="string" label="CONF_MESSAGE[Consumer Secret]" description="CONF_MESSAGE[Secret]" mandatory="true"/>
-		<param name="USER" type="string" label="CONF_MESSAGE[User Mail]" description="CONF_MESSAGE[User account]" mandatory="true"/>
-		<param name="PASS" type="password" label="CONF_MESSAGE[Password]" description="CONF_MESSAGE[User Password]" mandatory="true"/>
 	</server_settings>
 	<class_definition filename="plugins/access.dropbox/class.dropboxAccessDriver.php" classname="dropboxAccessDriver"/>
 	<registry_contributions>

@@ -57,7 +57,7 @@ class dropboxAccessDriver extends fsAccessDriver
         if(!empty($_SESSION["OAUTH_DROPBOX_TOKENS"])) return;
 
         // TOKENS IN FILE ?
-        $tokens = $this->getTokens($this->repository->getId());
+        $tokens = $this->getTokens();
         if (!empty($tokens)) {
             $_SESSION["OAUTH_DROPBOX_TOKENS"] = $tokens;
             return;
@@ -87,7 +87,7 @@ class dropboxAccessDriver extends fsAccessDriver
                 $tokens = $oauth->getAccessToken();
                 $_SESSION['DROPBOX_NEGOCIATION_STATE'] = 3;
                 $_SESSION['OAUTH_DROPBOX_TOKENS'] = $tokens;
-                $this->setTokens($this->repository->getId(), $tokens);
+                $this->setTokens($tokens);
                 return;
         }
 
@@ -107,13 +107,19 @@ class dropboxAccessDriver extends fsAccessDriver
         return true;
     }
 
-    public function getTokens($repositoryId)
+    public function getTokens()
     {
-        return AJXP_Utils::loadSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_tokens");
+        $repositoryId = $this->repository->getId();
+        if(AuthService::usersEnabled()) $userId = AuthService::getLoggedUser()->getId();
+        else $userId = "shared";
+        return AJXP_Utils::loadSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_".$userId."_tokens");
     }
-    public function setTokens($repositoryId, $oauth_tokens)
+    public function setTokens($oauth_tokens)
     {
-        return AJXP_Utils::saveSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_tokens", $oauth_tokens, true);
+        $repositoryId = $this->repository->getId();
+        if(AuthService::usersEnabled()) $userId = AuthService::getLoggedUser()->getId();
+        else $userId = "shared";
+        return AJXP_Utils::saveSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_".$userId."_tokens", $oauth_tokens, true);
     }
 
 }

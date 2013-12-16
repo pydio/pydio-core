@@ -63,7 +63,8 @@ class dropboxWrapper implements AjxpWrapper
             self::$oauth->setToken($_SESSION["OAUTH_DROPBOX_TOKENS"]);
             self::$dropbox = new Dropbox_API(self::$oauth);
         }
-        $path = parse_url($ajxpPath, PHP_URL_PATH);
+        $parts = AJXP_Utils::safeParseUrl($ajxpPath);
+        $path = $parts["path"];
         if($path == "") return "/";
         return $path;
     }
@@ -205,7 +206,7 @@ class dropboxWrapper implements AjxpWrapper
     public function dir_readdir()
     {
         //return false;
-        if(self::$crtDirIndex == count(self::$crtDirContent)-1) return false;
+        if(self::$crtDirIndex == count(self::$crtDirContent)) return false;
         $meta = self::$crtDirContent[self::$crtDirIndex];
         self::$crtDirIndex ++;
         return basename($meta["path"]);
