@@ -37,7 +37,7 @@
 	</registry_contributions>
     <dependencies>
         <!-- Stream Wrapper Access, and dependancy to uploader.flex forces the order -->
-        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER|action.quicksend"/>
         <pluginClass pluginName="uploader.flex"/>
         <pluginClass pluginName="gui.ajax"/>
     </dependencies>
