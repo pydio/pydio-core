@@ -4604,7 +4604,6 @@ div.flat_tabulator > div:not(.tabulatorContainer){
     width: 22%;
     padding: 0;
     background-color: #ebedf0 !important;
-    border-right: 1px solid rgb(111, 123, 136)
 }
 
 .horizontal_tabulator span.toggleHeader{
@@ -4630,7 +4629,7 @@ div.flat_tabulator > div:not(.tabulatorContainer){
 div.horizontal_tabulator > div:not(.tabulatorContainer){
     float: left;
     padding: 0 !important;
-    width:77%;
+    width:78%;
 }
 
 #breadcrumb{

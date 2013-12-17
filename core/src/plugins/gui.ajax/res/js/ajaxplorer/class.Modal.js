@@ -139,14 +139,15 @@ Class.create("Modal", {
 		if(!boxPadding) boxPadding = 10;
 		this.dialogContent.setStyle({padding:boxPadding+'px'});
 
-		
-		if(fOnCancel){
-			this.dialogTitle.select('#modalCloseBtn')[0].observe("click", function(){fOnCancel(modal.getForm());hideLightBox();});
-		}
-		else{
-			this.dialogTitle.select('#modalCloseBtn')[0].observe("click", function(){hideLightBox();});
-		}			
-		
+		if(this.dialogTitle.select('#modalCloseBtn')[0]){
+            if(fOnCancel){
+                this.dialogTitle.select('#modalCloseBtn')[0].observe("click", function(){fOnCancel(modal.getForm());hideLightBox();});
+            }
+            else{
+                this.dialogTitle.select('#modalCloseBtn')[0].observe("click", function(){hideLightBox();});
+            }
+        }
+
 		if(fOnComplete)	{
 			newForm.onsubmit = function(){
 				try{
@@ -387,7 +388,9 @@ Class.create("Modal", {
                             duration:0.4,
                             afterFinish:function(){
                                 content.down('div.dialogButtons').remove();
-                                $(element).down("#element_overlay").setStyle({opacity:0});
+                                if($(element).down("#element_overlay")) {
+                                    $(element).down("#element_overlay").setStyle({opacity:0});
+                                }
                                 box.remove();
                                 removeLightboxFromElement(element);
                                 this.currentLightBoxElement = null;
