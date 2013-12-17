@@ -475,7 +475,6 @@
     </registry_contributions>
     <class_definition filename="plugins/action.share/class.ShareCenter.php" classname="ShareCenter"/>
     <dependencies>
-        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
-        <activePlugin pluginName="access.ajxp_user"/>
+        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER|access.ajxp_user"/>
     </dependencies>
 </ajxp_plugin>
