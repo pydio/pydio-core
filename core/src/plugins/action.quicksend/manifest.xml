@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin enabled="false" id="action.quicksend" label="CONF_MESSAGE[Quick Send (experimental)]" description="CONF_MESSAGE[Send, share and email the link at once, from the user dashboard.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+
+    <plugin_info>
+        <core_relation packaged="true" tested_version="follow_core"/>
+        <plugin_author>Charles du Jeu</plugin_author>
+    </plugin_info>
+
+    <client_settings>
+        <resources>
+            <js className="QuicksendManager" file="plugins/action.quicksend/class.QuicksendManager.js" autoload="true"/>
+            <i18n namespace="action.quicksend" path="plugins/action.quicksend/i18n"/>
+        </resources>
+    </client_settings>
+
+    <dependencies>
+        <activePlugin pluginName="access.ajxp_user"/>
+    </dependencies>
+
+    <registry_contributions>
+        <client_configs>
+            <component_config className="AjxpTabulator::userdashboard_main_tab">
+                <additional_tab id="qsmanager"
+                                tabInfo='{"id":"qsmanager","iconClass":"icon-upload-alt","element":"qsmanager","closeable":false,"label":"action.quicksend.1","title":"action.quicksend.2","dontFocus":true, "position":2}'
+                                paneInfo='{"type":"widget"}'><![CDATA[
+                    <div ajxpClass="QuicksendManager" id="qsmanager" ajxpOptions='{"fit":"height"}'>
+                        <div id="big_upload_button" style="margin: 5px;text-align: center;background-color: #e35d52;color: white;padding: 15px;border-radius: 3px;cursor: pointer;">AJXP_MESSAGE[action.quicksend.4]</div>
+                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"fit":"height", "fitMarginBottom":5}'></div>
+                    </div>
+                ]]></additional_tab>
+            </component_config>
+        </client_configs>
+        <actions>
+            <action name="upload">
+                <gui text="27" title="27" src="yast_backup.png" iconClass="icon-upload-alt" accessKey="upload_access_key" hasAccessKey="true">
+                    <context selection="false" dir="true" recycle="hidden"
+                             actionBar="true" contextMenu="true" infoPanel="false"
+                             actionBarGroup="put,minisite" inZip="false">
+                    </context></gui>
+                <rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""></rightsContext>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                        if(!window.QuicksendManager.INSTANCE){
+                            window.QuicksendManager.INSTANCE = new QuicksendManager();
+                        }
+                        window.QuicksendManager.INSTANCE.applyUpload();
+				]]></clientCallback>
+                    <serverCallback methodName="switchAction" restParams="/input_stream/dir+" sdkMethodName="upload" checkParams="false">
+                        <input_param description="filename" name="node" type="string"/>
+                    </serverCallback>
+                </processing>
+            </action>
+        </actions>
+    </registry_contributions>
+
+</ajxp_plugin>
