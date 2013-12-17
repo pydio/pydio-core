@@ -106,11 +106,13 @@ class UserDashboardDriver extends AbstractAccessDriver
                     AJXP_XMLWriter::close();
                 } else {
                     AJXP_XMLWriter::header();
+                    /*
                     AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="user_dash.8" attributeName="ajxp_label" sortType="String"/><column messageId="user_dash.31" attributeName="description" sortType="String"/></columns>');
                     foreach ($rootNodes as $key => $data) {
                         $l = $data["LABEL"];
                         print '<tree text="'.$l.'" icon="'.$data["ICON"].'" filename="/'.$key.'" parentname="/" description="'.$data["DESCRIPTION"].'" />';
                     }
+                    */
                     AJXP_XMLWriter::close();
                 }
             break;
