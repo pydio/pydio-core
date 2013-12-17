@@ -49,7 +49,7 @@
                         <div id="buttons_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["vertical_splitter-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                     </div>
                     <div id="rightPane"  style="background-color:#fffff; border-left: 1px solid #5C5C5C;" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "messageBoxReference":true}'>
-                        <div id="editor_tabs" ajxpClass="AjxpTabulator" class="flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":true, "saveState":false,"events":{}, "defaultTabId": "info","tabInfos" : [{"id":"info","label":"","iconClass":"icon-list-alt", "element":"files_list_pane"}]}'>
+                        <div id="editor_tabs" ajxpClass="AjxpTabulator" class="flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":true, "saveState":false,"events":{"ajaxplorer:context_changed":"this.switchTabulator(this.tabulatorData.first().id);"}, "defaultTabId": "info","tabInfos" : [{"id":"info","label":"","iconClass":"icon-list-alt", "element":"files_list_pane"}]}'>
                             <div id="files_list_pane" ajxpClass="AjxpPane">
                                 <div id="breadcrumb_container"><div id="breadcrumb" ajxpClass="Breadcrumb" ajxpOptions=''></div></div>
                                 <div id="actions" class="buttons_bar_container">

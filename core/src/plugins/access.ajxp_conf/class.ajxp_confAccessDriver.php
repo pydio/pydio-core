@@ -1240,7 +1240,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.53"]);
                 } else {
                     AJXP_XMLWriter::sendMessage($mess["ajxp_conf.54"], null);
-                    AJXP_XMLWriter::reloadDataNode("", (isSet($httpVars["newLabel"])?$repId:false));
+                    if(isSet($httpVars["newLabel"])) {
+                        AJXP_XMLWriter::reloadDataNode("", $repId);
+                    }
                     AJXP_XMLWriter::reloadRepositoryList();
                 }
                 AJXP_XMLWriter::close();
@@ -1530,7 +1532,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 @unlink(AJXP_PLUGINS_MESSAGES_FILE);
                 AJXP_XMLWriter::header();
                 AJXP_XMLWriter::sendMessage($mess["ajxp_conf.97"], null);
-                AJXP_XMLWriter::reloadDataNode();
                 AJXP_XMLWriter::close();
 
 
