@@ -75,7 +75,7 @@
 .mailer_tofield_line{
     overflow-y: auto;
     position: relative;
-    height: 25px;
+    height: 32px;
 }
 
 .mailer_tofield_line span.mailer_input_label{
