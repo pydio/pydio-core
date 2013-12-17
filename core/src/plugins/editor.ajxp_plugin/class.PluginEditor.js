@@ -110,8 +110,8 @@ Class.create("PluginEditor", AbstractEditor, {
     },
 
     updateTitle: function(label){
-        this.element.down("span.header_label").update(label);
-        this.element.fire("editor:updateTitle", label);
+        this.element.down("span.header_label").update("<span class='icon-puzzle-piece'></span> " + label);
+        this.element.fire("editor:updateTitle", "<span class='icon-puzzle-piece'></span> " + label);
     },
 
     loadPluginConfig : function(){
