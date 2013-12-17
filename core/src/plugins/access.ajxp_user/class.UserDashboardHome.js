@@ -82,16 +82,29 @@ Class.create("UserDashboardHome", AjxpPane, {
 
         if(notifCenter){
             notifCenter.ajxpNode.observe("loaded", function(){
+                notifCenter.pFactory.setThumbSize(64);
                 var existingItems = notificationElement.select('li');
                 notifCenter.childrenToMenuItems(function(obj){
-                    var a = new Element('li', {title:obj['alt']}).update(obj['name']);
+                    var a = new Element('li', {title:obj['alt'],style:'position:relative;'}).update(obj['name']);
                     notificationElement.insert(a);
                     var img = obj.pFactory.generateBasePreview(obj.ajxpNode);
                     a.IMAGE_ELEMENT = img;
                     a.insert({top:img});
                     obj.pFactory.enrichBasePreview(obj.ajxpNode, a);
+                    var moreMenu = new Element('div', {style:'float:right;cursor:pointer;margin-top:20px;margin-right:10px;'});
+                    a.insert({top:moreMenu});
+                    obj.moreActions.each(function(mA){
+                        var mAButton = new Element('span', {className:mA.icon_class, title:mA.name});
+                        mAButton.observe("click", function(e){
+                            mA.callback(e);
+                        });
+                        moreMenu.insert(mAButton);
+                    });
                 });
                 existingItems.invoke('remove');
+                window.setTimeout(function(){
+                    notifCenter.pFactory.setThumbSize(22);
+                }, 10000);
             });
 
             var clicker = function(e, skipsave){

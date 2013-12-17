@@ -32,8 +32,8 @@ Class.create("UserProfileEditor", AjxpPane, {
 
             this._formManager = new FormManager();
             var definitions = this._formManager.parseParameters(ajaxplorer.getXmlRegistry(), "user/preferences/pref[@exposed='true']|//param[contains(@scope,'user') and @expose='true']");
-            this._formManager.createParametersInputs(oFormObject, definitions, true, ajaxplorer.user.preferences, false, true);
-            this._formManager.disableShortcutsOnForm(oFormObject);
+            this._formManager.createParametersInputs(oFormObject.down('#user_profile_form'), definitions, true, ajaxplorer.user.preferences, false, true);
+            this._formManager.disableShortcutsOnForm(oFormObject.down('#user_profile_form'));
 
             var saveButton = new Element('a', {}).update('<span class="icon-save"></span> <span>'+MessageHash[53]+'</span>');
             oFormObject.down('.toolbarGroup').insert({top: saveButton});
@@ -41,7 +41,7 @@ Class.create("UserProfileEditor", AjxpPane, {
 
             saveButton.observe("click", function(){
                 var params = $H();
-                this._formManager.serializeParametersInputs(oFormObject, params, 'PREFERENCES_');
+                this._formManager.serializeParametersInputs(oFormObject.down('#user_profile_form'), params, 'PREFERENCES_');
                 var conn = new Connexion();
                 params.set("get_action", "custom_data_edit");
                 conn.setParameters(params);
@@ -58,6 +58,11 @@ Class.create("UserProfileEditor", AjxpPane, {
 
             }.bind(this));
 
+            fitHeightToBottom(oFormObject);
+            fitHeightToBottom(oFormObject.down('#user_profile_form'));
+            oFormObject.down('#user_profile_form').setStyle({overflow:'auto'});
+
+
         }
 
         if(ajaxplorer.actionBar.getActionByName('pass_change')){
@@ -70,7 +75,10 @@ Class.create("UserProfileEditor", AjxpPane, {
 
         }
 
-    }
+    },
 
+    resize: function(size){
+        fitHeightToBottom(this.htmlElement.down('#user_profile_form'));
+    }
 
 });

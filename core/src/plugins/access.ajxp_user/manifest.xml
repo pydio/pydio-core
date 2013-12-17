@@ -30,7 +30,10 @@
                 .action_bar{
                     background-color: #ebedf0;
                     padding: 4px;
-                    margin: 0 -5px;
+                    border-left:1px solid #5C5C5C;
+                }
+                #user_profile_form, div.class-FetchedResultPane{
+                    border-left:1px solid #5C5C5C;
                 }
                 #account_pane .action_bar{
                     text-align: right;
@@ -41,7 +44,6 @@
                     cursor: pointer;
                 }
                 div.class-FetchedResultPane{
-                    border-left: 0;
                     background-color: #f8f8f8;
                 }
                 #buttons_bar{
@@ -70,6 +72,7 @@
                 }
                 div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel{
                     padding-top:8px;
+                    font-weight: bold;
                 }
                 .thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata{
                     opacity: 1 !important;
@@ -113,6 +116,7 @@
                                 <div class="action_bar">
                                     <div class="toolbarGroup"></div>
                                 </div>
+                                <div id="user_profile_form"></div>
                             </div>
                         </div>
                     </div>

@@ -99,18 +99,39 @@
 
 #home_account_pane #notifications_center li {
     list-style: none;
-    padding: 5px 10px;
+    padding: 5px 10px 5px 0;
 }
 
 #home_account_pane .notif_event_container > div{
     padding:0;
+    line-height: 15px;
+}
+
+#home_account_pane .notif_event_container > div.notif_event_label {
+    line-height: 25px;
+    font-weight: bold;
+}
+
+#home_account_pane .imagePreviewOverlay{
+    display: none !important;
 }
 
 #home_account_pane #notifications_center img {
     float: left;
-    height: 22px;
-    width: 22px;
-    margin: 0 10px;
+    height: 64px;
+    width: 64px;
+    margin: 0 20px;
+}
+
+#home_account_pane #notifications_center div[data-is_loaded] {
+    display: block !important;
+    float: left;
+    width: 104px !important;
+    text-align: center;
+}
+
+#home_account_pane #notifications_center div[data-is_loaded] img {
+    float: none!important;
 }
 
 #home_account_pane{
@@ -158,4 +179,16 @@
 #disconnect_link span{
     text-decoration: underline;
     cursor: pointer;
+}
+
+#userdashboard_main_tab #content_pane.droparea{
+    background: url("../../../../../../index.php?get_action=get_drop_bg") no-repeat scroll left bottom transparent;
+    background-position: 50%;
+    border: 5px dashed #5c5c5c !important;
+    border-radius: 5px !important;
+    margin: 5px !important;
+}
+
+#userdashboard_main_tab #content_pane.dropareaHover{
+    border-color: #e35d52 !important;
 }
