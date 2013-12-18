@@ -561,6 +561,8 @@ $mess=array(
 "504" => "1k,1M,1G",
 "505" => "to",
 "506" => "Application parameters (users, workspaces, configurations)",
+"507" => "Welcome on %s",
+"508" => "I just created an account for you on %s. To connect, please click on the following link %link and use these credentials:  <br><br> Login: %user <br><br> Password: %pass",
 /* END SENTENCE */
 /* END SENTENCE */
 );

@@ -675,10 +675,9 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                         if ($mailer !== false) {
                             $mess = ConfService::getMessages();
                             $link = AJXP_Utils::detectServerURL();
-                            $apptitle = ConfService::getCoreConf("APPLICATION_NAME");
-                            $subject = "Welcome on Pydio!";
-                            $body = "An account was just created for you by %s on $apptitle. <br>Go to <a href='$link'>$link</a> and use the following credentials to login: %s, %s. ";
-                            $body = sprintf($body, AuthService::getLoggedUser()->getId(), $data["new_user_id"], $data["new_password"]);
+                            $apptitle = ConfService::getCoreConf("APPLICATION_TITLE");
+                            $subject = str_replace("%s", $apptitle, $mess["507"]);
+                            $body = str_replace(array("%s", "%link", "%user", "%pass"), array($apptitle, $link, $data["new_user_id"], $data["new_password"]), $mess["508"]);
                             $mailer->sendMail(array($data["email"]), $subject, $body);
                         }
                     }

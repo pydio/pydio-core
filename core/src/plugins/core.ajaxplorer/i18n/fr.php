@@ -562,5 +562,7 @@ $mess=array(
 "504"=> "1k,1M,1G",
 "505"=> "à",
 "506" => "Paramètres de l'application (utilisateurs, workspaces, configurations)",
+"507"=> "Bienvenue sur %s",
+"508"=> "Je vous ai créé un compte sur %s. Pour vous connecter, veuillez cliquer sur le lien suivant %link, et utiliser ces identifiants: <br><br> Login: %user <br><br> Mot de passe: %pass",
 /* END SENTENCE */
 );
