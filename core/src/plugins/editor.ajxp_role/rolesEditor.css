@@ -231,7 +231,7 @@ div#actions-selected > span.list_remove_item{
 div#acls-selected div.repositoryEntry{
     clear:both;
     height: 17px;
-    padding: 11px 8px 12px;
+    padding: 11px 8px 11px;
 }
 
 div#acls-selected div.repositoryLabel{
@@ -283,11 +283,11 @@ div.add_button{
     right: 16%;
 }
 span.list_remove_item{
-    float:right;
     cursor: pointer;
     top: 16px;
     right: 0;
-    padding: 8px 5px;
+    padding: 6px 8px;
+    margin-right: 5px;
 }
 
 
