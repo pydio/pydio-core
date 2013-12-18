@@ -5,7 +5,7 @@ CREATE TABLE ajxp_changes (
   type TEXT,
   source TEXT,
   target TEXT
-)
+);
 
 CREATE TABLE ajxp_index (
   node_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -14,24 +14,24 @@ CREATE TABLE ajxp_index (
   bytesize NUMERIC,
   md5 TEXT,
   mtime NUMERIC
-)
+);
 
 CREATE TRIGGER LOG_DELETE AFTER DELETE ON ajxp_index
 BEGIN
  INSERT INTO ajxp_changes (repository_identifer, node_id,source,target,type) VALUES (old.repository_identifer, old.node_id, old.node_path, "NULL", "delete");
-END
+END;
 
 CREATE TRIGGER LOG_INSERT AFTER INSERT ON ajxp_index
 BEGIN
 INSERT INTO ajxp_changes (repository_identifer, node_id,source,target,type) VALUES (new.repository_identifer, new.node_id, "NULL", new.node_path, "create");
-END
+END;
 
 CREATE TRIGGER "LOG_UPDATE_CONTENT" AFTER UPDATE ON "ajxp_index" FOR EACH ROW  WHEN old.node_path=new.node_path
 BEGIN
 INSERT INTO ajxp_changes (repository_identifer, node_id,source,target,type) VALUES (new.repository_identifer, new.node_id, old.node_path, new.node_path, "content");
-END
+END;
 
 CREATE TRIGGER "LOG_UPDATE_PATH" AFTER UPDATE ON "ajxp_index" FOR EACH ROW  WHEN old.node_path!=new.node_path
 BEGIN
 INSERT INTO ajxp_changes (repository_identifer, node_id,source,target,type) VALUES (new.repository_identifer, new.node_id, old.node_path, new.node_path, "path");
-END
+END;
