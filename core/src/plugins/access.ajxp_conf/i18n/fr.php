@@ -140,7 +140,8 @@ $mess=array(
 "118" => "Nouveau Groupe",
 "group_access" => "G",
 "119" => "Set user group",
-    "120" => "Go Pro",
-    "121" => "Get professional support for your install",
+"120" => "Go Pro",
+"121" => "Get professional support for your install",
+"122" => "Paramètres",
 /* END SENTENCE */
 );

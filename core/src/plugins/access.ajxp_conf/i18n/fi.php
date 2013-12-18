@@ -145,5 +145,6 @@ $mess=array(
 "119" => "Set user group",
     "120" => "Go Pro",
     "121" => "Get professional support for your install",
+    "122" => "All Settings",
 /* END SENTENCE */
 );

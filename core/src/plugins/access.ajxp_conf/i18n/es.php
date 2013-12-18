@@ -142,4 +142,5 @@ $mess=array(
 "119" => "Fijar grupo de usuario",
     "120" => "Go Pro",
     "121" => "Get professional support for your install",
+    "122" => "All Settings",
 );
