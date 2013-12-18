@@ -154,6 +154,7 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
                     }else if(selectedLi.getAttribute("data-temporary") && createActionPanel){
 
                         element.readOnly = true;
+                        createActionPanel.update('');
                         var params = $A(ajaxplorer.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(','));
                         for(var i=0;i<params.length;i++){
                             params[i] = "user/preferences/pref[@exposed]|//param[@name='"+params[i]+"']";
@@ -186,7 +187,7 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
                             name: "send_email",
                             scope: "user",
                             type: "boolean",
-                            default: false,
+                            default: "",
                             mandatory: true
                         }));
                         var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), params.join('|'));
@@ -194,6 +195,7 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
                         var defaultValues = $H();
                         defaultValues.set('lang', ajaxplorer.currentLanguage);
                         defaultValues.set('new_user_id', label);
+                        defaultValues.set('new_password', '');
                         f.createParametersInputs(createActionPanel, def1, true, defaultValues, false, true);
 
                         var parent = listElement.up('div.dialogContent') || listElement.up('div');

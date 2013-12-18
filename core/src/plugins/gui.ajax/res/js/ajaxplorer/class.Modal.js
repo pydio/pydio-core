@@ -112,10 +112,12 @@ Class.create("Modal", {
 		{
 			var formDiv = $(sFormId);
 			//var formDiv = $('all_forms').select('[id="'+sFormId+'"]')[0];	
-			newForm = document.createElement('form');
-			newForm.id = 'modal_action_form';
-			newForm.setAttribute('name','modal_action_form');
-			newForm.appendChild(formDiv.cloneNode(true));
+			newForm = new Element('form', {
+                name:'modal_action_form',
+                id:'modal_action_form',
+                autocomplete:'off'
+            });
+			newForm.insert(formDiv.cloneNode(true));
 			var reloadIFrame = null;
 			if($(newForm).getElementsByTagName("iframe")[0])
 			{

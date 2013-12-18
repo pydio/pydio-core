@@ -26,6 +26,7 @@ Effect.CSS_ANIMATE = function(effectName, element, options){
     var className;
     var originalMethod;
     var endStyle = {};
+    if(!options) options = {};
     switch (effectName){
         case "RowFade":
             className = 'quick bounceOutLeft';
@@ -39,11 +40,18 @@ Effect.CSS_ANIMATE = function(effectName, element, options){
             className = 'long fadeInUpBig';
             endStyle = {opacity: 1};
             originalMethod ='Appear';
+            element.setOpacity(0);
+            element.show();
             break;
         case "MessageFade":
             className = 'long fadeOutDownBig';
             endStyle = {opacity: 0};
             originalMethod ='Appear';
+            if(!options.afterFinish){
+                options.afterFinish = function(){
+                    element.hide();
+                };
+            }
             break;
         case "MenuAppear":
             className = 'super-quick fadeIn';
@@ -56,11 +64,14 @@ Effect.CSS_ANIMATE = function(effectName, element, options){
 
         ["webkitAnimationEnd", "mozAnimationEnd", "oAnimationEnd", "animationEnd"].map(
             function(event){
-                element.observe(event, function(){
-                    element.removeClassName('animated ' + className);
+                element.observeOnce(event, function(){
+                    ('animated ' + className).split(" ").map(function(cName){
+                        element.removeClassName(cName);
+                    });
+                    if(endStyle) element.setStyle(endStyle);
+                    if(options && options.afterFinish) options.afterFinish();
                 });
-                if(endStyle) element.setStyle(endStyle);
-                if(options && options.afterFinish) element.observe(event, options.afterFinish);
+
             }
         );
         element.addClassName('animated ' + className);
