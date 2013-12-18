@@ -510,7 +510,7 @@ Class.create("ShareCenter", {
                     directLink += '\
                     <tr>\
                         <td class="infoPanelLabel">'+MessageHash['share_center.60']+'</td>\
-                        <td class="infoPanelValue"><textarea style="width:100%;height: 45px;"><a href="'+ jsonData.publiclet_link +'?dl=true">Download '+node.getLabel()+'</a></textarea></td>\
+                        <td class="infoPanelValue"><textarea style="width:100%;height: 45px;" readonly="true"><a href="'+ jsonData.publiclet_link +'?dl=true">Download '+node.getLabel()+'</a></textarea></td>\
                     </tr>\
                     ';
                     var editors = ajaxplorer.findEditorsForMime(node.getAjxpMime(), true);
@@ -527,7 +527,7 @@ Class.create("ShareCenter", {
                         directLink += '\
                             <tr>\
                                 <td class="infoPanelLabel">'+MessageHash[messKey]+'</td>\
-                                <td class="infoPanelValue"><textarea style="width:100%;height: 80px;">'+ tplString + '</textarea></td>\
+                                <td class="infoPanelValue"><textarea style="width:100%;height: 80px;" readonly="true">'+ tplString + '</textarea></td>\
                             </tr>\
                         ';
                     }
@@ -536,7 +536,7 @@ Class.create("ShareCenter", {
                 container.down('#ajxp_shared_info_panel table').update('\
                     <tr>\
                         <td class="infoPanelLabel">'+MessageHash['share_center.59']+'</td>\
-                        <td class="infoPanelValue"><textarea style="width:100%;height: 45px;">'+ jsonData.publiclet_link +'</textarea></td>\
+                        <td class="infoPanelValue"><textarea style="width:100%;height: 45px;" readonly="true">'+ jsonData.publiclet_link +'</textarea></td>\
                     </tr>'+directLink+'\
                     <tr>\
                         <td class="infoPanelLabel">'+MessageHash['share_center.51']+'</td>\
@@ -566,11 +566,11 @@ Class.create("ShareCenter", {
                     linkString = '\
                     <tr>\
                         <td class="infoPanelLabel">'+MessageHash['share_center.62']+'</td>\
-                        <td class="infoPanelValue"><textarea style="width:100%;height: 40px;">'+ jsonData.minisite.public_link +'</textarea></td>\
+                        <td class="infoPanelValue"><textarea style="width:100%;height: 40px;" readonly="true">'+ jsonData.minisite.public_link +'</textarea></td>\
                     </tr>\
                     <tr>\
                         <td class="infoPanelLabel">'+MessageHash['share_center.61']+'</td>\
-                        <td class="infoPanelValue"><textarea style="width:100%;height: 80px;" id="embed_code"></textarea></td>\
+                        <td class="infoPanelValue"><textarea style="width:100%;height: 80px;" id="embed_code" readonly="true"></textarea></td>\
                     </tr>\
                     ';
                 }
