@@ -19,27 +19,20 @@ CREATE TABLE IF NOT EXISTS `ajxp_index` (
   PRIMARY KEY (`node_id`)
 );
 
---
--- Déclencheurs `ajxp_index`
---
 DROP TRIGGER IF EXISTS `LOG_DELETE`;
-DELIMITER //
+
 CREATE TRIGGER `LOG_DELETE` AFTER DELETE ON `ajxp_index`
 FOR EACH ROW INSERT INTO ajxp_changes (repository_identifier, node_id,source,target,type)
-  VALUES (old.repository_identifier, old.node_id, old.node_path, 'NULL', 'delete')
-//
-DELIMITER ;
+  VALUES (old.repository_identifier, old.node_id, old.node_path, 'NULL', 'delete');
+
 DROP TRIGGER IF EXISTS `LOG_INSERT`;
-DELIMITER //
+
 CREATE TRIGGER `LOG_INSERT` AFTER INSERT ON `ajxp_index`
 FOR EACH ROW INSERT INTO ajxp_changes (repository_identifier, node_id,source,target,type)
-  VALUES (new.repository_identifier, new.node_id, 'NULL', new.node_path, 'create')
-//
-DELIMITER ;
+  VALUES (new.repository_identifier, new.node_id, 'NULL', new.node_path, 'create');
+
 DROP TRIGGER IF EXISTS `LOG_UPDATE`;
-DELIMITER //
+
 CREATE TRIGGER `LOG_UPDATE` AFTER UPDATE ON `ajxp_index`
 FOR EACH ROW INSERT INTO ajxp_changes (repository_identifier, node_id,source,target,type)
-  VALUES (new.repository_identifier, new.node_id, old.node_path, new.node_path, CASE old.node_path = new.node_path WHEN true THEN 'content' ELSE 'path' END)
-//
-DELIMITER ;
+  VALUES (new.repository_identifier, new.node_id, old.node_path, new.node_path, CASE old.node_path = new.node_path WHEN true THEN 'content' ELSE 'path' END);
