@@ -153,8 +153,8 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
 						$(div.parentNode).setStyle({paddingLeft:10,paddingRight:10});
 						div.ajxpPlayer = VideoJS.setup(videoObject, {
 							preload:true,
-							controlsBelow: innerInstance?true:false, // Display control bar below video instead of in front of
-							controlsHiding: innerInstance?false:true, // Hide controls when mouse is not over the video
+							controlsBelow: false, // Display control bar below video instead of in front of
+							controlsHiding: true, // Hide controls when mouse is not over the video
 							defaultVolume: 0.85, // Will be overridden by user's last volume if available
 							flashVersion: 9, // Required flash version for fallback
 							linksHiding: true, // Hide download links when video is supported,
