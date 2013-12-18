@@ -44,7 +44,7 @@
             <template_part ajxpId="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOption":"true"}' theme="vision"><![CDATA[
                 <div id="vertical_splitter" class="settings_main_pane" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "invisibleBar":true, "initA": "20%", "minA":28, "maxA":380, "fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"A"}'>
                     <div id="leftPane"  style="background-color:#ebedf0;" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                        <div id="search_container_settings" class="settings_search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":0}'></div>
+                        <div id="search_container_settings" class="settings_search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":10}'></div>
                         <div id="settings_pane" class="flat_tree_pane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ></div>
                         <div id="buttons_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["vertical_splitter-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                     </div>

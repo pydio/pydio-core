@@ -1794,7 +1794,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $r[] = $repository->getDisplay()." (".$rs.")";
             }
             $rightsString = implode(", ", $r);
-            $nodeKey = "/roles/".$roleId;
+            $nodeKey = "/data/roles/".$roleId;
             $meta = array(
                 "icon" => "user-acl.png",
                 "rights_summary" => $rightsString,
@@ -2183,7 +2183,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         if($t2 == "metastore") return 1;
         if($key1 == "meta.git" || $key1 == "meta.svn") return 1;
         if($key2 == "meta.git" || $key2 == "meta.svn") return -1;
-        return 0;
+        return strcmp($key1, $key2);
     }
 
     public function clearExpiredFiles()

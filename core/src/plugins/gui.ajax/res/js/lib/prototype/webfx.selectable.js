@@ -293,7 +293,7 @@ SelectableElements = Class.create({
 	focus: function()
 	{
 		this.hasFocus = true;
-        if(!this._selectedItems.length) this.selectFirst();
+        if(!this._selectedItems.length && !this.options.skipSelectFirstOnFocus) this.selectFirst();
         if(this.options && this.options.invisibleSelection) return;
         for(var i=0; i < this._selectedItems.length;i++)
 		{

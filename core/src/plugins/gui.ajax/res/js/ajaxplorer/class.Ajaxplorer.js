@@ -637,7 +637,8 @@ Class.create("Ajaxplorer", {
 			path = nodeOrPath
 		}else{
 			path = nodeOrPath.getPath();
-            if(nodeOrPath.getMetadata().get("repository_id") != undefined && nodeOrPath.getMetadata().get("repository_id") != this.repositoryId){
+            if(nodeOrPath.getMetadata().get("repository_id") != undefined && nodeOrPath.getMetadata().get("repository_id") != this.repositoryId
+                && nodeOrPath.getAjxpMime() != "repository" && nodeOrPath.getAjxpMime() != "repository_editable"){
                 if(ajaxplorer.user){
                     ajaxplorer.user.setPreference("pending_folder", nodeOrPath.getPath());
                 }

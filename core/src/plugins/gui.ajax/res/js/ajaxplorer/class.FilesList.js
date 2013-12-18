@@ -1908,7 +1908,8 @@ Class.create("FilesList", SelectableElements, {
 		// Defer Drag'n'drop assignation for performances
 		if(!ajxpNode.isRecycle()){
 			window.setTimeout(function(){
-				var newDrag = new AjxpDraggable(largeRow, {
+                if(!this.htmlElement) return;
+                var newDrag = new AjxpDraggable(largeRow, {
 					revert:true,
 					ghosting:true,
 					scroll:($('tree_container')?'tree_container':null),

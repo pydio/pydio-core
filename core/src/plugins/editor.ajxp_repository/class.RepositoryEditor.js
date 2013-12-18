@@ -234,29 +234,30 @@ Class.create("RepositoryEditor", AbstractEditor, {
                 }
                 accordionContent.insert(form);
                 var saveButton = null;
+                accordionContent.insert(new Element('div',{className:'tabPaneButtons', style:'clear:both; padding-right: 20px;'}));
                 if(insertSave){
-                    accordionContent.insert("<div tabindex='0' name='meta_source_edit' class='largeButton SF_disabled' style='min-width:70px; margin-top: 20px;margin-right: 0;float: right;'><span class='icon-save'></span> <span class=\"title\">Save</span></div>");
+                    accordionContent.down(".tabPaneButtons").insert("<div tabindex='0' name='meta_source_edit' class='largeButton SF_disabled' style='min-width:70px; margin-top: 20px;margin-right: 0;float: right;'><span class='icon-save'></span> <span class=\"title\">Save</span></div>");
                     saveButton = accordionContent.down("div[name='meta_source_edit']");
                 }
-                accordionContent.insert("<div  tabindex='0' name='meta_source_delete' class='largeButton' style='min-width:70px; margin-top: 20px;margin-right: 0;'><span class='icon-trash'></span> <span class=\"title\">Remove</span></div>");
+                accordionContent.down(".tabPaneButtons").insert("<div  tabindex='0' name='meta_source_delete' class='largeButton' style='min-width:70px; margin-top: 20px;margin-right: 0;float: right;'><span class='icon-trash'></span> <span class=\"title\">Remove</span></div>");
                 metaTabHead.insert(title);
                 metaTabBody.insert(accordionContent);
                 if(saveButton){
                     form.select("div.SF_element").each(function(element){
                         element.select("input,textarea,select").invoke("observe", "change", function(event){
-                            var but = Event.findElement(event, "div.accordion_content").down("div[name='meta_source_edit']");
+                            var but = Event.findElement(event, "div.tabPane").down("div[name='meta_source_edit']");
                             but.removeClassName("SF_disabled");
                             this.setDirty();
                         }.bind(this));
                         element.select("input,textarea").invoke("observe", "keydown", function(event){
-                            var but = Event.findElement(event, "div.accordion_content").down("div[name='meta_source_edit']");
+                            var but = Event.findElement(event, "div.tabPane").down("div[name='meta_source_edit']");
                             but.removeClassName("SF_disabled");
                             this.setDirty();
                         }.bind(this));
                     }.bind(this) );
                 }
             }
-            this.metaTab = new AjxpSimpleTabs(this.metaPane.down("#metaTabulator"), {autoHeight:true});
+            this.metaTab = new AjxpSimpleTabs(this.metaPane.down("#metaTabulator"), {autoHeight:true, saveState:true});
             metaPane.select("div.largeButton").invoke("observe", "click", this.metaActionClick.bind(this));
         }
         if(!metaPane.down('div.metaPane')){

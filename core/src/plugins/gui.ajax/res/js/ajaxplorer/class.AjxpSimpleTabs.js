@@ -31,7 +31,7 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
 	 * @param tabulatorOptions Object Widget options
 	 */
 	initialize : function($super, htmlElement, tabulatorOptions){
-		$super(htmlElement);
+		$super(htmlElement, tabulatorOptions);
         if(tabulatorOptions && tabulatorOptions.autoHeight){
             this.fitHeight = false;
         }
@@ -51,6 +51,13 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
                 }
             }.bind(this));
             window.setTimeout( function(){
+                if(this.options.saveState){
+                    var test = this.loadState();
+                    if(test !== undefined) {
+                        this.selectTabByIndex(test);
+                        return;
+                    }
+                }
                 this.selectTabByIndex(0);
             }.bind(this), 100);
         }else{
@@ -58,6 +65,8 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
             this.tabRow = htmlElement.down("ul.tabrow");
         }
 	},
+
+
 
     addTab: function (tab, pane){
         if(tab instanceof String){
@@ -84,6 +93,10 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
         }.bind(this);
         tab.observe("click", function(){
             tab.setSelected();
+            if(this.options.saveState){
+                var index = this.tabRow.select('li').indexOf(tab);
+                this.saveState(index);
+            }
         }.bind(this));
         tab.setSelected();
     },
@@ -92,7 +105,22 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
         try{
             this.tabRow.select("li")[index].setSelected();
             this.notify("switch");
+            if(this.options.saveState){
+                this.saveState(index);
+            }
         }catch(e){}
+    },
+
+    saveState : function(index){
+        this.setUserPreference("tabs_state", "selected_"+index);
+    },
+
+    loadState : function(){
+        var pref = this.getUserPreference("tabs_state");
+        if(pref && pref.startsWith("selected_")){
+            return parseInt(pref.replace("selected_", ""));
+        }
+        return undefined;
     },
 
 	/**
