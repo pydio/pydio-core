@@ -152,7 +152,7 @@ class BootConfLoader extends AbstractConfDriver
             ));
 
             // INSTALL ALL SQL TABLES
-            $sqlPlugs = array("conf.sql", "auth.sql", "feed.sql", "log.sql", "mq.sql");
+            $sqlPlugs = array("conf.sql", "auth.sql", "feed.sql", "log.sql", "mq.sql", "meta.syncable");
             foreach ($sqlPlugs as $plugId) {
                 $plug = AJXP_PluginsService::findPluginById($plugId);
                 $plug->installSQLTables(array("SQL_DRIVER" => $data["STORAGE_TYPE"]["db_type"]));

@@ -173,7 +173,7 @@ class ChangesTracker extends AJXP_Plugin
 
     public function installSQLTables($param)
     {
-        $p = AJXP_Utils::cleanDibiDriverParameters($this->sqlDriver);
+        $p = AJXP_Utils::cleanDibiDriverParameters(isSet($param) && isSet($param["SQL_DRIVER"])?$param["SQL_DRIVER"]:$this->sqlDriver);
         return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
     }
 

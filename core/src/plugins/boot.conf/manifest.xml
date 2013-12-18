@@ -68,7 +68,7 @@
                     </clientCallback>
                     <clientForm id="installer_form"><![CDATA[
                         <div id="installer_form" box_padding="0" box_resize="true" box_width="560" overlayStyle='{"backgroundColor":"white","opacity":10,"backgroundImage":"url(\"AJXP_THEME_FOLDER/images/grid_t.png\")"}' style="padding: 10px; overflow:auto; background-color: white;">
-                            <img src="plugins/gui.ajax/PydioLogo250.png" style="display:block;">
+                            <img src="plugins/gui.ajax/PydioLogo250.png" style="display:block;margin:0 auto;">
                             <div class="dialogLegend installerWelcome"> Thank you for installing Pydio!<br> This tool will make sure your new sharing platform is up and running in no time: browse through the various sections to set up the general behaviour of the application. You can fly over the fields labels with your mouse to get more information. <br>Are you ready ? <span id="start_button">Start wizard!</span></div>
                             <div id="the_form" style="display:none; margin:0 5px;"></div>
                             <div id="configuration_progress" class="dialogLegend installerWelcome" style="display:none; margin:0 5px;">
