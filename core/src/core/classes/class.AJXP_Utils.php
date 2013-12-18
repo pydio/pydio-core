@@ -1617,6 +1617,15 @@ class AJXP_Utils
         $file = dirname($file) ."/". str_replace(".sql", $ext, basename($file) );
         $sql = file_get_contents($file);
         $parts = explode(";", $sql);
+        $remove = array();
+        for($i = 0 ; $i < count($parts); $i++){
+            $part = $parts[$i];
+            if(strpos($part, "BEGIN") && isSet($parts[$i+1])) {
+                $parts[$i] .= ';'.$parts[$i+1];
+                $remove[] = $i+1;
+            }
+        }
+        foreach($remove as $rk) unset($parts[$rk]);
         dibi::connect($p);
         dibi::begin();
         foreach ($parts as $createPart) {
