@@ -601,7 +601,7 @@ class AJXP_XMLWriter
                 $uId = $repoObject->getOwner();
                 $uObject = ConfService::getConfStorageImpl()->createUserObject($uId);
                 $label = $uObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $uId);
-                $isSharedString =  "owner='".$label."'";
+                $isSharedString =  'owner="'.AJXP_Utils::xmlEntities($label).'"';
             }
             $descTag = "";
             $description = $repoObject->getDescription();
