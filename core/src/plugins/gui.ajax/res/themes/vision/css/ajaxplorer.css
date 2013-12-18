@@ -951,8 +951,8 @@ input.SF_input.SF_number{
 
 .SF_inlineButton.SF_inlineButtonWorking{
     box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.35);
-    padding-top: 5px !important;
-    padding-bottom: 3px !important;
+    padding-top: 10px !important;
+    padding-bottom: 8px !important;
 }
 
 .SF_failed{
