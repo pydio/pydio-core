@@ -28,7 +28,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class PhpMailLiteMailer extends AjxpMailer
 {
-    protected function sendMailImpl($recipients, $subject, $body, $from = null)
+    protected function sendMailImpl($recipients, $subject, $body, $from = null, $images = array())
     {
         require_once("lib/class.phpmailer-lite.php");
         $realRecipients = $this->resolveAdresses($recipients);
@@ -58,9 +58,17 @@ class PhpMailLiteMailer extends AjxpMailer
         $mail->WordWrap = 50;                                 // set word wrap to 50 characters
         $mail->IsHTML(true);                                  // set email format to HTML
         $mail->CharSet = "utf-8";
+        $mail->Encoding = "quoted-printable";
+        foreach($images as $image){
+            $mail->AddEmbeddedImage($image["path"], $image["cid"], '', 'base64', 'image/png');
+        }
 
         $mail->Subject = $subject;
-        $mail->Body = "<html><body>".nl2br($body)."</body></html>";
+        if(strpos($body, "<html")!==false){
+            $mail->Body = $body;
+        }else{
+            $mail->Body = "<html><body>".nl2br($body)."</body></html>";
+        }
         $mail->AltBody = strip_tags($mail->Body);
 
         if (!$mail->Send()) {

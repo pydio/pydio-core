@@ -746,14 +746,16 @@ Class.create("ShareCenter", {
         if(ajaxplorer.hasPluginOfType("mailer") && !forceOldSchool){
             mailerButton.observe("click", function(event){
                 Event.stop(event);
-                var s, message;
+                var s, message, link;
                 if(shareType == "file"){
                     s = MessageHash["share_center.42"];
                     if(s) s = s.replace("%s", ajaxplorer.appTitle);
-                    message = s + "\n\n " + dialogButtonsOrRow.down('[name="link_url"]').getValue();
+                    link = dialogButtonsOrRow.down('[name="link_url"]').getValue();
+                    message = s + "\n\n " + "<a href='"+link+"'>"+link+"</a>";
                 }else{
                     s = MessageHash["share_center.43"];
                     if(s) s = s.replace("%s", ajaxplorer.appTitle);
+                    link = this._currentRepositoryLink;
                     message = s + "\n\n " + "<a href='" + this._currentRepositoryLink+"'>" + MessageHash["share_center.46"].replace("%s1", this._currentRepositoryLabel).replace("%s2", ajaxplorer.appTitle) + "</a>";
                 }
                 if(dialogButtonsOrRow.down('.share_qrcode') && dialogButtonsOrRow.down('.share_qrcode').visible() && dialogButtonsOrRow.down('.share_qrcode > img')){
@@ -766,13 +768,13 @@ Class.create("ShareCenter", {
                 }
                 modal.showSimpleModal(
                     dialogButtonsOrRow.up(".dialogContent"),
-                    mailer.buildMailPane(MessageHash["share_center.44"].replace("%s", ajaxplorer.appTitle), message, usersList, MessageHash["share_center.45"]),
+                    mailer.buildMailPane(MessageHash["share_center.44"].replace("%s", ajaxplorer.appTitle), message, usersList, MessageHash["share_center.45"], link),
                     function(){
                         mailer.postEmail();
                         return true;
                     },function(){
                         return true;
-                });
+                    });
             }.bind(this));
         }else{
             var subject = encodeURIComponent(MessageHash["share_center.44"].replace("%s", ajaxplorer.appTitle));

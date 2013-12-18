@@ -7,7 +7,8 @@
         <global_param name="FROM_NAME" type="string" label="CONF_MESSAGE[Sender name]" description="CONF_MESSAGE[Name of the sender]" mandatory="true" default=""/>
         <global_param name="SUBJECT_PREPEND" label="CONF_MESSAGE[Subject Prepend]" description="CONF_MESSAGE[String automatically added at the beginning of the mail subject]" type="string" mandatory="false" default=""/>
         <global_param name="SUBJECT_APPEND" label="CONF_MESSAGE[Subject Append]" description="CONF_MESSAGE[String automatically added at the end of the mail subject]" type="string" mandatory="false" default=""/>
-        <global_param name="BODY_LAYOUT" label="CONF_MESSAGE[Body Layout]" description="CONF_MESSAGE[Main Layout for the email body, use HTML for send nice emails, and use the AJXP_MAIL_BODY keyword for the real content.]" type="textarea" mandatory="true" default="AJXP_MAIL_BODY"/>
+        <global_param name="BODY_LAYOUT" label="CONF_MESSAGE[Body Layout]" description="CONF_MESSAGE[Main Layout for the email body, use HTML for send nice emails, and use the AJXP_MAIL_BODY keyword for the real content.]" type="textarea" mandatory="false" default="AJXP_MAIL_BODY"/>
+        <global_param name="LAYOUT_FOLDER" label="CONF_MESSAGE[Layout Folder]" description="CONF_MESSAGE[Extract the main layout from a localized file. Will prevail on the previous parameter, make sure to have an AJXP_MAIL_BODY in the layout file.]" type="string" mandatory="false" default="plugins/core.mailer/layout"/>
     </server_settings>
     <client_settings>
         <resources>

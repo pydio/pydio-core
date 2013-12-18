@@ -53,7 +53,8 @@ class AjxpMailer extends AJXP_Plugin
                     array($notification->getTarget()),
                     $notification->getDescriptionShort(),
                     $notification->getDescriptionLong(),
-                    $notification->getAuthor()
+                    $notification->getAuthor(),
+                    $notification->getMainLink()
                 );
             } catch (Exception $e) {
                 $this->logError("Exception", $e->getMessage(), $e->getTrace());
@@ -61,24 +62,42 @@ class AjxpMailer extends AJXP_Plugin
         }
     }
 
-    public function sendMail($recipients, $subject, $body, $from = null)
+    public function sendMail($recipients, $subject, $body, $from = null, $imageLink = null)
     {
         $prepend = ConfService::getCoreConf("SUBJECT_PREPEND", "mailer");
         $append = ConfService::getCoreConf("SUBJECT_APPEND", "mailer");
+        $layoutFolder = ConfService::getCoreConf("LAYOUT_FOLDER", "mailer");
         $layout = ConfService::getCoreConf("BODY_LAYOUT", "mailer");
+        $images = array();
         if(!empty($prepend)) $subject = $prepend ." ". $subject;
         if(!empty($append)) $subject .= " ".$append;
-        if (strpos($layout, "AJXP_MAIL_BODY") !== false) {
-            $body = str_replace("AJXP_MAIL_BODY", $body, $layout);
+        if(!empty($layoutFolder)){
+            $layoutFolder .= "/";
+            $lang = ConfService::getLanguage();
+            if(is_file(AJXP_INSTALL_PATH."/".$layoutFolder.$lang.".html")){
+                $layout = implode("", file(AJXP_INSTALL_PATH."/".$layoutFolder.$lang.".html"));
+            }else if (is_file(AJXP_INSTALL_PATH."/".$layoutFolder."en.html")){
+                $layout = implode("", file(AJXP_INSTALL_PATH."/".$layoutFolder."en.html"));
+            }
         }
-        $this->sendMailImpl($recipients, $subject, $body, $from = null);
+        if (strpos($layout, "AJXP_MAIL_BODY") !== false) {
+            $body = str_replace("AJXP_MAIL_BODY", nl2br($body), $layout);
+        }
+        if($imageLink != null){
+            $body = str_replace(array("AJXP_IMAGE_LINK"), "<a href='".$imageLink."'>".'<img alt="Download" width="100" style="width: 100px;" src="cid:download_id">'."</a>", $body);
+            $images[] = array("path" => AJXP_INSTALL_PATH."/".$layoutFolder."/download.png", "cid" => "download_id");
+        }else{
+            $body = str_replace(array("AJXP_IMAGE_LINK", "AJXP_IMAGE_END"), "", $body);
+        }
+        $body = str_replace("AJXP_MAIL_SUBJECT", $subject, $body);
+        $this->sendMailImpl($recipients, $subject, $body, $from = null, $images);
         if (AJXP_SERVER_DEBUG) {
             $line = "------------------------------------------------------------------------\n";
             file_put_contents($this->mailCache, "Sending mail from ".print_r($from, true)." to ".print_r($recipients, true)."\n\n$subject\n\n$body\n".$line, FILE_APPEND);
         }
     }
 
-    protected function sendMailImpl($recipients, $subject, $body, $from = null)
+    protected function sendMailImpl($recipients, $subject, $body, $from = null, $images = array())
     {
     }
 
@@ -98,12 +117,13 @@ class AjxpMailer extends AJXP_Plugin
 
         $emails = $this->resolveAdresses($toUsers);
         $from = $this->resolveFrom($httpVars["from"]);
+        $imageLink = isSet($httpVars["link"]) ? $httpVars["link"] : null;
 
         $subject = $httpVars["subject"];
         $body = $httpVars["message"];
 
         if (count($emails)) {
-            $mailer->sendMail($emails, $subject, $body, $from);
+            $mailer->sendMail($emails, $subject, $body, $from, $imageLink);
             AJXP_XMLWriter::header();
             AJXP_XMLWriter::sendMessage(str_replace("%s", count($emails), $mess["core.mailer.1"]), null);
             AJXP_XMLWriter::close();

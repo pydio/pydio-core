@@ -112,7 +112,7 @@ class AJXP_Notification
             "AJXP_PARENT_LABEL"     => $em.$this->getRoot(basename(dirname($this->getNode()->getPath()))).$me,
             "AJXP_REPOSITORY_ID"    => $em.$repoId.$me,
             "AJXP_REPOSITORY_LABEL" => $em.$repoLabel.$me,
-            "AJXP_LINK"             => AJXP_Utils::detectServerURL(true)."/?goto=".$repoId.$this->node->getPath(),
+            "AJXP_LINK"             => $this->getMainLink(),
             "AJXP_USER"             => $uLabel,
             "AJXP_DATE"             => AJXP_Utils::relativeDate($this->getDate(),$mess) //date($mess["date_format"], $this->getDate()),
         );
@@ -130,6 +130,14 @@ class AJXP_Notification
         }
 
         return str_replace(array_keys($replaces), array_values($replaces), $tplString);
+    }
+
+    /**
+     * @return string
+     */
+    public function getMainLink(){
+        $repoId = $this->getNode()->getRepositoryId();
+        return AJXP_Utils::detectServerURL(true)."/?goto=".$repoId.$this->node->getPath();
     }
 
     /**

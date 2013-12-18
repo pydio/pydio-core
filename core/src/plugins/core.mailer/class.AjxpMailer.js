@@ -50,7 +50,7 @@ Class.create("AjxpMailer", {
         field.focus();
     },
 
-    buildMailPane:function(subject, body, recipientsList, paneTitle){
+    buildMailPane:function(subject, body, recipientsList, paneTitle, downloadLink){
         if(!$("mailer_message")){
             $(document.body).insert("<div id='mailer_message'></div>");
         }
@@ -66,6 +66,7 @@ Class.create("AjxpMailer", {
         }
 
         this._mailerPane = $("mailer_message");
+        this.downloadLink = downloadLink;
 
         if(recipientsList){
             recipientsList.select("div.user_entry").each(function(el){
@@ -113,6 +114,9 @@ Class.create("AjxpMailer", {
             aa.push(el.readAttribute('data-entry_id'));
         });
         params.set('emails[]', aa);
+        if(this.downloadLink){
+            params.set('link', this.downloadLink);
+        }
         var connexion = new Connexion();
         connexion.setMethod("post");
         connexion.setParameters(params);
