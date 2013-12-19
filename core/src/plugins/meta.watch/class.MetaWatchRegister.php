@@ -353,7 +353,7 @@ class MetaWatchRegister extends AJXP_Plugin
             if (count($ids)) {
                 foreach($ids as $id) $this->notificationCenter->postNotification($newNotif, $id);
             }
-            if(!$newNode->isRoot()){
+            if (!$newNode->isRoot()) {
                 $parentNode = new AJXP_Node(dirname($newNode->getUrl()));
                 $parentNode->setLeaf(false);
                 $ids = $this->getWatchesOnNode($parentNode, self::$META_WATCH_CHANGE);
@@ -375,7 +375,7 @@ class MetaWatchRegister extends AJXP_Plugin
             if (count($ids)) {
                 foreach($ids as $id) $this->notificationCenter->postNotification($oldNotif, $id);
             }
-            if(!$oldNode->isRoot()){
+            if (!$oldNode->isRoot()) {
                 $parentNode = new AJXP_Node(dirname($oldNode->getUrl()));
                 $parentNode->setLeaf(false);
                 $ids = $this->getWatchesOnNode($parentNode, self::$META_WATCH_CHANGE);
@@ -404,7 +404,7 @@ class MetaWatchRegister extends AJXP_Plugin
         if (count($ids)) {
             foreach($ids as $id) $this->notificationCenter->postNotification($notif, $id);
         }
-        if(!$node->isRoot()){
+        if (!$node->isRoot()) {
             $parentNode = new AJXP_Node(dirname($node->getUrl()));
             $parentNode->setLeaf(false);
             $ids = $this->getWatchesOnNode($parentNode, self::$META_WATCH_READ);

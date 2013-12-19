@@ -452,7 +452,7 @@ class ftpAccessWrapper implements AjxpWrapper
     public function getRemoteUserId()
     {
         $repoUid = ConfService::getRepository()->getOption("UID");
-        if(!empty($repoUid)){
+        if (!empty($repoUid)) {
             return array($repoUid, "-1");
         }
         return array($this->user, "-1");

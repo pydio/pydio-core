@@ -650,7 +650,7 @@ class ConfService
         if (isSet($this->configs["REPOSITORIES"]) && isSet($this->configs["REPOSITORIES"][$repoId])) {
             return $this->configs["REPOSITORIES"][$repoId];
         }
-        if (iSset($this->configs["REPOSITORY"]) && $this->configs["REPOSITORY"]->getId()."" == $repoId){
+        if (iSset($this->configs["REPOSITORY"]) && $this->configs["REPOSITORY"]->getId()."" == $repoId) {
             return $this->configs["REPOSITORY"];
         }
         return $this->getConfStorageImpl()->getRepositoryById($repoId);

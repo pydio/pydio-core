@@ -123,7 +123,7 @@ class ShareCenter extends AJXP_Plugin
                 $subAction = (isSet($httpVars["sub_action"])?$httpVars["sub_action"]:"");
                 $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                 $ajxpNode = new AJXP_Node($this->urlBase.$file);
-                if(!file_exists($ajxpNode->getUrl())){
+                if (!file_exists($ajxpNode->getUrl())) {
                     throw new Exception("Cannot share a non-existing file: ".$ajxpNode->getUrl());
                 }
                 $metadata = null;
@@ -542,13 +542,13 @@ class ShareCenter extends AJXP_Plugin
             try {
                 $type = $oldNode->isLeaf() ? "file":"repository";
                 $elementIds = array();
-                if($type == "file"){
+                if ($type == "file") {
                     if(!is_array($metadata["element"])) $elementIds[] = $metadata["element"];
                     else $elementIds = array_keys($metadata["element"]);
-                }else{
+                } else {
                     $elementIds[]= $metadata["element"];
                 }
-                foreach($elementIds as $elementId){
+                foreach ($elementIds as $elementId) {
                     self::deleteSharedElement(
                         $type,
                         $elementId,
@@ -1404,7 +1404,7 @@ class ShareCenter extends AJXP_Plugin
             $minisiteData = self::loadPublicletData($element);
             $repoId = $minisiteData["REPOSITORY"];
             $repo = ConfService::getRepositoryById($repoId);
-            if($repo == null){
+            if ($repo == null) {
                 return false;
             }
             if (!$repo->hasOwner() || $repo->getOwner() != $loggedUser->getId()) {

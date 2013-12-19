@@ -241,9 +241,9 @@ class serialConfDriver extends AbstractConfDriver
                 }
             }
         }
-        try{
+        try {
             AJXP_Utils::saveSerialFile($this->repoSerialFile, $repositories);
-        } catch(Exception $e){
+        } catch (Exception $e) {
             return -1;
         }
         $this->updateAliasesIndex($repositoryObject->getUniqueId(), $repositoryObject->getSlug());
