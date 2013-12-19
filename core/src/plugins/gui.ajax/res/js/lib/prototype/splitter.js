@@ -359,7 +359,10 @@ Class.create("Splitter", AjxpPane, {
      */
     toggleFolding : function(pane){
         if(this.splitbar.hasClassName("folded")) {
+            var afE = this.options.autoFoldOnEvent;
+            this.options.autoFoldOnEvent = false;
             this.unfold();
+            this.options.autoFoldOnEvent = afE;
             return false;
         }else {
             this.foldPane(pane);
