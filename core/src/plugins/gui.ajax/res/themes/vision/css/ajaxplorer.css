@@ -884,6 +884,7 @@ div.SF_label{
     padding-top: 5px;
     padding-bottom: 8px;
     line-height: 18px;
+    font-size: 12px;
     /*white-space: nowrap; /* css-3 */
     /*word-wrap: no break-word; /* Internet Explorer 5.5+ */
 }
@@ -3807,7 +3808,7 @@ div.menu a {
     text-decoration: none;
     cursor: default;
     outline: none;
-    font-size: 11px;
+    font-size: 13px;
 }
 .menu .separator {
     height: 1px;
@@ -4115,6 +4116,7 @@ div.menu a {
     display: block;
     letter-spacing: 0;
     line-height: 13px;
+    font-size: 11px;
 }
 
 .menu.menuDetails img{
@@ -4128,7 +4130,7 @@ div.menu a {
 
 
 .rightAlignMenu a{
-    padding: 6px 5px 5px 20px;
+    padding: 8px 5px 7px 20px;
     text-align:right;
     letter-spacing: 1px;
 }
@@ -4143,9 +4145,11 @@ div.menu a {
 .rightAlignMenu span.ajxp_icon_span
 {
     margin-right: 0;
-    margin-left:5px;
+    margin-left: 9px;
+    display: inline-block;
+    font-size: 13px;
     float: right;
-    font-size: 1.3em;
+    margin-top: 2px;
 }
 
 .menuActions {

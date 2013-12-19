@@ -29,6 +29,7 @@ Class.create("UserDashboardHome", AjxpPane, {
         oFormObject.down("#welcome").update( MessageHash['user_dash.40'].replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME")));
 
         var wsElement = oFormObject.down('#workspaces_list');
+        attachMobileScroll(wsElement, 'vertical');
 
         var switchToRepo = function(repoId){
             if(!repoId) return;
@@ -66,6 +67,7 @@ Class.create("UserDashboardHome", AjxpPane, {
                 oFormObject.down('#go_to_ws').CURRENT_REPO_ID = repoId;
             };
             repoEl.observe("click", select);
+            attachMobilTouchForClick(repoEl, select);
             repoEl.observe("dblclick", function(e){
                 select(e);
                 switchToRepo(repoId);
@@ -79,6 +81,7 @@ Class.create("UserDashboardHome", AjxpPane, {
 
         var notifCenter = ajaxplorer.NotificationLoaderInstance;
         var notificationElement = oFormObject.down("#notifications_center");
+        attachMobileScroll(notificationElement, "vertical");
 
         if(notifCenter){
             notifCenter.ajxpNode.observe("loaded", function(){
@@ -98,6 +101,7 @@ Class.create("UserDashboardHome", AjxpPane, {
                         mAButton.observe("click", function(e){
                             mA.callback(e);
                         });
+                        attachMobilTouchForClick(mAButton, mA.callback);
                         moreMenu.insert(mAButton);
                     });
                 });

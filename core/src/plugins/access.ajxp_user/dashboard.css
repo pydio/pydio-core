@@ -102,6 +102,10 @@
     padding: 5px 10px 5px 0;
 }
 
+#notifications_center li > img{
+    margin-top: 7px !important;
+}
+
 #home_account_pane .notif_event_container > div{
     padding:0;
     line-height: 15px;
@@ -191,4 +195,77 @@
 
 #userdashboard_main_tab #content_pane.dropareaHover{
     border-color: #e35d52 !important;
+}
+
+@media only screen
+and (max-width : 980px){
+    #notifications_center div.notif_event_container{
+        width: 100px;
+    }
+}
+
+    @media only screen
+and (max-width : 800px){
+
+    #workspaces_center{
+        margin-left: 10% !important;
+    }
+
+    #notifications_center li{
+        text-align: center;
+    }
+
+    #notifications_center li > div:first-of-type{
+        float: none !important;
+        position: absolute;
+        bottom: 5px;
+        left: 45%;
+    }
+
+    #notifications_center li > img{
+        float: none !important;
+        margin: auto;
+    }
+
+    #notifications_center div.notif_event_container{
+        float: none;
+        margin-bottom: 2px;
+        width: 100%;
+        text-align: center;
+    }
+
+    #notifications_center div[data-is_loaded]{
+        margin: 0 auto;
+        float: none !important;
+        min-height: 70px;
+    }
+
+    #notifications_center div.notif_event_label{
+        font-size: 11px;
+    }
+
+    #logo_div img{
+        width: 210px;
+    }
+
+}
+
+@media only screen
+and (max-width : 400px){
+
+    #workspaces_center{
+        margin-left: -20px !important;
+    }
+
+    #notifications_center li > div:first-of-type,
+    #notifications_center div.notif_event_repository,
+    #notifications_center div.notif_event_description,
+    #notifications_center div.notif_event_date{
+        display: none;
+    }
+
+    #logo_div img{
+        width: 100px;
+    }
+
 }

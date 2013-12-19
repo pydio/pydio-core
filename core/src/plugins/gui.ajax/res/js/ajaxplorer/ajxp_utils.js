@@ -774,3 +774,24 @@ function attachMobileScroll(targetId, direction){
 	target.addEventListener("touchstart", function(event){ scrollByTouch(event, direction, targetId); });
 	target.addEventListener("touchend", function(event){ scrollByTouch(event, direction, targetId); });
 }
+
+function attachMobilTouchForClick(oElement, callback){
+
+    oElement.observe("touchstart", function(event){
+        var touchData = event.changedTouches[0];
+        oElement.selectableTouchStart = touchData["clientY"];
+    });
+    oElement.observe("touchend", function(event){
+        if(oElement.selectableTouchStart) {
+            var touchData = event.changedTouches[0];
+            var delta = touchData['clientY'] - oElement.selectableTouchStart;
+            if(Math.abs(delta) > 2){
+                return;
+            }
+        }
+        oElement.selectableTouchStart = null;
+        callback(event);
+    } );
+
+
+}

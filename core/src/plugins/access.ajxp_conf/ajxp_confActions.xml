@@ -234,7 +234,7 @@
 					modal.showDialogForm('Create Repository', 'create_repository_box', loadFunc, null, null, false, true);
 					]]></clientCallback>
 				<clientForm id="create_repository_box"><![CDATA[
-					<div id="create_repository_box" action="create_repository" box_width="320">
+					<div id="create_repository_box" action="create_repository" box_width="380">
 					    <div id="creation_form" style="padding:5px;padding-top:0px;">
                             <div class="dialogLegend repoCreationString">AJXP_MESSAGE[ajxp_conf.95]</div>
                             <div class="dialogLegend tplCreationString">AJXP_MESSAGE[ajxp_conf.96]</div>

@@ -449,7 +449,8 @@ Class.create("FormManager", {
                 if(ref > (Prototype.Browser.IE?40:0)){
                     var lab = div.down('.SF_label');
                     if(lab){
-                        lab.setStyle({fontSize:'11px'});
+                        var fontSize = lab.getStyle('fontSize');
+                        lab.setStyle({fontSize:fontSize});
                         lab.setStyle({width:parseInt(39*ref/100)+'px'});
                         if( parseInt(lab.getHeight()) > Math.round(parseFloat(lab.getStyle('lineHeight')) + Math.round(parseFloat(lab.getStyle('paddingTop'))) + Math.round(parseFloat(lab.getStyle('paddingBottom')))) ){
                             lab.next().setStyle({marginTop:lab.getStyle('lineHeight')});

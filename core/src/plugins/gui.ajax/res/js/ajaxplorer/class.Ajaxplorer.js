@@ -371,6 +371,10 @@ Class.create("Ajaxplorer", {
             if(!$(ajxpId)) return;
             oldObj = $(ajxpId).ajxpPaneObject;
         }
+        if(!oldObj){
+            alert('Cannot find GUI component ' + ajxpId + ' to be refreshed!');
+            return;
+        }
 		if(oldObj.__className == ajxpClassName && oldObj.__ajxpOptionsString == ajxpOptionsString){
 			return;
 		}
