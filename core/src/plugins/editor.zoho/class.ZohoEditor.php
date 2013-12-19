@@ -37,6 +37,51 @@ class ZohoEditor extends AJXP_Plugin
         }
     }
 
+    public function init($options){
+
+        parent::init($options);
+        if(!extension_loaded("openssl")) return;
+
+        $keyFile = $this->getPluginWorkDir(true)."/agent.pem";
+        if(file_exists($keyFile)) return;
+
+        $config = array(
+            "digest_alg" => "sha1",
+            "private_key_bits" => 1024,
+            "private_key_type" => OPENSSL_KEYTYPE_RSA,
+        );
+
+        // Create the private and public key
+        $res = openssl_pkey_new($config);
+        openssl_pkey_export_to_file($res, $keyFile);
+
+    }
+
+    public function loadConfigs($configData){
+
+        parent::loadConfigs($configData);
+        $keyFile = $this->getPluginWorkDir(true)."/agent.pem";
+        if(file_exists($keyFile)){
+            $res = openssl_pkey_get_private(file_get_contents($keyFile));
+            $details = openssl_pkey_get_details($res);
+            $public = $details["key"];
+            $this->pluginConf["ZOHO_AGENT_PUBLIC_KEY"] = $public;
+        }
+
+    }
+
+    public function signID($id){
+        $keyFile = $this->getPluginWorkDir(true)."/agent.pem";
+        if(file_exists($keyFile)){
+            $keyId = openssl_get_privatekey(file_get_contents($keyFile));
+            $message = $id;
+            openssl_sign($message, $signature, $keyId);
+            openssl_free_key($keyId);
+            return urlencode(base64_encode($signature));
+        }
+        return false;
+    }
+
 
     public function switchAction($action, $httpVars, $filesVars)
     {
@@ -81,6 +126,7 @@ class ZohoEditor extends AJXP_Plugin
                 $saveUrl = $target."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/save_zoho.php";
             }
 
+            $b64Sig = $this->signID($_SESSION["ZOHO_CURRENT_UUID"]);
 
             $params = array(
                 'id' => $_SESSION["ZOHO_CURRENT_UUID"],
@@ -91,7 +137,7 @@ class ZohoEditor extends AJXP_Plugin
                 'persistence' => 'false',
                 'format' => $extension,
                 'mode' => 'normaledit',
-                'saveurl'   => $saveUrl
+                'saveurl'   => $saveUrl."?signature=".$b64Sig
             );
 
             $service = "exportwriter";
@@ -138,13 +184,17 @@ class ZohoEditor extends AJXP_Plugin
 
         } else if ($action == "retrieve_from_zohoagent") {
             $targetFile = $_SESSION["ZOHO_CURRENT_EDITED"];
-            $id = $_SESSION["ZOHO_CURRENT_UUID"].".".pathinfo($targetFile, PATHINFO_EXTENSION);
+            $id = $_SESSION["ZOHO_CURRENT_UUID"];
+            $ext = pathinfo($targetFile, PATHINFO_EXTENSION);
             $node = new AJXP_Node($targetFile);
             $node->loadNodeInfo();
             AJXP_Controller::applyHook("node.before_change", array(&$node));
 
+            $b64Sig = $this->signID($id);
+
             if ($this->getFilteredOption("USE_ZOHO_AGENT",$repository->getId()) ) {
-                $data = AJXP_Utils::getRemoteContent( $this->getFilteredOption("ZOHO_AGENT_URL",$repository->getId())."?ajxp_action=get_file&name=".$id."&key=".$this->getFilteredOption("ZOHO_AGENT_KEY", $repository->getId()));
+                $url =  $this->getFilteredOption("ZOHO_AGENT_URL",$repository->getId())."?ajxp_action=get_file&name=".$id."&ext=".$ext."&signature=".$b64Sig ;
+                $data = AJXP_Utils::getRemoteContent($url);
                 if (strlen($data)) {
                     file_put_contents($targetFile, $data);
                     echo "MODIFIED";
