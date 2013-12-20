@@ -182,7 +182,7 @@ class MqManager extends AJXP_Plugin
                 $this->msgExchanger->unsuscribeFromChannel($httpVars["channel"], $httpVars["client_id"]);
                 break;
             case "client_consume_channel":
-                if(AuthService::usersEnabled()){
+                if (AuthService::usersEnabled()) {
                     $user = AuthService::getLoggedUser();
                     if ($user == null) {
                         //throw new Exception("You must be logged in");
@@ -194,7 +194,7 @@ class MqManager extends AJXP_Plugin
                     $GROUP_PATH = $user->getGroupPath();
                     if($GROUP_PATH == null) $GROUP_PATH = false;
                     $uId = $user->getId();
-                }else{
+                } else {
                     $GROUP_PATH = '/';
                     $uId = 'shared';
                 }

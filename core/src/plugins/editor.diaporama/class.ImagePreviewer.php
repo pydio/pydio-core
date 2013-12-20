@@ -49,7 +49,7 @@ class ImagePreviewer extends AJXP_Plugin
 
         if ($action == "preview_data_proxy") {
             $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-            if(!file_exists($destStreamURL.$file)){
+            if (!file_exists($destStreamURL.$file)) {
                 header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($file))."; name=\"".basename($file)."\"");
                 header("Content-Length: 0");
                 return;

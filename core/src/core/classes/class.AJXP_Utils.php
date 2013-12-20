@@ -1434,7 +1434,8 @@ class AJXP_Utils
      * @param $path
      * @return array
      */
-    public static function safeParseUrl($path){
+    public static function safeParseUrl($path)
+    {
         $parts = parse_url(str_replace(array("#", "?"), array("__AJXP_FRAGMENT__", "__AJXP_MARK__"), $path));
         $parts["path"]= str_replace(array("__AJXP_FRAGMENT__", "__AJXP_MARK__"), array("#", "?"), $parts["path"]);
         return $parts;
@@ -1618,9 +1619,9 @@ class AJXP_Utils
         $sql = file_get_contents($file);
         $parts = explode(";", $sql);
         $remove = array();
-        for($i = 0 ; $i < count($parts); $i++){
+        for ($i = 0 ; $i < count($parts); $i++) {
             $part = $parts[$i];
-            if(strpos($part, "BEGIN") && isSet($parts[$i+1])) {
+            if (strpos($part, "BEGIN") && isSet($parts[$i+1])) {
                 $parts[$i] .= ';'.$parts[$i+1];
                 $remove[] = $i+1;
             }

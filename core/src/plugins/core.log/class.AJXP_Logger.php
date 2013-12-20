@@ -287,7 +287,7 @@ class AJXP_Logger extends AJXP_Plugin
      */
     public static function getInstance()
     {
-        if(!isset(self::$loggerInstance)){
+        if (!isset(self::$loggerInstance)) {
             $p = AJXP_PluginsService::findPlugin("core", "log");
             $p->init(array());
         }

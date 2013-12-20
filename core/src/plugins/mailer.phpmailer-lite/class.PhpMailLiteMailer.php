@@ -59,14 +59,14 @@ class PhpMailLiteMailer extends AjxpMailer
         $mail->IsHTML(true);                                  // set email format to HTML
         $mail->CharSet = "utf-8";
         $mail->Encoding = "quoted-printable";
-        foreach($images as $image){
+        foreach ($images as $image) {
             $mail->AddEmbeddedImage($image["path"], $image["cid"], '', 'base64', 'image/png');
         }
 
         $mail->Subject = $subject;
-        if(strpos($body, "<html")!==false){
+        if (strpos($body, "<html")!==false) {
             $mail->Body = $body;
-        }else{
+        } else {
             $mail->Body = "<html><body>".nl2br($body)."</body></html>";
         }
         $mail->AltBody = strip_tags($mail->Body);

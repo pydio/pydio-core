@@ -135,7 +135,8 @@ class AJXP_Notification
     /**
      * @return string
      */
-    public function getMainLink(){
+    public function getMainLink()
+    {
         $repoId = $this->getNode()->getRepositoryId();
         return AJXP_Utils::detectServerURL(true)."/?goto=".$repoId.$this->node->getPath();
     }
