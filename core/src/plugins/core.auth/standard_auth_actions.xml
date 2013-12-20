@@ -17,7 +17,7 @@
 						document.location.href=loginRedirect;
 					}else{
 					    modal.setCloseValidation(function(){
-					        return (ajaxplorer && ajaxplorer.user && ajaxplorer.user.id == "guest")
+					        return (!!ajaxplorer && !!ajaxplorer.user && ajaxplorer.user.id == "guest")
 					    });
 						modal.showDialogForm('Log In', ($('login_form')?'login_form':'login_form_dynamic'),
 						function(oForm){
