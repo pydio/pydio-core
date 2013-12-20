@@ -52,19 +52,20 @@ class dropboxWrapper implements AjxpWrapper
 
     public function initPath($ajxpPath)
     {
+        $repo = ConfService::getRepository();
         if (empty(self::$dropbox)) {
-            $repo = ConfService::getRepository();
             $consumerKey = $repo->getOption('CONSUMER_KEY');
             $consumerSecret = $repo->getOption('CONSUMER_SECRET');
-            $email = $repo->getOption('USER');
-            $pass = $repo->getOption("PASS");
 
             self::$oauth = new Dropbox_OAuth_PEAR($consumerKey, $consumerSecret);
             self::$oauth->setToken($_SESSION["OAUTH_DROPBOX_TOKENS"]);
             self::$dropbox = new Dropbox_API(self::$oauth);
         }
+        $basePath = $repo->getOption("PATH");
+        if(empty($basePath)) $basePath = "";
         $parts = AJXP_Utils::safeParseUrl($ajxpPath);
-        $path = $parts["path"];
+        $path = $basePath."/".ltrim($parts["path"], "/");
+
         if($path == "") return "/";
         return $path;
     }
