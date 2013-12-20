@@ -71,22 +71,22 @@ class AjxpMailer extends AJXP_Plugin
         $images = array();
         if(!empty($prepend)) $subject = $prepend ." ". $subject;
         if(!empty($append)) $subject .= " ".$append;
-        if(!empty($layoutFolder)){
+        if (!empty($layoutFolder)) {
             $layoutFolder .= "/";
             $lang = ConfService::getLanguage();
-            if(is_file(AJXP_INSTALL_PATH."/".$layoutFolder.$lang.".html")){
+            if (is_file(AJXP_INSTALL_PATH."/".$layoutFolder.$lang.".html")) {
                 $layout = implode("", file(AJXP_INSTALL_PATH."/".$layoutFolder.$lang.".html"));
-            }else if (is_file(AJXP_INSTALL_PATH."/".$layoutFolder."en.html")){
+            } else if (is_file(AJXP_INSTALL_PATH."/".$layoutFolder."en.html")) {
                 $layout = implode("", file(AJXP_INSTALL_PATH."/".$layoutFolder."en.html"));
             }
         }
         if (strpos($layout, "AJXP_MAIL_BODY") !== false) {
             $body = str_replace("AJXP_MAIL_BODY", nl2br($body), $layout);
         }
-        if($imageLink != null){
+        if ($imageLink != null) {
             $body = str_replace(array("AJXP_IMAGE_LINK"), "<a href='".$imageLink."'>".'<img alt="Download" width="100" style="width: 100px;" src="cid:download_id">'."</a>", $body);
             $images[] = array("path" => AJXP_INSTALL_PATH."/".$layoutFolder."/download.png", "cid" => "download_id");
-        }else{
+        } else {
             $body = str_replace(array("AJXP_IMAGE_LINK", "AJXP_IMAGE_END"), "", $body);
         }
         $body = str_replace("AJXP_MAIL_SUBJECT", $subject, $body);

@@ -1240,7 +1240,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.53"]);
                 } else {
                     AJXP_XMLWriter::sendMessage($mess["ajxp_conf.54"], null);
-                    if(isSet($httpVars["newLabel"])) {
+                    if (isSet($httpVars["newLabel"])) {
                         AJXP_XMLWriter::reloadDataNode("", $repId);
                     }
                     AJXP_XMLWriter::reloadRepositoryList();

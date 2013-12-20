@@ -1565,8 +1565,7 @@ class http_class
             $sasl->SetCredential("session",$this->session);
             do {
                 $status=$sasl->Start($mechanisms,$message,$interactions);
-            }
-            while($status==SASL_INTERACT);
+            } while ($status==SASL_INTERACT);
             switch ($status) {
                 case SASL_CONTINUE:
                     break;

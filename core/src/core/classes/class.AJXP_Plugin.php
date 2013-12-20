@@ -542,7 +542,7 @@ class AJXP_Plugin implements Serializable
         foreach ($nodes as $attr) {
             $value = $attr->value;
             $parts = explode("|", $value);
-            foreach($parts as $depName){
+            foreach ($parts as $depName) {
                 if ($depName == "access.AJXP_STREAM_PROVIDER") {
                     $deps = array_merge($deps, $pluginService->getStreamWrapperPlugins());
                 } else if (strpos($depName, "+") !== false) {

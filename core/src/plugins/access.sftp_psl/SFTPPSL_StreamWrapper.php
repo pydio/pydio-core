@@ -832,4 +832,4 @@ class SFTPPSL_StreamWrapper
  * Register "sftp://" protocol
  */
 stream_wrapper_register('sftp', 'SFTPPSL_StreamWrapper')
-	or die ('Failed to register protocol');
+    or die ('Failed to register protocol');
