@@ -135,6 +135,10 @@
     background-color: #f8f8f8;
 }
 
+#leftTabulator{
+    background-color: #ebedf0;
+}
+
 #leftTabulator div.tabulatorContainer {
     border-bottom: 1px solid #5c5c5c;
     height: 38px;
@@ -146,7 +150,7 @@
     font-size: 13px;
 }
 
-div.class-FetchedResultPane {
+.settings_main_pane div.class-FetchedResultPane {
     background-color: #f8f8f8;
     border-left: 1px solid rgb(187,187,187);
 }
@@ -156,5 +160,17 @@ div.class-FetchedResultPane {
 }
 
 #leftTabulator div.panelHeader{
-    background-color: rgba(138, 149, 160, 0.79);
+    background-color: rgba(138, 149, 160);
+}
+
+.settings_main_pane div.folded .toggleHeader {
+    display: none;
+}
+
+.settings_main_pane div.tabulatorContainer div#display_toolbar{
+    padding-top: 11px;
+}
+
+.settings_main_pane div.tabulator-vertical div.toolbarGroup{
+    font-size: 1em;
 }

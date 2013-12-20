@@ -138,18 +138,20 @@ textarea{
     background-color: rgb(250, 250, 250);
     -moz-border-radius : 2px;
     border-radius: 2px;
-    padding: 2px;
+    padding: 4px 6px;
     color: rgb(111, 121, 131);
 }
 
-.thumbnail_selectable_cell.detailed {
-    width: 100% !important;
-    margin: 0 !important;
+.thumbnail_selectable_cell.detailed {;
+    margin: 0px 0px !important;
     margin-bottom: 2px;
     background-color: #ffffff;
-    height: auto !important;
-    border-radius: 0;
-    border-bottom: 1px solid #ebedf0;
+    width: 100%;
+    display: block;;
+    height: auto;
+    
+border-radius: 0;
+padding: 6px 4px;
 }
 
 .thumbnail_selectable_cell.detailed:hover{
@@ -162,17 +164,21 @@ textarea{
 
 .thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell{
 
-    margin-right: 15px;
+    margin-right: 11px;
     background-color: transparent;
 
 }
 
 .thumbnail_selectable_cell.detailed div.thumbLabel{
 
-    font-size: 18px;
+    font-size: 15px;
     text-align: left;
-    padding-top: 7px;
-    padding-bottom: 2px;
+    
+
+    padding-top: 9px;
+    
+
+    padding-bottom: 0px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -1941,7 +1947,7 @@ div.header_resizer div.ascending {
 }
 
 .sort-table td {
-    padding: 6px 0;
+    padding: 7px 0;
 }
 
 .no-flexbox .sort-table td{
@@ -3069,7 +3075,6 @@ div.foldedPanel_tooltip td{
 td.infoPanelValue
 {
     padding: 6px;
-    border-bottom: 1px solid #fff;
 }
 
 .panelContent.scrolling td.infoPanelValue{
@@ -3077,9 +3082,8 @@ td.infoPanelValue
 }
 
 td.infoPanelLabel {
-    padding: 6px 6px;
+    padding: 7px 6px;
     width: 35%;
-    border-bottom: 1px solid #fff;
     text-align: right;
     color: #555;
     vertical-align: top;
