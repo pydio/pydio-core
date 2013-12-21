@@ -789,7 +789,7 @@ class ShareCenter extends AJXP_Plugin
         } else {
             $tPath = (!empty($data["TRAVEL_PATH_TO_ROOT"]) ? $data["TRAVEL_PATH_TO_ROOT"] : "../..");
         }
-        $html = str_replace("AJXP_PATH_TO_ROOT", $tPath, $html);
+        $html = str_replace("AJXP_PATH_TO_ROOT", rtrim($tPath, "/")."/", $html);
         HTMLWriter::internetExplorerMainDocumentHeader();
         HTMLWriter::charsetHeader();
         echo($html);
