@@ -210,7 +210,7 @@ function initialize(){
 			//modal.close();
             if(modal.currentLightBoxElement){
                 removeLightboxFromElement(modal.currentLightBoxElement);
-                if(modal.currentLightBoxModal) {
+                if(modal.currentLightBoxModal && modal.currentLightBoxModal.parentNode) {
                     modal.currentLightBoxModal.remove();
                 }
                 modal.currentLightBoxElement = null;
