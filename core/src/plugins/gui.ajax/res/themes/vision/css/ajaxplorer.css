@@ -290,8 +290,8 @@ div.thumbnail_cell_metadata span.metadata_chunk{
 }
 
 .thumbnail_selectable_cell > div > div.overlay_icon_div{
-    top: 19px !important;
-    right: 18px !important;
+    top: 24px !important;
+    right: 21px !important;
     font-size: 16px;
 }
 
