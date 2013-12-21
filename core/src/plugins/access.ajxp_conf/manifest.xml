@@ -61,6 +61,11 @@
                             </div>
                         </div>
                     </div>
+                    <style>
+                        #get_my_feed_button{
+                            display:none !important;
+                        }
+                    </style>
                 </div>
                 <script>
                     document.observeOnce("ajaxplorer:context_changed", function(){
@@ -68,7 +73,6 @@
                             c._webfxtree_expand();
                             $(c._loadingItem).remove();
                         })
-                        window.setTimeout(function(){ $("get_my_feed_button").hide(); }, 10);
                         $("browser").ajxpPaneObject.resize();
                     });
                 </script>
