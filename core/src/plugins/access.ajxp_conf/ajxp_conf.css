@@ -152,7 +152,7 @@
 
 .settings_main_pane div.class-FetchedResultPane {
     background-color: #f8f8f8;
-    border-left: 1px solid rgb(187,187,187);
+    border-left: 1px solid #5c5c5c;
 }
 
 #leftTabulator span.toggleHeader.toggleInactive {

@@ -3678,6 +3678,19 @@ div.user_entry span.cbContainer
     cursor: pointer;
 }
 
+div.editable_users_header.autocomplete_readonly {
+    display: none !important;
+}
+
+input.autocomplete_readonly{
+    display:none;
+}
+
+div.autocomplete_readonly span.delete_user_entry{
+    display: none !important;
+}
+
+
 .share_chooser_list li.selected{
     color: #555555;
 }

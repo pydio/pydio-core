@@ -306,7 +306,7 @@ Class.create("FilesList", SelectableElements, {
 	 * Handler for contextChange event 
 	 */
 	contextObserver : function(e){
-		if(!this.crtContext) return;
+		if(!this.crtContext || !this.htmlElement) return;
 		//console.log('FILES LIST : FILL');
         var base = getBaseName(this.crtContext.getLabel());
         if(!base){

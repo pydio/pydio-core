@@ -209,12 +209,7 @@ Class.create("ShareCenter", {
             }
             
             this.createQRCode = ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("CREATE_QRCODE");
-
-            var ppass = new Protopass($('shared_pass'), {
-                barContainer : $('pass_strength_container'),
-                barPosition:'bottom'
-            });
-            var mailerDetected = ajaxplorer.hasPluginOfType("mailer");
+            var disableAutocompleter = (nodeMeta.get("ajxp_shared") && this.shareFolderMode != "workspace");
             var updateUserEntryAfterCreate = function(li, assignedRights, watchValue){
                 if(assignedRights == undefined) assignedRights = "r";
                 var id = Math.random();
@@ -230,6 +225,9 @@ Class.create("ShareCenter", {
                      watchBox +
                     '</div>'
                 });
+                if(disableAutocompleter){
+                    li.select('input[type="checkbox"]').invoke("disable");
+                }
             };
             oForm.down('#repo_label').setValue(getBaseName(this.currentNode.getPath()));
             if(!$('share_folder_form').autocompleter){
@@ -258,6 +256,10 @@ Class.create("ShareCenter", {
             if(nodeMeta.get("ajxp_shared")){
                 if (this.shareFolderMode != 'workspace'){
                     oForm.down('#share_result').show();
+                    oForm.down(".editable_users_header").addClassName('autocomplete_readonly');
+                    $("shared_user").addClassName('autocomplete_readonly').removeClassName("dialogFocus");
+                    $("shared_users_summary").addClassName('autocomplete_readonly');
+                    $("shared_users_autocomplete_choices").addClassName('autocomplete_readonly');
                 }
                 oForm.down('div#share_generate').hide();
                 if(oForm.down("#share_unshare")) {
