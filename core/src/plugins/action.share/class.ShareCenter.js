@@ -508,7 +508,7 @@ Class.create("ShareCenter", {
                 var linksCount = jsonData.length;
                 jsonData = jsonData[0];
                 var directLink = "";
-                if(!jsonData.hasPassword){
+                if(!jsonData.has_password){
                     directLink += '\
                     <tr>\
                         <td class="infoPanelLabel">'+MessageHash['share_center.60']+'</td>\
@@ -546,9 +546,9 @@ Class.create("ShareCenter", {
                     </tr>\
                     <tr>\
                         <td class="infoPanelLabel">'+MessageHash['share_center.52']+'</td>\
-                        <td class="infoPanelValue">'+MessageHash['share_center.22']+' : '+ (jsonData.download_limit?jsonData.download_limit:MessageHash['share_center.53'])
+                        <td class="infoPanelValue">'+MessageHash['share_center.22']+' '+ (jsonData.download_limit?jsonData.download_limit:MessageHash['share_center.53'])
                                 +', '+MessageHash['share_center.11']+':'+ (jsonData.expiration_time?jsonData.expiration_time:MessageHash['share_center.53'])
-                                +', '+MessageHash['share_center.12']+':'+ (jsonData.hasPassword?MessageHash['share_center.13']:MessageHash['share_center.14']) +'</td>\
+                                +', '+MessageHash['share_center.12']+':'+ (jsonData.has_password?MessageHash['share_center.13']:MessageHash['share_center.14']) +'</td>\
                     </tr>\
                 ');
 
