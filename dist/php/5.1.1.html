@@ -1,0 +1,170 @@
+<div style='font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif; font-size: 12px;'
+     xmlns="http://www.w3.org/1999/html">
+    <h2>Pydio 5.1.1</h2>
+    <p>This release is a bugfix of 5.1.0, and a release candidate for 5.2.0. <br><br>There is not yet an upgrade mechanism, thus it is <b>not yet tagged stable</b>: it is not meant to be deployed in production, unless you know what you are doing.
+      <br/><br/> We need you to test and report bugs ASAP to make sure we achieve stability soon! Update from 5.1.0 can be done using the in-app upgrade mechanism by switching the updater to the "development" channel. Please read <a href="http://pyd.io/pydio-5-1-0/" target="_blank">5.1.0 release note</a> not to discover the new features.</p>
+
+    <h2>Summary</h2>
+    <ul>
+        <li>License : Affero GPL</li>
+        <li>Copyright : Charles du Jeu 2013</li>
+        <li>Download : https://pyd.io/download</li>
+        <li>Demo : https://demo.pyd.io/</li>
+        <li>Date : 23rd, December 2013</li>
+        <li>Contributors: Charles du Jeu, Etienne Champetier, Nikita Rousseau, Thomas Frivold</li>
+    </ul>
+
+    <h2>Detailed Changelog</h2>
+
+<h3>[Noticeable]</h3>
+<ul>
+    <li>Repository switch and loading optimization: avoid loading all available repository when we already know the repository ID. Will have a great impact on REST-based access, typically WebDAV. (<a href="http://github.com/pydio/pydio-core/commit/5fd9a35eb7589b7e08bef9d21b612ac0c0cd327d">details</a>)</li>
+    <li>Fix rename just after creation, detect where to "switchCurrentLabelToEdition" (<a href="http://github.com/pydio/pydio-core/commit/ba5ebe3be6690b91d33563f32a4eebf1b1fcbb8f">details</a>)</li>
+    <li>Add ENABLE_FOLDER_SHARING option in action.share, defaulting to true (<a href="http://github.com/pydio/pydio-core/commit/f1fb7e836e96bb28441cde6c9426ef5e5de516c3">details</a>)</li>
+    <li>Fix some specific installs problems with libxml and "external entity load" erros. (<a href="http://github.com/pydio/pydio-core/commit/fc98af5a3df2e6e7a5b332763e821a8ed0fe2c90">details</a>)</li>
+    <li>Declare restParams for move and rename (<a href="http://github.com/pydio/pydio-core/commit/4b5bf8bca9555e70d44a1cb940011cbd124500de">details</a>)</li>
+    <li>Switch to scrutinizer-ci.com (<a href="http://github.com/pydio/pydio-core/commit/8a94fe4a987c1b6c82bb5c5d5febd03ded4fd37b">details</a>)</li>
+    <li>Move copy operations into AbstractAccessDriver to factorize normal and cross-repository copies. Enable cross-repository copy for folders. To be tested extensively. (<a href="http://github.com/pydio/pydio-core/commit/a5f3329e5f3fe392eec8bc41c7f0b457e6624e63">details</a>)</li>
+    <li>Fix sorting problems when not in list mode. (<a href="http://github.com/pydio/pydio-core/commit/89b01dc73df18e464b26755a5f5633099e00700c">details</a>)</li>
+    <li>Fix copy permission: can copy from one ro ws to another but not inside it. (<a href="http://github.com/pydio/pydio-core/commit/fb65dfb2a15e24131ca41600ce96069dff321b27">details</a>)</li>
+    <li>Missing log when opening a file via the Editor (FileMimeSender) Fix #341 : force init core.log plugin if self::$loggerInstance is not yet defined. (<a href="http://github.com/pydio/pydio-core/commit/2084d570d28ba59041fd7497ab9dcea02a419149">details</a>)</li>
+    <li>Settings panel: Rework the tabs, should be clearer (<a href="http://github.com/pydio/pydio-core/commit/9df10e85ed97d2c6940805b6093e8d830b7b40c9">details</a>)</li>
+    <li>Make sure to show controls on video when opened in editor. (<a href="http://github.com/pydio/pydio-core/commit/d60bd04becc67138ce595636131ccc0c4c0d139d">details</a>)</li>
+    <li>Fix Dropbox plugin in sharing cases, retrieve the correct oauth tokens (<a href="http://github.com/pydio/pydio-core/commit/e117376de600c5fc15edd3060706885db319a1a8">details</a>)</li>
+    <li>Minisite: Ensure the BASE html tag ends with /, otherwise it goes up one folder (<a href="http://github.com/pydio/pydio-core/commit/bab86f0c598d7a1ec5d1b8255d499dbfebd866ee">details</a>)</li>
+    <li>API CHANGE: switch to nodes[] query parameters instead of file_0, file_1, file_2, etc. Unique "file" is still allowed though. Fix dblclick on IE10 and IE11, tested on WIN7 and 8 (<a href="http://github.com/pydio/pydio-core/commit/9828af80ca87244cb4378d88ab35dd99cfd3d889">details</a>)</li>
+</ul>
+    <h3>[Other]</h3>
+<ul>
+    <li>Update plugin_doc.html (<a href="http://github.com/pydio/pydio-core/commit/bae0078a1655aaaf9c7fad49eba96a17bab53d45">details</a>)</li>
+    <li>Also apply CREATE action if inherit_recycle (<a href="http://github.com/pydio/pydio-core/commit/33d1b9997173711306f30f29e6fdcc7a8e45a790">details</a>)</li>
+    <li>Add sort_by, sort_dir, offset and limit parameters (<a href="http://github.com/pydio/pydio-core/commit/09d810b2a91b5a95a66cbbe25d29540842f8115d">details</a>)</li>
+    <li>Secure new meta.comments feed. (<a href="http://github.com/pydio/pydio-core/commit/8c021cea073f8c8795e7d682bc38bfb33fd26c85">details</a>)</li>
+    <li>Performances: do not trigger load() in storageExists() if not necessary. FilterUsersByGroup: is_array() security check. Typo when catching exception in logger (<a href="http://github.com/pydio/pydio-core/commit/68f3af08ee8f37772009597018156fbdc4a7e309">details</a>)</li>
+    <li>Wrong notification sent during copy (<a href="http://github.com/pydio/pydio-core/commit/b273523e3adb578d679d7cf0e89153fd11b1e327">details</a>)</li>
+    <li>Weak detection of file folder and add a class accordingly (<a href="http://github.com/pydio/pydio-core/commit/3b5cfa900515b094066099a41adb5a5e0ca5a60f">details</a>)</li>
+    <li>Missing translation in Comments feed Missing delete_comment implementation (<a href="http://github.com/pydio/pydio-core/commit/6370e911b55beaa5332872f1cc3237ee3f3af687">details</a>)</li>
+    <li>Fix #358, #359, #360 (<a href="http://github.com/pydio/pydio-core/commit/702a9cc67678b2d32c49bb47c99c9381b107b55b">details</a>)</li>
+    <li>Fix #354 (<a href="http://github.com/pydio/pydio-core/commit/3c37f505967c8b3d4e6c29baf564a398f2fe0ce9">details</a>)</li>
+    <li>pgsql: IF NOT EXISTS is only supported since PostgreSQL 9.1 (<a href="http://github.com/pydio/pydio-core/commit/2bfc0076475080dc1acd653e061081ca2b609141">details</a>)</li>
+    <li>try/catch on repository switch (<a href="http://github.com/pydio/pydio-core/commit/71663fae7603d4667fcff345b349fccd946e8f3f">details</a>)</li>
+    <li>Update XSD (<a href="http://github.com/pydio/pydio-core/commit/88b296521ed6cdcf29f8ad4f2c657d67fd6887f6">details</a>)</li>
+    <li>PublishNodeChange was not taking into account the "copy" parameter. (<a href="http://github.com/pydio/pydio-core/commit/375bc83acb131acaa93fe33481e6883dba8c1313">details</a>)</li>
+    <li>Fix comments feed (<a href="http://github.com/pydio/pydio-core/commit/be414f19364f14b034c05cbf6fae04eee07b056e">details</a>)</li>
+    <li>Lower the poller frequency value from 5 to 15 (<a href="http://github.com/pydio/pydio-core/commit/59addd7136f85f2ae23d5238d228bf09cd07c67a">details</a>)</li>
+    <li>Correct typo in AbstractLogDriver (<a href="http://github.com/pydio/pydio-core/commit/05e6540aabf069677f306e604132a93a2a744393">details</a>)</li>
+    <li>functions ListRepository and GetWebspaceLog take 2 arguments (<a href="http://github.com/pydio/pydio-core/commit/5322fa3f862bc8376d2f74447add1e46ca1b2605">details</a>)</li>
+    <li>Small typo in class.phpmailer-lite.php (<a href="http://github.com/pydio/pydio-core/commit/91229086fa5e7fd13545944ad399ef9914920950">details</a>)</li>
+    <li>LOG_GROUP_RIGHTS was removed in cda23be27cf360f5f77dc4658e63d7a8dfcb7b1c (<a href="http://github.com/pydio/pydio-core/commit/5a0f0e93cd8031d94e2fa22df779eaceea13d3f6">details</a>)</li>
+    <li>Correct typo in class.cmsmsAuthDriver.php (<a href="http://github.com/pydio/pydio-core/commit/c53c56f68078eef93878aea7817f8e6cc874ea62">details</a>)</li>
+    <li>Typo in test.ServerEncoding.php (<a href="http://github.com/pydio/pydio-core/commit/9e348d359553dbfebeac805db78506d4fa756e85">details</a>)</li>
+    <li>session_unset() doesn't take arguments (<a href="http://github.com/pydio/pydio-core/commit/4125237463eed7c8003564eae43a3368d042fd6e">details</a>)</li>
+    <li>AJXP_Utils::getRemoteContent take only 1 argument (<a href="http://github.com/pydio/pydio-core/commit/4abc15043806cc29397e35e4510d72db7be31830">details</a>)</li>
+    <li>Encoding is a parameter of Zend_Search_Lucene_Field::Keyword, not $privateDoc->addField (<a href="http://github.com/pydio/pydio-core/commit/a2654f5d61a80d1e7ece0f90a883de7c4f1a1757">details</a>)</li>
+    <li>listUsers() doesn't take parameters in remoteAuthDriver (<a href="http://github.com/pydio/pydio-core/commit/3a6063dfe6dff1fc419fa8917479a0ca7b72f372">details</a>)</li>
+    <li>Replace $HTTP_HOST with $_SERVER["SERVER_NAME"] (<a href="http://github.com/pydio/pydio-core/commit/d42674ad071153f3ca766906f777da74497b5cce">details</a>)</li>
+    <li>Fix post-upload hooks: make sure to send node UPDATED instead of CREATED if was already there. (<a href="http://github.com/pydio/pydio-core/commit/6af65908c2d779e413045b1e88ab7c9aa521267a">details</a>)</li>
+    <li>Make sure the rest API point is working on root. (<a href="http://github.com/pydio/pydio-core/commit/c76f1815b960109b36828e8286afbd896bb97087">details</a>)</li>
+    <li>New meta.syncable plugin keep tracks of all changes with a global revision number (inspired by couchdb mechanism) (<a href="http://github.com/pydio/pydio-core/commit/99449b648ee11dd31e8325aac3e16edeaee42ed4">details</a>)</li>
+    <li>Add an optional caching mechanism to the full XML tree (<a href="http://github.com/pydio/pydio-core/commit/9cd5c10ae141e210255a8a3e652afc59ec0ebf97">details</a>)</li>
+    <li>Name sdk methods for search and searchByKeyword (<a href="http://github.com/pydio/pydio-core/commit/1f0b680904ed910ce526ab6b2c45daa085b6d7e7">details</a>)</li>
+    <li>optional parameter can't be before required parameter (<a href="http://github.com/pydio/pydio-core/commit/12dd256baf16855b0650703d55ba5220f34592e3">details</a>)</li>
+    <li>return AJXP_Utils::saveSerialFile is misleading and useless (<a href="http://github.com/pydio/pydio-core/commit/53149fcc4823dfb71ad15a628d07b95847476cc1">details</a>)</li>
+    <li>$error isn't defined and used (<a href="http://github.com/pydio/pydio-core/commit/a915d616e69b7204ad9698b07b3fdfb003c8cb4d">details</a>)</li>
+    <li>Replace $REMOTE_HOST with $_SERVER["REMOTE_ADDR"] (<a href="http://github.com/pydio/pydio-core/commit/c2558e3243e5d4cfd4dae5f33ae15d2d00f81b3b">details</a>)</li>
+    <li>getUniqueFile() doesn't take args (<a href="http://github.com/pydio/pydio-core/commit/2317844a7ead3dc0c52d0608ef4d95a85cfba8af">details</a>)</li>
+    <li>Small typos in phpCAS lib (<a href="http://github.com/pydio/pydio-core/commit/4ccc2b20d71c09a190d8b41444db6e35d80a7c1c">details</a>)</li>
+    <li>typo in websocket.server.php (<a href="http://github.com/pydio/pydio-core/commit/c7d7ae79046821b5b851d85465e25f1c9ec9b6a4">details</a>)</li>
+    <li>typos in phpCAS lib (<a href="http://github.com/pydio/pydio-core/commit/5fb1ce8c6a746f93c4efc55c0d784d34fcb32ae3">details</a>)</li>
+    <li>Close #371 (<a href="http://github.com/pydio/pydio-core/commit/ef2583d996d163321abcd393dc0d9061e4cfbd52">details</a>)</li>
+    <li>self:: is used outside class/method scope (<a href="http://github.com/pydio/pydio-core/commit/ec73a937c62a18e481c4f7ad024be67476bc01cc">details</a>)</li>
+    <li>Manually define columns list to avoid NULL node_id (nulled by the left join) (<a href="http://github.com/pydio/pydio-core/commit/9e441e40dd61643f7b0a4019e48d3d067374b9bd">details</a>)</li>
+    <li>Change how uploader.html depends on uploader.flex, should impact plugins ordering, but not activation. (<a href="http://github.com/pydio/pydio-core/commit/cbd7c07c291bbb049fc569d9d846462e46eca3a0">details</a>)</li>
+    <li>Update rhs-pydio.sh (<a href="http://github.com/pydio/pydio-core/commit/3a281e2046d6abdf43678dddaffa4650d98aa007">details</a>)</li>
+    <li>Update rhs-pydio.sh (<a href="http://github.com/pydio/pydio-core/commit/e10a9960b3f5be81165c9ba01e48c9c5530ebbdb">details</a>)</li>
+    <li>porting rhs/centos script to gluster/debian (<a href="http://github.com/pydio/pydio-core/commit/5dc6326ab1b86e7013c10b38fabc942707eb3f5b">details</a>)</li>
+    <li>Add a stat_hash action to extend standard stat with the file hash. (<a href="http://github.com/pydio/pydio-core/commit/235478544c4ac95dd4f3a0482b901e29b64afd72">details</a>)</li>
+    <li>Change file_ to nodes[] (<a href="http://github.com/pydio/pydio-core/commit/5804ca018e139fc2c82ff43f545da4151a84c7f9">details</a>)</li>
+    <li>Sanitize user name at creation in user_create_user (<a href="http://github.com/pydio/pydio-core/commit/eb505518eec233fd2fb3999a6326a625b5efb2c1">details</a>)</li>
+    <li>Updated access.sftp_psl (<a href="http://github.com/pydio/pydio-core/commit/961a5ed0cd50ab235dd2a47c47380d7638ecefe1">details</a>)</li>
+    <li>Use CSS animation when possible to make it lighter (<a href="http://github.com/pydio/pydio-core/commit/94dcceebb622547330cb5630bca739bbc538d1cb">details</a>)</li>
+    <li>Close #363 Add parameter for sendmail path (<a href="http://github.com/pydio/pydio-core/commit/05f1d71f72471aeeecb99fea30bbc8fcdc7387c1">details</a>)</li>
+    <li>Fix #356 (<a href="http://github.com/pydio/pydio-core/commit/0ea5b3a9e72874266e46b50c1fc0ea5738ee998c">details</a>)</li>
+    <li>Fix typo access.sftp_psl (<a href="http://github.com/pydio/pydio-core/commit/2ddf975c70466f5c8603e1062a950ef85f97a703">details</a>)</li>
+    <li>Fix #355 Fix #356 (<a href="http://github.com/pydio/pydio-core/commit/93515f2195ee522b29e835db245f2224b0be4507">details</a>)</li>
+    <li>Mq manager was breaking the "guest" access. (<a href="http://github.com/pydio/pydio-core/commit/10bd8f966058e9276aacc2f84441c211a39e2e6f">details</a>)</li>
+    <li>Other usersDisabled() tracking (<a href="http://github.com/pydio/pydio-core/commit/9937b2747cd5c05b1ad8d6bf863dbadea2b47e4b">details</a>)</li>
+    <li>Do not override the _isRoot property in replaceBy. Do not filter out rootNode from selection, but explicitely enableRoot on actions, download only for the moment. (<a href="http://github.com/pydio/pydio-core/commit/0ff0f6dacd4836892b94b02ef4a10aa976459fbd">details</a>)</li>
+    <li>Fix #370 (5.1.0 regression) Avoid checking MetaWatch on parent if node is already root Avoid unnecessary DB calls to get repository by Id (<a href="http://github.com/pydio/pydio-core/commit/7d0415458eaa0df2e6fa2cad1bc826843884e8b7">details</a>)</li>
+    <li>Optionally set the unique button to 'close' when opening modal (<a href="http://github.com/pydio/pydio-core/commit/c8a168cec1e5bbfc25511a4106e50d372f37976c">details</a>)</li>
+    <li>Should fix #376 : catch exception instead of testing result (<a href="http://github.com/pydio/pydio-core/commit/9d8c61d30e1f1f714cfc034c0726f6352cc84649">details</a>)</li>
+    <li>Fix #377 (<a href="http://github.com/pydio/pydio-core/commit/5341414e7318f21982d46082af975fb0ff7644df">details</a>)</li>
+    <li>Fix #374 (<a href="http://github.com/pydio/pydio-core/commit/c130953a8751bb6c8cefa006cb72d487834d9945">details</a>)</li>
+    <li>Fix #342 Source editor was broken in modal mode + detect BASE tag if defined to recompute correct URLS in minisite. (<a href="http://github.com/pydio/pydio-core/commit/9f3eaf8cbdde52bd4763e3c798caf14eca793238">details</a>)</li>
+    <li>Fix tabs and scrolling issues in RepositoryEditor Make sure to disableShortcutsOnForm when replicating rows (<a href="http://github.com/pydio/pydio-core/commit/85e7c1bf39286424cbb36e8481da8c105ac7818a">details</a>)</li>
+    <li>Fix #260 manually: put full Imagick options in the Parameters, for both Thumbs and Image (<a href="http://github.com/pydio/pydio-core/commit/73d72b8cf79030a01b13d8df4015611477c1feb0">details</a>)</li>
+    <li>Should fix #384 (<a href="http://github.com/pydio/pydio-core/commit/71caea501b72ae613d341ff81d41c9a3e78cbb46">details</a>)</li>
+    <li>Remove deprecated notify.phpmail-lite (<a href="http://github.com/pydio/pydio-core/commit/5bcfabd9daa6ac172c68f2449a2d03efd2b1ee49">details</a>)</li>
+    <li>Updated access.sftp_psl (phpseclib build-524) (<a href="http://github.com/pydio/pydio-core/commit/efd2078dfac6ab9f0e5b4f24a43360873595e79a">details</a>)</li>
+    <li>Hotfix PSL_SSH2 (<a href="http://github.com/pydio/pydio-core/commit/fd5d05aa7b1380c08eae50cc0aa9f38d0002babe">details</a>)</li>
+    <li>Re-add a legend on the share link dialog, otherwise it's not intuitive. (<a href="http://github.com/pydio/pydio-core/commit/3542e5c7d14a7619825a569c85a56903f93c36bd">details</a>)</li>
+    <li>Fix search form in settings pane (<a href="http://github.com/pydio/pydio-core/commit/952fd83ba439f274c33e71266381626c5f9078b8">details</a>)</li>
+    <li>Make sure file or folder exists before sharing. Short hash with numbers only can be interpreted as integer and checkHash send false negative. (<a href="http://github.com/pydio/pydio-core/commit/cd26aa189fbd59d7a6996f71cbb6836a86382aaf">details</a>)</li>
+    <li>Fix IE11 XPath not working correctly, probably because node is stored in a property in-between. (<a href="http://github.com/pydio/pydio-core/commit/05f8b9d06540fcac08d32daacf8ca09c789c9113">details</a>)</li>
+    <li>Fix #386 make sure to encode filename in VideoPreviewer (<a href="http://github.com/pydio/pydio-core/commit/6bc96c742c964f701d3cb4a5a2824b57d478f4cb">details</a>)</li>
+    <li>Fix #261 (<a href="http://github.com/pydio/pydio-core/commit/84163023d8c5ec7458b6b431b502762b25931cfc">details</a>)</li>
+    <li>Make sure to type the session_timeout and client_timeout correctly (<a href="http://github.com/pydio/pydio-core/commit/5d6951e3c7b526d641e498e264a3d8b74e445527">details</a>)</li>
+    <li>Make sure to send the correct image header, even for 0-length file. (<a href="http://github.com/pydio/pydio-core/commit/1f618c3bd18a362f5d8d4c31eb1218426260b513">details</a>)</li>
+    <li>Fix #60 - Replace # and ? before calling parse_url() (<a href="http://github.com/pydio/pydio-core/commit/2f3f45ea22e8e65bce1f9a029f0bd07b7301ab8b">details</a>)</li>
+    <li>Make sure CREATE is defined, otherwise it make a DB error on workspace creation. Use AJXP_Utils::safeParseUrl() (<a href="http://github.com/pydio/pydio-core/commit/ed05c5f852a30749b68bf95e87b17d992406107d">details</a>)</li>
+    <li>Change dependencies parsing to allow access.AJXP_STREAM_PROVIDER|something.else (<a href="http://github.com/pydio/pydio-core/commit/22de28b6bd309084a9532c48e465b1644322a3f0">details</a>)</li>
+    <li>Fix #390 Dropbox plugin. Missing one item each time Remove user name / password, it's useless. Store tokens in a per-user file. (<a href="http://github.com/pydio/pydio-core/commit/a3035943434664bc1ba74c867b4ebdad311e3453">details</a>)</li>
+    <li>Conf.sql:make sure to transform repository create options to integer, to avoid DB error Ajxp_conf: resplit create ws and create tpl as two separate buttons, not a menu. (<a href="http://github.com/pydio/pydio-core/commit/1e55ab5c12cd47fee5f9b29ceee256504da80fd8">details</a>)</li>
+    <li>Remove console.log Fix the checkboxes when editing templates (<a href="http://github.com/pydio/pydio-core/commit/588fc17cd94f3adde04f03d9c16667e678aadbb6">details</a>)</li>
+    <li>AbstractAccessDriver fix.perms (<a href="http://github.com/pydio/pydio-core/commit/8802e04415bfa65caa7ad305dde7b4881337d90b">details</a>)</li>
+    <li>Fix how UID is extracted for FTP driver (<a href="http://github.com/pydio/pydio-core/commit/cef6566fc9c9f02f8436db702b3acc0bc1e1e3da">details</a>)</li>
+    <li>Clean style of user dashboard (<a href="http://github.com/pydio/pydio-core/commit/92c1448e4a888ab5f651e394ec253ff96161cc6c">details</a>)</li>
+    <li>Missing copyright header (<a href="http://github.com/pydio/pydio-core/commit/8c4017f833cf6fffb584a4572bcc72d0e065fd14">details</a>)</li>
+    <li>Action.quicksend: new experimental plugin to upload, share and send at once. Adds a tab in the user dashboard. To be toughened if some components are missing (share, mailer, etc...) (<a href="http://github.com/pydio/pydio-core/commit/f641276d4d3c8ffadfb8611018714f2d65316b51">details</a>)</li>
+    <li>Use | in active plugin dependency (<a href="http://github.com/pydio/pydio-core/commit/bb7ee9f3f08de0cb652870713819ee5b1bc14235">details</a>)</li>
+    <li>Enable uploaders if action.quicksend is active (<a href="http://github.com/pydio/pydio-core/commit/959d728548dad30377b2a4def58cc8d330bac5db">details</a>)</li>
+    <li>Fix mailer line-height (<a href="http://github.com/pydio/pydio-core/commit/f698323b36109d16bc8d67f7a4e26c50a325f45d">details</a>)</li>
+    <li>Some checks when showing Modal (<a href="http://github.com/pydio/pydio-core/commit/cfc267664e1a3e80ae744508a99d49d70326f1bd">details</a>)</li>
+    <li>Auto switch to list tab on context change, thus do not trigger reloadDataNode() to avoid auto switch to list tab. (<a href="http://github.com/pydio/pydio-core/commit/dfd76aab6b76fbdf0bff78589cbed12eb8cea336">details</a>)</li>
+    <li>Fix plugin label (<a href="http://github.com/pydio/pydio-core/commit/26446095a59a6457fc06e2ed2cbbd83bc79a47b4">details</a>)</li>
+    <li>Do not send the first level nodes, to leave the drag'n'drop zone empty . Update plugin label (<a href="http://github.com/pydio/pydio-core/commit/780ebd3aba3e3e1652b49c041c63c54f7a06a6c1">details</a>)</li>
+    <li>Prefix an icon to the PluginEditor (<a href="http://github.com/pydio/pydio-core/commit/24f1a7d9d41318c301fee9e553eafd74676ae963">details</a>)</li>
+    <li>Fix typo in SSL indication (<a href="http://github.com/pydio/pydio-core/commit/67b334a66c7bf98fcc39b42a09b2799c8511a9b4">details</a>)</li>
+    <li>Escape user label before sending in XML (<a href="http://github.com/pydio/pydio-core/commit/73b02c0ccf12f15cdc14bc840d1061e4a0809f47">details</a>)</li>
+    <li>Ignore set_magic_quotes_runtime (deprecated) (<a href="http://github.com/pydio/pydio-core/commit/cf902ac8487f59ff4f3f5f2d21c453e3be89103f">details</a>)</li>
+    <li>Replace EncodeQ function by the latest phpmailer version. We should probably totally switch to this mailer. Optionally pass images to be attached in the layout. (<a href="http://github.com/pydio/pydio-core/commit/7e98f19f8efea5a18a107bb5718069b7b68bd6c6">details</a>)</li>
+    <li>Add an HTML layout for the emails, and pass a "main link" either by argument or from the main node of the notification (<a href="http://github.com/pydio/pydio-core/commit/053a2cfc9bad58c7f7f2c8582e96f9a1d884ab32">details</a>)</li>
+    <li>Revert line height from previous commit (<a href="http://github.com/pydio/pydio-core/commit/28d284a89b607fa7642093820d0dbde85afb56e7">details</a>)</li>
+    <li>Use creation email (<a href="http://github.com/pydio/pydio-core/commit/e736b126565e8a38c65e8138685002359442c69f">details</a>)</li>
+    <li>Fix CSSFX / Fix create user panel (<a href="http://github.com/pydio/pydio-core/commit/30078c010735236aca8bdd16f22f1bf1ac9bb950">details</a>)</li>
+    <li>Compile form (<a href="http://github.com/pydio/pydio-core/commit/ee99ddae36f03df0b69d2b5d189ad82ba8927294">details</a>)</li>
+    <li>Fix buttons positions in the Actions tab (<a href="http://github.com/pydio/pydio-core/commit/e5d9849d7cb40ecc6cb0d94eb7d856fb294fcac2">details</a>)</li>
+    <li>Fix search engine problems / Save tabs state in the RepositoryEditor to reopen metatab at the correct place (<a href="http://github.com/pydio/pydio-core/commit/0e00807928d20b0c24561af184dda70c6f715f32">details</a>)</li>
+    <li>Make sure textareas are readonly / Add PostgreSQL to install choices (<a href="http://github.com/pydio/pydio-core/commit/2ac42b1159039c208f90f823b962a550c42809da">details</a>)</li>
+    <li>Fix inline button style (<a href="http://github.com/pydio/pydio-core/commit/515743a8f88f15389f5580b0fae5fc43114c1ce4">details</a>)</li>
+    <li>meta.syncable: fix mysql to make sure it can be automatically installed. Pass default driver to run installation. (<a href="http://github.com/pydio/pydio-core/commit/5a073d9fa887361bdc94c8721141166839ead5d0">details</a>)</li>
+    <li>meta.syncable: fix sqlite to make sure it can be automatically installed (<a href="http://github.com/pydio/pydio-core/commit/6f64a2744e648224fe017421ba37efeb3458bc0f">details</a>)</li>
+    <li>Handle multiple line SQL requests for tables creation. (<a href="http://github.com/pydio/pydio-core/commit/bec749b89a22026612355f742615ddfd203a88b5">details</a>)</li>
+    <li>Fix installer. Install meta.syncable tables as well. (<a href="http://github.com/pydio/pydio-core/commit/d81bf005599127eed5755b1f299e1f279fbdc8ed">details</a>)</li>
+    <li>Fix #357 The return of the bookmarks in Settings! (<a href="http://github.com/pydio/pydio-core/commit/06e91106ad5f624f375e4d6a3117fb32464516c8">details</a>)</li>
+    <li>Styling harmonization Readapt for mobile tablets (<a href="http://github.com/pydio/pydio-core/commit/62cc9671de6fee5b03f47fce543dcfc845c01ff5">details</a>)</li>
+    <li>Style (<a href="http://github.com/pydio/pydio-core/commit/133fd93df87ec64028f7bff7d209ec6498c82005">details</a>)</li>
+    <li>Update core plugins HTML documentation (<a href="http://github.com/pydio/pydio-core/commit/20e2822fc54826fc6a13df26b74e427a6d84a505">details</a>)</li>
+    <li>Do not "autoFoldOnEvent" if unfolded from main button, just when unfolded from the tabs. (<a href="http://github.com/pydio/pydio-core/commit/eff582475b1b8fbd42270434d37a24935a13a6a8">details</a>)</li>
+    <li>Style (tab to space) (<a href="http://github.com/pydio/pydio-core/commit/084c9813a88e94c9380595a038df9a7c328356a3">details</a>)</li>
+    <li>Strengthen again the security level of zoho plugin. (<a href="http://github.com/pydio/pydio-core/commit/6d8602463807fd83fcb9d4f92a9c06d6e8aade56">details</a>)</li>
+    <li>Login modal closeValidation was broken (<a href="http://github.com/pydio/pydio-core/commit/bc254a3cc491477a320d0ad2cd45266b32f78c08">details</a>)</li>
+    <li>Do some CSS (<a href="http://github.com/pydio/pydio-core/commit/e7801b6a50fec601fb728c284bc46c659a81c390">details</a>)</li>
+    <li>Fix icons positiong (<a href="http://github.com/pydio/pydio-core/commit/d9bc16e4f0fa3bde3b31d0992664491299aab163">details</a>)</li>
+    <li>Replace get_my_feed hiding by CSS instead of JS (<a href="http://github.com/pydio/pydio-core/commit/a3b6280d6fe1a1f6ef2e1fe7a4abd8592484eb00">details</a>)</li>
+    <li>Test modal.currentLigtBox.parentNode before calling remove (<a href="http://github.com/pydio/pydio-core/commit/025323421a4827d4eab04c9991ade185effd51f5">details</a>)</li>
+    <li>Do not pre-install meta.syncable for the moment. (<a href="http://github.com/pydio/pydio-core/commit/5dda9c86064f0c0de0a7ebeab6c7950ebaa86fa1">details</a>)</li>
+    <li>Let the editor.zoho be active in access.ajxp_user, to be sure the img_library is loaded. (<a href="http://github.com/pydio/pydio-core/commit/46ea0690677416e187db7fb8c90ac1cbdbb1024a">details</a>)</li>
+    <li>For the moment, disable users autocompleter for existing private minisite. (<a href="http://github.com/pydio/pydio-core/commit/670e0b1bd802db8de1be5b68c4d3fec426a12c51">details</a>)</li>
+    <li>Fix #398 has_password wrongly reported (<a href="http://github.com/pydio/pydio-core/commit/f2d21c15c83fe22ec107ab390be97730db171cb9">details</a>)</li>
+</ul>
