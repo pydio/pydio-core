@@ -2,9 +2,9 @@ Pydio ##VERSION_NUMBER## Release Note
 
 This release is a bugfix of 5.1.0, and a release candidate for 5.2.0.
 
-There is not yet an upgrade mechanism, thus it is not yet tagged stable: it is not meant to be deployed in production, unless you know what you are doing.
+There is not yet an upgrade mechanism, thus it is not tagged stable: it is not meant to be deployed in production, unless you know what you are doing.
 
-We need you to test and report bugs ASAP to make sure we achieve stability soon! Update from 5.1.0 can be done using the in-app upgrade mechanism by switching the updater to the "development" channel. Please read 5.1.0 release note not to discover the new features.
+We need you to test and report bugs ASAP to make sure we achieve stability soon! Update from 5.1.0 can be done using the in-app upgrade mechanism by switching the updater to the "development" channel. Please read 5.1.0 release note to discover the new features.
 
 Summary
 
