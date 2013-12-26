@@ -1,10 +1,11 @@
 ## Pydio Core
 
-[Homepage](http://ajaxplorer.info/) | 
-[GitHub-Repository](https://github.com/ajaxplorer/ajaxplorer-core) | 
-[Issue-Tracker](https://github.com/ajaxplorer/ajaxplorer-core) 
+[Homepage](http://pyd.io/) |
+[GitHub-Repository](https://github.com/pydio/pydio-core) |
+[Issue-Tracker](https://github.com/pydio/pydio-core/issues) |
+[![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/pydio/pydio-core/badges/quality-score.png?s=fc0c15158cf6df37758a21a899c6ac3867aec596)](https://scrutinizer-ci.com/g/pydio/pydio-core/)
 
-This is the main source code repository of AjaXplorer, containing all the PHP server and HTML5 Web GUI. It was migrated from previous Sourceforge SVN repository, which is hence deprecated. 
+This is the main source code repository of Pydio (formerly AjaXplorer), containing all the PHP server and HTML5 Web GUI.
 
 * Latest Stable release : 5.0.4
 * Latest Dev release : 5.1.1 (RC for Pydio 5.2.0)
