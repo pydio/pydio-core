@@ -4,6 +4,6 @@ CREATE TABLE IF NOT EXISTS `ajxp_log` (
 	`remote_ip`	VARCHAR(32),
 	`severity`	ENUM('DEBUG', 'INFO', 'NOTICE', 'WARNING', 'ERROR'),
 	`user`		VARCHAR(255),
-	`message`	VARCHAR(255),
+	`message`	TEXT,
 	`params`	TEXT
 );

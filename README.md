@@ -1,20 +1,19 @@
-## AjaXplorer Core
+## Pydio Core
 
 [Homepage](http://ajaxplorer.info/) | 
 [GitHub-Repository](https://github.com/ajaxplorer/ajaxplorer-core) | 
-[Issue-Tracker](https://github.com/ajaxplorer/ajaxplorer-core) |
-[![Build Status](https://travis-ci.org/ajaxplorer/ajaxplorer-core.png?branch=master)](https://travis-ci.org/ajaxplorer/ajaxplorer-core)
+[Issue-Tracker](https://github.com/ajaxplorer/ajaxplorer-core) 
 
 This is the main source code repository of AjaXplorer, containing all the PHP server and HTML5 Web GUI. It was migrated from previous Sourceforge SVN repository, which is hence deprecated. 
 
-* Latest Stable release : 5.0.3
-* Latest Dev release : 4.3.4 (RC for AjaXplorer5)
+* Latest Stable release : 5.0.4
+* Latest Dev release : 5.1.1 (RC for Pydio 5.2.0)
 * License: [AGPLv3](https://www.gnu.org/licenses/agpl.html)
-* Lead developer  : Charles du Jeu (cdujeu): [Github](https://github.com/cdujeu) | [Twitter](https://twitter.com/AjaXplorer)
+* Lead developer  : Charles du Jeu (cdujeu): [Github](https://github.com/cdujeu) | [Twitter](https://twitter.com/Pydio)
 
 ### Getting support
 
-Please DO NOT send emails to Charles, but use the forum located on http://forum.ajaxplorer.info instead. Once your problem is qualified, if it's a bug, you will be asked to enter it in the GitHub issue tracker.
+Please DO NOT send emails to Charles, but use the forum located on http://pyd.io/f/ instead. Once your problem is qualified, if it's a bug, you will be asked to enter it in the GitHub issue tracker.
 
 ### How to contribute / Developer Resources
 
