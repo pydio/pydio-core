@@ -591,7 +591,15 @@
                 </serverCallback>
             </processing>
         </action>
-        <action name="get_bookmarks">
+        <action name="role_update_right">
+            <processing>
+                <serverCallback methodName="switchAction" restParams="/repository/role_id/right" checkParams="true">
+                    <input_param name="role_id" type="AJXP_ROLE" mandatory="true" description="ID of the role"/>
+                    <input_param name="repository_id" type="AJXP_REPOSITORY" mandatory="true" description="Repository ID"/>
+                    <input_param name="right" type="string" mandatory="true" description="Must be r (read), w (write) or n (none)"/>
+                </serverCallback>
+            </processing>
+        </action>        <action name="get_bookmarks">
             <pre_processing>
                 <serverCallback methodName="preProcessBookmarkAction"></serverCallback>
             </pre_processing>

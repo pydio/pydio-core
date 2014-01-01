@@ -694,7 +694,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$confStorage = ConfService::getConfStorageImpl();		
 				$user = $confStorage->createUserObject($httpVars["user_id"]);
 				$user->personalRole->setAcl(AJXP_Utils::sanitize($httpVars["repository_id"], AJXP_SANITIZE_ALPHANUM), AJXP_Utils::sanitize($httpVars["right"], AJXP_SANITIZE_ALPHANUM));
-				$user->save();
+				$user->save("superuser");
 				$loggedUser = AuthService::getLoggedUser();
 				if($loggedUser->getId() == $user->getId()){
 					AuthService::updateUser($user);
@@ -706,6 +706,32 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				AJXP_XMLWriter::close();
 				return ;
 			break;
+
+            case "role_update_right" :
+                if(!isSet($httpVars["role_id"])
+                    || !isSet($httpVars["repository_id"])
+                    || !isSet($httpVars["right"]))
+                {
+                    AJXP_XMLWriter::header();
+                    AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
+                    AJXP_XMLWriter::close();
+                    break;
+                }
+                $rId = AJXP_Utils::sanitize($httpVars["role_id"]);
+                $role = AuthService::getRole($rId);
+                if($role === false){
+                    AJXP_XMLWriter::header();
+                    AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]."(".$rId.")");
+                    AJXP_XMLWriter::close();
+                    break;
+                }
+                $role->setAcl(AJXP_Utils::sanitize($httpVars["repository_id"], AJXP_SANITIZE_ALPHANUM), AJXP_Utils::sanitize($httpVars["right"], AJXP_SANITIZE_ALPHANUM));
+                AuthService::updateRole($role);
+                AJXP_XMLWriter::header();
+                AJXP_XMLWriter::sendMessage($mess["ajxp_conf.46"].$httpVars["role_id"], null);
+                AJXP_XMLWriter::close();
+
+                break;
 
             case "user_update_group":
 
