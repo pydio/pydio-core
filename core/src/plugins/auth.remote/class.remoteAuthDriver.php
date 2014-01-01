@@ -161,7 +161,7 @@ class remoteAuthDriver extends AbstractAuthDriver
     {
         if(AuthService::ignoreUserCase()) $login = strtolower($login);
         global $AJXP_GLUE_GLOBALS;
-        if (isSet($AJXP_GLUE_GLOBALS) || (isSet($this->options["LOCAL_PREFIX"]) && strpos($login, $this->options["LOCAL_PREFIX"]) === 0) ) {
+        if (isSet($AJXP_GLUE_GLOBALS) || (!empty($this->options["LOCAL_PREFIX"]) && strpos($login, $this->options["LOCAL_PREFIX"]) === 0) ) {
             $userStoredPass = $this->getUserPass($login);
             if(!$userStoredPass) return false;
             if ($seed == "-1") { // Seed = -1 means that password is not encoded.
