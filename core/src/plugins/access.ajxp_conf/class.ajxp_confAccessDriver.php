@@ -301,16 +301,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                                 "DESCRIPTION" => "Core application parameters",
                                 "ICON" => "preferences_desktop.png",
                                 "LIST" => "listPlugins"),
-                            "core_plugins" => array(
-                                "LABEL" => "Core Plugins",
-                                "DESCRIPTION" => "Enable/disable core plugins (auth, conf, mail, etc), check if they are correctly working. Configuration of these plugins are generally done through the Main Options",
-                                "ICON" => "folder_development.png",
-                                "LIST" => "listPlugins"),
                             "plugins"	   => array(
                                 "LABEL" => $mess["ajxp_conf.99"],
                                 "DESCRIPTION" => "Enable/disable additional feature-oriented plugins, check if they are correctly working, set up global parameters of the plugins.",
                                 "ICON" => "folder_development.png",
-                                "LIST" => "listPlugins")
+                                "LIST" => "listPlugins"),
+                            "core_plugins" => array(
+                                "LABEL" => $mess["ajxp_conf.123"],
+                                "DESCRIPTION" => "Enable/disable core plugins (auth, conf, mail, etc), check if they are correctly working. Configuration of these plugins are generally done through the Main Options",
+                                "ICON" => "folder_development.png",
+                                "LIST" => "listPlugins"),
                         )
                     ),
                     "admin" => array(
@@ -1589,6 +1589,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             ksort($types);
             foreach ($types as $t => $tPlugs) {
                 if(!in_array($t, $uniqTypes))continue;
+                if($t == "core") continue;
                 $nodeKey = "/".$root.$dir."/".$t;
                 $meta = array(
                     "icon" 		=> "folder_development.png",

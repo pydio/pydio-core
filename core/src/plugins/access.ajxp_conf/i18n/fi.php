@@ -146,5 +146,6 @@ $mess=array(
     "120" => "Go Pro",
     "121" => "Get professional support for your install",
     "122" => "All Settings",
+    "123" => "Other plugins",
 /* END SENTENCE */
 );

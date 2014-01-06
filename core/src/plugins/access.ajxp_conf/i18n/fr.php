@@ -118,7 +118,7 @@ $mess=array(
 "repository_access_key" => "D",
 "97" => "Plugin options successfully updated",
 "98" => "Options Principales",
-"99" => "Extensions",
+"99" => "Extensions importantes",
 "100" => "Options communes pour les '%s'",
 "101" => "Nom",
 "102" => "Identifiant",
@@ -143,5 +143,6 @@ $mess=array(
 "120" => "Go Pro",
 "121" => "Get professional support for your install",
 "122" => "Paramètres",
+"123" => "Autres extensions",
 /* END SENTENCE */
 );
