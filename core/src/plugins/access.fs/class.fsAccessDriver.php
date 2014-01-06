@@ -491,10 +491,15 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             case "purge" :
 
 
-                $pTime = intval($this->repository->getOption("PURGE_AFTER"));
-                if ($pTime > 0) {
-                    $purgeTime = intval($pTime)*3600*24;
-                    $this->recursivePurge($this->urlBase, $purgeTime);
+                $hardPurgeTime = intval($this->repository->getOption("PURGE_AFTER"))*3600*24;
+                $softPurgeTime = intval($this->repository->getOption("PURGE_AFTER_SOFT"))*3600*24;
+                $shareCenter = AJXP_PluginsService::findPluginById('action.share');
+                if( !($shareCenter && $shareCenter->isEnabled()) ) {
+                    //action.share is disabled, don't look at the softPurgeTime
+                    $softPurgeTime = 0;
+                }
+                if ($hardPurgeTime > 0 || $softPurgeTime > 0) {
+                    $this->recursivePurge($this->urlBase, $hardPurgeTime, $softPurgeTime);
                 }
 
             break;
@@ -1747,34 +1752,39 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     }
 
 
-    public function recursivePurge($dirName, $purgeTime)
+    public function recursivePurge($dirName, $hardPurgeTime, $softPurgeTime = 0)
     {
         $handle=opendir($dirName);
-        $count = 0;
-        while (strlen($file = readdir($handle)) > 0) {
-            if ($file == "" || $file == ".."  || AJXP_Utils::isHidden($file) ) {
+        while (false !== ($entry = readdir($handle))) {
+            if ($entry == "" || $entry == ".."  || AJXP_Utils::isHidden($entry) ) {
                 continue;
             }
-            if (is_file($dirName."/".$file)) {
-                $time = filemtime($dirName."/".$file);
-                $docAge = time() - $time;
-                if ($docAge > $purgeTime) {
-                    $node = new AJXP_Node($dirName."/".$file);
-                    AJXP_Controller::applyHook("node.before_path_change", array($node));
-                    unlink($dirName."/".$file);
-                    AJXP_Controller::applyHook("node.change", array($node));
-                    $this->logInfo("Purge", array("file" => $dirName."/".$file));
-                    print(" - Purging document : ".$dirName."/".$file."\n");
+            $fileName = $dirName."/".$entry;
+            if (is_file($fileName)) {
+                $docAge = time() - filemtime($fileName);
+                if ($hardPurgeTime > 0 && $docAge > $hardPurgeTime) {
+                    $this->purge($fileName);
+                } elseif ($softPurgeTime > 0 && $docAge > $softPurgeTime) {
+                    if(!ShareCenter::isShared(new AJXP_Node($fileName))) {
+                        $this->purge($fileName);
+                    }
                 }
             } else {
-                $this->recursivePurge($dirName."/".$file, $purgeTime);
+                $this->recursivePurge($fileName, $hardPurgeTime, $softPurgeTime);
             }
         }
         closedir($handle);
-
-
     }
 
+    private function purge($fileName)
+    {
+        $node = new AJXP_Node($fileName);
+        AJXP_Controller::applyHook("node.before_path_change", array($node));
+        unlink($fileName);
+        AJXP_Controller::applyHook("node.change", array($node));
+        $this->logInfo("Purge", array("file" => $fileName));
+        print(" - Purging document : ".$fileName."\n");
+    }
 
     /** The publiclet URL making */
     public function makePublicletOptions($filePath, $password, $expire, $downloadlimit, $repository)

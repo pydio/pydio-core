@@ -487,7 +487,7 @@ class ShareCenter extends AJXP_Plugin
             if (is_array($metadata["element"])) {
                 $updateMeta = false;
                 foreach ($metadata["element"] as $elementId => $elementData) {
-                    if (!self::sharedElementExists($eType, $elementId, AuthService::getLoggedUser())) {
+                    if (!self::sharedElementExists($eType, $elementId)) {
                         unset($metadata["element"][$elementId]);
                         $updateMeta = true;
                         return;
@@ -505,7 +505,7 @@ class ShareCenter extends AJXP_Plugin
                     }
                 }
             } else {
-                if (!self::sharedElementExists($eType, $metadata["element"], AuthService::getLoggedUser())) {
+                if (!self::sharedElementExists($eType, $metadata["element"])) {
                     $ajxpNode->removeMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
                     return;
                 }
@@ -518,6 +518,25 @@ class ShareCenter extends AJXP_Plugin
             if($eType == "minisite") $merge["ajxp_shared_minisite"] = $metadata["minisite"];
             $ajxpNode->mergeMetadata($merge, true);
         }
+    }
+
+    /**
+     * @param AJXP_Node $ajxpNode
+     * @return boolean
+     */
+    public static function isShared($ajxpNode)
+    {
+        $metadata = $ajxpNode->retrieveMetadata("ajxp_shared",true);
+        if (is_array($metadata) && is_array($metadata["element"])) {
+            $eType = $ajxpNode->isLeaf()?"file":"repository";
+            if(isSet($metadata["minisite"])) $eType = "minisite";
+            foreach ($metadata["element"] as $elementId => $elementData) {
+                if (self::sharedElementExists($eType, $elementId)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -1441,7 +1460,7 @@ class ShareCenter extends AJXP_Plugin
         }
     }
 
-    public static function sharedElementExists($type, $element, $loggedUser)
+    public static function sharedElementExists($type, $element)
     {
         if ($type == "repository") {
             return (ConfService::getRepositoryById($element) != null);
