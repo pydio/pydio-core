@@ -589,19 +589,14 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             //------------------------------------
             case "chmod";
 
-                $messtmp="";
                 $files = $selection->getFiles();
                 $changedFiles = array();
                 $chmod_value = $httpVars["chmod_value"];
                 $recursive = $httpVars["recursive"];
                 $recur_apply_to = $httpVars["recur_apply_to"];
                 foreach ($files as $fileName) {
-                    $error = $this->chmod($fileName, $chmod_value, ($recursive=="on"), ($recursive=="on"?$recur_apply_to:"both"), $changedFiles);
+                    $this->chmod($fileName, $chmod_value, ($recursive=="on"), ($recursive=="on"?$recur_apply_to:"both"), $changedFiles);
                 }
-                if (isSet($error)) {
-                    throw new AJXP_Exception($error);
-                }
-                //$messtmp.="$mess[34] ".SystemTextEncoding::toUTF8($filename)." $mess[39] ";
                 $logMessage="Successfully changed permission to ".$chmod_value." for ".count($changedFiles)." files or folders";
                 $this->logInfo("Chmod", array("dir"=>$this->addSlugToPath($dir), "filesCount"=>count($changedFiles)));
                 if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
@@ -1655,9 +1650,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
      * @param String $chmodValue
      * @param Boolean $recursive
      * @param String $nodeType "both", "file", "dir"
+     * @param $changedFiles
+     * @return void
      */
-
-    // $recursive=false, $nodeType="both"
     public function chmod($path, $chmodValue, $recursive, $nodeType, &$changedFiles)
     {
         $realValue = octdec(ltrim($chmodValue, "0"));
