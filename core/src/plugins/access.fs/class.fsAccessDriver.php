@@ -784,10 +784,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if ($this->wrapperClassName == "fsAccessWrapper") {
                     $nonPatchedPath = fsAccessWrapper::unPatchPathForBaseDir($path);
                 }
-                $threshold = $this->repository->getOption("PAGINATION_THRESHOLD");
-                if(!isSet($threshold) || intval($threshold) == 0) $threshold = 500;
-                $limitPerPage = $this->repository->getOption("PAGINATION_NUMBER");
-                if(!isset($limitPerPage) || intval($limitPerPage) == 0) $limitPerPage = 200;
 
                 if ($this->getFilteredOption("REMOTE_SORTING")) {
                     $orderDirection = isSet($httpVars["order_direction"])?strtolower($httpVars["order_direction"]):"asc";
@@ -796,9 +792,23 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         $orderField = "ajxp_label";
                     }
                 }
+                if(isSet($httpVars["recursive"])){
+                    $max_depth = (isSet($httpVars["max_depth"])?intval($httpVars["max_depth"]):0);
+                    $max_nodes = (isSet($httpVars["max_nodes"])?intval($httpVars["max_nodes"]):0);
+                    $crt_depth = (isSet($httpVars["crt_depth"])?intval($httpVars["crt_depth"])+1:1);
+                    $crt_nodes = (isSet($httpVars["crt_nodes"])?intval($httpVars["crt_nodes"]):0);
+                }else{
+                    $threshold = $this->repository->getOption("PAGINATION_THRESHOLD");
+                    if(!isSet($threshold) || intval($threshold) == 0) $threshold = 500;
+                    $limitPerPage = $this->repository->getOption("PAGINATION_NUMBER");
+                    if(!isset($limitPerPage) || intval($limitPerPage) == 0) $limitPerPage = 200;
+                }
 
                 $countFiles = $this->countFiles($path, !$lsOptions["f"]);
-                if ($countFiles > $threshold) {
+                if(isSet($crt_nodes)){
+                    $crt_nodes += $countFiles;
+                }
+                if (isSet($threshold) && isSet($limitPerPage) && $countFiles > $threshold) {
                     if (isSet($uniqueFile)) {
                         $originalLimitPerPage = $limitPerPage;
                         $offset = $limitPerPage = 0;
@@ -857,7 +867,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 closedir($handle);
                 $fullList = array("d" => array(), "z" => array(), "f" => array());
 
-                if (isSet($orderField) && $orderField == "ajxp_label" && $orderDirection == "desc") {
+                if (isSet($orderField) && isSet($orderDirection) && $orderField == "ajxp_label" && $orderDirection == "desc") {
                     $nodes = scandir($path, 1);
                 } else {
                     $nodes = scandir($path);
@@ -865,7 +875,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if (!empty($this->driverConf["SCANDIR_RESULT_SORTFONC"])) {
                     usort($nodes, $this->driverConf["SCANDIR_RESULT_SORTFONC"]);
                 }
-                if (isSet($orderField) && $orderField != "ajxp_label") {
+                if (isSet($orderField) && isSet($orderDirection) && $orderField != "ajxp_label") {
                     $toSort = array();
                     foreach ($nodes as $node) {
                         if($orderField == "filesize") $toSort[$node] = is_file($nonPatchedPath."/".$node) ? $this->filesystemFileSize($nonPatchedPath."/".$node) : 0;
@@ -938,11 +948,23 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     }
                 }
                 if (isSet($httpVars["recursive"]) && $httpVars["recursive"] == "true") {
-                    foreach ($fullList["d"] as $nodeDir) {
+                    $breakNow = false;
+                    if(isSet($max_depth) && $max_depth > 0 && $crt_depth >= $max_depth) $breakNow = true;
+                    if(isSet($max_nodes) && $max_nodes > 0 && $crt_nodes >= $max_nodes) $breakNow = true;
+                    foreach ($fullList["d"] as &$nodeDir) {
+                        if($breakNow){
+                            $nodeDir->mergeMetadata(array("ajxp_has_children" => $this->countFiles($nodeDir->getUrl(), false, true)?"true":"false"));
+                            AJXP_XMLWriter::renderAjxpNode($nodeDir, true);
+                            continue;
+                        }
                         $this->switchAction("ls", array(
                             "dir" => SystemTextEncoding::toUTF8($nodeDir->getPath()),
                             "options"=> $httpVars["options"],
-                            "recursive" => "true"
+                            "recursive" => "true",
+                            "max_depth"=> $max_depth,
+                            "max_nodes"=> $max_nodes,
+                            "crt_depth"=> $crt_depth,
+                            "crt_nodes"=> $crt_nodes,
                         ), array());
                     }
                 } else {
