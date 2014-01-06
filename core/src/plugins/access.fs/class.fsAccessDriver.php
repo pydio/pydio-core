@@ -26,6 +26,14 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 if (!function_exists('download_exception_handler')) {
     function download_exception_handler($exception){}
 }
+if (!function_exists('staticExtractArchiveItemCallback')){
+    function staticExtractArchiveItemPostCallback($status, $data){
+        return fsAccessDriver::$currentZipOperationHandler->extractArchiveItemPostCallback($status, $data);
+    }
+    function staticExtractArchiveItemPreCallback($status, $data){
+        return fsAccessDriver::$currentZipOperationHandler->extractArchiveItemPreCallback($status, $data);
+    }
+}
 
 /**
  * AJXP_Plugin to access a filesystem. Most "FS" like driver (even remote ones)
@@ -1409,6 +1417,33 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         return $bytesize;
     }
 
+    public static $currentZipOperationHandler;
+    public function extractArchiveItemPreCallback($status, $data){
+        $fullname = $data['filename'];
+        $size = $data['size'];
+        $realBase = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase);
+        $repoName = $this->urlBase.str_replace($realBase, "", $fullname);
+
+        $toNode = new AJXP_Node($repoName);
+        $toNode->setLeaf($data['folder'] ? false:true);
+        if(file_exists($toNode->getUrl())){
+            AJXP_Controller::applyHook("node.before_change", array($toNode, $size));
+        }else{
+            AJXP_Controller::applyHook("node.before_create", array($toNode, $size));
+        }
+        return 1;
+    }
+
+    public function extractArchiveItemPostCallback($status, $data){
+        $fullname = $data['filename'];
+        $realBase = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase);
+        $repoName = str_replace($realBase, "", $fullname);
+        $toNode = new AJXP_Node($this->urlBase.$repoName);
+        $toNode->setLeaf($data['folder'] ? false:true);
+        AJXP_Controller::applyHook("node.change", array(null, $toNode, false));
+        return 1;
+    }
+
     /**
      * Extract an archive directly inside the dest directory.
      *
@@ -1443,9 +1478,15 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $this->logDebug("Archive", $this->addSlugToPath($files));
         $realDestination = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase.$destDir);
         $this->logDebug("Extract", array($realDestination, $realZipFile, $this->addSlugToPath($files), $zipLocalPath));
-        $result = $archive->extract(PCLZIP_OPT_BY_NAME, $files,
-                                    PCLZIP_OPT_PATH, $realDestination,
-                                    PCLZIP_OPT_REMOVE_PATH, $zipLocalPath);
+        self::$currentZipOperationHandler = &$this;
+        $result = $archive->extract(PCLZIP_OPT_BY_NAME,     $files,
+                                    PCLZIP_OPT_PATH,        $realDestination,
+                                    PCLZIP_OPT_REMOVE_PATH, $zipLocalPath,
+                                    PCLZIP_CB_PRE_EXTRACT,  "staticExtractArchiveItemPreCallback",
+                                    PCLZIP_CB_POST_EXTRACT, "staticExtractArchiveItemPostCallback",
+                                    PCLZIP_OPT_STOP_ON_ERROR
+        );
+        self::$currentZipOperationHandler = null;
         if ($result <= 0) {
             $error[] = $archive->errorInfo(true);
         } else {
