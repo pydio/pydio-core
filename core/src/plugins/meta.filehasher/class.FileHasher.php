@@ -52,7 +52,7 @@ class FileHasher extends AJXP_Plugin
                 $contribNode->removeChild($child);
             }
         }
-        if (!$this->getFilteredOption("CACHE_XML_TREE") && $contribNode->nodeName == "actions") {
+        if ($this->getFilteredOption("CACHE_XML_TREE") !== true && $contribNode->nodeName == "actions") {
             // REMOVE pre and post process on LS action
             $xp = new DOMXPath($contribNode->ownerDocument);
             $children = $xp->query("action[@name='ls']", $contribNode);
