@@ -899,7 +899,7 @@ class ConfService
         if (!empty($test) && is_array($test)) {
             return $test;
         } else {
-            $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//action[@skipSecureToken]", "nodes");
+            $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//action[@skipSecureToken]", "nodes", false, false, true);
             $res = array();
             foreach ($nodes as $node) {
                 $res[] = $node->getAttribute("name");
