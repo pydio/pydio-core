@@ -57,31 +57,6 @@
                 .action_bar span.actionbar_button_label{
                     font-size: 11px;
                 }
-                .thumbnail_selectable_cell{
-                    padding: 11px 2px;
-                }
-                .thumbLabel{
-                    font-size: 18px;
-                }
-                .text_label{
-                    padding-left: 0;
-                    padding-right: 10px;
-                }
-                div.thumbnail_cell_metadata span.icon-angle-right{
-                    display:none;
-                }
-                div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel{
-                    padding-top:8px;
-                    font-weight: bold;
-                }
-                .thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata{
-                    opacity: 1 !important;
-                }
-                div.thumbnail_cell_metadata .text_label{
-                    font-size: 13px !important;
-                    letter-spacing: 1px;
-                    color: rgb(111, 121, 131);
-                }
                 </style>
             ]]></template_part>
             <template_part ajxpId="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOptionUser":"true", "messageBoxReference":true}' theme="vision"><![CDATA[

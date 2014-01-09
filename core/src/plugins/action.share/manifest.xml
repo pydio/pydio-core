@@ -60,6 +60,13 @@
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_3" group="CONF_MESSAGE[Page Background Images]" type="select"
                       choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:100%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
                       label="CONF_MESSAGE[Background Attributes(3)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false" expose="true"/>
+        <global_param name="CUSTOM_MINISITE_LOGO" group="CONF_MESSAGE[Minisite]" type="image" label="CONF_MESSAGE[Minisite Logo]" description="CONF_MESSAGE[Top-right logo displayed on minisite page]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/PydioLogo250.png"
+                      expose="true"
+        />
     </server_settings>
     <client_settings>
         <resources>
@@ -186,7 +193,7 @@
                                     <span id="header_write" ajxp_message_id="share_center.32">AJXP_MESSAGE[share_center.32]</span>
                                     <span id="header_watch" ajxp_message_id="share_center.33">AJXP_MESSAGE[share_center.33]</span>
                                 </div>
-                                <input type="text" class="dialogFocus" value="" style="width:98%;" placeholder="AJXP_MESSAGE[share_center.34]" name="shared_user" id="shared_user"/>
+                                <input type="text" class="dialogFocus" value="" style="width:98%;" placeholder="AJXP_MESSAGE[share_center.34]" id="shared_user"/>
                                 <div id="complete_indicator" style="position:absolute;top:25px;right:4px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
                                 <div id="shared_users_autocomplete_choices" class="autocomplete" style="margin-top:0px !important;z-index:20000 !important;"></div>
                                 <div class="editable_users_list grey_gradient_light_inputs" id="shared_users_summary" style="margin-bottom:7px;">
@@ -332,7 +339,7 @@
                                     <span id="header_write" ajxp_message_id="share_center.32">AJXP_MESSAGE[share_center.32]</span>
                                     <span id="header_watch" ajxp_message_id="share_center.33">AJXP_MESSAGE[share_center.33]</span>
                                 </div>
-                                <input type="text" class="dialogFocus" value="" style="width:98%;" placeholder="AJXP_MESSAGE[share_center.34]" name="shared_user" id="shared_user"/>
+                                <input type="text" class="dialogFocus" value="" style="width:98%;" placeholder="AJXP_MESSAGE[share_center.34]" id="shared_user"/>
                                 <div id="complete_indicator" style="position:absolute;top:25px;right:4px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
                                 <div id="shared_users_autocomplete_choices" class="autocomplete" style="margin-top:0px !important;z-index:20000 !important;"></div>
                                 <div class="editable_users_list grey_gradient_light_inputs" id="shared_users_summary" style="margin-bottom:7px;">

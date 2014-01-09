@@ -243,7 +243,7 @@ class BootConfLoader extends AbstractConfDriver
         ConfService::setTmpStorageImplementations($newConfigPlugin, $newAuthPlugin);
         require_once($newConfigPlugin->getUserClassFileName());
 
-        $adminLogin = $data["ADMIN_USER_LOGIN"];
+        $adminLogin = AJXP_Utils::sanitize($data["ADMIN_USER_LOGIN"], AJXP_SANITIZE_EMAILCHARS);
         $adminName = $data["ADMIN_USER_NAME"];
         $adminPass = $data["ADMIN_USER_PASS"];
         $adminPass2 = $data["ADMIN_USER_PASS2"];
@@ -260,8 +260,9 @@ class BootConfLoader extends AbstractConfDriver
             $pass2 = $data[str_replace("_LOGIN", "_PASS2", $loginP)];
             $name  = $data[str_replace("_LOGIN", "_NAME",  $loginP)];
             $mail  = $data[str_replace("_LOGIN", "_MAIL",  $loginP)];
-            AuthService::createUser($data[$loginP], $pass);
-            $uObj = $newConfigPlugin->createUserObject($data[$loginP]);
+            $saniLogin = AJXP_Utils::sanitize($data[$loginP], AJXP_SANITIZE_EMAILCHARS);
+            AuthService::createUser($saniLogin, $pass);
+            $uObj = $newConfigPlugin->createUserObject($saniLogin);
             $uObj->personalRole->setParameterValue("core.conf", "email", $mail);
             $uObj->personalRole->setParameterValue("core.conf", "USER_DISPLAY_NAME", $name);
             AuthService::updateRole($uObj->personalRole);

@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title><?php
+            if(!empty($CUSTOM_SHAREPAGE_TITLE)) echo(str_replace(array("AJXP_APPLICATION_TITLE","AJXP_FILENAME"), array(ConfService::getCoreConf("APPLICATION_TITLE"), $AJXP_LINK_BASENAME), $CUSTOM_SHAREPAGE_TITLE));
+            else echo sprintf($messages[1], ConfService::getCoreConf("APPLICATION_TITLE"))
+            ?></title>
+        <link rel="icon" type="image/x-png" href="favi.png">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <style type="text/css">
             * {
@@ -11,7 +16,7 @@
                 <?php if(!empty($CUSTOM_SHAREPAGE_TEXTSHADOW_COLOR)) echo "text-shadow: 0 1px 0 $CUSTOM_SHAREPAGE_TEXTSHADOW_COLOR;";?>
             }
             body{
-                background-image: url("grid_t.png");
+                /*background-image: url("grid_t.png");*/
                 <?php if(!empty($CUSTOM_SHAREPAGE_BACKGROUND_COLOR)) echo "background-color:$CUSTOM_SHAREPAGE_BACKGROUND_COLOR;";?>
             }
             h1 {
@@ -37,7 +42,7 @@
                 top: 0;
                 left: -15px;
                 border: 0px;
-                width: 226px;
+                width: 204px;
             }
             .link_w_pass{
                 position: absolute;

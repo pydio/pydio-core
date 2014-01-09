@@ -69,15 +69,15 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
             var createUserPass = options.createUserPanel.pass;
             var createUserConfirmPass = options.createUserPanel.confirmPass;
         }else{
-            var createActionPanel = new Element('div', {id:'create_sub_user'}).update('<div class="dialogContentMainTitle">Create user</div>');
+            var createActionPanel = new Element('div', {id:'create_sub_user'}).update('<div class="dialogContentMainTitle">'+MessageHash[484]+'</div>');
         }
 
         if(listElement && ajaxplorer.actionBar.actions.get('user_team_create')){
-            var butt = new Element('span', {className:'icon-save user_team_save', 'data-simpleTooltipTitle':'Save the current users list as a personal team'});
+            var butt = new Element('span', {className:'icon-save user_team_save', 'data-simpleTooltipTitle':MessageHash[509]});
             listElement.insert({after:butt});
-            modal.simpleTooltip(butt, '', 'top center', 'down_arrow_tip', 'element'),
+            modal.simpleTooltip(butt, '', 'top center', 'down_arrow_tip', 'element');
             butt.observe('click', function(){
-                var label = window.prompt('Please select a team label');
+                var label = window.prompt(MessageHash[510]);
                 if(!label) return;
                 var params = $H({
                     'user_ids[]':[],

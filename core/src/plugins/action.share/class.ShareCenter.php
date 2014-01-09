@@ -750,6 +750,7 @@ class ShareCenter extends AJXP_Plugin
         $sLegend = $messages[20];
 
         @copy($pDir."/res/dl.png", $downloadFolder."/dl.png");
+        @copy($pDir."/res/favi.png", $downloadFolder."/davi.png");
         @copy($pDir."/res/grid_t.png", $downloadFolder."/grid_t.png");
         @copy($pDir."/res/button_cancel.png", $downloadFolder."/button_cancel.png");
         @copy(AJXP_INSTALL_PATH."/server/index.html", $downloadFolder."/index.html");
@@ -779,11 +780,21 @@ class ShareCenter extends AJXP_Plugin
     {
         $repository = $data["REPOSITORY"];
         AJXP_PluginsService::getInstance()->initActivePlugins();
+        $shareCenter = AJXP_PluginsService::findPlugin("action", "share");
+        $confs = $shareCenter->getConfigs();
+        $minisiteLogo = "plugins/gui.ajax/PydioLogo250.png";
+        if(isSet($confs["CUSTOM_MINISITE_LOGO"])){
+            $minisiteLogo = "index_shared.php?get_action=get_global_binary_param&binary_id=". $confs["CUSTOM_MINISITE_LOGO"];
+        }
+        // UPDATE TEMPLATE
         $html = file_get_contents(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/res/minisite.php");
         AJXP_Controller::applyHook("tpl.filter_html", array(&$html));
         $html = AJXP_XMLWriter::replaceAjxpXmlKeywords($html);
+        $html = str_replace("AJXP_MINISITE_LOGO", $minisiteLogo, $html);
+        $html = str_replace("AJXP_APPLICATION_TITLE", ConfService::getCoreConf("APPLICATION_TITLE"), $html);
         $html = str_replace("AJXP_START_REPOSITORY", $repository, $html);
         $html = str_replace("AJXP_REPOSITORY_LABEL", ConfService::getRepositoryById($repository)->getDisplay(), $html);
+
         session_name("AjaXplorer_Shared");
         session_start();
         if (!empty($data["PRELOG_USER"])) {
@@ -1152,7 +1163,7 @@ class ShareCenter extends AJXP_Plugin
                 continue;
             }
             if ($eType == "user") {
-                $u = AJXP_Utils::decodeSecureMagic($httpVars["user_".$index], AJXP_SANITIZE_ALPHANUM);
+                $u = AJXP_Utils::decodeSecureMagic($httpVars["user_".$index], AJXP_SANITIZE_EMAILCHARS);
                 if (!AuthService::userExists($u) && !isSet($httpVars["user_pass_".$index])) {
                     $index++;
                     continue;
@@ -1321,6 +1332,10 @@ class ShareCenter extends AJXP_Plugin
                 $userObject->setParent($loggedUser->id);
                 $userObject->setGroupPath($loggedUser->getGroupPath());
                 $userObject->setProfile("shared");
+                if(isSet($httpVars["minisite"])){
+                    $mess = ConfService::getMessages();
+                    $userObject->personalRole->setParameterValue("core.conf", "USER_DISPLAY_NAME", "[".$mess["share_center.84"]."] ".$newRepo->getDisplay());
+                }
                 AJXP_Controller::applyHook("user.after_create", array($userObject));
             }
             // CREATE USER WITH NEW REPO RIGHTS

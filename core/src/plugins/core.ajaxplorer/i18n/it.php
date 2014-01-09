@@ -582,5 +582,7 @@ $mess=array(
 "506" => "Application parameters (users, workspaces, configurations)",
 "507" => "Welcome on %s",
 "508" => "I just created an account for you on %s. To connect, please click on the following link %link and use these credentials:  <br><br> Login: %user <br><br> Password: %pass",
+"509" => "Save the current users list as a personal team",
+"510" => "Please enter a team label",
 /* END SENTENCE */
 );

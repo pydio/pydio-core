@@ -113,4 +113,5 @@ $mess = array(
     "108" => "Utilisez un lecteur de QRCode pour scanner l'image ",
     "80b"=> "Inviter les utilisateurs par email à visiter ce workspace",
     "83b"=> "Changer le statut de surveillance pour recevoir ou non une alerte lorsque le workspace est consulté.",
+    "109" => "Utilisateur Minisite",
 );

@@ -1200,11 +1200,12 @@ input.SF_input.SF_number{
     vertical-align: middle;
     background-color: rgb(138, 149, 160);
     letter-spacing: 1px; /* Old browsers */   /* FF3.6+ */   /* Chrome,Safari4+ */   /* Chrome10+,Safari5.1+ */   /* Opera 11.10+ */   /* IE10+ */   /* W3C */   /* IE6-9 */; /* Old browsers */   /* FF3.6+ */   /* Chrome,Safari4+ */   /* Chrome10+,Safari5.1+ */   /* Opera 11.10+ */   /* IE10+ */   /* W3C */   /* IE6-9 */;
-    border-radius: 2px 2px 0 0;
     border-bottom: 2px solid rgb(111, 123, 136);
 }
 
+
 .dialogTitle{
+    border-radius: 2px 2px 0 0;
     background-color: #4dc5c3;
     border-bottom: 1px solid rgb(67, 156, 155);
 }

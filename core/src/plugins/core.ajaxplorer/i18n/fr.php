@@ -564,5 +564,7 @@ $mess=array(
 "506" => "Paramètres de l'application (utilisateurs, workspaces, configurations)",
 "507"=> "Bienvenue sur %s",
 "508"=> "Je vous ai créé un compte sur %s. Pour vous connecter, veuillez cliquer sur le lien suivant %link, et utiliser ces identifiants: <br><br> Login: %user <br><br> Mot de passe: %pass",
+"509" => "Sauver la sélection comme une équipe",
+"510" => "Veuillez entrer un libellé",
 /* END SENTENCE */
 );
