@@ -44,8 +44,8 @@ table structure
 | remote_ip | VARCHAR(32)                                     | YES  |     | NULL    |                | 
 | severity  | enum('DEBUG','INFO','NOTICE','WARNING','ERROR') | YES  |     | NULL    |                | 
 | user      | varchar(255)                                    | YES  |     | NULL    |                | 
-| message   | varchar(255)                                    | YES  |     | NULL    |                | 
-| params    | varchar(255)                                    | YES  |     | NULL    |                | 
+| message   | TEXT                                            | YES  |     | NULL    |                | 
+| params    | TEXT                                            | YES  |     | NULL    |                | 
 +-----------+-------------------------------------------------+------+-----+---------+----------------+
 
 // ORIGINAL 
