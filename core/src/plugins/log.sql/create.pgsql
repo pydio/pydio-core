@@ -9,7 +9,7 @@ CREATE TYPE ajxp_log_severity AS ENUM (
 CREATE TABLE ajxp_log (
   id serial PRIMARY KEY,
   logdate timestamp,
-  remote_ip varchar(32),
+  remote_ip varchar(45),
   severity ajxp_log_severity,
   "user" varchar(255),
   message varchar(255),
