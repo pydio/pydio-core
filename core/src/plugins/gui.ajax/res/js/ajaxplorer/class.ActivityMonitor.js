@@ -138,8 +138,10 @@ Class.create("ActivityMonitor", {
 			this._state = 'active';
 			if(this.interval) window.clearInterval(this.interval);
 			if(this.serverInterval) window.clearInterval(this.serverInterval);
-			ajaxplorer.actionBar.fireDefaultAction("expire");
-			return;
+            window.setTimeout(function(){
+                ajaxplorer.actionBar.fireDefaultAction("expire");
+            }, 1000);
+            return;
 		}
 		if( this._warningTime && idleTime >= this._warningTime ){
 			if(this._state == 'active'){
@@ -180,7 +182,7 @@ Class.create("ActivityMonitor", {
 		new Effect.Shake(this.warningPane);
 		this.opaFx = new Effect.Opacity($('overlay'), {
 			from:0.4, 
-			to : 1,
+			to : 0.7,
 			duration: this._warningMinutes*60
 		});
 	},
