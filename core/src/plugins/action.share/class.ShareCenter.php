@@ -784,7 +784,12 @@ class ShareCenter extends AJXP_Plugin
         $confs = $shareCenter->getConfigs();
         $minisiteLogo = "plugins/gui.ajax/PydioLogo250.png";
         if(isSet($confs["CUSTOM_MINISITE_LOGO"])){
-            $minisiteLogo = "index_shared.php?get_action=get_global_binary_param&binary_id=". $confs["CUSTOM_MINISITE_LOGO"];
+            $logoPath = $confs["CUSTOM_MINISITE_LOGO"];
+            if (strpos($logoPath, "plugins/") === 0 && is_file(AJXP_INSTALL_PATH."/".$logoPath)) {
+                $minisiteLogo = $logoPath;
+            }else{
+                $minisiteLogo = "index_shared.php?get_action=get_global_binary_param&binary_id=". $logoPath;
+            }
         }
         // UPDATE TEMPLATE
         $html = file_get_contents(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/res/minisite.php");
@@ -865,6 +870,7 @@ class ShareCenter extends AJXP_Plugin
 
         $AJXP_LINK_HAS_PASSWORD = false;
         $AJXP_LINK_BASENAME = SystemTextEncoding::toUTF8(basename($data["FILE_PATH"]));
+        AJXP_PluginsService::getInstance()->initActivePlugins();
         $customs = array("title", "legend", "legend_pass", "background_attributes_1", "background_attributes_2", "background_attributes_3", "text_color", "background_color", "textshadow_color");
         $images = array("button", "background_1", "background_2", "background_3");
         $shareCenter = AJXP_PluginsService::findPlugin("action", "share");
@@ -897,20 +903,20 @@ class ShareCenter extends AJXP_Plugin
         // Check password
         if (strlen($data["PASSWORD"])) {
             if (!isSet($_POST['password']) || ($_POST['password'] != $data["PASSWORD"])) {
-                AJXP_PluginsService::getInstance()->initActivePlugins();
+                //AJXP_PluginsService::getInstance()->initActivePlugins();
                 $AJXP_LINK_HAS_PASSWORD = true;
                 $AJXP_LINK_WRONG_PASSWORD = (isSet($_POST['password']) && ($_POST['password'] != $data["PASSWORD"]));
                 include (AJXP_INSTALL_PATH."/plugins/action.share/res/public_links.php");
-                $res = ('<div style="position: absolute;z-index: 10000; bottom: 0; right: 0; color: #666;font-family: HelveticaNeue-Light,Helvetica Neue Light,Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;font-size: 13px;text-align: right;padding: 6px; line-height: 20px;text-shadow: 0px 1px 0px white;" class="no_select_bg"><br>Build your own box with Pydio : <a style="color: #000000;" target="_blank" href="http://pyd.io/">http://pyd.io/</a><br/>Community - Free non supported version © C. du Jeu 2008-2013 </div>');
+                $res = ('<div style="position: absolute;z-index: 10000; bottom: 0; right: 0; color: #666;font-family: HelveticaNeue-Light,Helvetica Neue Light,Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;font-size: 13px;text-align: right;padding: 6px; line-height: 20px;text-shadow: 0px 1px 0px white;" class="no_select_bg"><br>Build your own box with Pydio : <a style="color: #000000;" target="_blank" href="http://pyd.io/">http://pyd.io/</a><br/>Community - Free non supported version © C. du Jeu 2008-2014 </div>');
                 AJXP_Controller::applyHook("tpl.filter_html", array(&$res));
                 echo($res);
                 return;
             }
         } else {
             if (!isSet($_GET["dl"])) {
-                AJXP_PluginsService::getInstance()->initActivePlugins();
+                //AJXP_PluginsService::getInstance()->initActivePlugins();
                 include (AJXP_INSTALL_PATH."/plugins/action.share/res/public_links.php");
-                $res = '<div style="position: absolute;z-index: 10000; bottom: 0; right: 0; color: #666;font-family: HelveticaNeue-Light,Helvetica Neue Light,Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;font-size: 13px;text-align: right;padding: 6px; line-height: 20px;text-shadow: 0px 1px 0px white;" class="no_select_bg"><br>Build your own box with Pydio : <a style="color: #000000;" target="_blank" href="http://pyd.io/">http://pyd.io/</a><br/>Community - Free non supported version © C. du Jeu 2008-2013 </div>';
+                $res = '<div style="position: absolute;z-index: 10000; bottom: 0; right: 0; color: #666;font-family: HelveticaNeue-Light,Helvetica Neue Light,Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;font-size: 13px;text-align: right;padding: 6px; line-height: 20px;text-shadow: 0px 1px 0px white;" class="no_select_bg"><br>Build your own box with Pydio : <a style="color: #000000;" target="_blank" href="http://pyd.io/">http://pyd.io/</a><br/>Community - Free non supported version © C. du Jeu 2008-2014 </div>';
                 AJXP_Controller::applyHook("tpl.filter_html", array(&$res));
                 echo($res);
                 return;
