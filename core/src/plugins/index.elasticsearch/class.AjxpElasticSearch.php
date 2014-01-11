@@ -379,6 +379,7 @@ class AjxpElasticSearch extends AJXP_Plugin
      */
     public function updateNodeIndexMeta($node)
     {
+        /*
         if (!isSet($this->currentIndex)) {
             $this->currentIndex =  $this->loadIndex(ConfService::getRepository()->getId());
         }
@@ -398,7 +399,7 @@ class AjxpElasticSearch extends AJXP_Plugin
             if($id != null) $this->currentIndex->delete($id);
         }
         $this->createIndexedDocument($node, $this->currentInd);
-
+        */
     }
 
     /**
