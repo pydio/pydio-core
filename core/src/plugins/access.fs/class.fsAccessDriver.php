@@ -26,15 +26,6 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 if (!function_exists('download_exception_handler')) {
     function download_exception_handler($exception){}
 }
-if (!function_exists('staticExtractArchiveItemCallback')){
-    function staticExtractArchiveItemPostCallback($status, $data){
-        return fsAccessDriver::$currentZipOperationHandler->extractArchiveItemPostCallback($status, $data);
-    }
-    function staticExtractArchiveItemPreCallback($status, $data){
-        return fsAccessDriver::$currentZipOperationHandler->extractArchiveItemPreCallback($status, $data);
-    }
-}
-
 /**
  * AJXP_Plugin to access a filesystem. Most "FS" like driver (even remote ones)
  * extend this one.
@@ -227,7 +218,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     if (is_dir($this->urlBase.$selection->getUniqueFile())) {
                         $zip = true;
                         $base = basename($selection->getUniqueFile());
-                        $dir .= "/".dirname($selection->getUniqueFile());
+                        $uniqDir = dirname($selection->getUniqueFile());
+                        if(!empty($uniqDir) && $uniqDir != "/"){
+                            $dir = dirname($selection->getUniqueFile());
+                        }
                     } else {
                         if (!file_exists($this->urlBase.$selection->getUniqueFile())) {
                             throw new Exception("Cannot find file!");
@@ -1777,11 +1771,18 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
      * @var fsAccessDriver
      */
     public static $filteringDriverInstance;
+
     /**
+     * @param $src
+     * @param $dest
+     * @param $basedir
+     * @throws Exception
      * @return zipfile
      */
     public function makeZip ($src, $dest, $basedir)
     {
+        $zipEncoding = ConfService::getCoreConf("ZIP_ENCODING");
+
         @set_time_limit(0);
         require_once(AJXP_BIN_FOLDER."/pclzip.lib.php");
         $filePaths = array();
@@ -1791,8 +1792,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             if (basename($item) == "") {
                 $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile);
             } else {
+                $shortName = basename($item);
+                if(!empty($zipEncoding)){
+                    $test = iconv(SystemTextEncoding::getEncoding(), $zipEncoding, $shortName);
+                    if($test !== false) $shortName = $test;
+                }
                 $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile,
-                                    PCLZIP_ATT_FILE_NEW_SHORT_NAME => basename($item));
+                                    PCLZIP_ATT_FILE_NEW_SHORT_NAME => $shortName);
             }
         }
         $this->logDebug("Pathes", $filePaths);
@@ -1880,10 +1886,26 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 
 }
 
-function zipPreAddCallback($value, $header)
+function zipPreAddCallback($value, &$header)
 {
     if(fsAccessDriver::$filteringDriverInstance == null) return true;
     $search = $header["filename"];
+    $zipEncoding = ConfService::getCoreConf("ZIP_ENCODING");
+    if(!empty($zipEncoding)){
+        $test = iconv(SystemTextEncoding::getEncoding(), $zipEncoding, $header["stored_filename"]);
+        if($test !== false){
+            $header["stored_filename"] = $test;
+        }
+    }
     return !(fsAccessDriver::$filteringDriverInstance->filterFile($search)
         || fsAccessDriver::$filteringDriverInstance->filterFolder($search, "contains"));
+}
+
+if (!function_exists('staticExtractArchiveItemCallback')){
+    function staticExtractArchiveItemPostCallback($status, $data){
+        return fsAccessDriver::$currentZipOperationHandler->extractArchiveItemPostCallback($status, $data);
+    }
+    function staticExtractArchiveItemPreCallback($status, $data){
+        return fsAccessDriver::$currentZipOperationHandler->extractArchiveItemPreCallback($status, $data);
+    }
 }
