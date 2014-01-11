@@ -1134,7 +1134,7 @@ input.SF_input.SF_number{
 }
 
 #global_toolbar{
-    background-color: #5C5C5C;
+    background-color: #474E50;
     height: 30px;
     padding: 9px 0 0 5px;
     background-image: url("../images/white_logo.png");
@@ -3220,11 +3220,11 @@ div.selectable_div, .table_rows_container, #tree_container, #bottomSplitPane, .a
     background-image: url(../images/vgrabber.gif);
     background-repeat: no-repeat;
     background-position: center;
-    background-color: #5C5C5C;/*rgba(255,255,255,0.5);*/
+    background-color: #474E50;/*rgba(255,255,255,0.5);*/
 }
 .vsplitbar.active
 {
-    background-color: #5C5C5C;
+    background-color: #474E50;
 }
 .hsplitbar.folded, .vsplitbar.folded{
     opacity: 0;
@@ -3245,7 +3245,7 @@ div.selectable_div, .table_rows_container, #tree_container, #bottomSplitPane, .a
 }
 .hsplitbar.active
 {
-    background-color: #5C5C5C;
+    background-color: #474E50;
 }
 
 .hsplitbar:hover{
@@ -3919,7 +3919,7 @@ div.menu a {
     padding: 7px 0 7px 8px;
     color: rgb(255, 255, 255);
     text-align: left;
-    background-color: rgba(255, 255, 255, 0.28);
+    background-color: rgba(255, 255, 255, 0.16);
     font-size: 13px;
     /*margin: 1px;*/
     border-bottom: 1px solid rgb(172, 172, 172);
@@ -4029,7 +4029,7 @@ div.menu a {
     width: 250px !important;
     /* IE */
     width:expression("250px");
-    background-color: #5C5C5C;
+    background-color: #474E50;
 }
 
 .rootDirChooser span.ajxp_icon_span{
@@ -4414,7 +4414,8 @@ td.ip_geo_cell{
     overflow: hidden;
     font-size: 13px;
     position: relative;
-    border-bottom: 1px solid #5c5c5c;
+    background-color: rgb(78, 167, 165);
+    border-radius: 0 3px 0 0;
 }
 
 .tabpanes {
@@ -4426,16 +4427,16 @@ td.ip_geo_cell{
     border: 0;
     display: inline-block;
     position: relative;
-    padding: 12px 22px 11px;
+    padding: 9px 10px 9px;
     cursor: pointer;
-    color: rgb(111,123,136);
+    color: rgba(255, 255, 255, 0.61);
     text-align: center;
     line-height: 16px;
     margin: 0;
 }
 .tabrow li.selected {
     color: #ffffff;
-    background-color: rgba(77, 197, 195, 0.79) !important;
+    background-color: transparent !important;
 }
 
 #sm2-container{
@@ -4572,19 +4573,25 @@ DASHBOARD TABULATOR
 .flat_tabulator  div.panelHeader.tabulatorContainer
 {
     padding: 0 0 0 0;
-    height: 39px;
-    background-color: #5C5C5C;
+    height: 34px;
+    background-color: transparent;
     border-bottom: 0;
 }
 
 .flat_tabulator span.toggleHeader{
-    padding: 11px 20px 9px;
+    padding: 8px 10px 8px;
     font-size: 13px;
     border-bottom: 0 solid #399C9B;
     color: #ffffff;
-    background-color: rgba(77, 197, 195, 0.79);
-    margin-right: 0;
-    border-right: 1px solid #5C5C5C;
+    background-color: rgb(78, 167, 165);
+    margin-right: 1px;
+    border-right: 0;
+    box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.26);
+    border-radius: 3px 3px 0 0;
+}
+
+.flat_tabulator span.toggleHeader:first-of-type{
+    background-color: rgb(111,123,136) !important;
 }
 
 .flat_tabulator[data-ajxpTabsCount="1"] span.toggleHeader
@@ -4592,11 +4599,13 @@ DASHBOARD TABULATOR
 /*    background-color: white;*/
 }
 
-.flat_tabulator span.toggleHeader.toggleInactive{
-    background-color: #f8f8f8;
+.flat_tabulator span.toggleHeader.toggleInactive {
     border-bottom: 0;
-    color: rgb(111,123,136);
+    color: rgba(255, 255, 255, 0.62);
     font-size: 13px;
+    background-color: rgba(78, 167, 165, 0.5);
+    box-shadow: none;
+    padding-bottom: 7px;
 }
 
 div.flat_tabulator > div.tabulatorContainer > #display_toolbar a:hover,
@@ -4617,8 +4626,10 @@ div.flat_tabulator span.toggleInactiveBeforeActive{
 }
 
 div.flat_tabulator > div:not(.tabulatorContainer){
+    /*
     background-color: #ffffff;
     border-radius: 0 0 2px 2px;
+    */
 }
 
 .horizontal_tabulator div.tabulatorContainer {

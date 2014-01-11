@@ -173,7 +173,7 @@ div#actions-selector,
 div#parameters-selector,
 div#pane-acls > div.dialogLegend
 {
-    padding-top: 10px;
+    padding: 10px;
 }
 
 div#pane-infos > div{
@@ -186,12 +186,14 @@ div#pane-docs{
 
 div.tabbed_editor div.innerTitle{
     font-size: 13px;
-    border-bottom: 0;
-    background-color: rgba(111, 123, 136, 0.52);/*rgba(255, 255, 255, 0.6);*/
+    margin: 3px 9px 10px;
+    border-bottom: 1px solid rgba(111, 123, 136, 1);
     margin-bottom: 10px;
     text-align: left;
-    padding: 12px;
-    color: #ffffff;
+    padding: 8px 10px 10px;
+    color: rgba(76, 85, 95, 1);
+    letter-spacing: 0px;
+    font-size: 15px;
 }
 
 div#account_actions{
@@ -337,6 +339,7 @@ span.m-2 {
 
 .pluginfo_list {
     padding: 0 !important;
+    margin: 10px 20px;
 }
 
 .pluginfo_list li:nth-child(2n+1) {
@@ -352,4 +355,8 @@ span.m-2 {
 .pluginfo_key {
     display: inline-block;
     width: 90px;
+}
+
+div.documentation{
+    padding: 0 20px !important;
 }

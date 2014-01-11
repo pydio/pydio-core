@@ -27,14 +27,19 @@
 }
 
 .settings_main_pane .buttons_bar_container{
-    height: 48px;
+    height: 41px;
     margin: 0;
     padding-left: 0;
     background-color: #f8f8f8;
 }
 
+.settings_main_pane .buttons_bar_container a{
+    height: 26px;
+    padding-top: 2px;
+}
+
 .settings_main_pane #breadcrumb{
-    color: rgb(111, 123, 136);
+    color: white;
     font-size: 13px;
     margin: 0;
     padding: 0;
@@ -43,12 +48,12 @@
 
 .settings_main_pane #breadcrumb_container{
     font-size: 13px;
-    border-bottom: 1px solid #5C5C5C;
     margin: 0;
     text-align: left;
-    padding: 10px 11px 6px;
-    border-radius: 0 !important;
-    background-color: #f8f8f8;
+    padding: 7px 11px 4px;
+    border-radius: 0 3px 0 0 !important;
+    background-color: rgb(111, 123, 136);
+;
 }
 
 .settings_main_pane #content_pane{
@@ -83,11 +88,9 @@
 .settings_search_container{
     display: block;
     padding: 0;
-    height: 35px;
-    background-color: rgba(138, 149, 160, 0.28);
+    height: 34px;
+    background-color: transparent;
     margin-right: 0;
-    padding-top: 4px;
-    border-bottom: 1px Solid #5C5C5C;
 }
 
 .settings_search_container #search_form{
@@ -96,17 +99,19 @@
 }
 
 .settings_search_container #search_form a{
-    color: rgba(92, 92, 92, 0.61);
+    color: rgba(105, 105, 105, 1);
     position: absolute;
     right: 14px;
+    text-shadow: none;
 }
 
 .settings_search_container #search_form input{
     height: 21px;
     border-radius: 4px;
-    border: 0;
     margin-top: 3px;
     width: 91%;
+    background-color: #30383A;
+    border: 1px solid #5c5c5c;
 }
 
 .settings_main_pane div#vertical_splitter-actions_toolbar > div.separator,
@@ -134,43 +139,59 @@
 }
 
 .flat_tree_pane > #tree_container > .webfx-tree-container > .webfx-tree-item:first-of-type {
-    margin-top: 13px;
-}
-
-.flat_tree_pane > #tree_container{
-    text-shadow: 0 1px rgba(255, 255, 255, 0.4);
+    margin-top: 4px;
 }
 
 #leftTabulator{
-    background-color: #ebedf0;
+    background-color: #30383A;
+    text-shadow: 0 1px rgba(0, 0, 0, 1);
 }
 
 #leftTabulator div.tabulatorContainer {
-    border-bottom: 1px solid #5c5c5c;
-    height: 38px;
+    padding: 3px 0;
 }
 
 #leftTabulator span.toggleHeader {
-    border-right: 1px solid #5c5c5c;
-    padding: 11px 20px;
-    font-size: 13px;
+    background-color: transparent;
+    padding: 6px 7px 7px 11px;
+    font-size: 14px;
+}
+
+#leftTabulator span.toggleHeader span[class^="icon-"],
+#leftTabulator span.toggleHeader span[class*=" icon-"]{
+    display: none;
+}
+#leftTabulator span.toggleHeader.toggleInactive span[class^="icon-"],
+#leftTabulator span.toggleHeader.toggleInactive span[class*=" icon-"]{
+    display: inline;
 }
 
 #leftTabulator span.toggleHeader span.tab_label{
+    display: inline;
+    font-size: 22px;
+}
+
+#leftTabulator span.toggleHeader.toggleInactive span.tab_label{
     display: none;
 }
 
-.settings_main_pane div.class-FetchedResultPane {
-    background-color: #f8f8f8;
-    border-left: 1px solid #5c5c5c;
+#leftTabulator span.toggleHeader.toggleInactive{
+    float: right;
 }
 
-#leftTabulator span.toggleHeader.toggleInactive {
-    background-color: rgb(138, 149, 160);
+.settings_main_pane div.class-FetchedResultPane {
+    background-color: #30383A;
+    text-shadow: none;
+    border: 0;
+}
+
+.settings_main_pane div.class-FetchedResultPane .thumbnail_selectable_cell{
+    color: white !important;
 }
 
 #leftTabulator div.panelHeader{
-    background-color: rgba(138, 149, 160);
+    background-color: #30383A;
+    border-bottom: 0;
 }
 
 .settings_main_pane div.folded .toggleHeader {
@@ -178,7 +199,7 @@
 }
 
 .settings_main_pane div.tabulatorContainer div#display_toolbar{
-    padding-top: 11px;
+    padding-top: 6px;
 }
 
 .settings_main_pane div.tabulator-vertical div.toolbarGroup{

@@ -57,6 +57,16 @@
                 .action_bar span.actionbar_button_label{
                     font-size: 11px;
                 }
+                .flat_tabulator div.panelHeader.tabulatorContainer{
+                    background-color: #30383A;
+                    padding-top: 10px;
+                }
+                .flat_tabulator span.toggleHeader:first-of-type {
+                    background-color: #e35d52 !important;
+                }
+                .flat_tabulator span.toggleHeader.toggleInactive {
+                    background-color: rgba(227, 93, 82, 0.35) !important;
+                }
                 </style>
             ]]></template_part>
             <template_part ajxpId="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOptionUser":"true", "messageBoxReference":true}' theme="vision"><![CDATA[
