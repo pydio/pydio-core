@@ -69,7 +69,7 @@ tools:
                 - 'core/src/plugins/core.mq/vendor/*'
                 - 'core/src/plugins/editor.diaporama/PThumb.lib.php'
                 - 'core/src/plugins/meta.svn/svn_lib.inc.php'
-          config:
+        config:
             bad_php_include_file: true
             php_include_file_not_found: true
             use_undeclared_global_variable: true
