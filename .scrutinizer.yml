@@ -70,6 +70,8 @@ tools:
                 - 'core/src/plugins/editor.diaporama/PThumb.lib.php'
                 - 'core/src/plugins/meta.svn/svn_lib.inc.php'
                 - 'core/src/plugins/auth.radius/class.radiusAuthDriver.php'
+                - 'core/src/plugins/editor.etherpad/etherpad-client/*'
+                - 'core/src/plugins/meta.svn/svn_executor.inc.php'
         config:
             bad_php_include_file: true
             php_include_file_not_found: true
