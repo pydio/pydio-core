@@ -69,6 +69,7 @@ tools:
                 - 'core/src/plugins/core.mq/vendor/*'
                 - 'core/src/plugins/editor.diaporama/PThumb.lib.php'
                 - 'core/src/plugins/meta.svn/svn_lib.inc.php'
+                - 'core/src/plugins/auth.radius/class.radiusAuthDriver.php'
         config:
             bad_php_include_file: true
             php_include_file_not_found: true
