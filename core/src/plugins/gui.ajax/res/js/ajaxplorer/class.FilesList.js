@@ -654,7 +654,19 @@ Class.create("FilesList", SelectableElements, {
 			buffer = buffer + '<div id="table_rows_container-'+this.__currentInstanceIndex+'" class="table_rows_container"><table id="selectable_div-'+this.__currentInstanceIndex+'" class="selectable_div sort-table" width="100%" cellspacing="0"><tbody></tbody></table></div>';
 			this.htmlElement.update(buffer);
             var contentContainer = this.htmlElement.down("div.table_rows_container");
-            contentContainer.setStyle((this.gridStyle!="grid")?{overflowX:"hidden",overflowY:(this.options.replaceScroller?"hidden":"auto")}:{overflow:"auto"});
+            contentContainer.setStyle((this.gridStyle!="grid")
+                ?
+                {
+                    overflowX:"hidden",
+                    overflowY:(this.options.replaceScroller?"hidden":"auto"),
+                    paddingBottom: '16px'
+                }
+                    :
+                {
+                    overflow:"auto",
+                    paddingBottom: '0'
+                }
+            );
 			attachMobileScroll(contentContainer, "vertical");
             var scrollElement = contentContainer;
 			var oElement = this.htmlElement.down(".selectable_div");
@@ -848,9 +860,16 @@ Class.create("FilesList", SelectableElements, {
             this.scroller.insert('<div id="filelist_scrollbar_handle'+this.__currentInstanceIndex+'" class="scroller_handle"></div>');
             scrollElement.insert({before:this.scroller});
             if(this.gridStyle == "grid"){
-                scrollElement.setStyle({overflowY:"hidden",overflowX:"auto"});
+                scrollElement.setStyle({
+                    overflowY:"hidden",
+                    overflowX:"auto",
+                    paddingBottom: '16px'
+                });
             }else{
-                scrollElement.setStyle({overflow:"hidden"});
+                scrollElement.setStyle({
+                    overflow:"hidden",
+                    paddingBottom: '0'
+                });
             }
             this.scrollbar = new Control.ScrollBar(scrollElement,'filelist_scroller'+this.__currentInstanceIndex);
             if(this.scrollSizeObserver){
