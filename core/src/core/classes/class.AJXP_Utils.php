@@ -1092,7 +1092,7 @@ class AJXP_Utils
      * @param $outputArray
      * @param $testedParams
      * @param bool $showSkipLink
-     * @return string
+     * @return void
      */
     public static function testResultsToTable($outputArray, $testedParams, $showSkipLink = true)
     {

@@ -165,7 +165,8 @@ class AJXP_ClientDriver extends AJXP_Plugin
                     $testedParams = array();
                     $passed = AJXP_Utils::runTests($outputArray, $testedParams);
                     if (!$passed && !isset($_GET["ignore_tests"])) {
-                        die(AJXP_Utils::testResultsToTable($outputArray, $testedParams));
+                        AJXP_Utils::testResultsToTable($outputArray, $testedParams);
+                        die();
                     } else {
                         AJXP_Utils::testResultsToFile($outputArray, $testedParams);
                     }
