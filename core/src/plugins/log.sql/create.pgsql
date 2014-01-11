@@ -12,6 +12,6 @@ CREATE TABLE ajxp_log (
   remote_ip varchar(45),
   severity ajxp_log_severity,
   "user" varchar(255),
-  message varchar(255),
+  message text,
   params text
 );
