@@ -216,12 +216,12 @@ class textLogDriver extends AbstractLogDriver
                 $split2 = explode("_", $split[0]);
                 $date = $split2[1];
                 $dSplit = explode("-", $date);
-                $logY = $dSplit[2];
-                $logM = $dSplit[0];
                 $time = mktime(0,0,1,intval($dSplit[0]), intval($dSplit[1]), intval($dSplit[2]));
                 $display = date("l d", $time);
                 $fullYear = date("Y", $time);
                 $fullMonth = date("F", $time);
+                $logY = $fullYear;
+                $logM = $fullMonth;
                 if($year != null && $fullYear != $year) continue;
                 if($month != null && $fullMonth != $month) continue;
                 $logs[$time] = "<$nodeName icon=\"toggle_log.png\" date=\"$display\" display=\"$display\" text=\"$date\" is_file=\"0\" filename=\"$rootPath/$fullYear/$fullMonth/$date\"/>";
