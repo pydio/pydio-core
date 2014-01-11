@@ -45,7 +45,31 @@ tools:
             level: custom
             fixers: { indentation: true, linefeed: true, trailing_spaces: true, unused_use: true, visibility: true, short_tag: true, braces: true, php_closing_tag: true, controls_spaces: true, eof_ending: true }
     php_hhvm:
-        config:
+        filter:
+            paths:
+                - 'core/src/*'
+            excluded_paths:
+                - 'dist/*'
+                - 'ext/*'
+                - 'jdrivers/*'
+                - 'core/src/data/*'
+                - 'core/src/plugins/access.sftp_psl/phpseclib/*'
+                - 'core/src/plugins/index.lucene/Zend/*'
+                - 'core/src/core/classes/pclzip.lib.php'
+                - 'core/src/core/classes/dibi.compact.php'
+                - 'core/src/core/classes/http_class/*'
+                - 'core/src/core/classes/sabredav/lib/*'
+                - 'core/src/core/classes/sabredav/vendor/*'
+                - 'core/src/plugins/access.hpcloud/HPCloud_Patch/*'
+                - 'core/src/plugins/access.dropbox/dropbox-php/*'
+                - 'core/src/plugins/access.s3/aS3StreamWrapper/lib/*'
+                - 'core/src/plugins/access.smb/smb.php'
+                - 'core/src/plugins/auth.cas/CAS/*'
+                - 'core/src/plugins/editor.ckeditor/ckeditor/*'
+                - 'core/src/plugins/core.mq/vendor/*'
+                - 'core/src/plugins/editor.diaporama/PThumb.lib.php'
+                - 'core/src/plugins/meta.svn/svn_lib.inc.php'
+          config:
             bad_php_include_file: true
             php_include_file_not_found: true
             use_undeclared_global_variable: true
