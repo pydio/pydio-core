@@ -45,7 +45,7 @@ class sqlAuthDriver extends AbstractAuthDriver
 
     public function performChecks()
     {
-        if(!isSet($this->options)) return;
+        if (!isSet($this->options)) return;
         $test = AJXP_Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
         if (!count($test)) {
             throw new Exception("You probably did something wrong! To fix this issue you have to remove the file \"bootsrap.json\" and rename the backup file \"bootstrap.json.bak\" into \"bootsrap.json\" in data/plugins/boot.conf/");
@@ -107,7 +107,7 @@ class sqlAuthDriver extends AbstractAuthDriver
         $rows = $res->fetchAll();
         foreach ($rows as $row) {
             $grp = $row["groupPath"];
-            if(strlen($grp) > strlen($baseGroup)) continue;
+            if (strlen($grp) > strlen($baseGroup)) continue;
             $pairs[$row["login"]] = $row["password"];
         }
         return $pairs;
@@ -122,12 +122,43 @@ class sqlAuthDriver extends AbstractAuthDriver
     public function checkPassword($login, $pass, $seed)
     {
         $userStoredPass = $this->getUserPass($login);
-        if(!$userStoredPass) return false;
+        if (!$userStoredPass) return false;
 
         if ($this->getOption("TRANSMIT_CLEAR_PASS") === true) { // Seed = -1 means that password is not encoded.
-            return AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass); //($userStoredPass == md5($pass));
+                if (ConfService::getCoreConf("COMPLEX_PASSWORD", "auth")) {
+                        $pwAge = ConfService::getCoreConf("PASSWORD_MAXAGE", "auth");
+                        $res = dibi::query("select * from [ajxp_users] where [login]=%s and date (julianday(date('now'))- %s)  <= lastChange  limit 1",$login,$pwAge);
+                        if (count($res->fetchAll()) > 0) {
+                                return AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass);
+                        } else {
+                                return false;
+                        }
+                }
+                return AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass); //($userStoredPass == md5($pass));
         } else {
-            return (md5($userStoredPass.$seed) == $pass);
+                return (md5($userStoredPass.$seed) == $pass);
+        }
+    }
+
+    public function checkLastPasswords($login, $pass)
+    {
+        $userStoredPass = $this->getUserPass($login);
+        if (!$userStoredPass) return false;
+        // check last x passwords against new
+        if ($this->getOption("PASSWORD_SECURITY") === true) {
+            $passwordHistory = $this->getOption("PASSWORD_HISTORY");
+            if ($passwordHistory < 1) {
+                $passwordHistory = 1;
+            }
+            $res = dibi::query("SELECT [password] FROM [ajxp_users_passwords] WHERE [login]=%s order by date desc limit %s" , $login,$passwordHistory);
+            $rows = $res->fetchAll();
+            foreach ($rows as $row) {
+                if (AJXP_Utils::pbkdf2_validate_password($pass, $row["password"])) {
+                    //same password found
+                    AXJP_Logger::debug("Passoword complexity check failed! Or password was used in last x");
+                    return true;
+                }
+            }
         }
     }
 
@@ -142,19 +173,26 @@ class sqlAuthDriver extends AbstractAuthDriver
 
     public function createUser($login, $passwd)
     {
-        if($this->userExists($login)) return "exists";
+        if ($this->userExists($login)) return "exists";
         $userData = array("login" => $login);
         if ($this->getOption("TRANSMIT_CLEAR_PASS") === true) {
+            // check security
+            if (($this->getOption("COMPLEX_PASSWORD") === true) && (!checkPasswordComplexity($passwd) || checkLastPasswords($login, $passwd)) ) {
+                throw new Exception("Your password is to weak or already used in the past! ");
+                return false;
+            }
             $userData["password"] = AJXP_Utils::pbkdf2_create_hash($passwd); //md5($passwd);
         } else {
             $userData["password"] = $passwd;
         }
+        $userData['failedLogins'] = 0;
+        $userData['lastChange'] = date('Y-m-d');
         $userData['groupPath'] = '/';
         dibi::query('INSERT INTO [ajxp_users]', $userData);
     }
     public function changePassword($login, $newPass)
     {
-        if(!$this->userExists($login)) throw new Exception("User does not exists!");
+        if (!$this->userExists($login)) throw new Exception("User does not exists!");
         $userData = array("login" => $login);
         if ($this->getOption("TRANSMIT_CLEAR_PASS") === true) {
             $userData["password"] = AJXP_Utils::pbkdf2_create_hash($newPass); //md5($newPass);

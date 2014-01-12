@@ -290,6 +290,21 @@ class AbstractAuthDriver extends AJXP_Plugin
     public function changePassword($login, $newPass){}
     public function deleteUser($login){}
 
+    public function checkPasswordComplexity($userPass)
+    {
+        $uppercase = preg_match('@[A-Z]@', $userPass);
+        $lowercase = preg_match('@[a-z]@', $userPass);
+        $number = preg_match('@[0-9]@', $userPass);
+        $symbol = preg_match('@[^a-zA-Z0-9]@', $userPass);
+        $ret = false;
+        if (!$uppercase || !$lowercase || !$number || !$symbol) {
+            $ret = false;
+        } else {
+            $ret = true;
+        }
+        return $ret;
+    }
+
     public function supportsAuthSchemes()
     {
         return false;

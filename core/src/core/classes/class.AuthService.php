@@ -106,7 +106,7 @@ class AuthService
             }
             return $_SESSION["AJXP_USER"];
         }
-        if(!self::$useSession && isSet(self::$currentUser)) return self::$currentUser;
+        if (!self::$useSession && isSet(self::$currentUser)) return self::$currentUser;
         return null;
     }
     /**
@@ -117,7 +117,7 @@ class AuthService
      */
     public static function preLogUser($remoteSessionId = "")
     {
-        if(AuthService::getLoggedUser() != null) return ;
+        if (AuthService::getLoggedUser() != null) return ;
         $authDriver = ConfService::getAuthDriverImpl();
         $authDriver->preLogUser($remoteSessionId);
         return ;
@@ -267,7 +267,7 @@ class AuthService
         if (isSet($_SESSION["AJXP_USER"]) || isSet(self::$currentUser)) {
             AJXP_Logger::info(__CLASS__, "Log Out", "");
             unset($_SESSION["AJXP_USER"]);
-            if(isSet(self::$currentUser)) unset(self::$currentUser);
+            if (isSet(self::$currentUser)) unset(self::$currentUser);
             if (ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
                 AJXP_Safe::clearCredentials();
             }
@@ -296,9 +296,9 @@ class AuthService
         $confDriver = ConfService::getConfStorageImpl();
         if ($user_id == null) {
             if (self::$useSession) {
-                if(isSet($_SESSION["AJXP_USER"]) && is_object($_SESSION["AJXP_USER"])) return 1;
+                if (isSet($_SESSION["AJXP_USER"]) && is_object($_SESSION["AJXP_USER"])) return 1;
             } else {
-                if(isSet(self::$currentUser) && is_object(self::$currentUser)) return 1;
+                if (isSet(self::$currentUser) && is_object(self::$currentUser)) return 1;
             }
             if (ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) {
                 $authDriver = ConfService::getAuthDriverImpl();
@@ -330,7 +330,7 @@ class AuthService
                 if ($bruteForceLogin === FALSE) {
                     return -4;
                 } else {
-                    if($cookieLogin) return -5;
+                    if ($cookieLogin) return -5;
                     return -1;
                 }
             }
@@ -359,7 +359,7 @@ class AuthService
                 //$user->setAcl("ajxp_shared", "rw");
             }
         }
-        if(self::$useSession) $_SESSION["AJXP_USER"] = $user;
+        if (self::$useSession) $_SESSION["AJXP_USER"] = $user;
         else self::$currentUser = $user;
 
         if ($authDriver->autoCreateUser() && !$user->storageExists()) {
@@ -376,7 +376,7 @@ class AuthService
      */
     public static function updateUser($userObject)
     {
-        if(self::$useSession) $_SESSION["AJXP_USER"] = $userObject;
+        if (self::$useSession) $_SESSION["AJXP_USER"] = $userObject;
         else self::$currentUser = $userObject;
     }
     /**
@@ -393,7 +393,7 @@ class AuthService
             AuthService::clearRememberCookie();
             AJXP_Logger::info(__CLASS__, "Log Out", "");
             unset($_SESSION["AJXP_USER"]);
-            if(isSet(self::$currentUser)) unset(self::$currentUser);
+            if (isSet(self::$currentUser)) unset(self::$currentUser);
             if (ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
                 AJXP_Safe::clearCredentials();
             }
@@ -408,15 +408,15 @@ class AuthService
      */
     public static function bootSequence(&$START_PARAMETERS)
     {
-        if(AJXP_Utils::detectApplicationFirstRun()) return;
-        if(file_exists(AJXP_CACHE_DIR."/admin_counted")) return;
+        if (AJXP_Utils::detectApplicationFirstRun()) return;
+        if (file_exists(AJXP_CACHE_DIR."/admin_counted")) return;
         $rootRole = AuthService::getRole("ROOT_ROLE", false);
         if ($rootRole === false) {
             $rootRole = new AJXP_Role("ROOT_ROLE");
             $rootRole->setLabel("Root Role");
             $rootRole->setAutoApplies(array("standard", "admin"));
             foreach (ConfService::getRepositoriesList("all") as $repositoryId => $repoObject) {
-                if($repoObject->isTemplate) continue;
+                if ($repoObject->isTemplate) continue;
                 $gp = $repoObject->getGroupPath();
                 if (empty($gp) || $gp == "/") {
                     if ($repoObject->getDefaultRight() != "") {
@@ -428,7 +428,7 @@ class AuthService
             if (is_array($paramNodes) && count($paramNodes)) {
                 foreach ($paramNodes as $xmlNode) {
                     $default = $xmlNode->getAttribute("default");
-                    if(empty($default)) continue;
+                    if (empty($default)) continue;
                     $parentNode = $xmlNode->parentNode->parentNode;
                     $pluginId = $parentNode->getAttribute("id");
                     if (empty($pluginId)) {
@@ -545,7 +545,7 @@ class AuthService
     public static function getDefaultRootId()
     {
         $loggedUser = AuthService::getLoggedUser();
-        if($loggedUser == null) return 0;
+        if ($loggedUser == null) return 0;
         $repoList = ConfService::getRepositoriesList();
         foreach ($repoList as $rootDirIndex => $rootDirObject) {
             if ($loggedUser->canRead($rootDirIndex."") || $loggedUser->canWrite($rootDirIndex."")) {
@@ -571,8 +571,8 @@ class AuthService
     public static function updateAdminRights($adminUser)
     {
         foreach (ConfService::getRepositoriesList() as $repoId => $repoObject) {
-            if(!self::allowedForCurrentGroup($repoObject, $adminUser)) continue;
-            if($repoObject->hasParent() && $repoObject->getParentId() != $adminUser->getId()) continue;
+            if (!self::allowedForCurrentGroup($repoObject, $adminUser)) continue;
+            if ($repoObject->hasParent() && $repoObject->getParentId() != $adminUser->getId()) continue;
             $adminUser->personalRole->setAcl($repoId, "rw");
             $adminUser->recomputeMergedRole();
         }
@@ -590,8 +590,8 @@ class AuthService
         if (!$userObject->hasParent()) {
             $changes = false;
             foreach (ConfService::getRepositoriesList() as $repositoryId => $repoObject) {
-                if(!self::allowedForCurrentGroup($repoObject, $userObject)) continue;
-                if($repoObject->isTemplate) continue;
+                if (!self::allowedForCurrentGroup($repoObject, $userObject)) continue;
+                if ($repoObject->isTemplate) continue;
                 if ($repoObject->getDefaultRight() != "") {
                     $changes = true;
                     $userObject->personalRole->setAcl($repositoryId, $repoObject->getDefaultRight());
@@ -601,7 +601,7 @@ class AuthService
                 $userObject->recomputeMergedRole();
             }
             foreach (AuthService::getRolesList(array(), true) as $roleId => $roleObject) {
-                if(!self::allowedForCurrentGroup($roleObject, $userObject)) continue;
+                if (!self::allowedForCurrentGroup($roleObject, $userObject)) continue;
                 if ($userObject->getProfile() == "shared" && $roleObject->autoAppliesTo("shared")) {
                     $userObject->addRole($roleObject);
                 } else if ($roleObject->autoAppliesTo("standard")) {
@@ -618,7 +618,7 @@ class AuthService
     public static function updateAutoApplyRole(&$userObject)
     {
         foreach (AuthService::getRolesList(array(), true) as $roleId => $roleObject) {
-            if(!self::allowedForCurrentGroup($roleObject, $userObject)) continue;
+            if (!self::allowedForCurrentGroup($roleObject, $userObject)) continue;
             if ($roleObject->autoAppliesTo($userObject->getProfile()) || $roleObject->autoAppliesTo("all")) {
                 $userObject->addRole($roleObject);
             }
@@ -683,7 +683,7 @@ class AuthService
      */
     public static function checkPassword($userId, $userPass, $cookieString = false, $returnSeed = "")
     {
-        if(ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest") return true;
+        if (ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest") return true;
         $userId = AuthService::filterUserSensitivity($userId);
         $authDriver = ConfService::getAuthDriverImpl();
         if ($cookieString) {
@@ -693,7 +693,7 @@ class AuthService
             return $res;
         }
         $seed = $authDriver->getSeed(false);
-        if($seed != $returnSeed) return false;
+        if ($seed != $returnSeed) return false;
         return $authDriver->checkPassword($userId, $userPass, $returnSeed);
     }
     /**
@@ -706,12 +706,20 @@ class AuthService
      */
     public static function updatePassword($userId, $userPass)
     {
-        if (strlen($userPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth")) {
-            $messages = ConfService::getMessages();
-            throw new Exception($messages[378]);
+        $authDriver = ConfService::getAuthDriverImpl();
+        if ($authDriver->getOption("TRANSMIT_CLEAR_PASS") === true) {
+            if (ConfService::getCoreConf("COMPLEX_PASSWORD", "auth") === true) {
+                if (!$authDriver->checkPasswordComplexity($userPass) || $authDriver->checkLastPasswords($userId, $userPass) || strlen($userPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth")) {
+                    $messages = ConfService::getMessages();
+                    throw new Exception($messages[378]);
+                }
+            } elseif (strlen($userPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth")) {
+                $messages = ConfService::getMessages();
+                throw new Exception($messages[378]);
+            }
         }
         $userId = AuthService::filterUserSensitivity($userId);
-        $authDriver = ConfService::getAuthDriverImpl();
+
         $authDriver->changePassword($userId, $userPass);
         if ($authDriver->getOption("TRANSMIT_CLEAR_PASS") === true) {
             // We can directly update the HA1 version of the WEBDAV Digest
@@ -719,7 +727,7 @@ class AuthService
             $ha1 = md5("{$userId}:{$realm}:{$userPass}");
             $zObj = ConfService::getConfStorageImpl()->createUserObject($userId);
             $wData = $zObj->getPref("AJXP_WEBDAV_DATA");
-            if(!is_array($wData)) $wData = array();
+            if (!is_array($wData)) $wData = array();
             $wData["HA1"] = $ha1;
             $zObj->setPref("AJXP_WEBDAV_DATA", $wData);
             $zObj->save();
@@ -766,7 +774,7 @@ class AuthService
                 $user = $confDriver->createUserObject($userId);
             }
             $wData = $user->getPref("AJXP_WEBDAV_DATA");
-            if(!is_array($wData)) $wData = array();
+            if (!is_array($wData)) $wData = array();
             $wData["HA1"] = $ha1;
             $user->setPref("AJXP_WEBDAV_DATA", $wData);
             $user->save();
@@ -818,9 +826,9 @@ class AuthService
         $u = self::getLoggedUser();
         // make sure it starts with a slash.
         $baseGroup = "/".ltrim($baseGroup, "/");
-        if($u == null) return $baseGroup;
+        if ($u == null) return $baseGroup;
         if ($u->getGroupPath() != "/") {
-            if($baseGroup == "/") return $u->getGroupPath();
+            if ($baseGroup == "/") return $u->getGroupPath();
             else return $u->getGroupPath().$baseGroup;
         } else {
             return $baseGroup;
@@ -835,8 +843,8 @@ class AuthService
 
     public static function createGroup($baseGroup, $groupName, $groupLabel)
     {
-        if(empty($groupName)) throw new Exception("Please provide a name for this new group!");
-        if(empty($groupLabel)) $groupLabel = $groupName;
+        if (empty($groupName)) throw new Exception("Please provide a name for this new group!");
+        if (empty($groupLabel)) $groupLabel = $groupName;
         ConfService::getConfStorageImpl()->createGroup(rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName, $groupLabel);
     }
 
@@ -878,8 +886,8 @@ class AuthService
             $users = $authDriver->listUsers($baseGroup);
         }
         foreach (array_keys($users) as $userId) {
-            if(($userId == "guest" && !ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) || $userId == "ajxp.admin.users" || $userId == "") continue;
-            if($regexp != null && !$authDriver->supportsUsersPagination() && !preg_match("/$regexp/i", $userId)) continue;
+            if (($userId == "guest" && !ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) || $userId == "ajxp.admin.users" || $userId == "") continue;
+            if ($regexp != null && !$authDriver->supportsUsersPagination() && !preg_match("/$regexp/i", $userId)) continue;
             $allUsers[$userId] = $confDriver->createUserObject($userId);
             if ($paginated) {
                 // Make sure to reload all children objects
@@ -933,7 +941,7 @@ class AuthService
     public static function getRole($roleId, $createIfNotExists = false)
     {
         $roles = self::getRolesList(array($roleId));
-        if(isSet($roles[$roleId])) return $roles[$roleId];
+        if (isSet($roles[$roleId])) return $roles[$roleId];
         if ($createIfNotExists) {
             $role = new AJXP_Role($roleId);
             if (self::getLoggedUser()!=null && self::getLoggedUser()->getGroupPath()!=null) {
@@ -968,12 +976,12 @@ class AuthService
     public static function filterPluginParameters($pluginId, $params, $repoId = null)
     {
         $logged = self::getLoggedUser();
-        if($logged == null) return $params;
+        if ($logged == null) return $params;
         if ($repoId == null) {
             $repo = ConfService::getRepository();
-            if($repo!=null) $repoId = $repo->getId();
+            if ($repo!=null) $repoId = $repo->getId();
         }
-        if($logged == null || $logged->mergedRole == null) return $params;
+        if ($logged == null || $logged->mergedRole == null) return $params;
         $roleParams = $logged->mergedRole->listParameters();
         if (iSSet($roleParams[AJXP_REPO_SCOPE_ALL][$pluginId])) {
             $params = array_merge($params, $roleParams[AJXP_REPO_SCOPE_ALL][$pluginId]);
@@ -991,7 +999,7 @@ class AuthService
     public static function limitedRoleFromParent($parentUser)
     {
         $parentRole = self::getRole("AJXP_USR_/".$parentUser);
-        if($parentRole === false) return null;
+        if ($parentRole === false) return null;
 
         // Inherit actions
         $inheritActions = array();
@@ -1004,7 +1012,7 @@ class AuthService
                 foreach ($paramNodes as $node) {
                     $paramName = $node->getAttribute("name");
                     $pluginId = $node->parentNode->parentNode->getAttribute("id");
-                    if(isSet($inheritActions[$pluginId])) $inheritActions[$pluginId] = array();
+                    if (isSet($inheritActions[$pluginId])) $inheritActions[$pluginId] = array();
                     $inheritActions[$pluginId][] = $paramName;
                 }
             }
@@ -1022,7 +1030,7 @@ class AuthService
 
         foreach ($params as $scope => $plugData) {
             foreach ($plugData as $pId => $paramData) {
-                if(!isSet($inheritActions[$pId])) continue;
+                if (!isSet($inheritActions[$pId])) continue;
                 foreach ($paramData as $pName => $pValue) {
                     $childRole->setParameterValue($pId, $pName, $pValue, $scope);
                 }
@@ -1041,13 +1049,13 @@ class AuthService
      */
     public static function getRolesList($roleIds = array(), $excludeReserved = false)
     {
-        //if(isSet(self::$roles)) return self::$roles;
+        //if (isSet(self::$roles)) return self::$roles;
         $confDriver = ConfService::getConfStorageImpl();
         self::$roles = $confDriver->listRoles($roleIds, $excludeReserved);
         $repoList = null;
         foreach (self::$roles as $roleId => $roleObject) {
             if (is_a($roleObject, "AjxpRole")) {
-                if($repoList == null) $repoList = ConfService::getRepositoriesList("all");
+                if ($repoList == null) $repoList = ConfService::getRepositoriesList("all");
                 $newRole = new AJXP_Role($roleId);
                 $newRole->migrateDeprectated($repoList, $roleObject);
                 self::$roles[$roleId] = $newRole;
@@ -1061,8 +1069,8 @@ class AuthService
     {
         $l = ($userObject == null ? self::getLoggedUser() : $userObject);
         $pGP = $provider->getGroupPath();
-        if(empty($pGP)) $pGP = "/";
-        if($l == null || $l->getGroupPath() == null || $pGP == null) return true;
+        if (empty($pGP)) $pGP = "/";
+        if ($l == null || $l->getGroupPath() == null || $pGP == null) return true;
         return (strpos($l->getGroupPath(), $pGP, 0) === 0);
     }
 
@@ -1070,8 +1078,8 @@ class AuthService
     {
         $l = ($userObject == null ? self::getLoggedUser() : $userObject);
         $pGP = $provider->getGroupPath();
-        if(empty($pGP)) $pGP = "/";
-        if($l == null || $l->getGroupPath() == null || $pGP == null) return true;
+        if (empty($pGP)) $pGP = "/";
+        if ($l == null || $l->getGroupPath() == null || $pGP == null) return true;
         return (strpos($pGP, $l->getGroupPath(), 0) === 0);
     }
 
@@ -1079,8 +1087,8 @@ class AuthService
     {
         $l = ($userObject == null ? self::getLoggedUser() : $userObject);
         $pGP = $provider->getGroupPath();
-        if(empty($pGP)) $pGP = "/";
-        if($l == null || $l->getGroupPath() == null || $pGP == null) return true;
+        if (empty($pGP)) $pGP = "/";
+        if ($l == null || $l->getGroupPath() == null || $pGP == null) return true;
         return (strpos($l->getGroupPath(), $pGP, 0) === 0);
     }
 
