@@ -262,7 +262,7 @@ Class.create("NotificationLoader", {
         }.bind(this);
         protoMenu.options = Object.extend(protoMenu.options, {
             position: "bottom middle",
-            menuMaxHeight: 350,
+            menuMaxHeight: 480,
             topOffset: 14,
             menuTitle: this.hasAlerts ? MessageHash['notification_center.3'] : MessageHash['notification_center.5'],
             beforeShow: function(){

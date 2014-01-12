@@ -566,5 +566,6 @@ $mess=array(
 "508"=> "Je vous ai créé un compte sur %s. Pour vous connecter, veuillez cliquer sur le lien suivant %link, et utiliser ces identifiants: <br><br> Login: %user <br><br> Mot de passe: %pass",
 "509" => "Sauver la sélection comme une équipe",
 "510" => "Veuillez entrer un libellé",
+"511" => "Mon %s",
 /* END SENTENCE */
 );

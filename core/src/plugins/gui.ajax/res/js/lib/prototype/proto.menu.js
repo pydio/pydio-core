@@ -23,6 +23,7 @@ Proto.Menu = Class.create({
 			submenuArrow:ajxpResourcesFolder+'/images/arrow_right.png',
 			position:'bottom',
 			menuTitle:'',
+            detailedItems: false,
 			fade: false,
 			zIndex: 100,
 			createAnchor:false,
@@ -218,8 +219,13 @@ Proto.Menu = Class.create({
                 newItem.setStyle({position:"relative"});
 			}
 			if(item.action_id && ajaxplorer && ajaxplorer.getActionBar() && ajaxplorer.getActionBar().getActionByName(item.action_id)){
-                item.name = ajaxplorer.getActionBar().getActionByName(item.action_id).getKeyedText();
-                item.title = ajaxplorer.getActionBar().getActionByName(item.action_id).options.title;
+                var actionObject = ajaxplorer.getActionBar().getActionByName(item.action_id);
+                if(this.options.detailedItems){
+                    item.name = '<span class="menu_label">'+ actionObject.getKeyedText() + '</span>' + '<span class="menu_description">'+ actionObject.options.title + '</span>'
+                }else{
+                    item.name = actionObject.getKeyedText();
+                }
+                item.title = actionObject.options.title;
             }
             var img = '';
             if(item.icon_class && window.ajaxplorer.currentThemeUsesIconFonts){

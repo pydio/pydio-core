@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 $mess=array(
-"title"=> "My Dashboard",
+"title"=> "Dashboard",
 "desc" => "Manage my account preferences, my address book, shared elements, etc.",
 "1" => "Address Book",
 "2" => "Shared folders",

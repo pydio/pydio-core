@@ -144,7 +144,7 @@ Class.create("UserWidget", {
 			this.menu.refreshList();
 		}else{			
 			this.menu = new Proto.Menu({			
-				className: 'menu rootDirChooser rightAlignMenu',
+				className: 'menu rootDirChooser menuDetails',
 				mouseClick:(this.options.menuEvent?this.options.menuEvent:"left"),
 				position: 'bottom right',
 				anchor:this.element,
@@ -152,6 +152,8 @@ Class.create("UserWidget", {
 				topOffset:2,
 				leftOffset:-3,
 				menuItems: menuItems,
+                menuTitle: MessageHash[511].replace('%s', ajaxplorer.getPluginConfigs("ajaxplorer").get("APPLICATION_TITLE")),
+                detailedItems: true,
 				fade:true,
 				zIndex:1500,
 				beforeShow : function(e){

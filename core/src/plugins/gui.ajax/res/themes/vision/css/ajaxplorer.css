@@ -3820,6 +3820,7 @@ div.menu {
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     -moz-border-radius:5px;
     border-radius: 2px;
+    opacity: 0.97;
 }
 div.menu a {
     display: block;
@@ -3916,13 +3917,14 @@ div.menu a {
 }
 
 .rootDirChooser li.menuTitle {
-    padding: 7px 0 7px 8px;
-    color: rgb(255, 255, 255);
+    color: rgba(77, 197, 195, 1);
+    padding: 10px 8px 4px;
     text-align: left;
-    background-color: rgba(255, 255, 255, 0.16);
-    font-size: 13px;
+    /* background-color: rgba(77, 197, 195, 1); */
+    font-size: 22px;
     /*margin: 1px;*/
-    border-bottom: 1px solid rgb(172, 172, 172);
+    /* border-bottom: 1px solid #fff; */
+    letter-spacing: 1px;
 }
 
 .menu li.menuTitle{
@@ -4083,7 +4085,8 @@ div.menu a {
 .bookmarksMenu a.hovered,
 .rootDirChooser a.hovered
 {
-    background-color: #73a2d7;
+    background-color: rgba(200, 219, 223, 0.21);
+    box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.12);
     color: #fff;
 }
 
@@ -4121,7 +4124,7 @@ div.menu a {
 
 .menu.menuDetails span.ajxp_icon_span{
     float: left;
-    padding: 3px 9px 15px 4px;
+    padding: 3px 9px 23px 4px;
     font-size: 18px;
 }
 
@@ -4133,14 +4136,15 @@ div.menu a {
 .menu.menuDetails span.menu_description{
     display: block;
     letter-spacing: 0;
-    line-height: 13px;
+    line-height: 15px;
     font-size: 11px;
+    color: rgba(255, 255, 255, 0.57);
+    padding-top: 2px;
 }
 
 .menu.menuDetails img{
     display: none;
 }
-
 
 .rightAlignMenu{
     width: 180px !important;
