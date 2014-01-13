@@ -77,6 +77,9 @@ class BootConfLoader extends AbstractConfDriver
      */
     public function loadInstallerForm($action, $httpVars, $fileVars)
     {
+        if(isSet($httpVars["lang"])){
+            ConfService::setLanguage($httpVars["lang"]);
+        }
         AJXP_XMLWriter::header("admin_data");
         $fullManifest = $this->getManifestRawContent("", "xml");
         $xPath = new DOMXPath($fullManifest->ownerDocument);

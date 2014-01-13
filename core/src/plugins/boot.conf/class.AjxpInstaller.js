@@ -27,12 +27,29 @@ Class.create("AjxpInstaller", AjxpPane, {
         this.formManager = new FormManager();
         this.formElement = this.htmlElement.down("#the_form");
         this.formElement.ajxpPaneObject = this;
+        this.initLanguageSwitcher();
         this.initForm();
+    },
+
+    initLanguageSwitcher: function(){
+        var selector = this.htmlElement.down("#installer_lang");
+        $H(ajxpBootstrap.parameters.get('availableLanguages')).each(function(pair){
+            var option = new Element('option', {value:pair.key}).update(pair.value);
+            if(pair.key == ajaxplorer.currentLanguage){
+                option.writeAttribute("selected", "true");
+            }
+            selector.insert(option);
+        });
+        selector.observe("change", function(){
+            ajaxplorer.currentLanguage = selector.getValue();
+            ajaxplorer.loadI18NMessages(selector.getValue());
+        });
     },
 
     initForm : function(){
         var params = new Hash();
         params.set("get_action", "load_installer_form");
+        params.set("lang", ajaxplorer.currentLanguage);
         var connexion = new Connexion();
         connexion.setParameters(params);
         connexion.onComplete = function(transport){
@@ -80,6 +97,10 @@ Class.create("AjxpInstaller", AjxpPane, {
                 this.bindPassword(newRow);
             }.bind(this));
             this.htmlElement.down("#start_button").observe("click", function(){
+                new Effect.Morph(this.htmlElement.down(".install_pydio_logo"), {
+                    style:'height:30px',
+                    duration:0.5
+                });
                 this.htmlElement.down(".installerWelcome").update("Click on each section to edit parameters");
                 new Effect.Appear(this.formElement, {afterFinish : function(){
                     this.formElement.SF_accordion.activate(this.formElement.down('.accordion_toggle'));

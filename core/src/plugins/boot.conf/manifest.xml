@@ -8,34 +8,34 @@
         </resources>
     </client_settings>
     <server_settings>
-        <global_param group="&lt;span class='icon-key'&gt;&lt;/span&gt; Admin access" name="adminLegend" type="legend" label="" description="Please set up a login and password for the administrator user. This step is necessary to let you login the first time. You can create more administrators later by going to the 'Settings' workspace."/>
-        <global_param group="&lt;span class='icon-key'&gt;&lt;/span&gt; Admin access" name="ADMIN_USER_LOGIN" type="string" label="Admin Login" description="Alphanumeric login" mandatory="true"/>
-        <global_param group="&lt;span class='icon-key'&gt;&lt;/span&gt; Admin access" name="ADMIN_USER_NAME" type="string" label="Admin Display Name" description="User-friendly name of the user" mandatory="true"/>
-        <global_param group="&lt;span class='icon-key'&gt;&lt;/span&gt; Admin access" name="ADMIN_USER_PASS" type="password" label="Admin Password" description="Password" mandatory="true"/>
-        <global_param group="&lt;span class='icon-key'&gt;&lt;/span&gt; Admin access" name="ADMIN_USER_PASS2" type="password" label="Confirm" description="Confirm password" mandatory="true"/>
-        <global_param group="&lt;span class='icon-cogs'&gt;&lt;/span&gt; Global options" name="sysLegend" type="legend" label="" description="Set up some application parameters. If you enable Emails, please use the Test button to check if your php is correctly configured."/>
-        <global_param group="&lt;span class='icon-cogs'&gt;&lt;/span&gt; Global options" name="APPLICATION_TITLE" type="string" label="Application Title" description="Your system title" default="Pydio" mandatory="false"/>
-        <global_param group="&lt;span class='icon-cogs'&gt;&lt;/span&gt; Global options" name="APPLICATION_WELCOME" type="textarea" label="Welcome Message" description="An additional message displayed at startup, on the splash screen and the login screen." default="Welcome to Pydio" mandatory="false"/>
-        <global_param group="&lt;span class='icon-cogs'&gt;&lt;/span&gt; Global options" name="APPLICATION_LANGUAGE" type="select" choices="AJXP_AVAILABLE_LANGUAGES" label="Default Language" description="Select a language activated by default( users will still be able to switch)" default="en" mandatory="true"/>
-        <global_param group="&lt;span class='icon-cogs'&gt;&lt;/span&gt; Global options" name="MAILER_ENABLE" type="group_switch:mailer" label="Enable emails" description="Set up system to send emails" default="no" mandatory="true"/>
-        <global_param group_switch_name="mailer" group_switch_value="no" group_switch_label="No (you can enable mails later)" name="status" type="hidden" label="No" description="s" default="no"/>
-        <global_param group_switch_name="mailer" group_switch_value="yes" group_switch_label="Yes (requires a correct PHP configuration)" name="status" type="hidden" label="Yes" description="s" default="yes"/>
-        <global_param group_switch_name="mailer" group_switch_value="yes" group_switch_label="Yes" name="MAILER_SYSTEM" type="select" label="Php Mailer" description="Set up the correct value to send emails" choices="mail|Mail,sendmail|Sendmail" default="mail" mandatory="true"/>
-        <global_param group_switch_name="mailer" group_switch_value="yes" group_switch_label="Yes" name="MAILER_ADMIN" type="string" label="Administrator Email" description="Default 'From' email used to send emails." mandatory="true"/>
+        <global_param group="CONF_MESSAGE[Admin access]" name="adminLegend" type="legend" label="" description="CONF_MESSAGE[Please set up a login and password for the administrator user. This step is necessary to let you login the first time. You can create more administrators later by going to the 'Settings' workspace.]"/>
+        <global_param group="CONF_MESSAGE[Admin access]" name="ADMIN_USER_LOGIN" type="string" label="CONF_MESSAGE[Admin Login]" description="CONF_MESSAGE[Alphanumeric login]" mandatory="true"/>
+        <global_param group="CONF_MESSAGE[Admin access]" name="ADMIN_USER_NAME" type="string" label="CONF_MESSAGE[Admin Display Name]" description="CONF_MESSAGE[User-friendly name of the user]" mandatory="true"/>
+        <global_param group="CONF_MESSAGE[Admin access]" name="ADMIN_USER_PASS" type="password" label="CONF_MESSAGE[Admin Password]" description="CONF_MESSAGE[Use a strong password (more than 8 characters, complicated ones.]" mandatory="true"/>
+        <global_param group="CONF_MESSAGE[Admin access]" name="ADMIN_USER_PASS2" type="password" label="CONF_MESSAGE[Confirm]" description="CONF_MESSAGE[Confirm password]" mandatory="true"/>
+        <global_param group="CONF_MESSAGE[Global options]" name="sysLegend" type="legend" label="" description="CONF_MESSAGE[Set up some application parameters. If you enable Emails, please use the Test button to check if your php is correctly configured.]"/>
+        <global_param group="CONF_MESSAGE[Global options]" name="APPLICATION_TITLE" type="string" label="CONF_MESSAGE[Application Title]" description="CONF_MESSAGE[Your system title]" default="Pydio" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Global options]" name="APPLICATION_WELCOME" type="textarea" label="CONF_MESSAGE[Welcome Message]" description="CONF_MESSAGE[An additional message displayed at startup, on the splash screen and the login screen.]" default="Welcome to Pydio" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Global options]" name="APPLICATION_LANGUAGE" type="select" choices="AJXP_AVAILABLE_LANGUAGES" label="CONF_MESSAGE[Default Language]" description="CONF_MESSAGE[Select a language activated by default( users will still be able to switch)]" default="en" mandatory="true"/>
+        <global_param group="CONF_MESSAGE[Global options]" name="MAILER_ENABLE" type="group_switch:mailer" label="CONF_MESSAGE[Enable emails]" description="CONF_MESSAGE[Set up system to send emails]" default="no" mandatory="true"/>
+        <global_param group_switch_name="mailer" group_switch_value="no" group_switch_label="CONF_MESSAGE[No (you can enable mails later)]" name="status" type="hidden" label="No" description="s" default="no"/>
+        <global_param group_switch_name="mailer" group_switch_value="yes" group_switch_label="CONF_MESSAGE[Yes (requires a correct PHP configuration)]" name="status" type="hidden" label="Yes" description="s" default="yes"/>
+        <global_param group_switch_name="mailer" group_switch_value="yes" group_switch_label="Yes" name="MAILER_SYSTEM" type="select" label="CONF_MESSAGE[Php Mailer]" description="CONF_MESSAGE[Set up the correct value to send emails]" choices="mail|Mail,sendmail|Sendmail" default="mail" mandatory="true"/>
+        <global_param group_switch_name="mailer" group_switch_value="yes" group_switch_label="Yes" name="MAILER_ADMIN" type="string" label="CONF_MESSAGE[Administrator Email]" description="CONF_MESSAGE[Default 'From' email used to send emails.]" mandatory="true"/>
         <global_param group_switch_name="mailer" group_switch_label="yes" group_switch_value="yes" type="button" name="TEST_MAILER" choices="boot_test_mailer" label="CONF_MESSAGE[Test Mailer]" description="CONF_MESSAGE[Try sending an email with the configured data]" mandatory="false"/>
-        <global_param group="&lt;span class='icon-save'&gt;&lt;/span&gt; Configurations storage" name="StorageLegend" type="legend" label="" description="How the application configuration data will be stored (users, plugins, etc. &lt;b&gt;not&lt;/b&gt; how your actual documents are managed). To get started rapidly, select No Database. To enable more advanced features, configure a database connexion."/>
-        <global_param group="&lt;span class='icon-save'&gt;&lt;/span&gt; Configurations storage" name="STORAGE_TYPE" type="group_switch:storage_type" label="Storage Type" description="Select how the configurations will be stored." default="" mandatory="false"/>
-        <global_param group_switch_name="storage_type" group_switch_label="No Database (Quick Start)" group_switch_value="serial" name="type" default="serial" label="No Database" description="h" type="hidden" mandatory="true"/>
-        <global_param group_switch_name="storage_type" group_switch_label="Database (Requires MySQL, PostgreSQL or SQLite)" group_switch_value="db" name="type" default="db" label="Database" description="Driver type (do not touch)" type="hidden" mandatory="true"/>
-        <global_param group_switch_name="storage_type" group_switch_label="Enable Notifications" group_switch_value="db" name="notifications" default="true" label="Enable Notifications" description="Log all events and alerts" type="boolean" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Configurations storage]" name="StorageLegend" type="legend" label="" description="CONF_MESSAGE[How the application configuration data will be stored (users, plugins, etc. &lt;b&gt;not&lt;/b&gt; how your actual documents are managed). To get started rapidly, select No Database. To enable more advanced features, configure a database connexion.]"/>
+        <global_param group="CONF_MESSAGE[Configurations storage]" name="STORAGE_TYPE" type="group_switch:storage_type" label="CONF_MESSAGE[Storage Type]" description="CONF_MESSAGE[Select how the configurations will be stored]" default="" mandatory="false"/>
+        <global_param group_switch_name="storage_type" group_switch_label="CONF_MESSAGE[No Database (Quick Start)]" group_switch_value="serial" name="type" default="serial" label="No Database" description="h" type="hidden" mandatory="true"/>
+        <global_param group_switch_name="storage_type" group_switch_label="CONF_MESSAGE[Database (Requires MySQL, PostgreSQL or SQLite)]" group_switch_value="db" name="type" default="db" label="Database" description="Driver type (do not touch)" type="hidden" mandatory="true"/>
+        <global_param group_switch_name="storage_type" group_switch_label="Enable Notifications" group_switch_value="db" name="notifications" default="true" label="CONF_MESSAGE[Enable Notifications]" description="CONF_MESSAGE[Log all events and alerts]" type="boolean" mandatory="false"/>
         <global_param group_switch_name="storage_type" group_switch_label="Database" group_switch_value="db" name="db_type" default="mysql" label="Database" description="Driver type (do not touch)" type="group_switch:dibi_provider" mandatory="true" choices="mysql|MySQL,sqlite3|Sqlite 3,postgre|PostgreSQL"/>
         <global_param group_switch_name="storage_type" group_switch_label="Database" group_switch_value="db" type="button" name="TEST_SQL" choices="boot_test_sql_connexion" label="CONF_MESSAGE[Test SQL Connexion]" description="CONF_MESSAGE[Try connecting to the database]" mandatory="false"/>
-        <global_param group="&lt;span class='icon-group'&gt;&lt;/span&gt; Add some users" name="usersLegend" type="legend" label="" description="Create users for your organization right now. You can do this later by going to the Settings workspace."/>
-        <global_param group="&lt;span class='icon-group'&gt;&lt;/span&gt; Add some users" name="USER_LOGIN" type="string" label="Login" replicationGroup="users" description="Alphanumeric login"/>
-        <global_param group="&lt;span class='icon-group'&gt;&lt;/span&gt; Add some users" name="USER_MAIL" type="string" label="User Email" replicationGroup="users" description="User-friendly name of the user"/>
-        <global_param group="&lt;span class='icon-group'&gt;&lt;/span&gt; Add some users" name="USER_NAME" type="string" label="User Name" replicationGroup="users" description="User-friendly name of the user"/>
-        <global_param group="&lt;span class='icon-group'&gt;&lt;/span&gt; Add some users" name="USER_PASS" type="password" label="Password" replicationGroup="users" description="Password"/>
-        <global_param group="&lt;span class='icon-group'&gt;&lt;/span&gt; Add some users" name="USER_PASS2" type="password" label="Confirm" replicationGroup="users" description="Confirm password"/>
+        <global_param group="CONF_MESSAGE[Add some users]" name="usersLegend" type="legend" label="" description="CONF_MESSAGE[Create users for your organization right now. You can do this later by going to the Settings workspace.]"/>
+        <global_param group="CONF_MESSAGE[Add some users]" name="USER_LOGIN" type="string" label="CONF_MESSAGE[Login]" replicationGroup="users" description="CONF_MESSAGE[Alphanumeric login]"/>
+        <global_param group="CONF_MESSAGE[Add some users]" name="USER_MAIL" type="string" label="CONF_MESSAGE[User Email]" replicationGroup="users" description="CONF_MESSAGE[User-friendly name of the user]"/>
+        <global_param group="CONF_MESSAGE[Add some users]" name="USER_NAME" type="string" label="CONF_MESSAGE[User Name]" replicationGroup="users" description="CONF_MESSAGE[User-friendly name of the user]"/>
+        <global_param group="CONF_MESSAGE[Add some users]" name="USER_PASS" type="password" label="CONF_MESSAGE[Password]" replicationGroup="users" description="CONF_MESSAGE[Password]"/>
+        <global_param group="CONF_MESSAGE[Add some users]" name="USER_PASS2" type="password" label="CONF_MESSAGE[Confirm]" replicationGroup="users" description="CONF_MESSAGE[Confirm password]"/>
     </server_settings>
     <registry_contributions>
         <actions>
@@ -68,17 +68,21 @@
                     </clientCallback>
                     <clientForm id="installer_form"><![CDATA[
                         <div id="installer_form" box_padding="0" box_resize="true" box_width="560" overlayStyle='{"backgroundColor":"white","opacity":10,"backgroundImage":"url(\"AJXP_THEME_FOLDER/images/grid_t.png\")"}' style="padding: 10px; overflow:auto; background-color: white;">
-                            <img src="plugins/gui.ajax/PydioLogo250.png" style="display:block;margin:0 auto;">
-                            <div class="dialogLegend installerWelcome"> Thank you for installing Pydio!<br> This tool will make sure your new sharing platform is up and running in no time: browse through the various sections to set up the general behaviour of the application. You can fly over the fields labels with your mouse to get more information. <br>Are you ready ? <span id="start_button">Start wizard!</span></div>
+                            <img class="install_pydio_logo" src="plugins/gui.ajax/PydioLogo250.png" style="display:block;margin:0 auto;">
+                            <div style="text-align:center" class="dialogLegend installerLang"><select id="installer_lang"></select></div>
+                            <div class="dialogLegend installerWelcome">
+                                <span ajxp_message_id="installer.3">AJXP_MESSAGE[installer.3]</span>
+                                <span id="start_button" ajxp_message_id="installer.4">AJXP_MESSAGE[installer.4]</span>
+                            </div>
                             <div id="the_form" style="display:none; margin:0 5px;"></div>
                             <div id="configuration_progress" class="dialogLegend installerWelcome" style="display:none; margin:0 5px;">
-                                Please wait while Pydio is being configured! It will be up and running in a couple of seconds...
+                                <span ajxp_message_id="installer.5">AJXP_MESSAGE[installer.5]</span>
                                 <div style="margin: 20px auto; width: 40px;">
                                     <span class="icon-spinner rotating spinner_large"></span>
                                 </div>
                             </div>
                             <div style="margin-top:20px;">
-                                <div id="save_button" class="SF_input SF_inlineButton disabled"><span class="icon-play-circle"></span>Install Pydio Now!</div>
+                                <div id="save_button" class="SF_input SF_inlineButton disabled" tabIndex="0"><span class="icon-play-circle"></span><span ajxp_message_id="installer.6">AJXP_MESSAGE[installer.6]</span></div>
                             </div>
                         </div>
                         <style type="text/css">
