@@ -28,4 +28,6 @@ $mess=array(
 "Password" => "Password",
 "User account" => "User account",
 "User Password" => "User Password",
+"timestamp" => "timestamp",
+"Allow timestamp files with Universign." => "Allow timestamp files with Universign.",
 );

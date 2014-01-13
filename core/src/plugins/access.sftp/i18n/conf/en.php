@@ -29,4 +29,6 @@ $mess=array(
 "Real path to the folder on the server" => "Real path to the folder on the server",
 "Fix Permissions" => "Fix Permissions",
 "How to handle remote permissions to be used by PHP as local permissions. See manual." => "How to handle remote permissions to be used by PHP as local permissions. See manual.",
+"Create" => "Create",
+"Create folder if it does not exists" => "Create folder if it does not exists",
 );

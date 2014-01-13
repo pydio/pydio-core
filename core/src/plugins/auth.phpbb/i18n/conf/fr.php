@@ -31,4 +31,5 @@ $mess=array(
 "The phpbb path" => "Chemin PHPBB",
 "Users" => "Utilisateurs",
 "The users list" => "Liste des utilisateurs",
+"PHPBB authentication" => "PHPBB authentication",
 );

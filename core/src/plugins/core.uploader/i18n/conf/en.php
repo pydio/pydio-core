@@ -26,4 +26,6 @@ $mess=array(
 "Files Number" => "Files Number",
 "File Size" => "File Size",
 "Cumul. Size" => "Cumul. Size",
+"Uploaders Options" => "Uploaders Options",
+"Options shared by all uploaders plugins" => "Options shared by all uploaders plugins",
 );

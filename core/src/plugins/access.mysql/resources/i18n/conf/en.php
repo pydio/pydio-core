@@ -32,4 +32,5 @@ $mess=array(
 "Pattern" => "Pattern",
 "If not empty, only tables beginning with such a prefix will be displayed." => "If not empty, only tables beginning with such a prefix will be displayed.",
 "Repository Commons" => "Repository Commons",
+"Default Rights" => "Default Rights",
 );

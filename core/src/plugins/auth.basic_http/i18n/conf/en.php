@@ -23,4 +23,6 @@ $mess=array(
 "Use the standard http authentication." => "Use the standard http authentication.",
 "Users" => "Users",
 "The users list" => "The users list",
+"Logout URL" => "Logout URL",
+"Redirect to the given URL on loggin out" => "Redirect to the given URL on loggin out",
 );

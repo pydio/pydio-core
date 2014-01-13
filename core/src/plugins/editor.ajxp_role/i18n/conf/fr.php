@@ -21,4 +21,6 @@
 $mess=array(
 "Text Editor" => "Editeur Text",
 "Very basic text editor" => "editeur text basique",
+"Role Editor" => "Role Editor",
+"Administrator Role Editor" => "Administrator Role Editor",
 );

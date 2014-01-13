@@ -27,4 +27,8 @@ $mess=array(
 "The auth drivers definition, see detailed documenation for more info." => "Les drivers définis (tableau de valeurs PHP). Voir la doc du plugin.",
 "Separator" => "Séparateur",
 "This is necessary to discriminate users data loaded from various sources. Warning, use foldername compliant characters. For example :: does not work!" => "Séparateur pour stocker les données des utilisateurs avec en les différenciant correctement selon les drivers.",
+"Mode" => "Mode",
+"Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features." => "Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features.",
+"Listing" => "Listing",
+"In Master_Slave mode, use this option to limit the users listing in the administration to one driver only (leave empty if you want to see all users)" => "In Master_Slave mode, use this option to limit the users listing in the administration to one driver only (leave empty if you want to see all users)",
 );

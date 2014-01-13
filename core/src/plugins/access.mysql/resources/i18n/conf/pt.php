@@ -32,4 +32,5 @@ $mess=array(
 "Pattern" => "Padrão",
 "If not empty, only tables beginning with such a prefix will be displayed." => "Caso não esteja vazio, apenas as tabelas com o prefixo serão mostradas.",
 "Repository Commons" => "Ficheiros de Repositório Comuns",
+"Default Rights" => "Default Rights",
 );

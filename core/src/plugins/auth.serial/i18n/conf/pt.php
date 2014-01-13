@@ -23,4 +23,7 @@ $mess=array(
 "Stores the Authentication data as serialized PHP values on the filesystem." => "Guarda os dados de autenticação em valores em série PHP no sistema de ficheiros.",
 "Users" => "Utilizadores",
 "The users list" => "Lista de Utilizadores",
+"Users File" => "Users File",
+"Fast Checks" => "Fast Checks",
+"When using a custom stream wrapper to read the files, this can increase performances by skipping various is_file,is_dir checks" => "When using a custom stream wrapper to read the files, this can increase performances by skipping various is_file,is_dir checks",
 );

@@ -21,4 +21,5 @@
 $mess=array(
 "Audio Player" => "Sound Player",
 "Uses HTML5 or Flash to play a sound" => "Uses HTML5 or Flash to play a sound",
+"Sound Player" => "Sound Player",
 );

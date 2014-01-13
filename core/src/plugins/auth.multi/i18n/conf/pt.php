@@ -27,4 +27,8 @@ $mess=array(
 "The auth drivers definition, see detailed documenation for more info." => "A definição Auth dos controladores, ler documentação para mais informação.",
 "Separator" => "Separador",
 "This is necessary to discriminate users data loaded from various sources. Warning, use foldername compliant characters. For example :: does not work!" => "Esta função é necessária para descriminar dados dos utilizadores de várias fontes. ATENÇÃO: Use apenas caracteres padrão para o nome das pastas. Por exemplo :: não irá funcionar!",
+"Mode" => "Mode",
+"Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features." => "Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features.",
+"Listing" => "Listing",
+"In Master_Slave mode, use this option to limit the users listing in the administration to one driver only (leave empty if you want to see all users)" => "In Master_Slave mode, use this option to limit the users listing in the administration to one driver only (leave empty if you want to see all users)",
 );

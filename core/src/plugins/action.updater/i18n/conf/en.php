@@ -29,4 +29,10 @@ $mess=array(
 "Enable the migration action, available in the Settings repository" => "Enable the migration action, available in the Settings workspace",
 "Update Channel" => "Update Channel",
 "Check stable or dev channel" => "Check stable or dev channel",
+"Proxy Host" => "Proxy Host",
+"Use a predefined proxy to establish connexion" => "Use a predefined proxy to establish connexion",
+"Proxy User" => "Proxy User",
+"Predefined proxy user name" => "Predefined proxy user name",
+"Proxy Pass" => "Proxy Pass",
+"Predefined proxy password" => "Predefined proxy password",
 );

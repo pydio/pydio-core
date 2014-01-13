@@ -27,4 +27,9 @@ $mess=array(
 "The folder in which all users files will be stored" => "The folder in which all users files will be stored",
 "Roles" => "Roles",
 "The file in which all roles definitions will be stored" => "The file in which all roles definitions will be stored",
+"Repositories File" => "Repositories File",
+"Users Folder" => "Users Folder",
+"Roles File" => "Roles File",
+"Fast Checks" => "Fast Checks",
+"When using a custom stream wrapper to read the files, this can increase performances by skipping various is_file,is_dir checks" => "When using a custom stream wrapper to read the files, this can increase performances by skipping various is_file,is_dir checks",
 );

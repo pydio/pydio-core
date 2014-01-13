@@ -25,4 +25,6 @@ $mess=array(
 "The Database Connexion" => "The Database Connexion",
 "Users Tmp Folder" => "Users Tmp Folder",
 "The folder in which all temporary files will be stored" => "The folder in which all temporary files will be stored",
+"SQL Tables" => "SQL Tables",
+"Install SQL Tables" => "Install SQL Tables",
 );

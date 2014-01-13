@@ -27,4 +27,6 @@ $mess=array(
 "The name of the log file" => "The name of the log file",
 "Files Permissions" => "Files Permissions",
 "" => "",
+"Log Folder" => "Log Folder",
+"Files Name Pattern" => "Files Name Pattern",
 );

@@ -40,4 +40,10 @@ $mess=array(
 "Dynamic FTP" => "FTP Dynamique",
 "Pass Ftp data through Auth driver" => "Paramêtres passés par l'Auth",
 "In conjunction with a correctly configured auth.ftp driver, this allow to transform ajaxplorer into a simple netFtp client." => "A utiliser en conjonction avec Auth.ftp, utiliser les données de FTP passées par le driver auth. Ceci permet de transformer Pydio en un client WebFTP générique.",
+"Test Connexion" => "Test Connexion",
+"Test FTP connexion" => "Test FTP connexion",
+"Create" => "Create",
+"Create folder if it does not exists" => "Create folder if it does not exists",
+"User Id" => "User Id",
+"To fetch the user id you have to run a listing command on your ftp client (ls or dir most of the time) and take the first of the two last numbers as the user id. It can be possible that there is more than one number. If you experience errors using one id try to use another one." => "To fetch the user id you have to run a listing command on your ftp client (ls or dir most of the time) and take the first of the two last numbers as the user id. It can be possible that there is more than one number. If you experience errors using one id try to use another one.",
 );

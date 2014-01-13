@@ -23,4 +23,6 @@ $mess=array(
 "Use the standard http authentication." => "Utilizar autenticação básica HTTP.",
 "Users" => "Utilizadores",
 "The users list" => "Lista de Utilizadores",
+"Logout URL" => "Logout URL",
+"Redirect to the given URL on loggin out" => "Redirect to the given URL on loggin out",
 );

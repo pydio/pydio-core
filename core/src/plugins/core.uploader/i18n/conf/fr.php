@@ -26,4 +26,6 @@ $mess=array(
 "Files Number" => "Nombre de fichiers",
 "File Size" => "Taille par fichier",
 "Cumul. Size" => "Taille cumulée",
+"Uploaders Options" => "Uploaders Options",
+"Options shared by all uploaders plugins" => "Options shared by all uploaders plugins",
 );

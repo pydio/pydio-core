@@ -24,4 +24,10 @@ $mess=array(
 "Bit.ly account API Key" => "Bit.ly account API Key",
 "Yourls domain" => "Yourls domain",
 "Use IDN" => "Use IDN",
+"multi URL Shortener" => "multi URL Shortener",
+"Shorten type" => "Shorten type",
+"adF.ly account user ID.\nThe numbers after -= ?id= =- in of your referral program's URL" => "adF.ly account user ID.\nThe numbers after -= ?id= =- in of your referral program's URL",
+"Type of AD you like to show.\n Select Fullscreen AD or Top banner AD" => "Type of AD you like to show.\n Select Fullscreen AD or Top banner AD",
+"adF.ly account user ID.\nThe numbers after -= ?id= =- in of your referral program's URL" => "adF.ly account user ID.\nThe numbers after -= ?id= =- in of your referral program's URL",
+"Type of AD you like to show.\n Select Fullscreen AD or Top banner AD" => "Type of AD you like to show.\n Select Fullscreen AD or Top banner AD",
 );

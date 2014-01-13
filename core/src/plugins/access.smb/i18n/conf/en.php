@@ -27,4 +27,12 @@ $mess=array(
 "Path to the root folder on the server" => "Path to the root folder on the server",
 "File Creation Mask" => "File Creation Mask",
 "Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." => "Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc.",
+"Server IP or name, do not use add slashes or backward slashes" => "Server IP or name, do not use add slashes or backward slashes",
+"Path to the share and complementary URI if necessary" => "Path to the share and complementary URI if necessary",
+"Domain" => "Domain",
+"Default domain to use with session credentials" => "Default domain to use with session credentials",
+"Smbclient" => "Smbclient",
+"Path to smbclient executable, considered to be in the path by default." => "Path to smbclient executable, considered to be in the path by default.",
+"Enable Zip" => "Enable Zip",
+"Enable zip creation for repositories using Samba access. Make sure that you are using a very fast network, otherwise it will be very long!" => "Enable zip creation for repositories using Samba access. Make sure that you are using a very fast network, otherwise it will be very long!",
 );

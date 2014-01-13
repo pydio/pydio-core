@@ -29,4 +29,10 @@ $mess=array(
 "Enable the migration action, available in the Settings repository" => "Ajoute des boutons pour importer des données depuis une version antérieur (3.2.4)",
 "Update Channel" => "Canal",
 "Check stable or dev channel" => "Canal stable ou développement",
+"Proxy Host" => "Proxy Host",
+"Use a predefined proxy to establish connexion" => "Use a predefined proxy to establish connexion",
+"Proxy User" => "Proxy User",
+"Predefined proxy user name" => "Predefined proxy user name",
+"Proxy Pass" => "Proxy Pass",
+"Predefined proxy password" => "Predefined proxy password",
 );

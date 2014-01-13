@@ -20,4 +20,5 @@
 */
 $mess=array(
 "Repository Editor" => "Repository Editor",
+"Plugin Editor" => "Plugin Editor",
 );

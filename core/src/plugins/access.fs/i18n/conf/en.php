@@ -34,5 +34,15 @@ $mess=array(
 "X-SendFile Active" => "X-SendFile Active",
 "Delegates all download operations to the webserver using the X-SendFile header. Warning, this is an external module to install for Apache. Module is active by default in Lighttpd. Warning, you have to manually add the folders where files will be downloaded in the module configuration (XSendFilePath directive)" => "Delegates all download operations to the webserver using the X-SendFile header. Warning, this is an external module to install for Apache. Module is active by default in Lighttpd. Warning, you have to manually add the folders where files will be downloaded in the module configuration (XSendFilePath directive)",
 "Data template" => "Data template",
-"Path to a directory on the filesystem whose content will be copied to the repository the first time it is loaded." => "Path to a directory on the filesystem whose content will be copied to the workspace the first time it is loaded."
+"Path to a directory on the filesystem whose content will be copied to the repository the first time it is loaded." => "Path to a directory on the filesystem whose content will be copied to the workspace the first time it is loaded.",
+"Purge Days (Hard limit)" => "Purge Days (Hard limit)",
+"Option to purge documents after a given number of days (even if shared). This require a manual set up of a CRON task. Leave to 0 if you don't wan't to use this feature." => "Option to purge documents after a given number of days (even if shared). This require a manual set up of a CRON task. Leave to 0 if you don't wan't to use this feature.",
+"Purge Days (Soft limit)" => "Purge Days (Soft limit)",
+"Option to purge documents after a given number of days (if not shared). This require a manual set up of a CRON task. Leave to 0 if you don't wan't to use this feature." => "Option to purge documents after a given number of days (if not shared). This require a manual set up of a CRON task. Leave to 0 if you don't wan't to use this feature.",
+"Remote Sorting" => "Remote Sorting",
+"Force remote sorting when in paginated mode. Warning, this can impact the performances." => "Force remote sorting when in paginated mode. Warning, this can impact the performances.",
+"Use POSIX" => "Use POSIX",
+"Use php POSIX extension to read files permissions. Only works on *nix systems." => "Use php POSIX extension to read files permissions. Only works on *nix systems.",
+"X-Accel-Redirect Active" => "X-Accel-Redirect Active",
+"Delegates all download operations to nginx using the X-Accel-Redirect header. Warning, you have to add some configuration in nginx, like X-Accel-Mapping" => "Delegates all download operations to nginx using the X-Accel-Redirect header. Warning, you have to add some configuration in nginx, like X-Accel-Mapping",
 );

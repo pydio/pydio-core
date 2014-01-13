@@ -27,4 +27,6 @@ $mess=array(
 "Id of the repository to use for testing connexion" => "Id of the workspace to use for testing connexion",
 "Admin user" => "Admin user",
 "The ID of an existing admin for Pydio (using conf.serial)" => "The ID of an existing admin for Pydio (using conf.serial)",
+"Test Connexion" => "Test Connexion",
+"Test connexion to the FTP server" => "Test connexion to the FTP server",
 );

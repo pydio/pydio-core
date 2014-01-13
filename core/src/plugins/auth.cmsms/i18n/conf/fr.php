@@ -30,4 +30,6 @@ $mess=array(
 "The Database Connexion" => "Connexion à la base",
 "Prefix tables" => "Préfixes",
 "Prefix of CMSMS tables " => "Préfixes des tables CMSMS",
+"CMSMS Authentication" => "CMSMS Authentication",
+"Stores the Authentication data in CMSMS FEU" => "Stores the Authentication data in CMSMS FEU",
 );

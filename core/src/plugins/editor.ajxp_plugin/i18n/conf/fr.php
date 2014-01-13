@@ -19,5 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-    "Repository Editor" => "Editeur de dépôts",
+"Repository Editor" => "Editeur de dépôts",
+"Plugin Editor" => "Plugin Editor",
 );

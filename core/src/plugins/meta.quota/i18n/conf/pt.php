@@ -21,4 +21,6 @@
 $mess=array(
 "FS Mount" => "Partição FS",
 "Mount a remote location on the file system before accessing the repository" => "Montar uma partição remota no sistema de ficheiros local antes de aceder à Área de Trabalho",
+"User quota" => "User quota",
+"Maintain the size of a given directory for each user" => "Maintain the size of a given directory for each user",
 );

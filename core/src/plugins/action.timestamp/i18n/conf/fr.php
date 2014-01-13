@@ -29,4 +29,5 @@ $mess=array(
 "User account" => "Compte utilisateur",
 "User Password" => "Mot de passe utilisateur",
 "Timestamp" => "Timestamp",
+"Allow timestamp files with Universign." => "Allow timestamp files with Universign.",
 );

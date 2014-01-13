@@ -21,4 +21,6 @@
 $mess=array(
 "FS Mount" => "FS Mount",
 "Mount a remote location on the file system before accessing the repository" => "Mount a remote location on the file system before accessing the workspace",
+"User quota" => "User quota",
+"Maintain the size of a given directory for each user" => "Maintain the size of a given directory for each user",
 );

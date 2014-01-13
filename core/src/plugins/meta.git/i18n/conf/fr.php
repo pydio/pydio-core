@@ -24,4 +24,5 @@ defined('AJXP_EXEC') or die('Access not allowed');
 $mess = array(
     "Git-based Versioning" => "Historique (Git)",
     "Keep tracks of all files modifications using a local Git workspace" => "Garder la mémoire de toutes les modifications avec un dépôt git créé en local. Nécessite PEAR/VersionControl_Git ainsi que git installé sur le serveur.",
+    "Keep tracks of all files modifications using a local Git repository" => "Keep tracks of all files modifications using a local Git repository",
 );

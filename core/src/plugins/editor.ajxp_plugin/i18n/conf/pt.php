@@ -20,4 +20,5 @@
 */
 $mess=array(
 "Repository Editor" => "Editor de Repositórios",
+"Plugin Editor" => "Plugin Editor",
 );

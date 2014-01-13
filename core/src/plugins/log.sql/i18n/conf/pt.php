@@ -23,4 +23,6 @@ $mess=array(
 "Stores the logs in an SQL database." => "Guarda registos numa Base de Dados SQL.",
 "Connexion" => "Ligação",
 "The Database Connexion" => "Ligação à Base de Dados",
+"SQL Tables" => "SQL Tables",
+"Install SQL Tables" => "Install SQL Tables",
 );

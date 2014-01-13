@@ -27,4 +27,7 @@ $mess=array(
 "Use Z-Agent" => "Use Z-Agent",
 "If you use the agent, enter its URL here." => "If you use the agent, enter its URL here.",
 "Z-Agent URL" => "Z-Agent URL",
+"Uniquely generated public key, that you must copy and paste inside the save_zoho.php file (see doc)." => "Uniquely generated public key, that you must copy and paste inside the save_zoho.php file (see doc).",
+"Z-Agent Key" => "Z-Agent Key",
+"External Z-Agent" => "External Z-Agent",
 );

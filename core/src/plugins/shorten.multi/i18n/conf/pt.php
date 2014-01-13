@@ -26,4 +26,6 @@ $mess=array(
 "Shorten Download Links before sending them back to the user. Requires a Bit.ly account." => "Shorten Download Links before sending them back to the user. Requires a Bit.ly account.",
 "Yourls domain" => "Yourls domain",
 "Use IDN" => "Use IDN",
+"multi URL Shortener" => "multi URL Shortener",
+"Shorten type" => "Shorten type",
 );

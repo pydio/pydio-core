@@ -23,4 +23,7 @@ $mess=array(
 "Stores the Authentication data in an SQL database." => "Guarda os dados de autenticação numa base de dados SQL.",
 "Connexion" => "Ligação",
 "The Database Connexion" => "Ligação à Base de Dados",
+"DB Auth Storage" => "DB Auth Storage",
+"SQL Tables" => "SQL Tables",
+"Install SQL Tables" => "Install SQL Tables",
 );

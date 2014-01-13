@@ -24,4 +24,6 @@ $mess=array(
 "Bit.ly account API Key" => "Clave API de la cuenta Bit.ly",
 "Yourls domain" => "Yourls domain",
 "Use IDN" => "Use IDN",
+"multi URL Shortener" => "multi URL Shortener",
+"Shorten type" => "Shorten type",
 );

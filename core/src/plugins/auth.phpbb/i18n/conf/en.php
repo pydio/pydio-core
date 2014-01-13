@@ -31,4 +31,5 @@ $mess=array(
 "The phpbb path" => "The phpbb path",
 "Users" => "Users",
 "The users list" => "The users list",
+"PHPBB authentication" => "PHPBB authentication",
 );
