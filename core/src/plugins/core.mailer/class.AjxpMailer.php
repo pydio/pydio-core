@@ -90,7 +90,7 @@ class AjxpMailer extends AJXP_Plugin
             $body = str_replace(array("AJXP_IMAGE_LINK", "AJXP_IMAGE_END"), "", $body);
         }
         $body = str_replace("AJXP_MAIL_SUBJECT", $subject, $body);
-        $this->sendMailImpl($recipients, $subject, $body, $from = null, $images);
+        $this->sendMailImpl($recipients, $subject, $body, $from, $images);
         if (AJXP_SERVER_DEBUG) {
             $line = "------------------------------------------------------------------------\n";
             file_put_contents($this->mailCache, "Sending mail from ".print_r($from, true)." to ".print_r($recipients, true)."\n\n$subject\n\n$body\n".$line, FILE_APPEND);
