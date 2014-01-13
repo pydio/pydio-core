@@ -73,6 +73,8 @@ Class.create("User", {
      */
     lock : false,
 
+    _parsedJSONCache: $H(),
+
 	/**
 	 * Constructor
 	 * @param id String The user unique id
@@ -141,11 +143,17 @@ Class.create("User", {
 	 * @returns Mixed
 	 */
 	getPreference : function(prefName, fromJSON){
-	    var value = this.preferences.get(prefName);	
+        if(fromJSON){
+            var test = this._parsedJSONCache.get(prefName);
+            if(test !== undefined) return test;
+        }
+	    var value = this.preferences.get(prefName);
 	    if(fromJSON && value){
 	    	try{
                 if(typeof value == "object") return value;
-		    	return value.evalJSON();
+		    	var parsed = value.evalJSON();
+                this._parsedJSONCache.set(prefName, parsed);
+                return parsed;
 	    	}catch(e){
                 if(console){
                     console.log("Error parsing JSON in preferences ("+prefName+"). You should contact system admin and clear user preferences.");
@@ -173,6 +181,7 @@ Class.create("User", {
 	 */
 	setPreference : function(prefName, prefValue, toJSON){
 		if(toJSON){
+            this._parsedJSONCache.set(prefName, prefValue);
 			prefValue = Object.toJSON(prefValue);
 		}
 		this.preferences.set(prefName, prefValue);

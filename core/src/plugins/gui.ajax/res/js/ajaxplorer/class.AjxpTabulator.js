@@ -339,6 +339,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 	 * @param tabId String The id of the target tab
 	 */
 	switchTabulator:function(tabId){
+        if(this.crtTabId && this.crtTabId == tabId) return;
 		var toShow ;
         var toShowElement;
 		this.tabulatorData.each(function(tabInfo){
@@ -385,6 +386,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             this.htmlElement.writeAttribute("data-ajxpTabsCount", this.tabulatorData.size());
         }
         this.resize();
+        this.crtTabId = tabId;
         this.notify("switch", tabId);
 
 	},
@@ -422,7 +424,7 @@ Class.create("AjxpTabulator", AjxpPane, {
                 total += hWidth;
             }.bind(this));
             if(total >= innerWidth){
-                var part = parseInt( left / ( this.tabulatorData.length -1) ) ;
+                var part = parseInt( left / ( this.tabulatorData.length -1) ) - 1 ;
                 if(part < 14){
                     cont.addClassName('icons_only');
                 }

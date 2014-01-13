@@ -37,6 +37,9 @@ and (max-width : 680px) {
         width: 30px;
         overflow: hidden;
     }
+    .thumbnail_selectable_cell > div > div.overlay_icon_div{
+        top: 32px !important;
+    }
 }
 
 @media only screen

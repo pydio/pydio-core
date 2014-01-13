@@ -293,6 +293,7 @@ div.thumbnail_cell_metadata span.metadata_chunk{
     top: 24px !important;
     right: 21px !important;
     font-size: 16px;
+    transition: top 0.6s ease;
 }
 
 div.class-FetchedResultPane div.overlay_icon_div {
@@ -1148,6 +1149,8 @@ input.SF_input.SF_number{
 
 #workspace_toolbar{
     padding-top: 11px;
+    height: 53px;
+    overflow: hidden;
 }
 
 #simple_repository_label{

@@ -776,7 +776,7 @@ Class.create("FilesList", SelectableElements, {
 			}
             var scrollElement = this.htmlElement.down(".selectable_div");
 			this.observer = function(e){
-				fitHeightToBottom(scrollElement, this.htmlElement);
+				fitHeightToBottom.defer(scrollElement, this.htmlElement);
 			}.bind(this);
 			this.observe("resize", this.observer);
 			
@@ -875,9 +875,25 @@ Class.create("FilesList", SelectableElements, {
             if(this.scrollSizeObserver){
                 this.stopObserving("resize", this.scrollSizeObserver);
             }
+            this.stopObserving("resize", this.observer);
             this.scrollSizeObserver = function(){
-                this.scroller.setStyle({height:parseInt(scrollElement.getHeight())+"px"});
-                this.scrollbar.recalculateLayout();
+                window.setTimeout(function(){
+                    if(!this.htmlElement || !this.scrollbar) return;
+                    if(this._displayMode == "list"){
+                        fitHeightToBottom(contentContainer, this.htmlElement);
+                        if(Prototype.Browser.IE){
+                            this._headerResizer.resize(contentContainer.getWidth());
+                        }else{
+                            var width = this.htmlElement.getWidth();
+                            width -= parseInt(this.htmlElement.getStyle("borderLeftWidth")) + parseInt(this.htmlElement.getStyle("borderRightWidth"));
+                            this._headerResizer.resize(width);
+                        }
+                    }else{
+                        fitHeightToBottom(scrollElement, this.htmlElement);
+                    }
+                    this.scroller.setStyle({height:parseInt(scrollElement.getHeight())+"px"});
+                    this.scrollbar.recalculateLayout();
+                }.bind(this), 0.01);
             }.bind(this);
             this.observe("resize", this.scrollSizeObserver);
         }
@@ -1104,7 +1120,7 @@ Class.create("FilesList", SelectableElements, {
 		var allItems = this.getItems();
 		for(var i=0; i<allItems.length;i++)
 		{
-			this.disableTextSelection(allItems[i], true);
+			this.disableTextSelection.bind(this).defer(allItems[i], true);
 		}
         this.notify("resize");
         this.notify("rows:didInitialize");
@@ -2062,9 +2078,12 @@ Class.create("FilesList", SelectableElements, {
 		var elList;
 		if(one_element) elList = [one_element]; 
 		else elList = this._htmlElement.select('div.thumbnail_selectable_cell');
+        if(this._displayMode == "detail"){
+            elList = this._htmlElement.select('div.thumbnail_selectable_cell.detailed');
+        }
         var ellipsisDetected;
 		elList.each(function(element){
-            if(element.up('div.thumbnail_selectable_cell.detailed')) return;
+            //if(element.up('div.thumbnail_selectable_cell.detailed')) return;
 			var node = element.ajxpNode;
 			var image_element = element.IMAGE_ELEMENT || element.down('img');
 			var label_element = element.LABEL_ELEMENT || element.down('.thumbLabel');

@@ -92,6 +92,7 @@ Class.create("AjxpPane", {
 
     filterWidthFromSiblings : function(original){
         "use strict";
+        if(!this.htmlElement || !this.htmlElement.parentNode) return;
         var parentWidth = this.htmlElement.parentNode.getWidth();
         var siblingWidth = 0;
         this.htmlElement.siblings().each(function(s){
