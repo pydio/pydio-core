@@ -269,8 +269,9 @@ class UserDashboardDriver extends AbstractAccessDriver
         foreach ($teams as $teamId => $team) {
             if(empty($team["LABEL"])) continue;
             AJXP_XMLWriter::renderNode("/teams/".$teamId, $team["LABEL"], true, array(
-                    "icon" => "users-folder.png",
-                    "users" => "<span class='icon-groups'></span> ".implode(",", array_values($team["USERS"]))
+                    "icon"      => "users-folder.png",
+                    "ajxp_mime" => "ajxp_team",
+                    "users"     => "<span class='icon-groups'></span> ".implode(",", array_values($team["USERS"]))
                 ), true, true);
         }
     }

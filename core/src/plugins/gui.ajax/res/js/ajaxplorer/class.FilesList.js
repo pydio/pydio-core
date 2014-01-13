@@ -2169,8 +2169,7 @@ Class.create("FilesList", SelectableElements, {
 	 * Remove the loading image
 	 */
 	removeOnLoad: function(){
-        var element = this.htmlElement; //this.htmlElement.down('.selectable_div,.table_rows_container') || this.htmlElement;
-		removeLightboxFromElement(element);
+        if(this.htmlElement) removeLightboxFromElement(this.htmlElement);
 		this.loading = false;
 	},
 	

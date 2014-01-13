@@ -73,4 +73,5 @@ $mess=array(
 "49"=> "Utilisateurs externes que vous avez créés",
 "50"=> "Mes équipes",
 "51"=> "Groupes d'utilisateurs accessibles comme des raccourcis lors du partage",
+"52"=> "Are you sure you want to delete this team? This will not remove any users.",
 );

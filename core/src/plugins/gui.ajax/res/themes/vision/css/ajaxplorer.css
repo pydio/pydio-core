@@ -4661,6 +4661,7 @@ div.flat_tabulator > div:not(.tabulatorContainer){
     background-color: transparent !important;
     color: rgb(111, 123, 136) !important;
     text-shadow: none;
+    padding-bottom: 33px !important;
 }
 
 div.horizontal_tabulator > div:not(.tabulatorContainer){

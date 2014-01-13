@@ -75,4 +75,5 @@ $mess=array(
 "49"=> "External users that you created",
 "50"=> "My Teams",
 "51"=> "Teams of users, used as shortcuts when sharing",
+"52"=> "Are you sure you want to delete this team? This will not remove any users.",
 );

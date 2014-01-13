@@ -65,12 +65,12 @@
                     background-color: #e35d52 !important;
                 }
                 .flat_tabulator span.toggleHeader.toggleInactive {
-                    background-color: rgba(227, 93, 82, 0.35) !important;
+                    background-color: rgba(119, 119, 119, 0.35) !important;
                 }
                 </style>
             ]]></template_part>
             <template_part ajxpId="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOptionUser":"true", "messageBoxReference":true}' theme="vision"><![CDATA[
-                <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="settings_main_pane dashboard_main_pane flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "home","tabInfos" : [{"id":"home","label":"Home","iconClass":"icon-home", "element":"home_account_pane"},{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"parameters_pane"},{"id":"info","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"files_list_pane"}]}'>
+                <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="dashboard_main_pane flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "home","tabInfos" : [{"id":"home","label":"Home","iconClass":"icon-home", "element":"home_account_pane"},{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"parameters_pane"},{"id":"info","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"files_list_pane"}]}'>
                     <div id="home_account_pane" ajxpClass="UserDashboardHome">
                         <div id="notifications_center">
                             <span class="icon-rss" id="close-icon"></span>
@@ -91,7 +91,7 @@
                         <div id="userdashboard_addressbook_tab" ajxpClass="AjxpTabulator" class="horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "my-users","tabInfos" : [{"id":"my-users","label":"user_dash.48", "title":"user_dash.49","iconClass":"icon-user", "element":"my-users-pane"}]}'>
                             <div id="my-users-pane" ajxpClass="AjxpPane" class="tabbed_editor">
                                 <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                                <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "fitParent":"userdashboard_main_tab", "fitMarginBottom":10, "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
+                                <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "fitParent":"userdashboard_main_tab", "fitMarginBottom":0, "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
                             </div>
                         </div>
                     </div>
