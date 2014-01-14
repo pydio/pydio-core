@@ -42,6 +42,9 @@ class AJXP_JSPacker
             AJXP_JSPacker::concatListAndPack($list,
                                              $scriptName,
                                             "Normal");
+            if(isSet($_GET["separate"])){
+                self::compactEach($list, "Normal");
+            }
         }
         $sList = glob(AJXP_THEME_FOLDER."/css/*_list.txt");
         foreach ($sList as $list) {
@@ -89,6 +92,28 @@ class AJXP_JSPacker
         @file_put_contents($out, $packed);
 
         return true;
+    }
+
+    public function compactEach($list, $mode){
+        $lines = file($list);
+        require_once("packer/class.JavaScriptPacker.php");
+        $fullcode = '';
+        foreach($lines as $line){
+            $in = AJXP_INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/".rtrim($line,"\n\r");
+            $out = str_replace("/js/", "/js/min/", $in);
+            $outfull = str_replace(".js", ".full.js", $out);
+            $jscode = file_get_contents($in);
+            $fullcode .= $jscode;
+            // Pack and write to file
+            $packer = new JavaScriptPacker($jscode, $mode , true, false);
+            $packed = $packer->pack();
+            file_put_contents($out, $packed);
+
+            // Pack and write to file
+            $packer = new JavaScriptPacker($fullcode, $mode , true, false);
+            $packed = $packer->pack();
+            file_put_contents($outfull, $packed);
+        }
     }
 
 }

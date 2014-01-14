@@ -187,7 +187,7 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
                             name: "send_email",
                             scope: "user",
                             type: "boolean",
-                            default: "",
+                            "default": "",
                             mandatory: true
                         }));
                         var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), params.join('|'));

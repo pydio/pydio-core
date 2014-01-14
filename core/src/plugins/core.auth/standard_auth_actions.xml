@@ -91,8 +91,8 @@
 									ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
 								}
 								if(success){
-        						    $("generic_dialog_box").down(".dialogTitle").setAttribute("style", "");
-        						    oForm.up('.dialogContent').setAttribute("style", "");
+        						    $("generic_dialog_box").down(".dialogTitle").writeAttribute("style", "");
+        						    oForm.up('.dialogContent').writeAttribute("style", "");
     						        $("generic_dialog_box").select("#progressCustomMessage").invoke("remove");
         						}
 

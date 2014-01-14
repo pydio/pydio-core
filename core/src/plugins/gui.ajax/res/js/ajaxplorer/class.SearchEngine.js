@@ -391,7 +391,9 @@ Class.create("SearchEngine", AjxpPane, {
         }else{
             $(this._ajxpOptions.toggleResultsVisibility).setStyle({display:'none'});
         }
-        this._fileList.showElement(show);
+        if(this._fileList) {
+            this._fileList.showElement(show);
+        }
     },
 
 	/**

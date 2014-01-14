@@ -2085,8 +2085,12 @@ Class.create("FilesList", SelectableElements, {
 		elList.each(function(element){
             //if(element.up('div.thumbnail_selectable_cell.detailed')) return;
 			var node = element.ajxpNode;
-			var image_element = element.IMAGE_ELEMENT || element.down('img');
-			var label_element = element.LABEL_ELEMENT || element.down('.thumbLabel');
+            try{
+                var image_element = element.IMAGE_ELEMENT || element.down('img');
+                var label_element = element.LABEL_ELEMENT || element.down('.thumbLabel');
+            }catch(e){
+                return;
+            }
             var elementsAreSiblings = (label_element && (label_element.siblings().indexOf(image_element) !== -1));
             var tSize = (this._displayMode=='detail'? this._detailThumbSize:this._thumbSize);
             if(element.down('div.thumbnail_selectable_cell')){
