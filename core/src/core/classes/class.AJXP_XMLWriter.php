@@ -451,7 +451,7 @@ class AJXP_XMLWriter
                     $buffer .= AJXP_XMLWriter::renderNode($path, $title, false, array('icon' => "mime_empty.png"), true, false);
                 }
             } else {
-                $buffer .= "<bookmark path=\"".AJXP_Utils::xmlEntities($path)."\" title=\"".AJXP_Utils::xmlEntities($title)."\"/>";
+                $buffer .= "<bookmark path=\"".AJXP_Utils::xmlEntities($path, true)."\" title=\"".AJXP_Utils::xmlEntities($title, true)."\"/>";
             }
         }
         if($print) print $buffer;

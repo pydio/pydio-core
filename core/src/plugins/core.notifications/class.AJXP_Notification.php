@@ -114,7 +114,7 @@ class AJXP_Notification
             "AJXP_REPOSITORY_LABEL" => $em.$repoLabel.$me,
             "AJXP_LINK"             => $this->getMainLink(),
             "AJXP_USER"             => $uLabel,
-            "AJXP_DATE"             => AJXP_Utils::relativeDate($this->getDate(),$mess) //date($mess["date_format"], $this->getDate()),
+            "AJXP_DATE"             => SystemTextEncoding::fromUTF8(AJXP_Utils::relativeDate($this->getDate(),$mess)),
         );
 
         if((strstr($tplString, "AJXP_TARGET_FOLDER") !== false || strstr($tplString, "AJXP_SOURCE_FOLDER")) &&
