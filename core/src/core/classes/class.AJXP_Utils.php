@@ -269,6 +269,9 @@ class AJXP_Utils
             $errorsArray[UPLOAD_ERR_NO_FILE] = array(410, "No file found on server!");
             $errorsArray[UPLOAD_ERR_PARTIAL] = array(410, "File is partial");
             $errorsArray[UPLOAD_ERR_INI_SIZE] = array(410, "No file found on server!");
+            $errorsArray[UPLOAD_ERR_NO_TMP_DIR] = array(410, "Cannot find the temporary directory!");
+            $errorsArray[UPLOAD_ERR_CANT_WRITE] = array(411, "Cannot write into the temporary directory!");
+            $errorsArray[UPLOAD_ERR_EXTENSION] = array(410, "A PHP extension stopped the upload process");
             if ($userfile_error == UPLOAD_ERR_NO_FILE) {
                 // OPERA HACK, do not display "no file found error"
                 if (!ereg('Opera', $_SERVER['HTTP_USER_AGENT'])) {
