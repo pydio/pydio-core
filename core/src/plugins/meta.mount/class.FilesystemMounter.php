@@ -69,11 +69,12 @@ class FilesystemMounter extends AJXP_Plugin
         return array($user, $password);
     }
 
-    protected function getOption($name, $user="", $pass="")
+    protected function getOption($name, $user="", $pass="", $escapePass = true)
     {
         $opt = $this->options[$name];
         $opt = str_replace("AJXP_USER", $user, $opt);
-        $opt = str_replace("AJXP_PASS",  "'$pass'", $opt);
+        if($escapePass)  $opt = str_replace("AJXP_PASS",  "'$pass'", $opt);
+        else $opt = str_replace("AJXP_PASS",  $pass, $opt);
         $opt = str_replace("AJXP_SERVER_UID", posix_getuid(), $opt);
         $opt = str_replace("AJXP_SERVER_GID", posix_getgid(), $opt);
         if (stristr($opt, "AJXP_REPOSITORY_PATH") !== false) {
@@ -118,7 +119,7 @@ class FilesystemMounter extends AJXP_Plugin
                 }
             }
         }
-        $UNC_PATH = $this->getOption("UNC_PATH", $user, $password);
+        $UNC_PATH = $this->getOption("UNC_PATH", $user, $password, false);
         $MOUNT_OPTIONS = $this->getOption("MOUNT_OPTIONS", $user, $password);
 
         $cmd = ($MOUNT_SUDO? "sudo ": ""). "mount -t " .$MOUNT_TYPE. (empty( $MOUNT_OPTIONS )? " " : " -o " .$MOUNT_OPTIONS. " " ) .$UNC_PATH. " " .$MOUNT_POINT;
