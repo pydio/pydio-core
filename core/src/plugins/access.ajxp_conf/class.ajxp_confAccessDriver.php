@@ -705,7 +705,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 $rId = AJXP_Utils::sanitize($httpVars["role_id"]);
                 $role = AuthService::getRole($rId);
-                if($role === false){
+                if ($role === false) {
                     AJXP_XMLWriter::header();
                     AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]."(".$rId.")");
                     AJXP_XMLWriter::close();

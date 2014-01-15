@@ -37,8 +37,8 @@ class ZohoEditor extends AJXP_Plugin
         }
     }
 
-    public function init($options){
-
+    public function init($options)
+    {
         parent::init($options);
         if(!extension_loaded("openssl")) return;
 
@@ -53,22 +53,22 @@ class ZohoEditor extends AJXP_Plugin
 
         // Create the private and public key
         $res = openssl_pkey_new($config);
-        if($res === false){
+        if ($res === false) {
             AJXP_Logger::error(__CLASS__, __FUNCTION__, "Warning, OpenSSL is active but could not correctly generate a key for Zoho Editor. Please make sure the openssl.cnf file is correctly set up.");
-            while($message = openssl_error_string()){
+            while ($message = openssl_error_string()) {
                 AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Open SSL Error: ".$message);
             }
-        }else{
+        } else {
             openssl_pkey_export_to_file($res, $keyFile);
         }
 
     }
 
-    public function loadConfigs($configData){
-
+    public function loadConfigs($configData)
+    {
         parent::loadConfigs($configData);
         $keyFile = $this->getPluginWorkDir(true)."/agent.pem";
-        if(file_exists($keyFile)){
+        if (file_exists($keyFile)) {
             $res = openssl_pkey_get_private(file_get_contents($keyFile));
             $details = openssl_pkey_get_details($res);
             $public = $details["key"];
@@ -77,9 +77,10 @@ class ZohoEditor extends AJXP_Plugin
 
     }
 
-    public function signID($id){
+    public function signID($id)
+    {
         $keyFile = $this->getPluginWorkDir(true)."/agent.pem";
-        if(file_exists($keyFile)){
+        if (file_exists($keyFile)) {
             $keyId = openssl_get_privatekey(file_get_contents($keyFile));
             $message = $id;
             openssl_sign($message, $signature, $keyId);

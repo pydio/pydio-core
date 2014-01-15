@@ -42,7 +42,7 @@ class AJXP_JSPacker
             AJXP_JSPacker::concatListAndPack($list,
                                              $scriptName,
                                             "Normal");
-            if(isSet($_GET["separate"])){
+            if (isSet($_GET["separate"])) {
                 self::compactEach($list, "Normal");
             }
         }
@@ -94,11 +94,12 @@ class AJXP_JSPacker
         return true;
     }
 
-    public function compactEach($list, $mode){
+    public function compactEach($list, $mode)
+    {
         $lines = file($list);
         require_once("packer/class.JavaScriptPacker.php");
         $fullcode = '';
-        foreach($lines as $line){
+        foreach ($lines as $line) {
             $in = AJXP_INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/".rtrim($line,"\n\r");
             $out = str_replace("/js/", "/js/min/", $in);
             $outfull = str_replace(".js", ".full.js", $out);

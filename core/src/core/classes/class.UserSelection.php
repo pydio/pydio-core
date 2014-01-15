@@ -107,7 +107,7 @@ class UserSelection
         }
         if (isSet($array["nodes"]) && is_array($array["nodes"])) {
             $this->files = array();
-            foreach($array["nodes"] as $value){
+            foreach ($array["nodes"] as $value) {
                 $this->files[] = AJXP_Utils::decodeSecureMagic($value);
             }
             $this->isUnique = count($this->files) == 1;
