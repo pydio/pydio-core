@@ -327,7 +327,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
             action = "meta_source_add";
         }else{
             var button = Event.findElement(event, 'div.largeButton');
-            var form = button.previous('div.meta_form_container');
+            var form = button.up('div.tabPaneButtons').previous('div.meta_form_container');
             if(button.getAttribute("name")){
                 action = button.getAttribute("name");
             }else{
