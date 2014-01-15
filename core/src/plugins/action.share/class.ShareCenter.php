@@ -1351,7 +1351,7 @@ class ShareCenter extends AJXP_Plugin
                 $userObject->setProfile("shared");
                 if(isSet($httpVars["minisite"])){
                     $mess = ConfService::getMessages();
-                    $userObject->personalRole->setParameterValue("core.conf", "USER_DISPLAY_NAME", "[".$mess["share_center.84"]."] ".$newRepo->getDisplay());
+                    $userObject->personalRole->setParameterValue("core.conf", "USER_DISPLAY_NAME", "[".$mess["share_center.109"]."] ".$newRepo->getDisplay());
                 }
                 AJXP_Controller::applyHook("user.after_create", array($userObject));
             }
