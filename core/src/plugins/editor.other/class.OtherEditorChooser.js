@@ -48,6 +48,7 @@ Class.create("OtherEditorChooser", AbstractEditor, {
 	
 	open : function($super, node){
 		$super(node);
+        this.currentNode = node;
 		var allEditors = this.findActiveEditors(node.getAjxpMime());
 		var selector = this.element.down('#editor_selector');
         var clearAssocLink = this.element.down('#clear_assoc_link');
@@ -85,7 +86,11 @@ Class.create("OtherEditorChooser", AbstractEditor, {
 		if(!event.target.editorData) return;
 		ajaxplorer.loadEditorResources(event.target.editorData.resourcesManager);
 		hideLightBox();
-		modal.openEditorDialog(event.target.editorData);
+        if(!ajaxplorer._editorOpener || event.target.editorData.modalOnly){
+            modal.openEditorDialog(event.target.editorData);
+        }else{
+            ajaxplorer._editorOpener.openEditorForNode(this.currentNode, event.target.editorData);
+        }
         this.createAssociation(event.target.currentMime, event.target.editorData.editorClass);
 	},
 
