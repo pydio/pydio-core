@@ -19,7 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Files MetaStore" => "MetaStore S3",
-"Stores metadata s3 metadata" => "Stores metadata s3 metadata",
-"S3 MetaStore" => "MetaStore S3",
+    "Stores metadata s3 metadata" => "Stores metadata s3 metadata",
+    "S3 MetaStore" => "MetaStore S3",
 );
