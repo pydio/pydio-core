@@ -786,7 +786,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         $orderField = "ajxp_label";
                     }
                 }
-                if(isSet($httpVars["recursive"])){
+                if(isSet($httpVars["recursive"]) && $httpVars["recursive"] == "true"){
                     $max_depth = (isSet($httpVars["max_depth"])?intval($httpVars["max_depth"]):0);
                     $max_nodes = (isSet($httpVars["max_nodes"])?intval($httpVars["max_nodes"]):0);
                     $crt_depth = (isSet($httpVars["crt_depth"])?intval($httpVars["crt_depth"])+1:1);

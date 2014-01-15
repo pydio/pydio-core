@@ -90,7 +90,9 @@ AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){
 			if(!this.paginated){
 				this.paginated = true;
 				if(pData.get('dirsCount')!="0"){
-					this.updateLabel(this.text + " (" + MessageHash[pData.get('overflowMessage')]+ ")");
+                    var message = pData.get('overflowMessage');
+                    if(MessageHash[message]) message = MessageHash[message];
+					this.updateLabel(this.text + " (" + message+ ")");
 				}
 			}
 			//return;

@@ -253,7 +253,7 @@
 						};
 						var closeFunc = function(){
 							userSelection.updateFormOrUrl(modal.getForm());
-							ajaxplorer.actionBar.submitForm(modal.getForm());
+							ajaxplorer.actionBar.submitForm(modal.getForm(), true);
 							hideLightBox();
 						};
 						modal.showDialogForm('Compress selection to ...', 'compress_form', loadFunc, closeFunc);

@@ -93,7 +93,7 @@ class AJXP_XMLWriter
         if (is_array($remoteSortAttributes)) {
             foreach($remoteSortAttributes as $k => $v) $remoteSortString .= " $k='$v'";
         }
-        $string = '<pagination count="'.$count.'" total="'.$totalPages.'" current="'.$currentPage.'" overflowMessage="306" icon="folder.png" openicon="folder_open.png" dirsCount="'.$dirsCount.'"'.$remoteSortString.'/>';
+        $string = '<pagination count="'.$count.'" total="'.$totalPages.'" current="'.$currentPage.'" overflowMessage="'.$currentPage."/".$totalPages.'" icon="folder.png" openicon="folder_open.png" dirsCount="'.$dirsCount.'"'.$remoteSortString.'/>';
         AJXP_XMLWriter::write($string, true);
     }
     /**
