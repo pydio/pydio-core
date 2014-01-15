@@ -261,7 +261,17 @@ class AJXP_Safe
             list($user, $password) = AJXP_Safe::getCredentialsFromEncodedString($repository->getOption("ENCODED_CREDENTIALS"));
         }
         // 5. Try from session
-        if ($user=="" && ( $repository->getOption("USE_SESSION_CREDENTIALS") || self::getInstance()->forceSessionCredentials )) {
+        $storeCreds = false;
+        if ($repository->getOption("META_SOURCES")) {
+            $options["META_SOURCES"] = $repository->getOption("META_SOURCES");
+            foreach ($options["META_SOURCES"] as $metaSource) {
+                if (isSet($metaSource["USE_SESSION_CREDENTIALS"]) && $metaSource["USE_SESSION_CREDENTIALS"] === true) {
+                    $storeCreds = true;
+                    break;
+                }
+            }
+        }
+        if ($user=="" && ( $repository->getOption("USE_SESSION_CREDENTIALS") || $storeCreds || self::getInstance()->forceSessionCredentials )) {
             $safeCred = AJXP_Safe::loadCredentials();
             if ($safeCred !== false) {
                 $user = $safeCred["user"];

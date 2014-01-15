@@ -612,13 +612,24 @@ class ShareCenter extends AJXP_Plugin
         if (AuthService::usersEnabled()) {
             $data["OWNER_ID"] = AuthService::getLoggedUser()->getId();
         }
-        if ($accessDriver->hasMixin("credentials_consumer")) {
+        $storeCreds = false;
+        if ($repository->getOption("META_SOURCES")) {
+            $options["META_SOURCES"] = $repository->getOption("META_SOURCES");
+            foreach ($options["META_SOURCES"] as $metaSource) {
+                if (isSet($metaSource["USE_SESSION_CREDENTIALS"]) && $metaSource["USE_SESSION_CREDENTIALS"] === true) {
+                    $storeCreds = true;
+                    break;
+                }
+            }
+        }
+        if ($storeCreds || $accessDriver->hasMixin("credentials_consumer")) {
             $cred = AJXP_Safe::tryLoadingCredentialsFromSources(array(), $repository);
             if (isSet($cred["user"]) && isset($cred["password"])) {
                 $data["SAFE_USER"] = $cred["user"];
                 $data["SAFE_PASS"] = $cred["password"];
             }
         }
+
         // Force expanded path in publiclet
         $copy = clone $repository;
         $copy->addOption("PATH", $repository->getOption("PATH"));
@@ -935,7 +946,7 @@ class ShareCenter extends AJXP_Plugin
 
         //AuthService::logUser($data["OWNER_ID"], "", true);
         AuthService::logTemporaryUser($data["OWNER_ID"], $shortHash);
-        if ($driver->hasMixin("credentials_consumer") && isSet($data["SAFE_USER"]) && isSet($data["SAFE_PASS"])) {
+        if (isSet($data["SAFE_USER"]) && isSet($data["SAFE_PASS"])) {
             // FORCE SESSION MODE
             AJXP_Safe::getInstance()->forceSessionCredentialsUsage();
             AJXP_Safe::storeCredentials($data["SAFE_USER"], $data["SAFE_PASS"]);
