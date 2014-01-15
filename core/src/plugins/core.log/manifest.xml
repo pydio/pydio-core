@@ -3,6 +3,9 @@
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition classname="AJXP_Logger" filename="plugins/core.log/class.AJXP_Logger.php"/>
     <server_settings>
-        <global_param description="CONF_MESSAGE[Plugin instance to handle log implementation]" label="CONF_MESSAGE[Logger plugin]" name="UNIQUE_PLUGIN_INSTANCE" type="plugin_instance:log" default="log.text" mandatory="true"/>
+        <global_param name="ERROR_TO_ERROR_LOG" type="boolean" label="CONF_MESSAGE[Send errors to system log]"
+                      description="CONF_MESSAGE[Always send all Error-level messages to the system error log]" default="false" mandatory="true"/>
+        <global_param description="CONF_MESSAGE[Plugin instance to handle log implementation]" label="CONF_MESSAGE[Logger plugin]"
+                      name="UNIQUE_PLUGIN_INSTANCE" type="plugin_instance:log" default="log.text" mandatory="true"/>
     </server_settings>
 </ajxp_plugin>

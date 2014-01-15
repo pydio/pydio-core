@@ -38,10 +38,12 @@ class AJXP_Logger extends AJXP_Plugin
      */
     protected $pluginInstance;
     protected static $loggerInstance;
+    protected static $globalOptions;
 
     public function init($options)
     {
         parent::init($options);
+        self::$globalOptions = $this->pluginConf;
         $this->pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_PLUGIN_INSTANCE"], "AbstractLogDriver");
         if ($this->pluginInstance != false) {
             AJXP_PluginsService::getInstance()->setPluginUniqueActiveForType("log", $this->pluginInstance->getName(), $this->pluginInstance);
@@ -86,6 +88,9 @@ class AJXP_Logger extends AJXP_Plugin
         if ($logger != null) {
             try {
                 $logger->write2($level, $ip, $user, $source, $prefix, $res);
+                if ( $level == LOG_LEVEL_ERROR && self::$globalOptions["ERROR_TO_ERROR_LOG"] === true) {
+                    error_log("[PYDIO] IP $ip | user $user | $level | $prefix | from $source | ".$res);
+                }
             } catch (Exception $e) {
                 error_log("Exception while logging");
                 error_log("Log message was : IP => $ip | user => $user | level => $level | source => $source | prefix => $prefix | message => ".$res);
