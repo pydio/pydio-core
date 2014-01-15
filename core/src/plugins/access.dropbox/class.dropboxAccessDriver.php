@@ -109,17 +109,17 @@ class dropboxAccessDriver extends fsAccessDriver
 
     public function getTokens()
     {
-        if($this->repository->getOption("DROPBOX_OAUTH_TOKENS") !== null && is_array($this->repository->getOption("DROPBOX_OAUTH_TOKENS"))){
+        if ($this->repository->getOption("DROPBOX_OAUTH_TOKENS") !== null && is_array($this->repository->getOption("DROPBOX_OAUTH_TOKENS"))) {
             return $this->repository->getOption("DROPBOX_OAUTH_TOKENS");
         }
         $repositoryId = $this->repository->getId();
-        if(AuthService::usersEnabled()) {
+        if (AuthService::usersEnabled()) {
             $u = AuthService::getLoggedUser();
             $userId = $u->getId();
-            if($u->getResolveAsParent()){
+            if ($u->getResolveAsParent()) {
                 $userId = $u->getParent();
             }
-        }else {
+        } else {
             $userId = "shared";
         }
         return AJXP_Utils::loadSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_".$userId."_tokens");

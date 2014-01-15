@@ -35,7 +35,7 @@ class serial_otpAuthDriver extends AbstractAuthDriver
     public function init($options)
     {
         parent::init($options);
-        if(AJXP_Utils::searchIncludePath('Auth/Yubico.php')){
+        if (AJXP_Utils::searchIncludePath('Auth/Yubico.php')) {
             require_once 'Auth/Yubico.php';
         }
         $this->usersSerFile = AJXP_VarsFilter::filter($this->getOption("USERS_FILEPATH"));

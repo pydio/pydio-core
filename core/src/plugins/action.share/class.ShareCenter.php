@@ -783,11 +783,11 @@ class ShareCenter extends AJXP_Plugin
         $shareCenter = AJXP_PluginsService::findPlugin("action", "share");
         $confs = $shareCenter->getConfigs();
         $minisiteLogo = "plugins/gui.ajax/PydioLogo250.png";
-        if(isSet($confs["CUSTOM_MINISITE_LOGO"])){
+        if (isSet($confs["CUSTOM_MINISITE_LOGO"])) {
             $logoPath = $confs["CUSTOM_MINISITE_LOGO"];
             if (strpos($logoPath, "plugins/") === 0 && is_file(AJXP_INSTALL_PATH."/".$logoPath)) {
                 $minisiteLogo = $logoPath;
-            }else{
+            } else {
                 $minisiteLogo = "index_shared.php?get_action=get_global_binary_param&binary_id=". $logoPath;
             }
         }
@@ -1338,7 +1338,7 @@ class ShareCenter extends AJXP_Plugin
                 $userObject->setParent($loggedUser->id);
                 $userObject->setGroupPath($loggedUser->getGroupPath());
                 $userObject->setProfile("shared");
-                if(isSet($httpVars["minisite"])){
+                if (isSet($httpVars["minisite"])) {
                     $mess = ConfService::getMessages();
                     $userObject->personalRole->setParameterValue("core.conf", "USER_DISPLAY_NAME", "[".$mess["share_center.84"]."] ".$newRepo->getDisplay());
                 }

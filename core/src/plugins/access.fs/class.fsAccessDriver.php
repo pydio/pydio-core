@@ -219,7 +219,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         $zip = true;
                         $base = basename($selection->getUniqueFile());
                         $uniqDir = dirname($selection->getUniqueFile());
-                        if(!empty($uniqDir) && $uniqDir != "/"){
+                        if (!empty($uniqDir) && $uniqDir != "/") {
                             $dir = dirname($selection->getUniqueFile());
                         }
                     } else {
@@ -242,7 +242,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         register_shutdown_function("unlink", $file);
                     }
                     $localName = ($base==""?"Files":$base).".zip";
-                    if(isSet($httpVars["archive_name"])){
+                    if (isSet($httpVars["archive_name"])) {
                         $localName = AJXP_Utils::decodeSecureMagic($httpVars["archive_name"]);
                     }
                     $this->readFile($file, "force-download", $localName, false, false, true);
@@ -338,17 +338,17 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             case "stat" :
                 clearstatcache();
                 header("Content-type:application/json");
-                if($selection->isUnique()){
+                if ($selection->isUnique()) {
                     $stat = @stat($this->urlBase.$selection->getUniqueFile());
                     if (!$stat) {
                         print '{}';
                     } else {
                         print json_encode($stat);
                     }
-                }else{
+                } else {
                     $files = $selection->getFiles();
                     print '{';
-                    foreach($files as $index => $path){
+                    foreach ($files as $index => $path) {
                         $stat = @stat($this->urlBase.$path);
                         if(!$stat) $stat = '{}';
                         else $stat = json_encode($stat);
@@ -423,7 +423,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     throw new AJXP_Exception("", 113);
                 }
                 $loggedUser = AuthService::getLoggedUser();
-                if($loggedUser != null && !$loggedUser->canWrite(ConfService::getCurrentRepositoryId())){
+                if ($loggedUser != null && !$loggedUser->canWrite(ConfService::getCurrentRepositoryId())) {
                     throw new AJXP_Exception("You are not allowed to write", 207);
                 }
                 $success = $error = array();
@@ -496,7 +496,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 $hardPurgeTime = intval($this->repository->getOption("PURGE_AFTER"))*3600*24;
                 $softPurgeTime = intval($this->repository->getOption("PURGE_AFTER_SOFT"))*3600*24;
                 $shareCenter = AJXP_PluginsService::findPluginById('action.share');
-                if( !($shareCenter && $shareCenter->isEnabled()) ) {
+                if ( !($shareCenter && $shareCenter->isEnabled()) ) {
                     //action.share is disabled, don't look at the softPurgeTime
                     $softPurgeTime = 0;
                 }
@@ -536,11 +536,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             case "mkdir";
 
                 $messtmp="";
-                if(!isSet($httpVars["dirname"])){
+                if (!isSet($httpVars["dirname"])) {
                     $uniq = $selection->getUniqueFile();
                     $dir = AJXP_Utils::safeDirname($uniq);
                     $dirname = AJXP_Utils::safeBasename($uniq);
-                }else{
+                } else {
                     $dirname=AJXP_Utils::decodeSecureMagic($httpVars["dirname"], AJXP_SANITIZE_FILENAME);
                 }
                 $dirname = substr($dirname, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
@@ -729,9 +729,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $errorMessage));
                 } else {
                     $this->logDebug("Return success");
-                    if($already_existed){
+                    if ($already_existed) {
                         return array("SUCCESS" => true, "UPDATED_NODE" => $createdNode);
-                    }else{
+                    } else {
                         return array("SUCCESS" => true, "CREATED_NODE" => $createdNode);
                     }
                 }
@@ -786,12 +786,12 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         $orderField = "ajxp_label";
                     }
                 }
-                if(isSet($httpVars["recursive"])){
+                if (isSet($httpVars["recursive"])) {
                     $max_depth = (isSet($httpVars["max_depth"])?intval($httpVars["max_depth"]):0);
                     $max_nodes = (isSet($httpVars["max_nodes"])?intval($httpVars["max_nodes"]):0);
                     $crt_depth = (isSet($httpVars["crt_depth"])?intval($httpVars["crt_depth"])+1:1);
                     $crt_nodes = (isSet($httpVars["crt_nodes"])?intval($httpVars["crt_nodes"]):0);
-                }else{
+                } else {
                     $threshold = $this->repository->getOption("PAGINATION_THRESHOLD");
                     if(!isSet($threshold) || intval($threshold) == 0) $threshold = 500;
                     $limitPerPage = $this->repository->getOption("PAGINATION_NUMBER");
@@ -799,7 +799,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 }
 
                 $countFiles = $this->countFiles($path, !$lsOptions["f"]);
-                if(isSet($crt_nodes)){
+                if (isSet($crt_nodes)) {
                     $crt_nodes += $countFiles;
                 }
                 if (isSet($threshold) && isSet($limitPerPage) && $countFiles > $threshold) {
@@ -946,7 +946,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     if(isSet($max_depth) && $max_depth > 0 && $crt_depth >= $max_depth) $breakNow = true;
                     if(isSet($max_nodes) && $max_nodes > 0 && $crt_nodes >= $max_nodes) $breakNow = true;
                     foreach ($fullList["d"] as &$nodeDir) {
-                        if($breakNow){
+                        if ($breakNow) {
                             $nodeDir->mergeMetadata(array("ajxp_has_children" => $this->countFiles($nodeDir->getUrl(), false, true)?"true":"false"));
                             AJXP_XMLWriter::renderAjxpNode($nodeDir, true);
                             continue;
@@ -1434,7 +1434,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     }
 
     public static $currentZipOperationHandler;
-    public function extractArchiveItemPreCallback($status, $data){
+    public function extractArchiveItemPreCallback($status, $data)
+    {
         $fullname = $data['filename'];
         $size = $data['size'];
         $realBase = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase);
@@ -1442,15 +1443,16 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 
         $toNode = new AJXP_Node($repoName);
         $toNode->setLeaf($data['folder'] ? false:true);
-        if(file_exists($toNode->getUrl())){
+        if (file_exists($toNode->getUrl())) {
             AJXP_Controller::applyHook("node.before_change", array($toNode, $size));
-        }else{
+        } else {
             AJXP_Controller::applyHook("node.before_create", array($toNode, $size));
         }
         return 1;
     }
 
-    public function extractArchiveItemPostCallback($status, $data){
+    public function extractArchiveItemPostCallback($status, $data)
+    {
         $fullname = $data['filename'];
         $realBase = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase);
         $repoName = str_replace($realBase, "", $fullname);
@@ -1793,7 +1795,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile);
             } else {
                 $shortName = basename($item);
-                if(!empty($zipEncoding)){
+                if (!empty($zipEncoding)) {
                     $test = iconv(SystemTextEncoding::getEncoding(), $zipEncoding, $shortName);
                     if($test !== false) $shortName = $test;
                 }
@@ -1805,9 +1807,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         self::$filteringDriverInstance = $this;
         $archive = new PclZip($dest);
 
-        if($basedir == "__AJXP_ZIP_FLAT__/"){
+        if ($basedir == "__AJXP_ZIP_FLAT__/") {
             $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_ALL_PATH, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'zipPreAddCallback');
-        }else{
+        } else {
             $basedir = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase).trim($basedir);
             $this->logDebug("Basedir", array($basedir));
             $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'zipPreAddCallback');
@@ -1834,7 +1836,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if ($hardPurgeTime > 0 && $docAge > $hardPurgeTime) {
                     $this->purge($fileName);
                 } elseif ($softPurgeTime > 0 && $docAge > $softPurgeTime) {
-                    if(!ShareCenter::isShared(new AJXP_Node($fileName))) {
+                    if (!ShareCenter::isShared(new AJXP_Node($fileName))) {
                         $this->purge($fileName);
                     }
                 }
@@ -1891,9 +1893,9 @@ function zipPreAddCallback($value, &$header)
     if(fsAccessDriver::$filteringDriverInstance == null) return true;
     $search = $header["filename"];
     $zipEncoding = ConfService::getCoreConf("ZIP_ENCODING");
-    if(!empty($zipEncoding)){
+    if (!empty($zipEncoding)) {
         $test = iconv(SystemTextEncoding::getEncoding(), $zipEncoding, $header["stored_filename"]);
-        if($test !== false){
+        if ($test !== false) {
             $header["stored_filename"] = $test;
         }
     }
