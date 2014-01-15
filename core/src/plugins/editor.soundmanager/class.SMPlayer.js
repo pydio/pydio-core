@@ -292,15 +292,17 @@ soundManager.setup({\n\
             }
         };
         container.destroyElement = function(){
-            var urlKey = container.down('a.sm2_link').href;
-            if(threeSixtyPlayer.getSoundByURL(urlKey)){
-                var theSound = threeSixtyPlayer.getSoundByURL(urlKey);
-                threeSixtyPlayer.sounds = $A(threeSixtyPlayer.sounds).without(theSound);
-                threeSixtyPlayer.soundsByURL[urlKey] = null;
-                delete threeSixtyPlayer.soundsByURL[urlKey];
-                soundManager.destroySound(theSound.sID);
+            if(container.down('a.sm2_link')) {
+                var urlKey = container.down('a.sm2_link').href;
+                if(threeSixtyPlayer.getSoundByURL(urlKey)){
+                    var theSound = threeSixtyPlayer.getSoundByURL(urlKey);
+                    threeSixtyPlayer.sounds = $A(threeSixtyPlayer.sounds).without(theSound);
+                    threeSixtyPlayer.soundsByURL[urlKey] = null;
+                    delete threeSixtyPlayer.soundsByURL[urlKey];
+                    soundManager.destroySound(theSound.sID);
+                }
             }
-        }
+        };
 
         threeSixtyPlayer.config.items = [player];
         threeSixtyPlayer.init();
