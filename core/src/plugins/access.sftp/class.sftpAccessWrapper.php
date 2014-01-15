@@ -64,7 +64,8 @@ function macerrorSftp($packet)
  */
 class sftpAccessWrapper extends fsAccessWrapper
 {
-    public static $sftpResource;
+    private static $sftpResource;
+    private static $resourceRepoId;
 
     /**
      * Initialize the stream from the given path.
@@ -108,7 +109,7 @@ class sftpAccessWrapper extends fsAccessWrapper
      */
     protected static function getSftpResource($repoObject)
     {
-        if (isSet(self::$sftpResource)) {
+        if (isSet(self::$sftpResource) && self::$resourceRepoId == $repoObject->getId()) {
             return self::$sftpResource;
         }
         $callbacks = array('disconnect' => "disconnectedSftp",
@@ -124,6 +125,7 @@ class sftpAccessWrapper extends fsAccessWrapper
         $connection = ssh2_connect($remote_serv, intval($remote_port), array(), $callbacks);
         ssh2_auth_password($connection, $remote_user, $remote_pass);
         self::$sftpResource = ssh2_sftp($connection);
+        self::$resourceRepoId = $repoObject->getId();
         return self::$sftpResource;
     }
 
