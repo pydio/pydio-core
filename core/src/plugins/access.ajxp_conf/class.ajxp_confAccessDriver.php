@@ -1750,6 +1750,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $label = $userObject->getId();
             if ($userObject->hasParent()) {
                 $label = $userObject->getParent()."000".$label;
+            }else{
+                $children = ConfService::getConfStorageImpl()->getUserChildren($label);
+                foreach($children as $addChild){
+                    $userArray[$label."000".$addChild->getId()] = $addChild;
+                }
             }
             $userArray[$label] = $userObject;
         }

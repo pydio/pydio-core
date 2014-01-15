@@ -72,11 +72,14 @@
                 </div>
                 <script>
                     document.observeOnce("ajaxplorer:context_changed", function(){
-                        $A($("settings_pane").ajxpPaneObject.tree.childNodes).each(function(c){
-                            c._webfxtree_expand();
-                            $(c._loadingItem).remove();
-                        })
-                        $("browser").ajxpPaneObject.resize();
+                        try{
+                            $A($("settings_pane").ajxpPaneObject.tree.childNodes).each(function(c){
+                                c._webfxtree_expand();
+                                $(c._loadingItem).remove();
+                            })
+                        }catch(e){}
+                        if($("browser")) $("browser").ajxpPaneObject.resize();
+
                     });
                 </script>
 			]]></template_part>

@@ -27,14 +27,14 @@
 }
 
 .settings_main_pane .buttons_bar_container{
-    height: 41px;
+    height: 39px;
     margin: 0;
     padding-left: 0;
     background-color: #f8f8f8;
 }
 
 .settings_main_pane .buttons_bar_container a{
-    height: 26px;
+    height: 25px !important;
     padding-top: 2px;
 }
 
