@@ -280,14 +280,15 @@ class ldapAuthDriver extends AbstractAuthDriver
                 $allEntries["count"] += ldap_count_entries($conn[$i], $resourceResult);
                 continue;
             }
+            if ($limit != -1) {
+                //usort($entries, array($this, "userSortFunction"));
+                ldap_sort($conn[$i], $resourceResult, $this->ldapUserAttr);
+            }
             $entries = ldap_get_entries($conn[$i], $resourceResult);
             $index = 0;
             if (!empty($entries["count"])) {
                 $allEntries["count"] += $entries["count"];
                 unset($entries["count"]);
-                if ($limit != -1) {
-                    usort($entries, array($this, "userSortFunction"));
-                }
                 foreach ($entries as $entry) {
                     if ($offset != -1 && $index < $offset) {
                         $index ++; continue;
@@ -318,7 +319,7 @@ class ldapAuthDriver extends AbstractAuthDriver
             if ($baseGroup == "/") {
                 $this->dynamicFilter = "!(".$this->hasGroupsMapping."=*)";
             } else {
-                $this->dynamicFilter = $this->hasGroupsMapping."=".ltrim($baseGroup, "/");
+                $this->dynamicFilter = $this->hasGroupsMapping."=".basename($baseGroup);
             }
 
         } else if (!empty($this->separateGroup) && $baseGroup != "/".$this->separateGroup) {
@@ -341,12 +342,21 @@ class ldapAuthDriver extends AbstractAuthDriver
     }
     public function getUsersCount($baseGroup = "/", $regexp = "")
     {
+        if ($this->hasGroupsMapping !== false) {
+            if ($baseGroup == "/") {
+                $this->dynamicFilter = "!(".$this->hasGroupsMapping."=*)";
+            } else {
+                $this->dynamicFilter = $this->hasGroupsMapping."=".basename($baseGroup);
+            }
+        }
+
         $re = null;
         if (!empty($regexp)) {
             if($regexp[0]=="^") $re = ltrim($regexp, "^")."*";
             else if($regexp[strlen($regexp)-1] == "$") $re = "*".rtrim($regexp, "$");
         }
         $res = $this->getUserEntries($re, true, null);
+        $this->dynamicFilter = null;
         return $res["count"];
     }
 
@@ -373,7 +383,7 @@ class ldapAuthDriver extends AbstractAuthDriver
             $this->ldapUserAttr = $this->ldapGroupAttr;
 
             if ($baseGroup != "/") {
-                $this->dynamicFilter = $this->hasGroupsMapping."=".ltrim($baseGroup, "/");
+                $this->dynamicFilter = $this->hasGroupsMapping."=".basename($baseGroup);
             } else {
                 //STRANGE, SHOULD WORK BUT CAN EXCLUDES ALL GROUPS
                 $this->dynamicFilter = "!(".$this->hasGroupsMapping."=*)";
@@ -386,7 +396,8 @@ class ldapAuthDriver extends AbstractAuthDriver
             foreach ($entries as $id => $person) {
                 $login = $person[$this->ldapUserAttr][0];
                 //if(AuthService::ignoreUserCase()) $login = strtolower($login);
-                $persons[$person["dn"]] = $login;
+                $dn = $person["dn"];
+                $persons["/".$dn] = $login;
 
                 $branch = array();
                 $this->buildGroupBranch($login, $branch);
@@ -394,7 +405,7 @@ class ldapAuthDriver extends AbstractAuthDriver
                 if (count($branch)) {
                     $parent = "/".implode("/", array_reverse($branch));
                 }
-                AuthService::createGroup($parent, $person["dn"], $login);
+                AuthService::createGroup($parent, $dn, $login);
 
             }
             $this->ldapDN = $origUsersDN;
@@ -409,26 +420,7 @@ class ldapAuthDriver extends AbstractAuthDriver
 
     public function listUsers($baseGroup = "/")
     {
-        if ($this->hasGroupsMapping !== false) {
-            if ($baseGroup == "/") {
-                $this->dynamicFilter = $this->hasGroupsMapping."=";
-            } else {
-                $this->dynamicFilter = $this->hasGroupsMapping."=".array_pop(explode("/", $baseGroup));
-            }
-        } else if (!empty($this->separateGroup) && $baseGroup != "/".$this->separateGroup) {
-            return array();
-        }
-
-        $entries = $this->getUserEntries();
-        $this->dynamicFilter = null;
-        $persons = array();
-        unset($entries['count']); // remove 'count' entry
-        foreach ($entries as $id => $person) {
-            $login = $person[$this->ldapUserAttr][0];
-            if(AuthService::ignoreUserCase()) $login = strtolower($login);
-            $persons[$login] = "XXX";
-        }
-        return $persons;
+        return $this->listUsersPaginated($baseGroup, null, -1, -1);
     }
 
     public function userExists($login)
@@ -593,7 +585,7 @@ class ldapAuthDriver extends AbstractAuthDriver
                                     $filter = $params["MAPPING_LOCAL_PARAM"];
                                     if (strpos($filter, "preg:") !== false) {
                                         $matchFilter = "/".str_replace("preg:", "", $filter)."/i";
-                                    } else {
+                                    } else if(!empty($filter)) {
                                         $valueFilters = array_map("trim", explode(",", $filter));
                                     }
                                     foreach ($memberValues as $uniqValue => $fullDN) {
