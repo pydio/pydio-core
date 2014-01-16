@@ -181,7 +181,7 @@ Class.create("User", {
 	 */
 	setPreference : function(prefName, prefValue, toJSON){
 		if(toJSON){
-            this._parsedJSONCache.set(prefName, prefValue);
+            this._parsedJSONCache.unset(prefName);
 			prefValue = Object.toJSON(prefValue);
 		}
 		this.preferences.set(prefName, prefValue);

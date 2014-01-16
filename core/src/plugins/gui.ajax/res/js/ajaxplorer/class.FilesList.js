@@ -1579,7 +1579,7 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	ajxpNodeToTableRow: function(ajxpNode, replaceItem){
 		var metaData = ajxpNode.getMetadata();
-		var newRow = new Element("tr", {id:slugString(ajxpNode.getPath())});
+		var newRow = new Element("tr", {id:"item-"+slugString(ajxpNode.getPath())});
 		var tBody = this.getFromCache('tBody');
 
 		metaData.each(function(pair){
@@ -1734,7 +1734,7 @@ Class.create("FilesList", SelectableElements, {
 	ajxpNodeToDiv: function(ajxpNode){
 		var newRow = new Element('div', {
             className:"thumbnail_selectable_cell",
-            id:slugString(ajxpNode.getPath())});
+            id:"item-"+slugString(ajxpNode.getPath())});
 		var metadata = ajxpNode.getMetadata();
 				
 		var innerSpan = new Element('span', {style:"cursor:default;"});
@@ -1827,7 +1827,7 @@ Class.create("FilesList", SelectableElements, {
 
         var largeRow = new Element('div', {
             className:"thumbnail_selectable_cell detailed",
-            id:slugString(ajxpNode.getPath())+"-cont"
+            id:"item-"+slugString(ajxpNode.getPath())+"-cont"
         });
         var metadataDiv = new Element("div", {className:"thumbnail_cell_metadata"});
 

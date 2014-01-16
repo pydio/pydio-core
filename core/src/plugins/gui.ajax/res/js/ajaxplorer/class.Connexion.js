@@ -192,6 +192,7 @@ Class.create("Connexion", {
 						alert(messageType+":"+messageContent);
 					}
 				}
+                messageNode.parentNode.removeChild(messageNode);
 			}
 		}
 		if(this.onComplete){

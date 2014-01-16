@@ -665,6 +665,10 @@ Class.create("Modal", {
 			width:boxWidth+'px'
 		});
 		new Effect.MessageAppear(this.messageBox);
+        if(window.console){
+            if(messageType == 'ERROR') window.console.error(message);
+            else window.console.info(message);
+        }
 		this.tempoMessageDivClosing();
 	},
 	/**

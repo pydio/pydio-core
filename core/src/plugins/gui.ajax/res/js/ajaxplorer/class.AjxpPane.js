@@ -66,7 +66,7 @@ Class.create("AjxpPane", {
 
     resizeBound : function(event){
         "use strict";
-        if(!$(this.options.bindSizeTo.width.id)) return;
+        if(!$(this.options.bindSizeTo.width.id) || !this.htmlElement) return;
         var min = this.options.bindSizeTo.width.min;
         if(Object.isString(min) && min.indexOf("%") != false) min = this.htmlElement.parentNode.getWidth() * min / 100;
         var w = Math.max($(this.options.bindSizeTo.width.id).getWidth() + this.options.bindSizeTo.width.offset, min);
