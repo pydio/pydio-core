@@ -106,14 +106,15 @@
     margin-top: 7px !important;
 }
 
-#home_account_pane .notif_event_container > div{
+#home_account_pane .notif_event_container > div {
     padding:0;
     line-height: 15px;
+    color: rgba(92, 92, 92, 0.55);
 }
 
 #home_account_pane .notif_event_container > div.notif_event_label {
+    color: #5C5C5C;
     line-height: 25px;
-    font-weight: bold;
 }
 
 #home_account_pane .imagePreviewOverlay{
