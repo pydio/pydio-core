@@ -214,7 +214,7 @@
 					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
 				</clientCallback>
 				<clientForm id="pass_change_form"><![CDATA[
-					<div id="pass_change_form" action="pass_change_form" box_width="210">
+					<div id="pass_change_form" action="pass_change_form" box_width="260">
 						<input type="hidden" name="pass_seed" id="pass_seed" value="">
 						<div class="SF_element">
 							<div class="SF_label" ajxp_message_id="237">AJXP_MESSAGE[237] : </div><input id="user_change_ownpass_old" type="password" class="dialogFocus SF_input"/>
