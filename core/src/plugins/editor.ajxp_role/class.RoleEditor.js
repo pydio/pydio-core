@@ -319,13 +319,13 @@ Class.create("RoleEditor", AbstractEditor, {
             buttonPane.insert(b0);
             var userId = this.roleId.replace("AJXP_USR_/", "");
             b0.observe("click", function(){
-                var pane = new Element("div", {style:"width:200px;"});
+                var pane = new Element("div", {style:"width:300px;"});
                 pane.insert(new Element("div", {className:"dialogLegend"}).update(MessageHash["ajxp_role_editor.29"]));
                 var passEl1 = new Element("div", {className:"SF_element"});
-                passEl1.insert(new Element("div",{className:"SF_label"}).update(MessageHash[182]));
+                passEl1.insert(new Element("div",{className:"SF_label"}).update(MessageHash[182]+": "));
                 passEl1.insert(new Element("input",{type:"password",name:"password",className:"SF_input",id:"pass"}));
                 pane.insert(passEl1);
-                var passEl2 = passEl1.cloneNode(true);passEl2.down("div").update(MessageHash["ajxp_role_editor.30"]); passEl2.down("input").setAttribute("name", "pass_confirm");
+                var passEl2 = passEl1.cloneNode(true);passEl2.down("div").update(MessageHash["ajxp_role_editor.30"] + ": "); passEl2.down("input").setAttribute("name", "pass_confirm");
                 pane.insert(passEl2);
                 pane.insert('<div class="SF_element" id="pwd_strength_container"></div>');
                 modal.showSimpleModal(this.element.down("#pane-infos"),pane, function(){
