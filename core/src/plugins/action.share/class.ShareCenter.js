@@ -509,21 +509,23 @@ Class.create("ShareCenter", {
                 jsonData = jsonData[0];
                 var directLink = "";
                 if(!jsonData.has_password){
+                    var shortlink = jsonData.publiclet_link + (jsonData.publiclet_link.indexOf('?') !== -1 ? '&' : '?') + 'dl=true';
                     directLink += '\
                     <tr>\
                         <td class="infoPanelLabel">'+MessageHash['share_center.60']+'</td>\
-                        <td class="infoPanelValue"><textarea style="width:100%;height: 45px;" readonly="true"><a href="'+ jsonData.publiclet_link +'?dl=true">Download '+node.getLabel()+'</a></textarea></td>\
+                        <td class="infoPanelValue"><textarea style="width:100%;height: 45px;" readonly="true"><a href="'+ shortlink +'">'+ MessageHash[88] + ' ' +node.getLabel()+'</a></textarea></td>\
                     </tr>\
                     ';
                     var editors = ajaxplorer.findEditorsForMime(node.getAjxpMime(), true);
                     if(editors.length){
                         var tplString ;
                         var messKey = "share_center.61";
+                        var newlink = jsonData.publiclet_link + (jsonData.publiclet_link.indexOf('?') !== -1 ? '&' : '?') + 'dl=true&ct=true';
                         if(Class.getByName(editors[0].editorClass).prototype.getSharedPreviewTemplate){
                             var template = Class.getByName(editors[0].editorClass).prototype.getSharedPreviewTemplate(node);
-                            tplString = template.evaluate({WIDTH:480, HEIGHT:260, DL_CT_LINK:jsonData.publiclet_link +'?dl&true&ct=true'});
+                            tplString = template.evaluate({WIDTH:480, HEIGHT:260, DL_CT_LINK:newlink});
                         }else{
-                            tplString = jsonData.publiclet_link +'?dl&true&ct=true';
+                            tplString = newlink;
                             messKey = "share_center.60";
                         }
                         directLink += '\
