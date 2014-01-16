@@ -183,12 +183,9 @@ class textLogDriver extends AbstractLogDriver
      */
     public function close()
     {
-        $success = @fclose($this->fileHandle);
-        if ($success === false) {
-            // Failure to close the log file
-            // error_log("AJXP_Logger failed to close the handle to the log file");
+        if(is_resource($this->fileHandle)){
+            fclose($this->fileHandle);
         }
-
     }
 
     /**

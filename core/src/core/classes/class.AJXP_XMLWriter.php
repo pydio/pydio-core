@@ -201,11 +201,27 @@ class AJXP_XMLWriter
      */
     public static function catchError($code, $message, $fichier, $ligne, $context)
     {
-        if(error_reporting() == 0) return ;
+        if(error_reporting() == 0) {
+            return ;
+        }
         AJXP_Logger::error(basename($fichier), "error l.$ligne", array("message" => $message));
         $loggedUser = AuthService::getLoggedUser();
         if (ConfService::getConf("SERVER_DEBUG") || ( $loggedUser != null && $loggedUser->isAdmin() )) {
-            $message .= " in $fichier (l.$ligne)";
+            $stack = debug_backtrace();
+            $stackLen = count($stack);
+            for ($i = 1; $i < $stackLen; $i++) {
+                $entry = $stack[$i];
+
+                $func = $entry['function'] . '(';
+                $argsLen = count($entry['args']);
+                for ($j = 0; $j < $argsLen; $j++) {
+                    $func .= $entry['args'][$j];
+                    if ($j < $argsLen - 1) $func .= ', ';
+                }
+                $func .= ')';
+
+                $message .= "\n". str_replace(dirname(__FILE__), '', $entry['file']) . ':' . $entry['line'] . ' - ' . $func . PHP_EOL;
+            }
         }
         if(!headers_sent()) AJXP_XMLWriter::header();
         AJXP_XMLWriter::sendMessage(null, SystemTextEncoding::toUTF8($message), true);
