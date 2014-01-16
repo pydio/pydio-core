@@ -347,13 +347,13 @@ class multiAuthDriver extends AbstractAuthDriver
             if ($this->drivers[$this->masterName]->userExists($login)) {
                 // check master, and refresh slave if necessary
                 if ($this->drivers[$this->masterName]->checkPassword($login, $pass, $seed)) {
-                    /*
-                    if ($this->drivers[$this->slaveName]->userExists($login)) {
-                        $this->drivers[$this->slaveName]->changePassword($login, $pass);
-                    } else {
-                        $this->drivers[$this->slaveName]->createUser($login, $pass);
+                    if($this->getFilteredOption("CACHE_MASTER_USERS_TO_SLAVE")){
+                        if ($this->drivers[$this->slaveName]->userExists($login)) {
+                            $this->drivers[$this->slaveName]->changePassword($login, $pass);
+                        } else {
+                            $this->drivers[$this->slaveName]->createUser($login, $pass);
+                        }
                     }
-                    */
                     return true;
                 } else {
                     return false;

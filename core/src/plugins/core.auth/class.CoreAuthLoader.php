@@ -66,10 +66,13 @@ class CoreAuthLoader extends AJXP_Plugin
                 else $baseName = "";
 
                 $mLabel = ""; $sLabel = "";$separator = "";
+                $cacheMasters = true;
                 if ($this->pluginConf["MULTI_MODE"]["instance_name"] == "USER_CHOICE") {
                     $mLabel = $this->pluginConf["MULTI_MODE"]["MULTI_MASTER_LABEL"];
                     $sLabel = $this->pluginConf["MULTI_MODE"]["MULTI_SLAVE_LABEL"];
                     $separator = $this->pluginConf["MULTI_MODE"]["MULTI_USER_ID_SEPARATOR"];
+                }else{
+                    $cacheMasters = $this->pluginConf["MULTI_MODE"]["CACHE_MASTER_USERS_TO_SLAVE"];
                 }
                 $newOptions = array(
                     "instance_name" => "auth.multi",
@@ -77,6 +80,7 @@ class CoreAuthLoader extends AJXP_Plugin
                     "MASTER_DRIVER" => $masterName,
                     "USER_BASE_DRIVER" => $baseName,
                     "USER_ID_SEPARATOR" => $separator,
+                    "CACHE_MASTER_USERS_TO_SLAVE" => $cacheMasters,
                     "TRANSMIT_CLEAR_PASS" => $this->pluginConf["TRANSMIT_CLEAR_PASS"],
                     "DRIVERS" => array(
                         $masterName => array(
