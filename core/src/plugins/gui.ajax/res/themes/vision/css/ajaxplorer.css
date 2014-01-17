@@ -4301,6 +4301,10 @@ div.dialogBox div.dialogBox.css_boxshadow{
     background-color: white;
 }
 
+.no-flexbox div#mailer_message{
+    width: 380px !important;
+}
+
 div.dialogBox div.dialogBox.css_boxshadow > div{
     background-color: transparent;
 }
