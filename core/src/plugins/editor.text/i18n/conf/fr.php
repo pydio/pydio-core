@@ -19,7 +19,7 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"Text Editor" => "Editeur Text",
-"Very basic text editor" => "editeur text basique",
+"Text Editor" => "Editeur Texte",
+"Very basic text editor" => "Editeur texte basique",
 );
 ?>

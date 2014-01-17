@@ -20,7 +20,7 @@
 */
 $mess=array(
 "Text logger" => "Logger Texte",
-"Stores the logs as readable tab delimited text." => "Stockage des logs dans des fichiers textes journaliés.",
+"Stores the logs as readable tab delimited text." => "Stockage des logs dans des fichiers textes journaliers.",
 "Logpath" => "Chemin",
 "The path to where the logs are kept." => "Où stocker les fichiers.",
 "Logfile" => "Nom de fichier",

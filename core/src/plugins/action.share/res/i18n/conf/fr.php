@@ -22,7 +22,7 @@ $mess=array(
 "Sharing Features" => "Partage",
 "Share Center actions and hooks" => "Centre de partage et hooks",
 "Metadata File" => "Fichier Métadonnées",
-"Hidden file containing shared metadata" => "Nom du fichier caché contenant les métadonnées de partage",
+"Hidden file containing shared metadata" => "Nom du fichier caché contenant les Métadonnées de partage",
 "File location" => "Emplacement",
 "Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder." => "Où stocker le fichier : LOCAL un fichier caché sera créé dans chaque répertoire, GLOBAL un fichier global sera créé dans AJXP_DATA_PATH/plugins/action.share folder.",
 );

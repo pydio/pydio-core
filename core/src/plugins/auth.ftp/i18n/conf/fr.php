@@ -20,12 +20,12 @@
 */
 $mess=array(
 "FTP Authentification" => "Authentification FTP",
-"Authenticate user directly to an FTP server, and connect him to this server." => "Intérrogation d'un serveur FTP pour valider une identification",
+"Authenticate user directly to an FTP server, and connect him to this server." => "Interrogation d'un serveur FTP pour valider une identification",
 "FTP Login Screen" => "Ecran de login FTP",
 "Whether to display a generic 'FTP connexion' dialog at startup (allowing the user to enter his own host/port data) or the standard login dialog." => "Remplace l'écran de connexion standard (login/mot de passe) et permet à l'utilisateur d'entrer les informations de connexions au serveur FTP (serveur, port, etc).",
 "Repository" => "Dépôt",
-"Id of the repository to use for testing connexion" => "Id du dépot à utiliser pour récuperer les informations de connexion FTP.",
+"Id of the repository to use for testing connexion" => "Id du dépôt à utiliser pour récupérer les informations de connexion FTP.",
 "Admin user" => "Utilisateur admin",
-"The ID of an existing admin for Ajaxplorer (using conf.serial)" => "ID d'un utilisateur admin récuperé dans conf.serial.",
+"The ID of an existing admin for Ajaxplorer (using conf.serial)" => "ID d'un utilisateur admin récupéré dans conf.serial.",
 );
 ?>

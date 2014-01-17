@@ -19,8 +19,8 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"Remote authentication" => "Authentication externe",
-"Authentication is done remotely (useful in CMS system)." => "Interface avec un CMS extener",
+"Remote authentication" => "Authentification externe",
+"Authentication is done remotely (useful in CMS system)." => "Interface avec un CMS externe",
 "Authentication mode" => "Mode",
 "If set, the remote end calls us to register upon login, else, we will be calling the remote end when login is required" => "Qui est le maitre de l'authentification ? AjaXplorer ou le CMS externe?",
 "Login URL" => "URL d'identification",

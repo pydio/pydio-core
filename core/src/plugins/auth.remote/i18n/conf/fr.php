@@ -20,7 +20,7 @@
 */
 $mess=array(
 "Remote authentication" => "Authentication externe",
-"Authentication is done remotely (useful in CMS system)." => "Interface avec un CMS extener",
+"Authentication is done remotely (useful in CMS system)." => "Interface avec un CMS externe",
 "Authentication mode" => "Mode",
 "If set, the remote end calls us to register upon login, else, we will be calling the remote end when login is required" => "Qui est le maitre de l'authentification ? AjaXplorer ou le CMS externe?",
 "Login URL" => "URL d'identification",
@@ -36,7 +36,7 @@ $mess=array(
 "Master Host" => "Hôte Master",
 "Host used to negociated the master authentication, if not set will be detected" => "Hôte appelé pour la négociation master, peut être détecté automatiquement",
 "Master Base URI" => "URI Master",
-"URI to access the base of the CMS installation. Used by the master auth function, this page must contain the login form!" => "Paramêtre utilisé par la fonction de auth master, pour trouver le formulaire de login du CMS et le soumettre automatiquement.",
+"URI to access the base of the CMS installation. Used by the master auth function, this page must contain the login form!" => "Paramètre utilisé par la fonction de auth master, pour trouver le formulaire de login du CMS et le soumettre automatiquement.",
 "Auth Form ID" => "Form ID Master",
 "The HTML ID of the form tag displayed for login on the page defined previously. Not necessary for WP, login-form by default for Joomla, and user-login-form for Drupal" => "ID HTML du formulaire de login affiché sur la page du CMS. Not necessary for WP, login-form by default for Joomla, and user-login-form for Drupal",
 );

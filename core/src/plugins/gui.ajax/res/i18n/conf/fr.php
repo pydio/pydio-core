@@ -22,8 +22,8 @@ $mess=array(
 "Client Plugin" => "Interface Client",
 "Browser-based rich interface. Contains configurations for theming, custom welcome message, etc." => "Client riche pour les navigateurs standards. ",
 "Main Options" => "Options Principales",
-"Theme" => "Theme",
-"Theme used for display" => "Theme d'affichage",
+"Theme" => "Thème",
+"Theme used for display" => "Thème d'affichage",
 "Start Up Screen" => "Ecran de démarrage",
 "Title Font Size" => "Taille du titre",
 "Font sized used for the title in the start up screen" => "Taille de la police du titre",
@@ -43,7 +43,7 @@ $mess=array(
 "Id of your GA account, something like UE-XXXX-YY" => "Compte GA, du type UE-XXXX-YY",
 "Analytics Domain" => "Domaine GA",
 "Set the domain for yuor analytics reports (not mandatory!)" => "Domaine pour le rapport Google Analytics",
-"Analytics Events" => "Evenements GA",
-"Use Events Logging, experimental only implemented on download action in AjaXplorer" => "Utiliser les Events google analytics, implémenté seulement pour l'action download actuellement",
+"Analytics Events" => "Evénements GA",
+"Use Events Logging, experimental only implemented on download action in AjaXplorer" => "Utiliser les événements google analytics, implémenté seulement pour l'action download actuellement",
 );
 ?>

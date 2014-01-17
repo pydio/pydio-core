@@ -20,7 +20,7 @@
 */
 $mess=array(
 "Mailbox (Imap or POP)" => "Boîte mail (Imap ou POP)",
-"This plugin will browse the content of a mailbox (imap or pop) and allow to grab emails attachments and copy them to another repository. Requires the PHP IMAP extension." => "Permet d'accèder à une boîte mail et au contenu des mails, et de copier les attachements sur un autre dépôt de type fichier. Nécessite l'extension PHP IMAP.",
+"This plugin will browse the content of a mailbox (imap or pop) and allow to grab emails attachments and copy them to another repository. Requires the PHP IMAP extension." => "Permet d'accéder à une boîte mail et au contenu des mails, et de copier les attachements sur un autre dépôt de type fichier. Nécessite l'extension PHP IMAP.",
 "Mail Server" => "Connexion au serveur",
 "Host" => "Hôte",
 "Server host" => "IP du serveur",
@@ -42,7 +42,7 @@ $mess=array(
 "This right pattern (empty, r, or rw) will be applied at user creation for this repository." => "Sera appliqué lors de la création des utilisateurs.",
 "Pagination Threshold" => "Seuil de pagination",
 "When a folder will contain more items than this number, display will switch to pagination mode, for better performances." => "Nombre d'items pour lesquel la liste est paginée.",
-"#Items per page" => "Elements par page",
+"#Items per page" => "Eléments par page",
 "Once in pagination mode, number of items to display per page." => "Nombre d'items par page.",
 );
 ?>

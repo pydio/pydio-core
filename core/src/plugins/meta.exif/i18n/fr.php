@@ -19,7 +19,7 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"1" => "Geolocalisation Exif",
+"1" => "Géolocalisation Exif",
 "2" => "Localiser",
 );
 ?>

@@ -28,5 +28,5 @@ $mess=array(
     "Region" => "Région",
     "S3 storage region" => "Région du stockage S3",
     "Container" => "Container",
-    "Root container in the S3 storage" => "Container S3 sans lequel sont stockées les données"
+    "Root container in the S3 storage" => "Container S3 sous lequel sont stockées les données"
 );

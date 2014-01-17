@@ -23,10 +23,10 @@ $mess = array(
     "1" => "Indexer",
     "2" => "Indexer le contenu du répertoire",
     "3" => "Indexation en cours en arrière-plan",
-    "4" => "L'index est vérouillé, une indexation est peut-être en cours. Si ce n'est pas le cas, effacer à la main le fichier .ajxp_lock situé dans cache/indexes",
+    "4" => "L'index est verrouillé, une indexation est peut-être en cours. Si ce n'est pas le cas, effacer à la main le fichier .ajxp_lock situé dans cache/indexes",
     "5" => "Indexation terminée",
     "6" => "Attention, le dépôt est en cours d'indexation, veuillez réessayer plus tard.",
     "7" => "Lancement de la première indexation, veuillez attendre puis relancer votre recherche.",
     "8" => "Indexation (%s) en arrière plan.",
-    "9" => "Impossible de trouver un index pour ce dépôt, vous devrier déclencher l'indexation d'abord.",
+    "9" => "Impossible de trouver un index pour ce dépôt, vous devriez déclencher l'indexation d'abord.",
 );

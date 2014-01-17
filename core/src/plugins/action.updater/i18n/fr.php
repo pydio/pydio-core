@@ -33,7 +33,7 @@ $mess = array(
 "9" => "Appliquer l'import maintenant",
 "10" => "C'est un 'dry-run'. Veuillez vérifier les différentes actions d'import qui vont être appliquées, et si c'est bon appliquez l'import réel.",
 "11" => "Migrer meta.serial",
-"12" => "L'ancien plugin meta.serial a été remplaçé par metastore.serial et meta.user",
+"12" => "L'ancien plugin meta.serial a été remplacé par metastore.serial et meta.user",
 "13" => "Simuler la migration",
 "14" => "Appliquer la migration",
 );

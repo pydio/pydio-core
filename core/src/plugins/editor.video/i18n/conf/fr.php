@@ -19,7 +19,7 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"Video Player" => "Player Video",
+"Video Player" => "Player Vidéo",
 "Inserts a video player in the info panel, either HTML5 or Flash depending on the format." => "Player HTML5 avec fallback en flash pour pouvoir visualiser un maximum de vidéos en ligne.",
 );
 ?>
