@@ -17,6 +17,7 @@
 		<param name="LDAP_DN" type="string" replicationGroup="LDAPDN" label="CONF_MESSAGE[People DN]" description="CONF_MESSAGE[DN where the users are stored]" mandatory="false"/>
 		<param name="LDAP_FILTER" type="string" label="CONF_MESSAGE[LDAP Filter]" description="CONF_MESSAGE[Filter which users to fetch.]" mandatory="false" default="objectClass=person"/>
         <param name="LDAP_USERATTR" type="string" label="CONF_MESSAGE[User attribute]" description="CONF_MESSAGE[Username attribute]" mandatory="false"/>
+        <param name="LDAP_SEARCHUSER_ATTR" type="string" label="CONF_MESSAGE[Search Users by Attribute]" description="CONF_MESSAGE[When looking for a user through autocomplete, search on a specific parameter instead of user ID]" mandatory="false" default=""/>
         <param name="LDAP_GDN" type="string" replicationGroup="LDAPGDN" label="CONF_MESSAGE[Groups DN]" description="CONF_MESSAGE[DN where the groups are stored. Must be used in cunjonction with a group parameter mapping, generally using the memberOf feature.]" mandatory="false"/>
         <param name="LDAP_GROUP_FILTER" type="string" label="CONF_MESSAGE[LDAP Groups Filter]" description="CONF_MESSAGE[Filter which groups to fetch.]" mandatory="false" default="objectClass=group"/>
         <param name="LDAP_GROUPATTR" type="string" label="CONF_MESSAGE[Group attribute]" description="CONF_MESSAGE[Group main attribute to be used as a label]" mandatory="false"/>

@@ -225,13 +225,17 @@ class ldapAuthDriver extends AbstractAuthDriver
     }
 
 
-    public function getUserEntries($login = null, $countOnly = false, $offset = -1, $limit = -1)
+    public function getUserEntries($login = null, $countOnly = false, $offset = -1, $limit = -1, $regexpOnSearchAttr = false)
     {
         if ($login == null) {
             $filter = $this->ldapFilter;
         } else {
-            if($this->ldapFilter == "") $filter = "(" . $this->ldapUserAttr . "=" . $login . ")";
-            else  $filter = "(&" . $this->ldapFilter . "(" . $this->ldapUserAttr . "=" . $login . "))";
+            $searchAttr = $this->ldapUserAttr;
+            if($regexpOnSearchAttr && !empty($this->options["LDAP_SEARCHUSER_ATTR"])){
+                $searchAttr = $this->options["LDAP_SEARCHUSER_ATTR"];
+            }
+            if($this->ldapFilter == "") $filter = "(" . $searchAttr . "=" . $login . ")";
+            else  $filter = "(&" . $this->ldapFilter . "(" . $searchAttr . "=" . $login . "))";
         }
         if (empty($filter)) {
             if(!empty($this->dynamicFilter)) $filter = $this->dynamicFilter;
@@ -329,7 +333,7 @@ class ldapAuthDriver extends AbstractAuthDriver
         if($regexp[0]=="^") $regexp = ltrim($regexp, "^")."*";
         else if($regexp[strlen($regexp)-1] == "$") $regexp = "*".rtrim($regexp, "$");
 
-        $entries = $this->getUserEntries($regexp, false, $offset, $limit);
+        $entries = $this->getUserEntries($regexp, false, $offset, $limit, true);
         $this->dynamicFilter = null;
         $persons = array();
         unset($entries['count']); // remove 'count' entry
