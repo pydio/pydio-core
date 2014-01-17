@@ -215,7 +215,12 @@ class AJXP_XMLWriter
                 $func = $entry['function'] . '(';
                 $argsLen = count($entry['args']);
                 for ($j = 0; $j < $argsLen; $j++) {
-                    $func .= $entry['args'][$j];
+                    $s = $entry['args'][$j];
+                    if(is_string($s)){
+                        $func .= $s;
+                    }else if (is_object($s)){
+                        $func .= get_class($s);
+                    }
                     if ($j < $argsLen - 1) $func .= ', ';
                 }
                 $func .= ')';
