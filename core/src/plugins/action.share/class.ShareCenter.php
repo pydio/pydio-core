@@ -1187,7 +1187,7 @@ class ShareCenter extends AJXP_Plugin
                 } else if (AuthService::userExists($u) && isSet($httpVars["user_pass_".$index])) {
                     throw new Exception("User $u already exists, please choose another name.");
                 }
-                if(!AuthService::userExists($u, "w") && !empty($prefix)
+                if(!AuthService::userExists($u, "r") && !empty($prefix)
                 && strpos($u, $prefix)!==0 ){
                     $u = $prefix . $u;
                 }
@@ -1289,7 +1289,7 @@ class ShareCenter extends AJXP_Plugin
                 null
             );
             $gPath = $loggedUser->getGroupPath();
-            if (!empty($gPath)) {
+            if (!empty($gPath) && !ConfService::getCoreConf("CROSSUSERS_ALLGROUPS", "conf")) {
                 $newRepo->setGroupPath($gPath);
             }
             $newRepo->setDescription($description);
@@ -1326,7 +1326,7 @@ class ShareCenter extends AJXP_Plugin
         }
 
         foreach ($users as $userName) {
-            if (AuthService::userExists($userName, "w")) {
+            if (AuthService::userExists($userName, "r")) {
                 // check that it's a child user
                 $userObject = $confDriver->createUserObject($userName);
             } else {

@@ -866,7 +866,12 @@ class AuthService
      */
     public static function listUsers($baseGroup = "/", $regexp = null, $offset = -1, $limit = -1, $cleanLosts = true)
     {
-        $baseGroup = self::filterBaseGroup($baseGroup);
+        $searchAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS", "conf");
+        $displayAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS_DISPLAY", "conf");
+        if( ($regexp == null && !$displayAll) || ($regexp != null && !$searchAll) ){
+            $baseGroup = self::filterBaseGroup($baseGroup);
+        }
+        //$baseGroup = self::filterBaseGroup($baseGroup);
         $authDriver = ConfService::getAuthDriverImpl();
         $confDriver = ConfService::getConfStorageImpl();
         $allUsers = array();
