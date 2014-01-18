@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head><meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Wordpress Pydio How-to.html</title></head><body>This
+wordpress plugin will make a bridge between your Wordpress users (wp is
+the "master") and the Pydio users. That means that users
+created/deleted in your wordpress installation will be created/deleted
+in your Pydio installation, and that you will use the Wordpress login
+page instead of the "popup" to log on to Pydio.<br>
+<br>
+So what do you need to make it work?<br>
+<ul>
+  <li>You must use at least the 5.X version of Pydio.</li>
+  <li>Download and extract the WP-Pydio plugin inside your WP/wp-content/plugins/ folder.</li>
+  <li>Make sure that basically your Pydio install has already an
+"admin" user (you will still need it to edit the repositories). The
+simplest is to use the same login for ajxp admin and wp admin.</li>
+  <li>Inside you WP admin panel : Activate the Pydio plugin, and go to
+"Settings &gt; Pydio" to init the plugin options. This is mandatory, or
+the plugin wont work. Choose a secret key.</li>
+  <li>Logged as admin on Pydio, go to Settings &gt; Core Configurations &gt; Authentication</li>
+  <ul>
+    <li>Switch the "Main Instance" to "Remote Authentication"</li>
+  </ul>
+  <ul>
+    <li>Make sure not to have "Second Instance" (this plugin does not support multi auth yet)</li>
+  </ul>
+  <ul>
+    <li>Choose CMS Type "Wordpress", and set up the necessary
+parameters. The secret key must be the same that the one you've set in
+the WP plugin settings.<br>
+    </li>
+  </ul>
+  <ul>
+    <li>Warning, if you use "$" in your secret key (on the wordpress side), add a \ symbol before it in the configuration.</li>
+  </ul>
+</ul>
+You should now be good to go, try to login using WP users credentials,
+from "both" sides: either via WP login form or via Pydio login form.<br>
+<br>
+http://pyd.io<br>
+
+<br>
+
+</body></html>
