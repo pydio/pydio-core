@@ -206,7 +206,7 @@ class AJXP_XMLWriter
         }
         AJXP_Logger::error(basename($fichier), "error l.$ligne", array("message" => $message));
         $loggedUser = AuthService::getLoggedUser();
-        if (ConfService::getConf("SERVER_DEBUG") || ( $loggedUser != null && $loggedUser->isAdmin() )) {
+        if (ConfService::getConf("SERVER_DEBUG")) {
             $stack = debug_backtrace();
             $stackLen = count($stack);
             for ($i = 1; $i < $stackLen; $i++) {
