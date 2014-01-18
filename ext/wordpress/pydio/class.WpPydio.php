@@ -1,16 +1,16 @@
 <?php
 
 /*
-Plugin Name: Ajaxplorer
-Plugin URI: http://www.ajaxplorer.info/wp_ajaxplorer
-Description: This plugin allow to associate directly AjaXplorer users to wordpress ones (using WP as the master). Warning, it will not work until you open the "Settings > AjaXplorer" panel (here on the left) to edit your AjaXplorer installation path. Tested with WP 3.0.4 & AjaXplorer 3.2.0
+Plugin Name: Pydio
+Plugin URI: http://pyd.io/
+Description: This plugin allow to associate directly Pydio users to wordpress ones (using WP as the master). Warning, it will not work until you open the "Settings > Pydio" panel (here on the left) to edit your Pydio installation path. Tested with WP 3.0.4 & Pydio 3.2.0
 Version: 1.0
 Author: Charles du Jeu
-Author URI: http://www.ajaxplorer.info/
+Author URI: http://pyd.io/
 */
 define("AJXP_EXEC", true);
 
-class WpAjxp
+class WpPydio
 {
     public $options;
     public $secret;
@@ -111,15 +111,15 @@ class WpAjxp
     // SETTINGS FUNCTIONS
     public function setting_menu()
     {
-      add_options_page(__("AjaXplorer Options","ajxp"), __("AjaXplorer","ajxp"), '1', 'wp_ajxp_options', array(&$this, 'ajxp_options'));
+      add_options_page(__("Pydio Options","ajxp"), __("Pydio","ajxp"), '1', 'wp_ajxp_options', array(&$this, 'ajxp_options'));
     }
 
     public function ajxp_options()
     {
         echo '
         <div>
-        <h2>'.__("AjaXplorer Options","ajxp").'</h2>
-        '.__("Options related to your AjaXplorer installation.","ajxp").'
+        <h2>'.__("Pydio Options","ajxp").'</h2>
+        '.__("Options related to your Pydio installation.","ajxp").'
         <form action="options.php" method="post">';
         settings_fields('wp_ajxp_options');
         do_settings_sections('plugin');
@@ -131,26 +131,26 @@ class WpAjxp
     public function admin_init()
     {
         register_setting( 'wp_ajxp_options', 'wp_ajxp_options', array(&$this,'plugin_options_validate') );
-        add_settings_section('plugin_main', __("AjaXplorer Installation","ajxp"), array(&$this,'install_section_text'), 'plugin');
-        add_settings_field('plugin_text_string', __("AjaXplorer Path","ajxp"), array(&$this,'plugin_setting_string'), 'plugin', 'plugin_main');
+        add_settings_section('plugin_main', __("Pydio Installation","ajxp"), array(&$this,'install_section_text'), 'plugin');
+        add_settings_field('plugin_text_string', __("Pydio Path","ajxp"), array(&$this,'plugin_setting_string'), 'plugin', 'plugin_main');
         add_settings_field('plugin_secret_string', __("Secret Key (must be the same as the AUTH_DRIVER 'SECRET' option in your configuration.","ajxp"), array(&$this,'plugin_secret_string'), 'plugin', 'plugin_main');
         add_settings_field('plugin_autocreate_string', __("Auto Create (Create Ajxp users when they login)","ajxp"), array(&$this,'plugin_autocreate_string'), 'plugin', 'plugin_main');
-        add_settings_section('plugin_repo', __("Creating AjaXplorer Repositories","ajxp"), array(&$this,'repo_section_text'), 'plugin');
+        add_settings_section('plugin_repo', __("Creating Pydio Repositories","ajxp"), array(&$this,'repo_section_text'), 'plugin');
     }
 
-    public function guess_ajpx_path()
+    public function guess_pydio_path()
     {
         //get WP abs path
         $wp_abspath = ABSPATH;
         $url = dirname($wp_abspath);
-        return $url.'/ajaxplorer';
+        return $url.'/pydio';
 
     }
 
     public function install_section_text()
     {
         echo"<p>";
-        printf(__("Installation path. Enter here the full path to your installation on the server, i.e. the root folder containing ajaxplorer index.php file. Do not include slash at the end. May look like %s","ajxp"),'<em>'.$this->guess_ajpx_path().'</em>');
+        printf(__("Installation path. Enter here the full path to your installation on the server, i.e. the root folder containing ajaxplorer index.php file. Do not include slash at the end. May look like %s","ajxp"),'<em>'.$this->guess_pydio_path().'</em>');
         echo"</p>";
     }
 
@@ -159,10 +159,10 @@ class WpAjxp
         $installPath = str_replace("\\", "/", dirname(dirname(dirname(dirname(__FILE__)))));
 
         echo '<p>';
-        _e("Now that your Wordpress users can access AjaXplorer, you have to create repositories in AjaXplorer and let them access it. This is not automated at the moment, so you have to log in as 'admin' and create them manually from within AjaXplorer. Set the repositories default rights at least at 'r' (read), so that the users can indeed access the repositories.","ajxp");
+        _e("Now that your Wordpress users can access Pydio, you have to create repositories in Pydio and let them access it. This is not automated at the moment, so you have to log in as 'admin' and create them manually from within Pydio. Set the repositories default rights at least at 'r' (read), so that the users can indeed access the repositories.","ajxp");
         echo '</p><p>';
 
-        _e("Repository creation will ask you to enter the path to your repository. Here are some wordpress-related paths you may want to explore using AjaXplorer :","ajxp");
+        _e("Repository creation will ask you to enter the path to your repository. Here are some wordpress-related paths you may want to explore using Pydio :","ajxp");
         echo'
         <ul>
             <li>. <b>'.$installPath.'/wp-content/themes</b> : '.__("The wordpress themes contents","ajxp").'<li>
@@ -217,5 +217,5 @@ class WpAjxp
 
 }
 
-$ajxp_plugin = new WpAjxp();
+$ajxp_plugin = new WpPydio();
 $ajxp_plugin->init();

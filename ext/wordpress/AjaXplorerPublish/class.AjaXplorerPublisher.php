@@ -2,7 +2,7 @@
 
 /*
 Plugin Name: AjaxplorerPublisher
-Plugin URI: http://ajaxplorer.info/
+Plugin URI: http://pyd.io/
 Description: This plugin is providing a set of shortcodes to directly publish the content of an AjaXplorer workspace / folder inside a wordpress article.
 Version: 1.0
 Author: Charles du Jeu

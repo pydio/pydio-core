@@ -1,0 +1,21 @@
+http://pyd.io
+
+This wordpress plugin will make a bridge between your Wordpress users (wp is the "master") and the Pydio users. That means that users created/deleted in your wordpress installation will be created/deleted in your Pydio installation, and that you will use the Wordpress login page instead of the "popup" to log on to Pydio.
+
+So what do you need to make it work?
+
+ * You must use at least the 5.X version of Pydio.
+
+ * Download and extract the WP-Pydio plugin inside your WP/wp-content/plugins/ folder.
+
+ * Make sure that basically your Pydio install has already an "admin" user (you will still need it to edit the repositories). The simplest is to use the same login for ajxp admin and wp admin.
+
+ * Inside you WP admin panel : Activate the Pydio plugin, and go to "Settings > Pydio" to init the plugin options. This is mandatory, or the plugin wont work. Choose a secret key.
+
+ * Logged as admin on Pydio, go to Settings > Core Configurations > Authentication
+
+     * Switch the "Main Instance" to "Remote Authentication"
+     * Make sure not to have "Second Instance" (this plugin does not support multi auth yet)
+     * Choose CMS Type "Wordpress", and set up the necessary parameters.
+
+ * Warning, if you use "$" in your secret key (on the wordpress side), add a \ symbol before it in the configuration.
