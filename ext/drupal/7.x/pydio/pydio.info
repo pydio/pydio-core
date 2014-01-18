@@ -1,0 +1,4 @@
+; $Id$
+name = Pydio Bridge
+description = A bridge for using Drupal (7.x) users inside Pydio
+core = 7.x
