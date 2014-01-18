@@ -10,7 +10,7 @@
         <param name="LOCAL_PREFIX" label="CONF_MESSAGE[Local Prefix]" description="CONF_MESSAGE[The users created with this prefix in their identifier will be stored and handled in the local filesystem. This can be handy for managing the temporary users.]" type="string"/>
         <param name="ROLES_MAP" label="CONF_MESSAGE[Roles Map]" description="CONF_MESSAGE[Define a map of key/values for automatically mapping roles from the CMS to Pydio.]" type="array"/>
         <param name="SECRET" type="string" label="CONF_MESSAGE[Secret key]" description="CONF_MESSAGE[This key must only be known by remote end]" mandatory="false" />
-        <param name="USERS_FILEPATH" type="string" label="CONF_MESSAGE[Users]" description="CONF_MESSAGE[The users list]" mandatory="true"/>
+        <param name="USERS_FILEPATH" type="string" label="CONF_MESSAGE[Users]" description="CONF_MESSAGE[The users list]" mandatory="true" default="AJXP_DATA_PATH/plugins/auth.serial/users.ser"/>
         <!-- WP -->
         <param group_switch_name="cms" group_switch_label="WordPress" group_switch_value="wp" name="cms" type="hidden" label="" description="" default="wp"/>
         <param group_switch_name="cms" group_switch_label="WordPress" group_switch_value="wp" name="MASTER_URL" type="string" label="CONF_MESSAGE[Wordpress URL]" description="CONF_MESSAGE[URL of your WP installation, either http://host/path or simply /path if it's on the same host]" mandatory="false"/>

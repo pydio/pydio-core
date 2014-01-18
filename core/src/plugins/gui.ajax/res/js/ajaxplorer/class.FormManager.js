@@ -283,14 +283,18 @@ Class.create("FormManager", {
                         potentialSubSwitches.push(p);
                         return;
                     }
-                    if(! switchValues[p.get('group_switch_value')] ){
-                        switchValues[p.get('group_switch_value')] = {label :p.get('group_switch_label'), fields : [], values : $H()};
+                    if( !switchValues[p.get('group_switch_value')]){
+                        switchValues[p.get('group_switch_value')] = {label :p.get('group_switch_label'), fields : [], values : $H(), fieldsKeys:{}};
                     }
                     p = new Hash(p._object);
                     p.unset('group_switch_name');
                     p.set('name', name + '/' + p.get('name'));
-                    switchValues[p.get('group_switch_value')].fields.push(p);
                     var vKey = p.get("name");
+                    if(switchValues[p.get('group_switch_value')].fieldsKeys[vKey]){
+                       return;
+                    }
+                    switchValues[p.get('group_switch_value')].fields.push(p);
+                    switchValues[p.get('group_switch_value')].fieldsKeys[vKey] = vKey;
                     if(values && values.get(vKey)){
                         switchValues[p.get('group_switch_value')].values.set(vKey, values.get(vKey));
                     }
@@ -327,7 +331,7 @@ Class.create("FormManager", {
                         target.FIELDS_CONTAINER,
                         data.fields,
                         true,
-                        values,
+                        null,
                         false,
                         true);
                     if(selector.getAttribute('data-disableShortcutsOnForm')){
