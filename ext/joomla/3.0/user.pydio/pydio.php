@@ -15,13 +15,13 @@ jimport( 'joomla.registry.registry' );
 
 
 /**
- * AjaXplorer User Plugin
+ * Pydio User Plugin
  *
  * @package		Joomla
  * @subpackage	JFramework
  * @since 		3.0
  */
-class plgUserAjaxplorer extends JPlugin
+class plgUserPydio extends JPlugin
 {
     /**
      * Constructor
@@ -34,10 +34,10 @@ class plgUserAjaxplorer extends JPlugin
      * @param 	array  $config  An array that holds the plugin configuration
      * @since 1.6
      */
-    public function plgUserAjaxplorer(& $subject, $config)
+    public function plgUserPydio(& $subject, $config)
     {
         parent::__construct($subject, $config);
-        $this->_plugin = JPluginHelper::getPlugin( 'user', 'ajaxplorer' );
+        $this->_plugin = JPluginHelper::getPlugin( 'user', 'pydio' );
         $this->_params = new JRegistry();
         $this->_params->loadString($this->_plugin->params);
 

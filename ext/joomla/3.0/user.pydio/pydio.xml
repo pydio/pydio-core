@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="1.6" type="plugin" group="user">
+	<name>User - Pydio</name>
+	<author>Charles du Jeu</author>
+	<creationDate>April 2010</creationDate>
+	<copyright>Copyright (C) 2010 Charles du Jeu - All rights reserved</copyright>
+	<license>LGPL</license>
+	<authorEmail>team@pyd.io</authorEmail>
+	<authorUrl>http://pyd.io</authorUrl>
+	<version>3.0</version>
+	<description>Synchronize Joomla users (source) to Pydio users (destination)</description>
+	<files>
+		<filename plugin="pydio">pydio.php</filename>
+	</files>
+	<config>
+		<fields name="params">
+			<fieldset name="basic">
+				<field name="ajxp_install_path" type="text" size="70" default="" label="Pydio Install Path" description="Path to your Pydio installation (absolute path on server)"/>
+				<field name="ajxp_secret_key" type="text" size="70" default="myprivatesecret" label="Secret Key" description="The secret key defined in your Pydio plugin auth.remote configuration (see conf.php)."/>
+				<field name="ajxp_auto_create" type="radio" default="0" label="Auto Create Users" description="Create Pydio user automatically at login, not only via the Joomla administration interface.">
+					<option value="0">No</option>
+					<option value="1">Yes</option>
+				</field>
+			</fieldset>
+		</fields>
+	</config>
+</extension>
