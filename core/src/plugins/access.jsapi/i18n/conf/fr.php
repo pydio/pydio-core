@@ -20,5 +20,5 @@
 */
 $mess=array(
 "Javascript Api Browser" => "Navigateur d'Api Javascript",
-"Browse Pydio Javascript classes and interfaces. Helper for developpers, but also good demonstration of how Pydio data can be fed by something different than a remote server filesystem!" => "Lister les classes et interfaces javascript et leur methodes, avec affichage du code. Pratique non seulement pour le développement, mais aussi comme démonstration de l'utilisation d'Pydio pour browser d'autres types de données.",
+"Browse Pydio Javascript classes and interfaces. Helper for developpers, but also good demonstration of how Pydio data can be fed by something different than a remote server filesystem!" => "Lister les classes et interfaces javascript et leurs méthodes, avec affichage du code. Pratique non seulement pour le développement, mais aussi comme démonstration de l'utilisation d'Pydio pour browser d'autres types de données.",
 );

@@ -21,7 +21,7 @@
 $mess=array(
 "1" => "Données de connexion",
 "2" => "Hôte",
-"3" => "Optionel",
+"3" => "Optionnel",
 "4" => "Chemin",
 "5" => "Protocole",
 "6" => "Encodage",

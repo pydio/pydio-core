@@ -19,11 +19,11 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1.ios" => "Il existe un client natif pour accèder à %s sur l'iPhone/iPad.",
+"1.ios" => "Il existe un client natif pour accéder à %s sur l'iPhone/iPad.",
 "2.ios" => "Je l'ai déjà, l'ouvrir et ajouter ce serveur à mes serveurs distants",
 "3.ios" => "Je ne l'ai pas, envoyez moi sur l'App Store maintenant!",
 "4.ios" => "Je n'en veux pas, laissez moi utiliser la version web de %s.",
-"1.android" => "Il existe un client natif pour accèder à %s sur Android.",
+"1.android" => "Il existe un client natif pour accéder à %s sur Android.",
 "2.android" => "Je l'ai déjà, l'ouvrir et ajouter ce serveur à mes serveurs distants",
 "3.android" => "Je ne l'ai pas, envoyez moi sur l'Android Market maintenant!",
 "4.android" => "Je n'en veux pas, laissez moi utiliser la version web de %s.",

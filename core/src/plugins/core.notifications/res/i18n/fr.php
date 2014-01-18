@@ -23,7 +23,7 @@ $mess=array(
 "2" => "Flux",
 "3" => "Alertes",
 "4" => "Notifications",
-"5" => "Tous les évenements",
+"5" => "Tous les événements",
 "6" => "Aller à ...",
 "7" => "Supprimer",
 );

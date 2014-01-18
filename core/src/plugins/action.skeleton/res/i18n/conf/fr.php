@@ -20,7 +20,7 @@
 */
 $mess=array(
 "Skeleton Plugin" => "Plugin Squelette",
-"This is an empty container to demonstrate the basics of plugins coding." => "Plugin vide pour expliquer les fonctionnalités de base d'un plugin. Ajoute un bouton dans la toolbar pour ouvrir une URL externe, et un header/footer customizés.",
+"This is an empty container to demonstrate the basics of plugins coding." => "Plugin vide pour expliquer les fonctionnalités de base d'un plugin. Ajoute un bouton dans la toolbar pour ouvrir une URL externe, et un header/footer customisé.",
 "Custom Footer" => "Pied de page",
 "Show a custom footer div" => "Afficher un pied de page custom",
 "Footer Content" => "Contenu du pied",

@@ -22,6 +22,6 @@
 $mess = array(
     "1" => "Envoi rapide",
     "2" => "Envoyer un fichier, le partager et envoyer le lien par email d'un coup",
-    "3" => "Selectionner un fichier",
+    "3" => "Sélectionner un fichier",
     "4" => "Cliquer pour sélectionner un fichier, ou le glisser dans la zone",
 );

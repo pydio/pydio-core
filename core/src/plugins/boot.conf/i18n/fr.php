@@ -22,7 +22,7 @@
 $mess = array(
     "1" => "Assistant d'installation",
     "2" => "Bienvenue dans l'assistant d'installation de Pydio",
-    "3" => "Merci d'installer Pydio!<br> Cet outil va vous aider à configurer l'application en quelques minutes: les sections ci-dessous vous permettrons de configurer les options importantes. Passez votre souris sur les libéllés des champs pour avoir plus d'information. <br>Prêt? ",
+    "3" => "Merci d'installer Pydio!<br> Cet outil va vous aider à configurer l'application en quelques minutes: les sections ci-dessous vous permettrons de configurer les options importantes. Passez votre souris sur les libellés des champs pour avoir plus d'information. <br>Prêt? ",
     "4" => "Démarrer l'assistant!",
     "5" => "Veuillez patienter pendant la configuration! Pydio sera prêt à l'emploi dans quelques secondes...",
     "6" => "Installer Pydio",

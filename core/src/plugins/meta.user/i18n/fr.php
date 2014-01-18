@@ -24,7 +24,7 @@ $mess=array(
 "3" => "Retirer la notation",
 "4" => "Faible",
 "5" => "A faire",
-"6" => "Personel",
+"6" => "Personnel",
 "7" => "Travail",
 "8" => "Important"
 );
