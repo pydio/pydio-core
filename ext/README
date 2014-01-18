@@ -17,6 +17,11 @@
  *
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
+2014-01-16 : Switch to Pydio
+
+Rechecked that the plugins were working on all recent versions of WP, Joomla! and Drupal.
+Massively update the How-To's to reflect the name change but also the fact that the conf is no more in a bootstrap file but through the Settings panel.
+
 2013-05-10 : Update of Joomla plugin
 
 The Joomla! plugin should be working on 2.5 (use the 1.7/ folder content) and 3.0 (new 3.0/ folder).
