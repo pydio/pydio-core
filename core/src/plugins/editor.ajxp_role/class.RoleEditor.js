@@ -328,6 +328,11 @@ Class.create("RoleEditor", AbstractEditor, {
                 var passEl2 = passEl1.cloneNode(true);passEl2.down("div").update(MessageHash["ajxp_role_editor.30"] + ": "); passEl2.down("input").setAttribute("name", "pass_confirm");
                 pane.insert(passEl2);
                 pane.insert('<div class="SF_element" id="pwd_strength_container"></div>');
+                pane.select('input').invoke('observe', 'focus', function(){
+                    ajaxplorer.disableAllKeyBindings();
+                }).invoke('observe', 'blur', function(){
+                    ajaxplorer.enableAllKeyBindings();
+                });
                 modal.showSimpleModal(this.element.down("#pane-infos"),pane, function(){
                     var p1 = passEl1.down("input").getValue();
                     var p2 = passEl2.down("input").getValue();

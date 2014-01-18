@@ -202,11 +202,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
                 echo AJXP_XMLWriter::renderNode($nodeKey, $groupLabel, false, $meta, true, false);
             }
-            $this->recursiveSearchGroups(rtrim($baseGroup, "/")."/".$groupId, $term);
+            $this->recursiveSearchGroups(rtrim($baseGroup, "/")."/".ltrim($groupId, "/"), $term);
 
         }
 
-        $users = AuthService::listUsers($baseGroup, $term);
+        $users = AuthService::listUsers($baseGroup, "^".$term);
         foreach ($users as $userId => $userObject) {
 
             $nodeKey = "/data/users/".trim($userObject->getGroupPath(),"/")."/".$userId;

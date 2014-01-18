@@ -1,10 +1,25 @@
 <img src="plugins/gui.ajax/PydioLogo250.png"/>
-<div style="padding-left:10px;">Version __AJXP_VERSION__ - __AJXP_VERSION_DATE__
-
-Copyright 2007-2013 Abstrium SAS
+<div style="padding-left:10px;"><div style="font-size:0.8em;">Version __AJXP_VERSION__ - __AJXP_VERSION_DATE__
+Copyright 2007-2014 Abstrium SAS
 The latest code can be found at http://pyd.io/.
+</div>
+++ Getting Help ++
+Pydio is an open source software distributed without warranties and 'as is'. If you are encountering a bug or unexpected behavior, a great community is ready to help, given you respect some basic guidelines.
 
-++ LICENSE ++
+[Configuration and Installation problems]
+The most complete Administrator Guide can be found on http://pyd.io/administrator/. It covers most configuration topics, and is handfully completed with a detailed set of How-To's describing more specific problems : http://pyd.io/knowledge-base-2/knowledge-base/.
+
+[Forum Help]
+If you can't find your answers in the standards docs, you can post to the forum. PLEASE read the rules below to make sure we keep the forum readable and organized, and to ensure you a proper response time.
+<ul>
+ <li>The STFF rule : Search The Forum First. There is a high probability that you answer is already there. Please, do not repost ten times the same question.</li><li>Gather as much data as possible about your environment: server OS, client OS, browser, Pydio version, PHP version, etc.</li><li>If you see an error in the interface, set the server in debug mode (see bootstrap_context.php) and use the Chrome Developer Tools to copy/paste the full error</li><li>Describe precisely what's happening, how one can reproduce it, etc.</li>
+</ul>
+Finally, with all that info gathered, post a topic with a clear and describing subject: avoid "I need help on Pydio", it's useless. Instead use "Upload problem with IE7 on Linux2.3". Please don't post issues directly in GitHub, unless you are invited to by a forum member.
+
+[Pro Support]
+As Pydio instances are often deployed in the enterprise world, we do provide a Professional Support offer based on annual subscription. Please go http://pydio.com/ to learn more.
+
+++ License ++
 Pydio is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -19,7 +34,7 @@ You should have received a copy of the GNU Affero General Public License
 along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 
 
-++ CONTRIBUTORS ++
+++ Contributors ++
 Cyril Russo : public links generation
 Panni (support for folder upload using jumploader, support for contextmenu in Opera)
 German : panzaeron
@@ -28,7 +43,7 @@ Other translators : see mention in translation files
 Shorten.multi plugin by Miguelon
 Ultreia many fixes
 
-++ THIRD PARTY LIBRARIES ++
+++ Third Party Library ++
 [Amazon S3]
     S3 Stream Wrapper is released under the BSD license, Copyright 2011 P'unk Avenue LLC http://punkave.com/
 

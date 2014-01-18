@@ -4272,8 +4272,13 @@ div.menuActions img{
 #docDiv div.subtitle
 {
     color: #5E7C90;
-    font-size:12px;
-    font-weight: bold;
+    font-size:25px;
+}
+
+#docDiv a
+{
+    color: #39C0BE !important;
+    text-decoration: underline;
 }
 
 /********************************************/
