@@ -60,6 +60,9 @@ $secret = $AJXP_GLUE_GLOBALS["secret"];
 
 $confPlugs = ConfService::getConf("PLUGINS");
 $authPlug = ConfService::getAuthDriverImpl();
+if(property_exists($authPlug, "drivers") && is_array($authPlug->drivers) && $authPlug->drivers["remote"]){
+    $authPlug = $authPlug->drivers["remote"];
+}
 if ($authPlug->getOption("SECRET") == "") {
     if (basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME'])) {
        die("This file must be included and cannot be called directly");
@@ -80,6 +83,9 @@ if(!function_exists("ajxp_gluecode_updateRole")){
     function ajxp_gluecode_updateRole($loginData, &$userObject)
     {
         $authPlug = ConfService::getAuthDriverImpl();
+        if(property_exists($authPlug, "drivers") && is_array($authPlug->drivers) && $authPlug->drivers["remote"]){
+            $authPlug = $authPlug->drivers["remote"];
+        }
         $rolesMap = $authPlug->getOption("ROLES_MAP");
         if(!isSet($rolesMap) || strlen($rolesMap) == 0) return;
         // String like {key:value,key2:value2,key3:value3}
@@ -166,7 +172,7 @@ switch ($plugInAction) {
     case 'updateUser':
         $user = $AJXP_GLUE_GLOBALS["user"];
         if (is_array($user)) {
-            if (AuthService::updatePassword($user["name"], $user["password"])) {
+            if (AuthService::userExists($user["name"]) && AuthService::updatePassword($user["name"], $user["password"])) {
                 $isAdmin =  (isSet($user["right"]) && $user["right"] == "admin");
                 $confDriver = ConfService::getConfStorageImpl();
                 $userObject = $confDriver->createUserObject($user["name"]);

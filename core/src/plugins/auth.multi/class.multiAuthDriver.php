@@ -106,6 +106,7 @@ class multiAuthDriver extends AbstractAuthDriver
         if(!$loginCallbackNodeList->length) return ;
         $xmlContent = file_get_contents(AJXP_INSTALL_PATH."/plugins/auth.multi/login_patch.xml");
         $sources = array();
+        if(!isSet($this->options) || !isSet($this->options["DRIVERS"]) || !is_array($this->options["DRIVERS"])) return;
         foreach ($this->getOption("DRIVERS") as $driverDef) {
             $dName = $driverDef["NAME"];
             if (isSet($driverDef["LABEL"])) {
