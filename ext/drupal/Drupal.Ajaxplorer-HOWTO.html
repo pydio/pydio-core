@@ -1,120 +1,75 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML>
-<HEAD>
-</HEAD>
-<BODY LANG="fr-FR" TEXT="#000000" BGCOLOR="#ffffff" DIR="LTR">
-<P>This is the bridge between a Drupal installation and an
-AjaXplorer. The aim is to provide a single-signon mechanism based on
-the Drupal users system : users logged in Drupal must have access to
-repositories of AjaXplorer. <STRONG><EM>It's never totally evident to
+
+<p>This is the bridge between a Drupal installation and a Pydio. The aim is to provide a single-sign-on (SSO) mechanism based on
+the Drupal users system : users logged in Drupal will have access to workspaces of Pydio. <br></p><p><strong><em>It's never totally evident to
 interface two different softwares, so don't expect it to be magical,
-and please follow the steps carefully and in this order.</EM></STRONG></P>
-<H3>1/ Base Installation</H3>
-<P><STRONG>1.1 Install AjaXplorer and Drupal</STRONG><BR>First of
-all, make sure you have AjaXplorer 4.0.1 installed and Drupal 6.x or
-7.x</P>
-<P><STRONG>1.2 Install Drupal plugin</STRONG><BR>Unpack the
-Drupal.user.ajaxplorer.zip inside the [6]&quot;<EM>sites/all/modules/</EM>&quot;
-or [7]&quot;<I>modules/</I>&quot; folder of your Drupal installation.</P>
-<H3>2/ AjaXplorer configuration</H3>
-<P><STRONG>2.1 Create administrator</STRONG><BR>If it's not already
-done, with the standard ajaxplorer authentication mechanism, be sure
-that at least an &quot;admin&quot; user is created.</P>
-<P><STRONG>2.2 Guest Browsing</STRONG><BR>If you intend to allow
-guest browsing, set the &quot;Allow Guest Browsing&quot; option to
-true in the Ajaxplorer Settings &gt; Core Options &gt; Common Auth
-Options,  and if you are logged, log out. This should create the
-&quot;guest&quot; user. As admin, log back to the interface and
-create a &quot;Guest&quot; Repository. Go to the users section and
+and please follow the steps carefully and in this order.</em></strong></p>
+<h3>1/ Base Installation</h3>
+
+<p>First of
+all, make sure you have a Pydio recent version installed, and Drupal 6.x or
+7.x<br>Unpack the
+Drupal <span style="font-weight: bold;">user.pydio.zip</span> inside the [drupal 6]"<em>sites/all/modules/</em>"
+or [drupal 7]"<i>modules/</i>" folder of your Drupal installation.</p>
+<h3>2/ Pydio configuration</h3>
+<p><strong>2.1 Administrator &amp; guest</strong><br></p><p>If it's not already
+done, with the standard pydio authentication mechanism, be sure
+that at least an "admin" user is created.</p><p>If you intend to allow
+guest browsing, set the "Allow Guest Browsing" option to
+true in the Pydio Settings &gt; Global Options &gt; Core Options &gt; Authentication,  and if you are logged, log out. This should create the
+"guest" user. As admin, log back to the interface and
+create a "Guest" Repository. Go to the users section and
 grant access (read only may be better) to this repository to the
-&quot;guest&quot; user. Now, when you log out, you should have access
-to this repository.</P>
-<P><STRONG>2.3 Repositories</STRONG><BR>Now create one or many
-repositories that you will want your Drupal logged users to access.
+"guest" user. Now, when you log out, you should have access
+to this repository.</p>
+<p><strong>2.3 Workspaces</strong><br></p><p>Now create one or many workspaces that you will want your Drupal logged users to access.
 You can use the AJXP_USER keyword inside the repository PATH if you
-want to create automatically &quot;personnal&quot; folders for each
-users. Considering the acces rights, the trick here would be to set a
-DEFAULT_RIGHT value to &quot;rw&quot;, so that you don't have to
-manually edit the users rights each time you add them.</P>
-<H4>2.4 Log out&nbsp;<SPAN STYLE="font-weight: normal">of AjaXplorer</SPAN></H4>
-<P><STRONG>2.5 Auth.remote configuration</STRONG><BR><SPAN STYLE="font-weight: normal">Now
-go back to your </SPAN><I><SPAN STYLE="font-weight: normal">conf/boostrap_plugins.php</SPAN></I><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">
-file </SPAN></SPAN><SPAN STYLE="font-weight: normal">and set the
-Authentification driver to be the </SPAN><STRONG><SPAN STYLE="font-weight: normal">auth.remote</SPAN></STRONG><SPAN STYLE="font-weight: normal">.
-There is a commented sample in the bootstrap_plugins.php aimed at wordpress user,
-you should use the following values :</SPAN></P>
-<PRE>        $AUTH_DRIVER = array(
-             &quot;NAME&quot; =&gt; &quot;remote&quot;,
-             &quot;OPTIONS&quot; =&gt; array(
-                &quot;SLAVE_MODE&quot; =&gt; true,
-                &quot;USERS_FILEPATH&quot; =&gt; &quot;AJXP_DATA_PATH/plugins/auth.serial/users.ser&quot;,
-                &quot;LOGIN_URL&quot; =&gt; &quot;/drupal/&quot;,
-                [6.x]&quot;LOGOUT_URL&quot; =&gt; &quot;/drupal/?q=logout&quot;,
-                [7.x]&quot;LOGOUT_URL&quot; =&gt; &quot;/drupal/?q=user/logout&quot;,
-                &quot;SECRET&quot; =&gt; &quot;my_own_private_Drupal_key&quot;,
-                &quot;MASTER_AUTH_FUNCTION&quot; =&gt; &quot;drupal_remote_auth&quot;,
-                &quot;MASTER_HOST&quot; =&gt; &quot;localhost&quot;, // the drupal host
-                &quot;MASTER_URI&quot; =&gt; &quot;/drupal/&quot;,
-                &quot;MASTER_AUTH_FORM_ID&quot; =&gt; &quot;user-login-form&quot;,
-                &quot;TRANSMIT_CLEAR_PASS&quot; =&gt; true)
-        );</PRE><P>
-What you should edit here are only LOGIN_URL, LOGOUT_URL and SECRET.
-LOGIN&amp;LOGOUT should point to your Drupal installation URL on the
-server (URL, not the folder path from the server root). For example,
-here we consider Drupal to be found at
-http://www.mydomain.com/Drupal/. The SECRET key is what will assure
-AjaXplorer that the authentification operations called
-programmatically are indeed called by a trustee. You may put whatever
-you want, it will be a configuration of the Drupal Ajaxplorer
-plugin.&nbsp; Warning, if you want to use a &quot;$&quot; sign in
-your key, you have to put a \ before.</P>
-<P><STRONG>2.6 Checks</STRONG><BR><SPAN STYLE="font-weight: normal">Now
-if you are logged out, when you go to AjaXplorer URL, if you have
-enabled guest browsing you should have access to the Guest repository
-and clicking on the &quot;Back&quot; button should send you to
-Drupal. If &quot;guest&quot; is not enabled, you should be
-automatically redirected to Drupal.</SPAN></P>
-<H3>3/ Drupal Configuration</H3>
-<P><STRONG>3.1 Activate Module</STRONG><BR>Login to Drupal as
-administrator and go to [6]&quot;Administer &gt; Site Building &gt;
-Modules&quot;  or [7]&quot;Modules&quot;. Here you can select the
-&quot;AjaXplorer Bridge&quot; module inside the &quot;Other&quot;
-section. Enable the plugin.</P>
-<P><STRONG>3.2 Configure the module</STRONG><BR>Go to &quot;Site
-Configuration &gt; AjaXplorer Settings&quot; (click on the module
-&quot;Help&quot; for v7). There are three parameters to configure for
-this plugin :&nbsp;</P>
-<UL>
-	<LI><P STYLE="margin-bottom: 0cm"><STRONG>AjaXplorer Install Path</STRONG>
-	: here you have to enter the full path to the AjaXplorer
-	installation. &quot;Full path&quot; in the sense of the server
+want to create automatically "personal" folders for each
+users. Considering the acces rights, the trick here would be to set a "Default Right" value to "rw", so that you don't have to
+manually edit the users rights each time you add them.</p>
+
+<p><strong>2.4 Auth.remote configuration</strong></p><p><strong></strong><span style="font-weight: normal;">Logged as admin, go to </span>Settings &gt; Global Options &gt; Core Options &gt; Authentication,<span style="font-weight: normal;"> </span><span style="font-style: normal;"><span style="font-weight: normal;"></span></span><span style="font-weight: normal;">and set the
+Authentification "Main Instance" driver to be the "Remote Authentication" ( = auth.remote plugin)</span><span style="font-weight: normal;"> :<span style="font-family: monospace;"><br></span></span></p><ul><li>Choose the CMS Type "Drupal"</li><li>Enter your Drupal installation full URL (e.g. http://domain.tld/drupal)</li><li>Leave the Login URL to default "/" , except if no login form can be found on your drupal home page.</li><li>Leave the Auth Form ID to default "user-login-form", except if the login form on your drupal home page has not as html ID this string. You can check that using the HTML inspector of your favorite browser.</li><li>Exit Action: either leads back to drupal page, or triggers a log out.</li><li>Local Prefix: force some users with specific prefix to be stored and authenticated locally (not against drupal).</li><li>Secret Key: this will be a string that both side (pydio &amp; drupal) will share to recognize each other</li><li>Login Redirect: if set to a given page URL, when arriving on pydio, a not-logged guest will be directly redirected to this page.</li><li>Admin Login: make sure a specific user will be recognized as administrator by Pydio.<br></li></ul>
+<p>Other options should be left to default values, otherwise put your mouse on the options label to get more info. For the secret key, warning, if you want to use a "$" sign in
+your key, you have to put a \ before.</p><p>Also make sure NOT to set a secondary instance, this plugin does not support multi-auth configuration yet.<br></p>
+
+<h3>3/ Drupal Configuration</h3>
+<p><strong>3.1 Activate Module</strong></p><p><strong></strong>Login to Drupal as
+administrator and go to [6]"Administer &gt; Site Building &gt;
+Modules"  or [7]"Modules". Here you can select the
+"Pydio Bridge" module under the "Other"
+section. Enable the plugin.</p>
+<p><strong>3.2 Configure the module</strong></p><p><strong></strong>Go to "Site
+Configuration &gt; Pydio Settings" (click on the module
+"Help" for v7). There are three parameters to configure for
+this plugin :&nbsp;</p>
+<ul>
+	<li><p style="margin-bottom: 0cm;"><strong>Pydio Install Path</strong>
+	: here you have to enter the full path to the Pydio
+	installation. "Full path" in the sense of the server
 	filesystem. On Windows, it could be
-	C:/Programs/ApacheData/html/ajaxplorer, or Linux more probably
-	/var/www/html/AjaXplorer. In any cases, use &quot;slashes&quot; and
+	C:/Programs/ApacheData/html/pydio, or Linux more probably
+	/var/www/html/Pydio. In any cases, use "slashes" and
 	not backslashes, and take care that names are case sensitive. 
-	</P>
-	<LI><P STYLE="margin-bottom: 0cm"><STRONG>Secret Key</STRONG> : here
-	you'll have to enter the &quot;SECRET&quot; you entered in the
-	AjaXplorer conf.php configuration file. If it's not the same, it
+	</p>
+	</li><li><p style="margin-bottom: 0cm;"><strong>Secret Key</strong> : here
+	you'll have to enter the "SECRET" you entered in the Pydio authentication configuration. Warning, if they differ, it
 	will (silently) not work. 
-	</P>
-	<LI><P><STRONG>Auto Create Users</STRONG> : This option is useful
-	specially if you are installing this &quot;bridge&quot; when already
-	managing many users in a Drupal installation. By default (&quot;no&quot;),
-	Users will be created in AjaXplorer only by a Drupal administrator
+	</p>
+	</li><li><p><strong>Auto Create Users</strong> : This option is useful
+	specially if you are installing this "bridge" when already
+	managing many users in a Drupal installation. By default ("no"),
+	Users will be created in Pydio only by a Drupal administrator
 	action of creating a Drupal users. Existing users will not be
-	recognized by AjaXplorer. If you set to &quot;Auto create&quot;,
+	recognized by Pydio. If you set to "Auto create",
 	existing users will be automatically created when a user logs in to
 	Drupal. 
-	</P>
-</UL>
-<P>Save the module configuration.</P>
-<P><STRONG>3.3 Use!</STRONG><BR>Now everything should be connected,
+	</p>
+</li></ul>
+<p>Save the module configuration.</p>
+<h3><strong>4/ Use!</strong></h3><p><strong></strong>Now everything should be connected,
 and you can try the following : create an Administrator user and a
 simple user in Drupal. Log in to Drupal as these user and check that
-you are recognized in AjaXplorer, and further more, that the
-administrator has AjaXplorer administration rights. If you want to
-enable the guest mechanism in AjaXplorer, log out from Drupal and
-check that you are recognized as &quot;guest&quot; in AjaXplorer.</P>
-</BODY>
-</HTML>
+you are recognized in Pydio, and further more, that the
+administrator has Pydio administration rights. If you want to
+enable the guest mechanism in Pydio, log out from Drupal and
+check that you are recognized as "guest" in Pydio.</p><p>If you have not enabled the automatic redirection, check that you can log in from Pydio using drupal users's credenatials. This is important to check, as it will allow the mobile devices to connect successfully as well.</p><p><br></p>

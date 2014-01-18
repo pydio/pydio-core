@@ -1,77 +1,126 @@
-<html>
-	<head>
-		<title>AjaXplorer Joomla Bridge</title>
-		<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type" />
-	</head>
-	<body bgcolor="#FFFFFF" text="#000000">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>AjaXplorer Joomla Bridge</title>
+	
+		
+		<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type"></head><body bgcolor="#ffffff" text="#000000">
 		<p>
-			This is the bridge between a Joomla installation and an AjaXplorer. The aim is to provide a single-signon mechanism based on the Joomla users system : users logged in joomla must have access to repositories of AjaXplorer. <strong><em>It&#39;s never totally evident to interface two different softwares, so don&#39;t expect it to be magical, and please follow the steps carefully and in this order.</em></strong></p>
+This is the bridge between a Joomla installation and an Pydio. The aim
+is to provide a single-signon mechanism based on the Joomla users
+system : users logged in joomla must have access to repositories of
+Pydio. <strong><em>It's
+never totally evident to interface two different softwares, so don't
+expect it to be magical, and please follow the steps carefully and in
+this order.</em></strong></p>
 		<h3>
 			1/ Base Installation</h3>
+		
 		<p>
-			<strong>1.1 Install AjaXplorer and Joomla</strong><br />
-			First of all, make sure you have AjaXplorer 3.0.1 installed and Joomla 1.5, 1.6, 2.5 or 3.0</p>
-		<p>
-			<strong>1.2 Install Joomla plugin</strong><br />
-			Drop the right plugin version inside your Joomla installation folder (the &quot;<em>tmp</em>&quot; folder of your Joomla installation.)</p>
+			<strong></strong>First of all, make sure you have a Pydio recent version installed and Joomla 1.5, 1.6, 2.5 or 3.0<strong></strong><br>
+			Drop the right plugin version inside your Joomla installation folder (the "<em>tmp</em>" folder of your Joomla installation.)</p>
 		<h3>
-			2/ AjaXplorer configuration</h3>
+			2/ Pydio configuration</h3>
 		<p>
-			<strong>2.1 Create administrator</strong><br />
-			If it&#39;s not already done, with the standard ajaxplorer authentication mechanism, be sure that at least an &quot;admin&quot; user is created.</p>
+			<strong>2.1 Administrator &amp; guest</strong><br>
+			</p>
+<p>If it's not already done, with the standard Pydio authentication mechanism, be sure that at least an "admin" user is created.</p>
+
 		<p>
-			<strong>2.2 Guest Browsing</strong><br />
-			If you intend to allow guest browsing, set the &quot;Allow Guest Browsing&quot; option to
-true in the Ajaxplorer Settings &gt; Core Options &gt; Common Auth
-Options, and if you are logged, log out. This should create the &quot;guest&quot; user. As admin, log back to the interface and create a &quot;Guest&quot; Repository. Go to the users section and grant access (read only may be better) to this repository to the &quot;guest&quot; user. Now, when you log out, you should have access to this repository.</p>
+			<strong></strong>If you intend to allow guest browsing, set
+the "Allow Guest Browsing" option to
+true in the Settings &gt; Global Options &gt; Core Options &gt;
+Authentication, and if you are logged, log out. This should create the
+"guest" user. As admin, log back to the interface and create a "Guest"
+Repository. Go to the users section and grant access (read only may be
+better) to this repository to the "guest" user. Now, when you log out,
+you should have access to this repository.</p>
 		<p>
-			<strong>2.3 Repositories</strong><br />
-			Now create one or many repositories that you will want your joomla logged users to access. You can use the AJXP_USER keyword inside the repository PATH if you want to create automatically &quot;personnal&quot; folders for each users. Considering the acces rights, the trick here would be to set a DEFAULT_RIGHT value to &quot;rw&quot;, so that you don&#39;t have to manually edit the users rights each time you add them.</p>
-		<h4>
-			2.4 Log out&nbsp;<span class="Apple-style-span" style="font-weight: normal; ">of AjaXplorer</span></h4>
+			<strong>2.2 Workspaces</strong><br></p>
+<p> Now create one or many repositories that you will want your joomla
+logged users to access. You can use the AJXP_USER keyword inside the
+repository PATH if you want to create automatically "personnal" folders
+for each users. Considering the acces rights, the trick here would be
+to set a "Default Rights" value to "rw", so that you don't have to
+manually edit the users rights each time you add them.</p>
+
+		
 		<p>
-			<strong>2.5 Auth.remote configuration</strong><br />
-			<span class="Apple-style-span" style="font-weight: normal; ">Now go back to your conf/bootstrap_plugins.php and set the Authentification driver to be the <strong>auth.remote</strong>. There is a commented sample in the config file aimed at wordpress user, you should use the following values :</span></p>
-		<pre>
-	"AUTH_DRIVER" => array(&nbsp;
-		&quot;NAME&quot; =&gt; &quot;remote&quot;,
-		&quot;OPTIONS&quot; =&gt; array(
-		&quot;SLAVE_MODE&quot; =&gt; true,
-		&quot;USERS_FILEPATH&quot; =&gt; &quot;AJXP_DATA_PATH/plugins/auth.serial/users.ser&quot;,
-		&quot;LOGIN_URL&quot; =&gt; &quot;/joomla/&quot;,
-		&quot;LOGOUT_URL&quot; =&gt; &quot;/joomla/&quot;,
-		&quot;SECRET&quot; =&gt; &quot;my_own_private_joomla_key&quot;,
-	        &quot;MASTER_AUTH_FUNCTION&quot; =&gt; &quot;joomla_remote_auth&quot;,
-	        &quot;MASTER_HOST&quot; =&gt; &quot;localhost&quot;, // the joomla host
-	        &quot;MASTER_URI&quot; =&gt; &quot;/joomla/&quot;,
-	        &quot;MASTER_AUTH_FORM_ID&quot; =&gt; &quot;login-form&quot;, // or maybe form-login, check your login page
-		&quot;TRANSMIT_CLEAR_PASS&quot; =&gt; true)
-	),</pre>
-		<p>
-			What you should edit here are only LOGIN_URL, LOGOUT_URL and SECRET. LOGIN&amp;LOGOUT should point to your joomla installation URL on the server (URL, not the folder path from the server root). For example, here we consider joomla to be found at http://www.mydomain.com/joomla/. The SECRET key is what will assure AjaXplorer that the authentification operations called programmatically are indeed called by a trustee. You may put whatever you want, it will be a configuration of the Joomla Ajaxplorer plugin.&nbsp; Warning, if you want to use a "$" sign in your key, you have to put a \ before.</p>
-		<p>
-			<strong>2.6 Checks</strong><br />
-			<span class="Apple-style-span" style="font-weight: normal; ">Now if you are logged out, when you go to AjaXplorer URL, if you have enabled guest browsing you should have access to the Guest repository and clicking on the &quot;Back&quot; button should send you to Joomla. If &quot;guest&quot; is not enabled, you should be automatically redirected to Joomla.</span></p>
+			<strong>2.3 Auth.remote configuration</strong><br>
+			<span class="Apple-style-span" style="font-weight: normal;"></span></p>
+<p><span class="Apple-style-span" style="font-weight: normal;">Go to </span>Settings &gt; Global Options &gt; Core Options &gt; Authentication<span class="Apple-style-span" style="font-weight: normal;"> and set the "Main Instance" driver to be the <strong>auth.remote</strong>
+(Remote Authentication). There is a commented sample in the config file
+aimed at Joomla user, you should use the following values :</span></p>
+
+		
+		
+<ul>
+<li>Choose the CMS Type "Joomla"</li><li>Enter your Drupal installation full URL (e.g. http://domain.tld/joomla)</li><li>Leave the Home node to default "/" , except if this page does not contain any login form by default<br>
+</li><li>Leave the Auth Form ID to default "user-login-form", except if the
+login form on your drupal home page has not as html ID this string. You
+can check that using the HTML inspector of your favorite browser.</li>
+  <li>Exit Action: either leads back to drupal page, or triggers a log out.</li>
+<li>Local Prefix: force some users with specific prefix to be stored and authenticated locally (not against drupal).</li><li>Secret Key: this will be a string that both side (pydio &amp; drupal) will share to recognize each other</li><li>Login Redirect: if set to a given page URL, when arriving on pydio, a not-logged guest will be directly redirected to this page.</li><li>Admin Login: make sure a specific user will be recognized as administrator by Pydio.<br>
+  </li>
+</ul>
+
+<p>Other options should be left to default values, otherwise put your
+mouse on the options label to get more info. For the secret key,warning, if you want to use a "$" sign in
+your key, you have to put a \ before. </p>
+
+<p>Also make sure NOT to set a secondary instance, this plugin does not support multi-auth configuration yet.</p>
+
+		
 		<h3>
 			3/ Joomla Configuration</h3>
 		<p>
-			<strong>3.1 Install Extension</strong><br />
-			Login to Joomla adminstration front-end and go to &quot;Extensions &gt; Install/Uninstall&quot;. Normally, the &quot;Install from a folder&quot; section should be already filled with your &quot;tmp&quot; folder path. Click &quot;Install&quot; beside this field. It should install successfully the User - AjaXplorer plugin.</p>
+			<strong>3.1 Install Extension</strong><br>
+			</p>
+<p>Login to Joomla adminstration front-end and go to "Extensions &gt;
+Install/Uninstall". Normally, the "Install from a folder" section
+should be already filled with your "tmp" folder path. Click "Install"
+beside this field. It should install successfully the User - Pydio
+plugin.</p>
+
 		<p>
-			<strong>3.2 Activate and Configure the new plugin</strong><br />
-			Go to &quot;Extension &gt; Manage Plugins&quot; and find the User - AjaXplorer plugin module in the list. You can select the plugin type &quot;user&quot; to filter the list. Click in the &quot;Active&quot; column to activate this plugin, then enter the plugin configuration. Change the "Order" parameter to make sure this plugin is called AFTER your master authentication plugin, generally user.joomla. Then there are three ajxp-parameters to configure for this plugin :&nbsp;</p>
+			<strong>3.2 Activate and Configure the new plugin</strong><br>
+			</p>
+<p>Go to "Extension &gt; Manage Plugins" and find the User - Pydio
+plugin module in the list. You can select the plugin type "user" to
+filter the list. Click in the "Active" column to activate this plugin,
+then enter the plugin configuration. Change the "Order" parameter to
+make sure this plugin is called AFTER your master authentication
+plugin, generally user.joomla. Then there are three ajxp-parameters to
+configure for this plugin :&nbsp;</p>
+
 		<ul>
 			<li>
-				<strong>AjaXplorer Install Path</strong> : here you have to enter the full path to the AjaXplorer installation. &quot;Full path&quot; in the sense of the server filesystem. On Windows, it could be C:/Programs/ApacheData/html/ajaxplorer, or Linux more probably /var/www/html/AjaXplorer. In any cases, use &quot;slashes&quot; and not backslashes, and take care that names are case sensitive.</li>
+				<strong>Pydio Install Path</strong> : here you have
+to enter the full path to the Pydio installation. "Full path" in the
+sense of the server filesystem. On Windows, it could be
+C:/Programs/ApacheData/html/ajaxplorer, or Linux more probably
+/var/www/html/Pydio. In any cases, use "slashes" and not backslashes,
+and take care that names are case sensitive.</li>
 			<li>
-				<strong>Secret Key</strong> : here you&#39;ll have to enter the &quot;SECRET&quot; you entered in the AjaXplorer boostrap_plugins.php configuration file. If it&#39;s not the same, it will (silently) not work.</li>
+				<strong>Secret Key</strong>
+: here you'll have to enter the "SECRET" you entered in the Pydio
+configuration. If it's not the same, it will (silently) not work.</li>
 			<li>
-				<strong>Auto Create Users</strong> : This option is useful specially if you are installing this &quot;bridge&quot; when already managing many users in a Joomla installation. By default (&quot;no&quot;), Users will be created in AjaXplorer only by a joomla administrator action of creating a Joomla users. Existing users will not be recognized by AjaXplorer. If you set to &quot;Auto create&quot;, existing users will be automatically created when a user logs in to Joomla.</li>
+				<strong>Auto Create Users</strong>
+: This option is useful specially if you are installing this "bridge"
+when already managing many users in a Joomla installation. By default
+("no"), Users will be created in Pydio only by a joomla administrator
+action of creating a Joomla users. Existing users will not be
+recognized by Pydio. If you set to "Auto create", existing users will
+be automatically created when a user logs in to Joomla.</li>
 		</ul>
 		<p>
 			Save the module configuration.</p>
 		<p>
-			<strong>3.3 Use!</strong><br />
-			Now everything should be connected, and you can try the following : create an Administrator user and a simple user in Joomla. Log in to Joomla as these user and check that you are recognized in AjaXplorer, and further more, that the administrator has AjaXplorer administration rights. If you want to enable the guest mechanism in AjaXplorer, log out from Joomla and check that you are recognized as &quot;guest&quot; in AjaXplorer.</p>
-	</body>
-</html>
+			<strong>3.3 Use!</strong><br>
+Now everything should be connected, and you can try the following :
+create an Administrator user and a simple user in Joomla. Log in to
+Joomla as these user and check that you are recognized in Pydio, and
+further more, that the administrator has Pydio administration rights.
+If you want to enable the guest mechanism in Pydio, log out from Joomla
+and check that you are recognized as "guest" in Pydio.</p>
+	
+</body></html>
