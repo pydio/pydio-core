@@ -30,7 +30,7 @@ $mess=array(
 "Password" => "Mot de passe",
 "Password on the remote host" => "Mot de passe",
 "Session Name" => "Nom de la session",
-"Parameter name to pass the session id" => "Paramêtre pour passer l'id de session",
+"Parameter name to pass the session id" => "Paramètre pour passer l'id de session",
 "URI" => "URI",
 "Script URI on the remote server" => "Chemin sur le serveur distant.",
 );
