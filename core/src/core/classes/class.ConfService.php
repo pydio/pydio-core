@@ -653,6 +653,12 @@ class ConfService
         if (iSset($this->configs["REPOSITORY"]) && $this->configs["REPOSITORY"]->getId()."" == $repoId) {
             return $this->configs["REPOSITORY"];
         }
+        if (isSet($this->configs["DEFAULT_REPOSITORIES"]) && isSet($this->configs["DEFAULT_REPOSITORIES"][$repoId])) {
+            $repo = self::createRepositoryFromArray($repoId, $this->configs["DEFAULT_REPOSITORIES"][$repoId]);
+            $repo->setWriteable(false);
+            if(!isset($this->configs["REPOSITORIES"])) $this->configs["REPOSITORIES"][$repoId] = $repo;
+            return $repo;
+        }
         return $this->getConfStorageImpl()->getRepositoryById($repoId);
     }
 
