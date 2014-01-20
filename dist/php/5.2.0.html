@@ -3,10 +3,11 @@
 <p>This is a major stable release, upgrade is recommended. Please read below the detail of the changes.</p>
 
 <ul>
+    <li><b>Date</b>: 21st, January 2014</li>
     <li><b>License</b>: Affero GPL</li>
     <li><b>Copyright</b>: Charles du Jeu 2014</li>
-    <li><b>Demo</b>: <a href="https://demo.pyd.io/">https://demo.pyd.io/</a></li>
-    <li><b>Date</b>: 21st, January 2014</li>
+    <li><b>Demo</b>: <a target="_blank" href="https://demo.pyd.io/">https://demo.pyd.io/</a></li>
+    <li><b>Upgrade</b>: For <b>linux packages</b>, please <a target="_blank" href="http://pyd.io/pydio-core-5.0.2/">read the release note</a> and <b>manually upgrade your database.</b></li>
     <li><b>Contributors</b>: cdujeu, echampet, chusopr, joubertredrat, BlackLionPT, warhawk3407, andypmuc, Afterster, Ellega, TheLexus, terminal-addict, cfoellman, millsdude, bitstrings, thomasfrivold</li>
 </ul>
 
@@ -33,7 +34,6 @@
             <li>Use CSS animation when possible to make it lighter (<a href="http://github.com/pydio/pydio-core/commit/94dcceebb622547330cb5630bca739bbc538d1cb">details</a>)</li>
             <li>Fix ResourcesManager : was loading css multiple times (<a href="http://github.com/pydio/pydio-core/commit/9e287175318718cda2589c2d4be5b44ea5fa6d81">details</a>)</li>
             <li>Performance Hunting: divided by 3,5 the display of long list of files. Todo: monitor for side-effects (<a href="http://github.com/pydio/pydio-core/commit/afdb66f0901faa79b560d00dcfc316c5e789e8c9">details</a>)</li>
-            <li>Minisite: remove the inlineToolbar, it creates big performances problems, we have to find an alternative for that in the mobile GUI as well. (<a href="http://github.com/pydio/pydio-core/commit/5e493a63fe9bdf4627003e75ac529e618248a996">details</a>)</li>
         </ul>
     <li><b>Plugins</b></li>
         <ul>
@@ -56,7 +56,6 @@
     <li>Make sure to show controls on video when opened in editor. (<a href="http://github.com/pydio/pydio-core/commit/d60bd04becc67138ce595636131ccc0c4c0d139d">details</a>)</li>
     <li>Shared users: inherit parent personalRole if the parameter is marked as inherit. (<a href="http://github.com/pydio/pydio-core/commit/c29ae8b6bd638c77bc52d0dc6d1b6b4f933e73a9">details</a>)</li>
     <li>Allow administrators to disable WebDAV on individual repositories. This is necessary for repositories that depend on session credentials because clients such as Windows default WebDAV do not use sessions. (<a href="http://github.com/pydio/pydio-core/commit/1119e8c80e3d1c4303c8a99b4264ddbeb3d6cd67">details</a>)</li>
-    <li>Implement WebDAV Basic authentication the same way as Digest. (<a href="http://github.com/pydio/pydio-core/commit/94b06074bbf1b45c3cd66a07d83fdfe6a48568f9">details</a>)</li>
     <li>FS: Pass __AJXP_ZIP_FLAT__ to makeZip function to force all files to be at level 0 Fix tabulator et splitter resizing issues Download Cart. (<a href="http://github.com/pydio/pydio-core/commit/8b2353ceac7f72f7dbc729ea445a3629b05569d9">details</a>)</li>
     <li>Use FeedStore instead of MetaStore to have recursive meta. Could be expanded to a more generic SQL-based metastore. (<a href="http://github.com/pydio/pydio-core/commit/18dc884ed392b18e166a2e0c88d86d4cf1d288a0">details</a>)</li>
     <li>Impl #259 : if windows OS , alternative unoconv call. (<a href="http://github.com/pydio/pydio-core/commit/057fa1595e19b9dc5d4546da27a1b16559dfce1c">details</a>)</li>
@@ -96,16 +95,10 @@
     <li>Correct access.wms i18n files (<a href="http://github.com/pydio/pydio-core/commit/0fe67c9db286013f617e2a0b4a2b2553ae10ce3d">details</a>)</li>
     <li>Allow log plugins to handle variable number of \t (<a href="http://github.com/pydio/pydio-core/commit/6d2fd41133d7cbb17b87ec573574882cc6e62817">details</a>)</li>
     <li>Add logging functions to AJXP_Plugin class / put plugin id as log prefix (<a href="http://github.com/pydio/pydio-core/commit/0c607c19ba97086df521236050c77a5582522408">details</a>)</li>
-    <li>Avoid group creation without action. (<a href="http://github.com/pydio/pydio-core/commit/444ccd16913c5ddd5ad6436066cb931246032204">details</a>)</li>
-    <li>Fix code style (<a href="http://github.com/pydio/pydio-core/commit/a962c56e2f167309e744e1eccabecceb43e8cc55">details</a>)</li>
-    <li>Refix remote sorting that was broken. Implement it in FS for paginated case (standard attributes only, not metadata) (<a href="http://github.com/pydio/pydio-core/commit/a147cc194f9d273fb13ef5a49843986de6b5dd01">details</a>)</li>
     <li>Avoid fatal error if a meta plugin does not implement the initMeta method. (<a href="http://github.com/pydio/pydio-core/commit/d63b116c137c50f00f4071712fa485d841347be6">details</a>)</li>
-    <li>Fix dead link to the F.A.Q. concerning the server charset encoding check warning (<a href="http://github.com/pydio/pydio-core/commit/678bd117ee22c123d6ecbfad1b17df52b0c96a4e">details</a>)</li>
     <li>Move metadata along. (<a href="http://github.com/pydio/pydio-core/commit/ed3ab0d4d05bca6cda33237c899dcb274815be57">details</a>)</li>
     <li>Remove exit() instruction (<a href="http://github.com/pydio/pydio-core/commit/d6aee2fc22519dfb808b385f7d59493bedb7753a">details</a>)</li>
-    <li>Fix zoho (<a href="http://github.com/pydio/pydio-core/commit/fbb8565cc99a41c9799f35aa36cde24bc18bec68">details</a>)</li>
     <li>Declare new attribute (<a href="http://github.com/pydio/pydio-core/commit/3d436b1278f93dcca400d621fbe691f84b9b6499">details</a>)</li>
-    <li>Css update (<a href="http://github.com/pydio/pydio-core/commit/5de2949d00e26cf6823c9f5630cd13c405da643a">details</a>)</li>
     <li>Last compile (<a href="http://github.com/pydio/pydio-core/commit/a47ae3d3d381a221bf864d952230aa19be139770">details</a>)</li>
     <li>IE fixes (<a href="http://github.com/pydio/pydio-core/commit/d49cb24d528037fdce67baa7e9f8e8f07c7a8267">details</a>)</li>
     <li>Rebranding (<a href="http://github.com/pydio/pydio-core/commit/ee7512bb7405b1ccfa87d6d18cdf7a6855e92dc7">details</a>)</li>
@@ -120,9 +113,7 @@
     <li>Delete from [ajxp_user_rights] only for the current user (add [login] in where clause) Also use more dibi (use (%s)) (<a href="http://github.com/pydio/pydio-core/commit/549051b12793aade6a404615b703a1c6834ec006">details</a>)</li>
     <li>Change serial_role type to bytea for PostgreSQL (table ajxp_roles) (<a href="http://github.com/pydio/pydio-core/commit/0d3f6a9689b30d5262d3e2e5f39ef7181ab029bf">details</a>)</li>
     <li>Force an archive name for downloading multiple nodes. (<a href="http://github.com/pydio/pydio-core/commit/e5c07e3448e697411baab9220ef44b440501e89b">details</a>)</li>
-    <li>Fix floating "No Results Found" in the search engine. (<a href="http://github.com/pydio/pydio-core/commit/7adbae5832a14ab1ee014a5f29a0baf45629fd54">details</a>)</li>
     <li>Pipe search and download actions by using nodes selections to download a whole search result at once. (<a href="http://github.com/pydio/pydio-core/commit/4fbcb0b778035f000d924718340417dca0c2565b">details</a>)</li>
-    <li>Update class.FilesystemMounter.php (<a href="http://github.com/pydio/pydio-core/commit/948f51dc4877cd69ce3e2313db236675c9b5cfa1">details</a>)</li>
     <li>Hook to correct resize event (<a href="http://github.com/pydio/pydio-core/commit/6b4c9ffe611a3c67458b2607d891c2564d8e85d2">details</a>)</li>
     <li>Fix new node not removed correctly. Do not set node selected if current context is not its parent. (<a href="http://github.com/pydio/pydio-core/commit/ae1dde8c7bf662a16142b8c839cda8ea04620174">details</a>)</li>
     <li>Serialized data can contain null bytes, store them in blob (<a href="http://github.com/pydio/pydio-core/commit/b551098f050694f485fa6ae682868f92922a8e99">details</a>)</li>
@@ -131,12 +122,7 @@
     <li>Fix wrong initialization of splitter (<a href="http://github.com/pydio/pydio-core/commit/0821f8ac2bd355a0449833062769a0d06e7912d5">details</a>)</li>
     <li>Add "pydio" as default identifier for log.syslog (<a href="http://github.com/pydio/pydio-core/commit/3372240131ea7fabda27ffbe431e5f93366d6050">details</a>)</li>
     <li>Don't limit log messages size (use TEXT for params column) (<a href="http://github.com/pydio/pydio-core/commit/f822f689629ea2893bc455a61b276196514bc6b4">details</a>)</li>
-    <li>Update Modernizr, current version seems to create problems on some IE9 (<a href="http://github.com/pydio/pydio-core/commit/d6948404145ac77fdc3d44ede8f8ca55cdfccfc6">details</a>)</li>
-    <li>Refix remote sorting that was broken. Implement it in FS for paginated case (standard attributes only, not metadata) (<a href="http://github.com/pydio/pydio-core/commit/24b43fe23f475fa6c6e196081b521e56e21f92bb">details</a>)</li>
-    <li>Fix dead link to the F.A.Q. concerning the server charset encoding check warning (<a href="http://github.com/pydio/pydio-core/commit/abd8f4d60a9171fd230b22465432b028b65c8551">details</a>)</li>
     <li>Fix in_array() error in ldap driver (<a href="http://github.com/pydio/pydio-core/commit/07c9e3353e4729c505c6840e54dbf714236e72f7">details</a>)</li>
-    <li>Deport authorization check in the nodeleaf put() method. (<a href="http://github.com/pydio/pydio-core/commit/5fb62c24f58ba871343da071b53a9a08e762cc96">details</a>)</li>
-    <li>Commit RewriteBase with htaccess set to / (<a href="http://github.com/pydio/pydio-core/commit/7095ff389eaed9946c9631a01c6020f7aa7a0c68">details</a>)</li>
     <li>Fix #310, missing short form tpl for rename notification (<a href="http://github.com/pydio/pydio-core/commit/f5ee436f001b8a5c9376c61e56636ae6fb5ad471">details</a>)</li>
     <li>Correct insertion_date in conf.sql/create.pgsql (<a href="http://github.com/pydio/pydio-core/commit/789756e0cfe25b60ab436df7ad42c0aedc34a5d9">details</a>)</li>
     <li>Update class.SvnManager.php (<a href="http://github.com/pydio/pydio-core/commit/fe2cc2b023d2325fd3ac44f3f6565a64367aef11">details</a>)</li>
