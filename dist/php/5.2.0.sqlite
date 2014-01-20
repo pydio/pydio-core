@@ -1,0 +1,61 @@
+/* SEPARATOR */
+ALTER TABLE `ajxp_feed` ADD COLUMN `index_path` text;
+/* SEPARATOR */
+ALTER TABLE ajxp_user_prefs RENAME TO ajxp_user_prefs_old;
+/* SEPARATOR */
+CREATE TABLE IF NOT EXISTS ajxp_user_prefs (
+  rid integer NOT NULL primary key autoincrement,
+  login text NOT NULL,
+  "name" text NOT NULL,
+  val blob DEFAULT NULL
+);
+/* SEPARATOR */
+INSERT INTO ajxp_user_prefs SELECT rid,login,name,val FROM ajxp_user_prefs_old;
+/* SEPARATOR */
+DROP TABLE ajxp_user_prefs_old;
+/* SEPARATOR */
+ALTER TABLE ajxp_repo_options RENAME TO ajxp_repo_options_old;
+/* SEPARATOR */
+CREATE TABLE IF NOT EXISTS ajxp_repo_options (
+  oid integer NOT NULL primary key autoincrement,
+  uuid text NOT NULL,
+  "name" text NOT NULL,
+  val blob DEFAULT NULL
+);
+/* SEPARATOR */
+INSERT INTO ajxp_repo_options SELECT oid,uuid,name,val FROM ajxp_repo_options_old;
+/* SEPARATOR */
+DROP TABLE ajxp_repo_options_old;
+/* SEPARATOR */
+ALTER TABLE ajxp_plugin_configs RENAME TO ajxp_plugin_configs_old;
+/* SEPARATOR */
+CREATE TABLE IF NOT EXISTS ajxp_plugin_configs (
+  id text NOT NULL,
+  configs longblob NOT NULL
+);
+/* SEPARATOR */
+INSERT INTO ajxp_plugin_configs SELECT id,configs FROM ajxp_plugin_configs_old;
+/* SEPARATOR */
+DROP TABLE ajxp_plugin_configs_old;
+/* SEPARATOR */
+ALTER TABLE ajxp_simple_store RENAME TO ajxp_simple_store_old;
+/* SEPARATOR */
+CREATE TABLE IF NOT EXISTS ajxp_simple_store (
+  object_id text NOT NULL,
+  store_id text NOT NULL,
+  serialized_data blob,
+  binary_data blob,
+  related_object_id text DEFAULT NULL,
+  insertion_date DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+/* SEPARATOR */
+INSERT INTO ajxp_simple_store SELECT object_id,store_id,serialized_data,binary_data,related_object_id,CURRENT_TIMESTAMP FROM ajxp_simple_store_old;
+/* SEPARATOR */
+DROP TABLE ajxp_simple_store_old;
+/* SEPARATOR */
+CREATE TABLE IF NOT EXISTS ajxp_user_teams (
+    team_id text NOT NULL,
+    user_id text NOT NULL,
+    team_label text NOT NULL,
+    owner_id text NOT NULL
+);
