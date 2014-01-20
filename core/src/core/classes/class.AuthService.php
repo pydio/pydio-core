@@ -415,8 +415,10 @@ class AuthService
             $rootRole = new AJXP_Role("ROOT_ROLE");
             $rootRole->setLabel("Root Role");
             $rootRole->setAutoApplies(array("standard", "admin"));
+            $dashId = "";
             foreach (ConfService::getRepositoriesList("all") as $repositoryId => $repoObject) {
                 if($repoObject->isTemplate) continue;
+                if($repoObject->getAccessType() == "ajxp_user") $dashId = $repositoryId;
                 $gp = $repoObject->getGroupPath();
                 if (empty($gp) || $gp == "/") {
                     if ($repoObject->getDefaultRight() != "") {
@@ -424,6 +426,7 @@ class AuthService
                     }
                 }
             }
+            if(!empty($dashId)) $rootRole->setParameterValue("core.conf", "DEFAULT_REPOSITORY", $dashId);
             $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[@scope]", "node", false, false, true);
             if (is_array($paramNodes) && count($paramNodes)) {
                 foreach ($paramNodes as $xmlNode) {
