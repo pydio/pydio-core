@@ -1,5 +1,322 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+This is a major stable release, upgrade is recommended. Please read below the detail of the changes.
+
+License: Affero GPL
+Copyright: Charles du Jeu 2014
+Demo: https://demo.pyd.io/
+Date: 21st, January 2014
+Contributors: cdujeu, echampet, chusopr, joubertredrat, BlackLionPT, warhawk3407, andypmuc, Afterster, Ellega, TheLexus, terminal-addict, cfoellman, millsdude, bitstrings, thomasfrivold
+Main new features
+
+Tab-based editors: open editors in tabbed navigation, to work on many files at once.
+New user Dashboard: displaying all personal parameters and custom data.
+Faceted search: search files and folders by date, extension, date range, metadata, etc.
+Sharing & emails
+Update ShareCenter to create multiple links on a given file and associate an arbitrary tag data.
+Add QRCode on shared links
+Add an HTML layout for the emails, and pass a "main link" either by argument or from the main node of the notification
+Ability to create personal contacts lists ("teams")
+Add ENABLE_FOLDER_SHARING option in action.share, defaulting to true
+Optional limit for number of shared users creation
+Expand the Shared User creation form to fill user email, full name, send an email, etc.
+Add a parameter to force old-school external email
+Add a parameter to allow new users creation while sharing (true by default). Use AutoCompleter for AjxpMailer Send users_only in list_authorized_users to avoid retrieving groups.
+GUI Performances
+Quicker start Customize dialogbox with a className.
+Use CSS animation when possible to make it lighter
+Fix ResourcesManager : was loading css multiple times
+Performance Hunting: divided by 3,5 the display of long list of files. Todo: monitor for side-effects
+Minisite: remove the inlineToolbar, it creates big performances problems, we have to find an alternative for that in the mobile GUI as well.
+Plugins
+Comments feed
+Rework metadata modifiers and Meta.user plugin. Implement a custom SelectBox choice. Should replace and close #255.
+Selection cart and save search advanced.
+Add avatar plugins (Gravatar and Libravatar)
+Relayout admin dashboard
+Simple implementation of WebODF viewer. Only as viewer for the moment, we have to get a way to send back the modif in a standard manner, probably by replacing the Runtime implementation.
+Add plugin auth.radius
+Add YOURLS shortener, with optional IDN support
+Rework AJXP_Logger - expose all log levels - accept a variable number of argument
+Add PostgreSQL database support
+Improvements and API Changes
+
+Make sure to show controls on video when opened in editor.
+Shared users: inherit parent personalRole if the parameter is marked as inherit.
+Allow administrators to disable WebDAV on individual repositories. This is necessary for repositories that depend on session credentials because clients such as Windows default WebDAV do not use sessions.
+Implement WebDAV Basic authentication the same way as Digest.
+FS: Pass __AJXP_ZIP_FLAT__ to makeZip function to force all files to be at level 0 Fix tabulator et splitter resizing issues Download Cart.
+Use FeedStore instead of MetaStore to have recursive meta. Could be expanded to a more generic SQL-based metastore.
+Impl #259 : if windows OS , alternative unoconv call.
+Add office templates to Imagick support.
+Rework "regexp" in listUsersPaginated / getUsersCount in class.sqlAuthDriver.php Now "^a" matches everything that start with a "a$" matches everything that end with a "^a$" matches exactly a (wasn't working) "a" matches everything that contains a (was matching exactly a)
+Use HTML base tag instead of the previous complicated "travel_path_to_root" mechanism...
+New access point for managing users self-service operations (currently reset password)
+Make custom sort function to make sure users are sorted (fix #279)
+New variable AJXP_SANITIZE_FILENAME, to be less restrictive on the allowed characters than AJXP_SANITIZE_HTML_STRICT. Particularly, allow commas in filename.
+Login: trim username and password to avoid trailing and ending white space problems
+Better API for get_my_feed. Ability to force recycle_bin creation in workspace share
+Add node.share.create hooks
+Add user.before_disconnect and user.after_disconnect hooks
+Optionally attach a link to LogoWidget or RepositorySimpleLabel via ajxpOptions.
+Fix minisite: > Display workspace description > Do not display label/description if no user logged.
+API CHANGE: switch to nodes[] query parameters instead of file_0, file_1, file_2, etc. Unique "file" is still allowed though. Fix dblclick on IE10 and IE11, tested on WIN7 and 8
+Add a stat_hash action to extend standard stat with the file hash.
+Repository switch and loading optimization: avoid loading all available repository when we already know the repository ID. Should have a great impact on REST-based access, typically WebDAV.
+New meta.syncable plugin keep tracks of all changes with a global revision number (inspired by couchdb mechanism)
+Meta.filehasher: Add an optional caching mechanism to the full XML tree
+Change how uploader.html depends on uploader.flex, should impact plugins ordering, but not activation.
+Move copy operations into AbstractAccessDriver to factorize normal and cross-repository copies. Enable cross-repository copy for folders. To be tested extensively.
+Strengthen again the security level of zoho plugin. Could be circumvented if people did not change their secret key.
+Add two new parameters to the ls action, only playing for recursive case: max_depth and max_nodes. If activated ( = recursion is cut before the end), the folder nodes have a new property ajxp_has_children = true|false to decide whether client must recurse again or not.
+Add an optional parameter for ZIP filenames encoding at creation. CP437 is a working value for Windows, but then archive is incorrect on mac... The best we can do to fix #10
+LDAP: use ldap_sort instead of a custom sorter Fix filter differing in count and list users Fix groups listing - user object update when filter is empty
+Add a parameter in LDAP to search users by another attribute
+Check regexp on userId or userLabel ConfCenter: New parameter: get users from all groups (search them), and display whole list. ShareCenter: Sticking to userExists("write") is creating a local user instead of getting it from master auth.
+Revert previous commit disabling users creation: add a parameter instead CACHE_MASTER_USERS_TO_SLAVE, set to true by default for backward compat.
+In DEBUG mode, display stack trace in errors
+Bugfixes
+
+Correct editor.openlayer i18n files
+Correct access.wms i18n files
+Allow log plugins to handle variable number of \t
+Add logging functions to AJXP_Plugin class / put plugin id as log prefix
+Avoid group creation without action.
+Fix code style
+Refix remote sorting that was broken. Implement it in FS for paginated case (standard attributes only, not metadata)
+Avoid fatal error if a meta plugin does not implement the initMeta method.
+Fix dead link to the F.A.Q. concerning the server charset encoding check warning
+Move metadata along.
+Remove exit() instruction
+Fix zoho
+Declare new attribute
+Css update
+Last compile
+IE fixes
+Rebranding
+fix shortcut for open_with
+Fix applied hooks in FTP driver, were sending "file deleted" instead of "file created"...
+Fix code style
+Fix #293
+Fix size after full screen
+Save tabulator state and Cart Manager state. Reloading is not totally working.
+Fix editors
+Do no reinvent dibi (use (%s))
+Delete from [ajxp_user_rights] only for the current user (add [login] in where clause) Also use more dibi (use (%s))
+Change serial_role type to bytea for PostgreSQL (table ajxp_roles)
+Force an archive name for downloading multiple nodes.
+Fix floating "No Results Found" in the search engine.
+Pipe search and download actions by using nodes selections to download a whole search result at once.
+Update class.FilesystemMounter.php
+Hook to correct resize event
+Fix new node not removed correctly. Do not set node selected if current context is not its parent.
+Serialized data can contain null bytes, store them in blob
+New functions in to be implemented by conf plugins (save/load/clearTemporaryKey, pruneTemporaryKeys)
+Override GUI parameters by setting session key.
+Fix wrong initialization of splitter
+Add "pydio" as default identifier for log.syslog
+Don't limit log messages size (use TEXT for params column)
+Update Modernizr, current version seems to create problems on some IE9
+Refix remote sorting that was broken. Implement it in FS for paginated case (standard attributes only, not metadata)
+Fix dead link to the F.A.Q. concerning the server charset encoding check warning
+Fix in_array() error in ldap driver
+Deport authorization check in the nodeleaf put() method.
+Commit RewriteBase with htaccess set to /
+Fix #310, missing short form tpl for rename notification
+Correct insertion_date in conf.sql/create.pgsql
+Update class.SvnManager.php
+Fix sharing / Mailer / autocomplete
+Fix json_data case for the create_repository action
+Fix #309
+Implement #291
+Fix #331
+Should fix #308 - We now use index_path dedicated column
+Fix IE10/11 problems (close #318), plus IE8 problems. Fix close modal by ESC key that was broken.
+Replace default_repository parameter by a real role/group/user parameter.
+Fix old-school uploader for IE (Send button did not appear)
+Fix #332: Error when renaming on Windows.
+Fix #249, #250, #252 - @Ellega can you verify ?
+Test also for X_ACCELREDIRECT parameter to disable the zip automatic deletion.
+Auth.remote cms_functions: when looking for the hidden files, make sure to use ".//" to search only below the current node.
+ajxp_users.login must be in GROUP BY clause (Correct PostgreSQL error)
+Auth.remote: test if ajxp_gluecode_updateRole function exists to avoid errors if the glueCode is inserted many times.
+Remove compat.php
+Fix #285 again
+Editor.browser: go through the various mime detectors while the result is octet-stream. Office docs should have the correct mimetype.
+New invisibleBar, and autoFoldOnEvent options on Splitter New tabsTips option on Tabulator Fix simpleTooltip positioning and style Rework layout here and there, implements the new behaviours, still to be tested and validated.
+Fix destroy and various components glitches. Move Search box to the global toolbar in admin mode.
+Clean destroy() of ActionsToolbar
+Don't use More in admin - Small button for list and bookmarks
+Missing CHMOD application on directories when applying recursive copy.
+Update auth.remote plugin, seems wp can create problems with wordpress_test_cookie missing.
+Do not use UserSelection->initFromHttpVars() without arguments, otherwise it breaks while in the CLI context.
+Add log when sharing file (in writePubliclet)
+Don't check for date_default_timezone_*, we're using php 5.3+
+Don't check for filter_var, we're using php 5.3+
+Remove SystemTextEncoding::magicDequote, magic_quotes are deprecated in php 5.3 and removed in 5.4
+Adapt buttons to appear only in scheduler zone
+MCRYPT_MODE_ECB doesn't require an IV
+Repository Editor
+Adapt showSimpleModal for legacy IE
+Display users as list to keep hierarchy
+Indexation: do not use set_time_limit if already CLI context
+Do not set transparency on left tab. Close notifications after opening.
+Make sure we don't have false positive for old user migrations, otherwise it can end up overriding the role
+To be retested extensively, use ConfService::switchUserToActiveRepository() in the cmd.php scripts to replace old code.
+Notifications: make the goto button more accessible.
+Display teams at the right place Separate comments only by one BR Unnecessary return instruction.
+Don't trigger upload if drop does not have "files".
+Fix various refresh / focus problems, TAB navigation was broken.
+Define InfoPanelExtension for "ajxp_root_node" mime, used only on the root node. If none is define, we use "no_selection" instead.
+Use fontawesome for overlay icons Switch icon-star to icon-bookmark Search Engine Advanced panel i18n - Fix result positioning
+Disable focus on form edition. Fix textarea and image input styling Change various default settings
+Add format=json parameter to the Share action for backward compatibility
+Fix serverUrl detection
+Lower the poller frequency value from 5 to 15
+Fix default share folder for RPM install (cherry picked from commit 3243d70)
+Performances: do not trigger load() in storageExists() if not necessary filterUsersByGroup: is_array() security check Typo when catching exception in logger
+Wrong notification sent during copy
+Fix #358, #359, #360
+Fix #354
+pgsql: IF NOT EXISTS is only supported since PostgreSQL 9.1
+try/cactch on repository switch
+Update XSD
+Fix rename just after creation, detect where to "switchCurrentLabelToEdition"
+Correct typo in AbstractLogDriver
+Small typo in class.phpmailer-lite.php
+Correct typo in class.cmsmsAuthDriver.php
+Typo in test.ServerEncoding.php
+session_unset() doesn't take arguments
+AJXP_Utils::getRemoteContent take only 1 argument
+encoding is a parameter of Zend_Search_Lucene_Field::Keyword, not $privateDoc->addField
+listUsers() doesn't take parameters in remoteAuthDriver
+Replace $HTTP_HOST with $_SERVER["SERVER_NAME"]
+Fix post-upload hooks: make sure to send node UPDATED instead of CREATED if was already there.
+Make sure the rest API point is working on root.
+Name sdk methods for search and searchByKeyword
+return AJXP_Utils::saveSerialFile is misleading and useless
+$error isn't defined and used
+Replace $REMOTE_HOST with $_SERVER["REMOTE_ADDR"]
+Fix some specific installs problems with libxml and "external entity load" erros.
+getUniqueFile() doesn't take args
+Small typos in phpCAS lib
+typo in websocket.server.php
+typos in phpCAS lib
+Declare restParams for move and rename
+Close #371
+Switch to scrutinizer-ci.com
+Manually define columns list to avoid NULL node_id (nulled by the left join)
+porting rhs/centos script to gluster/debian
+Fix copy permission: can copy from one ro ws to another but not inside it.
+Sanitize user name at creation in user_create_user
+Updated access.sftp_psl
+Fix sorting problems when not in list mode.
+Close #363 Add parameter for sendmail path
+Fix #356
+Fix typo access.sftp_psl
+Fix #355 Fix #356
+Mq manager was breaking the "guest" access.
+Other usersDisabled() tracking
+Do not override the _isRoot property in replaceBy. Do not filter out rootNode from selection, but explicitely enableRoot on actions, download only for the moment.
+Fix #370 (5.1.0 regression) Avoid checking MetaWatch on parent if node is already root Avoid unnecessary DB calls to get repository by Id
+Optionaly set the unique button to 'close' when opening modal
+Should fix #376 : catch exception instead of testing result
+Fix #377
+Fix #374
+Fix #342 Source editor was broken in modal mode + detect BASE tag if defined to recompute correct URLS in minisite.
+Missing log when opening a file via the Editor (FileMimeSender) Fix #341 : force init core.log plugin if self::$loggerInstance is not yet defined.
+Fix tabs and scrolling issues in RepositoryEditor Make sure to disableShortcutsOnForm when replicating rows
+Fix #260 manually: put full Imagick options in the Parameters, for both Thumbs and Image
+Should fix #384
+Remove deprecated notify.phpmail-lite
+Updated access.sftp_psl (phpseclib build-524)
+Make sure file or folder exists before sharing. Short hash with numbers only can be interpreted as integer and checkHash send false negative.
+Fix IE11 XPath not working correctly, probably because node is stored in a property in-between.
+Fix #386 make sure to encode filename in VideoPreviewer
+Fix #261
+Make sure to type the session_timeout and client_timeout correctly
+Make sure to send the correct image header, even for 0-length file.
+Fix #60 - Replace # and ? before calling parse_url()
+Make sure CREATE is defined, otherwise it make a DB error on workspace creation. Use AJXP_Utils::safeParseUrl()
+Change dependencies parsing to allow access.AJXP_STREAM_PROVIDER|something.else
+Fix #390 Dropbox plugin. Missing one item each time Remove user name / password, it's useless. Store tokens in a per-user file.
+Conf.sql:make sure to transform repository create options to integer, to avoid DB error Ajxp_conf: resplit create ws and create tpl as two separate buttons, not a menu.
+Remove console.log Fix the checkboxes when editing templates
+Fix how UID is extracted for FTP driver
+Use | in active plugin dependency
+Auto switch to list tab on context change, thus do not trigger reloadDataNode() to avoid auto switch to list tab.
+Prefix an icon to the PluginEditor
+Fix typo in SSL indication
+Escape user label before sending in XML
+Ignore set_magic_quotes_runtime (deprecated)
+Replace EncodeQ function by the latest phpmailer version. We should probably totally switch to this mailer. Optionally pass images to be attached in the layout.
+Make sure textareas are readonly Add PostgreSQL to install choices
+Handle multiple line SQL requests for tables creation.
+Styling harmonization Readapt for mobile tablets
+Update core plugins HTML documentation
+Do not "autoFoldOnEvent" if unfolded from main button, just when unfolded from the tabs.
+Fix Dropbox plugin in sharing cases, retrieve the correct oauth tokens
+Let the editor.zoho be active in access.ajxp_user, to be sure the img_library is loaded.
+For the moment, disable users autocompleter for existing private minisite.
+Fix #398 has_password wrongly reported
+Fix #407, openssl_pkey_new may fail if openssl.cnf is not correctly setup (particularly on Windows).
+Update log.sql
+Update create.pgsql
+Fix strpos empty in checkPassword
+Add role_update_right for API access
+Add ShareCenter::isShared($ajxpNode) to test if a node is shared
+Add PURGE_AFTER_SOFT option
+preg_replace(): The /e modifier is deprecated in PHP5.5
+Fix #404
+Fix #392, by adding PRE and POST callbacks to PclZip
+skipSecureToken actions were not taken into accounts in external files.
+Disable at last native autocompletion on share dialog, by removing name attribute. Styling of the Minisite, customize Logo Always sanitize user names as AJXP_SANITIZE_EMAILCHARS Users dashboard, revert styling of FetchedResultPane, was ugly. To be improved still.
+Detect if minisite logo is a binary or a real filepath
+Fix log.sql for ipv6 logging
+Add a paddingBottom when FilesList is in gridMode, to avoid hiding last line with scrollbar, fix #172
+Fix #394
+Fix #411
+Make sure to search include path before requiring Yubico.php Exclude radius from php_hhvm
+Rework global toolbar menus
+Should Fix #412
+Email : $from field not correctly passed to inner implementation
+Installer internationalization.
+scrutinizer: exclude what we can
+IE8 Debugging
+Update UPLOAD_ERR constants, there were new values introduced since 5.1
+Remove the "on" AJXP_DATE as AJXP_DATE is a relative date and must contain the correct word. Also should fix #250 and fix #252 @Ellega I let you check :-)
+File sharing: check not only repository options, but META_SOURCES as well to detect if we need to store credentials. Should fix #265
+Access.smb: do not escape password if replaced in UNC_PATH (necessary for MacOS)
+AuthRemote: Disable the local copy of the user when doing master/slave, should fix #382 and fix #40
+Add an option to send error to error_log, close #402
+Avoid loading Dropbox library if PEAR is not detected
+Files Metastore / S3 Metastore confusion. Fix #383
+Fix #164 switching between two SFTP repositories implies some caching.
+Fix #419
+Fix embeddable link if the publiclet_link already has a ?lang=... extension.
+Update change password size
+Connexion : Remove messageNode from XML response once displayed, otherwise it goes twice through displayMessage Fix parsedJSONCache, Display message in console if a console is detected, Fix IE8 problem with items beginning with a number (breaking CSS selector by ID). Editor.eml button, editor.codemirror left border
+Ignore Exif errors, otherwise it can break folder listing.
+Fix stack trace
+IE8 Mailer message box width
+A little mistake in language fr
+Always make sure the owner_id is not empty
+Show error details only if SERVER_DEBUG, otherwise group administrators see detail as well.
+DisableKeyBindings in change password modal Update "About" action style & content In Auth.multi, if there is a $regexp, search in all drivers Recursive search: search with regexp
+WP seems to send updateUser event BEFORE addUser ... triggering an error on check password, so check if user exists before.
+checking fr.php
+Search repositories in default repositories as well.
+Set Dashboard as default repository in ROOT_ROLE Fix Dashboard tweaks: "welcome, userID" , password focus in webdav pane Fix Mobile template and Media queries CSS User Wiget: add a "down arrow" to make more visible the access to the user menu
+Mysql and Sqlite upgrade scripts for stable branch (5.2.0)
+Php update script
+
+
+
+
+
+-----
+Pydio 5.1.1
+
 This release is a bugfix of 5.1.0, and a release candidate for 5.2.0.
 
 There is not yet an upgrade mechanism, thus it is not tagged stable: it is not meant to be deployed in production, unless you know what you are doing.
