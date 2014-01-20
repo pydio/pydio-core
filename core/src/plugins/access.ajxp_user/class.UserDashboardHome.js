@@ -26,7 +26,7 @@ Class.create("UserDashboardHome", AjxpPane, {
 
         $super(oFormObject, editorOptions);
 
-        oFormObject.down("#welcome").update( MessageHash['user_dash.40'].replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME")));
+        oFormObject.down("#welcome").update( MessageHash['user_dash.40'].replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME") || ajaxplorer.user.id));
 
         var wsElement = oFormObject.down('#workspaces_list');
         attachMobileScroll(wsElement, 'vertical');
