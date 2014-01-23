@@ -220,9 +220,18 @@ class ftpAccessDriver extends fsAccessDriver
         if ($type == "dir" && ($dir == "" || $dir == "/" || $dir == "\\")) { // ROOT, WE ARE NOT SURE TO BE ABLE TO READ THE PARENT
             return true;
         } else {
+            if (strtoupper(substr(PHP_OS, 0, 3)) === "WIN") {
+                return is_writable($path);
+            } else {
+                if (extension_loaded("posix")) {
+                    posix_access($path, POSIX_W_OK);
+                    return posix_get_last_error();
+                } else {
+                    return is_writable($path);
+                }
+            }
             return is_writable($path);
         }
-
     }
 
     public function deldir($location)
