@@ -266,7 +266,8 @@ class AJXP_Node
         if (!empty($this->_wrapperClassName)) {
             $registered = AJXP_PluginsService::getInstance()->getRegisteredWrappers();
             if (!isSet($registered[$this->getScheme()])) {
-                $this->getDriver()->detectStreamWrapper(true);
+                $driver = $this->getDriver();
+                if(is_object($driver)) $driver->detectStreamWrapper(true);
             }
         }
         AJXP_Controller::applyHook("node.info", array(&$this, $contextNode, $details));
