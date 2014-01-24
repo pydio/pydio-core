@@ -382,7 +382,7 @@ class Repository implements AjxpGroupPathProvider
                 return SystemTextEncoding::fromUTF8($mess[$this->displayStringId]);
             }
         }
-        return $this->display;
+        return AJXP_VarsFilter::filter($this->display);
     }
 
     /**
