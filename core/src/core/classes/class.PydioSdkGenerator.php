@@ -66,8 +66,12 @@ class PydioSdkGenerator
             $comment = $callbackNode->getAttribute("developerComment");
             $http = $callbackNode->getAttribute("preferredHttp");
             $restParams = $callbackNode->getAttribute("restParams");
+            $prefix = "/default";
+            if($pluginName == "access.ajxp_conf"){
+                $prefix = "/ajxp_conf";
+            }
             $api = array(
-                "path"  => "/".$actionName . (empty($restParams) ? "" : $restParams),
+                "path"  => $prefix."/".$actionName . (empty($restParams) ? "" : $restParams),
                 "operations" => array(
                     array(
                         "method"        => empty($http) ? "POST" : strtoupper($http),
