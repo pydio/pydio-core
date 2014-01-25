@@ -73,6 +73,11 @@
                 <serverCallback methodName="listAllActions" developerComment="Returns all users"/>
             </processing>
         </action>
+        <action name="generate_api_docs">
+            <processing>
+                <serverCallback methodName="switchAction" developerComment="Generate API docs"/>
+            </processing>
+        </action>
 		<action name="get_plugin_manifest">
 			<processing>
 				<serverCallback methodName="switchAction" restParams="/plugin_id">

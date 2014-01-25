@@ -1563,6 +1563,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             break;
 
+            case "generate_api_docs":
+
+                PydioSdkGenerator::analyzeRegistry();
+
+            break;
+
             default:
             break;
         }

@@ -698,7 +698,7 @@
             <xs:attribute name="default"/>
             <xs:attribute name="description" use="required"/>
             <xs:attribute name="mandatory" type="xs:boolean"/>
-            <xs:attribute name="name" use="required" type="xs:NCName"/>
+            <xs:attribute name="name" use="required" type="xs:all"/>
             <xs:attribute name="type" use="required" type="xs:all"/>
         </xs:complexType>
     </xs:element>
