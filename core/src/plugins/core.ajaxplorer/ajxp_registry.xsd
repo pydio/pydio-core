@@ -562,6 +562,7 @@
             <xs:attribute name="pluginId" use="optional" type="xs:NCName"/>
             <xs:attribute name="defer" type="xs:boolean"/>
             <xs:attribute name="restParams"/>
+            <xs:attribute name="preferredHttp" type="xs:NCName"/>
             <xs:attribute name="sdkMethodName"/>
             <xs:attribute name="developerComment"/>
             <xs:attribute name="checkParams" type="xs:boolean"/>
