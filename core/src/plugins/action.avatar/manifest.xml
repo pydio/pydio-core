@@ -17,7 +17,7 @@
         <actions>
             <action name="get_avatar_url">
                 <processing>
-                    <serverCallback methodName="receiveAction"></serverCallback>
+                    <serverCallback methodName="receiveAction" developerComment="Get avatar URL for currently logged user"/>
                 </processing>
             </action>
         </actions>
