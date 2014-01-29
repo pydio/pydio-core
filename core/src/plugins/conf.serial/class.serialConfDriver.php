@@ -192,6 +192,67 @@ class serialConfDriver extends AbstractConfDriver
     }
 
     /**
+     * Get users count from the conf driver (not auth)
+     * @param string $baseGroup
+     * @param bool $groupExactMatch if false, count users in this group and subgroups
+     * @param string $regexp
+     */
+    public function getUsersCountFromConf($baseGroup = "/",  $groupExactMatch = false, $regexp = "")
+    {
+        return count($this->listUsersFromConf($baseGroup, $groupExactMatch, $regexp));
+    }
+
+    /**
+     * Test if user exists in conf driver (not auth)
+     * @param string $login
+     */
+    public function userExistsInConf($login)
+    {
+        $groups = AJXP_Utils::loadSerialFile($this->usersSerialDir."/groups.ser");
+        return array_key_exists($login, $groups);
+    }
+
+
+    /**
+     * List users from the conf driver (not auth)
+     * @param string $baseGroup
+     * @param bool $groupExactMatch if false, list users in this group and subgroups
+     * @param string $regexp
+     * @param int $offset
+     * @param int $limit
+     */
+    public function listUsersFromConf($baseGroup = "/", $groupExactMatch = false, $regexp = "", $offset = null, $limit = null)
+    {
+        if (empty($regexp)) {
+            $regexp = "#.*#";
+        } else {
+            $regexp = '#'.$regexp.'#';
+        }
+        $groups = AJXP_Utils::loadSerialFile($this->usersSerialDir."/groups.ser");
+        if ($groupExactMatch) {
+            foreach ($groups as $key => $value) {
+                if (strpos($key, "AJXP_GROUP:") === 0 ||
+                    $value !== $baseGroup ||
+                    preg_match($regexp, $key) === 0) {
+                    unset($groups[$key]);
+                    continue;
+                }
+            }
+        } else {
+            foreach ($groups as $key => $value) {
+                if (strpos($key, "AJXP_GROUP:") === 0 ||
+                    strpos($value, $baseGroup) !== 0 ||
+                    preg_match($regexp, $key) === 0) {
+                    unset($groups[$key]);
+                    continue;
+                }
+            }
+        }
+        return $groups;
+    }
+
+
+    /**
      * Unique ID of the repositor
      *
      * @param String $repositoryId
