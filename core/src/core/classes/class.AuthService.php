@@ -117,7 +117,7 @@ class AuthService
      */
     public static function preLogUser($remoteSessionId = "")
     {
-        if(AuthService::getLoggedUser() != null) return ;
+        if(self::getLoggedUser() != null) return ;
         $authDriver = ConfService::getAuthDriverImpl();
         $authDriver->preLogUser($remoteSessionId);
         return ;
@@ -190,8 +190,8 @@ class AuthService
      */
     public static function suspectBruteForceLogin()
     {
-        $loginAttempt = AuthService::getBruteForceLoginArray();
-        return !AuthService::checkBruteForceLogin($loginAttempt);
+        $loginAttempt = self::getBruteForceLoginArray();
+        return !self::checkBruteForceLogin($loginAttempt);
     }
 
     public static function filterUserSensitivity($user)
@@ -238,7 +238,7 @@ class AuthService
     public static function clearRememberCookie()
     {
         $current = $_COOKIE["AjaXplorer-remember"];
-        $user = AuthService::getLoggedUser();
+        $user = self::getLoggedUser();
         if (!empty($current) && $user != null) {
             $user->invalidateCookieString(substr($current, strpos($current, ":")+1));
         }
@@ -303,20 +303,20 @@ class AuthService
             if (ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) {
                 $authDriver = ConfService::getAuthDriverImpl();
                 if (!$authDriver->userExists("guest")) {
-                    AuthService::createUser("guest", "");
+                    self::createUser("guest", "");
                     $guest = $confDriver->createUserObject("guest");
                     $guest->save("superuser");
                 }
-                AuthService::logUser("guest", null);
+                self::logUser("guest", null);
                 return 1;
             }
             return -1;
         }
         $authDriver = ConfService::getAuthDriverImpl();
         // CHECK USER PASSWORD HERE!
-        $loginAttempt = AuthService::getBruteForceLoginArray();
-        $bruteForceLogin = AuthService::checkBruteForceLogin($loginAttempt);
-        AuthService::setBruteForceLoginArray($loginAttempt);
+        $loginAttempt = self::getBruteForceLoginArray();
+        $bruteForceLogin = self::checkBruteForceLogin($loginAttempt);
+        self::setBruteForceLoginArray($loginAttempt);
 
         if (!$authDriver->userExists($user_id)) {
             if ($bruteForceLogin === FALSE) {
@@ -326,7 +326,7 @@ class AuthService
             }
         }
         if (!$bypass_pwd) {
-            if (!AuthService::checkPassword($user_id, $pwd, $cookieLogin, $returnSeed)) {
+            if (!self::checkPassword($user_id, $pwd, $cookieLogin, $returnSeed)) {
                 if ($bruteForceLogin === FALSE) {
                     return -4;
                 } else {
@@ -337,7 +337,7 @@ class AuthService
         }
         // Successful login attempt
         unset($loginAttempt[$_SERVER["REMOTE_ADDR"]]);
-        AuthService::setBruteForceLoginArray($loginAttempt);
+        self::setBruteForceLoginArray($loginAttempt);
 
         // Setting session credentials if asked in config
         if (ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
@@ -353,7 +353,7 @@ class AuthService
             $user->setAdmin(true);
         }
         if ($user->isAdmin()) {
-            $user = AuthService::updateAdminRights($user);
+            $user = self::updateAdminRights($user);
         } else {
             if (!$user->hasParent() && $user_id != "guest") {
                 //$user->setAcl("ajxp_shared", "rw");
@@ -390,7 +390,7 @@ class AuthService
             $user = isSet($_SESSION["AJXP_USER"]) ? $_SESSION["AJXP_USER"] : self::$currentUser;
             $userId = $user->id;
             AJXP_Controller::applyHook("user.before_disconnect", array($user));
-            AuthService::clearRememberCookie();
+            self::clearRememberCookie();
             AJXP_Logger::info(__CLASS__, "Log Out", "");
             unset($_SESSION["AJXP_USER"]);
             if(isSet(self::$currentUser)) unset(self::$currentUser);
@@ -410,7 +410,7 @@ class AuthService
     {
         if(AJXP_Utils::detectApplicationFirstRun()) return;
         if(file_exists(AJXP_CACHE_DIR."/admin_counted")) return;
-        $rootRole = AuthService::getRole("ROOT_ROLE", false);
+        $rootRole = self::getRole("ROOT_ROLE", false);
         if ($rootRole === false) {
             $rootRole = new AJXP_Role("ROOT_ROLE");
             $rootRole->setLabel("Root Role");
@@ -440,9 +440,9 @@ class AuthService
                     $rootRole->setParameterValue($pluginId, $xmlNode->getAttribute("name"), $default);
                 }
             }
-            AuthService::updateRole($rootRole);
+            self::updateRole($rootRole);
         }
-        $miniRole = AuthService::getRole("MINISITE", false);
+        $miniRole = self::getRole("MINISITE", false);
         if ($miniRole === false) {
             $rootRole = new AJXP_Role("MINISITE");
             $rootRole->setLabel("Minisite Users");
@@ -462,9 +462,9 @@ class AuthService
                     $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_SHARED, false);
                 }
             }
-            AuthService::updateRole($rootRole);
+            self::updateRole($rootRole);
         }
-        $miniRole = AuthService::getRole("MINISITE_NODOWNLOAD", false);
+        $miniRole = self::getRole("MINISITE_NODOWNLOAD", false);
         if ($miniRole === false) {
             $rootRole = new AJXP_Role("MINISITE_NODOWNLOAD");
             $rootRole->setLabel("Minisite Users - No Download");
@@ -476,9 +476,9 @@ class AuthService
                     $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_SHARED, false);
                 }
             }
-            AuthService::updateRole($rootRole);
+            self::updateRole($rootRole);
         }
-        $miniRole = AuthService::getRole("GUEST", false);
+        $miniRole = self::getRole("GUEST", false);
         if ($miniRole === false) {
             $rootRole = new AJXP_Role("GUEST");
             $rootRole->setLabel("Guest user role");
@@ -493,27 +493,27 @@ class AuthService
                     $rootRole->setActionState($pluginId, $act, AJXP_REPO_SCOPE_ALL);
                 }
             }
-            AuthService::updateRole($rootRole);
+            self::updateRole($rootRole);
         }
-        $adminCount = AuthService::countAdminUsers();
+        $adminCount = self::countAdminUsers();
         if ($adminCount == 0) {
             $authDriver = ConfService::getAuthDriverImpl();
             $adminPass = ADMIN_PASSWORD;
             if ($authDriver->getOption("TRANSMIT_CLEAR_PASS") !== true) {
                 $adminPass = md5(ADMIN_PASSWORD);
             }
-             AuthService::createUser("admin", $adminPass, true);
+             self::createUser("admin", $adminPass, true);
              if (ADMIN_PASSWORD == INITIAL_ADMIN_PASSWORD) {
                  $userObject = ConfService::getConfStorageImpl()->createUserObject("admin");
                  $userObject->setAdmin(true);
-                 AuthService::updateAdminRights($userObject);
-                 if (AuthService::changePasswordEnabled()) {
+                 self::updateAdminRights($userObject);
+                 if (self::changePasswordEnabled()) {
                      $userObject->setLock("pass_change");
                  }
                  $userObject->save("superuser");
                  $START_PARAMETERS["ALERT"] .= "Warning! User 'admin' was created with the initial password '". INITIAL_ADMIN_PASSWORD ."'. \\nPlease log in as admin and change the password now!";
              }
-            AuthService::updateUser($userObject);
+            self::updateUser($userObject);
         } else if ($adminCount == -1) {
             // Here we may come from a previous version! Check the "admin" user and set its right as admin.
             $confStorage = ConfService::getConfStorageImpl();
@@ -547,14 +547,14 @@ class AuthService
      */
     public static function getDefaultRootId()
     {
-        $loggedUser = AuthService::getLoggedUser();
+        $loggedUser = self::getLoggedUser();
         if($loggedUser == null) return 0;
         $repoList = ConfService::getRepositoriesList();
         foreach ($repoList as $rootDirIndex => $rootDirObject) {
             if ($loggedUser->canRead($rootDirIndex."") || $loggedUser->canWrite($rootDirIndex."")) {
                 // Warning : do not grant access to admin repository to a non admin, or there will be
                 // an "Empty Repository Object" error.
-                if ($rootDirObject->getAccessType()=="ajxp_conf" && AuthService::usersEnabled() && !$loggedUser->isAdmin()) {
+                if ($rootDirObject->getAccessType()=="ajxp_conf" && self::usersEnabled() && !$loggedUser->isAdmin()) {
                     continue;
                 }
                 if ($rootDirObject->getAccessType() == "ajxp_shared" && count($repoList) > 1) {
@@ -603,7 +603,7 @@ class AuthService
             if ($changes) {
                 $userObject->recomputeMergedRole();
             }
-            foreach (AuthService::getRolesList(array(), true) as $roleId => $roleObject) {
+            foreach (self::getRolesList(array(), true) as $roleId => $roleObject) {
                 if(!self::allowedForCurrentGroup($roleObject, $userObject)) continue;
                 if ($userObject->getProfile() == "shared" && $roleObject->autoAppliesTo("shared")) {
                     $userObject->addRole($roleObject);
@@ -620,7 +620,7 @@ class AuthService
      */
     public static function updateAutoApplyRole(&$userObject)
     {
-        foreach (AuthService::getRolesList(array(), true) as $roleId => $roleObject) {
+        foreach (self::getRolesList(array(), true) as $roleId => $roleObject) {
             if(!self::allowedForCurrentGroup($roleObject, $userObject)) continue;
             if ($roleObject->autoAppliesTo($userObject->getProfile()) || $roleObject->autoAppliesTo("all")) {
                 $userObject->addRole($roleObject);
@@ -645,7 +645,7 @@ class AuthService
         if ($userId == "guest" && !ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) {
             return false;
         }
-        $userId = AuthService::filterUserSensitivity($userId);
+        $userId = self::filterUserSensitivity($userId);
         $authDriver = ConfService::getAuthDriverImpl();
         if ($mode == "w") {
             return $authDriver->userExistsWrite($userId);
@@ -661,7 +661,7 @@ class AuthService
      */
     public static function isReservedUserId($username)
     {
-        $username = AuthService::filterUserSensitivity($username);
+        $username = self::filterUserSensitivity($username);
         return in_array($username, array("guest", "shared"));
     }
 
@@ -687,7 +687,7 @@ class AuthService
     public static function checkPassword($userId, $userPass, $cookieString = false, $returnSeed = "")
     {
         if(ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest") return true;
-        $userId = AuthService::filterUserSensitivity($userId);
+        $userId = self::filterUserSensitivity($userId);
         $authDriver = ConfService::getAuthDriverImpl();
         if ($cookieString) {
             $confDriver = ConfService::getConfStorageImpl();
@@ -713,7 +713,7 @@ class AuthService
             $messages = ConfService::getMessages();
             throw new Exception($messages[378]);
         }
-        $userId = AuthService::filterUserSensitivity($userId);
+        $userId = self::filterUserSensitivity($userId);
         $authDriver = ConfService::getAuthDriverImpl();
         $authDriver->changePassword($userId, $userPass);
         if ($authDriver->getOption("TRANSMIT_CLEAR_PASS") === true) {
@@ -742,7 +742,7 @@ class AuthService
      */
     public static function createUser($userId, $userPass, $isAdmin=false)
     {
-        $userId = AuthService::filterUserSensitivity($userId);
+        $userId = self::filterUserSensitivity($userId);
         AJXP_Controller::applyHook("user.before_create", array($userId, $userPass, $isAdmin));
         if (!ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest") {
             throw new Exception("Reserved user id");
@@ -802,8 +802,8 @@ class AuthService
      */
     public static function deleteUser($userId)
     {
-        $userId = AuthService::filterUserSensitivity($userId);
         AJXP_Controller::applyHook("user.before_delete", array($userId));
+        $userId = self::filterUserSensitivity($userId);
         $authDriver = ConfService::getAuthDriverImpl();
         $authDriver->deleteUser($userId);
         $subUsers = array();
