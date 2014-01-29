@@ -276,6 +276,34 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
     /**
      * @abstract
+     * Get users count from the conf driver (not auth)
+     * @param string $baseGroup
+     * @param bool $groupExactMatch if false, count users in this group and subgroups
+     * @param string $regexp
+     */
+    abstract public function getUsersCountFromConf($baseGroup = "/", $groupExactMatch = false, $regexp = "");
+
+    /**
+     * @abstract
+     * Test if user exists in conf driver (not auth)
+     * @param string $login
+     */
+    abstract public function userExistsInConf($login);
+
+    /**
+     * @abstract
+     * List users from the conf driver (not auth)
+     * @param string $baseGroup
+     * @param bool $groupExactMatch if false, list users in this group and subgroups
+     * @param string $regexp
+     * @param int $offset
+     * @param int $limit
+     */
+    abstract public function listUsersFromConf($baseGroup = "/", $groupExactMatch = false, $regexp = "", $offset = null, $limit = null);
+
+
+    /**
+     * @abstract
      * @param array $context
      * @param String $fileName
      * @param String $ID
