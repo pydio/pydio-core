@@ -634,7 +634,7 @@ class AuthService
     }
 
     /**
-     * Use driver implementation to check whether the user exists or not.
+     * Use auth driver implementation to check whether the user exists or not.
      * @static
      * @param String $userId
      * @param String $mode "r" or "w"
@@ -651,6 +651,19 @@ class AuthService
             return $authDriver->userExistsWrite($userId);
         }
         return $authDriver->userExists($userId);
+    }
+
+    /**
+     * Test if user exists in conf driver (not auth)
+     * Conf driver is always writable
+     * @static
+     * @param String $userId
+     * @return
+     */
+    public static function userExistsInConf($userId)
+    {
+        $userId = self::filterUserSensitivity($userId);
+        return ConfService::getConfStorageImpl()->userExistsInConf($userId);
     }
 
     /**
