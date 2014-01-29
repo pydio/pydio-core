@@ -501,6 +501,21 @@ class BootConfLoader extends AbstractConfDriver
     }
 
     /**
+     * Get users count from the conf driver (not auth)
+     */
+    public function getUsersCountFromConf($baseGroup = "/", $groupExactMatch = false, $regexp = ""){}
+
+    /**
+     * Test if user exists in conf driver (not auth)
+     */
+    public function userExistsInConf($login){}
+
+    /**
+     * List users from the conf driver (not auth)
+     */
+    public function listUsersFromConf($baseGroup = "/", $groupExactMatch = false, $regexp = "", $offset = -1 , $limit = -1){}
+
+    /**
      * @param array $context
      * @param String $fileName
      * @param String $ID
