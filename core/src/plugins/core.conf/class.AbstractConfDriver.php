@@ -30,7 +30,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 {
     public $options;
     public $driverType = "conf";
-
+    /**
+     * listUsersFromConf support pagination ?
+     */
+    const supportsUsersPaginationInConf = false;
 
     public function init($options)
     {
@@ -300,7 +303,6 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      * @param int $limit
      */
     abstract public function listUsersFromConf($baseGroup = "/", $groupExactMatch = false, $regexp = "", $offset = null, $limit = null);
-
 
     /**
      * @abstract
