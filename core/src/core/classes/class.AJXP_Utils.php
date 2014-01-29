@@ -1852,4 +1852,21 @@ class AJXP_Utils
         return $files;
     }
 
+    public static function regexpToLike(&$regexp)
+    {
+        $left = "~";
+        $right = "~";
+        if ($regexp[0]=="^") {
+            $regexp = ltrim($regexp, "^");
+            $left = "";
+        }
+        if ($regexp[strlen($regexp)-1] == "$") {
+            $regexp = rtrim($regexp, "$");
+            $right = "";
+        }
+        if ($left == "" && $right == "") {
+            return "= %s";
+        }
+        return "LIKE %".$left."like".$right;
+    }
 }
