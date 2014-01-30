@@ -957,6 +957,47 @@ class AuthService
         return $allUsers;
     }
 
+    /**
+     * @static
+     * @param string $baseGroup
+     * @param string $regexp
+     * @param int $offset
+     * @param int $limit
+     * @param bool $cleanLosts
+     * @return array
+     */
+    public static function listUsersFromConf($baseGroup = "/", $groupExactMatch = false, $regexp = "", $offset = -1, $limit = -1, $cleanLosts = true)
+    {
+        $baseGroup = self::filterBaseGroup($baseGroup);
+        $confDriver = ConfService::getConfStorageImpl();
+        $allUsers = array();
+        $paginated = false;
+        if ((!empty($regexp) || $offset != -1 || $limit != -1) && $confDriver::supportsUsersPaginationInConf) {
+            $paginated = true;
+        }
+        $users = $confDriver->listUsersFromConf($baseGroup, $groupExactMatch, $regexp, $offset, $limit);
+        foreach (array_keys($users) as $userId) {
+            if(($userId == "guest" && !ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) || $userId == "ajxp.admin.users" || $userId == "") continue;
+            if(!empty($regexp) && !$confDriver::supportsUsersPaginationInConf && !preg_match("/$regexp/i", $userId)) continue;
+            $allUsers[$userId] = $confDriver->createUserObject($userId);
+            if ($paginated) {
+                // Make sure to reload all children objects
+                foreach ($confDriver->getUserChildren($userId) as $childObject) {
+                    $allUsers[$childObject->getId()] = $childObject;
+                }
+            }
+        }
+        if ($paginated && $cleanLosts) {
+            // Remove 'lost' items (children without parents).
+            foreach ($allUsers as $id => $object) {
+                if ($object->hasParent() && !array_key_exists($object->getParent(), $allUsers)) {
+                    unset($allUsers[$id]);
+                }
+            }
+        }
+        return $allUsers;
+    }
+
     public static function authSupportsPagination()
     {
         $authDriver = ConfService::getAuthDriverImpl();
