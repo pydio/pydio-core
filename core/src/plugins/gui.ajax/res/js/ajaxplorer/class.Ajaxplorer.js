@@ -976,7 +976,7 @@ Class.create("Ajaxplorer", {
 						pair.value.refreshFromI18NHash();
 					});
 				}
-                this.repositoryId = null;
+                //this.repositoryId = null;
                 this.loadXmlRegistry();
                 this.fireContextRefresh();
                 this.currentLanguage = newLanguage;

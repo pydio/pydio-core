@@ -62,7 +62,7 @@ Effect.CSS_ANIMATE = function(effectName, element, options){
 
     if(Effect.CSS_SUPPORTED){
 
-        ["webkitAnimationEnd", "mozAnimationEnd", "oAnimationEnd", "animationEnd"].map(
+        ["webkitAnimationEnd", "mozAnimationEnd", "oAnimationEnd", "animationEnd", "transitionend", "animationend", "oanimationend", "mozanimationend"].map(
             function(event){
                 element.observeOnce(event, function(){
                     ('animated ' + className).split(" ").map(function(cName){
