@@ -386,7 +386,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if (isSet($httpVars["encode"]) && $httpVars["encode"] == "base64") {
                     $code = base64_decode($code);
                 } else {
-                    $code=str_replace("&lt;","<",$code);
+                    $code=str_replace("&lt;","<",SystemTextEncoding::magicDequote($code));
                 }
                 $fileName = $this->urlBase.$file;
                 $currentNode = new AJXP_Node($fileName);
@@ -1546,7 +1546,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     {
         $nom_fic=basename($filePath);
         $mess = ConfService::getMessages();
-        $filename_new=AJXP_Utils::sanitize($filename_new, AJXP_SANITIZE_FILENAME);
+        $filename_new=AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($filename_new), AJXP_SANITIZE_FILENAME);
         $filename_new = substr($filename_new, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
         $old=$this->urlBase."/$filePath";
         if (!$this->isWriteable($old)) {
