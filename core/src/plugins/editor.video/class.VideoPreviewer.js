@@ -87,6 +87,9 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
 			}else if(url.lastIndexOf('/') > -1){
 				url = url.substr(0, url.lastIndexOf('/'));
 			}
+            if($$('base').length){
+                url = $$("base")[0].getAttribute("href");
+            }
 
             var html5proxies = $H({});
 			var mime = ajxpNode.getAjxpMime();
