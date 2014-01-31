@@ -150,7 +150,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin
             try {
                 $index =  $this->loadIndex(ConfService::getRepository()->getId(), false);
             } catch (Exception $ex) {
-                $this->applyAction("index", array(), array());
+                $this->applyAction("index", array("inner_apply" => "true"), array());
                 throw new Exception($messages["index.lucene.7"]);
             }
             if ((isSet($this->metaFields) || $this->indexContent) && isSet($httpVars["fields"])) {
@@ -296,7 +296,9 @@ class AjxpLuceneIndexer extends AJXP_Plugin
                 AJXP_Controller::applyActionInBackground($repoId, "index", $httpVars);
                 AJXP_XMLWriter::header();
                 AJXP_XMLWriter::triggerBgAction("check_lock", array("repository_id" => $repoId), sprintf($messages["index.lucene.8"], $dir), true, 2);
-                AJXP_XMLWriter::close();
+                if(!isSet($httpVars["inner_apply"])){
+                    AJXP_XMLWriter::close();
+                }
                 return;
             }
 

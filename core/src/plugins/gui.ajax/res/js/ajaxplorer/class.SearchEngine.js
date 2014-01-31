@@ -770,6 +770,7 @@ Class.create("SearchEngine", AjxpPane, {
                 connexion.addParameter('fields', this.getSearchColumns().join(','));
             }
             connexion.onComplete = function(transport){
+                ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
                 this._parseResults(transport.responseXML, currentFolder);
                 this.updateStateFinished();
                 this.removeOnLoad($(this._resultsBoxId));
