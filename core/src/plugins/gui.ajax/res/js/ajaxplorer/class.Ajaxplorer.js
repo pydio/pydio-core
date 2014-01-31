@@ -560,7 +560,7 @@ Class.create("Ajaxplorer", {
 	loadRepository: function(repository){
 		
 		if(this.repositoryId != null && this.repositoryId == repository.getId()){
-			return;
+			//return;
 		}
 		
 		repository.loadResources();
@@ -976,10 +976,11 @@ Class.create("Ajaxplorer", {
 						pair.value.refreshFromI18NHash();
 					});
 				}
-				this.loadXmlRegistry();
-				this.fireContextRefresh();
-				this.currentLanguage = newLanguage;
-			}
+                this.repositoryId = null;
+                this.loadXmlRegistry();
+                this.fireContextRefresh();
+                this.currentLanguage = newLanguage;
+            }
 		}.bind(this);
 		connexion.sendSync();
 	},
