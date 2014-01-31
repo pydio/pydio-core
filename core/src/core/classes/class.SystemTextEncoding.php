@@ -124,7 +124,7 @@ class SystemTextEncoding
      * @param string $filesystemElement
      * @return string
      */
-    public static function fromPostedFileName(&$filesystemElement)
+    public static function fromPostedFileName($filesystemElement)
     {
         return SystemTextEncoding::fromUTF8(SystemTextEncoding::magicDequote($filesystemElement));
     }
