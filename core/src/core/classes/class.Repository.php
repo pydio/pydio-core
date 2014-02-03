@@ -399,7 +399,7 @@ class Repository implements AjxpGroupPathProvider
      */
     public function getCreate()
     {
-        return $this->getOption("CREATE");
+        return (bool) $this->getOption("CREATE");
     }
 
     /**
@@ -407,7 +407,7 @@ class Repository implements AjxpGroupPathProvider
      */
     public function setCreate($create)
     {
-        $this->options["CREATE"] = $create;
+        $this->options["CREATE"] = (bool) $create;
     }
 
 
@@ -437,22 +437,22 @@ class Repository implements AjxpGroupPathProvider
 
     public function isWriteable()
     {
-        return $this->writeable;
+        return (bool) $this->writeable;
     }
 
     public function setWriteable($w)
     {
-        $this->writeable = $w;
+        $this->writeable = (bool) $w;
     }
 
     public function isEnabled()
     {
-        return $this->enabled;
+        return (bool) $this->enabled;
     }
 
     public function setEnabled($e)
     {
-        $this->enabled = $e;
+        $this->enabled = (bool) $e;
     }
 
     public function setDisplayStringId($id)
@@ -494,12 +494,12 @@ class Repository implements AjxpGroupPathProvider
 
     public function setInferOptionsFromParent($bool)
     {
-        $this->inferOptionsFromParent = $bool;
+        $this->inferOptionsFromParent = (bool) $bool;
     }
 
     public function getInferOptionsFromParent()
     {
-        return $this->inferOptionsFromParent;
+        return (bool) $this->inferOptionsFromParent;
     }
 
     /**
