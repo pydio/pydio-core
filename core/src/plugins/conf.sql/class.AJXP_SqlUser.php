@@ -339,16 +339,14 @@ class AJXP_SqlUser extends AbstractAjxpUser
     public function load()
     {
         $this->log('Loading all user data..');
-        // update group
-        $res = dibi::query('SELECT [groupPath] FROM [ajxp_users] WHERE [login] = %s', $this->getId());
-        $this->groupPath = $res->fetchSingle();
-        if (empty($this->groupPath)) {
-            // Auto migrate from old version
-            $this->setGroupPath("/");
-        }
+
 
         $result_rights = dibi::query('SELECT [repo_uuid], [rights] FROM [ajxp_user_rights] WHERE [login] = %s', $this->getId());
         $this->rights = $result_rights->fetchPairs('repo_uuid', 'rights');
+
+        if (isset($this->rights["ajxp.group_path"])) {
+            $this->groupPath = $this->rights["ajxp.group_path"];
+        }
 
         // Db field returns integer or string so we are required to cast it in order to make the comparison
         if (isSet($this->rights["ajxp.admin"]) && (bool) $this->rights["ajxp.admin"] === true) {
@@ -457,6 +455,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
         if ($this->hasParent()) {
             $this->rights["ajxp.parent_user"] = $this->parentUser;
         }
+        $this->rights["ajxp.group_path"] = $this->groupPath;
 
         // UPDATE TABLE
         dibi::query("DELETE FROM [ajxp_user_rights] WHERE [login]=%s", $this->getId());
@@ -477,11 +476,6 @@ class AJXP_SqlUser extends AbstractAjxpUser
         }
 
         AuthService::updateRole($this->personalRole);
-
-        if (!empty($this->groupPath)) {
-            $this->setGroupPath($this->groupPath);
-        }
-
     }
 
     /**
@@ -524,7 +518,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
     {
         if ($update &&  isSet($this->groupPath) && $groupPath != $this->groupPath) {
             // Update Shared Users groups as well
-            $res = dibi::query("SELECT [u.login] FROM [ajxp_users] AS u, [ajxp_user_rights] AS p WHERE [u.login] = [p.login] AND [p.repo_uuid] = %s AND [p.rights] = %s AND [u.groupPath] != %s ", "ajxp.parent_user", $this->getId(), $groupPath);
+            $res = dibi::query("SELECT [u.login] FROM [ajxp_user_rights] AS u, [ajxp_user_rights] AS p WHERE [u.login] = [p.login] AND [p.repo_uuid] = %s AND [p.rights] = %s AND [u.repo_uuid] = %s AND [u.rights] != %s ", "ajxp.parent_user", $this->getId(), "ajxp.group_path", $groupPath);
             foreach ($res as $row) {
                 $userId = $row->login;
                 // UPDATE USER GROUP AND ROLES
@@ -540,7 +534,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
             }
         }
         parent::setGroupPath($groupPath);
-        dibi::query('UPDATE [ajxp_users] SET ', Array('groupPath'=>$groupPath), 'WHERE [login] = %s', $this->getId());
+        dibi::query('UPDATE [ajxp_user_rights] SET ', Array('rights'=>$groupPath), 'WHERE [login] = %s AND [repo_uuid] = %s', $this->getId(), "ajxp.group_path");
         $this->log('UPDATE GROUP: [Login]: '.$this->getId().' [Group]:'.$groupPath);
     }
 
