@@ -19,6 +19,8 @@
  */
 Class.create("AjxpCkEditor", TextEditor, {
 
+    editorInstanceId:null,
+
 	initialize: function($super, oFormObject, options)
 	{
 		$super(oFormObject, options);
@@ -78,30 +80,32 @@ Class.create("AjxpCkEditor", TextEditor, {
 		this.inputNode = node;
 		var fileName = node.getPath();
 		var textarea;
+        this.editorInstanceId = slugString(node.getPath());
+
 		this.textareaContainer = new Element('div');
 		this.textarea = new Element('textarea');
-		this.textarea.name =  this.textarea.id = 'content';
+		this.textarea.name =  this.textarea.id = this.editorInstanceId;
 		this.contentMainContainer = this.textareaContainer;
 		this.textarea.setStyle({width:'100%'});	
 		this.textarea.setAttribute('wrap', 'off');	
 		this.element.insert(this.textareaContainer);
 		this.textareaContainer.appendChild(this.textarea);
-		fitHeightToBottom(this.textareaContainer, $(modal.elementName));
-		this.reloadEditor('content');
+		//fitHeightToBottom(this.textareaContainer, $(modal.elementName));
+		this.reloadEditor(this.editorInstanceId);
 		this.element.observe("editor:close", function(){
-			CKEDITOR.instances.content.destroy();
-		});		
+			CKEDITOR.instances[this.editorInstanceId].destroy();
+        }.bind(this));
 		this.element.observe("editor:resize", function(event){
 			this.resizeEditor();
 		}.bind(this));
 		var destroy = function(){
-			if(CKEDITOR.instances.content){
-				this.textarea.value = CKEDITOR.instances.content.getData();
-				CKEDITOR.instances.content.destroy();			
+			if(CKEDITOR.instances[this.editorInstanceId]){
+				this.textarea.value = CKEDITOR.instances[this.editorInstanceId].getData();
+				CKEDITOR.instances[this.editorInstanceId].destroy();
 			}				
 		};
 		var reInit  = function(){
-			CKEDITOR.replace('content', this.editorConfig);
+			CKEDITOR.replace(this.editorInstanceId, this.editorConfig);
 			window.setTimeout(function(){
 				this.resizeEditor();
 				this.bindCkEditorEvents();								
@@ -126,7 +130,7 @@ Class.create("AjxpCkEditor", TextEditor, {
 		if(this.isModified) return;// useless
 		
 		window.setTimeout(function(){
-			var editor = CKEDITOR.instances.content;
+			var editor = CKEDITOR.instances[this.editorInstanceId];
 			if(!editor) {
 				return;
 			}
@@ -168,16 +172,16 @@ Class.create("AjxpCkEditor", TextEditor, {
 	},
 	
 	resizeEditor : function(){
-		var width = this.contentMainContainer.getWidth()-(Prototype.Browser.IE?0:12);		
-		var height = this.contentMainContainer.getHeight();
-		if(CKEDITOR.instances.content){
-			CKEDITOR.instances.content.resize(width,height);
+		if(CKEDITOR.instances[this.editorInstanceId] && CKEDITOR.instances[this.editorInstanceId].container){
+            var width = this.contentMainContainer.getWidth();
+            var height = this.contentMainContainer.getHeight();
+            CKEDITOR.instances[this.editorInstanceId].resize(width,height);
 		}
 	},
 			
 	saveFile : function(){
 		var connexion = this.prepareSaveConnexion();
-		var value = CKEDITOR.instances.content.getData();
+		var value = CKEDITOR.instances[this.editorInstanceId].getData();
 		this.textarea.value = value;		
 		connexion.addParameter('content', value);
 		connexion.sendAsync();
@@ -185,7 +189,7 @@ Class.create("AjxpCkEditor", TextEditor, {
 		
 	parseTxt : function(transport){	
 		this.textarea.value = transport.responseText;
-		CKEDITOR.instances.content.setData(transport.responseText);
+		CKEDITOR.instances[this.editorInstanceId].setData(transport.responseText);
 		this.removeOnLoad(this.textareaContainer);
 		this.setModified(false);
 	}
