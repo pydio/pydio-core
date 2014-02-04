@@ -130,17 +130,16 @@ class sqlConfDriver extends AbstractConfDriver
         $repo->uuid = $result['uuid'];
         $repo->setOwnerData($result['parent_uuid'], $result['owner_user_id'], $result['child_user_id']);
         $repo->path = $result['path'];
-        $repo->create = $result['bcreate'];
-        $repo->writeable = $result['writeable'];
-        $repo->writeable = true;
-        $repo->enabled = $result['enabled'];
+        $repo->create = (bool) $result['bcreate'];
+        $repo->writeable = (bool) $result['writeable'];
+        $repo->enabled = (bool) $result['enabled'];
         $repo->recycle = "";
         $repo->setSlug($result['slug']);
         if (isSet($result['groupPath']) && !empty($result['groupPath'])) {
             $repo->setGroupPath($result['groupPath']);
         }
-        $repo->isTemplate = intval($result['isTemplate']) == 1 ? true : false;
-        $repo->setInferOptionsFromParent(intval($result['inferOptionsFromParent']) == 1 ? true : false);
+        $repo->isTemplate = (bool) $result['isTemplate'];
+        $repo->setInferOptionsFromParent((bool) $result['inferOptionsFromParent']);
 
         foreach ($options_result as $k => $v) {
             if (strpos($v, '$phpserial$') !== false && strpos($v, '$phpserial$') === 0) {
@@ -172,13 +171,13 @@ class sqlConfDriver extends AbstractConfDriver
                 'display'                   => $repository->getDisplay(),
                 'accessType'                => $repository->getAccessType(),
                 'recycle'                   => $repository->recycle,
-                'bcreate'                   => intval($repository->getCreate()),
+                'bcreate'                   => $repository->getCreate(),
                 'writeable'                 => $repository->isWriteable(),
                 'enabled'                   => $repository->isEnabled(),
                 'options'                   => $repository->options,
                 'groupPath'                 => $repository->getGroupPath(),
                 'slug'		                => $repository->getSlug(),
-                'isTemplate'                => $repository->isTemplate,
+                'isTemplate'                => (bool) $repository->isTemplate,
                 'inferOptionsFromParent'    => $repository->getInferOptionsFromParent()
         );
 
