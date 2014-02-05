@@ -667,6 +667,24 @@ class AuthService
     }
 
     /**
+     * Test if user exists in conf driver or Auth
+     * Useful before creating a user
+     * @static
+     * @param String $userId
+     * @return bool
+     */
+    public static function userExistsInConfOrAuth($userId)
+    {
+        $userId = self::filterUserSensitivity($userId);
+        if (ConfService::getConfStorageImpl()->userExistsInConf($userId)) {
+            return true;
+        } elseif (ConfService::getAuthDriverImpl()->userExists($userId)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Make sure a user id is not reserved for low-level tasks (currently "guest" and "shared").
      * @static
      * @param String $username
