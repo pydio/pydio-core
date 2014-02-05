@@ -224,7 +224,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
     {
         AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_shared.10" attributeName="repo_accesses" sortType="String"/></columns>');
         if(!AuthService::usersEnabled()) return ;
-        $users = AuthService::listUsers();
+        $users = AuthService::listUsersFromConf();
         $mess = ConfService::getMessages();
         $loggedUser = AuthService::getLoggedUser();
         $repoList = ConfService::getRepositoriesList("all");
@@ -269,7 +269,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
         $repoArray = array();
         $childRepos = array();
         $loggedUser = AuthService::getLoggedUser();
-        $users = AuthService::listUsers();
+        $users = AuthService::listUsersFromConf();
         foreach ($repos as $repoIndex => $repoObject) {
             if($repoObject->getAccessType() == "ajxp_conf") continue;
             if (!$repoObject->hasOwner() || $repoObject->getOwner() != $loggedUser->getId()) {

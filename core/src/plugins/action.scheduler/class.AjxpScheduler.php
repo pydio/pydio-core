@@ -176,13 +176,12 @@ class AjxpScheduler extends AJXP_Plugin
         }
         if ( ( $res >= $lastExec && $res < $now && !$alreadyRunning ) || $queued || $forceStart) {
             if ($data["user_id"] == "*") {
-                $data["user_id"] = implode(",", array_keys(AuthService::listUsers()));
+                // Put all users (even in subgroups) in user_id
+                $data["user_id"] = implode(",", array_keys(AuthService::listUsersFromConf()));
             } else if ($data["user_id"] == "*/*") {
-                // Recurse all groups and put them into a queue file
-                $allUsers = array();
-                $this->gatherUsers($allUsers, "/");
+                // Put all users (even in subgroups) into a queue file
                 $tmpQueue = AJXP_CACHE_DIR."/cmd_outputs/queue_".$taskId."";
-                file_put_contents($tmpQueue, implode(",", $allUsers));
+                file_put_contents($tmpQueue, implode(",", array_keys(AuthService::listUsersFromConf())));
                 $data["user_id"] = "queue:".$tmpQueue;
             }
             if ($data["repository_id"] == "*") {
@@ -204,19 +203,6 @@ class AjxpScheduler extends AJXP_Plugin
         }
         return false;
     }
-
-    protected function gatherUsers(&$users, $startGroup="/")
-    {
-        $u = AuthService::listUsers($startGroup);
-        $users = array_merge($users, array_keys($u));
-        $g = AuthService::listChildrenGroups($startGroup);
-        if (count($g)) {
-            foreach ($g as $gName => $gLabel) {
-                $this->gatherUsers($users, $startGroup.$gName);
-            }
-        }
-    }
-
 
     public function sortTasksByPriorityStatus($data1, $data2)
     {

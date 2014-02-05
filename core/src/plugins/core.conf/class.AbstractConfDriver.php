@@ -643,7 +643,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 if ($action == "user_create_user") {
                     AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "NEW_");
                     $data["new_user_id"] = AJXP_Utils::decodeSecureMagic($data["new_user_id"], AJXP_SANITIZE_EMAILCHARS);
-                    if (AuthService::userExists($data["new_user_id"])) {
+                    if (AuthService::userExistsInConf($data["new_user_id"])) {
                         throw new Exception('Please choose another user id');
                     }
                     AJXP_Controller::applyHook("user.before_create", array($data["new_user_id"]));
@@ -942,7 +942,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     $baseGroup = AuthService::filterBaseGroup("/");
                 }
                 AuthService::setGroupFiltering(false);
-                $allUsers = AuthService::listUsers($baseGroup, $regexp, 0, $limit, false);
+                $allUsers = AuthService::listUsersFromConf($baseGroup, false, $regexp, 0, $limit, false);
                 if (!$usersOnly) {
                     $allGroups = AuthService::listChildrenGroups($baseGroup);
                 }
