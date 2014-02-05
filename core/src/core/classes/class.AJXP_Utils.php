@@ -1911,4 +1911,10 @@ class AJXP_Utils
         }
         return $left.$regexp.$right;
     }
+
+    public static function groupMatchToLike($exactMatch)
+    {
+        if ($exactMatch) return "= %s";
+        return "LIKE %like~";
+    }
 }
