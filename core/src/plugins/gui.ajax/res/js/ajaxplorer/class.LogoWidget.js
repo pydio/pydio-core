@@ -149,7 +149,7 @@ Class.create("LogoWidget", AjxpPane, {
             this.htmlElement.setStyle({
                 backgroundImage : 'url(' + window.ajxpResourcesFolder + '/images/white_by.png)',
                 backgroundSize : '66px',
-                backgroundPosition : (imgW+10) + 'px '+ (htHeight - 14) +'px'
+                backgroundPosition : (imgW+10) + 'px '+ (htHeight - 16) +'px'
             });
         }
         if(this.titleDiv){
