@@ -82,8 +82,8 @@
 									if(transport.responseText == 'PASS_ERROR'){
 										alert(MessageHash[240]);
 									}else if(transport.responseText == 'SUCCESS'){
-										ajaxplorer.displayMessage('SUCCESS', MessageHash[gui.user.6]);
-										oForm.down('#reset-password').update(MessageHash[gui.user.6]);
+										ajaxplorer.displayMessage('SUCCESS', MessageHash['gui.user.6']);
+										oForm.down('#reset-password').update(MessageHash['gui.user.6']);
 									}
 								}
 							};
