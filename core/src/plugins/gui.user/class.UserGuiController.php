@@ -76,7 +76,7 @@ class UserGuiController extends AJXP_Plugin
 
                 // This is a reset password request, generate a token and store it.
                 // Find user by id
-                if (AuthService::userExists($httpVars["email"])) {
+                if (AuthService::userExistsInConf($httpVars["email"])) {
                     // Send email
                     $userObject = ConfService::getConfStorageImpl()->createUserObject($httpVars["email"]);
                     $email = $userObject->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
@@ -105,7 +105,7 @@ class UserGuiController extends AJXP_Plugin
                 // This is a reset password
                 if (isSet($httpVars["key"]) && isSet($httpVars["user_id"])) {
                     $key = ConfService::getConfStorageImpl()->loadTemporaryKey("password-reset", $httpVars["key"]);
-                    if ($key != null && $key["user_id"] == $httpVars["user_id"] && AuthService::userExists($key["user_id"])) {
+                    if ($key != null && $key["user_id"] == $httpVars["user_id"] && AuthService::userExistsInConf($key["user_id"])) {
                         AuthService::updatePassword($key["user_id"], $httpVars["new_pass"]);
                     }
                     ConfService::getConfStorageImpl()->deleteTemporaryKey("password-reset", $httpVars["key"]);

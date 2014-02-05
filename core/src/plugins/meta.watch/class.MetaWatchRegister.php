@@ -324,7 +324,7 @@ class MetaWatchRegister extends AJXP_Plugin
                     unset($IDS[$index]);
                     continue;
                 }
-                if (!AuthService::userExists($id)) {
+                if (!AuthService::userExistsInConf($id)) {
                     $changes = true;
                     unset($watchMeta[$id]);
                     unset($IDS[$index]);

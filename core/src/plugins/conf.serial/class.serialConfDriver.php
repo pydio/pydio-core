@@ -375,7 +375,7 @@ class serialConfDriver extends AbstractConfDriver
             $parent->save("superuser");
         } else {
             foreach ($pointer as $childId) {
-                if (!AuthService::userExists($childId)) {
+                if (!AuthService::userExistsInConf($childId)) {
                     $clean = true;
                     unset($pointer[$childId]);
                     continue;

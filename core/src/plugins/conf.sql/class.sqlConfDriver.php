@@ -882,7 +882,7 @@ class sqlConfDriver extends AbstractConfDriver
         $teams = $this->listUserTeams();
         $teamData = $teams[$teamId];
         foreach ($teamData["USERS"] as $userId) {
-            if (AuthService::userExists($userId)) {
+            if (AuthService::userExistsInConf($userId)) {
                 $res[] = $userId;
             } else {
                 $this->removeUserFromTeam($teamId, $userId);
