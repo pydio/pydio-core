@@ -127,6 +127,7 @@ Class.create("XHRUploader", {
             var length = items.length;
             for (var i = 0; i < length; i++) {
                 var entry;
+                if(items[i].kind && items[i].kind != 'file') continue;
                 if(items[0].getAsEntry){
                     entry = items[i].getAsEntry();
                 }else{
