@@ -532,6 +532,79 @@ class sqlConfDriver extends AbstractConfDriver
     }
 
     /**
+     * Get users count from the conf driver (not auth)
+     * @param string $baseGroup
+     * @param bool $groupExactMatch if false, count users in this group and subgroups
+     * @param string $regexp
+     */
+    public function getUsersCountFromConf($baseGroup = "/", $groupExactMatch = false, $regexp = "")
+    {
+        $groupLike = AJXP_Utils::groupMatchToLike($groupExactMatch);
+        if (!empty($regexp)) {
+            $like = AJXP_Utils::regexpToLike($regexp);
+            $res = dibi::query("SELECT COUNT(*)
+                                FROM [ajxp_user_rights]
+                                WHERE [login] ".$like."
+                                      AND [repo_uuid] = %s
+                                      AND [rights] ".$groupLike,
+                                $regexp, "ajxp.group_path", $baseGroup);
+        } else {
+            $res = dibi::query("SELECT COUNT(*)
+                                FROM [ajxp_user_rights]
+                                WHERE [repo_uuid] = %s
+                                      AND [rights] ".$groupLike,
+                                "ajxp.group_path", $baseGroup);
+        }
+        return $res->fetchSingle();
+    }
+
+    /**
+     * Test if user exists in conf driver (not auth)
+     * @param string $login
+     */
+    public function userExistsInConf($login)
+    {
+        $res = dibi::query("SELECT COUNT(*) FROM [ajxp_user_rights] WHERE [login] = %s", $login);
+        return $res->fetchSingle() > 0;
+    }
+
+    /**
+     * List users from the conf driver (not auth)
+     * @param string $baseGroup
+     * @param bool $groupExactMatch if false, list users in this group and subgroups
+     * @param string $regexp
+     * @param int $offset
+     * @param int $limit
+     */
+    public function listUsersFromConf($baseGroup = "/", $groupExactMatch = false, $regexp = "", $offset = null , $limit = null)
+    {
+        if (!($offset > -1)) $offset = null;
+        if (!($limit > -1)) $limit = null;
+
+        $groupLike = AJXP_Utils::groupMatchToLike($groupExactMatch);
+
+        if (!empty($regexp)) {
+            $like = AJXP_Utils::regexpToLike($regexp);
+            $res = dibi::query("SELECT [login]
+                                FROM [ajxp_user_rights]
+                                WHERE [login] ".$like."
+                                      AND [repo_uuid] = %s
+                                      AND [rights] ".$groupLike."
+                                ORDER BY [login] ASC %lmt %ofs",
+                                $regexp, "ajxp.group_path", $baseGroup, $limit, $offset);
+        } else {
+            $res = dibi::query("SELECT [login]
+                                FROM [ajxp_user_rights]
+                                WHERE [repo_uuid] = %s
+                                      AND [rights] ".$groupLike."
+                                ORDER BY [login] ASC %lmt %ofs",
+                                "ajxp.group_path", $baseGroup, $limit, $offset);
+        }
+        return $res->fetchAssoc('login');
+    }
+
+
+    /**
      * @param AbstractAjxpUser[] $flatUsersList
      * @param string $baseGroup
      * @param bool $fullTree
