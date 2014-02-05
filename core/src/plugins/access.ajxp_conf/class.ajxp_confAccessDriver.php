@@ -696,7 +696,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $userId = AJXP_Utils::decodeSecureMagic($httpVars["user_id"]);
                 $lock = ($httpVars["lock"] == "true" ? true : false);
                 $lockType = $httpVars["lock_type"];
-                if (AuthService::userExists($userId)) {
+                if (AuthService::userExistsInConf($userId)) {
                     $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
                     if(!AuthService::canAdministrate($userObject)){
                         throw new Exception("Cannot update user data for ".$userId);
@@ -720,7 +720,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     return;
                 }
                 $new_user_login = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($httpVars["new_user_login"]), AJXP_SANITIZE_EMAILCHARS);
-                if (AuthService::userExists($new_user_login, "w") || AuthService::isReservedUserId($new_user_login)) {
+                if (AuthService::isReservedUserId($new_user_login) || AuthService::userExistsInConfOrAuth($new_user_login)) {
                     AJXP_XMLWriter::header();
                     AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.43"]);
                     AJXP_XMLWriter::close();
@@ -748,7 +748,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             case "change_admin_right" :
                 $userId = $httpVars["user_id"];
-                if (!AuthService::userExists($userId)) {
+                if (!AuthService::userExistsInConf($userId)) {
                     throw new Exception("Invalid user id!");
                 }
                 $confStorage = ConfService::getConfStorageImpl();
@@ -795,7 +795,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if(!isSet($httpVars["user_id"])
                     || !isSet($httpVars["repository_id"])
                     || !isSet($httpVars["right"])
-                    || !AuthService::userExists($httpVars["user_id"]))
+                    || !AuthService::userExistsInConf($httpVars["user_id"]))
                 {
                     AJXP_XMLWriter::header();
                     AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
@@ -843,7 +843,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
                 foreach ($userSelection->getFiles() as $selectedUser) {
                     $userId = basename($selectedUser);
-                    if (!AuthService::userExists($userId)) {
+                    if (!AuthService::userExistsInConf($userId)) {
                         continue;
                     }
                     $user = $confStorage->createUserObject($userId);
@@ -869,7 +869,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case "user_add_role" :
             case "user_delete_role":
 
-                if (!isSet($httpVars["user_id"]) || !isSet($httpVars["role_id"]) || !AuthService::userExists($httpVars["user_id"]) || !AuthService::getRole($httpVars["role_id"])) {
+                if (!isSet($httpVars["user_id"]) || !isSet($httpVars["role_id"]) || !AuthService::userExistsInConf($httpVars["user_id"]) || !AuthService::getRole($httpVars["role_id"])) {
                     throw new Exception($mess["ajxp_conf.61"]);
                 }
                 if ($action == "user_add_role") {
@@ -1003,7 +1003,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             break;
 
             case "update_user_pwd" :
-                if (!isSet($httpVars["user_id"]) || !isSet($httpVars["user_pwd"]) || !AuthService::userExists($httpVars["user_id"]) || trim($httpVars["user_pwd"]) == "") {
+                if (!isSet($httpVars["user_id"]) || !isSet($httpVars["user_pwd"]) || !AuthService::userExistsInConf($httpVars["user_id"]) || trim($httpVars["user_pwd"]) == "") {
                     AJXP_XMLWriter::header();
                     AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
                     AJXP_XMLWriter::close();
@@ -1027,7 +1027,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             case "save_user_preference":
 
-                if (!isSet($httpVars["user_id"]) || !AuthService::userExists($httpVars["user_id"]) ) {
+                if (!isSet($httpVars["user_id"]) || !AuthService::userExistsInConf($httpVars["user_id"]) ) {
                     throw new Exception($mess["ajxp_conf.61"]);
                 }
                 $userId = AJXP_Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);

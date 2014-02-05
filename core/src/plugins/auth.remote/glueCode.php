@@ -119,7 +119,7 @@ switch ($plugInAction) {
         if (is_array($login)) {
             $newSession = new SessionSwitcher("AjaXplorer");
             $creation = false;
-            if ($autoCreate && !AuthService::userExists($login["name"], "w")) {
+            if ($autoCreate && !AuthService::userExistsInConfOrAuth($login["name"])) {
                 $creation = true;
                 $isAdmin = (isSet($login["right"]) && $login["right"] == "admin");
                 AuthService::createUser($login["name"], $login["password"], $isAdmin);
@@ -172,7 +172,7 @@ switch ($plugInAction) {
     case 'updateUser':
         $user = $AJXP_GLUE_GLOBALS["user"];
         if (is_array($user)) {
-            if (AuthService::userExists($user["name"]) && AuthService::updatePassword($user["name"], $user["password"])) {
+            if (AuthService::userExistsInConf($user["name"]) && AuthService::updatePassword($user["name"], $user["password"])) {
                 $isAdmin =  (isSet($user["right"]) && $user["right"] == "admin");
                 $confDriver = ConfService::getConfStorageImpl();
                 $userObject = $confDriver->createUserObject($user["name"]);
