@@ -26,6 +26,16 @@ Class.create("UserDashboardHome", AjxpPane, {
 
         $super(oFormObject, editorOptions);
 
+        var dashLogo = ajaxplorer.getPluginConfigs("guidriver").get("CUSTOM_DASH_LOGO");
+        if(dashLogo){
+            var url;
+            if(dashLogo.indexOf('plugins/') === 0){
+                url = dashLogo;
+            }else{
+                url = window.ajxpServerAccessPath + "&get_action=get_global_binary_param&binary_id=" + dashLogo;
+            }
+            oFormObject.down("#logo_div").down("img").src = url;
+        }
         oFormObject.down("#welcome").update( MessageHash['user_dash.40'].replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME") || ajaxplorer.user.id));
 
         var wsElement = oFormObject.down('#workspaces_list');

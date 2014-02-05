@@ -209,7 +209,7 @@
 				</processing>
 		</action>
         <action name="download_all">
-            <gui text="463" title="464" src="download_manager.png" iconClass="icon-download-alt" accessKey="download_access_key" hasAccessKey="true">
+            <gui text="463" title="464" src="download_manager.png" iconClass="icon-download-alt" hasAccessKey="false">
                 <context selection="false" dir="true" recycle="false" actionBar="true" contextMenu="false" infoPanel="false"
                     actionBarGroup="minisite">
                 </context>
