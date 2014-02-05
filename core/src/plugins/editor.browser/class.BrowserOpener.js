@@ -33,6 +33,10 @@ Class.create("BrowserOpener", AbstractEditor, {
         var loc = document.location.href;
         if(loc.indexOf("?") !== -1) loc = loc.substring(0, loc.indexOf("?"));
         var url = loc.substring(0, loc.lastIndexOf('/'));
+        if($$('base').length){
+            url = $$("base")[0].getAttribute("href");
+            if(url.substr(-1) == '/') url = url.substr(0, url.length - 1);
+        }
         var nonSecureAccessPath = ajxpServerAccessPath.substring(0, ajxpServerAccessPath.lastIndexOf('?'));
         var open_file_url = url + "/" + nonSecureAccessPath + "?get_action=open_file&repository_id=" + repo + "&file=" + encodeURIComponent(node.getPath());
 
