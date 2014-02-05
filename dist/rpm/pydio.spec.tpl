@@ -85,6 +85,7 @@ rm -rf %{buildroot}
 if [ -f "%{_localstatedir}/cache/%{name}/plugins_cache.ser" ]
 then
 # Upgrading an existing install
+rm -f %{_localstatedir}/cache/%{name}/i18n/*.ser
 rm -f %{_localstatedir}/cache/%{name}/plugins_*.ser
 if [ ! -f "%{_localstatedir}/cache/%{name}/first_run_passed" ]
 then
