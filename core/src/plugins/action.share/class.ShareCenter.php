@@ -1523,4 +1523,8 @@ class ShareCenter extends AJXP_Plugin
         return $publicletData;
     }
 
+    public static function currentContextIsLinkDownload(){
+        return (isSet($_GET["dl"]) && isSet($_GET["dl"]) == "true");
+    }
+
 }

@@ -28,6 +28,12 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class PowerFSController extends AJXP_Plugin
 {
 
+    public function performChecks(){
+        if(ShareCenter::currentContextIsLinkDownload()) {
+            throw new Exception("Disable during link download");
+        }
+    }
+
     public function switchAction($action, $httpVars, $fileVars)
     {
         if(!isSet($this->actions[$action])) return;
@@ -78,7 +84,7 @@ class PowerFSController extends AJXP_Plugin
                             $('download_form').submit();
                             $('download_form').get_action.value = 'download';
                         ";
-                        AJXP_XMLWriter::triggerBgJsAction($jsCode, "powerfs.3", true);
+                        AJXP_XMLWriter::triggerBgJsAction($jsCode, $mess["powerfs.3"], true);
                         AJXP_XMLWriter::triggerBgAction("reload_node", array(), "powerfs.2", true, 2);
                     }
                     AJXP_XMLWriter::close();
@@ -147,7 +153,7 @@ class PowerFSController extends AJXP_Plugin
                     $archiveName = AJXP_Utils::getAjxpTmpDir()."/".$httpVars["ope_id"]."_".$archiveName;
                 }
                 chdir($rootDir);
-                $cmd = "zip -r ".escapeshellarg($archiveName)." ".implode(" ", $args);
+                $cmd = $this->getFilteredOption("ZIP_PATH")." -r ".escapeshellarg($archiveName)." ".implode(" ", $args);
                 $fsDriver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
                 $c = $fsDriver->getConfigs();
                 if (!isSet($c["SHOW_HIDDEN_FILES"]) || $c["SHOW_HIDDEN_FILES"] == false) {

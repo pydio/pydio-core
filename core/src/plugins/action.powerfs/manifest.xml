@@ -7,6 +7,10 @@
             <i18n namespace="powerfs" path="plugins/action.powerfs/i18n"/>
         </resources>
     </client_settings>
+    <server_settings>
+        <global_param name="ZIP_PATH" type="string" label="Zip path"
+                      description="Path of the zip utilitary on the command line" default="zip"/>
+    </server_settings>
     <registry_contributions>
         <actions>
             <!-- Override access.fs compression -->
@@ -65,11 +69,13 @@
                                     conn.addParameter("get_action", "precompress");
                                     conn.addParameter("archive_name", zipName+".zip");
                                     conn.addParameter("on_end", "postcompress_download");
-                                    conn.addParameter("dir", userSelection.getContextNode().getPath());
                                     var selected = userSelection.getFileNames();
+                                    var dir = userSelection.getContextNode().getPath();
                                     for(var i=0;i<selected.length;i++){
                                         conn.addParameter("file_"+i, selected[i]);
+                                        dir = getRepName(selected[i]);
                                     }
+                                    conn.addParameter("dir", dir);
                                     conn.onComplete = function(transport){
                                         this.parseXmlMessage(transport.responseXML);
                                     }.bind(ajaxplorer.actionBar) ;
@@ -112,6 +118,6 @@
         </actions>
     </registry_contributions>
     <dependencies>
-        <activePlugin pluginName="access.fs"/>
+       <activePlugin pluginName="access.fs"/>
     </dependencies>
 </ajxp_plugin>
