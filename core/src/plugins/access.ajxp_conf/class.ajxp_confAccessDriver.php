@@ -237,7 +237,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
         }
 
-        $users = AuthService::listUsers($baseGroup, $term);
+        $users = AuthService::listUsersFromConf($baseGroup, true, $term);
         foreach ($users as $userId => $userObject) {
 
             $nodeKey = "/data/users/".trim($userObject->getGroupPath(),"/")."/".$userId;
@@ -1786,11 +1786,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         $USER_PER_PAGE = 50;
         if($root == "users") $baseGroup = "/";
         else $baseGroup = substr($root, strlen("users"));
+        $count = AuthService::getUsersCountFromConf($baseGroup, true);
 
         if ($findNodePosition != null && $hashValue == null) {
 
             // Loop on each page to find the correct page.
-            $count = AuthService::authCountUsers($baseGroup);
             $pages = ceil($count / $USER_PER_PAGE);
             for ($i = 0; $i < $pages ; $i ++) {
 
@@ -1825,18 +1825,17 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         if(!AuthService::usersEnabled()) return ;
         if(empty($hashValue)) $hashValue = 1;
 
-        $count = AuthService::authCountUsers($baseGroup);
-        if (AuthService::authSupportsPagination() && $count >= $USER_PER_PAGE) {
+        if ($count >= $USER_PER_PAGE) {
             $offset = ($hashValue - 1) * $USER_PER_PAGE;
             if(!$returnNodes) AJXP_XMLWriter::renderPaginationData($count, $hashValue, ceil($count/$USER_PER_PAGE));
-            $users = AuthService::listUsers($baseGroup, "", $offset, $USER_PER_PAGE);
+            $users = AuthService::listUsersFromConf($baseGroup, true, "", $offset, $USER_PER_PAGE);
             if ($hashValue == 1) {
                 $groups = AuthService::listChildrenGroups($baseGroup);
             } else {
                 $groups = array();
             }
         } else {
-            $users = AuthService::listUsers($baseGroup);
+            $users = AuthService::listUsersFromConf($baseGroup, true);
             $groups = AuthService::listChildrenGroups($baseGroup);
         }
         foreach ($groups as $groupId => $groupLabel) {

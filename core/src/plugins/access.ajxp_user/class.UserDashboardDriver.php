@@ -348,7 +348,7 @@ class UserDashboardDriver extends AbstractAccessDriver
             $baseGroup = AuthService::filterBaseGroup("/");
         }
         AuthService::setGroupFiltering(false);
-        $users = AuthService::listUsers($baseGroup);
+        $users = AuthService::listUsersFromConf($baseGroup);
 
         $minisites = $this->listSharedFiles("minisites");
 
