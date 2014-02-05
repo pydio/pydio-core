@@ -103,8 +103,8 @@ document.write('<applet name="jumpLoaderApplet" id="jumpLoaderApplet" \
 						height="400" \
 						mayscript> \
 					<param name="gc_loggingLevel" value="ERROR"/> \
-					<param name="uc_uploadUrl" value="'+ document.location.href.split("?").shift() + '?secure_token=' + parent.Connexion.SECURE_TOKEN  +'&get_action=upload"/> \
-					<param name="uc_resumeCheckUrl" value="'+ document.location.href.split("?").shift() + '?secure_token=' + parent.Connexion.SECURE_TOKEN  +'&get_action=upload"/> \
+					<param name="uc_uploadUrl" value="'+ document.location.href.split("?").shift().replace('index_shared.php', 'index.php') + '?secure_token=' + parent.Connexion.SECURE_TOKEN  +'&get_action=upload"/> \
+					<param name="uc_resumeCheckUrl" value="'+ document.location.href.split("?").shift().replace('index_shared.php', 'index.php') + '?secure_token=' + parent.Connexion.SECURE_TOKEN  +'&get_action=upload"/> \
 					<param name="uc_fileParameterName" value="userfile_0"/> \
 					<param name="ac_fireUploaderStatusChanged" value="true"/> \
 					<param name="ac_fireAppletInitialized" value="true"/> \
