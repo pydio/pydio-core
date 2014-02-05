@@ -635,6 +635,7 @@ class AuthService
 
     /**
      * Use auth driver implementation to check whether the user exists or not.
+     * @deprecated
      * @static
      * @param String $userId
      * @param String $mode "r" or "w"
@@ -914,6 +915,7 @@ class AuthService
     }
 
     /**
+     * @deprecated
      * @static
      * @param string $baseGroup
      * @param null $regexp
