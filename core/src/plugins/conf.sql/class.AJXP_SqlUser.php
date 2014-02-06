@@ -27,13 +27,6 @@ require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
  *
  * Stores rights, preferences and bookmarks in various database tables.
  *
- * The class will expect these schema objects to be present:
- *
- * CREATE TABLE ajxp_user_rights ( rid INTEGER PRIMARY KEY, login VARCHAR(255), repo_uuid VARCHAR(33), rights VARCHAR(20));
- * CREATE TABLE ajxp_user_prefs ( rid INTEGER PRIMARY KEY, login VARCHAR(255), name VARCHAR(255), val VARCHAR(255));
- * CREATE TABLE ajxp_user_bookmarks ( rid INTEGER PRIMARY KEY, login VARCHAR(255), repo_uuid VARCHAR(33), path VARCHAR(255), title VARCHAR(255));
- *
- *
  * @author ebrosnan
  * @package AjaXplorer_Plugins
  * @subpackage Conf
