@@ -1,63 +1,63 @@
 CREATE TABLE IF NOT EXISTS ajxp_user_rights (
-  rid integer NOT NULL primary key autoincrement,
   login text NOT NULL,
   repo_uuid text NOT NULL,
-  rights text NOT NULL
+  rights text NOT NULL,
+  PRIMARY KEY(login, repo_uuid)
 );
 
 CREATE TABLE IF NOT EXISTS ajxp_user_prefs (
-  rid integer NOT NULL primary key autoincrement,
   login text NOT NULL,
   "name" text NOT NULL,
-  val blob DEFAULT NULL
+  val blob,
+  PRIMARY KEY(login, name)
 );
 
 CREATE TABLE IF NOT EXISTS ajxp_user_bookmarks (
-  rid integer NOT NULL primary key autoincrement,
   login text NOT NULL,
   repo_uuid text NOT NULL,
-  path text DEFAULT NULL,
-  title text DEFAULT NULL
+  path text,
+  title text NOT NULL,
+  PRIMARY KEY(login, repo_uuid, title)
 );
 
 CREATE TABLE IF NOT EXISTS ajxp_repo (
-  uuid text NOT NULL,
+  uuid text PRIMARY KEY,
   parent_uuid text DEFAULT NULL,
   owner_user_id text DEFAULT NULL,
   child_user_id text DEFAULT NULL,
-  path text DEFAULT NULL,
-  display text DEFAULT NULL,
-  accessType text DEFAULT NULL,
-  recycle text DEFAULT NULL,
-  bcreate integer DEFAULT NULL,
-  writeable integer DEFAULT NULL,
-  enabled integer DEFAULT NULL,
-  isTemplate integer DEFAULT NULL,
-  inferOptionsFromParent integer DEFAULT NULL,
-  slug text DEFAULT NULL,
-  groupPath text DEFAULT NULL
+  path text,
+  display text,
+  accessType text,
+  recycle text,
+  bcreate integer,
+  writeable integer,
+  enabled integer,
+  isTemplate integer,
+  inferOptionsFromParent integer,
+  slug text,
+  groupPath text
 );
  
 CREATE TABLE IF NOT EXISTS ajxp_repo_options (
-  oid integer NOT NULL primary key autoincrement,
   uuid text NOT NULL,
   "name" text NOT NULL,
-  val blob DEFAULT NULL
+  val blob
+  PRIMARY KEY (uuid, name)
 );
 
 CREATE TABLE IF NOT EXISTS ajxp_roles (
-  role_id text NOT NULL,
+  role_id text PRIMARY KEY,
   serial_role blob NOT NULL,
   searchable_repositories text
 );
 
 CREATE TABLE IF NOT EXISTS ajxp_groups (
-  groupPath text NOT NULL,
+  groupPath text PRIMARY KEY,
   groupLabel text NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ajxp_plugin_configs (
-  id text NOT NULL,
+  id text PRIMARY KEY,
   configs longblob NOT NULL
 );
 
@@ -66,13 +66,15 @@ CREATE TABLE IF NOT EXISTS ajxp_simple_store (
   store_id text NOT NULL,
   serialized_data longtext,
   binary_data blob,
-  related_object_id text DEFAULT NULL,
-  insertion_date DATETIME DEFAULT CURRENT_TIMESTAMP
+  related_object_id text,
+  insertion_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY(object_id, store_id)
 );
 
 CREATE TABLE IF NOT EXISTS ajxp_user_teams (
-    team_id text NOT NULL,
-    user_id text NOT NULL,
-    team_label text NOT NULL,
-    owner_id text NOT NULL
+  team_id text NOT NULL,
+  user_id text NOT NULL,
+  team_label text NOT NULL,
+  owner_id text NOT NULL,
+  PRIMARY KEY(team_id, user_id)
 );
