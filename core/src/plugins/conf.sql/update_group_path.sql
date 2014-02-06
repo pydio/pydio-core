@@ -10,3 +10,5 @@ INSERT INTO ajxp_user_rights (login, repo_uuid, rights)
     (SELECT DISTINCT login,'ajxp.group_path','/'
      FROM ajxp_user_rights
      WHERE login NOT IN (SELECT login FROM ajxp_users));
+
+ALTER TABLE ajxp_users DROP COLUMN groupPath;
