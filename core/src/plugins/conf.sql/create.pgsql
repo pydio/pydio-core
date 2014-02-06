@@ -1,9 +1,3 @@
-CREATE TABLE ajxp_users (
-  login varchar(255) PRIMARY KEY,
-  password varchar(255) NOT NULL,
-  "groupPath" varchar(255)
-);
-
 CREATE TABLE ajxp_user_rights (
   rid serial PRIMARY KEY,
   login varchar(255) NOT NULL,
