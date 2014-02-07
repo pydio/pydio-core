@@ -1,5 +1,41 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+This is a bugfix release for small issues introduced in last major release, upgrade is recommended.
+
+License: Affero GPL
+Copyright: Charles du Jeu 2014
+Demo: https://demo.pyd.io/
+Date: 7th, Feb 2014
+Contributors: cdujeu
+
+Update README.md (details)
+Base work for direct monitoring of the filesystem using watchdog (details)
+Make sure $driver is not empty when loading node info, can lead to a stuck interface (details)
+Filter repositories labels (details)
+API Documentation update for fsActions (details)
+Massive update of serverCallbacks SdkGenerator class to generate Swagger-compatible JSON description of the API. #WIP - http://swagger.wordnik.com/ (details)
+Basic testing by prepending a repository id to the api "paths" (details)
+Change AJXP_APPLICATION_TITLE to PYDIO_APP_TITLE to avoid replacement by standard varsFilter, otherwise it can trigger unexpected XML problems. (details)
+Fix i18n switch at user login - list was emptied. (details)
+Mozilla events for end of animation are all lowercase. Search Engine was not correctly triggering background jobs (indexation...) Fix wrong XML by not closing Tree if indexation launched with inner_apply parameter Let read only users trigger the "index" action on a workspace All this is a start for #435 - Indexation still not triggered from parent WS in shared WS. More complex here. (details)
+The return of magicDequote (details)
+Useless pass-by-reference in fromPostedFilename() function (details)
+Get base instead of document.location.href if the tag is defined. Should fix #433 (details)
+Correct the boolean handling (details)
+Fix #444: multiple CKEditor instances (details)
+Make sure to handle the "BASE" tag instead of document.location.href, should be an util function - Fix 404 for opening images in external window. (details)
+Fix #450 (details)
+Fix #447 Minisites deleted from user dashboard are not correctly removed. (details)
+Fix #335 downloading with powerFS from left pane Fix #432 disable powerfs plugin when in share link download context (details)
+Configure user dashboard logo Fix old "ajaxplorer" mention Fix download_all action overriding the download keyboard shortcut (details)
+Fix Chrome 32 drag'n'drop bug - Close #426 (details)
+Dist: make sure to clear i18n cache after rpm/deb update. Update AJXP_PACKAGING variable for deb packages to avoid in-app upgrade. (details)
+Fix external mailer button in folder sharing (details)
+Fix #452 (details)
+
+--------
+Pydio 5.2.0 Release Note
+
 This is a major stable release, upgrade is recommended. Please read below the detail of the changes.
 
 License: Affero GPL
