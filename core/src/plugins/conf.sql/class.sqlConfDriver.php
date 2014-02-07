@@ -831,7 +831,7 @@ class sqlConfDriver extends AbstractConfDriver
         if (AuthService::getLoggedUser() == null) {
             return array();
         }
-        dibi::query("DELETE FROM [ajxp_user_teams] WHERE [user_id] NOT IN (SELECT [login] FROM [ajxp_users])");
+        dibi::query("DELETE FROM [ajxp_user_teams] WHERE [user_id] NOT IN (SELECT DISTINCT [login] FROM [ajxp_user_rights])");
         $res = dibi::query("SELECT * FROM [ajxp_user_teams] WHERE [owner_id] = %s ORDER BY [team_id]", AuthService::getLoggedUser()->getId());
         $data = $res->fetchAll();
         $all = array();
