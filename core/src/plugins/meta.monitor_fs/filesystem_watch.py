@@ -36,20 +36,12 @@ class PydioEventHandler(FileSystemEventHandler):
     def on_moved(self, event):
         if not self.included(event):
             return
-        logging.debug("Event: move noticed: " + event.event_type + " on file " + self.remove_prefix(event.src_path)
-                      + " at " + time.asctime())
-        t = (
-            self.remove_prefix(event.dest_path.decode('utf-8')),
-            self.remove_prefix(event.src_path.decode('utf-8')),
-        )
+        self.action_detected("path_change", self.remove_prefix(event.src_path))
 
     def on_created(self, event):
         if not self.included(event):
             return
-        logging.debug("Event: creation noticed: " + event.event_type +
-                         " on file " + self.remove_prefix(event.src_path) + " at " + time.asctime())
-
-        search_key = self.remove_prefix(event.src_path)
+        self.action_detected("create", self.remove_prefix(event.src_path))
         if event.is_directory:
             hash_key = 'directory'
         else:
@@ -59,8 +51,7 @@ class PydioEventHandler(FileSystemEventHandler):
     def on_deleted(self, event):
         if not self.included(event):
             return
-        logging.debug("Event: deletion noticed: " + event.event_type +
-                         " on file " + self.remove_prefix(event.src_path) + " at " + time.asctime())
+        self.action_detected("path_change", self.remove_prefix(event.src_path))
 
     def on_modified(self, event):
         super(PydioEventHandler, self).on_modified(event)
@@ -74,10 +65,16 @@ class PydioEventHandler(FileSystemEventHandler):
             else:
                 return
             if os.path.isfile(modified_filename) and self.included(event=None, base=modified_filename):
-                logging.debug("Event: modified file : %s" % self.remove_prefix(modified_filename))
+                #logging.debug("Event: modified file : %s" % self.remove_prefix(modified_filename))
+                self.action_detected("content_change", self.remove_prefix(modified_filename))
         else:
             modified_filename = event.src_path
-            logging.debug("Event: modified file : %s" % self.remove_prefix(modified_filename))
+            #logging.debug("Event: modified file : %s" % self.remove_prefix(modified_filename))
+            self.action_detected("content_change", self.remove_prefix(modified_filename))
+
+    def action_detected(self, action, path):
+        time.sleep(0.5)
+        logging.debug("Event: " + action + " file : %s" % path)
 
 
 class LocalWatcher(threading.Thread):
