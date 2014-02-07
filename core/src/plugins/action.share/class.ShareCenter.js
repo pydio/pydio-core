@@ -788,7 +788,7 @@ Class.create("ShareCenter", {
                 mailerButton.update('<a href="mailto:unknown@unknown.com?Subject='+subject+'&Body='+body+'"> invite</a>');
             }else{
                 body = this.shareFolderMode != 'workspace' ?  dialogButtonsOrRow.up('.dialogContent').down('#share_container').getValue() : MessageHash["share_center.43"].replace("%s", ajaxplorer.appTitle);
-                mailerButton.down('span').update('<a href="mailto:unknown@unknown.com?Subject='+subject+'&Body='+body+'"> invite</a>');
+                mailerButton.update('<a href="mailto:unknown@unknown.com?Subject='+subject+'&Body='+body+'"> invite</a>');
             }
             mailerButton.down('a').observe("click", function(e){
                 var body;
