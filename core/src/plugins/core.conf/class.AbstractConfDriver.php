@@ -356,9 +356,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      * Function for deleting a user
      *
      * @param String $userId
-     * @param Array $deletedSubUsers
      */
-    abstract public function deleteUser($userId, &$deletedSubUsers);
+    abstract public function deleteUser($userId);
 
 
     /**

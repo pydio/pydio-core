@@ -425,16 +425,16 @@ class serialConfDriver extends AbstractConfDriver
 
     public function deleteGroup($groupPath)
     {
-        $gUsers = AuthService::listUsers($groupPath);
-        $gGroups = AuthService::listChildrenGroups($groupPath);
-        if (count($gUsers) || count($gGroups)) {
-            throw new Exception("Group is not empty, please do something with its content before trying to delete it!");
+        // Delete group, as well as subgroups, users removal is taken care of in AuthService
+        $groupFile = AJXP_VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser";
+        $childrenGroups = AuthService::listChildrenGroups($groupPath);
+        $groups = AJXP_Utils::loadSerialFile($groupFile);
+        foreach ($groups as $key => $gPath) {
+            if ($gPath == $groupPath || array_key_exists($gPath, $childrenGroups)) {
+                unset($groups[$key]);
+            }
         }
-        $groups = AJXP_Utils::loadSerialFile(AJXP_VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser");
-        foreach ($groups as $key => $value) {
-            if($value == $groupPath) unset($groups[$key]);
-        }
-        AJXP_Utils::saveSerialFile(AJXP_VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser", $groups);
+        AJXP_Utils::saveSerialFile($groupFile, $groups);
     }
 
     /**
@@ -457,9 +457,8 @@ class serialConfDriver extends AbstractConfDriver
      * Function for deleting a user
      *
      * @param String $userId
-     * @param Array $deletedSubUsers
      */
-    public function deleteUser($userId, &$deletedSubUsers)
+    public function deleteUser($userId)
     {
         $user = $this->createUserObject($userId);
         $files = glob($user->getStoragePath()."/*.ser");
@@ -477,8 +476,7 @@ class serialConfDriver extends AbstractConfDriver
         foreach (array_keys($users) as $id) {
             $object = $this->createUserObject($id);
             if ($object->hasParent() && $object->getParent() == $userId) {
-                $this->deleteUser($id, $deletedSubUsers);
-                $deletedSubUsers[] = $id;
+                $this->deleteUser($id);
             }
         }
 

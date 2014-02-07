@@ -798,22 +798,27 @@ class AuthService
      * Delete a user in the auth/conf driver impl
      * @static
      * @param $userId
-     * @return bool
+     * @return array
      */
     public static function deleteUser($userId)
     {
         AJXP_Controller::applyHook("user.before_delete", array($userId));
+
         $userId = self::filterUserSensitivity($userId);
-        $authDriver = ConfService::getAuthDriverImpl();
-        $authDriver->deleteUser($userId);
-        $subUsers = array();
-        ConfService::getConfStorageImpl()->deleteUser($userId, $subUsers);
-        foreach ($subUsers as $deletedUser) {
-            $authDriver->deleteUser($deletedUser);
+        $childrens = array_keys(self::getChildrenUsers($userId, false));
+        $deletedUsers = array();
+        if (!empty($childrens)) {
+            foreach ($childrens as $children) {
+                $deletedUsers = array_merge(self::deleteUser($children), $deletedUsers);
+            }
         }
+        ConfService::getAuthDriverImpl()->deleteUser($userId);
+        ConfService::getConfStorageImpl()->deleteUser($userId);
+
         AJXP_Controller::applyHook("user.after_delete", array($userId));
-        AJXP_Logger::info(__CLASS__,"Delete User", array("user_id"=>$userId, "sub_user" => implode(",", $subUsers)));
-        return true;
+        AJXP_Logger::info(__CLASS__,"Delete User", array("user_id"=>$userId, "sub_user" => implode(",", $deletedUsers)));
+        $deletedUsers[] = $userId;
+        return $deletedUsers;
     }
 
     private static $groupFiltering = true;
@@ -846,7 +851,6 @@ class AuthService
     public static function listChildrenGroups($baseGroup = "/")
     {
         return ConfService::getAuthDriverImpl()->listChildrenGroups(self::filterBaseGroup($baseGroup));
-
     }
 
     public static function createGroup($baseGroup, $groupName, $groupLabel)
@@ -858,12 +862,19 @@ class AuthService
 
     public static function deleteGroup($baseGroup, $groupName)
     {
-        ConfService::getConfStorageImpl()->deleteGroup(rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName);
+        $group = rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName;
+        $groupUsers = array_keys(ConfService::getConfStorageImpl()->listUsersFromConf($group, false));
+        $deletedUsers = array();
+        foreach ($groupUsers as $login) {
+            if (in_array($login, $deletedUsers)) continue;
+            $deletedUsers = array_merge(self::deleteUser($login),$deletedUsers);
+        }
+        ConfService::getConfStorageImpl()->deleteGroup($group);
     }
 
-    public static function getChildrenUsers($parentUserId)
+    public static function getChildrenUsers($parentUserId, $instantiate = true)
     {
-        return ConfService::getConfStorageImpl()->getUserChildren($parentUserId);
+        return ConfService::getConfStorageImpl()->getUserChildren($parentUserId, $instantiate);
     }
 
     public static function getUsersForRepository($repositoryId)

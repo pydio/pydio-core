@@ -366,16 +366,21 @@ class sqlConfDriver extends AbstractConfDriver
         */
     }
 
-    public function getUserChildren( $userId )
+    public function getUserChildren($userId, $instantiate = true)
     {
         $children = array();
         $children_results = dibi::query('SELECT [login] FROM [ajxp_user_rights] WHERE [repo_uuid] = %s AND [rights] = %s ', "ajxp.parent_user", $userId);
         $all = $children_results->fetchAll();
-        foreach ($all as $item) {
-            $children[$item["login"]] = $this->createUserObject($item["login"]);
+        if ($instantiate) {
+            foreach ($all as $item) {
+                $children[$item["login"]] = $this->createUserObject($item["login"]);
+            }
+        } else {
+            foreach ($all as $item) {
+                $children[$item["login"]] = $item["login"];
+            }
         }
         return $children;
-
     }
 
     /**
@@ -560,14 +565,7 @@ class sqlConfDriver extends AbstractConfDriver
 
     public function deleteGroup($groupPath)
     {
-        // Delete users of this group, as well as subgroups
-        $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %like~ OR [groupPath] = %s ORDER BY [login] ASC", $groupPath."/", $groupPath);
-        $rows = $res->fetchAll();
-        $subUsers = array();
-        foreach ($rows as $row) {
-            $this->deleteUser($row["login"], $subUsers);
-            dibi::query("DELETE FROM [ajxp_users] WHERE [login] = %s", $row["login"]);
-        }
+        // Delete group, as well as subgroups, users removal is taken care of in AuthService
         dibi::query("DELETE FROM [ajxp_groups] WHERE [groupPath] LIKE %like~ OR [groupPath] = %s", $groupPath."/", $groupPath);
         dibi::query('DELETE FROM [ajxp_roles] WHERE [role_id] = %s', 'AJXP_GRP_'.$groupPath);
     }
@@ -594,34 +592,20 @@ class sqlConfDriver extends AbstractConfDriver
 
     /**
      * Function for deleting a user
-     *
+     * Doesn't take care of the children users (it's in AuthService)
      * @param String $userId
-     * @param Array $deletedSubUsers
      * @throws Exception
      * @return void
      */
-    public function deleteUser($userId, &$deletedSubUsers)
+    public function deleteUser($userId)
     {
-        $children = array();
         try {
-            // FIND ALL CHILDREN FIRST
-            $children_results = dibi::query('SELECT [login] FROM [ajxp_user_rights] WHERE [repo_uuid] = %s AND [rights] = %s', "ajxp.parent_user", $userId);
-            $all = $children_results->fetchAll();
-            foreach ($all as $item) {
-                $children[] = $item["login"];
-            }
             dibi::begin();
-            //This one is done by AUTH_DRIVER, not CONF_DRIVER
-            //dibi::query('DELETE FROM [ajxp_users] WHERE [login] = %s', $userId);
             dibi::query('DELETE FROM [ajxp_user_rights] WHERE [login] = %s', $userId);
             dibi::query('DELETE FROM [ajxp_user_prefs] WHERE [login] = %s', $userId);
             dibi::query('DELETE FROM [ajxp_user_bookmarks] WHERE [login] = %s', $userId);
             dibi::query('DELETE FROM [ajxp_roles] WHERE [role_id] = %s', 'AJXP_USR_/'.$userId);
             dibi::commit();
-            foreach ($children as $childId) {
-                $this->deleteUser($childId, $deletedSubUsers);
-                $deletedSubUsers[] = $childId;
-            }
         } catch (DibiException $e) {
             throw new Exception('Failed to delete user, Reason: '.$e->getMessage());
         }

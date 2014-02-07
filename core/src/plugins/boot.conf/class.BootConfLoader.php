@@ -538,7 +538,7 @@ class BootConfLoader extends AbstractConfDriver
      * @param String $userId
      * @param Array $deletedSubUsers
      */
-    public function deleteUser($userId, &$deletedSubUsers)
+    public function deleteUser($userId)
     {
         // TODO: Implement deleteUser() method.
     }
