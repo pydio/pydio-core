@@ -50,7 +50,7 @@ class FSMonitoringManager extends AJXP_Plugin
 
     protected function informWatcher($action, $path)
     {
-        $cmd = "python ".$this->getBaseDir()."/framework_watch.py --action=$action --path=". escapeshellarg($this->repoBase.SystemTextEncoding::fromUTF8($path));
+        $cmd = "python ".$this->getBaseDir()."/framework_watch.py --action=$action --path=". escapeshellarg($path);
         AJXP_Controller::runCommandInBackground($cmd, $this->getBaseDir()."/cmd.out");
     }
 
