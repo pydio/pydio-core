@@ -198,6 +198,40 @@
     border-color: #e35d52 !important;
 }
 
+#tutorials_pane{
+    color: rgb(111,123,136);
+    background-color: #f8f8f8;
+}
+
+#tutorials_pane h2{
+    font-weight: normal;
+    font-size: 25px;
+}
+
+#tutorial_dl_apps_pane{
+    height: 107px;
+    background-color: #ebedf0;
+    border-top: 1px solid rgb(111,123,136);
+    border-bottom: 1px solid rgb(111,123,136);
+}
+
+.tutorial_legend{
+    clear: left;
+    float: left;
+    width: 30%;
+    margin-left: 5%;
+    font-size: 14px;
+    margin-top: 20px;
+}
+
+.tutorial_video{
+    width: 60%;
+    height: 350px;
+    margin-top: 20px;
+    margin-right: 5%;
+    margin-bottom: 20px;
+}
+
 @media only screen
 and (max-width : 980px){
     #notifications_center div.notif_event_container{
@@ -248,6 +282,25 @@ and (max-width : 800px){
     #logo_div img{
         width: 210px;
     }
+
+    .tutorial_legend{
+        clear: left;
+        width: 97%;
+    }
+
+    .tutorial_video{
+        width: 94%;
+        height: 300px;
+        margin-right: 3%;
+        margin-left: 3%;
+    }
+    #dl_pydio_cont{
+        width: 400px !important;
+    }
+    #dl_pydio_for{
+        display: none;
+    }
+
 
 }
 
