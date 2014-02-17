@@ -350,7 +350,17 @@ class UserDashboardDriver extends AbstractAccessDriver
         AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/><column messageId="user_dash.9" attributeName="parent_label" sortType="String"/><column messageId="user_dash.9" attributeName="repo_accesses" sortType="String"/></columns>');
         $repoArray = array();
         $loggedUser = AuthService::getLoggedUser();
-        $users = AuthService::listUsers();
+
+        $searchAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS", "conf");
+        $displayAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS_DISPLAY", "conf");
+        if($searchAll || $displayAll){
+            $baseGroup = "/";
+        }else{
+            $baseGroup = AuthService::filterBaseGroup("/");
+        }
+        AuthService::setGroupFiltering(false);
+        $users = AuthService::listUsers($baseGroup);
+
         $minisites = $this->listSharedFiles("minisites");
 
         foreach ($repos as $repoIndex => $repoObject) {
@@ -370,6 +380,7 @@ class UserDashboardDriver extends AbstractAccessDriver
             foreach ($users as $userId => $userObject) {
                 if($userObject->getId() == $loggedUser->getId()) continue;
                 $label = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $userId);
+                if(empty($label)) $label = $userId;
                 $acl = $userObject->mergedRole->getAcl($repoObject->getId());
                 if(!empty($acl)) $repoAccesses[] = $label. " (".$acl.")";
             }

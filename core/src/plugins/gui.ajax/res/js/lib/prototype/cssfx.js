@@ -37,7 +37,7 @@ Effect.CSS_ANIMATE = function(effectName, element, options){
             originalMethod = 'Appear';
             break;
         case "MessageAppear":
-            className = 'long fadeInUpBig';
+            className = 'fadeInUpBig';
             endStyle = {opacity: 1};
             originalMethod ='Appear';
             element.setOpacity(0);

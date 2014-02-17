@@ -256,7 +256,7 @@ Class.create("RoleEditor", AbstractEditor, {
         var orig = this.roleData.USER.ROLES || $A();
         var currentUserId = this.roleId.replace("AJXP_USR_/", "");
         orig.each(function(el){
-            if(!selection[el]) {
+            if(!selection[el] && !el.startsWith('AJXP_GRP_/') && !el.startsWith('AJXP_USR_/')) {
                 var conn = new Connexion();
                 conn.setParameters({
                     get_action:"edit",
