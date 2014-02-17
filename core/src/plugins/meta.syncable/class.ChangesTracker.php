@@ -143,7 +143,9 @@ class ChangesTracker extends AJXP_Plugin
                 $repoId = $this->computeIdentifier($oldNode->getRepository());
                 if ($oldNode->getPath() == $newNode->getPath()) {
                     // CONTENT CHANGE
+                    clearstatcache();
                     $stat = stat($newNode->getUrl());
+                    $this->logDebug("Content changed", "current stat size is : " . $stat["size"]);
                     dibi::query("UPDATE [ajxp_index] SET ", array(
                         "bytesize"  => $stat["size"],
                         "mtime"     => $stat["mtime"],

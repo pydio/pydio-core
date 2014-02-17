@@ -905,7 +905,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 $existingOnly = isSet($httpVars["existing_only"]) && $httpVars["existing_only"] == "true";
                 if(!empty($crtValue)) $regexp = '^'.preg_quote($crtValue);
                 else $regexp = null;
-                $limit = min(ConfService::getCoreConf("USERS_LIST_COMPLETE_LIMIT", "conf"), 20);
+                $limit = intval(ConfService::getCoreConf("USERS_LIST_COMPLETE_LIMIT", "conf"));
                 $allUsers = AuthService::listUsers("/", $regexp, 0, $limit, false);
                 if (!$usersOnly) {
                     $allGroups = AuthService::listChildrenGroups("/");
