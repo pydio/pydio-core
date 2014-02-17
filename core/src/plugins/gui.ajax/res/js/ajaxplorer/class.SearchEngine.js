@@ -472,7 +472,7 @@ Class.create("SearchEngine", AjxpPane, {
 			option.toggleClassName('checked');
 		});
         var fName = (optionValue == 'filename'?'basename':'ajxp_meta_'+optionValue);
-        advancedPanel.insert('<div><span class="c4" style="width: 25%;"><span class="icon-tag"></span> '+optionLabel+'</span><input style="width: 35%;" type="text" class="c3" id="'+fName+'"></div>');
+        advancedPanel.insert('<div><span class="c4" style="width: 35%;"><span class="icon-tag"></span> '+optionLabel+'</span><input style="width: 35%;" type="text" class="c3" id="'+fName+'"></div>');
 
         /*
         if(this._ajxpOptions.metaColumnsRenderers && this._ajxpOptions.metaColumnsRenderers[optionValue]){
