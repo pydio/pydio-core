@@ -906,9 +906,16 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 if(!empty($crtValue)) $regexp = '^'.preg_quote($crtValue);
                 else $regexp = null;
                 $limit = intval(ConfService::getCoreConf("USERS_LIST_COMPLETE_LIMIT", "conf"));
-                $allUsers = AuthService::listUsers("/", $regexp, 0, $limit, false);
+                $searchAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS", "conf");
+                $displayAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS_DISPLAY", "conf");
+                $baseGroup = "/";
+                if( ($regexp == null && !$displayAll) || ($regexp != null && !$searchAll) ){
+                    $baseGroup = AuthService::filterBaseGroup("/");
+                }
+                AuthService::setGroupFiltering(false);
+                $allUsers = AuthService::listUsers($baseGroup, $regexp, 0, $limit, false);
                 if (!$usersOnly) {
-                    $allGroups = AuthService::listChildrenGroups("/");
+                    $allGroups = AuthService::listChildrenGroups($baseGroup);
                 }
                 $users = "";
                 $index = 0;
@@ -952,7 +959,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 if (strlen($users)) {
                     print("<ul>".$users."</ul>");
                 }
-
+                AuthService::setGroupFiltering(true);
 
                 break;
 

@@ -27,7 +27,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @abstract
  * User abstraction, the "conf" driver must provides its own implementation
  */
-abstract class AbstractAjxpUser
+abstract class AbstractAjxpUser implements AjxpGroupPathProvider
 {
     public $id;
     public $hasAdmin = false;
