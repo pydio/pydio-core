@@ -11,28 +11,20 @@
 
 #workspaces_list{
     overflow-y: auto;
-    max-height: 230px;
+    max-height: 400px;
     min-height: 100px;
     margin: 0 30px;
-    border: 1px solid rgb(111,123,136);
-    background-color: #fff;
-    border-radius: 3px;
+    background-color: #2c3e50;
+    border-radius: 6px;
     list-style: none;
     padding-left: 0;
-    color: rgb(46, 58, 70);
-
-    background: -moz-linear-gradient(top,  rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 72%, rgba(0,0,0,0.1) 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0.1)), color-stop(28%,rgba(0,0,0,0)), color-stop(72%,rgba(0,0,0,0)), color-stop(100%,rgba(0,0,0,0.1))); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 28%,rgba(0,0,0,0) 72%,rgba(0,0,0,0.1) 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 28%,rgba(0,0,0,0) 72%,rgba(0,0,0,0.1) 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 28%,rgba(0,0,0,0) 72%,rgba(0,0,0,0.1) 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  rgba(0,0,0,0.1) 0%,rgba(0,0,0,0) 28%,rgba(0,0,0,0) 72%,rgba(0,0,0,0.1) 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1a000000', endColorstr='#1a000000',GradientType=0 ); /* IE6-9 */
+    color: #ffffff;
 
 }
 
 .dashboard_main_pane > div.tabulatorContainer{
     text-align: center;
+    background-color: #2c3e50 !important;
 }
 
 #home_account_pane #close-icon{
@@ -59,21 +51,29 @@
 
 #workspaces_list h3{
     margin: 0;
-    padding: 12px 12px 3px 10px;
+    padding: 13px 12px 3px 10px;
     font-weight: normal;
-    font-size: 20px;
+    font-size: 19px;
+    letter-spacing: 1px;
 }
 
 #workspaces_list h4{
     margin: 0;
-    padding: 0 10px 10px;
+    padding: 0 10px 11px;
     font-weight: normal;
     font-size: 12px;
+    opacity: 0.4;
+    letter-spacing: 1px;
 }
 
 #workspaces_list li {
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid #263544;
     cursor: pointer;
+    padding: 1px 7px;
+}
+
+#workspaces_list li:hover {
+    background-color: #4F6275;
 }
 
 #workspaces_list li.selected{
@@ -87,14 +87,15 @@
 
 #home_account_pane #notifications_center {
     float: right;
-    width: 30%;
-    height: 100%;
+    width: 29%;
+    height: 96%;
     overflow-y: auto;
     overflow-x: hidden;
     background-color: #ebedf0;
     color: rgb(111,123,136);
-    border-left: 1px solid rgb(111,123,136);
-    transition: width 0.5s ease;
+    margin-top: 2px;
+    transition: width 1s ease;
+    border-radius: 6px 0 0 0;
 }
 
 #home_account_pane #notifications_center li {
@@ -106,6 +107,10 @@
     margin-top: 7px !important;
 }
 
+#home_account_pane .notif_event_container{
+    width: 56%;
+}
+
 #home_account_pane .notif_event_container > div {
     padding:0;
     line-height: 15px;
@@ -113,8 +118,9 @@
 }
 
 #home_account_pane .notif_event_container > div.notif_event_label {
-    color: #5C5C5C;
+    color: rgb(111,123,136);
     line-height: 25px;
+    overflow: hidden;
 }
 
 #home_account_pane .imagePreviewOverlay{
@@ -146,15 +152,18 @@
 #home_account_pane h1{
     margin-top: 0;
     padding-top: 12px;
-    font-size: 24px;
+    font-size: 21px;
     text-align: center;
     font-weight: normal;
 }
 
 #home_account_pane #welcome{
-    padding: 8px 0 0 0;
     text-align: center;
-    font-size: 12px;
+    background-color: #ebedf0;
+    border-bottom: 1px solid #E6E6E6;
+    font-size: 13px;
+    padding: 12px;
+    border-top: 1px solid #FFFFFF;
 }
 
 #workspaces_button {
@@ -181,8 +190,9 @@
     padding-top: 20px;
 }
 
+#get_started_link,
 #disconnect_link span{
-    text-decoration: underline;
+    font-weight: bold;
     cursor: pointer;
 }
 

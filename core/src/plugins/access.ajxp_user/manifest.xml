@@ -10,6 +10,18 @@
             <css file="plugins/access.ajxp_user/dashboard.css"/>
 		</resources>
 	</client_settings>
+    <server_settings>
+        <global_param name="ENABLE_GETTING_STARTED" type="boolean"
+                      label="Enable Getting Started" description="Enable addition tabulation to access getting started videos" default="true" expose="true"/>
+        <global_param name="URL_APP_IOSAPPSTORE" type="string"
+                      label="iOS App URL" description="URL of the iOS application" default="https://itunes.apple.com/us/app/pydio/id709275884?mt=8"/>
+        <global_param name="URL_APP_ANDROID" type="string"
+                      label="iOS App URL" description="URL of the iOS application" default="https://play.google.com/store/apps/details?id=com.pydio.android.Client"/>
+        <global_param name="URL_APP_SYNC_WIN" type="string"
+                      label="iOS App URL" description="URL of the iOS application" default="http://pyd.io/apps/desktop-sync-client/"/>
+        <global_param name="URL_APP_SYNC_MAC" type="string"
+                      label="iOS App URL" description="URL of the iOS application" default="http://pyd.io/apps/desktop-sync-client/"/>
+    </server_settings>
 	<registry_contributions>
 		<client_configs>
             <template_part theme="umbra" ajxpId="sidebar_splitter" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fake":"option"}'><![CDATA[
@@ -70,15 +82,15 @@
                 </style>
             ]]></template_part>
             <template_part ajxpId="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOptionUser":"true", "messageBoxReference":true}' theme="vision"><![CDATA[
-                <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="dashboard_main_pane flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "home","tabInfos" : [{"id":"home","label":"Home","iconClass":"icon-home", "element":"home_account_pane"},{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"parameters_pane"},{"id":"info","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"files_list_pane"},{"id":"tutorials","label":"user_dash.53", "title":"user_dash.54","iconClass":"icon-film", "element":"tutorials_pane"}]}'>
+                <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="dashboard_main_pane flat_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "home","tabInfos" : [{"id":"home","label":"Home","iconClass":"icon-home", "element":"home_account_pane"},{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"parameters_pane"}]}'>
                     <div id="home_account_pane" ajxpClass="UserDashboardHome">
+                        <div id="welcome"></div>
                         <div id="notifications_center">
                             <span class="icon-rss" id="close-icon"></span>
                             <h1>AJXP_MESSAGE[user_dash.38]</h1>
                         </div>
                         <div id="workspaces_center">
                             <div id="logo_div"><img src="plugins/gui.ajax/PydioLogo250.png"></div>
-                            <div id="welcome"></div>
                             <h1>AJXP_MESSAGE[user_dash.39]</h1>
                             <ul id="workspaces_list" style="height: 100px;"></ul>
                             <div id="workspaces_button">
@@ -105,68 +117,6 @@
                             </div>
                         </div>
                     </div>
-                    <div id="tutorials_pane" ajxpClass="AjxpPane" ajxpOptions='{"replaceScroller":true}' style="overflow-y: scroll;">
-                        <div style="clear:left; font-size: 25px; text-align:center; margin: 40px 0 30px;">Getting started with Pydio? Here are some videos for you!</div>
-                        <div id="tutorial_dl_apps_pane">
-                            <div style="width: 750px; margin: 0 auto;" id="dl_pydio_cont">
-                                <div style="float: left;margin: 44px 60px;font-size: 21px;" id="dl_pydio_for">Download Pydio for...</div>
-                                <div style="width: 92px; float:left;">
-                                    <a href="https://play.google.com/store/apps/details?id=com.pydio.android.Client" target="_blank" class="icon-mobile-phone" style="font-size: 96px;"></a><i class="icon-android" style="font-size: 30px;position: relative;top: -26px;left: -32px;color: rgb(86, 190, 86);"></i><div style="font-size: 11px;top: -15px;position: relative;left: -13px;">Android device</div>
-                                </div>
-
-<div style="width: 91px; float:left;">
-                                    <a href="https://itunes.apple.com/us/app/pydio/id709275884?mt=8" target="_blank" class="icon-mobile-phone" style="font-size: 96px;"></a><i class="icon-apple" style="font-size: 26px;position: relative;top: -27px;left: -31px;color: white;"></i><div style="font-size: 11px;top: -15px;position: relative;left: -12px;">iPhone/iPad</div></div><div style="width: 110px; float:left;padding-top: 14px;">
-                                    <a href="https://itunes.apple.com/us/app/pydio/id709275884?mt=8" target="_blank" class="icon-desktop" style="font-size: 74px;"></a><i class="icon-apple" style="font-size: 26px;position: relative;top: -30px;left: -51px;color: rgb(148, 148, 148);"></i><div style="font-size: 11px;top: -6px;position: relative;left: 6px;">Mac OS (Beta)</div></div>
-
-<div style="width: 100px; float:left;padding-top: 8px;">
-                                    <a href="https://itunes.apple.com/us/app/pydio/id709275884?mt=8" target="_blank" class="icon-laptop" style="font-size: 87px;"></a><i class="icon-windows" style="font-size: 26px;position: relative;top: -66px;left: 34px;color: rgb(56, 122, 173);"></i><div style="font-size: 11px;top: -40px;position: relative;left: 12px;">Windows (Beta)</div></div>
-                            </div>
-                        </div>
-                        <div class="tutorial_legend">
-                            <h2>Getting started</h2>
-                            This video is an introduction to Pydio web application:
-                            <ul>
-                                <li>User Dashboard</li>
-                                <li>GUI Overview</li>
-                                <li>Managing files and folders</li>
-                                <li>Previewing and editing files</li>
-                                <li>Quick access through bookmarks and search engine</li>
-                                <li>Selection cart</li>
-                            </ul>
-                        </div>
-                        <iframe class="tutorial_video" width="640" height="360" frameborder="0" src="//www.youtube.com/embed/C6L_9QT0lDE?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5"></iframe>
-                        <div class="tutorial_legend">
-                            <h2>Sharing files with Pydio</h2>
-                            In this tutorial, we will cover the basics of file sharing with Pydio:
-                            <ul>
-                                <li>Create web links</li>
-                                <li>Send them to internal or external users</li>
-                                <li>Get notified that a link was downloaded</li>
-                                <li>Create a password-protected link</li>
-                                <li>Create many links on one file</li>
-                                <li>Stop sharing a file totally</li>
-                            </ul>
-                        </div>
-                        <iframe class="tutorial_video" width="640" height="360" frameborder="0" src="//www.youtube.com/embed/Nj3d0AXfJXI?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5"></iframe>
-                        <div class="tutorial_legend">
-                            <h2>Sharing folders with Pydio</h2>
-                            This video covers the various options to share folders in Pydio
-                            <ul>
-                                <li>Share as new workspace</li>
-                                <li>Share as a public minisite</li>
-                            </ul>
-                        </div>
-                        <iframe class="tutorial_video" width="640" height="360" frameborder="0" src="//www.youtube.com/embed/1o62QF_ATYA?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5"></iframe>
-                        <div style="clear:left; text-align:center;">
-                            <a href="http://pyd.io/end-user-tutorials/" target="_blank" style="text-align: center;
-font-size: 25px;
-background-color: #e35d52;
-padding: 10px;
-border-radius: 5px;
-color: white;
-display: inline-block;
-margin: 40px 0;"><i class="icon-youtube-play"></i> Discover more on the Pydio channel!</a></div>
-                    </div>
                 </div>
                 <script>
                     document.observeOnce("ajaxplorer:context_changed", function(){
@@ -179,6 +129,45 @@ margin: 40px 0;"><i class="icon-youtube-play"></i> Discover more on the Pydio ch
                     }, 100);
                 </script>
 			]]></template_part>
+            <component_config className="AjxpTabulator::userdashboard_main_tab">
+                <additional_tab id="tutorials_pane"
+                                tabInfo='{"id":"tutorials","label":"user_dash.53", "title":"user_dash.54","iconClass":"icon-play", "element":"tutorials_pane", "dontFocus":true}'
+                                paneInfo='{"type":"widget"}'><![CDATA[
+                    <div id="tutorials_pane" ajxpClass="AjxpPane" ajxpOptions='{"replaceScroller":true}' style="overflow-y: scroll;">
+                        <div style="clear:left; font-size: 25px; text-align:center; margin: 40px 0 30px;">AJXP_MESSAGE[user_dash.56]</div>
+                        <div id="tutorial_dl_apps_pane">
+                            <div style="width: 750px; margin: 0 auto;" id="dl_pydio_cont">
+                                <div style="float: left;margin: 44px 60px;font-size: 21px;" id="dl_pydio_for">AJXP_MESSAGE[user_dash.57]</div>
+                                <div style="width: 81px; float:left;">
+                                    <a href="URL_APP_ANDROID" target="_blank" class="icon-mobile-phone" style="font-size: 96px;"></a><a href="URL_APP_ANDROID" target="_blank"  class="icon-android" style="font-size: 30px;position: relative;top: -26px;left: -32px;color: rgb(86, 190, 86);"></a><div style="font-size: 11px;top: -15px;position: relative;left: -13px;">AJXP_MESSAGE[user_dash.58]</div>
+                                </div>
+                                <div style="width: 91px; float:left;">
+                                    <a href="URL_APP_IOSAPPSTORE" target="_blank" class="icon-tablet" style="font-size: 96px;"></a><a href="URL_APP_IOSAPPSTORE" target="_blank" class="icon-apple" style="font-size: 26px;position: relative;top: -33px;left: -40px;color: white;text-shadow: 0px 0px 20px rgba(0,0,0,0.4);"></a><div style="font-size: 11px;top: -15px;position: relative;left: 2px;">AJXP_MESSAGE[user_dash.59]</div>
+                                </div>                                <div style="width: 110px; float:left;padding-top: 14px;">
+                                    <a href="URL_APP_SYNC_MAC" target="_blank" class="icon-desktop" style="font-size: 74px;"></a><a href="URL_APP_SYNC_MAC" target="_blank" class="icon-apple" style="font-size: 26px;position: relative;top: -30px;left: -51px;color: rgb(148, 148, 148);"></a><div style="font-size: 11px;top: -6px;position: relative;left: 6px;">AJXP_MESSAGE[user_dash.60]</div>
+                                </div>
+                                <div style="width: 100px; float:left;padding-top: 8px;">
+                                    <a href="URL_APP_SYNC_WIN" target="_blank" class="icon-laptop" style="font-size: 87px;"></a><a href="URL_APP_SYNC_WIN" target="_blank" class="icon-windows" style="font-size: 26px;position: relative;top: -66px;left: 34px;color: rgb(56, 122, 173);"></a><div style="font-size: 11px;top: -40px;position: relative;left: 12px;">AJXP_MESSAGE[user_dash.61]</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tutorial_legend">
+                            AJXP_MESSAGE[user_dash.62]
+                        </div>
+                        <iframe class="tutorial_video" width="640" height="360" frameborder="0" src="//www.youtube.com/embed/C6L_9QT0lDE?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5"></iframe>
+                        <div class="tutorial_legend">
+                        AJXP_MESSAGE[user_dash.63]
+                        </div>
+                        <iframe class="tutorial_video" width="640" height="360" frameborder="0" src="//www.youtube.com/embed/Nj3d0AXfJXI?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5"></iframe>
+                        <div class="tutorial_legend">
+                        AJXP_MESSAGE[user_dash.64]
+                        </div>
+                        <iframe class="tutorial_video" width="640" height="360" frameborder="0" src="//www.youtube.com/embed/1o62QF_ATYA?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5"></iframe>
+                        <div style="clear:left; text-align:center;">
+                            <a href="http://pyd.io/end-user-tutorials/" target="_blank" style="text-align: center;font-size: 25px;background-color: #e35d52;padding: 10px;border-radius: 5px;color: white;display: inline-block;margin: 40px 0;"><i class="icon-youtube-play"></i> AJXP_MESSAGE[user_dash.65]</a></div>
+                    </div>
+                ]]></additional_tab>
+            </component_config>
         </client_configs>
 		<actions>
 			<action name="ls" dirDefault="true">

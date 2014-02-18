@@ -74,4 +74,40 @@ $mess=array(
 "50"=> "My Teams",
 "51"=> "Teams of users, used as shortcuts when sharing",
 "52"=> "Are you sure you want to delete this team? This will not remove any users.",
+    "53"=> "Getting Started",
+    "54"=> "Get started with Pydio by following How-to videos",
+    "55"=> "Do you need help <a>to get started?</a>",
+    "56"=> "Getting started with Pydio? Here are some videos for you!",
+    "57"=> "Download Pydio for...",
+    "58"=> "Android device",
+    "59"=> "iPhone/iPad",
+    "60"=>"Mac OS (Beta)",
+    "61"=>"Windows (Beta)",
+    "62"=>"<h2>Getting started</h2>
+            This video is an introduction to Pydio web application:
+            <ul>
+                <li>User Dashboard</li>
+                <li>GUI Overview</li>
+                <li>Managing files and folders</li>
+                <li>Previewing and editing files</li>
+                <li>Quick access through bookmarks and search engine</li>
+                <li>Selection cart</li>
+            </ul>",
+    "63"=>"<h2>Sharing files with Pydio</h2>
+                            In this tutorial, we will cover the basics of file sharing with Pydio:
+                            <ul>
+                                <li>Create web links</li>
+                                <li>Send them to internal or external users</li>
+                                <li>Get notified that a link was downloaded</li>
+                                <li>Create a password-protected link</li>
+                                <li>Create many links on one file</li>
+                                <li>Stop sharing a file totally</li>
+            </ul>",
+    "64"=>"<h2>Sharing folders with Pydio</h2>
+                            This video covers the various options to share folders in Pydio
+                            <ul>
+                                <li>Share as new workspace</li>
+                                <li>Share as a public minisite</li>
+            </ul>",
+    "65"=> "Discover more on the Pydio channel!",
 );

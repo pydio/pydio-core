@@ -151,11 +151,18 @@ Class.create("UserDashboardHome", AjxpPane, {
         }
 
         if(ajaxplorer.actionBar.getActionByName("logout")){
-            oFormObject.down("#welcome").insert(new Element("span", {id:"disconnect_link"}).update(" (<span>"+ajaxplorer.actionBar.getActionByName("logout").options.text.toLowerCase()+"</span>)"));
+            oFormObject.down("#welcome").insert(new Element("span", {id:"disconnect_link"}).update(" [<span>"+ajaxplorer.actionBar.getActionByName("logout").options.text.toLowerCase()+"</span>]"));
             oFormObject.down('#disconnect_link').observe("click", function(e){
                 ajaxplorer.actionBar.fireAction("logout");
             });
         }
+
+        if(ajaxplorer.getPluginConfigs('ajxpdriver[@id=\'access.ajxp_user\']').get("ENABLE_GETTING_STARTED")){
+            oFormObject.down("#welcome").insert(". " + MessageHash["user_dash.55"].replace("<a>", "<a id='get_started_link' href='#' onclick='javascript:$(\"userdashboard_main_tab\").ajxpPaneObject.switchTabulator(\"tutorials\")'>"));
+        }else{
+            oFormObject.down("#welcome").insert(".");
+        }
+
     },
 
     resize: function($super, size){
