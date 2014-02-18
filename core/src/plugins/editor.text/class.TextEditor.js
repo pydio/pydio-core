@@ -63,6 +63,12 @@ Class.create("TextEditor", AbstractEditor, {
         this.element.observeOnce("editor:close", function(){
             //ajaxplorer.fireNodeRefresh(nodeOrNodes);
         });
+        this.textarea.observe("focus", function(){
+            ajaxplorer.disableAllKeyBindings()
+        });
+        this.textarea.observe("blur", function(){
+            ajaxplorer.enableAllKeyBindings()
+        });
 	},
 	
 	loadFileContent : function(fileName){

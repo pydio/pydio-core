@@ -67,14 +67,17 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 			}
 			return false;
 		}.bind(this));		
-		
-		this.element.down('#goto_line').observe('keypress', function(event){
+
+        var gotoLine = this.element.down('#goto_line');
+		gotoLine.observe('keypress', function(event){
 			if(event.keyCode == Event.KEY_RETURN && this.codeMirror){
 				this.codeMirror.jumpToLine(parseInt(event.target.value));
 			}			
 		}.bind(this) );
-		
-		this.element.down('#text_search').observe('keypress', function(event){
+
+        var textSearch = this.element.down('#text_search');
+
+		textSearch.observe('keypress', function(event){
 			if(event.keyCode == Event.KEY_RETURN && this.codeMirror){
 				var cursor;
 				if(this.currentSearch && this.currentSearch == event.target.value && this.currentCursor){
@@ -92,7 +95,12 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 				}
 			}			
 		}.bind(this) );
-		
+
+        textSearch.observe("focus", function(){ajaxplorer.disableAllKeyBindings()});
+        textSearch.observe("blur", function(){ajaxplorer.enableAllKeyBindings()});
+        gotoLine.observe("focus", function(){ajaxplorer.disableAllKeyBindings()});
+        gotoLine.observe("blur", function(){ajaxplorer.enableAllKeyBindings()});
+
 		// Remove python rule, if any
 		$$('link[href="plugins/editor.codemirror/css/linenumbers-py.css"]').invoke('remove');
 		
