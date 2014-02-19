@@ -29,6 +29,11 @@ define ('SMB4PHP_VERSION', '0.8');
 if (!defined('SMB4PHP_SMBCLIENT')) {
     define ('SMB4PHP_SMBCLIENT', 'smbclient');
 }
+
+if (!defined('SMB4PHP_SMBTMP')) {
+    define ('SMB4PHP_SMBTMP', '/tmp');
+}
+
 define ('SMB4PHP_SMBOPTIONS', 'TCP_NODELAY IPTOS_LOWDELAY SO_KEEPALIVE SO_RCVBUF=8192 SO_SNDBUF=8192');
 define ('SMB4PHP_AUTHMODE', 'arg'); # set to 'env' to use USER enviroment variable
 
@@ -181,7 +186,7 @@ class smb
             2 => array("pipe", "w") 	// stderr is a pipe to write to
         );
         $env = null;
-        if (defined('AJXP_LOCALE')) {
+        if (defined('AJXP_LOCALE') && stripos(PHP_OS, "win") === false) {
             $env = array("LC_ALL" => AJXP_LOCALE);
         }
         $process = proc_open($cmd, $descriptorspec, $pipes, null, $env);
@@ -290,7 +295,7 @@ class smb
             case 'host':
                 if ($o = smb::look ($pu))
                 //self::debug($_SESSION["AJXP_SESSION_REMOTE_USER"]);
-                   $stat = stat ("/tmp");
+                   $stat = stat (SMB4PHP_SMBTMP);
                 else
                   trigger_error ("url_stat(): list failed for host '{$host}'", E_USER_WARNING);
                 break;
@@ -310,7 +315,7 @@ class smb
                        foreach ($o['disk'] as $s) if ($lshare == strtolower($s)) {
                            $found = TRUE;
                            //self::debug("DISK: " . $s);
-                           $stat = stat ("/tmp");
+                           $stat = stat (SMB4PHP_SMBTMP);
                            break;
                        }
                    }
@@ -328,7 +333,7 @@ class smb
                        foreach ($_SESSION["disk"] as $s) if ($lshare == strtolower($s)) {
                            $found = TRUE;
                            //self::debug("oh boy");
-                           $stat = stat ("/tmp");
+                           $stat = stat (SMB4PHP_SMBTMP);
                            break;
                        }
                    }
@@ -349,11 +354,11 @@ class smb
                     if (isset ($o['info'][$name])) {
                        $stat = smb::addstatcache ($url, $o['info'][$name]);
                     } else {
-                        $stat = stat("/tmp");
+                        $stat = stat(SMB4PHP_SMBTMP);
                        //trigger_error ("url_stat(): path '{$pu['path']}' not found", E_USER_WARNING);
                     }
                 } else {
-            //$stat = stat("/tmp");
+            //$stat = stat(SMB4PHP_SMBTMP);
                     trigger_error ("url_stat(): dir failed for path '{$pu['path']}'", E_USER_WARNING);
                 }
                 break;
@@ -371,7 +376,7 @@ class smb
         if (stripos(PHP_OS, "win") !== false) {
             $s = ($is_file) ? stat (__FILE__) : stat (dirname(__FILE__));
         } else {
-            $s = ($is_file) ? stat ('/etc/passwd') : stat ('/tmp');
+            $s = ($is_file) ? stat ('/etc/passwd') : stat (SMB4PHP_SMBTMP);
         }
         if ($is_file) {
             $s[2] = $s['mode'] = 0666;
@@ -631,7 +636,7 @@ class smb_stream_wrapper extends smb
             case 'a+':
                 // REFERENCE STREAM BUT DO NOT OPEN IT UNTIL READING IS REALLY NECESSARY!
                 /*
-                $this->tmpfile = tempnam('/tmp', 'smb.down.');
+                $this->tmpfile = tempnam(SMB4PHP_SMBTMP, 'smb.down.');
                 smb::execute ('get "'.$pu['path'].'" "'.$this->tmpfile.'"', $pu);
                 $this->stream = fopen ($this->tmpfile, $mode);
                 */
@@ -643,7 +648,7 @@ class smb_stream_wrapper extends smb
             case 'x':
             case 'x+':
                 $this->cleardircache();
-                $this->tmpfile = tempnam('/tmp', 'smb.up.');
+                $this->tmpfile = tempnam(SMB4PHP_SMBTMP, 'smb.up.');
                 $this->stream = fopen ($this->tmpfile, $mode);
                 $this->need_flush = TRUE;
 
@@ -702,7 +707,7 @@ class smb_stream_wrapper extends smb
             return $this->stream;
         }
         if (isSet($this->defer_stream_read)) {
-            $this->tmpfile = tempnam('/tmp', 'smb.down');
+            $this->tmpfile = tempnam(SMB4PHP_SMBTMP, 'smb.down');
             self::debug("Creating real tmp file now");
             smb::execute ('get "'.$this->parsed_url['path'].'" "'.$this->tmpfile.'"', $this->parsed_url);
             $this->stream = fopen($this->tmpfile, $this->mode);
