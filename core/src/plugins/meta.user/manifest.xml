@@ -12,7 +12,7 @@
 		<!--<param name="meta_file_name" type="string" label="CONF_MESSAGE[Meta File]" description="CONF_MESSAGE[Hidden file used inside folders to save meta data]" mandatory="true" default=".ajxp_meta"/>-->
 		<param name="meta_fields" type="string" replicationGroup="group1" label="CONF_MESSAGE[Field ID]" description="CONF_MESSAGE[Id of fiels, use standard characters here.]" mandatory="true" default="comment_field"/>
 		<param name="meta_labels" type="string" replicationGroup="group1" label="CONF_MESSAGE[Label]" description="CONF_MESSAGE[Label of the field, human friendly]" mandatory="true" default="My Comments"/>
-		<param name="meta_types" type="select" choices="string|Short text,textarea|Long text,stars_rate|Stars Rating,css_label|Color labels,comments_feed|Comments Feed,choice|Selection (set choices in Label)" replicationGroup="group1" label="CONF_MESSAGE[Field Type]" description="CONF_MESSAGE[Type of field]" mandatory="true" default="string"/>
+		<param name="meta_types" type="select" choices="string|Short text,textarea|Long text,stars_rate|Stars Rating,css_label|Color labels,choice|Selection (set choices in Additional Info)" replicationGroup="group1" label="CONF_MESSAGE[Field Type]" description="CONF_MESSAGE[Type of field]" mandatory="true" default="string"/>
 		<param name="meta_visibility" type="select" replicationGroup="group1" label="CONF_MESSAGE[Column visibility]" description="CONF_MESSAGE[Set default visibility.]" mandatory="true" default="visible" choices="visible|Visible,hidden|Hidden"/>
 		<param name="meta_additional" type="string" replicationGroup="group1" label="CONF_MESSAGE[Additional info]" description="CONF_MESSAGE[Depending on the field type. Currently used for selection only]" mandatory="false"/>
 	</server_settings>
@@ -54,7 +54,7 @@
 							var metaTypes =  nodeMeta.get('meta_types').split(',');
 							for(var i=0;i<metaFields.length;i++){
 								var value = nodeMeta.get(metaFields[i]) || '';
-								form.insert('<div class="SF_element"><div class="SF_label">'+metaLabels[i]+' : </div><input class="SF_input" name="'+metaFields[i]+'" value="'+value+'"/></div>');
+								form.insert('<div class="SF_element"><div class="SF_label">'+metaLabels[i]+' : </div><input class="SF_input" name="'+metaFields[i]+'" value="'+value.replace(/"/g, '&quot;')+'"/></div>');
                                 var element = form.down('input[name="'+metaFields[i]+'"]');
                                 var fieldType = metaTypes[i];
 								if(fieldType == 'stars_rate'){
@@ -78,7 +78,7 @@
 						modal.showDialogForm('Meta Edit', 'user_meta_form', loadFunc, closeFunc);
 						]]></clientCallback>
 					<clientForm id="user_meta_form"><![CDATA[
-					<div id="user_meta_form" action="edit_user_meta" box_width="250"></div>
+					<div id="user_meta_form" action="edit_user_meta" box_width="320"></div>
 					]]></clientForm>
 					<serverCallback methodName="editMeta"></serverCallback>
 					</processing>

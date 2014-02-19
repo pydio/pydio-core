@@ -73,7 +73,7 @@ Class.create("MetaCellRenderer", {
             var value = formElement.getValue();
             var select = new Element('select', {name: formElement.name,style:'width:56%;height:24px;'});
             $H(selectorValues).each(function(pair){
-                select.insert(new Element("option", {value:pair.value}).update(pair.key));
+                select.insert(new Element("option", {value:pair.key}).update(pair.value));
                 if(value) select.setValue(value);
             });
             formElement.replace(select);
@@ -213,6 +213,17 @@ Class.create("MetaCellRenderer", {
                         td.update(rule.label);
                     }
                 break;
+                case "choice":
+                    if(MetaCellRenderer.staticMetadataCache && MetaCellRenderer.staticMetadataCache.get(metaName)){
+                        var selectorValues  = MetaCellRenderer.staticMetadataCache.get(metaName);
+                        if(!selectorValues) break;
+                        console.log(selectorValues);
+                        var value = td.innerHTML.strip();
+                        if(selectorValues[value]){
+                            td.update(selectorValues[value]);
+                        }
+                    }
+                break;
                 case "text":
                 case "textarea":
                     if(typeof td.contentEditable != 'undefined'){
@@ -345,7 +356,7 @@ Class.create("MetaCellRenderer", {
 	// mod for textarea
 	formTextarea: function(formElement, form){
 		var obj = new MetaCellRenderer();
-		var cont = new Element('textarea', {name:formElement.name,style:'float: left;width: 136;border-radius: 3px;padding: 2px;height:100px;'});
+		var cont = new Element('textarea', {name:formElement.name,style:'float: left;width: 161px;border-radius: 3px;padding: 2px;height:100px;'});
 		cont.innerHTML = formElement.value;
 		formElement.replace(cont);
 	}
