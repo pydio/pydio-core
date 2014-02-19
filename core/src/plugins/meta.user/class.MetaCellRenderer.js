@@ -217,7 +217,6 @@ Class.create("MetaCellRenderer", {
                     if(MetaCellRenderer.staticMetadataCache && MetaCellRenderer.staticMetadataCache.get(metaName)){
                         var selectorValues  = MetaCellRenderer.staticMetadataCache.get(metaName);
                         if(!selectorValues) break;
-                        console.log(selectorValues);
                         var value = td.innerHTML.strip();
                         if(selectorValues[value]){
                             td.update(selectorValues[value]);
