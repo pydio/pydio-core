@@ -5441,7 +5441,11 @@
 		    $v_skip--;
 		  }
 		  else {
-             $v_result = $v_list[$i].(( $i == 0 && $scheme)? "/" : "").($i!=(sizeof($v_list)-1)? "/".$v_result : "");
+              if(stripos(PHP_OS, "win") === 0){
+                  $v_result = $v_list[$i].($i!=(sizeof($v_list)-1)? "/".$v_result : "");
+              }else{
+                  $v_result = $v_list[$i].(( $i == 0 && $scheme)? "/" : "").($i!=(sizeof($v_list)-1)? "/".$v_result : "");
+              }
 		  }
         }
       }
