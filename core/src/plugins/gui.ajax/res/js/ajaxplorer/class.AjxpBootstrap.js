@@ -257,7 +257,15 @@ Class.create("AjxpBootstrap", {
             }else{
                 html+= '';
             }
-            html += '<div style="height: 85px;position: relative;" id="loader_round_progress"><div class="rotating" style="width: 0;height: 0;border: 24px solid rgb(0, 123, 219);border-radius: 50px;position: absolute;clip: rect(0px, 50px, 100px, 0px);left: 131px;top: 11px;color: white;font-size: 20px;">.</div></div>';
+            var spinnerType = "double-bounce";
+            if(this.parameters.get("spinner-type")) spinnerType = this.parameters.get("spinner-type");
+            if(spinnerType == "planet-rotating"){
+                html += '<div style="height: 85px;position: relative;" id="loader_round_progress"><div class="rotating" style="width: 0;height: 0;border: 24px solid rgb(0, 123, 219);border-radius: 50px;position: absolute;clip: rect(0px, 50px, 100px, 0px);left: 131px;top: 11px;color: white;font-size: 20px;">.</div></div>';
+            }else if(spinnerType == "stretch-rectangles"){
+                html += '<div style="position: relative;" id="loader_round_progress" class="rect_spinners"><div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div></div>';
+            }else if(spinnerType == "double-bounce"){
+                html += '<div style="position: relative;" id="loader_round_progress" class="bounce-spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>';
+            }
 			html += '<div style="padding:5px;font-size: 11px;line-height: 1.5em;" class="dialogFooter" id="loader_dialog_footer">';
             if(customWording.title.toLowerCase() != "ajaxplorer"){
 				html+='	<div style="padding:4px 7px;position: relative;"><div>Pydio Community Edition<span id="version_span"></span></div>';

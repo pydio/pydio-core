@@ -381,7 +381,7 @@ Class.create("FormManager", {
             }else if(type=='password-create'){
                 var button = new Element('span', {className:'icon-refresh ajxpPasswordGenerate'});
                 element.insert({after:button});
-                element.up('.SF_element').setStyle({position:'relative'});
+                div.setStyle({position:'relative'});
                 button.observe('click', function(){
                     element.setValue(Math.random().toString(36).slice(-10));
                 });
