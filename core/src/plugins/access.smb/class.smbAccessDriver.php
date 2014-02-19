@@ -46,8 +46,10 @@ class smbAccessDriver extends fsAccessDriver
         $smbclientPath = $this->driverConf["SMBCLIENT"];
         define ('SMB4PHP_SMBCLIENT', $smbclientPath);
 
+        $smbtmpPath = $this->driverConf["SMB_PATH_TMP"];
+        define ('SMB4PHP_SMBTMP', $smbtmpPath);
+		
         require_once($this->getBaseDir()."/smb.php");
-
 
         $create = $this->repository->getOption("CREATE");
         $recycle = $this->repository->getOption("RECYCLE_BIN");
