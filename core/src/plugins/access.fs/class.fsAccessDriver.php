@@ -57,7 +57,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $create = $this->repository->getOption("CREATE");
         $path = $this->repository->getOption("PATH");
         $recycle = $this->repository->getOption("RECYCLE_BIN");
-        $chmod = $this->repository->getOption("CHMOD");
+        $chmod = $this->repository->getOption("CHMOD_VALUE");
         $wrapperData = $this->detectStreamWrapper(true);
         $this->wrapperClassName = $wrapperData["classname"];
         $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
@@ -619,7 +619,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 $repoData = array(
                     'base_url' => $this->urlBase,
                     'wrapper_name' => $this->wrapperClassName,
-                    'chmod'     => $this->repository->getOption('CHMOD'),
+                    'chmod'     => $this->repository->getOption('CHMOD_VALUE'),
                     'recycle'     => $this->repository->getOption('RECYCLE_BIN')
                 );
                 $this->logDebug("Upload Files Data", $fileVars);
@@ -1522,7 +1522,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $repoData = array(
             'base_url' => $this->urlBase,
             'wrapper_name' => $this->wrapperClassName,
-            'chmod'     => $this->repository->getOption('CHMOD'),
+            'chmod'     => $this->repository->getOption('CHMOD_VALUE'),
             'recycle'     => $this->repository->getOption('RECYCLE_BIN')
         );
 
@@ -1643,7 +1643,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $repoData = array(
             'base_url' => $this->urlBase,
             'wrapper_name' => $this->wrapperClassName,
-            'chmod'     => $this->repository->getOption('CHMOD'),
+            'chmod'     => $this->repository->getOption('CHMOD_VALUE'),
             'recycle'     => $this->repository->getOption('RECYCLE_BIN')
         );
         $fp=fopen($this->urlBase."$crtDir/$newFileName","w");
@@ -1667,7 +1667,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $repoData = array(
             'base_url' => $this->urlBase,
             'wrapper_name' => $this->wrapperClassName,
-            'chmod'     => $this->repository->getOption('CHMOD'),
+            'chmod'     => $this->repository->getOption('CHMOD_VALUE'),
             'recycle'     => $this->repository->getOption('RECYCLE_BIN')
         );
         $mess = ConfService::getMessages();
