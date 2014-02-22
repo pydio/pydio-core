@@ -1,0 +1,35 @@
+<div style='font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif; font-size: 12px;'>
+
+  <h2>Pydio 5.2.2</h2>
+<p>This is a security & bugfix release, upgrade is recommended. See changelog below.</p>
+
+<ul>
+    <li><b>Date</b>: 22nd, Feb 2014</li>
+    <li><b>License</b>: Affero GPL</li>
+    <li><b>Copyright</b>: Charles du Jeu 2014</li>
+    <li><b>Demo</b>: <a target="_blank" href="https://demo.pyd.io/">https://demo.pyd.io/</a></li>
+    <li><b>Upgrade</b>: In-app or Linux package managers</li>
+</ul>
+
+<h2>Bugfixes</h2>
+<ul>
+	<li>Meta.syncable : Make sure to clear stat cache (<a href="http://github.com/pydio/pydio-core/commit/b92297919e23a6105cb71516381e8ed022c36664">details</a>)</li> 
+	<li>Fix wrong autocompleter limit - there was a useless min() call. Fix #463 (<a href="http://github.com/pydio/pydio-core/commit/25f831d04c7d7e3d4635da49186733cccd9f0edb">details</a>)</li> 
+	<li>Fix #461 > hardcoded "localhost" (<a href="http://github.com/pydio/pydio-core/commit/231cb17faf6998a9a92e5cbd01922148fd6874e6">details</a>)</li> 
+	<li>Little CSS fix for Metadata in advanced search filter (<a href="http://github.com/pydio/pydio-core/commit/6a66fe747a362b77ffc53f13538fe993bb0451aa">details</a>)</li> 
+	<li>Revert how CROSSUSERS_ALLGROUPS_* options were applied by default, otherwise would create strange situations for group sub-admins Refix reserved roles appearing in admin even when not in DEBUG MODE AbstractUser now implements AjxpGroupPathProvider, to be checkable by canAdministrate(). Add checks throughout the ajxp_conf driver Fix ajxp_role editor for #457 (<a href="http://github.com/pydio/pydio-core/commit/ff88d32b6a463681f6af1938fd6f9783dbb609a2">details</a>)</li> 
+	<li>Update font awesome to 3.2.1 (<a href="http://github.com/pydio/pydio-core/commit/ac6d65c1a2cc4d84e7864c09f5f2cc2cf67148ce">details</a>)</li> 
+	<li>Insert videos in a new tab of the dashboard. Yet to be "modularized" (<a href="http://github.com/pydio/pydio-core/commit/69150e435181585ad28d86bd60c879d88cfe9ecf">details</a>)</li> 
+	<li>Rework dashboard design. Add a new tab for "Getting Started" (<a href="http://github.com/pydio/pydio-core/commit/e6194c78745d63fdbdcf9d230b68186a2e06a231">details</a>)</li> 
+	<li>Fix editor.text & editor.codemirror for various focused fields to disable key bindings. Fix #462 (<a href="http://github.com/pydio/pydio-core/commit/6675811ae2d193817d79e7542698b4e6007812f8">details</a>)</li> 
+	<li>Compile Ellega's last commit (<a href="http://github.com/pydio/pydio-core/commit/27b88fbd64a1e1d9b90b5e96eb3b06dad39eb5d1">details</a>)</li> 
+	<li>Pclzip: revert a problematic commit for Windows OS. (<a href="http://github.com/pydio/pydio-core/commit/b5492858f581a0a1b6775d3bfcbd30a95c691735">details</a>)</li> 
+	<li>Default language was a bit broken in download pages. Security fix. (<a href="http://github.com/pydio/pydio-core/commit/19c5817baad97f572fc3bd4394349ca5709f726b">details</a>)</li> 
+	<li>Fix FormManager password-create field for IE8 Switch spinner to spinKit double-bounce (<a href="http://github.com/pydio/pydio-core/commit/068f8ebb1272c31f256cdd5bc459c6744818c914">details</a>)</li> 
+	<li>Access.smb - enhancement and fix if Windows OS (<a href="http://github.com/pydio/pydio-core/commit/a77b0b72395cbc5e638598852518159ade2bc1d1">details</a>)</li> 
+	<li>Fix user-defined metadata: fix #431 (quotes in long text), fix choices, remove "comments feed" it's a dedicated plugin. (<a href="http://github.com/pydio/pydio-core/commit/a64bdfd1bf4ffabb5fb790e55a5525cf7d4bcf7a">details</a>)</li> 
+	<li>Remove -strip option on imagick, use -flatten instead, otherwise background is black on resize. (<a href="http://github.com/pydio/pydio-core/commit/1a801f106e98d265f2ac069877ded654632c63d7">details</a>)</li> 
+	<li>Regexp2like function must stripslashes previously escaped chars (via preg_quote). Fix #437 (<a href="http://github.com/pydio/pydio-core/commit/c0dcfa848f7fcc24639856c8cd054887d1a31953">details</a>)</li> 
+	<li>Missing restParams to activate the REST api on some actions (<a href="http://github.com/pydio/pydio-core/commit/f4808c283bd64e52e2ee72179e183a74ca6da1bc">details</a>)</li> 
+	<li>Typo: pointing to CHMOD instead of CHMOD_VALUE, applying chmod failed for files. (<a href="http://github.com/pydio/pydio-core/commit/e0796390cd1918d223164e6d95bd4668de70d762">details</a>)</li> 
+</ul>
