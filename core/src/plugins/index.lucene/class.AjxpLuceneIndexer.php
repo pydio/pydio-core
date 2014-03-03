@@ -349,7 +349,9 @@ class AjxpLuceneIndexer extends AJXP_Plugin
                 $newUrl = $url."/".$child;
                 $this->logDebug("Indexing Node ".$newUrl);
                 try {
-                    $this->updateNodeIndex(null, new AJXP_Node($newUrl));
+                    $newNode = new AJXP_Node($newUrl);
+                    $this->updateNodeIndex(null, $newNode);
+                    AJXP_Controller::applyHook("node.index", array($newNode));
                 } catch (Exception $e) {
                     $this->logDebug("Error Indexing Node ".$newUrl." (".$e->getMessage().")");
                 }

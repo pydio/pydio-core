@@ -57,7 +57,7 @@ class ChangesTracker extends AJXP_Plugin
                 LEFT JOIN [ajxp_index]
                     ON [ajxp_changes].[node_id] = [ajxp_index].[node_id]
                 WHERE [ajxp_changes].[repository_identifier] = %s AND [seq] > %i
-                ORDER BY [ajxp_changes].[node_id], [seq] ASC",
+                ORDER BY [ajxp_changes].[node_id],[seq] ASC",
             $this->computeIdentifier(ConfService::getRepository()), AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
 
         echo '{"changes":[';
@@ -65,7 +65,8 @@ class ChangesTracker extends AJXP_Plugin
         $previousRow = null;
         $order = array("path"=>0, "content"=>1, "create"=>2, "delete"=>3);
         $relocateAttrs = array("bytesize", "md5", "mtime", "node_path", "repository_identifier");
-        foreach ($res as $row) {
+        $lastPrinted = false;
+        foreach ($res as  $i => $row) {
             $row->node = array();
             foreach ($relocateAttrs as $att) {
                 $row->node[$att] = $row->$att;
@@ -77,6 +78,10 @@ class ChangesTracker extends AJXP_Plugin
                 if ($order[$row->type] > $order[$previousRow->type]) {
                     $previousRow->type = $row->type;
                 }
+                if($i == (count($res) - 1)){
+                    $lastPrinted = true;
+                    echo json_encode($previousRow);
+                }
             } else {
                 if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content")) {
                     echo json_encode($previousRow) . ",";
@@ -84,10 +89,11 @@ class ChangesTracker extends AJXP_Plugin
                 $previousRow = $row;
                 $previousNodeId = $row->node_id;
             }
-            $lastSeq = $row->seq;
+            if(isSet($lastSeq)) $lastSeq = max($lastSeq, $row->seq);
+            else $lastSeq = $row->seq;
             flush();
         }
-        if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content")) {
+        if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content") && !$lastPrinted) {
             echo json_encode($previousRow);
         }
         if (isSet($lastSeq)) {
@@ -155,10 +161,12 @@ class ChangesTracker extends AJXP_Plugin
                     // PATH CHANGE ONLY
                     $newNode->loadNodeInfo();
                     if ($newNode->isLeaf()) {
+                        $this->logDebug("Path changed", "Moving file from " . $oldNode->getPath(). " to ".$newNode->getPath());
                         dibi::query("UPDATE [ajxp_index] SET ", array(
                             "node_path"  => $newNode->getPath(),
                         ), "WHERE [node_path] = %s AND [repository_identifier] = %s", $oldNode->getPath(), $repoId);
                     } else {
+                        $this->logDebug("Path changed", "Moving folder from " . $oldNode->getPath(). " to ".$newNode->getPath());
                         dibi::query("UPDATE [ajxp_index] SET [node_path]=REPLACE( REPLACE(CONCAT('$$$',[node_path]), CONCAT('$$$', %s), CONCAT('$$$', %s)) , '$$$', '') ",
                             $oldNode->getPath(),
                             $newNode->getPath()
@@ -171,6 +179,27 @@ class ChangesTracker extends AJXP_Plugin
             AJXP_Logger::error("[meta.syncable]", "Indexation", $e->getMessage());
         }
 
+    }
+
+    /**
+     * @param AJXP_Node $node
+     */
+    public function indexNode($node){
+        $path = $node->getPath();
+        if(empty($path) || $path == "/") return;
+        $repoId = $this->computeIdentifier($node->getRepository());
+        $res = dibi::query("SELECT node_id FROM [ajxp_index] WHERE [node_path] = %s AND [repository_identifier] = %s", $path, $repoId);
+        $count = $res->getRowCount();
+        if($count) return;
+        $this->logDebug("[meta.syncable]", "Indexing $path");
+        $stat = stat($node->getUrl());
+        dibi::query("INSERT INTO [ajxp_index]", array(
+            "node_path" => $path,
+            "bytesize"  => $stat["size"],
+            "mtime"     => $stat["mtime"],
+            "md5"       => $node->isLeaf()? md5_file($node->getUrl()):"directory",
+            "repository_identifier" => $repoId)
+        );
     }
 
     public function installSQLTables($param)

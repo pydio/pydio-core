@@ -15,6 +15,7 @@
            </actions>
    		<hooks>
    			<serverCallback hookName="node.change" methodName="updateNodesIndex" defer="true"/>
+   			<serverCallback hookName="node.index" methodName="indexNode"/>
    		</hooks>
     </registry_contributions>
 </meta>
