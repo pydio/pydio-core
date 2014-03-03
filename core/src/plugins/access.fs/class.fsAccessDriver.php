@@ -568,7 +568,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             case "mkfile";
 
                 $messtmp="";
-                $filename=AJXP_Utils::decodeSecureMagic($httpVars["filename"], AJXP_SANITIZE_FILENAME);
+                if(empty($httpVars["filename"]) && isSet($httpVars["node"])){
+                    $filename=AJXP_Utils::decodeSecureMagic($httpVars["node"], AJXP_SANITIZE_FILENAME);
+                }else{
+                    $filename=AJXP_Utils::decodeSecureMagic($httpVars["filename"], AJXP_SANITIZE_FILENAME);
+                }
                 $filename = substr($filename, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
                 $this->filterUserSelectionToHidden(array($filename));
                 $content = "";
