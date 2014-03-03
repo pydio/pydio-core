@@ -1054,6 +1054,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $templateId = substr($repDef["DRIVER"], 14);
                     $templateRepo = ConfService::getRepositoryById($templateId);
                     $newRep = $templateRepo->createTemplateChild($repDef["DISPLAY"], $repDef["DRIVER_OPTIONS"]);
+                    if(isSet($repDef["AJXP_SLUG"])){
+                        $newRep->setSlug($repDef["AJXP_SLUG"]);
+                    }
                 } else {
                     if ($currentUserIsGroupAdmin) {
                         throw new Exception("You are not allowed to create a repository from a driver. Use a template instead.");
