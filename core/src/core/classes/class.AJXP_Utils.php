@@ -122,6 +122,57 @@ class AJXP_Utils
         return (DIRECTORY_SEPARATOR === "\\" ? str_replace("\\", "/", basename($path)): basename($path));
     }
 
+    public static function clearHexaCallback($array){
+        return chr(hexdec($array[1]));
+    }
+
+    /**
+     * Given a string, this function will determine if it potentially an
+     * XSS attack and return boolean.
+     *
+     * @param string $string
+     *  The string to run XSS detection logic on
+     * @return boolean
+     *  True if the given `$string` contains XSS, false otherwise.
+     */
+    public static function detectXSS($string) {
+        $contains_xss = FALSE;
+
+        // Skip any null or non string values
+        if(is_null($string) || !is_string($string)) {
+            return $contains_xss;
+        }
+
+        // Keep a copy of the original string before cleaning up
+        $orig = $string;
+
+        // Set the patterns we'll test against
+        $patterns = array(
+            // Match any attribute starting with "on" or xmlns
+            '#(<[^>]+[\x00-\x20\"\'\/])(on|xmlns)[^>]*>?#iUu',
+
+            // Match javascript:, livescript:, vbscript: and mocha: protocols
+            '!((java|live|vb)script|mocha|feed|data):(\w)*!iUu',
+            '#-moz-binding[\x00-\x20]*:#u',
+
+            // Match style attributes
+            '#(<[^>]+[\x00-\x20\"\'\/])style=[^>]*>?#iUu',
+
+            // Match unneeded tags
+            '#</*(applet|meta|xml|blink|link|style|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base)[^>]*>?#i'
+        );
+
+        foreach($patterns as $pattern) {
+            // Test both the original string and clean string
+            if(preg_match($pattern, $string) || preg_match($pattern, $orig)){
+                $contains_xss = TRUE;
+            }
+            if ($contains_xss === TRUE) return TRUE;
+        }
+
+        return FALSE;
+    }
+
 
     /**
      * Function to clean a string from specific characters
@@ -139,8 +190,19 @@ class AJXP_Utils
         } else if ($level == AJXP_SANITIZE_EMAILCHARS) {
             return preg_replace("/[^a-zA-Z0-9_\-\.@!%\+=|~\?]/", "", $s);
         } else if ($level == AJXP_SANITIZE_FILENAME) {
+            // Convert Hexadecimals
+            $s = preg_replace_callback('!(&#|\\\)[xX]([0-9a-fA-F]+);?!', array('AJXP_Utils', 'clearHexaCallback'), $s);
+            // Clean up entities
+            $s = preg_replace('!(&#0+[0-9]+)!','$1;',$s);
+            // Decode entities
+            $s = html_entity_decode($s, ENT_NOQUOTES, 'UTF-8');
+            // Strip whitespace characters
+            $s = preg_replace('!\s!','',$s);
             $s = str_replace(chr(0), "", $s);
             $s = preg_replace("/[\"\/\|\?\\\]/", "", $s);
+            if(self::detectXSS($s)){
+                $s = "XSS Detected - Rename Me";
+            }
             return $s;
         }
 
