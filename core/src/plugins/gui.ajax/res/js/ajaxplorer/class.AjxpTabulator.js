@@ -366,8 +366,9 @@ Class.create("AjxpTabulator", AjxpPane, {
 			}
 		}.bind(this));
 		if(toShow){
-            if($(toShowElement) && !$(toShowElement).visible()){
+            if($(toShowElement) && (!$(toShowElement).visible() || parseInt($(toShowElement).getStyle("height")) == 0)){
                 if($(toShowElement)) $(toShowElement).show();
+                fitHeightToBottom($(toShowElement), null, this.options.fitMarginBottom);
                 toShow.showElement(true);
             }
             var reFold = false;
@@ -377,7 +378,7 @@ Class.create("AjxpTabulator", AjxpPane, {
                     splitter.unfold();
                 }
             }
-			toShow.resize();
+            toShow.resize();
 		}
         if(this.options.headerToolbarOptions){
             ajaxplorer.actionBar.fireSelectionChange();
@@ -538,6 +539,20 @@ Class.create("AjxpTabulator", AjxpPane, {
                 this.tabsConfigs.get(tabInfo.id)['DATA'] = object.getStateData();
             }
         }.bind(this));
+        // Clean tabsConfigs
+        this.tabsConfigs.each(function(pair){
+            var confPaneInfo = pair.value.PANE;
+            if(confPaneInfo){
+                if(confPaneInfo.editorData) {
+                    confPaneInfo.editorID = confPaneInfo.editorData.id;
+                    delete confPaneInfo['editorData'];
+                }
+                if(confPaneInfo.node){
+                    confPaneInfo.nodePath = confPaneInfo.node.getPath();
+                    delete confPaneInfo['node'];
+                }
+            }
+        });
         this.setUserPreference("tabs_state", this.tabsConfigs);
     },
 
@@ -546,10 +561,14 @@ Class.create("AjxpTabulator", AjxpPane, {
         if(!ajaxplorer || !ajaxplorer.user) return;
         var pref = this.getUserPreference("tabs_state");
         if(pref){
+            var index = 1;
             $H(pref).each(function(pair){
                 if(pair.value.TAB && pair.value.PANE){
                     pair.value.TAB.dontFocus = true;
-                    this.addTab(pair.value.TAB, pair.value.PANE, true);
+                    window.setTimeout(function(){
+                        this.addTab(pair.value.TAB, pair.value.PANE, true);
+                    }.bind(this), index * 2000);
+                    index ++;
                 }
                 if(pair.value.DATA){
                     var object = this.getAjxpObjectByTabId(pair.key);
