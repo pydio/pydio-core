@@ -197,7 +197,7 @@ class AJXP_Utils
             // Decode entities
             $s = html_entity_decode($s, ENT_NOQUOTES, 'UTF-8');
             // Strip whitespace characters
-            $s = preg_replace('!\s!','',$s);
+            $s = trim($s);
             $s = str_replace(chr(0), "", $s);
             $s = preg_replace("/[\"\/\|\?\\\]/", "", $s);
             if(self::detectXSS($s)){
