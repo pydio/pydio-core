@@ -172,9 +172,14 @@ class AJXP_ClientDriver extends AJXP_Plugin
                     }
                 }
 
+                $root = $_SERVER['REQUEST_URI'];
+                if(basename($root) == "dashboard" || basename($root) == "settings" || strpos(basename($root), "ws-") === 0){
+                    $root = dirname($root);
+                }
                 $START_PARAMETERS = array(
                     "BOOTER_URL"=>"index.php?get_action=get_boot_conf",
-                    "MAIN_ELEMENT" => "ajxp_desktop"
+                    "MAIN_ELEMENT" => "ajxp_desktop",
+                    "APPLICATION_ROOT" => $root
                 );
                 if (AuthService::usersEnabled()) {
                     AuthService::preLogUser((isSet($httpVars["remote_session"])?$httpVars["remote_session"]:""));

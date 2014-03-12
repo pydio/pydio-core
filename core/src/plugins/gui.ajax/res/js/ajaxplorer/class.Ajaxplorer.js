@@ -113,7 +113,17 @@ Class.create("Ajaxplorer", {
         });
 
         window.router = new WorkspaceRouter();
-        Backbone.history.start({pushState: true});
+        var appRoot = ajxpBootstrap.parameters.get('APPLICATION_ROOT');
+        if(appRoot && appRoot != "/"){
+            Backbone.history.start({
+                pushState: true,
+                root:appRoot
+            });
+        }else{
+            Backbone.history.start({
+                pushState: true
+            });
+        }
         if(this.user && this.user.getActiveRepository()){
             var repoList = this.user.getRepositoriesList();
             var activeRepo = repoList.get(this.user.getActiveRepository());
