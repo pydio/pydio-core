@@ -374,7 +374,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin
         if (isSet($this->currentIndex)) {
             $index = $this->currentIndex;
         } else {
-            $index =  $this->loadIndex(ConfService::getRepository()->getId());
+            $index =  $this->loadIndex($node->getRepositoryId());
         }
         Zend_Search_Lucene_Analysis_Analyzer::setDefault( new Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum_CaseInsensitive());
 
@@ -412,7 +412,11 @@ class AjxpLuceneIndexer extends AJXP_Plugin
         if (isSet($this->currentIndex)) {
             $index = $this->currentIndex;
         } else {
-               $index =  $this->loadIndex(ConfService::getRepository()->getId());
+            if($oldNode == null){
+                $index =  $this->loadIndex($newNode->getRepositoryId());
+            }else{
+                $index = $this->loadIndex($oldNode->getRepositoryId());
+            }
         }
         $this->setDefaultAnalyzer();
         if ($oldNode != null && $copy == false) {

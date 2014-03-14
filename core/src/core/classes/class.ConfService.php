@@ -1195,7 +1195,12 @@ class ConfService
         }
         $accessType = $repository->getAccessType();
         $pServ = AJXP_PluginsService::getInstance();
-        $plugInstance = $pServ->getPluginByTypeName("access", $accessType);
+        $plugInstanceOrig = $pServ->getPluginByTypeName("access", $accessType);
+        if(!empty($plugInstanceOrig->repository) && $plugInstanceOrig->repository != $repository){
+            $plugInstance = clone $plugInstanceOrig;
+        }else{
+            return $plugInstanceOrig;
+        }
 
         // TRIGGER BEFORE INIT META
         $metaSources = $repository->getOption("META_SOURCES");
@@ -1227,6 +1232,7 @@ class ConfService
         } catch (Exception $e) {
             throw $e;
         }
+        AJXP_PluginsService::deferBuildingRegistry();
         $pServ->setPluginUniqueActiveForType("access", $accessType);
 
         // TRIGGER INIT META
@@ -1251,6 +1257,7 @@ class ConfService
                 $pServ->setPluginActive($split[0], $split[1]);
             }
         }
+        AJXP_PluginsService::flushDeferredRegistryBuilding();
         if (count($this->errors)>0) {
             $e = new AJXP_Exception("Error while loading repository feature : ".implode(",",$this->errors));
             throw $e;

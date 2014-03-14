@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin name="share" label="CONF_MESSAGE[Sharing Features]" description="CONF_MESSAGE[Share Center actions and hooks]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <server_settings>
+        <global_param name="FORK_EVENT_FORWARDING" type="boolean" label="Fork Events Forwarding" description="If you detect performances issues while modifiyng files under deep trees, try activating that one. Please be sure of what you do, this may trigger a whole lot of php processes on the server." default="false"/>
         <global_param name="USE_REWRITE_RULE" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Use web server RewriteEngine mechanism to generate prettier URLs]" label="CONF_MESSAGE[Use Rewrite Rule]" type="boolean" default="false"/>
         <global_param name="HASH_MIN_LENGTH" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Minimum length of the generated hash]" label="CONF_MESSAGE[Hash minimum length]" type="integer" default="6"/>
         <global_param name="FILE_MAX_EXPIRATION" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Maximum share expiration limit for file, 0 = unlimited]" label="CONF_MESSAGE[Maximum file expiration limit]" type="integer" default="0" expose="true"/>
@@ -9,13 +10,7 @@
         <global_param name="CREATE_QRCODE" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Create and display QRCode for shared link]" label="CONF_MESSAGE[Create QRCode]" type="boolean" default="true" expose="true"/>
         <global_param name="ENABLE_FOLDER_SHARING" group="CONF_MESSAGE[Folder Sharing]" description="CONF_MESSAGE[Enable folder sharing (workspace and minisite)]" label="CONF_MESSAGE[Enable folder sharing]" type="boolean" default="true" expose="true"/>
         <global_param name="AVOID_SHARED_FOLDER_SAME_LABEL" group="CONF_MESSAGE[Folder Sharing]" description="CONF_MESSAGE[Disallow users to create shared folders if a workspace already exists with the same label]" label="CONF_MESSAGE[Avoid labels duplication]" type="boolean" default="false"/>
-        <!--
-        <global_param name="SHARED_USERS_LIST_MINIMUM" group="CONF_MESSAGE[Shared users configurations]" description="CONF_MESSAGE[Minimum number of characters to start getting results by auto-completion when sharing a folder with other users]" label="CONF_MESSAGE[Autocomplete minimum chars]" type="integer" default="2" expose="true"/>
-        <global_param name="SHARED_USERS_LIST_LIMIT" group="CONF_MESSAGE[Shared users configurations]" description="CONF_MESSAGE[Limit the number of results returned by the auto-completion feature when sharing a folder with other users]" label="CONF_MESSAGE[Autocompletion results limit]" type="integer" default="50" expose="true"/>
-        -->
         <global_param name="SHARED_USERS_TMP_PREFIX" group="CONF_MESSAGE[Shared users configurations]" description="CONF_MESSAGE[Mandatory prefix for users created temporary users login]" label="CONF_MESSAGE[Tmp users prefix]" type="string" expose="true"/>
-        <global_param name="METADATA_FILE" group="CONF_MESSAGE[Metadata Files]" type="string" label="CONF_MESSAGE[Metadata File]" description="CONF_MESSAGE[Hidden file containing shared metadata]" mandatory="true" default=".ajxp_share_meta"/>
-        <global_param name="METADATA_FILE_LOCATION" group="CONF_MESSAGE[Metadata Files]" type="select" choices="infolders|In Local Folders,global|In Global Folder" label="CONF_MESSAGE[File location]" description="CONF_MESSAGE[Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder.]" mandatory="true" default="infolders"/>
         <global_param name="CUSTOM_SHAREPAGE_TITLE" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Page Title]" description="CONF_MESSAGE[Share page title. Use AJXP_FILENAME keyword to display the file name.]" mandatory="false" default=""/>
         <global_param name="CUSTOM_SHAREPAGE_LEGEND" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Download text]" description="CONF_MESSAGE[Text displayed below the download button. Use AJXP_FILENAME keyword to display the file name, and PYDIO_APP_TITLE for the application title.]" mandatory="false" default=""/>
         <global_param name="CUSTOM_SHAREPAGE_LEGEND_PASS" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Download text w/ Pass]" description="CONF_MESSAGE[Text displayed below the download button when a password is mandatory. Use AJXP_FILENAME keyword to display the file name, and PYDIO_APP_TITLE for the application title.]" mandatory="false" default=""/>
@@ -479,6 +474,11 @@
                     </serverCallback>
                 </processing>
             </action>
+            <action name="forward_change_event">
+                <processing>
+                    <serverCallback methodName="forwardEventToSharesAction"/>
+                </processing>
+            </action>
         </actions>
         <client_configs>
             <component_config className="InfoPanel">
@@ -513,6 +513,9 @@
                 ]]></additional_tab>
             </component_config>
         </client_configs>
+        <hooks>
+            <serverCallback methodName="forwardEventToShares" hookName="node.change" defer="true"/>
+        </hooks>
     </registry_contributions>
     <class_definition filename="plugins/action.share/class.ShareCenter.php" classname="ShareCenter"/>
     <dependencies>

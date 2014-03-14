@@ -540,6 +540,126 @@ class ShareCenter extends AJXP_Plugin
     }
 
     /**
+     * @param AJXP_Node $node
+     * @param String|null $direction "UP", "DOWN"
+     * @return array()
+     */
+    private function findMirrorNodesInShares($node, $direction){
+        $result = array();
+        if($direction !== "UP"){
+            $upmetas = array();
+            $node->collectMetadataInParents("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, false, $upmetas);
+            foreach($upmetas as $metadata){
+                if (is_array($metadata) && !empty($metadata["element"])) {
+                    if(is_string($metadata["element"])){
+                        $wsId = $metadata["element"];
+                        if(isSet($metadata["minisite"])){
+                            $minisiteData = self::loadPublicletData($metadata["element"]);
+                            $wsId = $minisiteData["REPOSITORY"];
+                        }
+                        $sharedNode = $metadata["SOURCE_NODE"];
+                        $sharedPath = substr($node->getPath(), strlen($sharedNode->getPath()));
+                        $sharedNodeUrl = $node->getScheme() . "://".$wsId.$sharedPath;
+                        $result[$wsId] = array(new AJXP_Node($sharedNodeUrl), "DOWN");
+                    }
+                }
+            }
+        }
+        if($direction !== "DOWN"){
+            if($node->getRepository()->hasParent()){
+                $parentRepoId = $node->getRepository()->getParentId();
+                $currentRoot = $node->getRepository()->getOption("PATH");
+                $parentRoot = ConfService::getRepositoryById($parentRepoId)->getOption("PATH");
+                $relative = substr($currentRoot, strlen($parentRoot));
+                $parentNodeURL = $node->getScheme()."://".$parentRepoId.$relative.$node->getPath();
+                $this->logDebug("action.share", "Should trigger on ".$parentNodeURL);
+                $result[$parentRepoId] = array(new AJXP_Node($parentNodeURL), "UP");
+            }
+        }
+        return $result;
+    }
+
+    private function applyForwardEvent($fromMirrors = null, $toMirrors = null, $copy = false, $direction = null){
+        if($fromMirrors === null){
+            // Create
+            foreach($toMirrors as $mirror){
+                list($node, $direction) = $mirror;
+                AJXP_Controller::applyHook("node.change", array(null, $node, false, $direction), true);
+            }
+        }else if($toMirrors === null){
+            foreach($fromMirrors as $mirror){
+                list($node, $direction) = $mirror;
+                AJXP_Controller::applyHook("node.change", array($node, null, false, $direction), true);
+            }
+        }else{
+            foreach($fromMirrors as $repoId => $mirror){
+                list($fNode, $fDirection) = $mirror;
+                if(isSet($toMirrors[$repoId])){
+                    list($tNode, $tDirection) = $toMirrors[$repoId];
+                    unset($toMirrors[$repoId]);
+                    AJXP_Controller::applyHook("node.change", array($fNode, $tNode, $copy, $fDirection), true);
+                }else{
+                    AJXP_Controller::applyHook("node.change", array($fNode, null, $copy, $fDirection), true);
+                }
+            }
+            foreach($toMirrors as $mirror){
+                list($tNode, $tDirection) = $mirror;
+                AJXP_Controller::applyHook("node.change", array(null, $tNode, $copy, $tDirection), true);
+            }
+        }
+
+    }
+
+    /**
+     * @param AJXP_Node $fromNode
+     * @param AJXP_Node $toNode
+     * @param bool $copy
+     * @param String $direction
+     */
+    public function forwardEventToShares($fromNode=null, $toNode=null, $copy = false, $direction=null){
+
+        if(empty($direction) && $this->getFilteredOption("FORK_EVENT_FORWARDING")){
+            AJXP_Controller::applyActionInBackground(
+                ConfService::getRepository()->getId(),
+                "forward_change_event",
+                array(
+                    "from" => $fromNode === null ? "" : $fromNode->getUrl(),
+                    "to" =>   $toNode === null ? "" : $toNode->getUrl(),
+                    "copy" => $copy ? "true" : "false",
+                    "direction" => $direction
+                ));
+            return;
+        }
+
+        $fromMirrors = null;
+        $toMirrors = null;
+        if($fromNode != null){
+            $fromMirrors = $this->findMirrorNodesInShares($fromNode, $direction);
+        }
+        if($toNode != null){
+            $toMirrors = $this->findMirrorNodesInShares($toNode, $direction);
+        }
+
+        $this->applyForwardEvent($fromMirrors, $toMirrors, $copy, $direction);
+
+    }
+
+    public function forwardEventToSharesAction($actionName, $httpVars, $fileVars){
+
+        $fromMirrors = null;
+        $toMirrors = null;
+        if(!empty($httpVars["from"])){
+            $fromMirrors = $this->findMirrorNodesInShares(new AJXP_Node($httpVars["from"]), $httpVars["direction"]);
+        }
+        if(!empty($httpVars["to"])){
+            $toMirrors = $this->findMirrorNodesInShares(new AJXP_Node($httpVars["to"]), $httpVars["direction"]);
+        }
+        $this->applyForwardEvent($fromMirrors, $toMirrors, ($httpVars["copy"] === "true"), $httpVars["direction"]);
+
+    }
+
+
+    /**
      *
      * Hooked to node.change, this will update the index
      * if $oldNode = null => create node $newNode
