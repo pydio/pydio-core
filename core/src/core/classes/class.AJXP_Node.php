@@ -239,6 +239,13 @@ class AJXP_Node
 
     }
 
+    /**
+     * @param String $nameSpace
+     * @param bool $private
+     * @param int $scope
+     * @param bool $indexable
+     * @param array $collect
+     */
     public function collectMetadataInParents($nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false, &$collect=array()){
 
         $parentNode = $this->getParent();
@@ -249,6 +256,33 @@ class AJXP_Node
                 $collect[] = $metadata;
             }
             $parentNode->collectMetadataInParents($nameSpace, $private, $scope, $indexable, $collect);
+        }
+
+    }
+
+    /**
+     * @param array $nameSpaces
+     * @param bool $private
+     * @param int $scope
+     * @param bool $indexable
+     * @param array $collect
+     */
+    public function collectMetadatasInParents($nameSpaces, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false, &$collect=array()){
+
+        $parentNode = $this->getParent();
+        if($parentNode != null){
+            $nodeMeta = array();
+            foreach($nameSpaces as $nameSpace){
+                $metadata = $parentNode->retrieveMetadata($nameSpace, $private, $scope,$indexable);
+                if($metadata != false){
+                    $nodeMeta[$nameSpace] = $metadata;
+                }
+            }
+            if(count($nodeMeta)){
+                $nodeMeta["SOURCE_NODE"] = $parentNode;
+                $collect[] = $nodeMeta;
+            }
+            $parentNode->collectMetadatasInParents($nameSpaces, $private, $scope, $indexable, $collect);
         }
 
     }
