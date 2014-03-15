@@ -2161,12 +2161,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         $logger = AJXP_Logger::getInstance();
         $parts = explode("/", $dir);
         if (count($parts)>4) {
-            $config = '<columns switchDisplayMode="list" switchGridMode="grid" template_name="ajxp_conf.logs">
-                <column messageId="ajxp_conf.17" attributeName="date" sortType="MyDate" defaultWidth="10%"/>
-                <column messageId="ajxp_conf.18" attributeName="ip" sortType="String" defaultWidth="10%"/>
+            $config = '<columns switchDisplayMode="list" switchGridMode="list" template_name="ajxp_conf.logs">
+                <column messageId="ajxp_conf.17" attributeName="date" sortType="MyDate" defaultWidth="18%"/>
+                <column messageId="ajxp_conf.18" attributeName="ip" sortType="String" defaultWidth="5%"/>
                 <column messageId="ajxp_conf.19" attributeName="level" sortType="String" defaultWidth="10%"/>
-                <column messageId="ajxp_conf.20" attributeName="user" sortType="String" defaultWidth="10%"/>
-                <column messageId="ajxp_conf.21" attributeName="action" sortType="String" defaultWidth="10%"/>
+                <column messageId="ajxp_conf.20" attributeName="user" sortType="String" defaultWidth="5%"/>
+                <column messageId="ajxp_conf.124" attributeName="source" sortType="String" defaultWidth="5%"/>
+                <column messageId="ajxp_conf.21" attributeName="action" sortType="String" defaultWidth="7%"/>
                 <column messageId="ajxp_conf.22" attributeName="params" sortType="String" defaultWidth="50%"/>
             </columns>';
             if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig($config);

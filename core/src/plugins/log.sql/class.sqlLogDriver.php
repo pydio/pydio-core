@@ -98,7 +98,7 @@ class sqlLogDriver extends AbstractLogDriver
      *
      * @return String Formatted XML node for insertion into the log reader
      */
-    public function formatXmlLogItem($node, $icon, $dateattrib, $filename, $remote_ip, $log_level, $user, $action, $params, $rootPath = "/logs")
+    public function formatXmlLogItem($node, $icon, $dateattrib, $filename, $remote_ip, $log_level, $user, $source, $action, $params, $rootPath = "/logs")
     {
         $remote_ip = $this->inet_dtop($remote_ip);
         $log_unixtime = strtotime($dateattrib);
@@ -110,8 +110,9 @@ class sqlLogDriver extends AbstractLogDriver
         // Some actions or parameters can contain characters that need to be encoded, especially when a piece of code raises a notification or error.
         $action = AJXP_Utils::xmlEntities($action);
         $params = AJXP_Utils::xmlEntities($params);
+        $source = AJXP_Utils::xmlEntities($source);
 
-        return "<$node icon=\"{$icon}\" date=\"{$log_datetime}\" ajxp_modiftime=\"{$log_unixtime}\" is_file=\"true\" filename=\"{$rootPath}/{$log_year}/{$log_month}/{$log_date}/{$log_datetime}\" ajxp_mime=\"log\" ip=\"{$remote_ip}\" level=\"{$log_level}\" user=\"{$user}\" action=\"{$action}\" params=\"{$params}\"/>";
+        return "<$node icon=\"{$icon}\" date=\"{$log_datetime}\" ajxp_modiftime=\"{$log_unixtime}\" is_file=\"true\" filename=\"{$rootPath}/{$log_year}/{$log_month}/{$log_date}/{$log_datetime}\" ajxp_mime=\"log\" ip=\"{$remote_ip}\" level=\"{$log_level}\" user=\"{$user}\" action=\"{$action}\" source=\"{$source}\" params=\"{$params}\"/>";
     }
 
     /**
@@ -128,12 +129,13 @@ class sqlLogDriver extends AbstractLogDriver
     public function write2($level, $ip, $user, $source, $prefix, $message)
     {
         $log_row = Array(
-            'logdate' => new DateTime('NOW'),
+            'logdate'   => new DateTime('NOW'),
             'remote_ip' => $this->inet_ptod($ip),
-            'severity' => strtoupper((string) $level),
-            'user' => $user,
-            'message' => $source,
-            'params' => $prefix."\t".$message
+            'severity'  => strtoupper((string) $level),
+            'user'      => $user,
+            'source'    => $source,
+            'message'   => $prefix,
+            'params'    => $message
         );
         //we already handle exception for write2 in core.log
         dibi::query('INSERT INTO [ajxp_log]', $log_row);
@@ -277,6 +279,7 @@ class sqlLogDriver extends AbstractLogDriver
                     $r['remote_ip'],
                     $r['severity'],
                     $r['user'],
+                    $r['source'],
                     $r['message'],
                     $r['params'],
                     $rootPath));
