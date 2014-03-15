@@ -68,6 +68,12 @@ class AjxpMailer extends AJXP_Plugin
         $append = ConfService::getCoreConf("SUBJECT_APPEND", "mailer");
         $layoutFolder = ConfService::getCoreConf("LAYOUT_FOLDER", "mailer");
         $layout = ConfService::getCoreConf("BODY_LAYOUT", "mailer");
+        $forceFrom = ConfService::getCoreConf("FORCE_UNIQUE_FROM", "mailer");
+        $coreFrom = ConfService::getCoreConf("FROM", "mailer");
+        if($forceFrom && $from != null){
+            $coreFromName = ConfService::getCoreConf("FROM_NAME", "mailer");
+            $from = array("adress" => $coreFrom, "name" => $coreFromName);
+        }
         $images = array();
         if(!empty($prepend)) $subject = $prepend ." ". $subject;
         if(!empty($append)) $subject .= " ".$append;

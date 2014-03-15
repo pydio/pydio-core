@@ -5,6 +5,7 @@
         <global_param name="UNIQUE_MAILER_INSTANCE" type="plugin_instance:mailer" label="CONF_MESSAGE[Mailer Plugin]" description="CONF_MESSAGE[Select the plugin to activate for concretely sending emails]" mandatory="true" default="mailer.phpmailer-lite"/>
         <global_param name="FROM" type="string" label="CONF_MESSAGE[Sender email]" description="CONF_MESSAGE[Adress of the sender]" mandatory="true" default=""/>
         <global_param name="FROM_NAME" type="string" label="CONF_MESSAGE[Sender name]" description="CONF_MESSAGE[Name of the sender]" mandatory="true" default=""/>
+        <global_param name="FORCE_UNIQUE_FROM" type="boolean" label="CONF_MESSAGE[Unique Sender]" description="CONF_MESSAGE[Force all mails to be sent by this Sender email, instead of users adresses]" mandatory="true" default="false"/>
         <global_param name="SUBJECT_PREPEND" label="CONF_MESSAGE[Subject Prepend]" description="CONF_MESSAGE[String automatically added at the beginning of the mail subject]" type="string" mandatory="false" default=""/>
         <global_param name="SUBJECT_APPEND" label="CONF_MESSAGE[Subject Append]" description="CONF_MESSAGE[String automatically added at the end of the mail subject]" type="string" mandatory="false" default=""/>
         <global_param name="BODY_LAYOUT" label="CONF_MESSAGE[Body Layout]" description="CONF_MESSAGE[Main Layout for the email body, use HTML for send nice emails, and use the AJXP_MAIL_BODY keyword for the real content.]" type="textarea" mandatory="false" default="AJXP_MAIL_BODY"/>
