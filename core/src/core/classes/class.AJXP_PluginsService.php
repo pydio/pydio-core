@@ -464,6 +464,19 @@ class AJXP_PluginsService
             $this->buildXmlRegistry(($this->registryVersion == "extended"));
         }
     }
+
+    public static function deferBuildingRegistry(){
+        self::getInstance()->tmpDeferRegistryBuild = true;
+    }
+
+    public static function flushDeferredRegistryBuilding(){
+        $t = self::getInstance();
+        $t->tmpDeferRegistryBuild = false;
+        if (isSet($t->xmlRegistry)) {
+            $t->buildXmlRegistry(($t->registryVersion == "extended"));
+        }
+    }
+
     /**
      * Some type require only one active plugin at a time
      * @param $type
@@ -474,11 +487,12 @@ class AJXP_PluginsService
     public function setPluginUniqueActiveForType($type, $name, $updateInstance = null)
     {
         $typePlugs = $this->getPluginsByType($type);
+        $originalValue = $this->tmpDeferRegistryBuild;
         $this->tmpDeferRegistryBuild = true;
         foreach ($typePlugs as $plugName => $plugObject) {
             $this->setPluginActiveInst($type, $plugName, false);
         }
-        $this->tmpDeferRegistryBuild = false;
+        $this->tmpDeferRegistryBuild = $originalValue;
         $this->setPluginActiveInst($type, $name, true, $updateInstance);
     }
     /**
