@@ -92,6 +92,14 @@ Class.create("Ajaxplorer", {
             document.fire('ajaxplorer:loaded');
         }, 200);
 
+        this.initRouter();
+
+	},
+
+    initRouter : function(){
+
+        if(!window.Backbone || !window.Backbone.Router) return;
+
         var WorkspaceRouter = Backbone.Router.extend({
             routes: {
                 ":workspace":"switchToWorkspace"
@@ -112,7 +120,7 @@ Class.create("Ajaxplorer", {
 
         });
 
-        window.router = new WorkspaceRouter();
+        this.router = new WorkspaceRouter();
         var appRoot = ajxpBootstrap.parameters.get('APPLICATION_ROOT');
         if(appRoot && appRoot != "/"){
             Backbone.history.start({
@@ -131,20 +139,20 @@ Class.create("Ajaxplorer", {
             if(!activeRepo.getAccessType().startsWith("ajxp_")){
                 slug = "ws-" + slug;
             }
-            window.router.navigate(slug);
+            this.router.navigate(slug);
         }
         var navigate = function(repList, repId){
             if(repId === false){
-                window.router.navigate("/");
+                this.router.navigate("/");
             }else{
                 var repositoryObject = repList.get(repId);
                 var slug = repositoryObject.getSlug();
                 if(!repositoryObject.getAccessType().startsWith("ajxp_")){
                     slug = "ws-" + slug;
                 }
-                window.router.navigate(slug);
+                this.router.navigate(slug);
             }
-        };
+        }.bind(this);
 
         if(this.user){
             navigate(this.user.getRepositoriesList(), this.user.getActiveRepository());
@@ -155,7 +163,8 @@ Class.create("Ajaxplorer", {
             navigate(repList, repId);
         });
 
-	},
+    },
+
 	/**
 	 * Loads the XML Registry, an image of the application in its current state
 	 * sent by the server.
@@ -421,14 +430,16 @@ Class.create("Ajaxplorer", {
 		}
 		this.templatePartsToRestore = futurePartsToRestore;
 	},
-	
-	/**
-	 * Applies a template_part by removing existing components at this location
-	 * and recreating new ones.
-	 * @param ajxpId String The id of the DOM anchor
-	 * @param ajxpClass IAjxpWidget A widget class
-	 * @param ajxpOptions Object A set of options that may have been decoded from json.
-	 */
+
+    /**
+     * Applies a template_part by removing existing components at this location
+     * and recreating new ones.
+     * @param ajxpId String The id of the DOM anchor
+     * @param ajxpClass IAjxpWidget A widget class
+     * @param ajxpClassName
+     * @param ajxpOptionsString
+     * @param cdataContent
+     */
 	refreshGuiComponent:function(ajxpId, ajxpClass, ajxpClassName, ajxpOptionsString, cdataContent){
 		if(!window[ajxpId]) return;
 		// First destroy current component, unregister actions, etc.			

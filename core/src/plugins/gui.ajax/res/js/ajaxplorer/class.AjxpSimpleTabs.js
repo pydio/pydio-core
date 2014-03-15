@@ -81,6 +81,7 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
         this.panes.insert(pane);
         if(this.fitHeight) fitHeightToBottom(pane, this.panes);
         pane.setStyle({overflowY:"auto"});
+        attachMobileScroll(pane, "vertical");
         tab.setSelected = function(){
             this.panes.childElements("div.tabPane").invoke("hide");
             tab.tabPANE.show();

@@ -718,7 +718,7 @@ Class.create("FilesList", SelectableElements, {
                         oThis.fill(oThis.crtContext);
                     });
                     this.getCurrentContextNode().reload();
-				}.bind(this), this.columnsDef, this.paginationData.get('currentOrderCol')||-1, this.paginationData.get('currentOrderDir') );
+				}.bind(this), this.getVisibleColumns(), this.paginationData.get('currentOrderCol')||-1, this.paginationData.get('currentOrderDir') );
 			}
 			this.disableTextSelection(this.htmlElement.down('div.sort-table'), true);
 			this.disableTextSelection(contentContainer, true);
