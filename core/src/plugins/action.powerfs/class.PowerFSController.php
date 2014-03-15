@@ -148,7 +148,7 @@ class PowerFSController extends AJXP_Plugin
                     }
                 }
                 $cmdSeparator = ((PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows")? "&" : ";");
-                $archiveName = $httpVars["archive_name"];
+                $archiveName = SystemTextEncoding::fromUTF8($httpVars["archive_name"]);
                 if (!$compressLocally) {
                     $archiveName = AJXP_Utils::getAjxpTmpDir()."/".$httpVars["ope_id"]."_".$archiveName;
                 }
@@ -156,7 +156,7 @@ class PowerFSController extends AJXP_Plugin
                 $cmd = $this->getFilteredOption("ZIP_PATH")." -r ".escapeshellarg($archiveName)." ".implode(" ", $args);
                 $fsDriver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
                 $c = $fsDriver->getConfigs();
-                if (!isSet($c["SHOW_HIDDEN_FILES"]) || $c["SHOW_HIDDEN_FILES"] == false) {
+                if ((!isSet($c["SHOW_HIDDEN_FILES"]) || $c["SHOW_HIDDEN_FILES"] == false) && stripos(PHP_OS, "win") === false) {
                     $cmd .= " -x .\*";
                 }
                 $cmd .= " ".$cmdSeparator." echo ZIP_FINISHED";
