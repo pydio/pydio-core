@@ -37,6 +37,9 @@ Class.create("PluginEditor", AbstractEditor, {
         var infoPane = this.element.down("#pane-infos");
         var docPane = this.element.down("#pane-docs");
         var oElement = this.element;
+        if(editorOptions.context.__className == 'Modal') {
+            oElement = null;
+        }
         infoPane.setStyle({position:"relative"});
         infoPane.resizeOnShow = function(tab){
             fitHeightToBottom(infoPane, oElement, Prototype.Browser.IE ? 40 : 0);
