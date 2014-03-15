@@ -437,6 +437,7 @@ class MetaWatchRegister extends AJXP_Plugin
         foreach($all["ancestors"] as $pair){
             $parentNotification = new AJXP_Notification();
             $parentNotification->setNode($pair["node"]);
+            $parentNotification->getNode()->setLeaf(false);
             if($parentActionType == null){
                 $parentNotification->setAction($notification->getAction());
             }else{
