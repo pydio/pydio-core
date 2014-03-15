@@ -82,7 +82,7 @@ Class.create("FilesList", SelectableElements, {
         this.__currentInstanceIndex = FilesList.staticIndex;
 
         var userLoggedObserver = function(){
-			if(!ajaxplorer || !ajaxplorer.user) return;
+			if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return;
 			disp = ajaxplorer.user.getPreference("display");
 			if(disp && (disp == 'thumb' || disp == 'list' || disp == 'detail')){
 				if(disp != this._displayMode) this.switchDisplayMode(disp);
@@ -124,6 +124,7 @@ Class.create("FilesList", SelectableElements, {
 
 		}.bind(this);
         var componentConfigObserver = function(event){
+            if(!this.htmlElement) return;
 			if(event.memo.className == "FilesList"){
 				var refresh = this.parseComponentConfig(event.memo.classConfig.get('all'));
 				if(refresh){
@@ -878,7 +879,7 @@ Class.create("FilesList", SelectableElements, {
             this.stopObserving("resize", this.observer);
             this.scrollSizeObserver = function(){
                 window.setTimeout(function(){
-                    if(!this.htmlElement || !this.scrollbar) return;
+                    if(!this.htmlElement || !this.scrollbar || !contentContainer) return;
                     if(this._displayMode == "list"){
                         fitHeightToBottom(contentContainer, this.htmlElement);
                         if(Prototype.Browser.IE){
