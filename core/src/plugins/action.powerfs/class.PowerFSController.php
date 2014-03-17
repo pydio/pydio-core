@@ -107,6 +107,7 @@ class PowerFSController extends AJXP_Plugin
             case "compress" :
             case "precompress" :
 
+                $archiveName = AJXP_Utils::sanitize(AJXP_Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
                 if (!ConfService::currentContextIsCommandLine() && ConfService::backgroundActionsSupported()) {
                     $opeId = substr(md5(time()),0,10);
                     $httpVars["ope_id"] = $opeId;
@@ -114,7 +115,7 @@ class PowerFSController extends AJXP_Plugin
                     AJXP_XMLWriter::header();
                     $bgParameters = array(
                         "dir" => $dir,
-                        "archive_name"  => $httpVars["archive_name"],
+                        "archive_name"  => $archiveName,
                         "on_end" => (isSet($httpVars["on_end"])?$httpVars["on_end"]:"reload"),
                         "ope_id" => $opeId
                     );
@@ -148,7 +149,7 @@ class PowerFSController extends AJXP_Plugin
                     }
                 }
                 $cmdSeparator = ((PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows")? "&" : ";");
-                $archiveName = SystemTextEncoding::fromUTF8($httpVars["archive_name"]);
+                //$archiveName = SystemTextEncoding::fromUTF8($httpVars["archive_name"]);
                 if (!$compressLocally) {
                     $archiveName = AJXP_Utils::getAjxpTmpDir()."/".$httpVars["ope_id"]."_".$archiveName;
                 }
