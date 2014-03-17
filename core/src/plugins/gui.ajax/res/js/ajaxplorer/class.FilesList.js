@@ -879,8 +879,8 @@ Class.create("FilesList", SelectableElements, {
             this.stopObserving("resize", this.observer);
             this.scrollSizeObserver = function(){
                 window.setTimeout(function(){
-                    if(!this.htmlElement || !this.scrollbar || !contentContainer) return;
-                    if(this._displayMode == "list"){
+                    if(!this.htmlElement || !this.scrollbar) return;
+                    if(this._displayMode == "list" && contentContainer){
                         fitHeightToBottom(contentContainer, this.htmlElement);
                         if(Prototype.Browser.IE){
                             this._headerResizer.resize(contentContainer.getWidth());
