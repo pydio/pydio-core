@@ -1195,12 +1195,7 @@ class ConfService
         }
         $accessType = $repository->getAccessType();
         $pServ = AJXP_PluginsService::getInstance();
-        $plugInstanceOrig = $pServ->getPluginByTypeName("access", $accessType);
-        if(!empty($plugInstanceOrig->repository) && $plugInstanceOrig->repository != $repository){
-            $plugInstance = clone $plugInstanceOrig;
-        }else{
-            return $plugInstanceOrig;
-        }
+        $plugInstance = $pServ->getPluginByTypeName("access", $accessType);
 
         // TRIGGER BEFORE INIT META
         $metaSources = $repository->getOption("META_SOURCES");

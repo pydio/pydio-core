@@ -641,7 +641,18 @@ class ShareCenter extends AJXP_Plugin
         }
 
         $this->applyForwardEvent($fromMirrors, $toMirrors, $copy, $direction);
-
+        if(count($fromMirrors) || count($toMirrors)){
+            // Make sure to switch back to correct repository in memory
+            if($fromNode != null) {
+                $fromNode->getRepository()->driverInstance = null;
+                $fromNode->setDriver(null);
+                $fromNode->getDriver();
+            }else if($toNode != null){
+                $toNode->getRepository()->driverInstance = null;
+                $toNode->setDriver(null);
+                $toNode->getDriver();
+            }
+        }
     }
 
     public function forwardEventToSharesAction($actionName, $httpVars, $fileVars){
@@ -649,13 +660,26 @@ class ShareCenter extends AJXP_Plugin
         $fromMirrors = null;
         $toMirrors = null;
         if(!empty($httpVars["from"])){
-            $fromMirrors = $this->findMirrorNodesInShares(new AJXP_Node($httpVars["from"]), $httpVars["direction"]);
+            $fromNode = new AJXP_Node($httpVars["from"]);
+            $fromMirrors = $this->findMirrorNodesInShares($fromNode, $httpVars["direction"]);
         }
         if(!empty($httpVars["to"])){
-            $toMirrors = $this->findMirrorNodesInShares(new AJXP_Node($httpVars["to"]), $httpVars["direction"]);
+            $toNode = new AJXP_Node($httpVars["to"]);
+            $toMirrors = $this->findMirrorNodesInShares($toNode, $httpVars["direction"]);
         }
         $this->applyForwardEvent($fromMirrors, $toMirrors, ($httpVars["copy"] === "true"), $httpVars["direction"]);
-
+        if(count($fromMirrors) || count($toMirrors)){
+            // Make sure to switch back to correct repository in memory
+            if($fromNode != null) {
+                $fromNode->getRepository()->driverInstance = null;
+                $fromNode->setDriver(null);
+                $fromNode->getDriver();
+            }else if($toNode != null){
+                $toNode->getRepository()->driverInstance = null;
+                $toNode->setDriver(null);
+                $toNode->getDriver();
+            }
+        }
     }
 
 
