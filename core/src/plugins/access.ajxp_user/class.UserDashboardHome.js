@@ -78,8 +78,10 @@ Class.create("UserDashboardHome", AjxpPane, {
             };
             repoEl.observe("click", select);
             attachMobilTouchForClick(repoEl, select);
+            disableTextSelection(repoEl);
             repoEl.observe("dblclick", function(e){
                 select(e);
+                Event.findElement(e, "li").setOpacity(0.7);
                 switchToRepo(repoId);
             });
         });
