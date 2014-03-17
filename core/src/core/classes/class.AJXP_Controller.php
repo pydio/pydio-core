@@ -336,7 +336,15 @@ class AJXP_Controller
         }
         foreach ($parameters as $key=>$value) {
             if($key == "action" || $key == "get_action") continue;
-            $cmd .= " --$key=".escapeshellarg($value);
+            if(is_array($value)){
+                $index = 0;
+                foreach($value as $v){
+                    $cmd .= " --file_".$index."=".escapeshellarg($v);
+                    $index++;
+                }
+            }else{
+                $cmd .= " --$key=".escapeshellarg($value);
+            }
         }
 
         return self::runCommandInBackground($cmd, $logFile);
