@@ -74,7 +74,7 @@ class AbstractAuthDriver extends AJXP_Plugin
                        $passId = -1;
                        if (isSet($httpVars["tmp_repository_id"])) {
                            $passId = $httpVars["tmp_repository_id"];
-                       } else if ($force != "" && $loggedUser->canSwitchTo($force) && !isSet($httpVars["tmp_repository_id"])) {
+                       } else if ($force != "" && $loggedUser->canSwitchTo($force) && !isSet($httpVars["tmp_repository_id"]) && !isSet($_SESSION["PENDING_REPOSITORY_ID"])) {
                            $passId = $force;
                        }
                        $res = ConfService::switchUserToActiveRepository($loggedUser, $passId);
