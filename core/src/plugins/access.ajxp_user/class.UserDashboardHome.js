@@ -60,11 +60,9 @@ Class.create("UserDashboardHome", AjxpPane, {
             ajaxplorer.triggerRepositoryChange(repoId);
         };
 
-        ajaxplorer.user.repositories.each(function(pair){
-            var repoId = pair.key;
-            var repoObject = pair.value;
-            if(repoObject.getAccessType() == 'ajxp_user') return;
+        var renderElement = function(repoObject){
 
+            var repoId = repoObject.getId();
             var repoEl = new Element('li').update("<h3>"+repoObject.getLabel() + "</h3><h4>" + repoObject.getDescription()+"</h4>");
             wsElement.insert(repoEl);
             var select = function(e){
@@ -84,7 +82,29 @@ Class.create("UserDashboardHome", AjxpPane, {
                 Event.findElement(e, "li").setOpacity(0.7);
                 switchToRepo(repoId);
             });
+
+        };
+
+        var myWS = ajaxplorer.user.repositories.filter(function(pair){
+            return (pair.value.owner === '' && pair.value.getAccessType() != 'ajxp_user');
+        }).sortBy(function(pair){
+            return (pair.value.getLabel());
         });
+        var sharedWS = ajaxplorer.user.repositories.filter(function(pair){
+            return (pair.value.owner !== '' && pair.value.getAccessType() != 'ajxp_user');
+        }).sortBy(function(pair){
+            return (pair.value.getLabel());
+        });
+
+        if(myWS.size()){
+            wsElement.insert(new Element('li', {className:'ws_selector_title'}).update("<h3>"+MessageHash[468]+"</h3>"));
+            myWS.each(function(pair){renderElement(pair.value);});
+        }
+
+        if(sharedWS.size()){
+            wsElement.insert(new Element('li', {className:'ws_selector_title'}).update("<h3>"+MessageHash[469]+"</h3>"));
+            sharedWS.each(function(pair){renderElement(pair.value);});
+        }
 
         oFormObject.down('#go_to_ws').observe("click", function(e){
             var target = e.target;

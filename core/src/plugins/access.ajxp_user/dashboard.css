@@ -72,8 +72,22 @@
     padding: 1px 7px;
 }
 
+#workspaces_list li.ws_selector_title{
+    cursor: default;
+}
+
 #workspaces_list li:hover {
     background-color: #4F6275;
+}
+
+#workspaces_list li.ws_selector_title:hover {
+    background-color: transparent;
+}
+
+#workspaces_list li.ws_selector_title h3{
+    color: rgba(227, 93, 82, 1) !important;
+    font-size: 23px;
+    padding: 20px 10px;
 }
 
 #workspaces_list li.selected{
