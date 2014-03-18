@@ -16,8 +16,9 @@
                 background-image: url('plugins/gui.ajax/res/themes/vision/images/grid_t.png');
             }
             h1 {
-                font-size: 33px;
-                color: #BBB;
+                font-size: 30px;
+                font-weight: normal;
+                color: #555;
                 height: 20px;
                 text-align: center;
                 margin: 20px auto;
@@ -26,17 +27,12 @@
             div.mainContainer{
                 position: relative;
                 display: block;
-                -webkit-border-radius: 10px;
-                -moz-border-radius: 10px;
-                border-radius: 10px;
-                background-color: #EEF3F7;
-                -webkit-box-shadow: 1px 1px 64px rgba(0,0,0,0.25);
-                -moz-box-shadow: 1px 1px 64px rgba(0,0,0,0.25);
-                box-shadow: 1px 1px 64px rgba(0,0,0,0.25);
-                margin: 40px auto;
+                border-radius: 4px;
+                margin: 36px auto;
                 width: 500px;
                 height: 80%;
-                padding: 18px;
+                padding: 7px 11px;
+                color: #535353;
             }
 
             p.status{
@@ -45,10 +41,10 @@
                 line-height: 20px;
                 text-align: justify;
                 height: 60px;
+                padding: 0 5px;
             }
             p.status a{
-                font-weight: bold;
-                color: #666;
+                color: #535353;
             }
             p.status strong{
                 font-weight: normal;
@@ -61,11 +57,9 @@
                 margin: 0 auto;
                 height: 331px;
                 overflow-y: scroll;
-                border: 1px solid #DDD;
-                -moz-box-shadow: inset 1px 1px 9px #ddd;
-                -webkit-box-shadow: inset 1px 1px 9px #ddd;
-                box-shadow: inset 1px 1px 9px #ddd;
                 background-color: #ffffff;
+                border-radius: 3px;
+                box-shadow: inset 1px 1px 3px rgba(0,0,0,0.5);
             }
 
             div.testLine {
@@ -185,7 +179,7 @@
                     }
                 });
                 var resize = function(){
-                    var h1 = document.viewport.getHeight() - 160 ;
+                    var h1 = document.viewport.getHeight() - 120 ;
                     var h = h1 - 80;
                     $$("div.mainContainer")[0].setStyle({height:h1+'px'});
                     $$("div.testList")[0].setStyle({height:h + 'px'});
