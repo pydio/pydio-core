@@ -75,7 +75,7 @@
             <action name="send-selection-to-cart">
                 <gui src="" text="action.cart.1" title="action.cart.2" iconClass="icon-suitcase">
                     <context dir="true" recycle="true" selection="true" actionBar="false" contextMenu="true" actionBarGroup="change"/>
-                    <selectionContext dir="true" file="true" recycle="false" unique="false"  evalMetadata="!(metadata.get('ajxp_mime').startsWith('shared_'))"/>
+                    <selectionContext dir="true" file="true" recycle="false" unique="false"  evalMetadata="!metadata.get('ajxp_mime') || !metadata.get('ajxp_mime').startsWith('shared_')"/>
                 </gui>
                 <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="false"/>
                 <processing>
