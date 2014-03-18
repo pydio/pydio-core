@@ -87,7 +87,7 @@
                         actionBar="true" contextMenu="true" infoPanel="true"
                         actionBarGroup="get">
                     </context>
-                    <selectionContext dir="true" file="true" recycle="false" unique="true"></selectionContext></gui>
+                    <selectionContext dir="true" evalMetadata="!(metadata.get('ajxp_mime').startsWith('shared_'))" file="true" recycle="false" unique="true"></selectionContext></gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
