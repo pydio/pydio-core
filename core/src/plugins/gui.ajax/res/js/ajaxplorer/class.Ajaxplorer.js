@@ -562,6 +562,7 @@ Class.create("Ajaxplorer", {
 		if(this.repositoryId != null && this.repositoryId == repository.getId()){
 			//return;
 		}
+        this._contextHolder.setSelectedNodes([]);
 		
 		repository.loadResources();
 		var repositoryId = repository.getId();		
