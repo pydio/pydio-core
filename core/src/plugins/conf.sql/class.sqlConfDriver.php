@@ -555,15 +555,14 @@ class sqlConfDriver extends AbstractConfDriver
     public function deleteGroup($groupPath)
     {
         // Delete users of this group, as well as subgroups
-        $ids = array();
-        $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %like~ ORDER BY [login] ASC", $groupPath);
+        $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %like~ OR [groupPath] = %s ORDER BY [login] ASC", $groupPath."/", $groupPath);
         $rows = $res->fetchAll();
         $subUsers = array();
         foreach ($rows as $row) {
             $this->deleteUser($row["login"], $subUsers);
             dibi::query("DELETE FROM [ajxp_users] WHERE [login] = %s", $row["login"]);
         }
-        dibi::query("DELETE FROM [ajxp_groups] WHERE [groupPath] LIKE %like~", $groupPath);
+        dibi::query("DELETE FROM [ajxp_groups] WHERE [groupPath] LIKE %like~ OR [groupPath] = %s", $groupPath."/", $groupPath);
         dibi::query('DELETE FROM [ajxp_roles] WHERE [role_id] = %s', 'AJXP_GRP_'.$groupPath);
     }
 
