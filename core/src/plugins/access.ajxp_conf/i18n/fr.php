@@ -144,5 +144,7 @@ $mess=array(
 "121" => "Get professional support for your install",
 "122" => "Paramètres",
 "123" => "Autres extensions",
+"124" => "Group créé avec succès",
+"125" => "Group supprimé avec succès"
 /* END SENTENCE */
 );
