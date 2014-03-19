@@ -112,4 +112,11 @@ $mess=array(
                                 <li>Share as a public minisite</li>
             </ul>",
     "65"=> "Discover more on the Pydio channel!",
+    "66"=>"<h2>Using Pydio on iOS device</h2>
+                            This video explains how to use the Pydio application (available on the App Store). Process is quite similar on Android as well.
+<ul><li>Setup the server connection</li>
+<li>Navigating through the files</li>
+<li>Keeping files offline and interacting with external applications</li>
+<li>Protecting the app with a PIN-code</li>
+<li>Using bookmarks and search engine</li></ul>",
 );
