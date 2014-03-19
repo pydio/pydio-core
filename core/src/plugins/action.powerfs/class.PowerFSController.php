@@ -139,7 +139,7 @@ class PowerFSController extends AJXP_Plugin
                 $replaceReplace = array("", "/");
                 foreach ($selection->getFiles() as $selectionFile) {
                     $baseFile = $selectionFile;
-                    $args[] = '"'.substr($selectionFile, strlen($dir)+($dir=="/"?0:1)).'"';
+                    $args[] = escapeshellarg(substr($selectionFile, strlen($dir)+($dir=="/"?0:1)));
                     $selectionFile = fsAccessWrapper::getRealFSReference($urlBase.$selectionFile);
                     $todo[] = ltrim(str_replace($replaceSearch, $replaceReplace, $selectionFile), "/");
                     if (is_dir($selectionFile)) {
@@ -150,7 +150,7 @@ class PowerFSController extends AJXP_Plugin
                     }
                     if(trim($baseFile, "/") == ""){
                         // ROOT IS SELECTED, FIX IT
-                        $args = array(basename($rootDir));
+                        $args = array(escapeshellarg(basename($rootDir)));
                         $rootDir = dirname($rootDir);
                         break;
                     }
