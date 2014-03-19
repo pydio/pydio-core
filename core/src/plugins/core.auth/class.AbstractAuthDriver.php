@@ -20,6 +20,9 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+define('AJXP_FILTER_EMPTY', 'AJXP_FILTER_EMPTY');
+define('AJXP_FILTER_NOT_EMPTY', 'AJXP_FILTER_NOT_EMPTY');
+
 /**
  * @package AjaXplorer_Plugins
  * @subpackage Core
@@ -234,7 +237,7 @@ class AbstractAuthDriver extends AJXP_Plugin
     {
         return $this->listUsers($baseGroup);
     }
-    public function getUsersCount($baseGroup = "/", $regexp = "")
+    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null)
     {
         return -1;
     }

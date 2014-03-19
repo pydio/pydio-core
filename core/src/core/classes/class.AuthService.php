@@ -921,10 +921,10 @@ class AuthService
         return $authDriver->supportsUsersPagination();
     }
 
-    public static function authCountUsers($baseGroup="/", $regexp="")
+    public static function authCountUsers($baseGroup="/", $regexp="", $filterProperty = null, $filterValue = null)
     {
         $authDriver = ConfService::getAuthDriverImpl();
-        return $authDriver->getUsersCount($baseGroup, $regexp);
+        return $authDriver->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue);
     }
 
     public static function getAuthScheme($userName)

@@ -344,7 +344,7 @@ class ldapAuthDriver extends AbstractAuthDriver
         }
         return $persons;
     }
-    public function getUsersCount($baseGroup = "/", $regexp = "")
+    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null)
     {
         if ($this->hasGroupsMapping !== false) {
             if ($baseGroup == "/") {
