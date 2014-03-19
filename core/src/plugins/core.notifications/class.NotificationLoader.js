@@ -108,7 +108,9 @@ Class.create("NotificationLoader", {
                 }
                 alerts = true;
             }
-            var block = '<div class="notif_event_label">'+el.getLabel()+'</div>';
+            var elLabel = el.getLabel();
+            if(!elLabel) elLabel = "/";
+            var block = '<div class="notif_event_label">'+elLabel+'</div>';
             var detail = '';
             if(el.getMetadata().get('event_repository_label')){
                 detail += '<div class="notif_event_repository">'+ el.getMetadata().get('event_repository_label') + '</div>';
@@ -149,7 +151,7 @@ Class.create("NotificationLoader", {
                 });
                 if(this.lastAlertID && alertID > this.lastAlertID ){
                     newNotifs.push({
-                        title:el.getLabel(),
+                        title:elLabel,
                         body :detail.stripTags()
                     });
                 }
@@ -158,7 +160,7 @@ Class.create("NotificationLoader", {
                 var eventID = parseInt(el.getMetadata().get("event_id"));
                 if(this.lastEventID && eventID > this.lastEventID ){
                     newNotifs.push({
-                        title:el.getLabel(),
+                        title:elLabel,
                         body :detail.stripTags()
                     });
                 }
