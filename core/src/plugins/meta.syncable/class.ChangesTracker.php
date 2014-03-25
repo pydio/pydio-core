@@ -95,6 +95,7 @@ class ChangesTracker extends AJXP_Plugin
                     if($this->filterRow($previousRow, $filter)){
                         $previousRow = $row;
                         $previousNodeId = $row->node_id;
+                        $lastSeq = $row->seq;
                         continue;
                     }
                     if($valuesSent) echo ",";
@@ -143,7 +144,11 @@ class ChangesTracker extends AJXP_Plugin
         if($targetInFilter){
             $previousRow->target = substr($previousRow->target, strlen($filter));
         }
-        $previousRow->node['node_path'] = substr($previousRow->node['node_path'], strlen($filter));
+        if($previousRow->type != 'delete'){
+            $previousRow->node['node_path'] = substr($previousRow->node['node_path'], strlen($filter));
+        }else if(strpos($previousRow->node['node_path'], $filter) !== 0){
+            $previousRow->node['node_path'] = false;
+        }
         return false;
     }
 
