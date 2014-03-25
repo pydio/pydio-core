@@ -48,25 +48,37 @@ class ChangesTracker extends AJXP_Plugin
 
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
+        $filter = null;
 
         HTMLWriter::charsetHeader('application/json', 'UTF-8');
-
-        $res = dibi::query("SELECT
+        if(isSet($httpVars["filter"])){
+            $filter = AJXP_Utils::decodeSecureMagic($httpVars["filter"]);
+            $res = dibi::query("SELECT
+                [seq] , [ajxp_changes].[repository_identifier] , [ajxp_changes].[node_id] , [type] , [source] ,  [target] , [ajxp_index].[bytesize], [ajxp_index].[md5], [ajxp_index].[mtime], [ajxp_index].[node_path]
+                FROM [ajxp_changes]
+                LEFT JOIN [ajxp_index]
+                    ON [ajxp_changes].[node_id] = [ajxp_index].[node_id]
+                WHERE [ajxp_changes].[repository_identifier] = %s AND ([source] LIKE %like~ OR [target] LIKE %like~ ) AND [seq] > %i
+                ORDER BY [ajxp_changes].[node_id], [seq] ASC",
+                $this->computeIdentifier(ConfService::getRepository()), $filter, $filter, AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
+        }else{
+            $res = dibi::query("SELECT
                 [seq] , [ajxp_changes].[repository_identifier] , [ajxp_changes].[node_id] , [type] , [source] ,  [target] , [ajxp_index].[bytesize], [ajxp_index].[md5], [ajxp_index].[mtime], [ajxp_index].[node_path]
                 FROM [ajxp_changes]
                 LEFT JOIN [ajxp_index]
                     ON [ajxp_changes].[node_id] = [ajxp_index].[node_id]
                 WHERE [ajxp_changes].[repository_identifier] = %s AND [seq] > %i
-                ORDER BY [ajxp_changes].[node_id],[seq] ASC",
-            $this->computeIdentifier(ConfService::getRepository()), AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
+                ORDER BY [ajxp_changes].[node_id], [seq] ASC",
+                $this->computeIdentifier(ConfService::getRepository()), AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
+        }
 
         echo '{"changes":[';
         $previousNodeId = -1;
         $previousRow = null;
         $order = array("path"=>0, "content"=>1, "create"=>2, "delete"=>3);
         $relocateAttrs = array("bytesize", "md5", "mtime", "node_path", "repository_identifier");
-        $lastPrinted = false;
-        foreach ($res as  $i => $row) {
+        $valuesSent = false;
+        foreach ($res as $row) {
             $row->node = array();
             foreach ($relocateAttrs as $att) {
                 $row->node[$att] = $row->$att;
@@ -78,22 +90,25 @@ class ChangesTracker extends AJXP_Plugin
                 if ($order[$row->type] > $order[$previousRow->type]) {
                     $previousRow->type = $row->type;
                 }
-                if($i == (count($res) - 1)){
-                    $lastPrinted = true;
-                    echo json_encode($previousRow);
-                }
             } else {
                 if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content")) {
-                    echo json_encode($previousRow) . ",";
+                    if($this->filterRow($previousRow, $filter)){
+                        $previousRow = $row;
+                        $previousNodeId = $row->node_id;
+                        continue;
+                    }
+                    if($valuesSent) echo ",";
+                    echo json_encode($previousRow);
+                    $valuesSent = true;
                 }
                 $previousRow = $row;
                 $previousNodeId = $row->node_id;
             }
-            if(isSet($lastSeq)) $lastSeq = max($lastSeq, $row->seq);
-            else $lastSeq = $row->seq;
+            $lastSeq = $row->seq;
             flush();
         }
-        if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content") && !$lastPrinted) {
+        if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content") && !$this->filterRow($previousRow, $filter)) {
+            if($valuesSent) echo ",";
             echo json_encode($previousRow);
         }
         if (isSet($lastSeq)) {
@@ -104,6 +119,32 @@ class ChangesTracker extends AJXP_Plugin
             echo '], "last_seq":'.$lastSeq.'}';
         }
 
+    }
+
+    protected function filterRow(&$previousRow, $filter = null){
+        if($filter == null) return false;
+        $srcInFilter = strpos($previousRow->source, $filter) === 0;
+        $targetInFilter = strpos($previousRow->target, $filter) === 0;
+        if(!$srcInFilter && !$targetInFilter){
+            return true;
+        }
+        if($previousRow->type == 'path'){
+            if(!$srcInFilter){
+                $previousRow->type = 'create';
+                $previousRow->source = 'NULL';
+            }else if(!$targetInFilter){
+                $previousRow->type = 'delete';
+                $previousRow->target = 'NULL';
+            }
+        }
+        if($srcInFilter){
+            $previousRow->source = substr($previousRow->source, strlen($filter));
+        }
+        if($targetInFilter){
+            $previousRow->target = substr($previousRow->target, strlen($filter));
+        }
+        $previousRow->node['node_path'] = substr($previousRow->node['node_path'], strlen($filter));
+        return false;
     }
 
     /**
@@ -161,12 +202,10 @@ class ChangesTracker extends AJXP_Plugin
                     // PATH CHANGE ONLY
                     $newNode->loadNodeInfo();
                     if ($newNode->isLeaf()) {
-                        $this->logDebug("Path changed", "Moving file from " . $oldNode->getPath(). " to ".$newNode->getPath());
                         dibi::query("UPDATE [ajxp_index] SET ", array(
                             "node_path"  => $newNode->getPath(),
                         ), "WHERE [node_path] = %s AND [repository_identifier] = %s", $oldNode->getPath(), $repoId);
                     } else {
-                        $this->logDebug("Path changed", "Moving folder from " . $oldNode->getPath(). " to ".$newNode->getPath());
                         dibi::query("UPDATE [ajxp_index] SET [node_path]=REPLACE( REPLACE(CONCAT('$$$',[node_path]), CONCAT('$$$', %s), CONCAT('$$$', %s)) , '$$$', '') ",
                             $oldNode->getPath(),
                             $newNode->getPath()
@@ -179,27 +218,6 @@ class ChangesTracker extends AJXP_Plugin
             AJXP_Logger::error("[meta.syncable]", "Indexation", $e->getMessage());
         }
 
-    }
-
-    /**
-     * @param AJXP_Node $node
-     */
-    public function indexNode($node){
-        $path = $node->getPath();
-        if(empty($path) || $path == "/") return;
-        $repoId = $this->computeIdentifier($node->getRepository());
-        $res = dibi::query("SELECT node_id FROM [ajxp_index] WHERE [node_path] = %s AND [repository_identifier] = %s", $path, $repoId);
-        $count = $res->getRowCount();
-        if($count) return;
-        $this->logDebug("[meta.syncable]", "Indexing $path");
-        $stat = stat($node->getUrl());
-        dibi::query("INSERT INTO [ajxp_index]", array(
-            "node_path" => $path,
-            "bytesize"  => $stat["size"],
-            "mtime"     => $stat["mtime"],
-            "md5"       => $node->isLeaf()? md5_file($node->getUrl()):"directory",
-            "repository_identifier" => $repoId)
-        );
     }
 
     public function installSQLTables($param)
