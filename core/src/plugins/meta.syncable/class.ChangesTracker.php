@@ -48,23 +48,36 @@ class ChangesTracker extends AJXP_Plugin
 
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
+        $filter = null;
 
         HTMLWriter::charsetHeader('application/json', 'UTF-8');
-
-        $res = dibi::query("SELECT
+        if(isSet($httpVars["filter"])){
+            $filter = AJXP_Utils::decodeSecureMagic($httpVars["filter"]);
+            $res = dibi::query("SELECT
+                [seq] , [ajxp_changes].[repository_identifier] , [ajxp_changes].[node_id] , [type] , [source] ,  [target] , [ajxp_index].[bytesize], [ajxp_index].[md5], [ajxp_index].[mtime], [ajxp_index].[node_path]
+                FROM [ajxp_changes]
+                LEFT JOIN [ajxp_index]
+                    ON [ajxp_changes].[node_id] = [ajxp_index].[node_id]
+                WHERE [ajxp_changes].[repository_identifier] = %s AND ([source] LIKE %like~ OR [target] LIKE %like~ ) AND [seq] > %i
+                ORDER BY [ajxp_changes].[node_id], [seq] ASC",
+                $this->computeIdentifier(ConfService::getRepository()), $filter, $filter, AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
+        }else{
+            $res = dibi::query("SELECT
                 [seq] , [ajxp_changes].[repository_identifier] , [ajxp_changes].[node_id] , [type] , [source] ,  [target] , [ajxp_index].[bytesize], [ajxp_index].[md5], [ajxp_index].[mtime], [ajxp_index].[node_path]
                 FROM [ajxp_changes]
                 LEFT JOIN [ajxp_index]
                     ON [ajxp_changes].[node_id] = [ajxp_index].[node_id]
                 WHERE [ajxp_changes].[repository_identifier] = %s AND [seq] > %i
                 ORDER BY [ajxp_changes].[node_id], [seq] ASC",
-            $this->computeIdentifier(ConfService::getRepository()), AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
+                $this->computeIdentifier(ConfService::getRepository()), AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
+        }
 
         echo '{"changes":[';
         $previousNodeId = -1;
         $previousRow = null;
         $order = array("path"=>0, "content"=>1, "create"=>2, "delete"=>3);
         $relocateAttrs = array("bytesize", "md5", "mtime", "node_path", "repository_identifier");
+        $valuesSent = false;
         foreach ($res as $row) {
             $row->node = array();
             foreach ($relocateAttrs as $att) {
@@ -79,7 +92,14 @@ class ChangesTracker extends AJXP_Plugin
                 }
             } else {
                 if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content")) {
-                    echo json_encode($previousRow) . ",";
+                    if($this->filterRow($previousRow, $filter)){
+                        $previousRow = $row;
+                        $previousNodeId = $row->node_id;
+                        continue;
+                    }
+                    if($valuesSent) echo ",";
+                    echo json_encode($previousRow);
+                    $valuesSent = true;
                 }
                 $previousRow = $row;
                 $previousNodeId = $row->node_id;
@@ -87,7 +107,8 @@ class ChangesTracker extends AJXP_Plugin
             $lastSeq = $row->seq;
             flush();
         }
-        if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content")) {
+        if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content") && !$this->filterRow($previousRow, $filter)) {
+            if($valuesSent) echo ",";
             echo json_encode($previousRow);
         }
         if (isSet($lastSeq)) {
@@ -98,6 +119,32 @@ class ChangesTracker extends AJXP_Plugin
             echo '], "last_seq":'.$lastSeq.'}';
         }
 
+    }
+
+    protected function filterRow(&$previousRow, $filter = null){
+        if($filter == null) return false;
+        $srcInFilter = strpos($previousRow->source, $filter) === 0;
+        $targetInFilter = strpos($previousRow->target, $filter) === 0;
+        if(!$srcInFilter && !$targetInFilter){
+            return true;
+        }
+        if($previousRow->type == 'path'){
+            if(!$srcInFilter){
+                $previousRow->type = 'create';
+                $previousRow->source = 'NULL';
+            }else if(!$targetInFilter){
+                $previousRow->type = 'delete';
+                $previousRow->target = 'NULL';
+            }
+        }
+        if($srcInFilter){
+            $previousRow->source = substr($previousRow->source, strlen($filter));
+        }
+        if($targetInFilter){
+            $previousRow->target = substr($previousRow->target, strlen($filter));
+        }
+        $previousRow->node['node_path'] = substr($previousRow->node['node_path'], strlen($filter));
+        return false;
     }
 
     /**
