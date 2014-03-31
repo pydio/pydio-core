@@ -234,6 +234,7 @@ class AbstractAccessDriver extends AJXP_Plugin
                 AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($realSrcFile)));
                 if(file_exists($destFile)) $this->deldir($destFile, $destRepoData);
                 $res = rename($realSrcFile, $destFile);
+                if ($srcWrapperName = "smbAccessWrapper") $res = true;
             } else {
                 $dirRes = $this->dircopy($realSrcFile, $destFile, $errors, $succFiles, false, true, $srcRepoData, $destRepoData);
             }
