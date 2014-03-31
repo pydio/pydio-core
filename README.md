@@ -37,4 +37,4 @@ New in latest build, in the Settings panel, you can find a new "Developer" node 
 
 #### Signing the CLA
 
-Please <a href="http://www.clahub.com/agreements/ajaxplorer/ajaxplorer-core">sign the Contributor License Agreement</a> before contributing.
+Please <a href="http://pyd.io/contribute/cla">sign the Contributor License Agreement</a> before contributing.
