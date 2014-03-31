@@ -5442,7 +5442,11 @@
 		  }
 		  else {
               if(stripos(PHP_OS, "win") === 0){
-                  $v_result = $v_list[$i].($i!=(sizeof($v_list)-1)? "/".$v_result : "");
+                  if (substr($p_dir, 0, 3) == "smb") { 	  
+                      $v_result = (($i==0 && $scheme)? $v_list[$i]."/" : $v_list[$i]).($i!=(sizeof($v_list)-1)? "/".$v_result : "");
+                      } else { 
+                      $v_result = $v_list[$i].($i!=(sizeof($v_list)-1)? "/".$v_result : "");
+                      } 
               }else{
                   $v_result = $v_list[$i].(( $i == 0 && $scheme)? "/" : "").($i!=(sizeof($v_list)-1)? "/".$v_result : "");
               }
