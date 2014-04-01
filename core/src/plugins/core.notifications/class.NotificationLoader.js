@@ -39,7 +39,7 @@ Class.create("NotificationLoader", {
         this.ajxpNode._iNodeProvider = rP;
         this.pFactory = new PreviewFactory();
         this.pFactory.sequencialLoading = false;
-        this.pFactory.setThumbSize(22);
+        this.pFactory.setThumbSize(44);
         this.ajxpNode.observe('loaded', function(){
             this.menuItems = this.childrenToMenuItems();
         }.bind(this));
@@ -108,9 +108,7 @@ Class.create("NotificationLoader", {
                 }
                 alerts = true;
             }
-            var elLabel = el.getLabel();
-            if(!elLabel) elLabel = "/";
-            var block = '<div class="notif_event_label">'+elLabel+'</div>';
+            var block = '<div class="notif_event_label">'+el.getLabel()+'</div>';
             var detail = '';
             if(el.getMetadata().get('event_repository_label')){
                 detail += '<div class="notif_event_repository">'+ el.getMetadata().get('event_repository_label') + '</div>';
@@ -151,7 +149,7 @@ Class.create("NotificationLoader", {
                 });
                 if(this.lastAlertID && alertID > this.lastAlertID ){
                     newNotifs.push({
-                        title:elLabel,
+                        title:el.getLabel(),
                         body :detail.stripTags()
                     });
                 }
@@ -160,7 +158,7 @@ Class.create("NotificationLoader", {
                 var eventID = parseInt(el.getMetadata().get("event_id"));
                 if(this.lastEventID && eventID > this.lastEventID ){
                     newNotifs.push({
-                        title:elLabel,
+                        title:el.getLabel(),
                         body :detail.stripTags()
                     });
                 }
@@ -264,7 +262,7 @@ Class.create("NotificationLoader", {
         }.bind(this);
         protoMenu.options = Object.extend(protoMenu.options, {
             position: "bottom middle",
-            menuMaxHeight: 480,
+            menuMaxHeight: 680,
             topOffset: 14,
             menuTitle: this.hasAlerts ? MessageHash['notification_center.3'] : MessageHash['notification_center.5'],
             beforeShow: function(){

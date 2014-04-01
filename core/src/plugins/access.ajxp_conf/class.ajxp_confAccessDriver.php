@@ -126,7 +126,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 break;
             case "parameters_to_form_definitions" :
 
-                $data = json_decode(AJXP_Utils::decodeSecureMagic($httpVars["json_parameters"]), true);
+                $data = json_decode($httpVars["json_parameters"], true);
                 AJXP_XMLWriter::header("standard_form");
                 foreach ($data as $repoScope => $pluginsData) {
                     echo("<repoScope id='$repoScope'>");
@@ -587,8 +587,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     throw new Exception("Cant find role! ");
                 }
 
-                $jsonData = AJXP_Utils::decodeSecureMagic($httpVars["json_data"]);
-                $data = json_decode($jsonData, true);
+                $data = json_decode($httpVars["json_data"], true);
                 $roleData = $data["ROLE"];
                 $forms = $data["FORMS"];
                 $binariesContext = array();
@@ -1047,6 +1046,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $options = array();
                     $this->parseParameters($repDef, $options, null, true);
                 }
+                $repDef["DISPLAY"] = SystemTextEncoding::toUTF8($repDef["DISPLAY"]);
                 if (count($options)) {
                     $repDef["DRIVER_OPTIONS"] = $options;
                     unset($repDef["DRIVER_OPTIONS"]["AJXP_GROUP_PATH_PARAMETER"]);
@@ -1258,7 +1258,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         AJXP_XMLWriter::close();
                         return;
                     }
-                    $repo->setDisplay($newLabel);
+                    $repo->setDisplay(SystemTextEncoding::toUTF8($newLabel));
                     $res = ConfService::replaceRepository($repId, $repo);
                 } else {
                     $options = array();

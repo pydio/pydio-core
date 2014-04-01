@@ -66,6 +66,14 @@ class ftpAccessDriver extends fsAccessDriver
         $this->wrapperClassName = $wrapperData["classname"];
         $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
         $recycle = $this->repository->getOption("RECYCLE_BIN");
+		
+        if ($recycle!= "" && !is_dir($this->urlBase."/".$recycle)) {
+            @mkdir($this->urlBase."/".$recycle);
+            if (!is_dir($this->urlBase."/".$recycle)) {
+                throw new AJXP_Exception("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
+            }
+        }
+		
         if ($recycle != "") {
             RecycleBinManager::init($this->urlBase, "/".$recycle);
         }
