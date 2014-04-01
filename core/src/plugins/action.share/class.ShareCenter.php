@@ -1292,7 +1292,6 @@ class ShareCenter extends AJXP_Plugin
                 $newRepo->setGroupPath($gPath);
             }
             $newRepo->setDescription($description);
-            $newRepo->options["PATH"] = SystemTextEncoding::toUTF8($newRepo->options["PATH"]);
             ConfService::addRepository($newRepo);
         }
 
