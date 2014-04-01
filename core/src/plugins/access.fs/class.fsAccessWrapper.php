@@ -178,7 +178,7 @@ class fsAccessWrapper implements AjxpWrapper
                     return -1;
                 }
             }
-            return realpath($repoObject->getOption("PATH")).$repoObject->resolveVirtualRoots($url["path"]);
+            return realpath(SystemTextEncoding::fromUTF8($repoObject->getOption("PATH"))).$repoObject->resolveVirtualRoots($url["path"]);
         }
     }
 
