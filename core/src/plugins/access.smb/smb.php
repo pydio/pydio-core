@@ -196,7 +196,12 @@ class smb
         $process = proc_open($cmd, $descriptorspec, $pipes, null, $env);
         if (is_resource($process)) {
             fclose($pipes[0]);
-            $error = stream_get_contents($pipes[2]);
+            if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
+                $error = stream_get_contents($pipes[2], 524);
+                } else {	
+                $error = stream_get_contents($pipes[2]);
+                }
+            
             fclose($pipes[2]);
             if ($error != "") {
                 $error = strtolower($error);
@@ -216,6 +221,11 @@ class smb
         if (isset($output) && is_resource($output)) {
 
             while ($line = fgets ($output, 4096)) {
+			
+                if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
+                    $line = SystemTextEncoding::fromUTF8($line);
+                    }
+
                 list ($tag, $regs, $i) = array ('skip', array (), array ());
                 reset ($regexp);
                 foreach ($regexp as $r => $t) if (preg_match ('/'.$r.'/', $line, $regs)) {
@@ -354,7 +364,7 @@ class smb
                         return null;
                     }
                     $p = explode ("\\", $pu['path']);
-                    $name = SystemTextEncoding::toUTF8($p[count($p)-1]);
+                    $name = $p[count($p)-1];
                     if (isset ($o['info'][$name])) {
                        $stat = smb::addstatcache ($url, $o['info'][$name]);
                     } else {
