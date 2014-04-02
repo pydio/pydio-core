@@ -4,7 +4,6 @@ MAINTAINER tran@pydio.com
 
 ADD ./my.cnf /etc/my.cnf
 ADD ./supervisord.conf /etc/
-ADD ./pydio.sh /etc/pydio.sh
 ADD ./create.mysql /etc/create.mysql
 ADD ./bootstrap.json /etc/bootstrap.json
 ADD ./gencert.sh /etc/gencert.sh
