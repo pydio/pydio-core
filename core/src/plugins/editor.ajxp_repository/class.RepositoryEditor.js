@@ -139,6 +139,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
                     parent_repository_id:this.repositoryId,
                     user_context:"global"
                 },
+                groupByData:2,
                 updateGlobalContext:false,
                 selectionChangeCallback:false,
                 displayMode: 'list',

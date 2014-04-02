@@ -139,6 +139,10 @@
     font-size: 12px;
 }
 
+.settings_main_pane div.action_bar.editor_action_bar{
+    background-color: transparent;
+}
+
 .flat_tree_pane > #tree_container > .webfx-tree-container > .webfx-tree-item{
     margin-bottom: 4px;
 }

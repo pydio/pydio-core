@@ -159,15 +159,18 @@ Class.create("HeaderResizer", {
 	 * Resize the headers with the passed sizes
 	 * @param sizes Array
 	 */
-	resizeHeaders : function(sizes){
+	resizeHeaders : function(sizes, loop){
 		
 		//this.checkBodyScroll();
-		
-		var innerWidth = this.getInnerWidth();	
-		if(!innerWidth) return;	
+
+		var innerWidth = this.getInnerWidth();
+		if(!innerWidth) return;
 		if(!sizes && this.currentInner && innerWidth != this.currentInner){
 			sizes = this.computePercentSizes(this.currentSizes, this.currentInner);
 		}
+        if(!sizes){
+            sizes = this.computeEqualSizes();
+        }
 		//console.log("return");
 		if(!sizes) return;
 		this.log("Inner Width:"+innerWidth+'/'+this.element.offsetWidth);

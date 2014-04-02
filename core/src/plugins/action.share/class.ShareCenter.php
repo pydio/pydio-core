@@ -470,13 +470,20 @@ class ShareCenter extends AJXP_Plugin
                 $nodes = $this->listSharesAsNodes("/data/repositories/$parentRepoId/shares", $currentUser, $parentRepoId);
 
                 AJXP_XMLWriter::header();
-
+                if($userContext == "current"){
+                    AJXP_XMLWriter::sendFilesListComponentConfig('<columns template_name="ajxp_user.shares">
+                    <column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/>
+                    <column messageId="share_center.132" attributeName="shared_element_parent_repository_label" sortType="String"/>
+                    <column messageId="3" attributeName="share_type_readable" sortType="String"/>
+                    </columns>');
+                }else{
                     AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.repositories">
                     <column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/>
                     <column messageId="ajxp_shared.27" attributeName="owner" sortType="String"/>
                     <column messageId="3" attributeName="share_type_readable" sortType="String"/>
                     <column messageId="share_center.52" attributeName="share_data" sortType="String"/>
                     </columns>');
+                }
 
                 foreach($nodes as $node){
                     AJXP_XMLWriter::renderAjxpNode($node);
@@ -1757,6 +1764,12 @@ class ShareCenter extends AJXP_Plugin
                     $meta["copy_url"]  = $this->buildPublicletLink($hash);
                 }
                 $meta["shared_element_parent_repository"] = $repoObject->getParentId();
+                $parent = ConfService::getRepositoryById($repoObject->getParentId());
+                if(!empty($parent)){
+                    $meta["shared_element_parent_repository_label"] = $parent->getDisplay();
+                }else{
+                    $meta["shared_element_parent_repository_label"] = $repoObject->getParentId();
+                }
                 if($shareType != "repository"){
                     if($repoObject->hasContentFilter()){
                         $meta["ajxp_shared_minisite"] = "file";

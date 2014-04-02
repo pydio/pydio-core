@@ -353,33 +353,55 @@ SortableTable = Class.create({
 		// insert in the new order
 		var l = a.length;
         if(this.groupByData){
-            var col = this.columnsDefs.detect(function(c){
-                return c.attributeName == this.groupByData;
-            }.bind(this));
-            if(col){
-                var groupColIndex = this.columnsDefs.indexOf(col);
+            if(this.columnsDefs){
+                var col = this.columnsDefs.detect(function(c){
+                    return c.attributeName == this.groupByData;
+                }.bind(this));
+                if(col){
+                    var groupColIndex = this.columnsDefs.indexOf(col);
+                    var groupType = this.getSortType(groupColIndex);
+                    var all_blocks = [];
+                    var blockType = 'div';
+                }
+            }else{
+                var groupColIndex = this.groupByData;
                 var groupType = this.getSortType(groupColIndex);
                 var all_blocks = [];
+                var blockType = 'tr';
             }
         }
 
 		for (var i = 0; i < l; i++){
             if(groupColIndex){
-                var fieldValue = this.getRowValue(a[i].element, groupType, groupColIndex);
-                var block = tBody.down('div[data-groupbyvalue="'+fieldValue+'"]');
+                var fieldValue = this.getRowValue(a[i].element, groupType, groupColIndex).trim();
+                if(!fieldValue) fieldValue = "N/A";
+                var block;
+                if(blockType == 'tr'){
+                    block = tBody.down( 'tr[data-groupbyvalue="'+fieldValue+'"]');
+                }else{
+                    block = tBody.down( 'div[data-groupbyvalue="'+fieldValue+'"]');
+                }
                 if(!block){
-                    block = new Element('div', {"data-groupbyvalue":fieldValue});
+                    block = new Element(blockType, {"data-groupbyvalue":fieldValue});
                     tBody.insert(block);
                     if(MessageHash[fieldValue]) fieldValue = MessageHash[fieldValue];
-                    block.insert(new Element('h3').update(fieldValue));
+                    if(blockType == 'div'){
+                        block.insert(new Element('h3').update(fieldValue));
+                    }else if(blockType == 'tr'){
+                        block.insert(new Element('td', {colspan:this.sortTypes.length}).update(new Element('h3').update(fieldValue)));
+                    }
                     all_blocks[fieldValue] = block;
                 }
-                block.insert(a[i].element);
+                if(blockType == 'tr'){
+                    block.insert({after: a[i].element});
+                }else{
+                    block.insert(a[i].element);
+                }
             }else{
                 tBody.appendChild(a[i].element);
             }
         }
-        if(all_blocks){
+        if(all_blocks && blockType == 'div'){
             var keys = Object.keys(all_blocks);
             keys.sort();
             for(var z=0 ; z<keys.length;z++){
