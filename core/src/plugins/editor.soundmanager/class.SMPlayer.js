@@ -28,7 +28,11 @@ if(!$$("html")[0].hasClassName("no-canvas") && !window.soundManager && ajaxplore
         if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("soundmanager.volume") !== undefined){
             soundManager.defaultOptions.volume = ajaxplorer.user.getPreference("soundmanager.volume");
         }
-        conn.loadLibrary('360-player/script/360player.js', function(){
+        var conn2 = new Connexion();
+        conn2._libUrl = (ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')?ajxpBootstrap.parameters.get('SERVER_PREFIX_URI'):'')+'plugins/editor.soundmanager/sm/';
+        conn2.loadLibrary('360-player/script/360player.js', function(){
+
+            if(!window.threeSixtyPlayer) return;
 
             window.threeSixtyPlayer.config.scaleFont = (navigator.userAgent.match(/msie/i)?false:true);
             window.threeSixtyPlayer.config.showHMSTime = true;
@@ -258,7 +262,7 @@ soundManager.setup({\n\
         container.resizePreviewElement = function(element){
             if(rich){
                 player.setStyle({
-                    marginLeft:parseInt((element.width-256)/2)+24+"px",
+                    marginLeft:parseInt((element.width-256)/2)+9+"px",
                     marginTop:'-15px'
                 });
                 if(Prototype.Browser.IE) {
