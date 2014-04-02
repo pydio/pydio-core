@@ -2907,7 +2907,7 @@ div#upload_files_list span.item_relative_path{
     top:0;
 }
 
-div.fl-displayMode-list .scroller_track {
+div.fl-displayMode-list div.scroller_track {
     top: 26px;
 }
 
