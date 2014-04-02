@@ -7,6 +7,14 @@ touch /var/cache/pydio/admin_counted
 touch /var/cache/pydio/diag_result.php
 touch /var/cache/pydio/first_run_passed
 
+# fix LANG
+if [ "$LANG" = "" ]; then
+mylang=$LANG
+else
+mylang="en_US.UTF-8"
+fi
+echo "define(\"AJXP_LOCALE\", \"$mylang\");" >> /etc/pydio/bootstrap_conf.php
+
 # mysql
 service mysqld start
 mysql -uroot -e "create database pydio"

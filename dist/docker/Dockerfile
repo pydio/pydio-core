@@ -17,9 +17,10 @@ RUN yum install -y wget
 RUN rpm -Uvh http://dl.ajaxplorer.info/repos/pydio-release-1-1.noarch.rpm
 RUN wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 RUN wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+RUN wget -q -O – http://www.atomicorp.com/installers/atomic |sh
 RUN rpm -Uvh remi-release-6*.rpm epel-release-6*.rpm
 RUN yum -y update
-RUN yum -y install httpd php-mcrypt* ImageMagick ImageMagick-devel ImageMagick-perl gcc cc php-pecl-apc  php php-mysql php-cli php-devel php-gd php-pecl-memcache php-pspell php-snmp php-xmlrpc php-xml php-imap mod_ssl openssl mysql-server mysql
+RUN yum -y install httpd php-mcrypt* ImageMagick ImageMagick-devel ImageMagick-perl gcc cc php-pecl-apc  php php-mysql php-cli php-devel php-gd php-pecl-memcache php-pspell php-snmp php-xmlrpc php-xml php-imap mod_ssl openssl mysql-server mysql php-ioncube-loader
 
 RUN chmod 0777 /etc/create.mysql
 RUN chmod +x /etc/gencert.sh
@@ -39,7 +40,6 @@ RUN echo -e "NETWORKING=yes" > /etc/sysconfig/network
 RUN yum install -y pydio
 # pre-configure pydio
 RUN /etc/pre_conf_pydio.sh
-
 
 # install supervisord
 RUN yum install -y python-pip && pip install "pip>=1.4,<1.5" --upgrade
