@@ -2,8 +2,7 @@
 
 [Homepage](http://pyd.io/) |
 [GitHub-Repository](https://github.com/pydio/pydio-core) |
-[Issue-Tracker](https://github.com/pydio/pydio-core/issues) |
-[![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/pydio/pydio-core/badges/quality-score.png?s=fc0c15158cf6df37758a21a899c6ac3867aec596)](https://scrutinizer-ci.com/g/pydio/pydio-core/)
+[Issue-Tracker](https://github.com/pydio/pydio-core/issues)
 
 This is the main source code repository of Pydio (formerly AjaXplorer), containing all the PHP server and HTML5 Web GUI.
 
