@@ -36,7 +36,7 @@
                         <div id="files_list_pane" ajxpClass="AjxpPane">
                             <div id="files_list_header" ajxpClass="AjxpPane">
                                 <div id="display_toolbar" class="text_only" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":5}'></div>
-                                <div style="float:left;" ajxpClass="AjxpPane"  id="buttons_bar_cont" ajxpOptions='{"flexTo":"files_list_header", "flexToMargin":30}'>
+                                <div style="float:left;position:fixed;" ajxpClass="AjxpPane"  id="buttons_bar_cont" ajxpOptions='{"flexTo":"files_list_header", "flexToMargin":30}'>
                                     <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["navigation", "change_main"],"groupOtherToolbars":["more", "change", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                                 </div>
                             </div>
