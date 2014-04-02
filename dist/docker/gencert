@@ -1,0 +1,113 @@
+#!/bin/sh
+#
+# gen-webid-cert.sh: WebID Self-signed Certificate Generator
+#
+# This is free and unencumbered software released into the public domain.
+#
+# Anyone is free to copy, modify, publish, use, compile, sell, or
+# distribute this software, either in source code form or as a compiled
+# binary, for any purpose, commercial or non-commercial, and by any
+# means.
+#
+# In jurisdictions that recognize copyright laws, the author or authors
+# of this software dedicate any and all copyright interest in the
+# software to the public domain. We make this dedication for the benefit
+# of the public at large and to the detriment of our heirs and
+# successors. We intend this dedication to be an overt act of
+# relinquishment in perpetuity of all present and future rights to this
+# software under copyright law.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+#
+# For more information, please refer to <http://unlicense.org/>
+#
+ 
+# Be safe about permissions
+umask 077
+ 
+echo "WebID Self-signed Certificate Generator."
+echo "This script will create a certificate and snippet of RDF for you."
+echo "For more information about WebID visit: http://webid.info/"
+echo
+ 
+# Check that OpenSSL is available
+command -v openssl >/dev/null 2>&1 || {
+echo >&2 "The scripts requires OpenSSL but it is not available. Aborting."
+exit 1
+}
+ 
+
+NAME="pydio"
+WEBID="pydio.com" 
+
+# Create an OpenSSL configuration file
+OPENSSL_CONFIG=`mktemp -q /tmp/webid-openssl-conf.XXXXXXXX`
+if [ ! $? -eq 0 ]; then
+echo >&2 "Could not create temporary OpenSSL config file. Aborting."
+exit 1
+fi
+ 
+cat <<EOF > $OPENSSL_CONFIG
+[ req ]
+default_md = sha1
+default_bits = 2048
+distinguished_name = req_distinguished_name
+encrypt_key = no
+string_mask = nombstr
+x509_extensions = req_ext
+ 
+[ req_distinguished_name ]
+commonName = Common Name (eg, YOUR name)
+commonName_default = $NAME
+emailAddress		= charles@ajaxplore.info
+UID = A user ID
+UID_default="$WEBID"
+ 
+[ req_ext ]
+subjectKeyIdentifier = hash
+#authorityKeyIdentifier=keyid:always,issuer:always
+subjectAltName = critical,@subject_alt
+basicConstraints = CA:false
+extendedKeyUsage = clientAuth
+# Here are some examples of the usage of nsCertType. If it is omitted
+# the certificate can be used for anything *except* object signing.
+
+# This is OK for an SSL server.
+# nsCertType                    = server
+
+# For an object signing certificate this would be used.
+# nsCertType = objsign
+
+# For normal client use this is typical
+# nsCertType = client, email
+
+# and for everything including object signing:
+# nsCertType = client, email, objsign
+nsCertType = server
+
+[ subject_alt ]
+URI.1="$WEBID"
+EOF
+ 
+# Create the self-signed certificate as a PEM file
+openssl req -new -batch \
+-days 3650 \
+-config $OPENSSL_CONFIG \
+-keyout /etc/pki/tls/private/pydio.pem \
+-out /etc/pki/tls/certs/pydio.csr \
+-x509
+ 
+RESULT=$?
+ 
+rm -f $OPENSSL_CONFIG
+ 
+if [ ! $RESULT -eq 0 ]; then
+echo >&2 "Failed to create certificate. Aborting."
+exit 1
+fi

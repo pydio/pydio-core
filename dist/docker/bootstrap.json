@@ -1,0 +1,30 @@
+{
+  "core.conf":{
+    "UNIQUE_INSTANCE_CONFIG":{
+      "instance_name":"conf.sql",
+      "group_switch_value":"conf.sql",
+      "SQL_DRIVER":{
+        "core_driver":"core",
+        "group_switch_value":"core"
+      }
+    },
+    "DIBI_PRECONFIGURATION":{
+      "mysql_username":"pydio",
+      "mysql_password":"pydiopsss",
+      "mysql_host":"localhost",
+      "mysql_driver":"mysql",
+      "mysql_database":"pydio",
+      "group_switch_value":"mysql"
+    }
+  },
+  "core.auth":{
+    "MASTER_INSTANCE_CONFIG":{
+      "instance_name":"auth.sql",
+      "group_switch_value":"auth.sql",
+      "SQL_DRIVER":{
+        "core_driver":"core",
+        "group_switch_value":"core"
+      }
+    }
+  }
+}

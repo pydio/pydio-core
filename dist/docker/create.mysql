@@ -1,0 +1,381 @@
+-- MySQL dump 10.13  Distrib 5.5.35, for debian-linux-gnu (x86_64)
+--
+-- Host: localhost    Database: pydio
+-- ------------------------------------------------------
+-- Server version	5.5.35-0ubuntu0.12.04.2
+
+use pydio;
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `ajxp_feed`
+--
+
+DROP TABLE IF EXISTS `ajxp_feed`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ajxp_feed` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `edate` int(11) NOT NULL,
+  `etype` varchar(12) NOT NULL,
+  `htype` varchar(32) NOT NULL,
+  `index_path` mediumtext,
+  `user_id` varchar(255) NOT NULL,
+  `repository_id` varchar(33) NOT NULL,
+  `user_group` varchar(500) DEFAULT NULL,
+  `repository_scope` varchar(50) DEFAULT NULL,
+  `repository_owner` varchar(255) DEFAULT NULL,
+  `content` longblob NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `edate` (`edate`,`etype`,`htype`,`user_id`,`repository_id`),
+  KEY `index_path` (`index_path`(40))
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ajxp_feed`
+--
+
+LOCK TABLES `ajxp_feed` WRITE;
+/*!40000 ALTER TABLE `ajxp_feed` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ajxp_feed` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ajxp_groups`
+--
+
+DROP TABLE IF EXISTS `ajxp_groups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ajxp_groups` (
+  `groupPath` varchar(255) NOT NULL,
+  `groupLabel` varchar(255) NOT NULL,
+  PRIMARY KEY (`groupPath`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ajxp_groups`
+--
+
+LOCK TABLES `ajxp_groups` WRITE;
+/*!40000 ALTER TABLE `ajxp_groups` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ajxp_groups` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ajxp_log`
+--
+
+DROP TABLE IF EXISTS `ajxp_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ajxp_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `logdate` datetime DEFAULT NULL,
+  `remote_ip` varchar(45) DEFAULT NULL,
+  `severity` enum('DEBUG','INFO','NOTICE','WARNING','ERROR') DEFAULT NULL,
+  `user` varchar(255) DEFAULT NULL,
+  `message` text,
+  `params` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ajxp_log`
+--
+
+LOCK TABLES `ajxp_log` WRITE;
+/*!40000 ALTER TABLE `ajxp_log` DISABLE KEYS */;
+INSERT INTO `ajxp_log` VALUES (1,'2014-03-24 18:07:50','127.0.0.1','INFO','admin','AuthService','Log In	');
+/*!40000 ALTER TABLE `ajxp_log` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ajxp_plugin_configs`
+--
+
+DROP TABLE IF EXISTS `ajxp_plugin_configs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ajxp_plugin_configs` (
+  `id` varchar(50) NOT NULL,
+  `configs` longblob NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ajxp_plugin_configs`
+--
+
+LOCK TABLES `ajxp_plugin_configs` WRITE;
+/*!40000 ALTER TABLE `ajxp_plugin_configs` DISABLE KEYS */;
+INSERT INTO `ajxp_plugin_configs` VALUES ('core.ajaxplorer','a:2:{s:17:\"APPLICATION_TITLE\";s:5:\"Pydio\";s:16:\"DEFAULT_LANGUAGE\";s:2:\"en\";}'),('core.log','a:1:{s:22:\"UNIQUE_PLUGIN_INSTANCE\";a:3:{s:13:\"instance_name\";s:7:\"log.sql\";s:18:\"group_switch_value\";s:7:\"log.sql\";s:10:\"SQL_DRIVER\";a:2:{s:11:\"core_driver\";s:4:\"core\";s:18:\"group_switch_value\";s:4:\"core\";}}}'),('core.mq','a:1:{s:18:\"UNIQUE_MS_INSTANCE\";a:3:{s:13:\"instance_name\";s:6:\"mq.sql\";s:18:\"group_switch_value\";s:6:\"mq.sql\";s:10:\"SQL_DRIVER\";a:2:{s:11:\"core_driver\";s:4:\"core\";s:18:\"group_switch_value\";s:4:\"core\";}}}'),('core.notifications','a:2:{s:11:\"USER_EVENTS\";b:1;s:20:\"UNIQUE_FEED_INSTANCE\";a:3:{s:13:\"instance_name\";s:8:\"feed.sql\";s:18:\"group_switch_value\";s:8:\"feed.sql\";s:10:\"SQL_DRIVER\";a:2:{s:11:\"core_driver\";s:4:\"core\";s:18:\"group_switch_value\";s:4:\"core\";}}}'),('gui.ajax','a:1:{s:22:\"CUSTOM_WELCOME_MESSAGE\";s:16:\"Welcome to Pydio\";}');
+/*!40000 ALTER TABLE `ajxp_plugin_configs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ajxp_repo`
+--
+
+DROP TABLE IF EXISTS `ajxp_repo`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ajxp_repo` (
+  `uuid` varchar(33) NOT NULL,
+  `parent_uuid` varchar(33) DEFAULT NULL,
+  `owner_user_id` varchar(50) DEFAULT NULL,
+  `child_user_id` varchar(50) DEFAULT NULL,
+  `path` varchar(255) DEFAULT NULL,
+  `display` varchar(255) DEFAULT NULL,
+  `accessType` varchar(20) DEFAULT NULL,
+  `recycle` varchar(255) DEFAULT NULL,
+  `bcreate` tinyint(1) DEFAULT NULL,
+  `writeable` tinyint(1) DEFAULT NULL,
+  `enabled` tinyint(1) DEFAULT NULL,
+  `isTemplate` tinyint(1) DEFAULT NULL,
+  `inferOptionsFromParent` tinyint(1) DEFAULT NULL,
+  `slug` varchar(255) DEFAULT NULL,
+  `groupPath` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ajxp_repo`
+--
+
+LOCK TABLES `ajxp_repo` WRITE;
+/*!40000 ALTER TABLE `ajxp_repo` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ajxp_repo` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ajxp_repo_options`
+--
+
+DROP TABLE IF EXISTS `ajxp_repo_options`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ajxp_repo_options` (
+  `oid` int(11) NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(33) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `val` blob,
+  PRIMARY KEY (`oid`),
+  KEY `uuid` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ajxp_repo_options`
+--
+
+LOCK TABLES `ajxp_repo_options` WRITE;
+/*!40000 ALTER TABLE `ajxp_repo_options` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ajxp_repo_options` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ajxp_roles`
+--
+
+DROP TABLE IF EXISTS `ajxp_roles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ajxp_roles` (
+  `role_id` varchar(255) NOT NULL,
+  `serial_role` text NOT NULL,
+  PRIMARY KEY (`role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ajxp_roles`
+--
+
+LOCK TABLES `ajxp_roles` WRITE;
+/*!40000 ALTER TABLE `ajxp_roles` DISABLE KEYS */;
+INSERT INTO `ajxp_roles` VALUES ('AJXP_USR_/admin','O:9:\"AJXP_Role\":7:{s:12:\"\0*\0groupPath\";N;s:9:\"\0*\0roleId\";s:15:\"AJXP_USR_/admin\";s:12:\"\0*\0roleLabel\";N;s:7:\"\0*\0acls\";a:5:{i:1;s:2:\"rw\";s:9:\"ajxp_user\";s:2:\"rw\";i:0;s:2:\"rw\";s:9:\"ajxp_conf\";s:2:\"rw\";s:11:\"fs_template\";s:2:\"rw\";}s:13:\"\0*\0parameters\";a:1:{s:19:\"AJXP_REPO_SCOPE_ALL\";a:1:{s:9:\"core.conf\";a:1:{s:17:\"USER_DISPLAY_NAME\";s:5:\"admin\";}}}s:10:\"\0*\0actions\";a:0:{}s:14:\"\0*\0autoApplies\";a:0:{}}'),('GUEST','O:9:\"AJXP_Role\":7:{s:12:\"\0*\0groupPath\";N;s:9:\"\0*\0roleId\";s:5:\"GUEST\";s:12:\"\0*\0roleLabel\";s:15:\"Guest user role\";s:7:\"\0*\0acls\";a:0:{}s:13:\"\0*\0parameters\";a:0:{}s:10:\"\0*\0actions\";a:1:{s:19:\"AJXP_REPO_SCOPE_ALL\";a:3:{s:9:\"access.fs\";a:1:{s:5:\"purge\";s:8:\"disabled\";}s:10:\"meta.watch\";a:1:{s:12:\"toggle_watch\";s:8:\"disabled\";}s:12:\"index.lucene\";a:1:{s:5:\"index\";s:8:\"disabled\";}}}s:14:\"\0*\0autoApplies\";a:1:{i:0;s:5:\"guest\";}}'),('MINISITE','O:9:\"AJXP_Role\":7:{s:12:\"\0*\0groupPath\";N;s:9:\"\0*\0roleId\";s:8:\"MINISITE\";s:12:\"\0*\0roleLabel\";s:14:\"Minisite Users\";s:7:\"\0*\0acls\";a:0:{}s:13:\"\0*\0parameters\";a:0:{}s:10:\"\0*\0actions\";a:1:{s:22:\"AJXP_REPO_SCOPE_SHARED\";a:9:{s:9:\"access.fs\";a:3:{s:9:\"ajxp_link\";b:0;s:5:\"chmod\";b:0;s:5:\"purge\";b:0;}s:10:\"meta.watch\";a:1:{s:12:\"toggle_watch\";b:0;}s:11:\"conf.serial\";a:1:{s:13:\"get_bookmarks\";b:0;}s:8:\"conf.sql\";a:1:{s:13:\"get_bookmarks\";b:0;}s:12:\"index.lucene\";a:1:{s:5:\"index\";b:0;}s:12:\"action.share\";a:1:{s:5:\"share\";b:0;}s:8:\"gui.ajax\";a:1:{s:8:\"bookmark\";b:0;}s:11:\"auth.serial\";a:1:{s:11:\"pass_change\";b:0;}s:8:\"auth.sql\";a:1:{s:11:\"pass_change\";b:0;}}}s:14:\"\0*\0autoApplies\";a:0:{}}'),('MINISITE_NODOWNLOAD','O:9:\"AJXP_Role\":7:{s:12:\"\0*\0groupPath\";N;s:9:\"\0*\0roleId\";s:19:\"MINISITE_NODOWNLOAD\";s:12:\"\0*\0roleLabel\";s:28:\"Minisite Users - No Download\";s:7:\"\0*\0acls\";a:0:{}s:13:\"\0*\0parameters\";a:0:{}s:10:\"\0*\0actions\";a:1:{s:22:\"AJXP_REPO_SCOPE_SHARED\";a:1:{s:9:\"access.fs\";a:4:{s:8:\"download\";b:0;s:14:\"download_chunk\";b:0;s:16:\"prepare_chunk_dl\";b:0;s:12:\"download_all\";b:0;}}}s:14:\"\0*\0autoApplies\";a:0:{}}'),('ROOT_ROLE','O:9:\"AJXP_Role\":7:{s:12:\"\0*\0groupPath\";N;s:9:\"\0*\0roleId\";s:9:\"ROOT_ROLE\";s:12:\"\0*\0roleLabel\";s:9:\"Root Role\";s:7:\"\0*\0acls\";a:2:{i:1;s:2:\"rw\";s:9:\"ajxp_user\";s:2:\"rw\";}s:13:\"\0*\0parameters\";a:1:{s:19:\"AJXP_REPO_SCOPE_ALL\";a:1:{s:9:\"core.conf\";a:2:{s:18:\"DEFAULT_REPOSITORY\";s:9:\"ajxp_user\";s:24:\"DEFAULT_START_REPOSITORY\";s:9:\"ajxp_user\";}}}s:10:\"\0*\0actions\";a:0:{}s:14:\"\0*\0autoApplies\";a:2:{i:0;s:8:\"standard\";i:1;s:5:\"admin\";}}');
+/*!40000 ALTER TABLE `ajxp_roles` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ajxp_simple_store`
+--
+
+DROP TABLE IF EXISTS `ajxp_simple_store`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ajxp_simple_store` (
+  `object_id` varchar(255) NOT NULL,
+  `store_id` varchar(50) NOT NULL,
+  `serialized_data` longtext,
+  `binary_data` longblob,
+  `related_object_id` varchar(255) DEFAULT NULL,
+  `insertion_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`object_id`,`store_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ajxp_simple_store`
+--
+
+LOCK TABLES `ajxp_simple_store` WRITE;
+/*!40000 ALTER TABLE `ajxp_simple_store` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ajxp_simple_store` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ajxp_user_bookmarks`
+--
+
+DROP TABLE IF EXISTS `ajxp_user_bookmarks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ajxp_user_bookmarks` (
+  `rid` int(11) NOT NULL AUTO_INCREMENT,
+  `login` varchar(255) NOT NULL,
+  `repo_uuid` varchar(33) NOT NULL,
+  `path` varchar(255) DEFAULT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`rid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ajxp_user_bookmarks`
+--
+
+LOCK TABLES `ajxp_user_bookmarks` WRITE;
+/*!40000 ALTER TABLE `ajxp_user_bookmarks` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ajxp_user_bookmarks` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ajxp_user_prefs`
+--
+
+DROP TABLE IF EXISTS `ajxp_user_prefs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ajxp_user_prefs` (
+  `rid` int(11) NOT NULL AUTO_INCREMENT,
+  `login` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `val` blob,
+  PRIMARY KEY (`rid`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ajxp_user_prefs`
+--
+
+LOCK TABLES `ajxp_user_prefs` WRITE;
+/*!40000 ALTER TABLE `ajxp_user_prefs` DISABLE KEYS */;
+INSERT INTO `ajxp_user_prefs` VALUES (1,'admin','AJXP_WEBDAV_DATA','$phpserial$a:1:{s:3:\"HA1\";s:32:\"caa7132ad30dd00188a11c86c9cea3c0\";}');
+/*!40000 ALTER TABLE `ajxp_user_prefs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ajxp_user_rights`
+--
+
+DROP TABLE IF EXISTS `ajxp_user_rights`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ajxp_user_rights` (
+  `rid` int(11) NOT NULL AUTO_INCREMENT,
+  `login` varchar(255) NOT NULL,
+  `repo_uuid` varchar(33) NOT NULL,
+  `rights` mediumtext NOT NULL,
+  PRIMARY KEY (`rid`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ajxp_user_rights`
+--
+
+LOCK TABLES `ajxp_user_rights` WRITE;
+/*!40000 ALTER TABLE `ajxp_user_rights` DISABLE KEYS */;
+INSERT INTO `ajxp_user_rights` VALUES (3,'admin','ajxp.admin','1'),(4,'admin','ajxp.roles','$phpserial$a:2:{s:9:\"ROOT_ROLE\";b:1;s:15:\"AJXP_USR_/admin\";b:1;}');
+/*!40000 ALTER TABLE `ajxp_user_rights` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ajxp_user_teams`
+--
+
+DROP TABLE IF EXISTS `ajxp_user_teams`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ajxp_user_teams` (
+  `team_id` varchar(255) NOT NULL,
+  `user_id` varchar(255) NOT NULL,
+  `team_label` varchar(255) NOT NULL,
+  `owner_id` varchar(255) NOT NULL,
+  PRIMARY KEY (`team_id`,`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ajxp_user_teams`
+--
+
+LOCK TABLES `ajxp_user_teams` WRITE;
+/*!40000 ALTER TABLE `ajxp_user_teams` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ajxp_user_teams` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ajxp_users`
+--
+
+DROP TABLE IF EXISTS `ajxp_users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ajxp_users` (
+  `login` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `groupPath` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`login`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ajxp_users`
+--
+
+LOCK TABLES `ajxp_users` WRITE;
+/*!40000 ALTER TABLE `ajxp_users` DISABLE KEYS */;
+INSERT INTO `ajxp_users` VALUES ('admin','sha256:1000:C/D/peaeK6CjJlYzbNQWrN+4DCOPSDsz:2bchUvfOzB1q52zKERKwEb2C8LPhOdkc','/');										      
+/*!40000 ALTER TABLE `ajxp_users` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2014-03-24 18:08:30
