@@ -126,7 +126,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 break;
             case "parameters_to_form_definitions" :
 
-                $data = json_decode(AJXP_Utils::decodeSecureMagic($httpVars["json_parameters"]), true);
+                $data = json_decode($httpVars["json_parameters"], true);
                 AJXP_XMLWriter::header("standard_form");
                 foreach ($data as $repoScope => $pluginsData) {
                     echo("<repoScope id='$repoScope'>");
@@ -587,8 +587,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     throw new Exception("Cant find role! ");
                 }
 
-                $jsonData = AJXP_Utils::decodeSecureMagic($httpVars["json_data"]);
-                $data = json_decode($jsonData, true);
+                $data = json_decode($httpVars["json_data"], true);
                 $roleData = $data["ROLE"];
                 $forms = $data["FORMS"];
                 $binariesContext = array();
