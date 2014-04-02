@@ -81,12 +81,33 @@ class s3MetaStore extends AJXP_Plugin implements MetaStoreProvider
         return aS3StreamWrapper::getAWSServiceForProtocol("s3");
     }
 
+    /**
+     * @param AJXP_Node $ajxpNode
+     * @param boolean $create
+     * @return String
+     */
+    private function updateNodeMetaPath($ajxpNode, $create = false){
+        $folder = false;
+        $trim = trim($ajxpNode->getPath(), "/");
+        if($ajxpNode->is_file !== null){
+            $folder = !$ajxpNode->isLeaf();
+        }else{
+            $folder = is_dir($ajxpNode->getUrl());
+        }
+        if(!$folder) return $trim;
+        $meta = is_file(rtrim($ajxpNode->getUrl(), "/")."/.meta");
+        if(!$meta && $create){
+            file_put_contents(rtrim($ajxpNode->getUrl(), "/")."/.meta", "meta");
+        }
+        return $trim."/.meta";
+    }
+
     public function setMetadata($ajxpNode, $nameSpace, $metaData, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY)
     {
         $aws = $this->getAwsService();
         if($aws == null) return;
         $user = ($private?$this->getUserId($ajxpNode):AJXP_METADATA_SHAREDUSER);
-        $pathName = ltrim($ajxpNode->getPath(), "/");
+        $pathName = $this->updateNodeMetaPath($ajxpNode, true);
         $response = $aws->copy_object(
             array('bucket' => $this->bucketName, 'filename' => $pathName),
             array('bucket' => $this->bucketName, 'filename' => $pathName),
@@ -103,9 +124,10 @@ class s3MetaStore extends AJXP_Plugin implements MetaStoreProvider
         $aws = $this->getAwsService();
         if($aws == null) return;
         $user = ($private?$this->getUserId($ajxpNode):AJXP_METADATA_SHAREDUSER);
-        $aws->update_object(
+        $pathName = $this->updateNodeMetaPath($ajxpNode, false);
+        $response = $aws->update_object(
             $this->bucketName,
-            ltrim($ajxpNode->getPath(), "/"),
+            $pathName,
             array("x-amz-meta-".$this->getMetaKey($nameSpace,$scope,$user) => "")
         );
     }
@@ -119,7 +141,8 @@ class s3MetaStore extends AJXP_Plugin implements MetaStoreProvider
         if (isSet(self::$metaCache[$ajxpNode->getPath()])) {
             $data = self::$metaCache[$ajxpNode->getPath()];
         } else {
-            $response = $aws->get_object_metadata($this->bucketName, ltrim($ajxpNode->getPath(), "/"));
+            $pathName = $this->updateNodeMetaPath($ajxpNode, false);
+            $response = $aws->get_object_metadata($this->bucketName, $pathName);
             self::$metaCache[$ajxpNode->getPath()] = $response["Headers"];
             $data = self::$metaCache[$ajxpNode->getPath()];
         }
@@ -150,7 +173,8 @@ class s3MetaStore extends AJXP_Plugin implements MetaStoreProvider
             $data = self::$metaCache[$ajxpNode->getPath()];
         } else {
             $this->logDebug("Should retrieve metadata for ".$ajxpNode->getPath());
-            $response = $aws->get_object_metadata($this->bucketName, ltrim($ajxpNode->getPath(), "/"));
+            $pathName = $this->updateNodeMetaPath($ajxpNode, false);
+            $response = $aws->get_object_metadata($this->bucketName, $pathName);
             self::$metaCache[$ajxpNode->getPath()] = $response["Headers"];
             $data = self::$metaCache[$ajxpNode->getPath()];
         }
