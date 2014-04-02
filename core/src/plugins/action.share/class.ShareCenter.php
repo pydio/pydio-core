@@ -956,6 +956,8 @@ class ShareCenter extends AJXP_Plugin
         $html = str_replace("AJXP_REPOSITORY_LABEL", ConfService::getRepositoryById($repository)->getDisplay(), $html);
         $html = str_replace("AJXP_TEMPLATE_NAME", $templateName, $html);
         $html = str_replace("AJXP_LINK_HASH", $hash, $html);
+        $guiConfigs = AJXP_PluginsService::findPluginById("gui.ajax")->getConfigs();
+        $html = str_replace("AJXP_THEME", $guiConfigs["GUI_THEME"] , $html);
 
         session_name("AjaXplorer_Shared".$hash);
         session_start();

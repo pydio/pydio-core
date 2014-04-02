@@ -5,11 +5,11 @@
         <base href="AJXP_PATH_TO_ROOT"/>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-        <link rel="icon" type="image/x-png" href="plugins/gui.ajax/res/themes/vision/images/html-folder.png">
-        <link rel="stylesheet" type="text/css" href="plugins/gui.ajax/res/themes/vision/css/allz.css">
-        <link rel="stylesheet" href="plugins/gui.ajax/res/themes/vision/css/font-awesome.css"/>
-        <link rel="stylesheet" href="plugins/gui.ajax/res/themes/vision/css/media.css"/>
-        <link rel="stylesheet" href="plugins/gui.ajax/res/themes/vision/css/animate-custom.css"/>
+        <link rel="icon" type="image/x-png" href="plugins/gui.ajax/res/themes/AJXP_THEME/images/html-folder.png">
+        <link rel="stylesheet" type="text/css" href="plugins/gui.ajax/res/themes/AJXP_THEME/css/allz.css">
+        <link rel="stylesheet" href="plugins/gui.ajax/res/themes/AJXP_THEME/css/font-awesome.css"/>
+        <link rel="stylesheet" href="plugins/gui.ajax/res/themes/AJXP_THEME/css/media.css"/>
+        <link rel="stylesheet" href="plugins/gui.ajax/res/themes/AJXP_THEME/css/animate-custom.css"/>
         <style type="text/css">
             #widget_title{
                 font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
@@ -131,7 +131,7 @@
             };
             document.observe("ajaxplorer:before_gui_load", function(e){
                ajaxplorer.currentThemeUsesIconFonts = true;
-               document.documentElement.className += " ajxp_theme_vision";
+               document.documentElement.className += " ajxp_theme_AJXP_THEME";
            });
             window.ajxpBootstrap = new AjxpBootstrap(startParameters);
             window.ajxpMinisite = true;

@@ -157,6 +157,9 @@ Class.create("FilesList", SelectableElements, {
 
 		this._thumbSize = 64;
 		this._crtImageIndex = 0;
+        if(this.options.fixedThumbSize){
+            this._fixedThumbSize = this.options.fixedThumbSize;
+        }
 	
 		this._pendingFile = null;
 		this.allDraggables = new Array();
@@ -1043,7 +1046,7 @@ Class.create("FilesList", SelectableElements, {
             this.htmlElement.down('.table_rows_container').setStyle({width:'100%'});
     	}
         if(this._displayMode == 'thumb'){
-            this.resizeThumbnails();
+            this.resizeThumbnails(null, true);
         }
 		this.notify("resize");
         document.fire("ajaxplorer:resize-FilesList-" + this.htmlElement.id, this.htmlElement.getDimensions());
@@ -2128,7 +2131,7 @@ Class.create("FilesList", SelectableElements, {
 	 * Resize the thumbnails
 	 * @param one_element HTMLElement Optionnal, if empty all thumbnails are resized.
 	 */
-	resizeThumbnails: function(one_element){
+	resizeThumbnails: function(one_element, skipResize){
 			
 		var elList;
 		if(one_element) elList = [one_element]; 
@@ -2185,7 +2188,7 @@ Class.create("FilesList", SelectableElements, {
             var scrollElement = this.htmlElement.down(".selectable_div");
             scrollElement.setStyle({width:(elList.length * (this._thumbSize + 46)) + 'px'});
         }
-        if(this.options.fit && this.options.fit == 'content'){
+        if(this.options.fit && this.options.fit == 'content' && !skipResize){
             this.resize();
         }
         return tSize;
@@ -2193,7 +2196,7 @@ Class.create("FilesList", SelectableElements, {
 
     getAdjustedThumbSize:function(referenceElement){
         var tSize = (this._displayMode=='detail'? this._detailThumbSize:this._thumbSize);
-        if(this._displayMode == 'thumb'){
+        if(this._displayMode == 'thumb' && !this._fixedThumbSize){
             // Readjust tSize
             var w = this._htmlElement.getWidth();
             var margin = parseInt(referenceElement.getStyle('marginLeft')) + parseInt(referenceElement.getStyle('marginRight'));
