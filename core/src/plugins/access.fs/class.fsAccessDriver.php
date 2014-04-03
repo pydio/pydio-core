@@ -1349,7 +1349,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         } else {
             $filepath = $this->repository->getDisplay().substr($filePathOrData,42);
         }
-        $accelfile = dirname($_SERVER["REQUEST_URI"])."/data/".$filepath;
+        $accelfile = dirname($_SERVER["REQUEST_URI"])."/xaccel/".$filepath;
         header("X-Accel-Redirect: $accelfile");
         return;
     }
