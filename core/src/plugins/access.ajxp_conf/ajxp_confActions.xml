@@ -351,7 +351,7 @@
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="get" inZip="false">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="role,group,user,user_editable,repository,repository_editable,ajxp_plugin" behaviour="disable"></selectionContext></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE" behaviour="disable"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
             <processing>
                 <clientCallback prepareModal="false"><![CDATA[

@@ -33,6 +33,63 @@ class sqlLogDriver extends AbstractLogDriver
      * @var Array
      */
     private $sqlDriver;
+    private $queries;
+
+    /**
+     * @var array Sample queries for the record. See the queries.json file instead.
+     */
+    private $sampleQueries = array(
+        "connections_per_day" => array(
+            "LABEL" => "Total connections per day",
+            "AXIS" => array("x" => "Date", "y" => "Users Connections"),
+            "SQL" =>'SELECT DATE( logdate )AS Date, COUNT( DISTINCT id ) AS "Users Connections"
+                        FROM ajxp_log2
+                        WHERE user
+                        IN (
+                            SELECT DISTINCT login
+                            FROM ajxp_user_rights
+                            WHERE severity =  "INFO"
+                            AND login NOT
+                            IN (
+                                SELECT DISTINCT login
+                                FROM ajxp_user_rights
+                                WHERE repo_uuid =  "ajxp.parent_user"
+                            )
+                        )
+                        AND params LIKE  "Log In%"
+                        GROUP BY DATE( logdate )
+                         ORDER BY logdate DESC'),
+
+        "downloads_per_day" => array(
+            "LABEL" => "Downloads per day",
+            "AXIS" => array("x" => "Date", "y" => "Downloads"),
+            "SQL" =>'SELECT SQL_CALC_FOUND_ROWS DATE(logdate) AS Date, COUNT(distinct id) AS "Downloads"
+                        FROM ajxp_log2
+                        WHERE severity = "INFO" AND params like "Download%"
+                        GROUP BY DATE(logdate)
+                         ORDER BY logdate DESC'),
+        "sharedfiles_per_day" => array(
+            "LABEL" => "Shared files per day",
+            "AXIS" => array("x" => "Date", "y" => "Shares"),
+            "SQL" => 'SELECT DATE( logdate )AS Date, COUNT( DISTINCT id ) AS "Shares"
+                        FROM ajxp_log2
+                        WHERE severity = "INFO"
+                        AND user
+                        IN (
+                            SELECT DISTINCT login
+                            FROM ajxp_user_rights
+                            WHERE login NOT
+                            IN (
+                                SELECT DISTINCT login
+                                FROM ajxp_user_rights
+                                WHERE repo_uuid = "ajxp.parent_user"
+                            )
+                        )
+                        AND params LIKE "New Share%"
+                        GROUP BY DATE( logdate )
+                         ORDER BY logdate DESC')
+
+    );
 
     /**
      * Initialise the driver.
@@ -53,6 +110,7 @@ class sqlLogDriver extends AbstractLogDriver
             echo get_class($e), ': ', $e->getMessage(), "\n";
             exit(1);
         }
+        $this->queries = AJXP_Utils::loadSerialFile($this->getBaseDir()."/queries.json", false, "json");
     }
 
     public function performChecks()
@@ -63,6 +121,70 @@ class sqlLogDriver extends AbstractLogDriver
             throw new Exception("Please define an SQL connexion in the core configuration");
         }
     }
+
+    public function exposeQueries($actionName, &$httpVars, &$fileVars){
+
+        header('Content-type: application/json');
+        echo json_encode($this->queries);
+
+    }
+
+    public function processQuery($actionName, &$httpVars, &$fileVars){
+
+        $query_name = AJXP_Utils::sanitize($httpVars["query_name"], AJXP_SANITIZE_ALPHANUM);
+        if(!isSet($this->queries[$query_name])){
+            throw new Exception("Cannot find query ".$query_name);
+        }
+        $start = 0;
+        $count = 30;
+        if(isSet($httpVars["start"])) $start = intval($httpVars["start"]);
+        if(isSet($httpVars["count"])) $count = intval($httpVars["count"]);
+
+        $mess = ConfService::getMessages();
+        $q = $this->queries[$query_name]["SQL"];
+
+        $q .= " LIMIT $start, $count";
+        $res = dibi::query($q);
+        $all = $res->fetchAll();
+        foreach($all as $row => &$data){
+            if(isSet($data["Date"])){
+                $data["Date"] = date($mess["date_relative_date_format"], $data["Date"]->getTimestamp());
+            }
+        }
+
+        $qry = "SELECT FOUND_ROWS() AS NbRows";
+        $res = dibi::query($qry);
+        $total_count = $res->fetchSingle();
+
+        header('Content-type: application/json');
+        $links = array();
+
+        if($start > $count){
+            $links[] = array('rel' => 'first', 'cursor' => 0, 'count' => $count);
+        }
+        if($start > 0){
+            $prev = max(0,  $start - $count);
+            $links[] = array('rel' => 'previous', 'cursor' => $prev, 'count' => $count);
+        }
+        if($start < $total_count){
+            $next = min($start + $count, $total_count);
+            $links[] = array('rel' => 'next', 'cursor' => $next, 'count' => $count);
+        }
+        if($start < $total_count - $count){
+            $last = $total_count - ($total_count % $count);
+            $links[] = array('rel' => 'last', 'cursor' => $last, 'count' => $count);
+        }
+        $hLinks = array();
+        foreach($links as $link){
+            $hLinks[] = '<http://localhost/api/ajxp_conf/analytic_query/'.$query_name.'/'.$link["cursor"].'/'.$link["cursor"].'>; rel="'.$link["rel"].'"';
+        }
+        header('Link: '.implode(",", $hLinks));
+
+        $envelope = array("links" => $links, "data" => $all);
+        echo json_encode($envelope);
+
+    }
+
 
     /**
      * Format a table row into an xml list of nodes for the log treeview
@@ -226,7 +348,22 @@ class sqlLogDriver extends AbstractLogDriver
                     //"<$nodeName icon=\"x-office-calendar.png\" date=\"$fullMonth\" display=\"$logM\" text=\"$fullMonth\" is_file=\"0\" filename=\"/logs/$fullYear/$fullMonth\"/>";
                 }
 
-            } else { // Get years
+            } else {
+
+                // Append Analytics Node
+                $xml_strings['0000'] = AJXP_XMLWriter::renderNode($rootPath."/all_analytics",
+                    "Analytics Dashboard",
+                    true,
+                    array(
+                        "icon"      => "scheduler/ICON_SIZE/task.png",
+                        "ajxp_mime" => "ajxp_graphs",
+                    ),
+                    true,
+                    false
+                );
+
+
+                // Get years
                 $q = 'SELECT
                     DISTINCT '.$yFunc.' AS year
                     FROM [ajxp_log]';
