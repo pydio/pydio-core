@@ -5,6 +5,10 @@
     "FIGURE":"total_number_of_logins",
     "SQL":"SELECT COUNT( DISTINCT id ) AS total_number_of_logins FROM ajxp_log2 WHERE user IN ( SELECT DISTINCT login FROM ajxp_user_rights WHERE severity =  \"INFO\" AND login NOT IN ( SELECT DISTINCT login FROM ajxp_user_rights WHERE repo_uuid = \"ajxp.parent_user\" ) ) AND params LIKE  \"Log In%\""
   },
+    {
+        "SEPARATOR":true,
+        "LABEL":"Users activity"
+    },
   {
     "NAME":"unique_users_per_day",
     "LABEL":"Unique users per day",
@@ -23,6 +27,10 @@
     },
     "SQL":"SELECT SQL_CALC_FOUND_ROWS DATE( logdate )AS Date, COUNT( DISTINCT id ) AS \"Users Connections\" FROM ajxp_log2 WHERE user IN ( SELECT DISTINCT login FROM ajxp_user_rights WHERE severity =  \"INFO\" AND login NOT IN (SELECT DISTINCT login FROM ajxp_user_rights WHERE repo_uuid = \"ajxp.parent_user\" ) ) AND params LIKE  \"Log In%\" GROUP BY DATE( logdate )  ORDER BY logdate DESC"
   },
+    {
+        "SEPARATOR":true,
+        "LABEL":"Documents Activity"
+    },
   {
     "NAME":"downloads_per_day",
     "LABEL":"Downloads per day",

@@ -59,7 +59,13 @@ Class.create("GraphsViewer", AbstractEditor, {
         $('graph_viewer_box').update('');
         this.queriesData = $A(queriesData);
         this.queriesData.each(function(qData){
-            var div = new Element('div', {id:qData['NAME']+'_container'});
+            var div;
+            if(qData['SEPARATOR']){
+                div = new Element('div', {class:'tabrow'}).update('<li class="selected">' + qData['LABEL'] + '</li>');
+                this.element.insert(div);
+                return;
+            }
+            div = new Element('div', {id:qData['NAME']+'_container'});
             this.element.insert(div);
             div.insert({top:('<div class="innerTitle">'+qData['LABEL']+'</div>')});
             div.insert(('<div style="text-align: center; padding:100px;">Loading...</div>'));

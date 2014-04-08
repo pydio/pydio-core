@@ -131,7 +131,7 @@ class sqlLogDriver extends AbstractLogDriver
 
     private function getQuery($queryName){
         foreach($this->queries as $q){
-            if($q["NAME"] == $queryName) return $q;
+            if(isset($q["NAME"]) && $q["NAME"] == $queryName) return $q;
         }
         return false;
     }
