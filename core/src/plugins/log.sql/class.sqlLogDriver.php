@@ -129,10 +129,18 @@ class sqlLogDriver extends AbstractLogDriver
 
     }
 
+    private function getQuery($queryName){
+        foreach($this->queries as $q){
+            if($q["NAME"] == $queryName) return $q;
+        }
+        return false;
+    }
+
     public function processQuery($actionName, &$httpVars, &$fileVars){
 
         $query_name = AJXP_Utils::sanitize($httpVars["query_name"], AJXP_SANITIZE_ALPHANUM);
-        if(!isSet($this->queries[$query_name])){
+        $query = $this->getQuery($query_name);
+        if($query === false){
             throw new Exception("Cannot find query ".$query_name);
         }
         $start = 0;
@@ -141,7 +149,7 @@ class sqlLogDriver extends AbstractLogDriver
         if(isSet($httpVars["count"])) $count = intval($httpVars["count"]);
 
         $mess = ConfService::getMessages();
-        $q = $this->queries[$query_name]["SQL"];
+        $q = $query["SQL"];
 
         $q .= " LIMIT $start, $count";
         $res = dibi::query($q);

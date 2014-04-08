@@ -57,10 +57,20 @@ Class.create("GraphsViewer", AbstractEditor, {
 
     parseAndLoadQueries: function(queriesData){
         $('graph_viewer_box').update('');
-        this.queriesData = $H(queriesData);
-        this.queriesData.each(function(pair){
-            this.loadData(pair.key);
+        this.queriesData = $A(queriesData);
+        this.queriesData.each(function(qData){
+            var div = new Element('div', {id:qData['NAME']+'_container'});
+            this.element.insert(div);
+            div.insert({top:('<div class="innerTitle">'+qData['LABEL']+'</div>')});
+            div.insert(('<div style="text-align: center; padding:100px;">Loading...</div>'));
+            this.loadData(qData['NAME']);
         }.bind(this));
+    },
+
+    getQueryByName: function(queryName){
+        return this.queriesData.detect(function(q){
+            return q['NAME'] == queryName;
+        });
     },
 
     loadData : function(queryName, chart, start, count){
@@ -84,9 +94,9 @@ Class.create("GraphsViewer", AbstractEditor, {
     },
 
     createChart : function(queryName, jsonData){
-        var qData = this.queriesData.get(queryName);
-        var div = new Element('div', {id:queryName+'_container'});
-        this.element.insert(div);
+        var qData = this.getQueryByName(queryName);
+        var div = this.element.down("#"+queryName+'_container');
+        div.update('');
         if(qData['AXIS']){
             var svg = dimple.newSvg("#"+queryName+'_container', '100%', 300);
             var chart = new dimple.chart(svg, jsonData['data']);
@@ -97,12 +107,7 @@ Class.create("GraphsViewer", AbstractEditor, {
             chart.addSeries(null, dimple.plot.line);
             chart.draw();
             div.insert({top:('<div class="innerTitle">'+qData['LABEL']+'</div>')});
-            var linksCont = new Element('div', {className:'chart_links', style:'float: right;margin: 10px 20px;'});
-            div.insert({top:linksCont});
-            $A(jsonData['links']).each(function(ln){
-                var a = this.createLink(queryName, ln, chart);
-                linksCont.insert({top:a});
-            }.bind(this));
+            this.updateLinks(chart, queryName, jsonData);
             this.charts.push(chart);
         }else if(qData["FIGURE"]){
 
@@ -112,18 +117,43 @@ Class.create("GraphsViewer", AbstractEditor, {
     updateChart : function(chart, queryName, jsonData){
         chart.data = jsonData["data"];
         chart.draw();
+        this.updateLinks(chart, queryName, jsonData);
+    },
+
+    updateLinks : function(chart, queryName, jsonData){
+
         var container = this.element.down('#' + queryName+'_container');
         var linkCont = container.down('.chart_links');
-        linkCont.update('');
-        $A(jsonData['links']).each(function(ln){
-            var a = this.createLink(queryName, ln, chart);
+        if(!linkCont){
+            linkCont = new Element('div', {className:'chart_links', style:'float: right;margin: 10px 20px;'});
+            container.insert({top:linkCont});
+        }else{
+            linkCont.update('');
+        }
+
+        $A(["last", "next", "previous", "first"]).each(function(relName){
+            var linkData = jsonData['links'].detect(function(l){
+                return (l['rel'] == relName);
+            });
+            if(linkData){
+                var a = this.createLink(queryName, linkData, chart);
+            }else{
+                var a = this.createLink(queryName, relName, chart);
+            }
             linkCont.insert(a);
         }.bind(this));
     },
 
     createLink: function(queryName, linkData, chart){
         var label;
-        var rel = linkData["rel"];
+        var rel;
+        var linkActive = false;
+        if(Object.isString(linkData)){
+            rel = linkData;
+        }else{
+            linkActive = true;
+            rel = linkData["rel"];
+        }
         switch(rel){
             case "next":
                 label = "icon-backward";
@@ -138,10 +168,12 @@ Class.create("GraphsViewer", AbstractEditor, {
                 label = "icon-fast-forward";
                 break;
         }
-        var link = new Element('a').update("<a class='"+label+"' style='display:inline-block; margin: 0 5px; color:#399C9B;'></a>");
-        link.observe("click", function(){
-            this.loadData(queryName, chart, linkData['cursor'], linkData['count']);
-        }.bind(this));
+        var link = new Element('a').update("<a class='"+label+"' style='display:inline-block; margin: 0 5px;"+(linkActive?"cursor:pointer;color:#399C9B;":"color:#CCCCCC;")+"'></a>");
+        if(!Object.isString(linkData)){
+            link.observe("click", function(){
+                this.loadData(queryName, chart, linkData['cursor'], linkData['count']);
+            }.bind(this));
+        }
         return link;
     },
 
