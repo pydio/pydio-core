@@ -22,7 +22,7 @@ Class.create("GraphsViewer", AbstractEditor, {
 
     queriesData: null,
     charts: null,
-    defaultCount:25,
+    defaultCount:31,
 
     initialize: function($super, oFormObject, editorOptions)
     {
@@ -137,7 +137,7 @@ Class.create("GraphsViewer", AbstractEditor, {
             linkCont.update('');
         }
 
-        $A(["last", "next", "previous", "first"]).each(function(relName){
+        $A(["next", "previous", "first"]).each(function(relName){
             var linkData = jsonData['links'].detect(function(l){
                 return (l['rel'] == relName);
             });

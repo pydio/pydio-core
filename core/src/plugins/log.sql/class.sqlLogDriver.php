@@ -149,20 +149,44 @@ class sqlLogDriver extends AbstractLogDriver
         if(isSet($httpVars["count"])) $count = intval($httpVars["count"]);
 
         $mess = ConfService::getMessages();
-        $q = $query["SQL"];
 
-        $q .= " LIMIT $start, $count";
+        $format = 'Y-m-d 00:00:00';
+        $dKeyFormat = $mess["date_relative_date_format"];
+        $ref = time();
+        $last = $start + $count;
+        $startDate = date($format, strtotime("-$last day", $ref));
+        $endDate =  date($format, strtotime("-$start day", $ref));
+        $dateCursor = "logdate > '$startDate' AND logdate <= '$endDate'";
+
+        $q = $query["SQL"];
+        $q = str_replace("AJXP_CURSOR_DATE", $dateCursor, $q);
+
+        //$q .= " LIMIT $start, $count";
         $res = dibi::query($q);
         $all = $res->fetchAll();
+        $allDates = array();
         foreach($all as $row => &$data){
             if(isSet($data["Date"])){
-                $data["Date"] = date($mess["date_relative_date_format"], $data["Date"]->getTimestamp());
+                $key = date($dKeyFormat, $data["Date"]->getTimestamp());
+                $data["Date"] = $key;
+                $allDates[$key] = true;
             }
         }
 
-        $qry = "SELECT FOUND_ROWS() AS NbRows";
-        $res = dibi::query($qry);
-        $total_count = $res->fetchSingle();
+        if(isSet($query["AXIS"]) && $query["AXIS"]["x"] == "Date"){
+            for($i = 0;$i<$count;$i++){
+                $dateCurs = $start + $i;
+                $dateK = date($dKeyFormat, strtotime("-$dateCurs day", $ref));
+                if(!isSet($dKeyFormat[$dateK])){
+                    array_push($all, array("Date" => $dateK));
+                }
+            }
+        }
+
+
+        //$qry = "SELECT FOUND_ROWS() AS NbRows";
+        //$res = dibi::query($qry);
+        $total_count = 1000; //$res->fetchSingle();
 
         header('Content-type: application/json');
         $links = array();
@@ -175,12 +199,12 @@ class sqlLogDriver extends AbstractLogDriver
             $links[] = array('rel' => 'previous', 'cursor' => $prev, 'count' => $count);
         }
         if($start < $total_count){
-            $next = min($start + $count, $total_count);
+            $next = $start + $count;
             $links[] = array('rel' => 'next', 'cursor' => $next, 'count' => $count);
         }
         if($start < $total_count - $count){
             $last = $total_count - ($total_count % $count);
-            $links[] = array('rel' => 'last', 'cursor' => $last, 'count' => $count);
+            //$links[] = array('rel' => 'last', 'cursor' => $last, 'count' => $count);
         }
         $hLinks = array();
         foreach($links as $link){
