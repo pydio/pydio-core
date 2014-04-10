@@ -87,7 +87,7 @@ class ldapAuthDriver extends AbstractAuthDriver
                 $this->ldapFilter = "(" . $this->ldapFilter . ")";
             }
         } else {
-            if ($this->hasGroupsMapping && !empty($this->ldapGFilter)) {
+            if (!empty($this->hasGroupsMapping) && !empty($this->ldapGFilter)) {
                 $this->ldapFilter = "!(".$this->ldapGFilter.")";
             }
         }
@@ -319,7 +319,7 @@ class ldapAuthDriver extends AbstractAuthDriver
     // $baseGroup = "/"
     public function listUsersPaginated($baseGroup, $regexp, $offset, $limit)
     {
-        if ($this->hasGroupsMapping !== false) {
+        if (!empty($this->hasGroupsMapping)) {
             if ($baseGroup == "/") {
                 $this->dynamicFilter = "!(".$this->hasGroupsMapping."=*)";
             } else {
@@ -346,7 +346,7 @@ class ldapAuthDriver extends AbstractAuthDriver
     }
     public function getUsersCount($baseGroup = "/", $regexp = "")
     {
-        if ($this->hasGroupsMapping !== false) {
+        if (!empty($this->hasGroupsMapping)) {
             if ($baseGroup == "/") {
                 $this->dynamicFilter = "!(".$this->hasGroupsMapping."=*)";
             } else {
@@ -378,7 +378,7 @@ class ldapAuthDriver extends AbstractAuthDriver
             $arr[$this->separateGroup] = "LDAP Annuary";
             return $arr;
         }
-        if ($this->hasGroupsMapping) {
+        if (!empty($this->hasGroupsMapping)) {
             $origUsersDN = $this->ldapDN;
             $origUsersFilter = $this->ldapFilter;
             $origUsersAttr = $this->ldapUserAttr;
