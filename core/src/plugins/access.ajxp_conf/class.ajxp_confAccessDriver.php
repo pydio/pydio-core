@@ -515,6 +515,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     HTMLWriter::charsetHeader("application/json");
                     $roleData = $role->getDataArray();
                     $repos = ConfService::getAccessibleRepositories($userObject, true, true, ($userObject == null ? true:false));
+                    // Make sure it's utf8
+                    foreach($repos as $r => $rLabel){
+                        $repos[$r] = SystemTextEncoding::toUTF8($rLabel);
+                    }
                     $data = array(
                         "ROLE" => $roleData,
                         "ALL"  => array(
