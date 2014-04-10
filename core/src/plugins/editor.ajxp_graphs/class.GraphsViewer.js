@@ -61,7 +61,7 @@ Class.create("GraphsViewer", AbstractEditor, {
         this.queriesData.each(function(qData){
             var div;
             if(qData['SEPARATOR']){
-                div = new Element('div', {class:'tabrow'}).update('<li class="selected">' + qData['LABEL'] + '</li>');
+                div = new Element('div', {class:'tabrow', style:'clear:left;'}).update('<li class="selected">' + qData['LABEL'] + '</li>');
                 this.element.insert(div);
                 return;
             }
@@ -69,7 +69,8 @@ Class.create("GraphsViewer", AbstractEditor, {
             this.element.insert(div);
             div.insert({top:('<div class="innerTitle">'+qData['LABEL']+'</div>')});
             div.insert(('<div style="text-align: center; padding:100px;">Loading...</div>'));
-            this.loadData(qData['NAME']);
+            if(!qData["COUNT"]) qData["COUNT"] = this.defaultCount;
+            this.loadData(qData['NAME'], null, 0, qData['COUNT']);
         }.bind(this));
     },
 
@@ -104,19 +105,35 @@ Class.create("GraphsViewer", AbstractEditor, {
         var div = this.element.down("#"+queryName+'_container');
         div.update('');
         if(qData['AXIS']){
-            var svg = dimple.newSvg("#"+queryName+'_container', '100%', 300);
+            var height = 300;
+            if(qData["DIRECTION"] && qData["DIRECTION"] == "horizontal"){
+                height = 600;
+            }
+            var svg = dimple.newSvg("#"+queryName+'_container', '100%', height);
             var chart = new dimple.chart(svg, jsonData['data']);
-            chart.addCategoryAxis("x", qData['AXIS']['x']);
-            chart.addMeasureAxis("y", qData['AXIS']['y']);
             chart.defaultColors[0] = new dimple.color("#399C9B");
             chart.setMargins(80, 20, 40, 80);
-            chart.addSeries(null, dimple.plot.line);
+            if(qData["DIRECTION"] && qData["DIRECTION"] == "horizontal"){
+                chart.addMeasureAxis("x", qData['AXIS']['x']);
+                chart.addCategoryAxis("y", qData['AXIS']['y']);
+                chart.setMargins('40%', 20, 40, 80);
+            }else{
+                chart.addCategoryAxis("x", qData['AXIS']['x']);
+                chart.addMeasureAxis("y", qData['AXIS']['y']);
+            }
+
+            if(qData["DIAGRAM"]){
+                chart.addSeries(null, dimple.plot[qData["DIAGRAM"]]);
+            }else{
+                chart.addSeries(null, dimple.plot.line);
+            }
             chart.draw();
             div.insert({top:('<div class="innerTitle">'+qData['LABEL']+'</div>')});
             this.updateLinks(chart, queryName, jsonData);
             this.charts.push(chart);
         }else if(qData["FIGURE"]){
-
+            div.setStyle('float:left; width:22%;margin-right:3%;');
+            div.update('<div class="innerTitle">'+qData['LABEL']+'</div>' + '<div style="font-size: 70px; font-weight: bold;text-align: center;color: rgb(78,167,165);padding: 10px 0 30px;">' + jsonData['data'][0]['total'] + '</div>');
         }
     },
 
@@ -131,20 +148,34 @@ Class.create("GraphsViewer", AbstractEditor, {
         var container = this.element.down('#' + queryName+'_container');
         var linkCont = container.down('.chart_links');
         if(!linkCont){
-            linkCont = new Element('div', {className:'chart_links', style:'float: right;margin: 10px 20px;'});
+            linkCont = new Element('div', {className:'chart_links', style:'float: right;margin: 10px 20px;min-width: 180px;text-align: right;'});
             container.insert({top:linkCont});
         }else{
             linkCont.update('');
         }
 
-        $A(["next", "previous", "first"]).each(function(relName){
+        $A(["next", "count", "previous", "first"]).each(function(relName){
+            if(relName == "count"){
+                var qData = this.getQueryByName(queryName);
+                var input = new Element("input", {type:"text", value:qData["COUNT"], style:'width: 20px !important;height: 19px;text-align:right'});
+                input.observe("keydown", function(e){
+                    if(e.keyCode == Event.KEY_RETURN){
+                        qData["COUNT"] = parseInt(input.getValue());
+                        this.loadData(queryName, chart, 0, qData["COUNT"]);
+                    }
+                }.bind(this));
+                linkCont.insert(input);
+                linkCont.insert('<span> days</span>');
+                return;
+            }
             var linkData = jsonData['links'].detect(function(l){
                 return (l['rel'] == relName);
             });
+            var a;
             if(linkData){
-                var a = this.createLink(queryName, linkData, chart);
+                a = this.createLink(queryName, linkData, chart);
             }else{
-                var a = this.createLink(queryName, relName, chart);
+                a = this.createLink(queryName, relName, chart);
             }
             linkCont.insert(a);
         }.bind(this));

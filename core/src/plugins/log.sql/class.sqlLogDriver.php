@@ -36,63 +36,7 @@ class sqlLogDriver extends AbstractLogDriver
     private $queries;
 
     /**
-     * @var array Sample queries for the record. See the queries.json file instead.
-     */
-    private $sampleQueries = array(
-        "connections_per_day" => array(
-            "LABEL" => "Total connections per day",
-            "AXIS" => array("x" => "Date", "y" => "Users Connections"),
-            "SQL" =>'SELECT DATE( logdate )AS Date, COUNT( DISTINCT id ) AS "Users Connections"
-                        FROM ajxp_log2
-                        WHERE user
-                        IN (
-                            SELECT DISTINCT login
-                            FROM ajxp_user_rights
-                            WHERE severity =  "INFO"
-                            AND login NOT
-                            IN (
-                                SELECT DISTINCT login
-                                FROM ajxp_user_rights
-                                WHERE repo_uuid =  "ajxp.parent_user"
-                            )
-                        )
-                        AND params LIKE  "Log In%"
-                        GROUP BY DATE( logdate )
-                         ORDER BY logdate DESC'),
-
-        "downloads_per_day" => array(
-            "LABEL" => "Downloads per day",
-            "AXIS" => array("x" => "Date", "y" => "Downloads"),
-            "SQL" =>'SELECT SQL_CALC_FOUND_ROWS DATE(logdate) AS Date, COUNT(distinct id) AS "Downloads"
-                        FROM ajxp_log2
-                        WHERE severity = "INFO" AND params like "Download%"
-                        GROUP BY DATE(logdate)
-                         ORDER BY logdate DESC'),
-        "sharedfiles_per_day" => array(
-            "LABEL" => "Shared files per day",
-            "AXIS" => array("x" => "Date", "y" => "Shares"),
-            "SQL" => 'SELECT DATE( logdate )AS Date, COUNT( DISTINCT id ) AS "Shares"
-                        FROM ajxp_log2
-                        WHERE severity = "INFO"
-                        AND user
-                        IN (
-                            SELECT DISTINCT login
-                            FROM ajxp_user_rights
-                            WHERE login NOT
-                            IN (
-                                SELECT DISTINCT login
-                                FROM ajxp_user_rights
-                                WHERE repo_uuid = "ajxp.parent_user"
-                            )
-                        )
-                        AND params LIKE "New Share%"
-                        GROUP BY DATE( logdate )
-                         ORDER BY logdate DESC')
-
-    );
-
-    /**
-     * Initialise the driver.
+     * Initialize the driver.
      *
      * Gives the driver a chance to set up it's connection / file resource etc..
      *

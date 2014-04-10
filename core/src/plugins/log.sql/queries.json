@@ -1,9 +1,13 @@
 [
+    {
+        "SEPARATOR":true,
+        "LABEL":"Main Figures"
+    },
   {
     "NAME":"cumulated_logins",
     "LABEL":"Cumulated Logins",
-    "FIGURE":"total_number_of_logins",
-    "SQL":"SELECT COUNT( DISTINCT id ) AS total_number_of_logins FROM ajxp_log WHERE user IN ( SELECT DISTINCT login FROM ajxp_user_rights WHERE severity =  \"INFO\" AND login NOT IN ( SELECT DISTINCT login FROM ajxp_user_rights WHERE repo_uuid = \"ajxp.parent_user\" ) ) AND (params LIKE  \"Log In%\" OR message LIKE \"Log In%\") AND AJXP_CURSOR_DATE"
+    "FIGURE":"total",
+    "SQL":"SELECT COUNT( DISTINCT id ) AS total FROM ajxp_log WHERE user IN ( SELECT DISTINCT login FROM ajxp_user_rights WHERE severity =  \"INFO\" AND login NOT IN ( SELECT DISTINCT login FROM ajxp_user_rights WHERE repo_uuid = \"ajxp.parent_user\" ) ) AND (params LIKE  \"Log In%\" OR message LIKE \"Log In%\") AND AJXP_CURSOR_DATE"
   },
     {
         "SEPARATOR":true,
@@ -25,7 +29,7 @@
       "x":"Date",
       "y":"Users Connections"
     },
-    "SQL":"SELECT DATE( logdate )AS Date, COUNT( DISTINCT id ) AS \"Users Connections\" FROM ajxp_log WHERE user IN ( SELECT DISTINCT login FROM ajxp_user_rights WHERE severity =  \"INFO\" AND login NOT IN (SELECT DISTINCT login FROM ajxp_user_rights WHERE repo_uuid = \"ajxp.parent_user\" ) ) AND AJXP_CURSOR_DATE AND params LIKE  \"Log In%\" GROUP BY DATE( logdate )  ORDER BY logdate DESC"
+    "SQL":"SELECT DATE( logdate )AS Date, COUNT( DISTINCT id ) AS \"Users Connections\" FROM ajxp_log WHERE user IN ( SELECT DISTINCT login FROM ajxp_user_rights WHERE severity =  \"INFO\" AND login NOT IN (SELECT DISTINCT login FROM ajxp_user_rights WHERE repo_uuid = \"ajxp.parent_user\" ) ) AND AJXP_CURSOR_DATE AND (params LIKE  \"Log In%\" OR message LIKE  \"Log In%\" ) GROUP BY DATE( logdate )  ORDER BY logdate DESC"
   },
     {
         "SEPARATOR":true,
@@ -57,5 +61,16 @@
       "y":"Shares"
     },
     "SQL":"SELECT DATE( logdate )AS Date, COUNT( DISTINCT id ) AS \"Shares\" FROM ajxp_log WHERE severity = \"INFO\" AND AJXP_CURSOR_DATE AND user IN ( SELECT DISTINCT login FROM ajxp_user_rights  WHERE login NOT IN ( SELECT DISTINCT login FROM ajxp_user_rights WHERE repo_uuid = \"ajxp.parent_user\" ) ) AND (params LIKE \"New Share%\" OR message LIKE \"New Share%\" ) GROUP BY DATE( logdate )  ORDER BY logdate DESC"
-  }
+  },
+    {
+        "NAME":"most_downloaded",
+        "LABEL":"Most downloaded files",
+        "AXIS":{
+            "y":"File Name",
+            "x":"Downloaded"
+        },
+        "DIAGRAM": "bar",
+        "DIRECTION":"horizontal",
+        "SQL":"SELECT SUBSTRING(params,7) AS \"File Name\", COUNT( 1 ) AS Downloaded FROM ajxp_log WHERE severity = \"INFO\" AND (params LIKE \"Download%\" OR message LIKE \"Download%\" ) AND AJXP_CURSOR_DATE GROUP BY params ORDER BY COUNT( 1 ) DESC LIMIT 20"
+    }
 ]
