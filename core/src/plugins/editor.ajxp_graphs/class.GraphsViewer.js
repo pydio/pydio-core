@@ -113,7 +113,7 @@ Class.create("GraphsViewer", AbstractEditor, {
             }
             var svg = dimple.newSvg("#"+queryName+'_container', '100%', height);
             var chart = new dimple.chart(svg, jsonData['data']);
-            var colorIndex = this.colors.length % this.colorIndex;
+            var colorIndex = this.colorIndex % this.colors.length;
             chart.defaultColors[0] = new dimple.color(this.colors[colorIndex]);
             this.colorIndex ++;
             chart.setMargins(80, 20, 40, 80);
