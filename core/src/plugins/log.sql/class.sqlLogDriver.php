@@ -331,7 +331,7 @@ class sqlLogDriver extends AbstractLogDriver
                     "Analytics Dashboard",
                     true,
                     array(
-                        "icon"      => "scheduler/ICON_SIZE/task.png",
+                        "icon"      => "graphs_viewer/ICON_SIZE/analytics.png",
                         "ajxp_mime" => "ajxp_graphs",
                     ),
                     true,

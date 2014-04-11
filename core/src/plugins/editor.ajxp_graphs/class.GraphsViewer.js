@@ -23,6 +23,8 @@ Class.create("GraphsViewer", AbstractEditor, {
     queriesData: null,
     charts: null,
     defaultCount:31,
+    colors: [ '#77b8e2', '#e35d52', '#d7a76A', '#399C9B', '#156FAF', '#4ACEB0' ],
+    colorIndex:1,
 
     initialize: function($super, oFormObject, editorOptions)
     {
@@ -111,7 +113,9 @@ Class.create("GraphsViewer", AbstractEditor, {
             }
             var svg = dimple.newSvg("#"+queryName+'_container', '100%', height);
             var chart = new dimple.chart(svg, jsonData['data']);
-            chart.defaultColors[0] = new dimple.color("#399C9B");
+            var colorIndex = this.colors.length % this.colorIndex;
+            chart.defaultColors[0] = new dimple.color(this.colors[colorIndex]);
+            this.colorIndex ++;
             chart.setMargins(80, 20, 40, 80);
             if(qData["DIRECTION"] && qData["DIRECTION"] == "horizontal"){
                 chart.addMeasureAxis("x", qData['AXIS']['x']);
@@ -132,8 +136,8 @@ Class.create("GraphsViewer", AbstractEditor, {
             this.updateLinks(chart, queryName, jsonData);
             this.charts.push(chart);
         }else if(qData["FIGURE"]){
-            div.setStyle('float:left; width:22%;margin-right:3%;');
-            div.update('<div class="innerTitle">'+qData['LABEL']+'</div>' + '<div style="font-size: 70px; font-weight: bold;text-align: center;color: rgb(78,167,165);padding: 10px 0 30px;">' + jsonData['data'][0]['total'] + '</div>');
+            div.addClassName("cumulated_figure");
+            div.update('<div class="innerTitle">'+qData['LABEL']+'</div>' + '<div class="figure">' + jsonData['data'][0]['total'] + '</div>');
         }
     },
 

@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor id="editor.ajxp_graphs" openable="true" order="10" text="graphs_viewer.1"
-        title="graphs_viewer.2" iconClass="icon-dashboard" icon="edit.png" className="GraphsViewer"
+        title="graphs_viewer.2" iconClass="icon-bar-chart" icon="edit.png" className="GraphsViewer"
         mimes="ajxp_graphs" formId="graph_viewer_box" label="CONF_MESSAGE[Graphs Viewer]"
         description="CONF_MESSAGE[Plugin Editor]"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<client_settings>
         <resources>
-            <js file="plugins/editor.ajxp_graphs/res/d3.min.js" className="d3" />
-            <js file="plugins/editor.ajxp_graphs/res/dimple.v1.1.5.js" className="dimple" />
+            <js file="plugins/editor.ajxp_graphs/res/js/d3.min.js" className="d3" />
+            <js file="plugins/editor.ajxp_graphs/res/js/dimple.v1.1.5.js" className="dimple" />
             <js file="plugins/editor.ajxp_graphs/class.GraphsViewer.js" className="GraphsViewer"/>
             <css file="plugins/editor.ajxp_role/rolesEditor.css" />
-            <i18n namespace="graphs_viewer" path="plugins/editor.ajxp_graphs/i18n"/>
+            <css file="plugins/editor.ajxp_graphs/res/css/graphsViewer.css" />
+            <i18n namespace="graphs_viewer" path="plugins/editor.ajxp_graphs/res/i18n"/>
+            <img_library alias="graphs_viewer" path="plugins/editor.ajxp_graphs/res/icons"/>
         </resources>
 	</client_settings>
 	<clientForm id="graph_viewer_box"><![CDATA[
