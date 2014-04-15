@@ -1002,11 +1002,36 @@ class ShareCenter extends AJXP_Plugin
         {
             // Remove the publiclet, it's done
             if (strstr(realpath($_SERVER["SCRIPT_FILENAME"]),realpath(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"))) !== FALSE) {
-                PublicletCounter::delete($shortHash);
-                unlink($_SERVER["SCRIPT_FILENAME"]);
+
+                AuthService::logUser($data["OWNER_ID"], "", true);
+                $repoObject = $data["REPOSITORY"];
+                $nodePath = "ajxp.".$repoObject->getAccessType()."://".$repoObject->getId().$data["FILE_PATH"];
+                $ajxpNode = new AJXP_Node($nodePath);
+                $metadata = $ajxpNode->retrieveMetadata(
+                    "ajxp_shared",
+                    true,
+                    AJXP_METADATA_SCOPE_REPOSITORY
+                );
+                if (count($metadata)) {
+                    $eType = "file";
+                    $elementId = $shortHash;
+                    $updateMeta = false;
+                    if (is_array($metadata["element"]) && isSet($metadata["element"][$elementId])) {
+                        unset($metadata["element"][$elementId]);
+                        if(count($metadata["element"]) > 0) $updateMeta = true;
+                    }
+                    self::deleteSharedElement($eType, $elementId, AuthService::getLoggedUser());
+                    if ($updateMeta) {
+                        $ajxpNode->setMetadata("ajxp_shared", $metadata, true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+                    } else {
+                        $ajxpNode->removeMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+                    }
+                }
             }
 
-            echo "Link is expired, sorry.";
+            //echo "Link is expired, sorry.";
+            header("HTTP/1.0 404 Not Found");
+            echo '404 File not found';
             exit();
         }
         // Load language messages
