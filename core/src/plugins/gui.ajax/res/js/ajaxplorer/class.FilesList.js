@@ -725,7 +725,7 @@ Class.create("FilesList", SelectableElements, {
 			this.observer = function(e){
 				fitHeightToBottom(contentContainer, this.htmlElement);
 				if(Prototype.Browser.IE){
-					this._headerResizer.resize(contentContainer.getWidth());
+                    if(contentContainer) this._headerResizer.resize(contentContainer.getWidth());
 				}else{
                     var width = this.htmlElement.getWidth();
                     width -= parseInt(this.htmlElement.getStyle("borderLeftWidth")) + parseInt(this.htmlElement.getStyle("borderRightWidth"));
@@ -881,7 +881,7 @@ Class.create("FilesList", SelectableElements, {
                     if(!this.htmlElement || !this.scrollbar) return;
                     if(this._displayMode == "list"){
                         fitHeightToBottom(contentContainer, this.htmlElement);
-                        if(Prototype.Browser.IE){
+                        if(Prototype.Browser.IE && contentContainer){
                             this._headerResizer.resize(contentContainer.getWidth());
                         }else{
                             var width = this.htmlElement.getWidth();
