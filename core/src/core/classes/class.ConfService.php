@@ -399,6 +399,9 @@ class ConfService
                 return false;
             }
         }
+        if ($repositoryObject->getAccessType()=="ajxp_user" && $userObject != null) {
+            return true;// ($userObject->canRead($repositoryId) || $userObject->canWrite($repositoryId)) ;
+        }
         if ($repositoryObject->getAccessType() == "ajxp_shared" && !AuthService::usersEnabled()) {
             return false;
         }
