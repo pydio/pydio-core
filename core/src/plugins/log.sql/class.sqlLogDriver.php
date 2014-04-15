@@ -95,11 +95,12 @@ class sqlLogDriver extends AbstractLogDriver
         $mess = ConfService::getMessages();
 
         $format = 'Y-m-d 00:00:00';
+        $endFormat = 'Y-m-d 23:59:59';
         $dKeyFormat = $mess["date_relative_date_format"];
         $ref = time();
         $last = $start + $count;
         $startDate = date($format, strtotime("-$last day", $ref));
-        $endDate =  date($format, strtotime("-$start day", $ref));
+        $endDate =  date($endFormat, strtotime("-$start day", $ref));
         $dateCursor = "logdate > '$startDate' AND logdate <= '$endDate'";
 
         $q = $query["SQL"];
