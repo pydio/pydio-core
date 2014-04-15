@@ -37,6 +37,45 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return (strpos($key, "AJXP_GRP_/") === FALSE && strpos($key, "AJXP_USR_/") === FALSE);
     }
 
+    private function getEditableParameters($withLabel = false){
+        $currentUserIsGroupAdmin = (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/");
+        $query = "//param|//global_param";
+        if($currentUserIsGroupAdmin){
+            $query = "//param[@scope]|//global_param[@scope]";
+        }
+
+        $nodes = AJXP_PluginsService::getInstance()->searchAllManifests($query, "node", false, true, true);
+        $actions = array();
+        foreach ($nodes as $node) {
+            if($node->parentNode->nodeName != "server_settings") continue;
+            $parentPlugin = $node->parentNode->parentNode;
+            $pId = $parentPlugin->attributes->getNamedItem("id")->nodeValue;
+            if (empty($pId)) {
+                $pId = $parentPlugin->nodeName .".";
+                if($pId == "ajxpdriver.") $pId = "access.";
+                $pId .= $parentPlugin->attributes->getNamedItem("name")->nodeValue;
+            }
+            //echo($pId." : ". $node->attributes->getNamedItem("name")->nodeValue . " (".$messId.")<br>");
+            if(!is_array($actions[$pId])) $actions[$pId] = array();
+            $actionName = $node->attributes->getNamedItem("name")->nodeValue;
+            $messId = $node->attributes->getNamedItem("label")->nodeValue;
+            if($withLabel){
+                $actions[$pId][$actionName] = array( "parameter" => $actionName , "label" => AJXP_XMLWriter::replaceAjxpXmlKeywords($messId));
+            }else{
+                $actions[$pId][] = $actionName;
+            }
+
+        }
+        foreach ($actions as $actPid => $actionGroup) {
+            ksort($actionGroup, SORT_STRING);
+            $actions[$actPid] = array();
+            foreach ($actionGroup as $k => $v) {
+                $actions[$actPid][] = $v;
+            }
+        }
+        return $actions;
+    }
+
     public function listAllActions($action, $httpVars, $fileVars)
     {
         if(!isSet($this->actions[$action])) return;
@@ -60,6 +99,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             break;
 
             case "list_all_plugins_actions":
+
+                $currentUserIsGroupAdmin = (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/");
+                if($currentUserIsGroupAdmin){
+                    // Group admin : do not allow actions edition
+                    HTMLWriter::charsetHeader("application/json");
+                    echo json_encode(array("LIST" => array(), "HAS_GROUPS" => true));
+                    return;
+                }
+
                 $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//action", "node", false, true, true);
                 $actions = array();
                 foreach ($nodes as $node) {
@@ -95,35 +143,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 HTMLWriter::charsetHeader("application/json");
                 echo json_encode(array("LIST" => $actions, "HAS_GROUPS" => true));
                 break;
-            case "list_all_plugins_parameters":
-                $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//param|//global_param", "node", false, true, true);
-                $actions = array();
-                foreach ($nodes as $node) {
-                    if($node->parentNode->nodeName != "server_settings") continue;
-                    $parentPlugin = $node->parentNode->parentNode;
-                    $pId = $parentPlugin->attributes->getNamedItem("id")->nodeValue;
-                    if (empty($pId)) {
-                        $pId = $parentPlugin->nodeName .".";
-                        if($pId == "ajxpdriver.") $pId = "access.";
-                        $pId .= $parentPlugin->attributes->getNamedItem("name")->nodeValue;
-                    }
-                    //echo($pId." : ". $node->attributes->getNamedItem("name")->nodeValue . " (".$messId.")<br>");
-                    if(!is_array($actions[$pId])) $actions[$pId] = array();
-                    $actionName = $node->attributes->getNamedItem("name")->nodeValue;
-                    $messId = $node->attributes->getNamedItem("label")->nodeValue;
-                    $actions[$pId][$actionName] = array( "parameter" => $actionName , "label" => AJXP_XMLWriter::replaceAjxpXmlKeywords($messId));
 
-                }
-                foreach ($actions as $actPid => $actionGroup) {
-                    ksort($actionGroup, SORT_STRING);
-                    $actions[$actPid] = array();
-                    foreach ($actionGroup as $k => $v) {
-                        $actions[$actPid][] = $v;
-                    }
-                }
+            case "list_all_plugins_parameters":
+
+                $actions = $this->getEditableParameters(true);
                 HTMLWriter::charsetHeader("application/json");
                 echo json_encode(array("LIST" => $actions, "HAS_GROUPS" => true));
                 break;
+
             case "parameters_to_form_definitions" :
 
                 $data = json_decode(AJXP_Utils::decodeSecureMagic($httpVars["json_parameters"]), true);
@@ -617,6 +644,30 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 if (isSet($data["GROUP_LABEL"]) && isSet($groupLabel) && $groupLabel != $data["GROUP_LABEL"]) {
                     ConfService::getConfStorageImpl()->relabelGroup($filteredGroupPath, $data["GROUP_LABEL"]);
+                }
+
+                if($currentUserIsGroupAdmin){
+                    // FILTER DATA FOR GROUP ADMINS
+                    $params = $this->getEditableParameters(false);
+                    foreach($roleData["PARAMETERS"] as $scope => &$plugsParameters){
+                        foreach($plugsParameters as $paramPlugin => &$parameters){
+                            foreach($parameters as $pName => $pValue){
+                                if(!isSet($params[$paramPlugin]) || !in_array($pName, $params[$paramPlugin])){
+                                    unset($parameters[$pName]);
+                                }
+                            }
+                            if(!count($parameters)){
+                                unset($plugsParameters[$paramPlugin]);
+                            }
+                        }
+                        if(!count($plugsParameters)){
+                            unset($roleData["PARAMETERS"][$scope]);
+                        }
+                    }
+                    // Remerge from parent
+                    $roleData["PARAMETERS"] = $originalRole->array_merge_recursive2($originalRole->listParameters(), $roleData["PARAMETERS"]);
+                    // Changing Actions is not allowed
+                    $roleData["ACTIONS"] = $originalRole->listActionsStates();
                 }
 
                 $output = array();
