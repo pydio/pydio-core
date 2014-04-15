@@ -1001,7 +1001,7 @@ class AuthService
     }
 
     /**
-     * @param AJXP_Role $parentRole
+     * @param AJXP_User $parentUser
      * @return AJXP_Role
      */
     public static function limitedRoleFromParent($parentUser)
