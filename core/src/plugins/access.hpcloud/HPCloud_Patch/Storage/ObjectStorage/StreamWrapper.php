@@ -407,10 +407,10 @@ class StreamWrapper
    */
   public function dir_opendir($path, $options)
   {
-      \AJXP_Logger::debug("OPENDIR ".$path);
+      \AJXP_Logger::debug(__CLASS__,__FUNCTION__,"OPENDIR ".$path);
     $url = $this->parseUrl($path);
       if (isSet(self::$statCacheData["HPC_MAIN_PATH"]) && self::$statCacheData["HPC_MAIN_PATH"] == $path) {
-          \AJXP_Logger::debug(">> listing from cache");
+          \AJXP_Logger::debug(__CLASS__,__FUNCTION__,">> listing from cache");
           $this->listFromCache = true;
           return TRUE;
       }
@@ -497,7 +497,7 @@ class StreamWrapper
 
       if ($curr instanceof \HPCloud\Storage\ObjectStorage\Subdir) {
         $fullpath = $curr->path();
-          \AJXP_Logger::debug("Full path should be dir ".$fullpath);
+          \AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Full path should be dir ".$fullpath);
           $fullpath = rtrim($fullpath, "/");
         self::$statCache[basename($fullpath)] = $this->fakeStat(true);
     } else {
@@ -926,7 +926,7 @@ class StreamWrapper
     // us the peace of mind that we have an actual container.
     // XXX: Should we make it possible to get a container blindly, without the
     // server roundtrip?
-      \AJXP_Logger::debug(">> Getting the container $containerName");
+      \AJXP_Logger::debug(__CLASS__,__FUNCTION__,">> Getting the container $containerName");
     try {
         if (isSet(self::$statCacheData["HPC_CONTAINER"]) && self::$statCacheData["HPC_MAIN_PATH"] == $containerName) {
             $this->container = self::$statCacheData["HPC_CONTAINER"];
@@ -941,7 +941,7 @@ class StreamWrapper
     }
 
     try {
-        \AJXP_Logger::debug(">> Now fetching the file");
+        \AJXP_Logger::debug(__CLASS__,__FUNCTION__,">> Now fetching the file");
         // Now we fetch the file. Only under certain circumstances do we generate
       // an error if the file is not found.
       // FIXME: We should probably allow a context param that can be set to
@@ -1210,7 +1210,7 @@ class StreamWrapper
   public function url_stat($path, $flags)
   {
     $url = $this->parseUrl($path);
-      \AJXP_Logger::debug("STATING ".$path);
+      \AJXP_Logger::debug(__CLASS__,__FUNCTION__,"STATING ".$path);
 
       $base = $url["host"]; //dirname($path)."/";
       $name = basename($path);
@@ -1221,7 +1221,7 @@ class StreamWrapper
           return self::$statCache[$name];
       }
       if (is_array(self::$statCache) && isSet(self::$statCache[$path])) {
-          \AJXP_Logger::debug("Cached path!");
+          \AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Cached path!");
           return self::$statCache[$path];
       }
       if (empty($url['host']) || empty($url['path'])) {
@@ -1241,10 +1241,10 @@ class StreamWrapper
       $name = $url['host'];
       try {
           if (isSet(self::$statCacheData["HPC_CONTAINER"]) && self::$statCacheData["HPC_MAIN_PATH"] == $name) {
-              \AJXP_Logger::debug("URL_STAT Getting container from cache");
+              \AJXP_Logger::debug(__CLASS__,__FUNCTION__,"URL_STAT Getting container from cache");
               $container = self::$statCacheData["HPC_CONTAINER"];
           } else {
-              \AJXP_Logger::debug("URL_STAT Instanciating container ".$name);
+              \AJXP_Logger::debug(__CLASS__,__FUNCTION__,"URL_STAT Instanciating container ".$name);
               $token = $this->store->token();
               $endpoint_url = $this->store->url() . '/' . rawurlencode($name);
               $container = new \HPCloud\Storage\ObjectStorage\Container($name, $endpoint_url, $token);
@@ -1270,7 +1270,7 @@ class StreamWrapper
     if ($flags & STREAM_URL_STAT_QUIET) {
       try {
         $s = @$this->generateStat($obj, $container, $obj->contentLength());
-          \AJXP_Logger::debug("CACHING1 ".$path, array_keys(self::$statCache));
+          \AJXP_Logger::debug(__CLASS__,__FUNCTION__,"CACHING1 ".$path, array_keys(self::$statCache));
           self::$statCache[$path] = $s;
           return $s;
       } catch (\HPCloud\Exception $e) {
@@ -1279,7 +1279,7 @@ class StreamWrapper
     }
     $s = $this->generateStat($obj, $container, $obj->contentLength());
       self::$statCache[$path] = $s;
-      \AJXP_Logger::debug("CACHING2 ".$path, array_keys(self::$statCache));
+      \AJXP_Logger::debug(__CLASS__,__FUNCTION__,"CACHING2 ".$path, array_keys(self::$statCache));
       return $s;
   }
 
@@ -1664,7 +1664,7 @@ class StreamWrapper
     }
     // Try to authenticate and get a new token.
     else {
-        \AJXP_Logger::debug("Authenticating");
+        \AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Authenticating");
       $ident = $this->authenticate();
 
       // Update token and service catalog. The old pair may be out of date.

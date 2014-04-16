@@ -1616,7 +1616,7 @@ class ShareCenter extends AJXP_Plugin
     public static function deleteSharedElement($type, $element, $loggedUser)
     {
         $mess = ConfService::getMessages();
-        AJXP_Logger::debug(__FILE__, "Deleting shared element ".$type."-".$element);
+        AJXP_Logger::debug(__CLASS__, __FILE__, "Deleting shared element ".$type."-".$element);
         if ($type == "repository") {
             $repo = ConfService::getRepositoryById($element);
             if($repo == null) return;

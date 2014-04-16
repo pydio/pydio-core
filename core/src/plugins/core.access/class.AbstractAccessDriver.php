@@ -496,11 +496,11 @@ class AbstractAccessDriver extends AJXP_Plugin
             $actualPerms = $otherPerms;
 
             if ( ( isSet($uid) && $stat["uid"] == $uid ) || $fixPermPolicy == "user"  ) {
-                AJXP_Logger::debug("upgrading abit to ubit");
+                AJXP_Logger::debug(__CLASS__,__FUNCTION__,"upgrading abit to ubit");
                 $userPerms = decbin(intval($p[$lastInd - 2]));
                 $actualPerms |= $userPerms;
             } else if ( ( isSet($gid) && $stat["gid"] == $gid ) || $fixPermPolicy == "group"  ) {
-                AJXP_Logger::debug("upgrading abit to gbit");
+                AJXP_Logger::debug(__CLASS__,__FUNCTION__,"upgrading abit to gbit");
                 $groupPerms = decbin(intval($p[$lastInd - 1]));
                 $actualPerms |= $groupPerms;
             }
@@ -508,7 +508,7 @@ class AbstractAccessDriver extends AJXP_Plugin
             $p[$lastInd] = $test;
 
             $stat["mode"] = $stat[2] = octdec($p);
-            //AJXP_Logger::debug("FIXED PERM DATA ($fixPermPolicy)",sprintf("%o", ($p & 000777)));
+            //AJXP_Logger::debug(__CLASS__,__FUNCTION__,"FIXED PERM DATA ($fixPermPolicy)",sprintf("%o", ($p & 000777)));
         }
     }
 
