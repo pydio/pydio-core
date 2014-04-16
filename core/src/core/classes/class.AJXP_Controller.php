@@ -57,6 +57,10 @@ class AJXP_Controller
         return self::$xPath;
     }
 
+    public static function registryReset(){
+        self::$xPath = null;
+    }
+
     /**
      * Check the current user "specificActionsRights" and filter the full registry actions with these.
      * @static

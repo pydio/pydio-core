@@ -371,28 +371,33 @@ class AjxpLuceneIndexer extends AJXP_Plugin
     public function updateNodeIndexMeta($node)
     {
         require_once("Zend/Search/Lucene.php");
-        if (isSet($this->currentIndex)) {
-            $index = $this->currentIndex;
-        } else {
-            $index =  $this->loadIndex($node->getRepositoryId());
-        }
-        Zend_Search_Lucene_Analysis_Analyzer::setDefault( new Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum_CaseInsensitive());
+        try{
 
-        if (AuthService::usersEnabled() && AuthService::getLoggedUser()!=null) {
-            $term = new Zend_Search_Lucene_Index_Term(SystemTextEncoding::toUTF8($node->getUrl()), "node_url");
-            $hits = $index->termDocs($term);
-            foreach ($hits as $hitId) {
-                $hit = $index->getDocument($hitId);
-                if ($hit->ajxp_scope == 'shared' || ($hit->ajxp_scope == 'user' && $hit->ajxp_user == AuthService::getLoggedUser()->getId())) {
-                    $index->delete($hitId);
-                }
+            if (isSet($this->currentIndex)) {
+                $index = $this->currentIndex;
+            } else {
+                $index =  $this->loadIndex($node->getRepositoryId());
             }
-        } else {
-            $id = $this->getIndexedDocumentId($index, $node);
-            if($id != null) $index->delete($id);
-        }
-        $this->createIndexedDocument($node, $index);
+            Zend_Search_Lucene_Analysis_Analyzer::setDefault( new Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum_CaseInsensitive());
 
+            if (AuthService::usersEnabled() && AuthService::getLoggedUser()!=null) {
+                $term = new Zend_Search_Lucene_Index_Term(SystemTextEncoding::toUTF8($node->getUrl()), "node_url");
+                $hits = $index->termDocs($term);
+                foreach ($hits as $hitId) {
+                    $hit = $index->getDocument($hitId);
+                    if ($hit->ajxp_scope == 'shared' || ($hit->ajxp_scope == 'user' && $hit->ajxp_user == AuthService::getLoggedUser()->getId())) {
+                        $index->delete($hitId);
+                    }
+                }
+            } else {
+                $id = $this->getIndexedDocumentId($index, $node);
+                if($id != null) $index->delete($id);
+            }
+            $this->createIndexedDocument($node, $index);
+            $this->logDebug(__FILE__, "Indexation passed ".$node->getUrl());
+        } catch (Exception $e){
+            $this->logError(__FILE__, "Lucene indexation failed for ".$node->getUrl()." (".$e->getMessage().")");
+        }
     }
 
         /**

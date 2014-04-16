@@ -984,6 +984,38 @@ class ShareCenter extends AJXP_Plugin
         echo($html);
     }
 
+    private static function deleteExpiredPubliclet($elementId, $data){
+
+        if(AuthService::getLoggedUser()->getId() != $data["OWNER_ID"]){
+            AuthService::logUser($data["OWNER_ID"], "", true);
+        }
+        $repoObject = $data["REPOSITORY"];
+
+        ConfService::loadDriverForRepository($repoObject)->detectStreamWrapper(true);
+        AJXP_Controller::registryReset();
+        $ajxpNode = new AJXP_Node("ajxp.".$repoObject->getAccessType()."://".$repoObject->getId().$data["FILE_PATH"]);
+        $metadata = $ajxpNode->retrieveMetadata(
+            "ajxp_shared",
+            true,
+            AJXP_METADATA_SCOPE_REPOSITORY,
+            true
+        );
+        self::deleteSharedElement("file", $elementId, AuthService::getLoggedUser());
+        if (count($metadata)) {
+            $updateMeta = false;
+            if (is_array($metadata["element"]) && isSet($metadata["element"][$elementId])) {
+                unset($metadata["element"][$elementId]);
+                if(count($metadata["element"]) > 0) $updateMeta = true;
+            }
+            if ($updateMeta) {
+                $ajxpNode->setMetadata("ajxp_shared", $metadata, true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+            } else {
+                $ajxpNode->removeMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+            }
+        }
+
+    }
+
     /**
      * @static
      * @param Array $data
@@ -1003,30 +1035,7 @@ class ShareCenter extends AJXP_Plugin
             // Remove the publiclet, it's done
             if (strstr(realpath($_SERVER["SCRIPT_FILENAME"]),realpath(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"))) !== FALSE) {
 
-                AuthService::logUser($data["OWNER_ID"], "", true);
-                $repoObject = $data["REPOSITORY"];
-                $nodePath = "ajxp.".$repoObject->getAccessType()."://".$repoObject->getId().$data["FILE_PATH"];
-                $ajxpNode = new AJXP_Node($nodePath);
-                $metadata = $ajxpNode->retrieveMetadata(
-                    "ajxp_shared",
-                    true,
-                    AJXP_METADATA_SCOPE_REPOSITORY
-                );
-                if (count($metadata)) {
-                    $eType = "file";
-                    $elementId = $shortHash;
-                    $updateMeta = false;
-                    if (is_array($metadata["element"]) && isSet($metadata["element"][$elementId])) {
-                        unset($metadata["element"][$elementId]);
-                        if(count($metadata["element"]) > 0) $updateMeta = true;
-                    }
-                    self::deleteSharedElement($eType, $elementId, AuthService::getLoggedUser());
-                    if ($updateMeta) {
-                        $ajxpNode->setMetadata("ajxp_shared", $metadata, true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-                    } else {
-                        $ajxpNode->removeMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-                    }
-                }
+                self::deleteExpiredPubliclet($shortHash, $data);
             }
 
             //echo "Link is expired, sorry.";
@@ -1607,7 +1616,7 @@ class ShareCenter extends AJXP_Plugin
     public static function deleteSharedElement($type, $element, $loggedUser)
     {
         $mess = ConfService::getMessages();
-        AJXP_Logger::debug($type."-".$element);
+        AJXP_Logger::debug(__FILE__, "Deleting shared element ".$type."-".$element);
         if ($type == "repository") {
             $repo = ConfService::getRepositoryById($element);
             if($repo == null) return;
@@ -1680,6 +1689,7 @@ class ShareCenter extends AJXP_Plugin
         $inputData = '';
         $code = $lines[3] . $lines[4] . $lines[5];
         eval($code);
+        if(empty($inputData)) return false;
         $dataModified = self::checkHash($inputData, $id); //(md5($inputData) != $id);
         $publicletData = unserialize($inputData);
         $publicletData["SECURITY_MODIFIED"] = $dataModified;
@@ -1689,6 +1699,40 @@ class ShareCenter extends AJXP_Plugin
         $publicletData["PUBLICLET_PATH"] = $file;
         return $publicletData;
     }
+
+    public static function clearExpiredFiles($currentUser = true)
+    {
+        $files = glob(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/*.php");
+        if($currentUser){
+            $loggedUser = AuthService::getLoggedUser();
+            $userId = $loggedUser->getId();
+        }else{
+            $originalUser = AuthService::getLoggedUser()->getId();
+        }
+        $deleted = array();
+        $switchBackToOriginal = false;
+        foreach ($files as $file) {
+            $ar = explode(".", basename($file));
+            $id = array_shift($ar);
+            $publicletData = self::loadPublicletData($id);
+            if($publicletData === false) continue;
+            if ($currentUser && ( !isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $userId )) {
+                continue;
+            }
+            if( (isSet($publicletData["EXPIRE_TIME"]) && is_numeric($publicletData["EXPIRE_TIME"]) && $publicletData["EXPIRE_TIME"] > 0 && $publicletData["EXPIRE_TIME"] < time()) ||
+                (isSet($publicletData["DOWNLOAD_LIMIT"]) && $publicletData["DOWNLOAD_LIMIT"] > 0 && $publicletData["DOWNLOAD_LIMIT"] <= $publicletData["DOWNLOAD_COUNT"]) ) {
+                if(!$currentUser) $switchBackToOriginal = true;
+                self::deleteExpiredPubliclet($id, $publicletData);
+                $deleted[] = $publicletData["FILE_PATH"];
+
+            }
+        }
+        if($switchBackToOriginal){
+            AuthService::logUser($originalUser, "", true);
+        }
+        return $deleted;
+    }
+
 
     public static function currentContextIsLinkDownload(){
         return (isSet($_GET["dl"]) && isSet($_GET["dl"]) == "true");

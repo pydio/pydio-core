@@ -1495,7 +1495,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     AJXP_XMLWriter::header();
                     $element = basename($httpVars["shared_file"]);
                     $dlFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
-                    $publicletData = $this->loadPublicletData($dlFolder."/".$element.".php");
                     unlink($dlFolder."/".$element.".php");
                     AJXP_XMLWriter::sendMessage($mess["ajxp_shared.13"], null);
                     AJXP_XMLWriter::reloadDataNode();
@@ -1538,7 +1537,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             case "clear_expired" :
 
-                $deleted = $this->clearExpiredFiles();
+                $deleted = ShareCenter::clearExpiredFiles(false);  // $this->clearExpiredFiles();
                 AJXP_XMLWriter::header();
                 if (count($deleted)) {
                     AJXP_XMLWriter::sendMessage(sprintf($mess["ajxp_shared.23"], count($deleted).""), null);
@@ -2295,7 +2294,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
 
         foreach ($files as $file) {
-            $publicletData = $this->loadPublicletData($file);
+            $publicletData = ShareCenter::loadPublicletData(array_shift(explode(".", basename($file))));
             if (!is_a($publicletData["REPOSITORY"], "Repository")) {
                 continue;
             }
@@ -2325,37 +2324,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         if($key1 == "meta.git" || $key1 == "meta.svn") return 1;
         if($key2 == "meta.git" || $key2 == "meta.svn") return -1;
         return strcmp($key1, $key2);
-    }
-
-    public function clearExpiredFiles()
-    {
-        $files = glob(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/*.php");
-        $loggedUser = AuthService::getLoggedUser();
-        $userId = $loggedUser->getId();
-        $deleted = array();
-        foreach ($files as $file) {
-            $publicletData = $this->loadPublicletData($file);
-            if (isSet($publicletData["EXPIRATION_TIME"]) && is_numeric($publicletData["EXPIRATION_TIME"]) && $publicletData["EXPIRATION_TIME"] > 0 && $publicletData["EXPIRATION_TIME"] < time()) {
-                unlink($file);
-                $deleted[] = basename($file);
-            }
-        }
-        return $deleted;
-    }
-
-    protected function loadPublicletData($file)
-    {
-        $inputData = null;
-        $lines = file($file);
-        $id = str_replace(".php", "", basename($file));
-        $code = trim($lines[3] . $lines[4] . $lines[5]);
-        if(strpos($code, '$cypheredData =') !== 0) return null;
-        eval($code);
-        $dataModified = !ShareCenter::checkHash($inputData, $id);
-        $publicletData = unserialize($inputData);
-        if(!is_array($publicletData)) return null;
-        $publicletData["SECURITY_MODIFIED"] = $dataModified;
-        return $publicletData;
     }
 
     public function updateUserRole($userId, $roleId, $addOrRemove, $updateSubUsers = false)
