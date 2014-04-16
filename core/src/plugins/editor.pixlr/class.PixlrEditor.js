@@ -56,7 +56,7 @@ Class.create("PixlrEditor", AbstractEditor, {
             if(this.editorOptions.context.__className == "Modal"){
                 hideLightBox(true);
             }else if(this.editorOptions.context.__className == "AjxpTabulator"){
-                this.editorOptions.context.closeTab(this.currentNode.getPath());
+                this.editorOptions.context.closeTab("editor.pixlr:/" + this.currentNode.getPath());
             }
 			ajaxplorer.actionBar.fireAction('refresh');
 		}.bind(this);
