@@ -187,7 +187,7 @@ class smb
         $descriptorspec = array(
             0 => array("pipe", "r"),  	// stdin is a pipe that the child will read from
             1 => array("pipe", "w"),  	// stdout is a pipe that the child will write to
-            2 => array("pipe", "w") 	// stderr is a pipe to write to
+            2 => array("pipe", "rw") 	// stderr is a pipe to write to
         );
         $env = null;
         if (defined('AJXP_LOCALE') && stripos(PHP_OS, "win") === false) {
@@ -196,12 +196,7 @@ class smb
         $process = proc_open($cmd, $descriptorspec, $pipes, null, $env);
         if (is_resource($process)) {
             fclose($pipes[0]);
-            if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
-                $error = stream_get_contents($pipes[2], 524);
-                } else {	
-                $error = stream_get_contents($pipes[2]);
-                }
-            
+            $error = stream_get_contents($pipes[2]);
             fclose($pipes[2]);
             if ($error != "") {
                 $error = strtolower($error);
