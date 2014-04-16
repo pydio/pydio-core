@@ -268,7 +268,7 @@ class MqManager extends AJXP_Plugin
             }
         }
 
-        $cmd = ConfService::getCoreConf("CLI_PHP")." ws-server.php -host=".$params["WS_SERVER_HOST"]." -port=".$params["WS_SERVER_PORT"]." -path=".$params["WS_SERVER_PATH"];
+        $cmd = ConfService::getCoreConf("CLI_PHP")." ws-server.php -host=".$params["WS_SERVER_BIND_HOST"]." -port=".$params["WS_SERVER_BIND_PORT"]." -path=".$params["WS_SERVER_PATH"];
         chdir(AJXP_INSTALL_PATH.DIRECTORY_SEPARATOR.AJXP_PLUGINS_FOLDER.DIRECTORY_SEPARATOR."core.mq");
         $process = AJXP_Controller::runCommandInBackground($cmd, null);
         if ($process != null) {
