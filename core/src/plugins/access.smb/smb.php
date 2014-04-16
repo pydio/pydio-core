@@ -179,11 +179,15 @@ class smb
         //$output = popen (SMB4PHP_SMBCLIENT." -N {$options} {$port} {$options} {$params} 2>/dev/null {$auth}", 'r');
         $info = array ();
 
+        if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
+            $params = ConvSmbParameterToWinOs($params);
+            }
+	
         $cmd = SMB4PHP_SMBCLIENT." -N {$options} {$port} {$options} {$params} {$auth}";
         $descriptorspec = array(
             0 => array("pipe", "r"),  	// stdin is a pipe that the child will read from
             1 => array("pipe", "w"),  	// stdout is a pipe that the child will write to
-            2 => array("pipe", "w") 	// stderr is a pipe to write to
+            2 => array("pipe", "rw") 	// stderr is a pipe to write to
         );
         $env = null;
         if (defined('AJXP_LOCALE') && stripos(PHP_OS, "win") === false) {
@@ -212,6 +216,11 @@ class smb
         if (isset($output) && is_resource($output)) {
 
             while ($line = fgets ($output, 4096)) {
+			
+                if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
+                    $line = SystemTextEncoding::fromUTF8($line);
+                    }
+
                 list ($tag, $regs, $i) = array ('skip', array (), array ());
                 reset ($regexp);
                 foreach ($regexp as $r => $t) if (preg_match ('/'.$r.'/', $line, $regs)) {
@@ -715,6 +724,44 @@ class smb_stream_wrapper extends smb
         return $this->stream;
     }
 
+}
+
+function ConvSmbParameterToWinOs($params)
+{
+
+    $paramstemp = explode(" ", $params);
+    
+	// first command '-d' or '-L' ?
+    if ($paramstemp[0] == "-d") {
+        $count_params = count($paramstemp);
+
+        // index command = 4;
+        // index start path = 6;
+        $paramstemp[6] = '""'.$paramstemp[6];
+        $type_cmd = substr($paramstemp[4], 1);
+        switch ($type_cmd) {
+
+        case get:
+        case put:
+        case rename:
+            $index_end_path = $count_params - 2;
+            $paramstemp[$index_end_path] = $paramstemp[$index_end_path].'""';
+            $new_params = implode(" ", $paramstemp);
+            $new_params = str_replace('   ', '""   ""', $new_params);
+            break;
+
+        //Cmd: dir, del, rmdir, mkdir					
+        default:
+            $index_end_path = $count_params - 2;
+            $paramstemp[$index_end_path] = $paramstemp[$index_end_path].'""';
+            $new_params = implode(" ", $paramstemp);
+        }
+
+        return $new_params;
+    }
+    else {		
+        return $params;
+    }
 }
 
 ###################################################################

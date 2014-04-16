@@ -820,7 +820,7 @@ div.accordion_toggle{
 
 div.accordion_content div.dialogLegend{
     text-align: justify;
-    opacity: 0.7;
+    /*opacity: 0.7;*/
     color: rgb(117, 128, 139);
 }
 

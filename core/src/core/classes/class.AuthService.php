@@ -426,7 +426,7 @@ class AuthService
                     }
                 }
             }
-            if(!empty($dashId)) $rootRole->setParameterValue("core.conf", "DEFAULT_REPOSITORY", $dashId);
+            if(!empty($dashId)) $rootRole->setParameterValue("core.conf", "DEFAULT_START_REPOSITORY", $dashId);
             $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[@scope]", "node", false, false, true);
             if (is_array($paramNodes) && count($paramNodes)) {
                 foreach ($paramNodes as $xmlNode) {
@@ -921,10 +921,10 @@ class AuthService
         return $authDriver->supportsUsersPagination();
     }
 
-    public static function authCountUsers($baseGroup="/", $regexp="")
+    public static function authCountUsers($baseGroup="/", $regexp="", $filterProperty = null, $filterValue = null)
     {
         $authDriver = ConfService::getAuthDriverImpl();
-        return $authDriver->getUsersCount($baseGroup, $regexp);
+        return $authDriver->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue);
     }
 
     public static function getAuthScheme($userName)

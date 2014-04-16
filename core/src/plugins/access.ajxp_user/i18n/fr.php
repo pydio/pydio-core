@@ -110,4 +110,11 @@ $mess=array(
                                 <li>Partager comme un minisite public</li>
             </ul>",
     "65"=> "Découvrir plus de vidéos sur le canal Pydio!",
+    "66"=>"<h2>Pydio sur un appareil iOS</h2>
+                     Cette vidéo décrit l'utilisation de l'application Pydio disponible sur l'App Store. Le processus est similaire sur Android.
+<ul><li>Configuration de la connexion</li>
+<li>Navigation dans les fichiers</li>
+<li>Garder des fichiers en cache, et interagir avec d'autres apps</li>
+<li>Protéger l'application avec un code PIN</li>
+<li>Utiliser les favoris et le moteur de recherche</li></ul>",
 );

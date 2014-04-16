@@ -447,8 +447,12 @@ Class.create("AbstractEditor" , {
 	 */
 	getPreview : function(ajxpNode, rich){
 		// Return icon if not overriden by derived classes
-		src = AbstractEditor.prototype.getThumbnailSource(ajxpNode);
-		imgObject = new Element("img", {src:src, width:64, height:64, align:'absmiddle', border:0});
+		var src = AbstractEditor.prototype.getThumbnailSource(ajxpNode);
+        if(!src){
+            if(!ajxpNode.isLeaf()) src = resolveImageSource('folder.png', "/images/mimes/ICON_SIZE", 64);
+            else src = resolveImageSource('mime_empty.png', "/images/mimes/ICON_SIZE", 64);
+        }
+		var imgObject = new Element("img", {src:src, width:64, height:64, align:'absmiddle', border:0});
 		imgObject.resizePreviewElement = function(dimensionObject){
 			dimensionObject.maxWidth = dimensionObject.maxHeight = 64;
 			var styleObject = fitRectangleToDimension({width:64,height:64},dimensionObject);

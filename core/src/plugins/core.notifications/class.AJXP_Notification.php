@@ -117,6 +117,12 @@ class AJXP_Notification
             "AJXP_DATE"             => SystemTextEncoding::fromUTF8(AJXP_Utils::relativeDate($this->getDate(),$mess)),
         );
 
+        if($replaces["AJXP_NODE_LABEL"]==$em.$me){
+            $replaces["AJXP_NODE_LABEL"] = $em. "[".$replaces["AJXP_REPOSITORY_LABEL"]."]".$me;
+        }
+        if($replaces["AJXP_PARENT_LABEL"] == $em.$me ){
+            $replaces["AJXP_PARENT_LABEL"] = $em. "[".$replaces["AJXP_REPOSITORY_LABEL"]."]".$me;
+        }
         if((strstr($tplString, "AJXP_TARGET_FOLDER") !== false || strstr($tplString, "AJXP_SOURCE_FOLDER")) &&
             isSet($this->secondaryNode)
         ){

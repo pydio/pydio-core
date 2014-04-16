@@ -1,3 +1,33 @@
+Pydio 5.2.2 Release Note
+
+This is a bugfix and security release, upgrade is recommended.
+
+License: Affero GPL
+Copyright: Charles du Jeu 2014
+Demo: https://demo.pyd.io/
+Date: 22nd, Feb 2014
+Contributors: cdujeu
+
+Meta.syncable : Make sure to clear stat cache (details)
+Fix wrong autocompleter limit - there was a useless min() call. Fix #463 (details)
+Fix #461 > hardcoded "localhost" (details)
+Little CSS fix for Metadata in advanced search filter (details)
+Revert how CROSSUSERS_ALLGROUPS_* options were applied by default, otherwise would create strange situations for group sub-admins Refix reserved roles appearing in admin even when not in DEBUG MODE AbstractUser now implements AjxpGroupPathProvider, to be checkable by canAdministrate(). Add checks throughout the ajxp_conf driver Fix ajxp_role editor for #457 (details)
+Update font awesome to 3.2.1 (details)
+Insert videos in a new tab of the dashboard. Yet to be "modularized" (details)
+Rework dashboard design. Add a new tab for "Getting Started" (details)
+Fix editor.text & editor.codemirror for various focused fields to disable key bindings. Fix #462 (details)
+Compile Ellega's last commit (details)
+Pclzip: revert a problematic commit for Windows OS. (details)
+Default language was a bit broken in download pages. Security fix. (details)
+Fix FormManager password-create field for IE8 Switch spinner to spinKit double-bounce (details)
+Access.smb - enhancement and fix if Windows OS (details)
+Fix user-defined metadata: fix #431 (quotes in long text), fix choices, remove "comments feed" it's a dedicated plugin. (details)
+Remove -strip option on imagick, use -flatten instead, otherwise background is black on resize. (details)
+Regexp2like function must stripslashes previously escaped chars (via preg_quote). Fix #437 (details)
+Missing restParams to activate the REST api on some actions (details)
+Typo: pointing to CHMOD instead of CHMOD_VALUE, applying chmod failed for files. (details)
+
 Pydio 5.2.1 Release Note
 
 This is a bugfix release for small issues introduced in last major release, upgrade is recommended.

@@ -206,17 +206,17 @@ class multiAuthDriver extends AbstractAuthDriver
         }
     }
 
-    public function getUsersCount($baseGroup = "/", $regexp = "")
+    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null)
     {
         if (empty($this->baseName)) {
             if ($this->masterSlaveMode) {
-                return $this->drivers[$this->slaveName]->getUsersCount($baseGroup, $regexp) +  $this->drivers[$this->masterName]->getUsersCount($baseGroup, $regexp);
+                return $this->drivers[$this->slaveName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue) +  $this->drivers[$this->masterName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue);
             } else {
                 $keys = array_keys($this->drivers);
-                return $this->drivers[$keys[0]]->getUsersCount($baseGroup, $regexp) +  $this->drivers[$keys[1]]->getUsersCount($baseGroup, $regexp);
+                return $this->drivers[$keys[0]]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue) +  $this->drivers[$keys[1]]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue);
             }
         } else {
-            return $this->drivers[$this->baseName]->getUsersCount($baseGroup, $regexp);
+            return $this->drivers[$this->baseName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue);
         }
     }
 

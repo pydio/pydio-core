@@ -1,0 +1,49 @@
+<div style='font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif; font-size: 12px;'>
+
+    <h2>Pydio 5.2.3</h2>
+    <p>This is a security & bugfix release, upgrade is recommended. See changelog below.</p>
+
+    <ul>
+        <li><b>Date</b>: 19th, March 2014</li>
+        <li><b>License</b>: Affero GPL</li>
+        <li><b>Copyright</b>: Charles du Jeu 2014</li>
+        <li><b>Demo</b>: <a target="_blank" href="https://demo.pyd.io/">https://demo.pyd.io/</a></li>
+        <li><b>Upgrade</b>: In-app or Linux package managers</li>
+    </ul>
+
+    <h2>Bugfixes</h2>
+    <ul>
+        <li>Update README.md (<a href="http://github.com/pydio/pydio-core/commit/3c10ad0fa3288c4a40de544751116d16e5f82560">details</a>)</li>
+        <li>Command smbclient if Windows OS (<a href="http://github.com/pydio/pydio-core/commit/66e453693bfd0d32340aef755dfca56e4e01d5a4">details</a>)</li>
+        <li>Make sure the slug is applied at workspace creation even if from a template. (<a href="http://github.com/pydio/pydio-core/commit/210559c4c90f251a907c9cc4b0350db37ba7e1aa">details</a>)</li>
+        <li>Make sure mkfile is compatible with the node signature (<a href="http://github.com/pydio/pydio-core/commit/edce64d858a3828eec72ca1abfc51ed0e6610823">details</a>)</li>
+        <li>Higher filtering level for filename (<a href="http://github.com/pydio/pydio-core/commit/e211a37d68b6ab09c3a4f29afef9236ca069c47f">details</a>)</li>
+        <li>Fix tabs re-opening / Fix 'circular JSON structure' error by filtering data before saving. (<a href="http://github.com/pydio/pydio-core/commit/1876892029c2bf7151473c0a23f9f371029e80f2">details</a>)</li>
+        <li>Activate rest for stat_hash action (<a href="http://github.com/pydio/pydio-core/commit/558fff01cb305e054ffba9c3bd6ae5dfc931d4f5">details</a>)</li>
+        <li>Add an option to fix #195 : force all emails to be sent by a unique adress (<a href="http://github.com/pydio/pydio-core/commit/56930fe118b510bff392128b8ef38f0314ae2981">details</a>)</li>
+        <li>Fix PowerFS charset problems (<a href="http://github.com/pydio/pydio-core/commit/4a613436e44860aa9de0fcb9ed0f1f7af6625890">details</a>)</li>
+        <li>Fix some errors with nodes parameter array when sending to background (<a href="http://github.com/pydio/pydio-core/commit/a1ef3fa90f0247f08be3760a5ef647609bcb51ca">details</a>)</li>
+        <li>Sanitize and decode archive name (see #480) (<a href="http://github.com/pydio/pydio-core/commit/7589346b08df7066dec7d362b64fcd3a1ddd0737">details</a>)</li>
+        <li>Meta.exif : ignore UndefinedTag: key (<a href="http://github.com/pydio/pydio-core/commit/7c395760a3580015ecbefd0e46e1378626772d10">details</a>)</li>
+        <li>WS selector: visually show that element was selected (<a href="http://github.com/pydio/pydio-core/commit/a3346979a8eb2d0fd3c936f73a5b4fb27b22c778">details</a>)</li>
+        <li>Fix simple tabs, fix #373 date modified sorts wrong (<a href="http://github.com/pydio/pydio-core/commit/79c547e2b71c2d228d039889e61dae88f5e591a8">details</a>)</li>
+        <li>Defer registry building when initiating repository driver. (<a href="http://github.com/pydio/pydio-core/commit/f6a555f243e6beff0b004fb41bf0e7e38108719a">details</a>)</li>
+        <li>Default folder / mime_empty images in preview factory (<a href="http://github.com/pydio/pydio-core/commit/0d3d736f219a4af271113cd685197f0e4020edd8">details</a>)</li>
+        <li>Exclude mime shared_* for "Share" and "To selection cart" actions, to avoid having them appear in user dashboard. (<a href="http://github.com/pydio/pydio-core/commit/f082847fd287e1fa154f6317eb443f5a09f34a7d">details</a>)</li>
+        <li>Clear user selection before switching repository (<a href="http://github.com/pydio/pydio-core/commit/bf051f811a435d09616dd1f4e9d14bc3b9d4f949">details</a>)</li>
+        <li>Correct metadata expression (<a href="http://github.com/pydio/pydio-core/commit/809012cd9e1959aef9863daec7870c69e0f62a03">details</a>)</li>
+        <li>Order WS list in dashboard fix #484 (<a href="http://github.com/pydio/pydio-core/commit/489a4a0704bc3c8b1220e0f9f8c49b45e5af8aeb">details</a>)</li>
+        <li>Goto shortcut and default_start_repository were colliding (<a href="http://github.com/pydio/pydio-core/commit/390ff90674491dbcd33a3cce4423c0cdca072963">details</a>)</li>
+        <li>Missing message in group creation / deletion (<a href="http://github.com/pydio/pydio-core/commit/a8a434c99804bc0e57ecf0a5594482586fd6c9c5">details</a>)</li>
+        <li>Conf.sql : deleting a group was deleting all groups with the same prefix (<a href="http://github.com/pydio/pydio-core/commit/fd408bbbe264dd81372c0f9f589dd410322a8f2c">details</a>)</li>
+        <li>Fix PowerFS + Download All in minisite combination (<a href="http://github.com/pydio/pydio-core/commit/944d2da682b4b20a43233faab8d06691b1d7d928">details</a>)</li>
+        <li>Upgrade installer style and messaging (<a href="http://github.com/pydio/pydio-core/commit/da2fef350c5f3a429655af7bf63af93159e41214">details</a>)</li>
+        <li>Path to Jumploader archive changed on their website. (<a href="http://github.com/pydio/pydio-core/commit/098223283ed545d3ffeb17ac0910623095cb887b">details</a>)</li>
+        <li>Update plupload plugin to support their version 2.1 (<a href="http://github.com/pydio/pydio-core/commit/890d389a34ca20c28cbba515104d0b2ff25b5cfb">details</a>)</li>
+        <li>Fix problems with specific values when saving roles parameters. (<a href="http://github.com/pydio/pydio-core/commit/f7f5126110d09b22135fb30335ff261bd8639305">details</a>)</li>
+        <li>Make share button transparent (<a href="http://github.com/pydio/pydio-core/commit/1d2f611e3686a224cff17df2eac929755a4f7482">details</a>)</li>
+        <li>Fix openlayer "Fullscreen" button (<a href="http://github.com/pydio/pydio-core/commit/0f4be336430ed93ff9a9889d0b86f8f4225a419c">details</a>)</li>
+        <li>Fix notification when it's pointing to root folder (display ws name). (<a href="http://github.com/pydio/pydio-core/commit/471a2dfe0f6482dee97c7a19198159f61058a79e">details</a>)</li>
+        <li>Getting Started: new video (iOS device tutorial) (<a href="http://github.com/pydio/pydio-core/commit/203dcafa783c2cc82144d690fc4a97d38cac647b">details</a>)</li>
+        <li>Add optional filters for users counting (e.g parent or admin) (<a href="http://github.com/pydio/pydio-core/commit/27c52cd15f775df8d68598acfd2ed8fe50f2b653">details</a>)</li>
+    </ul>

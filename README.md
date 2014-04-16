@@ -2,13 +2,12 @@
 
 [Homepage](http://pyd.io/) |
 [GitHub-Repository](https://github.com/pydio/pydio-core) |
-[Issue-Tracker](https://github.com/pydio/pydio-core/issues) |
-[![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/pydio/pydio-core/badges/quality-score.png?s=fc0c15158cf6df37758a21a899c6ac3867aec596)](https://scrutinizer-ci.com/g/pydio/pydio-core/)
+[Issue-Tracker](https://github.com/pydio/pydio-core/issues)
 
 This is the main source code repository of Pydio (formerly AjaXplorer), containing all the PHP server and HTML5 Web GUI.
 
-* Latest Stable release : 5.2.0
-* Latest Dev release : 5.1.1 (RC for Pydio 5.2.0)
+* Latest Stable release : 5.2.3
+* Latest Dev release : 5.1.1 (was RC for Pydio 5.2.0)
 * License: [AGPLv3](https://www.gnu.org/licenses/agpl.html)
 * Lead developer  : Charles du Jeu (cdujeu): [Github](https://github.com/cdujeu) | [Twitter](https://twitter.com/Pydio)
 
@@ -37,4 +36,4 @@ New in latest build, in the Settings panel, you can find a new "Developer" node 
 
 #### Signing the CLA
 
-Please <a href="http://www.clahub.com/agreements/ajaxplorer/ajaxplorer-core">sign the Contributor License Agreement</a> before contributing.
+Please <a href="http://pyd.io/contribute/cla">sign the Contributor License Agreement</a> before contributing.

@@ -103,7 +103,7 @@ class serial_otpAuthDriver extends AbstractAuthDriver
         }
         return $result;
     }
-    public function getUsersCount($baseGroup = "/", $regexp = "")
+    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null)
     {
         return count($this->listUsersPaginated($baseGroup, $regexp));
     }

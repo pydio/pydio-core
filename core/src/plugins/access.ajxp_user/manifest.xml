@@ -163,6 +163,10 @@
                         AJXP_MESSAGE[user_dash.64]
                         </div>
                         <iframe class="tutorial_video" width="640" height="360" frameborder="0" src="//www.youtube.com/embed/1o62QF_ATYA?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5"></iframe>
+                        <div class="tutorial_legend">
+                        AJXP_MESSAGE[user_dash.66]
+                        </div>
+                        <iframe width="640" height="360" class="tutorial_video" src="//www.youtube.com/embed/ot2Nq-RAnYE?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5" frameborder="0" allowfullscreen></iframe>
                         <div style="clear:left; text-align:center;">
                             <a href="http://pyd.io/end-user-tutorials/" target="_blank" style="text-align: center;font-size: 25px;background-color: #e35d52;padding: 10px;border-radius: 5px;color: white;display: inline-block;margin: 40px 0;"><i class="icon-youtube-play"></i> AJXP_MESSAGE[user_dash.65]</a></div>
                     </div>
