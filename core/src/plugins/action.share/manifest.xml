@@ -502,7 +502,7 @@
                         <div id="shared_tab" ajxpClass="AjxpTabulator" class="horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "shared-files","tabInfos" : [{"id":"shared-files","label":"share_center.100", "title":"share_center.101","iconClass":"icon-file", "element":"shared_files_pane"},{"id":"shared-folders","label":"share_center.102","title":"share_center.103","iconClass":"icon-folder-close", "element":"shared_folders_pane"}]}'>
                             <div id="shared_files_pane" ajxpClass="AjxpPane" ajxpOptions=''>
                                 <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","public_links"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                                <div id="shared_files_pane" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"files"}}'></div>
+                                <div id="shared_files_list" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"files"}}'></div>
                             </div>
                             <div id="shared_folders_pane" ajxpClass="AjxpPane" ajxpOptions='{}'>
                                 <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","shared_folders"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
