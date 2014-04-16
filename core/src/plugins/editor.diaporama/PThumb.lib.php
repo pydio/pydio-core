@@ -1087,40 +1087,39 @@ class PThumb{
 		return true;
 	}
 
-  function exiforientation($image, $fetch) 
-  {
-    if (!$this -> exif_rotation)
-      return;
+    function exiforientation($image, $fetch)
+    {
+        if (!$this -> exif_rotation)
+            return;
 
-    if ($fetch) 
-    {
-      $image_data = $this -> retrieve_remote_file($image,true, false, 1);
-      $exif = @exif_read_data("data://image/jpeg;base64,".@base64_encode($image_data),'IFD0');
-    } else 
-    {
-      $exif = @exif_read_data($image);
+        if ($fetch)
+        {
+            $image_data = $this -> retrieve_remote_file($image,true, false, 1);
+            $exif = @exif_read_data("data://image/jpeg;base64,".@base64_encode($image_data),'IFD0');
+        } else
+        {
+            $exif = @exif_read_data($image);
+        }
+        if ($exif!=FALSE)
+        {
+            return $exif['Orientation'];
+        }
     }
-    if ($exif!=FALSE) 
+
+    function rotationsupported($exif_orientation)
     {
-      return $exif['Orientation'];
+        if (!$exif_orientation)
+            return FALSE;
+
+        if (!$this -> exif_rotation)
+            return FALSE;
+
+        if (function_exists("imageflip"))
+            return TRUE;
+
+        if ($exif_orientation!=2 and $exif_orientation!=4 and $exif_orientation!=5 and $exif_orientation!=7)
+            return TRUE;
+
+        return FALSE;
     }
-  }
-
-  function rotationsupported($exif_orientation)
-  {
-    if (!$exif_orientation)
-      return FALSE;
-
-    if (!$this -> exif_rotation)
-      return FALSE;
-
-    if (function_exists("imageflip"))
-      return TRUE;
-
-    if ($exif_orientation!=2 and $exif_orientation!=4 and $exif_orientation!=5 and $exif_orientation!=7)
-      return TRUE;
-
-    return FALSE;
-  }
 }
-?>

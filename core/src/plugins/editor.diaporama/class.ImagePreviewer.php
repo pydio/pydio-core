@@ -122,7 +122,7 @@ class ImagePreviewer extends AJXP_Plugin
     {
         $size = $this->currentDimension;
         require_once(AJXP_INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
-        $pThumb = new PThumb($this->getFilteredOption("THUMBNAIL_QUALITY"));
+        $pThumb = new PThumb($this->getFilteredOption("THUMBNAIL_QUALITY"), $this->getFilteredOption("EXIF_ROTATION"));
         if (!$pThumb->isError()) {
             $pThumb->remote_wrapper = $this->streamData["classname"];
             //$this->logDebug("Will fit thumbnail");
@@ -176,6 +176,23 @@ class ImagePreviewer extends AJXP_Plugin
             } else {
                 $realFile = $ajxpNode->getRealFile();
                 list($width, $height, $type, $attr) = @getimagesize($realFile);
+
+                if($this->getFilteredOption("EXIF_ROTATION")){
+                    require_once(AJXP_INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
+                    $pThumb = new PThumb($this->getFilteredOption["THUMBNAIL_QUALITY"],$this->getFilteredOption("EXIF_ROTATION"));
+                    $orientation = $pThumb->exiforientation($realFile, false);
+                    if ($pThumb->rotationsupported($orientation))
+                    {
+                        $ajxpNode->image_exif_orientation = $orientation;
+                        if ($orientation>4)
+                        {
+                            $tmp=$height;
+                            $height=$width;
+                            $width=$tmp;
+                        }
+                    }
+                }
+
                 $ajxpNode->image_type = image_type_to_mime_type($type);
                 $ajxpNode->image_width = $width;
                 $ajxpNode->image_height = $height;
