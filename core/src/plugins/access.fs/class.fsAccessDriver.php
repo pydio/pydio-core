@@ -1164,9 +1164,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         }
     }
 
-    public function filterFile($fileName)
+    public function filterFile($fileName, $hiddenTest = false)
     {
         $pathParts = pathinfo($fileName);
+        if($hiddenTest){
+            $showHiddenFiles = $this->getFilteredOption("SHOW_HIDDEN_FILES", $this->repository->getId());
+            if (AJXP_Utils::isHidden($pathParts["basename"]) && !$showHiddenFiles) return true;
+        }
         $hiddenFileNames = $this->getFilteredOption("HIDE_FILENAMES", $this->repository->getId());
         $hiddenExtensions = $this->getFilteredOption("HIDE_EXTENSIONS", $this->repository->getId());
         if (!empty($hiddenFileNames)) {
@@ -1901,7 +1905,7 @@ function zipPreAddCallback($value, &$header)
             $header["stored_filename"] = $test;
         }
     }
-    return !(fsAccessDriver::$filteringDriverInstance->filterFile($search)
+    return !(fsAccessDriver::$filteringDriverInstance->filterFile($search, true)
         || fsAccessDriver::$filteringDriverInstance->filterFolder($search, "contains"));
 }
 
