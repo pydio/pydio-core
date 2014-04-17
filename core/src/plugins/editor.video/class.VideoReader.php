@@ -40,9 +40,11 @@ class VideoReader extends AJXP_Plugin
         $streamData = $repository->streamData;
         $destStreamURL = $streamData["protocol"]."://".$repository->getId();
 
+        $selection = new UserSelection($repository, $httpVars);
+
         if ($action == "read_video_data") {
             $this->logDebug("Reading video");
-            $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+            $file = $selection->getUniqueFile();
             $node = new AJXP_Node($destStreamURL.$file);
             session_write_close();
             $filesize = filesize($destStreamURL.$file);

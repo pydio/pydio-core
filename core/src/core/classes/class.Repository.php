@@ -114,6 +114,35 @@ class Repository implements AjxpGroupPathProvider
     public $driverInstance;
 
     /**
+     * @var ContentFilter
+     */
+    protected $contentFilter;
+
+    /**
+     * @param \ContentFilter $contentFilter
+     */
+    public function setContentFilter($contentFilter)
+    {
+        $this->contentFilter = $contentFilter;
+    }
+
+    /**
+     * Check if a ContentFilter is set or not
+     * @return bool
+     */
+    public function hasContentFilter(){
+        return isSet($this->contentFilter);
+    }
+
+    /**
+     * @return \ContentFilter
+     */
+    public function getContentFilter()
+    {
+        return $this->contentFilter;
+    }
+
+    /**
      * @param string $id
      * @param string $display
      * @param string $driver

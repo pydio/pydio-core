@@ -41,7 +41,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     public $driverConf;
     protected $wrapperClassName;
     protected $urlBase;
-    private static $loadedUserBookmarks;
 
     public function initRepository()
     {
@@ -175,7 +174,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     {
         if(!isSet($this->actions[$action])) return;
         parent::accessPreprocess($action, $httpVars, $fileVars);
-        $selection = new UserSelection();
+        $selection = new UserSelection($this->repository);
         $dir = $httpVars["dir"] OR "";
         if ($this->wrapperClassName == "fsAccessWrapper") {
             $dir = fsAccessWrapper::patchPathForBaseDir($dir);
@@ -511,7 +510,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             //------------------------------------
             case "rename";
 
-                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $file = $selection->getUniqueFile();
                 $filename_new = AJXP_Utils::decodeSecureMagic($httpVars["filename_new"]);
                 $dest = null;
                 if (isSet($httpVars["dest"])) {
@@ -773,14 +772,33 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 $lsOptions = $this->parseLsOptions((isSet($httpVars["options"])?$httpVars["options"]:"a"));
 
                 $startTime = microtime();
-                if (isSet($httpVars["file"])) {
-                    $uniqueFile = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-                }
                 $dir = AJXP_Utils::securePath($dir);
                 $path = $this->urlBase.($dir!= ""?($dir[0]=="/"?"":"/").$dir:"");
                 $nonPatchedPath = $path;
                 if ($this->wrapperClassName == "fsAccessWrapper") {
                     $nonPatchedPath = fsAccessWrapper::unPatchPathForBaseDir($path);
+                }
+
+                if(!$selection->isEmpty() && !$selection->isUnique()){
+                    $uniqueNodes = $selection->buildNodes($this->repository->driverInstance);
+                    $parentAjxpNode = new AJXP_Node($this->urlBase."/", array());
+                    if (AJXP_XMLWriter::$headerSent == "tree") {
+                        AJXP_XMLWriter::renderAjxpNode($parentAjxpNode, false);
+                    } else {
+                        AJXP_XMLWriter::renderAjxpHeaderNode($parentAjxpNode);
+                    }
+                    foreach($uniqueNodes as $node){
+                        $node->loadNodeInfo(false, false, ($lsOptions["l"]?"all":"minimal"));
+                        if($this->repository->hasContentFilter()){
+                            $externalPath = $this->repository->getContentFilter()->externalPath($node);
+                            $node->setUrl($this->urlBase.$externalPath);
+                        }
+                        AJXP_XMLWriter::renderAjxpNode($node);
+                    }
+                    AJXP_XMLWriter::close();
+                    break;
+                }else if (!$selection->isEmpty() && $selection->isUnique()){
+                    $uniqueFile = $selection->getUniqueFile();
                 }
 
                 if ($this->getFilteredOption("REMOTE_SORTING")) {
@@ -1541,13 +1559,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             }
             $this->copyOrMoveFile($destDir, $selectedFile, $error, $success, $move, $repoData, $repoData);
         }
-    }
-
-    public function renameAction($actionName, $httpVars)
-    {
-        $filePath = SystemTextEncoding::fromUTF8($httpVars["file"]);
-        $newFilename = SystemTextEncoding::fromUTF8($httpVars["filename_new"]);
-        return $this->rename($filePath, $newFilename);
     }
 
     public function rename($filePath, $filename_new, $dest = null)

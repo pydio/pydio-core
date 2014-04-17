@@ -41,6 +41,8 @@ class ImagePreviewer extends AJXP_Plugin
         if (!isSet($this->pluginConf)) {
             $this->pluginConf = array("GENERATE_THUMBNAIL"=>false);
         }
+        $selection = new UserSelection($repository);
+        $selection->initFromHttpVars($httpVars);
 
 
         $streamData = $repository->streamData;
@@ -48,7 +50,7 @@ class ImagePreviewer extends AJXP_Plugin
         $destStreamURL = $streamData["protocol"]."://".$repository->getId();
 
         if ($action == "preview_data_proxy") {
-            $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+            $file = $selection->getUniqueFile();
             if (!file_exists($destStreamURL.$file)) {
                 header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($file))."; name=\"".basename($file)."\"");
                 header("Content-Length: 0");

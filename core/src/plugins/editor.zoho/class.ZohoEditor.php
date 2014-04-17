@@ -110,8 +110,12 @@ class ZohoEditor extends AJXP_Plugin
 
             require_once(AJXP_BIN_FOLDER."/http_class/http_class.php");
 
-            $file = base64_decode($httpVars["file"]);
-            $file = AJXP_Utils::securePath($file);
+            // Backward compat
+            if(strpos($httpVars["file"], "base64encoded:") !== 0){
+                $file = AJXP_Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
+            }else{
+                $file = $selection->getUniqueFile();
+            }
             $target = base64_decode($httpVars["parent_url"]);
             $tmp = call_user_func(array($streamData["classname"], "getRealFSReference"), $destStreamURL.$file);
             $tmp = SystemTextEncoding::fromUTF8($tmp);
