@@ -334,7 +334,6 @@ Class.create("Diaporama", AbstractEditor, {
 	},
 		
 	resizeImage : function(morph){	
-    var node = this.nodes.get(this.currentFile);
 		if(this.autoFit && morph){
 			this.computeFitToScreenFactor();
 		}
@@ -352,9 +351,13 @@ Class.create("Diaporama", AbstractEditor, {
         this.imgBorder.removeClassName("ort-rotate-6");
         this.imgBorder.removeClassName("ort-rotate-7");
         this.imgBorder.removeClassName("ort-rotate-8");
-        var ort = node.getMetadata().get("image_exif_orientation");
-        if (ort)
-            this.imgBorder.addClassName("ort-rotate-"+ort);
+
+        if(this.nodes && this.nodes.get(this.currentFile)){
+            var node = this.nodes.get(this.currentFile);
+            var ort = node.getMetadata().get("image_exif_orientation");
+            if (ort)
+                this.imgBorder.addClassName("ort-rotate-"+ort);
+        }
 
         // Center vertically
         var marginTop=0;
