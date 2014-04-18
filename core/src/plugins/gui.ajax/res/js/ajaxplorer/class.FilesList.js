@@ -776,10 +776,14 @@ Class.create("FilesList", SelectableElements, {
                 this.htmlElement.down(".selectable_div").insert({before:this.createPaginator()});
 			}
             var scrollElement = this.htmlElement.down(".selectable_div");
-			this.observer = function(e){
-				fitHeightToBottom.defer(scrollElement, this.htmlElement);
-			}.bind(this);
-			this.observe("resize", this.observer);
+            if(this.options.horizontalScroll){
+                scrollElement.setStyle({width:'100000px'});
+                this.htmlElement.setStyle({overflowX:'auto'});
+            }
+            this.observer = function(e){
+                fitHeightToBottom.defer(scrollElement, this.htmlElement);
+            }.bind(this);
+            this.observe("resize", this.observer);
 			
 			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("thumb_size")){
 				this._thumbSize = parseInt(ajaxplorer.user.getPreference("thumb_size"));
@@ -837,6 +841,9 @@ Class.create("FilesList", SelectableElements, {
 				{
 					this._thumbSize = value;
 					this.resizeThumbnails();
+                    if(this.options.fit && this.options.fit == 'content'){
+                        this.resize();
+                    }
 				}.bind(this),
 				onChange : function(value){
                     if(this.options.replaceScroller){
@@ -1005,7 +1012,9 @@ Class.create("FilesList", SelectableElements, {
     			try{marginBottom = parseInt(eval(expr));}catch(e){}
     		}
     		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null), expr);
-    	}		
+    	}else if(this.options.fit && this.options.fit == 'content' && this.options.horizontalScroll){
+            this.htmlElement.setStyle({height:(this._thumbSize + 60) + 'px'});
+        }
     	if(this.htmlElement.down('.table_rows_container') && Prototype.Browser.IE && this.gridStyle == "file"){
             this.htmlElement.down('.table_rows_container').setStyle({width:'100%'});
     	}
@@ -2117,8 +2126,13 @@ Class.create("FilesList", SelectableElements, {
             }
 
 		}.bind(this));
-		
-	},
+
+        if(this.options.horizontalScroll){
+            var scrollElement = this.htmlElement.down(".selectable_div");
+            scrollElement.setStyle({width:(elList.length * (this._thumbSize + 46)) + 'px'});
+        }
+
+    },
 	/**
 	 * For list mode, recompute alternate BG distribution
 	 * Should use CSS3 when possible!
