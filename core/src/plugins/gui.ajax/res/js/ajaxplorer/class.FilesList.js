@@ -841,9 +841,6 @@ Class.create("FilesList", SelectableElements, {
 				{
 					this._thumbSize = value;
 					this.resizeThumbnails();
-                    if(this.options.fit && this.options.fit == 'content'){
-                        this.resize();
-                    }
 				}.bind(this),
 				onChange : function(value){
                     if(this.options.replaceScroller){
@@ -2130,6 +2127,9 @@ Class.create("FilesList", SelectableElements, {
         if(this.options.horizontalScroll){
             var scrollElement = this.htmlElement.down(".selectable_div");
             scrollElement.setStyle({width:(elList.length * (this._thumbSize + 46)) + 'px'});
+        }
+        if(this.options.fit && this.options.fit == 'content'){
+            this.resize();
         }
 
     },
