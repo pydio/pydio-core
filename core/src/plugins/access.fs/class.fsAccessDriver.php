@@ -71,6 +71,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 @mkdir($path."/".$recycle);
                 if (!is_dir($path."/".$recycle)) {
                     throw new AJXP_Exception("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
+                } elseif (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                    $attributes = shell_exec('attrib +H ' . $path . "/" . $recycle);
                 }
             }
             $dataTemplate = $this->repository->getOption("DATA_TEMPLATE");
