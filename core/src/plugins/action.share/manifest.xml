@@ -109,8 +109,8 @@
                                 </div>
                                 <div class="SF_element" id="public_pass_container" style="display:none;height:20px;"></div>
                                 <div id="share_generate">
-                                    <div align="center" style="margin: 4px 0;text-align:center;">
-                                        <div align="center" id="generate_publiclet" class="largeButton"><img id="generate_image" src="AJXP_THEME_FOLDER/images/actions/16/share.png" height="16" width="16"/><span>AJXP_MESSAGE[309]</span></div>
+                                    <div align="center" style="margin: 15px 0;text-align:center;">
+                                        <div align="center" id="generate_publiclet"  style="margin-bottom:15px;" class="largeButton"><img id="generate_image" src="AJXP_THEME_FOLDER/images/actions/16/share.png" height="16" width="16"/><span>AJXP_MESSAGE[309]</span></div>
                                     </div>
                                 </div>
                                 <div style="display:none;margin: 3px 0px; text-align:center;" id="share_unshare">
@@ -168,8 +168,8 @@
                                 </div>
                                 <br style="clear:both;"/>
                                 <div id="share_generate" class="mode-minipub mode-minipriv" style="display:none;">
-                                    <div align="center" style="margin: 4px 0;text-align:center;">
-                                        <div align="center" id="generate_publiclet" class="largeButton"><img id="generate_image" src="AJXP_THEME_FOLDER/images/actions/16/share.png" height="16" width="16"/><span>AJXP_MESSAGE[309]</span></div>
+                                    <div align="center" style="margin: 15px 0;text-align:center;">
+                                        <div align="center" id="generate_publiclet"  style="margin-bottom:15px;" class="largeButton"><img id="generate_image" src="AJXP_THEME_FOLDER/images/actions/16/share.png" height="16" width="16"/><span>AJXP_MESSAGE[309]</span></div>
                                     </div>
                                 </div>
                                 <div style="display:none;margin: 4px 0;text-align:center;" id="share_unshare">
@@ -304,7 +304,7 @@
                                 <div class="dialogLegend" style="margin:0 5px;" ajxp_message_id="share_center.70">AJXP_MESSAGE[share_center.70]</div>
                             </div>
                             <div id="target_repository">
-                                <div class="SF_horizontal_fieldsRow" style="margin:0 5px;">
+                                <div class="SF_horizontal_fieldsRow" style="margin:0 5px;min-height: 20px;">
                                     <input type="text" value="" id="repo_label" name="repo_label" class="SF_input" style="width: 90px !important;" placeholder="AJXP_MESSAGE[share_center.35]"/>
                                     <input type="text" id="repo_description" name="repo_description" class="SF_input" style="width:212px !important;" placeholder="Description"/>
                                 </div>
@@ -317,8 +317,8 @@
                                     </div>
                                 </div>
                                 <div id="share_generate" class="mode-minipub mode-minipriv" style="display:none;">
-                                    <div align="center" style="margin: 4px 0;text-align:center;">
-                                        <div align="center" id="generate_publiclet" class="largeButton" style="padding:6px;"><span class="icon-retweet" style="font-size:14px;"></span> <img style="display:none;" id="generate_image" src="AJXP_THEME_FOLDER/images/actions/16/share.png" height="16" width="16"/><span>AJXP_MESSAGE[309]</span></div>
+                                    <div align="center" style="margin: 15px 0;text-align:center;">
+                                        <div align="center" id="generate_publiclet" class="largeButton" style="margin-bottom:15px;"><span class="icon-retweet" style="font-size:14px;"></span> <img style="display:none;" id="generate_image" src="AJXP_THEME_FOLDER/images/actions/16/share.png" height="16" width="16"/><span>AJXP_MESSAGE[309]</span></div>
                                     </div>
                                 </div>
                                 <br style="clear:both;"/>

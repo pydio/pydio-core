@@ -314,7 +314,13 @@ Class.create("ShareCenter", {
                     $('share_folder_form').autocompleter.activate();
                 });
                 if(this.shareFolderMode != "workspace"){
-                    oForm.down("#generate_publiclet").observe("click", function(){submitFunc(oForm);} );
+                    var generateButton = oForm.down("#generate_publiclet");
+                    var tplChooser = this.createTemplateChooser();
+                    if(tplChooser){
+                        generateButton.insert({before:tplChooser});
+                        generateButton.setStyle({float: 'left'});
+                    }
+                    generateButton.observe("click", function(){submitFunc(oForm);} );
                 }
             }
             if(ajaxplorer.hasPluginOfType("meta", "watch")){
@@ -361,9 +367,31 @@ Class.create("ShareCenter", {
                 (this.shareFolderMode != "workspace" ? function(){hideLightBox();} : submitFunc),
                 closeFunc,
                 (this.shareFolderMode != "workspace" ? true: false),
-                false
+                (this.shareFolderMode != "workspace" && !this.currentNode.getMetadata().get("ajxp_shared") ? true: false)
             );
         }
+    },
+
+    createTemplateChooser : function(){
+
+        // Search registry for template nodes starting with minisite_
+        var tmpl = XPathSelectNodes(ajaxplorer.getXmlRegistry(), "//template[contains(@name, 'minisite_') and @theme='"+ajxpBootstrap.parameters.get('theme')+"']");
+        if(tmpl.length < 2){
+            return false;
+        }
+        var chooser = new Element('select', {name:'minisite_layout', style:'width: 150px;height: 30px;font-size: 13px;text-align: center;float: left;margin-right: 15px;margin-left: 10px;'});
+        tmpl.each(function(node){
+            var element = node.getAttribute('element');
+            var label = node.getAttribute('label');
+            if(label) {
+                if(MessageHash[label]) label = MessageHash[label];
+            }else{
+                label = node.getAttribute('name');
+            }
+            chooser.insert(new Element('option', {value:element}).update('Layout: ' + label));
+        });
+        return chooser;
+
     },
 
     populateLinkData: function(linkData, oRow){
@@ -429,6 +457,7 @@ Class.create("ShareCenter", {
 
     shareFile : function(){
 
+        var nodeMeta = this.currentNode.getMetadata();
         modal.showDialogForm(
             'Get',
             'share_form',
@@ -438,7 +467,6 @@ Class.create("ShareCenter", {
                     barPosition:'bottom',
                     labelWidth: 58
                 });
-                var nodeMeta = this.currentNode.getMetadata();
                 if(nodeMeta.get("ajxp_shared")){
                     oForm.down('div#share_result').show();
                     oForm.down('div#generate_indicator').show();
@@ -476,7 +504,9 @@ Class.create("ShareCenter", {
                 return false;
             },
             null,
-            'close');
+            'close',
+            true
+        );
 
     },
 

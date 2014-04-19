@@ -944,6 +944,10 @@ class ShareCenter extends AJXP_Plugin
                 $minisiteLogo = "index_shared.php?get_action=get_global_binary_param&binary_id=". $logoPath;
             }
         }
+        $templateName = "ajxp_shared_folder";
+        if(isSet($data["AJXP_TEMPLATE_NAME"])){
+            $templateName = $data["AJXP_TEMPLATE_NAME"];
+        }
         // UPDATE TEMPLATE
         $html = file_get_contents(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/res/minisite.php");
         AJXP_Controller::applyHook("tpl.filter_html", array(&$html));
@@ -953,6 +957,7 @@ class ShareCenter extends AJXP_Plugin
         $html = str_replace("PYDIO_APP_TITLE", ConfService::getCoreConf("APPLICATION_TITLE"), $html);
         $html = str_replace("AJXP_START_REPOSITORY", $repository, $html);
         $html = str_replace("AJXP_REPOSITORY_LABEL", ConfService::getRepositoryById($repository)->getDisplay(), $html);
+        $html = str_replace("AJXP_TEMPLATE_NAME", $templateName, $html);
 
         session_name("AjaXplorer_Shared");
         session_start();
@@ -1280,6 +1285,9 @@ class ShareCenter extends AJXP_Plugin
         }
         //$data["TRAVEL_PATH_TO_ROOT"] = $this->computeMinisiteToServerURL();
         $data["AJXP_APPLICATION_BASE"] = AJXP_Utils::detectServerURL(true);
+        if(isSet($httpVars["minisite_layout"])){
+            $data["AJXP_TEMPLATE_NAME"] = $httpVars["minisite_layout"];
+        }
 
         $outputData = serialize($data);
         $hash = self::computeHash($outputData, $downloadFolder);
