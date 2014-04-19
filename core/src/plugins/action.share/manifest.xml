@@ -355,7 +355,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div style="display:none;position:relative;margin-bottom:0;" id="share_result" class="">
+                            <div style="display:none;position:relative;margin-bottom:10px;min-height:85px;" id="share_result" class="">
                                 <div class="dialogContentMainTitle" ajxp_message_id="share_center.29">AJXP_MESSAGE[share_center.29]</div>
                                 <div id="generate_indicator" style="position:absolute;top:2px;right:4px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
                                 <div class="SF_horizontal_fieldsRow">
