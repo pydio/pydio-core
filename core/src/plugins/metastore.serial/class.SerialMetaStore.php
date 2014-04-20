@@ -264,10 +264,34 @@ class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider
                     unset(self::$fullMetaCache[$metaFile][$fileKey]);
                 }
             }
-            $fp = fopen($metaFile, "w");
+            $set_attribute_hide = false;            
+            // check if file metaFile is created for the first time and if Windows OS
+            if (!file_exists($metaFile) && strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                $set_attribute_hide = true;
+            }
+
+            if (!file_exists($metaFile) || strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+                $fp = fopen($metaFile, "w");
+            } else { 
+                $fp = fopen($metaFile, "rw+"); // rw+ Necessary on File Hidden if Windows OS 
+            }
             if ($fp !== false) {
                 @fwrite($fp, serialize(self::$fullMetaCache[$metaFile]), strlen(serialize(self::$fullMetaCache[$metaFile])));
                 @fclose($fp);
+                // file metaFile is Hidden with Attribute H the first time if Windows OS 
+                if ($set_attribute_hide) {
+                    $root_repo_winOS = $this->accessDriver->repository->options["PATH"];
+
+                    if (strpos($root_repo_winOS, "AJXP_DATA_PATH") !==  false) {
+                        $root_repo_winOS = AJXP_DATA_PATH . substr($root_repo_winOS, strlen("AJXP_DATA_PATH"));
+                    }
+                    $Path = dirname($ajxpNode->getPath());
+                    if ($Path[strlen($Path)-1] == "\\") { 
+                        $Path = substr($Path, 0, -1);
+                    }
+                    $path_meta_file = realpath(AJXP_Utils::sanitize($root_repo_winOS . $Path . "/" . $this->options["METADATA_FILE"]));
+                    $attributes = shell_exec('attrib +H ' . escapeshellarg($path_meta_file));
+                }
             }
             if ($scope == AJXP_METADATA_SCOPE_GLOBAL) {
                  AJXP_Controller::applyHook("version.commit_file", array($metaFile, $ajxpNode));
