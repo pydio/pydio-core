@@ -10,7 +10,7 @@ $AJXP_FILE_URL = $_GET["file"];
         {
             var odfelement = document.getElementById("odf");
             window.odfcanvas = new odf.OdfCanvas(odfelement);
-            window.odfcanvas.load("../../index.php?secure_token=<?php echo $AJXP_SECURE_TOKEN; ?>&get_action=download&file=<?php echo $AJXP_FILE_URL; ?>");
+            window.odfcanvas.load("../../" + window.parent.ajxpServerAccessPath + "&get_action=download&file=<?php echo $AJXP_FILE_URL; ?>");
             //window.odfcanvas.setEditable(true);
             /*
             odfcanvas.odfContainer().save(function(err){
