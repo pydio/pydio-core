@@ -27,7 +27,7 @@ Class.create("ShareCenter", {
         var userSelection = ajaxplorer.getUserSelection();
         this.currentNode = userSelection.getUniqueNode();
         this.shareFolderMode = "workspace";
-        if(userSelection.hasDir() && !userSelection.hasMime($A(['ajxp_browsable_archive']))){
+        if(( userSelection.hasDir() && !userSelection.hasMime($A(['ajxp_browsable_archive']))) || userSelection.isMultiple()){
             var nodeMeta = this.currentNode.getMetadata();
             if(!nodeMeta.get("ajxp_shared")){
                 var oThis = this;
@@ -53,6 +53,24 @@ Class.create("ShareCenter", {
         }else{
             this.createQRCode = ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("CREATE_QRCODE");
             this.shareFile(userSelection);
+        }
+    },
+
+    performShare: function(type){
+        this.currentNode = ajaxplorer.getUserSelection().getUniqueNode();
+        if(type == 'workspace'){
+            this.shareFolderMode = 'workspace';
+        }else if(type == 'minisite-public'){
+            this.shareFolderMode = 'minisite_public';
+        }else if(type == 'minisite-private'){
+            this.shareFolderMode = 'minisite_private';
+        }else if(type == 'file-dl'){
+            this.shareFolderMode = 'file';
+        }
+        if(this.shareFolderMode == 'file'){
+            this.shareFile();
+        }else{
+            this.shareRepository();
         }
     },
 
@@ -239,12 +257,6 @@ Class.create("ShareCenter", {
                     {
                         tmpUsersPrefix:pref,
                         updateUserEntryAfterCreate:updateUserEntryAfterCreate,
-                        /*
-                        createUserPanel:{
-                            panel : $("create_shared_user"),
-                            pass  : $("shared_pass"),
-                            confirmPass: $("shared_pass_confirm")
-                        },*/
                         indicator: $("complete_indicator"),
                         minChars:parseInt(ajaxplorer.getPluginConfigs("conf").get("USERS_LIST_COMPLETE_MIN_CHARS"))
                     }
@@ -355,7 +367,6 @@ Class.create("ShareCenter", {
                 if($(document.body).down("#shared_users_autocomplete_choices_iefix")){
                     $(document.body).down("#shared_users_autocomplete_choices_iefix").remove();
                 }
-                $('create_shared_user').select('div.dialogButtons>input').invoke("removeClassName", "dialogButtons");
             }
         }
         if(window.ajxpBootstrap.parameters.get("usersEditable") == false){
@@ -375,7 +386,9 @@ Class.create("ShareCenter", {
     createTemplateChooser : function(){
 
         // Search registry for template nodes starting with minisite_
-        var tmpl = XPathSelectNodes(ajaxplorer.getXmlRegistry(), "//template[contains(@name, 'minisite_') and @theme='"+ajxpBootstrap.parameters.get('theme')+"']");
+        var tmpl = XPathSelectNodes(ajaxplorer.getXmlRegistry(), "//template[contains(@name, 'minisite_')]");
+        // Filter with theme
+        // and @theme='"+ajxpBootstrap.parameters.get('theme')+"'
         if(tmpl.length < 2){
             return false;
         }

@@ -109,10 +109,14 @@ class IMagickPreviewer extends AJXP_Plugin
                 return;
             }
 
-        } else if ($action == "get_extracted_page" && !$selection->isEmpty()) {
-            $file = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/imagick_full/".$selection->getUniqueFile();
+        } else if ($action == "get_extracted_page" && isSet($httpVars["file"])) {
+            $file = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/imagick_full/".AJXP_Utils::decodeSecureMagic($httpVars["file"]);
             if (!is_file($file)) {
                 $srcfile = AJXP_Utils::decodeSecureMagic($httpVars["src_file"]);
+                if($repository->hasContentFilter()){
+                    $contentFilter = $repository->getContentFilter();
+                    $srcfile = $contentFilter->filterExternalPath($srcfile);
+                }
                 $size = filesize($destStreamURL."/".$srcfile);
                 if($size > $flyThreshold) $this->useOnTheFly = true;
                 else $this->useOnTheFly = false;

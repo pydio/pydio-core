@@ -292,7 +292,7 @@ class ShareCenter extends AJXP_Plugin
                 if (count($metadata)) {
                     header("Content-type:application/json");
 
-                    if ($elementType == "file") {
+                    if ($elementType == "file" && !isSet($metadata["minisite"]) ) {
                         $elements = $metadata["element"];
                         if(is_string($elements)) $elements = array($elements => true);
                         $jsonData = array();
@@ -334,7 +334,7 @@ class ShareCenter extends AJXP_Plugin
                             ), $elementData);
 
                         }
-                    } else if ($elementType == "repository") {
+                    } else if ($elementType == "repository" || isSet($metadata["minisite"])) {
                         if (isSet($metadata["minisite"])) {
                             $minisiteData = self::loadPublicletData($metadata["element"]);
                             $repoId = $minisiteData["REPOSITORY"];
@@ -961,6 +961,7 @@ class ShareCenter extends AJXP_Plugin
 
         session_name("AjaXplorer_Shared");
         session_start();
+
         if (!empty($data["PRELOG_USER"])) {
             AuthService::logUser($data["PRELOG_USER"], "", true);
             $html = str_replace("AJXP_PRELOGED_USER", "ajxp_preloged_user", $html);
@@ -1272,6 +1273,22 @@ class ShareCenter extends AJXP_Plugin
         }
 
         $httpVars["minisite"] = true;
+        $httpVars["selection"] = true;
+        $userSelection = new UserSelection($repository, $httpVars);
+        $setFilter = false;
+        if($userSelection->isUnique()){
+            $node = $userSelection->getUniqueNode($this->accessDriver);
+            $node->loadNodeInfo();
+            if($node->isLeaf()){
+                $setFilter = true;
+                $httpVars["file"] = "/";
+            }
+        }else{
+            $setFilter = true;
+        }
+        if($setFilter){
+            $httpVars["filter_nodes"] = $userSelection->buildNodes($this->accessDriver);
+        }
         $newRepo = $this->createSharedRepository($httpVars, $repository, $accessDriver, $uniqueUser);
 
         if(!is_a($newRepo, "Repository")) return $newRepo;
@@ -1478,6 +1495,9 @@ class ShareCenter extends AJXP_Plugin
                 $newRepo->setGroupPath($gPath);
             }
             $newRepo->setDescription($description);
+            if(isSet($httpVars["filter_nodes"])){
+                $newRepo->setContentFilter(new ContentFilter($httpVars["filter_nodes"]));
+            }
             ConfService::addRepository($newRepo);
         }
 
