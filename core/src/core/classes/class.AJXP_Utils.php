@@ -1872,4 +1872,25 @@ class AJXP_Utils
     {
         return ltrim(rtrim($regexp, "$"), "^");
     }
+
+    public static function likeToLike($regexp)
+    {
+        $left = "";
+        $right = "";
+        if ($regexp[0]=="%") {
+            $left = "~";
+        }
+        if ($regexp[strlen($regexp)-1] == "%") {
+            $right = "~";
+        }
+        if ($left == "" && $right == "") {
+            return "= %s";
+        }
+        return "LIKE %".$left."like".$right;
+    }
+
+    public static function cleanLike($regexp)
+    {
+        return ltrim(rtrim($regexp, "%"), "%");
+    }
 }
