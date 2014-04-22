@@ -61,8 +61,7 @@ class sqlAuthDriver extends AbstractAuthDriver
     public function listUsersPaginated($baseGroup, $regexp, $offset, $limit)
     {
         if ($regexp != null) {
-            $like = AJXP_Utils::regexpToLike($regexp);
-            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [login] ".$like." AND [groupPath] LIKE %like~ ORDER BY [login] ASC", $regexp, $baseGroup) ;
+            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [login] ".AJXP_Utils::regexpToLike($regexp)." AND [groupPath] LIKE %like~ ORDER BY [login] ASC", AJXP_Utils::cleanRegexp($regexp), $baseGroup) ;
         } else if ($offset != -1 || $limit != -1) {
             $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %like~ ORDER BY [login] ASC %lmt %ofs", $baseGroup, $limit, $offset);
         } else {
@@ -84,7 +83,7 @@ class sqlAuthDriver extends AbstractAuthDriver
 
         $wheres = array();
         if(!empty($regexp)){
-            $wheres[] = "[ajxp_users].[login] ". AJXP_Utils::regexpToLike($regexp);
+            $wheres[] = "[ajxp_users].[login] ".AJXP_Utils::regexpToLike($regexp);
         }
         $wheres[] = "[ajxp_users].[groupPath] LIKE %like~";
 
@@ -119,9 +118,8 @@ class sqlAuthDriver extends AbstractAuthDriver
 
 
         if (!empty($regexp)) {
-            $res = dibi::query($q, $regexp, $baseGroup);
-            //$like = AJXP_Utils::regexpToLike($regexp);
-            //$res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [login] ".$like." AND [groupPath] LIKE %like~", $regexp, $baseGroup) ;
+            $res = dibi::query($q, AJXP_Utils::cleanRegexp($regexp), $baseGroup);
+            //$res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [login] ".AJXP_Utils::regexpToLike($regexp)." AND [groupPath] LIKE %like~", AJXP_Utils::cleanRegexp($regexp), $baseGroup) ;
         } else {
             $res = dibi::query($q, $baseGroup);
             //$res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [groupPath] LIKE %like~", $baseGroup);
