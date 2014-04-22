@@ -71,7 +71,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if (!is_dir($path."/".$recycle)) {
                     throw new AJXP_Exception("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
                 } elseif (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                    $attributes = shell_exec('attrib +H ' . escapeshellarg($path . "/" . $recycle));
+                    @shell_exec('attrib +H ' . escapeshellarg($path . "/" . $recycle));
                 }
             }
             $dataTemplate = $this->repository->getOption("DATA_TEMPLATE");
@@ -780,8 +780,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if ($this->wrapperClassName == "fsAccessWrapper") {
                     $nonPatchedPath = fsAccessWrapper::unPatchPathForBaseDir($path);
                 }
-
-                if(!$selection->isEmpty() && !$selection->isUnique()){
+                // Backward compat
+                if($selection->isUnique() && strpos($selection->getUniqueFile(), "/") !== 0){
+                    $selection->setFiles(array($dir . "/" . $selection->getUniqueFile()));
+                }
+                if(!$selection->isEmpty()){
                     $uniqueNodes = $selection->buildNodes($this->repository->driverInstance);
                     $parentAjxpNode = new AJXP_Node($this->urlBase."/", array());
                     if (AJXP_XMLWriter::$headerSent == "tree") {
@@ -790,7 +793,23 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         AJXP_XMLWriter::renderAjxpHeaderNode($parentAjxpNode);
                     }
                     foreach($uniqueNodes as $node){
+                        $nodeName = $node->getLabel();
+                        if (!$this->filterNodeName($node->getPath(), $nodeName, $isLeaf, $lsOptions)) {
+                            continue;
+                        }
+                        if (RecycleBinManager::recycleEnabled() && $node->getPath() == RecycleBinManager::getRecyclePath()) {
+                            continue;
+                        }
                         $node->loadNodeInfo(false, false, ($lsOptions["l"]?"all":"minimal"));
+                        if (!empty($node->metaData["nodeName"]) && $node->metaData["nodeName"] != $nodeName) {
+                            $node->setUrl(dirname($node->getUrl())."/".$node->metaData["nodeName"]);
+                        }
+                        if (!empty($node->metaData["hidden"]) && $node->metaData["hidden"] === true) {
+                            continue;
+                        }
+                        if (!empty($node->metaData["mimestring_id"]) && array_key_exists($node->metaData["mimestring_id"], $mess)) {
+                            $node->mergeMetadata(array("mimestring" =>  $mess[$node->metaData["mimestring_id"]]));
+                        }
                         if($this->repository->hasContentFilter()){
                             $externalPath = $this->repository->getContentFilter()->externalPath($node);
                             $node->setUrl($this->urlBase.$externalPath);
@@ -799,9 +818,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     }
                     AJXP_XMLWriter::close();
                     break;
-                }else if (!$selection->isEmpty() && $selection->isUnique()){
+                }/*else if (!$selection->isEmpty() && $selection->isUnique()){
                     $uniqueFile = $selection->getUniqueFile();
-                }
+                }*/
 
                 if ($this->getFilteredOption("REMOTE_SORTING")) {
                     $orderDirection = isSet($httpVars["order_direction"])?strtolower($httpVars["order_direction"]):"asc";
@@ -958,6 +977,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     }
                     // There is a special sorting, cancel the reordering of files & folders.
                     if(isSet($orderField) && $orderField != "ajxp_label") $nodeType = "f";
+
+                    if($this->repository->hasContentFilter()){
+                        $externalPath = $this->repository->getContentFilter()->externalPath($node);
+                        $node->setUrl($this->urlBase.$externalPath);
+                    }
 
                     $fullList[$nodeType][$nodeName] = $node;
                     $cursor ++;
