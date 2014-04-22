@@ -3757,6 +3757,7 @@ textarea.editor
 div.icons_only.diaporama_toolbar{
     height: 33px !important;
     width: 470px;
+    max-width:80%;
 }
 div.diaporama_toolbar div#diaporama_legend{
     display: none;

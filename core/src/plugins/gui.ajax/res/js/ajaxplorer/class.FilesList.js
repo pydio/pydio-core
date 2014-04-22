@@ -668,7 +668,11 @@ Class.create("FilesList", SelectableElements, {
                     paddingBottom: '0'
                 }
             );
-			attachMobileScroll(contentContainer, "vertical");
+            if(this.options.horizontalScroll){
+                attachMobileScroll(this.htmlElement, "horizontal");
+            }else{
+                attachMobileScroll(contentContainer, "vertical");
+            }
             var scrollElement = contentContainer;
 			var oElement = this.htmlElement.down(".selectable_div");
 			
@@ -771,8 +775,12 @@ Class.create("FilesList", SelectableElements, {
 			var buffer = '<div class="panelHeader"><div style="float:right;padding-right:5px;font-size:1px;height:16px;"><input type="image" height="16" width="16" src="'+ajxpResourcesFolder+'/images/actions/16/zoom-in.png" id="slider-input-1" style="border:0px;width:16px;height:16px;margin-top:0px;padding:0px;" value="64"/></div>'+MessageHash[126]+'</div>';
 			buffer += '<div id="selectable_div-'+this.__currentInstanceIndex+'" class="selectable_div'+(this._displayMode == "detail" ? ' detailed':'')+'" style="overflow:auto;">';
 			this.htmlElement.update(buffer);
-			attachMobileScroll(this.htmlElement.down(".selectable_div"), "vertical");
-			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){				
+            if(this.options.horizontalScroll){
+                attachMobileScroll(this.htmlElement, "horizontal");
+            }else{
+                attachMobileScroll(this.htmlElement.down(".selectable_div"), "vertical");
+            }
+			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){
                 this.htmlElement.down(".selectable_div").insert({before:this.createPaginator()});
 			}
             var scrollElement = this.htmlElement.down(".selectable_div");

@@ -551,8 +551,16 @@
 				<script>
 				    window.setTimeout(function(){
                         try{
+                            document.observe("ajaxplorer:selection_changed", function(e){
+                                try{
+                                    var nodes = ajaxplorer.getContextHolder().getSelectedNodes();
+                                    console.log(nodes);
+                                    if(nodes[0].isLeaf() && e.memo._selectionSource.__className == 'FilesList'){
+                                        ajaxplorer.actionBar.fireDefaultAction("file");
+                                    }
+                                }catch(e){}
+                            });
                             ajaxplorer.getContextHolder().setSelectedNodes([ajaxplorer.getContextHolder().getContextNode().getChildren().first()]);
-                            ajaxplorer.actionBar.fireDefaultAction("file");
                         }catch(e){}
                     }, 1000);
 				</script>

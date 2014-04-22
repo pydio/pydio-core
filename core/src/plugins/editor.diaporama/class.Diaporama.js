@@ -206,16 +206,19 @@ Class.create("Diaporama", AbstractEditor, {
 		this.element.observe("editor:close", function(){
 			Event.stopObserving(document, "keydown", this.zoomObs);
 		}.bind(this));
-		
+
+        this.autoFit = true;
 		// Init preferences
 		if(ajaxplorer && ajaxplorer.user){
 			var autoFit = ajaxplorer.user.getPreference('diapo_autofit');
-			if(autoFit && autoFit == "true"){
-				this.autoFit = true;
-				this.fitToScreenButton.select('img')[0].src = ajxpResourcesFolder + '/images/actions/22/zoom-fit-restore.png';
-				this.fitToScreenButton.select('span')[0].update(MessageHash[326]);
+			if(autoFit && autoFit === 'false'){
+				this.autoFit = false;
 			}
-		}
+            if(this.autoFit){
+                this.fitToScreenButton.select('img')[0].src = ajxpResourcesFolder + '/images/actions/22/zoom-fit-restore.png';
+                this.fitToScreenButton.select('span')[0].update(MessageHash[326]);
+            }
+        }
 		this.contentMainContainer = this.imgContainer ;
 		this.element.observe("editor:close", function(){
 			this.currentFile = null;
@@ -245,7 +248,7 @@ Class.create("Diaporama", AbstractEditor, {
 			this.imgContainer.setStyle({width:this.IEorigWidth});
 		}
         disableTextSelection(this.imgTag);
-		if(window.ajxpMobile){
+		if(window.ajxpMobile && this.editorOptions.context.elementName){
 			this.setFullScreen();
 			attachMobileScroll(this.imgContainer, "both");
 		}
