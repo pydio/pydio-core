@@ -330,7 +330,9 @@ Class.create("ShareCenter", {
                     var tplChooser = this.createTemplateChooser();
                     if(tplChooser){
                         generateButton.insert({before:tplChooser});
-                        generateButton.setStyle({float: 'left'});
+                        if(tplChooser.type != 'hidden'){
+                            generateButton.setStyle({float: 'left'});
+                        }
                     }
                     generateButton.observe("click", function(){submitFunc(oForm);} );
                 }
@@ -386,11 +388,23 @@ Class.create("ShareCenter", {
     createTemplateChooser : function(){
 
         // Search registry for template nodes starting with minisite_
-        var tmpl = XPathSelectNodes(ajaxplorer.getXmlRegistry(), "//template[contains(@name, 'minisite_')]");
+        var tmpl;
+        if(ajaxplorer.getUserSelection().isUnique() && this.currentNode.isLeaf()){
+            tmpl = XPathSelectNodes(ajaxplorer.getXmlRegistry(), "//template[contains(@name, 'unique_preview_')]");
+        }else{
+            tmpl = XPathSelectNodes(ajaxplorer.getXmlRegistry(), "//template[contains(@name, 'minisite_')]");
+        }
         // Filter with theme
         // and @theme='"+ajxpBootstrap.parameters.get('theme')+"'
-        if(tmpl.length < 2){
+        if(!tmpl.length){
             return false;
+        }
+        if(tmpl.length == 1){
+            return new Element('input', {
+                type:'hidden',
+                name:'minisite_layout',
+                value:tmpl[0].getAttribute('element')
+            });
         }
         var chooser = new Element('select', {name:'minisite_layout', style:'width: 150px;height: 30px;font-size: 13px;text-align: center;float: left;margin-right: 15px;margin-left: 10px;'});
         tmpl.each(function(node){

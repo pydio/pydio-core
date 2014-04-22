@@ -312,6 +312,9 @@ Class.create("Action", {
 		if(selectionContext.unique && !bUnique){
 			return this.disable();
 		}
+		if(selectionContext.multipleOnly && bUnique){
+			return this.disable();
+		}
 		if((selectionContext.file || selectionContext.dir) && !bFile && !bDir){
 			return this.disable();
 		}

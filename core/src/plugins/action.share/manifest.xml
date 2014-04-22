@@ -467,7 +467,7 @@
                     </messages>
                     <html><![CDATA[
                         <div id="ajxp_shared_info_panel">
-                            <div class="panelHeader infoPanelGroup" colspan="2"><span class="icon-share" data-ajxpAction="share" title="AJXP_MESSAGE[share_center.55]"></span>#{type_string}</div>
+                            <div class="panelHeader infoPanelGroup" colspan="2"><span class="icon-share" data-ajxpAction="share-edit-shared" title="AJXP_MESSAGE[share_center.55]"></span>#{type_string}</div>
                             <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0"></table>
                         </div>
                     ]]></html>
@@ -565,7 +565,7 @@
                     }, 1000);
 				</script>
 			]]></template>
-            <template name="minisite_unique_preview" element="ajxp_unique_strip" position="top" label="Unique File Preview"><![CDATA[
+            <template name="unique_preview_file" element="ajxp_unique_strip" position="top" label="Unique File Preview"><![CDATA[
 				<style type="text/css">
 				#cpane_header{
 				    padding-bottom: 7px;
@@ -619,6 +619,25 @@
                         try{
                             ajaxplorer.getContextHolder().setSelectedNodes([ajaxplorer.getContextHolder().getContextNode().getChildren().first()]);
                             ajaxplorer.actionBar.fireDefaultAction("file");
+                        }catch(e){}
+                    }, 1000);
+				</script>
+			]]></template>
+            <template name="unique_preview_download" element="ajxp_unique_dl" position="top" label="Big download button"><![CDATA[
+				<style type="text/css"></style>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
+                    <div id="cpane_header" class="panelHeader">
+                        <div class="widget_logo"></div>
+                        <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}' style="color: white;z-index: 100000;position: absolute;margin-top: -10px;"></div>
+                    </div>
+                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser", "imageBackgroundFromConfigs":"action.share/CUSTOM_SHAREPAGE_BACKGROUND_"}'>
+                        <div id="dl_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["inline", "minisite-share-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                    </div>
+				</div>
+				<script>
+				    window.setTimeout(function(){
+                        try{
+                            ajaxplorer.getContextHolder().setSelectedNodes([ajaxplorer.getContextHolder().getContextNode().getChildren().first()]);
                         }catch(e){}
                     }, 1000);
 				</script>
