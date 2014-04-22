@@ -149,6 +149,9 @@ class sqlConfDriver extends AbstractConfDriver
             }
             $repo->options[$k] = $v;
         }
+        if(isSet($repo->options["content_filter"]) && is_a($repo->options["content_filter"], "ContentFilter")){
+            $repo->setContentFilter($repo->options["content_filter"]);
+        }
 
         return $repo;
     }
@@ -278,6 +281,9 @@ class sqlConfDriver extends AbstractConfDriver
         try {
                 $repository_array = $this->repoToArray($repositoryObject);
                 $options = $repository_array['options'];
+                if($repositoryObject->hasContentFilter()){
+                    $options["content_filter"] = $repositoryObject->getContentFilter();
+                }
                 unset($repository_array['options']);
             if (!$update) {
                 dibi::query('INSERT INTO [ajxp_repo]', $repository_array);

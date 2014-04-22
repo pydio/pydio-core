@@ -74,4 +74,15 @@ class ContentFilter {
         return $this->getVirtualPath($node->getPath());
     }
 
+    /**
+     * @param String $vPath
+     * @return String mixed
+     */
+    function filterExternalPath($vPath){
+        if(isSet($this->virtualPaths) && isSet($this->virtualPaths[$vPath])){
+            return $this->virtualPaths[$vPath];
+        }
+        return $vPath;
+    }
+
 } 
