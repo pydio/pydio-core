@@ -141,7 +141,6 @@ class sqlAuthDriver extends AbstractAuthDriver
             $regexp = rtrim($regexp, "$");
             $right = "";
         }
-        $regexp = stripslashes($regexp);
         if ($left == "" && $right == "") {
             return "= %s";
         }
