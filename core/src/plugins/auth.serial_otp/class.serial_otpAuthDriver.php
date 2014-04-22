@@ -90,7 +90,7 @@ class serial_otpAuthDriver extends AbstractAuthDriver
         $result = array();
         $index = 0;
         foreach ($users as $usr => $pass) {
-            if (!empty($regexp) && !preg_match("/$regexp/i", $usr)) {
+            if (!empty($regexp) && !preg_match("/".preg_quote($regexp)."/i", $usr)) {
                 continue;
             }
             if ($offset != -1 && $index < $offset) {
