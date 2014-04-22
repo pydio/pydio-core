@@ -8,7 +8,7 @@ ul.notification_list{
     letter-spacing: 1px;
     padding: 0px;
     border-radius: 2px;
-    width:600px !important;
+    width:350px !important;
     max-height: 550px !important;
     overflow-y: auto !important;
 }
