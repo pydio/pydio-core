@@ -753,7 +753,7 @@ class PThumb{
 	     */
      
      function fit_thumbnail($image,$max_width = -1, $max_height = -1,$behaviour = 1 ,$return = false){
-        print_r("fit_thumbnail");
+
         $array = @$this -> retrieve_image_data($image);
         if (!$array){
             return $this -> set_error("Method scale_thumbnail: Unable to retrieve Image '$image' Size.");  
