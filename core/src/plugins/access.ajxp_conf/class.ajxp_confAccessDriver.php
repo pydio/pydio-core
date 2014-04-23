@@ -1539,7 +1539,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             case "clear_expired" :
 
-                $deleted = ShareCenter::clearExpiredFiles(false);  // $this->clearExpiredFiles();
+                $shareCenter = AJXP_PluginsService::getInstance()->findPluginById("action.share");
+                $deleted = $shareCenter->clearExpiredFiles(false);  // $this->clearExpiredFiles();
                 AJXP_XMLWriter::header();
                 if (count($deleted)) {
                     AJXP_XMLWriter::sendMessage(sprintf($mess["ajxp_shared.23"], count($deleted).""), null);
@@ -2295,8 +2296,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $downloadBase = str_replace("\\", "/", $fullUrl.rtrim(str_replace(AJXP_INSTALL_PATH, "", $dlFolder), "/"));
         }
 
+        $shareCenter = AJXP_PluginsService::getInstance()->findPluginById("action.share");
         foreach ($files as $file) {
-            $publicletData = ShareCenter::loadPublicletData(array_shift(explode(".", basename($file))));
+            $publicletData = $shareCenter->loadPublicletData(array_shift(explode(".", basename($file))));
             if (!is_a($publicletData["REPOSITORY"], "Repository")) {
                 continue;
             }

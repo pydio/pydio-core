@@ -21,8 +21,6 @@
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once("class.PublicletCounter.php");
-
 /**
  * @package AjaXplorer_Plugins
  * @subpackage Action
@@ -40,6 +38,10 @@ class ShareCenter extends AJXP_Plugin
     private $urlBase;
     private $baseProtocol;
 
+    /**
+     * @var ShareStore
+     */
+    private $shareStore;
     /**
      * @var MetaStoreProvider
      */
@@ -93,6 +95,30 @@ class ShareCenter extends AJXP_Plugin
         $this->baseProtocol = array_shift(explode("://", $this->urlBase));
         if (array_key_exists("meta.watch", AJXP_PluginsService::getInstance()->getActivePlugins())) {
             $this->watcher = AJXP_PluginsService::getInstance()->getPluginById("meta.watch");
+        }
+    }
+
+    /**
+     * @return ShareStore
+     */
+    private function getShareStore(){
+        if(!isSet($this->shareStore)){
+            require_once("class.ShareStore.php");
+            $hMin = 32;
+            if(isSet($this->repository)){
+                $hMin = $this->getFilteredOption("HASH_MIN_LENGTH", $this->repository->getId());
+            }
+            $this->shareStore = new ShareStore(
+                ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"),
+                $hMin
+            );
+        }
+        return $this->shareStore;
+    }
+
+    public function preProcessDownload($action, &$httpVars, &$fileVars){
+        if(isSet($_SESSION["CURRENT_MINISITE"])){
+            $this->logDebug(__FUNCTION__, "Do something here!");
         }
     }
 
@@ -299,7 +325,7 @@ class ShareCenter extends AJXP_Plugin
                         foreach ($elements as $element => $elementData) {
                             if(!is_array($elementData)) $elementData = array();
 
-                            $pData = self::loadPublicletData($element);
+                            $pData = $this->getShareStore()->loadShare($element);
                             if (!count($pData)) {
                                 continue;
                             }
@@ -326,7 +352,7 @@ class ShareCenter extends AJXP_Plugin
                             $jsonData[] = array_merge(array(
                                 "element_id"       => $element,
                                 "publiclet_link"   => $link,
-                                "download_counter" => PublicletCounter::getCount($element),
+                                "download_counter" => $this->getShareStore()->getCurrentDownloadCounter($element),
                                 "download_limit"   => $pData["DOWNLOAD_LIMIT"],
                                 "expire_time"      => ($pData["EXPIRE_TIME"]!=0?date($messages["date_format"], $pData["EXPIRE_TIME"]):0),
                                 "has_password"     => (!empty($pData["PASSWORD"])),
@@ -336,7 +362,7 @@ class ShareCenter extends AJXP_Plugin
                         }
                     } else if ($elementType == "repository" || isSet($metadata["minisite"])) {
                         if (isSet($metadata["minisite"])) {
-                            $minisiteData = self::loadPublicletData($metadata["element"]);
+                            $minisiteData = $this->getShareStore()->loadShare($metadata["element"]);
                             $repoId = $minisiteData["REPOSITORY"];
                             $minisiteIsPublic = isSet($minisiteData["PRELOG_USER"]);
                             $dlDisabled = isSet($minisiteData["DOWNLOAD_DISABLED"]);
@@ -415,7 +441,7 @@ class ShareCenter extends AJXP_Plugin
                             if(count($metadata["element"]) > 0) $updateMeta = true;
                         }
                     }
-                    self::deleteSharedElement($eType, $elementId, AuthService::getLoggedUser());
+                    $this->getShareStore()->deleteShare($eType, $elementId, AuthService::getLoggedUser());
                     if ($updateMeta) {
                         $ajxpNode->setMetadata("ajxp_shared", $metadata, true, AJXP_METADATA_SCOPE_REPOSITORY, true);
                     } else {
@@ -436,7 +462,7 @@ class ShareCenter extends AJXP_Plugin
                     AJXP_METADATA_SCOPE_REPOSITORY
                 );
                 if (isSet($metadata["element"][$httpVars["element_id"]])) {
-                    PublicletCounter::reset($httpVars["element_id"]);
+                    $this->getShareStore()->resetDownloadCounter($httpVars["element_id"]);
                 }
 
             break;
@@ -487,7 +513,7 @@ class ShareCenter extends AJXP_Plugin
             if (is_array($metadata["element"])) {
                 $updateMeta = false;
                 foreach ($metadata["element"] as $elementId => $elementData) {
-                    if (!self::sharedElementExists($eType, $elementId)) {
+                    if (!$this->getShareStore()->shareExists($eType, $elementId)) {
                         unset($metadata["element"][$elementId]);
                         $updateMeta = true;
                         return;
@@ -505,7 +531,7 @@ class ShareCenter extends AJXP_Plugin
                     }
                 }
             } else {
-                if (!self::sharedElementExists($eType, $metadata["element"])) {
+                if (!$this->getShareStore()->shareExists($eType, $metadata["element"])) {
                     $ajxpNode->removeMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
                     return;
                 }
@@ -524,14 +550,14 @@ class ShareCenter extends AJXP_Plugin
      * @param AJXP_Node $ajxpNode
      * @return boolean
      */
-    public static function isShared($ajxpNode)
+    public function isShared($ajxpNode)
     {
         $metadata = $ajxpNode->retrieveMetadata("ajxp_shared",true);
         if (is_array($metadata) && is_array($metadata["element"])) {
             $eType = $ajxpNode->isLeaf()?"file":"repository";
             if(isSet($metadata["minisite"])) $eType = "minisite";
             foreach ($metadata["element"] as $elementId => $elementData) {
-                if (self::sharedElementExists($eType, $elementId)) {
+                if ($this->getShareStore()->shareExists($eType, $elementId)) {
                     return true;
                 }
             }
@@ -554,7 +580,7 @@ class ShareCenter extends AJXP_Plugin
                     if(is_string($metadata["element"])){
                         $wsId = $metadata["element"];
                         if(isSet($metadata["minisite"])){
-                            $minisiteData = self::loadPublicletData($metadata["element"]);
+                            $minisiteData = $this->getShareStore()->loadShare($metadata["element"]);
                             $wsId = $minisiteData["REPOSITORY"];
                         }
                         $sharedNode = $metadata["SOURCE_NODE"];
@@ -712,7 +738,7 @@ class ShareCenter extends AJXP_Plugin
                     $elementIds[]= $metadata["element"];
                 }
                 foreach ($elementIds as $elementId) {
-                    self::deleteSharedElement(
+                    $this->getShareStore()->deleteShare(
                         $type,
                         $elementId,
                         AuthService::getLoggedUser()
@@ -781,25 +807,14 @@ class ShareCenter extends AJXP_Plugin
         if ($data["ACTION"] == "") $data["ACTION"] = "download";
         // Create a random key
         $data["FINAL_KEY"] = md5(mt_rand().time());
-        // Cypher the data with a random key
-        $outputData = serialize($data);
-        // Hash the data to make sure it wasn't modified
-        $hash = $this->computeHash($outputData, $downloadFolder); // md5($outputData);
 
-        $outputData = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $hash, $outputData, MCRYPT_MODE_ECB));
-        $fileData = "<"."?"."php \n".
-        '   require_once("'.str_replace("\\", "/", AJXP_INSTALL_PATH).'/publicLet.inc.php"); '."\n".
-        '   $id = str_replace(".php", "", basename(__FILE__)); '."\n". // Not using "" as php would replace $ inside
-        '   $cypheredData = base64_decode("'.$outputData.'"); '."\n".
-        '   $inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $id, $cypheredData, MCRYPT_MODE_ECB), "\0");  '."\n".
-        '   if (!ShareCenter::checkHash($inputData, $id)) { header("HTTP/1.0 401 Not allowed, script was modified"); exit(); } '."\n".
-        '   // Ok extract the data '."\n".
-        '   $data = unserialize($inputData); ShareCenter::loadPubliclet($data); ';
-        if (@file_put_contents($downloadFolder."/".$hash.".php", $fileData) === FALSE) {
-            return "Can't write to PUBLIC URL";
+        try{
+            $hash = $this->getShareStore()->storeShare($data, "publiclet");
+        }catch(Exception $e){
+            return $e->getMessage();
         }
-        @chmod($downloadFolder."/".$hash.".php", 0755);
-        PublicletCounter::reset($hash);
+
+        $this->getShareStore()->resetDownloadCounter($hash);
         $url = $this->buildPublicletLink($hash);
         $this->logInfo("New Share", array(
             "file" => "'".$copy->display.":/".$data['FILE_PATH']."'",
@@ -816,41 +831,6 @@ class ShareCenter extends AJXP_Plugin
             'url' => $url,
         ));
         return array($hash, $url);
-    }
-
-    /**
-     * Computes a short form of the hash, checking if it already exists in the folder,
-     * in which case it increases the hashlength until there is no collision.
-     * @static
-     * @param String $outputData Serialized data
-     * @param String|null $checkInFolder Path to folder
-     * @return string
-     */
-    public function computeHash($outputData, $checkInFolder = null)
-    {
-        $length = $this->getFilteredOption("HASH_MIN_LENGTH", $this->repository->getId());
-        $full =  md5($outputData);
-        $starter = substr($full, 0, $length);
-        if ($checkInFolder != null) {
-            while (file_exists($checkInFolder.DIRECTORY_SEPARATOR.$starter.".php")) {
-                $length ++;
-                $starter = substr($full, 0, $length);
-            }
-        }
-        return $starter;
-    }
-
-    /**
-     * Check if the hash seems to correspond to the serialized data.
-     * @static
-     * @param String $outputData serialized data
-     * @param String $hash Id to check
-     * @return bool
-     */
-    public static function checkHash($outputData, $hash)
-    {
-        $full = md5($outputData);
-        return (!empty($hash) && strpos($full, $hash."") === 0);
     }
 
     public function buildPublicDlURL()
@@ -970,6 +950,7 @@ class ShareCenter extends AJXP_Plugin
             $_SESSION["PENDING_FOLDER"] = "/";
             $html = str_replace("AJXP_PRELOGED_USER", "", $html);
         }
+        $_SESSION["CURRENT_MINISITE"] = true;
         if (isSet($_GET["lang"])) {
             $loggedUser = &AuthService::getLoggedUser();
             if ($loggedUser != null) {
@@ -990,9 +971,13 @@ class ShareCenter extends AJXP_Plugin
         echo($html);
     }
 
-    private static function deleteExpiredPubliclet($elementId, $data){
+    public static function loadShareByHash($hash){
+        AJXP_Logger::debug(__CLASS__, __FUNCTION__, "Do something");
+    }
 
-        if(AuthService::getLoggedUser()->getId() != $data["OWNER_ID"]){
+    private function deleteExpiredPubliclet($elementId, $data){
+
+        if(AuthService::getLoggedUser() == null ||  AuthService::getLoggedUser()->getId() != $data["OWNER_ID"]){
             AuthService::logUser($data["OWNER_ID"], "", true);
         }
         $repoObject = $data["REPOSITORY"];
@@ -1006,7 +991,7 @@ class ShareCenter extends AJXP_Plugin
             AJXP_METADATA_SCOPE_REPOSITORY,
             true
         );
-        self::deleteSharedElement("file", $elementId, AuthService::getLoggedUser());
+        $this->getShareStore()->deleteShare("file", $elementId, AuthService::getLoggedUser());
         if (count($metadata)) {
             $updateMeta = false;
             if (is_array($metadata["element"]) && isSet($metadata["element"][$elementId])) {
@@ -1035,20 +1020,6 @@ class ShareCenter extends AJXP_Plugin
         $u = parse_url($_SERVER["REQUEST_URI"]);
         $shortHash = pathinfo(basename($u["path"]), PATHINFO_FILENAME);
 
-        if ( ($data["EXPIRE_TIME"] && time() > $data["EXPIRE_TIME"]) ||
-            ($data["DOWNLOAD_LIMIT"] && $data["DOWNLOAD_LIMIT"]> 0 && $data["DOWNLOAD_LIMIT"] <= PublicletCounter::getCount($shortHash)) )
-        {
-            // Remove the publiclet, it's done
-            if (strstr(realpath($_SERVER["SCRIPT_FILENAME"]),realpath(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"))) !== FALSE) {
-
-                self::deleteExpiredPubliclet($shortHash, $data);
-            }
-
-            //echo "Link is expired, sorry.";
-            header("HTTP/1.0 404 Not Found");
-            echo '404 File not found';
-            exit();
-        }
         // Load language messages
         $language = ConfService::getLanguage();
         if (isSet($_GET["lang"])) {
@@ -1065,6 +1036,23 @@ class ShareCenter extends AJXP_Plugin
         $AJXP_LINK_HAS_PASSWORD = false;
         $AJXP_LINK_BASENAME = SystemTextEncoding::toUTF8(basename($data["FILE_PATH"]));
         AJXP_PluginsService::getInstance()->initActivePlugins();
+
+        $shareCenter = AJXP_PluginsService::findPluginById("action.share");
+
+        if ($shareCenter->getShareStore()->isShareExpired($shortHash, $data))
+        {
+            // Remove the publiclet, it's done
+            if (strstr(realpath($_SERVER["SCRIPT_FILENAME"]),realpath(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"))) !== FALSE) {
+                $shareCenter->deleteExpiredPubliclet($shortHash, $data);
+            }
+
+            //echo "Link is expired, sorry.";
+            header("HTTP/1.0 404 Not Found");
+            echo '404 File not found';
+            exit();
+        }
+
+
         $customs = array("title", "legend", "legend_pass", "background_attributes_1", "background_attributes_2", "background_attributes_3", "text_color", "background_color", "textshadow_color");
         $images = array("button", "background_1", "background_2", "background_3");
         $shareCenter = AJXP_PluginsService::findPlugin("action", "share");
@@ -1125,7 +1113,7 @@ class ShareCenter extends AJXP_Plugin
         $driver->loadManifest();
 
         //$hash = md5(serialize($data));
-        PublicletCounter::increment($shortHash);
+        $shareCenter->getShareStore()->incrementDownloadCounter($shortHash);
 
         //AuthService::logUser($data["OWNER_ID"], "", true);
         AuthService::logTemporaryUser($data["OWNER_ID"], $shortHash);
@@ -1306,22 +1294,11 @@ class ShareCenter extends AJXP_Plugin
             $data["AJXP_TEMPLATE_NAME"] = $httpVars["minisite_layout"];
         }
 
-        $outputData = serialize($data);
-        $hash = self::computeHash($outputData, $downloadFolder);
-
-        $outputData = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $hash, $outputData, MCRYPT_MODE_ECB));
-        $fileData = "<"."?"."php \n".
-        '   require_once("'.str_replace("\\", "/", AJXP_INSTALL_PATH).'/publicLet.inc.php"); '."\n".
-        '   $id = str_replace(".php", "", basename(__FILE__)); '."\n". // Not using "" as php would replace $ inside
-        '   $cypheredData = base64_decode("'.$outputData.'"); '."\n".
-        '   $inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $id, $cypheredData, MCRYPT_MODE_ECB), "\0");  '."\n".
-        '   if (!ShareCenter::checkHash($inputData, $id)) { header("HTTP/1.0 401 Not allowed, script was modified"); exit(); } '."\n".
-        '   // Ok extract the data '."\n".
-        '   $data = unserialize($inputData); ShareCenter::loadMinisite($data); ';
-        if (@file_put_contents($downloadFolder."/".$hash.".php", $fileData) === FALSE) {
-            return "Can't write to PUBLIC URL";
+        try{
+            $hash = $this->getShareStore()->storeShare($data);
+        }catch(Exception $e){
+            return $e->getMessage();
         }
-        @chmod($downloadFolder."/".$hash.".php", 0755);
         $url = $this->buildPublicletLink($hash);
 
         AJXP_Controller::applyHook("node.share.create", array(
@@ -1635,100 +1612,22 @@ class ShareCenter extends AJXP_Plugin
 
 
     /**
-     * @static
      * @param String $type
      * @param String $element
      * @param AbstractAjxpUser $loggedUser
      * @throws Exception
      */
-    public static function deleteSharedElement($type, $element, $loggedUser)
+    public function deleteSharedElement($type, $element, $loggedUser)
     {
-        $mess = ConfService::getMessages();
-        AJXP_Logger::debug(__CLASS__, __FILE__, "Deleting shared element ".$type."-".$element);
-        if ($type == "repository") {
-            $repo = ConfService::getRepositoryById($element);
-            if($repo == null) return;
-            if (!$repo->hasOwner() || $repo->getOwner() != $loggedUser->getId()) {
-                throw new Exception($mess["ajxp_shared.12"]);
-            } else {
-                $res = ConfService::deleteRepository($element);
-                if ($res == -1) {
-                    throw new Exception($mess["ajxp_conf.51"]);
-                }
-            }
-        } else if ($type == "minisite") {
-            $minisiteData = self::loadPublicletData($element);
-            $repoId = $minisiteData["REPOSITORY"];
-            $repo = ConfService::getRepositoryById($repoId);
-            if ($repo == null) {
-                return false;
-            }
-            if (!$repo->hasOwner() || $repo->getOwner() != $loggedUser->getId()) {
-                throw new Exception($mess["ajxp_shared.12"]);
-            } else {
-                $res = ConfService::deleteRepository($repoId);
-                if ($res == -1) {
-                    throw new Exception($mess["ajxp_conf.51"]);
-                }
-                // Silently delete corresponding role if it exists
-                AuthService::deleteRole("AJXP_SHARED-".$repoId);
-                // If guest user created, remove it now.
-                if (isSet($minisiteData["PRELOG_USER"])) {
-                    AuthService::deleteUser($minisiteData["PRELOG_USER"]);
-                }
-                unlink($minisiteData["PUBLICLET_PATH"]);
-            }
-        } else if ($type == "user") {
-            $confDriver = ConfService::getConfStorageImpl();
-            $object = $confDriver->createUserObject($element);
-            if (!$object->hasParent() || $object->getParent() != $loggedUser->getId()) {
-                throw new Exception($mess["ajxp_shared.12"]);
-            } else {
-                AuthService::deleteUser($element);
-            }
-        } else if ($type == "file") {
-            $publicletData = self::loadPublicletData($element);
-            if (isSet($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] == $loggedUser->getId()) {
-                PublicletCounter::delete($element);
-                unlink($publicletData["PUBLICLET_PATH"]);
-            } else {
-                throw new Exception($mess["ajxp_shared.12"]);
-            }
-        }
+        $this->getShareStore()->deleteShare($type, $element, $loggedUser);
     }
 
-    public static function sharedElementExists($type, $element)
+    public function loadPublicletData($id)
     {
-        if ($type == "repository") {
-            return (ConfService::getRepositoryById($element) != null);
-        } else if ($type == "file" || $type == "minisite") {
-            $dlFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
-            return is_file($dlFolder."/".$element.".php");
-        }
+        return $this->getShareStore()->loadShare($id);
     }
 
-
-    public static function loadPublicletData($id)
-    {
-        $dlFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
-        $file = $dlFolder."/".$id.".php";
-        if(!is_file($file)) return array();
-        $lines = file($file);
-        $inputData = '';
-        $code = $lines[3] . $lines[4] . $lines[5];
-        eval($code);
-        if(empty($inputData)) return false;
-        $dataModified = self::checkHash($inputData, $id); //(md5($inputData) != $id);
-        $publicletData = unserialize($inputData);
-        $publicletData["SECURITY_MODIFIED"] = $dataModified;
-        if (!isSet($publicletData["REPOSITORY"])) {
-            $publicletData["DOWNLOAD_COUNT"] = PublicletCounter::getCount($id);
-        }
-        $publicletData["PUBLICLET_PATH"] = $file;
-        return $publicletData;
-    }
-
-    public static function clearExpiredFiles($currentUser = true)
+    public function clearExpiredFiles($currentUser = true)
     {
         $files = glob(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/*.php");
         if($currentUser){
@@ -1740,9 +1639,10 @@ class ShareCenter extends AJXP_Plugin
         $deleted = array();
         $switchBackToOriginal = false;
         foreach ($files as $file) {
+            if(basename($file) == "share.php") continue;
             $ar = explode(".", basename($file));
             $id = array_shift($ar);
-            $publicletData = self::loadPublicletData($id);
+            $publicletData = $this->getShareStore()->loadShare($id);
             if($publicletData === false) continue;
             if ($currentUser && ( !isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $userId )) {
                 continue;
@@ -1750,7 +1650,7 @@ class ShareCenter extends AJXP_Plugin
             if( (isSet($publicletData["EXPIRE_TIME"]) && is_numeric($publicletData["EXPIRE_TIME"]) && $publicletData["EXPIRE_TIME"] > 0 && $publicletData["EXPIRE_TIME"] < time()) ||
                 (isSet($publicletData["DOWNLOAD_LIMIT"]) && $publicletData["DOWNLOAD_LIMIT"] > 0 && $publicletData["DOWNLOAD_LIMIT"] <= $publicletData["DOWNLOAD_COUNT"]) ) {
                 if(!$currentUser) $switchBackToOriginal = true;
-                self::deleteExpiredPubliclet($id, $publicletData);
+                $this->deleteExpiredPubliclet($id, $publicletData);
                 $deleted[] = $publicletData["FILE_PATH"];
 
             }
@@ -1765,5 +1665,20 @@ class ShareCenter extends AJXP_Plugin
     public static function currentContextIsLinkDownload(){
         return (isSet($_GET["dl"]) && isSet($_GET["dl"]) == "true");
     }
+
+    /**
+     * Check if the hash seems to correspond to the serialized data.
+     * Kept there only for backward compatibility
+     * @static
+     * @param String $outputData serialized data
+     * @param String $hash Id to check
+     * @return bool
+     */
+    public static function checkHash($outputData, $hash)
+    {
+        $full = md5($outputData);
+        return (!empty($hash) && strpos($full, $hash."") === 0);
+    }
+
 
 }

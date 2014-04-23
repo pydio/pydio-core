@@ -153,6 +153,7 @@ class UserDashboardDriver extends AbstractAccessDriver
                 $files = $selection->getFiles();
                 AJXP_XMLWriter::header();
                 $minisites = $this->listSharedFiles("minisites");
+                $shareCenter = AJXP_PluginsService::findPluginById("action.share");
                 foreach ($files as $index => $element) {
                     $element = basename($element);
                     $ar = explode("shared_", $mime);
@@ -161,7 +162,7 @@ class UserDashboardDriver extends AbstractAccessDriver
                         $mime = "minisite";
                         $element = $minisites[$element];
                     }
-                    ShareCenter::deleteSharedElement($mime, $element, $loggedUser);
+                    $shareCenter->deleteSharedElement($mime, $element, $loggedUser);
                     if($mime == "repository" || $mime == "minisite") $out = $mess["ajxp_conf.59"];
                     else if($mime == "user") $out = $mess["ajxp_conf.60"];
                     else if($mime == "file") $out = $mess["user_dash.13"];
@@ -173,7 +174,8 @@ class UserDashboardDriver extends AbstractAccessDriver
 
             case "clear_expired" :
 
-                $deleted = ShareCenter::clearExpiredFiles(true); // $this->clearExpiredFiles();
+                $shareCenter = AJXP_PluginsService::getInstance()->findPluginById("action.share");
+                $deleted = $shareCenter->clearExpiredFiles(true);
                 AJXP_XMLWriter::header();
                 if (count($deleted)) {
                     AJXP_XMLWriter::sendMessage(sprintf($mess["user_dash.23"], count($deleted).""), null);
@@ -237,12 +239,13 @@ class UserDashboardDriver extends AbstractAccessDriver
             $downloadBase = str_replace("\\", "/", $fullUrl.rtrim(str_replace(AJXP_INSTALL_PATH, "", $dlFolder), "/"));
         }
         $minisites = array();
+        $shareCenter = AJXP_PluginsService::getInstance()->findPluginById("action.share");
         foreach ($files as $file) {
             $ar = explode(".", basename($file));
             $id = array_shift($ar);
             if($ar[0] != "php") continue;
             //if(strlen($id) != 32) continue;
-            $publicletData = ShareCenter::loadPublicletData($id);
+            $publicletData = $shareCenter->loadPublicletData($id);
             if($mode == "files"){
                 if(isSet($publicletData["AJXP_APPLICATION_BASE"]) || isSet($publicletData["TRAVEL_PATH_TO_ROOT"])
                     ||  (isset($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] != $userId)
