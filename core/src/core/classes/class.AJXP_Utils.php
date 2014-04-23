@@ -1893,4 +1893,22 @@ class AJXP_Utils
     {
         return ltrim(rtrim($regexp, "%"), "%");
     }
+
+    public static function regexpToLdap($regexp)
+    {
+        if(empty($regexp))
+            return null;
+
+        $left = "*";
+        $right = "*";
+        if ($regexp[0]=="^") {
+            $regexp = ltrim($regexp, "^");
+            $left = "";
+        }
+        if ($regexp[strlen($regexp)-1] == "$") {
+            $regexp = rtrim($regexp, "$");
+            $right = "";
+        }
+        return $left.$regexp.$right;
+    }
 }
