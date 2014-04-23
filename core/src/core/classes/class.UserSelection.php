@@ -36,12 +36,25 @@ class UserSelection
     public $inZip = false;
     public $zipFile;
     public $localZipPath;
+
+    /**
+     * @var ContentFilter
+     */
+    private $contentFilter;
+
     /**
      * Construction selector
+     * @param Repository|null $repository
      */
-    public function UserSelection()
+    public function UserSelection($repository = null, $httpVars = null)
     {
         $this->files = array();
+        if(isSet($repository) && $repository->hasContentFilter()){
+            $this->contentFilter = $repository->getContentFilter();
+        }
+        if(iSset($httpVars)){
+            $this->initFromHttpVars($httpVars);
+        }
     }
     /**
      * Init the selection from the query vars
@@ -59,6 +72,9 @@ class UserSelection
         } else {
             $this->initFromArray($_GET);
             $this->initFromArray($_POST);
+        }
+        if(isSet($this->contentFilter)){
+            $this->contentFilter->filterUserSelection($this);
         }
     }
 
@@ -89,14 +105,22 @@ class UserSelection
             return ;
         }
         if (isSet($array[$this->varPrefix]) && $array[$this->varPrefix] != "") {
-            $this->files[] = AJXP_Utils::decodeSecureMagic($array[$this->varPrefix]);
+            $v = $array[$this->varPrefix];
+            if(strpos($v, "base64encoded:") === 0){
+                $v = base64_decode(array_pop(explode(':', $v, 2)));
+            }
+            $this->files[] = AJXP_Utils::decodeSecureMagic($v);
             $this->isUnique = true;
             //return ;
         }
         if (isSet($array[$this->varPrefix."_0"])) {
             $index = 0;
             while (isSet($array[$this->varPrefix."_".$index])) {
-                $this->files[] = AJXP_Utils::decodeSecureMagic($array[$this->varPrefix."_".$index]);
+                $v = $array[$this->varPrefix."_".$index];
+                if(strpos($v, "base64encoded:") === 0){
+                    $v = base64_decode(array_pop(explode(':', $v, 2)));
+                }
+                $this->files[] = AJXP_Utils::decodeSecureMagic($v);
                 $index ++;
             }
             $this->isUnique = false;
@@ -133,7 +157,7 @@ class UserSelection
      */
     public function isUnique()
     {
-        return $this->isUnique;
+        return (count($this->files) == 1);
     }
     /**
      * Are we currently inside a zip?
@@ -269,6 +293,25 @@ class UserSelection
     public function setFiles($files)
     {
         $this->files = $files;
+    }
+
+    public function removeFile($file){
+        $newFiles = array();
+        foreach($this->files as $k => $f){
+            if($f != $file) $newFiles[] = $file;
+        }
+        $this->files = $newFiles;
+        if(isSet($this->nodes)){
+            $newNodes = array();
+            foreach($this->nodes as $l => $n){
+                if($n->getPath() != $file) $newNodes[] = $n;
+            }
+            $this->nodes = $newNodes;
+        }
+    }
+
+    public function addFile($file){
+        $this->files[] = $file;
     }
 
 }

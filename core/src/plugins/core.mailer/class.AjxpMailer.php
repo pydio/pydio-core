@@ -198,7 +198,7 @@ class AjxpMailer extends AJXP_Plugin
                 } else {
                     if ($this->validateEmail($recipient)) {
                         $realRecipients[] = array("name" => $recipient, "adress" => $recipient);
-                    } else if (AuthService::userExists($recipient)) {
+                    } else if (AuthService::userExistsInConf($recipient)) {
                         $user = ConfService::getConfStorageImpl()->createUserObject($recipient);
                         $res = $this->abstractUserToAdress($user);
                         if($res !== false) $realRecipients[] = $res;

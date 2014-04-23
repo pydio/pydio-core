@@ -81,7 +81,7 @@ class webdavAccessWrapper extends fsAccessWrapper
             $path = substr($path, 1);
         }
         // SHOULD RETURN webdav://host_server/uri/to/webdav/folder
-        AJXP_Logger::debug($host.$basePath."/".$path);
+        AJXP_Logger::debug(__CLASS__,__FUNCTION__,$host.$basePath."/".$path);
         return $host.$basePath."/".$path;
     }
 

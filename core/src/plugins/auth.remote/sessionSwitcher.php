@@ -33,7 +33,7 @@ class SessionSwitcher
     /** Construction. This kills the current session if any started, and restart the given session */
     public function __construct($name, $killPreviousSession = false, $loadPreviousSession = false, $saveHandlerType = "files", $saveHandlerData = null)
     {
-        AJXP_Logger::debug("Switching to session ".$name);
+        AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Switching to session ".$name);
         if (session_id() == "") {
             if (isSet($saveHandlerData)) {
                 session_set_save_handler(
@@ -64,7 +64,7 @@ class SessionSwitcher
                 setcookie(session_name(), '', time() - 42000, '/');
                 session_destroy();
             }
-            AJXP_Logger::debug("Closing previous session ".session_name()." / ".session_id());
+            AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Closing previous session ".session_name()." / ".session_id());
             session_write_close();
             session_regenerate_id(false);
             $_SESSION = array();
@@ -86,7 +86,7 @@ class SessionSwitcher
         }
 
         if ($loadPreviousSession) {
-            AJXP_Logger::debug("Restoring previous session".SessionSwitcher::$sessionArray[0]['id']);
+            AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Restoring previous session".SessionSwitcher::$sessionArray[0]['id']);
             session_id(SessionSwitcher::$sessionArray[0]['id']);
         } else {
             $newId = md5(SessionSwitcher::$sessionArray[0]['id'].$name);
@@ -94,6 +94,6 @@ class SessionSwitcher
         }
         session_name($name);
         session_start();
-        AJXP_Logger::debug("Restarted session ".session_name()." / ".session_id(), $_SESSION);
+        AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Restarted session ".session_name()." / ".session_id(), $_SESSION);
     }
 };

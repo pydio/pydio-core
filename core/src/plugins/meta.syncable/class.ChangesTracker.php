@@ -225,6 +225,13 @@ class ChangesTracker extends AJXP_Plugin
 
     }
 
+    /**
+     * @param AJXP_Node $node
+     */
+    public function indexNode($node){
+        // TODO: DO SOMETHING HERE!!
+    }
+
     public function installSQLTables($param)
     {
         $p = AJXP_Utils::cleanDibiDriverParameters(isSet($param) && isSet($param["SQL_DRIVER"])?$param["SQL_DRIVER"]:$this->sqlDriver);

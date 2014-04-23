@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS ajxp_log (
   remote_ip text DEFAULT NULL,
   severity text DEFAULT NULL,
   "user" text DEFAULT NULL,
+  source text DEFAULT NULL,
   message text DEFAULT NULL,
   params text DEFAULT NULL
 );

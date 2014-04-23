@@ -30,7 +30,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 {
     public $options;
     public $driverType = "conf";
-
+    /**
+     * listUsersFromConf support pagination ?
+     */
+    const supportsUsersPaginationInConf = false;
 
     public function init($options)
     {
@@ -276,6 +279,33 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
     /**
      * @abstract
+     * Get users count from the conf driver (not auth)
+     * @param string $baseGroup
+     * @param bool $groupExactMatch if false, count users in this group and subgroups
+     * @param string $regexp
+     */
+    abstract public function getUsersCountFromConf($baseGroup = "/", $groupExactMatch = false, $regexp = "");
+
+    /**
+     * @abstract
+     * Test if user exists in conf driver (not auth)
+     * @param string $login
+     */
+    abstract public function userExistsInConf($login);
+
+    /**
+     * @abstract
+     * List users from the conf driver (not auth)
+     * @param string $baseGroup
+     * @param bool $groupExactMatch if false, list users in this group and subgroups
+     * @param string $regexp
+     * @param int $offset
+     * @param int $limit
+     */
+    abstract public function listUsersFromConf($baseGroup = "/", $groupExactMatch = false, $regexp = "", $offset = null, $limit = null);
+
+    /**
+     * @abstract
      * @param array $context
      * @param String $fileName
      * @param String $ID
@@ -356,9 +386,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      * Function for deleting a user
      *
      * @param String $userId
-     * @param Array $deletedSubUsers
      */
-    abstract public function deleteUser($userId, &$deletedSubUsers);
+    abstract public function deleteUser($userId);
 
 
     /**
@@ -614,7 +643,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 if ($action == "user_create_user") {
                     AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "NEW_");
                     $data["new_user_id"] = AJXP_Utils::decodeSecureMagic($data["new_user_id"], AJXP_SANITIZE_EMAILCHARS);
-                    if (AuthService::userExists($data["new_user_id"])) {
+                    if (AuthService::userExistsInConf($data["new_user_id"])) {
                         throw new Exception('Please choose another user id');
                     }
                     AJXP_Controller::applyHook("user.before_create", array($data["new_user_id"]));
@@ -903,7 +932,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 $crtValue = $httpVars["value"];
                 $usersOnly = isSet($httpVars["users_only"]) && $httpVars["users_only"] == "true";
                 $existingOnly = isSet($httpVars["existing_only"]) && $httpVars["existing_only"] == "true";
-                if(!empty($crtValue)) $regexp = '^'.preg_quote($crtValue);
+                if(!empty($crtValue)) $regexp = $crtValue;
                 else $regexp = null;
                 $limit = intval(ConfService::getCoreConf("USERS_LIST_COMPLETE_LIMIT", "conf"));
                 $searchAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS", "conf");
@@ -913,7 +942,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     $baseGroup = AuthService::filterBaseGroup("/");
                 }
                 AuthService::setGroupFiltering(false);
-                $allUsers = AuthService::listUsers($baseGroup, $regexp, 0, $limit, false);
+                $allUsers = AuthService::listUsersFromConf($baseGroup, false, $regexp, 0, $limit, false);
                 if (!$usersOnly) {
                     $allGroups = AuthService::listChildrenGroups($baseGroup);
                 }

@@ -232,7 +232,7 @@ class CURLTransport implements Transporter
     // Set all of the curl opts and then execute.
     curl_setopt_array($curl, $opts);
     $ret = curl_exec($curl);
-      \AJXP_Logger::debug("CURL $method ".$uri /*,debug_backtrace()*/);
+      \AJXP_Logger::debug(__CLASS__,__FUNCTION__,"CURL $method ".$uri /*,debug_backtrace()*/);
     //$ret = $this->execCurl($curl);
     $info = curl_getinfo($curl);
       //var_dump($info);

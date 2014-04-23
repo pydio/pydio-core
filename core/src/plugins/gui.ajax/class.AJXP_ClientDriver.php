@@ -172,9 +172,14 @@ class AJXP_ClientDriver extends AJXP_Plugin
                     }
                 }
 
+                $root = $_SERVER['REQUEST_URI'];
+                if(basename($root) == "dashboard" || basename($root) == "settings" || strpos(basename($root), "ws-") === 0){
+                    $root = dirname($root);
+                }
                 $START_PARAMETERS = array(
                     "BOOTER_URL"=>"index.php?get_action=get_boot_conf",
-                    "MAIN_ELEMENT" => "ajxp_desktop"
+                    "MAIN_ELEMENT" => "ajxp_desktop",
+                    "APPLICATION_ROOT" => $root
                 );
                 if (AuthService::usersEnabled()) {
                     AuthService::preLogUser((isSet($httpVars["remote_session"])?$httpVars["remote_session"]:""));
@@ -220,6 +225,15 @@ class AJXP_ClientDriver extends AJXP_Plugin
 
                 $JSON_START_PARAMETERS = json_encode($START_PARAMETERS);
                 $crtTheme = $this->pluginConf["GUI_THEME"];
+                $additionalFrameworks = $this->getFilteredOption("JS_RESOURCES_BEFORE");
+                $ADDITIONAL_FRAMEWORKS = "";
+                if( !empty($additionalFrameworks) ){
+                    $frameworkList = explode(",", $additionalFrameworks);
+                    foreach($frameworkList as $index => $framework){
+                        $frameworkList[$index] = '<script language="javascript" type="text/javascript" src="'.$framework.'"></script>'."\n";
+                    }
+                    $ADDITIONAL_FRAMEWORKS = implode("", $frameworkList);
+                }
                 if (ConfService::getConf("JS_DEBUG")) {
                     if (!isSet($mess)) {
                         $mess = ConfService::getMessages();
@@ -238,6 +252,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
                     if (preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])) {
                         $content = str_replace("ajaxplorer_boot.js", "ajaxplorer_boot_protolegacy.js", $content);
                     }
+                    $content = str_replace("AJXP_ADDITIONAL_JS_FRAMEWORKS", $ADDITIONAL_FRAMEWORKS, $content);
                     $content = AJXP_XMLWriter::replaceAjxpXmlKeywords($content, false);
                     $content = str_replace("AJXP_REBASE", isSet($START_PARAMETERS["REBASE"])?'<base href="'.$START_PARAMETERS["REBASE"].'"/>':"", $content);
                     if ($JSON_START_PARAMETERS) {

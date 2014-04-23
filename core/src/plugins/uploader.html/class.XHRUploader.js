@@ -153,7 +153,7 @@ Class.create("XHRUploader", {
                 this.addListRow(files[j]);
             }
         }
-
+        this.createdDirs = $A();
         if(this.optionPane.autoSendCheck.checked){
              window.setTimeout(this.submit.bind(this), 1000);
         }
@@ -449,6 +449,9 @@ Class.create("XHRUploader", {
 
         this.listTarget.removeClassName('dropareaHover');
 
+        if(getBaseName(file.name)==".DS_Store"){
+            return;
+        }
 		if(file.size==0 && file.type == ""){
 			// FOLDER!
 			alert(MessageHash[336]);
@@ -758,24 +761,28 @@ Class.create("XHRUploader", {
 
         var currentDir = this.contextNode.getPath();
         if(item.relativePath){
-            if(!this.createdDirs) {
-                this.createdDirs = $A();
-            }
+            if(!this.createdDirs) this.createdDirs = $A();
             // Create the folder directly!
             var createConn = new Connexion();
             var dirPath = getRepName(item.relativePath);
-            var fullPath = currentDir+dirPath;
-            if(this.createdDirs.indexOf(dirPath) == -1){
-                item.down('span.item_relative_path').update('Creating '+dirPath + '...');
-                createConn.setParameters(new Hash({
-                    get_action: 'mkdir',
-                    dir: getRepName(fullPath),
-                    ignore_exists:true,
-                    dirname:getBaseName(fullPath)
-                }));
-                createConn.sendSync();
-                item.down('span.item_relative_path').update(dirPath);
-                this.createdDirs.push(dirPath);
+            var parts = dirPath.split("/");
+            var localDir = "";
+            for(var i=0;i<parts.length;i++){
+                localDir += "/" + parts[i];
+
+                var fullPath = currentDir+localDir;
+                if(this.createdDirs.indexOf(localDir) == -1){
+                    item.down('span.item_relative_path').update('Creating '+localDir + '...');
+                    createConn.setParameters(new Hash({
+                        get_action: 'mkdir',
+                        dir: getRepName(fullPath),
+                        ignore_exists:true,
+                        dirname:getBaseName(fullPath)
+                    }));
+                    createConn.sendSync();
+                    item.down('span.item_relative_path').update(localDir);
+                    this.createdDirs.push(localDir);
+                }
             }
             currentDir = fullPath;
         }

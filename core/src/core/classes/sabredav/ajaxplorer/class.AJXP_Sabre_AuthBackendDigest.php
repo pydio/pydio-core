@@ -42,7 +42,7 @@ class AJXP_Sabre_AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
 
     public function getDigestHash($realm, $username)
     {
-        if (!AuthService::userExists($username)) {
+        if (!AuthService::userExistsInConf($username)) {
             return false;
         }
         $confDriver = ConfService::getConfStorageImpl();

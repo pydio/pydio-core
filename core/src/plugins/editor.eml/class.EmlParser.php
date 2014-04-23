@@ -49,8 +49,12 @@ class EmlParser extends AJXP_Plugin
         $streamData = $repository->streamData;
         $destStreamURL = $streamData["protocol"]."://".$repository->getId();
         $wrapperClassName = $streamData["classname"];
-        if(empty($httpVars["file"])) return;
-        $file = $destStreamURL.AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+
+        $selection = new UserSelection($repository, $httpVars);
+
+        if($selection->isEmpty()) return;
+
+        $file = $destStreamURL.$selection->getUniqueFile();
         $mess = ConfService::getMessages();
 
         $node = new AJXP_Node($file);

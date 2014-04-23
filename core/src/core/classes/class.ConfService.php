@@ -399,6 +399,9 @@ class ConfService
                 return false;
             }
         }
+        if ($repositoryObject->getAccessType()=="ajxp_user" && $userObject != null) {
+            return true;// ($userObject->canRead($repositoryId) || $userObject->canWrite($repositoryId)) ;
+        }
         if ($repositoryObject->getAccessType() == "ajxp_shared" && !AuthService::usersEnabled()) {
             return false;
         }
@@ -981,7 +984,7 @@ class ConfService
             return $this->configs[$varName];
         }
         if (defined("AJXP_".$varName)) {
-            return eval("return AJXP_".$varName.";");
+            return constant("AJXP_".$varName);
         }
         return null;
     }

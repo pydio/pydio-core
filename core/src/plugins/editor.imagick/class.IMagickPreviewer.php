@@ -61,11 +61,13 @@ class IMagickPreviewer extends AJXP_Plugin
         $streamData = $repository->streamData;
         $destStreamURL = $streamData["protocol"]."://".$repository->getId();
         $flyThreshold = 1024*1024*intval($this->getFilteredOption("ONTHEFLY_THRESHOLD", $repository->getId()));
+        $selection = new UserSelection($repository);
+        $selection->initFromHttpVars($httpVars);
 
         if ($action == "imagick_data_proxy") {
             $this->extractAll = false;
             if(isSet($httpVars["all"])) $this->extractAll = true;
-            $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+            $file = $selection->getUniqueFile();
 
             if (($size = filesize($destStreamURL.$file)) === false) {
                 return ;
@@ -111,6 +113,10 @@ class IMagickPreviewer extends AJXP_Plugin
             $file = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/imagick_full/".AJXP_Utils::decodeSecureMagic($httpVars["file"]);
             if (!is_file($file)) {
                 $srcfile = AJXP_Utils::decodeSecureMagic($httpVars["src_file"]);
+                if($repository->hasContentFilter()){
+                    $contentFilter = $repository->getContentFilter();
+                    $srcfile = $contentFilter->filterExternalPath($srcfile);
+                }
                 $size = filesize($destStreamURL."/".$srcfile);
                 if($size > $flyThreshold) $this->useOnTheFly = true;
                 else $this->useOnTheFly = false;
@@ -125,7 +131,7 @@ class IMagickPreviewer extends AJXP_Plugin
             header('Cache-Control: public');
             readfile($file);
             exit(1);
-        } else if ($action == "delete_imagick_data" && isSet($httpVars["file"])) {
+        } else if ($action == "delete_imagick_data" && !$selection->isEmpty()) {
             /*
             $files = $this->listExtractedJpg(AJXP_CACHE_DIR."/".$httpVars["file"]);
             foreach ($files as $file) {

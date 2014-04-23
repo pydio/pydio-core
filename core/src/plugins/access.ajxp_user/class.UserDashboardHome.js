@@ -123,6 +123,9 @@ Class.create("UserDashboardHome", AjxpPane, {
                     var a = new Element('li', {title:obj['alt'],style:'position:relative;'}).update(obj['name']);
                     notificationElement.insert(a);
                     var img = obj.pFactory.generateBasePreview(obj.ajxpNode);
+                    if(!img.src && !obj.ajxpNode.isLeaf()){
+                        img.src = window.ajxpResourcesFolder + '/images/mimes/64/folder.png';
+                    }
                     a.IMAGE_ELEMENT = img;
                     a.insert({top:img});
                     obj.pFactory.enrichBasePreview(obj.ajxpNode, a);

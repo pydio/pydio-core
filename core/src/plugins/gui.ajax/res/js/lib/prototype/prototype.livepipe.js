@@ -134,9 +134,13 @@ Element.addMethods({
         if (!delta) { return; }
         element = Event.extend(event).target;
         element = Element.extend(element.nodeType === Node.TEXT_NODE ? element.parentNode : element);
-        custom_event = element.fire('mouse:wheel',{ delta: delta });
-        if (custom_event.stopped) {
-            Event.stop(event);
+        try{
+            custom_event = element.fire('mouse:wheel',{ delta: delta });
+            if (custom_event.stopped) {
+                Event.stop(event);
+                return false;
+            }
+        }catch (e){
             return false;
         }
     }

@@ -40,10 +40,16 @@ class PixlrEditor extends AJXP_Plugin
     $streamData = $repository->streamData;
       $destStreamURL = $streamData["protocol"]."://".$repository->getId();
 
+      $selection = new UserSelection($repository, $httpVars);
+
     if ($action == "post_to_server") {
 
-      $file = base64_decode($httpVars["file"]);
-      $file = AJXP_Utils::securePath($file);
+        // Backward compat
+        if(strpos($httpVars["file"], "base64encoded:") !== 0){
+            $file = AJXP_Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
+        }else{
+            $file = $selection->getUniqueFile();
+        }
       $target = base64_decode($httpVars["parent_url"])."/plugins/editor.pixlr";
       $tmp = call_user_func(array($streamData["classname"], "getRealFSReference"), $destStreamURL.$file);
       $tmp = SystemTextEncoding::fromUTF8($tmp);
@@ -62,7 +68,7 @@ class PixlrEditor extends AJXP_Plugin
           $saveTarget = $target."/fake_save_pixlr_".md5($httpVars["secure_token"]).".php";
       }
       $params = array(
-        "referrer"  => "AjaXplorer",
+        "referrer"  => "Pydio",
         "method"  => "get",
         "loc"    => ConfService::getLanguage(),
         "target"  => $saveTarget,

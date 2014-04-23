@@ -386,7 +386,7 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
             throw new Exception("Empty role, this is not normal");
         }
         uksort($this->roles, array($this, "orderRoles"));
-        $this->mergedRole =  $this->roles[array_shift(array_keys($this->roles))];
+        $this->mergedRole =  clone $this->roles[array_shift(array_keys($this->roles))];
         if (count($this->roles) > 1) {
             $this->parentRole = $this->mergedRole;
         }
@@ -405,8 +405,12 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
             $stretchedParentUserRole = AuthService::limitedRoleFromParent($this->parentUser);
             if ($stretchedParentUserRole !== null) {
                 $this->parentRole = $this->parentRole->override($stretchedParentUserRole);
+                // REAPPLY SPECIFIC "SHARED" ROLES
+                foreach ($this->roles as $role) {
+                    if(! $role->autoAppliesTo("shared")) continue;
+                    $this->parentRole = $role->override($this->parentRole);
+                }
             }
-
             $this->mergedRole = $this->parentRole->override($this->personalRole);
         }
     }

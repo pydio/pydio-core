@@ -1,0 +1,1 @@
+ALTER TABLE "ajxp_log" ADD COLUMN "source" text

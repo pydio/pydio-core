@@ -29,4 +29,6 @@ $mess=array(
 "Generate thumbnails or not" => "Gerar ou não miniaturas",
 "Quality" => "Qualidade",
 "Thumbs quality" => "Qualidade das miniaturas",
+    "Exif Rotation" => "Exif Rotation",
+    "Rotate image using exif rotation" => "Rotate image using exif rotation"
 );

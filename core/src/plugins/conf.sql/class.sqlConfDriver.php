@@ -31,6 +31,11 @@ class sqlConfDriver extends AbstractConfDriver
     public $sqlDriver = array();
 
     /**
+     * listUsersFromConf support pagination ?
+     */
+    const supportsUsersPaginationInConf = true;
+
+    /**
      * Initialise the driver.
      *
      * Expects options containing a key 'SQL_DRIVER' with constructor values from dibi::connect()
@@ -148,6 +153,9 @@ class sqlConfDriver extends AbstractConfDriver
                 $v = unserialize($v);
             }
             $repo->options[$k] = $v;
+        }
+        if(isSet($repo->options["content_filter"]) && is_a($repo->options["content_filter"], "ContentFilter")){
+            $repo->setContentFilter($repo->options["content_filter"]);
         }
 
         return $repo;
@@ -278,6 +286,9 @@ class sqlConfDriver extends AbstractConfDriver
         try {
                 $repository_array = $this->repoToArray($repositoryObject);
                 $options = $repository_array['options'];
+                if($repositoryObject->hasContentFilter()){
+                    $options["content_filter"] = $repositoryObject->getContentFilter();
+                }
                 unset($repository_array['options']);
             if (!$update) {
                 dibi::query('INSERT INTO [ajxp_repo]', $repository_array);
@@ -360,16 +371,21 @@ class sqlConfDriver extends AbstractConfDriver
         */
     }
 
-    public function getUserChildren( $userId )
+    public function getUserChildren($userId, $instantiate = true)
     {
         $children = array();
-        $children_results = dibi::query('SELECT [ajxp_users].[login] FROM [ajxp_user_rights],[ajxp_users] WHERE [repo_uuid] = %s AND [rights] = %s AND [ajxp_user_rights].[login] = [ajxp_users].[login]', "ajxp.parent_user", $userId);
+        $children_results = dibi::query('SELECT [login] FROM [ajxp_user_rights] WHERE [repo_uuid] = %s AND [rights] = %s ', "ajxp.parent_user", $userId);
         $all = $children_results->fetchAll();
-        foreach ($all as $item) {
-            $children[] = $this->createUserObject($item["login"]);
+        if ($instantiate) {
+            foreach ($all as $item) {
+                $children[$item["login"]] = $this->createUserObject($item["login"]);
+            }
+        } else {
+            foreach ($all as $item) {
+                $children[$item["login"]] = $item["login"];
+            }
         }
         return $children;
-
     }
 
     /**
@@ -380,7 +396,7 @@ class sqlConfDriver extends AbstractConfDriver
     {
         $result = array();
         // OLD METHOD
-        $children_results = dibi::query('SELECT [ajxp_users].[login] FROM [ajxp_user_rights],[ajxp_users] WHERE [repo_uuid] = %s AND [ajxp_user_rights].[login] = [ajxp_users].[login] GROUP BY [ajxp_users].[login]', $repositoryId);
+        $children_results = dibi::query('SELECT [login] FROM [ajxp_user_rights] WHERE [repo_uuid] = %s', $repositoryId);
         $all = $children_results->fetchAll();
         foreach ($all as $item) {
             $result[$item["login"]] = $this->createUserObject($item["login"]);
@@ -521,6 +537,78 @@ class sqlConfDriver extends AbstractConfDriver
     }
 
     /**
+     * Get users count from the conf driver (not auth)
+     * @param string $baseGroup
+     * @param bool $groupExactMatch if false, count users in this group and subgroups
+     * @param string $regexp
+     */
+    public function getUsersCountFromConf($baseGroup = "/", $groupExactMatch = false, $regexp = "")
+    {
+        $groupLike = AJXP_Utils::groupMatchToLike($groupExactMatch);
+        if (!empty($regexp)) {
+            $like = AJXP_Utils::regexpToLike($regexp);
+            $res = dibi::query("SELECT COUNT(*)
+                                FROM [ajxp_user_rights]
+                                WHERE [login] ".$like."
+                                      AND [repo_uuid] = %s
+                                      AND [rights] ".$groupLike,
+                                $regexp, "ajxp.group_path", $baseGroup);
+        } else {
+            $res = dibi::query("SELECT COUNT(*)
+                                FROM [ajxp_user_rights]
+                                WHERE [repo_uuid] = %s
+                                      AND [rights] ".$groupLike,
+                                "ajxp.group_path", $baseGroup);
+        }
+        return $res->fetchSingle();
+    }
+
+    /**
+     * Test if user exists in conf driver (not auth)
+     * @param string $login
+     */
+    public function userExistsInConf($login)
+    {
+        $res = dibi::query("SELECT COUNT(*) FROM [ajxp_user_rights] WHERE [login] = %s", $login);
+        return $res->fetchSingle() > 0;
+    }
+
+    /**
+     * List users from the conf driver (not auth)
+     * @param string $baseGroup
+     * @param bool $groupExactMatch if false, list users in this group and subgroups
+     * @param string $regexp
+     * @param int $offset
+     * @param int $limit
+     */
+    public function listUsersFromConf($baseGroup = "/", $groupExactMatch = false, $regexp = "", $offset = null , $limit = null)
+    {
+        if (!($offset > -1)) $offset = null;
+        if (!($limit > -1)) $limit = null;
+
+        $groupLike = AJXP_Utils::groupMatchToLike($groupExactMatch);
+
+        if (!empty($regexp)) {
+            $like = AJXP_Utils::regexpToLike($regexp);
+            $res = dibi::query("SELECT [login]
+                                FROM [ajxp_user_rights]
+                                WHERE [login] ".$like."
+                                      AND [repo_uuid] = %s
+                                      AND [rights] ".$groupLike."
+                                ORDER BY [login] ASC %lmt %ofs",
+                                $regexp, "ajxp.group_path", $baseGroup, $limit, $offset);
+        } else {
+            $res = dibi::query("SELECT [login]
+                                FROM [ajxp_user_rights]
+                                WHERE [repo_uuid] = %s
+                                      AND [rights] ".$groupLike."
+                                ORDER BY [login] ASC %lmt %ofs",
+                                "ajxp.group_path", $baseGroup, $limit, $offset);
+        }
+        return $res->fetchAssoc('login');
+    }
+
+    /**
      * @param AbstractAjxpUser[] $flatUsersList
      * @param string $baseGroup
      * @param bool $fullTree
@@ -554,14 +642,7 @@ class sqlConfDriver extends AbstractConfDriver
 
     public function deleteGroup($groupPath)
     {
-        // Delete users of this group, as well as subgroups
-        $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %like~ OR [groupPath] = %s ORDER BY [login] ASC", $groupPath."/", $groupPath);
-        $rows = $res->fetchAll();
-        $subUsers = array();
-        foreach ($rows as $row) {
-            $this->deleteUser($row["login"], $subUsers);
-            dibi::query("DELETE FROM [ajxp_users] WHERE [login] = %s", $row["login"]);
-        }
+        // Delete group, as well as subgroups, users removal is taken care of in AuthService
         dibi::query("DELETE FROM [ajxp_groups] WHERE [groupPath] LIKE %like~ OR [groupPath] = %s", $groupPath."/", $groupPath);
         dibi::query('DELETE FROM [ajxp_roles] WHERE [role_id] = %s', 'AJXP_GRP_'.$groupPath);
     }
@@ -588,34 +669,20 @@ class sqlConfDriver extends AbstractConfDriver
 
     /**
      * Function for deleting a user
-     *
+     * Doesn't take care of the children users (it's in AuthService)
      * @param String $userId
-     * @param Array $deletedSubUsers
      * @throws Exception
      * @return void
      */
-    public function deleteUser($userId, &$deletedSubUsers)
+    public function deleteUser($userId)
     {
-        $children = array();
         try {
-            // FIND ALL CHILDREN FIRST
-            $children_results = dibi::query('SELECT [login] FROM [ajxp_user_rights] WHERE [repo_uuid] = %s AND [rights] = %s', "ajxp.parent_user", $userId);
-            $all = $children_results->fetchAll();
-            foreach ($all as $item) {
-                $children[] = $item["login"];
-            }
             dibi::begin();
-            //This one is done by AUTH_DRIVER, not CONF_DRIVER
-            //dibi::query('DELETE FROM [ajxp_users] WHERE [login] = %s', $userId);
             dibi::query('DELETE FROM [ajxp_user_rights] WHERE [login] = %s', $userId);
             dibi::query('DELETE FROM [ajxp_user_prefs] WHERE [login] = %s', $userId);
             dibi::query('DELETE FROM [ajxp_user_bookmarks] WHERE [login] = %s', $userId);
             dibi::query('DELETE FROM [ajxp_roles] WHERE [role_id] = %s', 'AJXP_USR_/'.$userId);
             dibi::commit();
-            foreach ($children as $childId) {
-                $this->deleteUser($childId, $deletedSubUsers);
-                $deletedSubUsers[] = $childId;
-            }
         } catch (DibiException $e) {
             throw new Exception('Failed to delete user, Reason: '.$e->getMessage());
         }
@@ -795,7 +862,7 @@ class sqlConfDriver extends AbstractConfDriver
         if (AuthService::getLoggedUser() == null) {
             return array();
         }
-        dibi::query("DELETE FROM [ajxp_user_teams] WHERE [user_id] NOT IN (SELECT [login] FROM [ajxp_users])");
+        dibi::query("DELETE FROM [ajxp_user_teams] WHERE [user_id] NOT IN (SELECT DISTINCT [login] FROM [ajxp_user_rights])");
         $res = dibi::query("SELECT * FROM [ajxp_user_teams] WHERE [owner_id] = %s ORDER BY [team_id]", AuthService::getLoggedUser()->getId());
         $data = $res->fetchAll();
         $all = array();
@@ -815,7 +882,7 @@ class sqlConfDriver extends AbstractConfDriver
         $teams = $this->listUserTeams();
         $teamData = $teams[$teamId];
         foreach ($teamData["USERS"] as $userId) {
-            if (AuthService::userExists($userId)) {
+            if (AuthService::userExistsInConf($userId)) {
                 $res[] = $userId;
             } else {
                 $this->removeUserFromTeam($teamId, $userId);

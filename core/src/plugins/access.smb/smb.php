@@ -105,7 +105,7 @@ class smb
                 }
             }
         }
-        AJXP_Logger::debug($str, $array);
+        AJXP_Logger::debug(__CLASS__,__FUNCTION__,$str, $array);
     }
 
 

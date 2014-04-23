@@ -173,7 +173,7 @@ class UserDashboardDriver extends AbstractAccessDriver
 
             case "clear_expired" :
 
-                $deleted = $this->clearExpiredFiles();
+                $deleted = ShareCenter::clearExpiredFiles(true); // $this->clearExpiredFiles();
                 AJXP_XMLWriter::header();
                 if (count($deleted)) {
                     AJXP_XMLWriter::sendMessage(sprintf($mess["user_dash.23"], count($deleted).""), null);
@@ -272,30 +272,6 @@ class UserDashboardDriver extends AbstractAccessDriver
         }
     }
 
-    public function clearExpiredFiles()
-    {
-        $files = glob(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/*.php");
-        $loggedUser = AuthService::getLoggedUser();
-        $userId = $loggedUser->getId();
-        $deleted = array();
-        foreach ($files as $file) {
-            $ar = explode(".", basename($file));
-            $id = array_shift($ar);
-            if(strlen($id) != 32) continue;
-            $publicletData = ShareCenter::loadPublicletData($id);
-            if (!isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $userId) {
-                continue;
-            }
-            if( (isSet($publicletData["EXPIRE_TIME"]) && is_numeric($publicletData["EXPIRE_TIME"]) && $publicletData["EXPIRE_TIME"] > 0 && $publicletData["EXPIRE_TIME"] < time()) ||
-                            (isSet($publicletData["DOWNLOAD_LIMIT"]) && $publicletData["DOWNLOAD_LIMIT"] > 0 && $publicletData["DOWNLOAD_LIMIT"] <= $publicletData["DOWNLOAD_COUNT"]) ) {
-                unlink($file);
-                $deleted[] = basename($file);
-                PublicletCounter::delete(str_replace(".php", "", basename($file)));
-            }
-        }
-        return $deleted;
-    }
-
     private function metaIcon($metaIcon)
     {
         return "<span class='icon-".$metaIcon." meta-icon'></span> ";
@@ -381,7 +357,7 @@ class UserDashboardDriver extends AbstractAccessDriver
             $baseGroup = AuthService::filterBaseGroup("/");
         }
         AuthService::setGroupFiltering(false);
-        $users = AuthService::listUsers($baseGroup);
+        $users = AuthService::listUsersFromConf($baseGroup);
 
         $minisites = $this->listSharedFiles("minisites");
 

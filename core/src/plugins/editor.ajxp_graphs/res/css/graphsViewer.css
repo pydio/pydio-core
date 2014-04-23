@@ -1,0 +1,46 @@
+div.cumulated_figure{
+    float:left;
+    width: 23%;
+    background-color: #77b8e2;
+    margin: 10px 1%;
+    border-radius: 4px;
+}
+
+div.cumulated_figure:nth-child(2){
+    background-color: #77b8e2;
+}
+
+div.cumulated_figure:nth-child(3){
+    background-color: #e35d52;
+}
+
+div.cumulated_figure:nth-child(4){
+    background-color: #d7a76A;
+}
+
+div.cumulated_figure:nth-child(5){
+    background-color: rgb(78,167,165);
+}
+
+div.cumulated_figure:nth-child(6){
+    background-color: #156FAF;
+}
+
+div.cumulated_figure div.innerTitle{
+    color: white;
+    border-bottom: 0;
+    text-align: center;
+    font-size: 17px;
+}
+
+div.cumulated_figure div.figure{
+    font-size: 60px;
+    text-align: center;
+    color: white;
+    padding: 10px 0 50px;
+    letter-spacing: 4px;
+}
+
+svg text {
+    font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif !important;
+}

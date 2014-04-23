@@ -107,7 +107,8 @@ class ExifMetaManager extends AJXP_Plugin
         $repo->detectStreamWrapper();
         $wrapperData = $repo->streamData;
         $urlBase = $wrapperData["protocol"]."://".$repo->getId();
-        $decoded = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+        $selection = new UserSelection($repo, $httpVars);
+        $decoded = $selection->getUniqueFile();
         $realFile = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $urlBase.$decoded);
         AJXP_Utils::safeIniSet('exif.encode_unicode', 'UTF-8');
         $exifData = @exif_read_data($realFile, 0, TRUE);
@@ -116,7 +117,7 @@ class ExifMetaManager extends AJXP_Plugin
             $exifData["COMPUTED_GPS"] = $this->convertGPSData($exifData);
         }
         $excludeTags = array("componentsconfiguration", "filesource", "scenetype", "makernote");
-        AJXP_XMLWriter::header("metadata", array("file" => $httpVars["file"], "type" => "EXIF"));
+        AJXP_XMLWriter::header("metadata", array("file" => $decoded, "type" => "EXIF"));
         foreach ($exifData as $section => $data) {
             print("<exifSection name='$section'>");
             foreach ($data as $key => $value) {

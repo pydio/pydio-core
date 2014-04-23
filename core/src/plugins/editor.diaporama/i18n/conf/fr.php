@@ -29,4 +29,6 @@ $mess=array(
 "Generate thumbnails or not" => "Génération des vignettes ou pas",
 "Quality" => "Qualité",
 "Thumbs quality" => "Qualité pour le rendu de la vignette.",
+    "Exif Rotation" => "Exif Rotation",
+    "Rotate image using exif rotation" => "Rotate image using exif rotation"
 );

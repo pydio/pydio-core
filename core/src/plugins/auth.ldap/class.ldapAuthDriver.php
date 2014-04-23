@@ -87,7 +87,7 @@ class ldapAuthDriver extends AbstractAuthDriver
                 $this->ldapFilter = "(" . $this->ldapFilter . ")";
             }
         } else {
-            if ($this->hasGroupsMapping && !empty($this->ldapGFilter)) {
+            if (!empty($this->hasGroupsMapping) && !empty($this->ldapGFilter)) {
                 $this->ldapFilter = "!(".$this->ldapGFilter.")";
             }
         }
@@ -319,7 +319,7 @@ class ldapAuthDriver extends AbstractAuthDriver
     // $baseGroup = "/"
     public function listUsersPaginated($baseGroup, $regexp, $offset, $limit)
     {
-        if ($this->hasGroupsMapping !== false) {
+        if (!empty($this->hasGroupsMapping)) {
             if ($baseGroup == "/") {
                 $this->dynamicFilter = "!(".$this->hasGroupsMapping."=*)";
             } else {
@@ -330,10 +330,7 @@ class ldapAuthDriver extends AbstractAuthDriver
             return array();
         }
 
-        if($regexp[0]=="^") $regexp = ltrim($regexp, "^")."*";
-        else if($regexp[strlen($regexp)-1] == "$") $regexp = "*".rtrim($regexp, "$");
-
-        $entries = $this->getUserEntries($regexp, false, $offset, $limit, true);
+        $entries = $this->getUserEntries(AJXP_Utils::regexpToLdap($regexp), false, $offset, $limit, true);
         $this->dynamicFilter = null;
         $persons = array();
         unset($entries['count']); // remove 'count' entry
@@ -346,7 +343,7 @@ class ldapAuthDriver extends AbstractAuthDriver
     }
     public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null)
     {
-        if ($this->hasGroupsMapping !== false) {
+        if (!empty($this->hasGroupsMapping)) {
             if ($baseGroup == "/") {
                 $this->dynamicFilter = "!(".$this->hasGroupsMapping."=*)";
             } else {
@@ -354,12 +351,7 @@ class ldapAuthDriver extends AbstractAuthDriver
             }
         }
 
-        $re = null;
-        if (!empty($regexp)) {
-            if($regexp[0]=="^") $re = ltrim($regexp, "^")."*";
-            else if($regexp[strlen($regexp)-1] == "$") $re = "*".rtrim($regexp, "$");
-        }
-        $res = $this->getUserEntries($re, true, null);
+        $res = $this->getUserEntries(AJXP_Utils::regexpToLdap($regexp), true, null);
         $this->dynamicFilter = null;
         return $res["count"];
     }
@@ -378,7 +370,7 @@ class ldapAuthDriver extends AbstractAuthDriver
             $arr[$this->separateGroup] = "LDAP Annuary";
             return $arr;
         }
-        if ($this->hasGroupsMapping) {
+        if (!empty($this->hasGroupsMapping)) {
             $origUsersDN = $this->ldapDN;
             $origUsersFilter = $this->ldapFilter;
             $origUsersAttr = $this->ldapUserAttr;
