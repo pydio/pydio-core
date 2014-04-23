@@ -237,7 +237,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
         }
 
-        $users = AuthService::listUsers($baseGroup, "^".$term);
+        $users = AuthService::listUsers($baseGroup, $term);
         foreach ($users as $userId => $userObject) {
 
             $nodeKey = "/data/users/".trim($userObject->getGroupPath(),"/")."/".$userId;
