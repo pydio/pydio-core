@@ -1128,6 +1128,10 @@ input.SF_input.SF_number{
     padding: 7px !important;
 }
 
+.ajxp_password_auth div.SF_element:first-of-type{
+    display: none !important;
+}
+
 /***************/
 /*ACTION BAR   */
 /***************/
