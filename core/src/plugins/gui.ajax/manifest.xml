@@ -322,14 +322,72 @@
 				</script>
 			]]></template>
             <template name="unique_preview_download" element="ajxp_unique_dl" position="top" label="Big download button"><![CDATA[
-				<style type="text/css"></style>
+				<style type="text/css">
+				#cpane_container{
+				    position: absolute;
+                    width: 100%;
+                    top:0;
+                }
+                body{
+                    overflow: hidden;
+                }
+                #background_container{
+				    position: absolute;
+                    width: 102%;
+                    top:-5px;
+                    left:-5px;
+                    bottom:-5px;
+                    right:-5px;
+                    filter: blur(5px);
+                    -moz-filter: blur(5px);
+                    -webkit-filter: blur(5px);
+                }
+                div#dl_toolbar {
+                    margin: 27% auto;
+                    display: block;
+                    width: 400px;
+                    font-size: 62px;
+                    text-align: center;
+                    background-color: rgba(0,0,0,0.5);
+                    padding: 20px 10px;
+                    border-radius: 5px;
+                }
+                div#widget_title{
+                    color: rgba(255,255,255,0.8);
+                    position: absolute;
+                    margin-top: 0px;
+                    padding: 23px 30px 20px;
+                    width: 100%;
+                    background-color: rgba(0,0,0,0.7);
+                    position: absolute;
+                }
+                div#inline_toolbar a{
+                    display:none;
+                }
+                a#download_button, a#share_current_page_button{
+                    display:block !important;
+                    text-align: center;
+                    color: rgba(255,255,255,0.8);
+                }
+                a#download_button span.ajxp_icon{
+                    display: inline-block;
+                    margin-right: 10px;
+                }
+                div#share_toolbar{
+                    position: absolute;
+                    right: 48px;
+                    bottom: 37px;
+                    font-size: 21px;
+                }
+                </style>
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div id="cpane_header" class="panelHeader">
+                    <div id="background_container" ajxpClass="AjxpPane" ajxpOptions='{"imageBackgroundFromConfigs":"action.share/CUSTOM_SHAREPAGE_BACKGROUND_"}'></div>
+                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
                         <div class="widget_logo"></div>
-                        <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}' style="color: white;z-index: 100000;position: absolute;margin-top: -10px;"></div>
-                    </div>
-                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser", "imageBackgroundFromConfigs":"action.share/CUSTOM_SHAREPAGE_BACKGROUND_"}'>
-                        <div id="dl_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["inline", "minisite-share-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                        <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'>
+                        </div>
+                        <div id="dl_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["inline"], "skipCarousel":true}'></div>
+                        <div id="share_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["minisite-share-actions"], "skipCarousel":true}'></div>
                     </div>
 				</div>
 				<script>
