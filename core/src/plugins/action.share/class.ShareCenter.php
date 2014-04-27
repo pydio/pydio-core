@@ -119,6 +119,16 @@ class ShareCenter extends AJXP_Plugin
     public function preProcessDownload($action, &$httpVars, &$fileVars){
         if(isSet($_SESSION["CURRENT_MINISITE"])){
             $this->logDebug(__FUNCTION__, "Do something here!");
+            $hash = $_SESSION["CURRENT_MINISITE"];
+            $share = $this->getShareStore()->loadShare($hash);
+            if(!empty($share)){
+                if($this->getShareStore()->isShareExpired($hash, $share)){
+                    throw new Exception('Link is expired');
+                }
+                if(!empty($share["DOWNLOAD_LIMIT"])){
+                    $this->getShareStore()->incrementDownloadCounter($hash);
+                }
+            }
         }
     }
 
@@ -153,6 +163,24 @@ class ShareCenter extends AJXP_Plugin
                     throw new Exception("Cannot share a non-existing file: ".$ajxpNode->getUrl());
                 }
                 $metadata = null;
+                $maxdownload = abs(intval($this->getFilteredOption("FILE_MAX_DOWNLOAD", $this->repository->getId())));
+                $download = isset($httpVars["downloadlimit"]) ? abs(intval($httpVars["downloadlimit"])) : 0;
+                if ($maxdownload == 0) {
+                    $httpVars["downloadlimit"] = $download;
+                } elseif ($maxdownload > 0 && $download == 0) {
+                    $httpVars["downloadlimit"] = $maxdownload;
+                } else {
+                    $httpVars["downloadlimit"] = min($download,$maxdownload);
+                }
+                $maxexpiration = abs(intval($this->getFilteredOption("FILE_MAX_EXPIRATION", $this->repository->getId())));
+                $expiration = isset($httpVars["expiration"]) ? abs(intval($httpVars["expiration"])) : 0;
+                if ($maxexpiration == 0) {
+                    $httpVars["expiration"] = $expiration;
+                } elseif ($maxexpiration > 0 && $expiration == 0) {
+                    $httpVars["expiration"] = $maxexpiration;
+                } else {
+                    $httpVars["expiration"] = min($expiration,$maxexpiration);
+                }
 
                 if ($subAction == "delegate_repo") {
                     header("Content-type:text/plain");
@@ -175,25 +203,6 @@ class ShareCenter extends AJXP_Plugin
                     }
                     print($url);
                 } else {
-                    $maxdownload = abs(intval($this->getFilteredOption("FILE_MAX_DOWNLOAD", $this->repository->getId())));
-                    $download = isset($httpVars["downloadlimit"]) ? abs(intval($httpVars["downloadlimit"])) : 0;
-                    if ($maxdownload == 0) {
-                        $httpVars["downloadlimit"] = $download;
-                    } elseif ($maxdownload > 0 && $download == 0) {
-                        $httpVars["downloadlimit"] = $maxdownload;
-                    } else {
-                        $httpVars["downloadlimit"] = min($download,$maxdownload);
-                    }
-                    $maxexpiration = abs(intval($this->getFilteredOption("FILE_MAX_EXPIRATION", $this->repository->getId())));
-                    $expiration = isset($httpVars["expiration"]) ? abs(intval($httpVars["expiration"])) : 0;
-                    if ($maxexpiration == 0) {
-                        $httpVars["expiration"] = $expiration;
-                    } elseif ($maxexpiration > 0 && $expiration == 0) {
-                        $httpVars["expiration"] = $maxexpiration;
-                    } else {
-                        $httpVars["expiration"] = min($expiration,$maxexpiration);
-                    }
-
                     $data = $this->accessDriver->makePublicletOptions($file, $httpVars["password"], $httpVars["expiration"], $httpVars["downloadlimit"], $this->repository);
                     $customData = array();
                     foreach ($httpVars as $key => $value) {
@@ -897,8 +906,9 @@ class ShareCenter extends AJXP_Plugin
             RewriteBase '.$path.'
             RewriteCond %{REQUEST_FILENAME} !-f
             RewriteCond %{REQUEST_FILENAME} !-d
-            RewriteRule ^([a-z0-9]+)-([a-z]+)$ $1.php?lang=$2 [QSA]
-            RewriteRule ^([a-z0-9]+)$ $1.php [QSA]
+            RewriteRule ^([a-z0-9]+)\.php$ share.php?hash=$1 [QSA]
+            RewriteRule ^([a-z0-9]+)-([a-z]+)$ share.php?hash=$1&lang=$2 [QSA]
+            RewriteRule ^([a-z0-9]+)$ share.php?hash=$1 [QSA]
             </IfModule>
             ';
         }
@@ -909,7 +919,7 @@ class ShareCenter extends AJXP_Plugin
 
     }
 
-    public static function loadMinisite($data)
+    public static function loadMinisite($data, $hash = '')
     {
         $repository = $data["REPOSITORY"];
         AJXP_PluginsService::getInstance()->initActivePlugins();
@@ -950,7 +960,9 @@ class ShareCenter extends AJXP_Plugin
             $_SESSION["PENDING_FOLDER"] = "/";
             $html = str_replace("AJXP_PRELOGED_USER", "", $html);
         }
-        $_SESSION["CURRENT_MINISITE"] = true;
+        if(isSet($hash)){
+            $_SESSION["CURRENT_MINISITE"] = $hash;
+        }
         if (isSet($_GET["lang"])) {
             $loggedUser = &AuthService::getLoggedUser();
             if ($loggedUser != null) {
@@ -973,6 +985,27 @@ class ShareCenter extends AJXP_Plugin
 
     public static function loadShareByHash($hash){
         AJXP_Logger::debug(__CLASS__, __FUNCTION__, "Do something");
+        AJXP_PluginsService::getInstance()->initActivePlugins();
+        $shareCenter = AJXP_PluginsService::findPlugin("action", "share");
+        $data = $shareCenter->loadPublicletData($hash);
+        if($shareCenter->getShareStore()->isShareExpired($hash, $data)){
+            // Remove the publiclet, it's done
+            if (strstr(realpath($_SERVER["SCRIPT_FILENAME"]),realpath(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"))) !== FALSE) {
+                $shareCenter->deleteExpiredPubliclet($hash, $data);
+                AuthService::disconnect();
+            }
+            die('Link expired!');
+        }
+        if(!empty($data) && is_array($data)){
+            if($data["SHARE_TYPE"] == "minisite"){
+                self::loadMinisite($data, $hash);
+            }else{
+                self::loadPubliclet($data);
+            }
+        }else{
+            echo 'Cannot find link';
+        }
+
     }
 
     private function deleteExpiredPubliclet($elementId, $data){
@@ -981,6 +1014,9 @@ class ShareCenter extends AJXP_Plugin
             AuthService::logUser($data["OWNER_ID"], "", true);
         }
         $repoObject = $data["REPOSITORY"];
+        if(!is_a($repoObject, "Repository")) {
+            $repoObject = ConfService::getRepositoryById($data["REPOSITORY"]);
+        }
 
         ConfService::loadDriverForRepository($repoObject)->detectStreamWrapper(true);
         AJXP_Controller::registryReset();
@@ -1231,7 +1267,7 @@ class ShareCenter extends AJXP_Plugin
      * @param $httpVars
      * @param $repository
      * @param $accessDriver
-     * @return array An array containing the hash (0) and the generated url (1)
+     * @return mixed An array containing the hash (0) and the generated url (1)
      */
     public function createSharedMinisite($httpVars, $repository, $accessDriver)
     {
@@ -1288,10 +1324,19 @@ class ShareCenter extends AJXP_Plugin
         if ($httpVars["disable_download"]) {
             $data["DOWNLOAD_DISABLED"] = true;
         }
-        //$data["TRAVEL_PATH_TO_ROOT"] = $this->computeMinisiteToServerURL();
+
         $data["AJXP_APPLICATION_BASE"] = AJXP_Utils::detectServerURL(true);
         if(isSet($httpVars["minisite_layout"])){
             $data["AJXP_TEMPLATE_NAME"] = $httpVars["minisite_layout"];
+        }
+        if(isSet($httpVars["expiration"]) && intval($httpVars["expiration"]) > 0){
+            $data["EXPIRE_TIME"] = time() + intval($httpVars["expiration"]) * 86400;
+        }
+        if(isSet($httpVars["downloadlimit"]) && intval($httpVars["downloadlimit"]) > 0){
+            $data["DOWNLOAD_LIMIT"] = intval($httpVars["downloadlimit"]);
+        }
+        if(AuthService::usersEnabled()){
+            $data["OWNER_ID"] = AuthService::getLoggedUser()->getId();
         }
 
         try{
@@ -1627,9 +1672,17 @@ class ShareCenter extends AJXP_Plugin
         return $this->getShareStore()->loadShare($id);
     }
 
+    public function listShares($currentUser = true, $cursor = null){
+        if(AuthService::usersEnabled()){
+            $crtUser = ($currentUser?AuthService::getLoggedUser()->getId():'');
+        }else{
+            $crtUser = ($currentUser?'shared':'');
+        }
+        return $this->getShareStore()->listShares($crtUser, $cursor);
+    }
+
     public function clearExpiredFiles($currentUser = true)
     {
-        $files = glob(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/*.php");
         if($currentUser){
             $loggedUser = AuthService::getLoggedUser();
             $userId = $loggedUser->getId();
@@ -1638,11 +1691,9 @@ class ShareCenter extends AJXP_Plugin
         }
         $deleted = array();
         $switchBackToOriginal = false;
-        foreach ($files as $file) {
-            if(basename($file) == "share.php") continue;
-            $ar = explode(".", basename($file));
-            $id = array_shift($ar);
-            $publicletData = $this->getShareStore()->loadShare($id);
+
+        $publicLets = $this->getShareStore()->listShares($currentUser? $userId: '');
+        foreach ($publicLets as $hash => $publicletData) {
             if($publicletData === false) continue;
             if ($currentUser && ( !isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $userId )) {
                 continue;
@@ -1650,7 +1701,7 @@ class ShareCenter extends AJXP_Plugin
             if( (isSet($publicletData["EXPIRE_TIME"]) && is_numeric($publicletData["EXPIRE_TIME"]) && $publicletData["EXPIRE_TIME"] > 0 && $publicletData["EXPIRE_TIME"] < time()) ||
                 (isSet($publicletData["DOWNLOAD_LIMIT"]) && $publicletData["DOWNLOAD_LIMIT"] > 0 && $publicletData["DOWNLOAD_LIMIT"] <= $publicletData["DOWNLOAD_COUNT"]) ) {
                 if(!$currentUser) $switchBackToOriginal = true;
-                $this->deleteExpiredPubliclet($id, $publicletData);
+                $this->deleteExpiredPubliclet($hash, $publicletData);
                 $deleted[] = $publicletData["FILE_PATH"];
 
             }

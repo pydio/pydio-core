@@ -224,28 +224,17 @@ class UserDashboardDriver extends AbstractAccessDriver
                 <column messageId="user_dash.7" attributeName="expiration" sortType="String" width="5%"/>
             </columns>');
         }
-        $dlFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
-        if(!is_dir($dlFolder)) return ;
-        $files = glob($dlFolder."/*.php");
-        if(!is_array($files))return;
+
         $mess = ConfService::getMessages();
         $loggedUser = AuthService::getLoggedUser();
         $userId = $loggedUser->getId();
-        $dlURL = ConfService::getCoreConf("PUBLIC_DOWNLOAD_URL");
-        if ($dlURL!= "") {
-            $downloadBase = rtrim($dlURL, "/");
-        } else {
-            $fullUrl = AJXP_Utils::detectServerURL() . dirname($_SERVER['REQUEST_URI']);
-            $downloadBase = str_replace("\\", "/", $fullUrl.rtrim(str_replace(AJXP_INSTALL_PATH, "", $dlFolder), "/"));
-        }
-        $minisites = array();
+
         $shareCenter = AJXP_PluginsService::getInstance()->findPluginById("action.share");
-        foreach ($files as $file) {
-            $ar = explode(".", basename($file));
-            $id = array_shift($ar);
-            if($ar[0] != "php") continue;
-            //if(strlen($id) != 32) continue;
-            $publicletData = $shareCenter->loadPublicletData($id);
+        $downloadBase = $shareCenter->buildPublicDlURL();
+        $publicLets = $shareCenter->listShares(true, null);
+
+        $minisites = array();
+        foreach ($publicLets as $hash => $publicletData) {
             if($mode == "files"){
                 if(isSet($publicletData["AJXP_APPLICATION_BASE"]) || isSet($publicletData["TRAVEL_PATH_TO_ROOT"])
                     ||  (isset($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] != $userId)
@@ -255,19 +244,18 @@ class UserDashboardDriver extends AbstractAccessDriver
                 }
                 $expired = ($publicletData["EXPIRE_TIME"]!=0?($publicletData["EXPIRE_TIME"]<time()?true:false):false);
                 if(!is_a($publicletData["REPOSITORY"], "Repository")) continue;
-                AJXP_XMLWriter::renderNode(str_replace(".php", "", basename($file)), "".SystemTextEncoding::toUTF8($publicletData["REPOSITORY"]->getDisplay()).":/".SystemTextEncoding::toUTF8($publicletData["FILE_PATH"]), true, array(
+                AJXP_XMLWriter::renderNode($hash, "".SystemTextEncoding::toUTF8($publicletData["REPOSITORY"]->getDisplay()).":/".SystemTextEncoding::toUTF8($publicletData["FILE_PATH"]), true, array(
                         "icon"		=> "html.png",
                         "password" => ($publicletData["PASSWORD"]!=""?$this->metaIcon("key").$publicletData["PASSWORD"]:""),
                         "expiration" => ($publicletData["EXPIRE_TIME"]!=0?($expired?$this->metaIcon("time"):"").date($mess["date_format"], $publicletData["EXPIRE_TIME"]):""),
                         "download_count" => !empty($publicletData["DOWNLOAD_COUNT"])?$this->metaIcon("download-alt").$publicletData["DOWNLOAD_COUNT"]:"",
                         "download_limit" => ($publicletData["DOWNLOAD_LIMIT"] == 0 ? "" : $this->metaIcon("cloud-download").$publicletData["DOWNLOAD_LIMIT"] ),
-                        "integrity"  => (!$publicletData["SECURITY_MODIFIED"]?$mess["user_dash.15"]:$mess["user_dash.16"]),
-                        "download_url" => $this->metaIcon("link").$downloadBase . "/".basename($file),
+                        "download_url" => $this->metaIcon("link").$downloadBase . "/".$hash,
                         "ajxp_mime" => "shared_file")
                 );
             }else if($mode == "minisites"){
                 if(!isSet($publicletData["AJXP_APPLICATION_BASE"]) && !isSet($publicletData["TRAVEL_PATH_TO_ROOT"])) continue;
-                $minisites[$publicletData["REPOSITORY"]] = $id;
+                $minisites[$publicletData["REPOSITORY"]] = $hash;
             }
         }
         if($mode == "minisites"){

@@ -2275,40 +2275,31 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.shared">
                 <column messageId="ajxp_shared.4" attributeName="ajxp_label" sortType="String" defaultWidth="30%"/>
                 <column messageId="ajxp_shared.27" attributeName="owner" sortType="String" defaultWidth="10%"/>
-                <column messageId="ajxp_shared.17" attributeName="download_url" sortType="String" defaultWidth="40%"/>
+                <column messageId="ajxp_shared.17" attributeName="download_url" sortType="String" defaultWidth="44%"/>
                 <column messageId="ajxp_shared.6" attributeName="password" sortType="String" defaultWidth="4%"/>
                 <column messageId="ajxp_shared.7" attributeName="expiration" sortType="String" defaultWidth="4%"/>
                 <column messageId="ajxp_shared.20" attributeName="expired" sortType="String" defaultWidth="4%"/>
-                <column messageId="ajxp_shared.14" attributeName="integrity" sortType="String" defaultWidth="4%" hidden="true"/>
             </columns>');
-        $dlFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
-        if(!is_dir($dlFolder)) return ;
-        $files = glob($dlFolder."/*.php");
-        if($files === false) return ;
-        $mess = ConfService::getMessages();
-        $loggedUser = AuthService::getLoggedUser();
-        $userId = $loggedUser->getId();
-        $dlURL = ConfService::getCoreConf("PUBLIC_DOWNLOAD_URL");
-        if ($dlURL!= "") {
-            $downloadBase = rtrim($dlURL, "/");
-        } else {
-            $fullUrl = AJXP_Utils::detectServerURL() . dirname($_SERVER['REQUEST_URI']);
-            $downloadBase = str_replace("\\", "/", $fullUrl.rtrim(str_replace(AJXP_INSTALL_PATH, "", $dlFolder), "/"));
-        }
 
+        $mess = ConfService::getMessages();
         $shareCenter = AJXP_PluginsService::getInstance()->findPluginById("action.share");
-        foreach ($files as $file) {
-            $publicletData = $shareCenter->loadPublicletData(array_shift(explode(".", basename($file))));
-            if (!is_a($publicletData["REPOSITORY"], "Repository")) {
-                continue;
+        $downloadBase = $shareCenter->buildPublicDlURL();
+        $files = $shareCenter->listShares(false, null /*array(0,200)*/); // we can implement pagination
+
+        foreach ($files as $hash =>  $publicletData) {
+            if (is_a($publicletData["REPOSITORY"], "Repository")) {
+                $display = $publicletData["REPOSITORY"]->getDisplay().":/".$publicletData["FILE_PATH"];
+            }else{
+                $repo = ConfService::getRepositoryById($publicletData["REPOSITORY"]);
+                if(!is_a($repo, "Repository")) continue;
+                $display = '[Minisite] '.$repo->getDisplay();
             }
-            AJXP_XMLWriter::renderNode(str_replace(".php", "", basename($file)), "".SystemTextEncoding::toUTF8($publicletData["REPOSITORY"]->getDisplay()).":/".SystemTextEncoding::toUTF8($publicletData["FILE_PATH"]), true, array(
+            AJXP_XMLWriter::renderNode($hash, "".SystemTextEncoding::toUTF8($display), true, array(
                 "icon"		=> "html.png",
                 "password" => ($publicletData["PASSWORD"]!=""?$publicletData["PASSWORD"]:"-"),
                 "expiration" => ($publicletData["EXPIRE_TIME"]!=0?date($mess["date_format"], $publicletData["EXPIRE_TIME"]):"-"),
                 "expired" => ($publicletData["EXPIRE_TIME"]!=0?($publicletData["EXPIRE_TIME"]<time()?$mess["ajxp_shared.21"]:$mess["ajxp_shared.22"]):"-"),
-                "integrity"  => (!$publicletData["SECURITY_MODIFIED"]?$mess["ajxp_shared.15"]:$mess["ajxp_shared.16"]),
-                "download_url" => $downloadBase . "/".basename($file),
+                "download_url" => $downloadBase . "/".$hash,
                 "owner" => (isset($publicletData["OWNER_ID"])?$publicletData["OWNER_ID"]:"-"),
                 "ajxp_mime" => "shared_file")
             );

@@ -25,14 +25,39 @@ require_once("class.PublicletCounter.php");
 
 class ShareStore {
 
-    var $slqSupported = false;
+    var $sqlSupported = false;
     var $downloadFolder;
     var $hashMinLength;
+    /**
+     * @var sqlConfDriver
+     */
+    var $confStorage;
 
     public function __construct($downloadFolder, $hashMinLength = 32){
         $this->downloadFolder = $downloadFolder;
         $this->hashMinLength = $hashMinLength;
         $storage = ConfService::getConfStorageImpl();
+        if($storage->getId() == "conf.sql") {
+            $this->sqlSupported = true;
+            $this->confStorage = $storage;
+        }
+    }
+
+    private function createGenericLoader(){
+        if(!is_file($this->downloadFolder."/share.php")){
+            $loader_content = '<'.'?'.'php
+                    $hash = $_GET["hash"];
+                    if(file_exists($hash.".php")){
+                        require_once($hash.".php");
+                    }else{
+                        require_once("'.str_replace("\\", "/", AJXP_INSTALL_PATH).'/publicLet.inc.php");
+                        ShareCenter::loadShareByHash($_GET["hash"]);
+                    }
+                ';
+            if (@file_put_contents($this->downloadFolder."/share.php", $loader_content) === FALSE) {
+                throw new Exception("Can't write to PUBLIC URL");
+            }
+        }
     }
 
     /**
@@ -45,6 +70,13 @@ class ShareStore {
 
         $data = serialize($shareData);
         $hash = $this->computeHash($data, $this->downloadFolder);
+        if($this->sqlSupported){
+            $this->createGenericLoader();
+            $shareData["SHARE_TYPE"] = $type;
+            $this->confStorage->simpleStoreSet("share", $hash, $shareData, "serial");
+            return $hash;
+        }
+
         $loader = 'ShareCenter::loadMinisite($data);';
         if($type == "publiclet"){
             $loader = 'ShareCenter::loadPubliclet($data);';
@@ -71,7 +103,16 @@ class ShareStore {
 
         $dlFolder = $this->downloadFolder;
         $file = $dlFolder."/".$hash.".php";
-        if(!is_file($file)) return array();
+        if(!is_file($file)) {
+            if($this->sqlSupported){
+                $this->confStorage->simpleStoreGet("share", $hash, "serial", $data);
+                if(!empty($data)){
+                    $data["DOWNLOAD_COUNT"] = PublicletCounter::getCount($hash);
+                    return $data;
+                }
+            }
+            return array();
+        }
         $lines = file($file);
         $inputData = '';
         // Necessary for the eval
@@ -86,8 +127,40 @@ class ShareStore {
             $publicletData["DOWNLOAD_COUNT"] = PublicletCounter::getCount($hash);
         }
         $publicletData["PUBLICLET_PATH"] = $file;
+        if($this->sqlSupported){
+            // Move old file to DB-storage
+            $type = (isset($publicletData["REPOSITORY"]) ? "minisite" : "publiclet");
+            $this->createGenericLoader();
+            $shareData["SHARE_TYPE"] = $type;
+            $this->confStorage->simpleStoreSet("share", $hash, $publicletData, "serial");
+            unlink($file);
+        }
+
         return $publicletData;
 
+    }
+
+    public function listShares($limitToUser = '', $cursor = null){
+
+        // Get DB files
+        $dbLets = $this->confStorage->simpleStoreList("share", $cursor, "", "serial", (!empty($limitToUser)?'%"OWNER_ID";s:'.strlen($limitToUser).':"'.$limitToUser.'"%':''));
+
+        // Get hardcoded files
+        $files = glob(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/*.php");
+        if($files === false) return $dbLets;
+        foreach ($files as $file) {
+            if(basename($file) == "share.php") continue;
+            $ar = explode(".", basename($file));
+            $id = array_shift($ar);
+            $publicletData = $this->loadShare($id);
+            if($publicletData === false) continue;
+            if ($limitToUser && ( !isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $limitToUser )) {
+                continue;
+            }
+            $dbLets[$id] = $publicletData;
+        }
+
+        return $dbLets;
     }
 
     /**
@@ -132,7 +205,11 @@ class ShareStore {
                 if (isSet($minisiteData["PRELOG_USER"])) {
                     AuthService::deleteUser($minisiteData["PRELOG_USER"]);
                 }
-                unlink($minisiteData["PUBLICLET_PATH"]);
+                if(isSet($minisiteData["PUBLICLET_PATH"]) && is_file($minisiteData["PUBLICLET_PATH"])){
+                    unlink($minisiteData["PUBLICLET_PATH"]);
+                }else if($this->sqlSupported){
+                    $this->confStorage->simpleStoreClear("share", $element);
+                }
             }
         } else if ($type == "user") {
             $confDriver = ConfService::getConfStorageImpl();
@@ -146,7 +223,11 @@ class ShareStore {
             $publicletData = $this->loadShare($element);
             if (isSet($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] == $loggedUser->getId()) {
                 PublicletCounter::delete($element);
-                unlink($publicletData["PUBLICLET_PATH"]);
+                if(isSet($minisiteData["PUBLICLET_PATH"]) && is_file($minisiteData["PUBLICLET_PATH"])){
+                    unlink($minisiteData["PUBLICLET_PATH"]);
+                }else if($this->sqlSupported){
+                    $this->confStorage->simpleStoreClear("share", $element);
+                }
             } else {
                 throw new Exception($mess["ajxp_shared.12"]);
             }
@@ -159,7 +240,15 @@ class ShareStore {
         if ($type == "repository") {
             return (ConfService::getRepositoryById($element) != null);
         } else if ($type == "file" || $type == "minisite") {
-            return is_file($this->downloadFolder."/".$element.".php");
+            $fileExists = is_file($this->downloadFolder."/".$element.".php");
+            if($fileExists) {
+                return true;
+            }
+            if($this->sqlSupported) {
+                $this->confStorage->simpleStoreGet("share", $element, "serial", $data);
+                if(is_array($data)) return true;
+            }
+            return false;
         }
     }
 

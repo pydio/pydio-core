@@ -500,6 +500,11 @@ Class.create("ShareCenter", {
                     this.loadSharedElementData(this.currentNode, function(json){
 
                         var firstRow = oForm.down('#share_result').down('div.SF_horizontal_fieldsRow');
+                        if(json['repositoryId']){
+                            this.shareFolderMode = 'minisite_public';
+                            this.shareRepository(true);
+                            return;
+                        }
                         $A(json).each(function(linkData){
                             var row = firstRow.cloneNode(true);
                             firstRow.parentNode.insert(row);
@@ -559,7 +564,7 @@ Class.create("ShareCenter", {
         ');
         ShareCenter.prototype.loadSharedElementData(node, function(jsonData){
             "use strict";
-            if(node.isLeaf()){
+            if(node.isLeaf() && !jsonData['repositoryId']){
 
                 if(!jsonData) return ;
                 var linksCount = jsonData.length;

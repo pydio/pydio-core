@@ -440,7 +440,7 @@
             </action>
             <action name="download">
                 <pre_processing>
-                    <serverCallback methodName="preProcessDownload"/>
+                    <serverCallback methodName="preProcessDownload" applyCondition="$apply=isSet($_SESSION['CURRENT_MINISITE']);"/>
                 </pre_processing>
             </action>
         </actions>
