@@ -951,6 +951,7 @@ class ShareCenter extends AJXP_Plugin
 
         session_name("AjaXplorer_Shared");
         session_start();
+        AuthService::disconnect();
 
         if (!empty($data["PRELOG_USER"])) {
             AuthService::logUser($data["PRELOG_USER"], "", true);
@@ -958,7 +959,7 @@ class ShareCenter extends AJXP_Plugin
         } else {
             $_SESSION["PENDING_REPOSITORY_ID"] = $repository;
             $_SESSION["PENDING_FOLDER"] = "/";
-            $html = str_replace("AJXP_PRELOGED_USER", "", $html);
+            $html = str_replace("AJXP_PRELOGED_USER", $data["PRESET_LOGIN"], $html);
         }
         if(isSet($hash)){
             $_SESSION["CURRENT_MINISITE"] = $hash;
@@ -1279,7 +1280,11 @@ class ShareCenter extends AJXP_Plugin
             if (!empty($pref)) {
                 $userId = $pref.$userId;
             }
-            $userPass = substr(md5(time()), 13, 24);
+            if(!empty($httpVars["guest_user_pass"])){
+                $userPass = $httpVars["guest_user_pass"];
+            }else{
+                $userPass = substr(md5(time()), 13, 24);
+            }
             $httpVars["user_0"] = $userId;
             $httpVars["user_pass_0"] = $httpVars["shared_pass"] = $userPass;
             $httpVars["entry_type_0"] = "user";
@@ -1320,7 +1325,17 @@ class ShareCenter extends AJXP_Plugin
         $newId = $newRepo->getId();
         $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
         $this->initPublicFolder($downloadFolder);
-        $data = array("REPOSITORY"=>$newId, "PRELOG_USER"=>$userId);
+
+        $data = array(
+            "REPOSITORY"=>$newId
+        );
+        if(isSet($httpVars["create_guest_user"]) && isSet($userId)){
+            if(empty($httpVars["guest_user_pass"])){
+                $data["PRELOG_USER"] = $userId;
+            }else{
+                $data["PRESET_LOGIN"] = $userId;
+            }
+        }
         if ($httpVars["disable_download"]) {
             $data["DOWNLOAD_DISABLED"] = true;
         }

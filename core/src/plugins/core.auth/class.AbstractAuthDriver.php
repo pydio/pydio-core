@@ -54,9 +54,6 @@ class AbstractAuthDriver extends AJXP_Plugin
                     $loggingResult = -4;
                 } else {
                     $userId = (isSet($httpVars["userid"])?trim($httpVars["userid"]):null);
-                    if($userId == 'PRESET_LOGIN' && isSet($_SESSION["PENDING_LOGIN"])){
-                        $userId = $_SESSION["PENDING_LOGIN"];
-                    }
                     $userPass = (isSet($httpVars["password"])?trim($httpVars["password"]):null);
                     $rememberMe = ((isSet($httpVars["remember_me"]) && $httpVars["remember_me"] == "true")?true:false);
                     $cookieLogin = (isSet($httpVars["cookie_login"])?true:false);
