@@ -495,23 +495,71 @@ class ldapAuthDriver extends AbstractAuthDriver
         unset($entries['count']); // remove 'count' entry
         $groupData = $entries[0];
 
-        $memberOf = $groupData[strtolower($this->hasGroupsMapping)][0];
+        /*
+         * memberOf could be a array because of a object(such as user) can be belong to multi-groups
+         * example: object w10S was belong to 04 groups
+         * [
+            {"memberof":
+                {
+                    "0":"CN=globalmarkettings,OU=MARKETING,OU=company,DC=vpydio,DC=fr",
+                    "1":"CN=algers,CN=Alger,OU=algeria,OU=Africe,OU=MARKETING,OU=company,DC=vpydio,DC=fr",
+                    "2":"CN=algerias,OU=algeria,OU=Africe,OU=MARKETING,OU=company,DC=vpydio,DC=fr",
+                    "3":"CN=africes,OU=Africe,OU=MARKETING,OU=company,DC=vpydio,DC=fr"
+                }
+                ,
+                "0":"memberof",
+                "samaccountname":
+                {
+                    "0":"w10s"
+                },
+                "1":"samaccountname",
+                "dn":"CN=w10s,CN=willaya10,CN=Alger,OU=algeria,OU=Africe,OU=MARKETING,OU=company,DC=vpydio,DC=fr"
+            }
+            ]
+         */
+        $memberOfs = $groupData[strtolower($this->hasGroupsMapping)];
+        //$memberOf = $groupData[strtolower($this->hasGroupsMapping)][0];
+
 
         $this->ldapDN = $origUsersDN;
         $this->ldapFilter = $origUsersFilter;
         $this->ldapUserAttr = $origUsersAttr;
 
-        if (!empty($memberOf)) {
-            $parts = explode(",", ltrim($memberOf, '/'));
-            foreach ($parts as $part) {
-                list($att,$attVal) = explode("=", $part);
-                if(strtolower($att) == "cn")  $parentCN = $attVal;
-            }
-            if (!empty($parentCN)) {
-                $branch[] = $memberOf;
-                $this->buildGroupBranch($parentCN, $branch);
-            }
+        $this->logDebug(__FUNCTION__, "GroupData[]: " . json_encode($groupData));
 
+        if (!empty($memberOfs)) {
+
+            /*
+             * recursively build group branch for each memeber of $memberOfs
+             *
+             */
+            foreach ($memberOfs as $memberOf) {
+                if (!empty($memberOf)) {
+                    $this->logDebug(__FUNCTION__, "memberOf[]: " . json_encode($memberOf));
+                    $parts = explode(",", ltrim($memberOf, '/'));
+                    foreach ($parts as $part) {
+                        list($att, $attVal) = explode("=", $part);
+                        /*
+                         * In the example above, 1st CN indicates the name of group, from 2nd, CN indicate a container,
+                         * therefore, we just take the first "cn" element by breaking the for if we found.
+                         *
+                         */
+                        if (strtolower($att) == "cn") {
+                            $parentCN = $attVal;
+                            break;
+                        }
+                    }
+                    if (!empty($parentCN)) {
+                        $branch[] = $memberOf;
+                        $this->logDebug(__FUNCTION__,"branch[]: ".$branch);
+
+                        /*
+                         * recursive function call to look for more group deeply
+                         */
+                        $this->buildGroupBranch($parentCN, $branch);
+                    }
+                }
+            }  // foreach
         }
 
 
@@ -560,17 +608,28 @@ class ldapAuthDriver extends AbstractAuthDriver
                         $memberValues = array();
                         if ($key == "memberof") {
                             // get CN from value
-                            foreach ($entry[$key] as $possibleValue) {
-                                $hnParts = array();
-                                $parts = explode(",", ltrim($possibleValue, '/'));
-                                foreach ($parts as $part) {
-                                    list($att,$attVal) = explode("=", $part);
-                                    if(strtolower($att) == "cn")  $hnParts[] = $attVal;
-                                }
-                                if (count($hnParts)) {
-                                    $memberValues[implode(",", $hnParts)] = $possibleValue;
-                                }
-                            }
+                                    foreach ($entry[$key] as $possibleValue) {
+                                        $hnParts = array();
+                                        $parts = explode(",", ltrim($possibleValue, '/'));
+                                        foreach ($parts as $part) {
+                                            list($att, $attVal) = explode("=", $part);
+
+                                            //if (strtolower($att) == "cn")  $hnParts[] = $attVal;
+
+                                            /*
+                                             * In the example above, 1st CN indicates the name of group, from 2nd, CN indicate a container,
+                                             * therefore, we just take the first "cn" element by breaking the for if we found.
+                                             *
+                                             */
+                                            if (strtolower($att) == "cn") {
+                                                $hnParts[] = $attVal;
+                                                break;
+                                            }
+                                        }
+                                        if (count($hnParts)) {
+                                            $memberValues[implode(",", $hnParts)] = $possibleValue;
+                                        }
+                                    }
                         }
                         switch ($params['MAPPING_LOCAL_TYPE']) {
                             case "role_id":
