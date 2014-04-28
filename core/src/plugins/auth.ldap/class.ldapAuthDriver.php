@@ -330,10 +330,7 @@ class ldapAuthDriver extends AbstractAuthDriver
             return array();
         }
 
-        if($regexp[0]=="^") $regexp = ltrim($regexp, "^")."*";
-        else if($regexp[strlen($regexp)-1] == "$") $regexp = "*".rtrim($regexp, "$");
-
-        $entries = $this->getUserEntries($regexp, false, $offset, $limit, true);
+        $entries = $this->getUserEntries(AJXP_Utils::regexpToLdap($regexp), false, $offset, $limit, true);
         $this->dynamicFilter = null;
         $persons = array();
         unset($entries['count']); // remove 'count' entry
@@ -354,12 +351,7 @@ class ldapAuthDriver extends AbstractAuthDriver
             }
         }
 
-        $re = null;
-        if (!empty($regexp)) {
-            if($regexp[0]=="^") $re = ltrim($regexp, "^")."*";
-            else if($regexp[strlen($regexp)-1] == "$") $re = "*".rtrim($regexp, "$");
-        }
-        $res = $this->getUserEntries($re, true, null);
+        $res = $this->getUserEntries(AJXP_Utils::regexpToLdap($regexp), true, null);
         $this->dynamicFilter = null;
         return $res["count"];
     }

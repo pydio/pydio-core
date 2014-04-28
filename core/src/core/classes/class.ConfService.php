@@ -984,7 +984,7 @@ class ConfService
             return $this->configs[$varName];
         }
         if (defined("AJXP_".$varName)) {
-            return eval("return AJXP_".$varName.";");
+            return constant("AJXP_".$varName);
         }
         return null;
     }
