@@ -94,7 +94,7 @@ class AJXP_Notification
         $uLabel = "";
         if (array_key_exists($this->getAuthor(), self::$usersCaches)) {
             $uLabel = self::$usersCaches[$this->getAuthor()];
-        } else if (strstr($tplString, "AJXP_USER") !== false && AuthService::userExists($this->getAuthor())) {
+        } else if (strstr($tplString, "AJXP_USER") !== false && AuthService::userExistsInConf($this->getAuthor())) {
             $obj = ConfService::getConfStorageImpl()->createUserObject($this->getAuthor());
             $uLabel = $obj->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
             self::$usersCaches[$this->getAuthor()] = $uLabel;

@@ -192,6 +192,67 @@ class serialConfDriver extends AbstractConfDriver
     }
 
     /**
+     * Get users count from the conf driver (not auth)
+     * @param string $baseGroup
+     * @param bool $groupExactMatch if false, count users in this group and subgroups
+     * @param string $regexp
+     */
+    public function getUsersCountFromConf($baseGroup = "/",  $groupExactMatch = false, $regexp = "")
+    {
+        return count($this->listUsersFromConf($baseGroup, $groupExactMatch, $regexp));
+    }
+
+    /**
+     * Test if user exists in conf driver (not auth)
+     * @param string $login
+     */
+    public function userExistsInConf($login)
+    {
+        $groups = AJXP_Utils::loadSerialFile($this->usersSerialDir."/groups.ser");
+        return array_key_exists($login, $groups);
+    }
+
+
+    /**
+     * List users from the conf driver (not auth)
+     * @param string $baseGroup
+     * @param bool $groupExactMatch if false, list users in this group and subgroups
+     * @param string $regexp
+     * @param int $offset
+     * @param int $limit
+     */
+    public function listUsersFromConf($baseGroup = "/", $groupExactMatch = false, $regexp = "", $offset = null, $limit = null)
+    {
+        if (empty($regexp)) {
+            $regexp = "#.*#";
+        } else {
+            $regexp = '#'.$regexp.'#';
+        }
+        $groups = AJXP_Utils::loadSerialFile($this->usersSerialDir."/groups.ser");
+        if ($groupExactMatch) {
+            foreach ($groups as $key => $value) {
+                if (strpos($key, "AJXP_GROUP:") === 0 ||
+                    $value !== $baseGroup ||
+                    preg_match($regexp, $key) === 0) {
+                    unset($groups[$key]);
+                    continue;
+                }
+            }
+        } else {
+            foreach ($groups as $key => $value) {
+                if (strpos($key, "AJXP_GROUP:") === 0 ||
+                    strpos($value, $baseGroup) !== 0 ||
+                    preg_match($regexp, $key) === 0) {
+                    unset($groups[$key]);
+                    continue;
+                }
+            }
+        }
+        return $groups;
+    }
+
+
+    /**
      * Unique ID of the repositor
      *
      * @param String $repositoryId
@@ -314,7 +375,7 @@ class serialConfDriver extends AbstractConfDriver
             $parent->save("superuser");
         } else {
             foreach ($pointer as $childId) {
-                if (!AuthService::userExists($childId)) {
+                if (!AuthService::userExistsInConf($childId)) {
                     $clean = true;
                     unset($pointer[$childId]);
                     continue;
@@ -425,16 +486,16 @@ class serialConfDriver extends AbstractConfDriver
 
     public function deleteGroup($groupPath)
     {
-        $gUsers = AuthService::listUsers($groupPath);
-        $gGroups = AuthService::listChildrenGroups($groupPath);
-        if (count($gUsers) || count($gGroups)) {
-            throw new Exception("Group is not empty, please do something with its content before trying to delete it!");
+        // Delete group, as well as subgroups, users removal is taken care of in AuthService
+        $groupFile = AJXP_VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser";
+        $childrenGroups = AuthService::listChildrenGroups($groupPath);
+        $groups = AJXP_Utils::loadSerialFile($groupFile);
+        foreach ($groups as $key => $gPath) {
+            if ($gPath == $groupPath || array_key_exists($gPath, $childrenGroups)) {
+                unset($groups[$key]);
+            }
         }
-        $groups = AJXP_Utils::loadSerialFile(AJXP_VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser");
-        foreach ($groups as $key => $value) {
-            if($value == $groupPath) unset($groups[$key]);
-        }
-        AJXP_Utils::saveSerialFile(AJXP_VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser", $groups);
+        AJXP_Utils::saveSerialFile($groupFile, $groups);
     }
 
     /**
@@ -457,9 +518,8 @@ class serialConfDriver extends AbstractConfDriver
      * Function for deleting a user
      *
      * @param String $userId
-     * @param Array $deletedSubUsers
      */
-    public function deleteUser($userId, &$deletedSubUsers)
+    public function deleteUser($userId)
     {
         $user = $this->createUserObject($userId);
         $files = glob($user->getStoragePath()."/*.ser");
@@ -477,8 +537,7 @@ class serialConfDriver extends AbstractConfDriver
         foreach (array_keys($users) as $id) {
             $object = $this->createUserObject($id);
             if ($object->hasParent() && $object->getParent() == $userId) {
-                $this->deleteUser($id, $deletedSubUsers);
-                $deletedSubUsers[] = $id;
+                $this->deleteUser($id);
             }
         }
 

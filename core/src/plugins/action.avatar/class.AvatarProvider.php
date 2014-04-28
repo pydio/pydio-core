@@ -62,7 +62,7 @@ class AvatarProvider extends AJXP_Plugin
 
             if (isSet($httpVars["userid"])) {
                 $userid = $httpVars["userid"];
-                if (AuthService::usersEnabled() && AuthService::userExists($userid)) {
+                if (AuthService::usersEnabled() && AuthService::userExistsInConf($userid)) {
                     $confDriver = ConfService::getConfStorageImpl();
                     $user = $confDriver->createUserObject($userid);
                     $userEmail = $user->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");

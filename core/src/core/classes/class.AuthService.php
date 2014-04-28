@@ -634,7 +634,8 @@ class AuthService
     }
 
     /**
-     * Use driver implementation to check whether the user exists or not.
+     * Use auth driver implementation to check whether the user exists or not.
+     * @deprecated
      * @static
      * @param String $userId
      * @param String $mode "r" or "w"
@@ -651,6 +652,37 @@ class AuthService
             return $authDriver->userExistsWrite($userId);
         }
         return $authDriver->userExists($userId);
+    }
+
+    /**
+     * Test if user exists in conf driver (not auth)
+     * Conf driver is always writable
+     * @static
+     * @param String $userId
+     * @return
+     */
+    public static function userExistsInConf($userId)
+    {
+        $userId = self::filterUserSensitivity($userId);
+        return ConfService::getConfStorageImpl()->userExistsInConf($userId);
+    }
+
+    /**
+     * Test if user exists in conf driver or Auth
+     * Useful before creating a user
+     * @static
+     * @param String $userId
+     * @return bool
+     */
+    public static function userExistsInConfOrAuth($userId)
+    {
+        $userId = self::filterUserSensitivity($userId);
+        if (ConfService::getConfStorageImpl()->userExistsInConf($userId)) {
+            return true;
+        } elseif (ConfService::getAuthDriverImpl()->userExists($userId)) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -798,22 +830,27 @@ class AuthService
      * Delete a user in the auth/conf driver impl
      * @static
      * @param $userId
-     * @return bool
+     * @return array
      */
     public static function deleteUser($userId)
     {
         AJXP_Controller::applyHook("user.before_delete", array($userId));
+
         $userId = self::filterUserSensitivity($userId);
-        $authDriver = ConfService::getAuthDriverImpl();
-        $authDriver->deleteUser($userId);
-        $subUsers = array();
-        ConfService::getConfStorageImpl()->deleteUser($userId, $subUsers);
-        foreach ($subUsers as $deletedUser) {
-            $authDriver->deleteUser($deletedUser);
+        $childrens = array_keys(self::getChildrenUsers($userId, false));
+        $deletedUsers = array();
+        if (!empty($childrens)) {
+            foreach ($childrens as $children) {
+                $deletedUsers = array_merge(self::deleteUser($children), $deletedUsers);
+            }
         }
+        ConfService::getAuthDriverImpl()->deleteUser($userId);
+        ConfService::getConfStorageImpl()->deleteUser($userId);
+
         AJXP_Controller::applyHook("user.after_delete", array($userId));
-        AJXP_Logger::info(__CLASS__,"Delete User", array("user_id"=>$userId, "sub_user" => implode(",", $subUsers)));
-        return true;
+        AJXP_Logger::info(__CLASS__,"Delete User", array("user_id"=>$userId, "sub_user" => implode(",", $deletedUsers)));
+        $deletedUsers[] = $userId;
+        return $deletedUsers;
     }
 
     private static $groupFiltering = true;
@@ -846,7 +883,6 @@ class AuthService
     public static function listChildrenGroups($baseGroup = "/")
     {
         return ConfService::getAuthDriverImpl()->listChildrenGroups(self::filterBaseGroup($baseGroup));
-
     }
 
     public static function createGroup($baseGroup, $groupName, $groupLabel)
@@ -858,12 +894,19 @@ class AuthService
 
     public static function deleteGroup($baseGroup, $groupName)
     {
-        ConfService::getConfStorageImpl()->deleteGroup(rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName);
+        $group = rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName;
+        $groupUsers = array_keys(ConfService::getConfStorageImpl()->listUsersFromConf($group, false));
+        $deletedUsers = array();
+        foreach ($groupUsers as $login) {
+            if (in_array($login, $deletedUsers)) continue;
+            $deletedUsers = array_merge(self::deleteUser($login),$deletedUsers);
+        }
+        ConfService::getConfStorageImpl()->deleteGroup($group);
     }
 
-    public static function getChildrenUsers($parentUserId)
+    public static function getChildrenUsers($parentUserId, $instantiate = true)
     {
-        return ConfService::getConfStorageImpl()->getUserChildren($parentUserId);
+        return ConfService::getConfStorageImpl()->getUserChildren($parentUserId, $instantiate);
     }
 
     public static function getUsersForRepository($repositoryId)
@@ -872,6 +915,7 @@ class AuthService
     }
 
     /**
+     * @deprecated
      * @static
      * @param string $baseGroup
      * @param null $regexp
@@ -915,16 +959,71 @@ class AuthService
         return $allUsers;
     }
 
+    /**
+     * @static
+     * @param string $baseGroup
+     * @param string $regexp
+     * @param int $offset
+     * @param int $limit
+     * @param bool $cleanLosts
+     * @return array
+     */
+    public static function listUsersFromConf($baseGroup = "/", $groupExactMatch = false, $regexp = "", $offset = -1, $limit = -1, $cleanLosts = true)
+    {
+        $baseGroup = self::filterBaseGroup($baseGroup);
+        $confDriver = ConfService::getConfStorageImpl();
+        $allUsers = array();
+        $paginated = false;
+        if ((!empty($regexp) || $offset != -1 || $limit != -1) && $confDriver::supportsUsersPaginationInConf) {
+            $paginated = true;
+        }
+        $users = $confDriver->listUsersFromConf($baseGroup, $groupExactMatch, $regexp, $offset, $limit);
+        foreach (array_keys($users) as $userId) {
+            if(($userId == "guest" && !ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) || $userId == "ajxp.admin.users" || $userId == "") continue;
+            if(!empty($regexp) && !$confDriver::supportsUsersPaginationInConf && !preg_match("/$regexp/i", $userId)) continue;
+            $allUsers[$userId] = $confDriver->createUserObject($userId);
+            if ($paginated) {
+                // Make sure to reload all children objects
+                foreach ($confDriver->getUserChildren($userId) as $childObject) {
+                    $allUsers[$childObject->getId()] = $childObject;
+                }
+            }
+        }
+        if ($paginated && $cleanLosts) {
+            // Remove 'lost' items (children without parents).
+            foreach ($allUsers as $id => $object) {
+                if ($object->hasParent() && !array_key_exists($object->getParent(), $allUsers)) {
+                    unset($allUsers[$id]);
+                }
+            }
+        }
+        return $allUsers;
+    }
+
     public static function authSupportsPagination()
     {
         $authDriver = ConfService::getAuthDriverImpl();
         return $authDriver->supportsUsersPagination();
     }
 
+    /**
+     * @deprecated
+     */
     public static function authCountUsers($baseGroup="/", $regexp="", $filterProperty = null, $filterValue = null)
+    {
+        return self::getUsersCountFromAuth($baseGroup,$regexp, $filterProperty, $filterValue);
+    }
+
+    public static function getUsersCountFromAuth($baseGroup="/", $regexp="", $filterProperty = null, $filterValue = null)
     {
         $authDriver = ConfService::getAuthDriverImpl();
         return $authDriver->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue);
+    }
+
+    public static function getUsersCountFromConf($baseGroup="/", $groupExactMatch = false, $regexp="")
+    {
+        $confDriver = ConfService::getConfStorageImpl();
+        return $confDriver->getUsersCountFromConf($baseGroup, $groupExactMatch, $regexp);
     }
 
     public static function getAuthScheme($userName)

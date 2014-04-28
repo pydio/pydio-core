@@ -1424,13 +1424,13 @@ class ShareCenter extends AJXP_Plugin
             }
             if ($eType == "user") {
                 $u = AJXP_Utils::decodeSecureMagic($httpVars["user_".$index], AJXP_SANITIZE_EMAILCHARS);
-                if (!AuthService::userExists($u) && !isSet($httpVars["user_pass_".$index])) {
+                if (!AuthService::userExistsInConf($u) && !isSet($httpVars["user_pass_".$index])) {
                     $index++;
                     continue;
-                } else if (AuthService::userExists($u) && isSet($httpVars["user_pass_".$index])) {
+                } else if (AuthService::userExistsInConf($u) && isSet($httpVars["user_pass_".$index])) {
                     throw new Exception("User $u already exists, please choose another name.");
                 }
-                if(!AuthService::userExists($u, "r") && !empty($prefix)
+                if(!AuthService::userExistsInConf($u) && !empty($prefix)
                 && strpos($u, $prefix)!==0 ){
                     $u = $prefix . $u;
                 }
@@ -1481,7 +1481,7 @@ class ShareCenter extends AJXP_Plugin
 
         $confDriver = ConfService::getConfStorageImpl();
         foreach ($users as $userName) {
-            if (AuthService::userExists($userName)) {
+            if (AuthService::userExistsInConf($userName)) {
                 // check that it's a child user
                 $userObject = $confDriver->createUserObject($userName);
                 if ( ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf") != true && ( !$userObject->hasParent() || $userObject->getParent() != $loggedUser->id ) ) {
@@ -1551,7 +1551,7 @@ class ShareCenter extends AJXP_Plugin
             $removeUsers = array_diff($originalUsers, $users);
             if (count($removeUsers)) {
                 foreach ($removeUsers as $user) {
-                    if (AuthService::userExists($user)) {
+                    if (AuthService::userExistsInConf($user)) {
                         $userObject = $confDriver->createUserObject($user);
                         $userObject->personalRole->setAcl($newRepo->getUniqueId(), "");
                         $userObject->save("superuser");
@@ -1572,7 +1572,7 @@ class ShareCenter extends AJXP_Plugin
         }
 
         foreach ($users as $userName) {
-            if (AuthService::userExists($userName, "r")) {
+            if (AuthService::userExistsInConf($userName)) {
                 // check that it's a child user
                 $userObject = $confDriver->createUserObject($userName);
             } else {
