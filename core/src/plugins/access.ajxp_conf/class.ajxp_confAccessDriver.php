@@ -1244,6 +1244,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         foreach ($option as $key => $optValue) {
                             if (is_array($optValue) && count($optValue)) {
                                 print("<param name=\"$key\"><![CDATA[".json_encode($optValue)."]]></param>");
+                            } else if (is_object($optValue)){
+                                print("<param name=\"$key\"><![CDATA[".json_encode($optValue)."]]></param>");
                             } else {
                                 if (is_bool($optValue)) {
                                     $optValue = ($optValue?"true":"false");
