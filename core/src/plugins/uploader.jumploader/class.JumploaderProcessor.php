@@ -146,7 +146,7 @@ class JumploaderProcessor extends AJXP_Plugin
             $httpVars["partitionRealName"] = $realName;
         }
     }
-
+    
     public function postProcess($action, $httpVars, $postProcessData)
     {
         if(isSet($httpVars["simple_uploader"]) || isSet($httpVars["xhr_uploader"])) return;
@@ -425,7 +425,7 @@ class JumploaderProcessor extends AJXP_Plugin
         if (is_file($this->getBaseDir()."/jumploader_z.jar")) {
             return "ERROR: The applet is already installed!";
         }
-        $fileData = AJXP_Utils::getRemoteContent("http://jumploader.com/jumploader_z.jar");
+        $fileData = AJXP_Utils::getRemoteContent("http://jumploader.com/jar/jumploader_z.jar");
         if (!is_writable($this->getBaseDir())) {
             file_put_contents(AJXP_CACHE_DIR."/jumploader_z.jar", $fileData);
             return "ERROR: The applet was downloaded, but the folder plugins/uploader.jumploader is not writeable. Applet is located in the cache folder, please put it manually in the plugin folder.";
