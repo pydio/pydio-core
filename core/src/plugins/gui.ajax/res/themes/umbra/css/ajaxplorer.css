@@ -922,10 +922,10 @@ div.editor_header > div.editor_action_bar > div.separator{
 }
 
 div.editor_header > span.header_label{
+    display: none;
     font-size: 24px;
     width: 100%;
     padding: 15px 0 0 62px;
-    display: inline-block;
     background-image: url('../images/mimes/64/user-acl.png');
     background-size: 40px;
     background-repeat: no-repeat;

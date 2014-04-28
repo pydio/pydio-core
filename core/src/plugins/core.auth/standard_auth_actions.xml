@@ -25,7 +25,22 @@
 						        top:$("progressBox").getStyle('top'),
 						        left:$("progressBox").getStyle('left')
 						    });
+                            var authConfs = ajaxplorer.getPluginConfigs("auth");
+                            if(!authConfs) authConfs = $H();
 						    if(!Modernizr.input.placeholder) oForm.addClassName('no_placeholder');
+						    if(window.ajxpBootstrap.parameters.get('PRESET_LOGIN')){
+						        oForm.addClassName('ajxp_preset_login');
+						        oForm.down('input[name="userid"]').setValue(window.ajxpBootstrap.parameters.get('PRESET_LOGIN'));
+						    }
+						    if(window.ajxpBootstrap.parameters.get('PRESET_PASSWORD')){
+						        oForm.addClassName('ajxp_preset_password');
+						        oForm.down('input[name="password"]').setValue(window.ajxpBootstrap.parameters.get('PRESET_PASSWORD'));
+						    }
+						    if(window.ajxpBootstrap.parameters.get('PASSWORD_AUTH_ONLY')){
+						        oForm.addClassName('ajxp_password_auth');
+						        authConfs.set('SECURE_LOGIN_FORM', true);
+						        authConfs.set('ENABLE_FORGOT_PASSWORD', false);
+                            }
 						    $("generic_dialog_box").down(".titleString").hide();
 						    $("generic_dialog_box").down("#modalCloseBtn").hide();
 						    $("generic_dialog_box").down(".dialogTitle").setAttribute("style", $("progressBox").down(".dialogTitle").getAttribute("style"));
@@ -50,7 +65,6 @@
 								oForm.down('input[type="text"]').key_enter_attached = true;
 							}
 
-                            var authConfs = ajaxplorer.getPluginConfigs("auth");
                             if(authConfs && authConfs.get("SECURE_LOGIN_FORM")){
                                 try{
                                     oForm.down('input[name="remember_me"]').up("div.SF_element").remove();
@@ -74,7 +88,7 @@
 							var oForm = modal.getForm();
 							var connexion = new Connexion();
 							connexion.addParameter('get_action', 'login');
-							connexion.addParameter('userid', oForm.userid.value);
+							connexion.addParameter('userid', window.ajxpBootstrap.parameters.get('PRESET_LOGIN')?window.ajxpBootstrap.parameters.get('PRESET_LOGIN'):oForm.userid.value);
 							connexion.addParameter('login_seed', oForm.login_seed.value);
 							connexion.addParameter('remember_me', (oForm.remember_me && oForm.remember_me.checked?"true":"false"));
 							if(oForm.login_seed.value != '-1'){

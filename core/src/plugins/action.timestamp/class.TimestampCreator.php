@@ -37,13 +37,15 @@ class TimestampCreator extends AJXP_Plugin
         if (!$repository->detectStreamWrapper(true)) {
             return false;
         }
+        $selection = new UserSelection($repository, $httpVars);
 
         //Retreive file info
         $streamData = $repository->streamData;
         $this->streamData = $streamData;
         $destStreamURL = $streamData["protocol"]."://".$repository->getId();
-        $fileName = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-        $fileUrl = $destStreamURL.AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+
+        $fileName = $selection->getUniqueFile();
+        $fileUrl = $destStreamURL.$fileName;
         $file = call_user_func(array($this->streamData["classname"], "getRealFSReference"), $fileUrl, true);
 
         //Hash the file, to send it to Universign

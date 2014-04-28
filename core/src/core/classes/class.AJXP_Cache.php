@@ -73,7 +73,6 @@ class AJXP_Cache
     public static function clearItem($pluginId, $filepath)
     {
         $inst = new AJXP_Cache($pluginId,$filepath, false);
-        AJXP_Logger::debug("SHOULD REMOVE ".$inst->getId());
         if (file_exists($inst->getId())) {
             @unlink($inst->getId());
         }
@@ -105,13 +104,12 @@ class AJXP_Cache
     public function getData()
     {
         if (!$this->hasCachedVersion()) {
-            AJXP_Logger::debug("caching data", $this->dataCallback);
             $result = call_user_func($this->dataCallback, $this->masterFile, $this->cacheId);
             if ($result !== false) {
                 $this->touch();
             }
         } else {
-            AJXP_Logger::debug("getting from cache");
+
         }
         return file_get_contents($this->cacheId);
     }

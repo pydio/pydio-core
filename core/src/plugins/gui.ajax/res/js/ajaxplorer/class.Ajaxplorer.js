@@ -88,10 +88,83 @@ Class.create("Ajaxplorer", {
 		this.initTemplates();
 		modal.initForms();
 		this.initObjects();
-		window.setTimeout(function(){
-			document.fire('ajaxplorer:loaded');
-		}, 200);		
+        window.setTimeout(function(){
+            document.fire('ajaxplorer:loaded');
+        }, 200);
+
+        this.initRouter();
+
 	},
+
+    initRouter : function(){
+
+        if(!window.Backbone || !window.Backbone.Router) return;
+
+        var WorkspaceRouter = Backbone.Router.extend({
+            routes: {
+                ":workspace":"switchToWorkspace"
+            },
+            switchToWorkspace: function(workspace) {
+                if(!ajaxplorer.user) {return;}
+                var repos = ajaxplorer.user.getRepositoriesList();
+                workspace = workspace.replace("ws-", "");
+                var object = $H(repos).detect(function(pair){
+                    return pair.value.getSlug() == workspace;
+                });
+                if(!object) return;
+                var foundRepo = object.value;
+                if(ajaxplorer.repositoryId != foundRepo.getId()){
+                    ajaxplorer.triggerRepositoryChange(foundRepo.getId());
+                }
+            }
+
+        });
+
+        this.router = new WorkspaceRouter();
+        var appRoot = ajxpBootstrap.parameters.get('APPLICATION_ROOT');
+        if(appRoot && appRoot != "/"){
+            Backbone.history.start({
+                pushState: true,
+                root:appRoot
+            });
+        }else{
+            Backbone.history.start({
+                pushState: true
+            });
+        }
+        if(this.user && this.user.getActiveRepository()){
+            var repoList = this.user.getRepositoriesList();
+            var activeRepo = repoList.get(this.user.getActiveRepository());
+            var slug = activeRepo.getSlug();
+            if(!activeRepo.getAccessType().startsWith("ajxp_")){
+                slug = "ws-" + slug;
+            }
+            this.router.navigate(slug);
+        }
+        var navigate = function(repList, repId){
+            if(repId === false){
+                this.router.navigate("/");
+            }else{
+                var repositoryObject = repList.get(repId);
+                var slug = repositoryObject.getSlug();
+                if(!repositoryObject.getAccessType().startsWith("ajxp_")){
+                    slug = "ws-" + slug;
+                }
+                this.router.navigate(slug);
+            }
+        }.bind(this);
+
+        if(this.user){
+            navigate(this.user.getRepositoriesList(), this.user.getActiveRepository());
+        }
+        document.observe("ajaxplorer:repository_list_refreshed", function(event){
+            var repList = event.memo.list;
+            var repId = event.memo.active;
+            navigate(repList, repId);
+        });
+
+    },
+
 	/**
 	 * Loads the XML Registry, an image of the application in its current state
 	 * sent by the server.
@@ -194,9 +267,11 @@ Class.create("Ajaxplorer", {
 		}.bind(this) );
 				
 		if(!Prototype.Browser.WebKit && !Prototype.Browser.IE){
+            /*
 			this.history = new Proto.History(function(hash){
 				this.goTo(this.historyHashToPath(hash));
 			}.bind(this));
+			*/
 			document.observe("ajaxplorer:context_changed", function(event){
 				this.updateHistory(this.getContextNode().getPath());
 			}.bind(this));
@@ -355,14 +430,16 @@ Class.create("Ajaxplorer", {
 		}
 		this.templatePartsToRestore = futurePartsToRestore;
 	},
-	
-	/**
-	 * Applies a template_part by removing existing components at this location
-	 * and recreating new ones.
-	 * @param ajxpId String The id of the DOM anchor
-	 * @param ajxpClass IAjxpWidget A widget class
-	 * @param ajxpOptions Object A set of options that may have been decoded from json.
-	 */
+
+    /**
+     * Applies a template_part by removing existing components at this location
+     * and recreating new ones.
+     * @param ajxpId String The id of the DOM anchor
+     * @param ajxpClass IAjxpWidget A widget class
+     * @param ajxpClassName
+     * @param ajxpOptionsString
+     * @param cdataContent
+     */
 	refreshGuiComponent:function(ajxpId, ajxpClass, ajxpClassName, ajxpOptionsString, cdataContent){
 		if(!window[ajxpId]) return;
 		// First destroy current component, unregister actions, etc.			
@@ -535,7 +612,7 @@ Class.create("Ajaxplorer", {
 			document.fire("ajaxplorer:repository_list_refreshed", {list:repList,active:repId});
 		}else{
 			document.fire("ajaxplorer:repository_list_refreshed", {list:false,active:false});
-		}		
+		}
 	},
 	
 	/**

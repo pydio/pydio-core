@@ -100,11 +100,14 @@ Class.create("AjxpMailer", {
             }
         );
 
-
         return $("mailer_message");
     },
 
     postEmail : function(){
+        var toField = this._mailerPane.down('#tofield');
+        if(toField.getValue()){
+            this.selectedLoginToSpan( toField.getValue(), toField.getValue() , false);
+        }
         var params = $H({get_action:"send_mail"});
         this._mailerPane.down("form").getElements().each(function(el){
             params.set(el.name, el.getValue());

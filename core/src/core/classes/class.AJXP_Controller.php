@@ -57,6 +57,10 @@ class AJXP_Controller
         return self::$xPath;
     }
 
+    public static function registryReset(){
+        self::$xPath = null;
+    }
+
     /**
      * Check the current user "specificActionsRights" and filter the full registry actions with these.
      * @static
@@ -457,7 +461,8 @@ class AJXP_Controller
      * @param Array $httpVars
      * @param Array $fileVars
      * @param null $variableArgs
-     * @throw AJXP_Exception
+     * @param bool $defer
+     * @throws AJXP_Exception* @throw AJXP_Exception
      * @return void
      */
     private static function applyCallback($xPath, $callback, &$actionName, &$httpVars, &$fileVars, &$variableArgs = null, $defer = false)
@@ -488,14 +493,14 @@ class AJXP_Controller
      * @static
      * @param string $hookName
      * @param array $args
-     * @return
+     * @param bool $forceNonDefer
+     * @return void
      */
     public static function applyHook($hookName, $args, $forceNonDefer = false)
     {
         $xPath = self::initXPath();
         $callbacks = $xPath->query("hooks/serverCallback[@hookName='$hookName']");
         if(!$callbacks->length) return ;
-        $callback = new DOMNode();
         foreach ($callbacks as $callback) {
             if ($callback->getAttribute("applyCondition")!="") {
                 $apply = false;
@@ -514,7 +519,7 @@ class AJXP_Controller
      * @static
      * @param $hookName
      * @param $args
-     * @return
+     * @return void
      */
     public static function applyIncludeHook($hookName, &$args)
     {

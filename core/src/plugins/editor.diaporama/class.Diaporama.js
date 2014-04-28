@@ -206,16 +206,19 @@ Class.create("Diaporama", AbstractEditor, {
 		this.element.observe("editor:close", function(){
 			Event.stopObserving(document, "keydown", this.zoomObs);
 		}.bind(this));
-		
+
+        this.autoFit = true;
 		// Init preferences
 		if(ajaxplorer && ajaxplorer.user){
 			var autoFit = ajaxplorer.user.getPreference('diapo_autofit');
-			if(autoFit && autoFit == "true"){
-				this.autoFit = true;
-				this.fitToScreenButton.select('img')[0].src = ajxpResourcesFolder + '/images/actions/22/zoom-fit-restore.png';
-				this.fitToScreenButton.select('span')[0].update(MessageHash[326]);
+			if(autoFit && autoFit === 'false'){
+				this.autoFit = false;
 			}
-		}
+            if(this.autoFit){
+                this.fitToScreenButton.select('img')[0].src = ajxpResourcesFolder + '/images/actions/22/zoom-fit-restore.png';
+                this.fitToScreenButton.select('span')[0].update(MessageHash[326]);
+            }
+        }
 		this.contentMainContainer = this.imgContainer ;
 		this.element.observe("editor:close", function(){
 			this.currentFile = null;
@@ -245,7 +248,7 @@ Class.create("Diaporama", AbstractEditor, {
 			this.imgContainer.setStyle({width:this.IEorigWidth});
 		}
         disableTextSelection(this.imgTag);
-		if(window.ajxpMobile){
+		if(window.ajxpMobile && this.editorOptions.context.elementName){
 			this.setFullScreen();
 			attachMobileScroll(this.imgContainer, "both");
 		}
@@ -341,17 +344,44 @@ Class.create("Diaporama", AbstractEditor, {
 		this.zoomInput.value = nPercent + ' %';
 		var height = parseInt(nPercent*this.crtHeight / 100);	
 		var width = parseInt(nPercent*this.crtWidth / 100);
-		// Center vertically
-		var marginTop=0;
-		var marginLeft=0;
-		this.containerDim = $(this.imgContainer).getDimensions();		
-		if (height < this.containerDim.height){
-			marginTop = parseInt((this.containerDim.height - height) / 2);
-		}
-		if (width < this.containerDim.width){
-			marginLeft = parseInt((this.containerDim.width - width) / 2);
-		}
-		if(morph && this.imgBorder.visible()){
+
+        // apply rotation
+        this.imgBorder.removeClassName("ort-rotate-1");
+        this.imgBorder.removeClassName("ort-rotate-2");
+        this.imgBorder.removeClassName("ort-rotate-3");
+        this.imgBorder.removeClassName("ort-rotate-4");
+        this.imgBorder.removeClassName("ort-rotate-5");
+        this.imgBorder.removeClassName("ort-rotate-6");
+        this.imgBorder.removeClassName("ort-rotate-7");
+        this.imgBorder.removeClassName("ort-rotate-8");
+
+        if(this.nodes && this.nodes.get(this.currentFile)){
+            var node = this.nodes.get(this.currentFile);
+            var ort = node.getMetadata().get("image_exif_orientation");
+            if (ort)
+                this.imgBorder.addClassName("ort-rotate-"+ort);
+        }
+
+        // Center vertically
+        var marginTop=0;
+        var marginLeft=0;
+        this.containerDim = $(this.imgContainer).getDimensions();
+
+        if (ort>4)
+        {
+            tmp=height;
+            height=width;
+            width=tmp;
+        }
+
+        if (height < this.containerDim.height){
+            marginTop = parseInt((this.containerDim.height - height) / 2);
+        }
+        if (width < this.containerDim.width){
+            marginLeft = parseInt((this.containerDim.width - width) / 2);
+        }
+
+        if(morph && this.imgBorder.visible()){
 			new Effect.Morph(this.imgBorder,{
 				style:{height:height+'px', width:width+'px',marginTop:marginTop+'px',marginLeft:marginLeft+'px'}, 
 				duration:0.5,
@@ -405,7 +435,6 @@ Class.create("Diaporama", AbstractEditor, {
         nav.centerY = (nav.bottom-nav.top)/2;
         nav.containerWidth = this.imgContainer.getWidth();
         nav.containerHeight = this.imgContainer.getHeight();
-
         var navigatorImg = overlay.next("img");
         var offset = navigatorImg.positionedOffset();
         var targetDim = navigatorImg.getDimensions();

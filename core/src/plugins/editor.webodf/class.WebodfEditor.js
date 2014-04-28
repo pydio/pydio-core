@@ -54,7 +54,6 @@ Class.create("WebodfEditor", AbstractEditor, {
 		$super(nodeOrNodes);
         this.node = nodeOrNodes;
 		var fileName = nodeOrNodes.getPath();
-        var fileContent = ajxpBootstrap.parameters.get('ajxpServerAccess')+'&get_action=download&file='+fileName;
 
         this.contentMainContainer = this.element.down('#webodf_container');
         this.contentMainContainer.src = 'plugins/editor.webodf/frame.php?token='+Connexion.SECURE_TOKEN+'&file='+fileName;

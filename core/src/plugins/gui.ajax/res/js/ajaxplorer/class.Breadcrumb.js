@@ -35,6 +35,7 @@ Class.create("Breadcrumb", {
         this.options = options || {};
         this.element.update('Files');
         this.observerFunc = function(event){
+            if(!this.element) return;
             var newNode = event.memo;
             var parts = $H();
             if(Object.isString(newNode)){

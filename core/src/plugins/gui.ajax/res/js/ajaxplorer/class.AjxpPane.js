@@ -62,6 +62,10 @@ Class.create("AjxpPane", {
             ajaxplorer.registerAsMessageBoxReference(this.htmlElement);
         }
 
+        if(this.options.imageBackgroundFromConfigs){
+            this.buildImageBackgroundFromConfigs(this.options.imageBackgroundFromConfigs);
+        }
+
     },
 
     resizeBound : function(event){
@@ -259,6 +263,29 @@ Class.create("AjxpPane", {
         }
         ajaxplorer.user.setPreference("gui_preferences", guiPref, true);
         ajaxplorer.user.savePreference("gui_preferences");
+    },
+
+
+    buildImageBackgroundFromConfigs:function(configName){
+        var exp = configName.split("/");
+        var plugin = exp[0];
+        var paramPrefix = exp[1];
+        var configs = XPathSelectNodes(ajaxplorer.getXmlRegistry(), "plugins/ajxp_plugin[@id='"+plugin+"']/plugin_configs/property[contains(@name, '"+paramPrefix+"')]");
+        var bgrounds = {};
+        configs.each(function(c){
+            bgrounds[c.getAttribute("name")] = c.firstChild.nodeValue.replace(/"/g, '');
+        });
+        var bStyles = [];
+        var index = 1;
+        while(bgrounds[paramPrefix+index]){
+            bStyles.push("background-image:url('"+window.ajxpServerAccessPath+"&get_action=get_global_binary_param&binary_id="+bgrounds[paramPrefix+index]+"');" + (bgrounds[paramPrefix + 'ATTRIBUTES_'+index]?bgrounds[paramPrefix + 'ATTRIBUTES_'+index]:''));
+            index++;
+        }
+        if (bStyles.length) {
+            var i = Math.floor( Math.random() * bStyles.length);
+            this.htmlElement.setAttribute("style", bStyles[i]);
+        }
+
     }
 
 });

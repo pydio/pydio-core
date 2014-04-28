@@ -135,7 +135,7 @@ function drupal_remote_auth($host, $uri, $login, $pass, $formId = "")
     $form = $nodes->item(0);
     $postUri = $form->getAttribute("action");
     $hiddens = $xPath->query('.//input[@type="hidden"]', $form);
-    AJXP_Logger::debug("Carry on Drupal hiddens ". $hiddens->length);
+    AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Carry on Drupal hiddens ". $hiddens->length);
     $postData = array(
         "name" => $login,
         "pass" => $pass,

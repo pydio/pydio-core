@@ -50,7 +50,14 @@ class AudioPreviewer extends AJXP_Plugin
 
         if ($action == "audio_proxy") {
 
-            $file = AJXP_Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
+            $selection = new UserSelection($repository, $httpVars);
+            // Backward compat
+            if(strpos($httpVars["file"], "base64encoded:") !== 0){
+                $file = AJXP_Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
+            }else{
+                $file = $selection->getUniqueFile();
+            }
+
             $cType = "audio/".array_pop(explode(".", $file));
 
             $localName = basename($file);

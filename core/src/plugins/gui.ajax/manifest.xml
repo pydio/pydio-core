@@ -7,6 +7,7 @@
     </client_settings>
 	<server_settings>
         <global_param name="GUI_THEME" group="CONF_MESSAGE[Main Options]" type="select" choices="vision|Vision,umbra|Umbra,oxygen|Oxygen (Legacy)" label="CONF_MESSAGE[Theme]" description="CONF_MESSAGE[Theme used for display]" mandatory="true" default="vision"/>
+        <global_param name="JS_RESOURCES_BEFORE" group="CONF_MESSAGE[Main Options]" type="string" label="CONF_MESSAGE[Additional JS frameworks]" description="CONF_MESSAGE[List of pathes to JS files that must be loaded BEFORE the main Pydio framework is loaded, comma separated. The preferred way should be using plugins resources declaration, but in some cases one may want to load some JS at the very start up of the page.]" mandatory="false"/>
         <global_param name="CUSTOM_ICON_ONLY" group="CONF_MESSAGE[Start Up Screen]" type="boolean" label="CONF_MESSAGE[Icon Only]" description="CONF_MESSAGE[Skip the title, only display an image]" mandatory="false" default="true"/>
         <global_param name="CUSTOM_ICON_BINARY" group="CONF_MESSAGE[Start Up Screen]" type="image" label="CONF_MESSAGE[Custom Icon]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]"
                     editable="true"
@@ -189,8 +190,8 @@
                     </div>
 				</div>
 			]]></template>
-            <template name="minisite_vision" element="ajxp_shared_folder" position="top" theme="vision"><![CDATA[
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_shared_folder"}'>
+            <template name="minisite_vision" element="ajxp_shared_folder" position="top" label="Standard"><![CDATA[
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
                     <div class="widget_logo"></div>
                     <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
       			    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["minisite", "inline"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
@@ -201,6 +202,209 @@
                         </div>
                         <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
                     </div>
+				</div>
+			]]></template>
+            <template name="minisite_filmstrip" element="ajxp_film_strip" position="top" label="Film Strip"><![CDATA[
+				<style type="text/css">
+				#cpane_header{
+				    padding-bottom: 7px;
+                    height: 19px;
+                    background-color: #222;
+                    border-bottom: 0;
+                    padding-top: 10px;
+                }
+                div#content_pane{
+                    background-color: #222;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+                    margin-bottom:5px;
+                }
+                div.thumbnail_selectable_cell{
+                    background-color: transparent;
+                    color: white !important;
+                }
+                #cpane_tabs>div.tabulatorContainer{
+                    height:0;
+                    border-bottom-width: 0;
+                }
+                #cpane_container{
+                    background-color: rgb(85, 85, 85);
+                }
+                #loading_overlay{
+                    display:none !important;
+                }
+                #diaporama_box{
+                    position:relative;
+                }
+
+				</style>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
+                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
+                        <div id="cpane_header" class="panelHeader">
+                            <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["minisite", "inline"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                            <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header"}'></div>
+                        </div>
+                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"thumb", "fixedDisplayMode":"thumb", "fixedThumbSize":45,"replaceScroller":false, "horizontalScroll":true, "messageBoxReference":true, "fit":"content", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}'></div>
+                        <div id="cpane_tabs" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"cpane_container","registerAsEditorOpener":true, "saveState":false, "defaultTabId": "","tabInfos" : [], "uniqueTab":true}'></div>
+                    </div>
+				</div>
+				<script>
+				    window.setTimeout(function(){
+                        try{
+                            document.observe("ajaxplorer:selection_changed", function(e){
+                                try{
+                                    var nodes = ajaxplorer.getContextHolder().getSelectedNodes();
+                                    if(nodes[0].isLeaf() && e.memo._selectionSource.__className == 'FilesList'){
+                                        ajaxplorer.actionBar.fireDefaultAction("file");
+                                    }
+                                }catch(e){}
+                            });
+                            ajaxplorer.getContextHolder().setSelectedNodes([ajaxplorer.getContextHolder().getContextNode().getChildren().first()]);
+                        }catch(e){}
+                    }, 1000);
+				</script>
+			]]></template>
+            <template name="unique_preview_file" element="ajxp_unique_strip" position="top" label="Unique File Preview"><![CDATA[
+				<style type="text/css">
+				#cpane_header{
+				    padding-bottom: 7px;
+                    height: 48px;
+                    background-color: #222;
+                    border-bottom: 0;
+                    padding-top: 10px;
+                }
+                div#content_pane{
+                    background-color: #222;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+                    margin-bottom:5px;
+                }
+                div.thumbnail_selectable_cell{
+                    background-color: transparent;
+                    color: white !important;
+                }
+                #cpane_tabs>div.tabulatorContainer{
+                    height:0;
+                    border-bottom-width: 0;
+                }
+                #cpane_container{
+                    background-color: rgb(85, 85, 85);
+                }
+                #loading_overlay{
+                    display:none !important;
+                }
+                #diaporama_box{
+                    position:relative;
+                }
+                #display_toolbar {
+                    margin-top: 32px;
+                    margin-right: 8px;
+                }
+                #display_toolbar span.actionbar_button_label {
+                    display: inline-block !important;
+                    margin-left: 4px !important;
+                }
+				</style>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
+                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
+                        <div id="cpane_header" class="panelHeader">
+                            <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["inline", "minisite-share-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                            <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}' style="color: white;z-index: 100000;position: absolute;margin-top: -10px;"></div>
+                        </div>
+                        <div id="cpane_tabs" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"cpane_container","registerAsEditorOpener":true, "saveState":false, "defaultTabId": "","tabInfos" : [], "uniqueTab":true}'></div>
+                    </div>
+				</div>
+				<script>
+				    window.setTimeout(function(){
+                        try{
+                            ajaxplorer.getContextHolder().setSelectedNodes([ajaxplorer.getContextHolder().getContextNode().getChildren().first()]);
+                            ajaxplorer.actionBar.fireDefaultAction("file");
+                        }catch(e){}
+                    }, 1000);
+				</script>
+			]]></template>
+            <template name="unique_preview_download" element="ajxp_unique_dl" position="top" label="Big download button"><![CDATA[
+				<style type="text/css">
+				#cpane_container{
+				    position: absolute;
+                    width: 100%;
+                    top:0;
+                }
+                body{
+                    overflow: hidden;
+                }
+                #background_container{
+				    position: absolute;
+                    width: 102%;
+                    top:-5px;
+                    left:-5px;
+                    bottom:-5px;
+                    right:-5px;
+                    filter: blur(5px);
+                    -moz-filter: blur(5px);
+                    -webkit-filter: blur(5px);
+                }
+                div#dl_toolbar {
+                    margin: 27% auto;
+                    display: block;
+                    width: 400px;
+                    font-size: 62px;
+                    text-align: center;
+                    background-color: rgba(0,0,0,0.5);
+                    padding: 20px 10px;
+                    border-radius: 5px;
+                }
+                div#widget_title{
+                    color: rgba(255,255,255,0.8);
+                    position: absolute;
+                    margin-top: 0px;
+                    padding: 23px 30px 20px;
+                    width: 100%;
+                    background-color: rgba(0,0,0,0.7);
+                    position: absolute;
+                }
+                div#inline_toolbar a{
+                    display:none;
+                }
+                a#download_button, a#share_current_page_button{
+                    display:block !important;
+                    text-align: center;
+                    color: rgba(255,255,255,0.8);
+                }
+                a#download_button span.ajxp_icon{
+                    display: inline-block;
+                    margin-right: 10px;
+                }
+                div#share_toolbar{
+                    position: absolute;
+                    right: 48px;
+                    bottom: 37px;
+                    font-size: 21px;
+                }
+                </style>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
+                    <div id="background_container" ajxpClass="AjxpPane" ajxpOptions='{"imageBackgroundFromConfigs":"action.share/CUSTOM_SHAREPAGE_BACKGROUND_"}'></div>
+                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
+                        <div class="widget_logo"></div>
+                        <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'>
+                        </div>
+                        <div id="dl_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["inline"], "skipCarousel":true}'></div>
+                        <div id="share_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["minisite-share-actions"], "skipCarousel":true}'></div>
+                    </div>
+				</div>
+				<script>
+				    window.setTimeout(function(){
+                        try{
+                            ajaxplorer.getContextHolder().setSelectedNodes([ajaxplorer.getContextHolder().getContextNode().getChildren().first()]);
+                        }catch(e){}
+                    }, 1000);
+				</script>
+			]]></template>
+            <template name="minisite_bare" element="ajxp_embed_template" position="top" label="Embedded"><![CDATA[
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
+                    <div id="cpane_header" class="panelHeader">
+                        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["minisite", "inline","default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                        <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header"}'></div>
+                    </div>
+                    <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
 				</div>
 			]]></template>
 			<component_config className="FilesList">

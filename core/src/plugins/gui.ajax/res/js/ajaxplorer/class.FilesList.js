@@ -82,7 +82,7 @@ Class.create("FilesList", SelectableElements, {
         this.__currentInstanceIndex = FilesList.staticIndex;
 
         var userLoggedObserver = function(){
-			if(!ajaxplorer || !ajaxplorer.user) return;
+			if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return;
 			disp = ajaxplorer.user.getPreference("display");
 			if(disp && (disp == 'thumb' || disp == 'list' || disp == 'detail')){
 				if(disp != this._displayMode) this.switchDisplayMode(disp);
@@ -124,6 +124,7 @@ Class.create("FilesList", SelectableElements, {
 
 		}.bind(this);
         var componentConfigObserver = function(event){
+            if(!this.htmlElement) return;
 			if(event.memo.className == "FilesList"){
 				var refresh = this.parseComponentConfig(event.memo.classConfig.get('all'));
 				if(refresh){
@@ -667,7 +668,11 @@ Class.create("FilesList", SelectableElements, {
                     paddingBottom: '0'
                 }
             );
-			attachMobileScroll(contentContainer, "vertical");
+            if(this.options.horizontalScroll){
+                attachMobileScroll(this.htmlElement, "horizontal");
+            }else{
+                attachMobileScroll(contentContainer, "vertical");
+            }
             var scrollElement = contentContainer;
 			var oElement = this.htmlElement.down(".selectable_div");
 			
@@ -770,15 +775,23 @@ Class.create("FilesList", SelectableElements, {
 			var buffer = '<div class="panelHeader"><div style="float:right;padding-right:5px;font-size:1px;height:16px;"><input type="image" height="16" width="16" src="'+ajxpResourcesFolder+'/images/actions/16/zoom-in.png" id="slider-input-1" style="border:0px;width:16px;height:16px;margin-top:0px;padding:0px;" value="64"/></div>'+MessageHash[126]+'</div>';
 			buffer += '<div id="selectable_div-'+this.__currentInstanceIndex+'" class="selectable_div'+(this._displayMode == "detail" ? ' detailed':'')+'" style="overflow:auto;">';
 			this.htmlElement.update(buffer);
-			attachMobileScroll(this.htmlElement.down(".selectable_div"), "vertical");
-			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){				
+            if(this.options.horizontalScroll){
+                attachMobileScroll(this.htmlElement, "horizontal");
+            }else{
+                attachMobileScroll(this.htmlElement.down(".selectable_div"), "vertical");
+            }
+			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){
                 this.htmlElement.down(".selectable_div").insert({before:this.createPaginator()});
 			}
             var scrollElement = this.htmlElement.down(".selectable_div");
-			this.observer = function(e){
-				fitHeightToBottom.defer(scrollElement, this.htmlElement);
-			}.bind(this);
-			this.observe("resize", this.observer);
+            if(this.options.horizontalScroll){
+                scrollElement.setStyle({width:'100000px'});
+                this.htmlElement.setStyle({overflowX:'auto'});
+            }
+            this.observer = function(e){
+                fitHeightToBottom.defer(scrollElement, this.htmlElement);
+            }.bind(this);
+            this.observe("resize", this.observer);
 			
 			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("thumb_size")){
 				this._thumbSize = parseInt(ajaxplorer.user.getPreference("thumb_size"));
@@ -879,7 +892,7 @@ Class.create("FilesList", SelectableElements, {
             this.scrollSizeObserver = function(){
                 window.setTimeout(function(){
                     if(!this.htmlElement || !this.scrollbar) return;
-                    if(this._displayMode == "list"){
+                    if(this._displayMode == "list" && contentContainer){
                         fitHeightToBottom(contentContainer, this.htmlElement);
                         if(Prototype.Browser.IE){
                             this._headerResizer.resize(contentContainer.getWidth());
@@ -1004,7 +1017,9 @@ Class.create("FilesList", SelectableElements, {
     			try{marginBottom = parseInt(eval(expr));}catch(e){}
     		}
     		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null), expr);
-    	}		
+    	}else if(this.options.fit && this.options.fit == 'content' && this.options.horizontalScroll){
+            this.htmlElement.setStyle({height:(this._thumbSize + 60) + 'px'});
+        }
     	if(this.htmlElement.down('.table_rows_container') && Prototype.Browser.IE && this.gridStyle == "file"){
             this.htmlElement.down('.table_rows_container').setStyle({width:'100%'});
     	}
@@ -2116,8 +2131,16 @@ Class.create("FilesList", SelectableElements, {
             }
 
 		}.bind(this));
-		
-	},
+
+        if(this.options.horizontalScroll){
+            var scrollElement = this.htmlElement.down(".selectable_div");
+            scrollElement.setStyle({width:(elList.length * (this._thumbSize + 46)) + 'px'});
+        }
+        if(this.options.fit && this.options.fit == 'content'){
+            this.resize();
+        }
+
+    },
 	/**
 	 * For list mode, recompute alternate BG distribution
 	 * Should use CSS3 when possible!

@@ -110,8 +110,12 @@ class ZohoEditor extends AJXP_Plugin
 
             require_once(AJXP_BIN_FOLDER."/http_class/http_class.php");
 
-            $file = base64_decode($httpVars["file"]);
-            $file = AJXP_Utils::securePath($file);
+            // Backward compat
+            if(strpos($httpVars["file"], "base64encoded:") !== 0){
+                $file = AJXP_Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
+            }else{
+                $file = $selection->getUniqueFile();
+            }
             $target = base64_decode($httpVars["parent_url"]);
             $tmp = call_user_func(array($streamData["classname"], "getRealFSReference"), $destStreamURL.$file);
             $tmp = SystemTextEncoding::fromUTF8($tmp);
@@ -207,9 +211,9 @@ class ZohoEditor extends AJXP_Plugin
                     echo "MODIFIED";
                 }
             } else {
-                if (is_file(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id)) {
-                    copy(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id, $targetFile);
-                    unlink(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id);
+                if (is_file(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id.".".$ext)) {
+                    copy(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id.".".$ext, $targetFile);
+                    unlink(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id.".".$ext);
                     echo "MODIFIED";
                 }
             }

@@ -1852,4 +1852,63 @@ class AJXP_Utils
         return $files;
     }
 
+    public static function regexpToLike($regexp)
+    {
+        $left = "~";
+        $right = "~";
+        if ($regexp[0]=="^") {
+            $left = "";
+        }
+        if ($regexp[strlen($regexp)-1] == "$") {
+            $right = "";
+        }
+        if ($left == "" && $right == "") {
+            return "= %s";
+        }
+        return "LIKE %".$left."like".$right;
+    }
+
+    public static function cleanRegexp($regexp)
+    {
+        return ltrim(rtrim($regexp, "$"), "^");
+    }
+
+    public static function likeToLike($regexp)
+    {
+        $left = "";
+        $right = "";
+        if ($regexp[0]=="%") {
+            $left = "~";
+        }
+        if ($regexp[strlen($regexp)-1] == "%") {
+            $right = "~";
+        }
+        if ($left == "" && $right == "") {
+            return "= %s";
+        }
+        return "LIKE %".$left."like".$right;
+    }
+
+    public static function cleanLike($regexp)
+    {
+        return ltrim(rtrim($regexp, "%"), "%");
+    }
+
+    public static function regexpToLdap($regexp)
+    {
+        if(empty($regexp))
+            return null;
+
+        $left = "*";
+        $right = "*";
+        if ($regexp[0]=="^") {
+            $regexp = ltrim($regexp, "^");
+            $left = "";
+        }
+        if ($regexp[strlen($regexp)-1] == "$") {
+            $regexp = rtrim($regexp, "$");
+            $right = "";
+        }
+        return $left.$regexp.$right;
+    }
 }

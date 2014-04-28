@@ -98,11 +98,12 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
                 $selection->initFromHttpVars($httpVars);
                 $files = $selection->getFiles();
                 AJXP_XMLWriter::header();
+                $shareCenter = AJXP_PluginsService::findPluginById("action.share");
                 foreach ($files as $index => $element) {
                     $element = basename($element);
                     $ar = explode("shared_", $mime);
                     $mime = array_pop($ar);
-                    ShareCenter::deleteSharedElement($mime, $element, $loggedUser);
+                    $shareCenter->deleteSharedElement($mime, $element, $loggedUser);
                     if($mime == "repository") $out = $mess["ajxp_conf.59"];
                     else if($mime == "user") $out = $mess["ajxp_conf.60"];
                     else if($mime == "file") $out = $mess["ajxp_shared.13"];

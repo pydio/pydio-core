@@ -149,6 +149,9 @@ class sqlConfDriver extends AbstractConfDriver
             }
             $repo->options[$k] = $v;
         }
+        if(isSet($repo->options["content_filter"]) && is_a($repo->options["content_filter"], "ContentFilter")){
+            $repo->setContentFilter($repo->options["content_filter"]);
+        }
 
         return $repo;
     }
@@ -278,6 +281,9 @@ class sqlConfDriver extends AbstractConfDriver
         try {
                 $repository_array = $this->repoToArray($repositoryObject);
                 $options = $repository_array['options'];
+                if($repositoryObject->hasContentFilter()){
+                    $options["content_filter"] = $repositoryObject->getContentFilter();
+                }
                 unset($repository_array['options']);
             if (!$update) {
                 dibi::query('INSERT INTO [ajxp_repo]', $repository_array);
@@ -621,7 +627,7 @@ class sqlConfDriver extends AbstractConfDriver
         }
     }
 
-    protected function simpleStoreSet($storeID, $dataID, $data, $dataType = "serial", $relatedObjectId = null)
+    public function simpleStoreSet($storeID, $dataID, $data, $dataType = "serial", $relatedObjectId = null)
     {
         $values = array(
             "store_id" => $storeID,
@@ -642,13 +648,12 @@ class sqlConfDriver extends AbstractConfDriver
             $dataID, $storeID, $values["serialized_data"], $values["binary_data"], $values["related_object_id"]);
     }
 
-    protected function simpleStoreClear($storeID, $dataID)
+    public function simpleStoreClear($storeID, $dataID)
     {
         dibi::query("DELETE FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id]=%s", $storeID, $dataID);
     }
 
-    //$dataType = "serial"
-    protected function simpleStoreGet($storeID, $dataID, $dataType, &$data)
+    public function simpleStoreGet($storeID, $dataID, $dataType, &$data)
     {
         $children_results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id]=%s", $storeID, $dataID);
         $value = $children_results->fetchAll();
@@ -664,6 +669,37 @@ class sqlConfDriver extends AbstractConfDriver
         } else {
             return false;
         }
+    }
+
+    public function simpleStoreList($storeId, $cursor=null, $dataIdLike="", $dataType="serial", $serialDataLike="", $relatedObjectId=""){
+        $wheres = array();
+        $wheres[] = array('[store_id]=%s', $storeId);
+        if(!empty($dataIdLike)){
+            $wheres[] = array('[object_id] LIKE %s', $dataIdLike);
+        }
+        if(!empty($serialDataLike)){
+            $wheres[] = array('[serialized_data] LIKE %s', $serialDataLike);
+        }
+        if(!empty($relatedObjectId)){
+            $wheres[] = array('[related_object_id] = %s', $relatedObjectId);
+        }
+        $limit = '';
+        if($cursor != null){
+            $limit = "LIMIT ".$cursor[0].','.$cursor[1];
+        }
+
+        $children_results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE %and $limit", $wheres);
+        $values = $children_results->fetchAll();
+        $result = array();
+        foreach($values as $value){
+            if ($dataType == "serial") {
+                $data = unserialize($value["serialized_data"]);
+            } else {
+                $data = $value["binary_data"];
+            }
+            $result[$value['object_id']] = $data;
+        }
+        return $result;
     }
 
     protected function binaryContextToStoreID($context)

@@ -144,6 +144,25 @@ Class.create("AjxpTabulator", AjxpPane, {
     },
 
     openEditorForNode:function(ajxpNode, editorData){
+        if(this.options.uniqueTab){
+            // Unique Tab: close anyway
+            var editorId = 'unique-editor';
+            var existing = this.tabulatorData.detect(function(internalInfo){return internalInfo.id == editorId;});
+            if(existing && existing.ajxpObject) {
+                this.closeTab(editorId, true);
+            }
+            this.addTab({
+                id:editorId,
+                label:editorData.text,
+                iconClass:editorData.icon_class,
+                closeable:true
+            }, {
+                type:"editor",
+                editorData:editorData,
+                node:ajxpNode
+            });
+            return;
+        }
         this.addTab({
             id:editorData.id + ":/" + ajxpNode.getPath(),
             label:editorData.text,
@@ -339,7 +358,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 	 * @param tabId String The id of the target tab
 	 */
 	switchTabulator:function(tabId){
-        if(this.crtTabId && this.crtTabId == tabId) return;
+        if(this.crtTabId && this.crtTabId == tabId && !this.options.uniqueTab) return;
 		var toShow ;
         var toShowElement;
 		this.tabulatorData.each(function(tabInfo){

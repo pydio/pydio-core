@@ -121,9 +121,10 @@ class FileHasher extends AJXP_Plugin
         $streamData = $repository->streamData;
         $this->streamData = $streamData;
         $destStreamURL = $streamData["protocol"]."://".$repository->getId();
+        $selection = new UserSelection($repository, $httpVars);
         switch ($actionName) {
             case "filehasher_signature":
-                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $file = $selection->getUniqueFile();
                 if(!file_exists($destStreamURL.$file)) break;
                 $cacheItem = AJXP_Cache::getItem("signatures", $destStreamURL.$file, array($this, "generateSignature"));
                 $data = $cacheItem->getData();
@@ -141,7 +142,7 @@ class FileHasher extends AJXP_Plugin
                 $uploadedData = tempnam(AJXP_Utils::getAjxpTmpDir(), $actionName."-sig");
                 move_uploaded_file($fileVars["userfile_0"]["tmp_name"], $uploadedData);
 
-                $fileUrl = $destStreamURL.AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $fileUrl = $destStreamURL.$selection->getUniqueFile();
                 $file = call_user_func(array($this->streamData["classname"], "getRealFSReference"), $fileUrl, true);
                 if ($actionName == "filehasher_delta") {
                     $signatureFile = $uploadedData;

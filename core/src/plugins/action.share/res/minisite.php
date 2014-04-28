@@ -122,8 +122,10 @@
             var startParameters = {
                 "BOOTER_URL":"index_shared.php?get_action=get_boot_conf&goto=AJXP_START_REPOSITORY&minisite_session=true",
                 "EXT_REP":"\/",
-                "MAIN_ELEMENT":"ajxp_shared_folder",
-                "SERVER_PREFIX_URI": ""
+                "MAIN_ELEMENT":"AJXP_TEMPLATE_NAME",
+                "SERVER_PREFIX_URI": "",
+                "PRESET_LOGIN":"AJXP_PRELOGED_USER",
+                "PASSWORD_AUTH_ONLY":true
             };
             document.observe("ajaxplorer:before_gui_load", function(e){
                ajaxplorer.currentThemeUsesIconFonts = true;
@@ -149,6 +151,6 @@
     </head>
 
     <body marginheight="0" marginwidth="0" leftmargin="0" topmargin="0" class="AJXP_PRELOGED_USER">
-        <div id="ajxp_shared_folder" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"window"}'></div>
+        <div id="AJXP_TEMPLATE_NAME" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"window"}'></div>
     </body>
 </html>

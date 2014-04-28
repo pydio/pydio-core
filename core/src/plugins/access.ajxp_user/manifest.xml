@@ -277,8 +277,11 @@
 						var conn = new Connexion();
 						conn.addParameter("get_action", "clear_expired");
 						conn.onComplete = function(transport){
-							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
-						};
+							this.actionBar.parseXmlMessage(transport.responseXML);
+                            if(this.getContextHolder()._selectionSource && this.getContextHolder()._selectionSource.__className=='FetchedResultPane'){
+                                this.getContextHolder()._selectionSource.reloadDataModel();
+                            }
+						}.bind(ajaxplorer);
 						conn.sendAsync();
 					]]></clientCallback>
 					<serverCallback methodName="switchAction" developerComment="Clear expired links" restParams="/"/>

@@ -210,6 +210,84 @@ class AJXP_Node
 
 
     /**
+     * @return AJXP_Node|null
+     */
+    public function getParent(){
+
+        if(empty($this->urlParts["path"]) || $this->urlParts["path"] == "/"){
+            return null;
+        }
+        $parent = new AJXP_Node(dirname($this->_url));
+        $parent->setDriver($this->_accessDriver);
+        return $parent;
+
+    }
+
+    public function findMetadataInParent($nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false){
+
+        $metadata = false;
+        $parentNode = $this->getParent();
+        if($parentNode != null){
+            $metadata = $parentNode->retrieveMetadata($nameSpace, $private, $scope,$indexable);
+            if($metadata == false){
+                $metadata = $parentNode->findMetadataInParent($nameSpace, $private, $scope, $indexable);
+            }else{
+                $metadata["SOURCE_NODE"] = $parentNode;
+            }
+        }
+        return $metadata;
+
+    }
+
+    /**
+     * @param String $nameSpace
+     * @param bool $private
+     * @param int $scope
+     * @param bool $indexable
+     * @param array $collect
+     */
+    public function collectMetadataInParents($nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false, &$collect=array()){
+
+        $parentNode = $this->getParent();
+        if($parentNode != null){
+            $metadata = $parentNode->retrieveMetadata($nameSpace, $private, $scope,$indexable);
+            if($metadata != false){
+                $metadata["SOURCE_NODE"] = $parentNode;
+                $collect[] = $metadata;
+            }
+            $parentNode->collectMetadataInParents($nameSpace, $private, $scope, $indexable, $collect);
+        }
+
+    }
+
+    /**
+     * @param array $nameSpaces
+     * @param bool $private
+     * @param int $scope
+     * @param bool $indexable
+     * @param array $collect
+     */
+    public function collectMetadatasInParents($nameSpaces, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false, &$collect=array()){
+
+        $parentNode = $this->getParent();
+        if($parentNode != null){
+            $nodeMeta = array();
+            foreach($nameSpaces as $nameSpace){
+                $metadata = $parentNode->retrieveMetadata($nameSpace, $private, $scope,$indexable);
+                if($metadata != false){
+                    $nodeMeta[$nameSpace] = $metadata;
+                }
+            }
+            if(count($nodeMeta)){
+                $nodeMeta["SOURCE_NODE"] = $parentNode;
+                $collect[] = $nodeMeta;
+            }
+            $parentNode->collectMetadatasInParents($nameSpaces, $private, $scope, $indexable, $collect);
+        }
+
+    }
+
+    /**
      * @param bool $boolean Leaf or Collection?
      * @return void
      */

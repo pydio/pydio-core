@@ -52,6 +52,7 @@
 		}.bind(this) );
 		document.observeOnce("ajaxplorer:actions_loaded", function(){
 			var bmAction = ajaxplorer.actionBar.actions.get('bookmark');
+            if(!bmAction) return;
 			this.addBookmarkObject = {
 				name:bmAction.getKeyedText(),
 				alt:bmAction.options.title,
