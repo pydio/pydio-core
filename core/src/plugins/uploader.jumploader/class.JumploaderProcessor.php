@@ -58,6 +58,7 @@ class JumploaderProcessor extends AJXP_Plugin
         $this->logDebug("Jumploader HttpVars", $httpVars);
         $this->logDebug("Jumploader FileVars", $fileVars);
 
+
         $httpVars["dir"] = base64_decode(str_replace(" ","+",$httpVars["dir"]));
         $index = $httpVars["partitionIndex"];
         $realName = $fileVars["userfile_0"]["name"];
@@ -121,7 +122,24 @@ class JumploaderProcessor extends AJXP_Plugin
             AJXP_LOGGER::debug("Filename: " . $realName . ", File hash: " . $fileHash);
             $fileVars["userfile_0"]["name"] = "$fileHash.$fileId.$index";
             $httpVars["lastPartition"] = false;
+        }else
+        /*
+         * If we wan to upload a folderUpload to folderServer
+         * Temporarily,put all files in this folder to folderServer.
+         * But a same file name may be existed in folderServer,
+         * this can cause error of uploading.
+         *
+         * We rename this file by his relativePath. At the postProcess session, we will use this name
+         * to copy to right location
+         *
+         */
+        {
+            $file_tmp_md5 = md5($httpVars["relativePath"]);
+            $fileVars["userfile_0"]["name"] = $file_tmp_md5;
         }
+
+
+
         /* if we received the last partition */
         if (intval($index) == intval($httpVars["partitionCount"])-1) {
             $httpVars["lastPartition"] = true;
@@ -197,6 +215,7 @@ class JumploaderProcessor extends AJXP_Plugin
             AJXP_LOGGER::debug("Now dispatching relativePath dest:", $httpVars["relativePath"]);
             $subs = explode("/", $httpVars["relativePath"]);
             $userfile_name = array_pop($subs);
+
             $folderForbidden = false;
             $all_in_place = true;
             $partitions_length = 0;
@@ -204,6 +223,15 @@ class JumploaderProcessor extends AJXP_Plugin
             $fileHash = md5($userfile_name);
             $partitionCount = $httpVars["partitionCount"];
             $fileLength = $_POST["fileLength"];
+
+            /*
+             *
+             * Now, we supposed that access driver has already saved uploaded file in to
+             * folderServer with file name is md5 relativePath value.
+             * We try to copy this file to right location in recovery his name.
+             *
+             */
+            $userfile_name = md5($httpVars["relativePath"]);
 
             if (self::$remote) {
                 $partitions = array();
@@ -297,7 +325,7 @@ class JumploaderProcessor extends AJXP_Plugin
                     $chmodValue = $repository->getOption("CHMOD_VALUE");
                     if (isSet($chmodValue) && $chmodValue != "") {
                         $dirMode = octdec(ltrim($chmodValue, "0"));
-                        if ($dirMode & 0400) $dirMode |= 0100; // User is allowed to read, allow to list the directory
+                        if ($dirMode & 0400) $dirMode |= 0100; // Owner is allowed to read, allow to list the directory
                         if ($dirMode & 0040) $dirMode |= 0010; // Group is allowed to read, allow to list the directory
                         if ($dirMode & 0004) $dirMode |= 0001; // Other are allowed to read, allow to list the directory
                     }
@@ -314,10 +342,22 @@ class JumploaderProcessor extends AJXP_Plugin
                 // Now move the final file to the right folder
                 // Currently the file is at the base of the current
                 AJXP_LOGGER::debug("PartitionRealName", $destStreamURL.$httpVars["partitionRealName"]);
+
+                // Get file by name (md5 value)
+                $relPath_md5 = AJXP_Utils::decodeSecureMagic(md5($httpVars["relativePath"]));
+
+                // original file name
                 $relPath = AJXP_Utils::decodeSecureMagic($httpVars["relativePath"]);
+
                 $target = $destStreamURL;
                 $target .= (self::$remote)? basename($relPath) : $relPath;
-                $current = $destStreamURL.basename($relPath);
+
+                /*
+                *   $current is uploaded file with md5 value as his name
+                *   we copy to $relPath and delete md5 file
+                */
+
+                $current = $destStreamURL.basename($relPath_md5);
 
                 if ($httpVars["partitionCount"] > 1) {
                     if (self::$remote) {
@@ -375,7 +415,7 @@ class JumploaderProcessor extends AJXP_Plugin
                 }
             } else {
                 // Remove the file, as it should not have been uploaded!
-                if(!self::$remote) unlink($current);
+                //if(!self::$remote) unlink($current);
             }
         }
     }
