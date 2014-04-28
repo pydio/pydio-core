@@ -205,6 +205,10 @@ class ShareStore {
                 if (isSet($minisiteData["PRELOG_USER"])) {
                     AuthService::deleteUser($minisiteData["PRELOG_USER"]);
                 }
+                // If guest user created, remove it now.
+                if (isSet($minisiteData["PRESET_LOGIN"])) {
+                    AuthService::deleteUser($minisiteData["PRESET_LOGIN"]);
+                }
                 if(isSet($minisiteData["PUBLICLET_PATH"]) && is_file($minisiteData["PUBLICLET_PATH"])){
                     unlink($minisiteData["PUBLICLET_PATH"]);
                 }else if($this->sqlSupported){

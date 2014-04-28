@@ -236,7 +236,7 @@ class ShareCenter extends AJXP_Plugin
                     }
                     flush();
                 }
-                if ($metadata != null && $ajxpNode->hasMetaStore()) {
+                if ($metadata != null && $ajxpNode->hasMetaStore() && !$ajxpNode->isRoot()) {
                     $ajxpNode->setMetadata(
                         "ajxp_shared",
                         $metadata,
@@ -384,7 +384,11 @@ class ShareCenter extends AJXP_Plugin
                             $repoId = $metadata["element"];
                         }
                         $repo = ConfService::getRepositoryById($repoId);
-                        if ($repo == null || $repo->getOwner() != AuthService::getLoggedUser()->getId()) {
+                        if($repo == null){
+                            // TODO : DELETE SHARE !
+                            $node->removeMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY);
+
+                        } else if ($repo->getOwner() != AuthService::getLoggedUser()->getId()) {
                             //throw new Exception($messages["share_center.48"]);
                             $jsonData = array(
                                 "repositoryId"  => $repoId,
