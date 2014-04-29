@@ -72,8 +72,8 @@
     </client_settings>
     <registry_contributions>
         <hooks>
-            <serverCallback hookName="node.info" methodName="nodeSharedMetadata"></serverCallback>
-            <serverCallback hookName="node.before_path_change" methodName="updateNodeSharedData"></serverCallback>
+            <serverCallback hookName="node.info" methodName="nodeSharedMetadata"/>
+            <serverCallback hookName="node.change" methodName="updateNodeSharedData"/>
         </hooks>
         <actions>
             <action name="share-menu">

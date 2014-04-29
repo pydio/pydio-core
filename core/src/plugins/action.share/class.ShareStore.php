@@ -66,10 +66,14 @@ class ShareStore {
      * @return string $hash
      * @throws Exception
      */
-    public function storeShare($shareData, $type="minisite"){
+    public function storeShare($shareData, $type="minisite", $existingHash = null){
 
         $data = serialize($shareData);
-        $hash = $this->computeHash($data, $this->downloadFolder);
+        if($existingHash){
+            $hash = $existingHash;
+        }else{
+            $hash = $this->computeHash($data, $this->downloadFolder);
+        }
         if($this->sqlSupported){
             $this->createGenericLoader();
             $shareData["SHARE_TYPE"] = $type;
@@ -167,12 +171,12 @@ class ShareStore {
      * @param String $type
      * @param String $element
      * @param AbstractAjxpUser $loggedUser
+     * @return bool
      * @throws Exception
      */
     public function deleteShare($type, $element, $loggedUser)
     {
         $mess = ConfService::getMessages();
-        $shareCenter = AJXP_PluginsService::getInstance()->findPluginById("action.share");
         AJXP_Logger::debug(__CLASS__, __FILE__, "Deleting shared element ".$type."-".$element);
         if ($type == "repository") {
             $repo = ConfService::getRepositoryById($element);
@@ -238,7 +242,30 @@ class ShareStore {
         }
     }
 
+    /**
+     * @param String $type
+     * @param String $element
+     * @param AJXP_Node $oldNode
+     * @param AJXP_Node $newNode
+     * @return bool
+     */
+    public function moveShareIfPossible($type, $element, $oldNode, $newNode){
+        if(!$this->sqlSupported) return false;
+        $this->confStorage->simpleStoreGet("share", $element, "serial", $data);
+        if($oldNode->isLeaf() && $type == "minisite" && is_array($data)){
+            $repo = ConfService::getRepositoryById($data["REPOSITORY"]);
+            $cFilter = $repo->getContentFilter();
+            if(isSet($cFilter)){
+                $cFilter->movePath($oldNode->getPath(), $newNode->getPath());
+            }
+        }
+    }
 
+    /**
+     * @param String $type
+     * @param String $element
+     * @return bool
+     */
     public function shareExists($type, $element)
     {
         if ($type == "repository") {

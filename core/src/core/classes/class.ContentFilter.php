@@ -85,4 +85,21 @@ class ContentFilter {
         return $vPath;
     }
 
+    /**
+     * @param String $oldPath
+     * @param String $newPath
+     * @return bool Operation result
+     */
+    public function movePath($oldPath, $newPath){
+
+        if(isSet($this->filters[$oldPath])){
+            $this->filters[$newPath] = $this->getVirtualPath($newPath);
+            unset($this->filters[$oldPath]);
+            $this->virtualPaths = array_flip($this->filters);
+            return true;
+        }
+        return false;
+
+    }
+
 } 
