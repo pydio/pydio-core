@@ -288,7 +288,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
         }
         $config = array();
         $config["ajxpResourcesFolder"] = "plugins/gui.ajax/res";
-        if (session_name() == "AjaXplorer_Shared") {
+        if (strpos(session_name(), "AjaXplorer_Shared") === 0) {
             $config["ajxpServerAccess"] = "index_shared.php";
         } else {
             $config["ajxpServerAccess"] = AJXP_SERVER_ACCESS;

@@ -105,6 +105,9 @@ Class.create("AjxpBootstrap", {
             }else{
                 this.parameters.set('ajxpServerAccess', this.parameters.get('ajxpServerAccess') + '?' + (Connexion.SECURE_TOKEN? 'secure_token='+Connexion.SECURE_TOKEN:''));
             }
+            if(this.parameters.get('SERVER_PERMANENT_PARAMS')){
+                this.parameters.set('ajxpServerAccess', this.parameters.get('ajxpServerAccess') + '&' + this.parameters.get('SERVER_PERMANENT_PARAMS') + '&');
+            }
             this.refreshContextVariablesAndInit(new Connexion());
             return;
         }
@@ -147,6 +150,9 @@ Class.create("AjxpBootstrap", {
 			}else{
 				this.parameters.set('ajxpServerAccess', this.parameters.get('ajxpServerAccess') + '?' + (Connexion.SECURE_TOKEN? 'secure_token='+Connexion.SECURE_TOKEN:''));
 			}
+            if(this.parameters.get('SERVER_PERMANENT_PARAMS')){
+                this.parameters.set('ajxpServerAccess', this.parameters.get('ajxpServerAccess') + '&' + this.parameters.get('SERVER_PERMANENT_PARAMS') + '&');
+            }
 			
 			this.refreshContextVariablesAndInit(connexion);
 			

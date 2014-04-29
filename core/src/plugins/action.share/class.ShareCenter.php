@@ -863,8 +863,9 @@ class ShareCenter extends AJXP_Plugin
         $html = str_replace("AJXP_START_REPOSITORY", $repository, $html);
         $html = str_replace("AJXP_REPOSITORY_LABEL", ConfService::getRepositoryById($repository)->getDisplay(), $html);
         $html = str_replace("AJXP_TEMPLATE_NAME", $templateName, $html);
+        $html = str_replace("AJXP_LINK_HASH", $hash, $html);
 
-        session_name("AjaXplorer_Shared");
+        session_name("AjaXplorer_Shared".$hash);
         session_start();
         AuthService::disconnect();
 

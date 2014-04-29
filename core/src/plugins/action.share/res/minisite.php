@@ -120,12 +120,13 @@
         <script type="text/javascript">
             var ajaxplorer, MessageHash={};
             var startParameters = {
-                "BOOTER_URL":"index_shared.php?get_action=get_boot_conf&goto=AJXP_START_REPOSITORY&minisite_session=true",
+                "BOOTER_URL":"index_shared.php?get_action=get_boot_conf&goto=AJXP_START_REPOSITORY&minisite_session=AJXP_LINK_HASH",
                 "EXT_REP":"\/",
                 "MAIN_ELEMENT":"AJXP_TEMPLATE_NAME",
                 "SERVER_PREFIX_URI": "",
                 "PRESET_LOGIN":"AJXP_PRELOGED_USER",
-                "PASSWORD_AUTH_ONLY":true
+                "PASSWORD_AUTH_ONLY":true,
+                "SERVER_PERMANENT_PARAMS":"minisite_session=AJXP_LINK_HASH"
             };
             document.observe("ajaxplorer:before_gui_load", function(e){
                ajaxplorer.currentThemeUsesIconFonts = true;
