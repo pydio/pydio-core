@@ -793,6 +793,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         AJXP_XMLWriter::renderAjxpHeaderNode($parentAjxpNode);
                     }
                     foreach($uniqueNodes as $node){
+                        if(!file_exists($node->getUrl())) continue;
                         $nodeName = $node->getLabel();
                         if (!$this->filterNodeName($node->getPath(), $nodeName, $isLeaf, $lsOptions)) {
                             continue;
