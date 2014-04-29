@@ -253,7 +253,8 @@ class ShareCenter extends AJXP_Plugin
                 if(isSet($httpVars["element_id"]) && isSet($shares[$httpVars["element_id"]])){
                     $elementId = $httpVars["element_id"];
                 }else{
-                    $elementId = array_keys($shares)[0];
+                    $sKeys = array_keys($shares);
+                    $elementId = $sKeys[0];
                 }
 
                 if ($this->watcher !== false) {
@@ -325,7 +326,8 @@ class ShareCenter extends AJXP_Plugin
                     if(isSet($httpVars["element_id"]) && isSet($shares[$httpVars["element_id"]])){
                         $elementId = $httpVars["element_id"];
                     }else{
-                        $elementId = array_keys($shares)[0];
+                        $sKeys = array_keys($shares);
+                        $elementId = $sKeys[0];
                     }
                     $this->getShareStore()->deleteShare($shares[$elementId]["type"], $elementId, AuthService::getLoggedUser());
                     $this->removeShareFromMeta($ajxpNode, $elementId);
@@ -396,7 +398,8 @@ class ShareCenter extends AJXP_Plugin
                 "overlay_class"    => "icon-share-sign"
             );
             // Backward compat, until we rework client-side
-            if($shares[array_keys($shares)[0]]["type"] == "minisite"){
+            $sKeys = array_keys($shares);
+            if($shares[$sKeys[0]]["type"] == "minisite"){
                 $merge["ajxp_shared_minisite"] = "public";
             }
             $ajxpNode->mergeMetadata($merge, true);
