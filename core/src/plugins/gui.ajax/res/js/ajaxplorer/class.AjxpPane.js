@@ -270,15 +270,26 @@ Class.create("AjxpPane", {
         var exp = configName.split("/");
         var plugin = exp[0];
         var paramPrefix = exp[1];
-        var configs = XPathSelectNodes(ajaxplorer.getXmlRegistry(), "plugins/ajxp_plugin[@id='"+plugin+"']/plugin_configs/property[contains(@name, '"+paramPrefix+"')]");
+        var registry = ajaxplorer.getXmlRegistry();
+        var configs = XPathSelectNodes(registry, "plugins/ajxp_plugin[@id='"+plugin+"']/plugin_configs/property[contains(@name, '"+paramPrefix+"')]");
+        var defaults = XPathSelectNodes(registry, "plugins/ajxp_plugin[@id='"+plugin+"']/server_settings/global_param[contains(@name, '"+paramPrefix+"') and @defaultImage]");
+
         var bgrounds = {};
         configs.each(function(c){
             bgrounds[c.getAttribute("name")] = c.firstChild.nodeValue.replace(/"/g, '');
         });
+        defaults.each(function(d){
+            var n = d.getAttribute("name");
+            if(!bgrounds[n]){
+                bgrounds[n] = d.getAttribute("defaultImage");
+            }else{
+                bgrounds[n] = window.ajxpServerAccessPath+"&get_action=get_global_binary_param&binary_id="+bgrounds[n];
+            }
+        });
         var bStyles = [];
         var index = 1;
         while(bgrounds[paramPrefix+index]){
-            bStyles.push("background-image:url('"+window.ajxpServerAccessPath+"&get_action=get_global_binary_param&binary_id="+bgrounds[paramPrefix+index]+"');" + (bgrounds[paramPrefix + 'ATTRIBUTES_'+index]?bgrounds[paramPrefix + 'ATTRIBUTES_'+index]:''));
+            bStyles.push("background-image:url('"+bgrounds[paramPrefix+index]+"');" + (bgrounds[paramPrefix + 'ATTRIBUTES_'+index]?bgrounds[paramPrefix + 'ATTRIBUTES_'+index]:''));
             index++;
         }
         if (bStyles.length) {
