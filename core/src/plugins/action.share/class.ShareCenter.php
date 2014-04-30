@@ -815,21 +815,19 @@ class ShareCenter extends AJXP_Plugin
         @copy($pDir."/res/button_cancel.png", $downloadFolder."/button_cancel.png");
         @copy(AJXP_INSTALL_PATH."/server/index.html", $downloadFolder."/index.html");
         $dlUrl = $this->buildPublicDlURL();
-        $htaccessContent = "ErrorDocument 404 ".$dlUrl."/404.html\n<Files \".ajxp_*\">\ndeny from all\n</Files>";
-        if ($this->getFilteredOption("USE_REWRITE_RULE", $this->repository->getId()) == true) {
-            $path = parse_url($dlUrl, PHP_URL_PATH);
-            $htaccessContent .= '
-            <IfModule mod_rewrite.c>
-            RewriteEngine on
-            RewriteBase '.$path.'
-            RewriteCond %{REQUEST_FILENAME} !-f
-            RewriteCond %{REQUEST_FILENAME} !-d
-            RewriteRule ^([a-z0-9]+)\.php$ share.php?hash=$1 [QSA]
-            RewriteRule ^([a-z0-9]+)-([a-z]+)$ share.php?hash=$1&lang=$2 [QSA]
-            RewriteRule ^([a-z0-9]+)$ share.php?hash=$1 [QSA]
-            </IfModule>
-            ';
-        }
+        $htaccessContent = "ErrorDocument 404 ".$dlUrl."/404.html\n<Files \".ajxp_*\">\ndeny from all\n</Files>\n";
+        $path = parse_url($dlUrl, PHP_URL_PATH);
+        $htaccessContent .= '
+        <IfModule mod_rewrite.c>
+        RewriteEngine on
+        RewriteBase '.$path.'
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteRule ^([a-z0-9]+)\.php$ share.php?hash=$1 [QSA]
+        RewriteRule ^([a-z0-9]+)-([a-z]+)$ share.php?hash=$1&lang=$2 [QSA]
+        RewriteRule ^([a-z0-9]+)$ share.php?hash=$1 [QSA]
+        </IfModule>
+        ';
         file_put_contents($downloadFolder."/.htaccess", $htaccessContent);
         $content404 = file_get_contents($pDir."/res/404.html");
         $content404 = str_replace(array("AJXP_MESSAGE_TITLE", "AJXP_MESSAGE_LEGEND"), array($sTitle, $sLegend), $content404);
