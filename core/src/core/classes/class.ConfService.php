@@ -490,6 +490,51 @@ class ConfService
         return "";
     }
 
+    public static function filterRepositoryListWithCriteria($repoList, $criteria){
+        $repositories = array();
+        $searchableKeys = array("uuid", "parent_uuid", "owner_user_id", "display", "accessType", "isTemplate", "slug", "groupPath");
+        foreach ($repoList as $repoId => $repoObject) {
+            foreach($criteria as $key => $value){
+                if(!in_array($key, $searchableKeys)) continue;
+                if($key == "uuid") $comp = $repoObject->getUniqueId();
+                else if($key == "parent_uuid") $comp = $repoObject->getParentId();
+                else if($key == "owner_user_id") $comp = $repoObject->getUniqueUser();
+                else if($key == "display") $comp = $repoObject->getDisplay();
+                else if($key == "accessType") $comp = $repoObject->getAccessType();
+                else if($key == "isTemplate") $comp = $repoObject->isTemplate;
+                else if($key == "slug") $comp = $repoObject->getSlug();
+                else if($key == "groupPath") $comp = $repoObject->getGroupPath();
+                if(is_array($value) && in_array($comp, $value)){
+                    $repositories[$repoId] = $repoObject;
+                }else if($value == AJXP_FILTER_EMPTY && empty($comp)){
+                    $repositories[$repoId] = $repoObject;
+                }else if($value == AJXP_FILTER_NOT_EMPTY && !empty($comp)){
+                    $repositories[$repoId] = $repoObject;
+                }else if(strpos($value, "regexp:")===0 && preg_match(str_replace("regexp:", "", $value), $comp)){
+                    $repositories[$repoId] = $repoObject;
+                }else if($value == $comp){
+                    $repositories[$repoId] = $repoObject;
+                }
+            }
+        }
+        return $repositories;
+    }
+
+    public static function listRepositoriesWithCriteria($criteria, &$count){
+
+        $statics = array();
+        foreach (self::getInstance()->configs["DEFAULT_REPOSITORIES"] as $index=>$repository) {
+            $repo = self::createRepositoryFromArray($index, $repository);
+            $repo->setWriteable(false);
+            $statics[$repo->getId()] = $repo;
+        }
+        $statics = self::filterRepositoryListWithCriteria($statics, $criteria);
+        $dyna = self::getInstance()->getConfStorageImpl()->listRepositoriesWithCriteria($criteria, $count);
+        $count += count($statics);
+        return array_merge($statics, $dyna);
+
+    }
+
     /**
      * @param $scope String "user", "all"
      * @return array
@@ -506,7 +551,19 @@ class ConfService
         }
         // LOAD FROM DRIVER
         $confDriver = self::getConfStorageImpl();
-        $drvList = $confDriver->listRepositories($scope == "user" ? AuthService::getLoggedUser() : null);
+        if($scope == "user"){
+            $acls = AuthService::getLoggedUser()->mergedRole->listAcls();
+            if(!count($acls)) {
+                $drvList = array();
+            }else{
+                $criteria = array(
+                    "uuid" => array_keys($acls)
+                );
+                $drvList = $confDriver->listRepositoriesWithCriteria($criteria);
+            }
+        }else{
+            $drvList = $confDriver->listRepositories();
+        }
         if (is_array($drvList)) {
             foreach ($drvList as $repoId=>$repoObject) {
                 $driver = AJXP_PluginsService::getInstance()->getPluginByTypeName("access", $repoObject->getAccessType());
