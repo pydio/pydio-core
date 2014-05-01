@@ -60,12 +60,14 @@ class sqlAuthDriver extends AbstractAuthDriver
     // $baseGroup = "/"
     public function listUsersPaginated($baseGroup, $regexp, $offset, $limit)
     {
+        $ignoreHiddens = "NOT EXISTS (SELECT * FROM [ajxp_user_rights] AS c WHERE [c.login]=[u.login] AND [c.repo_uuid] = 'ajxp.hidden')";
+
         if ($regexp != null) {
-            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [login] ".AJXP_Utils::regexpToLike($regexp)." AND [groupPath] LIKE %like~ ORDER BY [login] ASC", AJXP_Utils::cleanRegexp($regexp), $baseGroup) ;
+            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE [login] ".AJXP_Utils::regexpToLike($regexp)." AND [groupPath] LIKE %like~ AND $ignoreHiddens ORDER BY [login] ASC", AJXP_Utils::cleanRegexp($regexp), $baseGroup) ;
         } else if ($offset != -1 || $limit != -1) {
-            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %like~ ORDER BY [login] ASC %lmt %ofs", $baseGroup, $limit, $offset);
+            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE [groupPath] LIKE %like~ AND $ignoreHiddens ORDER BY [login] ASC %lmt %ofs", $baseGroup, $limit, $offset);
         } else {
-            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %like~ ORDER BY [login] ASC", $baseGroup);
+            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE [groupPath] LIKE %like~ AND $ignoreHiddens ORDER BY [login] ASC", $baseGroup);
         }
         $pairs = $res->fetchPairs('login', 'password');
            return $pairs;
@@ -86,6 +88,7 @@ class sqlAuthDriver extends AbstractAuthDriver
             $ands[] = array("[u.login] ".AJXP_Utils::regexpToLike($regexp), AJXP_Utils::cleanRegexp($regexp));
         }
         $ands[] = array("[u.groupPath] LIKE %like~", $baseGroup);
+        $ands[] = array("NOT EXISTS (SELECT * FROM [ajxp_user_rights] AS c WHERE [c.login]=[u.login] AND [c.repo_uuid] = 'ajxp.hidden')");
 
         if($filterProperty !== null && $filterValue !== null){
             if($filterProperty == "parent"){
@@ -114,7 +117,8 @@ class sqlAuthDriver extends AbstractAuthDriver
     public function listUsers($baseGroup="/")
     {
         $pairs = array();
-        $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %like~ ORDER BY [login] ASC", $baseGroup);
+        $ignoreHiddens = "NOT EXISTS (SELECT * FROM [ajxp_user_rights] AS c WHERE [c.login]=[u.login] AND [c.repo_uuid] = 'ajxp.hidden')";
+        $res = dibi::query("SELECT * FROM [ajxp_users] as u WHERE [u.groupPath] LIKE %like~ AND $ignoreHiddens ORDER BY [u.login] ASC", $baseGroup);
         $rows = $res->fetchAll();
         foreach ($rows as $row) {
             $grp = $row["groupPath"];

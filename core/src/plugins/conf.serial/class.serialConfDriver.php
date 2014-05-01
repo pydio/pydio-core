@@ -125,6 +125,23 @@ class serialConfDriver extends AbstractConfDriver
         return $all;
     }
 
+    /**
+     * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
+     * @param Array $criteria
+     * @return Array
+     */
+    public function listRepositoriesWithCriteria($criteria){
+
+        $all = AJXP_Utils::loadSerialFile($this->repoSerialFile);
+        if ($criteria != null) {
+            return ConfService::filterRepositoryListWithCriteria($all, $criteria);
+        }else{
+            return $all;
+        }
+
+    }
+
+
     public function listRoles($roleIds = array(), $excludeReserved = false)
     {
         $all = AJXP_Utils::loadSerialFile($this->rolesSerialFile);

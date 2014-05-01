@@ -217,6 +217,20 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      * @return Array
      */
     abstract public function listRepositories($user = null);
+
+    /**
+     * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
+     * @param Array $criteria This parameter can take the following keys
+     *      - Search keys "uuid", "parent_uuid", "owner_user_id", "display", "accessType", "isTemplate", "slug", "groupPath"
+     *        Search values can be either string, array of string, AJXP_FILTER_EMPTY, AJXP_FILTER_NOT_EMPTY or regexp:RegexpString
+     *      - ORDERBY = array("KEY"=>"", "DIR"=>""), GROUPBY, CURSOR = array("OFFSET" => 0, "LIMIT", 30)
+     *      - COUNT_ONLY
+     *
+     * @return Array
+     */
+    abstract public function listRepositoriesWithCriteria($criteria);
+
+
     /**
      * Retrieve a Repository given its unique ID.
      *

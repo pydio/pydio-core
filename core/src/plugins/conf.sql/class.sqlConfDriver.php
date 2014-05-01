@@ -225,6 +225,65 @@ class sqlConfDriver extends AbstractConfDriver
     }
 
     /**
+     * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
+     * @param Array $criteria
+     * @param int $count possible total count
+     * @return Array
+     */
+    public function listRepositoriesWithCriteria($criteria, &$count = null){
+
+        $wheres = array();
+        $limit = $groupBy = "";
+        $order = "ORDER BY display ASC";
+
+        $searchableKeys = array("uuid", "parent_uuid", "owner_user_id", "display", "accessType", "isTemplate", "slug", "groupPath");
+        foreach($criteria as $cName => $cValue){
+            if(in_array($cName, $searchableKeys)){
+                if(is_array($cValue)){
+                    $wheres[] = array("[$cName] IN (%s)", $cValue);
+                }else if(strpos($cValue, "regexp:") === 0){
+                    $regexp = str_replace("regexp:", "", $cValue);
+                    $wheres[] = array("[$cName] ".AJXP_Utils::regexpToLike($regexp), AJXP_Utils::cleanLike($regexp));
+                }else if ($cValue == AJXP_FILTER_NOT_EMPTY){
+                    $wheres[] = array("[$cName] NOT NULL");
+                }else if ($cValue == AJXP_FILTER_EMPTY){
+                    $wheres[] = array("[$cName] IS NULL");
+                }else{
+                    $type = "%s";
+                    if($cName == 'isTemplate') $type = "%d";
+                    $wheres[] = array("[$cName] = $type", $cValue);
+                }
+            }else if($cName == "CURSOR"){
+                $limit = "LIMIT ".$cValue["OFFSET"].",".$cValue["LIMIT"];
+            }else if($cName == "ORDERBY"){
+                $order = "ORDER BY ".$cValue["KEY"]." ".$cValue["DIR"];
+            }else if($cName == "GROUPBY"){
+                $groupBy = "GROUP BY ".$cValue;
+            }
+        }
+
+        if(isset($criteria["CURSOR"])){
+            $res = dibi::query("SELECT COUNT(uuid) FROM [ajxp_repo] WHERE %and", $wheres);
+            $count = $res->fetchSingle();
+        }
+
+        $res = dibi::query("SELECT * FROM [ajxp_repo] WHERE %and $groupBy $order $limit", $wheres);
+        $all = $res->fetchAll();
+
+        $repositories = Array();
+        foreach ($all as $repo_row) {
+            $res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
+            $opts = $res_opts->fetchPairs('name', 'val');
+            $repo = $this->repoFromDb($repo_row, $opts);
+            $repositories[$repo->getUniqueId()] = $repo;
+        }
+
+        return $repositories;
+
+    }
+
+
+    /**
      * Get repository by Unique ID (a hash calculated from the serialised object).
      *
      * @param String $repositoryId hash uuid
@@ -368,8 +427,9 @@ class sqlConfDriver extends AbstractConfDriver
 
     public function getUserChildren( $userId )
     {
+        $ignoreHiddens = "NOT EXISTS (SELECT * FROM [ajxp_user_rights] WHERE [ajxp_user_rights.login]=[ajxp_users.login] AND [ajxp_user_rights.repo_uuid] = 'ajxp.hidden')";
         $children = array();
-        $children_results = dibi::query('SELECT [ajxp_users].[login] FROM [ajxp_user_rights],[ajxp_users] WHERE [repo_uuid] = %s AND [rights] = %s AND [ajxp_user_rights].[login] = [ajxp_users].[login]', "ajxp.parent_user", $userId);
+        $children_results = dibi::query('SELECT [ajxp_users].[login] FROM [ajxp_user_rights],[ajxp_users] WHERE [repo_uuid] = %s AND [rights] = %s AND [ajxp_user_rights].[login] = [ajxp_users].[login] AND '.$ignoreHiddens, "ajxp.parent_user", $userId);
         $all = $children_results->fetchAll();
         foreach ($all as $item) {
             $children[] = $this->createUserObject($item["login"]);

@@ -415,6 +415,15 @@ class BootConfLoader extends AbstractConfDriver
     }
 
     /**
+     * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
+     * @param Array $criteria
+     * @return Array
+     */
+    public function listRepositoriesWithCriteria($criteria){
+
+    }
+
+    /**
      * Retrieve a Repository given its unique ID.
      *
      * @param String $repositoryId

@@ -41,6 +41,26 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
     public $version;
     public $parentUser;
     public $resolveAsParent = false;
+    /**
+     * @var bool
+     */
+    private $hidden;
+
+    /**
+     * @param bool $hidden
+     */
+    public function setHidden($hidden)
+    {
+        $this->hidden = $hidden;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHidden()
+    {
+        return $this->hidden;
+    }
 
     public $groupPath = "/";
     /**
