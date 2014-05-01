@@ -36,7 +36,8 @@ Class.create("ActionsToolbar", {
             skipBubbling: false,
 			toolbarsList : $A(['default', 'put', 'get', 'change', 'user', 'remote']),
             groupOtherToolbars : $A([]),
-            skipCarousel : false
+            skipCarousel : false,
+            manager:null
 		}, options || {});
 		var renderer = this.options.buttonRenderer;
 		if(renderer == 'this'){
@@ -71,8 +72,14 @@ Class.create("ActionsToolbar", {
             }
         }.bind(this);
 
-        document.observe("ajaxplorer:actions_loaded", this.actionsLoadedObserver);
-        document.observe("ajaxplorer:actions_refreshed", this.refreshToolbarObserver);
+        if(this.options.manager){
+            this.options.manager.observe("actions_loaded", this.actionsLoadedObserver);
+            this.options.manager.observe("actions_refreshed", this.refreshToolbarObserver);
+
+        }else{
+            document.observe("ajaxplorer:actions_loaded", this.actionsLoadedObserver);
+            document.observe("ajaxplorer:actions_refreshed", this.refreshToolbarObserver);
+        }
         document.observe("ajaxplorer:component_config_changed", this.componentConfigHandler );
 
 	},
@@ -82,8 +89,13 @@ Class.create("ActionsToolbar", {
 	},
 	destroy : function(){
 		this.emptyToolbars();
-        document.stopObserving("ajaxplorer:actions_loaded", this.actionsLoadedObserver);
-        document.stopObserving("ajaxplorer:actions_refreshed", this.refreshToolbarObserver);
+        if(this.options.manager){
+            this.options.manager.stopObserving("actions_loaded", this.actionsLoadedObserver);
+            this.options.manager.stopObserving("actions_refreshed", this.refreshToolbarObserver);
+        }else{
+            document.stopObserving("ajaxplorer:actions_loaded", this.actionsLoadedObserver);
+            document.stopObserving("ajaxplorer:actions_refreshed", this.refreshToolbarObserver);
+        }
         document.stopObserving("ajaxplorer:component_config_changed", this.componentConfigHandler );
         if(this.styleObserver) document.stopObserving("ajaxplorer:user_logged", this.styleObserver);
 	},
@@ -109,9 +121,15 @@ Class.create("ActionsToolbar", {
 	 * @param event Event ajaxplorer:actions_loaded
 	 */
 	actionsLoaded : function(event) {
-		this.actions = event.memo;
+        if(event && event.memo) {
+            this.actions = event.memo;
+        } else if(this.options.manager) {
+            this.actions = this.options.manager.actions;
+        }
 		this.emptyToolbars();
-		this.initToolbars();
+        if(this.actions){
+            this.initToolbars();
+        }
 	},
 	
 	/**

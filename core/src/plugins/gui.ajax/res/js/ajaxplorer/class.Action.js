@@ -147,6 +147,7 @@ Class.create("Action", {
 			);
 		}
 		window.actionArguments = $A([]);
+		window.actionManager = this.manager;
 		if(arguments[0]) window.actionArguments = $A(arguments[0]);
 		if(this.options.callbackCode) {
 			try{
@@ -186,6 +187,7 @@ Class.create("Action", {
 			this.notify("submenu_active", arguments[0][0]);
 		}
 		window.actionArguments = null;
+		window.actionManager = null;
         document.fire("ajaxplorer:afterApply-"+this.options.name);
 	},
 		

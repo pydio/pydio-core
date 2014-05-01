@@ -27,7 +27,7 @@ Class.create("ActionsManager", {
 	 * Standard constructor
 	 * @param bUsersEnabled Boolen Whether users management is enabled or not
 	 */
-	initialize: function(bUsersEnabled)
+	initialize: function(bUsersEnabled, dataModel)
 	{
 		this._registeredKeys = new Hash();
 		this._actions = new Hash();
@@ -37,29 +37,58 @@ Class.create("ActionsManager", {
 		this.subMenus = [];				
 		this.actions = new Hash();
 		this.defaultActions = new Hash();
-		this.toolbars = new Hash();		
-		document.observe("ajaxplorer:context_changed", function(event){
-			window.setTimeout(function(){
-				this.fireContextChange();
-			}.bind(this), 0);			
-		}.bind(this) );
-		
-		document.observe("ajaxplorer:selection_changed", function(event){
-			window.setTimeout(function(){
-				this.fireSelectionChange();
-			}.bind(this), 0);
-		}.bind(this) );
-		
-		document.observe("ajaxplorer:user_logged", function(event){
-			if(event.memo && event.memo.getPreference){
-				this.setUser(event.memo);
-			}else{
-				this.setUser(null);
-			}
-		}.bind(this));
-		
+		this.toolbars = new Hash();
+        if(dataModel){
+            this._dataModel = dataModel;
+        }
+        this.contextChangedObs = function(event){
+            window.setTimeout(function(){
+                this.fireContextChange();
+            }.bind(this), 0);
+        }.bind(this);
+        this.selectionChangedObs = function(event){
+            window.setTimeout(function(){
+                this.fireSelectionChange();
+            }.bind(this), 0);
+        }.bind(this);
+
+        if(this._dataModel){
+            this._dataModel.observe("context_changed", this.contextChangedObs);
+            this._dataModel.observe("selection_changed", this.selectionChangedObs);
+            this.localDataModel = true;
+        }else{
+            document.observe("ajaxplorer:context_changed", this.contextChangedObs);
+            document.observe("ajaxplorer:selection_changed", this.selectionChangedObs);
+            this._dataModel = ajaxplorer.getContextHolder();
+            this.localDataModel = false;
+        }
+
+        if(this.usersEnabled){
+            document.observe("ajaxplorer:user_logged", function(event){
+                if(event.memo && event.memo.getPreference){
+                    this.setUser(event.memo);
+                }else{
+                    this.setUser(null);
+                }
+            }.bind(this));
+            if(ajaxplorer.user) {
+                this.setUser(ajaxplorer.user);
+            }
+        }
+
 	},	
-	
+
+    getDataModel:function(){
+        return this._dataModel;
+    },
+
+    destroy: function(){
+        if(this.localDataModel && this._dataModel){
+            this._dataModel.stopObserving("context_changed", this.contextChangedObs);
+            this._dataModel.stopObserving("selection_changed", this.selectionChangedObs);
+        }
+    },
+
 	/**
 	 * Stores the currently logged user object
 	 * @param oUser User User instance
@@ -112,7 +141,7 @@ Class.create("ActionsManager", {
             var isDefault = false;
 			if(actionsSelectorAtt == 'selectionContext'){
 				// set default in bold
-				var userSelection = ajaxplorer.getUserSelection();
+				var userSelection = this._dataModel;
 				if(!userSelection.isEmpty()){
 					var defaultAction = 'file';
 					if(userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime(['ajxp_browsable_archive']))){
@@ -283,7 +312,7 @@ Class.create("ActionsManager", {
 			(copy && (!this.defaultActions.get('ctrldragndrop')||this.getDefaultAction('ctrldragndrop').deny))){
 			return;
 		}
-		if(fileName == null) fileNames = ajaxplorer.getUserSelection().getFileNames();
+		if(fileName == null) fileNames = this._dataModel.getFileNames();
 		else fileNames = [fileName];
 		if(destNodeName != null)
 		{
@@ -302,7 +331,7 @@ Class.create("ActionsManager", {
             }
         }
         // Check that dest is not the direct parent of source, ie current rep!
-        if(destDir == ajaxplorer.getContextNode().getPath()){
+        if(destDir == this._dataModel.getContextNode().getPath()){
             if(destNodeName != null) ajaxplorer.displayMessage('ERROR', MessageHash[203]);
             return;
         }
@@ -314,7 +343,7 @@ Class.create("ActionsManager", {
 		}
         connexion.addParameter('nodes[]', fileNames);
 		connexion.addParameter('dest', destDir);
-		connexion.addParameter('dir', ajaxplorer.getContextNode().getPath());		
+		connexion.addParameter('dir', this._dataModel.getContextNode().getPath());
 		connexion.onComplete = function(transport){this.parseXmlMessage(transport.responseXML);}.bind(this);
 		connexion.sendAsync();
 	},
@@ -374,8 +403,8 @@ Class.create("ActionsManager", {
 			if(fElement.type == 'radio' && !fElement.checked) return;
 			connexion.addParameter(fElement.name, fValue);
 		});
-		if(ajaxplorer.getContextNode()){
-			connexion.addParameter('dir', ajaxplorer.getContextNode().getPath());
+		if(this._dataModel.getContextNode()){
+			connexion.addParameter('dir', this._dataModel.getContextNode().getPath());
 		}
 		if(completeCallback){
 			connexion.onComplete = completeCallback;
@@ -418,9 +447,9 @@ Class.create("ActionsManager", {
 					}else{
 						var file = childs[i].getAttribute('file');
 						if(file){
-							ajaxplorer.getContextHolder().setPendingSelection(file);
+							this._dataModel.setPendingSelection(file);
 						}
-						reloadNodes.push(ajaxplorer.getContextNode());
+						reloadNodes.push(this._dataModel.getContextNode());
 					}
 				}
 				else if(obName == 'repository_list')
@@ -429,7 +458,7 @@ Class.create("ActionsManager", {
 				}
 			}
             else if(childs[i].nodeName == 'nodes_diff'){
-                var dm = ajaxplorer.getContextHolder();
+                var dm = this._dataModel;
                 var removes = XPathSelectNodes(childs[i], "remove/tree");
                 var adds = XPathSelectNodes(childs[i], "add/tree");
                 var updates = XPathSelectNodes(childs[i], "update/tree");
@@ -558,7 +587,7 @@ Class.create("ActionsManager", {
 
 		}
 		if(reloadNodes.length){
-			ajaxplorer.getContextHolder().multipleNodesReload(reloadNodes);
+			this._dataModel.multipleNodesReload(reloadNodes);
 		}
         return !error;
 	},
@@ -569,14 +598,16 @@ Class.create("ActionsManager", {
 	 */
 	fireSelectionChange: function(){
 		var userSelection = null;
-		if (ajaxplorer && ajaxplorer.getUserSelection()){
-			userSelection = ajaxplorer.getUserSelection();
-			if(userSelection.isEmpty()) userSelection = null;
-		} 
+        userSelection = this._dataModel;
+        if(userSelection.isEmpty()) userSelection = null;
 		this.actions.each(function(pair){
 			pair.value.fireSelectionChange(userSelection);
-		});		
-		document.fire("ajaxplorer:actions_refreshed");
+		});
+        if(this.localDataModel){
+            this.notify("actions_refreshed");
+        }else{
+            document.fire("ajaxplorer:actions_refreshed");
+        }
 	},
 	
 	/**
@@ -584,16 +615,17 @@ Class.create("ActionsManager", {
 	 * by triggering ajaxplorer:actions_refreshed event.
 	 */
 	fireContextChange: function(){
-		var crtNode;
-		if(ajaxplorer && ajaxplorer.getContextNode()){ 
-			var crtNode = ajaxplorer.getContextNode();
-		}
-		this.actions.each(function(pair){			
+        var crtNode = this._dataModel.getContextNode();
+		this.actions.each(function(pair){
 			pair.value.fireContextChange(this.usersEnabled, 
 									 this.oUser, 									 
 									 crtNode);
 		}.bind(this));
-		document.fire("ajaxplorer:actions_refreshed");
+        if(this.localDataModel){
+            this.notify("actions_refreshed");
+        }else{
+            document.fire("ajaxplorer:actions_refreshed");
+        }
 	},
 			
 	/**
@@ -620,7 +652,11 @@ Class.create("ActionsManager", {
 				this.registerAction(act);
 			}.bind(this));
 		}
-		document.fire("ajaxplorer:actions_loaded", this.actions);
+        if(this.localDataModel){
+            this.notify("actions_loaded");
+        }else{
+            document.fire("ajaxplorer:actions_loaded", this.actions);
+        }
 		this.fireContextChange();
 		this.fireSelectionChange();		
 	},

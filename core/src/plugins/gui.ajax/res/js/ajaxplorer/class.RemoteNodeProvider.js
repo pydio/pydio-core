@@ -55,8 +55,10 @@ Class.create("RemoteNodeProvider", {
 		conn.addParameter("options", "al");
 		var path = node.getPath();
 		// Double encode # character
+        var paginationHash;
 		if(node.getMetadata().get("paginationData")){
-			path += "%23" + node.getMetadata().get("paginationData").get("current");
+			paginationHash = "%23" + node.getMetadata().get("paginationData").get("current");
+            path += paginationHash;
             conn.addParameter("remote_order", "true");
             if(node.getMetadata().get("remote_order")){
                 node.getMetadata().get("remote_order").each(function(pair){
@@ -67,7 +69,7 @@ Class.create("RemoteNodeProvider", {
 		conn.addParameter("dir", path);
 		if(this.properties){
 			$H(this.properties).each(function(pair){
-				conn.addParameter(pair.key, pair.value);
+				conn.addParameter(pair.key, pair.value + (pair.key == 'dir' && paginationHash ? paginationHash :''));
 			});
 		}
 		conn.onComplete = function (transport){

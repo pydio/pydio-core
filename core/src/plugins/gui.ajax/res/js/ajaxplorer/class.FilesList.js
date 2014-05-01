@@ -952,7 +952,8 @@ Class.create("FilesList", SelectableElements, {
 				}
 				var node = this.getCurrentContextNode();
 				node.getMetadata().get("paginationData").set("new_page", new_page);
-				ajaxplorer.updateContextData(node);
+                if(this._dataModel) this._dataModel.requireContextChange(node);
+                else ajaxplorer.updateContextData(node);
 			}
 		}.bind(this) );
 		return div;
@@ -969,7 +970,8 @@ Class.create("FilesList", SelectableElements, {
 		var node = this.getCurrentContextNode();
 		return new Element('a', {href:'#', style:'font-size:12px;padding:0 7px;', title:title}).update(text).observe('click', function(e){
 			node.getMetadata().get("paginationData").set("new_page", page);
-			ajaxplorer.updateContextData(node);
+            if(this._dataModel) this._dataModel.requireContextChange(node);
+			else ajaxplorer.updateContextData(node);
 			Event.stop(e);
 		}.bind(this));		
 	},

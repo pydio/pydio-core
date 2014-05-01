@@ -12,6 +12,27 @@
             <i18n namespace="ajxp_repository_editor" path="plugins/editor.ajxp_repository/i18n"/>
         </resources>
 	</client_settings>
+    <registry_contributions>
+        <actions>
+            <action name="repo_editor_edit_share">
+                <gui text="ajxp_conf.93" title="301" iconClass="icon-edit" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
+                    <context selection="true" dir="" recycle="hidden"
+                             actionBar="true" contextMenu="true" infoPanel="true"
+                             actionBarGroup="repo_editor_shares" inZip="false">
+                    </context>
+                    <selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE" behaviour="disable"/></gui>
+                <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
+                <processing>
+                    <clientCallback prepareModal="false"><![CDATA[
+                    var editorData = window.actionArguments[0];
+                    var manager = window.actionManager;
+                    alert('Should display data about ' + manager.getDataModel().getUniqueFileName());
+                ]]></clientCallback>
+                    <serverCallback methodName="switchAction" developerComment="Shortcut for various actions, calling edit with subaction parameter."/>
+                </processing>
+            </action>
+        </actions>
+    </registry_contributions>
 	<clientForm id="repository_edit_box"><![CDATA[
 		<div id="repository_edit_box" class="tabbed_editor" action="editer" box_width="460" box_height="80%" box_resize="true" box_padding="0">
 		    <div class="editor_header">
@@ -22,6 +43,7 @@
 			    <ul class="tabrow">
                     <li class="selected" data-PaneID="pane-infos"><span ajxp_message_id="ajxp_repository_editor.3">AJXP_MESSAGE[ajxp_repository_editor.3]</span></li>
                     <li class="" data-PaneID="pane-metas"><span ajxp_message_id="ajxp_repository_editor.4">AJXP_MESSAGE[ajxp_repository_editor.4]</span></li>
+                    <li class="" data-PaneID="pane-shares"><span ajxp_message_id="ajxp_repository_editor.4">Shares</span></li>
 	            </ul>
 	            <div class="tabpanes">
 	            </div>
@@ -32,6 +54,10 @@
                         <ul class="tabrow"></ul>
                         <div class="tabpanes"></div>
                     </div>
+                </div>
+                <div id="pane-shares">
+                    <div id="shares-toolbar"></div>
+                    <div id="shares-list"></div>
                 </div>
 			</div>
 		</div>

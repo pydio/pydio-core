@@ -36,6 +36,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
         // INIT TAB
         var infoPane = this.element.down("#pane-infos");
         var metaPane = this.element.down("#pane-metas");
+        this.sharesPane = this.element.down("#pane-shares");
 
         var oElement = this.element;
         infoPane.setStyle({position:"relative"});
@@ -62,6 +63,16 @@ Class.create("RepositoryEditor", AbstractEditor, {
             if(!confirm) return false;
         }
         return true;
+    },
+
+    close: function($super){
+        if(this.sharesList){
+            this.sharesList.destroy();
+        }
+        if(this.manager){
+            this.manager.destroy();
+        }
+        $super();
     },
 
     save : function(){
@@ -109,6 +120,40 @@ Class.create("RepositoryEditor", AbstractEditor, {
         this.node = node;
         this.formManager = this.getFormManager();
         this.loadRepository(this.repositoryId);
+
+        // Load list of shares
+        var listPane = this.sharesPane.down("#shares-list");
+        var actionPane = this.sharesPane.down("#shares-toolbar");
+        listPane.observe("editor:updateTitle", function(e){
+            Event.stop(e);
+        });
+        this.sharesList = new FetchedResultPane(listPane, {
+            nodeProviderProperties:{get_action:"ls",dir:"/data/repositories/"+this.repositoryId},
+            updateGlobalContext:false,
+            selectionChangeCallback:false,
+            displayMode: 'list',
+            fixedDisplayMode: 'list',
+            fit:"height"
+        });
+        listPane.removeClassName("class-FetchedResultPane");
+        this.sharesList._dataLoaded = true;
+        this.sharesList.reloadDataModel();
+        this.sharesPane.resizeOnShow = function(){
+            this.sharesList.resize();
+            this.sharesList.reload();
+        }.bind(this);
+
+        this.manager = new ActionsManager(true, this.sharesList._dataModel);
+        this.sharesToolbar = new ActionsToolbar(actionPane, {
+            toolbarsList:["repo_editor_shares"],
+            skipBubbling:true,
+            skipCarousel:true,
+            submenuOffsetTop:2,
+            manager:this.manager
+        });
+        this.manager.loadActionsFromRegistry(ajaxplorer.getXmlRegistry());
+
+
     },
 
     updateTitle: function(label){

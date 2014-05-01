@@ -52,7 +52,12 @@ Class.create("FetchedResultPane", FilesList, {
             replaceScroller:true,
             fit:'height',
             detailThumbSize:22,
-            updateGlobalContext:false
+            updateGlobalContext:false,
+            selectionChangeCallback:function(){
+                if(!this._dataLoaded) return;
+                var selectedNode = this._dataModel.getSelectedNodes()[0];
+                if(selectedNode) ajaxplorer.goTo(selectedNode);
+            }.bind(this)
         }, ajxpOptions));
 
         if(this.options.updateGlobalContext){
@@ -63,12 +68,8 @@ Class.create("FetchedResultPane", FilesList, {
                     ajaxplorer.getContextHolder().setSelectedNodes(selectedNodes, this);
                 }
             }.bind(this));
-        }else{
-            dataModel.observe("selection_changed", function(){
-                if(!this._dataLoaded) return;
-                var selectedNode = this._dataModel.getSelectedNodes()[0];
-                if(selectedNode) ajaxplorer.goTo(selectedNode);
-            }.bind(this));
+        }else if(this.options.selectionChangeCallback){
+            dataModel.observe("selection_changed", this.options.selectionChangeCallback);
         }
 
         document.observe("ajaxplorer:repository_list_refreshed", function(){
