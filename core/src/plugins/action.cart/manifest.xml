@@ -15,7 +15,7 @@
     </client_settings>
 
     <dependencies>
-        <activePlugin pluginName="action.share"/>
+        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
     </dependencies>
 
     <registry_contributions>
