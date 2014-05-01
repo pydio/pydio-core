@@ -134,6 +134,8 @@ class AjxpLuceneIndexer extends AJXP_Plugin
     public function applyAction($actionName, $httpVars, $fileVars)
     {
         $messages = ConfService::getMessages();
+        $repoId = ConfService::getRepository()->getId();
+
         if ($actionName == "search") {
 
             // TMP
@@ -148,7 +150,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin
                 throw new Exception($messages["index.lucene.6"]);
             }
             try {
-                $index =  $this->loadIndex(ConfService::getRepository()->getId(), false);
+                $index =  $this->loadIndex($repoId, false);
             } catch (Exception $ex) {
                 $this->applyAction("index", array("inner_apply" => "true"), array());
                 throw new Exception($messages["index.lucene.7"]);
@@ -196,6 +198,12 @@ class AjxpLuceneIndexer extends AJXP_Plugin
                     $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), array());
                     $tmpNode->loadNodeInfo();
                 }
+                if($tmpNode->getRepositoryId() != $repoId){
+                    $this->logDebug(__CLASS__, "Strange case, search retrieves a node from wrong repository!");
+                    $index->delete($hit->id);
+                    $commitIndex = true;
+                    continue;
+                }
                 if (!file_exists($tmpNode->getUrl())) {
                     $index->delete($hit->id);
                     $commitIndex = true;
@@ -216,7 +224,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin
             require_once("Zend/Search/Lucene.php");
             $scope = "user";
 
-            if ($this->isIndexLocked(ConfService::getRepository()->getId())) {
+            if ($this->isIndexLocked($repoId)) {
                 throw new Exception($messages["index.lucene.6"]);
             }
             try {
