@@ -170,18 +170,18 @@ class ShareStore {
     /**
      * @param String $type
      * @param String $element
-     * @param AbstractAjxpUser $loggedUser
+     * @param String $ownerId
      * @return bool
      * @throws Exception
      */
-    public function deleteShare($type, $element, $loggedUser)
+    public function deleteShare($type, $element, $ownerId)
     {
         $mess = ConfService::getMessages();
         AJXP_Logger::debug(__CLASS__, __FILE__, "Deleting shared element ".$type."-".$element);
         if ($type == "repository") {
             $repo = ConfService::getRepositoryById($element);
             if($repo == null) return;
-            if (!$repo->hasOwner() || $repo->getOwner() != $loggedUser->getId()) {
+            if (!$repo->hasOwner() || $repo->getOwner() != $ownerId) {
                 throw new Exception($mess["ajxp_shared.12"]);
             } else {
                 $res = ConfService::deleteRepository($element);
@@ -196,7 +196,7 @@ class ShareStore {
             if ($repo == null) {
                 return false;
             }
-            if (!$repo->hasOwner() || $repo->getOwner() != $loggedUser->getId()) {
+            if (!$repo->hasOwner() || $repo->getOwner() != $ownerId) {
                 throw new Exception($mess["ajxp_shared.12"]);
             } else {
                 $res = ConfService::deleteRepository($repoId);
@@ -206,11 +206,11 @@ class ShareStore {
                 // Silently delete corresponding role if it exists
                 AuthService::deleteRole("AJXP_SHARED-".$repoId);
                 // If guest user created, remove it now.
-                if (isSet($minisiteData["PRELOG_USER"])) {
+                if (isSet($minisiteData["PRELOG_USER"]) && AuthService::userExists($minisiteData["PRELOG_USER"])) {
                     AuthService::deleteUser($minisiteData["PRELOG_USER"]);
                 }
                 // If guest user created, remove it now.
-                if (isSet($minisiteData["PRESET_LOGIN"])) {
+                if (isSet($minisiteData["PRESET_LOGIN"]) && AuthService::userExists($minisiteData["PRESET_LOGIN"])) {
                     AuthService::deleteUser($minisiteData["PRESET_LOGIN"]);
                 }
                 if(isSet($minisiteData["PUBLICLET_PATH"]) && is_file($minisiteData["PUBLICLET_PATH"])){
@@ -222,14 +222,14 @@ class ShareStore {
         } else if ($type == "user") {
             $confDriver = ConfService::getConfStorageImpl();
             $object = $confDriver->createUserObject($element);
-            if (!$object->hasParent() || $object->getParent() != $loggedUser->getId()) {
+            if (!$object->hasParent() || $object->getParent() != $ownerId) {
                 throw new Exception($mess["ajxp_shared.12"]);
             } else {
                 AuthService::deleteUser($element);
             }
         } else if ($type == "file") {
             $publicletData = $this->loadShare($element);
-            if (isSet($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] == $loggedUser->getId()) {
+            if (isSet($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] == $ownerId) {
                 PublicletCounter::delete($element);
                 if(isSet($minisiteData["PUBLICLET_PATH"]) && is_file($minisiteData["PUBLICLET_PATH"])){
                     unlink($minisiteData["PUBLICLET_PATH"]);

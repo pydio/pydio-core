@@ -71,10 +71,6 @@
         </resources>
     </client_settings>
     <registry_contributions>
-        <hooks>
-            <serverCallback hookName="node.info" methodName="nodeSharedMetadata"/>
-            <serverCallback hookName="node.change" methodName="updateNodeSharedData"/>
-        </hooks>
         <actions>
             <action name="share-menu">
                 <gui text="share_center.110b" title="292" src="share.png"
@@ -478,11 +474,14 @@
             </component_config>
         </client_configs>
         <hooks>
+            <serverCallback hookName="node.info" methodName="nodeSharedMetadata"/>
+            <serverCallback hookName="node.change" methodName="updateNodeSharedData"/>
+            <serverCallback hookName="user.after_delete" methodName="cleanUserShares" defer="true"/>
             <serverCallback methodName="forwardEventToShares" hookName="node.change" defer="true"/>
         </hooks>
     </registry_contributions>
     <class_definition filename="plugins/action.share/class.ShareCenter.php" classname="ShareCenter"/>
     <dependencies>
-        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER|access.ajxp_user"/>
+        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER|access.ajxp_user|access.ajxp_conf"/>
     </dependencies>
 </ajxp_plugin>
