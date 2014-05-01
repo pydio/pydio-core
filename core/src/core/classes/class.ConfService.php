@@ -552,7 +552,10 @@ class ConfService
         // LOAD FROM DRIVER
         $confDriver = self::getConfStorageImpl();
         if($scope == "user"){
-            $acls = AuthService::getLoggedUser()->mergedRole->listAcls();
+            $acls = array();
+            if(AuthService::getLoggedUser() != null){
+                $acls = AuthService::getLoggedUser()->mergedRole->listAcls();
+            }
             if(!count($acls)) {
                 $drvList = array();
             }else{
