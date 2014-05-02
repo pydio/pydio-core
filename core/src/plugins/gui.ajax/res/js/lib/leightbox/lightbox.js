@@ -336,8 +336,5 @@ function addLightboxMarkupToElement(element, skipElement)
 
 function removeLightboxFromElement(element)
 {
-	var  tmp = $(element).select('#element_overlay');
-	if(tmp.length){
-		tmp[0].remove();
-	}
+	$(element).select('#element_overlay').invoke('remove');
 }

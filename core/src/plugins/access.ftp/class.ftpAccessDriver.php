@@ -69,6 +69,7 @@ class ftpAccessDriver extends fsAccessDriver
         if ($recycle != "") {
             RecycleBinManager::init($this->urlBase, "/".$recycle);
         }
+        //AJXP_PromptException::testOrPromptForCredentials("ftp_ws_credentials", $this->repository->getId());
     }
 
     public function uploadActions($action, $httpVars, $filesVars)

@@ -759,10 +759,10 @@ Class.create("Ajaxplorer", {
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'switch_repository');
 		connexion.addParameter('repository_id', repositoryId);
-		oThis = this;
 		connexion.onComplete = function(transport){
-			this.repositoryId = null;
-			this.loadXmlRegistry();
+            this.actionBar.parseXmlMessage(transport.responseXML);
+            this.repositoryId = null;
+            this.loadXmlRegistry();
 		}.bind(this);
 		var root = this._contextHolder.getRootNode();
 		if(root){

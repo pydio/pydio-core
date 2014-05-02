@@ -229,7 +229,11 @@ class AJXP_XMLWriter
             }
         }
         if(!headers_sent()) AJXP_XMLWriter::header();
-        AJXP_XMLWriter::sendMessage(null, SystemTextEncoding::toUTF8($message), true);
+        if(!empty($context) && is_object($context) && is_a($context, "AJXP_PromptException")){
+            AJXP_XMLWriter::write("<prompt type=\"".$context->getPromptType()."\"><message>".$message."</message><data><![CDATA[".json_encode($context->getPromptData())."]]></data></prompt>", true);
+        }else{
+            AJXP_XMLWriter::sendMessage(null, SystemTextEncoding::toUTF8($message), true);
+        }
         AJXP_XMLWriter::close();
         exit(1);
     }
@@ -241,7 +245,7 @@ class AJXP_XMLWriter
     public static function catchException($exception)
     {
         try {
-            AJXP_XMLWriter::catchError($exception->getCode(), SystemTextEncoding::fromUTF8($exception->getMessage()), $exception->getFile(), $exception->getLine(), null);
+            AJXP_XMLWriter::catchError($exception->getCode(), SystemTextEncoding::fromUTF8($exception->getMessage()), $exception->getFile(), $exception->getLine(), $exception);
         } catch (Exception $innerEx) {
             error_log(get_class($innerEx)." thrown within the exception handler!");
             error_log("Original exception was: ".$innerEx->getMessage()." in ".$innerEx->getFile()." on line ".$innerEx->getLine());
