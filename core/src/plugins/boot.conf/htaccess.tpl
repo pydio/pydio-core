@@ -5,15 +5,15 @@
 # and that you want the webDAV shares to be accessible via 
 # http://yourdomain/shares/repository_id/
 RewriteEngine on
-RewriteBase /${APPLICATION_ROOT}
+RewriteBase ${APPLICATION_ROOT}
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^shares ./dav.php [L]
 RewriteRule ^api ./rest.php [L]
 RewriteRule ^user ./index.php?get_action=user_access_point [L]
-RewriteCond %{REQUEST_URI} !^/${APPLICATION_ROOT}index
-RewriteCond %{REQUEST_URI} !^/${APPLICATION_ROOT}plugins
-RewriteCond %{REQUEST_URI} ^/${APPLICATION_ROOT}dashboard|^/${APPLICATION_ROOT}settings|^/${APPLICATION_ROOT}ws-
+RewriteCond %{REQUEST_URI} !^${APPLICATION_ROOT}/index
+RewriteCond %{REQUEST_URI} !^${APPLICATION_ROOT}/plugins
+RewriteCond %{REQUEST_URI} ^${APPLICATION_ROOT}/dashboard|^${APPLICATION_ROOT}/settings|^${APPLICATION_ROOT}/ws-
 RewriteRule (.*) index.php [L]
 
 #Following lines seem to be necessary if PHP is working
