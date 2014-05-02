@@ -400,7 +400,7 @@ class ConfService
             }
         }
         if ($repositoryObject->getAccessType()=="ajxp_user" && $userObject != null) {
-            return true;// ($userObject->canRead($repositoryId) || $userObject->canWrite($repositoryId)) ;
+            return ($userObject->canRead($repositoryId) || $userObject->canWrite($repositoryId)) ;
         }
         if ($repositoryObject->getAccessType() == "ajxp_shared" && !AuthService::usersEnabled()) {
             return false;
@@ -542,10 +542,13 @@ class ConfService
     protected function initRepositoriesListInst($scope = "user")
     {
         // APPEND CONF FILE REPOSITORIES
-
+        $loggedUser = AuthService::getLoggedUser();
         $objList = array();
         foreach ($this->configs["DEFAULT_REPOSITORIES"] as $index=>$repository) {
             $repo = self::createRepositoryFromArray($index, $repository);
+            if($scope == "user" && $loggedUser != null && !self::repositoryIsAccessible($index, $repo, $loggedUser)){
+                continue;
+            }
             $repo->setWriteable(false);
             $objList[$repo->getId()] = $repo;
         }

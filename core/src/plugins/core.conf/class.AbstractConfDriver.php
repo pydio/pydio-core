@@ -80,6 +80,24 @@ abstract class AbstractConfDriver extends AJXP_Plugin
             }
         }
 
+        // SWITCH TO DASHBOARD ACTION
+        $u = AuthService::getLoggedUser();
+        $access = true;
+        if($u == null) $access = false;
+        else {
+            $acl = $u->mergedRole->getAcl("ajxp_user");
+            if(empty($acl)) $access = false;
+        }
+        if(!$access){
+            unset($this->actions["switch_to_user_dashboard"]);
+            $actionXpath=new DOMXPath($contribNode->ownerDocument);
+            $publicUrlNodeList = $actionXpath->query('action[@name="switch_to_user_dashboard"]', $contribNode);
+            if ($publicUrlNodeList->length) {
+                $publicUrlNode = $publicUrlNodeList->item(0);
+                $contribNode->removeChild($publicUrlNode);
+            }
+        }
+
         // PERSONAL INFORMATIONS
         $hasExposed = false;
         $cacheHasExposed = AJXP_PluginsService::getInstance()->loadFromPluginQueriesCache("//server_settings/param[contains(@scope,'user') and @expose='true']");
