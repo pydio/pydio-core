@@ -314,6 +314,25 @@ Class.create("AbstractEditor" , {
 		}
 		this.element.fire("editor:modified", isModified);
 	},
+
+    _supportsBrowserFullScreen:function(element){
+        return (element.requestFullScreen||element.webkitRequestFullScreen||element.mozRequestFullScreen);
+    },
+
+    _browserFullScreen: function (element) {
+        element.setStyle({width:'100%'});
+        element.select('#computer_fullscreen').invoke("remove");
+        if(element.requestFullScreen) {
+            element.requestFullScreen();
+        } else if(element.webkitRequestFullScreen) {
+            element.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+        } else if(element.mozRequestFullScreen){
+            element.mozRequestFullScreen();
+        } else {
+            return false;
+        }
+        return true;
+    },
 	/**
 	 * Switch to fullscreen mode
 	 */
@@ -321,7 +340,7 @@ Class.create("AbstractEditor" , {
 		if(!this.contentMainContainer){
 			this.contentMainContainer = this.element;
 		}
-		this.originalHeight = this.contentMainContainer.getHeight();	
+		this.originalHeight = this.contentMainContainer.getHeight();
 		this.originalWindowTitle = document.title;
         if(this.editorOptions.context.__className != "Modal"){
             this.originalParentId = this.element.parentNode.id;
@@ -350,6 +369,17 @@ Class.create("AbstractEditor" , {
 		this.resize();
 		this.fullScreenMode = true;
 		this.element.fire("editor:enterFSend");
+        if(this._supportsBrowserFullScreen(this.element) && !this.element.down('#computer_fullscreen')){
+            var button = new Element('span', {
+                id:'computer_fullscreen',
+                class:'icon-resize-full',
+                style:'display: block; cursor:pointer; position:absolute; top:10px; right:10px;color:white;font-size:15px;'
+            }).update('&nbsp;&nbsp;'+MessageHash[512]);
+            button.observe('click', function(){
+                this._browserFullScreen(this.element);
+            }.bind(this));
+            this.element.insert(button);
+        }
 	},
 	/**
 	 * Exits fullscreen mode

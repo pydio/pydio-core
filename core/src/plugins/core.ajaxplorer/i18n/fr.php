@@ -567,5 +567,6 @@ $mess=array(
 "509" => "Sauver la sélection comme une équipe",
 "510" => "Veuillez entrer un libellé",
 "511" => "Mon %s",
+"512" => "Plein Ecran (bureau)",
 /* END SENTENCE */
 );

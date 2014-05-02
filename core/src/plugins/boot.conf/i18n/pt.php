@@ -26,4 +26,5 @@ $mess = array(
 "4" => "Start Wizard!",
 "5" => "Please wait while Pydio is being configured! It will be up and running in a couple of seconds...",
 "6" => "Install Pydio Now",
+"7" => "Language",
 );

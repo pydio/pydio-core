@@ -570,5 +570,6 @@ $mess=array(
 "509" => "Aktuelle Benutzerliste als persöhnliches Team speichern",
 "510" => "Bitte eine Markierung für das Team eingeben",
 "511" => "My %s",
+"512" => "Desktop Full Screen",
 /* END SENTENCE */
 );

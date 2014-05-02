@@ -567,4 +567,5 @@ $mess=array(
 "509"=> "Save the current users list as a personal team",
 "510"=> "Please enter a team label",
 "511"=> "My %s",
+"512"=> "Desktop Full Screen",
 );
