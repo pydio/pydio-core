@@ -376,7 +376,7 @@ SelectableElements = Class.create({
     previousEventTarget: null,
     ie10detailFilter : function(e){
         if(!Prototype.Browser.IE10){
-            return true;
+            return false;
         }
         var result = true;
         if(!this.previousEventTime){
