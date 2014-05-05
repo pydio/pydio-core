@@ -144,6 +144,10 @@ class ShareStore {
 
     }
 
+    public function findSharesForRepo($repositoryId){
+        return $this->confStorage->simpleStoreList("share", null, "", "serial", '%"REPOSITORY";s:32:"'.$repositoryId.'"%');
+    }
+
     public function listShares($limitToUser = '', $cursor = null){
 
         // Get DB files

@@ -80,8 +80,9 @@ class ShareCenter extends AJXP_Plugin
             if ($disableSharing) {
                 unset($this->actions["share"]);
                 $actionXpath=new DOMXPath($contribNode->ownerDocument);
-                $publicUrlNodeList = $actionXpath->query('action[contains(@name, "share")]', $contribNode);
+                $publicUrlNodeList = $actionXpath->query('action[contains(@name, "share-")]', $contribNode);
                 foreach($publicUrlNodeList as $shareActionNode){
+                    if($shareActionNode->getAttribute("name") == "share-edit-shared") continue;
                     $contribNode->removeChild($shareActionNode);
                 }
             }
@@ -101,6 +102,13 @@ class ShareCenter extends AJXP_Plugin
         if (array_key_exists("meta.watch", AJXP_PluginsService::getInstance()->getActivePlugins())) {
             $this->watcher = AJXP_PluginsService::getInstance()->getPluginById("meta.watch");
         }
+    }
+
+    /**
+     * @return ShareCenter
+     */
+    public static function getShareCenter(){
+        return AJXP_PluginsService::findPluginById("action.share");
     }
 
     /**
@@ -302,15 +310,22 @@ class ShareCenter extends AJXP_Plugin
 
             case "load_shared_element_data":
 
-                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-                $node = new AJXP_Node($this->urlBase.$file);
-                $this->getSharesFromMeta($node, $parsedMeta, true);
+                $node = null;
+                if(isSet($httpVars["hash"])){
+                    $parsedMeta = array($httpVars["hash"] => array("type" => "minisite"));
+                }else if(isSet($httpVars["shared_repository_id"])){
+                    $parsedMeta = array($httpVars["shared_repository_id"] => array("type" => "repository"));
+                }else{
+                    $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                    $node = new AJXP_Node($this->urlBase.$file);
+                    $this->getSharesFromMeta($node, $parsedMeta, true);
+                }
 
                 $flattenJson = false;
                 $jsonData = array();
                 foreach($parsedMeta as $shareId => $shareMeta){
 
-                    $jsonData[] = $this->shareToJson($node, $shareId, $shareMeta);
+                    $jsonData[] = $this->shareToJson($shareId, $shareMeta, $node);
                     if($shareMeta["type"] != "file"){
                         $flattenJson = true;
                     }
@@ -978,7 +993,7 @@ class ShareCenter extends AJXP_Plugin
         $AJXP_LINK_BASENAME = SystemTextEncoding::toUTF8(basename($data["FILE_PATH"]));
         AJXP_PluginsService::getInstance()->initActivePlugins();
 
-        $shareCenter = AJXP_PluginsService::findPluginById("action.share");
+        $shareCenter = self::getShareCenter();
 
         if ($shareCenter->getShareStore()->isShareExpired($shortHash, $data))
         {
@@ -1102,7 +1117,7 @@ class ShareCenter extends AJXP_Plugin
      * @param $currentFileUrl
      * @return array
      */
-    public function computeSharedRepositoryAccessRights($repoId, $mixUsersAndGroups, $currentFileUrl)
+    public function computeSharedRepositoryAccessRights($repoId, $mixUsersAndGroups, $currentFileUrl = null)
     {
         $loggedUser = AuthService::getLoggedUser();
         $users = AuthService::getUsersForRepository($repoId);
@@ -1146,7 +1161,7 @@ class ShareCenter extends AJXP_Plugin
                     "LABEL" => $uLabel,
                     "RIGHT" => $userObject->personalRole->getAcl($repoId)
                 );
-                if ($this->watcher !== false) {
+                if ($this->watcher !== false && $currentFileUrl != null) {
                     $entry["WATCH"] = $this->watcher->hasWatchOnNode(
                         new AJXP_Node($currentFileUrl),
                         $userId,
@@ -1596,6 +1611,10 @@ class ShareCenter extends AJXP_Plugin
         return $this->getShareStore()->loadShare($id);
     }
 
+    public function findSharesForRepo($repositoryId, $ownerId){
+        return $this->getShareStore()->findSharesForRepo($repositoryId, $ownerId);
+    }
+
     public function listShares($currentUser = true, $cursor = null){
         if(AuthService::usersEnabled()){
             $crtUser = ($currentUser?AuthService::getLoggedUser()->getId():'');
@@ -1786,13 +1805,13 @@ class ShareCenter extends AJXP_Plugin
     }
 
     /**
-     * @param AJXP_Node $node
      * @param String $shareId
      * @param Array $shareData
-     * @return array|bool
+     * @param AJXP_Node $node
      * @throws Exception
+     * @return array|bool
      */
-    public function shareToJson($node, $shareId, $shareData){
+    public function shareToJson($shareId, $shareData, $node = null){
 
         $messages = ConfService::getMessages();
         $jsonData = array();
@@ -1811,7 +1830,7 @@ class ShareCenter extends AJXP_Plugin
             } else {
                 $link = $this->buildPublicletLink($shareId);
             }
-            if ($this->watcher != false) {
+            if ($this->watcher != false && $node != null) {
                 $result = array();
                 $elementWatch = $this->watcher->hasWatchOnNode(
                     $node,
@@ -1853,11 +1872,11 @@ class ShareCenter extends AJXP_Plugin
                 $repoId = $shareId;
             }
             $repo = ConfService::getRepositoryById($repoId);
-            if($repo == null){
+            if($repo == null && $node != null){
                 if($minisite){
                     $this->removeShareFromMeta($node, $shareId);
                 }
-            } else if ($repo->getOwner() != AuthService::getLoggedUser()->getId()) {
+            } else if (!AuthService::getLoggedUser()->isAdmin() && $repo->getOwner() != AuthService::getLoggedUser()->getId()) {
 
                 $jsonData = array(
                     "repositoryId"  => $repoId,
@@ -1870,14 +1889,18 @@ class ShareCenter extends AJXP_Plugin
                 return $jsonData;
 
             }
-            if ($this->watcher != false) {
+            if ($this->watcher != false && $node != null) {
                 $elementWatch = $this->watcher->hasWatchOnNode(
                     new AJXP_Node($this->baseProtocol."://".$repoId."/"),
                     AuthService::getLoggedUser()->getId(),
                     MetaWatchRegister::$META_WATCH_NAMESPACE
                 );
             }
-            $sharedEntries = $this->computeSharedRepositoryAccessRights($repoId, true, $node->getUrl());
+            if($node != null){
+                $sharedEntries = $this->computeSharedRepositoryAccessRights($repoId, true, $node->getUrl());
+            }else{
+                $sharedEntries = $this->computeSharedRepositoryAccessRights($repoId, true, null);
+            }
 
             $jsonData = array(
                 "repositoryId"  => $repoId,

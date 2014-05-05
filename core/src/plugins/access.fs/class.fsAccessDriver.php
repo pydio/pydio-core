@@ -1870,7 +1870,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     public function recursivePurge($dirName, $hardPurgeTime, $softPurgeTime = 0)
     {
         $handle=opendir($dirName);
-        $shareCenter = AJXP_PluginsService::findPluginById("action.share");
+        $shareCenter = false;
+        if(class_exists("ShareCenter")){
+            $shareCenter = ShareCenter::getShareCenter("action.share");
+        }
         while (false !== ($entry = readdir($handle))) {
             if ($entry == "" || $entry == ".."  || AJXP_Utils::isHidden($entry) ) {
                 continue;

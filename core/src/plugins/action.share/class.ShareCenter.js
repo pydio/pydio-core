@@ -21,13 +21,21 @@ Class.create("ShareCenter", {
 
     currentNode : null,
     shareFolderMode : "workspace",
+    readonlyMode : false,
     _currentFolderWatchValue:false,
 
-    performShareAction : function(){
-        var userSelection = ajaxplorer.getUserSelection();
+    performShareAction : function(dataModel, readOnlyMode){
+        var userSelection;
+        if(dataModel){
+            userSelection = dataModel;
+        }else{
+            userSelection =  ajaxplorer.getUserSelection();
+        }
         this.currentNode = userSelection.getUniqueNode();
         this.shareFolderMode = "workspace";
-        if(( userSelection.hasDir() && !userSelection.hasMime($A(['ajxp_browsable_archive']))) || userSelection.isMultiple()){
+        if(readOnlyMode) this.readonlyMode = true;
+        if(( userSelection.hasDir() && !userSelection.hasMime($A(['ajxp_browsable_archive'])))
+            || userSelection.isMultiple() || this.currentNode.getMetadata().get('share_data')){
             var nodeMeta = this.currentNode.getMetadata();
             if(!nodeMeta.get("ajxp_shared")){
                 var oThis = this;
@@ -379,7 +387,7 @@ Class.create("ShareCenter", {
                 loadFunc,
                 (this.shareFolderMode != "workspace" ? function(){hideLightBox();} : submitFunc),
                 closeFunc,
-                (this.shareFolderMode != "workspace" ? true: false),
+                (this.shareFolderMode != "workspace" || this.readonlyMode ? true: false),
                 (this.shareFolderMode != "workspace" && !this.currentNode.getMetadata().get("ajxp_shared") ? true: false)
             );
         }
@@ -548,8 +556,19 @@ Class.create("ShareCenter", {
             conn.discrete = true;
         }
         conn.addParameter("get_action", "load_shared_element_data");
-        conn.addParameter("file", uniqueNode.getPath());
-        conn.addParameter("element_type", uniqueNode.isLeaf() ? "file" : "repository");
+        var meta = uniqueNode.getMetadata();
+        if(meta.get('shared_element_hash')){
+            conn.addParameter("hash", meta.get('shared_element_hash'));
+            conn.addParameter("tmp_repository_id", meta.get('shared_element_parent_repository'));
+            conn.addParameter("element_type", meta.get('shared_element_type'));
+        }else if(meta.get('shared_element_repository_id')){
+            conn.addParameter("shared_repository_id", meta.get('shared_element_repository_id'));
+            conn.addParameter("element_type", "repository");
+            conn.addParameter("tmp_repository_id", meta.get('shared_element_parent_repository'));
+        }else{
+            conn.addParameter("file", uniqueNode.getPath());
+            conn.addParameter("element_type", uniqueNode.isLeaf() ? "file" : "repository");
+        }
         conn.onComplete = function(transport){
             jsonCallback(transport.responseJSON);
         };
