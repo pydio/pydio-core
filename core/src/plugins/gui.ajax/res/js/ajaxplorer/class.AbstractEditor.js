@@ -371,9 +371,9 @@ Class.create("AbstractEditor" , {
 		this.element.fire("editor:enterFSend");
         if(this._supportsBrowserFullScreen(this.element) && !this.element.down('#computer_fullscreen')){
             var button = new Element('span', {
-                id:'computer_fullscreen',
-                class:'icon-resize-full',
-                style:'display: block; cursor:pointer; position:absolute; top:10px; right:10px;color:white;font-size:15px;'
+                id          :'computer_fullscreen',
+                className   :'icon-resize-full',
+                style       :'display: block; cursor:pointer; position:absolute; top:10px; right:10px;color:white;font-size:15px;'
             }).update('&nbsp;&nbsp;'+MessageHash[512]);
             button.observe('click', function(){
                 this._browserFullScreen(this.element);
