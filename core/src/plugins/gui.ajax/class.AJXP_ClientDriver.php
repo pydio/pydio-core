@@ -286,9 +286,10 @@ class AJXP_ClientDriver extends AJXP_Plugin
         if (isSet($_GET["server_prefix_uri"])) {
             $_SESSION["AJXP_SERVER_PREFIX_URI"] = str_replace("_UP_", "..", $_GET["server_prefix_uri"]);
         }
+        $currentIsMinisite = (strpos(session_name(), "AjaXplorer_Shared") === 0);
         $config = array();
         $config["ajxpResourcesFolder"] = "plugins/gui.ajax/res";
-        if (strpos(session_name(), "AjaXplorer_Shared") === 0) {
+        if ($currentIsMinisite) {
             $config["ajxpServerAccess"] = "index_shared.php";
         } else {
             $config["ajxpServerAccess"] = AJXP_SERVER_ACCESS;
@@ -318,7 +319,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
         } else {
             $to = $timeoutTime;
         }
-        if(session_name() == "AjaXplorer_Shared") $to = -1;
+        if($currentIsMinisite) $to = -1;
         $config["client_timeout"] = intval($to);
         $config["client_timeout_warning"] = floatval($this->getFilteredOption("CLIENT_TIMEOUT_WARN"));
         $config["availableLanguages"] = ConfService::getConf("AVAILABLE_LANG");
