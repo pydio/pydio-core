@@ -250,15 +250,25 @@
 				<script>
 				    window.setTimeout(function(){
                         try{
+                            var dm = ajaxplorer.getContextHolder();
+                            var root = dm.getRootNode();
                             document.observe("ajaxplorer:selection_changed", function(e){
                                 try{
-                                    var nodes = ajaxplorer.getContextHolder().getSelectedNodes();
+                                    var nodes = dm.getSelectedNodes();
                                     if(nodes[0].isLeaf() && e.memo._selectionSource.__className == 'FilesList'){
                                         ajaxplorer.actionBar.fireDefaultAction("file");
                                     }
                                 }catch(e){}
                             });
-                            ajaxplorer.getContextHolder().setSelectedNodes([ajaxplorer.getContextHolder().getContextNode().getChildren().first()]);
+                            if(root.isLoaded()) {
+                                dm.setSelectedNodes([root.getChildren().first()], "dataModel");
+                                ajaxplorer.actionBar.fireDefaultAction("file");
+                            } else {
+                                root.observe("loaded", function(){
+                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
+                                    ajaxplorer.actionBar.fireDefaultAction("file");
+                                });
+                            }
                         }catch(e){}
                     }, 1000);
 				</script>
@@ -315,10 +325,19 @@
 				<script>
 				    window.setTimeout(function(){
                         try{
-                            ajaxplorer.getContextHolder().setSelectedNodes([ajaxplorer.getContextHolder().getContextNode().getChildren().first()]);
-                            ajaxplorer.actionBar.fireDefaultAction("file");
+                            var dm = ajaxplorer.getContextHolder();
+                            var root = dm.getRootNode();
+                            if(root.isLoaded()) {
+                                dm.setSelectedNodes([root.getChildren().first()], "dataModel");
+                                ajaxplorer.actionBar.fireDefaultAction("file");
+                            } else {
+                                root.observe("loaded", function(){
+                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
+                                    ajaxplorer.actionBar.fireDefaultAction("file");
+                                });
+                            }
                         }catch(e){}
-                    }, 1000);
+                    }, 500);
 				</script>
 			]]></template>
             <template name="unique_preview_download" element="ajxp_unique_dl" position="top" label="Big download button"><![CDATA[
@@ -393,9 +412,17 @@
 				<script>
 				    window.setTimeout(function(){
                         try{
-                            ajaxplorer.getContextHolder().setSelectedNodes([ajaxplorer.getContextHolder().getContextNode().getChildren().first()]);
+                            var dm = ajaxplorer.getContextHolder();
+                            var root = dm.getRootNode();
+                            if(root.isLoaded()) {
+                                dm.setSelectedNodes([root.getChildren().first()], "dataModel");
+                            } else {
+                                root.observe("loaded", function(){
+                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
+                                });
+                            }
                         }catch(e){}
-                    }, 1000);
+                    }, 500);
 				</script>
 			]]></template>
             <template name="minisite_bare" element="ajxp_embed_template" position="top" label="Embedded"><![CDATA[
