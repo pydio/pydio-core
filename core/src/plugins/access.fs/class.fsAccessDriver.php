@@ -570,7 +570,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
 
                 $messtmp="";
                 if(empty($httpVars["filename"]) && isSet($httpVars["node"])){
-                    $filename=AJXP_Utils::decodeSecureMagic($httpVars["node"], AJXP_SANITIZE_FILENAME);
+                    $filename=AJXP_Utils::decodeSecureMagic($httpVars["node"]);
                 }else{
                     $filename=AJXP_Utils::decodeSecureMagic($httpVars["filename"], AJXP_SANITIZE_FILENAME);
                 }
