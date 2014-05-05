@@ -142,10 +142,11 @@ $mess=array(
 "118" => "Új csoport",
 "group_access" => "g",
 "119" => "Set user group",
-    "120" => "Go Pro",
-    "121" => "Get professional support for your install",
-    "122" => "All Settings",
-    "123" => "Other plugins",
-    "124" => "Source",
+"120" => "Go Pro",
+"121" => "Get professional support for your install",
+"122" => "All Settings",
+"123" => "Other plugins",
+"124" => "Source",
+"125" => "Alias",
 /* END SENTENCE */
 );

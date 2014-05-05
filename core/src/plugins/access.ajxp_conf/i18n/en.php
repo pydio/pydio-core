@@ -145,4 +145,5 @@ $mess=array(
 "122" => "All Settings",
 "123" => "Other plugins",
 "124" => "Source",
+"125" => "Alias",
 );
