@@ -33,10 +33,10 @@ Class.create("ActionsToolbar", {
 		this.element.ajxpPaneObject = this;
 		this.options = Object.extend({
 			buttonRenderer : 'this',
-            skipBubbling: false,
+            skipBubbling: true,
 			toolbarsList : $A(['default', 'put', 'get', 'change', 'user', 'remote']),
             groupOtherToolbars : $A([]),
-            skipCarousel : false,
+            skipCarousel : true,
             manager:null
 		}, options || {});
 		var renderer = this.options.buttonRenderer;
