@@ -490,6 +490,11 @@ class ConfService
         return "";
     }
 
+    /**
+     * @param Repository[] $repoList
+     * @param array $criteria
+     * @return Repository[] array
+     */
     public static function filterRepositoryListWithCriteria($repoList, $criteria){
         $repositories = array();
         $searchableKeys = array("uuid", "parent_uuid", "owner_user_id", "display", "accessType", "isTemplate", "slug", "groupPath");
@@ -520,6 +525,11 @@ class ConfService
         return $repositories;
     }
 
+    /**
+     * @param array $criteria
+     * @param $count
+     * @return Repository[]
+     */
     public static function listRepositoriesWithCriteria($criteria, &$count){
 
         $statics = array();
