@@ -96,9 +96,7 @@
             </action>
             <action name="share">
                 <gui text="292" title="292" src="share.png" iconClass="icon-share" hasAccessKey="false">
-                    <context selection="true" dir="" recycle="hidden"
-                        actionBar="false" contextMenu="true" infoPanel="true"
-                        actionBarGroup="get">
+                    <context selection="true" dir="" recycle="hidden" actionBar="false" contextMenu="false" infoPanel="false">
                     </context>
                     <selectionContext dir="false" evalMetadata="!metadata.get('ajxp_mime') || !metadata.get('ajxp_mime').startsWith('shared_')" file="true" recycle="false" unique="false"/>
                 </gui>
@@ -280,13 +278,17 @@
             </action>
             <action name="share-edit-shared">
                 <gui src="share.png" iconClass="icon-share" text="share_center.125" title="share_center.126">
-                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="get" behaviour="hidden"/>
+                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="get,repo_editor_shares" behaviour="hidden"/>
                     <selectionContext dir="true" file="true" evalMetadata="metadata.get('ajxp_shared')" recycle="false" unique="true" behaviour="hidden"/>
                 </gui>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
                         if(!ajaxplorer.actionBar.shareCenter) ajaxplorer.actionBar.shareCenter = new ShareCenter();
-                        ajaxplorer.actionBar.shareCenter.performShareAction();
+                        if(window.actionManager){
+                            ajaxplorer.actionBar.shareCenter.performShareAction(window.actionManager.getDataModel(), true);
+                        }else{
+                            ajaxplorer.actionBar.shareCenter.performShareAction();
+                        }
                     ]]></clientCallback>
                 </processing>
             </action>
