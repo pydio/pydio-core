@@ -671,7 +671,7 @@ Class.create("RoleEditor", AbstractEditor, {
         if(!Object.keys(actionsData).length){
             parametersPane.update("");
             parametersPane.removeClassName("nonempty");
-            parametersPane.insert(new Element("ul", {className:"tabrow"}));
+            parametersPane.insert(new Element("ul", {className:"tabrow innerTabRow"}));
             return;
         }
         var conn = new Connexion();
@@ -684,7 +684,7 @@ Class.create("RoleEditor", AbstractEditor, {
 
             parametersPane.update("");
             parametersPane.removeClassName("non_empty");
-            parametersPane.insert(new Element("ul", {className:"tabrow"}));
+            parametersPane.insert(new Element("ul", {className:"tabrow innerTabRow"}));
 
             // Parse result as a standard form
             var xml = transport.responseXML;
@@ -732,6 +732,7 @@ Class.create("RoleEditor", AbstractEditor, {
             pane.select("div.accordion_content").invoke("setStyle", {display:"block"});
             new AjxpSimpleTabs(parametersPane);
             parametersPane.addClassName("non_empty");
+            parametersPane.down(".tabpanes").addClassName("innerContainer").setStyle({margin:'3px 10px'});
 
             // UPDATE FORMS ELEMENTS
             parametersPane.select("div.SF_element").each(function(element){

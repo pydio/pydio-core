@@ -20,8 +20,8 @@
 			<div id="pluginTabulator">
                 <div class="action_bar"><a href="#" onclick="return false;" class="icon-save disabled" id="saveButton" onclick="return false;"><img src="AJXP_THEME_FOLDER/images/actions/22/filesave.png" width="22" height="22" alt="AJXP_MESSAGE[53]" border="0"><br><span message_id="53">AJXP_MESSAGE[53]</span></a></div>
 			    <ul class="tabrow">
-                    <li class="selected" data-PaneID="pane-infos"><span ajxp_message_id="ajxp_plugin_editor.3">AJXP_MESSAGE[ajxp_plugin_editor.3]</span></li>
-                    <li class="" data-PaneID="pane-docs"><span ajxp_message_id="ajxp_plugin_editor.4">AJXP_MESSAGE[ajxp_plugin_editor.4]</span></li>
+                    <li class="selected" data-PaneID="pane-infos"><i class="icon-reorder"></i> <span ajxp_message_id="ajxp_plugin_editor.3">AJXP_MESSAGE[ajxp_plugin_editor.3]</span></li>
+                    <li class="" data-PaneID="pane-docs"><i class="icon-book"></i> <span ajxp_message_id="ajxp_plugin_editor.4">AJXP_MESSAGE[ajxp_plugin_editor.4]</span></li>
 	            </ul>
 	            <div class="tabpanes">
 	            </div>

@@ -239,7 +239,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
             if(this.currentRepoWriteable){
                 this.feedMetaSourceForm(xmlData, this.metaPane);
             }else{
-                this.metaPane.update(MessageHash['ajxp_repository_editor.15']);
+                this.metaPane.down("div.dialogLegend").update(MessageHash['ajxp_repository_editor.15']);
             }
         }
 
@@ -328,8 +328,8 @@ Class.create("RepositoryEditor", AbstractEditor, {
             addForm.insert(formEl);
             addForm.insert('<div style="clear: both"></div>');
             formEl.insert(this.metaSelector);
-            metaPane.insert({top:addForm});
-            addForm.insert({before: new Element("div", {className:"dialogLegend"}).update(MessageHash["ajxp_repository_editor.7"])});
+            metaPane.down("div.dialogLegend").update(MessageHash["ajxp_repository_editor.7"]);
+            metaPane.down("div.dialogLegend").insert({after:addForm});
             var addFormDetail = new Element("div");
             addForm.insert(addFormDetail);
 
@@ -350,7 +350,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
             }
             modal.refreshDialogAppearance();
             modal.refreshDialogPosition();
-            addFormDetail.insert("<div class='largeButton' style='width:100px;margin-top: 20px;margin-left: 0; float: right;'><span class='icon-plus-sign'></span> <span>"+MessageHash['ajxp_repository_editor.11']+"</span></div>");
+            addFormDetail.insert("<div class='largeButton' style='width:100px;margin-top: 20px;margin-left: 0; float: right;'><span class='icon-plus-sign'></span> <span>"+MessageHash['ajxp_repository_editor.11']+"</span></div><div style='clear:both;'></div>");
             addFormDetail.down(".largeButton")._form = addForm;
             addFormDetail.down(".largeButton").observe("click", this.metaActionClick.bind(this));
             this.resize();
