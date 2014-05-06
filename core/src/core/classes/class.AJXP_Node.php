@@ -61,9 +61,14 @@ class AJXP_Node
      */
     private $_accessDriver;
     /**
-     * @return MetaStoreProvider
+     * @var MetaStoreProvider
      */
     private $_metaStore;
+
+    /**
+     * @var String
+     */
+    private $_user;
 
     /**
      * @var array
@@ -396,6 +401,27 @@ class AJXP_Node
     public function getScheme()
     {
         return $this->urlParts["scheme"];
+    }
+
+    /**
+     * @return string A username
+     */
+    public function getUser(){
+        return $this->_user;
+    }
+
+    /**
+     * @param string $userId A username
+     */
+    public function setUser($userId){
+        $this->_user = $userId;
+    }
+
+    /**
+     * @return string A username passed through url
+     */
+    public function hasUser(){
+        return isSet($this->_user);
     }
 
     /**

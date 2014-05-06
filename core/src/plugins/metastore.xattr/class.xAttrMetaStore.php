@@ -61,9 +61,15 @@ class xAttrMetaStore extends AJXP_Plugin implements MetaStoreProvider
         return true;
     }
 
-    protected function getUserId($private)
+    /**
+     * @param bool $private
+     * @param AJXP_Node $node
+     * @return string
+     */
+    protected function getUserId($private, $node)
     {
         if(!$private) return AJXP_METADATA_SHAREDUSER;
+        if($node->hasUser()) return $node->getUser();
         if(AuthService::usersEnabled()) return AuthService::getLoggedUser()->getId();
         return "shared";
     }
@@ -80,7 +86,7 @@ class xAttrMetaStore extends AJXP_Plugin implements MetaStoreProvider
     {
         $path = $ajxpNode->getRealFile();
         if(!file_exists($path)) return;
-        $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private));
+        $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private, $ajxpNode));
         if (!xattr_supported($path)) {
             throw new Exception("Filesystem does not support Extended Attributes!");
         }
@@ -100,7 +106,7 @@ class xAttrMetaStore extends AJXP_Plugin implements MetaStoreProvider
     {
         $path = $ajxpNode->getRealFile();
         if(!file_exists($path)) return;
-        $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private));
+        $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private, $ajxpNode));
         if (!xattr_supported($path)) {
             throw new Exception("Filesystem does not support Extended Attributes!");
         }
@@ -118,7 +124,7 @@ class xAttrMetaStore extends AJXP_Plugin implements MetaStoreProvider
     {
         $path = $ajxpNode->getRealFile();
         if(!file_exists($path)) return array();
-        $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private));
+        $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private, $ajxpNode));
         if (!xattr_supported($path)) {
             //throw new Exception("Filesystem does not support Extended Attributes!");
             return array();

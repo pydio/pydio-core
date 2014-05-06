@@ -58,8 +58,13 @@ class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider
     }
 
 
-    protected function getUserId()
+    /**
+     * @param AJXP_Node $node
+     * @return string
+     */
+    protected function getUserId($node)
     {
+        if($node->hasUser()) return $node->getUser();
         if(AuthService::usersEnabled()) return AuthService::getLoggedUser()->getId();
         return "shared";
     }
@@ -69,7 +74,7 @@ class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider
         $this->loadMetaFileData(
             $ajxpNode,
             $scope,
-            ($private?$this->getUserId():AJXP_METADATA_SHAREDUSER)
+            ($private?$this->getUserId($ajxpNode):AJXP_METADATA_SHAREDUSER)
         );
         if (!isSet(self::$metaCache[$nameSpace])) {
             self::$metaCache[$nameSpace] = array();
@@ -78,7 +83,7 @@ class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider
         $this->saveMetaFileData(
             $ajxpNode,
             $scope,
-            ($private?$this->getUserId():AJXP_METADATA_SHAREDUSER)
+            ($private?$this->getUserId($ajxpNode):AJXP_METADATA_SHAREDUSER)
         );
     }
 
@@ -87,14 +92,14 @@ class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider
         $this->loadMetaFileData(
             $ajxpNode,
             $scope,
-            ($private?$this->getUserId():AJXP_METADATA_SHAREDUSER)
+            ($private?$this->getUserId($ajxpNode):AJXP_METADATA_SHAREDUSER)
         );
         if(!isSet(self::$metaCache[$nameSpace])) return;
         unset(self::$metaCache[$nameSpace]);
         $this->saveMetaFileData(
             $ajxpNode,
             $scope,
-            ($private?$this->getUserId():AJXP_METADATA_SHAREDUSER)
+            ($private?$this->getUserId($ajxpNode):AJXP_METADATA_SHAREDUSER)
         );
     }
 
@@ -103,7 +108,7 @@ class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider
         $this->loadMetaFileData(
             $ajxpNode,
             $scope,
-            ($private?$this->getUserId():AJXP_METADATA_SHAREDUSER)
+            ($private?$this->getUserId($ajxpNode):AJXP_METADATA_SHAREDUSER)
         );
         if(!isSet(self::$metaCache[$nameSpace])) return array();
         else return self::$metaCache[$nameSpace];
@@ -121,11 +126,11 @@ class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider
         $all = array();
         $this->loadMetaFileData($ajxpNode, AJXP_METADATA_SCOPE_GLOBAL, AJXP_METADATA_SHAREDUSER);
         $all[] = self::$metaCache;
-        $this->loadMetaFileData($ajxpNode, AJXP_METADATA_SCOPE_GLOBAL, $this->getUserId());
+        $this->loadMetaFileData($ajxpNode, AJXP_METADATA_SCOPE_GLOBAL, $this->getUserId($ajxpNode));
         $all[] = self::$metaCache;
         $this->loadMetaFileData($ajxpNode, AJXP_METADATA_SCOPE_REPOSITORY, AJXP_METADATA_SHAREDUSER);
         $all[] = self::$metaCache;
-        $this->loadMetaFileData($ajxpNode, AJXP_METADATA_SCOPE_REPOSITORY, $this->getUserId());
+        $this->loadMetaFileData($ajxpNode, AJXP_METADATA_SCOPE_REPOSITORY, $this->getUserId($ajxpNode));
         $all[] = self::$metaCache;
         $allMeta = array();
         foreach ($all as $metadata) {

@@ -62,8 +62,13 @@ class s3MetaStore extends AJXP_Plugin implements MetaStoreProvider
         return true;
     }
 
-    protected function getUserId()
+    /**
+     * @param AJXP_Node $node
+     * @return string
+     */
+    protected function getUserId($node)
     {
+        if($node->hasUser()) return $node->getUser();
         if(AuthService::usersEnabled()) return AuthService::getLoggedUser()->getId();
         return "shared";
     }
@@ -80,7 +85,7 @@ class s3MetaStore extends AJXP_Plugin implements MetaStoreProvider
     {
         $aws = $this->getAwsService();
         if($aws == null) return;
-        $user = ($private?$this->getUserId():AJXP_METADATA_SHAREDUSER);
+        $user = ($private?$this->getUserId($ajxpNode):AJXP_METADATA_SHAREDUSER);
         $pathName = ltrim($ajxpNode->getPath(), "/");
         $response = $aws->copy_object(
             array('bucket' => $this->bucketName, 'filename' => $pathName),
@@ -97,7 +102,7 @@ class s3MetaStore extends AJXP_Plugin implements MetaStoreProvider
     {
         $aws = $this->getAwsService();
         if($aws == null) return;
-        $user = ($private?$this->getUserId():AJXP_METADATA_SHAREDUSER);
+        $user = ($private?$this->getUserId($ajxpNode):AJXP_METADATA_SHAREDUSER);
         $aws->update_object(
             $this->bucketName,
             ltrim($ajxpNode->getPath(), "/"),
@@ -109,7 +114,7 @@ class s3MetaStore extends AJXP_Plugin implements MetaStoreProvider
     {
         $aws = $this->getAwsService();
         if($aws == null) return;
-        $user = ($private?$this->getUserId():AJXP_METADATA_SHAREDUSER);
+        $user = ($private?$this->getUserId($ajxpNode):AJXP_METADATA_SHAREDUSER);
 
         if (isSet(self::$metaCache[$ajxpNode->getPath()])) {
             $data = self::$metaCache[$ajxpNode->getPath()];
