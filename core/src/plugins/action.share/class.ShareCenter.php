@@ -1209,7 +1209,9 @@ class ShareCenter extends AJXP_Plugin
         }
 
         foreach ($users as $userId => $userObject) {
-            if($userObject->getId() == $loggedUser->getId()) continue;
+            if($userObject->getId() == $loggedUser->getId() && !$loggedUser->isAdmin()) {
+                continue;
+            }
             $ri = $userObject->personalRole->getAcl($repoId);
             $uLabel = $userObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
             if(empty($uLabel)) $uLabel = $userId;
