@@ -314,8 +314,6 @@ class ShareCenter extends AJXP_Plugin
                     $t = "minisite";
                     if(isSet($httpVars["element_type"]) && $httpVars["element_type"] == "file") $t = "file";
                     $parsedMeta = array($httpVars["hash"] => array("type" => $t));
-                }else if(isSet($httpVars["shared_repository_id"])){
-                    $parsedMeta = array($httpVars["shared_repository_id"] => array("type" => "repository"));
                 }else{
                     $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                     $node = new AJXP_Node($this->urlBase.$file);
@@ -343,16 +341,12 @@ class ShareCenter extends AJXP_Plugin
                 if(isSet($httpVars["hash"])){
                     $mess = ConfService::getMessages();
                     $userId = AuthService::getLoggedUser()->getId();
-                    $this->getShareStore()->deleteShare($httpVars["element_type"], $httpVars["hash"], $userId);
-
-                }else if(iSset($httpVars["shared_repository_id"])){
-
-                    $userId = AuthService::getLoggedUser()->getId();
-                    $repo = ConfService::getRepositoryById($httpVars["shared_repository_id"]);
-                    if(AuthService::getLoggedUser()->isAdmin() && !empty($repo)){
-                        $userId = $repo->getOwner();
+                    $res = $this->getShareStore()->deleteShare($httpVars["element_type"], $httpVars["hash"], $userId);
+                    if($res !== false){
+                        AJXP_XMLWriter::header();
+                        AJXP_XMLWriter::sendMessage("Successfully unshared element", null);
+                        AJXP_XMLWriter::close();
                     }
-                    $this->getShareStore()->deleteShare("repository", $httpVars["shared_repository_id"], $userId);
 
                 }else{
 

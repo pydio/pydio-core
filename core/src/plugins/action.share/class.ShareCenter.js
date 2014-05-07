@@ -23,10 +23,12 @@ Class.create("ShareCenter", {
     shareFolderMode : "workspace",
     readonlyMode : false,
     _currentFolderWatchValue:false,
+    _dataModel:null,
 
     performShareAction : function(dataModel){
         var userSelection;
         if(dataModel){
+            this._dataModel = dataModel;
             userSelection = dataModel;
         }else{
             userSelection =  ajaxplorer.getUserSelection();
@@ -705,6 +707,11 @@ Class.create("ShareCenter", {
         conn.addParameter("get_action", "unshare");
         this._prepareShareActionParameters(this.currentNode, conn);
         conn.onComplete = function(){
+            if(this._dataModel){
+                hideLightBox(true);
+                this._dataModel.requireContextChange(this.currentNode, true);
+                return;
+            }
             if(removeRow){
                 new Effect.Fade(removeRow, {duration: 0.3});
             }else{

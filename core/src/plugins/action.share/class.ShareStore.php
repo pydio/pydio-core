@@ -233,17 +233,30 @@ class ShareStore {
 
         if ($type == "repository") {
             $repo = ConfService::getRepositoryById($element);
-            if($repo == null) return;
+            if($repo == null) {
+                // Maybe a share has
+                $share = $this->loadShare($element);
+                if(is_array($share) && isSet($share["REPOSITORY"])){
+                    $repo = ConfService::getRepositoryById($share["REPOSITORY"]);
+                }
+                if($repo == null){
+                    throw new Exception("Cannot find associated share");
+                }
+            }
             $this->testUserCanEditShare($repo->getOwner());
             $res = ConfService::deleteRepository($element);
             if ($res == -1) {
                 throw new Exception($mess["ajxp_conf.51"]);
             }
             if($this->sqlSupported){
-                $shares = self::findSharesForRepo($element);
-                if(count($shares)){
-                    $keys = array_keys($shares);
-                    $this->confStorage->simpleStoreClear("share", $keys[0]);
+                if(isSet($share)){
+                    $this->confStorage->simpleStoreClear("share", $element);
+                }else{
+                    $shares = self::findSharesForRepo($element);
+                    if(count($shares)){
+                        $keys = array_keys($shares);
+                        $this->confStorage->simpleStoreClear("share", $keys[0]);
+                    }
                 }
             }
         } else if ($type == "minisite") {
