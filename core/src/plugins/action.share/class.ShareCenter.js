@@ -24,7 +24,7 @@ Class.create("ShareCenter", {
     readonlyMode : false,
     _currentFolderWatchValue:false,
 
-    performShareAction : function(dataModel, readOnlyMode){
+    performShareAction : function(dataModel){
         var userSelection;
         if(dataModel){
             userSelection = dataModel;
@@ -33,9 +33,14 @@ Class.create("ShareCenter", {
         }
         this.currentNode = userSelection.getUniqueNode();
         this.shareFolderMode = "workspace";
-        if(readOnlyMode) this.readonlyMode = true;
+        if(this.currentNode.getMetadata().get('share_data')) {
+            this.readonlyMode = true;
+        }else{
+            this.readonlyMode = false;
+        }
         if(( userSelection.hasDir() && !userSelection.hasMime($A(['ajxp_browsable_archive'])))
-            || userSelection.isMultiple() || this.currentNode.getMetadata().get('share_data')){
+            || userSelection.isMultiple()
+            || (this.currentNode.getMetadata().get('share_data') && !this.currentNode.getMetadata().get('share_link'))){
             var nodeMeta = this.currentNode.getMetadata();
             if(!nodeMeta.get("ajxp_shared")){
                 var oThis = this;
@@ -226,7 +231,12 @@ Class.create("ShareCenter", {
                 oForm.down(".editable_users_list").setStyle({height: ''});
             }
 
-
+            if(this.shareFolderMode == "minisite_public" && this.currentNode.isLeaf()
+                && !(this.currentNode.getMetadata().get("share_data") && this.currentNode.getMetadata().get("share_type") == "minisite")  ){
+                    oForm.down('#simple_right_write').checked = false;
+                    oForm.down('#simple_right_write').hide();
+                    oForm.down('label[for="simple_right_write"]').hide();
+            }
 
             var nodeMeta = this.currentNode.getMetadata();
             if(nodeMeta.get("ajxp_shared")){
@@ -235,7 +245,7 @@ Class.create("ShareCenter", {
             }
             
             this.createQRCode = ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("CREATE_QRCODE");
-            var disableAutocompleter = (nodeMeta.get("ajxp_shared") && this.shareFolderMode != "workspace");
+            var disableAutocompleter = (nodeMeta.get("ajxp_shared") && ( this.shareFolderMode != "workspace" || this.readonlyMode ));
             var updateUserEntryAfterCreate = function(li, assignedRights, watchValue){
                 if(assignedRights == undefined) assignedRights = "r";
                 var id = Math.random();
@@ -253,6 +263,7 @@ Class.create("ShareCenter", {
                 });
                 if(disableAutocompleter){
                     li.select('input[type="checkbox"]').invoke("disable");
+                    li.down('span.delete_user_entry').stopObserving("click");
                 }
             };
             oForm.down('#repo_label').setValue(getBaseName(this.currentNode.getPath()));
@@ -269,6 +280,9 @@ Class.create("ShareCenter", {
                         minChars:parseInt(ajaxplorer.getPluginConfigs("conf").get("USERS_LIST_COMPLETE_MIN_CHARS"))
                     }
                 );
+            }
+            if(this.readonlyMode){
+                $("shared_user").disabled = true;
             }
             this._currentRepositoryId = null;
             this._currentRepositoryLink = null;
@@ -318,11 +332,11 @@ Class.create("ShareCenter", {
                     }
 
                     if(this.shareFolderMode != "workspace"){
-                        this.updateDialogButtons(oForm.down('#share_result').down("div.SF_horizontal_fieldsRow"), "folder");
+                        this.updateDialogButtons(oForm.down('#share_result').down("div.SF_horizontal_fieldsRow"), "folder", json);
                     }else{
                         var El = new Element('div', {className:"SF_horizontal_fieldsRow"}).update('<div class="SF_horizontal_actions SF_horizontal_pastilles" style="padding-top: 12px;padding-left: 7px;"></div>');
                         $("share_folder_form").next("div.dialogButtons").insert({top:El});
-                        this.updateDialogButtons(El, "folder");
+                        this.updateDialogButtons(El, "folder", json);
                     }
                     oForm.select('span.simple_tooltip_observer').each(function(e){
                         modal.simpleTooltip(e, e.readAttribute('data-tooltipTitle'), 'top center', 'down_arrow_tip', 'element');
@@ -385,7 +399,7 @@ Class.create("ShareCenter", {
             modal.showDialogForm('Get',
                 'share_folder_form',
                 loadFunc,
-                (this.shareFolderMode != "workspace" ? function(){hideLightBox();} : submitFunc),
+                (this.shareFolderMode != "workspace" || this.readonlyMode ? function(){hideLightBox();} : submitFunc),
                 closeFunc,
                 (this.shareFolderMode != "workspace" || this.readonlyMode ? true: false),
                 (this.shareFolderMode != "workspace" && !this.currentNode.getMetadata().get("ajxp_shared") ? true: false)
@@ -550,31 +564,6 @@ Class.create("ShareCenter", {
 
     },
 
-    loadSharedElementData : function(uniqueNode, jsonCallback, discrete){
-        var conn = new Connexion();
-        if(discrete){
-            conn.discrete = true;
-        }
-        conn.addParameter("get_action", "load_shared_element_data");
-        var meta = uniqueNode.getMetadata();
-        if(meta.get('shared_element_hash')){
-            conn.addParameter("hash", meta.get('shared_element_hash'));
-            conn.addParameter("tmp_repository_id", meta.get('shared_element_parent_repository'));
-            conn.addParameter("element_type", meta.get('shared_element_type'));
-        }else if(meta.get('shared_element_repository_id')){
-            conn.addParameter("shared_repository_id", meta.get('shared_element_repository_id'));
-            conn.addParameter("element_type", "repository");
-            conn.addParameter("tmp_repository_id", meta.get('shared_element_parent_repository'));
-        }else{
-            conn.addParameter("file", uniqueNode.getPath());
-            conn.addParameter("element_type", uniqueNode.isLeaf() ? "file" : "repository");
-        }
-        conn.onComplete = function(transport){
-            jsonCallback(transport.responseJSON);
-        };
-        conn.sendAsync();
-    },
-
     loadInfoPanel : function(container, node){
         container.down('#ajxp_shared_info_panel table').update('<tr>\
             <td class="infoPanelLabel">'+MessageHash['share_center.55']+'</td>\
@@ -682,14 +671,39 @@ Class.create("ShareCenter", {
         }, true);
     },
 
+    _prepareShareActionParameters: function(uniqueNode, conn){
+        var meta = uniqueNode.getMetadata();
+        if(meta.get('shared_element_hash')){
+            conn.addParameter("hash", meta.get('shared_element_hash'));
+            conn.addParameter("tmp_repository_id", meta.get('shared_element_parent_repository'));
+            conn.addParameter("element_type", meta.get('share_type'));
+        }else{
+            conn.addParameter("file", uniqueNode.getPath());
+            conn.addParameter("element_type", uniqueNode.isLeaf() ? "file" : meta.get("ajxp_shared_minisite")? "minisite" : "repository");
+        }
+    },
+
+    loadSharedElementData : function(uniqueNode, jsonCallback, discrete){
+        var conn = new Connexion();
+        if(discrete){
+            conn.discrete = true;
+        }
+        conn.addParameter("get_action", "load_shared_element_data");
+        this._prepareShareActionParameters(uniqueNode, conn);
+        conn.onComplete = function(transport){
+            jsonCallback(transport.responseJSON);
+        };
+        conn.sendAsync();
+    },
+
+
     performUnshareAction : function(elementId, removeRow){
         var conn = new Connexion();
         if(elementId){
             conn.addParameter("element_id", elementId);
         }
         conn.addParameter("get_action", "unshare");
-        conn.addParameter("file", this.currentNode.getPath());
-        conn.addParameter("element_type", this.currentNode.isLeaf()?"file":"repository");
+        this._prepareShareActionParameters(this.currentNode, conn);
         conn.onComplete = function(){
             if(removeRow){
                 new Effect.Fade(removeRow, {duration: 0.3});
@@ -916,6 +930,32 @@ Class.create("ShareCenter", {
 
             }.bind(this));
         }
+
+        // DOWNLOAD COUNTER BUTTON
+        if(jsonData && jsonData["download_limit"]){
+
+            var dlC = new Element('span', {className:'icon-download-alt simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.89"]}).update(' '+MessageHash["share_center.88"]+' '+jsonData['download_counter']+'/'+jsonData['download_limit']);
+            dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:dlC});
+            dlC.observe("click", function(){
+                if(window.confirm(MessageHash['share_center.106'])){
+                    var conn = new Connexion();
+                    conn.addParameter("get_action", "reset_counter");
+                    this._prepareShareActionParameters(this.currentNode, conn);
+                    if(jsonData["element_id"]) conn.addParameter("element_id", jsonData["element_id"]);
+                    conn.onComplete =  function(transport){
+                        dlC.update(' '+MessageHash["share_center.88"]+' 0/'+jsonData['download_limit']);
+                    };
+                    conn.sendAsync();
+                }
+            }.bind(this));
+
+        }
+
+        // EXPIRATION TIME
+        if(jsonData && jsonData["expire_time"]){
+            dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:new Element('span', {className:'icon-calendar simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.87"]}).update(' '+jsonData["expire_time"])});
+        }
+
 
         // STOP SHARING BUTTON
         if(shareType == 'folder'){

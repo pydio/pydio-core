@@ -130,7 +130,8 @@ $mess = array(
     "122" => "Download page w/ embedded preview",
     "123" => "Selection as minisite",
     "124" => "Publish current selection",
-    "125" => "Edit sharing",
+    "125" => "Edit Share",
     "126" => "Edit/stop already configured sharing",
-
+    "127" => "Migrate legacy shares",
+    "128" => "Migrate legacy shares",
 );

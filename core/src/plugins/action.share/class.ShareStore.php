@@ -61,12 +61,14 @@ class ShareStore {
     }
 
     /**
+     * @param String $parentRepositoryId
      * @param Array $shareData
      * @param string $type
+     * @param String $existingHash
      * @return string $hash
      * @throws Exception
      */
-    public function storeShare($shareData, $type="minisite", $existingHash = null){
+    public function storeShare($parentRepositoryId, $shareData, $type="minisite", $existingHash = null){
 
         $data = serialize($shareData);
         if($existingHash){
@@ -77,7 +79,7 @@ class ShareStore {
         if($this->sqlSupported){
             $this->createGenericLoader();
             $shareData["SHARE_TYPE"] = $type;
-            $this->confStorage->simpleStoreSet("share", $hash, $shareData, "serial");
+            $this->confStorage->simpleStoreSet("share", $hash, $shareData, "serial", $parentRepositoryId);
             return $hash;
         }
 
@@ -148,10 +150,26 @@ class ShareStore {
         return $this->confStorage->simpleStoreList("share", null, "", "serial", '%"REPOSITORY";s:32:"'.$repositoryId.'"%');
     }
 
-    public function listShares($limitToUser = '', $cursor = null){
+    protected function updateShareType(&$shareData){
+        if ( isSet($shareData["SHARE_TYPE"]) && $shareData["SHARE_TYPE"] == "publiclet" ) {
+            $shareData["SHARE_TYPE"] = "file";
+        } else if ( isset($shareData["REPOSITORY"]) && is_a($shareData["REPOSITORY"], "Repository") ){
+            $shareData["SHARE_TYPE"] = "file";
+        } else if ( isSet($shareData["PUBLICLET_PATH"]) ){
+            $shareData["SHARE_TYPE"] = "minisite";
+        }
+    }
+
+    public function listShares($limitToUser = '', $parentRepository = '', $cursor = null, $shareType = null){
 
         // Get DB files
-        $dbLets = $this->confStorage->simpleStoreList("share", $cursor, "", "serial", (!empty($limitToUser)?'%"OWNER_ID";s:'.strlen($limitToUser).':"'.$limitToUser.'"%':''));
+        $dbLets = $this->confStorage->simpleStoreList(
+            "share",
+            $cursor,
+            "",
+            "serial",
+            (!empty($limitToUser)?'%"OWNER_ID";s:'.strlen($limitToUser).':"'.$limitToUser.'"%':''),
+            $parentRepository);
 
         // Get hardcoded files
         $files = glob(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/*.php");
@@ -165,10 +183,40 @@ class ShareStore {
             if ($limitToUser && ( !isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $limitToUser )) {
                 continue;
             }
+            $publicletData["SHARE_TYPE"] = "file";
             $dbLets[$id] = $publicletData;
         }
 
+        // Update share_type and filter if necessary
+        foreach($dbLets as $id => &$shareData){
+            if($shareData === false){
+                unset($dbLets[$id]);
+                continue;
+            }
+            $this->updateShareType($shareData);
+            if(!empty($shareType) && $shareData["SHARE_TYPE"] != $shareType){
+                unset($dbLets[$id]);
+            }
+        }
+
         return $dbLets;
+    }
+
+    protected function testUserCanEditShare($userId){
+
+        if(empty($userId)){
+            $mess = ConfService::getMessages();
+            throw new Exception($mess["ajxp_shared.12"]);
+        }
+        $crtUser = AuthService::getLoggedUser();
+        if($crtUser->getId() == $userId) return true;
+        if($crtUser->isAdmin()) return true;
+        $user = ConfService::getConfStorageImpl()->createUserObject($userId);
+        if($user->hasParent() && $user->getParent() == $userId){
+            return true;
+        }
+        $mess = ConfService::getMessages();
+        throw new Exception($mess["ajxp_shared.12"]);
     }
 
     /**
@@ -182,15 +230,20 @@ class ShareStore {
     {
         $mess = ConfService::getMessages();
         AJXP_Logger::debug(__CLASS__, __FILE__, "Deleting shared element ".$type."-".$element);
+
         if ($type == "repository") {
             $repo = ConfService::getRepositoryById($element);
             if($repo == null) return;
-            if (!$repo->hasOwner() || $repo->getOwner() != $ownerId) {
-                throw new Exception($mess["ajxp_shared.12"]);
-            } else {
-                $res = ConfService::deleteRepository($element);
-                if ($res == -1) {
-                    throw new Exception($mess["ajxp_conf.51"]);
+            $this->testUserCanEditShare($repo->getOwner());
+            $res = ConfService::deleteRepository($element);
+            if ($res == -1) {
+                throw new Exception($mess["ajxp_conf.51"]);
+            }
+            if($this->sqlSupported){
+                $shares = self::findSharesForRepo($element);
+                if(count($shares)){
+                    $keys = array_keys($shares);
+                    $this->confStorage->simpleStoreClear("share", $keys[0]);
                 }
             }
         } else if ($type == "minisite") {
@@ -200,40 +253,32 @@ class ShareStore {
             if ($repo == null) {
                 return false;
             }
-            if (!$repo->hasOwner() || $repo->getOwner() != $ownerId) {
-                throw new Exception($mess["ajxp_shared.12"]);
-            } else {
-                $res = ConfService::deleteRepository($repoId);
-                if ($res == -1) {
-                    throw new Exception($mess["ajxp_conf.51"]);
-                }
-                // Silently delete corresponding role if it exists
-                AuthService::deleteRole("AJXP_SHARED-".$repoId);
-                // If guest user created, remove it now.
-                if (isSet($minisiteData["PRELOG_USER"]) && AuthService::userExists($minisiteData["PRELOG_USER"])) {
-                    AuthService::deleteUser($minisiteData["PRELOG_USER"]);
-                }
-                // If guest user created, remove it now.
-                if (isSet($minisiteData["PRESET_LOGIN"]) && AuthService::userExists($minisiteData["PRESET_LOGIN"])) {
-                    AuthService::deleteUser($minisiteData["PRESET_LOGIN"]);
-                }
-                if(isSet($minisiteData["PUBLICLET_PATH"]) && is_file($minisiteData["PUBLICLET_PATH"])){
-                    unlink($minisiteData["PUBLICLET_PATH"]);
-                }else if($this->sqlSupported){
-                    $this->confStorage->simpleStoreClear("share", $element);
-                }
+            $this->testUserCanEditShare($repo->getOwner());
+            $res = ConfService::deleteRepository($repoId);
+            if ($res == -1) {
+                throw new Exception($mess["ajxp_conf.51"]);
+            }
+            // Silently delete corresponding role if it exists
+            AuthService::deleteRole("AJXP_SHARED-".$repoId);
+            // If guest user created, remove it now.
+            if (isSet($minisiteData["PRELOG_USER"]) && AuthService::userExists($minisiteData["PRELOG_USER"])) {
+                AuthService::deleteUser($minisiteData["PRELOG_USER"]);
+            }
+            // If guest user created, remove it now.
+            if (isSet($minisiteData["PRESET_LOGIN"]) && AuthService::userExists($minisiteData["PRESET_LOGIN"])) {
+                AuthService::deleteUser($minisiteData["PRESET_LOGIN"]);
+            }
+            if(isSet($minisiteData["PUBLICLET_PATH"]) && is_file($minisiteData["PUBLICLET_PATH"])){
+                unlink($minisiteData["PUBLICLET_PATH"]);
+            }else if($this->sqlSupported){
+                $this->confStorage->simpleStoreClear("share", $element);
             }
         } else if ($type == "user") {
-            $confDriver = ConfService::getConfStorageImpl();
-            $object = $confDriver->createUserObject($element);
-            if (!$object->hasParent() || $object->getParent() != $ownerId) {
-                throw new Exception($mess["ajxp_shared.12"]);
-            } else {
-                AuthService::deleteUser($element);
-            }
+            $this->testUserCanEditShare($element);
+            AuthService::deleteUser($element);
         } else if ($type == "file") {
             $publicletData = $this->loadShare($element);
-            if (isSet($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] == $ownerId) {
+            if (isSet($publicletData["OWNER_ID"]) && $this->testUserCanEditShare($publicletData["OWNER_ID"])) {
                 PublicletCounter::delete($element);
                 if(isSet($minisiteData["PUBLICLET_PATH"]) && is_file($minisiteData["PUBLICLET_PATH"])){
                     unlink($minisiteData["PUBLICLET_PATH"]);
@@ -296,7 +341,9 @@ class ShareStore {
         PublicletCounter::increment($hash);
     }
 
-    public function resetDownloadCounter($hash){
+    public function resetDownloadCounter($hash, $userId){
+        $data = $this->loadShare($hash);
+        // TODO We must check that the user has the right to do that!
         PublicletCounter::reset($hash);
     }
 

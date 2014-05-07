@@ -285,7 +285,7 @@
                     <clientCallback prepareModal="true"><![CDATA[
                         if(!ajaxplorer.actionBar.shareCenter) ajaxplorer.actionBar.shareCenter = new ShareCenter();
                         if(window.actionManager){
-                            ajaxplorer.actionBar.shareCenter.performShareAction(window.actionManager.getDataModel(), true);
+                            ajaxplorer.actionBar.shareCenter.performShareAction(window.actionManager.getDataModel());
                         }else{
                             ajaxplorer.actionBar.shareCenter.performShareAction();
                         }
@@ -412,6 +412,46 @@
             <action name="forward_change_event">
                 <processing>
                     <serverCallback methodName="forwardEventToSharesAction"/>
+                </processing>
+            </action>
+            <action name="sharelist-refresh">
+                <gui src="share.png" iconClass="icon-refresh" text="149" title="149">
+                    <context dir="true" recycle="false" selection="false" actionBar="true" actionBarGroup="repo_editor_shares" behaviour="hidden"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                        if(window.actionManager){
+                            window.actionManager.getDataModel().requireContextChange(window.actionManager.getDataModel().getRootNode(), true);
+                        }
+                    ]]></clientCallback>
+                </processing>
+            </action>
+            <action name="sharelist-edit">
+                <gui src="share.png" iconClass="icon-share" text="share_center.125" title="share_center.126">
+                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="repo_editor_shares" behaviour="hidden"/>
+                    <selectionContext dir="true" file="true" evalMetadata="metadata.get('ajxp_shared')" recycle="false" unique="true" behaviour="hidden"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                        if(!ajaxplorer.actionBar.shareCenter) ajaxplorer.actionBar.shareCenter = new ShareCenter();
+                        if(window.actionManager){
+                            ajaxplorer.actionBar.shareCenter.performShareAction(window.actionManager.getDataModel());
+                        }else{
+                            ajaxplorer.actionBar.shareCenter.performShareAction();
+                        }
+                    ]]></clientCallback>
+                </processing>
+            </action>
+            <action name="sharelist-migrate">
+                <gui src="share.png" iconClass="icon-sort-by-attributes-alt" text="share_center.127" title="share_center.128">
+                    <context dir="false" recycle="false" selection="false" actionBar="true" actionBarGroup="repo_editor_shares" behaviour="hidden"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                        if(window.actionManager){
+                            var id = window.actionManager.getDataModel().getRootNode().getPath();
+                        }
+                    ]]></clientCallback>
                 </processing>
             </action>
             <action name="share_current_page">

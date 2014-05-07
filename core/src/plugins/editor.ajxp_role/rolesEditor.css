@@ -377,6 +377,16 @@ div.documentation{
     padding-top: 6px;
 }
 
+#shares-toolbar a {
+    display: inline-block;
+    margin-left: 15px;
+}
+
+#shares-toolbar a span.ajxp_icon_span{
+    display: inline-block;
+    margin-right: 5px;
+}
+
 #shares-toolbar{
     padding: 10px 0 0 24px;
 }
