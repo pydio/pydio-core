@@ -473,7 +473,11 @@ class ShareCenter extends AJXP_Plugin
             // Backward compat, until we rework client-side
             $sKeys = array_keys($shares);
             if($shares[$sKeys[0]]["type"] == "minisite"){
-                $merge["ajxp_shared_minisite"] = "public";
+                if($ajxpNode->isLeaf()){
+                    $merge["ajxp_shared_minisite"] = "file";
+                }else{
+                    $merge["ajxp_shared_minisite"] = "public";
+                }
             }
             $ajxpNode->mergeMetadata($merge, true);
         }
@@ -1725,7 +1729,13 @@ class ShareCenter extends AJXP_Plugin
                 $meta["owner"] = $repoObject->getOwner();
                 $meta["shared_element_parent_repository"] = $repoObject->getParentId();
                 if($shareType != "repository"){
-                    $meta["ajxp_shared_minisite"] = "public";
+                    if($repoObject->hasContentFilter()){
+                        $meta["ajxp_shared_minisite"] = "file";
+                        $meta["icon"] = "mime_empty.png";
+                    }else{
+                        $meta["ajxp_shared_minisite"] = "public";
+                        $meta["icon"] = "folder.png";
+                    }
                     $meta["icon"] = $repoObject->hasContentFilter() ? "mime_empty.png" : "folder.png";
                 }
 

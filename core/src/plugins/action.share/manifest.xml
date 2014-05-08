@@ -163,8 +163,8 @@
                                 <div class="dialogLegend" style="margin:0 5px;" ajxp_message_id="share_center.36">AJXP_MESSAGE[share_center.36]</div>
                             </div>
                             <div class="mode-minipub mode-minipriv">
-                                <div class="dialogContentMainTitle" ajxp_message_id="share_center.69">AJXP_MESSAGE[share_center.69]</div>
-                                <div class="dialogLegend" style="margin:0 5px;" ajxp_message_id="share_center.70">AJXP_MESSAGE[share_center.70]</div>
+                                <div class="dialogContentMainTitle" id="minisite_dialogMainTitle" ajxp_message_id="share_center.69">AJXP_MESSAGE[share_center.69]</div>
+                                <div class="dialogLegend" style="margin:0 5px;"  id="minisite_dialogLegend" ajxp_message_id="share_center.70">AJXP_MESSAGE[share_center.70]</div>
                             </div>
                             <div id="target_repository">
                                 <div class="SF_horizontal_fieldsRow" style="margin:0 5px;min-height: 20px;">

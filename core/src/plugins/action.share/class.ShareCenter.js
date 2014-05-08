@@ -61,7 +61,7 @@ Class.create("ShareCenter", {
                 }.bind(this), function(){}, false,false, true);
             }else{
                 if(nodeMeta.get("ajxp_shared_minisite")){
-                    this.shareFolderMode = nodeMeta.get("ajxp_shared_minisite") == "public" ? "minisite_public" : "minisite_private";
+                    this.shareFolderMode = nodeMeta.get("ajxp_shared_minisite") == "private" ? "minisite_private" : "minisite_public";
                 }
                 this.shareRepository();
             }
@@ -234,7 +234,7 @@ Class.create("ShareCenter", {
             }
 
             if(this.shareFolderMode == "minisite_public" && this.currentNode.isLeaf()
-                && !(this.currentNode.getMetadata().get("share_data") && this.currentNode.getMetadata().get("share_type") == "minisite")  ){
+                && this.currentNode.getMetadata().get("ajxp_shared_minisite") != "public"){
                     oForm.down('#simple_right_write').checked = false;
                     oForm.down('#simple_right_write').hide();
                     oForm.down('label[for="simple_right_write"]').hide();
@@ -285,6 +285,11 @@ Class.create("ShareCenter", {
             }
             if(this.readonlyMode){
                 $("shared_user").disabled = true;
+                oForm.down("#minisite_dialogMainTitle").update(MessageHash["share_center.69r"]);
+                oForm.down("#minisite_dialogLegend").update(MessageHash["share_center.70r"]);
+            }else{
+                oForm.down("#minisite_dialogMainTitle").update(MessageHash["share_center.69"]);
+                oForm.down("#minisite_dialogLegend").update(MessageHash["share_center.70"]);
             }
             this._currentRepositoryId = null;
             this._currentRepositoryLink = null;
