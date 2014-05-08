@@ -809,7 +809,7 @@ class ShareCenter extends AJXP_Plugin
         $data["FINAL_KEY"] = md5(mt_rand().time());
 
         try{
-            $hash = $this->getShareStore()->storeShare($repository->getUniqueId(), $data, "publiclet");
+            $hash = $this->getShareStore()->storeShare($repository->getId(), $data, "publiclet");
         }catch(Exception $e){
             return $e->getMessage();
         }
@@ -1329,7 +1329,7 @@ class ShareCenter extends AJXP_Plugin
         }
 
         try{
-            $hash = $this->getShareStore()->storeShare($repository->getUniqueId(), $data);
+            $hash = $this->getShareStore()->storeShare($repository->getId(), $data);
         }catch(Exception $e){
             return $e->getMessage();
         }
@@ -1511,7 +1511,7 @@ class ShareCenter extends AJXP_Plugin
             }
             ConfService::addRepository($newRepo);
             if(!isSet($httpVars["minisite"])){
-                $this->getShareStore()->storeShare($repository->getUniqueId(), array(
+                $this->getShareStore()->storeShare($repository->getId(), array(
                     "REPOSITORY" => $newRepo->getUniqueId(),
                     "OWNER_ID" => $loggedUser->getId()), "repository");
             }

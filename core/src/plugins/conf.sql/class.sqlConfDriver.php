@@ -693,7 +693,7 @@ class sqlConfDriver extends AbstractConfDriver
             "store_id" => $storeID,
             "object_id" => $dataID
         );
-        if ($relatedObjectId != null) {
+        if ($relatedObjectId !== null) {
             $values["related_object_id"] = $relatedObjectId;
         }
         if ($dataType == "serial") {
@@ -740,7 +740,7 @@ class sqlConfDriver extends AbstractConfDriver
         if(!empty($serialDataLike)){
             $wheres[] = array('[serialized_data] LIKE %s', $serialDataLike);
         }
-        if(!empty($relatedObjectId)){
+        if($relatedObjectId != ""){
             $wheres[] = array('[related_object_id] = %s', $relatedObjectId);
         }
         $limit = '';
