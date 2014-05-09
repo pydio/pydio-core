@@ -118,8 +118,19 @@ class AuthService
     public static function preLogUser($remoteSessionId = "")
     {
         if(self::getLoggedUser() != null) return ;
+
+        $frontends = AJXP_PluginsService::getInstance()->getPluginsByType("authfront");
+        $index = 0;
+        foreach($frontends as $frontendPlugin){
+            if(!$frontendPlugin->isEnabled()) continue;
+            $res = $frontendPlugin->tryToLogUser(($index == count($frontends)-1));
+            $index ++;
+            if($res) break;
+        }
+        // Keep old-fashioned test, should be removed
         $authDriver = ConfService::getAuthDriverImpl();
         $authDriver->preLogUser($remoteSessionId);
+
         return ;
     }
     /**

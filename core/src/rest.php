@@ -21,19 +21,19 @@
  * Description : Real RESTful API access
  */
 
-die("This is experimental! You must set an API KEY & SECRET to enable Basic Http Auth");
-
+//die("This is experimental! You must set an API KEY & SECRET to enable Basic Http Auth");
+/*
 define("AJXP_API_LOGIN", "admin");
 define("AJXP_API_PASSWORD", "123456");
 define("AJXP_API_USER", "admin");
 
 if (!isset($_SERVER['PHP_AUTH_USER'])  || $_SERVER["PHP_AUTH_USER"] != AJXP_API_LOGIN || $_SERVER["PHP_AUTH_PW"] != AJXP_API_PASSWORD ) {
-    header('WWW-Authenticate: Basic realm="AjaXplorer API Realm"');
+    header('WWW-Authenticate: Basic realm="Pydio API"');
     header('HTTP/1.0 401 Unauthorized');
     echo 'You are not authorized to access this API.';
     exit;
 }
-
+*/
 include_once("base.conf.php");
 
 set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE & ~E_STRICT );
@@ -49,7 +49,14 @@ require_once($confStorageDriver->getUserClassFileName());
 session_name("AjaXplorer");
 session_start();
 AuthService::$useSession = false;
-AuthService::logUser(AJXP_API_USER, "", true);
+
+//AuthService::logUser(AJXP_API_USER, "", true);
+AuthService::preLogUser();
+if(AuthService::getLoggedUser() == null){
+    header('HTTP/1.0 401 Unauthorized');
+    echo 'You are not authorized to access this API.';
+    exit;
+}
 $authDriver = ConfService::getAuthDriverImpl();
 
 
