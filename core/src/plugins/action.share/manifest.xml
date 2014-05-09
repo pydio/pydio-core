@@ -410,18 +410,6 @@
                     <serverCallback methodName="forwardEventToSharesAction"/>
                 </processing>
             </action>
-            <action name="sharelist-refresh">
-                <gui src="share.png" iconClass="icon-refresh" text="149" title="149">
-                    <context dir="true" recycle="false" selection="false" actionBar="true" actionBarGroup="repo_editor_shares" behaviour="hidden"/>
-                </gui>
-                <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        if(window.actionManager){
-                            window.actionManager.getDataModel().requireContextChange(window.actionManager.getDataModel().getRootNode(), true);
-                        }
-                    ]]></clientCallback>
-                </processing>
-            </action>
             <action name="sharelist-edit">
                 <gui src="share.png" iconClass="icon-share" text="share_center.125" title="share_center.126">
                     <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="repo_editor_shares" behaviour="hidden"/>
@@ -432,6 +420,18 @@
                         if(!ajaxplorer.actionBar.shareCenter) ajaxplorer.actionBar.shareCenter = new ShareCenter();
                         if(window.actionManager){
                             ajaxplorer.actionBar.shareCenter.performShareAction(window.actionManager.getDataModel());
+                        }
+                    ]]></clientCallback>
+                </processing>
+            </action>
+            <action name="sharelist-refresh">
+                <gui src="share.png" iconClass="icon-refresh" text="149" title="149">
+                    <context dir="true" recycle="false" selection="false" actionBar="true" actionBarGroup="repo_editor_shares" behaviour="hidden"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                        if(window.actionManager){
+                            window.actionManager.getDataModel().requireContextChange(window.actionManager.getDataModel().getRootNode(), true);
                         }
                     ]]></clientCallback>
                 </processing>

@@ -28,6 +28,7 @@ class ShareStore {
     var $sqlSupported = false;
     var $downloadFolder;
     var $hashMinLength;
+    public $modifiableShareKeys = array("counter", "tags", "short_form_url");
     /**
      * @var sqlConfDriver
      */
@@ -144,6 +145,22 @@ class ShareStore {
 
         return $publicletData;
 
+    }
+
+    public function shareIsLegacy($hash){
+        $dlFolder = $this->downloadFolder;
+        $file = $dlFolder."/".$hash.".php";
+        return is_file($file);
+    }
+
+    public function updateShareProperty($hash, $pName, $pValue){
+        $relatedObjectId = $this->confStorage->simpleStoreGet("share", $hash, "serial", $data);
+        if(is_array($data)){
+            $data[$pName] = $pValue;
+            $this->confStorage->simpleStoreSet("share", $hash, $data, "serial", $relatedObjectId);
+            return true;
+        }
+        return false;
     }
 
     public function findSharesForRepo($repositoryId){
