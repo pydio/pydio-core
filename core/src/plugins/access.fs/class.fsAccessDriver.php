@@ -787,6 +787,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if(!$selection->isEmpty()){
                     $uniqueNodes = $selection->buildNodes($this->repository->driverInstance);
                     $parentAjxpNode = new AJXP_Node($this->urlBase."/", array());
+                    AJXP_Controller::applyHook("node.read", array(&$parentAjxpNode));
                     if (AJXP_XMLWriter::$headerSent == "tree") {
                         AJXP_XMLWriter::renderAjxpNode($parentAjxpNode, false);
                     } else {

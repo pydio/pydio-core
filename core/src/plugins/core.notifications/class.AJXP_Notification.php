@@ -144,7 +144,14 @@ class AJXP_Notification
     public function getMainLink()
     {
         $repoId = $this->getNode()->getRepositoryId();
-        return AJXP_Utils::detectServerURL(true)."/?goto=".$repoId.$this->node->getPath();
+        if(isSet($_SESSION["CURRENT_MINISITE"])){
+            $hash = $_SESSION["CURRENT_MINISITE"];
+            $shareCenter = ShareCenter::getShareCenter();
+            if(!empty($shareCenter)){
+                return $shareCenter->buildPublicletLink($hash);
+            }
+        }
+        return trim(AJXP_Utils::detectServerURL(true), "/")."/?goto=".$repoId.$this->node->getPath();
     }
 
     /**
