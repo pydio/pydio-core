@@ -251,6 +251,7 @@ class ShareCenter extends AJXP_Plugin
                 $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                 $watchValue = $httpVars["set_watch"] == "true" ? true : false;
                 $folder = false;
+                $shNode = new AJXP_Node($this->urlBase.$file);
                 if (isSet($httpVars["element_type"]) && $httpVars["element_type"] == "folder") {
                     $folder = true;
                     $node = new AJXP_Node($this->baseProtocol."://".$httpVars["repository_id"]."/");
@@ -258,7 +259,7 @@ class ShareCenter extends AJXP_Plugin
                     $node = new AJXP_Node($this->urlBase.$file);
                 }
 
-                $this->getSharesFromMeta($node, $shares, false);
+                $this->getSharesFromMeta($shNode, $shares, false);
                 if(!count($shares)){
                     break;
                 }
