@@ -140,7 +140,6 @@ Class.create("RepositoryEditor", AbstractEditor, {
         this.sharesList.reloadDataModel();
         this.sharesPane.resizeOnShow = function(){
             this.sharesList.resize();
-            this.sharesList.reload();
         }.bind(this);
 
         this.manager = new ActionsManager(true, this.sharesList._dataModel);
