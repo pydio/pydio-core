@@ -560,7 +560,7 @@ class ConfService
                 continue;
             }
             $repo->setWriteable(false);
-            $objList[$repo->getId()] = $repo;
+            $objList["".$repo->getId()] = $repo;
         }
         // LOAD FROM DRIVER
         $confDriver = self::getConfStorageImpl();
@@ -590,7 +590,9 @@ class ConfService
                     $drvList[$repoId] = $repoObject;
                 }
             }
-            $objList = array_merge($objList, $drvList);
+            foreach($drvList as $key => $value){
+                $objList[$key] = $value;
+            }
         }
         return $objList;
     }
