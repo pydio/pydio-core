@@ -117,14 +117,12 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         if (isSet($httpVars["repository_id"]) && $u->mergedRole->canRead($httpVars["repository_id"])) {
             $authRepos[] = $httpVars["repository_id"];
         } else {
-            $acls = AuthService::getLoggedUser()->mergedRole->listAcls();
-            foreach ($acls as $repoId => $rightString) {
-                if($rightString == "r" | $rightString == "rw") $authRepos[] = $repoId;
-            }
+            $accessibleRepos = ConfService::getAccessibleRepositories(AuthService::getLoggedUser(), false, true, true);
+            $authRepos = array_keys($accessibleRepos);
         }
         $offset = isSet($httpVars["offset"]) ? intval($httpVars["offset"]): 0;
         $limit = isSet($httpVars["limit"]) ? intval($httpVars["limit"]): 15;
-        $res = $this->eventStore->loadEvents($authRepos, $userId, $userGroup, $offset, $limit, (isSet($httpVars["repository_id"])?false:true));
+        $res = $this->eventStore->loadEvents($authRepos, $userId, $userGroup, $offset, $limit, /*(isSet($httpVars["repository_id"])?false:true)*/false);
         $mess = ConfService::getMessages();
         $format = "html";
         if (isSet($httpVars["format"])) {
