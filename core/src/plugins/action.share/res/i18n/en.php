@@ -134,6 +134,8 @@ $mess = array(
     "124" => "Publish current selection",
     "125" => "Edit Share",
     "126" => "Edit/stop already configured sharing",
-    "127" => "Migrate legacy shares",
+    "127" => "Migrate legacy",
     "128" => "Migrate legacy shares",
+    "129" => "Copy URL",
+    "130" => "Copy URL to your clipboard"
 );

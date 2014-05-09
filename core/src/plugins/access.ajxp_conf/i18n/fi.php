@@ -149,5 +149,6 @@ $mess=array(
 "123" => "Other plugins",
 "124" => "Source",
 "125" => "Alias",
+"126" => "Are you sure that you want to delete the selected element(s)?",
 /* END SENTENCE */
 );

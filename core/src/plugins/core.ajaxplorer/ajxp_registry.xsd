@@ -695,12 +695,12 @@
     </xs:element>
     <xs:element name="input_param">
         <xs:complexType>
-            <xs:attribute name="choices"/>
-            <xs:attribute name="default"/>
-            <xs:attribute name="description" use="required"/>
-            <xs:attribute name="mandatory" type="xs:boolean"/>
             <xs:attribute name="name" use="required" type="xs:all"/>
             <xs:attribute name="type" use="required" type="xs:all"/>
+            <xs:attribute name="description" use="required"/>
+            <xs:attribute name="choices"/>
+            <xs:attribute name="default"/>
+            <xs:attribute name="mandatory" type="xs:boolean"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="output">

@@ -1945,126 +1945,95 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
     public function listRepositories($root, $child, $hashValue = null, $returnNodes = false){
         $REPOS_PER_PAGE = 50;
-        $parts = explode("/", $root);
-        if(count($parts)>1){
-            $root = $parts[0];
-            $parentRepoId = $parts[1];
-        }
         $allNodes = array();
-
         if($hashValue == null) $hashValue = 1;
         $offset = ($hashValue - 1) * $REPOS_PER_PAGE;
 
         $count = null;
-        if(!isSet($parentRepoId)){
-            // Load all repositories = normal, templates, and templates children
-            $repos = ConfService::listRepositoriesWithCriteria(array(
-                    "parent_uuid"   => AJXP_FILTER_EMPTY,
-                    "ORDERBY"       => array("KEY" => "display", "DIR"=>"ASC"),
-                    "CURSOR"        => array("OFFSET" => $offset, "LIMIT" => $REPOS_PER_PAGE)
-                ), $count
-            );
-            if(!$returnNodes){
-                AJXP_XMLWriter::renderPaginationData($count, $hashValue, ceil($count/$REPOS_PER_PAGE));
-                AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.repositories">
-                    <column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/>
-                    <column messageId="ajxp_conf.9" attributeName="accessType" sortType="String"/>
-                    <column messageId="ajxp_conf.125" attributeName="slug" sortType="String"/>
-                    <column messageId="ajxp_conf.106" attributeName="repository_id" sortType="String"/>
-                </columns>');
-            }
-
-            foreach ($repos as $repoIndex => $repoObject) {
-
-                if($repoObject->getAccessType() == "ajxp_conf" || $repoObject->getAccessType() == "ajxp_shared") continue;
-                if (!AuthService::canAdministrate($repoObject))continue;
-                if(is_numeric($repoIndex)) $repoIndex = "".$repoIndex;
-
-                $icon = "hdd_external_unmount.png";
-                $editable = $repoObject->isWriteable();
-                if ($repoObject->isTemplate) {
-                    $icon = "hdd_external_mount.png";
-                    if (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/") {
-                        $editable = false;
-                    }
-                }
-                $meta = array(
-                    "repository_id" => $repoIndex,
-                    "accessType"	=> ($repoObject->isTemplate?"Template for ":"").$repoObject->getAccessType(),
-                    "icon"			=> $icon,
-                    "owner"			=> ($repoObject->hasOwner()?$repoObject->getOwner():""),
-                    "openicon"		=> $icon,
-                    "slug"          => $repoObject->getSlug(),
-                    "parentname"	=> "/repositories",
-                    "ajxp_mime" 	=> "repository".($editable?"_editable":"")
-                );
-
-                $nodeKey = "/data/repositories/$repoIndex";
-                if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-                $xml = AJXP_XMLWriter::renderNode(
-                    $nodeKey,
-                    AJXP_Utils::xmlEntities(SystemTextEncoding::toUTF8($repoObject->getDisplay())),
-                    true,
-                    $meta,
-                    true,
-                    false
-                );
-                if($returnNodes) $allNodes[$nodeKey] = $xml;
-                else print($xml);
-
-                if ($repoObject->isTemplate) {
-                    // Now Load children for template repositories
-                    $children = ConfService::listRepositoriesWithCriteria(array("parent_uuid" => $repoIndex.""), $count);
-                    foreach($children as $childId => $childObject){
-                        if (!AuthService::canAdministrate($childObject))continue;
-                        if(is_numeric($childId)) $childId = "".$childId;
-                        $meta = array(
-                            "repository_id" => $childId,
-                            "accessType"	=> $childObject->getAccessType(),
-                            "icon"			=> "repo_child.png",
-                            "owner"			=> ($childObject->hasOwner()?$childObject->getOwner():""),
-                            "openicon"		=> "repo_child.png",
-                            "parentname"	=> "/repositories",
-                            "ajxp_mime" 	=> "repository_editable"
-                        );
-                        $cNodeKey = "/data/repositories/$childId";
-                        if(in_array($cNodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-                        $xml = AJXP_XMLWriter::renderNode(
-                            $cNodeKey,
-                            AJXP_Utils::xmlEntities(SystemTextEncoding::toUTF8($childObject->getDisplay())),
-                            true,
-                            $meta,
-                            true,
-                            false
-                        );
-                        if($returnNodes) $allNodes[$cNodeKey] = $xml;
-                        else print($xml);
-                    }
-                }
-            }
-
-
-        }else{
-
-            if(!class_exists("ShareCenter")) return;
-            $shareCenter = ShareCenter::getShareCenter();
-            $nodes = $shareCenter->listSharesAsNodes("/data/repositories/$parentRepoId/shares", false, $parentRepoId);
-
-            if(!$returnNodes){
-                AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.repositories">
+        // Load all repositories = normal, templates, and templates children
+        $repos = ConfService::listRepositoriesWithCriteria(array(
+                "parent_uuid"   => AJXP_FILTER_EMPTY,
+                "ORDERBY"       => array("KEY" => "display", "DIR"=>"ASC"),
+                "CURSOR"        => array("OFFSET" => $offset, "LIMIT" => $REPOS_PER_PAGE)
+            ), $count
+        );
+        if(!$returnNodes){
+            AJXP_XMLWriter::renderPaginationData($count, $hashValue, ceil($count/$REPOS_PER_PAGE));
+            AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.repositories">
                 <column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/>
-                <column messageId="ajxp_shared.27" attributeName="owner" sortType="String"/>
-                <column messageId="3" attributeName="share_type_readable" sortType="String"/>
-                <column messageId="share_center.52" attributeName="share_data" sortType="String"/>
-                </columns>');
+                <column messageId="ajxp_conf.9" attributeName="accessType" sortType="String"/>
+                <column messageId="ajxp_conf.125" attributeName="slug" sortType="String"/>
+                <column messageId="ajxp_conf.106" attributeName="repository_id" sortType="String"/>
+            </columns>');
+        }
+
+        foreach ($repos as $repoIndex => $repoObject) {
+
+            if($repoObject->getAccessType() == "ajxp_conf" || $repoObject->getAccessType() == "ajxp_shared") continue;
+            if (!AuthService::canAdministrate($repoObject))continue;
+            if(is_numeric($repoIndex)) $repoIndex = "".$repoIndex;
+
+            $icon = "hdd_external_unmount.png";
+            $editable = $repoObject->isWriteable();
+            if ($repoObject->isTemplate) {
+                $icon = "hdd_external_mount.png";
+                if (AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->getGroupPath() != "/") {
+                    $editable = false;
+                }
             }
+            $meta = array(
+                "repository_id" => $repoIndex,
+                "accessType"	=> ($repoObject->isTemplate?"Template for ":"").$repoObject->getAccessType(),
+                "icon"			=> $icon,
+                "owner"			=> ($repoObject->hasOwner()?$repoObject->getOwner():""),
+                "openicon"		=> $icon,
+                "slug"          => $repoObject->getSlug(),
+                "parentname"	=> "/repositories",
+                "ajxp_mime" 	=> "repository".($editable?"_editable":"")
+            );
 
-            foreach($nodes as $node){
-                AJXP_XMLWriter::renderAjxpNode($node);
+            $nodeKey = "/data/repositories/$repoIndex";
+            if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
+            $xml = AJXP_XMLWriter::renderNode(
+                $nodeKey,
+                AJXP_Utils::xmlEntities(SystemTextEncoding::toUTF8($repoObject->getDisplay())),
+                true,
+                $meta,
+                true,
+                false
+            );
+            if($returnNodes) $allNodes[$nodeKey] = $xml;
+            else print($xml);
+
+            if ($repoObject->isTemplate) {
+                // Now Load children for template repositories
+                $children = ConfService::listRepositoriesWithCriteria(array("parent_uuid" => $repoIndex.""), $count);
+                foreach($children as $childId => $childObject){
+                    if (!AuthService::canAdministrate($childObject))continue;
+                    if(is_numeric($childId)) $childId = "".$childId;
+                    $meta = array(
+                        "repository_id" => $childId,
+                        "accessType"	=> $childObject->getAccessType(),
+                        "icon"			=> "repo_child.png",
+                        "owner"			=> ($childObject->hasOwner()?$childObject->getOwner():""),
+                        "openicon"		=> "repo_child.png",
+                        "parentname"	=> "/repositories",
+                        "ajxp_mime" 	=> "repository_editable"
+                    );
+                    $cNodeKey = "/data/repositories/$childId";
+                    if(in_array($cNodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
+                    $xml = AJXP_XMLWriter::renderNode(
+                        $cNodeKey,
+                        AJXP_Utils::xmlEntities(SystemTextEncoding::toUTF8($childObject->getDisplay())),
+                        true,
+                        $meta,
+                        true,
+                        false
+                    );
+                    if($returnNodes) $allNodes[$cNodeKey] = $xml;
+                    else print($xml);
+                }
             }
-
-            return;
-
         }
 
     }

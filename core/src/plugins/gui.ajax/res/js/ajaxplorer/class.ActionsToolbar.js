@@ -37,7 +37,8 @@ Class.create("ActionsToolbar", {
 			toolbarsList : $A(['default', 'put', 'get', 'change', 'user', 'remote']),
             groupOtherToolbars : $A([]),
             skipCarousel : true,
-            manager:null
+            manager:null,
+            dataModelElementId:null
 		}, options || {});
 		var renderer = this.options.buttonRenderer;
 		if(renderer == 'this'){
@@ -76,6 +77,12 @@ Class.create("ActionsToolbar", {
             this.options.manager.observe("actions_loaded", this.actionsLoadedObserver);
             this.options.manager.observe("actions_refreshed", this.refreshToolbarObserver);
 
+        }else if(this.options.dataModelElementId){
+            this.options.manager = new ActionsManager(true, this.options.dataModelElementId);
+            this.options.manager.observe("actions_loaded", this.actionsLoadedObserver);
+            this.options.manager.observe("actions_refreshed", this.refreshToolbarObserver);
+            // May be already loaded
+            this.actionsLoaded();
         }else{
             document.observe("ajaxplorer:actions_loaded", this.actionsLoadedObserver);
             document.observe("ajaxplorer:actions_refreshed", this.refreshToolbarObserver);
@@ -92,6 +99,7 @@ Class.create("ActionsToolbar", {
         if(this.options.manager){
             this.options.manager.stopObserving("actions_loaded", this.actionsLoadedObserver);
             this.options.manager.stopObserving("actions_refreshed", this.refreshToolbarObserver);
+            this.options.manager.destroy();
         }else{
             document.stopObserving("ajaxplorer:actions_loaded", this.actionsLoadedObserver);
             document.stopObserving("ajaxplorer:actions_refreshed", this.refreshToolbarObserver);

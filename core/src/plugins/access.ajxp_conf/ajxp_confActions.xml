@@ -434,7 +434,7 @@
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="get" inZip="false">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable,shared_file,role,group" image="false" editable="false"/></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable,role,group" image="false" editable="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
@@ -447,15 +447,11 @@
 						fieldName = "user_id";
 						fieldValue = getBaseName(meta.get("filename"));
 					}else if(meta.get("ajxp_mime") == "role"){
-						deleteMessage = MessageHash['ajxp_shared.11'];
+						deleteMessage = MessageHash['ajxp_conf.126'];
 						fieldName = "role_id";
 						fieldValue = getBaseName(meta.get("filename"));
-					}else if(meta.get("ajxp_mime") == "shared_file"){
-						deleteMessage = MessageHash['ajxp_shared.11'];
-						fieldName = "shared_file";
-						fieldValue = meta.get("filename");
 					}else if(meta.get("ajxp_mime") == "group"){
-						deleteMessage = MessageHash['ajxp_shared.11'];
+						deleteMessage = MessageHash['ajxp_conf.126'];
 						fieldName = "group";
 						fieldValue = meta.get("filename");
 					}else{
@@ -482,8 +478,6 @@
                                   var value;
                                   if(meta.get("ajxp_mime") == "user_editable"){
                                   	value = meta.get("text");
-                                  }else if(meta.get("ajxp_mime") == "shared_file"){
-                                  	value = meta.get("filename");
                                   }else{
                                   	value = meta.get("text");
                                   }
@@ -507,7 +501,7 @@
 				</div>
 				]]></clientForm>
 				<serverCallback methodName="switchAction" restParams="/data_type/data_id+">
-                    <input_param description="Type of the data to delete. Can be : user, group, role, repository, shared_file" name="date_type" type="String"/>
+                    <input_param description="Type of the data to delete. Can be : user, group, role, repository" name="date_type" type="String"/>
                     <input_param description="Id of the data to delete. For groups, full group path." name="data_id"
                                  type="string"/>
 				</serverCallback>

@@ -356,23 +356,23 @@ div.documentation{
     padding: 0 20px !important;
 }
 
-#shares-list{
+.shares-list{
     margin: 10px 15px 15px;
 }
 
-#shares-list div.header_cell:first-child{
+.shares-list div.header_cell:first-child{
     border-radius: 4px 0 0 0;
 }
-#shares-list div.header_cell:last-child{
+.shares-list div.header_cell:last-child{
     border-radius: 0 4px 0 0;
 }
-#shares-list div.header_label{
+.shares-list div.header_label{
     padding: 7px 6px 4px;
 }
-#shares-list div.header_resizer{
+.shares-list div.header_resizer{
     max-height: 30px;
 }
-#shares-list div.paginator{
+.shares-list div.paginator{
     height: 23px;
     padding-top: 6px;
 }

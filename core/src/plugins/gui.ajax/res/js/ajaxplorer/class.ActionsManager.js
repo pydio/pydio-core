@@ -27,7 +27,7 @@ Class.create("ActionsManager", {
 	 * Standard constructor
 	 * @param bUsersEnabled Boolen Whether users management is enabled or not
 	 */
-	initialize: function(bUsersEnabled, dataModel)
+	initialize: function(bUsersEnabled, dataModelElementId)
 	{
 		this._registeredKeys = new Hash();
 		this._actions = new Hash();
@@ -38,9 +38,7 @@ Class.create("ActionsManager", {
 		this.actions = new Hash();
 		this.defaultActions = new Hash();
 		this.toolbars = new Hash();
-        if(dataModel){
-            this._dataModel = dataModel;
-        }
+
         this.contextChangedObs = function(event){
             window.setTimeout(function(){
                 this.fireContextChange();
@@ -52,6 +50,25 @@ Class.create("ActionsManager", {
             }.bind(this), 0);
         }.bind(this);
 
+        if(dataModelElementId){
+            this.localDataModel = true;
+            try{
+                this._dataModel = $(dataModelElementId).ajxpPaneObject.getDataModel();
+            }catch(e){}
+            if(this._dataModel) {
+                this._connectDataModel();
+            }else{
+                document.observeOnce("ajaxplorer:datamodel-loaded-" + dataModelElementId, function(){
+                    this._dataModel = $(dataModelElementId).ajxpPaneObject.getDataModel();
+                    this._connectDataModel();
+                }.bind(this));
+            }
+        }else{
+            this.localDataModel = false;
+            this._connectDataModel();
+        }
+
+        /*
         if(this._dataModel){
             this._dataModel.observe("context_changed", this.contextChangedObs);
             this._dataModel.observe("selection_changed", this.selectionChangedObs);
@@ -62,6 +79,7 @@ Class.create("ActionsManager", {
             this._dataModel = ajaxplorer.getContextHolder();
             this.localDataModel = false;
         }
+        */
 
         if(this.usersEnabled){
             document.observe("ajaxplorer:user_logged", function(event){
@@ -76,7 +94,22 @@ Class.create("ActionsManager", {
             }
         }
 
-	},	
+	},
+
+    _connectDataModel: function(){
+        if(this.localDataModel){
+            this._dataModel.observe("context_changed", this.contextChangedObs);
+            this._dataModel.observe("selection_changed", this.selectionChangedObs);
+            this.loadActionsFromRegistry();
+            document.observe("ajaxplorer:registry_loaded", function(event){
+                this.loadActionsFromRegistry(event.memo);
+            }.bind(this));
+        }else{
+            document.observe("ajaxplorer:context_changed", this.contextChangedObs);
+            document.observe("ajaxplorer:selection_changed", this.selectionChangedObs);
+            this._dataModel = ajaxplorer.getContextHolder();
+        }
+    },
 
     getDataModel:function(){
         return this._dataModel;
@@ -682,6 +715,9 @@ Class.create("ActionsManager", {
 	 * @param registry DOMDocument
 	 */
 	loadActionsFromRegistry : function(registry){
+        if(!registry){
+            registry = ajaxplorer.getXmlRegistry();
+        }
 		this.removeActions();		
 		this.parseActions(registry);
 		if(ajaxplorer && ajaxplorer.guiActions){
@@ -723,7 +759,7 @@ Class.create("ActionsManager", {
 	 * @param documentElement DOMNode The node to parse
 	 */
 	parseActions: function(documentElement){		
-		actions = XPathSelectNodes(documentElement, "actions/action");
+		var actions = XPathSelectNodes(documentElement, "actions/action");
 		for(var i=0;i<actions.length;i++){
 			if(actions[i].nodeName != 'action') continue;
             if(actions[i].getAttribute('enabled') == 'false') continue;

@@ -146,12 +146,12 @@ class ShareCenter extends AJXP_Plugin
 
     public function switchAction($action, $httpVars, $fileVars)
     {
-        if (!isSet($this->accessDriver)) {
+        if (strpos($action, "sharelist") === false && !isSet($this->accessDriver)) {
             throw new Exception("Cannot find access driver!");
         }
 
 
-        if ($this->accessDriver->getId() == "access.demo") {
+        if (strpos($action, "sharelist") === false && $this->accessDriver->getId() == "access.demo") {
             $errorMessage = "This is a demo, all 'write' actions are disabled!";
             if ($httpVars["sub_action"] == "delegate_repo") {
                 return AJXP_XMLWriter::sendMessage(null, $errorMessage, false);
@@ -456,6 +456,46 @@ class ShareCenter extends AJXP_Plugin
 
 
                 break;
+
+            case "sharelist-load":
+
+                $parentRepoId = isset($httpVars["parent_repository_id"]) ? $httpVars["parent_repository_id"] : "";
+                $userContext = $httpVars["user_context"];
+                $currentUser = true;
+                if($userContext == "global" && AuthService::getLoggedUser()->isAdmin()){
+                    $currentUser = false;
+                }
+                $nodes = $this->listSharesAsNodes("/data/repositories/$parentRepoId/shares", $currentUser, $parentRepoId);
+
+                AJXP_XMLWriter::header();
+
+                    AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.repositories">
+                    <column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/>
+                    <column messageId="ajxp_shared.27" attributeName="owner" sortType="String"/>
+                    <column messageId="3" attributeName="share_type_readable" sortType="String"/>
+                    <column messageId="share_center.52" attributeName="share_data" sortType="String"/>
+                    </columns>');
+
+                foreach($nodes as $node){
+                    AJXP_XMLWriter::renderAjxpNode($node);
+                }
+                AJXP_XMLWriter::close();
+
+            break;
+
+            case "sharelist-clearExpired":
+
+                $currentUser  = (ConfService::getRepository()->getAccessType() != "ajxp_conf");
+                $count = $this->clearExpiredFiles($currentUser);
+                AJXP_XMLWriter::header();
+                if($count){
+                    AJXP_XMLWriter::sendMessage("Removed ".count($count)." expired links", null);
+                }else{
+                    AJXP_XMLWriter::sendMessage("Nothing to do", null);
+                }
+                AJXP_XMLWriter::close();
+
+            break;
 
             default:
             break;
@@ -1685,6 +1725,9 @@ class ShareCenter extends AJXP_Plugin
                 $meta["share_data"] = ($shareType == "repository" ? 'Shared as workspace: '.$repoObject->getDisplay() : $this->buildPublicletLink($hash));
                 $meta["shared_element_hash"] = $hash;
                 $meta["owner"] = $repoObject->getOwner();
+                if($shareType != "repository") {
+                    $meta["copy_url"]  = $this->buildPublicletLink($hash);
+                }
                 $meta["shared_element_parent_repository"] = $repoObject->getParentId();
                 if($shareType != "repository"){
                     if($repoObject->hasContentFilter()){
@@ -1703,7 +1746,7 @@ class ShareCenter extends AJXP_Plugin
                 $meta["share_type_readable"] = "Publiclet (old school)";
                 $meta["text"] = basename($shareData["FILE_PATH"]);
                 $meta["icon"] = "mime_empty.png";
-                $meta["share_data"] = $this->buildPublicletLink($hash);
+                $meta["share_data"] = $meta["copy_url"] = $this->buildPublicletLink($hash);
                 $meta["share_link"] = true;
                 $meta["shared_element_hash"] = $hash;
 

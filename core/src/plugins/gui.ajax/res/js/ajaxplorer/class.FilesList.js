@@ -190,12 +190,18 @@ Class.create("FilesList", SelectableElements, {
 		this._registerObserver(document, "keydown", keydownObserver);
         if(!this._dataModel){
             this._registerObserver(document, "ajaxplorer:trigger_repository_switch", repoSwitchObserver);
+        }else{
+            document.fire("ajaxplorer:datamodel-loaded-"+this.htmlElement.id);
         }
         if(this.options.messageBoxReference && ajaxplorer){
             ajaxplorer.registerAsMessageBoxReference(this.htmlElement);
         }
 
 	},
+
+    getDataModel: function(){
+        return this._dataModel;
+    },
 
     _registerObserver:function(object, eventName, handler, objectEvent){
         if(objectEvent){

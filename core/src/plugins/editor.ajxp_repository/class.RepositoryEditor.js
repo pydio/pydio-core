@@ -69,8 +69,8 @@ Class.create("RepositoryEditor", AbstractEditor, {
         if(this.sharesList){
             this.sharesList.destroy();
         }
-        if(this.manager){
-            this.manager.destroy();
+        if(this.sharesToolbar){
+            this.sharesToolbar.destroy();
         }
         $super();
     },
@@ -121,37 +121,46 @@ Class.create("RepositoryEditor", AbstractEditor, {
         this.formManager = this.getFormManager();
         this.loadRepository(this.repositoryId);
 
-        // Load list of shares
-        var listPane = this.sharesPane.down("#shares-list");
-        var actionPane = this.sharesPane.down("#shares-toolbar");
-        listPane.observe("editor:updateTitle", function(e){
-            Event.stop(e);
-        });
-        this.sharesList = new FetchedResultPane(listPane, {
-            nodeProviderProperties:{get_action:"ls",dir:"/data/repositories/"+this.repositoryId},
-            updateGlobalContext:false,
-            selectionChangeCallback:false,
-            displayMode: 'list',
-            fixedDisplayMode: 'list',
-            fit:"height"
-        });
-        listPane.removeClassName("class-FetchedResultPane");
-        this.sharesList._dataLoaded = true;
-        this.sharesList.reloadDataModel();
-        this.sharesPane.resizeOnShow = function(){
-            this.sharesList.resize();
-        }.bind(this);
+        if(ajaxplorer.actionBar.getActionByName("share")){
+            var listPaneId = "shares-list-" + this.repositoryId;
+            // Create Actionbar with specific datamodel - should detect dm initialisation
+            var actionPane = this.sharesPane.down("#shares-toolbar");
+            var listPane = this.sharesPane.down("#shares-list");
+            listPane.setAttribute("id", listPaneId);
 
-        this.manager = new ActionsManager(true, this.sharesList._dataModel);
-        this.sharesToolbar = new ActionsToolbar(actionPane, {
-            toolbarsList:["repo_editor_shares"],
-            skipBubbling:true,
-            skipCarousel:true,
-            submenuOffsetTop:2,
-            manager:this.manager
-        });
-        this.manager.loadActionsFromRegistry(ajaxplorer.getXmlRegistry());
 
+            // Load list of shares
+            listPane.observe("editor:updateTitle", function(e){
+                Event.stop(e);
+            });
+            this.sharesList = new FetchedResultPane(listPane, {
+                nodeProviderProperties:{
+                    get_action:"sharelist-load",
+                    parent_repository_id:this.repositoryId,
+                    user_context:"global"
+                },
+                updateGlobalContext:false,
+                selectionChangeCallback:false,
+                displayMode: 'list',
+                fixedDisplayMode: 'list',
+                fit:"height"
+            });
+            listPane.removeClassName("class-FetchedResultPane");
+            listPane.addClassName("shares-list");
+            this.sharesList._dataLoaded = true;
+            this.sharesList.reloadDataModel();
+            this.sharesPane.resizeOnShow = function(){
+                this.sharesList.resize();
+            }.bind(this);
+
+            this.sharesToolbar = new ActionsToolbar(actionPane, {
+                toolbarsList:["share_list_toolbar-selection", "share_list_toolbar"],
+                skipBubbling:true,
+                skipCarousel:true,
+                submenuOffsetTop:2,
+                dataModelElementId:listPaneId
+            });
+        }
 
     },
 

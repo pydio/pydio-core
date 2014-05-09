@@ -146,5 +146,6 @@ $mess=array(
 "123" => "Autres extensions",
 "124" => "Source",
 "125" => "Alias",
+"126" => "Voulez-vous vraiment supprimer les éléments sélectionnés?",
 /* END SENTENCE */
 );

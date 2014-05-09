@@ -278,7 +278,7 @@
             </action>
             <action name="share-edit-shared">
                 <gui src="share.png" iconClass="icon-share" text="share_center.125" title="share_center.126">
-                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="get,repo_editor_shares" behaviour="hidden"/>
+                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="get,share_list_toolbar" behaviour="hidden"/>
                     <selectionContext dir="true" file="true" evalMetadata="metadata.get('ajxp_shared')" recycle="false" unique="true" behaviour="hidden"/>
                 </gui>
                 <processing>
@@ -412,7 +412,7 @@
             </action>
             <action name="sharelist-edit">
                 <gui src="share.png" iconClass="icon-share" text="share_center.125" title="share_center.126">
-                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="repo_editor_shares" behaviour="hidden"/>
+                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="share_list_toolbar-selection" behaviour="hidden"/>
                     <selectionContext dir="true" file="true" evalMetadata="metadata.get('ajxp_shared')" recycle="false" unique="true" behaviour="hidden"/>
                 </gui>
                 <processing>
@@ -424,9 +424,44 @@
                     ]]></clientCallback>
                 </processing>
             </action>
-            <action name="sharelist-refresh">
+            <action name="sharelist-copyUrl">
+                <gui text="share_center.129" title="share_center.130" iconClass="icon-copy" src="editcopy.png" accessKey="" hasAccessKey="false">
+                    <context selection="true" dir="" recycle="false"
+                             actionBar="true" contextMenu="true" infoPanel="true"
+                             actionBarGroup="share_list_toolbar-selection" inZip="false">
+                    </context>
+                    <selectionContext dir="false" file="true" recycle="false" unique="true" evalMetadata="metadata.get('copy_url')" behaviour="hidden"/></gui>
+                <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+						var onLoad = function(oForm){
+						    if(window.navigator.platform.startsWith("Mac")){
+						        $(oForm).select(".macos_only").invoke("show");
+						        $(oForm).select(".non_macos").invoke("hide");
+						    }
+							var firstNode = window.actionManager.getDataModel().getUniqueNode();
+			   		    	var copyDiv = $(oForm).down('input[id="text_copy"]');
+			   		    	copyDiv.setValue(firstNode.getMetadata().get('copy_url').stripTags());
+			   		    	copyDiv.select();
+						};
+						modal.showDialogForm('Delete', 'copy_url_form', onLoad, function(){
+							hideLightBox(true);
+							return false;
+						},null,true);
+						]]></clientCallback>
+                    <clientForm id="copy_url_form"><![CDATA[
+					<div id="copy_url_form" action="copy" box_width="280">
+					    <div class="non_macos" style="font-size:1.5em;padding:5px 0;">Use <kbd>Ctrl</kbd>+<kbd>C</kbd>to copy the url to your clipboard</div>
+					    <div class="macos_only" style="display:none; font-size:1.2em;padding:5px 0;">Use <kbd>&#8984;</kbd>+<kbd>C</kbd> to copy the url to your clipboard</div>
+						<input  style="font-size:1.2em; width: 98%;" id="text_copy" class="dialogFocus"/>
+					</div>
+					]]></clientForm>
+                    <serverCallback methodName="switchAction"/>
+                </processing>
+            </action>
+            <action name="sharelist-load">
                 <gui src="share.png" iconClass="icon-refresh" text="149" title="149">
-                    <context dir="true" recycle="false" selection="false" actionBar="true" actionBarGroup="repo_editor_shares" behaviour="hidden"/>
+                    <context dir="true" recycle="false" selection="false" actionBar="true" actionBarGroup="share_list_toolbar" behaviour="hidden"/>
                 </gui>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
@@ -435,11 +470,41 @@
                         }
                     ]]></clientCallback>
                 </processing>
+                <processing>
+                    <serverCallback methodName="switchAction" sdkMethodName="loadShareList">
+                        <input_param description="Parent repository ID" name="parent_repository_id" type="string" mandatory="false"/>
+                        <input_param name="user_context" type="string" description="Either global (all users, requires admin right) or current (current user)" default="current"/>
+                    </serverCallback>
+                </processing>
+            </action>
+            <action name="sharelist-clearExpired">
+                <gui text="user_dash.25" title="user_dash.26" iconClass="icon-time" src="edit_clear_history.png" accessKey="" hasAccessKey="false">
+                    <context dir="true" selection="false" recycle="false" 
+                             actionBar="true" contextMenu="false" infoPanel="false"
+                             actionBarGroup="share_list_toolbar" inZip="false"/>
+                </gui>
+                <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+						var conn = new Connexion();
+						conn.addParameter("get_action", "sharelist-clearExpired");
+						var dm = window.actionManager.getDataModel();
+						conn.onComplete = function(transport){
+							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                            if(window.actionManager){
+                                dm.requireContextChange(dm.getRootNode(), true);
+                            }
+						};
+						conn.sendAsync();
+					]]></clientCallback>
+                    <serverCallback methodName="switchAction" developerComment="Clear expired links" restParams="/"/>
+                </processing>
             </action>
             <action name="sharelist-migrate">
                 <gui src="share.png" iconClass="icon-sort-by-attributes-alt" text="share_center.127" title="share_center.128">
-                    <context dir="false" recycle="false" selection="false" actionBar="true" actionBarGroup="repo_editor_shares" behaviour="hidden"/>
+                    <context dir="false" recycle="false" selection="false" actionBar="true" actionBarGroup="share_list_toolbar" behaviour="hidden"/>
                 </gui>
+                <rightsContext adminOnly="true" noUser="false" read="false" userLogged="true" write="false"/>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
                         if(window.actionManager){
@@ -448,6 +513,7 @@
                     ]]></clientCallback>
                 </processing>
             </action>
+
             <action name="share_current_page">
                 <gui src="" iconClass="icon-share" text="share_center.110" title="share_center.110">
                     <context dir="true" recycle="false" selection="false" actionBarGroup="minisite-share-actions" actionBar="true"/>
@@ -491,20 +557,12 @@
                 </infoPanelExtension>
             </component_config>
             <component_config className="AjxpTabulator::userdashboard_main_tab">
-                <additional_tab id="shared_pane"
-                                tabInfo='{"id":"my-shared","iconClass":"icon-share","element":"shared_pane","closeable":false,"label":"share_center.98","title":"share_center.99","dontFocus":true,"position":3}'
+                <additional_tab id="shared_pane2"
+                                tabInfo='{"id":"my-shared2","iconClass":"icon-share","element":"shared_pane2","closeable":false,"label":"share_center.98","title":"share_center.99","dontFocus":true,"position":3}'
                                 paneInfo='{"type":"widget"}'><![CDATA[
-                    <div id="shared_pane" ajxpClass="AjxpPane">
-                        <div id="shared_tab" ajxpClass="AjxpTabulator" class="horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "defaultTabId": "shared-files","tabInfos" : [{"id":"shared-files","label":"share_center.100", "title":"share_center.101","iconClass":"icon-file", "element":"shared_files_pane"},{"id":"shared-folders","label":"share_center.102","title":"share_center.103","iconClass":"icon-folder-close", "element":"shared_folders_pane"}]}'>
-                            <div id="shared_files_pane" ajxpClass="AjxpPane" ajxpOptions=''>
-                                <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","public_links"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                                <div id="shared_files_list" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"files"}}'></div>
-                            </div>
-                            <div id="shared_folders_pane" ajxpClass="AjxpPane" ajxpOptions='{}'>
-                                <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","shared_folders"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                                <div id="shared_folders_list" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true, "nodeProviderProperties":{"get_action":"ls","dir":"repositories"}}'></div>
-                            </div>
-                        </div>
+                    <div id="shared_pane2" ajxpClass="AjxpPane">
+                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"dataModelElementId":"shared_files_list","toolbarsList":["share_list_toolbar-selection", "share_list_toolbar"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                        <div id="shared_files_list" ajxpClass="FetchedResultPane" ajxpOptions='{"displayMode":"list", "fixedDisplayMode":"list", "fit":"height","selectionChangeCallback":false,"updateGlobalContext":false,"nodeProviderProperties":{"get_action":"sharelist-load","user_context":"current"}}'></div>
                     </div>
                 ]]></additional_tab>
             </component_config>
