@@ -1,5 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpcore id="authfront.keystore" label="CONF_MESSAGE[Basic Http by Server]" enabled="true" description="CONF_MESSAGE[Basic Http Auth performed by server (e.g. apache htaccess)]"
+<ajxpcore id="authfront.keystore" label="CONF_MESSAGE[API Keystore]" enabled="true" description="CONF_MESSAGE[Store API keys/token to simplify REST connection]"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/authfront.keystore/class.KeystoreAuthFrontend.php" classname="KeystoreAuthFrontend"/>
+    <client_settings>
+        <resources>
+            <js className="ApikeysPane" file="plugins/authfront.keystore/class.ApikeysPane.js" autoload="true"/>
+        </resources>
+    </client_settings>
+    <server_settings>
+        <global_param name="ORDER" type="integer" label="Order"
+                      description="Order this plugin with other auth frontends" default="3"/>
+    </server_settings>
+    <registry_contributions>
+        <client_configs>
+            <component_config className="AjxpTabulator::userdashboard_parameters_tab">
+                <additional_tab id="apikeys_pane"
+                                tabInfo='{"id":"my-api-data","iconClass":"icon-cog","element":"apikeys_pane","closeable":false,"label":"403","title":"403","dontFocus":true,"position":2}'
+                                paneInfo='{"type":"widget"}'><![CDATA[
+                    <div id="apikeys_pane" ajxpClass="ApikeysPane" class="tabbed_editor">
+                        <div id="generate_token_button">Generate new tokens!</div>
+                        <div id="token_results"></div>
+                        <div id="revoke_tokens_button">Revoke existing token!</div>
+                    </div>
+                    ]]></additional_tab>
+            </component_config>
+        </client_configs>
+        <actions>
+            <action name="keystore_generate_auth_token">
+                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="true" write="false"/>
+                <processing>
+                    <serverCallback methodName="authTokenActions" restParams="/device" sdkMethodName="generateAuthToken"/>
+                </processing>
+            </action>
+            <action name="keystore_revoke_tokens">
+                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="true" write="false"/>
+                <processing>
+                    <serverCallback methodName="authTokenActions" restParams="/" sdkMethodName="generateAuthToken"/>
+                </processing>
+            </action>
+        </actions>
+    </registry_contributions>
 </ajxpcore>

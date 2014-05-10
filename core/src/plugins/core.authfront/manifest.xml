@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpcore id="core.authfront" label="CONF_MESSAGE[Authentification FrontEnd]"
+          description="CONF_MESSAGE[Actual way to authenticate users (via credentials, certificates, http, etc]"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition classname="FrontendsLoader" filename="plugins/core.authfront/class.FrontendsLoader.php"/>
+</ajxpcore>

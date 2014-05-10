@@ -119,7 +119,7 @@ class AuthService
     {
         if(self::getLoggedUser() != null) return ;
 
-        $frontends = AJXP_PluginsService::getInstance()->getPluginsByType("authfront");
+        $frontends = AJXP_PluginsService::getInstance()->getActivePluginsForType("authfront");
         $index = 0;
         foreach($frontends as $frontendPlugin){
             if(!$frontendPlugin->isEnabled()) continue;

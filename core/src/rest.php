@@ -50,7 +50,7 @@ session_name("AjaXplorer");
 session_start();
 AuthService::$useSession = false;
 
-//AuthService::logUser(AJXP_API_USER, "", true);
+AJXP_PluginsService::getInstance()->initActivePlugins();
 AuthService::preLogUser();
 if(AuthService::getLoggedUser() == null){
     header('HTTP/1.0 401 Unauthorized');
@@ -69,11 +69,16 @@ $repoID = array_shift($uri);
 // GET ACTION NAME
 $action = array_shift($uri);
 $path = "/".implode("/", $uri);
-$repo = &ConfService::findRepositoryByIdOrAlias($repoID);
-if ($repo == null) {
-    die("Cannot find repository with ID ".$repoID);
+if($repoID == 'pydio'){
+    ConfService::switchRootDir();
+    $repo = ConfService::getRepository();
+}else{
+    $repo = &ConfService::findRepositoryByIdOrAlias($repoID);
+    if ($repo == null) {
+        die("Cannot find repository with ID ".$repoID);
+    }
+    ConfService::switchRootDir($repo->getId());
 }
-ConfService::switchRootDir($repo->getId());
 // DRIVERS BELOW NEED IDENTIFICATION CHECK
 if (!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") || AuthService::getLoggedUser()!=null) {
     $confDriver = ConfService::getConfStorageImpl();

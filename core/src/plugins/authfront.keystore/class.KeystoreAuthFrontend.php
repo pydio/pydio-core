@@ -36,30 +36,97 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
         if(isSet($_GET[$varName])) return $_GET[$varName];
         if(isSet($_POST[$varName])) return $_POST[$varName];
         if(isSet($_SERVER["HTTP_PYDIO_".strtoupper($varName)])) return $_SERVER["HTTP_".strtoupper($varName)];
+        return "";
     }
 
     function tryToLogUser($isLast = false){
 
         $token = $this->detectVar("auth_token");
         if(empty($token)){
+            $this->logDebug(__FUNCTION__, "Empty token", $_POST);
             return false;
         }
-        $secret = $this->detectVar("auth_hash");
         $this->storage = ConfService::getConfStorageImpl();
         if(!is_a($this->storage, "sqlConfDriver")) return false;
 
         $data = null;
         $this->storage->simpleStoreGet("keystore", $token, "serial", $data);
         if(empty($data)){
+            $this->logDebug(__FUNCTION__, "Cannot find token in keystore");
             return false;
         }
+        $this->logDebug(__FUNCTION__, "Found token in keystore");
         $userId = $data["USER_ID"];
         $private = $data["PRIVATE"];
-        if(md5($userId.$private) == $secret){
-            AuthService::logUser($userId, "", true);
-            return true;
+        $server_uri = rtrim(array_shift(explode("?", $_SERVER["REQUEST_URI"])), "/");
+        list($nonce, $hash) = explode(":", $this->detectVar("auth_hash"));
+        $replay = hash_hmac("sha256", $server_uri.":".$nonce.":".$private, $token);
+        $this->logDebug(__FUNCTION__, "Replay is ".$replay);
+
+        if($replay == $hash){
+            $res = AuthService::logUser($userId, "", true);
+            if($res > 0) return true;
         }
         return false;
+
+    }
+
+    /**
+     * @param String $action
+     * @param Array $httpVars
+     * @param Array $fileVars
+     */
+    function authTokenActions($action, $httpVars, $fileVars){
+
+        if(AuthService::getLoggedUser() == null) return;
+        $this->storage = ConfService::getConfStorageImpl();
+        if(!is_a($this->storage, "sqlConfDriver")) return false;
+
+        $user = AuthService::getLoggedUser()->getId();
+        if(AuthService::getLoggedUser()->isAdmin() && isSet($httpVars["user_id"])){
+            $user = $httpVars["user_id"];
+        }
+        switch($action){
+            case "keystore_generate_auth_token":
+
+                $token = AJXP_Utils::generateRandomString();
+                $private = AJXP_Utils::generateRandomString();
+                $data = array("USER_ID" => $user, "PRIVATE" => $private);
+                if(!empty($httpVars["device"])){
+                    // Revoke previous tokens for this device
+                    $device = $httpVars["device"];
+                    $keys = $this->storage->simpleStoreList("keystore", null, "", "serial", '%"DEVICE_ID";s:'.strlen($device).':"'.$device.'"%');
+                    foreach($keys as $keyId => $keyData){
+                        if($keyData["USER_ID"] != $user) continue;
+                        $this->storage->simpleStoreClear("keystore", $keyId);
+                    }
+                    $data["DEVICE_ID"] = $device;
+                }
+                $this->storage->simpleStoreSet("keystore", $token, $data, "serial");
+                header("Content-type: application/json;");
+                echo(json_encode(array(
+                    "t" => $token,
+                    "p" => $private)
+                ));
+
+                break;
+
+            case "keystore_revoke_tokens":
+
+                // Invalidate previous tokens
+                $keys = $this->storage->simpleStoreList("keystore", null, "", "serial", '%"USER_ID";s:'.strlen($user).':"'.$user.'"%');
+                foreach($keys as $keyId => $keyData){
+                    $this->storage->simpleStoreClear("keystore", $keyId);
+                }
+                break;
+
+            default:
+                break;
+        }
+
+
+
+
 
     }
 

@@ -507,7 +507,7 @@ class AJXP_PluginsService
      * Retrieve an array of active plugins for type
      * @param string $type
      * @param bool $unique
-     * @return array|bool
+     * @return AJXP_Plugin[]
      */
     public function getActivePluginsForType($type, $unique = false)
     {
