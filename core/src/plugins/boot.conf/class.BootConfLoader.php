@@ -105,6 +105,18 @@ class BootConfLoader extends AbstractConfDriver
                 $addParams .= AJXP_XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/global_param"));
             }
         }
+        $uri = $_REQUEST["REQUEST_URI"];
+        if(strpos($uri, '.php') !== false) $uri = dirname($uri);
+        if(empty($uri)) $uri = "/";
+        $loadedValues = array(
+            "ENCODING"  => (defined('AJXP_LOCALE')?AJXP_LOCALE:SystemTextEncoding::getEncoding()),
+            "SERVER_URI"=> $uri
+        );
+        foreach($loadedValues as $pName => $pValue){
+            $vNodes = $xPath->query("server_settings/global_param[@name='$pName']");
+            if(!$vNodes->length) continue;
+            $vNodes->item(0)->setAttribute("default", $pValue);
+        }
         $allParams = AJXP_XMLWriter::replaceAjxpXmlKeywords($fullManifest->ownerDocument->saveXML($fullManifest));
         $allParams = str_replace('type="plugin_instance:', 'type="group_switch:', $allParams);
         $allParams = str_replace("</server_settings>", $addParams."</server_settings>", $allParams);
@@ -124,7 +136,7 @@ class BootConfLoader extends AbstractConfDriver
     {
         $data = array();
         AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "");
-        $tot = "toto";
+
         // Create a custom bootstrap.json file
         $coreConf = array(); $coreAuth = array();
         $this->_loadPluginConfig("core.conf", $coreConf);
@@ -133,7 +145,6 @@ class BootConfLoader extends AbstractConfDriver
         if(!isSet($coreAuth["MASTER_INSTANCE_CONFIG"])) $coreAuth["MASTER_INSTANCE_CONFIG"] = array();
 
         $storageType = $data["STORAGE_TYPE"]["type"];
-        $coreConfLIVECONFIG = array();
         if ($storageType == "db") {
             // REWRITE BOOTSTRAP.JSON
             $coreConf["DIBI_PRECONFIGURATION"] = $data["STORAGE_TYPE"]["db_type"];
@@ -155,7 +166,7 @@ class BootConfLoader extends AbstractConfDriver
             ));
 
             // INSTALL ALL SQL TABLES
-            $sqlPlugs = array("conf.sql", "auth.sql", "feed.sql", "log.sql", "mq.sql");
+            $sqlPlugs = array("conf.sql", "auth.sql", "feed.sql", "log.sql", "mq.sql", "meta.syncable");
             foreach ($sqlPlugs as $plugId) {
                 $plug = AJXP_PluginsService::findPluginById($plugId);
                 $plug->installSQLTables(array("SQL_DRIVER" => $data["STORAGE_TYPE"]["db_type"]));
@@ -191,6 +202,18 @@ class BootConfLoader extends AbstractConfDriver
         $newConfigPlugin = ConfService::instanciatePluginFromGlobalParams($coreConf["UNIQUE_INSTANCE_CONFIG"], "AbstractConfDriver");
         $newAuthPlugin = ConfService::instanciatePluginFromGlobalParams($coreAuth["MASTER_INSTANCE_CONFIG"], "AbstractAuthDriver");
 
+        if($data["ENCODING"] != (defined('AJXP_LOCALE')?AJXP_LOCALE:SystemTextEncoding::getEncoding())){
+            file_put_contents($this->getPluginWorkDir()."/encoding.php", "<?php \$ROOT_ENCODING='".$data["ENCODING"]."';");
+        }
+        if(!empty($data["SERVER_URI"]) && $data["SERVER_URI"] != "/"){
+            $tpl = file_get_contents($this->getBaseDir()."/htaccess.tpl");
+            $htContent = str_replace('${APPLICATION_ROOT}', $data["SERVER_URI"], $tpl);
+            if(is_writeable(AJXP_INSTALL_PATH."/.htaccess")){
+                file_put_contents(AJXP_INSTALL_PATH."/.htaccess", $htContent);
+            }else{
+                $htAccessToUpdate = AJXP_INSTALL_PATH."/.htaccess";
+            }
+        }
 
         if ($storageType == "db") {
             $sqlPlugs = array(
@@ -274,14 +297,19 @@ class BootConfLoader extends AbstractConfDriver
         }
 
 
-
         @unlink(AJXP_PLUGINS_CACHE_FILE);
         @unlink(AJXP_PLUGINS_REQUIRES_FILE);
         @unlink(AJXP_PLUGINS_MESSAGES_FILE);
         AJXP_Utils::setApplicationFirstRunPassed();
-        session_destroy();
 
-        echo 'OK';
+        if(isSet($htAccessToUpdate)){
+            HTMLWriter::charsetHeader("application/json");
+            echo json_encode(array('file' => $htAccessToUpdate, 'content' => $htContent));
+        }else{
+            session_destroy();
+            HTMLWriter::charsetHeader("text/plain");
+            echo 'OK';
+        }
 
     }
 

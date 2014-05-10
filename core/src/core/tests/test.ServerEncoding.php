@@ -28,7 +28,9 @@ require_once('../classes/class.AbstractTest.php');
  */
 class ServerEncoding extends AbstractTest
 {
-    public function ServerEncoding() { parent::AbstractTest("Server charset encoding", "You must set a correct charset encoding in your locale definition in the form: en_us.UTF-8. Please refer to setlocale man page. If your detected locale is C, please check the <a href=\"http://ajaxplorer.info/knowledge-base-2/f-a-q/#39172\">F.A.Q.</a>. "); }
+    public function ServerEncoding() { parent::AbstractTest("Server charset encoding", "You must set a correct charset encoding
+        in your locale definition in the form: en_us.UTF-8. Please refer to setlocale man page.
+        If your detected locale is C, simply type echo \$LANG on your server command line to read the correct value."); }
     public function doTest()
     {
         // Get the locale
@@ -36,13 +38,13 @@ class ServerEncoding extends AbstractTest
         if ($locale == 'C') {
             $this->failedLevel = "warning";
             $this->failedInfo .= "Detected locale: $locale (using UTF-8)";
-            $this->failedInfo .= "<p class='suggestion'><b>Suggestion</b> : Set the AJXP_LOCALE parameter to the correct value in the <i>conf/bootstrap_conf.php</i> file</p>";
+            $this->failedInfo .= "<p class='suggestion'><b>Suggestion</b> : Set the AJXP_LOCALE parameter to the correct value in the <i>conf/bootstrap_conf.php</i> file. You can also set this value using the installer form (next step).</p>";
             return FALSE;
         }
         if (strpos($locale, '.') === FALSE) {
             $this->failedLevel = "warning";
             $this->failedInfo .= "Locale doesn't contain encoding: $locale (so using UTF-8)";
-            $this->failedInfo .= "<p class='suggestion'><b>Suggestion</b> : Set the AJXP_LOCALE parameter to the correct value in the <i>conf/bootstrap_conf.php</i> file</p>";
+            $this->failedInfo .= "<p class='suggestion'><b>Suggestion</b> : Set the AJXP_LOCALE parameter to the correct value in the <i>conf/bootstrap_conf.php</i> file.  You can also set this value using the installer form (next step).</p>";
             return FALSE;
         }
         // Check if we have iconv

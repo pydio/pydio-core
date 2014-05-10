@@ -9,7 +9,7 @@
     </client_settings>
     <server_settings>
         <global_param name="ORDER" type="integer" label="Order"
-                      description="Order this plugin with other auth frontends" default="3"/>
+                      description="Order this plugin with other auth frontends" default="2"/>
     </server_settings>
     <registry_contributions>
         <client_configs>
