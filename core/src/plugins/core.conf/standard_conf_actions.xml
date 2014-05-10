@@ -1,9 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <registry_contributions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<actions>
+        <action name="get_xml_registry">
+            <processing>
+                <serverCallback methodName="switchAction"/>
+            </processing>
+        </action>
+        <action name="state">
+            <processing>
+                <serverCallback methodName="switchAction" restParams="/xPath+" sdkMethodName="getAccountData">
+                    <input_param name="xPath" type="string" description="Optional xPath to search in registry"/>
+                    <input_param name="format" type="string" description="Optional format parameter, xml by default, can be forced to json"/>
+                </serverCallback>
+            </processing>
+        </action>
 		<action name="switch_repository">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
         <action name="user_create_repository">

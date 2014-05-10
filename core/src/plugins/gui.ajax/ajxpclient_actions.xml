@@ -1,36 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<guidriver name="ajxpclient">
+<registry_contributions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<actions>
-	<!--
-		<action name="get_boot_conf" skipSecureToken="true">
-			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
-			</processing>
-		</action>
-	-->
-		<action name="get_xml_registry">
-			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
-			</processing>
-		</action>
 		<action name="get_template">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
 		<action name="get_i18n_messages">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
 		<action name="get_editors_registry">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
 		<action name="display_doc">
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
 		<action name="up_dir">
@@ -176,4 +164,4 @@
 			</processing>
 		</action>
 	</actions>
-</guidriver>
+</registry_contributions>

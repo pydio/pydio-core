@@ -551,6 +551,53 @@ abstract class AbstractConfDriver extends AJXP_Plugin
             break;
 
             //------------------------------------
+            //	SEND XML REGISTRY
+            //------------------------------------
+            case "get_xml_registry" :
+            case "state" :
+
+                $regDoc = AJXP_PluginsService::getXmlRegistry();
+                $changes = AJXP_Controller::filterRegistryFromRole($regDoc);
+                if($changes) AJXP_PluginsService::updateXmlRegistry($regDoc);
+
+                $clone = $regDoc->cloneNode(true);
+                $clonePath = new DOMXPath($clone);
+                $serverCallbacks = $clonePath->query("//serverCallback|hooks");
+                foreach ($serverCallbacks as $callback) {
+                    $callback->parentNode->removeChild($callback);
+                }
+                $xPath = '';
+                if (isSet($httpVars["xPath"])) {
+                    $xPath = ltrim(AJXP_Utils::securePath($httpVars["xPath"]), "/");
+                }
+                if (!empty($xPath)) {
+                    $nodes = $clonePath->query($xPath);
+                    if($httpVars["format"] == "json"){
+                        $data = AJXP_XMLWriter::xmlToArray($nodes->item(0));
+                        HTMLWriter::charsetHeader("application/json");
+                        echo json_encode($data);
+                    }else{
+                        AJXP_XMLWriter::header("ajxp_registry_part", array("xPath"=>$xPath));
+                        if ($nodes->length) {
+                            print(AJXP_XMLWriter::replaceAjxpXmlKeywords($clone->saveXML($nodes->item(0))));
+                        }
+                        AJXP_XMLWriter::close("ajxp_registry_part");
+                    }
+                } else {
+                    AJXP_Utils::safeIniSet("zlib.output_compression", "4096");
+                    if($httpVars["format"] == "json"){
+                        $data = AJXP_XMLWriter::xmlToArray($clone);
+                        HTMLWriter::charsetHeader("application/json");
+                        echo json_encode($data);
+                    }else{
+                        header('Content-Type: application/xml; charset=UTF-8');
+                        print(AJXP_XMLWriter::replaceAjxpXmlKeywords($clone->saveXML()));
+                    }
+                }
+
+            break;
+
+            //------------------------------------
             //	BOOKMARK BAR
             //------------------------------------
             case "get_bookmarks":
