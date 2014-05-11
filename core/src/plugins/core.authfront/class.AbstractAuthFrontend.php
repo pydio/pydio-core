@@ -26,9 +26,10 @@ abstract class AbstractAuthFrontend extends AJXP_Plugin {
      * Try to authenticate the user based on various external parameters
      * Return true if user is now logged.
      *
+     * @param array $httpVars
      * @param bool $isLast Whether this is is the last plugin called.
      * @return bool
      */
-    abstract function tryToLogUser($isLast = false);
+    abstract function tryToLogUser($httpVars, $isLast = false);
 
 } 

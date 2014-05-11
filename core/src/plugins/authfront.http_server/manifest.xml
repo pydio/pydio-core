@@ -8,5 +8,8 @@
         <global_param name="AJXP_ADMIN" type="string" label="Admin login"
                       description="Automatically set this login as pydio administrator"/>
         <global_param name="ORDER" type="integer" label="Order" description="Order this plugin with other auth frontends" default="1"/>
+        <global_param name="PROTOCOL_TYPE" type="select"
+                      choices="session_only|Sessions Only,no_session|REST Only,both|Session-based or Rest"
+                      label="Protocol Type" description="Enable/disable automatically based on the protocol used" default="both"/>
     </server_settings>
 </ajxpcore>

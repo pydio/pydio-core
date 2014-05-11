@@ -112,10 +112,10 @@ class AuthService
     /**
      * Call the preLogUser() functino on the auth driver implementation
      * @static
-     * @param string $remoteSessionId
+     * @param Array $httpVars
      * @return void
      */
-    public static function preLogUser($remoteSessionId = "")
+    public static function preLogUser($httpVars)
     {
         if(self::getLoggedUser() != null) return ;
 
@@ -123,13 +123,13 @@ class AuthService
         $index = 0;
         foreach($frontends as $frontendPlugin){
             if(!$frontendPlugin->isEnabled()) continue;
-            $res = $frontendPlugin->tryToLogUser(($index == count($frontends)-1));
+            $res = $frontendPlugin->tryToLogUser($httpVars, ($index == count($frontends)-1));
             $index ++;
             if($res) break;
         }
         // Keep old-fashioned test, should be removed
         $authDriver = ConfService::getAuthDriverImpl();
-        $authDriver->preLogUser($remoteSessionId);
+        $authDriver->preLogUser((isSet($httpVars["remote_session"])?$httpVars["remote_session"]:""));
 
         return ;
     }

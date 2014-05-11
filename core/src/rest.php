@@ -51,7 +51,7 @@ session_start();
 AuthService::$useSession = false;
 
 AJXP_PluginsService::getInstance()->initActivePlugins();
-AuthService::preLogUser();
+AuthService::preLogUser(array_merge($_GET, $_POST));
 if(AuthService::getLoggedUser() == null){
     header('HTTP/1.0 401 Unauthorized');
     echo 'You are not authorized to access this API.';

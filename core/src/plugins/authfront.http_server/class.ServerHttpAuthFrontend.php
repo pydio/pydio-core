@@ -23,7 +23,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class ServerHttpAuthFrontend extends AbstractAuthFrontend {
 
-    function tryToLogUser($isLast = false){
+    function tryToLogUser($httpVars, $isLast = false){
 
         $localHttpLogin = $_SERVER["REMOTE_USER"];
         $localHttpPassw = isSet($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : "";

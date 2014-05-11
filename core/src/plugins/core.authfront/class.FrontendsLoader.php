@@ -31,6 +31,10 @@ class FrontendsLoader extends AJXP_Plugin {
         usort($fronts, array($this, "frontendsSort"));
         foreach($fronts as $front){
             if($front->isEnabled()){
+                $configs = $front->getConfigs();
+                $protocol = $configs["PROTOCOL_TYPE"];
+                if($protocol == "session_only" && !AuthService::$useSession) continue;
+                if($protocol == "no_session" && AuthService::$useSession) continue;
                 AJXP_PluginsService::setPluginActive($front->getType(), $front->getName(), true);
             }
         }

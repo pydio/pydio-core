@@ -32,16 +32,15 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
         parent::init($options);
     }
 
-    function detectVar($varName){
-        if(isSet($_GET[$varName])) return $_GET[$varName];
-        if(isSet($_POST[$varName])) return $_POST[$varName];
+    function detectVar($httpVars, $varName){
+        if(isSet($httpVars[$varName])) return $httpVars[$varName];
         if(isSet($_SERVER["HTTP_PYDIO_".strtoupper($varName)])) return $_SERVER["HTTP_".strtoupper($varName)];
         return "";
     }
 
-    function tryToLogUser($isLast = false){
+    function tryToLogUser($httpVars, $isLast = false){
 
-        $token = $this->detectVar("auth_token");
+        $token = $this->detectVar($httpVars, "auth_token");
         if(empty($token)){
             $this->logDebug(__FUNCTION__, "Empty token", $_POST);
             return false;
@@ -59,7 +58,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
         $userId = $data["USER_ID"];
         $private = $data["PRIVATE"];
         $server_uri = rtrim(array_shift(explode("?", $_SERVER["REQUEST_URI"])), "/");
-        list($nonce, $hash) = explode(":", $this->detectVar("auth_hash"));
+        list($nonce, $hash) = explode(":", $this->detectVar($httpVars, "auth_hash"));
         $replay = hash_hmac("sha256", $server_uri.":".$nonce.":".$private, $token);
         $this->logDebug(__FUNCTION__, "Replay is ".$replay);
 

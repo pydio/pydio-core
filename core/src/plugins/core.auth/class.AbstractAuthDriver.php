@@ -41,7 +41,7 @@ class AbstractAuthDriver extends AJXP_Plugin
         $mess = ConfService::getMessages();
 
         switch ($action) {
-
+/*
             case "login" :
 
                 if(!AuthService::usersEnabled()) return;
@@ -97,6 +97,51 @@ class AbstractAuthDriver extends AJXP_Plugin
 
             break;
 
+            case "logout" :
+
+                AuthService::disconnect();
+                $loggingResult = 2;
+                session_destroy();
+                AJXP_XMLWriter::header();
+                AJXP_XMLWriter::loggingResult($loggingResult, null, null, null);
+                AJXP_XMLWriter::close();
+
+
+            break;
+
+            case "get_seed" :
+                $seed = AuthService::generateSeed();
+                if (AuthService::suspectBruteForceLogin()) {
+                    HTMLWriter::charsetHeader('application/json');
+                    print json_encode(array("seed" => $seed, "captcha" => true));
+                } else {
+                    HTMLWriter::charsetHeader("text/plain");
+                    print $seed;
+                }
+                //exit(0);
+            break;
+
+            case "get_captcha":
+                include_once(AJXP_BIN_FOLDER."/class.CaptchaProvider.php");
+                CaptchaProvider::sendCaptcha();
+                //exit(0) ;
+            break;
+
+            case "back":
+                AJXP_XMLWriter::header("url");
+                  echo AuthService::getLogoutAddress(false);
+                  AJXP_XMLWriter::close("url");
+                //exit(1);
+
+            break;
+*/
+
+            case "get_secure_token" :
+                HTMLWriter::charsetHeader("text/plain");
+                print AuthService::generateSecureToken();
+                //exit(0);
+                break;
+
             //------------------------------------
             //	CHANGE USER PASSWORD
             //------------------------------------
@@ -130,51 +175,9 @@ class AbstractAuthDriver extends AJXP_Plugin
                 header("Content-Type:text/plain");
                 print "SUCCESS";
 
-            break;
-
-            case "logout" :
-
-                AuthService::disconnect();
-                $loggingResult = 2;
-                session_destroy();
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::loggingResult($loggingResult, null, null, null);
-                AJXP_XMLWriter::close();
+                break;
 
 
-            break;
-
-            case "get_seed" :
-                $seed = AuthService::generateSeed();
-                if (AuthService::suspectBruteForceLogin()) {
-                    HTMLWriter::charsetHeader('application/json');
-                    print json_encode(array("seed" => $seed, "captcha" => true));
-                } else {
-                    HTMLWriter::charsetHeader("text/plain");
-                    print $seed;
-                }
-                //exit(0);
-            break;
-
-            case "get_secure_token" :
-                HTMLWriter::charsetHeader("text/plain");
-                print AuthService::generateSecureToken();
-                //exit(0);
-            break;
-
-            case "get_captcha":
-                include_once(AJXP_BIN_FOLDER."/class.CaptchaProvider.php");
-                CaptchaProvider::sendCaptcha();
-                //exit(0) ;
-            break;
-
-            case "back":
-                AJXP_XMLWriter::header("url");
-                  echo AuthService::getLogoutAddress(false);
-                  AJXP_XMLWriter::close("url");
-                //exit(1);
-
-            break;
 
             default;
             break;
