@@ -239,11 +239,11 @@ class ShareStore {
     /**
      * @param String $type
      * @param String $element
-     * @param String $ownerId
-     * @return bool
      * @throws Exception
+     * @internal param String $ownerId
+     * @return bool
      */
-    public function deleteShare($type, $element, $ownerId)
+    public function deleteShare($type, $element)
     {
         $mess = ConfService::getMessages();
         AJXP_Logger::debug(__CLASS__, __FILE__, "Deleting shared element ".$type."-".$element);

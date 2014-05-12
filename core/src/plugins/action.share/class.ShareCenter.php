@@ -342,7 +342,7 @@ class ShareCenter extends AJXP_Plugin
                 if(isSet($httpVars["hash"])){
                     $mess = ConfService::getMessages();
                     $userId = AuthService::getLoggedUser()->getId();
-                    $res = $this->getShareStore()->deleteShare($httpVars["element_type"], $httpVars["hash"], $userId);
+                    $res = $this->getShareStore()->deleteShare($httpVars["element_type"], $httpVars["hash"]);
                     if($res !== false){
                         AJXP_XMLWriter::header();
                         AJXP_XMLWriter::sendMessage("Successfully unshared element", null);
@@ -361,7 +361,7 @@ class ShareCenter extends AJXP_Plugin
                             $sKeys = array_keys($shares);
                             $elementId = $sKeys[0];
                         }
-                        $this->getShareStore()->deleteShare($shares[$elementId]["type"], $elementId, AuthService::getLoggedUser()->getId());
+                        $this->getShareStore()->deleteShare($shares[$elementId]["type"], $elementId);
                         $this->removeShareFromMeta($ajxpNode, $elementId);
                         AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
                     }
@@ -696,7 +696,7 @@ class ShareCenter extends AJXP_Plugin
      */
     public function updateNodeSharedData($oldNode=null, $newNode=null, $copy = false){
 
-        if($newNode != null && $oldNode != null && !$copy){
+        if($oldNode != null && !$copy){
             $this->logDebug("Should update node");
 
             $this->getSharesFromMeta($oldNode, $shares, true);
@@ -707,6 +707,11 @@ class ShareCenter extends AJXP_Plugin
             $newShares = array();
             foreach($shares as $id => $data){
                 $type = $data["type"];
+                if($newNode == null){
+                    $this->getShareStore()->deleteShare($type, $id);
+                    continue;
+                }
+
                 if($type == "minisite"){
                     $share = $this->getShareStore()->loadShare($id);
                     $repo = ConfService::getRepositoryById($share["REPOSITORY"]);
@@ -738,7 +743,7 @@ class ShareCenter extends AJXP_Plugin
 
                     if(isSet($publicLink["FILE_PATH"])){
                         $publicLink["FILE_PATH"] = str_replace($oldNode->getPath(), $newNode->getPath(), $publicLink["FILE_PATH"]);
-                        $this->getShareStore()->deleteShare("file", $id, AuthService::getLoggedUser()->getId());
+                        $this->getShareStore()->deleteShare("file", $id);
                         $this->getShareStore()->storeShare($newNode->getRepositoryId(), $publicLink, "file", $id);
                         $newShares[$id] = $data;
                     }
@@ -746,7 +751,7 @@ class ShareCenter extends AJXP_Plugin
                 }
             }
             $oldNode->removeMetadata("ajxp_shared", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-            if(count($newShares)){
+            if($newNode != null && count($newShares)){
                 $newNode->setMetadata("ajxp_shared", array("shares" => $newShares), true, AJXP_METADATA_SCOPE_REPOSITORY, true);
             }
 
@@ -1014,7 +1019,7 @@ class ShareCenter extends AJXP_Plugin
         ConfService::loadDriverForRepository($repoObject)->detectStreamWrapper(true);
         AJXP_Controller::registryReset();
         $ajxpNode = new AJXP_Node("ajxp.".$repoObject->getAccessType()."://".$repoObject->getId().$data["FILE_PATH"]);
-        $this->getShareStore()->deleteShare("file", $elementId, AuthService::getLoggedUser()->getId());
+        $this->getShareStore()->deleteShare("file", $elementId);
         $this->removeShareFromMeta($ajxpNode, $elementId);
     }
 
@@ -1665,7 +1670,7 @@ class ShareCenter extends AJXP_Plugin
      */
     public function deleteSharedElement($type, $element, $loggedUser)
     {
-        $this->getShareStore()->deleteShare($type, $element, $loggedUser->getId());
+        $this->getShareStore()->deleteShare($type, $element);
     }
 
     public function loadPublicletData($id)
@@ -1830,7 +1835,7 @@ class ShareCenter extends AJXP_Plugin
     public function cleanUserShares($userId){
         $shares = $this->getShareStore()->listShares($userId);
         foreach($shares as $hash => $data){
-            $this->getShareStore()->deleteShare($data['SHARE_TYPE'], $hash, $userId);
+            $this->getShareStore()->deleteShare($data['SHARE_TYPE'], $hash);
         }
     }
 
