@@ -105,7 +105,7 @@ class BootConfLoader extends AbstractConfDriver
                 $addParams .= AJXP_XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/global_param"));
             }
         }
-        $uri = $_REQUEST["REQUEST_URI"];
+        $uri = $_SERVER["REQUEST_URI"];
         if(strpos($uri, '.php') !== false) $uri = dirname($uri);
         if(empty($uri)) $uri = "/";
         $loadedValues = array(

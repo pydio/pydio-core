@@ -211,14 +211,6 @@ class AbstractAuthDriver extends AJXP_Plugin
     {
         parent::parseSpecificContributions($contribNode);
         if($contribNode->nodeName != "actions") return ;
-        if (AJXP_Utils::detectApplicationFirstRun()) {
-            $actionXpath=new DOMXPath($contribNode->ownerDocument);
-            $passChangeNodeList = $actionXpath->query('action[@name="login"]', $contribNode);
-            if(!$passChangeNodeList->length) return ;
-            unset($this->actions["login"]);
-            $passChangeNode = $passChangeNodeList->item(0);
-            $contribNode->removeChild($passChangeNode);
-        }
 
         if(AuthService::usersEnabled() && $this->passwordsEditable()) return ;
         // Disable password change action

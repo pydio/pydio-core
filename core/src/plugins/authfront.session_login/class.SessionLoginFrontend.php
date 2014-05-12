@@ -23,6 +23,11 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class SessionLoginFrontend extends AbstractAuthFrontend {
 
+    function isEnabled(){
+        if(AJXP_Utils::detectApplicationFirstRun()) return false;
+        return parent::isEnabled();
+    }
+
     function tryToLogUser($httpVars, $isLast = false){
 
         if(!isSet($httpVars["get_action"]) || $httpVars["get_action"] != "login"){
