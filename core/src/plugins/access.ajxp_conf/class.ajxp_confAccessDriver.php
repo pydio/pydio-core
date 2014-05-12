@@ -88,7 +88,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             //------------------------------------
             case "list_all_repositories_json":
 
-                $repositories = ConfService::getRepositoriesList("all");
+                $repositories = ConfService::getRepositoriesList("all", false);
                 $repoOut = array();
                 foreach ($repositories as $repoObject) {
                     $repoOut[$repoObject->getId()] = $repoObject->getDisplay();
@@ -1067,7 +1067,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case  "get_templates_definition":
 
                 AJXP_XMLWriter::header("repository_templates");
-                $repositories = ConfService::getRepositoriesList("all");
+                $repositories = ConfService::getRepositoriesList("all", false);
                 foreach ($repositories as $repo) {
                     if(!$repo->isTemplate) continue;
                     $repoId = $repo->getId();

@@ -427,7 +427,8 @@ class AuthService
             $rootRole->setLabel("Root Role");
             $rootRole->setAutoApplies(array("standard", "admin"));
             $dashId = "";
-            foreach (ConfService::getRepositoriesList("all") as $repositoryId => $repoObject) {
+            $allRepos = ConfService::getRepositoriesList("all", false);
+            foreach ($allRepos as $repositoryId => $repoObject) {
                 if($repoObject->isTemplate) continue;
                 if($repoObject->getAccessType() == "ajxp_user") $dashId = $repositoryId;
                 $gp = $repoObject->getGroupPath();

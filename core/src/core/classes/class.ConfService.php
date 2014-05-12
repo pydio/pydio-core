@@ -320,12 +320,12 @@ class ConfService
      * @param String $scope "user" or "all"
      * @return Repository[]
      */
-    public static function getRepositoriesList($scope = "user")
+    public static function getRepositoriesList($scope = "user", $includeShared = true)
     {
         if ($scope == "user") {
             return self::getInstance()->getLoadedRepositories();
         } else {
-            return self::getInstance()->initRepositoriesListInst("all");
+            return self::getInstance()->initRepositoriesListInst("all", $includeShared);
         }
     }
 
@@ -417,7 +417,7 @@ class ConfService
                 return false;
             }
             // Do not display shared repositories otherwise.
-            if ($repositoryObject->hasOwner() && $skipShared) {
+            if ($repositoryObject->hasOwner() && $skipShared && ($userObject == null || $userObject->getParent() != $repositoryObject->getOwner())) {
                 return false;
             }
             if ($userObject != null && $repositoryObject->hasOwner() && !$userObject->hasParent()) {
@@ -549,7 +549,7 @@ class ConfService
      * @param $scope String "user", "all"
      * @return array
      */
-    protected function initRepositoriesListInst($scope = "user")
+    protected function initRepositoriesListInst($scope = "user", $includeShared = true)
     {
         // APPEND CONF FILE REPOSITORIES
         $loggedUser = AuthService::getLoggedUser();
@@ -578,7 +578,13 @@ class ConfService
                 $drvList = $confDriver->listRepositoriesWithCriteria($criteria);
             }
         }else{
-            $drvList = $confDriver->listRepositories();
+            if($includeShared){
+                $drvList = $confDriver->listRepositories();
+            }else{
+                $drvList = $confDriver->listRepositoriesWithCriteria(array(
+                    "owner_user_id" => AJXP_FILTER_EMPTY
+                ));
+            }
         }
         if (is_array($drvList)) {
             foreach ($drvList as $repoId=>$repoObject) {
