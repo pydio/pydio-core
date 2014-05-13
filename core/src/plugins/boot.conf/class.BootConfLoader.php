@@ -106,7 +106,7 @@ class BootConfLoader extends AbstractConfDriver
             }
         }
         $uri = $_SERVER["REQUEST_URI"];
-        if(strpos($uri, '.php') !== false) $uri = dirname($uri);
+        if(strpos($uri, '.php') !== false) $uri = AJXP_Utils::safeDirname($uri);
         if(empty($uri)) $uri = "/";
         $loadedValues = array(
             "ENCODING"  => (defined('AJXP_LOCALE')?AJXP_LOCALE:SystemTextEncoding::getEncoding()),

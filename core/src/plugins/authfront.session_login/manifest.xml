@@ -184,6 +184,11 @@
                     <serverCallback methodName="switchAction"/>
                 </processing>
             </action>
+            <action name="get_captcha">
+                <processing>
+                    <serverCallback methodName="switchAction"/>
+                </processing>
+            </action>
         </actions>
     </registry_contributions>
     <dependencies>
