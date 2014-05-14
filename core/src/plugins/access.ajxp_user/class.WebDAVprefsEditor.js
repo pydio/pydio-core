@@ -73,12 +73,14 @@ Class.create("WebDAVprefsEditor", AjxpPane, {
                         ajaxplorer.webdavCurrentPreferences = transport.responseJSON;
                         if(ajaxplorer.webdavCurrentPreferences.webdav_active){
                             if(!ajaxplorer.webdavCurrentPreferences.digest_set
-                                || ajaxplorer.webdavCurrentPreferences.webdav_force_basic) {
+                                && !ajaxplorer.webdavCurrentPreferences.webdav_force_basic) {
                                 element.down('#webdav_password_form').show();
                             }
                             ajaxplorer.displayMessage("SUCCESS", MessageHash[408]);
                         }else {
-                            element.down('#webdav_password_form').hide();
+                            if(!ajaxplorer.webdavCurrentPreferences.webdav_force_basic) {
+                                element.down('#webdav_password_form').hide();
+                            }
                             ajaxplorer.displayMessage("SUCCESS", MessageHash[409]);
                         }
                     };
