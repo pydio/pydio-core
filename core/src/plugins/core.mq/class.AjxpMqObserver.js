@@ -82,36 +82,59 @@ Class.create("AjxpMqObserver", {
                     this.pe.stop();
                 }
 
-                if(this.currentRepo){
-                    var conn = new Connexion();
-                    conn.setParameters($H({
-                        get_action:'client_unregister_channel',
-                        channel:'nodes:' + this.currentRepo,
-                        client_id:this.clientId
-                    }));
-                    conn.discrete = true;
-                    conn.sendSync();
-                    this.currentRepo = null;
+                if(this.currentRepo && repoId){
+
+                    this.unregisterCurrentChannel(function(){
+                        this.registerChannel(repoId);
+                    }.bind(this));
+
+                }else if(this.currentRepo && !repoId){
+
+                    this.unregisterCurrentChannel();
+
+                }else if(!this.currentRepo && repoId){
+
+                    this.registerChannel(repoId);
+
                 }
-
-                if(!repoId) return;
-
-                this.currentRepo = repoId;
-                var conn = new Connexion();
-                conn.setParameters($H({
-                    get_action:'client_register_channel',
-                    channel:'nodes:' + repoId,
-                    client_id:this.clientId
-                }));
-                conn.discrete = true;
-                conn.sendAsync();
-
-                this.pe = new PeriodicalExecuter(this.consumeChannel.bind(this), configs.get('POLLER_FREQUENCY') || 5);
 
             }
 
 
         }.bind(this));
+
+    },
+
+    unregisterCurrentChannel : function(callback){
+
+        var conn = new Connexion();
+        conn.setParameters($H({
+            get_action:'client_unregister_channel',
+            channel:'nodes:' + this.currentRepo,
+            client_id:this.clientId
+        }));
+        conn.discrete = true;
+        conn.onComplete = function(transp){
+            this.currentRepo = null;
+            if(callback) callback();
+        }.bind(this);
+        conn.sendAsync();
+
+    },
+
+    registerChannel : function(repoId){
+
+        this.currentRepo = repoId;
+        var conn = new Connexion();
+        conn.setParameters($H({
+            get_action:'client_register_channel',
+            channel:'nodes:' + repoId,
+            client_id:this.clientId
+        }));
+        conn.discrete = true;
+        conn.sendAsync();
+
+        this.pe = new PeriodicalExecuter(this.consumeChannel.bind(this), configs.get('POLLER_FREQUENCY') || 5);
 
     },
 
