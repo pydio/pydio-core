@@ -27,6 +27,7 @@ Class.create("AjxpMqObserver", {
     currentRepo:null,
     clientId:null,
     ws: null,
+    configs: null,
 
     initialize : function(){
         "use strict";
@@ -34,7 +35,7 @@ Class.create("AjxpMqObserver", {
         if(window.ajxpMinisite) return;
 
         this.clientId = window.ajxpBootstrap.parameters.get("SECURE_TOKEN");
-        var configs = ajaxplorer.getPluginConfigs("mq");
+        this.configs = ajaxplorer.getPluginConfigs("mq");
 
         document.observe("ajaxplorer:repository_list_refreshed", function(event){
 
@@ -43,7 +44,7 @@ Class.create("AjxpMqObserver", {
             if(data.active) repoId = data.active;
             else if(ajaxplorer.repositoryId) repoId = ajaxplorer.repositoryId;
 
-            if(window.WebSocket && configs.get("WS_SERVER_ACTIVE")){
+            if(window.WebSocket && this.configs.get("WS_SERVER_ACTIVE")){
 
                 if(this.ws) {
                     if(!repoId){
@@ -61,7 +62,7 @@ Class.create("AjxpMqObserver", {
                     }
                 }else{
                     if(repoId){
-                        var url = "ws"+(configs.get("WS_SERVER_SECURE")?"s":"")+"://"+configs.get("WS_SERVER_HOST")+":"+configs.get("WS_SERVER_PORT")+configs.get("WS_SERVER_PATH");
+                        var url = "ws"+(this.configs.get("WS_SERVER_SECURE")?"s":"")+"://"+this.configs.get("WS_SERVER_HOST")+":"+this.configs.get("WS_SERVER_PORT")+this.configs.get("WS_SERVER_PATH");
                         this.ws = new WebSocket(url);
                         this.ws.onmessage = function(event){
                             var obj = parseXml(event.data);
@@ -134,7 +135,7 @@ Class.create("AjxpMqObserver", {
         conn.discrete = true;
         conn.sendAsync();
 
-        this.pe = new PeriodicalExecuter(this.consumeChannel.bind(this), configs.get('POLLER_FREQUENCY') || 5);
+        this.pe = new PeriodicalExecuter(this.consumeChannel.bind(this), this.configs.get('POLLER_FREQUENCY') || 5);
 
     },
 
