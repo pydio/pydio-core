@@ -64,7 +64,7 @@ class CommentsMetaManager extends AJXP_Plugin
         if($oldFile == null) return;
         $feedStore = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("feed");
         if ($feedStore !== false) {
-            $feedStore->updateMetaObject(ConfService::getRepository()->getId(), $oldFile->getPath(), ($newFile!=null?$newFile->getPath():null), $copy);
+            $feedStore->updateMetaObject($oldFile->getRepositoryId(), $oldFile->getPath(), ($newFile!=null?$newFile->getPath():null), $copy);
             return;
         }
 
@@ -146,7 +146,7 @@ class CommentsMetaManager extends AJXP_Plugin
                     $sortDir = isSet($httpVars["sort_dir"])?AJXP_Utils::decodeSecureMagic($httpVars["sort_dir"]):"asc";
                     $offset = isSet($httpVars["offset"]) ? intval($httpVars["offset"]) : 0;
                     $limit = isSet($httpVars["limit"]) ? intval($httpVars["limit"]) : 100;
-                    $data = $feedStore->findMetaObjectsByIndexPath(ConfService::getRepository()->getId(), $uniqNode->getPath(), AuthService::getLoggedUser()->getId(), AuthService::getLoggedUser()->getGroupPath(), $offset, $limit, $sortBy, $sortDir);
+                    $data = $feedStore->findMetaObjectsByIndexPath($this->accessDriver->repository->getId(), $uniqNode->getPath(), AuthService::getLoggedUser()->getId(), AuthService::getLoggedUser()->getGroupPath(), $offset, $limit, $sortBy, $sortDir);
                     $theFeed = array();
                     foreach ($data as $stdObject) {
                         $rPath = substr($stdObject->path, strlen($uniqNode->getPath()));

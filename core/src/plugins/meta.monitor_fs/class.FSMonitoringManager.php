@@ -30,9 +30,12 @@ class FSMonitoringManager extends AJXP_Plugin
 {
     private $repoBase;
 
+    /**
+     * @param AbstractAccessDriver $accessDriver
+     */
     public function initMeta($accessDriver)
     {
-        $repo = ConfService::getRepository();
+        $repo = $accessDriver->repository;
         $this->repoBase = $repo->getOption("PATH");
     }
 

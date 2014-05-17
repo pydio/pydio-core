@@ -28,6 +28,9 @@ defined('AJXP_EXEC') or die('Access not allowed');
  */
 class ChangesTracker extends AJXP_Plugin
 {
+    /**
+     * @var AbstractAccessDriver
+     */
     protected $accessDriver;
     private $sqlDriver;
 
@@ -49,6 +52,7 @@ class ChangesTracker extends AJXP_Plugin
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         $filter = null;
+        $currentRepo = $this->accessDriver->repository;
 
         HTMLWriter::charsetHeader('application/json', 'UTF-8');
         if(isSet($httpVars["filter"])){
@@ -60,7 +64,7 @@ class ChangesTracker extends AJXP_Plugin
                     ON [ajxp_changes].[node_id] = [ajxp_index].[node_id]
                 WHERE [ajxp_changes].[repository_identifier] = %s AND ([source] LIKE %like~ OR [target] LIKE %like~ ) AND [seq] > %i
                 ORDER BY [ajxp_changes].[node_id], [seq] ASC",
-                $this->computeIdentifier(ConfService::getRepository()), rtrim($filter, "/")."/", rtrim($filter, "/")."/", AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
+                $this->computeIdentifier($currentRepo), rtrim($filter, "/")."/", rtrim($filter, "/")."/", AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
         }else{
             $res = dibi::query("SELECT
                 [seq] , [ajxp_changes].[repository_identifier] , [ajxp_changes].[node_id] , [type] , [source] ,  [target] , [ajxp_index].[bytesize], [ajxp_index].[md5], [ajxp_index].[mtime], [ajxp_index].[node_path]
@@ -69,7 +73,7 @@ class ChangesTracker extends AJXP_Plugin
                     ON [ajxp_changes].[node_id] = [ajxp_index].[node_id]
                 WHERE [ajxp_changes].[repository_identifier] = %s AND [seq] > %i
                 ORDER BY [ajxp_changes].[node_id], [seq] ASC",
-                $this->computeIdentifier(ConfService::getRepository()), AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
+                $this->computeIdentifier($currentRepo), AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
         }
 
         echo '{"changes":[';

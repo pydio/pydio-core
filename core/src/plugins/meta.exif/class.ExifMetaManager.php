@@ -103,7 +103,7 @@ class ExifMetaManager extends AJXP_Plugin
     {
         $userSelection = new UserSelection();
         $userSelection->initFromHttpVars($httpVars);
-        $repo = ConfService::getRepository();
+        $repo = $this->accessDriver->repository;
         $repo->detectStreamWrapper();
         $wrapperData = $repo->streamData;
         $urlBase = $wrapperData["protocol"]."://".$repo->getId();

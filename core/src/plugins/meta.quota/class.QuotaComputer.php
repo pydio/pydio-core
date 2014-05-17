@@ -48,7 +48,7 @@ class QuotaComputer extends AJXP_Plugin
 
     protected function getWorkingPath()
     {
-        $repo = ConfService::getRepository();
+        $repo = $this->accessDriver->repository;
         $clearParent = null;
         // SPECIAL : QUOTA MUST BE COMPUTED ON PARENT REPOSITORY FOLDER
         if ($repo->hasParent()) {
@@ -134,13 +134,13 @@ class QuotaComputer extends AJXP_Plugin
         $q = $this->computeDirSpace($path);
         $this->storeUsage($path, $q);
         $t = $this->getAuthorized();
-        AJXP_Controller::applyHook("msg.instant", array("<metaquota usage='{$q}' total='{$t}'/>", ConfService::getRepository()->getId()));
+        AJXP_Controller::applyHook("msg.instant", array("<metaquota usage='{$q}' total='{$t}'/>", $this->accessDriver->repository->getId()));
     }
 
     protected function storeUsage($dir, $quota)
     {
         $data = $this->getUserData();
-        $repo = ConfService::getRepository()->getId();
+        $repo = $this->accessDriver->repository->getId();
         if(!isset($data["REPO_USAGES"])) $data["REPO_USAGES"] = array();
         $data["REPO_USAGES"][$repo] = $quota;
         $this->saveUserData($data);
@@ -173,7 +173,7 @@ class QuotaComputer extends AJXP_Plugin
     private function getUsage($dir)
     {
         $data = $this->getUserData();
-        $repo = ConfService::getRepository()->getId();
+        $repo = $this->accessDriver->repository->getId();
         if (!isSet($data["REPO_USAGES"][$repo]) || $this->options["CACHE_QUOTA"] === false) {
             $quota = $this->computeDirSpace($dir);
             if(!isset($data["REPO_USAGES"])) $data["REPO_USAGES"] = array();

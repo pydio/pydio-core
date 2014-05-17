@@ -29,6 +29,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class AjxpLuceneIndexer extends AJXP_Plugin
 {
     private $currentIndex;
+    /**
+     * @var AbstractAccessDriver
+     */
     private $accessDriver;
     private $metaFields = array();
     private $indexContent = false;
@@ -134,7 +137,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin
     public function applyAction($actionName, $httpVars, $fileVars)
     {
         $messages = ConfService::getMessages();
-        $repoId = ConfService::getRepository()->getId();
+        $repoId = $this->accessDriver->repository->getId();
 
         if ($actionName == "search") {
 
@@ -146,7 +149,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin
             }
 
             require_once("Zend/Search/Lucene.php");
-            if ($this->isIndexLocked(ConfService::getRepository()->getId())) {
+            if ($this->isIndexLocked($repoId)) {
                 throw new Exception($messages["index.lucene.6"]);
             }
             try {
@@ -228,7 +231,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin
                 throw new Exception($messages["index.lucene.6"]);
             }
             try {
-                $index =  $this->loadIndex(ConfService::getRepository()->getId(), false);
+                $index =  $this->loadIndex($repoId, false);
             } catch (Exception $ex) {
                 $this->applyAction("index", array(), array());
                 throw new Exception($messages["index.lucene.7"]);
@@ -287,14 +290,13 @@ class AjxpLuceneIndexer extends AJXP_Plugin
         } else if ($actionName == "index") {
             $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
             if(empty($dir)) $dir = "/";
-            $repo = ConfService::getRepository();
-            if ($this->isIndexLocked($repo->getId())) {
+            $repo = $this->accessDriver->repository;
+            if ($this->isIndexLocked($repoId)) {
                 throw new Exception($messages["index.lucene.6"]);
             }
             $accessType = $repo->getAccessType();
             $accessPlug = AJXP_PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
             $stData = $accessPlug->detectStreamWrapper(true);
-            $repoId = $repo->getId();
             $url = $stData["protocol"]."://".$repoId.$dir;
             if (isSet($httpVars["verbose"]) && $httpVars["verbose"] == "true") {
                 $this->verboseIndexation = true;

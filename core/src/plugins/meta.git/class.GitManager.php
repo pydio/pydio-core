@@ -39,11 +39,18 @@ class GitManager extends AJXP_Plugin
         }
     }
 
+    /**
+     * @param AbstractAccessDriver $accessDriver
+     * @throws Exception
+     */
     public function initMeta($accessDriver)
     {
         require_once("VersionControl/Git.php");
-        $repo = ConfService::getRepository();
+        $repo = $accessDriver->repository;
         $this->repoBase = $repo->getOption("PATH");
+        if(empty($this->repoBase)){
+            throw new Exception("Meta.git: cannot find PATH option in repository! Are you sure it's an FS-based workspace?");
+        }
         if (!is_dir($this->repoBase.DIRECTORY_SEPARATOR.".git")) {
             $git = new VersionControl_Git($this->repoBase);
             $git->initRepository();

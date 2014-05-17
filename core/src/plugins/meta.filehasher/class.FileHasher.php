@@ -75,8 +75,9 @@ class FileHasher extends AJXP_Plugin
 
     private function getTreeName()
     {
-        $base = AJXP_SHARED_CACHE_DIR."/trees/tree-".ConfService::getRepository()->getId();
-        $secuScope = ConfService::getRepository()->securityScope();
+        $repo = $this->accessDriver->repository;
+        $base = AJXP_SHARED_CACHE_DIR."/trees/tree-".$repo->getId();
+        $secuScope = $repo->securityScope();
         if ($secuScope == "USER") {
             $base .= "-".AuthService::getLoggedUser()->getId();
         } else if ($secuScope == "GROUP") {
@@ -114,7 +115,7 @@ class FileHasher extends AJXP_Plugin
     public function switchActions($actionName, $httpVars, $fileVars)
     {
         //$urlBase = $this->accessDriver
-        $repository = ConfService::getRepository();
+        $repository = $this->accessDriver->repository;
         if (!$repository->detectStreamWrapper(true)) {
             return false;
         }

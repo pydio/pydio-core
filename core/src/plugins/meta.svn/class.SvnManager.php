@@ -56,7 +56,7 @@ class SvnManager extends AJXP_Plugin
     {
         $userSelection = new UserSelection();
         $userSelection->initFromHttpVars($httpVars);
-        $repo = ConfService::getRepository();
+        $repo = $this->accessDriver->repository;
         $repo->detectStreamWrapper();
         $wrapperData = $repo->streamData;
         $urlBase = $wrapperData["protocol"]."://".$repo->getId();
@@ -117,7 +117,7 @@ class SvnManager extends AJXP_Plugin
      */
     public function commitFile($file, $ajxpNode = null)
     {
-        $repo = ConfService::getRepository();
+        $repo = $this->accessDriver->repository;
         $repo->detectStreamWrapper();
         $wrapperData = $repo->streamData;
         $realFile = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $file);

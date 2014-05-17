@@ -55,6 +55,9 @@ class AjxpElasticSearch extends AJXP_Plugin
     private $nextId;
     private $lastIdPath;
 
+    /**
+     * @var AbstractAccessDriver
+     */
     private $accessDriver;
     private $metaFields = array();
     private $indexContent = false;
@@ -137,7 +140,7 @@ class AjxpElasticSearch extends AJXP_Plugin
     public function applyAction($actionName, $httpVars, $fileVars)
     {
         $messages = ConfService::getMessages();
-        $repoId = ConfService::getRepository()->getId();
+        $repoId = $this->accessDriver->repository->getId();
 
         if ($actionName == "search") {
             // TMP
@@ -290,7 +293,7 @@ class AjxpElasticSearch extends AJXP_Plugin
         } else if ($actionName == "index") {
             $dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
             if(empty($dir)) $dir = "/";
-            $repo = ConfService::getRepository();
+            $repo = $this->accessDriver->repository;
             if ($this->isIndexLocked($repo->getId())) {
                 throw new Exception($messages["index.lucene.6"]);
             }
@@ -416,7 +419,11 @@ class AjxpElasticSearch extends AJXP_Plugin
     public function updateNodeIndex($oldNode, $newNode = null, $copy = false)
     {
         if (!isSet($this->currentIndex)) {
-            $this->loadIndex(ConfService::getRepository()->getId());
+            if($oldNode == null){
+                $this->loadIndex($newNode->getRepositoryId());
+            }else{
+                $this->loadIndex($oldNode->getRepositoryId());
+            }
         }
 
         //$this->setDefaultAnalyzer();
