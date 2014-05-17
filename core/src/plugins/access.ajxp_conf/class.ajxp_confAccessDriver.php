@@ -133,6 +133,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $actions[$pId][$actionName] = array( "action" => $actionName , "label" => $messId);
 
                 }
+                ksort($actions, SORT_STRING);
                 foreach ($actions as $actPid => $actionGroup) {
                     ksort($actionGroup, SORT_STRING);
                     $actions[$actPid] = array();

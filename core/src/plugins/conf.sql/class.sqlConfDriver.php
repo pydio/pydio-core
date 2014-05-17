@@ -327,6 +327,30 @@ class sqlConfDriver extends AbstractConfDriver
         return null;
     }
 
+    /**
+     * @param String $slug
+     * @param String|null $repositoryId
+     * @return String mixed
+     */
+    protected function uniquifySlug($slug, $repositoryId = null){
+
+        if($repositoryId != null){
+            $res = dibi::query("SELECT [slug],[uuid] FROM [ajxp_repo] WHERE [uuid] != %s AND [slug] LIKE '".$slug."%'", $repositoryId);
+        }else{
+            $res = dibi::query("SELECT [slug],[uuid] FROM [ajxp_repo] WHERE [slug] LIKE '".$slug."%'");
+        }
+        $existingSlugs = $res->fetchPairs();
+        if(!count($existingSlugs)) return $slug;
+        $index = 1;
+        $base = $slug;
+        $slug = $base."-".$index;
+        while(isSet($existingSlugs[$slug])){
+            $index++;
+            $slug = $base."-".$index;
+        }
+
+        return $slug;
+    }
 
     /**
      * Store a newly created repository
@@ -338,12 +362,20 @@ class sqlConfDriver extends AbstractConfDriver
     public function saveRepository($repositoryObject, $update = false)
     {
         try {
-                $repository_array = $this->repoToArray($repositoryObject);
-                $options = $repository_array['options'];
-                if($repositoryObject->hasContentFilter()){
-                    $options["content_filter"] = $repositoryObject->getContentFilter();
-                }
-                unset($repository_array['options']);
+            if($update){
+                $repositoryObject->setSlug($this->uniquifySlug(
+                    $repositoryObject->getSlug(),
+                    $repositoryObject->getUniqueId()
+                ));
+            }else{
+                $repositoryObject->setSlug($this->uniquifySlug($repositoryObject->getSlug()));
+            }
+            $repository_array = $this->repoToArray($repositoryObject);
+            $options = $repository_array['options'];
+            if($repositoryObject->hasContentFilter()){
+                $options["content_filter"] = $repositoryObject->getContentFilter();
+            }
+            unset($repository_array['options']);
             if (!$update) {
                 dibi::query('INSERT INTO [ajxp_repo]', $repository_array);
 
@@ -353,14 +385,6 @@ class sqlConfDriver extends AbstractConfDriver
                     }
                     dibi::query('INSERT INTO [ajxp_repo_options] ([uuid],[name],[val]) VALUES (%s,%s,%bin)', $repositoryObject->getUniqueId(), $k,$v);
                 }
-                /*
-                //set maximum rights to the repositorie's creator jcg
-                $user_right['login'] = $_SESSION["AJXP_USER"]->id;
-                $user_right['repo_uuid'] = $repository_array['uuid'];
-                $user_right['rights'] = 'rw';
-                dibi::query('INSERT INTO [ajxp_user_rights]', $user_right);
-                $userid=$_SESSION["AJXP_USER"]->id;
-                */
 
             } else {
                 dibi::query('DELETE FROM [ajxp_repo] WHERE [uuid] = %s',$repositoryObject->getUniqueId());

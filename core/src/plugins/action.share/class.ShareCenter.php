@@ -74,7 +74,9 @@ class ShareCenter extends AJXP_Plugin
                 }
             }
             $repo = ConfService::getRepository();
-            if(!is_a($repo->driverInstance, "AjxpWrapperProvider")){
+            // Hacky but necessary to edit roles...
+            if(!is_a($repo->driverInstance, "AjxpWrapperProvider")
+                && !(isset($_GET["get_action"]) && $_GET["get_action"]=="list_all_plugins_actions")){
                 $disableSharing = true;
             }
             if ($disableSharing) {
