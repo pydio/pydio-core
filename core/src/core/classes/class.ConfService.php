@@ -1296,7 +1296,7 @@ class ConfService
                 }
                 try {
                     $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $repository->getId()));
-                    $instance->beforeInitMeta($plugInstance);
+                    $instance->beforeInitMeta($plugInstance, $repository);
                 } catch (Exception $e) {
                     AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
                     $this->errors[] = $e->getMessage();
