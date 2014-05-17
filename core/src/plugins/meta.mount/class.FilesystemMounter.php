@@ -140,12 +140,19 @@ class FilesystemMounter extends AJXP_Plugin
         $MOUNT_OPTIONS = $this->getOption("MOUNT_OPTIONS", $user, $password);
 
         $cmd = ($MOUNT_SUDO? "sudo ": ""). "mount -t " .$MOUNT_TYPE. (empty( $MOUNT_OPTIONS )? " " : " -o " .$MOUNT_OPTIONS. " " ) .$UNC_PATH. " " .$MOUNT_POINT;
-        shell_exec($cmd);
-        // Check it is correctly mounted now!
-        $cmd = ($MOUNT_SUDO?"sudo":"")." mount | grep ".escapeshellarg($MOUNT_POINT);
-        $output = shell_exec($cmd);
-        if ($output == null || trim($output) == "") {
-            throw new Exception("Error while mounting file system - Test was ".$cmd);
+        $res = null;
+        system($cmd, $res);
+        if($res === null){
+            // Check it is correctly mounted now!
+            // Could not get the output return code
+            $cmd1 = ($MOUNT_SUDO?"sudo":"")." mount | grep ".escapeshellarg($MOUNT_POINT);
+            $output = shell_exec($cmd1);
+            $success = !empty($output);
+        }else{
+            $success = ($res == 0);
+        }
+        if (!$success) {
+            throw new Exception("Error while mounting file system!");
         } else {
             if (!is_file($MOUNT_POINT."/.ajxp_mount")) {
                 @file_put_contents($MOUNT_POINT."/.ajxp_mount", "");
