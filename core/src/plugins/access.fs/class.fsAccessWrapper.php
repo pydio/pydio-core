@@ -265,7 +265,7 @@ class fsAccessWrapper implements AjxpWrapper
         try {
             $this->realPath = AJXP_Utils::securePath(self::initPath($path, "file"));
         } catch (Exception $e) {
-            AJXP_Logger::error(__CLASS__,"stream_open", "Error while opening stream $path");
+            AJXP_Logger::error(__CLASS__,"stream_open", "Error while opening stream $path (".$e->getMessage().")");
             return false;
         }
         if ($this->realPath == -1) {
