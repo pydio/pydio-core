@@ -70,6 +70,7 @@ class AJXP_Sabre_AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
         $userObject = $confDriver->createUserObject($userpass[0]);
         $webdavData = $userObject->getPref("AJXP_WEBDAV_DATA");
         if (empty($webdavData) || !isset($webdavData["ACTIVE"]) || $webdavData["ACTIVE"] !== true) {
+            AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => $userpass[0], "error" => "WebDAV user not found or disabled"));
             throw new Sabre\DAV\Exception\NotAuthenticated();
         }
         // check if there are cached credentials. prevents excessive authentication calls to external
@@ -84,6 +85,7 @@ class AJXP_Sabre_AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
 
 
         if (!$cachedPasswordValid && (!$this->validateUserPass($userpass[0],$userpass[1]))) {
+            AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => $userpass[0], "error" => "Invalid WebDAV user or password"));
             $auth->requireLogin();
             throw new Sabre\DAV\Exception\NotAuthenticated('Username or password does not match');
         }
