@@ -578,7 +578,6 @@ $mess=array(
 "502" => "Cartella",
 "503" => "Dimensione",
 "504" => "1k,1M,1G",
-<<<<<<< HEAD
 "505" => "a",
 "506" => "Parametri applicazione (utenti, workspaces, configurazioni)",
 "507" => "Benvenuto su %s",
@@ -586,7 +585,6 @@ $mess=array(
 "509" => "Salva la lista di utenti corrente come team",
 "510" => "Inserisci un nome per il team",
 "511" => "Il mio %s",
-=======
 "505" => "to",
 "506" => "Application parameters (users, workspaces, configurations)",
 "507" => "Welcome on %s",
@@ -595,6 +593,5 @@ $mess=array(
 "510" => "Please enter a team label",
 "511" => "My %s",
 "512" => "Desktop Full Screen",
->>>>>>> 13cf9231313876f748a9b491bc5f80ebea15cd2f
 /* END SENTENCE */
 );
