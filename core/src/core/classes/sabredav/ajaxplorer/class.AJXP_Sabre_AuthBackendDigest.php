@@ -64,7 +64,15 @@ class AJXP_Sabre_AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
     {
         //AJXP_Logger::debug("Try authentication on $realm", $server);
 
-        $success = parent::authenticate($server, $realm);
+        try {
+          $success = parent::authenticate($server, $realm);
+        }
+        catch(Exception $e) {
+          $success = 0;
+          $errmsg = $e->getMessage();
+          if ($errmsg != "No digest authentication headers were found")
+            $success = false;
+        }
         if ($success) {
             $res = AuthService::logUser($this->currentUser, null, true);
             if ($res < 1) {
@@ -76,13 +84,15 @@ class AJXP_Sabre_AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
                 AJXP_Safe::storeCredentials($this->currentUser, $this->_decodePassword($webdavData["PASS"], $this->currentUser));
             }
         }
-        if ($success === false) {
-            throw new Sabre\DAV\Exception\NotAuthenticated();
+        else {
+          if ($success === false) {
+            AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => $this->currentUser, "error" => "Invalid WebDAV user or password"));
+          }
+          throw new Sabre\DAV\Exception\NotAuthenticated($errmsg);
         }
         ConfService::switchRootDir($this->repositoryId);
         return true;
     }
-
 
     protected function updateCurrentUserRights($user)
     {
