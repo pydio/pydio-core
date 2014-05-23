@@ -58,6 +58,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
         $userId = $data["USER_ID"];
         $private = $data["PRIVATE"];
         $server_uri = rtrim(array_shift(explode("?", $_SERVER["REQUEST_URI"])), "/");
+        $server_uri = implode("/", array_map("rawurlencode", array_map("urldecode", explode("/", $server_uri))));
         list($nonce, $hash) = explode(":", $this->detectVar($httpVars, "auth_hash"));
         $replay = hash_hmac("sha256", $server_uri.":".$nonce.":".$private, $token);
         $this->logDebug(__FUNCTION__, "Replay is ".$replay);
