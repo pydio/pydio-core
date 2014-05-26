@@ -930,6 +930,14 @@ class AuthService
         return $allUsers;
     }
 
+    public static function findUserPage($userLogin, $usersPerPage){
+        if(ConfService::getAuthDriverImpl()->supportsUsersPagination()){
+            return ConfService::getAuthDriverImpl()->findUserPage($userLogin, $usersPerPage);
+        }else{
+            return -1;
+        }
+    }
+
     public static function authSupportsPagination()
     {
         $authDriver = ConfService::getAuthDriverImpl();

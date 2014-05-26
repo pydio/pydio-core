@@ -196,10 +196,10 @@ class AbstractAuthDriver extends AJXP_Plugin
             if ($logged == null) {
                 return $this->registryContributions;
             } else {
-                $xmlString = AJXP_XMLWriter::getUserXml($logged, false);
+                $xmlString = AJXP_XMLWriter::getUserXml($logged);
             }
         } else {
-            $xmlString = AJXP_XMLWriter::getUserXml(null, false);
+            $xmlString = AJXP_XMLWriter::getUserXml(null);
         }
         $dom = new DOMDocument();
         $dom->loadXML($xmlString);
@@ -228,6 +228,11 @@ class AbstractAuthDriver extends AJXP_Plugin
     {
         return false;
     }
+
+    public function findUserPage($userLogin, $usersPerPage){
+        return -1;
+    }
+
     public function listUsersPaginated($baseGroup, $regexp, $offset, $limit)
     {
         return $this->listUsers($baseGroup);

@@ -358,7 +358,7 @@
                     var editorData = window.actionArguments[0];
                     ajaxplorer.openCurrentSelectionInEditor(editorData);
                 ]]></clientCallback>
-                <serverCallback methodName="switchAction" developerComment="Shortcut for various actions, calling edit with subaction parameter."/>
+                <serverCallback methodName="switchAction" restParams="/sub_action" developerComment="Shortcut for various actions, calling edit with subaction parameter."/>
             </processing>
         </action>
         <action name="edit_repository_label">

@@ -73,6 +73,14 @@ class sqlAuthDriver extends AbstractAuthDriver
            return $pairs;
     }
 
+    public function findUserPage($userLogin, $usersPerPage){
+
+        $res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [login] <= %s", $userLogin);
+        $count = $res->fetchSingle();
+        return ceil($count / $usersPerPage) - 1;
+
+    }
+
     public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null)
     {
         // WITH PARENT
