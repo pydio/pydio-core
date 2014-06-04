@@ -191,7 +191,4 @@
             </action>
         </actions>
     </registry_contributions>
-    <dependencies>
-        <activePlugin pluginName="gui.ajax"/>
-    </dependencies>
 </ajxpcore>
