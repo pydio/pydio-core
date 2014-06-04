@@ -181,6 +181,16 @@ class ChangesTracker extends AJXP_Plugin
 
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         try {
+            if ($newNode != null && $this->excludeNode($newNode)) {
+                // CREATE
+                if($oldNode == null) {
+                    AJXP_Logger::debug("Ignoring ".$newNode->getUrl()." for indexation");
+                    return;
+                }else{
+                    AJXP_Logger::debug("Target node is excluded, see it as a deletion: ".$newNode->getUrl());
+                    $newNode = null;
+                }
+            }
             if ($newNode == null) {
                 $repoId = $this->computeIdentifier($oldNode->getRepository());
                 // DELETE
@@ -231,9 +241,30 @@ class ChangesTracker extends AJXP_Plugin
 
     /**
      * @param AJXP_Node $node
+     * @return bool
+     */
+    protected function excludeNode($node){
+        $repo = $node->getRepository();
+        $recycle = $repo->getOption("RECYCLE_BIN");
+        if(!empty($recycle) && strpos($node->getPath(), "/".trim($recycle, "/")) === 0) return true;
+        // Other exclusions conditions here?
+        return false;
+    }
+
+    /**
+     * @param AJXP_Node $node
      */
     public function indexNode($node){
-        // TODO: DO SOMETHING HERE!!
+        // Create
+        $this->updateNodesIndex(null, $node, false);
+    }
+
+    /**
+     * @param AJXP_Node $node
+     */
+    public function clearIndexForNode($node){
+        // Delete
+        $this->updateNodesIndex($node, null, false);
     }
 
     public function installSQLTables($param)
