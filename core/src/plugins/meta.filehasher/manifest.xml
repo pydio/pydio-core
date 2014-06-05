@@ -4,6 +4,7 @@
     <class_definition filename="plugins/meta.filehasher/class.FileHasher.php" classname="FileHasher"/>
     <server_settings>
         <param name="CACHE_XML_TREE" type="boolean" default="false" label="Cache full tree" description="Cache XML tree and invalidate on node change"/>
+        <global_param name="RSYNC_SUPPORTED" type="boolean" label="Rsync Support" description="Don't edit, it will be detected by the server" expose="true"/>
     </server_settings>
    	<client_settings>
    		<resources>
@@ -15,19 +16,25 @@
                <action name="filehasher_signature">
                    <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="false"/>
                    <processing>
-                       <serverCallback methodName="switchActions"/>
+                       <serverCallback methodName="switchActions" restParams="/file+" developerComment="Get the signature of an existing file" sdkMethodName="rdiffSignature">
+                           <input_param name="file" type="AJXP_NODE" description="Path to file"/>
+                       </serverCallback>
                    </processing>
                </action>
                <action name="filehasher_delta">
                    <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="false"/>
                    <processing>
-                       <serverCallback methodName="switchActions"/>
+                       <serverCallback methodName="switchActions" restParams="/file+" developerComment="Compute a delta computed against an existing signature. Signature is posted as attached file (userfile_0)" sdkMethodName="rdiffDelta">
+                           <input_param name="file" type="AJXP_NODE" description="Path to file"/>
+                       </serverCallback>
                    </processing>
                </action>
                <action name="filehasher_patch">
                    <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="true"/>
                    <processing>
-                       <serverCallback methodName="switchActions"/>
+                       <serverCallback methodName="switchActions" restParams="/file+" sdkMethodName="rdiffPath" developerComment="Apply a patch to an existing file. Patch is posted as attached file (userfile_0)">
+                           <input_param name="file" type="AJXP_NODE" description="Path to file"/>
+                       </serverCallback>
                    </processing>
                </action>
                <action name="stat_hash">
