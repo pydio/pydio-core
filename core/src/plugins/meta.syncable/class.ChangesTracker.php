@@ -76,7 +76,9 @@ class ChangesTracker extends AJXP_Plugin
                 $this->computeIdentifier($currentRepo), AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
         }
 
-        echo '{"changes":[';
+        $stream = isSet($httpVars["stream"]);
+        $separator = $stream ? "\n" : ",";
+        if(!$stream) echo '{"changes":[';
         $previousNodeId = -1;
         $previousRow = null;
         $order = array("path"=>0, "content"=>1, "create"=>2, "delete"=>3);
@@ -102,7 +104,7 @@ class ChangesTracker extends AJXP_Plugin
                         $lastSeq = $row->seq;
                         continue;
                     }
-                    if($valuesSent) echo ",";
+                    if($valuesSent) echo $separator;
                     echo json_encode($previousRow);
                     $valuesSent = true;
                 }
@@ -113,15 +115,23 @@ class ChangesTracker extends AJXP_Plugin
             flush();
         }
         if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content") && !$this->filterRow($previousRow, $filter)) {
-            if($valuesSent) echo ",";
+            if($valuesSent) echo $separator;
             echo json_encode($previousRow);
         }
         if (isSet($lastSeq)) {
-            echo '], "last_seq":'.$lastSeq.'}';
+            if($stream){
+                echo("\nLAST_SEQ:".$lastSeq);
+            }else{
+                echo '], "last_seq":'.$lastSeq.'}';
+            }
         } else {
             $lastSeq = dibi::query("SELECT MAX([seq]) FROM [ajxp_changes]")->fetchSingle();
             if(empty($lastSeq)) $lastSeq = 1;
-            echo '], "last_seq":'.$lastSeq.'}';
+            if($stream){
+                echo("\nLAST_SEQ:".$lastSeq);
+            }else{
+                echo '], "last_seq":'.$lastSeq.'}';
+            }
         }
 
     }
