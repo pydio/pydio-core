@@ -28,10 +28,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-require_once(dirname(__FILE__).'/Abstract.php');
-include_once(dirname(__FILE__).'/../Exception.php');
-include_once(dirname(__FILE__).'/../InvalidArgumentException.php');
-include_once(dirname(__FILE__).'/../OutOfSequenceException.php');
+require_once(dirname(__FILE__) . '/Abstract.php');
+include_once(dirname(__FILE__) . '/../Exception.php');
+include_once(dirname(__FILE__) . '/../InvalidArgumentException.php');
+include_once(dirname(__FILE__) . '/../OutOfSequenceException.php');
 
 /**
  * Provides access to a proxy-authenticated IMAP stream

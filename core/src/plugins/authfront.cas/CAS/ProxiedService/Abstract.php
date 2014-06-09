@@ -28,10 +28,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-require_once(dirname(__FILE__).'/../ProxiedService.php');
-require_once(dirname(__FILE__).'/Testable.php');
-include_once(dirname(__FILE__).'/../InvalidArgumentException.php');
-include_once(dirname(__FILE__).'/../OutOfSequenceException.php');
+require_once(dirname(__FILE__) . '/../ProxiedService.php');
+require_once(dirname(__FILE__) . '/Testable.php');
+include_once(dirname(__FILE__) . '/../InvalidArgumentException.php');
+include_once(dirname(__FILE__) . '/../OutOfSequenceException.php');
 
 
 /**
