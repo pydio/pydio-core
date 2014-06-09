@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpcore id="authfront.cas" enabled="false" label="CONF_MESSAGE[CAS FrontEnd]" description="CONF_MESSAGE[Authentication by CAS]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<ajxpcore id="authfront.cas" label="CONF_MESSAGE[CAS FrontEnd]" description="CONF_MESSAGE[Authentication by CAS]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/authfront.cas/class.CasAuthFrontend.php" classname="CasAuthFrontend"/>
     <server_settings>
         <global_param name="ORDER" type="integer" label="Order" description="Order this plugin with other auth frontends" default="11" mandatory="true"/>
