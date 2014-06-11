@@ -317,6 +317,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin
             // GIVE BACK THE HAND TO USER
             session_write_close();
             $this->currentIndex = $this->loadIndex($repoId);
+            AJXP_Controller::applyHook("node.index.folder_recursive", array(new AJXP_Node($url)));
             $this->recursiveIndexation($url);
             if (ConfService::currentContextIsCommandLine() && $this->verboseIndexation) {
                 print("Optimizing\n");
@@ -357,12 +358,18 @@ class AjxpLuceneIndexer extends AJXP_Plugin
             while ( ($child = readdir($handle)) != false) {
                 if($child[0] == ".") continue;
                 $newUrl = $url."/".$child;
+                if (ConfService::currentContextIsCommandLine() && $this->verboseIndexation) {
+                    print("Indexing node ".$newUrl."\n");
+                }
                 $this->logDebug("Indexing Node ".$newUrl);
                 try {
                     $newNode = new AJXP_Node($newUrl);
                     $this->updateNodeIndex(null, $newNode);
-                    AJXP_Controller::applyHook("node.index", array($newNode));
+                    AJXP_Controller::applyHook("node.index.add", array($newNode));
                 } catch (Exception $e) {
+                    if (ConfService::currentContextIsCommandLine() && $this->verboseIndexation) {
+                        print("Error indexing node ".$newUrl." (".$e->getMessage().") \n");
+                    }
                     $this->logDebug("Error Indexing Node ".$newUrl." (".$e->getMessage().")");
                 }
             }

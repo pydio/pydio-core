@@ -515,25 +515,14 @@ class AJXP_XMLWriter
         }
         return AJXP_XMLWriter::write("<message type=\"$messageType\">".$message."</message>", $print);
     }
-    /**
-     * Writes the user data as XML
-     * @static
-     * @param null $userObject
-     * @param bool $details
-     * @return void
-     */
-    public static function sendUserData($userObject = null, $details=false)
-    {
-        print(AJXP_XMLWriter::getUserXML($userObject, $details));
-    }
+
     /**
      * Extract all the user data and put it in XML
      * @static
-     * @param null $userObject
-     * @param bool $details
+     * @param null $userObject * @internal param bool $details
      * @return string
      */
-    public static function getUserXML($userObject = null, $details=false)
+    public static function getUserXML($userObject = null)
     {
         $buffer = "";
         $loggedUser = AuthService::getLoggedUser();
@@ -541,24 +530,14 @@ class AJXP_XMLWriter
         if($userObject != null) $loggedUser = $userObject;
         if (!AuthService::usersEnabled()) {
             $buffer.="<user id=\"shared\">";
-            if (!$details) {
-                $buffer.="<active_repo id=\"".ConfService::getCurrentRepositoryId()."\" write=\"1\" read=\"1\"/>";
-            }
-            $buffer.= AJXP_XMLWriter::writeRepositoriesData(null, $details);
+            $buffer.="<active_repo id=\"".ConfService::getCurrentRepositoryId()."\" write=\"1\" read=\"1\"/>";
+            $buffer.= AJXP_XMLWriter::writeRepositoriesData(null);
             $buffer.="</user>";
         } else if ($loggedUser != null) {
             $lock = $loggedUser->getLock();
             $buffer.="<user id=\"".$loggedUser->id."\">";
-            if (!$details) {
-                $buffer.="<active_repo id=\"".ConfService::getCurrentRepositoryId()."\" write=\"".($loggedUser->canWrite(ConfService::getCurrentRepositoryId())?"1":"0")."\" read=\"".($loggedUser->canRead(ConfService::getCurrentRepositoryId())?"1":"0")."\"/>";
-            } else {
-                $buffer .= "<ajxp_roles>";
-                foreach ($loggedUser->getRoles() as $roleId => $boolean) {
-                    if($boolean === true) $buffer.= "<role id=\"$roleId\"/>";
-                }
-                $buffer .= "</ajxp_roles>";
-            }
-            $buffer.= AJXP_XMLWriter::writeRepositoriesData($loggedUser, $details);
+            $buffer.="<active_repo id=\"".ConfService::getCurrentRepositoryId()."\" write=\"".($loggedUser->canWrite(ConfService::getCurrentRepositoryId())?"1":"0")."\" read=\"".($loggedUser->canRead(ConfService::getCurrentRepositoryId())?"1":"0")."\"/>";
+            $buffer.= AJXP_XMLWriter::writeRepositoriesData($loggedUser);
             $buffer.="<preferences>";
             $preferences = $confDriver->getExposedPreferences($loggedUser);
             foreach ($preferences as $prefName => $prefData) {
@@ -589,27 +568,24 @@ class AJXP_XMLWriter
         }
         return $buffer;
     }
+
     /**
      * Write the repositories access rights in XML format
      * @static
-     * @param AbstractAjxpUser|null $loggedUser
-     * @param bool $details
+     * @param AbstractAjxpUser|null $loggedUser * @internal param bool $details
      * @return string
      */
-    public static function writeRepositoriesData($loggedUser, $details=false)
+    public static function writeRepositoriesData($loggedUser)
     {
         $st = "<repositories>";
         $streams = ConfService::detectRepositoryStreams(false);
-        foreach (ConfService::getAccessibleRepositories($loggedUser, $details, false) as $repoId => $repoObject) {
+        foreach (ConfService::getAccessibleRepositories($loggedUser, false, false) as $repoId => $repoObject) {
             $toLast = false;
             if ($repoObject->getAccessType()=="ajxp_conf") {
                 if(AuthService::usersEnabled() && !$loggedUser->isAdmin())continue;
                 $toLast = true;
             }
             $rightString = "";
-            if ($details) {
-                $rightString = " r=\"".($loggedUser->canRead($repoId)?"1":"0")."\" w=\"".($loggedUser->canWrite($repoId)?"1":"0")."\"";
-            }
             $streamString = "";
             if (in_array($repoObject->accessType, $streams)) {
                 $streamString = "allowCrossRepositoryCopy=\"true\"";

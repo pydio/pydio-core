@@ -76,7 +76,9 @@ class ChangesTracker extends AJXP_Plugin
                 $this->computeIdentifier($currentRepo), AJXP_Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
         }
 
-        echo '{"changes":[';
+        $stream = isSet($httpVars["stream"]);
+        $separator = $stream ? "\n" : ",";
+        if(!$stream) echo '{"changes":[';
         $previousNodeId = -1;
         $previousRow = null;
         $order = array("path"=>0, "content"=>1, "create"=>2, "delete"=>3);
@@ -102,7 +104,7 @@ class ChangesTracker extends AJXP_Plugin
                         $lastSeq = $row->seq;
                         continue;
                     }
-                    if($valuesSent) echo ",";
+                    if($valuesSent) echo $separator;
                     echo json_encode($previousRow);
                     $valuesSent = true;
                 }
@@ -113,15 +115,23 @@ class ChangesTracker extends AJXP_Plugin
             flush();
         }
         if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content") && !$this->filterRow($previousRow, $filter)) {
-            if($valuesSent) echo ",";
+            if($valuesSent) echo $separator;
             echo json_encode($previousRow);
         }
         if (isSet($lastSeq)) {
-            echo '], "last_seq":'.$lastSeq.'}';
+            if($stream){
+                echo("\nLAST_SEQ:".$lastSeq);
+            }else{
+                echo '], "last_seq":'.$lastSeq.'}';
+            }
         } else {
             $lastSeq = dibi::query("SELECT MAX([seq]) FROM [ajxp_changes]")->fetchSingle();
             if(empty($lastSeq)) $lastSeq = 1;
-            echo '], "last_seq":'.$lastSeq.'}';
+            if($stream){
+                echo("\nLAST_SEQ:".$lastSeq);
+            }else{
+                echo '], "last_seq":'.$lastSeq.'}';
+            }
         }
 
     }
@@ -181,6 +191,16 @@ class ChangesTracker extends AJXP_Plugin
 
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         try {
+            if ($newNode != null && $this->excludeNode($newNode)) {
+                // CREATE
+                if($oldNode == null) {
+                    AJXP_Logger::debug("Ignoring ".$newNode->getUrl()." for indexation");
+                    return;
+                }else{
+                    AJXP_Logger::debug("Target node is excluded, see it as a deletion: ".$newNode->getUrl());
+                    $newNode = null;
+                }
+            }
             if ($newNode == null) {
                 $repoId = $this->computeIdentifier($oldNode->getRepository());
                 // DELETE
@@ -231,9 +251,30 @@ class ChangesTracker extends AJXP_Plugin
 
     /**
      * @param AJXP_Node $node
+     * @return bool
+     */
+    protected function excludeNode($node){
+        $repo = $node->getRepository();
+        $recycle = $repo->getOption("RECYCLE_BIN");
+        if(!empty($recycle) && strpos($node->getPath(), "/".trim($recycle, "/")) === 0) return true;
+        // Other exclusions conditions here?
+        return false;
+    }
+
+    /**
+     * @param AJXP_Node $node
      */
     public function indexNode($node){
-        // TODO: DO SOMETHING HERE!!
+        // Create
+        $this->updateNodesIndex(null, $node, false);
+    }
+
+    /**
+     * @param AJXP_Node $node
+     */
+    public function clearIndexForNode($node){
+        // Delete
+        $this->updateNodesIndex($node, null, false);
     }
 
     public function installSQLTables($param)

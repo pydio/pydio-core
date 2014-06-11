@@ -28,13 +28,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-require_once(dirname(__FILE__).'/../Exception.php');
+require_once(dirname(__FILE__) . '/Exception.php');
 
 /**
- * An Exception for problems communicating with a proxied service.
+ * This class defines Exceptions that should be thrown when the sequence of operations
+ * is invalid. Examples are:
+ *		- Requesting the response before executing a request.
+ *		- Changing the URL of a request after executing the request.
  */
-class CAS_ProxiedService_Exception
-	extends Exception
+class CAS_OutOfSequenceException
+	extends BadMethodCallException
 	implements CAS_Exception
 {
 

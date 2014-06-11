@@ -40,6 +40,25 @@ class FileHasher extends AJXP_Plugin
         return function_exists("rsync_generate_signature");
     }
 
+    public function getConfigs()
+    {
+        $data = parent::getConfigs();
+        $this->filterData($data);
+        return $data;
+    }
+    public function loadConfigs($data)
+    {
+        $this->filterData($data);
+        parent::loadConfigs($data);
+
+    }
+
+    private function filterData(&$data)
+    {
+        $data["RSYNC_SUPPORTED"] = self::rsyncEnabled();
+    }
+
+
     public function parseSpecificContributions(&$contribNode)
     {
         parent::parseSpecificContributions($contribNode);
@@ -62,12 +81,12 @@ class FileHasher extends AJXP_Plugin
         }
     }
 
-       public function initMeta($accessDriver)
-       {
-           $this->accessDriver = $accessDriver;
+    public function initMeta($accessDriver)
+    {
+        $this->accessDriver = $accessDriver;
         $store = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
         if ($store === false) {
-           throw new Exception("The 'meta.simple_lock' plugin requires at least one active 'metastore' plugin");
+            throw new Exception("The 'meta.simple_lock' plugin requires at least one active 'metastore' plugin");
         }
         $this->metaStore = $store;
         $this->metaStore->initMeta($accessDriver);

@@ -189,6 +189,23 @@ class sqlConfDriver extends AbstractConfDriver
 
 
     /**
+     * @param Array $array
+     * @return Repository[]
+     */
+    protected function initRepoArrayFromDbFetch($array){
+        $repositories = array();
+        foreach ($array as $repo_row) {
+
+            $res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
+            $opts = $res_opts->fetchPairs('name', 'val');
+            $repo = $this->repoFromDb($repo_row, $opts);
+
+            $repositories[$repo->getUniqueId()] = $repo;
+        }
+        return $repositories;
+    }
+
+    /**
      * Get a list of repositories
      *
      * The list is an associative array of Array( 'uuid' => [Repository Object] );
@@ -199,42 +216,42 @@ class sqlConfDriver extends AbstractConfDriver
     public function listRepositories($user = null)
     {
         if ($user != null) {
-            $acls = $user->mergedRole->listAcls();
-            $limitRepositories = array_keys($acls);
-            if(!count($limitRepositories)) return array();
-            // we use (%s) instead of %in to pass int as string ('1' instead of 1)
-            $res = dibi::query('SELECT * FROM [ajxp_repo] WHERE [uuid] IN (%s) ORDER BY [display] ASC', $limitRepositories);
+            return $this->listRepositoriesForRole($user->mergedRole);
         } else {
             $res = dibi::query('SELECT * FROM [ajxp_repo] ORDER BY [display] ASC');
         }
-
         $all = $res->fetchAll();
+        return $this->initRepoArrayFromDbFetch($all);
+    }
 
-        $repositories = Array();
-
-        foreach ($all as $repo_row) {
-
-            $res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
-            $opts = $res_opts->fetchPairs('name', 'val');
-            $repo = $this->repoFromDb($repo_row, $opts);
-
-            $repositories[$repo->getUniqueId()] = $repo;
-        }
-
-        return $repositories;
+    /**
+     * @param AJXP_Role $role
+     * @return Repository[]
+     */
+    public function listRepositoriesForRole($role){
+        $acls = $role->listAcls();
+        if(!count($acls)) return array();
+        $limitRepositories = array_keys($acls);
+        $res = dibi::query('SELECT * FROM [ajxp_repo] WHERE [uuid] IN (%s) ORDER BY [display] ASC', $limitRepositories);
+        $all = $res->fetchAll();
+        return $this->initRepoArrayFromDbFetch($all);
     }
 
     /**
      * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
      * @param Array $criteria
      * @param int $count possible total count
-     * @return Array
+     * @return Repository[]
      */
     public function listRepositoriesWithCriteria($criteria, &$count = null){
 
         $wheres = array();
         $limit = $groupBy = "";
         $order = "ORDER BY display ASC";
+
+        if(isSet($criteria["role"]) && is_a($criteria["role"], "AJXP_Role")){
+            return $this->listRepositoriesForRole($criteria["role"]);
+        }
 
         $searchableKeys = array("uuid", "parent_uuid", "owner_user_id", "display", "accessType", "isTemplate", "slug", "groupPath");
         foreach($criteria as $cName => $cValue){
@@ -250,7 +267,7 @@ class sqlConfDriver extends AbstractConfDriver
                     $wheres[] = array("[$cName] IS NULL");
                 }else{
                     $type = "%s";
-                    if($cName == 'isTemplate') $type = "%d";
+                    if($cName == 'isTemplate') $type = "%i";
                     $wheres[] = array("[$cName] = $type", $cValue);
                 }
             }else if($cName == "CURSOR"){
@@ -269,16 +286,7 @@ class sqlConfDriver extends AbstractConfDriver
 
         $res = dibi::query("SELECT * FROM [ajxp_repo] WHERE %and $groupBy $order $limit", $wheres);
         $all = $res->fetchAll();
-
-        $repositories = Array();
-        foreach ($all as $repo_row) {
-            $res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
-            $opts = $res_opts->fetchPairs('name', 'val');
-            $repo = $this->repoFromDb($repo_row, $opts);
-            $repositories[$repo->getUniqueId()] = $repo;
-        }
-
-        return $repositories;
+        return $this->initRepoArrayFromDbFetch($all);
 
     }
 

@@ -354,12 +354,12 @@ class ConfService
      * @param bool $skipShared
      * @return Repository[]
      */
-    public static function getAccessibleRepositories($userObject=null, $details=false, $labelOnly = false, $skipShared = false)
+    public static function getAccessibleRepositories($userObject=null, $details=false, $labelOnly = false, $includeShared = true)
     {
         $result = array();
-        $allReps = ConfService::getRepositoriesList("all");
+        $allReps = ConfService::getRepositoriesList("user");
         foreach ($allReps as $repositoryId => $repositoryObject) {
-            if (!ConfService::repositoryIsAccessible($repositoryId, $repositoryObject, $userObject, $details, $skipShared)) {
+            if (!ConfService::repositoryIsAccessible($repositoryId, $repositoryObject, $userObject, $details, $includeShared)) {
                 continue;
             }
 
@@ -378,11 +378,11 @@ class ConfService
      * @param Repository $repositoryObject
      * @param AbstractAjxpUser $userObject
      * @param bool $details
-     * @param bool $skipShared
+     * @param bool $includeShared
      *
      * @return bool
      */
-    public static function repositoryIsAccessible($repositoryId, $repositoryObject, $userObject = null, $details=false, $skipShared=false)
+    public static function repositoryIsAccessible($repositoryId, $repositoryObject, $userObject = null, $details=false, $includeShared=true)
     {
         if($userObject == null) $userObject = AuthService::getLoggedUser();
         if ($userObject == null && AuthService::usersEnabled()) {
@@ -417,7 +417,7 @@ class ConfService
                 return false;
             }
             // Do not display shared repositories otherwise.
-            if ($repositoryObject->hasOwner() && $skipShared && ($userObject == null || $userObject->getParent() != $repositoryObject->getOwner())) {
+            if ($repositoryObject->hasOwner() && !$includeShared && ($userObject == null || $userObject->getParent() != $repositoryObject->getOwner())) {
                 return false;
             }
             if ($userObject != null && $repositoryObject->hasOwner() && !$userObject->hasParent()) {

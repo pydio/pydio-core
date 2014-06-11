@@ -35,26 +35,26 @@
  */
 
 // include internationalization stuff
-include_once(dirname(__FILE__).'/languages/languages.php');
+include_once(dirname(__FILE__) . '/languages/languages.php');
 
 // include PGT storage classes
-include_once(dirname(__FILE__).'/PGTStorage/AbstractStorage.php');
+include_once(dirname(__FILE__) . '/PGTStorage/AbstractStorage.php');
 
 // include class for storing service cookies.
-include_once(dirname(__FILE__).'/CookieJar.php');
+include_once(dirname(__FILE__) . '/CookieJar.php');
 
 // include class for fetching web requests.
-include_once(dirname(__FILE__).'/Request/CurlRequest.php');
+include_once(dirname(__FILE__) . '/Request/CurlRequest.php');
 
 // include classes for proxying access to services
-include_once(dirname(__FILE__).'/ProxiedService/Http/Get.php');
-include_once(dirname(__FILE__).'/ProxiedService/Http/Post.php');
-include_once(dirname(__FILE__).'/ProxiedService/Imap.php');
+include_once(dirname(__FILE__) . '/ProxiedService/Http/Get.php');
+include_once(dirname(__FILE__) . '/ProxiedService/Http/Post.php');
+include_once(dirname(__FILE__) . '/ProxiedService/Imap.php');
 
 // include Exception classes
-include_once(dirname(__FILE__).'/ProxiedService/Exception.php');
-include_once(dirname(__FILE__).'/ProxyTicketException.php');
-include_once(dirname(__FILE__).'/InvalidArgumentException.php');
+include_once(dirname(__FILE__) . '/ProxiedService/Exception.php');
+include_once(dirname(__FILE__) . '/ProxyTicketException.php');
+include_once(dirname(__FILE__) . '/InvalidArgumentException.php');
 
 
 /**
@@ -1146,7 +1146,7 @@ class CAS_Client
 					header('Location: '.$this->getURL());
 					phpCAS::trace( "Prepare redirect to : ".$this->getURL() );
 					phpCAS::traceExit();
-					exit();
+					//exit();
 				}
 			}
 		}
@@ -1271,6 +1271,7 @@ class CAS_Client
 	 * @params $params an array that contains the optional url and service parameters that will be passed to the CAS server
 	 */
 	public function logout($params) {
+        $res = array();
 		phpCAS::traceBegin();
 		$cas_url = $this->getServerLogoutURL();
 		$paramSeparator = '?';
@@ -1281,15 +1282,33 @@ class CAS_Client
 		if (isset($params['service'])) {
 			$cas_url = $cas_url . $paramSeparator . "service=" . urlencode($params['service']);
 		}
-		header('Location: '.$cas_url);
-		phpCAS::trace( "Prepare redirect to : ".$cas_url );
+
+        flush();
+        error_reporting(E_ALL);
+        ini_set('display_errors','On');
+        ob_start(null, 0, PHP_OUTPUT_HANDLER_STDFLAGS ^ PHP_OUTPUT_HANDLER_REMOVABLE);
+        header('Refresh: 5; url='.$cas_url);
+        die();
+		phpCAS::trace( "Prepare redirect logout to : ".$cas_url );
 
 		session_unset();
 		session_destroy();
 
+        /*
+         *
+         *
+         *
+         * */
+
 		$this->printHTMLHeader($this->getString(CAS_STR_LOGOUT));
 		printf('<p>'.$this->getString(CAS_STR_SHOULD_HAVE_BEEN_REDIRECTED).'</p>',$cas_url);
 		$this->printHTMLFooter();
+
+
+        $loggingResult = 2;
+        AJXP_XMLWriter::header();
+        AJXP_XMLWriter::loggingResult($loggingResult, null, null, null);
+        AJXP_XMLWriter::close();
 
 		phpCAS::traceExit();
 		exit();

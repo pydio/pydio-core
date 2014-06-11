@@ -28,35 +28,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-require_once(dirname(__FILE__).'/Exception.php');
+require_once(dirname(__FILE__) . '/../Exception.php');
 
 /**
- * An Exception for errors related to fetching or validating proxy tickets.
+ * An Exception for problems performing requests
  */
-class CAS_ProxyTicketException
-	extends BadMethodCallException
+class CAS_Request_Exception
+	extends Exception
 	implements CAS_Exception
 {
-	
-	/**
-	 * Constructor
-	 * 
-	 * @param string $message
-	 * @param optional int $code
-	 * @param optional Exception $previous
-	 * @return void
-	 */
-	public function __construct ($message, $code = PHPCAS_SERVICE_PT_FAILURE) {
-		// Warn if the code is not in our allowed list
-		$ptCodes = array(
-			PHPCAS_SERVICE_PT_FAILURE, 
-			PHPCAS_SERVICE_PT_NO_SERVER_RESPONSE, 
-			PHPCAS_SERVICE_PT_BAD_SERVER_RESPONSE,
-		);
-		if (!in_array($code, $ptCodes)) {
-			trigger_error('Invalid code '.$code.' passed. Must be one of PHPCAS_SERVICE_PT_FAILURE, PHPCAS_SERVICE_PT_NO_SERVER_RESPONSE, or PHPCAS_SERVICE_PT_BAD_SERVER_RESPONSE.');
-		}
-		
-		parent::__construct($message, $code);
-	}
+
 }

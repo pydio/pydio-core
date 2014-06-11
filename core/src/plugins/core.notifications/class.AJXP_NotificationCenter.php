@@ -117,7 +117,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         if (isSet($httpVars["repository_id"]) && $u->mergedRole->canRead($httpVars["repository_id"])) {
             $authRepos[] = $httpVars["repository_id"];
         } else {
-            $accessibleRepos = ConfService::getAccessibleRepositories(AuthService::getLoggedUser(), false, true, true);
+            $accessibleRepos = ConfService::getAccessibleRepositories(AuthService::getLoggedUser(), false, true, false);
             $authRepos = array_keys($accessibleRepos);
         }
         $offset = isSet($httpVars["offset"]) ? intval($httpVars["offset"]): 0;

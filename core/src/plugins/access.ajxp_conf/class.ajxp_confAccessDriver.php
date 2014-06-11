@@ -538,7 +538,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if (isSet($httpVars["format"]) && $httpVars["format"] == "json") {
                     HTMLWriter::charsetHeader("application/json");
                     $roleData = $role->getDataArray();
-                    $repos = ConfService::getAccessibleRepositories($userObject, true, true, ($userObject == null ? true:false));
+                    $repos = ConfService::getAccessibleRepositories($userObject, true, true, ($userObject == null ? false:true));
                     // Make sure it's utf8
                     foreach($repos as $r => $rLabel){
                         $repos[$r] = SystemTextEncoding::toUTF8($rLabel);
@@ -1068,10 +1068,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case  "get_templates_definition":
 
                 AJXP_XMLWriter::header("repository_templates");
-                $repositories = ConfService::getRepositoriesList("all", false);
+                $repositories = ConfService::getConfStorageImpl()->listRepositoriesWithCriteria(array(
+                    "isTemplate" => '1'
+                ));
                 foreach ($repositories as $repo) {
                     if(!$repo->isTemplate) continue;
-                    $repoId = $repo->getId();
+                    $repoId = $repo->getUniqueId();
                     $repoLabel = SystemTextEncoding::toUTF8($repo->getDisplay());
                     $repoType = $repo->getAccessType();
                     print("<template repository_id=\"$repoId\" repository_label=\"$repoLabel\" repository_type=\"$repoType\">");
@@ -1759,17 +1761,29 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
         if ($findNodePosition != null && $hashValue == null) {
 
-            // Loop on each page to find the correct page.
-            $count = AuthService::authCountUsers($baseGroup);
-            $pages = ceil($count / $USER_PER_PAGE);
-            for ($i = 0; $i < $pages ; $i ++) {
+            $position = AuthService::findUserPage($findNodePosition, $USER_PER_PAGE);
+            if($position != -1){
 
-                $tests = $this->listUsers($root, $child, $i+1, true, $findNodePosition);
-                if (is_array($tests) && isSet($tests["/data/".$root."/".$findNodePosition])) {
-                    return array("/data/".$root."/".$findNodePosition => str_replace("ajxp_mime", "page_position='".($i+1)."' ajxp_mime", $tests["/data/".$root."/".$findNodePosition]));
+                $key = "/data/".$root."/".$findNodePosition;
+                $data =  array($key => AJXP_XMLWriter::renderNode($key, $findNodePosition, true, array(
+                        "page_position" => $position
+                    ), true, false));
+                return $data;
+
+            }else{
+                // Loop on each page to find the correct page.
+                $count = AuthService::authCountUsers($baseGroup);
+                $pages = ceil($count / $USER_PER_PAGE);
+                for ($i = 0; $i < $pages ; $i ++) {
+
+                    $tests = $this->listUsers($root, $child, $i+1, true, $findNodePosition);
+                    if (is_array($tests) && isSet($tests["/data/".$root."/".$findNodePosition])) {
+                        return array("/data/".$root."/".$findNodePosition => str_replace("ajxp_mime", "page_position='".($i+1)."' ajxp_mime", $tests["/data/".$root."/".$findNodePosition]));
+                    }
+
                 }
-
             }
+
 
             return array();
 
@@ -1824,7 +1838,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
         }
         $mess = ConfService::getMessages();
-        $repos = ConfService::getRepositoriesList("all");
         $loggedUser = AuthService::getLoggedUser();
         $userArray = array();
         foreach ($users as $userIndex => $userObject) {
@@ -1841,6 +1854,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
         ksort($userArray);
         foreach ($userArray as $userObject) {
+            $repos = ConfService::getConfStorageImpl()->listRepositories($userObject);
             $isAdmin = $userObject->isAdmin();
             $userId = $userObject->getId();
             $icon = "user".($userId=="guest"?"_guest":($isAdmin?"_admin":""));
@@ -1894,12 +1908,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         if(!AuthService::usersEnabled()) return ;
         $roles = AuthService::getRolesList(array(), !$this->listSpecialRoles);
         $mess = ConfService::getMessages();
-        $repos = ConfService::getRepositoriesList("all");
         ksort($roles);
         foreach ($roles as $roleId => $roleObject) {
             //if(strpos($roleId, "AJXP_GRP_") === 0 && !$this->listSpecialRoles) continue;
             $r = array();
             if(!AuthService::canAdministrate($roleObject)) continue;
+            $repos = ConfService::getConfStorageImpl()->listRepositoriesWithCriteria(array("role" => $roleObject));
             foreach ($repos as $repoId => $repository) {
                 if($repository->getAccessType() == "ajxp_shared") continue;
                 if(!$roleObject->canRead($repoId) && !$roleObject->canWrite($repoId)) continue;

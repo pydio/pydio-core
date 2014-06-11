@@ -28,10 +28,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-require_once dirname(__FILE__).'/RequestInterface.php';
-include_once(dirname(__FILE__).'/Exception.php');
-include_once(dirname(__FILE__).'/../InvalidArgumentException.php');
-include_once(dirname(__FILE__).'/../OutOfSequenceException.php');
+require_once dirname(__FILE__) . '/RequestInterface.php';
+include_once(dirname(__FILE__) . '/Exception.php');
+include_once(dirname(__FILE__) . '/../InvalidArgumentException.php');
+include_once(dirname(__FILE__) . '/../OutOfSequenceException.php');
 
 /**
  * Provides support for performing web-requests via curl

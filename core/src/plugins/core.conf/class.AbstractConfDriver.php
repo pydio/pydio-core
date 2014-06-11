@@ -239,8 +239,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin
     /**
      * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
      * @param Array $criteria This parameter can take the following keys
-     *      - Search keys "uuid", "parent_uuid", "owner_user_id", "display", "accessType", "isTemplate", "slug", "groupPath"
+     *
+     *      - Search keys "uuid", "parent_uuid", "owner_user_id", "display", "accessType", "isTemplate", "slug", "groupPath",
      *        Search values can be either string, array of string, AJXP_FILTER_EMPTY, AJXP_FILTER_NOT_EMPTY or regexp:RegexpString
+     *      - or "role" => AJXP_Role object: will search repositories accessible to this role
      *      - ORDERBY = array("KEY"=>"", "DIR"=>""), GROUPBY, CURSOR = array("OFFSET" => 0, "LIMIT", 30)
      *      - COUNT_ONLY
      *
@@ -866,7 +868,9 @@ abstract class AbstractConfDriver extends AJXP_Plugin
             case  "get_user_templates_definition":
 
                 AJXP_XMLWriter::header("repository_templates");
-                $repositories = ConfService::getRepositoriesList("all", false);
+                $repositories = ConfService::getConfStorageImpl()->listRepositoriesWithCriteria(array(
+                    "isTemplate" => 1
+                ));
                 $pServ = AJXP_PluginsService::getInstance();
                 foreach ($repositories as $repo) {
                     if(!$repo->isTemplate) continue;

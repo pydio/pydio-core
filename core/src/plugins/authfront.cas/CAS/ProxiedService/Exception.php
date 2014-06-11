@@ -28,13 +28,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-require_once(dirname(__FILE__).'/Exception.php');
+require_once(dirname(__FILE__) . '/../Exception.php');
 
 /**
- * Exception that denotes invalid arguments were passed. 
+ * An Exception for problems communicating with a proxied service.
  */
-class CAS_InvalidArgumentException
-	extends InvalidArgumentException
+class CAS_ProxiedService_Exception
+	extends Exception
 	implements CAS_Exception
 {
 

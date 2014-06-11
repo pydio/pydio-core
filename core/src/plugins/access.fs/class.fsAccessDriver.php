@@ -707,6 +707,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     if (isSet($httpVars["appendto_urlencoded_part"])) {
                         $appendTo = AJXP_Utils::sanitize(SystemTextEncoding::fromUTF8(urldecode($httpVars["appendto_urlencoded_part"])), AJXP_SANITIZE_FILENAME);
                         if (file_exists($destination ."/" . $appendTo)) {
+                            $already_existed = true;
                             $this->logDebug("Should copy stream from $userfile_name to $appendTo");
                             $partO = fopen($destination."/".$userfile_name, "r");
                             $appendF = fopen($destination ."/". $appendTo, "a+");

@@ -28,16 +28,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-require_once(dirname(__FILE__).'/Exception.php');
+require_once(dirname(__FILE__) . '/Exception.php');
 
 /**
- * This class defines Exceptions that should be thrown when the sequence of operations
- * is invalid. Examples are:
- *		- Requesting the response before executing a request.
- *		- Changing the URL of a request after executing the request.
+ * Exception that denotes invalid arguments were passed. 
  */
-class CAS_OutOfSequenceException
-	extends BadMethodCallException
+class CAS_InvalidArgumentException
+	extends InvalidArgumentException
 	implements CAS_Exception
 {
 
