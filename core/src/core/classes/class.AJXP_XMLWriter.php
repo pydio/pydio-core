@@ -628,7 +628,6 @@ class AJXP_XMLWriter
                 $descTag = '<description>'.AJXP_Utils::xmlEntities($description, true).'</description>';
             }
             $roleString="";
-            $paramsString="";
             if($loggedUser != null){
                 $merged = $loggedUser->mergedRole;
                 $params = array();
@@ -637,14 +636,12 @@ class AJXP_XMLWriter
                     if($value !== null){
                         if($value === true  || $value === false) $value = ($value?"true":"false");
                         $params[] = '<repository_plugin_param plugin_id="'.$exposed_prop["PLUGIN_ID"].'" name="'.$exposed_prop["NAME"].'" value="'.AJXP_Utils::xmlEntities($value).'"/>';
+                        $roleString .= str_replace(".", "_",$exposed_prop["PLUGIN_ID"])."_".$exposed_prop["NAME"].'="'.AJXP_Utils::xmlEntities($value).'" ';
                     }
-                }
-                if(count($params)){
-                    $paramsString = '<plugins_params>'.implode("", $params).'</plugins_params>';
                 }
                 $roleString.='acl="'.$merged->getAcl($repoId).'"';
             }
-            $xmlString = "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$rightString $streamString $slugString $isSharedString $roleString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$paramsString.$repoObject->getClientSettings()."</repo>";
+            $xmlString = "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$rightString $streamString $slugString $isSharedString $roleString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings()."</repo>";
             if ($toLast) {
                 $lastString = $xmlString;
             } else {
