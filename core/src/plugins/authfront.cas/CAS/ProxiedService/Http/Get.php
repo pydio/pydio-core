@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright © 2003-2010, The ESUP-Portail consortium & the JA-SIG Collaborative.
+ * Copyright ï¿½ 2003-2010, The ESUP-Portail consortium & the JA-SIG Collaborative.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,21 +28,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-require_once(dirname(__FILE__).'/Abstract.php');
-include_once(dirname(__FILE__).'/../Exception.php');
-include_once(dirname(__FILE__).'/../../InvalidArgumentException.php');
-include_once(dirname(__FILE__).'/../../OutOfSequenceException.php');
+require_once(dirname(__FILE__) . '/Abstract.php');
 
 /**
- * This class is used to make proxied service requests via the HTTP POST method.
+ * This class is used to make proxied service requests via the HTTP GET method.
  *
  * Usage Example:
  *		
  *			try {
- * 				$service = phpCAS::getProxiedService(PHPCAS_PROXIED_SERVICE_HTTP_POST);
+ * 				$service = phpCAS::getProxiedService(PHPCAS_PROXIED_SERVICE_HTTP_GET);
  * 				$service->setUrl('http://www.example.com/path/');
- *				$service->setContentType('text/xml');
- *				$service->setBody(''<?xml version="1.0"?'.'><methodCall><methodName>example.search</methodName></methodCall>');
  * 				$service->send();
  *				if ($service->getResponseStatusCode() == 200)
  *					return $service->getResponseBody();
@@ -64,52 +59,11 @@ include_once(dirname(__FILE__).'/../../OutOfSequenceException.php');
  *				// We could handle it in some way, but for now we will just stop.
  *				throw $e;
  *			}
+ *
  */
-class CAS_ProxiedService_Http_Post
+class CAS_ProxiedService_Http_Get
 	extends CAS_ProxiedService_Http_Abstract
 {
-
-	/**
-	 * The content-type of this request
-	 * 
-	 * @var string $_contentType
-	 */
-	private $_contentType;
-	
-	/**
-	 * The body of the this request
-	 * 
-	 * @var string $_body
-	 */
-	private $_body;
-	
-	/**
-	 * Set the content type of this POST request.
-	 * 
-	 * @param string $contentType
-	 * @return void
-	 * @throws CAS_OutOfSequenceException If called after the Request has been sent.
-	 */
-	public function setContentType ($contentType) {
-		if ($this->hasBeenSent())
-			throw new CAS_OutOfSequenceException('Cannot set the content type, request already sent.');
-		
-		$this->_contentType = $contentType;
-	}
-
-	/**
-	 * Set the body of this POST request.
-	 * 
-	 * @param string $body
-	 * @return void
-	 * @throws CAS_OutOfSequenceException If called after the Request has been sent.
-	 */
-	public function setBody ($body) {
-		if ($this->hasBeenSent())
-			throw new CAS_OutOfSequenceException('Cannot set the body, request already sent.');
-		
-		$this->_body = $body;
-	}
 	
 	/**
 	 * Add any other parts of the request needed by concrete classes
@@ -118,15 +72,8 @@ class CAS_ProxiedService_Http_Post
 	 * @return void
 	 */
 	protected function populateRequest (CAS_RequestInterface $request) {
-		if (empty($this->_contentType) && !empty($this->_body))
-			throw new CAS_ProxiedService_Exception("If you pass a POST body, you must specify a content type via ".get_class($this).'->setContentType($contentType).');
-		
-		$request->makePost();
-		if (!empty($this->_body)) {
-			$request->addHeader('Content-Type: '.$this->_contentType);
-			$request->addHeader('Content-Length: '.strlen($this->_body));
-			$request->setPostBody($this->_body);
-		}
+		// do nothing, since the URL has already been sent and that is our
+		// only data.
 	}
 
 	

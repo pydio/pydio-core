@@ -209,7 +209,7 @@ abstract class CAS_PGTStorage_AbstractStorage
 }
 
 // include specific PGT storage classes
-include_once(dirname(__FILE__).'/Db.php');
-include_once(dirname(__FILE__).'/File.php');
+include_once(dirname(__FILE__) . '/Db.php');
+include_once(dirname(__FILE__) . '/File.php');
 
 ?>

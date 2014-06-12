@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-include_once(dirname(__FILE__).'/InvalidArgumentException.php');
+include_once(dirname(__FILE__) . '/InvalidArgumentException.php');
 
 /**
  * This class provides access to service cookies and handles parsing of response

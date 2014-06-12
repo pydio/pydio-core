@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright © 2003-2010, The ESUP-Portail consortium & the JA-SIG Collaborative.
+ * Copyright ï¿½ 2003-2010, The ESUP-Portail consortium & the JA-SIG Collaborative.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,11 +28,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-require_once(dirname(__FILE__).'/../Abstract.php');
-require_once(dirname(__FILE__).'/../Http.php');
-include_once(dirname(__FILE__).'/../Exception.php');
-include_once(dirname(__FILE__).'/../../InvalidArgumentException.php');
-include_once(dirname(__FILE__).'/../../OutOfSequenceException.php');
+require_once(dirname(__FILE__) . '/../Abstract.php');
+require_once(dirname(__FILE__) . '/../Http.php');
+include_once(dirname(__FILE__) . '/../Exception.php');
+include_once(dirname(__FILE__) . '/../../InvalidArgumentException.php');
+include_once(dirname(__FILE__) . '/../../OutOfSequenceException.php');
 
 
 /**
