@@ -105,7 +105,7 @@ class multiAuthDriver extends AbstractAuthDriver
             $actionXpath=new DOMXPath($contribNode->ownerDocument);
             $actionOverrideNodeList = $actionXpath->query('//action', $contribNode);
             $actionNode = $actionOverrideNodeList->item(0);
-            $actionNode->parentNode->removeChild($actionNode);
+            if($actionNode->parentNode) $actionNode->parentNode->removeChild($actionNode);
 
         }else{
 
