@@ -4,6 +4,7 @@
     <class_definition filename="plugins/meta.syncable/class.ChangesTracker.php" classname="ChangesTracker"/>
     <server_settings>
         <global_param type="button" name="INSTALL_SQL" choices="run_plugin_action:meta.syncable:installSQLTables" label="CONF_MESSAGE[SQL Tables]" description="CONF_MESSAGE[Install SQL Tables]" mandatory="false"/>
+        <param name="REPO_SYNCABLE" type="boolean" label="Syncable Workspace" description="Workspace is syncable" default="true" scope="repository" expose="true"/>
     </server_settings>
     <registry_contributions>
            <actions>

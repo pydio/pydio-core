@@ -579,6 +579,22 @@ class AJXP_XMLWriter
     {
         $st = "<repositories>";
         $streams = ConfService::detectRepositoryStreams(false);
+
+        $exposed = array();
+        $cacheHasExposed = AJXP_PluginsService::getInstance()->loadFromPluginQueriesCache("//server_settings/param[contains(@scope,'repository') and @expose='true']");
+        if ($cacheHasExposed !== null && is_array($cacheHasExposed)) {
+            $exposed = $cacheHasExposed;
+        } else {
+            $exposed_props = AJXP_PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'repository') and @expose='true']", "node", false, false, true);
+            foreach($exposed_props as $exposed_prop){
+                $pluginId = $exposed_prop->parentNode->parentNode->getAttribute("id");
+                $paramName = $exposed_prop->getAttribute("name");
+                $paramDefault = $exposed_prop->getAttribute("default");
+                $exposed[] = array("PLUGIN_ID" => $pluginId, "NAME" => $paramName, "DEFAULT" => $paramDefault);
+            }
+            AJXP_PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[contains(@scope,'repository') and @expose='true']", $exposed);
+        }
+
         foreach (ConfService::getAccessibleRepositories($loggedUser, false, false) as $repoId => $repoObject) {
             $toLast = false;
             if ($repoObject->getAccessType()=="ajxp_conf") {
@@ -611,7 +627,21 @@ class AJXP_XMLWriter
             if (!empty($description)) {
                 $descTag = '<description>'.AJXP_Utils::xmlEntities($description, true).'</description>';
             }
-            $xmlString = "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$rightString $streamString $slugString $isSharedString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings()."</repo>";
+            $roleString="";
+            if($loggedUser != null){
+                $merged = $loggedUser->mergedRole;
+                $params = array();
+                foreach($exposed as $exposed_prop){
+                    $value = $merged->filterParameterValue($exposed_prop["PLUGIN_ID"], $exposed_prop["NAME"], $repoId, $exposed_prop["DEFAULT"]);
+                    if($value !== null){
+                        if($value === true  || $value === false) $value = ($value?"true":"false");
+                        $params[] = '<repository_plugin_param plugin_id="'.$exposed_prop["PLUGIN_ID"].'" name="'.$exposed_prop["NAME"].'" value="'.AJXP_Utils::xmlEntities($value).'"/>';
+                        $roleString .= str_replace(".", "_",$exposed_prop["PLUGIN_ID"])."_".$exposed_prop["NAME"].'="'.AJXP_Utils::xmlEntities($value).'" ';
+                    }
+                }
+                $roleString.='acl="'.$merged->getAcl($repoId).'"';
+            }
+            $xmlString = "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$rightString $streamString $slugString $isSharedString $roleString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings()."</repo>";
             if ($toLast) {
                 $lastString = $xmlString;
             } else {
