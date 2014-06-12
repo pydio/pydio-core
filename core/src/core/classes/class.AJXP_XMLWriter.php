@@ -580,11 +580,7 @@ class AJXP_XMLWriter
         $st = "<repositories>";
         $streams = ConfService::detectRepositoryStreams(false);
 
-        $exposed_props = AJXP_PluginsService::getInstance()->loadFromPluginQueriesCache("//server_settings/param[contains(@scope,'repository') and @expose='true']");
-        if ($exposed_props == null) {
-            $exposed_props = AJXP_PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'repository') and @expose='true']", "node", false, false, true);
-            AJXP_PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[contains(@scope,'repository') and @expose='true']", $exposed_props);
-        }
+        $exposed_props = AJXP_PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'repository') and @expose='true']", "node", false, false, true);
 
         foreach (ConfService::getAccessibleRepositories($loggedUser, false, false) as $repoId => $repoObject) {
             $toLast = false;
