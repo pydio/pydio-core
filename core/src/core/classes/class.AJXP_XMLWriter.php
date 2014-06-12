@@ -580,7 +580,20 @@ class AJXP_XMLWriter
         $st = "<repositories>";
         $streams = ConfService::detectRepositoryStreams(false);
 
-        $exposed_props = AJXP_PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'repository') and @expose='true']", "node", false, false, true);
+        $exposed = array();
+        $cacheHasExposed = AJXP_PluginsService::getInstance()->loadFromPluginQueriesCache("//server_settings/param[contains(@scope,'repository') and @expose='true']");
+        if ($cacheHasExposed !== null && is_array($cacheHasExposed)) {
+            $exposed = $cacheHasExposed;
+        } else {
+            $exposed_props = AJXP_PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'repository') and @expose='true']", "node", false, false, true);
+            foreach($exposed_props as $exposed_prop){
+                $pluginId = $exposed_prop->parentNode->parentNode->getAttribute("id");
+                $paramName = $exposed_prop->getAttribute("name");
+                $paramDefault = $exposed_prop->getAttribute("default");
+                $exposed[] = array("PLUGIN_ID" => $pluginId, "NAME" => $paramName, "DEFAULT" => $paramDefault);
+            }
+            AJXP_PluginsService::getInstance()->storeToPluginQueriesCache("//server_settings/param[contains(@scope,'repository') and @expose='true']", $exposed);
+        }
 
         foreach (ConfService::getAccessibleRepositories($loggedUser, false, false) as $repoId => $repoObject) {
             $toLast = false;
@@ -619,13 +632,11 @@ class AJXP_XMLWriter
             if($loggedUser != null){
                 $merged = $loggedUser->mergedRole;
                 $params = array();
-                foreach($exposed_props as $exposed_prop){
-                    $pluginId = $exposed_prop->parentNode->parentNode->getAttribute("id");
-                    $paramName = $exposed_prop->getAttribute("name");
-                    $value = $merged->filterParameterValue($pluginId, $paramName, $repoId, $exposed_prop->getAttribute('default'));
+                foreach($exposed as $exposed_prop){
+                    $value = $merged->filterParameterValue($exposed_prop["PLUGIN_ID"], $exposed_prop["NAME"], $repoId, $exposed_prop["DEFAULT"]);
                     if($value !== null){
                         if($value === true  || $value === false) $value = ($value?"true":"false");
-                        $params[] = '<repository_plugin_param plugin_id="'.$pluginId.'" name="'.$paramName.'" value="'.AJXP_Utils::xmlEntities($value).'"/>';
+                        $params[] = '<repository_plugin_param plugin_id="'.$exposed_prop["PLUGIN_ID"].'" name="'.$exposed_prop["NAME"].'" value="'.AJXP_Utils::xmlEntities($value).'"/>';
                     }
                 }
                 if(count($params)){
