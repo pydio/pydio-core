@@ -59,6 +59,8 @@ class CasAuthFrontend extends AbstractAuthFrontend
             $this->forceRedirect = $this->pluginConf["FORCE_REDIRECT"];
         }
 
+        if(empty($this->cas_server)) return false;
+
         phpCAS::setDebug(AJXP_DATA_PATH . "/logs/debug.log");
         if ($GLOBALS['PHPCAS_CLIENT'] == null) {
             phpCAS::client(CAS_VERSION_2_0, $this->cas_server, $this->cas_port, $this->cas_uri, false);
