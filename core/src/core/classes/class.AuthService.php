@@ -564,6 +564,12 @@ class AuthService
     {
         $loggedUser = self::getLoggedUser();
         if($loggedUser == null) return 0;
+        $acls = $loggedUser->mergedRole->listAcls();
+        foreach($acls as $key => $right){
+            if (!empty($right) && ConfService::getRepositoryById($key) != null) return $key;
+        }
+        return 0;
+        /*
         $repoList = ConfService::getRepositoriesList();
         foreach ($repoList as $rootDirIndex => $rootDirObject) {
             if ($loggedUser->canRead($rootDirIndex."") || $loggedUser->canWrite($rootDirIndex."")) {
@@ -579,6 +585,7 @@ class AuthService
             }
         }
         return 0;
+        */
     }
 
     /**
@@ -588,13 +595,10 @@ class AuthService
     */
     public static function updateAdminRights($adminUser)
     {
-        foreach (ConfService::getRepositoriesList() as $repoId => $repoObject) {
-            if(!self::allowedForCurrentGroup($repoObject, $adminUser)) continue;
-            if($repoObject->hasParent() && $repoObject->getParentId() != $adminUser->getId()) continue;
-            $adminUser->personalRole->setAcl($repoId, "rw");
-            $adminUser->recomputeMergedRole();
+        if($adminUser->personalRole->getAcl('ajxp_conf') != "rw"){
+            $adminUser->personalRole->setAcl('ajxp_conf', 'rw');
+            $adminUser->save("superuser");
         }
-        $adminUser->save("superuser");
         return $adminUser;
     }
 

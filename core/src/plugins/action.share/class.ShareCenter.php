@@ -1450,12 +1450,25 @@ class ShareCenter extends AJXP_Plugin
 
         // CHECK USER & REPO DOES NOT ALREADY EXISTS
         if ( $this->getFilteredOption("AVOID_SHARED_FOLDER_SAME_LABEL", $this->repository->getId()) == true) {
+            $count = 0;
+            $similarLabelRepos = ConfService::listRepositoriesWithCriteria(array("display" => $label), $count);
+            if($count && !isSet($editingRepo)){
+                return 101;
+            }
+            if($count && isSet($editingRepo)){
+                foreach($similarLabelRepos as $slr){
+                    if($slr->getUniqueId() != $editingRepo->getUniqueId()){
+                        return 101;
+                    }
+                }
+            }
+            /*
             $repos = ConfService::getRepositoriesList();
             foreach ($repos as $obj) {
                 if ($obj->getDisplay() == $label && (!isSet($editingRepo) || $editingRepo != $obj)) {
-                    return 101;
                 }
             }
+            */
         }
 
         $confDriver = ConfService::getConfStorageImpl();

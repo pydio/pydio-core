@@ -986,7 +986,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 $crtValue = $httpVars["value"];
                 $usersOnly = isSet($httpVars["users_only"]) && $httpVars["users_only"] == "true";
                 $existingOnly = isSet($httpVars["existing_only"]) && $httpVars["existing_only"] == "true";
-                if(!empty($crtValue)) $regexp = $crtValue;
+                if(!empty($crtValue)) $regexp = '^'.$crtValue;
                 else $regexp = null;
                 $limit = intval(ConfService::getCoreConf("USERS_LIST_COMPLETE_LIMIT", "conf"));
                 $searchAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS", "conf");

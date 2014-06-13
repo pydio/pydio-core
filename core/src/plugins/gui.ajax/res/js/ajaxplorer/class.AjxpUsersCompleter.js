@@ -97,7 +97,7 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
         {
             paramName:'value',
             tokens:[',', '\n'],
-            frequency:0.25,
+            frequency:0.7,
             tmpUsersPrefix:'',
             updateUserEntryAfterCreate:null,
             createUserPanel:null,

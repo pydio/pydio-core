@@ -263,10 +263,17 @@ class ConfService
     public function switchRootDirInst($rootDirIndex=-1, $temporary=false)
     {
         if ($rootDirIndex == -1) {
-            $currentRepos = $this->getLoadedRepositories();
-            if (isSet($_SESSION['REPO_ID']) && array_key_exists($_SESSION['REPO_ID'], $currentRepos)) {
-                $this->configs["REPOSITORY"] = $currentRepos[$_SESSION['REPO_ID']];
-            } else {
+            $ok = false;
+            if (isSet($_SESSION['REPO_ID'])) {
+                $sessionId = $_SESSION['REPO_ID'];
+                $object = self::getRepositoryById($sessionId);
+                if($object != null && self::repositoryIsAccessible($sessionId, $object)){
+                    $this->configs["REPOSITORY"] = $object;
+                    $ok = true;
+                }
+            }
+            if(!$ok) {
+                $currentRepos = $this->getLoadedRepositories();
                 $keys = array_keys($currentRepos);
                 $this->configs["REPOSITORY"] = $currentRepos[$keys[0]];
                 $_SESSION['REPO_ID'] = $keys[0];
@@ -462,10 +469,13 @@ class ConfService
      */
     public function getCurrentRepositoryIdInst()
     {
-        $currentRepos = $this->getLoadedRepositories();
-        if (isSet($_SESSION['REPO_ID']) &&  isSet($currentRepos[$_SESSION['REPO_ID']])) {
-            return $_SESSION['REPO_ID'];
+        if(isSet($_SESSION['REPO_ID'])){
+            $object = self::getRepositoryById($_SESSION['REPO_ID']);
+            if($object != null && self::repositoryIsAccessible($_SESSION['REPO_ID'], $object)){
+                return $_SESSION['REPO_ID'];
+            }
         }
+        $currentRepos = $this->getLoadedRepositories();
         return array_shift(array_keys($currentRepos));
     }
     /**

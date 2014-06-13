@@ -63,7 +63,7 @@ class sqlAuthDriver extends AbstractAuthDriver
         $ignoreHiddens = "NOT EXISTS (SELECT * FROM [ajxp_user_rights] AS c WHERE [c.login]=[u.login] AND [c.repo_uuid] = 'ajxp.hidden')";
 
         if ($regexp != null) {
-            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE [login] ".AJXP_Utils::regexpToLike($regexp)." AND [groupPath] LIKE %like~ AND $ignoreHiddens ORDER BY [login] ASC", AJXP_Utils::cleanRegexp($regexp), $baseGroup) ;
+            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE [login] ".AJXP_Utils::regexpToLike($regexp)." AND [groupPath] LIKE %like~ AND $ignoreHiddens ORDER BY [login] ASC %lmt %ofs", AJXP_Utils::cleanRegexp($regexp), $baseGroup, $limit, $offset) ;
         } else if ($offset != -1 || $limit != -1) {
             $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE [groupPath] LIKE %like~ AND $ignoreHiddens ORDER BY [login] ASC %lmt %ofs", $baseGroup, $limit, $offset);
         } else {
