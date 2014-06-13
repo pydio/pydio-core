@@ -270,7 +270,7 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
     {
         $repositoryObject = ConfService::getRepositoryById($repositoryId);
         if($repositoryObject == null) return false;
-        return ConfService::repositoryIsAccessible($repositoryId, $repositoryObject, $this, false, false);
+        return ConfService::repositoryIsAccessible($repositoryId, $repositoryObject, $this, false, true);
         /*
         if($repositoryObject->getAccessType() == "ajxp_conf" && !$this->isAdmin()) return false;
         if($repositoryObject->getUniqueUser() && $this->id != $repositoryObject->getUniqueUser()) return false;
