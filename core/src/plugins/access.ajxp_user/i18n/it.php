@@ -75,16 +75,16 @@ $mess=array(
 "51"=> "Teams di utenti, usati come scorciatoia durante la condivisione",
 "52"=> "Sei sicuro di voler cancellare questo team? Questa operazione non cancellerà gli utenti associati..",
 "53"=> "Partenza!",
-"54"=> "Capisci come iniziare con Pydio seguendo i video 'How-to'",
+"54"=> "Capisci come iniziare con APPLICATION_TITLE seguendo i video 'How-to'",
 "55"=> "Hai bisogno di aiuto <a>per iniziare?</a>",
-"56"=> "Capisci come iniziare con Pydio? Ecco alcuni video per te!",
-"57"=> "Download Pydio per...",
+"56"=> "Capisci come iniziare con APPLICATION_TITLE? Ecco alcuni video per te!",
+"57"=> "Download APPLICATION_TITLE per...",
 "58"=> "Dispositivi Android",
 "59"=> "iPhone/iPad",
     "60"=>"Mac OS (Beta)",
     "61"=>"Windows (Beta)",
     "62"=>"<h2>Iniziamo!</h2>
-            Questo video è un'introduzione alla web application Pydio:
+            Questo video è un'introduzione alla web application APPLICATION_TITLE:
             <ul>
                 <li>Bacheca Utente</li>
                 <li>Panoramica GUI</li>
@@ -93,8 +93,8 @@ $mess=array(
                 <li>Accesso rapido, grazie ai segnalibri ed alle scorciatoie</li>
                 <li>Carrello selezioni</li>
             </ul>",
-    "63"=>"<h2>Condividere file con Pydio</h2>
-                            In questo tutorial, ci approcceremo alle basi della condivisione con Pydio:
+    "63"=>"<h2>Condividere file con APPLICATION_TITLE</h2>
+                            In questo tutorial, ci approcceremo alle basi della condivisione con APPLICATION_TITLE:
                             <ul>
                                 <li>Creare link web</li>
                                 <li>Inviarli ad utenti esterni od interni</li>
@@ -103,15 +103,15 @@ $mess=array(
                                 <li>Creare più link su di un singolo file</li>
                                 <li>Terminare totalmente la condivisione</li>
             </ul>",
-    "64"=>"<h2>Condividere cartelle con Pydio</h2>
-                            Questo video mostra le varie opzioni per la condivisione delle cartelle mediante Pydio
+    "64"=>"<h2>Condividere cartelle con APPLICATION_TITLE</h2>
+                            Questo video mostra le varie opzioni per la condivisione delle cartelle mediante APPLICATION_TITLE
                             <ul>
                                 <li>Condividere come nuovo workspace</li>
                                 <li>Condividere come un Minisito pubblico</li>
             </ul>",
-    "65"=> "Scopri di più sul canale ufficiale Pydio!",
-    "66"=>"<h2>Usare Pydio su dispositivi iOS</h2>
-                            Questo video spiega come usare l'applicazione Pydio (disponibile sull'App Store) su dispositivi muniti di iOS. Il procedimento è abbastanza simile anche per gli utenti Android..
+    "65"=> "Scopri di più sul canale ufficiale APPLICATION_TITLE!",
+    "66"=>"<h2>Usare APPLICATION_TITLE su dispositivi iOS</h2>
+                            Questo video spiega come usare l'applicazione APPLICATION_TITLE (disponibile sull'App Store) su dispositivi muniti di iOS. Il procedimento è abbastanza simile anche per gli utenti Android..
 <ul><li>Configurare la connessione al server</li>
 <li>Navigare tra i file</li>
 <li>Mantenere un file disponibile offline e le interazioni con altre applicazioni</li>
