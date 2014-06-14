@@ -42,7 +42,9 @@ Class.create("ShareCenter", {
         }
         if(( userSelection.hasDir() && !userSelection.hasMime($A(['ajxp_browsable_archive'])))
             || userSelection.isMultiple()
-            || (this.currentNode.getMetadata().get('share_data') && !this.currentNode.getMetadata().get('share_link'))){
+            || (this.currentNode.getMetadata().get('share_data') && !this.currentNode.getMetadata().get('share_link'))
+            || (this.currentNode.getMetadata().get('ajxp_shared') && !this.currentNode.getMetadata().get('ajxp_shared_publiclet'))
+            ){
             var nodeMeta = this.currentNode.getMetadata();
             if(!nodeMeta.get("ajxp_shared")){
                 var oThis = this;
@@ -288,8 +290,8 @@ Class.create("ShareCenter", {
                 oForm.down("#minisite_dialogMainTitle").update(MessageHash["share_center.69r"]);
                 oForm.down("#minisite_dialogLegend").update(MessageHash["share_center.70r"]);
             }else{
-                oForm.down("#minisite_dialogMainTitle").update(MessageHash["share_center.69"]);
-                oForm.down("#minisite_dialogLegend").update(MessageHash["share_center.70"]);
+                oForm.down("#minisite_dialogMainTitle").update(MessageHash["share_center.69r"]);
+                oForm.down("#minisite_dialogLegend").update(MessageHash["share_center.70r"]);
             }
             this._currentRepositoryId = null;
             this._currentRepositoryLink = null;
@@ -314,6 +316,23 @@ Class.create("ShareCenter", {
                     this._currentRepositoryLink = json['repository_url'];
                     oForm.down('input#repo_label').value = json['label'];
                     oForm.down('#repo_description').value = json['description'];
+                    try{
+                        if(json['password']){
+                            oForm.down('input[name="guest_user_pass"]').setValue(json['password']);
+                        }
+                        if(json['expire_time']){
+                            oForm.down('input[name="expiration"]').setValue(json['expire_time']);
+                        }
+                        if(json['download_limit']){
+                            oForm.down('input[name="downloadlimit"]').setValue(json['download_counter'] + '/' + json['download_limit']);
+                        }
+                        if(json["minisite_layout"]){
+                            var chooser = this.createTemplateChooser();
+                            var container = oForm.down('.layout_template_container');
+                            container.insert(chooser);
+                            chooser.setValue(json['minisite_layout']);
+                        }
+                    }catch(e){}
                     oForm.down('#complete_indicator').hide();
                     if(json.minisite){
                         oForm.down('#share_container').setValue(json.minisite.public_link);
@@ -356,11 +375,16 @@ Class.create("ShareCenter", {
                 });
                 if(this.shareFolderMode != "workspace"){
                     var generateButton = oForm.down("#generate_publiclet");
+                    var container = oForm.down('.layout_template_container');
                     var tplChooser = this.createTemplateChooser();
                     if(tplChooser){
-                        generateButton.insert({before:tplChooser});
-                        if(tplChooser.type != 'hidden'){
-                            generateButton.setStyle({float: 'left'});
+                        if(container){
+                            container.insert(tplChooser);
+                        }else{
+                            generateButton.insert({before:tplChooser});
+                            if(tplChooser.type != 'hidden'){
+                                generateButton.setStyle({float: 'left'});
+                            }
                         }
                     }
                     generateButton.observe("click", function(){submitFunc(oForm);} );
@@ -435,7 +459,10 @@ Class.create("ShareCenter", {
                 value:tmpl[0].getAttribute('element')
             });
         }
-        var chooser = new Element('select', {name:'minisite_layout', style:'width: 150px;height: 30px;font-size: 13px;text-align: center;float: left;margin-right: 15px;margin-left: 10px;'});
+        var chooser = new Element('select', {
+            name:'minisite_layout',
+            style:'font-size: 13px;height: 28px;width: 363px;',
+            className:'minisite_layout_selector'});
         tmpl.each(function(node){
             var element = node.getAttribute('element');
             var label = node.getAttribute('label');
