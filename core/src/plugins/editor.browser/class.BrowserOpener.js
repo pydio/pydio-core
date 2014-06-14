@@ -37,8 +37,8 @@ Class.create("BrowserOpener", AbstractEditor, {
             url = $$("base")[0].getAttribute("href");
             if(url.substr(-1) == '/') url = url.substr(0, url.length - 1);
         }
-        var nonSecureAccessPath = ajxpServerAccessPath.substring(0, ajxpServerAccessPath.lastIndexOf('?'));
-        var open_file_url = url + "/" + nonSecureAccessPath + "?get_action=open_file&repository_id=" + repo + "&file=" + encodeURIComponent(node.getPath());
+        //var nonSecureAccessPath = window.ajxpServerAccessPath.substring(0, window.ajxpServerAccessPath.lastIndexOf('?'));
+        var open_file_url = url + "/" + window.ajxpServerAccessPath + "&get_action=open_file&repository_id=" + repo + "&file=" + encodeURIComponent(node.getPath());
 
         if(this.editorOptions.context.__className == 'Modal'){
             var myRef = window.open(open_file_url);

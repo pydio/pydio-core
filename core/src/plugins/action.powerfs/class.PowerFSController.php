@@ -75,7 +75,7 @@ class PowerFSController extends AJXP_Plugin
                         $jsCode = "
                             var regex = new RegExp('.*?[&\\?]' + 'minisite_session' + '=(.*?)&.*');
                             val = window.ajxpServerAccessPath.replace(regex, \"\$1\");
-                            minisite_session = ( val == window.ajxpServerAccessPath ? false : val );
+                            var minisite_session = ( val == window.ajxpServerAccessPath ? false : val );
 
                             $('download_form').action = window.ajxpServerAccessPath;
                             $('download_form').secure_token.value = window.Connexion.SECURE_TOKEN;
