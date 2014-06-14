@@ -591,9 +591,14 @@ Class.create("ActionsManager", {
 			else if(childs[i].tagName == "logging_result")
 			{
 				if(childs[i].getAttribute("secure_token")){
+                    var regex = new RegExp('.*?[&\\?]' + 'minisite_session' + '=(.*?)&.*');
+                    val = window.ajxpServerAccessPath.replace(regex, "$1");
+                    var minisite_session = ( val == window.ajxpServerAccessPath ? false : val );
+
 					Connexion.SECURE_TOKEN = childs[i].getAttribute("secure_token");
 					var parts = window.ajxpServerAccessPath.split("?secure_token");
 					window.ajxpServerAccessPath = parts[0] + "?secure_token=" + Connexion.SECURE_TOKEN;
+                    if(minisite_session) window.ajxpServerAccessPath += "&minisite_session=" + minisite_session;
 					ajxpBootstrap.parameters.set('ajxpServerAccess', window.ajxpServerAccessPath);
 				}
                 if($("generic_dialog_box") && $("generic_dialog_box").down(".ajxp_login_error")){
