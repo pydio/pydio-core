@@ -140,11 +140,18 @@
 							downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
 							document.location.href=downloadUrl;
 						}else{
+                            var regex = new RegExp('.*?[&\\?]' + 'minisite_session' + '=(.*?)&.*');
+                            val = window.ajxpServerAccessPath.replace(regex, "$1");
+                            minisite_session = ( val == window.ajxpServerAccessPath ? false : val );
+
 							$('download_form').action = window.ajxpServerAccessPath;
 							$('download_form').secure_token.value = Connexion.SECURE_TOKEN;
 							$('download_form').select("input").each(function(input){
 								if(input.name!='get_action' && input.name!='secure_token') input.remove();
 							});
+							if(minisite_session){
+							    $('download_form').insert(new Element('input', {type:'hidden', name:'minisite_session', value:minisite_session}));
+							}
 							userSelection.updateFormOrUrl($('download_form'));
 							try{
     							$('download_form').submit();
