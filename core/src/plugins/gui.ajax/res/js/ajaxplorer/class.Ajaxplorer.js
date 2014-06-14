@@ -143,7 +143,7 @@ Class.create("Ajaxplorer", {
         }
         var navigate = function(repList, repId){
             if(repId === false){
-                this.router.navigate("/");
+                this.router.navigate("/.");
             }else{
                 var repositoryObject = repList.get(repId);
                 var slug = repositoryObject.getSlug();
