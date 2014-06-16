@@ -248,29 +248,35 @@
                     </div>
 				</div>
 				<script>
-				    window.setTimeout(function(){
+                    document.observe("ajaxplorer:selection_changed", function(e){
                         try{
                             var dm = ajaxplorer.getContextHolder();
-                            var root = dm.getRootNode();
-                            document.observe("ajaxplorer:selection_changed", function(e){
-                                try{
-                                    var nodes = dm.getSelectedNodes();
-                                    if(nodes[0].isLeaf() && e.memo._selectionSource.__className == 'FilesList'){
-                                        ajaxplorer.actionBar.fireDefaultAction("file");
-                                    }
-                                }catch(e){}
-                            });
-                            if(root.isLoaded()) {
-                                dm.setSelectedNodes([root.getChildren().first()], "dataModel");
+                            var nodes = dm.getSelectedNodes();
+                            if(nodes[0].isLeaf() && e.memo._selectionSource.__className == 'FilesList'){
                                 ajaxplorer.actionBar.fireDefaultAction("file");
-                            } else {
-                                root.observe("loaded", function(){
-                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
-                                    ajaxplorer.actionBar.fireDefaultAction("file");
-                                });
                             }
                         }catch(e){}
-                    }, 1000);
+                    });
+                    var p;
+				    document.observe("ajaxplorer:user_logged", function(){
+                        if(p) return;
+                        try{
+                            p = new PeriodicalExecuter(function(){
+                                var dm = ajaxplorer.getContextHolder();
+                                if(dm.getSelectedNodes().length){
+                                    p.stop();
+                                    return;
+                                }
+                                var root = dm.getRootNode();
+                                if(root.getChildren().length){
+                                    dm.setSelectedNodes([root.getChildren().first()], "dataModel");
+                                    window.setTimeout(function(){ajaxplorer.actionBar.fireDefaultAction("file");}, 1);
+                                    p.stop();
+                                    return;
+                                }
+                            }, 1);
+                        }catch(e){}
+                    });
 				</script>
 			]]></template>
             <template name="unique_preview_file" element="ajxp_unique_strip" position="top" label="Unique File Preview"><![CDATA[
@@ -323,21 +329,27 @@
                     </div>
 				</div>
 				<script>
-				    window.setTimeout(function(){
+				    document.observe("ajaxplorer:user_logged", function(){
                         try{
-                            var dm = ajaxplorer.getContextHolder();
-                            var root = dm.getRootNode();
-                            if(root.isLoaded()) {
-                                dm.setSelectedNodes([root.getChildren().first()], "dataModel");
-                                ajaxplorer.actionBar.fireDefaultAction("file");
-                            } else {
-                                root.observe("loaded", function(){
+
+                            var p = new PeriodicalExecuter(function(){
+                                var dm = ajaxplorer.getContextHolder();
+                                if(dm.getSelectedNodes().length){
+                                    p.stop();
+                                    return;
+                                }
+                                var root = dm.getRootNode();
+                                if(root.getChildren().length){
                                     dm.setSelectedNodes([root.getChildren().first()], "dataModel");
-                                    ajaxplorer.actionBar.fireDefaultAction("file");
-                                });
-                            }
-                        }catch(e){}
-                    }, 500);
+                                    window.setTimeout(function(){ajaxplorer.actionBar.fireDefaultAction("file");}, 1);
+                                    p.stop();
+                                    return;
+                                }
+                            }, 1);
+                        }catch(e){
+                            if (console) console.log(e);
+                        }
+                    });
 				</script>
 			]]></template>
             <template name="unique_preview_download" element="ajxp_unique_dl" position="top" label="Big download button"><![CDATA[
@@ -410,19 +422,26 @@
                     </div>
 				</div>
 				<script>
-				    window.setTimeout(function(){
+				    document.observe("ajaxplorer:user_logged", function(){
                         try{
-                            var dm = ajaxplorer.getContextHolder();
-                            var root = dm.getRootNode();
-                            if(root.isLoaded()) {
-                                dm.setSelectedNodes([root.getChildren().first()], "dataModel");
-                            } else {
-                                root.observe("loaded", function(){
+
+                            var p = new PeriodicalExecuter(function(){
+                                var dm = ajaxplorer.getContextHolder();
+                                if(dm.getSelectedNodes().length){
+                                    p.stop();
+                                    return;
+                                }
+                                var root = dm.getRootNode();
+                                if(root.getChildren().length){
                                     dm.setSelectedNodes([root.getChildren().first()], "dataModel");
-                                });
-                            }
-                        }catch(e){}
-                    }, 500);
+                                    p.stop();
+                                    return;
+                                }
+                            }, 1);
+                        }catch(e){
+                            if (console) console.log(e);
+                        }
+                    });
 				</script>
 			]]></template>
             <template name="minisite_bare" element="ajxp_embed_template" position="top" label="Embedded"><![CDATA[

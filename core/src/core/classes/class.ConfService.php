@@ -949,6 +949,8 @@ class ConfService
                 }
             }
             if(!is_dir($messageCacheDir)) mkdir($messageCacheDir);
+            AJXP_VarsFilter::filterI18nStrings($this->configs["MESSAGES"]);
+            AJXP_VarsFilter::filterI18nStrings($this->configs["CONF_MESSAGES"]);
             @file_put_contents($messageFile, "<?php \$MESSAGES = ".var_export($this->configs["MESSAGES"], true) ." ; \$CONF_MESSAGES = ".var_export($this->configs["CONF_MESSAGES"], true) ." ; ");
         }
 

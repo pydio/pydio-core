@@ -530,6 +530,8 @@ class ShareCenter extends AJXP_Plugin
                 }else{
                     $merge["ajxp_shared_minisite"] = "public";
                 }
+            }else if($shares[$sKeys[0]]["type"] == "file"){
+                $merge["ajxp_shared_publiclet"] = "true";
             }
             $ajxpNode->mergeMetadata($merge, true);
         }
@@ -976,6 +978,12 @@ class ShareCenter extends AJXP_Plugin
             $tPath = $data["AJXP_APPLICATION_BASE"];
         } else {
             $tPath = (!empty($data["TRAVEL_PATH_TO_ROOT"]) ? $data["TRAVEL_PATH_TO_ROOT"] : "../..");
+        }
+        // Update Host dynamically if it differ from registered one.
+        $registeredHost = parse_url($tPath, PHP_URL_HOST);
+        $currentHost = parse_url(AJXP_Utils::detectServerURL("SERVER_URL"), PHP_URL_HOST);
+        if($registeredHost != $currentHost){
+            $tPath = str_replace($registeredHost, $currentHost, $tPath);
         }
         $html = str_replace("AJXP_PATH_TO_ROOT", rtrim($tPath, "/")."/", $html);
         HTMLWriter::internetExplorerMainDocumentHeader();
@@ -2108,6 +2116,9 @@ class ShareCenter extends AJXP_Plugin
                 }
                 if(!empty($minisiteData["EXPIRE_TIME"])){
                     $jsonData["expire_time"] = date($messages["date_format"], $minisiteData["EXPIRE_TIME"]);
+                }
+                if(isSet($minisiteData["AJXP_TEMPLATE_NAME"])){
+                    $jsonData["minisite_layout"] = $minisiteData["AJXP_TEMPLATE_NAME"];
                 }
                 $jsonData["minisite"] = array(
                     "public" => $minisiteIsPublic?"true":"false",

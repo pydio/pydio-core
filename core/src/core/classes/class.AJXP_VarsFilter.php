@@ -78,4 +78,12 @@ class AJXP_VarsFilter
         AJXP_Controller::applyIncludeHook("vars.filter", $tab);
         return $value;
     }
+
+    public static function filterI18nStrings(&$array){
+        if(!is_array($array)) return;
+        $appTitle = ConfService::getCoreConf("APPLICATION_TITLE");
+        foreach($array as &$value){
+            $value = str_replace("APPLICATION_TITLE", $appTitle, $value);
+        }
+    }
 }

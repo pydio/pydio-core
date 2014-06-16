@@ -75,10 +75,10 @@ $mess=array(
 "51"=> "Groupes d'utilisateurs accessibles comme des raccourcis lors du partage",
 "52"=> "Voulez-vous vraiment supprimer cette équipe? Ca ne supprimera pas les utilisateurs.",
     "53"=> "Démarrage",
-    "54"=> "Suivez les vidéos pour démarrer rapidement avec Pydio",
+    "54"=> "Suivez les vidéos pour démarrer rapidement avec APPLICATION_TITLE",
     "55"=> "Avez-vous besoin d'aide <a>pour démarrer?</a>",
-    "56"=> "Nouveau sur Pydio? Quelques vidéos pour vous!",
-    "57"=> "Télécharger Pydio pour...",
+    "56"=> "Nouveau sur APPLICATION_TITLE? Quelques vidéos pour vous!",
+    "57"=> "Télécharger APPLICATION_TITLE pour...",
     "58"=> "Appareil android",
     "59"=> "iPhone/iPad",
     "60"=>"Mac OS (Beta)",
@@ -94,7 +94,7 @@ $mess=array(
                 <li>Panier de sélection</li>
             </ul>",
     "63"=>"<h2>Partager des fichiers</h2>
-                            Ce tutorial vous explique comment partager des fichiers avec pydio (anglais):
+                            Ce tutorial vous explique comment partager des fichiers avec APPLICATION_TITLE (anglais):
                             <ul>
                                 <li>Créer des liens publiques</li>
                                 <li>Les envoyers à d'autres utilisateurs</li>
@@ -104,14 +104,14 @@ $mess=array(
                                 <li>Arrêter un partage</li>
             </ul>",
     "64"=>"<h2>Partager des répertoires</h2>
-                            Cette vidéo vous explique comment partager tout un répertoire avec Pydio (anglais)
+                            Cette vidéo vous explique comment partager tout un répertoire avec APPLICATION_TITLE (anglais)
                             <ul>
                                 <li>Partager comme un nouveau Workspace</li>
                                 <li>Partager comme un minisite public</li>
             </ul>",
-    "65"=> "Découvrir plus de vidéos sur le canal Pydio!",
-    "66"=>"<h2>Pydio sur un appareil iOS</h2>
-                     Cette vidéo décrit l'utilisation de l'application Pydio disponible sur l'App Store. Le processus est similaire sur Android.
+    "65"=> "Découvrir plus de vidéos sur le canal APPLICATION_TITLE!",
+    "66"=>"<h2>APPLICATION_TITLE sur un appareil iOS</h2>
+                     Cette vidéo décrit l'utilisation de l'application APPLICATION_TITLE disponible sur l'App Store. Le processus est similaire sur Android.
 <ul><li>Configuration de la connexion</li>
 <li>Navigation dans les fichiers</li>
 <li>Garder des fichiers en cache, et interagir avec d'autres apps</li>
