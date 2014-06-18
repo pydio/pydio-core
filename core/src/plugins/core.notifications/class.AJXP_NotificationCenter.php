@@ -131,6 +131,8 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         if ($format == "html") {
             echo("<h2>".$mess["notification_center.4"]."</h2>");
             echo("<ul class='notification_list'>");
+        } else if($format == "json"){
+            $jsonNodes = array();
         } else {
             AJXP_XMLWriter::header();
         }
@@ -181,13 +183,24 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     $url = parse_url($node->getUrl());
                     $node->setUrl($url["scheme"]."://".$url["host"]."/notification_".$index);
                     $index ++;
-
-                    AJXP_XMLWriter::renderAjxpNode($node);
+                    if($format == "json"){
+                        $keys = $node->listMetaKeys();
+                        $data = array();
+                        foreach($keys as $k){
+                            $data[$k] = $node->$k;
+                        }
+                        $jsonNodes[] = json_encode($data);
+                    }else{
+                        AJXP_XMLWriter::renderAjxpNode($node);
+                    }
                 }
             }
         }
         if ($format == "html") {
             echo("</ul>");
+        } else if($format == "json"){
+            HTMLWriter::charsetHeader("application/json");
+            echo('[' . implode(",", $jsonNodes). ']');
         } else {
             AJXP_XMLWriter::close();
         }
