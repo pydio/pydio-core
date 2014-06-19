@@ -277,6 +277,7 @@ class BootConfLoader extends AbstractConfDriver
         $uObj = $newConfigPlugin->createUserObject($adminLogin);
         if(isSet($data["MAILER_ADMIN"])) $uObj->personalRole->setParameterValue("core.conf", "email", $data["MAILER_ADMIN"]);
         $uObj->personalRole->setParameterValue("core.conf", "USER_DISPLAY_NAME", $adminName);
+        $uObj->personalRole->setAcl('ajxp_conf', 'rw');
         AuthService::updateRole($uObj->personalRole);
 
         $loginP = "USER_LOGIN";
