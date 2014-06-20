@@ -9,6 +9,7 @@
         <link rel="stylesheet" type="text/css" href="plugins/gui.ajax/res/themes/vision/css/allz.css">
         <link rel="stylesheet" href="plugins/gui.ajax/res/themes/vision/css/font-awesome.css"/>
         <link rel="stylesheet" href="plugins/gui.ajax/res/themes/vision/css/media.css"/>
+        <link rel="stylesheet" href="plugins/gui.ajax/res/themes/vision/css/animate-custom.css"/>
         <style type="text/css">
             #widget_title{
                 font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
