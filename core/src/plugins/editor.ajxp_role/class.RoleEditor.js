@@ -723,7 +723,9 @@ Class.create("RoleEditor", AbstractEditor, {
                         h.set("label", '<span class="inherited">' + h.get("label") + ' ('+ MessageHash["ajxp_role_editor.38"] +')' + '</span>');
                     }
                 }
-                formManager.createParametersInputs(pane, formParams, true, null, false, false, false);
+                var formElement = new Element('form', {style:'display:inline;'});
+                pane.insert(formElement);
+                formManager.createParametersInputs(formElement, formParams, true, null, false, false, false);
                 if(pane.SF_accordion){
                     pane.SF_accordion.openAll();
                 }
