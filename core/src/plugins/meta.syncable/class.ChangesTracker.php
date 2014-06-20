@@ -90,33 +90,48 @@ class ChangesTracker extends AJXP_Plugin
                 $row->node[$att] = $row->$att;
                 unset($row->$att);
             }
-            if ($row->node_id == $previousNodeId) {
-                $previousRow->target = $row->target;
-                $previousRow->seq = $row->seq;
-                if ($order[$row->type] > $order[$previousRow->type]) {
-                    $previousRow->type = $row->type;
-                }
-            } else {
-                if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content")) {
-                    if($this->filterRow($previousRow, $filter)){
-                        $previousRow = $row;
-                        $previousNodeId = $row->node_id;
-                        $lastSeq = $row->seq;
-                        continue;
+            if(!isSet($httpVars["flatten"]) || $httpVars["flatten"] == "false"){
+
+                if(!$this->filterRow($row, $filter)){
+                    if ($valuesSent) {
+                        echo $separator;
                     }
-                    if($valuesSent) echo $separator;
-                    echo json_encode($previousRow);
+                    echo json_encode($row);
                     $valuesSent = true;
                 }
-                $previousRow = $row;
-                $previousNodeId = $row->node_id;
+
+            }else{
+
+                if ($row->node_id == $previousNodeId) {
+                    $previousRow->target = $row->target;
+                    $previousRow->seq = $row->seq;
+                    if ($order[$row->type] > $order[$previousRow->type]) {
+                        $previousRow->type = $row->type;
+                    }
+                } else {
+                    if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content")) {
+                        if($this->filterRow($previousRow, $filter)){
+                            $previousRow = $row;
+                            $previousNodeId = $row->node_id;
+                            $lastSeq = $row->seq;
+                            continue;
+                        }
+                        if($valuesSent) echo $separator;
+                        echo json_encode($previousRow);
+                        $valuesSent = true;
+                    }
+                    $previousRow = $row;
+                    $previousNodeId = $row->node_id;
+                }
+                $lastSeq = $row->seq;
+                flush();
             }
-            $lastSeq = $row->seq;
-            flush();
-        }
-        if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content") && !$this->filterRow($previousRow, $filter)) {
-            if($valuesSent) echo $separator;
-            echo json_encode($previousRow);
+            if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content") && !$this->filterRow($previousRow, $filter)) {
+                if($valuesSent) echo $separator;
+                echo json_encode($previousRow);
+                $valuesSent = true;
+            }
+
         }
         if (isSet($lastSeq)) {
             if($stream){
