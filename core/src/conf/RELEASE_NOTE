@@ -1,49 +1,236 @@
 Pydio ##VERSION_NUMBER## Release Note
 
-This is a bugfix and security release, upgrade is recommended.
+This is a development release, it should not be used in production.
+This release is necessary to test the desktop sync client
 
 License: Affero GPL
 Copyright: Charles du Jeu 2014
 Demo: https://demo.pyd.io/
-Date: 20th, March 2014
-Contributors: cdujeu, ellega
+Date: June, 20th 2014
 
-Update README.md (details)
-Command smbclient if Windows OS (details)
-Make sure the slug is applied at workspace creation even if from a template. (details)
-Make sure mkfile is compatible with the node signature (details)
-Higher filtering level for filename (details)
-Fix tabs re-opening / Fix 'circular JSON structure' error by filtering data before saving. (details)
-Do not remove all whitespaces, too restrictive (details)
-Activate rest for stat_hash action (details)
-Add an option to fix #195 : force all emails to be sent by a unique adress (details)
-Fix PowerFS charset problems (details)
-Should fix some errors with nodes parameter array when sending to background (details)
-Sanitize and decode archive name (see #480) (details)
-Meta.exif : ignore UndefinedTag: key (details)
-WS selector: visually show that element was selected (details)
-Fix simple tabs, fix #373 date modified sorts wrong (details)
-Defer registry building when initiating repository driver. (details)
-Default folder / mime_empty images in preview factory (details)
-Exclude mime shared_* for "Share" and "To selection cart" actions, to avoid having them appear in user dashboard. (details)
-Clear user selection before switching repository (details)
-Correct metadata expression (details)
-Order WS list in dashboard fix #484 (details)
-Goto shortcut and default_start_repository were colliding (details)
-Missing message in group creation / deletion (details)
-Conf.sql : deleting a group was deleting all groups with the same prefix! (details)
-Fix PowerFS + Download All in minisite combination (details)
-Installer style and messaging (details)
-Path to jumploader archive changed on their website. (details)
-Last compile (details)
-Update plupload plugin to support their version 2.1 (details)
-Refix powerfs cmd building (details)
-Fix problems with specific values when saving roles parameters. (details)
-Make share button transparent (details)
-Fix openlayer "Fullscreen" button (details)
-Fix notification when it's pointing to Root. (details)
-Integrate new video (iOS device) (details)
-Add optional filters for users counting (e.g parent or admin) (details)
+. Keep an up-to-date index and trigger a change feed via SQL triggers : used by the sync client
+. Split auth plugins into auth backends and auth frontends. Latter can be tested one by one until a credential is detected.
+. Create a "Keystore" based auth frontend for simplify REST api login
+. Enable routing between workspace via URL (backbone-based)
+. API enhancements
+. Massive refactoring of shares to store them in DB instead of data/public/ folder.
+. Massive refactoring for scalability when tons of users and tons of workspace
+. Italian translation
+
+Add image rotation using exif information 
+Added auth plugin for radius. 
+Add a small Backbone extension to enable URL routing 
+Add a node.index hook and use it in the meta.syncable. We should probably split index.lucene into a core component browsing recursively and the implementation using lucene. 
+Make sure the slug is applied at workspace creation even if from a template. 
+Make sure mkfile is compatible with the node signature 
+Higher filtering level for filename 
+Rewrite pattern update 'starts with' 
+Fix tabs re-opening / Fix 'circular JSON structure' error by filtering data before saving. 
+Do not remove all whitespaces, too restrictive 
+Activate rest for stat_hash action 
+Pass application Root for history manager. We should have an htaccess generation at install, as it's getting more complicated to configure. 
+Update htaccess comment 
+Create a template for htaccess, should be generated at install time 
+Add methods for recursive search of metadata and implement this by hooking into ShareCenter to make sure shared workspaces are synchronized to their parent and the other way. Added some performance optimizations on the way, to be extensively tested, could have some side-effects. Remove some debugging in AJXP_Cache 
+AJXP_Node: collect many metadata namespace at once Implement recursion in meta.watch > to be tested extensively 
+Make sure parent node is detected as non-leaf in notif fix #449 and fix #451 in dev branch 
+Add an option to fix #195 : force all emails to be sent by a unique adress 
+Detect Backbone before starting the router Attach mobile scroll in AjxpSimpleTabs Fix #373 Date modified sorting wrong Fix some small umbra/oxygen tweaks, especially the fact that if you turn this inadvertently you cannot go back... 
+Fix icon for folders in notification feed Fix some ie8 error, dashboard is still unusable. 
+Resplit LOG field into source, message and params - Close #483 Upgrade to be tested on PostgreSQL 
+Fix PowerFS charset problems 
+Should fix some errors with nodes parameter array when sending to background 
+Sanitize and decode archive name (see #480) 
+Add a parameter for optionally loading some JS frameworks before anything else. Leave it empty by default for the moment, to avoid letting people load backbone without knowledge. 
+Previous FilesList commit broke the scrolling 
+Revert the $plugin instance cloning, broke the REST api. Instead, make sure to reload node driver on original node after applying forward event. 
+Meta.exif : ignore UndefinedTag: key 
+WS selector: visually show that element was selected 
+Handle a path filter on the changes feed to synchronize only a subfolder 
+Add the missing German translation 
+Make sure to update $lastSeq if we "continue" the loop 
+Make sure the like $filter expression ends up with a slash, otherwise it can take files beginning with the same prefix. 
+Handle a path filter on the changes feed to synchronize only a subfolder (cherry picked from commit e3b580c) 
+Make sure to update $lastSeq if we "continue" the loop (cherry picked from commit 0ea7b2d) 
+Make sure the like $filter expression ends up with a slash, otherwise it can take files beginning with the same prefix. (cherry picked from commit 5f8f7a0) 
+Update CLA link 
+smb.php with Windows OS 
+Update README.md 
+Remove scrutinizer badge it's too depressing. 
+Create configure_php_modules.sh 
+Zoho Editor is broken when not using the "External Agent" 
+Fix key max length is 1000 bytes for mysql, plus fields length consistency 
+smb.php don't work with lot of files or folders if "Windows OS" 
+Quick integration of the analytics SQL queries. Warning, they are working on the old tables formats, to be updated. 
+Keep the right order 
+Add titles 
+Change cursor system / create empty values when there is no value on a given date. 
+Make queries compatible with both tables format (before and after update) by simply searching on message or params. 
+Fix hasGroupMapping test using empty() function, can lead to a false positive if an empty string. 
+Make sure to encode labels as UTF-8. 
+Bar plots and Figures. 
+Add some figures 
+Bring some life to analytics dashboard 
+Fix color index modulo compute 
+Fix HTML5 folder uploads issues, enable it for Mac 
+Fix SQL analytics date cursor (include last day) 
+Let the ajxp_user ( = dashboard ) repository always "accessible". 
+Update comment 
+Make sure to clone the original personal role before overriding. Re-apply specific "Shared" roles after clearing parent user's ACLs in case of a shared user. 
+Re-revert the isMac test for webkitGetAsEntry, otherwise utf8 files are skipped on MacOS. 
+Fix #496 : clear metadata when a shared link is expired (by date or number of downloads) 
+core.mailer: Make sure to add a typed email to the list of "to", if people don't explicitely click on the auto-complete list. 
+Admin : restrict Parameters & Actions edition when logged user is a groupAdmin (not super admin). Only parameters with a scope are allowed. 
+Disable old "Shared Elements" workspace by default (will be removed at one point) 
+Fix #418 : duplicate functions loadPublicletData & clearExpiredFiles, all moved to ShareCenter Fix events applied to various nodes : we must reset the AJXP_Controller xPath to make sure the hooks are cleaned up as well. Should be reimplemented in an event-based pattern. 
+Ajxp_user : reload shared files list after clearing expired / Fix list object ID 
+Update AJXP_Logger::debug() calls 
+[edito.pixlr] Fix #500, properly close editor tab after saving 
+Update default repositories with last features 
+Fix rest URI computation 
+Todo: implement indexNode method 
+Test hidden files during the filterFile() call when building Zips - Fix #532 
+Use SystemTextEncoding::magicDequote insteaod of decodeSecureMagic when handling json data, it MUST be utf-8 for json_decode function - Fix #529 
+Manually merge #300 : exif rotation 
+Manual merge of #300 exif rotation 
+Editor.diaporama : exif rotation changes broke ImageViewer (extending Diaporama) 
+Massive refactoring: generalize usage of UserSelection object instead of always parsing the $httpVars["file"] variable. Prepend base64 encoded versions for auto-detection, should be backward-compatible. 
+Add new carrousel-like display mode for file list : horizontalScroll and fit:content 
+Folder "Recycle_bin" must be Hidden with attribute "H" if Windows OS 
+GUI : AjxpTabulator: new option uniqueTab will always replace existing editor in tab. FilesList: call fit:content inside resizeThumbnails() function Last compile 
+Ability to define many templates for the minisites (name must begin with minisite_) and user can choose. Sample template is Film Strip, super simple. 
+Replace "Download All" icon with archive otherwise when no text Download and Download All conflict. 
+Fix share height 
+WebODF: Use ajxpServerAccessPath instead hardcoding index.php 
+- see result here #510 - rebuilt with branch "develop" 
+Attach ContentFilter to a repository - Save it as serialized option for conf.sql 
+Implement same filterings when listing only one or N specific nodes, instead of browsing a folder. Make shell_exec call silent on windows. 
+WIP: modularization of sharing features. Put the templates back in action.share instead of gui.ajax - Split the share action into many actions the will appear in the menu depending on the selection. Remove old clientForm, TODO make sure everything is working on "Umbra". 
+Notification list: back from 600 to 350 ;-) @ellega 
+Forgotten print_r in PThumb.lib.php 
+Fix film strip on mobile device => fix various diaporama stuff 
+Reproduce the "background image" of the current public link page directly as an AjxpPane option. WIP : make a "download page" template to replace public_links php file. 
+Don't preg_quote() and later stripslashes(), move preg_quote in the right places 
+Use self:: instead of AuthService:: in AuthService 
+Replace eval with constant in getConfInst 
+Move regexpToLike to AJXP_Utils 
+Introduce cleanRegexp() 
+New option in Auth to preset a login, providing a password-only protection for minisites 
+Reput the main templates in gui.ajax instead of action.share, otherwise they can be not found. 
+Make all calls to ShareCenter no more static, and split this class into a new ShareStore class, that will implement a DB-based storage (and maintain backward compat to publiclets). Add a download preProcessor to count the downloads. 
+Introduce likeToLike and cleanLike in AJXP_Utils 
+getUsersCount auth.sql: use dibi ... again 
+Stop restraining search by putting ^ 
+Download page 
+Minisites & publiclinks convergence, use simpleStoreGet/Set/List methods to store shares in the DB. 
+Fix pending login mechanism. Still somethig todo with various sessions opened. 
+fix Jumploader 
+fix ldap build group branch 
+json_encode object-like options when sending repository options. 
+Never store share meta on root node. 
+Massive rework of the shares storage & metadata => ability to build many links/workspace on each node, ability to move nodes without breaking (at least nodes directly shared, should be expanded to the children...), event forwarding to shared workspaces. To be tested extensively, particularly migration from old metadata format to new one. To be tested : URL shorteners. 
+One session per window in minisite makes it more convenient. Could be generalized to standard window. 
+Check if node exists when send unique file. 
+Do not use func()[0] for old php versions 
+AjxpPane image background: get defaultImage from parameter 
+ShareCenter: always write the RewriteRules in the htaccess. Set default images for download link. 
+ActionsManager / ActionsToolbar refactoring to handle a "local" datamodel. To be even more simplified if possible. Use it in RepositoryEditor to display a tab with all shares of the current edited workspace. 
+Change depandancy of action.cart 
+Conf/Auth driver : use a "ajxp.hidden" property to generally ignore all internal users created by minisites. Add powerfull methods to query repositories (directly in sql when possible). 
+Encapsulate new listRepositoriesWithCriteria() methods in ConfService. Use in ajxp_conf 
+Use new methods in action.share and access.ajxp_conf In ShareStore methods, pass userId instead of object. 
+Silently ignore wrong results in lucene. 
+Make sure the user object is not null - see previous commits. 
+Do not authorize ajxp_user repo by default ( = dashboard ) Disable "switch_to_dashboard_action" if repo is not allowed. 
+Update TPL access. Should be written at install time, along with the default charset. 
+Base for repository-specific authentication via a prompt dialog. Test in FTP by uncommenting the line. Could be used for the dropbox stuff. 
+Use html fullScreen 
+Fix RESTfull mkfile - too harsh sanitization clears the slashes in path 
+Fix minisite session detection (starts with AjaXplorer_Shared, not necessarily exactly that word) 
+Bug: dblclick was triggered twice on non-ie browsers 
+AbstractEditor last change: use className instead of class. 
+Update docblocks 
+Definitely set skipBubbling and skipCarousel to true by default - to be checked against mobile 
+Update ajxp_ role / plugin / repository editors. 
+Fix ajxp_conf layout resizing always showing some blank at the bottom, resize just after insertion. 
+Make sure share action does not appear in a menu 
+Fix minisite layouts initial loading 
+Create a static function to get ShareCenter instance (enabling the docblocks). Use it where possible. Start a readonly mode for ShareCenter.js 
+Display workspace alias, we could probably remove the unique ID 
+Test setting a user inside an AJXP_Node - could be used to impersonate a user instead of using logUser() 
+Carry on moving every actions / data concerning the shares inside the ShareCenter, out of ajxp_conf and presumabyl out of ajxp_user 
+Fix share actions 
+Clean ShareCenter 
+Fix passing 0 as related_object_id value to simpleStore 
+ShareCenter i18n / hide upload box for files. 
+Wrong call to list reload, triggers too much repainting 
+Update tags by directly setting them inside the shareData if possible, in the metadata otherwise. 
+Do not "enlargeToOwn" the events - check that it has no side effect 
+Fix share watch 
+Fix #538 Missing node.read in access.fs when reading unique nodes 
+Set up a datamodel-specific ActionsToolbar via XML. No more reference to sharing in ajxp_conf. Use datamodel-specific listings in My Shares dashboard tab and load from ShareCenter. 
+Last compile 
+Replace /node+ by /dir+ in the rest params, very strange it was probably broken. 
+Fix error in array_merge messing up with numeric keys. 
+First implementation of Auth Front End, simple impl of a keystore-based auth for the REST api. 
+Move get_xml_registry (and alias "state" action) in core.conf instead of gui.ajax, should not be there. 
+Implement RestAPI token-based authentication. Last todo is to check the nonce is never reused. Add ORDER parameter in auth frontends plugins to make sure they are called in the correct order. Introduce a specific /pydio/ path to query API for non-workspaces actions. To be documented and checked when generating workspace slugs. 
+ApikeyPane 
+Rework startup. Set Encoding and server URI via installer. Activate syncable features, rest API and backbone router by default. 
+Try to load dynamic file encoding.php 
+Create SessionLogin authentication frontend and replace core.auth actions. To be checked in all auth.* plugins Add a "PROTOCOL_TYPE" parameter to the auth frontends, to auto activate frontend for session-based or rest-based access points. 
+Fix startup installer 
+Remove share on node deletion. 
+Fix shared repositories listing problems 
+Re-adapt ftp special login screen in Auth.ftp driver 
+Forgot captcha Fix \ in new install web uri detection Adapt auth.multi (override login action) 
+MQObserver switching channels: always avoid using sendSync! 
+Oups unreferenced configs variable 
+Make sure to make the repository slugs unique - should be part of a futur upgrade script Hack shareCenter to display all actions in admin driver Sort plugins by name in actions lists 
+Removed all calls to ConfService::getRepository() in meta-like plugins (meta, metastore, index), as we have the RESTfull info from the passed accessDriver. Should be expanded to editors as well. 
+Fix Session Credentials & WebDAV Basic Auth 
+Print exception message when there is a stream_open error. 
+Meta.mount : check command result instead of re-running a second mount cmd. 
+beforeInitMeta has a new signature 
+Log invalid login attempts. 
+[SQL] Remove ajxp_simple_store create from mq.sql 
+Also log invalid login attemps via WebDAV. 
+Finished Italian translation for plugin 'core.ajaxplorer' and added the new one for 'access.fs' 
+FIX previous commit. 
+Added Italian translation for 'access.ajxp_conf' plugin 
+Make sure URI is totally URLEncoded by calling urldecode / rawurlencode to compute the correct hash. Fix pydio/pydio-sync/#26 
+Italian translation
+Hook node indexation to changes tracking. We should probably have a parent indexation core plugin, extended by lucene, change tracker, and elasticsearch. Make sure to exclude recycle_bin from indexation for synchro 
+Remove dependency of authfront.session_login to gui.ajax - we use protocol detection anyway. 
+Add an optional stream=true parameter to the changes request. Json data is return one per line, the result is not real json but it can be that way easily "streamed" by consuming clients. 
+Filehasher: publish rsync extension support through a plugin exposed parameter - document sdk methods for rest access. 
+Fix event sent when appending data to an existing file (must be an update instead of a create) 
+Transform auth.cas into an authfront plugin. Expand CAS feature 
+Publish repository-scope parameters in the writeRepositoriesData() function - Add such a parameter in the meta.syncable plugin, to disallow sync on given workspaces 
+Silently delete failing alert to avoid filling error logs 
+Prevent null pointer 
+Do not cache query result 
+Fix repository-exposed caching 
+Flatten repository-scope props differently, makes it easier to search 
+Fix CAS authfront plugin 
+Fix icon problem 
+Allow WS creation on read-only FS if option CREATE is not set. 
+Carry on fixing bottlenecks when tons of users and repositories. Avoid loading repository list if not necessary. Make sure to apply limit when loading users through autocompleter. Fix regexp (must start with ^) 
+Fix WebDAV enabler & password form (close #556) 
+Fix canSwitchTo() method - make sure to include shared workspaces 
+Chase Pydio in users strings - Replace by APPLICATION_TITLE, except for About ... 
+Sharing : move link at the top of the dialog, add all necessary paramaters. Detect legacy publiclink or not to avoid blinking 
+When using download_form, passing query parameters through the action attribute does not work in IE or FF. 
+Fix password-protected minisite behaviours 
+Fix minisite_session parameter management 
+Refix share pane size 
+Make sure the router always keep the / when navigating to root, otherwise requests are sent to the upper folder. 
+Add json possible value to the format parameter for get_my_feed request 
+Make sure to updateAdminRights for admin user first creation We do have to load all repositories once for editing a role 
+Update share panel layout, set link at the top 
+Fix radio button problem in Role Editor 
+Minisite.php layout was missing the animate-css library 
+Fix PLUpload chunk size 
 
 --
 See core/doc/PREVIOUS_RELEASES file to learn more about previous releases.
