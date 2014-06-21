@@ -537,29 +537,47 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             case "mkdir";
 
                 $messtmp="";
-                if(!isSet($httpVars["dirname"])){
-                    $uniq = $selection->getUniqueFile();
-                    $dir = AJXP_Utils::safeDirname($uniq);
-                    $dirname = AJXP_Utils::safeBasename($uniq);
-                }else{
-                    $dirname=AJXP_Utils::decodeSecureMagic($httpVars["dirname"], AJXP_SANITIZE_FILENAME);
+                $files = $selection->getFiles();
+                if(isSet($httpVars["dirname"])){
+                    $files[] = $dir ."/". AJXP_Utils::decodeSecureMagic($httpVars["dirname"], AJXP_SANITIZE_FILENAME);
                 }
-                $dirname = substr($dirname, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
-                $this->filterUserSelectionToHidden(array($dirname));
-                AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($dir."/".$dirname), -2));
-                $error = $this->mkDir($dir, $dirname, isSet($httpVars["ignore_exists"])?true:false);
-                if (isSet($error)) {
-                    throw new AJXP_Exception($error);
-                }
-                $messtmp.="$mess[38] ".SystemTextEncoding::toUTF8($dirname)." $mess[39] ";
-                if ($dir=="") {$messtmp.="/";} else {$messtmp.= SystemTextEncoding::toUTF8($dir);}
-                $logMessage = $messtmp;
-                //$pendingSelection = $dirname;
-                //$reloadContextNode = true;
-                $newNode = new AJXP_Node($this->urlBase.$dir."/".$dirname);
                 if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
-                array_push($nodesDiffs["ADD"], $newNode);
-                $this->logInfo("Create Dir", array("dir"=>$this->addSlugToPath($dir)."/".$dirname));
+                $messages = array();
+                $errors = array();
+                $max_length = ConfService::getCoreConf("NODENAME_MAX_LENGTH");
+                foreach($files as $newDirPath){
+                    $parentDir = AJXP_Utils::safeDirname($newDirPath);
+                    $basename = AJXP_Utils::safeBasename($newDirPath);
+                    $basename = substr($basename, 0, $max_length);
+                    $this->filterUserSelectionToHidden(array($basename));
+                    try{
+                        AJXP_Controller::applyHook("node.before_create", array(new AJXP_Node($parentDir."/".$basename), -2));
+                    }catch (AJXP_Exception $e){
+                        $errors[] = $e->getMessage();
+                        continue;
+                    }
+                    $error = $this->mkDir($parentDir, $basename, isSet($httpVars["ignore_exists"])?true:false);
+                    if (isSet($error)) {
+                        //throw new AJXP_Exception($error);
+                        $errors[] = $error;
+                        continue;
+                    }
+                    $messtmp.="$mess[38] ".SystemTextEncoding::toUTF8($basename)." $mess[39] ";
+                    if ($parentDir=="") {$messtmp.="/";} else {$messtmp.= SystemTextEncoding::toUTF8($parentDir);}
+                    $messages[] = $messtmp;
+                    $newNode = new AJXP_Node($this->urlBase.$parentDir."/".$basename);
+                    array_push($nodesDiffs["ADD"], $newNode);
+                    $this->logInfo("Create Dir", array("dir"=>$this->addSlugToPath($parentDir)."/".$basename));
+                }
+                if(count($errors)){
+                    if(!count($messages)){
+                        throw new AJXP_Exception(implode('', $errors));
+                    }else{
+                        $errorMessage = implode("<br>", $errors);
+                    }
+                }
+                $logMessage = implode("<br>", $messages);
+
 
             break;
 
