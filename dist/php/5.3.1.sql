@@ -40,9 +40,13 @@ CREATE TRIGGER `LOG_UPDATE` AFTER UPDATE ON `ajxp_index`
 FOR EACH ROW INSERT INTO ajxp_changes (repository_identifier, node_id,source,target,type)
   VALUES (new.repository_identifier, new.node_id, old.node_path, new.node_path, CASE old.node_path = new.node_path WHEN true THEN 'content' ELSE 'path' END);
 /* SEPARATOR */
-CREATE TABLE `ajxp_log2` LIKE `ajxp_log.back`; INSERT `ajxp_log.back` SELECT * FROM `ajxp_log`;
+CREATE TABLE `ajxp_log2` LIKE `ajxp_log.back`;
 /* SEPARATOR */
-CREATE TABLE `ajxp_log2` LIKE `ajxp_log`; INSERT `ajxp_log2` SELECT * FROM `ajxp_log`;
+INSERT `ajxp_log.back` SELECT * FROM `ajxp_log`;
+/* SEPARATOR */
+CREATE TABLE `ajxp_log2` LIKE `ajxp_log`;
+/* SEPARATOR */
+INSERT `ajxp_log2` SELECT * FROM `ajxp_log`;
 /* SEPARATOR */
 ALTER TABLE  `ajxp_log2` ADD  `source` VARCHAR( 255 ) NOT NULL AFTER  `user` , ADD INDEX (  `source` ) ;
 /* SEPARATOR */
