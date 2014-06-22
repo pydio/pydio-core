@@ -13,8 +13,6 @@ if (is_file(AJXP_INSTALL_PATH."/conf/bootstrap_repositories.php".".new-".date("Y
 
 echo "The bootstrap_context and bootstrap_repositories files were replaced by the new version, the .pre-update version is kept.";
 
-echo "Upgrading database ...";
-
 $dbInst = "
 /* SEPARATOR */
 ALTER TABLE ajxp_user_rights ADD INDEX (login), ADD INDEX (repo_uuid);
@@ -84,7 +82,9 @@ if (is_a($confDriver, "sqlConfDriver")) {
     if (!isSet($test["driver"])) {
         $test = AJXP_Utils::cleanDibiDriverParameters($confDriver->getOption("SQL_DRIVER"));
     }
-    if (is_array($test) && isSet($test["driver"])) {
+    if (is_array($test) && isSet($test["driver"]) && $test["driver"] == "mysql") {
+
+        echo "Upgrading MYSQL database ...";
 
         $parts = array_map("trim", explode("/* SEPARATOR */", $dbInst));
         $results = array();
@@ -106,10 +106,18 @@ if (is_a($confDriver, "sqlConfDriver")) {
         dibi::commit();
         dibi::disconnect();
 
+    } else if(is_array($test) && $test["driver"] != "mysql"){
+
+        echo "Cannot auto-upgrade Sqlite or PostgreSql DB automatically, please review the update instructions.";
+
     } else {
+
         echo "Nothing to do for the DB";
+
     }
 
 } else {
+
     echo "Nothing to do for the DB";
+
 }
