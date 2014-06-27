@@ -35,7 +35,7 @@
         <global_param group="CONF_MESSAGE[Add some users]" name="usersLegend" type="legend" label="" description="CONF_MESSAGE[Create users for your organization right now. You can do this later by going to the Settings workspace.]"/>
         <global_param group="CONF_MESSAGE[Add some users]" name="USER_LOGIN" type="string" label="CONF_MESSAGE[Login]" replicationGroup="users" description="CONF_MESSAGE[Alphanumeric login]"/>
         <global_param group="CONF_MESSAGE[Add some users]" name="USER_MAIL" type="string" label="CONF_MESSAGE[User Email]" replicationGroup="users" description="CONF_MESSAGE[User-friendly name of the user]"/>
-        <global_param group="CONF_MESSAGE[Add some users]" name="USER_NAME" type="string" label="CONF_MESSAGE[User Name]" replicationGroup="users" description="CONF_MESSAGE[User-friendly name of the user]"/>
+        <global_param group="CONF_MESSAGE[Add some users]" name="USER_NAME" type="string" label="CONF_MESSAGE[Display name]" replicationGroup="users" description="CONF_MESSAGE[User-friendly name of the user]"/>
         <global_param group="CONF_MESSAGE[Add some users]" name="USER_PASS" type="password" label="CONF_MESSAGE[Password]" replicationGroup="users" description="CONF_MESSAGE[Password]"/>
         <global_param group="CONF_MESSAGE[Add some users]" name="USER_PASS2" type="password" label="CONF_MESSAGE[Confirm]" replicationGroup="users" description="CONF_MESSAGE[Confirm password]"/>
     </server_settings>
