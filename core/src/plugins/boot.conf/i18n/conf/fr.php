@@ -25,7 +25,7 @@ $mess = array(
 "Admin Login" => "Identifiant",
 "Alphanumeric login" => "Utiliser des caractères alphanumériques standards (type email)",
 "Admin Display Name" => "Nom d'affichage",
-"User-friendly name of the user" => "Nom que les utilisateurs voient",
+"Name that users will see" => "Nom que les utilisateurs voient",
 "Admin Password" => "Mot de passe",
 "Use a strong password (more than 8 characters, complicated ones." => "Utiliser un mot de passe fort (plus de 8 caractères, compliqués)",
 "Confirm" => "Confirmer",
@@ -55,6 +55,6 @@ $mess = array(
 "Create users for your organization right now. You can do this later by going to the Settings workspace." => "Créer des utilisateurs pour votre organisation maintenant. Vous pourrez le faire plus tard.",
 "Login" => "Identifiant",
 "User Email" => "Email",
-"Display name" => "Nom (affiché)",
+"Display name" => "Nom d'affichage",
 "Password" => "Mot de passe",
 );
