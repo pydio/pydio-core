@@ -55,6 +55,7 @@ $mess = array(
 "Create users for your organization right now. You can do this later by going to the Settings workspace." => "Create users for your organization right now. You can do this later by going to the Settings workspace.",
 "Login" => "Login",
 "User Email" => "User Email",
+"Mail address of the user" => "Mail address of the user",
 "Display name" => "Display name",
 "Password" => "Password",
 

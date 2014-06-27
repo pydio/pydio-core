@@ -55,6 +55,7 @@ $mess = array(
 "Create users for your organization right now. You can do this later by going to the Settings workspace." => "Créer des utilisateurs pour votre organisation maintenant. Vous pourrez le faire plus tard.",
 "Login" => "Identifiant",
 "User Email" => "Email",
+"Mail address of the user" => "Adresse Email de l'utilsateur, de l'utilisatrice",
 "Display name" => "Nom d'affichage",
 "Password" => "Mot de passe",
 );
