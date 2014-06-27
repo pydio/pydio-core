@@ -35,7 +35,7 @@ $mess = array(
 "Try sending an email with the configured data" => "Envoyer un email avec la config",
 "Test SQL Connection" => "Tester la connexion SQL",
 "Try connecting to the database" => "Tenter de se connecter à la DB",
-"Configurations storage" => "&lt;span class='icon-save'&gt;&lt;/span&gt; Stockage des configurations",
+"Configuration storage" => "&lt;span class='icon-save'&gt;&lt;/span&gt; Stockage des configurations",
 "Add some users" => "&lt;span class='icon-group'&gt;&lt;/span&gt; Ajouter des utilisateurs",
 "Enable emails" => "Activer le mail",
 "Set up system to send emails" => "Configurer le système pour envoyer des mails",

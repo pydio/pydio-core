@@ -22,7 +22,7 @@
 $mess = array(
 "Admin access" => "&lt;span class='icon-key'&gt;&lt;/span&gt; Erster Administratorenzugang",
 "Global options" => "&lt;span class='icon-cogs'&gt;&lt;/span&gt; Globale Einstellungen",
-"Configurations storage" => "&lt;span class='icon-save'&gt;&lt;/span&gt; Konfigurationsspeicher",
+"Configuration storage" => "&lt;span class='icon-save'&gt;&lt;/span&gt; Konfigurationsspeicher",
 "Add some users" => "&lt;span class='icon-group'&gt;&lt;/span&gt; Benutzer hinzufügen",
 "Please set up a login and password for the administrator user. This step is necessary to let you login the first time. You can create more administrators later by going to the 'Settings' workspace." => "Please set up a login and password for the administrator user. This step is necessary to let you login the first time. You can create more administrators later by going to the 'Settings' workspace.",
 "Admin Login" => "Benutzername",
@@ -47,7 +47,7 @@ $mess = array(
 "Default 'From' email used to send emails." => "Default 'From' email used to send emails.",
 "How the application configuration data will be stored (users, plugins, etc. &lt;b&gt;not&lt;/b&gt; how your actual documents are managed). To get started rapidly, select No Database. To enable more advanced features, configure a database connection." => "How the application configuration data will be stored (users, plugins, etc. &lt;b&gt;not&lt;/b&gt; how your actual documents are managed). 'No DB' mode can be suited for a quick test of the system, but it's not suited for production and you should always prefer a db-based setup (sqlite does not require any additional service).",
 "Storage Type" => "Speichertyp",
-"Select how the configurations will be stored" => "Wählen Sie wie und wo die Konfigurationsdaten gespeichert werden sollen",
+"Select how the configuration will be stored" => "Wählen Sie wie und wo die Konfigurationsdaten gespeichert werden sollen",
 "No Database (Quick Start)" => "Keine Datenbank (Schnellstart, nicht für produktive Umgebungen)",
 "Database (Requires MySQL, PostgreSQL or SQLite)" => "Datenbank (Produktive Umgebungen, von APPLICATION_TITLE unterstütztes DBMS vorausgesetzt)",
 "Enable Notifications" => "Logging aktivieren",
