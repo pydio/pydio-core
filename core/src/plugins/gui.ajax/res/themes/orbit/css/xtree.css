@@ -86,6 +86,7 @@
 	vertical-align: middle;
 	border: 0;
 	float:left;
+    visibility: hidden;
 }
 
 .webfx-tree-icon {

@@ -191,7 +191,7 @@ Class.create("ActionsToolbar", {
                 selection:false,
                 dir:true,
                 actionBar:true,
-                actionBarGroup:'put',
+                actionBarGroup:'get',
                 contextMenu:false,
                 infoPanel:false
 
