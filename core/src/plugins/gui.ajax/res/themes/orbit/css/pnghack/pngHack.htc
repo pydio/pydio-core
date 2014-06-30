@@ -1,0 +1,61 @@
+<!--
+
+	PNG Hack
+
+	Copyright 2002, Aaron Porter <aaron@javasource.org>
+
+	Inspired by Erik Arvidsson's "PNG Behavior" at
+	http://webfx.eae.net/dhtml/pngbehavior/pngbehavior.html
+
+-->
+<public:component>
+ <public:attach event="onpropertychange" for="element" onEvent="propertyChanged()" />
+ <script language="JavaScript">
+
+	var needHack = needHack();
+
+	var transparentImage = ajxpResourcesFolder+"/css/pnghack/transparent.gif";
+
+	pngHack();
+
+	function propertyChanged()
+	{
+		if (event.propertyName == "src")
+			pngHack();
+	}
+
+	function pngHack()
+	{
+		if (!needHack)
+			return;
+
+		var src = element.src;
+
+		if (src.indexOf(transparentImage) != -1)
+			return; // Already fixed
+
+		if (src.indexOf("png") == -1) // There's got to be a better check than this!
+		{
+			element.runtimeStyle.filter = "";
+			return;
+		}
+
+		element.src = transparentImage;
+		element.original_src = src;
+		element.runtimeStyle.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + src + "',sizingMethod='scale')";
+	}
+
+	function needHack()
+	{
+		var pos = navigator.userAgent.indexOf("MSIE ");
+
+		if (pos == -1)
+			return false;
+
+		var version = navigator.userAgent.substring(pos + 5);
+
+		return (((version.indexOf("5.5") == 0) || (version.indexOf("6") == 0)) && (navigator.platform == ("Win32")));
+	}
+
+ </script>
+</public:component>

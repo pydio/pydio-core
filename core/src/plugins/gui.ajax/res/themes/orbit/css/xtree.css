@@ -1,0 +1,198 @@
+.flexbox div.webfx-tree-container.first_container{
+}
+
+.no-flexbox div#tree_container{
+	/*background-image:url('../images/tree-odd-even-bg.png');
+	background-attachment:scroll;*/
+}
+
+
+.webfx-tree-container {
+	margin: 0;
+	padding: 0;
+	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+	white-space: nowrap;
+	font-size: 11px;
+}
+
+.webfx-tree-item
+{
+	padding: 0;
+	margin: 0;
+	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+	font-size: 11px;
+	white-space: nowrap;
+	height: 27px;
+    position: relative;
+}
+
+.webfx-tree-item:hover{
+	background-color: rgb(253, 252, 228);
+}
+
+.selected-webfx-tree-item {
+	color : white;
+}
+
+.selected-webfx-tree-item-inactive 
+{
+	text-decoration: none;
+}
+
+.webfx-tree-item a, .webfx-tree-item a:active, .webfx-tree-item a:hover, .webfx-tree-item a:link {
+	margin-left: 0;
+	outline:0;
+	cursor: default;
+}
+
+.webfx-tree-item a {	
+	text-decoration: none;
+}
+
+.webfx-tree-item a:hover {
+	text-decoration: none;
+}
+
+.webfx-tree-item a {
+	outline:0;
+    color: rgb(111, 121, 131);
+}
+
+.webfx-tree-item a span {
+    display: inline-block;
+    line-height: 19px;
+    margin-top: 4px;
+    padding-left: 25px;
+    background-position: 4px 1px;
+    background-repeat: no-repeat;
+    font-size: 13px;
+}
+
+*::-moz-focus-inner { 
+	border: none; 
+}
+
+.selected-webfx-tree-item a {
+	color: white !important;
+	text-decoration: none;
+}
+
+
+.webfx-tree-item a.selected-focus{
+      color: white;
+}
+
+.webfx-tree-item img {
+	vertical-align: middle;
+	border: 0;
+	float:left;
+}
+
+.webfx-tree-icon {
+	width: 16px;
+	height: 16px;
+	margin-right:3px;
+}
+
+.selected
+{
+	background: #ddd;
+	color: white;
+	text-decoration: none;
+}
+
+.flat_tree_pane div#tree_container{
+    border: 0;
+    background-color: transparent;
+}
+.flat_tree_pane div#tree_container > .webfx-tree-item{
+    display: none;
+}
+
+.flat_tree_pane div.webfx-tree-item{
+    background-color: transparent;
+    cursor: pointer;
+    padding: 3px 6px;
+}
+
+.flat_tree_pane  div.webfx-tree-item a{
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+}
+
+.flat_tree_pane  div.webfx-tree-item a span{
+    padding-left: 33px; 
+    background-position: 13px 4px !important;
+    background-repeat: no-repeat;
+    font-size: 13px;
+    background-size: 12px;
+    padding-top: 1px;
+}
+
+.flat_tree_pane  div.webfx-tree-item.selected-webfx-tree-item-inactive,
+.flat_tree_pane  div.webfx-tree-item.selected-webfx-tree-item{
+    background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.flat_tree_pane  div.webfx-tree-item.selected-webfx-tree-item a,
+.flat_tree_pane  div.webfx-tree-item.selected-webfx-tree-item-inactive a{
+    text-shadow: none;
+    color:#fff !important;
+}
+
+
+.flat_tree_pane > #tree_container >  .webfx-tree-container > .webfx-tree-item{
+    margin-top: 10px;
+}
+
+.flat_tree_pane > #tree_container >  .webfx-tree-container > .webfx-tree-item a span{
+    color: #FFFFFF;
+    background-image: none!important;
+    padding-left: 4px;
+    margin-top: 5px;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+.flat_tree_pane div.webfx-tree-container.first_container {
+    padding: 0;
+}
+
+.flat_tree_pane  div.scrolling div.webfx-tree-container.first_container {
+    padding: 0;
+}
+
+.flat_tree_pane  div.webfx-tree-item img{
+    display:none;
+}
+
+.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container{
+    /*background-color: rgba(255, 255, 255, 0.44);*/
+}
+
+.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container > .webfx-tree-container{
+
+    margin-bottom: 0;
+    box-shadow: none;
+
+}
+
+.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container > .webfx-tree-item{
+    background-color: transparent;
+    border-top:0;
+}
+
+.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container  div.webfx-tree-container{
+}
+
+.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container  div.webfx-tree-container  div.webfx-tree-item{
+    padding-left: 20px;
+}
+
+.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container > .webfx-tree-container div.webfx-tree-container  div.webfx-tree-item{
+    padding-left: 40px;
+}
+
+.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container > .webfx-tree-container > .webfx-tree-container  div.webfx-tree-container  div.webfx-tree-item{
+    padding-left: 60px;
+}

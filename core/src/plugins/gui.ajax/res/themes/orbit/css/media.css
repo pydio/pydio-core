@@ -1,0 +1,71 @@
+@media only screen
+and (max-width : 800px) {
+    .custom_top_title{
+        width: 23%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+}
+
+@media only screen
+and (max-width : 680px) {
+    .ws-label{
+        display: none !important;
+    }
+    span.actionbar_button_label,
+    .action_bar span.actionbar_button_label,
+    #get_my_feed_button_label,
+    #logging_string i,
+    #logging_string *[ajxp_message_id],
+    #global_toolbar span.icon-caret-down,
+    #search_form a
+    {
+        display: none !important;
+    }
+    #simple_repository_label{
+        font-size: 16px;
+        width: 100px !important;
+    }
+    #simple_repository_label div.repository_legend{
+        visibility: hidden;
+    }
+    #workspace_toolbar {
+        padding-top: 0;
+    }
+    #group_more_action_button{
+        height:17px;
+    }
+    .user_widget_label.withImage i{
+        width: 30px;
+        overflow: hidden;
+    }
+    .thumbnail_selectable_cell > div > div.overlay_icon_div{
+        top: 32px !important;
+    }
+}
+
+@media only screen
+and (max-width : 400px){
+    #simple_repository_label{
+        display:none;
+        font-size: 12px;
+        width: 100% !important;
+        padding:0 20px;
+        height:auto;
+    }
+    
+    div.repository_legend{
+        display:none;
+    }
+    #search_engine_cont{
+        width:15% !important;
+    }
+    #buttons_bar_cont{
+        margin-left: 15px;
+    }
+    #workspace_toolbar{
+        padding-top:0;
+    }
+
+}
