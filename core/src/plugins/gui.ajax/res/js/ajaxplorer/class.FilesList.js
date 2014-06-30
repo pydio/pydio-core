@@ -734,7 +734,7 @@ Class.create("FilesList", SelectableElements, {
 			this.disableTextSelection(this.htmlElement.down('div.sort-table'), true);
 			this.disableTextSelection(contentContainer, true);
 			this.observer = function(e){
-				fitHeightToBottom(contentContainer, this.htmlElement);
+                if(this.options.fit && this.options.fit == 'height') fitHeightToBottom(contentContainer, this.htmlElement);
 				if(Prototype.Browser.IE){
 					this._headerResizer.resize(contentContainer.getWidth());
 				}else{
@@ -795,7 +795,7 @@ Class.create("FilesList", SelectableElements, {
                 this.htmlElement.setStyle({overflowX:'auto'});
             }
             this.observer = function(e){
-                fitHeightToBottom.defer(scrollElement, this.htmlElement);
+                if(this.options.fit && this.options.fit == 'height') fitHeightToBottom.defer(scrollElement, this.htmlElement);
             }.bind(this);
             this.observe("resize", this.observer);
 			
@@ -899,7 +899,7 @@ Class.create("FilesList", SelectableElements, {
                 window.setTimeout(function(){
                     if(!this.htmlElement || !this.scrollbar) return;
                     if(this._displayMode == "list" && contentContainer){
-                        fitHeightToBottom(contentContainer, this.htmlElement);
+                        if(this.options.fit && this.options.fit == 'height') fitHeightToBottom(contentContainer, this.htmlElement);
                         if(Prototype.Browser.IE){
                             this._headerResizer.resize(contentContainer.getWidth());
                         }else{
@@ -908,7 +908,7 @@ Class.create("FilesList", SelectableElements, {
                             this._headerResizer.resize(width);
                         }
                     }else{
-                        fitHeightToBottom(scrollElement, this.htmlElement);
+                        if(this.options.fit && this.options.fit == 'height') fitHeightToBottom(scrollElement, this.htmlElement);
                     }
                     this.scroller.setStyle({height:parseInt(scrollElement.getHeight())+"px"});
                     this.scrollbar.recalculateLayout();
@@ -1034,7 +1034,7 @@ Class.create("FilesList", SelectableElements, {
 		this.notify("resize");
         document.fire("ajaxplorer:resize-FilesList-" + this.htmlElement.id, this.htmlElement.getDimensions());
     },
-	
+
 	/**
 	 * Link focusing to ajaxplorer main
 	 */
