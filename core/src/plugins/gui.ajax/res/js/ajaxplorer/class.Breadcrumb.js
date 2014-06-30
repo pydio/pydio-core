@@ -59,7 +59,7 @@ Class.create("Breadcrumb", {
                     parts.set(parent.getPath(), parent.getLabel());
                     parent = parent.getParent();
                 }
-                if(parts.size() > 1){
+                if(parts.size() > 1 && !this.options['always_show_root']){
                     parts.unset(lastChild.getPath());
                 }
                 var keys = parts.keys().reverse();
@@ -68,16 +68,39 @@ Class.create("Breadcrumb", {
                 parts = tmpParts;
             }
 
-            var clickPath = "<span class='icon-home ajxp-goto' data-goTo='/' title='"+MessageHash[459]+"'></span>";
             var lastValue = parts.values().last();
+            var firstValue = parts.values().first();
+            var chevron = "<span class='icon-chevron-right'></span>";
+            var clickPath = '';
+            if(!this.options['hide_home_icon']){
+                clickPath = "<span class='icon-home ajxp-goto' data-goTo='/' title='"+MessageHash[459]+"'></span>";
+                if(this.options["use_ul"]){
+                    clickPath = "<li>"+clickPath+"</li>";
+                }
+            }
             parts.each(function(pair){
                 var refresh = '';
-                if(pair.value == lastValue){
-                    refresh = '<span class="icon-refresh ajxp-goto-refresh" title="'+MessageHash[149]+'"></span>';
+                if(this.options["use_ul"]){
+                    if(pair.value == lastValue){
+                        refresh = '<i class="icon-refresh ajxp-goto-refresh" title="'+MessageHash[149]+'"></i>';
+                    }
+                    var first = pair.value == firstValue ? ' first-bread':'';
+                    clickPath += "<li><span class='ajxp-goto "+first+"' data-goTo='"+pair.key+"'>"+pair.value+"</span></li>";
+                    if(refresh){
+                        clickPath += "<li><i class='ajxp-goto' data-goTo='"+pair.key+"'>"+refresh+"</i></li>";
+                    }
+                }else{
+                    if(pair.value == lastValue){
+                        refresh = '<span class="icon-refresh ajxp-goto-refresh" title="'+MessageHash[149]+'"></span>';
+                    }
+                    clickPath += (pair.value != firstValue || !this.options['hide_home_icon'] ? chevron : "") + "<span class='ajxp-goto' data-goTo='"+pair.key+"'>"+pair.value+refresh+"</span>";
                 }
-                clickPath += "<span class='icon-chevron-right'></span>" + "<span class='ajxp-goto' data-goTo='"+pair.key+"'>"+pair.value+refresh+"</span>";
-            });
-            this.element.update("<div class='inner_bread'>" + clickPath + "</div>");
+            }.bind(this));
+            if(this.options['use_ul']){
+                this.element.update("<div class='inner_bread'><ul>" + clickPath + "</ul></div>");
+            }else{
+                this.element.update("<div class='inner_bread'>" + clickPath + "</div>");
+            }
 
             this.element.select("span.ajxp-goto").invoke("observe", "click", function(event){
                 "use strict";
@@ -88,6 +111,9 @@ Class.create("Breadcrumb", {
                 }else{
                     window.ajaxplorer.goTo(target);
                 }
+            });
+            this.element.select("i.ajxp-goto").invoke("observe", "click", function(event){
+                window.ajaxplorer.fireContextRefresh();
             });
 
         }.bind(this);
