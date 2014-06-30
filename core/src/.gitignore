@@ -6,3 +6,4 @@ data/personal/*
 data/plugins/*
 data/public/*
 data/tmp
+vendor/

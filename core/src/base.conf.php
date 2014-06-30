@@ -24,4 +24,5 @@
 define("AJXP_PACKAGING", "zip");
 define("AJXP_INSTALL_PATH", realpath(dirname(__FILE__)));
 define("AJXP_CONF_PATH", AJXP_INSTALL_PATH."/conf");
+require_once(AJXP_INSTALL_PATH."/vendor/autoload.php");
 require_once(AJXP_CONF_PATH."/bootstrap_context.php");

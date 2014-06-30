@@ -59,7 +59,6 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
     public function persistEvent($hookName, $data, $repositoryId, $repositoryScope, $repositoryOwner, $userId, $userGroup)
     {
         if($this->sqlDriver["password"] == "XXXX") return;
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         try {
             $node = null;
@@ -93,7 +92,6 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
     public function loadEvents($filterByRepositories, $userId, $userGroup, $offset = 0, $limit = 10, $enlargeToOwned = true)
     {
         if($this->sqlDriver["password"] == "XXXX") return array();
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         if ($enlargeToOwned) {
             $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND
@@ -139,7 +137,6 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         $repositoryId = $notif->getNode()->getRepositoryId();
         $userId = $notif->getTarget();
         if($this->sqlDriver["password"] == "XXXX") return;
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         try {
             dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[content], [index_path]) VALUES (%i,%s,%s,%s,%s,%bin,%s)",
@@ -165,7 +162,6 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
     public function loadAlerts($userId, $repositoryIdFilter = null)
     {
         if($this->sqlDriver["password"] == "XXXX") return array();
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         if ($repositoryIdFilter != null) {
             $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND [repository_id] = %s AND [user_id] = %s ORDER BY [edate] DESC %lmt", "alert", $repositoryIdFilter, $userId, 100);
@@ -189,7 +185,6 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
      */
     public function dismissAlertById($alertId, $occurrences = 1)
     {
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         $userId = AuthService::getLoggedUser()->getId();
         if ($occurrences == 1) {
@@ -245,7 +240,6 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
     public function persistMetaObject($indexPath, $data, $repositoryId, $repositoryScope, $repositoryOwner, $userId, $userGroup)
     {
         if($this->sqlDriver["password"] == "XXXX") return;
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         try {
             dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[index_path],[user_id],[repository_id],[repository_owner],[user_group],[repository_scope],[content]) VALUES (%i,%s,%s,%s,%s,%s,%s,%s,%s,%bin)", time(), "meta", "comment", $indexPath, $userId, $repositoryId, $repositoryOwner, $userGroup, ($repositoryScope !== false ? $repositoryScope : "ALL"), serialize($data));
@@ -257,7 +251,6 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
     public function findMetaObjectsByIndexPath($repositoryId, $indexPath, $userId, $userGroup, $offset = 0, $limit = 20, $orderBy = "date", $orderDir = "desc")
     {
         if($this->sqlDriver["password"] == "XXXX") return array();
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         $res = dibi::query("SELECT * FROM [ajxp_feed]
             WHERE [etype] = %s AND [repository_id] = %s AND [index_path] LIKE %like~
@@ -281,7 +274,6 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
     public function updateMetaObject($repositoryId, $oldPath, $newPath = null, $copy = false)
     {
         if($this->sqlDriver["password"] == "XXXX") return array();
-        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
         if ($oldPath != null && $newPath == null) {// DELETE
 

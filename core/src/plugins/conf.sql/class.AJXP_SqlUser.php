@@ -20,7 +20,6 @@
  */
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
-require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
 
 /**
  * AJXP_User class for the conf.sql driver.

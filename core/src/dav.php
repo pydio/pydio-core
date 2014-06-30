@@ -53,9 +53,6 @@ function AJXP_Sabre_autoload($className)
 spl_autoload_register('AJXP_Sabre_autoload');
 
 
-
-include 'core/classes/sabredav/lib/Sabre/autoload.php';
-
 if (ConfService::getCoreConf("WEBDAV_BASEHOST") != "") {
     $baseURL = ConfService::getCoreConf("WEBDAV_BASEHOST");
 } else {
