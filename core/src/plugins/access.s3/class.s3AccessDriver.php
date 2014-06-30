@@ -64,7 +64,6 @@ class s3AccessDriver extends fsAccessDriver
             $this->driverConf = array();
         }
 
-        $path = $this->repository->getOption("PATH");
         $recycle = $this->repository->getOption("RECYCLE_BIN");
         ConfService::setConf("PROBE_REAL_SIZE", false);
         $wrapperData = $this->detectStreamWrapper(true);

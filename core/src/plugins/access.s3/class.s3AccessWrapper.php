@@ -49,7 +49,11 @@ class s3AccessWrapper extends fsAccessWrapper
             self::$lastException = $e;
             throw $e;
         }
+        $basePath = $repoObject->getOption("PATH");
         $baseContainer = $repoObject->getOption("CONTAINER");
+        if(!empty($basePath)){
+            $baseContainer.=rtrim($basePath, "/");
+        }
         $p = "s3://".$baseContainer.str_replace("//", "/", $url["path"]);
         return $p;
     }
