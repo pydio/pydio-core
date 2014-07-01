@@ -186,7 +186,9 @@ Class.create("FoldersTree", AjxpPane, {
 	 * Resize implementation of IAjxpWidget
 	 */
 	resize : function(){
-		fitHeightToBottom(this.treeContainer, null);
+        if(!this.options['fit'] || this.options['fit'] != 'content'){
+            fitHeightToBottom(this.treeContainer, null);
+        }
         if(this.scrollbar){
             this.scroller.setStyle({height:parseInt(this.treeContainer.getHeight())+'px'});
             this.scrollbar.recalculateLayout();

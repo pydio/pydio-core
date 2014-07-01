@@ -129,6 +129,7 @@ Class.create("Breadcrumb", {
 			var parentWidth = $(this.options.flexTo).getWidth();
 			var siblingWidth = 0;
 			this.element.siblings().each(function(s){
+                if(s.hasClassName('skipSibling')) return;
 				if(s.ajxpPaneObject && s.ajxpPaneObject.getActualWidth){
 					siblingWidth+=s.ajxpPaneObject.getActualWidth();
 				}else{

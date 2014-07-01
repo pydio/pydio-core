@@ -2963,7 +2963,7 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail
     height: 22px !important;
 }
 
-div.class-FetchedResultPane .thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata{
+div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata{
     display: none;
 }
 
@@ -4815,7 +4815,7 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
 
 .breadcrumbs-arrow li{
     float: left;
-    margin: 0 .3em 0 1em;
+    margin: 0 0.3em 0 1em;
     font-size: 15px;
 }
 
@@ -4825,7 +4825,7 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
 
 .breadcrumbs-arrow span{
     background: #4dc5c3;
-    padding: .4em 1em;
+    padding: 0.4em 1em;
     float: left;
     text-decoration: none;
     color: white;
@@ -4876,14 +4876,14 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
     border-left-color: #4dc5c3;
 }
 
-.breadcrumbs-arrow .current,
-.breadcrumbs-arrow .current:hover{
+.breadcrumbs-arrow span.current,
+.breadcrumbs-arrow span.current:hover{
     font-weight: bold;
     background: none;
 }
 
-.breadcrumbs-arrow .current::after,
-.breadcrumbs-arrow .current::before{
+.breadcrumbs-arrow span.current::after,
+.breadcrumbs-arrow span.current::before{
     content: normal;
 }
 
