@@ -70,7 +70,12 @@
 				<clientCallback prepareModal="true"><![CDATA[
 					var uploaders = ajaxplorer.getActiveExtensionByType("uploader");
 					if(uploaders.length){
-						var uploader = uploaders[0];
+					    var uploader;
+					    if(window.actionArguments[0]){
+                            uploader = window.actionArguments[0];
+					    }else{
+    						uploader = uploaders[0];
+                        }
 						if(ajaxplorer.actionBar.getActionByName("trigger_remote_copy")){
                             modal.setCloseAction(function(){
                                 ajaxplorer.fireContextRefresh();
@@ -87,7 +92,28 @@
 							uploader.resourcesManager.load();
 							var dialogOnComplete = new Function("oForm", uploader.dialogOnComplete);
 						}
-						modal.showDialogForm('Upload', uploader.formId, dialogOnOpen, null, dialogOnComplete, true, true);
+						var dialogOpen = function(form){
+						    if (form.down('#uploader_chooser')) form.down('#uploader_chooser').remove();
+						    var chooser = new Element('div', {id:'uploader_chooser'});
+						    form.insert({top:chooser});
+						    var chooserList = new Element('ul');
+                            chooser.insert(chooserList);
+                            uploaders.each(function(up){
+                                var label = up.xmlNode.getAttribute("label");
+                                var desc = up.xmlNode.getAttribute("description")
+                                var item = new Element('li', {title:desc}).update(label).observe("click", function(){
+                                    ajaxplorer.actionBar.fireAction("upload", up);
+                                });
+                                if(up == uploader) item.addClassName('current');
+                                chooserList.insert(item);
+                            });
+                            if(uploader.dialogOnOpen){
+                                uploader.resourcesManager.load();
+                                var dialogOnOpen = new Function("oForm", uploader.dialogOnOpen);
+                                dialogOnOpen(form);
+                            }
+						};
+						modal.showDialogForm('Upload', uploader.formId, dialogOpen, null, dialogOnComplete, true, true);
 					}
 				]]></clientCallback>
 				<serverCallback methodName="switchAction" restParams="/input_stream/dir+" preferredHttp="PUT" sdkMethodName="upload" developerComment="Post a file content for upload, by default as x-www-form-urlencoded, but can be passed as input stream as well." checkParams="false">

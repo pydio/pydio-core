@@ -169,7 +169,7 @@
 					<div id="workspace_toolbar" ajxpClass="AjxpPane">
                         <div id="repo_chooser" style="width:15px;" ajxpClass="RepositorySelect" ajxpOptions='{"menuPosition": "bottom middle", "menuOffsetTop":5, "menuOffsetLeft":110, "menuMaxHeight":535, "menuEvent":"over", "simpleLabel":"<span class=\"icon-caret-down\"></span>"}'></div>
                         <div id="breadcrumb" class="breadcrumbs-arrow" ajxpClass="Breadcrumb" ajxpOptions='{"use_ul":true, "always_show_root":true, "hide_home_icon":true, "flexTo":"workspace_toolbar", "checkSiblings":true}'></div>
-						<div style="float:right;" ajxpClass="AjxpPane" ajxpOptions='{}' id="search_engine_cont">
+						<div style="float:right; width:260px;" ajxpClass="AjxpPane" ajxpOptions='{}' id="search_engine_cont">
 						    <div id="buttons_bar_top" style="float:right;" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
 						    <div id="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}'></div>
 						</div>

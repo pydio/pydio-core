@@ -27,7 +27,7 @@ table.sort-table tr:nth-child(even)
 }
 
 .blue_gradient,div.selected-webfx-tree-item, .selected-focus{
-    background: #5599ff !important; /* Old browsers */ /* FF3.6+ */ /* Chrome,Safari4+ */ /* Chrome10+,Safari5.1+ */ /* Opera11.10+ */ /* IE10+ */ /* IE6-9 */ /* W3C */
+    background: #77b8e2 !important; /* Old browsers */ /* FF3.6+ */ /* Chrome,Safari4+ */ /* Chrome10+,Safari5.1+ */ /* Opera11.10+ */ /* IE10+ */ /* IE6-9 */ /* W3C */
 }
 
 .grey_gradient_light_inputs, .dialogContent input, .dialogContent input[type="text"], .dialogContent input[type="password"], .dialogContent select, #search_txt, #location_form,#treeCopy
@@ -450,7 +450,7 @@ div.shadow_class
 .dialogContent select:focus
 {
     background: white;
-    border: 1px solid #5599ff;
+    border: 1px solid #77b8e2;
 }
 
 .dialogContent input:disabled,
@@ -1232,10 +1232,17 @@ input.SF_input.SF_number{
 
 
 .dialogTitle{
+    /*
     border-radius: 2px 2px 0 0;
     background-color: #4dc5c3;
     border-bottom: 1px solid rgb(67, 156, 155);
-}
+    */
+    border-radius: 2px 2px 0 0;
+    background-color: #77b8e2;
+    border-bottom: 0px solid #b5b5b5;
+    color: #ffffff;
+    padding: 10px 2px 8px 9px;
+    font-weight: bold;}
 
 #sidebar_splitter div.panelHeader,
 #search_panel div.panelHeader{
@@ -1580,7 +1587,7 @@ div.class-FetchedResultPane > div.panelHeader
     padding: 14px 8px 6px;
     margin: 0;
     background-color: #f7f7f7;
-    color: #555;
+    color: #4dc5c3;
     text-transform: uppercase;
     letter-spacing: 1px;
     border-left: 1px solid #d5d5d5;
@@ -2269,7 +2276,7 @@ UPLOAD MULTIFILE FORM
 div#upload_files_list, div#multiple_download_container
 {
     overflow: auto;
-    height: 210px;
+    height: 350px;
     border: 4px dashed rgb(221, 221, 221);
     text-align: left;
     -moz-border-radius: 11px;
@@ -2278,7 +2285,7 @@ div#upload_files_list, div#multiple_download_container
 
 .droparea {
     background: url("../../../../../../index.php?get_action=get_drop_bg") no-repeat scroll left bottom transparent;
-    background-position: 10px 100%;
+    background-position: center;
 }
 
 .dropareaHover{
@@ -2289,6 +2296,44 @@ div#upload_files_list, div#multiple_download_container
     border-color: #D96252 !important;
     border-style: dashed;
     background-color: white !important;
+}
+
+#uploader_chooser{
+    width: 100%;
+}
+
+#uploader_chooser ul{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: block;
+    position: relative;
+    border-bottom: 1px solid #4DC5C2;
+    background-color: #d5d5d5;
+}
+
+#uploader_chooser li {
+    display: inline-block;
+    background-color: white;
+    padding: 7px 14px;
+    border-radius: 4px 4px 0 0;
+    margin: 8px 2px;
+    margin-bottom: 0;
+    border-bottom: 0;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+#uploader_chooser li:hover {
+    background-color: #f7f7f7;
+}
+#uploader_chooser li.current:hover {
+    background-color: #4DC5C2;
+}
+#uploader_chooser li.current {
+    background-color: #4DC5C2;
+    color: white;
+    cursor: default;
 }
 
 div#uploader_options_pane {
@@ -2440,7 +2485,7 @@ div#upload_files_list span.item_relative_path{
 
 
 .fakeUploadButton {
-    width: 151px;
+    width: 161px;
     padding-top: 6px;
     padding-bottom: 6px;
     border: 1px solid #ccc;
@@ -2587,7 +2632,7 @@ span.toggleHeader{
 }
 
 span.toggleHeader.toggleInactive{
-    background-color: #f7f7f7;
+    background-color: #e5e5e5;
     cursor: pointer;
     border: 1px solid #f7f7f7;
 }
@@ -3177,7 +3222,7 @@ td.infoPanelLabel {
 
 .panelContent div.panelHeader{
 
-    color: #555;
+    color: #77b8e2;
     font-weight: bold;
     font-size: 12px;
     padding: 6px 7px;
