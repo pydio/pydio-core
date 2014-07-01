@@ -4,7 +4,7 @@ table.sort-table tr:nth-child(even)
 }
 
 *{
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-family: "Open sans", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 }
 
 *:focus{
@@ -232,9 +232,11 @@ div.thumbnail_cell_metadata span.metadata_chunk{
 
 .thumbnail_iconlike_shadow{
     border: 1px solid white;
+    /*
     -webkit-box-shadow: 0 0 5px #5C5C5C;
     -moz-box-shadow: 0 0 5px #5C5C5C;
     box-shadow: 0 0 5px #5C5C5C;
+    */
 }
 
 .selectable_div div.selected{
@@ -302,7 +304,7 @@ div.thumbnail_cell_metadata span.metadata_chunk{
     height: 12px !important;
     bottom: 0 !important;
     width: auto !important;
-    top: 4px !important;
+    top: 9px !important;
     right: 10px !important;
     font-size: 11px;
 }
@@ -1423,9 +1425,10 @@ div.action_bar.text_only  span.actionbar_button_label{
 }
 
 .action_bar span.ajxp_icon_span {
-    font-size: 1.3em;
+    font-size: 1.2em;
     float: left;
-    padding-top: 3px;
+    padding-top: 6px;
+    padding-right: 2px;
 }
 
 .action_bar a.menuAnchorSelected,
@@ -1566,10 +1569,15 @@ div.class-FetchedResultPane > div.panelHeader
     border: 0 !important;
 }
 
+#navigation_pane{
+    background-color: #f7f7f7;
+    overflow: hidden;
+}
+
 #topPane h3{
     font-size: 12px;
     font-weight: bold;
-    padding: 11px 8px;
+    padding: 14px 8px 6px;
     margin: 0;
     background-color: #f7f7f7;
     color: #555;
@@ -1665,11 +1673,11 @@ div.class-FetchedResultPane > div.panelHeader
 #repo_chooser{
     background-color: #4dc5c3;
     float:left;
-    font-size: 16px;
+    font-size: 15px;
     color: #ffffff;
     font-weight: normal;
     letter-spacing: 1px;
-    margin: 0 .3em;
+    margin: 0;
     cursor: pointer;
     padding: 0.4em;
     border-radius: 3px 0 0 3px;
@@ -1793,7 +1801,7 @@ img.simple_button_arrow{
 }
 .user_widget_label{
     float: left;
-    padding: 3px 10px 12px 7px;
+    padding: 3px 10px 7px 7px;
     cursor: pointer;
     font-size: 12px;
     letter-spacing: 1px;
@@ -2579,9 +2587,9 @@ span.toggleHeader{
 }
 
 span.toggleHeader.toggleInactive{
-    background-color: transparent;
-    font-size: 0.9em;
+    background-color: #f7f7f7;
     cursor: pointer;
+    border: 1px solid #f7f7f7;
 }
 
 span.toggleHeader span[class^="icon-"],
@@ -2908,6 +2916,7 @@ span.search_meta_opt.checked > span {
 
 #search_results
 {
+    display: none;
     margin-left: 0;
     width: 350px;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
@@ -2935,7 +2944,27 @@ div.class-FetchedResultPane div.ajxpNodeProvider
 {
     cursor: pointer;
     background-color: transparent !important;
-    border-bottom: 1px solid #ffffff;
+
+}
+
+div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed{
+    padding: 3px 4px;
+}
+
+div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell img{
+    width: 16px !important;
+    height: 16px !important;
+    margin-top: 5px !important;
+}
+
+div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell{
+    margin: 0;
+    padding: 0 4px 0 9px;
+    height: 22px !important;
+}
+
+div.class-FetchedResultPane .thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata{
+    display: none;
 }
 
 #search_results div.ajxpNodeProvider:hover,
@@ -2952,7 +2981,7 @@ div.class-FetchedResultPane div.ajxpNodeProvider.selected-focus,
 
 div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel,
 #search_results div.thumbnail_selectable_cell.detailed div.thumbLabel{
-    font-size: 14px;
+    font-size: 13px;
     padding-top: 4px;
 }
 
@@ -3166,9 +3195,9 @@ tr td.infoPanelLabel
 
 .infoPanelImagePreview
 {
-    width: 100%;
     text-align:center;
     padding: 10px 0;
+    background-color: white; border: 1px solid #d5d5d5; margin: 8px; border-radius: 5px;
 }
 .infoPanelImagePreview img
 {
@@ -4656,7 +4685,7 @@ div.innerTabulator > div.tabulatorContainer > #display_toolbar a
 }
 
 #cpane_tabs span.toggleInactive{
-    border-right: 1px dotted rgb(111, 123, 136);
+    border-right: 1px solid white;
 }
 
 #cpane_tabs span.toggleInactiveBeforeActive{
@@ -4787,11 +4816,11 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
 .breadcrumbs-arrow li{
     float: left;
     margin: 0 .3em 0 1em;
-    font-size: 16px;
+    font-size: 15px;
 }
 
 .breadcrumbs-arrow li:first-of-type{
-    margin-left: 0;
+    margin-left: 0.2em;
 }
 
 .breadcrumbs-arrow span{
@@ -4924,7 +4953,7 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
 {
     display: inline-block;
     font-size: 11px;
-    padding: 1px 12px 3px 11px;
+    padding: 1px 12px 2px 11px;
     text-align: center;
     overflow: visible;
     outline: none;

@@ -17,7 +17,7 @@
 
 .webfx-tree-item
 {
-	padding: 0;
+	padding: 4px 0;
 	margin: 0;
 	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 	font-size: 11px;
@@ -62,7 +62,7 @@
     display: inline-block;
     line-height: 19px;
     margin-top: 4px;
-    padding-left: 25px;
+    padding-left: 30px;
     background-position: 4px 1px;
     background-repeat: no-repeat;
     font-size: 13px;
@@ -196,4 +196,17 @@
 
 .flat_tree_pane  div.webfx-tree-container > .webfx-tree-container > .webfx-tree-container > .webfx-tree-container  div.webfx-tree-container  div.webfx-tree-item{
     padding-left: 60px;
+}
+
+div#tree_container > div:first-child {
+    display: none;
+}
+
+#folder_pane{
+    margin-left: -4px;
+}
+
+
+div#tree_container > div.webfx-tree-container > div.webfx-tree-container{
+    display: none !important;
 }
