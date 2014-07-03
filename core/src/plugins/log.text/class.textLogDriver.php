@@ -258,9 +258,9 @@ class textLogDriver extends AbstractLogDriver
             $line = AJXP_Utils::xmlEntities($line);
             $matches = explode("\t",$line,7);
             if (count($matches) == 6){
-                $matches[4] = $matches[3];
-                $matches[5] = $matches[4];
                 $matches[6] = $matches[5];
+                $matches[5] = $matches[4];
+                $matches[4] = $matches[3];
                 $matches[3] = "";
             }
             if (count($matches) == 7) {
