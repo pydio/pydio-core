@@ -116,6 +116,8 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         $crtRepId = ConfService::getCurrentRepositoryId();
         if (isSet($httpVars["repository_id"]) && $u->mergedRole->canRead($httpVars["repository_id"])) {
             $authRepos[] = $httpVars["repository_id"];
+        } else if (isSet($httpVars["current_repository"])){
+            $authRepos[] = $crtRepId;
         } else {
             $accessibleRepos = ConfService::getAccessibleRepositories(AuthService::getLoggedUser(), false, true, false);
             $authRepos = array_keys($accessibleRepos);
@@ -180,6 +182,9 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     // Replace PATH, to make sure they will be distinct children of the loader node
                     $node->real_path = $node->getPath();
                     $node->setLabel(basename($node->getPath()));
+                    if(isSet($httpVars["merge_description"])){
+                        $node->setLabel(basename($node->getPath())." <small>".$node->event_description."</small>");
+                    }
                     $url = parse_url($node->getUrl());
                     $node->setUrl($url["scheme"]."://".$url["host"]."/notification_".$index);
                     $index ++;

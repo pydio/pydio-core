@@ -141,6 +141,7 @@ Class.create("Breadcrumb", {
                 buttonsWidth += el.getWidth();
             });
 			var newWidth = (parentWidth-siblingWidth-30);
+            if(this.options.flexToMargin) newWidth = newWidth - this.options.flexToMargin;
 			if(newWidth < 5){
 				this.element.hide();
 			}else{
@@ -148,6 +149,52 @@ Class.create("Breadcrumb", {
 				this.element.setStyle({width:newWidth + 'px'});
 			}
 		}
+        if(this.options["use_ul"]){
+            /*
+            var lastOverlaps = function(){
+                var last = this.element.down('li:last');
+                return (last && last.positionedOffset()['left'] + last.getWidth() ) > parseInt(this.element.getWidth())
+            }.bind(this);
+            var i=0;
+            var spans = this.element.select('li');
+            var available = parseInt(this.element.getWidth());
+            if(spans.length){
+                var base = 0;
+                var foldedSize = 38;
+                var allsizes = [];
+                var sumsizes = function(array){
+                    var r=0;
+                    for(n=0;n<array.length;n++) r+= array[n];
+                    return r;
+                }
+                for(var k=0;k<spans.length;k++){
+                    allsizes.push(spans[k].getWidth());
+                }
+                var p=0;
+                while(sumsizes(allsizes) > available && p<allsizes.length){
+                    allsizes[p] = 38;
+                    p++;
+                }
+                for(j=0;j<=p;j++){
+                    if(spans[p].down("span")) spans[p].down("span").update("..");
+                }
+                console.log(p);
+            }
+            while ( lastOverlaps() && i < spans.length - 1){
+                i++;
+                var span = spans[i].down('span');
+                if(!span)break;
+                span.update("..");
+            }
+            while(i < spans.length){
+                i++;
+                var span = spans[i].down('span');
+                if(!span)break;
+                span.update(getBaseName(span.readAttribute("data-goto")));
+            }
+            */
+        }
+        document.fire("ajaxplorer:resize-Breadcrumb-" + this.element.id, this.element.getDimensions());
 	},
 	
 	/**

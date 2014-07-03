@@ -3,23 +3,30 @@
 }
 
 #workspaces_center{
-    width: 40%;
-    margin: 0 15%;
-    min-width: 420px;
+    width: 100%;
     transition:margin 0.5s ease;
+    overflow-y: auto;
 }
 
 #workspaces_list{
-    overflow-y: auto;
-    max-height: 400px;
-    min-height: 100px;
-    margin: 0 30px;
-    background-color: #2c3e50;
+    margin: 0 auto;
     border-radius: 6px;
     list-style: none;
     padding-left: 0;
-    color: #ffffff;
+    width: 480px;
+}
 
+span.letter_badge {
+    display: inline-block;
+    float: left;
+    width: 57px;
+    background-color: #d5d5d5;
+    border-radius: 34px;
+    margin: 2px 17px 2px 0;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    font-size: 1.3em;
 }
 
 .dashboard_main_pane > div.tabulatorContainer{
@@ -64,10 +71,11 @@
     font-size: 12px;
     opacity: 0.4;
     letter-spacing: 1px;
+    margin-left:60px;
+    border-bottom: 1px solid #d5d5d5;
 }
 
 #workspaces_list li {
-    border-bottom: 1px solid #263544;
     cursor: pointer;
     padding: 1px 7px;
 }
@@ -77,7 +85,7 @@
 }
 
 #workspaces_list li:hover {
-    background-color: #4F6275;
+    background-color: #f5f5f5;
 }
 
 #workspaces_list li.ws_selector_title:hover {
@@ -165,7 +173,7 @@
 
 #home_account_pane h1{
     margin-top: 0;
-    padding-top: 12px;
+    padding-top: 44px;
     font-size: 21px;
     text-align: center;
     font-weight: normal;
@@ -181,8 +189,10 @@
 }
 
 #workspaces_button {
-    padding: 15px 30px;
+    padding: 45px 30px;
     font-size: 14px;
+    width: 480px;
+    margin: 0 auto;
 }
 
 #workspaces_button input[type="button"] {
@@ -191,7 +201,7 @@
     color: white;
     border: 0;
     cursor: pointer;
-    margin-top: -5px;
+    margin-top: 0;
     background-color: #e35d52;
 }
 
@@ -202,6 +212,7 @@
 #logo_div{
     text-align: center;
     padding-top: 20px;
+    display: none;
 }
 
 #get_started_link,
@@ -263,7 +274,7 @@ and (max-width : 980px){
     }
 }
 
-    @media only screen
+@media only screen
 and (max-width : 800px){
 
     #workspaces_center{

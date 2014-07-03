@@ -63,7 +63,10 @@ Class.create("UserDashboardHome", AjxpPane, {
         var renderElement = function(repoObject){
 
             var repoId = repoObject.getId();
-            var repoEl = new Element('li').update("<h3>"+repoObject.getLabel() + "</h3><h4>" + repoObject.getDescription()+"</h4>");
+            var startLetters;
+            var label = repoObject.getLabel();
+            startLetters = label.split(" ").map(function(word){return word.substr(0,1)}).join("");
+            var repoEl = new Element('li').update("<span class='letter_badge'>"+ startLetters +"</span><h3>"+repoObject.getLabel() + "</h3><h4>" + repoObject.getDescription()+"</h4>");
             wsElement.insert(repoEl);
             var select = function(e){
                 var target = Event.findElement(e, "li");
@@ -115,7 +118,7 @@ Class.create("UserDashboardHome", AjxpPane, {
         var notificationElement = oFormObject.down("#notifications_center");
         attachMobileScroll(notificationElement, "vertical");
 
-        if(notifCenter){
+        if(false && notifCenter){
             notifCenter.ajxpNode.observe("loaded", function(){
                 notifCenter.pFactory.setThumbSize(64);
                 var existingItems = notificationElement.select('li');
@@ -171,7 +174,7 @@ Class.create("UserDashboardHome", AjxpPane, {
                 clicker(null, true);
             }
         }else{
-            oFormObject.down("#workspaces_center").setStyle({marginLeft: '30%'});
+            //oFormObject.down("#workspaces_center").setStyle({marginLeft: '30%'});
             notificationElement.hide();
         }
 
@@ -194,7 +197,7 @@ Class.create("UserDashboardHome", AjxpPane, {
 
         $super(size);
 
-        fitHeightToBottom(this.htmlElement.down('#workspaces_list'), this.htmlElement, 90);
+        fitHeightToBottom(this.htmlElement.down('#workspaces_center'), this.htmlElement, 0);
     }
 
 

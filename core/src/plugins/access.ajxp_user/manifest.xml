@@ -28,10 +28,63 @@
                 <div id="folderPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ajxpPaneHeader="363" ajxpPaneIcon="view_tree.png" style="margin:20px;"></div>
                 <style>#sidebar_splitter{padding-bottom:20px;background-color:#A0C0A4;}</style>
             ]]></template_part>
-            <template_part ajxpClass="AjxpPane" ajxpId="workspace_toolbar" ajxpOptions='{"fit":"none"}'><![CDATA[
+            <template_part ajxpClass="AjxpPane" ajxpId="workspace_toolbar" ajxpOptions='{"fit":"none"}' theme="vision"><![CDATA[
                 <div id="search_container_settings" class="settings_search_container" style="display:none;" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}'></div>
                 <style>
                 #workspace_toolbar, #global_toolbar{display:none;}
+                #browser{padding:0}
+                div.flat_tabulator span.toggleHeader{
+                    background-color: #e35d52;
+                }
+                .largeButton, .SF_input.SF_inlineButton{
+                    background-color: #e35d52;
+                }
+                .action_bar{
+                    background-color: #ebedf0;
+                    padding: 4px;
+                    border-left:1px solid #5C5C5C;
+                }
+                #user_profile_form, div.class-FetchedResultPane{
+                    border-left:1px solid #5C5C5C;
+                }
+                #account_pane .action_bar{
+                    text-align: right;
+                }
+                .action_bar a{
+                    background-color: #e35d52;
+                    margin-top:3px;
+                    cursor: pointer;
+                }
+                div.class-FetchedResultPane{
+                    background-color: #f8f8f8;
+                }
+                #buttons_bar{
+                    padding-bottom: 2px;
+                    text-align: right;
+                }
+                #buttons_bar a {
+                    padding-bottom: 0;
+                    height: 26px;
+                }
+                .action_bar span.actionbar_button_label{
+                    font-size: 11px;
+                }
+                .flat_tabulator div.panelHeader.tabulatorContainer{
+                    background-color: #30383A;
+                    padding-top: 10px;
+                }
+                .flat_tabulator span.toggleHeader:first-of-type {
+                    background-color: #e35d52 !important;
+                }
+                .flat_tabulator span.toggleHeader.toggleInactive {
+                    background-color: rgba(119, 119, 119, 0.35) !important;
+                }
+                </style>
+            ]]></template_part>
+            <template_part ajxpClass="AjxpPane" ajxpId="workspace_toolbar" ajxpOptions='{"fit":"none"}' theme="orbit"><![CDATA[
+                <div id="search_container_settings" class="settings_search_container" style="display:none;" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}'></div>
+                <style>
+                #workspace_toolbar{display:none;}
                 #browser{padding:0}
                 div.flat_tabulator span.toggleHeader{
                     background-color: #e35d52;
@@ -140,7 +193,7 @@
                         <div id="workspaces_center">
                             <div id="logo_div"><img src="plugins/gui.ajax/PydioLogo250.png"></div>
                             <h1>AJXP_MESSAGE[user_dash.39]</h1>
-                            <ul id="workspaces_list" style="height: 100px;"></ul>
+                            <ul id="workspaces_list"></ul>
                             <div id="workspaces_button">
                                 <input type="checkbox" name="save_ws_choice" id="save_ws_choice" class="disabled" disabled><label for="save_ws_choice">AJXP_MESSAGE[user_dash.41]</label>
                                 <input type="button" name="go_to_ws" id="go_to_ws" value="AJXP_MESSAGE[user_dash.42]" class="disabled">
