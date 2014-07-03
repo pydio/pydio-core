@@ -2806,7 +2806,7 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
     transition:border-color 1s ease, width 1s ease;
 }
 
-#search_container.search_active #search_form input{
+#search_container.search_active div#search_form input{
     width: 100%;
     border-width: 1px;
     border-color: rgb(138, 149, 160);
