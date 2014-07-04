@@ -1588,7 +1588,9 @@ div.class-FetchedResultPane > div.panelHeader
     opacity: 0.7;
 }
 
-#topPane h3{
+#topPane h3,
+#search_meta div.advanced_search_section_title
+{
     font-size: 12px;
     font-weight: bold;
     padding: 14px 8px 6px;
@@ -1599,6 +1601,14 @@ div.class-FetchedResultPane > div.panelHeader
     letter-spacing: 1px;
     border-left: 1px solid #d5d5d5;
     display: block;
+}
+
+#search_meta div.advanced_search_section_title{
+    border-left: 0;
+}
+
+#search_meta div.advanced_search_section_title span.icon-circle{
+    display: none;
 }
 
 #topPane h3 small{
@@ -1928,9 +1938,7 @@ img.user_widget_mini{
 /********************************/
 /* HEADER RESIZER WIDGET
 /******************************/
-div#search_meta{
-}
-div.header_resizer, div#search_meta{
+div.header_resizer{
     overflow:hidden;
     box-shadow: 0 1px 1px rgba(0,0,0,0.35);
     opacity: 0.85;
@@ -2803,7 +2811,7 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
     width: 73px;
     border-radius: 4px;
     border-width: 0;
-    transition:border-color 1s ease, width 1s ease;
+    transition:border-color 0.5s ease, width 0.5s ease;
 }
 
 #search_container.search_active div#search_form input{
@@ -2813,30 +2821,16 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
 }
 
 #search_meta {
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-size: 11px;
+    font-size: 12px;
     padding: 0;
     background-color: rgb(255, 255, 255);
     color: rgb(143, 162, 182);
     letter-spacing: 1px;
-    border-bottom: 1px solid rgb(194, 196, 199);
-    max-height: 200px !important;
-    box-shadow: none !important;
-    height: 32px !important;
-    -webkit-transition-property: height;
-    -webkit-transition-duration: 0.1s;
-    -webkit-transition-timing-function: ease-in-out;
-    -moz-transition-property: height;
-    -moz-transition-duration: 0.1s;
-    -moz-transition-timing-function: ease-in-out;
-    transition-property: height;
-    transition-duration: 0.1s;
-    transition-timing-function: ease-in-out;
-    position: relative;
+    border-right: 1px solid rgb(194, 196, 199);
+    float: left;
 }
 
 #search_meta.toggle_open{
-    height: 200px !important;
 }
 
 #search_meta input.c3,
@@ -2959,14 +2953,6 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
     display: block;
 }
 
-#search_meta div.advanced_search_section_title {
-    border-bottom: 1px solid;
-    padding-bottom: 6px;
-    line-height: 9px;
-    margin-bottom: 7px;
-    cursor: pointer;
-}
-
 .searchScore{
     float: right;
     color: #CCC;
@@ -3004,7 +2990,6 @@ span.search_meta_opt.checked > span {
 {
     margin-left: 0;
     width: 100%;
-    background-color: white;
 }
 
 .close_results.icon-remove-sign {
@@ -4882,6 +4867,7 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
     overflow: hidden;
     color: rgb(111, 121, 131);
     margin-top: 1px;
+    border-radius: 0 40px 40px 0;
 }
 
 #breadcrumb div.inner_bread{
@@ -4921,6 +4907,39 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
 
 .breadcrumbs-arrow span.first-bread{
     min-width: 220px;
+}
+
+.breadcrumbs-arrow span.first-bread.reduced{
+    min-width: 0;
+}
+
+.breadcrumbs-arrow span.reduced{
+    padding: 0.4em 0;
+    width: 4px;
+    height: 20px;
+}
+
+.breadcrumbs-arrow span.reduced em{
+    visibility:hidden;
+}
+
+.breadcrumbs-arrow span.reduced:hover,
+.breadcrumbs-arrow span.reduced.first-bread
+{
+    padding: 0.4em 1em;
+    width: auto;
+    transition:padding 1s ease;
+}
+
+.breadcrumbs-arrow span.reduced:hover em,
+.breadcrumbs-arrow span.reduced.first-bread em
+{
+    visibility:visible;
+}
+
+.breadcrumbs-arrow span em{
+    font-style: normal;
+    font-weight: normal;
 }
 
 .breadcrumbs-arrow span:hover{

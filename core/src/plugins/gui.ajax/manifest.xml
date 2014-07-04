@@ -167,7 +167,7 @@
 					</div>
 					<div id="workspace_toolbar" ajxpClass="AjxpPane">
                         <div id="repo_chooser" style="width:15px;" ajxpClass="RepositorySelect" ajxpOptions='{"menuPosition": "bottom middle", "menuOffsetTop":5, "menuOffsetLeft":110, "menuMaxHeight":535, "menuEvent":"over", "simpleLabel":"<span class=\"icon-caret-down\"></span>"}'></div>
-                        <div id="breadcrumb" class="breadcrumbs-arrow" ajxpClass="Breadcrumb" ajxpOptions='{"use_ul":true, "always_show_root":true, "hide_home_icon":true, "flexTo":"workspace_toolbar", "flexToMargin":80, "checkSiblings":true}'></div>
+                        <div id="breadcrumb" class="breadcrumbs-arrow" ajxpClass="Breadcrumb" ajxpOptions='{"use_ul":true, "always_show_root":true, "hide_home_icon":true, "flexTo":"workspace_toolbar", "flexToMargin":50, "checkSiblings":true}'></div>
 						<div style="float:right;width:210px;" ajxpClass="AjxpPane" ajxpOptions='{}' id="search_engine_cont">
 						    <div id="buttons_bar_top" style="float:right;" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
 						</div>
@@ -182,7 +182,7 @@
                                 <h3>Bookmarks <small  id="bookmarks_toggler" ajxpClass="VisibilityToggler" ajxpOptions='{"widget_id":"flagged_elements"}'>hide</small></h3>
                                 <div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"replaceScroller":false, "fit":"content","nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_bookmarked"},"reloadOnServerMessage":"tree/reload_bookmarks"}'></div>
                                 <h3>Folders <small id="folders_pane_toggler" ajxpClass="VisibilityToggler" ajxpOptions='{"widget_id":"folder_pane", "detection_id":"tree_container"}'>hide</small></h3>
-                                <div id="folder_pane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":false,"fit":"content"}' ></div>
+                                <div id="folder_pane" class="show_first_level" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":false,"fit":"content"}' ></div>
                                 <h3>Shared <small id="shared_files_toggler" class="simple-toggler-show" ajxpClass="VisibilityToggler" ajxpOptions='{"widget_id":"shared_files_list"}'>show</small></h3>
                                 <div style="display:none;" id="shared_files_list" ajxpClass="FetchedResultPane" ajxpOptions='{"fit":"content","nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_shared"}}'></div>
                             </div>

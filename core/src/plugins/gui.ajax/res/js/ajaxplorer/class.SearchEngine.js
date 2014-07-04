@@ -398,6 +398,7 @@ Class.create("SearchEngine", AjxpPane, {
         var width = pos['left'] + container.getWidth() - 10;
         container.setStyle({width:width+'px',left:'10px'});
         container.addClassName("search_active");
+        container.addClassName("skipSibling");
     },
     closeSearchInput: function(){
         var container = this.htmlElement;
@@ -405,6 +406,7 @@ Class.create("SearchEngine", AjxpPane, {
         window.setTimeout(function(){
             container.relativize();
             container.setStyle({position:'relative'});
+            container.removeClassName("skipSibling");
         }, 1000);
     },
 
@@ -446,6 +448,11 @@ Class.create("SearchEngine", AjxpPane, {
 
         if(this.htmlElement && this.htmlElement.down('#search_meta')){
             var formPanel = this.htmlElement.down('#search_meta');
+            if(formPanel.getStyle('float') == 'left'){
+                fitHeightToBottom(formPanel);
+                formPanel.select('.advanced_search_section').invoke('addClassName', 'visible');
+                formPanel.select('.toggle_button').invoke('hide');
+            }
             fitHeightToBottom(formPanel.down('#search_meta_detailed'), formPanel);
             if(this.scrollbar) {
                 this.scrollbar.track.setStyle({height:formPanel.down('#search_meta_detailed').getHeight()+'px'});

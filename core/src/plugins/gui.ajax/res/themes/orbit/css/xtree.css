@@ -206,7 +206,6 @@ div#tree_container > div:first-child {
     margin-left: -4px;
 }
 
-
-div#tree_container > div.webfx-tree-container > div.webfx-tree-container{
+#folder_pane.show_first_level div#tree_container > div.webfx-tree-container > div.webfx-tree-container{
     display: none !important;
 }

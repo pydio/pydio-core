@@ -85,7 +85,7 @@ Class.create("Breadcrumb", {
                         refresh = '<i class="icon-refresh ajxp-goto-refresh" title="'+MessageHash[149]+'"></i>';
                     }
                     var first = pair.value == firstValue ? ' first-bread':'';
-                    clickPath += "<li><span class='ajxp-goto "+first+"' data-goTo='"+pair.key+"'>"+pair.value+"</span></li>";
+                    clickPath += "<li><span class='ajxp-goto "+first+"' data-goTo='"+pair.key+"'><em>"+pair.value+"</em></span></li>";
                     if(refresh){
                         clickPath += "<li><i class='ajxp-goto' data-goTo='"+pair.key+"'>"+refresh+"</i></li>";
                     }
@@ -98,13 +98,14 @@ Class.create("Breadcrumb", {
             }.bind(this));
             if(this.options['use_ul']){
                 this.element.update("<div class='inner_bread'><ul>" + clickPath + "</ul></div>");
+                this.resizeUls();
             }else{
                 this.element.update("<div class='inner_bread'>" + clickPath + "</div>");
             }
 
             this.element.select("span.ajxp-goto").invoke("observe", "click", function(event){
                 "use strict";
-                var target = event.target.getAttribute("data-goTo");
+                var target = Event.findElement(event, "span[data-goTo]").getAttribute("data-goTo");// event.target.getAttribute("data-goTo");
                 event.target.setAttribute("title", "Go to " + target);
                 if(event.target.down('span.ajxp-goto-refresh')){
                     window.ajaxplorer.fireContextRefresh();
@@ -150,53 +151,29 @@ Class.create("Breadcrumb", {
 			}
 		}
         if(this.options["use_ul"]){
-            /*
-            var lastOverlaps = function(){
-                var last = this.element.down('li:last');
-                return (last && last.positionedOffset()['left'] + last.getWidth() ) > parseInt(this.element.getWidth())
-            }.bind(this);
-            var i=0;
-            var spans = this.element.select('li');
-            var available = parseInt(this.element.getWidth());
-            if(spans.length){
-                var base = 0;
-                var foldedSize = 38;
-                var allsizes = [];
-                var sumsizes = function(array){
-                    var r=0;
-                    for(n=0;n<array.length;n++) r+= array[n];
-                    return r;
-                }
-                for(var k=0;k<spans.length;k++){
-                    allsizes.push(spans[k].getWidth());
-                }
-                var p=0;
-                while(sumsizes(allsizes) > available && p<allsizes.length){
-                    allsizes[p] = 38;
-                    p++;
-                }
-                for(j=0;j<=p;j++){
-                    if(spans[p].down("span")) spans[p].down("span").update("..");
-                }
-                console.log(p);
-            }
-            while ( lastOverlaps() && i < spans.length - 1){
-                i++;
-                var span = spans[i].down('span');
-                if(!span)break;
-                span.update("..");
-            }
-            while(i < spans.length){
-                i++;
-                var span = spans[i].down('span');
-                if(!span)break;
-                span.update(getBaseName(span.readAttribute("data-goto")));
-            }
-            */
+            this.resizeUls();
         }
         document.fire("ajaxplorer:resize-Breadcrumb-" + this.element.id, this.element.getDimensions());
 	},
-	
+
+    resizeUls: function(){
+        var available = parseInt(this.element.getWidth());
+        var lastOverlaps = function(){
+            var last = this.element.down('li:last');
+            return (last && last.positionedOffset()['left'] + last.getWidth() ) > available
+        }.bind(this);
+        var i=0;
+        var spans = this.element.select('li > span');
+        spans.invoke("removeClassName", "reduced");
+        while ( lastOverlaps() && i < spans.length - 2){
+            i++;
+            spans[i].addClassName("reduced");
+        }
+        if(lastOverlaps() && spans.length){
+            spans[0].addClassName("reduced");
+        }
+    },
+
 	/**
 	 * Implementation of the IAjxpWidget methods
 	 */	

@@ -437,6 +437,11 @@ var AjxpDroppables = {
 					if(WebFXtimer) clearTimeout(WebFXtimer);
 					if(droppable.id && webFXTreeHandler.all[droppable.id])
 					{
+                        var container = droppable.up('div.show_first_level');
+                        if(container) {
+                            container.removeClassName("show_first_level");
+                            container.addClassName("reset_show_first_level");
+                        }
 						var jsString = "javascript:";			
 						WebFXtimer = window.setTimeout(function(){
 							var node = webFXTreeHandler.all[droppable.id];
@@ -446,7 +451,9 @@ var AjxpDroppables = {
 				}, 
 		onOut:function(droppable)
 				{
-					if(WebFXtimer) clearTimeout(WebFXtimer);					
+					if(WebFXtimer) clearTimeout(WebFXtimer);
+                    var container = droppable.up('div.reset_show_first_level');
+                    if(container) container.addClassName("show_first_level");
 				}
 	},
 
