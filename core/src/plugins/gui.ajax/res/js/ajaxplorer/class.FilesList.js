@@ -714,6 +714,7 @@ Class.create("FilesList", SelectableElements, {
 				}.bind(this), 2000);				
 			}.bind(this) );
 			this._sortableTable = new AjxpSortable(oElement, this.getVisibleSortTypes(), this.htmlElement.down('div.sort-table'));
+            if(this.options.groupByData) this._sortableTable.setGroupByData(this.options.groupByData);
 			this._sortableTable.onsort = function(){
 				this.redistributeBackgrounds();
 				var ctxt = this.getCurrentContextNode();
@@ -808,6 +809,7 @@ Class.create("FilesList", SelectableElements, {
 
             this._sortableTable = new AjxpSortable(scrollElement, null, null);
             this._sortableTable.setMetaSortType(this.columnsDef);
+            if(this.options.groupByData) this._sortableTable.setGroupByData(this.options.groupByData);
             this._sortableTable.onsort = function(){
                 var ctxt = this.getCurrentContextNode();
                 ctxt.getMetadata().set("filesList.sortColumn", ''+this._sortableTable.sortColumn);
@@ -1379,7 +1381,7 @@ Class.create("FilesList", SelectableElements, {
 		// NOW PARSE LINES
 		this.clearParsingCache();
 		var children = contextNode.getChildren();
-        var renderer = this.getRenderer();// (this._displayMode == "list"?this.ajxpNodeToTableRow.bind(this):this.ajxpNodeToDiv.bind(this));
+        var renderer = this.getRenderer();
 		for (var i = 0; i < children.length ; i++) 
 		{
 			var child = children[i];
@@ -1399,7 +1401,16 @@ Class.create("FilesList", SelectableElements, {
 			this._sortableTable.sortColumn = -1;
 			this._sortableTable.updateHeaderArrows();
 		}
-		if(contextNode.getMetadata().get("filesList.sortColumn") && this.columnsDef[contextNode.getMetadata().get("filesList.sortColumn")]){
+        if(this.options.fixedSortColumn && this.options.fixedSortDirection){
+            var col = this.columnsDef.detect(function(c){
+                return c.attributeName == this.options.fixedSortColumn;
+            }.bind(this));
+            if(col){
+                var index = this.columnsDef.indexOf(col);
+                this._sortableTable.sort(index, (this.options.fixedSortDirection=="asc"));
+                this._sortableTable.updateHeaderArrows();
+            }
+        }else if(contextNode.getMetadata().get("filesList.sortColumn") && this.columnsDef[contextNode.getMetadata().get("filesList.sortColumn")]){
 			var sortColumn = parseInt(contextNode.getMetadata().get("filesList.sortColumn"));
 			var descending = contextNode.getMetadata().get("filesList.descending");
 			this._sortableTable.sort(sortColumn, descending);
@@ -2207,6 +2218,10 @@ Class.create("FilesList", SelectableElements, {
 	 * Add a "loading" image on top of the component
 	 */
 	setOnLoad: function()	{
+        if(this.options.silentLoading){
+            this.loading = true;
+            return;
+        }
 		if(this.loading) return;
         this.htmlElement.setStyle({position:'relative'});
         var element = this.htmlElement; // this.htmlElement.down('.selectable_div,.table_rows_container') || this.htmlElement;
@@ -2223,6 +2238,10 @@ Class.create("FilesList", SelectableElements, {
 	 * Remove the loading image
 	 */
 	removeOnLoad: function(){
+        if(this.options.silentLoading){
+            this.loading = false;
+            return;
+        }
         if(this.htmlElement) removeLightboxFromElement(this.htmlElement);
 		this.loading = false;
 	},

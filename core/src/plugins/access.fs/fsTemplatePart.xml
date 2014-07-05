@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<registry_contributions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_configs>
+        <template_part ajxpClass="AjxpPane" ajxpId="orbit_content" ajxpOptions="{}" theme="orbit"><![CDATA[
+            <div id="workspace_toolbar" ajxpClass="AjxpPane">
+                <div id="repo_chooser" style="width:15px;" ajxpClass="RepositorySelect" ajxpOptions='{"menuPosition": "bottom middle", "menuOffsetTop":5, "menuOffsetLeft":110, "menuMaxHeight":535, "menuEvent":"over", "simpleLabel":"<span class=\"icon-caret-down\"></span>"}'></div>
+                <div id="breadcrumb" class="breadcrumbs-arrow" ajxpClass="Breadcrumb" ajxpOptions='{"use_ul":true, "always_show_root":true, "hide_home_icon":true, "flexTo":"workspace_toolbar", "flexToMargin":50, "checkSiblings":true}'></div>
+                <div style="float:right;width:210px;" ajxpClass="AjxpPane" ajxpOptions='{}' id="search_engine_cont">
+                    <div id="buttons_bar_top" style="float:right;" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                </div>
+                <div id="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "openSearchInput":"true", "toggleResultsFitTo":"ajxp_desktop", "fitMarginBottom":20}'></div>
+                <div style="clear:both;" class="skipSibling"></div>
+            </div>
+            <div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
+                <div id="vertical_splitter2" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "autoFoldOnEvent":"ajaxplorer:context_changed", "initA":320, "minA":26, "maxA":320, "fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"A", "invisibleBar": true}'>
+                    <div id="topPane" ajxpClass="AjxpTabulator" ajxpOptions='{"defaultTabId": "folders","tabInfos" : [{"id":"folders","label":"130","iconClass":"icon-folder-close","element":"navigation_pane"},{"id":"feed","label":"notification_center.1","iconClass":"icon-rss","element":"feed_pane"}],"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["filter","vertical_splitter2-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'>
+                        <div id="navigation_pane" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","replaceScroller":true}' >
+                            <h3>Bookmarks <small  id="bookmarks_toggler" ajxpClass="VisibilityToggler" ajxpOptions='{"widget_id":"flagged_elements"}'>hide</small></h3>
+                            <div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"replaceScroller":false, "fit":"content", "silentLoading":true, "nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_bookmarked"},"reloadOnServerMessage":"tree/reload_bookmarks", "connexion_discrete":true}'></div>
+                            <h3>Folders <small id="folders_pane_toggler" ajxpClass="VisibilityToggler" ajxpOptions='{"widget_id":"folder_pane", "detection_id":"tree_container"}'>hide</small></h3>
+                            <div id="folder_pane" class="show_first_level" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":false,"fit":"content"}' ></div>
+                            <h3>Shared <small id="shared_files_toggler" class="simple-toggler-show" ajxpClass="VisibilityToggler" ajxpOptions='{"widget_id":"shared_files_list"}'>show</small></h3>
+                            <div style="display:none;" id="shared_files_list" ajxpClass="FetchedResultPane" ajxpOptions='{"fit":"content","silentLoading":true, "nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_shared", "connexion_discrete":true}}'></div>
+                        </div>
+                        <div id="feed_pane" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","replaceScroller":true}' >
+                            <div id="notif_pane" ajxpClass="FetchedResultPane" ajxpOptions='{"columnsDef":[{"attributeName":"ajxp_label", "messageId":1, "sortType":"String"},{"attributeName":"event_time", "messageString":"Time", "sortType":"MyDate"},{"attributeName":"event_type", "messageString":"Type", "sortType":"String"}], "reloadOnServerMessage":"tree/reload_user_feed", "silentLoading":true, "groupByData":"event_type", "fixedSortColumn":"event_time", "fixedSortDirection":"desc","nodeProviderProperties":{"get_action":"get_my_feed", "connexion_discrete":true, "format":"xml", "current_repository":"true", "merge_description":"true"}}'></div>
+                        </div>
+                    </div>
+                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
+                        <div id="cpane_tabs" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"browser","registerAsEditorOpener":true, "saveState":true,"events":{"ajaxplorer:context_changed":"this.switchTabulator(this.tabulatorData.first().id);"}, "defaultTabId": "files","tabInfos" : [{"id":"files","label":"","iconClass":"icon-folder-open", "element":"files_list_pane"}]}'>
+                            <div id="files_list_pane" ajxpClass="AjxpPane">
+                                <div id="files_list_header" ajxpClass="AjxpPane">
+                                    <div id="display_toolbar" class="text_only" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                                    <div style="float:left;" ajxpClass="AjxpPane"  id="buttons_bar_cont">
+                                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["navigation","get"],"groupOtherToolbars":["more", "change", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                                    </div>
+                                </div>
+                                <div id="vertical_splitter" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA":"70%", "minB":260,"fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"B", "invisibleBar": true}'>
+                                    <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"files_lit_pane", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}' style="border-left: 1px solid #bbb;"></div>
+                                    <div id="info_panel" ajxpClass="InfoPanel" style="top:0;" ajxpOptions='{"replaceScroller":"true", "skipActions":true,"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["filter","vertical_splitter-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        ]]></template_part>
+    </client_configs>
+</registry_contributions>

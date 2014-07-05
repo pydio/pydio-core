@@ -530,7 +530,7 @@ Class.create("Diaporama", AbstractEditor, {
 	updateImage : function(){
 
         var node = this.nodes.get(this.currentFile);
-        if(node.getMetadata().get("image_dimensions_thumb")){
+        if(node && node.getMetadata().get("image_dimensions_thumb")){
             var sizeLoader = new Image();
             var tmpThis = this;
             sizeLoader.onload = function(){

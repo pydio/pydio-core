@@ -75,7 +75,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         if ($this->eventStore) {
             AJXP_Controller::applyHook("msg.instant",array(
                 "<reload_user_feed/>",
-                AJXP_REPO_SCOPE_ALL,
+                $notification->getNode()->getRepositoryId(),
                 $notification->getTarget()
             ));
             $this->eventStore->persistAlert($notification);
@@ -95,7 +95,11 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         $repositoryScope = $repository->securityScope();
         $repositoryScope = ($repositoryScope !== false ? $repositoryScope : "ALL");
         $repositoryOwner = $repository->hasOwner() ? $repository->getOwner() : null;
-
+        AJXP_Controller::applyHook("msg.instant",array(
+            "<reload_user_feed/>",
+            $repoId,
+            $userId
+        ));
         $this->eventStore->persistEvent("node.change", func_get_args(), $repoId, $repositoryScope, $repositoryOwner, $userId, $userGroup);
 
     }
@@ -171,6 +175,8 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     $node->event_description = ucfirst($notif->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notif->getAuthor();
                     $node->event_description_long = $notif->getDescriptionLong(true);
                     $node->event_date = AJXP_Utils::relativeDate($notif->getDate(), $mess);
+                    $node->event_time = $notif->getDate();
+                    $node->event_type = "notification";
                     $node->event_id = $object->event_id;
                     if ($node->getRepository() != null) {
                         $node->repository_id = ''.$node->getRepository()->getId();

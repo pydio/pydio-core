@@ -45,7 +45,7 @@ Class.create("FetchedResultPane", FilesList, {
             ],
             displayMode: 'detail',
             fixedDisplayMode: 'detail',
-            defaultSortTypes:["String", "String", "String"],
+            defaultSortTypes:["String", "String", "String", "MyDate"],
             columnsTemplate:"search_results",
             selectable: true,
             draggable: false,
@@ -98,7 +98,9 @@ Class.create("FetchedResultPane", FilesList, {
 
     reloadDataModel: function(){
         if(this._dataLoaded){
-            this._rootNode.clear();
+            if(!this.options.silentLoading){
+                this._rootNode.clear();
+            }
             this._dataLoaded = false;
             if(this.htmlElement && this.htmlElement.visible()){
                 this._dataModel.requireContextChange(this._rootNode, true);

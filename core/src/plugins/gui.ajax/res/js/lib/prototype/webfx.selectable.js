@@ -409,9 +409,7 @@ SelectableElements = Class.create({
 		var selectedBefore = this.getSelectedItems();	// is a cloned array
 	
 		// find row
-		var el = e.target != null ? e.target : e.srcElement;
-		while (el != null && !this.isItem(el))
-			el = el.parentNode;
+        var el = Event.findElement(e, ".ajxpNodeProvider");
 	
 		if (el == null) {	// happens in IE when down and up occur on different items
 			this._fireChange = oldFireChange;
@@ -542,7 +540,7 @@ SelectableElements = Class.create({
 	},
 	
 	isItem: function (node) {
-		return node != null && node.nodeType == 1 && node.parentNode == this._htmlElement;
+		return node != null && node.up('#' + this._htmlElement.id);
 	},
 	
 	findSelectableParent : function(el, setSelected){
@@ -599,7 +597,7 @@ SelectableElements = Class.create({
 	getItems: function () {
 		var tmp = [];
 		var j = 0;
-		var cs = this._htmlElement.childNodes;
+		var cs = this._htmlElement.select('.ajxpNodeProvider');
 		var l = cs.length;
 		for (var i = 0; i < l; i++) {
 			if (cs[i].nodeType == 1)
@@ -610,7 +608,7 @@ SelectableElements = Class.create({
 	
 	getItem: function (nIndex) {
 		var j = 0;
-		var cs = this._htmlElement.childNodes;
+		var cs = this._htmlElement.select('.ajxpNodeProvider');
 		var l = cs.length;
 		for (var i = 0; i < l; i++) {
 			if (cs[i].nodeType == 1) {
@@ -634,7 +632,7 @@ SelectableElements = Class.create({
 	
 	getItemIndex: function (el) {
 		var j = 0;
-		var cs = this._htmlElement.childNodes;
+		var cs = this._htmlElement.select('.ajxpNodeProvider');
 		var l = cs.length;
 		for (var i = 0; i < l; i++) {
 			if (cs[i] == el)

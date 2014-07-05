@@ -31,7 +31,7 @@ Class.create("NotificationLoader", {
 
     initialize: function(){
 
-        if(window.ajxpMinisite) return;
+        if(window.ajxpMinisite || document.documentElement.hasClassName('ajxp_theme_orbit')) return;
 
         var rP = new RemoteNodeProvider();
         rP.initProvider({get_action:'get_my_feed', format:'xml', connexion_discrete:true});
@@ -60,24 +60,6 @@ Class.create("NotificationLoader", {
         }.bind(this));
         this.ajxpNode.reload();
     },
-
-    /*
-    childrenToMenu: function(menuContainer){
-        this.ajxpNode.getChildren().each(function(el){
-           var div = new Element('a');
-           var imgSpan = new Element('span', {className:'event_image'});
-           var labelSpan = new Element('span', {className:'event_label'});
-           var img = this.pFactory.generateBasePreview(el);
-           div.IMAGE_ELEMENT = img;
-           imgSpan.insert(img);
-           labelSpan.insert(el.getMetadata().get("event_description"));
-           div.insert(imgSpan); div.insert(labelSpan);
-           menuContainer.insert(div);
-           this.pFactory.enrichBasePreview(el, div);
-        }.bind(this) );
-
-    },
-    */
 
     childrenToMenuItems : function(callback){
         var menuItems = $A([]);

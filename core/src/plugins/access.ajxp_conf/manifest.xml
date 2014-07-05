@@ -35,7 +35,7 @@
                     }
                 </style>
             ]]></template_part>
-            <template_part ajxpClass="AjxpPane" ajxpId="workspace_toolbar" ajxpOptions='{"fit":"none"}'><![CDATA[
+            <template_part ajxpClass="AjxpPane" ajxpId="workspace_toolbar" ajxpOptions='{"fit":"none"}' theme="vision"><![CDATA[
                 <style>
                 #workspace_toolbar{display:none;}
                 #global_toolbar{background-color: #30383A;}
@@ -83,7 +83,7 @@
                     });
                 </script>
 			]]></template_part>
-            <template_part ajxpId="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOption":"true"}' theme="orbit"><![CDATA[
+            <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOption":"true"}' theme="orbit"><![CDATA[
                 <div id="vertical_splitter" class="settings_main_pane" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "invisibleBar":true, "initA": "20%", "minA":28, "maxA":380, "fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"A"}'>
                     <div ajxpClass="AjxpTabulator" id="leftTabulator" ajxpOptions='{"defaultTabId": "folders","tabInfos" : [{"id":"folders","label":"ajxp_conf.122","iconClass":"icon-cogs","element":"leftPane"},{"id":"flagged","label":"147","iconClass":"icon-bookmark","element":"flagged_elements"}],"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["vertical_splitter-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'>
                         <div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"get_bookmarks", "format":"node_list"},"reloadOnServerMessage":"tree/reload_bookmarks"}'></div>
@@ -103,11 +103,6 @@
                             </div>
                         </div>
                     </div>
-                    <style>
-                        #get_my_feed_button{
-                            display:none !important;
-                        }
-                    </style>
                 </div>
                 <script>
                     if($("browser")) $("browser").ajxpPaneObject.resize();

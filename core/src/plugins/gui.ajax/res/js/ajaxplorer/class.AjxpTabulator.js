@@ -312,6 +312,9 @@ Class.create("AjxpTabulator", AjxpPane, {
         }
         this.resize();
         if(!skipStateSave) this.saveState();
+        if(this.htmlElement) {
+            this.htmlElement.writeAttribute("data-ajxpTabsCount", this.tabulatorData.size());
+        }
     },
 
     /**
@@ -356,6 +359,9 @@ Class.create("AjxpTabulator", AjxpPane, {
 
             this.resize();
             if(!skipSaveState) this.saveState();
+            if(this.htmlElement) {
+                this.htmlElement.writeAttribute("data-ajxpTabsCount", this.tabulatorData.size());
+            }
         }
     },
 
@@ -594,6 +600,7 @@ Class.create("AjxpTabulator", AjxpPane, {
                 if(pair.value.TAB && pair.value.PANE){
                     pair.value.TAB.dontFocus = true;
                     window.setTimeout(function(){
+                        if(!$(this.htmlElement)) return;
                         this.addTab(pair.value.TAB, pair.value.PANE, true);
                     }.bind(this), index * 2000);
                     index ++;
