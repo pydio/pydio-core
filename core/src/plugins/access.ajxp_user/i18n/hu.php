@@ -120,4 +120,6 @@ $mess=array(
 <li>Keeping files offline and interacting with external applications</li>
 <li>Protecting the app with a PIN-code</li>
 <li>Using bookmarks and search engine</li></ul>",
+    "67"=> "You are not %s, %logout",
+
 );

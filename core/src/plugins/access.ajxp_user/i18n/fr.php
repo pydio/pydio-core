@@ -59,8 +59,8 @@ $mess=array(
 "36" => "Paramètres",
 "37" => "Profil et réglages",
 "38"=> "Notifications",
-"39"=> "Sélectionner un workspace",
-"40"=> "Bienvenue, %s",
+"39"=> "Voici les espaces de travail (workspaces) auxquels vous pouvez accèder. Ils vous sont personnels ou partagés avec/par d'autres utilisateurs.",
+"40"=> "Bienvenue, %s! ",
 "41"=> "Utiliser ce workspace par défaut",
 "42"=> "Entrer",
 "43"=> "Mon profil",
@@ -117,4 +117,6 @@ $mess=array(
 <li>Garder des fichiers en cache, et interagir avec d'autres apps</li>
 <li>Protéger l'application avec un code PIN</li>
 <li>Utiliser les favoris et le moteur de recherche</li></ul>",
+    "67"=> "Vous n'êtes pas %s, %logout",
+
 );

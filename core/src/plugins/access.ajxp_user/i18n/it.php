@@ -117,4 +117,6 @@ $mess=array(
 <li>Mantenere un file disponibile offline e le interazioni con altre applicazioni</li>
 <li>Protezione dell'app attraverso un codice PIN</li>
 <li>Uso dei segnalibri e del motore di ricerca</li></ul>",
+    "67"=> "You are not %s, %logout",
+
 );
