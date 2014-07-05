@@ -575,7 +575,7 @@ Class.create("Modal", {
             }
             var y = baseY+10;
             if(position.indexOf('middle') != -1){
-                y -= 5 + parseInt(this.tooltip.getHeight())/2;
+                y -= 10 + parseInt(this.tooltip.getHeight())/2 - parseInt(element.getHeight())/2 ;
             }else if(position.indexOf('bottom') != -1){
                 y -= 13 + parseInt(element.getHeight());
             }else if(position.indexOf('top') != -1){
@@ -590,7 +590,7 @@ Class.create("Modal", {
                     this.tooltip.addClassName("arrow_tip_arrow_left");
                 }
             }else if(position.indexOf('right') != -1){
-                x = baseX + 10;
+                x = baseX + 10 + parseInt(element.getWidth());
             }else{
                 x = (baseX - 10 - parseInt(this.tooltip.getWidth()));
             }

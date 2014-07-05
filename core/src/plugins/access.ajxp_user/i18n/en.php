@@ -59,8 +59,8 @@ $mess=array(
 "36"=> "Parameters",
 "37"=> "My profile and application settings",
 "38"=> "Notifications",
-"39"=> "Select a workspace",
-"40"=> "Welcome, %s",
+"39"=> "Below is a list of the workspaces you can access to. They can be personal or shared with/by others users.",
+"40"=> "Welcome, %s! ",
 "41"=> "Use this workspace as default",
 "42"=> "Enter",
 "43"=> "My Profile",
@@ -76,7 +76,7 @@ $mess=array(
 "52"=> "Are you sure you want to delete this team? This will not remove any users.",
 "53"=> "Getting Started",
 "54"=> "Get started with APPLICATION_TITLE by following How-to videos",
-"55"=> "Do you need help <a>to get started?</a>",
+"55"=> "New to APPLICATION_TITLE? <a>Watch our tutorials.</a>",
 "56"=> "Getting started with APPLICATION_TITLE? Here are some videos for you!",
 "57"=> "Download APPLICATION_TITLE for...",
 "58"=> "Android device",
@@ -117,4 +117,6 @@ $mess=array(
 <li>Keeping files offline and interacting with external applications</li>
 <li>Protecting the app with a PIN-code</li>
 <li>Using bookmarks and search engine</li></ul>",
+"67"=> "You are not %s, %logout",
+
 );

@@ -716,23 +716,19 @@ html.boxshadow div.errorMessage{
 .simple_tooltip_title{
     padding-top: 2px;
     padding-bottom: 1px;
+    text-transform: uppercase;
     font-weight: bold;
-    font-size: 11px;
+    font-size: 1.1em;
 }
 .simple_tooltip
 {
-    position:absolute;
-    width:150px;
-    z-index:10000;
-    border:1px solid #696765;
-    color : #696765;
-    background-color: #fff;
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-size: 11px;
+    position: absolute;
+    width: 150px;
+    z-index: 10000;
+    font-size: 13px;
     letter-spacing: 1px;
-    padding: 4px 5px 5px 5px;
+    padding: 5px 10px;
 }
-
 
 .down_arrow_tip,
 .top_arrow_tip {
@@ -815,6 +811,30 @@ html.boxshadow div.errorMessage{
     margin-top: -5px;
 }
 
+.left_arrow_tip {
+    color: #ffffff;
+    border-radius: 4px;
+    background-color: rgba(69, 77, 85, 0.86);
+    border: 0;
+}
+.left_arrow_tip:after, .left_arrow_tip:before {
+    left: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+.left_arrow_tip:before {
+    border-color: rgba(69, 77, 85, 0);
+    border-right-color: rgba(69, 77, 85, 0.86);
+    border-width: 5px;
+    top: 50%;
+    left:-10px;
+    margin-top: -5px;
+}
 
 div.accordion_toggle,
 div.dialogContentMainTitle{
@@ -4830,21 +4850,25 @@ div.flat_tabulator > div:not(.tabulatorContainer){
 
 .horizontal_tabulator div.tabulatorContainer {
     float: left;
-    width: 22%;
+    width: 46px;
     padding: 0;
     background-color: #ebedf0 !important;
 }
 
 .horizontal_tabulator span.toggleHeader{
-    width: 96% !important;
     text-align: center;
-    padding: 33px 0;
+    padding: 7px 0 7px 3px;
     background-color: #e35d52 !important;
     color: #ffffff !important;
     border: 0;
     display: block;
     margin: 2%;
     border-radius: 2px;
+    font-size: 30px;
+}
+
+.horizontal_tabulator span.toggleHeader span.tab_label{
+    display: none;
 }
 
 .horizontal_tabulator span.toggleInactive{
@@ -4853,7 +4877,6 @@ div.flat_tabulator > div:not(.tabulatorContainer){
     background-color: transparent !important;
     color: rgb(111, 123, 136) !important;
     text-shadow: none;
-    padding-bottom: 33px !important;
 }
 
 div.horizontal_tabulator > div:not(.tabulatorContainer){

@@ -118,7 +118,13 @@ Class.create("AjxpTabulator", AjxpPane, {
             if(!this.options.tabsTips){ options.title = title; }
             var td = new Element('span', options);
             if(this.options.tabsTips){
-                modal.simpleTooltip(td, title, this.options.tabsTips, "down_arrow_tip", "element");
+                var horizontal = this.htmlElement.hasClassName('left_tabulator');
+                modal.simpleTooltip(
+                    td,
+                    horizontal?'<div class="simple_tooltip_title">' + label+'</div>'+title:title,
+                    this.options.tabsTips,
+                    horizontal?"left_arrow_tip":"down_arrow_tip",
+                    "element");
             }
             if(tabInfo.icon){
                 td.insert('<img width="16" height="16" align="absmiddle" src="'+resolveImageSource(tabInfo.icon, '/images/actions/ICON_SIZE', 16)+'">');
@@ -417,7 +423,10 @@ Class.create("AjxpTabulator", AjxpPane, {
 	resize : function(){
 		if(!this.selectedTabInfo || !this.htmlElement) return;
         if(this.htmlElement.hasClassName('horizontal_tabulator')){
-            fitHeightToBottom(this.htmlElement.down('div.tabulatorContainer'), null, this.options.fitMarginBottom);
+            var tabContainer = this.htmlElement.down('div.tabulatorContainer');
+            fitHeightToBottom(tabContainer, null, this.options.fitMarginBottom);
+            var pWidth = this.htmlElement.getWidth() - tabContainer.getWidth();
+            this.htmlElement.select('> div:not(.tabulatorContainer)').invoke('setStyle', {width:pWidth+'px'});
         }
 		var ajxpObject = this.getAndSetAjxpObject(this.selectedTabInfo);
 		if(ajxpObject){

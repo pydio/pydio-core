@@ -178,18 +178,18 @@ Class.create("UserDashboardHome", AjxpPane, {
             notificationElement.hide();
         }
 
+        if(ajaxplorer.getPluginConfigs('ajxpdriver[@id=\'access.ajxp_user\']').get("ENABLE_GETTING_STARTED")){
+            oFormObject.down("#welcome").insert(MessageHash["user_dash.55"].replace("<a>", "<a id='get_started_link' href='#' onclick='javascript:$(\"userdashboard_main_tab\").ajxpPaneObject.switchTabulator(\"tutorials\")'>"));
+        }
+
         if(ajaxplorer.actionBar.getActionByName("logout")){
-            oFormObject.down("#welcome").insert(new Element("span", {id:"disconnect_link"}).update(" [<span>"+ajaxplorer.actionBar.getActionByName("logout").options.text.toLowerCase()+"</span>]"));
+            oFormObject.down("#welcome").insert('<small>'+MessageHash["user_dash.67"].replace("%logout", "<span id='disconnect_link'></span>").replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME") || ajaxplorer.user.id)+'</small>');
+            oFormObject.down('#disconnect_link').update("<a>"+ajaxplorer.actionBar.getActionByName("logout").options.text.toLowerCase()+"</a>");
             oFormObject.down('#disconnect_link').observe("click", function(e){
                 ajaxplorer.actionBar.fireAction("logout");
             });
         }
 
-        if(ajaxplorer.getPluginConfigs('ajxpdriver[@id=\'access.ajxp_user\']').get("ENABLE_GETTING_STARTED")){
-            oFormObject.down("#welcome").insert(". " + MessageHash["user_dash.55"].replace("<a>", "<a id='get_started_link' href='#' onclick='javascript:$(\"userdashboard_main_tab\").ajxpPaneObject.switchTabulator(\"tutorials\")'>"));
-        }else{
-            oFormObject.down("#welcome").insert(".");
-        }
 
     },
 

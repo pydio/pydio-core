@@ -179,13 +179,27 @@ span.letter_badge {
     font-weight: normal;
 }
 
+#home_account_pane div.ws_legend{
+    padding: 10px;
+    font-size: 0.9em;
+    text-align: center;
+    font-style: italic;
+}
+
 #home_account_pane #welcome{
     text-align: center;
     background-color: #ebedf0;
     border-bottom: 1px solid #E6E6E6;
-    font-size: 13px;
     padding: 12px;
     border-top: 1px solid #FFFFFF;
+}
+#home_account_pane a{
+    cursor: pointer;
+    text-decoration: underline;
+}
+#home_account_pane #welcome small{
+    padding-top: 10px;
+    display: block;
 }
 
 #workspaces_button {
