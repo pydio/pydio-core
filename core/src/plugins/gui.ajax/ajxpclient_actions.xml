@@ -22,7 +22,7 @@
 			</processing>
 		</action>
 		<action name="up_dir">
-			<gui text="148" title="24" src="up.png" iconClass="icon-chevron-up" hasAccessKey="true"
+			<gui text="148" title="24" src="up.png" iconClass="icon-chevron-left" hasAccessKey="true"
 				accessKey="parent_access_key">
 				<context selection="false" dir="false" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="navigation">

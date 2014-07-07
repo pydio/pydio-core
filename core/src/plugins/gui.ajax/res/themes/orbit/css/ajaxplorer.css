@@ -22,12 +22,16 @@ table.sort-table tr:nth-child(even)
     background: linear-gradient(top, rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%); /* W3C */
 }
 
-.grey_gradient_emboss,.selected, div.selected-webfx-tree-item-inactive{
-    background: rgb(221,221,221) !important; /* Old browsers */ /* FF3.6+ */ /* Chrome,Safari4+ */ /* Chrome10+,Safari5.1+ */ /* Opera11.10+ */ /* IE10+ */ /* IE6-9 */ /* W3C */
+.grey_gradient_emboss,.selected{
+    background: #CCC !important;
+}
+
+div.selected-webfx-tree-item-inactive{
+    background: #666 !important; /* Old browsers */ /* FF3.6+ */ /* Chrome,Safari4+ */ /* Chrome10+,Safari5.1+ */ /* Opera11.10+ */ /* IE10+ */ /* IE6-9 */ /* W3C */
 }
 
 .blue_gradient,div.selected-webfx-tree-item, .selected-focus{
-    background: #77b8e2 !important; /* Old browsers */ /* FF3.6+ */ /* Chrome,Safari4+ */ /* Chrome10+,Safari5.1+ */ /* Opera11.10+ */ /* IE10+ */ /* IE6-9 */ /* W3C */
+    background: #fb725c !important; /* Old browsers */ /* FF3.6+ */ /* Chrome,Safari4+ */ /* Chrome10+,Safari5.1+ */ /* Opera11.10+ */ /* IE10+ */ /* IE6-9 */ /* W3C */
 }
 
 .grey_gradient_light_inputs, .dialogContent input, .dialogContent input[type="text"], .dialogContent input[type="password"], .dialogContent select, #search_txt, #location_form,#treeCopy
@@ -49,7 +53,7 @@ MAJOR STYLES
 a:link, a:visited, a:hover, a:active, a:focus {
     text-decoration: none;
     outline: 0;
-    color: rgb(111, 121, 131);
+    color: #333;
 }
 
 .linked{
@@ -167,13 +171,13 @@ kbd {
     width: 100%;
     display: block;;
     height: auto;
-    
-border-radius: 0;
-padding: 6px 4px;
+
+    border-radius: 0;
+    padding: 6px 4px;
 }
 
 .thumbnail_selectable_cell.detailed:hover{
-    background-color: rgb(253, 252, 228);
+    background-color: #f7f7f7;
 }
 
 .thumbnail_selectable_cell.detailed:last-child{
@@ -191,10 +195,10 @@ padding: 6px 4px;
 
     font-size: 15px;
     text-align: left;
-    
+
 
     padding-top: 9px;
-    
+
 
     padding-bottom: 0px;
     white-space: nowrap;
@@ -206,10 +210,14 @@ padding: 6px 4px;
 
     text-align: left;
     padding-top: 0;
-    opacity: 0.8;
+
     font-size: 11px;
     white-space: nowrap;
     margin-top: 1px;
+
+
+    /* color: #aaa; */
+
 }
 
 .thumbnail_selectable_cell.detailed.metadata_empty div.thumbLabel{
@@ -278,7 +286,7 @@ div.thumbnail_cell_metadata span.metadata_chunk{
     height: 18px;
     line-height: 17px;
     white-space : nowrap;
-    color: #888;
+    color: #999;
     text-overflow: ellipsis;
 }
 
@@ -1182,10 +1190,10 @@ input.SF_input.SF_number{
 #global_toolbar{
     background-color: #145170;
     height: 33px;
-    padding: 9px 0 0 5px;
+    padding: 18px 15px 10px 5px;
     background-image: url("../images/white_logo.png");
     background-repeat: no-repeat;
-    background-position-y: 2px;
+    background-position: 11px;
 }
 
 #top_toolbar{
@@ -1235,8 +1243,15 @@ input.SF_input.SF_number{
     color: #ddd;
 }
 
+.actionbar_button_label u {
+    text-decoration: none;
+}
+
+div#navigation_toolbar {
+    padding: 0 6px;
+}
+
 #tree_container{
-    background-color: #f7f7f7;
 }
 
 .panelHeader, .dialogTitle{
@@ -1248,7 +1263,6 @@ input.SF_input.SF_number{
     vertical-align: middle;
     background-color: transparent;
     letter-spacing: 1px; /* Old browsers */   /* FF3.6+ */   /* Chrome,Safari4+ */   /* Chrome10+,Safari5.1+ */   /* Opera 11.10+ */   /* IE10+ */   /* W3C */   /* IE6-9 */; /* Old browsers */   /* FF3.6+ */   /* Chrome,Safari4+ */   /* Chrome10+,Safari5.1+ */   /* Opera 11.10+ */   /* IE10+ */   /* W3C */   /* IE6-9 */;
-    border-bottom: 1px solid #d5d5d5;
 }
 
 
@@ -1329,7 +1343,7 @@ div.editor_header > div.editor_action_bar > div.separator{
 }
 
 .editor_action_bar a {
-padding: 3px 5px !important;
+    padding: 3px 5px !important;
 }
 
 .editor_action_bar span.actionbar_button_label {
@@ -1473,7 +1487,7 @@ div.action_bar.text_only  span.actionbar_button_label{
 
 
 .action_bar a.menuAnchorSelected{
-   /* border-radius: 3px 3px 0 0;*/
+    /* border-radius: 3px 3px 0 0;*/
 }
 
 .action_bar a img
@@ -1599,8 +1613,8 @@ div.class-FetchedResultPane > div.panelHeader
     border: 0 !important;
 }
 
-#navigation_pane{
-    background-color: #f7f7f7;
+#navigation_pane,#notif_pane{
+    background-color: #333;
     overflow: auto;
 }
 
@@ -1612,17 +1626,14 @@ div.class-FetchedResultPane > div.panelHeader
 #topPane h3,
 #search_meta div.advanced_search_section_title
 {
-    font-size: 12px;
-    font-weight: bold;
-    padding: 14px 8px 6px;
+    font-size: 16px;
+    padding: 20px 8px 9px 17px;
     margin: 0;
-    background-color: #f7f7f7;
-    color: #4dc5c3;
-    text-transform: uppercase;
+    color: #fb725c;
     letter-spacing: 1px;
-    border-left: 1px solid #d5d5d5;
     display: block;
     clear: left;
+    font-weight: normal;
 }
 
 #search_meta div.advanced_search_section_title{
@@ -1638,7 +1649,7 @@ div.class-FetchedResultPane > div.panelHeader
     display: none;
     float: right;
     color: white;
-    background-color: #c5c5c5;
+    background-color: #999;
     border-radius: 5px;
     text-transform: lowercase;
     padding: 0 8px;
@@ -1736,13 +1747,13 @@ div.class-FetchedResultPane > div.panelHeader
 }
 
 #repo_chooser{
-    background-color: #4dc5c3;
+    background-color: #fb725c;
     float:left;
     font-size: 15px;
     color: #ffffff;
     font-weight: normal;
     letter-spacing: 1px;
-    margin: 0;
+    margin-left: 10px;
     margin-top:1px;
     cursor: pointer;
     padding: 0.4em;
@@ -1750,7 +1761,7 @@ div.class-FetchedResultPane > div.panelHeader
 }
 
 #repo_chooser:hover{
-    background-color: #4dc5c3;
+    background-color: #fb725c;
     color: white;
 }
 
@@ -2505,7 +2516,7 @@ div#upload_files_list span.item_relative_path{
     filter:alpha(opacity:0); opacity:0; moz-opacity:0;
     position: absolute;
     font-size: 60px; /* causes it to fill the containing div */
-    top: 0; 
+    top: 0;
     left: 0;
     z-index: 10000;
     height: 56px;
@@ -2516,7 +2527,7 @@ div#upload_files_list span.item_relative_path{
     height: 60px;
     width: 180px;
     position: absolute;
-    top: 0; 
+    top: 0;
     overflow: hidden;
     z-index: 9999; /* this was needed to work in IE */
 ;
@@ -2581,7 +2592,7 @@ div#upload_files_list span.item_relative_path{
 
 #uploadBrowseButton {
     position: absolute;
-    top: 0; 
+    top: 0;
     left: 0;
     margin:0;
 }
@@ -2593,11 +2604,11 @@ div#upload_files_list span.item_relative_path{
     padding: 2px 7px;
 }
 
-#uploadSendButton { 
+#uploadSendButton {
 }
 
 #uploaderTextActions span.disabled{
-     display:none;
+    display:none;
 }
 
 #uploadFilesListContainer
@@ -2643,7 +2654,7 @@ div.tabulatorContainer{
     padding: 0;
     height: 28px;
     overflow: hidden;
-    border-radius: 0;
+    padding-left: 17px;
 }
 
 #topPane > div.tabulatorContainer{
@@ -2686,23 +2697,25 @@ span.toggleHeader{
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    padding: 6px 6px;
-    background-color: #fcfcfc;
+    padding: 6px 11px;
+    background-color: #333;
     transition: background-color 0.3s ease;
     color: #555;
-    border: 1px solid #d5d5d5;
-    border-radius: 3px;
+    border-radius: 4px 4px 0 0;
+    font-size: 11px;
+    color: #ccc;
+    margin-right: 1px;
 }
 
 span.toggleHeader.toggleInactive{
-    background-color: #e5e5e5;
+    background-color: #999;
     cursor: pointer;
-    border: 1px solid #f7f7f7;
 }
 
 span.toggleHeader span[class^="icon-"],
 span.toggleHeader span[class*=" icon-"]{
     margin-right: 4px;
+    display: none;
 }
 
 div.tabulator-vertical div {
@@ -2743,6 +2756,7 @@ div.tabulatorContainer.icons_only div.toolbarGroup span[class*=" icon-"]
 div.tabulatorContainer span.tab_close_button {
     margin-left: 6px;
     cursor: pointer;
+    display: inline-block;
 }
 
 div.tabulatorContainer span.toggleInactive span.tab_close_button {
@@ -3031,8 +3045,7 @@ span.search_meta_opt.checked > span {
 }
 
 div.class-FetchedResultPane{
-    background-color: #f7f7f7;
-    border-left: 1px solid #d5d5d5;
+    background-color: transparent;
 }
 
 #search_results div.ajxpNodeProvider,
@@ -3044,7 +3057,7 @@ div.class-FetchedResultPane div.ajxpNodeProvider
 }
 
 div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed{
-    padding: 3px 4px;
+    padding: 2px 12px;
 }
 
 div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell img{
@@ -3066,19 +3079,24 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail
 #search_results div.ajxpNodeProvider:hover,
 div.class-FetchedResultPane div.ajxpNodeProvider:hover
 {
-    background-color: transparent !important;
+    background-color: #666 !important;
 }
 
 div.class-FetchedResultPane div.ajxpNodeProvider.selected-focus,
 #search_results div.ajxpNodeProvider.selected-focus
 {
-    background-color: #77b8e2 !important;
+    background-color: #fb725c !important;
 }
 
 div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel,
 #search_results div.thumbnail_selectable_cell.detailed div.thumbLabel{
     font-size: 13px;
     padding-top: 4px;
+}
+
+#topPane div.thumbnail_selectable_cell.detailed div.thumbLabel{
+    color: #ccc;
+    font-weight: lighter;
 }
 
 div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_label,
@@ -4744,13 +4762,11 @@ TABULATOR IN A TABULATOR
 .innerTabulator  div.panelHeader
 {
     font-size: 11px;
-    padding: 2px 3px 3px 8px;
+    padding: 2px 16px 3px 8px;
     height: 35px;
     letter-spacing: 1px;
-    background-color: #f7f7f7;
-    border: 1px solid #d5d5d5;
+    background-color: #ddd;
     color: rgb(111, 123, 136);
-    border-left: 1px solid rgb(187, 187, 187);
     border-right: 0;
 }
 
@@ -4777,7 +4793,7 @@ TABULATOR IN A TABULATOR
 div.innerTabulator > div.tabulatorContainer > #display_toolbar a:hover,
 div.innerTabulator > div.tabulatorContainer > #display_toolbar a
 {
-    color: rgb(111, 123, 136) !important;
+    color: #333 !important;
 }
 
 #cpane_tabs span.toggleHeader{
@@ -4822,7 +4838,7 @@ DASHBOARD TABULATOR
 
 .flat_tabulator[data-ajxpTabsCount="1"] span.toggleHeader
 {
-/*    background-color: white;*/
+    /*    background-color: white;*/
 }
 
 .flat_tabulator span.toggleHeader.toggleInactive {
@@ -4929,7 +4945,7 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
 }
 
 .breadcrumbs-arrow span{
-    background: #4dc5c3;
+    background: #fb725c;
     padding: 0.4em 1em;
     float: left;
     text-decoration: none;
@@ -4976,7 +4992,7 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
 }
 
 .breadcrumbs-arrow span:hover{
-    background: #4dc5c3;
+    background: #fb725c;
     color: white;
 }
 
@@ -4987,7 +5003,7 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
     margin-top: -1.5em;
     border-width: 1.5em 0 1.5em 1em;
     border-style: solid;
-    border-color: #4dc5c3 #4dc5c3 #4dc5c3 transparent;
+    border-color: #fb725c #fb725c #fb725c transparent;
     left: -1em;
 }
 
@@ -4996,7 +5012,7 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
 }
 
 .breadcrumbs-arrow span:hover::before{
-    border-color: #4dc5c3 #4dc5c3 #4dc5c3 transparent;
+    border-color: #fb725c #fb725c #fb725c transparent;
 }
 
 .breadcrumbs-arrow span::after{
@@ -5006,12 +5022,12 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
     margin-top: -1.5em;
     border-top: 1.5em solid transparent;
     border-bottom: 1.5em solid transparent;
-    border-left: 1em solid #4dc5c3;
+    border-left: 1em solid #fb725c;
     right: -1em;
 }
 
 .breadcrumbs-arrow span:hover::after{
-    border-left-color: #4dc5c3;
+    border-left-color: #fb725c;
 }
 
 .breadcrumbs-arrow span.current,
@@ -5095,12 +5111,12 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
     text-align: center;
     overflow: visible;
     outline: none;
-    border-radius: 3px;
-    margin: 2px 4px 0 1px;
+    border-radius: 14px;
+    margin: 3px 4px 0 1px;
     background: #ffffff;
     letter-spacing: 1px;
     float: left;
-    border: 1px solid #d5d5d5;
+    border: burlywood;
     color: #555;
 }
 
@@ -5111,6 +5127,23 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
 
 div#buttons_bar_top {
     padding-top: 1px;
+}
+
+#buttons_bar span.ajxp_icon_span {
+    display: none;
+}
+
+a#up_dir_button {
+    padding-top: 1px;
+    padding-bottom: 5px;
+}
+
+a#up_dir_button span.ajxp_icon_span{
+    display: inline-block;
+}
+
+span#up_dir_button_label {
+    display: none;
 }
 
 

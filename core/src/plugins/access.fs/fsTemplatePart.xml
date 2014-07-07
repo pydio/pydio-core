@@ -36,7 +36,7 @@
                                     </div>
                                 </div>
                                 <div id="vertical_splitter" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA":"70%", "minB":260,"fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"B", "invisibleBar": true}'>
-                                    <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"files_lit_pane", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}' style="border-left: 1px solid #bbb;"></div>
+                                    <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"files_lit_pane", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
                                     <div id="info_panel" ajxpClass="InfoPanel" style="top:0;" ajxpOptions='{"replaceScroller":"true", "skipActions":true,"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["filter","vertical_splitter-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'></div>
                                 </div>
                             </div>

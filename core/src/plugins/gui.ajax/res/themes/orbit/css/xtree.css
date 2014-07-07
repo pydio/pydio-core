@@ -17,7 +17,7 @@
 
 .webfx-tree-item
 {
-	padding: 4px 0;
+	padding: 4px;
 	margin: 0;
 	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 	font-size: 11px;
@@ -27,7 +27,7 @@
 }
 
 .webfx-tree-item:hover{
-	background-color: rgb(253, 252, 228);
+	background-color: #666;
 }
 
 .selected-webfx-tree-item {
@@ -55,7 +55,8 @@
 
 .webfx-tree-item a {
 	outline:0;
-    color: rgb(111, 121, 131);
+    color: #ccc !important;
+    font-weight: lighter !important;
 }
 
 .webfx-tree-item a span {
