@@ -21,7 +21,7 @@
 /**
  * Container for location components, go to parent, refresh.
  */
-Class.create("Breadcrumb", {
+Class.create("Breadcrumb", AjxpPane, {
 	__implements : ["IAjxpWidget"],
     currentPath : "",
 	/**
@@ -29,7 +29,8 @@ Class.create("Breadcrumb", {
 	 * @param oElement HTMLElement
 	 * @param options Object
 	 */
-	initialize : function(oElement, options){
+	initialize : function($super, oElement, options){
+        $super(oElement, options);
 		this.element = oElement;
 		this.element.ajxpPaneObject = this;
         this.options = options || {};
@@ -124,32 +125,9 @@ Class.create("Breadcrumb", {
 	/**
 	 * Resize widget
 	 */
-	resize : function(){
+	resize : function($super){
         if(!this.element) return;
-		if(this.options.flexTo){
-			var parentWidth = $(this.options.flexTo).getWidth();
-			var siblingWidth = 0;
-			this.element.siblings().each(function(s){
-                if(s.hasClassName('skipSibling')) return;
-				if(s.ajxpPaneObject && s.ajxpPaneObject.getActualWidth){
-					siblingWidth+=s.ajxpPaneObject.getActualWidth();
-				}else{
-					siblingWidth+=s.getWidth();
-				}
-			});
-            var buttonsWidth = 0;
-            this.element.select("div.inlineBarButton,div.inlineBarButtonLeft,div.inlineBarButtonRight").each(function(el){
-                buttonsWidth += el.getWidth();
-            });
-			var newWidth = (parentWidth-siblingWidth-30);
-            if(this.options.flexToMargin) newWidth = newWidth - this.options.flexToMargin;
-			if(newWidth < 5){
-				this.element.hide();
-			}else{
-				this.element.show();
-				this.element.setStyle({width:newWidth + 'px'});
-			}
-		}
+        $super();
         if(this.options["use_ul"]){
             this.resizeUls();
         }

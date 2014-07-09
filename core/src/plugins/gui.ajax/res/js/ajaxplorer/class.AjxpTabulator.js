@@ -426,7 +426,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 	/**
 	 * Resizes the widget
 	 */
-	resize : function(){
+	resize : function(size, loop){
 		if(!this.selectedTabInfo || !this.htmlElement) return;
         if(this.htmlElement.hasClassName('horizontal_tabulator')){
             var tabContainer = this.htmlElement.down('div.tabulatorContainer');
@@ -477,6 +477,11 @@ Class.create("AjxpTabulator", AjxpPane, {
             }
         }
         document.fire("ajaxplorer:resize-AjxpTabulator-" + this.htmlElement.id, this.htmlElement.getDimensions());
+        if(this.options.refireResize && !loop){
+            window.setTimeout(function(){
+                this.resize(size, true);
+            }.bind(this), this.options.refireResize * 1000);
+        }
 	},
 
     showElement: function($super, show){

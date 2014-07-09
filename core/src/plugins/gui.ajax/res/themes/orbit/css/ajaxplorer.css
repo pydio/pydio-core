@@ -5,6 +5,7 @@ table.sort-table tr:nth-child(even)
 
 *{
     font-family: "Open sans", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-weight: lighter;
 }
 
 *:focus{
@@ -45,6 +46,22 @@ div.selected-webfx-tree-item-inactive{
     background: -ms-linear-gradient(top, rgba(243,243,243,1) 0%,rgba(255,255,255,1) 100%); /* IE10+ */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f3f3f3', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
     background: linear-gradient(top, rgba(243,243,243,1) 0%,rgba(255,255,255,1) 100%); /* W3C */
+}
+
+.colorcode-alert{
+    color: #F5C781;
+}
+
+.colorcode-shared{
+    color: #4Aceb0;
+}
+
+.colorcode-bookmark{
+    color: #77b8e2;
+}
+
+.colorcode-folder{
+    color: #fb725c;
 }
 
 /*
@@ -210,14 +227,10 @@ kbd {
 
     text-align: left;
     padding-top: 0;
-
     font-size: 11px;
     white-space: nowrap;
     margin-top: 1px;
-
-
-    /* color: #aaa; */
-
+    opacity: 0.9;
 }
 
 .thumbnail_selectable_cell.detailed.metadata_empty div.thumbLabel{
@@ -406,7 +419,8 @@ div.shadow_class
 {
     display: inline-block;
     font-size: 15px;
-    padding-right: 5px
+    padding-right: 8px;
+    padding-top: 2px;
 }
 
 .dialogTitle span#modalCloseBtn{
@@ -1181,9 +1195,9 @@ input.SF_input.SF_number{
     display: none !important;
 }
 
-/***************/
-/*ACTION BAR   */
-/***************/
+/********************************/
+/*ACTION BARS AND MAIN LAYOUT   */
+/********************************/
 .centeredWidth{
 }
 
@@ -1201,11 +1215,20 @@ input.SF_input.SF_number{
 }
 
 #workspace_toolbar{
-    padding-top: 19px;
-    padding-left: 9px;
-    padding-right: 15px;
-    height: 51px;
+    padding: 0;
     overflow: hidden;
+    background-color: #f5f5f5;
+    height: 62px;
+}
+
+#topPane{
+    float:left;
+    width:280px;
+    background-color: #333;
+}
+
+#cpane_container{
+    float: left;
 }
 
 #simple_repository_label{
@@ -1257,7 +1280,7 @@ div#navigation_toolbar {
 .panelHeader, .dialogTitle{
     border: none;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue-Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-size: 12px !important;
+    font-size: 14px !important;
     padding: 5px 2px 5px 9px;
     color: rgb(255, 255, 255);
     vertical-align: middle;
@@ -1273,11 +1296,12 @@ div#navigation_toolbar {
     border-bottom: 1px solid rgb(67, 156, 155);
     */
     border-radius: 2px 2px 0 0;
-    background-color: #77b8e2;
+    background-color: #145170;
     border-bottom: 0px solid #b5b5b5;
-    color: #ffffff;
-    padding: 10px 2px 8px 9px;
-    font-weight: bold;}
+    color: #fff;
+    padding: 9px 4px 9px 10px;
+    font-weight: normal;
+}
 
 #sidebar_splitter div.panelHeader,
 #search_panel div.panelHeader{
@@ -1627,13 +1651,12 @@ div.class-FetchedResultPane > div.panelHeader
 #search_meta div.advanced_search_section_title
 {
     font-size: 16px;
-    padding: 20px 8px 9px 17px;
+    padding: 16px 8px 15px 17px;
     margin: 0;
-    color: #fb725c;
     letter-spacing: 1px;
     display: block;
     clear: left;
-    font-weight: normal;
+    font-weight: lighter;
 }
 
 #search_meta div.advanced_search_section_title{
@@ -1747,17 +1770,16 @@ div.class-FetchedResultPane > div.panelHeader
 }
 
 #repo_chooser{
-    background-color: #fb725c;
+    background-color: #222;
     float:left;
     font-size: 15px;
     color: #ffffff;
     font-weight: normal;
     letter-spacing: 1px;
-    margin-left: 10px;
-    margin-top:1px;
+    margin-top:0px;
     cursor: pointer;
-    padding: 0.4em;
-    border-radius: 3px 0 0 3px;
+    padding: 21px 15px 21px 15px;
+    border-right: 2px solid #333;
 }
 
 #repo_chooser:hover{
@@ -2652,9 +2674,8 @@ div#upload_files_list span.item_relative_path{
 
 div.tabulatorContainer{
     padding: 0;
-    height: 28px;
+    height: 34px;
     overflow: hidden;
-    padding-left: 17px;
 }
 
 #topPane > div.tabulatorContainer{
@@ -2667,10 +2688,15 @@ div#topPane div.overlay_icon_div {
 
 #cpane_tabs > div.tabulatorContainer{
     border-bottom: 0;
+    transition: height 0.5s ease;
+}
+
+#cpane_tabs[data-ajxptabscount="1"] > div.tabulatorContainer{
+    height: 0;
 }
 
 div#cpane_tabs[data-ajxptabscount="1"] span.toggleHeader {
-    visibility: hidden;
+    /*visibility: hidden;*/
 }
 
 div.tabulatorContainer div#display_toolbar{
@@ -2697,19 +2723,16 @@ span.toggleHeader{
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    padding: 6px 11px;
-    background-color: #333;
-    transition: background-color 0.3s ease;
+    padding: 7px 17px 6px;
+    transition: border-color 0.3s ease;
     color: #555;
-    border-radius: 4px 4px 0 0;
-    font-size: 11px;
-    color: #ccc;
-    margin-right: 1px;
+    font-size: 12px;
+    border-bottom: 3px solid #FB725C;
 }
 
 span.toggleHeader.toggleInactive{
-    background-color: #999;
     cursor: pointer;
+    border-bottom-color: transparent;
 }
 
 span.toggleHeader span[class^="icon-"],
@@ -2760,7 +2783,7 @@ div.tabulatorContainer span.tab_close_button {
 }
 
 div.tabulatorContainer span.toggleInactive span.tab_close_button {
-    color: rgb(111, 123, 136);
+    color: rgb(112, 127, 143);
 }
 
 div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
@@ -2798,17 +2821,16 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
     text-align: right;
     overflow: visible;
     position: relative;
+    z-index: 5;
 }
 
 #search_form, #search_state
 {
-    padding-left: 7px;
-    padding-top: 1px;
 }
 #search_form
 {
-    padding-right: 11px;
-    height: 35px;
+    padding-right: 4px;
+    height: 33px;
     overflow: visible;
 }
 #search_form a
@@ -2817,11 +2839,11 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
     width: 18px;
     cursor: pointer;
     font-size: 1em;
-    padding-top: 3px;
+    padding-top: 0px;
     color: #555;
     position: absolute;
-    right: 18px;
-    top: 6px;
+    right: 13px;
+    top: 21px;
 }
 
 #search_form a.disabled {
@@ -2838,26 +2860,29 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
 {
     float: right !important;
     margin: 0;
-    height: 28px;
-    background: #fff;
-    border-color: #fff ;
+    margin-top: 0px;
+    height: 58px;
+    background: #f5f5f5;
+    border-color: #f5f5f5;
     font-size: 1em;
     color: rgb(138, 149, 160);
-    padding-left: 6px;
+    padding-left: 5px;
     width: 80px;
-    border-radius: 4px;
     border-width: 0;
     text-align: right;
     padding-right: 30px;
     transition:border-color 0.5s ease, width 0.5s ease;
+    border-radius: 0;
+
 }
 
 #search_container.search_active div#search_form input{
     width: 100%;
-    border-width: 1px;
-    border-color: rgb(138, 149, 160);
+    background: #fff;
+    border: 0;
     text-align: left;
     padding-right: 0;
+    font-size: 40px;
 }
 
 #search_meta {
@@ -3128,19 +3153,12 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
     overflow: hidden;
     background-color: #f7f7f7;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    border-left: 1px solid rgb(172, 178, 184);
-    border-right: 1px solid rgb(172, 178, 184);
     padding-bottom: 15px;
 }
 
 #info_panel div.panelHeader.panelHeaderWithIcon{
-    /*
-    background-color: #5599FF !important;
-    border-bottom: 2px solid rgb(65, 117, 194);
-    */
     background-color: #4dc5c3;
     border-bottom: 2px solid #399997;
-
     -webkit-transition-property: height;
     -webkit-transition-duration: 0.2s;
     -webkit-transition-timing-function: ease-out;
@@ -3339,7 +3357,7 @@ div.triple div.infoPanelAllMetadata > div{
 #browser
 {
     clear:left;
-    background-color: #fff;
+    background-color: #f5f5f5;
     line-height: 18px;
 }
 
@@ -4066,25 +4084,13 @@ div.menu a {
 }
 
 .menu.desktop.toolbarmenu {
-    background: #4dc5c3;
+    background: #eee;
     padding-bottom: 0;
     width: auto;
     /* IE */
     width:expression("150px");
     -moz-border-radius : 0 5px 5px 5px;
-    border-radius: 0 2px 2px 2px;
-}
-
-.menu.desktop.toolbarmenu.panelHeaderMenu {
-    background: rgb(138, 149, 160);
-}
-
-.menu.desktop.toolbarmenu.panelHeaderMenu {
-    background: rgb(138, 149, 160);
-}
-
-.menu.desktop.toolbarmenu.panelHeaderMenu.bmbarMenu {
-    width:150px;
+    border-radius: 4px;
 }
 
 .bmbarMenu div.moreActions {
@@ -4121,7 +4127,7 @@ div.menu a {
 
 .menu.desktop.toolbarmenu li {
     height: auto;
-    padding-top: 1px;
+    padding-top: 0px;
     padding-bottom: 0;
     color: white;
 }
@@ -4130,10 +4136,7 @@ div.menu a {
     color: rgba(77, 197, 195, 1);
     padding: 10px 8px 4px;
     text-align: left;
-    /* background-color: rgba(77, 197, 195, 1); */
     font-size: 22px;
-    /*margin: 1px;*/
-    /* border-bottom: 1px solid #fff; */
     letter-spacing: 1px;
 }
 
@@ -4148,7 +4151,8 @@ div.menu a {
 .menu.desktop.panelHeaderMenu li.menuTitle {
     display: block;
     font-size: 12px;
-    border-bottom: 1px solid #ffffff;
+    color: #333;
+    border-bottom: 1px solid #333;
     padding: 7px;
     text-align: left;
     background-color: rgba(255,255,255,0.2);
@@ -4165,16 +4169,15 @@ div.menu a {
 
 .menu.desktop span.ajxp_icon_span{
     font-size: 1.1em;
-    padding-right: 5px;
+    padding-right: 10px;
+    display: none;
 }
 
 .menu.desktop a {
     color: rgb(123, 134, 145);
     padding: 5px 8px 3px;
     margin: 0;
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size: 12px;
-    letter-spacing: 1px;
     line-height: 20px;
 }
 
@@ -4183,19 +4186,10 @@ div.menu a {
 }
 
 .menu.desktop.toolbarmenu a {
-    color: #fff;
+    color: #333;
     padding: 8px 20px 5px 8px;
     margin: 0;
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-size:11px;
-}
-
-.menu.desktop.toolbarmenu.panelHeaderMenu a {
-    color: #fff;
-    padding: 7px 11px 4px 8px;
-    margin: 0;
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-size:11px;
+    font-size: 13px;
 }
 
 .menu.desktop a.disabled {
@@ -4209,7 +4203,7 @@ div.menu a {
     line-height: 1px !important;
 }
 .menu.desktop.toolbarmenu li.separator{
-    border-bottom: 1px solid #ffffff;
+    border-bottom: 1px solid #666;
 }
 
 .bookmarksMenu li.separator {
@@ -4238,10 +4232,10 @@ div.menu a {
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     position:absolute;
     z-index: 1500;
-    width: 250px !important;
+    width: 260px !important;
     /* IE */
     width:expression("250px");
-    background-color: #474E50;
+    background-color: #222;
 }
 
 .rootDirChooser span.ajxp_icon_span{
@@ -4430,7 +4424,8 @@ div.menuActions img{
 }
 
 .menuActions.icon-caret-right {
-    padding-top: 2px;
+    padding-top: 4px;
+    color: #666;
 }
 
 /*
@@ -4762,7 +4757,7 @@ TABULATOR IN A TABULATOR
 .innerTabulator  div.panelHeader
 {
     font-size: 11px;
-    padding: 2px 16px 3px 8px;
+    padding: 3px 16px 4px 8px;
     height: 35px;
     letter-spacing: 1px;
     background-color: #ddd;
@@ -4797,11 +4792,9 @@ div.innerTabulator > div.tabulatorContainer > #display_toolbar a
 }
 
 #cpane_tabs span.toggleHeader{
-    padding: 6px 10px;
 }
 
 #cpane_tabs span.toggleInactive{
-    border-right: 1px solid white;
 }
 
 #cpane_tabs span.toggleInactiveBeforeActive{
@@ -4915,7 +4908,7 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
     display: inline-block;
     overflow: hidden;
     color: rgb(111, 121, 131);
-    margin-top: 1px;
+    margin-top: 0px;
     border-radius: 0 40px 40px 0;
 }
 
@@ -4923,7 +4916,7 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
     width: 2000px;
 }
 
-.breadcrumbs-arrow ul{
+.breadcrumbs-arrow ul, .breadcrumbs-four ul, .breadcrumbs-one ul{
     margin: 0;
     padding: 0;
     list-style: none;
@@ -4936,7 +4929,7 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
 
 .breadcrumbs-arrow li{
     float: left;
-    margin: 0 0.3em 0 1em;
+    margin: 0 2px 0 1em;
     font-size: 15px;
 }
 
@@ -4946,7 +4939,7 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
 
 .breadcrumbs-arrow span{
     background: #fb725c;
-    padding: 0.4em 1em;
+    padding: 20px;
     float: left;
     text-decoration: none;
     color: white;
@@ -4955,35 +4948,8 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
 }
 
 .breadcrumbs-arrow span.first-bread{
-    min-width: 220px;
-}
-
-.breadcrumbs-arrow span.first-bread.reduced{
-    min-width: 0;
-}
-
-.breadcrumbs-arrow span.reduced{
-    padding: 0.4em 0;
-    width: 4px;
-    height: 20px;
-}
-
-.breadcrumbs-arrow span.reduced em{
-    visibility:hidden;
-}
-
-.breadcrumbs-arrow span.reduced:hover,
-.breadcrumbs-arrow span.reduced.first-bread
-{
-    padding: 0.4em 1em;
-    width: auto;
-    transition:padding 1s ease;
-}
-
-.breadcrumbs-arrow span.reduced:hover em,
-.breadcrumbs-arrow span.reduced.first-bread em
-{
-    visibility:visible;
+    width: 215px;
+    background: #222;
 }
 
 .breadcrumbs-arrow span em{
@@ -5030,6 +4996,10 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
     border-left-color: #fb725c;
 }
 
+.breadcrumbs-arrow span.first-bread::after{
+    border-left-color: #222;
+}
+
 .breadcrumbs-arrow span.current,
 .breadcrumbs-arrow span.current:hover{
     font-weight: bold;
@@ -5050,6 +5020,140 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
 .breadcrumbs-arrow i.ajxp-goto:hover{
     color: #555;
 }
+
+.breadcrumbs-one{
+    overflow: hidden;
+    width: 100%;
+}
+
+.breadcrumbs-one li{
+    float: left;
+}
+
+.breadcrumbs-one span{
+    padding: 20px 15px 20px 35px;
+    float: left;
+    text-decoration: none;
+    color: #666;
+    position: relative;
+    background-color: #f5f5f5;
+}
+
+.breadcrumbs-one li:first-child span{
+    padding-left: 1em;
+    border-radius: 0;
+    width: 201px;
+}
+
+.breadcrumbs-one span:hover{
+    background: #fff;
+    cursor: pointer;
+}
+
+.breadcrumbs-one span::after,
+.breadcrumbs-one span::before{
+    content: "";
+    position: absolute;
+    top: 50%;
+    margin-top: -33px;
+    border-top: 33px solid transparent;
+    border-bottom: 33px solid transparent;
+    border-left: 1em solid;
+    right: -1em;
+}
+
+.breadcrumbs-one span::after{
+    z-index: 2;
+    border-left-color: #f5f5f5;
+}
+
+.breadcrumbs-one li:first-child span::after{
+    border-left-color: #222;
+}
+.breadcrumbs-one li:first-child span{
+    background-color: #222;
+    color: white;
+}
+
+.breadcrumbs-one li:nth-child(1) span:before{
+    border-left-color: #f5f5f5;
+}
+
+.breadcrumbs-one span::before{
+    border-left-color: #fb725c;
+    right: -1.05em;
+    z-index: 1;
+}
+
+.breadcrumbs-one span:hover::after{
+    border-left-color: #fff;
+}
+
+.breadcrumbs-one .current,
+.breadcrumbs-one .current:hover{
+    font-weight: bold;
+    background: none;
+}
+
+.breadcrumbs-one .current::after,
+.breadcrumbs-one .current::before{
+    content: normal;
+}
+
+.breadcrumbs-one em{
+    font-style: normal;
+    font-weight: lighter;
+}
+
+.breadcrumbs-one i.ajxp-goto{
+    display: inline-block;
+    cursor: pointer;
+    padding: 20px 25px;
+    color: #fb725c;
+}
+.breadcrumbs-one i.ajxp-goto:hover{
+    color: #fb725c;
+}
+
+
+.breadcrumbs-one span.reduced,
+.breadcrumbs-arrow span.reduced
+{
+    padding: 20px 10px 20px 10px;
+    width: 4px;
+    height: 20px;
+}
+
+.breadcrumbs-one span.reduced em,
+.breadcrumbs-arrow span.reduced em
+{
+    visibility:hidden;
+}
+
+.breadcrumbs-one span.reduced:hover,
+.breadcrumbs-arrow span.reduced:hover
+{
+    padding: 20px 15px 20px 35px;
+    width: auto;
+    transition:padding 1s ease;
+}
+
+.breadcrumbs-one span.reduced.first-bread,
+.breadcrumbs-arrow span.reduced.first-bread{
+    padding: 20px 15px 20px 1em;
+    transition:none;
+    width: 201px;
+    height: auto;
+}
+
+.breadcrumbs-one span.reduced:hover em,
+.breadcrumbs-one span.reduced.first-bread em,
+.breadcrumbs-arrow span.reduced:hover em,
+.breadcrumbs-arrow span.reduced.first-bread em
+{
+    visibility:visible;
+}
+
 
 #AjxpConnexion-loader{
     left:49% !important;

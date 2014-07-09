@@ -1158,6 +1158,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $metaData["file_perms"] = $fPerms;
         $datemodif = $this->date_modif($ajxpNode->getUrl());
         $metaData["ajxp_modiftime"] = ($datemodif ? $datemodif : "0");
+        $metaData["ajxp_description"] =$metaData["ajxp_relativetime"] = "modified ".AJXP_Utils::relativeDate($datemodif, ConfService::getMessages());
         $metaData["bytesize"] = 0;
         if ($isLeaf) {
             $metaData["bytesize"] = $this->filesystemFileSize($ajxpNode->getUrl());

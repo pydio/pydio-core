@@ -394,9 +394,10 @@ Class.create("SearchEngine", AjxpPane, {
     openSearchInput: function(){
         var container = this.htmlElement;
         container.absolutize();
+        var leftPos = 285;
         var pos = container.positionedOffset();
-        var width = pos['left'] + container.getWidth() - 10;
-        container.setStyle({width:width+'px',left:'10px'});
+        var width = pos['left'] + container.getWidth() - leftPos;
+        container.setStyle({width:width+'px',left:leftPos+'px'});
         container.addClassName("search_active");
         container.addClassName("skipSibling");
     },

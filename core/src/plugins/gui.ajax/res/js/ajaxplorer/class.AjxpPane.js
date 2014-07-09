@@ -124,6 +124,30 @@ Class.create("AjxpPane", {
     		}
     		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null), marginBottom);
     	}
+        if(this.options.flexTo){
+            var parentWidth = $(this.options.flexTo).getWidth();
+            var siblingWidth = 0;
+            this.htmlElement.siblings().each(function(s){
+                if(s.hasClassName('skipSibling')) return;
+                if(s.ajxpPaneObject && s.ajxpPaneObject.getActualWidth){
+                    siblingWidth+=s.ajxpPaneObject.getActualWidth();
+                }else{
+                    siblingWidth+=s.getWidth();
+                }
+            });
+            var buttonsWidth = 0;
+            this.htmlElement.select("div.inlineBarButton,div.inlineBarButtonLeft,div.inlineBarButtonRight").each(function(el){
+                buttonsWidth += el.getWidth();
+            });
+            var newWidth = (parentWidth-siblingWidth);
+            if(this.options.flexToMargin) newWidth = newWidth - this.options.flexToMargin;
+            if(newWidth < 5){
+                this.htmlElement.hide();
+            }else{
+                this.htmlElement.show();
+                this.htmlElement.setStyle({width:newWidth + 'px'});
+            }
+        }
     	this.childrenPanes.invoke('resize');
 	},
 	

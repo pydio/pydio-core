@@ -1923,40 +1923,44 @@ Class.create("FilesList", SelectableElements, {
         largeRow.insert(label);
         largeRow.insert(metadataDiv);
 
-        var attributeList = this.getFromCache('visibleColumns');
-
-        var first = false;
-        var attKeys = attributeList.keys();
         var addedCell = 0;
-        for(var i = 0; i<attKeys.length;i++ ){
-            var s = attKeys[i];
-            var cell = new Element("span", {className:'metadata_chunk'});
-            if(s == "ajxp_label")
-            {
-                continue;
-            }else if(s=="ajxp_modiftime"){
-                var date = new Date();
-                date.setTime(parseInt(metaData.get(s))*1000);
-                newRow.ajxp_modiftime = date;
-                cell.update('<span class="text_label">' + formatDate(date) + '</span>');
-            }else if(s == "filesize" && metaData.get(s) == "-"){
+        if(metaData.get("ajxp_description")){
+            addedCell ++;
+            metadataDiv.insert(new Element("span", {className:'metadata_chunk'}).update(metaData.get("ajxp_description")));
+        }else{
+            var attributeList = this.getFromCache('visibleColumns');
+            var first = false;
+            var attKeys = attributeList.keys();
+            for(var i = 0; i<attKeys.length;i++ ){
+                var s = attKeys[i];
+                var cell = new Element("span", {className:'metadata_chunk'});
+                if(s == "ajxp_label")
+                {
+                    continue;
+                }else if(s=="ajxp_modiftime"){
+                    var date = new Date();
+                    date.setTime(parseInt(metaData.get(s))*1000);
+                    newRow.ajxp_modiftime = date;
+                    cell.update('<span class="text_label">' + formatDate(date) + '</span>');
+                }else if(s == "filesize" && metaData.get(s) == "-"){
 
-                continue;
+                    continue;
 
-            }else
-            {
-                var metaValue = metaData.get(s) || "";
-                if(!metaValue) continue;
-                cell.update('<span class="text_label">' + metaValue  + "</span>");
-            }
-            if(!first){
-                metadataDiv.insert(new Element('span', {className:'icon-angle-right'}));
-            }
-            metadataDiv.insert(cell);
-            addedCell++;
-            first = false;
-            if(attributeList.get(s).modifierFunc){
-                attributeList.get(s).modifierFunc(cell, ajxpNode, 'detail', attributeList.get(s));
+                }else
+                {
+                    var metaValue = metaData.get(s) || "";
+                    if(!metaValue) continue;
+                    cell.update('<span class="text_label">' + metaValue  + "</span>");
+                }
+                if(!first){
+                    metadataDiv.insert(new Element('span', {className:'icon-angle-right'}));
+                }
+                metadataDiv.insert(cell);
+                addedCell++;
+                first = false;
+                if(attributeList.get(s).modifierFunc){
+                    attributeList.get(s).modifierFunc(cell, ajxpNode, 'detail', attributeList.get(s));
+                }
             }
         }
         if(!addedCell){
