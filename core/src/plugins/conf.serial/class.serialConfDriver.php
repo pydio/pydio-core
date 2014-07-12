@@ -369,6 +369,14 @@ class serialConfDriver extends AbstractConfDriver
         return $result;
     }
 
+    /**
+     * @param string $repositoryId
+     * @return array('INTERNAL' => count, 'SHARED' => count)
+     */
+    public function countUsersForRepository($repositoryId){
+        return count($this->getUsersForRepository($repositoryId));
+    }
+
 
     public function filterUsersByGroup(&$flatUsersList, $baseGroup = "/", $fullTree = false)
     {

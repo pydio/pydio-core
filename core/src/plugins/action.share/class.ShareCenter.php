@@ -2055,6 +2055,7 @@ class ShareCenter extends AJXP_Plugin
         }else if($shareData["type"] == "minisite" || $shareData["type"] == "repository"){
 
             $minisite = ($shareData["type"] == "minisite");
+            $repoId = $shareId;
             if ($minisite) {
 
                 $minisiteData = $this->getShareStore()->loadShare($shareId);
@@ -2067,8 +2068,6 @@ class ShareCenter extends AJXP_Plugin
                     $minisiteLink = $this->buildPublicletLink($shareId);
                 }
 
-            } else {
-                $repoId = $shareId;
             }
             $repo = ConfService::getRepositoryById($repoId);
             if($repo == null && $node != null){
@@ -2079,6 +2078,7 @@ class ShareCenter extends AJXP_Plugin
 
                 $jsonData = array(
                     "repositoryId"  => $repoId,
+                    "users_number"  => AuthService::countUsersForRepository($repoId),
                     "label"         => "Error - Cannot find shared data",
                     "description"   => "Cannot find repository",
                     "entries"       => array(),
@@ -2103,6 +2103,7 @@ class ShareCenter extends AJXP_Plugin
 
             $jsonData = array(
                 "repositoryId"  => $repoId,
+                "users_number"  => AuthService::countUsersForRepository($repoId),
                 "label"         => $repo->getDisplay(),
                 "description"   => $repo->getDescription(),
                 "entries"       => $sharedEntries,

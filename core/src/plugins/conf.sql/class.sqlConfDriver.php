@@ -508,6 +508,29 @@ class sqlConfDriver extends AbstractConfDriver
         return $result;
     }
 
+    /**
+     * @param string $repositoryId
+     * @return Integer
+     */
+    public function countUsersForRepository($repositoryId){
+        // NEW METHOD : SEARCH PERSONAL ROLE
+        switch ($this->sqlDriver["driver"]) {
+            case "sqlite":
+            case "sqlite3":
+            case "postgre":
+                $res = dibi::query('SELECT count([role_id]) FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %~like~', '"'.$repositoryId.'";s:');
+                break;
+            case "mysql":
+                $res = dibi::query('SELECT count([role_id]) as c FROM [ajxp_roles] WHERE [serial_role] LIKE %~like~', '"'.$repositoryId.'";s:');
+                break;
+            default:
+                return "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
+        }
+        $all = $res->fetchAll();
+        return intval($all[0]['c']);
+    }
+
+
     // SAVE / EDIT / CREATE / DELETE USER OBJECT (except password)
     /**
      * Instantiate the right class

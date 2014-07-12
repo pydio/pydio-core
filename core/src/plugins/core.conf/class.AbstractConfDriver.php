@@ -419,6 +419,13 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      */
     abstract public function getUsersForRepository($repositoryId);
 
+    /**
+     * @abstract
+     * @param string $repositoryId
+     * @return Integer
+     */
+    abstract public function countUsersForRepository($repositoryId);
+
 
     /**
      * @param AbstractAjxpUser[] $flatUsersList

@@ -890,6 +890,11 @@ class AuthService
         return ConfService::getConfStorageImpl()->getUsersForRepository($repositoryId);
     }
 
+    public static function countUsersForRepository($repositoryId)
+    {
+        return ConfService::getConfStorageImpl()->countUsersForRepository($repositoryId);
+    }
+
     /**
      * @static
      * @param string $baseGroup
