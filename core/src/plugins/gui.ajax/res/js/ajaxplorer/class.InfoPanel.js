@@ -54,7 +54,8 @@ Class.create("InfoPanel", AjxpPane, {
 		this.setContent('<br><br><center><i>'+MessageHash[132]+'</i></center>');
 		this.mimesTemplates = new Hash();
 		this.registeredMimes = new Hash();
-		
+        this.primaryTemplates = new Hash();
+
 		this.updateHandler = this.update.bind(this);
 		this.componentConfigHandler = function(event){
 			if(event.memo.className == "InfoPanel"){
@@ -208,7 +209,7 @@ Class.create("InfoPanel", AjxpPane, {
 		var isFile = false;
 		if(uniqNode) isFile = uniqNode.isLeaf();
 		this.evalTemplateForMime((isFile?'generic_file':'generic_dir'), uniqNode);
-		
+
 		var extension = getAjxpMimeType(uniqNode);
         var metadata = uniqNode.getMetadata();
         this.registeredMimes.each(function(pair){
@@ -308,7 +309,7 @@ Class.create("InfoPanel", AjxpPane, {
 	resize : function(){
         this.contentContainer.removeClassName('double');
         this.contentContainer.removeClassName('triple');
-        var previewMaxHeight = 150;
+        var previewMaxHeight = 200;
         if(parseInt(this.contentContainer.getWidth()) > 500) {
             this.contentContainer.addClassName('double');
             previewMaxHeight = 300;
@@ -339,10 +340,24 @@ Class.create("InfoPanel", AjxpPane, {
 	 */
 	evalTemplateForMime: function(mimeType, fileNode, tArgs){
 		if(!this.htmlElement) return;
-		if(!this.registeredMimes.get(mimeType)) return;		
+		if(!this.registeredMimes.get(mimeType)) return;
 		var registeredTemplates = this.registeredMimes.get(mimeType);
-		for(var i=0;i<registeredTemplates.length;i++){		
-			var templateData = this.mimesTemplates.get(registeredTemplates[i]);
+        if(mimeType == "generic_file"){
+            var realExtension = getAjxpMimeType(fileNode);
+            var genericId = this.primaryTemplates.get(mimeType);
+            var primaryId = this.primaryTemplates.get(realExtension)
+        }else{
+            var skipId = this.primaryTemplates.get(mimeType);
+        }
+		for(var i=0;i<registeredTemplates.length;i++){
+            if(skipId && skipId == registeredTemplates[i]){
+                continue;
+            }
+            var templateData = this.mimesTemplates.get(registeredTemplates[i]);
+            if(primaryId && genericId && genericId == registeredTemplates[i]){
+                //replace;
+                templateData = this.mimesTemplates.get(primaryId);
+            }
 			var tString = templateData[0];
 			var tAttributes = templateData[1];
 			var tMessages = templateData[2];
@@ -479,6 +494,11 @@ Class.create("InfoPanel", AjxpPane, {
 		for(var i = 0; i<panels.length; i++){
 			var panelMimes = panels[i].getAttribute('mime');
 			var attributes = $A(panels[i].getAttribute('attributes').split(","));
+            var theme = panels[i].getAttribute('theme');
+            var winTheme = window.ajxpBootstrap.parameters.get("theme");
+            if(theme && theme.split(',').indexOf(winTheme) == -1){
+                continue;
+            }
 			var messages = new Hash();
 			var modifier = panels[i].getAttribute('modifier') || '';
 			var htmlContent = '';
@@ -499,12 +519,16 @@ Class.create("InfoPanel", AjxpPane, {
 			if(this.mimesTemplates.get(tId)){
 				continue;
 			}
-			this.mimesTemplates.set(tId, $A([htmlContent,attributes, messages, modifier]));				
-			
+			this.mimesTemplates.set(tId, $A([htmlContent,attributes, messages, modifier]));
+            var primary = panels[i].getAttribute('primary');
+
 			$A(panelMimes.split(",")).each(function(mime){
 				var registered = this.registeredMimes.get(mime) || $A([]);
 				registered.push(tId);
 				this.registeredMimes.set(mime, registered);
+                if(primary){
+                    this.primaryTemplates.set(mime, tId);
+                }
 			}.bind(this));
 		}
 	}

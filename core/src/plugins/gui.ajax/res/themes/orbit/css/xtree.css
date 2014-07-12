@@ -17,7 +17,7 @@
 
 .webfx-tree-item
 {
-	padding: 4px;
+	padding: 5px 4px;
 	margin: 0;
 	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 	font-size: 11px;
@@ -200,7 +200,42 @@
 }
 
 div#tree_container > div:first-child {
-    display: none;
+    padding-left: 23px;
+}
+
+div#tree_container > div:first-child > a > span,
+div#tree_container div[data-node-icon] > a > span
+{
+    background-image: none !important;
+    padding-left: 4px;
+}
+
+div#tree_container > div:first-child > a > span:before,
+div#tree_container div[data-node-icon] > a > span:before
+{
+    content: "\f015";
+    font-size: 1.3em;
+    padding-right: 13px;
+    font-family: FontAwesome;
+    font-weight: normal;
+    font-style: normal;
+    text-decoration: inherit;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* default: FOLDER */
+div#tree_container div[data-node-icon] > a > span:before {
+    content: "\f114";
+}
+
+div#tree_container div[data-node-icon="zip.png"] > a > span:before {
+    content: "\f187";
+}
+
+div#tree_container div[data-node-icon="trashcan_full.png"] > a > span:before,
+div#tree_container div[data-node-icon="trashcan.png"] > a > span:before
+{
+    content: "\f014";
 }
 
 #folder_pane{

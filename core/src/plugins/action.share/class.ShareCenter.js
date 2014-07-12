@@ -599,10 +599,10 @@ Class.create("ShareCenter", {
     },
 
     loadInfoPanel : function(container, node){
-        container.down('#ajxp_shared_info_panel table').update('<tr>\
-            <td class="infoPanelLabel">'+MessageHash['share_center.55']+'</td>\
-            <td class="infoPanelValue"><span class="icon-spinner"></span></td>\
-            </tr>\
+        container.down('#ajxp_shared_info_panel table').update('<div class="infoPanelRow">\
+            <div class="infoPanelLabel">'+MessageHash['share_center.55']+'</div>\
+            <div class="infoPanelValue"><span class="icon-spinner"></span></div>\
+            </div>\
         ');
         ShareCenter.prototype.loadSharedElementData(node, function(jsonData){
             "use strict";
@@ -615,10 +615,10 @@ Class.create("ShareCenter", {
                 if(!jsonData.has_password){
                     var shortlink = jsonData.publiclet_link + (jsonData.publiclet_link.indexOf('?') !== -1 ? '&' : '?') + 'dl=true';
                     directLink += '\
-                    <tr>\
-                        <td class="infoPanelLabel">'+MessageHash['share_center.60']+'</td>\
-                        <td class="infoPanelValue"><textarea style="width:100%;height: 45px;" readonly="true"><a href="'+ shortlink +'">'+ MessageHash[88] + ' ' +node.getLabel()+'</a></textarea></td>\
-                    </tr>\
+                    <div class="infoPanelRow">\
+                        <div class="infoPanelLabel">'+MessageHash['share_center.60']+'</div>\
+                        <div class="infoPanelValue"><textarea style="width:100%;height: 45px;" readonly="true"><a href="'+ shortlink +'">'+ MessageHash[88] + ' ' +node.getLabel()+'</a></textarea></div>\
+                    </div>\
                     ';
                     var editors = ajaxplorer.findEditorsForMime(node.getAjxpMime(), true);
                     if(editors.length){
@@ -633,35 +633,35 @@ Class.create("ShareCenter", {
                             messKey = "share_center.60";
                         }
                         directLink += '\
-                            <tr>\
-                                <td class="infoPanelLabel">'+MessageHash[messKey]+'</td>\
-                                <td class="infoPanelValue"><textarea style="width:100%;height: 80px;" readonly="true">'+ tplString + '</textarea></td>\
-                            </tr>\
+                            <div class="infoPanelRow">\
+                                <div class="infoPanelLabel">'+MessageHash[messKey]+'</div>\
+                                <div class="infoPanelValue"><textarea style="width:100%;height: 80px;" readonly="true">'+ tplString + '</textarea></div>\
+                            </div>\
                         ';
                     }
                 }
 
                 container.down('#ajxp_shared_info_panel table').update('\
-                    <tr>\
-                        <td class="infoPanelLabel">'+MessageHash['share_center.59']+'</td>\
-                        <td class="infoPanelValue"><textarea style="width:100%;height: 45px;" readonly="true">'+ jsonData.publiclet_link +'</textarea></td>\
-                    </tr>'+directLink+'\
-                    <tr>\
-                        <td class="infoPanelLabel">'+MessageHash['share_center.51']+'</td>\
-                        <td class="infoPanelValue">'+ jsonData.download_counter +' ' +  MessageHash['share_center.57'] + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td class="infoPanelLabel">'+MessageHash['share_center.52']+'</td>\
-                        <td class="infoPanelValue">'+MessageHash['share_center.22']+' '+ (jsonData.download_limit?jsonData.download_limit:MessageHash['share_center.53'])
+                    <div class="infoPanelRow">\
+                        <div class="infoPanelLabel">'+MessageHash['share_center.59']+'</div>\
+                        <div class="infoPanelValue"><textarea style="width:100%;height: 45px;" readonly="true">'+ jsonData.publiclet_link +'</textarea></div>\
+                    </div>'+directLink+'\
+                    <div class="infoPanelRow">\
+                        <div class="infoPanelLabel">'+MessageHash['share_center.51']+'</div>\
+                        <div class="infoPanelValue">'+ jsonData.download_counter +' ' +  MessageHash['share_center.57'] + '</div>\
+                    </div>\
+                    <div class="infoPanelRow">\
+                        <div class="infoPanelLabel">'+MessageHash['share_center.52']+'</div>\
+                        <div class="infoPanelValue">'+MessageHash['share_center.22']+' '+ (jsonData.download_limit?jsonData.download_limit:MessageHash['share_center.53'])
                                 +', '+MessageHash['share_center.11']+':'+ (jsonData.expiration_time?jsonData.expiration_time:MessageHash['share_center.53'])
-                                +', '+MessageHash['share_center.12']+':'+ (jsonData.has_password?MessageHash['share_center.13']:MessageHash['share_center.14']) +'</td>\
-                    </tr>\
+                                +', '+MessageHash['share_center.12']+':'+ (jsonData.has_password?MessageHash['share_center.13']:MessageHash['share_center.14']) +'</div>\
+                    </div>\
                 ');
 
                 if(linksCount > 1){
-                    container.down('#ajxp_shared_info_panel table').insert({bottom:'<tr>\
-                        <td class="infoPanelLabel" colspan="2" style="text-align: center;font-style: italic;">'+MessageHash['share_center.'+(linksCount>2?'104':'105')].replace('%s', linksCount-1)+'</td>\
-                    </tr>'});
+                    container.down('#ajxp_shared_info_panel table').insert({bottom:'<div class="infoPanelRow">\
+                        <div class="infoPanelLabel" colspan="2" style="text-align: center;font-style: italic;">'+MessageHash['share_center.'+(linksCount>2?'104':'105')].replace('%s', linksCount-1)+'</div>\
+                    </div>'});
                 }
 
             }else{
@@ -672,25 +672,25 @@ Class.create("ShareCenter", {
                 var linkString = '';
                 if(jsonData.minisite){
                     linkString = '\
-                    <tr>\
-                        <td class="infoPanelLabel">'+MessageHash['share_center.62']+'</td>\
-                        <td class="infoPanelValue"><textarea style="width:100%;height: 40px;" readonly="true">'+ jsonData.minisite.public_link +'</textarea></td>\
-                    </tr>\
-                    <tr>\
-                        <td class="infoPanelLabel">'+MessageHash['share_center.61']+'</td>\
-                        <td class="infoPanelValue"><textarea style="width:100%;height: 80px;" id="embed_code" readonly="true"></textarea></td>\
-                    </tr>\
+                    <div class="infoPanelRow">\
+                        <div class="infoPanelLabel">'+MessageHash['share_center.62']+'</div>\
+                        <div class="infoPanelValue"><textarea style="width:100%;height: 40px;" readonly="true">'+ jsonData.minisite.public_link +'</textarea></div>\
+                    </div>\
+                    <div class="infoPanelRow">\
+                        <div class="infoPanelLabel">'+MessageHash['share_center.61']+'</div>\
+                        <div class="infoPanelValue"><textarea style="width:100%;height: 80px;" id="embed_code" readonly="true"></textarea></div>\
+                    </div>\
                     ';
                 }
                 container.down('#ajxp_shared_info_panel table').update(linkString + '\
-                    <tr>\
-                        <td class="infoPanelLabel">'+MessageHash['share_center.35']+'</td>\
-                        <td class="infoPanelValue">'+ jsonData.label +'</td>\
-                    </tr>\
-                    <tr>\
-                        <td class="infoPanelLabel">'+MessageHash['share_center.54']+'</td>\
-                        <td class="infoPanelValue">'+ entries.join(', ') +'</td>\
-                    </tr>\
+                    <div class="infoPanelRow">\
+                        <div class="infoPanelLabel">'+MessageHash['share_center.35']+'</div>\
+                        <div class="infoPanelValue">'+ jsonData.label +'</div>\
+                    </div>\
+                    <div class="infoPanelRow">\
+                        <div class="infoPanelLabel">'+MessageHash['share_center.54']+'</div>\
+                        <div class="infoPanelValue">'+ entries.join(', ') +'</div>\
+                    </div>\
                 ');
                 if(jsonData.minisite){
                     container.down("#embed_code").setValue("<iframe height='500' width='600' style='border:1px solid black;' src='"+jsonData.minisite.public_link+"'></iframe>");

@@ -86,7 +86,7 @@
 				</columns>
 			</component_config>
 			<component_config className="InfoPanel">
-				<infoPanelExtension mime="AJXP_MIMES_IMAGE" attributes="image_width,image_height,image_type">
+				<infoPanelExtension mime="AJXP_MIMES_IMAGE" attributes="image_width,image_height,image_type" theme="oxygen,umbra,vision">
 					<messages>
 						<message key="type_string" id="134"/>
 						<message key="dim_string" id="135"/>
@@ -107,6 +107,41 @@
 							</table>
 						</div>
 					]]></html>
+				</infoPanelExtension>
+				<infoPanelExtension mime="AJXP_MIMES_IMAGE" attributes="basename,preview_rich,filesize,mimestring,formated_date,ajxp_description,image_width,image_height,image_type" theme="orbit" primary="true">
+                    <messages>
+                        <message key="name_string" id="133"/>
+                        <message key="size_string" id="127"/>
+                        <message key="type_string" id="134"/>
+                        <message key="modif_string" id="138"/>
+                        <message key="dim_string" id="135"/>
+                    </messages>
+                    <html><![CDATA[
+                        <div class="infoPanelBasenameTitle">#{basename}</div>
+                        <div class="infoPanelImagePreview">
+                            #{preview_rich}
+                        </div>
+                        <div class="infoPanelAllMetadata">
+                            <div>
+                                <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
+                                    <tr class="even">
+                                        <td class="infoPanelLabel">#{size_string}</td>
+                                        <td class="infoPanelLabel">#{dim_string}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="infoPanelValue">#{filesize}</td>
+                                        <td class="infoPanelValue">W #{image_width} px <br> H  #{image_height} px</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" class="infoPanelLabel">#{modif_string}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" class="infoPanelValue">#{ajxp_description}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    ]]></html>
 				</infoPanelExtension>
 			</component_config>
 		</client_configs>

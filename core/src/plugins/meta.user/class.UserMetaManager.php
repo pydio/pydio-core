@@ -63,8 +63,8 @@ class UserMetaManager extends AJXP_Plugin
         else $visibilities = explode(",", $this->options["meta_visibility"]);
         $cdataHead = '<div>
                         <div class="panelHeader infoPanelGroup" colspan="2"><span class="icon-edit" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]"></span>AJXP_MESSAGE[meta.user.1]</div>
-                        <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">';
-        $cdataFoot = '</table></div>';
+                     ';
+        $cdataFoot = '</div>';
         $cdataParts = "";
 
         $selection = $this->xPath->query('registry_contributions/client_configs/component_config[@className="FilesList"]/columns');
@@ -117,9 +117,9 @@ class UserMetaManager extends AJXP_Plugin
                     break;
             }
             $contrib->appendChild($col);
-            $trClass = ($even?" class=\"even\"":"");
+            $trClass = ($even?" class=\"even infoPanelRow\"":" class=\"infoPanelRow\"");
             $even = !$even;
-            $cdataParts .= '<tr'.$trClass.'><td class="infoPanelLabel">'.$label.'</td><td class="infoPanelValue" data-metaType="'.$fieldType.'" id="ip_'.$key.'">#{'.$key.'}</td></tr>';
+            $cdataParts .= '<div'.$trClass.'><div class="infoPanelLabel">'.$label.'</div><div class="infoPanelValue" data-metaType="'.$fieldType.'" id="ip_'.$key.'">#{'.$key.'}</div></div>';
         }
 
         $selection = $this->xPath->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');

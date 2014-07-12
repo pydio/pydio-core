@@ -89,8 +89,7 @@ input, textarea, select
     margin-left: 10px;
     padding: 2px;
     border: 1px solid #aaa;
-    font-size: 11px;
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-size: 13px;
     border-radius: 2px;
     -moz-border-radius: 2px;
     -webkit-border-radius: 2px;
@@ -212,15 +211,12 @@ kbd {
 
     font-size: 15px;
     text-align: left;
-
-
     padding-top: 9px;
-
-
     padding-bottom: 0px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    font-weight: normal;
 }
 
 .thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata{
@@ -1279,10 +1275,6 @@ div#navigation_toolbar {
 
 .panelHeader, .dialogTitle{
     border: none;
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue-Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-size: 14px !important;
-    padding: 5px 2px 5px 9px;
-    color: rgb(255, 255, 255);
     vertical-align: middle;
     background-color: transparent;
     letter-spacing: 1px; /* Old browsers */   /* FF3.6+ */   /* Chrome,Safari4+ */   /* Chrome10+,Safari5.1+ */   /* Opera 11.10+ */   /* IE10+ */   /* W3C */   /* IE6-9 */; /* Old browsers */   /* FF3.6+ */   /* Chrome,Safari4+ */   /* Chrome10+,Safari5.1+ */   /* Opera 11.10+ */   /* IE10+ */   /* W3C */   /* IE6-9 */;
@@ -1320,19 +1312,17 @@ div#navigation_toolbar {
     padding: 0;
     line-height: 15px;
 }
-.action_bar.editor_action_bar{
+.action_bar.editor_action_bar {
     height: 37px;
-    background-color: transparent;
-    border-bottom: 0 solid rgb(138, 149, 160);
+    background-color: #ddd;
     right: 29px;
     position: absolute;
     z-index: 10;
 }
 
-#codemirror_box div.action_bar.editor_action_bar{
+#codemirror_box div.action_bar.editor_action_bar {
     right: 0;
-    border-bottom: 1px solid rgb(138, 149, 160);
-    padding-left: 10px;
+    padding: 4px;
 }
 
 .action_bar.editor_action_bar div.separator{
@@ -1671,8 +1661,8 @@ div.class-FetchedResultPane > div.panelHeader
     cursor: pointer;
     display: none;
     float: right;
-    color: white;
-    background-color: #999;
+    color: #aaa;
+    background-color: #555;
     border-radius: 5px;
     text-transform: lowercase;
     padding: 0 8px;
@@ -2674,7 +2664,7 @@ div#upload_files_list span.item_relative_path{
 
 div.tabulatorContainer{
     padding: 0;
-    height: 34px;
+    height: 37px;
     overflow: hidden;
 }
 
@@ -2689,6 +2679,7 @@ div#topPane div.overlay_icon_div {
 #cpane_tabs > div.tabulatorContainer{
     border-bottom: 0;
     transition: height 0.5s ease;
+    box-shadow: inset 0px 2px 4px rgba(0,0,0,0.15);
 }
 
 #cpane_tabs[data-ajxptabscount="1"] > div.tabulatorContainer{
@@ -2723,7 +2714,7 @@ span.toggleHeader{
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    padding: 7px 17px 6px;
+    padding: 10px 17px 6px;
     transition: border-color 0.3s ease;
     color: #555;
     font-size: 12px;
@@ -3144,15 +3135,16 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
 #info_panel span[data-ajxpAction]{
     float: right;
     display: inline-block;
-    padding: 3px;
+    padding: 0px;
     cursor: pointer;
+    font-size: 17px;
+    display: none;
 }
 
 #info_panel div.panelContent
 {
     overflow: hidden;
-    background-color: #f7f7f7;
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    background-color: #f3f3f3;
     padding-bottom: 15px;
 }
 
@@ -3277,29 +3269,46 @@ div.foldedPanel_tooltip td{
     padding-bottom: 10px;
 }
 
-.infoPanelTable
+div.infoPanelBasenameTitle{
+    color: #555;
+    margin: 9px 15px;
+    line-height: 1.5em;
+}
+
+.infoPanelTable,
+div.infoPanelRow
 {
     font-size: 12px;
     width: 100%;
-    color: rgb(111, 121, 131);
 }
 
-td.infoPanelValue
+td.infoPanelValue,
+div.infoPanelValue
 {
-    padding: 6px;
+    padding: 0px 0 20px;
+    font-size: 1.5em;
+    color: #555;
+    line-height: 1.3em;
+    vertical-align: top;
 }
 
 .panelContent.scrolling td.infoPanelValue{
     padding-right: 18px;
 }
 
-td.infoPanelLabel {
-    padding: 7px 6px;
-    width: 35%;
-    text-align: right;
-    color: #555;
-    vertical-align: top;
+td.infoPanelLabel,
+div.infoPanelLabel
+{
+    width: 50%;
+    color: #999;
+    text-transform: uppercase;
+    font-size: 0.9em;
 }
+
+div.infoPanelLabel{
+    width: 100%;
+}
+
 
 .infoPanelGroup
 {
@@ -3308,13 +3317,11 @@ td.infoPanelLabel {
 }
 
 .panelContent div.panelHeader{
+    font-size: 1.3em;
+    padding: 16px 0 16px 0;
 
-    color: #77b8e2;
-    font-weight: bold;
-    font-size: 12px;
-    padding: 6px 7px;
-    border-bottom: 0 !important;
-
+    text-transform: uppercase;
+    color: #555;
 }
 
 .panelContent.scrolling div.panelHeader{
@@ -3329,17 +3336,44 @@ tr td.infoPanelLabel
 {
     text-align:center;
     padding: 10px 0;
-    background-color: white; border: 1px solid #d5d5d5; margin: 8px; border-radius: 5px;
+    background-color: white; 
+    /* border: 1px solid #d5d5d5; */ 
+    margin: 10px 14px; 
+    border-radius: 5px;
+    box-shadow: 0px 0px 4px rgba(0,0,0,0.25);
 }
 .infoPanelImagePreview img
 {
 }
 
-div.infoPanelAllMetadata > div {
-    background-color: white;
-    border: 1px solid #d5d5d5;
-    margin: 8px;
+div.dimension_card_width{
+    text-align: center;
+
+}
+
+div.dimension_card_height{
+    float: left;
+
+    height: 37px;
+    width: 28%;
+    padding-top: 59px;
+    text-align: right;
+}
+
+div.dimension_card_rectangle{
+    float: left;
+
+    height: 95px;
+    width: 67%;
+    /* background-color: #ddd; */
     border-radius: 5px;
+    margin-top: 5px;
+    margin-left: 2%;
+    border: 1px solid #AAA;
+}
+
+div.infoPanelAllMetadata > div {
+    margin: 6px 20px;
 }
 
 div.double div.infoPanelAllMetadata > div{
@@ -3379,15 +3413,13 @@ div.selectable_div, .table_rows_container, #tree_container, #bottomSplitPane, .a
     border-top: 0;
     border-bottom: 0;
 }
-.table_rows_container tr:first-child td,
-.infoPanelTable tr:first-child td
-{
-    border-top: 0;
+
+.table_rows_container span#ajxp_label {
+    font-weight: normal;
 }
 
 .table_rows_container tr:last-child td
 {
-    border-bottom: 0;
 }
 .infoPanelTable tr:last-child td
 {
@@ -5220,12 +5252,6 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
     background: #ffffff;
     letter-spacing: 1px;
     float: left;
-    border: burlywood;
-    color: #555;
-}
-
-#buttons_bar_top a{
-    background: #ebedf0;
     color: #555;
 }
 

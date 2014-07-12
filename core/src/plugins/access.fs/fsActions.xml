@@ -1005,7 +1005,7 @@
 					</div>
 				]]></html>
 			</infoPanel>
-			<infoPanel mime="generic_file" attributes="basename,preview_rich,filesize,mimestring,formated_date">
+			<infoPanel mime="generic_file" attributes="basename,preview_rich,filesize,mimestring,formated_date" theme="oxygen,umbra,vision">
 				<messages>
 					<message key="name_string" id="133"/>
 					<message key="size_string" id="127"/>
@@ -1042,7 +1042,42 @@
 				</div>
 				]]></html>
 			</infoPanel>
-			<infoPanel mime="generic_dir" attributes="basename,icon,formated_date">
+			<infoPanel mime="generic_file" attributes="basename,preview_rich,filesize,mimestring,formated_date,ajxp_description" theme="orbit" primary="true">
+				<messages>
+					<message key="name_string" id="133"/>
+					<message key="size_string" id="127"/>
+					<message key="type_string" id="134"/>
+					<message key="modif_string" id="138"/>
+					<message key="header_string" id="341"/>
+				</messages>
+				<html><![CDATA[
+				<div class="infoPanelBasenameTitle">#{basename}</div>
+                <div class="infoPanelImagePreview">
+                    #{preview_rich}
+                </div>
+				<div class="infoPanelAllMetadata">
+				    <div>
+                        <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
+                            <tr class="even">
+                                <td class="infoPanelLabel">#{size_string}</td>
+                                <td class="infoPanelLabel">#{type_string}</td>
+                            </tr>
+                            <tr>
+                                <td class="infoPanelValue">#{filesize}</td>
+                                <td class="infoPanelValue">#{mimestring}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="infoPanelLabel">#{modif_string}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="infoPanelValue">#{ajxp_description}</td>
+                            </tr>
+                        </table>
+                    </div>
+				</div>
+				]]></html>
+			</infoPanel>
+			<infoPanel mime="generic_dir" attributes="basename,icon,formated_date" theme="oxygen,umbra,vision">
 				<messages>
 					<message key="name_string" id="133"/>
 					<message key="modif_string" id="138"/>
@@ -1067,6 +1102,31 @@
                             </table>
 						</div>
 					</div>
+				]]></html>
+			</infoPanel>
+			<infoPanel mime="generic_dir" attributes="basename,icon,formated_date,ajxp_description" theme="orbit">
+				<messages>
+					<message key="name_string" id="133"/>
+					<message key="modif_string" id="138"/>
+					<message key="header_string" id="342"/>
+				</messages>
+				<html><![CDATA[
+                    <div class="infoPanelBasenameTitle">#{basename}</div>
+                    <div class="infoPanelImagePreview">
+                        <img src="AJXP_THEME_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
+                    </div>
+                    <div class="infoPanelAllMetadata">
+                        <div>
+                            <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
+                                <tr>
+                                    <td colspan="2" class="infoPanelLabel">#{modif_string}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="infoPanelValue">#{ajxp_description}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
 				]]></html>
 			</infoPanel>
 		</component_config>
