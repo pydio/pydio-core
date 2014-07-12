@@ -3210,6 +3210,26 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
     cursor: pointer;
 }
 
+#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed{
+    padding: 7px 1px;
+    cursor: default;
+}
+
+#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell{
+    display: none;
+}
+
+#info_panel div.class-FetchedResultPane  div.thumbnail_selectable_cell.detailed div.thumbLabel{
+    font-weight: lighter;
+    font-size: 1.4em;
+    color: #555;
+}
+
+#info_panel div.class-FetchedResultPane div.ajxpNodeProvider:hover{
+    background-color: transparent !important;
+}
+
+
 div.foldedPanel_tooltip{
     width: 210px !important;
     background-color: #399997;

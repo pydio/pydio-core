@@ -71,6 +71,19 @@
             <serverCallback methodName="persistChangeHookToFeed" hookName="node.change" defer="true"/>
             <serverCallback methodName="persistNotificationToAlerts" hookName="msg.notification"/>
         </hooks>
+        <client_configs>
+            <component_config className="InfoPanel">
+                <infoPanelExtension mime="generic_dir,generic_file" attributes="" modifier="NotificationLoader.prototype.loadInfoPanel">
+                    <messages>
+                        <message key="type_string" id="share_center.50"/>
+                    </messages>
+                    <html><![CDATA[
+                        <div id="ajxp_activity_panel">
+                        </div>
+                    ]]></html>
+                </infoPanelExtension>
+            </component_config>
+        </client_configs>
     </registry_contributions>
     <dependencies>
         <activePlugin pluginName="core.conf"/>

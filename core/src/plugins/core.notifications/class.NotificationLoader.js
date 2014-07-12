@@ -31,7 +31,7 @@ Class.create("NotificationLoader", {
 
     initialize: function(){
 
-        if(window.ajxpMinisite || document.documentElement.hasClassName('ajxp_theme_orbit')) return;
+        if(window.ajxpMinisite || window.ajxpNoNotifLoader) return;
 
         var rP = new RemoteNodeProvider();
         rP.initProvider({get_action:'get_my_feed', format:'xml', connexion_discrete:true});
@@ -293,6 +293,46 @@ Class.create("NotificationLoader", {
         var offset = protoMenu.computeAnchorOffset();
         protoMenu.container.setStyle(offset);
         protoMenu.correctWindowClipping(protoMenu.container, offset, dim);
+    },
+
+    loadInfoPanel : function(container, node){
+        container.down("#ajxp_activity_panel").update('<div class="panelHeader" style="display: none;">'+(node.isLeaf()?'File Activity':'Folder Activity')+'</div><div id="activity_results">Nothing</div>');
+        var resultPane = container.down("#activity_results");
+        var fRp = new FetchedResultPane(resultPane, {
+            "fit":"content",
+            "columnsDef":[
+                {"attributeName":"ajxp_label", "messageId":1, "sortType":"String"},
+                {"attributeName":"event_time", "messageString":"Time", "sortType":"MyDate"},
+                {"attributeName":"event_type", "messageString":"Type", "sortType":"String"}],
+            "silentLoading":true,
+            "fixedSortColumn":"event_time",
+            "fixedSortDirection":"desc",
+            "nodeProviderProperties":{
+                "get_action":"get_my_feed",
+                "connexion_discrete":true,
+                "format":"xml", "current_repository":"true",
+                "feed_type":"notif",
+                "limit":5,
+                "path":(node.isLeaf() || node.isRoot()?node.getPath():node.getPath()+'/'),
+                "merge_description":"true",
+                "description_as_label":node.isLeaf()?"true":"false"
+            }});
+        var pane = container.up('[ajxpClass="InfoPanel"]');
+        fRp._rootNode.observe("loaded", function(){
+            if(pane && pane.ajxpPaneObject){
+                window.setTimeout(function(){
+                    pane.ajxpPaneObject.resize();
+                },0.2);
+            }
+            if(!fRp._rootNode.getChildren().length){
+                container.down('#ajxp_activity_panel > div.panelHeader').hide();
+            }else{
+                container.down('#ajxp_activity_panel > div.panelHeader').show();
+            }
+        });
+        fRp.showElement(true);
+
+        // TODO , RESIZE CONTAINER PANEL WHEN DATAMODEL IS REFRESHED - OR HIDE THE TITLE
     }
 
 });

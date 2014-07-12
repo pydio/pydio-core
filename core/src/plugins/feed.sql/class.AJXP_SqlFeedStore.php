@@ -84,13 +84,15 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
 
     /**
      * @param array $filterByRepositories
-     * @param string $userId
+     * @param $filterByPath
      * @param string $userGroup
      * @param integer $offset
      * @param integer $limit
+     * @param bool $enlargeToOwned
+     * @param string $userId
      * @return An array of stdClass objects with keys hookname, arguments, author, date, repository
      */
-    public function loadEvents($filterByRepositories, $userId, $userGroup, $offset = 0, $limit = 10, $enlargeToOwned = true)
+    public function loadEvents($filterByRepositories, $filterByPath, $userGroup, $offset = 0, $limit = 10, $enlargeToOwned = true, $userId)
     {
         if($this->sqlDriver["password"] == "XXXX") return array();
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
@@ -105,14 +107,33 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
             )
             ORDER BY [edate] DESC %lmt %ofs", "event", $filterByRepositories, $userId, $userId, $userGroup, $limit, $offset);
         } else {
-            $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND
-            ( [repository_id] IN (%s))
-            AND (
-                [repository_scope] = 'ALL'
-                OR  ([repository_scope] = 'USER' AND [user_id] = %s  )
-                OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )
-            )
-            ORDER BY [edate] DESC %lmt %ofs", "event", $filterByRepositories, $userId, $userGroup, $limit, $offset);
+            if(!empty($filterByPath)){
+                $groupByClause = "";
+                if($filterByPath[strlen($filterByPath)-1]=='/'){
+                    $groupByClause = " GROUP BY [index_path] ";
+                }
+                $index_path = "ajxp.fs://".$filterByRepositories[0].$filterByPath."%";
+                $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s
+                AND
+                  ( [repository_id] IN (%s))
+                AND
+                  ([index_path] LIKE %s)
+                AND (
+                    [repository_scope] = 'ALL'
+                    OR  ([repository_scope] = 'USER' AND [user_id] = %s  )
+                    OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )
+                )
+                $groupByClause ORDER BY [edate] DESC %lmt %ofs", "event", $filterByRepositories, $index_path, $userId, $userGroup, $limit, $offset);
+            }else{
+                    $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND
+                ( [repository_id] IN (%s))
+                AND (
+                    [repository_scope] = 'ALL'
+                    OR  ([repository_scope] = 'USER' AND [user_id] = %s  )
+                    OR  ([repository_scope] = 'GROUP' AND [user_group] = %s  )
+                )
+                ORDER BY [edate] DESC %lmt %ofs", "event", $filterByRepositories, $userId, $userGroup, $limit, $offset);
+            }
         }
         $data = array();
         foreach ($res as $n => $row) {

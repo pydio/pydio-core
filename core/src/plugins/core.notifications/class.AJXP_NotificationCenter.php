@@ -128,7 +128,12 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         }
         $offset = isSet($httpVars["offset"]) ? intval($httpVars["offset"]): 0;
         $limit = isSet($httpVars["limit"]) ? intval($httpVars["limit"]): 15;
-        $res = $this->eventStore->loadEvents($authRepos, $userId, $userGroup, $offset, $limit, /*(isSet($httpVars["repository_id"])?false:true)*/false);
+        if(!isSet($httpVars["feed_type"]) || $httpVars["feed_type"] == "notif" || $httpVars["feed_type"] == "all"){
+            $res = $this->eventStore->loadEvents($authRepos, isSet($httpVars["path"])?$httpVars["path"]:"", $userGroup, $offset, $limit, false, $userId);
+        }else{
+            $res = array();
+        }
+
         $mess = ConfService::getMessages();
         $format = "html";
         if (isSet($httpVars["format"])) {
@@ -144,7 +149,9 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         }
 
         // APPEND USER ALERT IN THE SAME QUERY FOR NOW
-        $this->loadUserAlerts("", array_merge($httpVars, array("skip_container_tags" => "true")), $fileVars);
+        if(!isSet($httpVars["feed_type"]) || $httpVars["feed_type"] == "alert" || $httpVars["feed_type"] == "all"){
+            $this->loadUserAlerts("", array_merge($httpVars, array("skip_container_tags" => "true")), $fileVars);
+        }
         restore_error_handler();
         $index = 1;
         foreach ($res as $n => $object) {
@@ -188,8 +195,12 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     // Replace PATH, to make sure they will be distinct children of the loader node
                     $node->real_path = $node->getPath();
                     $node->setLabel(basename($node->getPath()));
-                    if(isSet($httpVars["merge_description"])){
-                        $node->setLabel(basename($node->getPath())." <small>".$node->event_description."</small>");
+                    if(isSet($httpVars["merge_description"]) && $httpVars["merge_description"] == "true"){
+                        if(isSet($httpVars["description_as_label"]) && $httpVars["description_as_label"] == "true"){
+                            $node->setLabel($node->event_description." ".$node->event_date);
+                        }else{
+                            $node->setLabel(basename($node->getPath())." <small class='notif_desc'>".$node->event_description." ".$node->event_date."</small>");
+                        }
                     }
                     $url = parse_url($node->getUrl());
                     $node->setUrl($url["scheme"]."://".$url["host"]."/notification_".$index);
@@ -238,10 +249,10 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         if (isSet($httpVars["repository_id"]) && $u->mergedRole->canRead($httpVars["repository_id"])) {
             $repositoryFilter = $httpVars["repository_id"];
         }
-        $res = $this->eventStore->loadAlerts($userId, $repositoryFilter);
         if ($repositoryFilter == null) {
             $repositoryFilter = ConfService::getRepository()->getId();
         }
+        $res = $this->eventStore->loadAlerts($userId, $repositoryFilter);
         if(!count($res)) return;
 
         $format = $httpVars["format"];
