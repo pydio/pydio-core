@@ -3272,17 +3272,50 @@ div.foldedPanel_tooltip td{
 
 }
 
-#info_panel a
-{
+#info_panel a {
     display: inline-block;
-    padding: 4px 8px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-    margin-right: 10px;
+    padding: 4px 10px;
+    margin-right: 1px;
     margin-bottom: 6px;
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 1px;
-    background-color: #eee;
+    background-color: rgba(107, 107, 107, 0.87);
+    color: #fff;
+    font-family: "Open Sans Regular";
+    -webkit-font-smoothing:auto;
+}
+
+
+.panelContent span.ajxp_icon_span {
+    color: #ffffff;
+    margin-right: 5px;
+}
+
+.panelContent div.toolbarGroup a:first-child {
+    border-radius: 30px 0 0 30px;
+}
+
+.panelContent div.toolbarGroup a:last-child{
+    border-radius: 0 30px 30px 0;
+}
+
+.panelContent div.toolbarGroup a:last-child:first-child{
+    border-radius: 30px;
+}
+
+.panelContent a#open_with_button span.ajxp_icon_span,
+.panelContent span#open_with_button_label{
+    display: none;
+}
+
+.panelContent div#info_panel_share_toolbar a{
+    background-color: #4aCEB0;
+    border-radius: 30px;
+}
+
+div.infoPanelImagePreview img {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
 }
 
 #info_panel a:hover
@@ -3308,6 +3341,8 @@ div.infoPanelBasenameTitle{
     color: #555;
     margin: 9px 15px;
     line-height: 1.5em;
+    text-align: left;
+    margin-top: 0;
 }
 
 .infoPanelTable,
@@ -3353,32 +3388,56 @@ div.infoPanelLabel{
 
 .panelContent div.panelHeader{
     font-size: 1.3em;
-    padding: 16px 0 16px 0;
+    padding: 24px 0 8px 0;
     text-transform: uppercase;
     color: #222;
 }
 
 .panelContent div.panelHeader:before{
-    content:"> ";
+    /*content:"> ";*/
 }
 
 .panelContent.scrolling div.panelHeader{
-    padding-right: 13px;
+    /*padding-right: 13px;*/
+}
+
+.panelContent div.panelHeader a[data-ajxpAction]{
+    float:right;
+    cursor:pointer;
+    text-transform:none;
+    margin-top:-3px;
+    border-radius: 30px;
+}
+
+.panelContent div.toolbar_placeholder{
+    display: inline-block;
+}
+
+.panelContent div.toolbarGroup{
+    text-align: center;
 }
 
 tr td.infoPanelLabel
 {
 }
 
+div.one_has_many > div.toolbar_placeholder.has_many > div.toolbarGroup {
+    min-width: 250px;
+}
+
+div.one_has_many > div.toolbar_placeholder.one_or_less > div.toolbarGroup a {
+    width: 211px;
+}
+
 .infoPanelImagePreview
 {
     text-align:center;
-    padding: 10px 0;
+    padding: 10px 6px;
+    position: relative;
     background-color: white; 
-    /* border: 1px solid #d5d5d5; */ 
-    margin: 10px 14px; 
+    margin: 10px 14px;
     border-radius: 5px;
-    box-shadow: 0px 0px 4px rgba(0,0,0,0.25);
+    box-shadow: 0 0 7px rgba(0,0,0,0.25);
 }
 .infoPanelImagePreview img
 {

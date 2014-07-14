@@ -78,7 +78,7 @@
                         <message key="type_string" id="share_center.50"/>
                     </messages>
                     <html><![CDATA[
-                        <div id="ajxp_activity_panel">
+                        <div id="ajxp_activity_panel" data-infoPanelPosition="last">
                         </div>
                     ]]></html>
                 </infoPanelExtension>

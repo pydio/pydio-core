@@ -27,7 +27,9 @@ Class.create("ExifCellRenderer", {
 		if(latiCell && longiCell && latiCell.innerHTML && longiCell.innerHTML){
 			var object = new ExifCellRenderer();
 			object.transformGeoCells(latiCell, longiCell);
-		}		
+		}else if(latiCell && longiCell){
+            latiCell.up('table').up('div').hide();
+        }
 	},
 	
 	transformGeoCells : function(latiCell, longiCell){

@@ -362,6 +362,7 @@ Class.create("InfoPanel", AjxpPane, {
 			var tAttributes = templateData[1];
 			var tMessages = templateData[2];
 			var tModifier = templateData[3];
+            var tPosition = templateData[4];
 			if(!tArgs){
 				tArgs = new Object();
 			}
@@ -371,9 +372,8 @@ Class.create("InfoPanel", AjxpPane, {
 				var metadata = fileNode.getMetadata();			
 				tAttributes.each(function(attName){				
 					if(attName == 'basename' && metadata.get('filename')){
-						this[attName] = getBaseName(metadata.get('filename'));						
-					}
-					else if(attName == 'compute_image_dimensions'){
+						this[attName] = getBaseName(metadata.get('filename'));
+					} else if(attName == 'compute_image_dimensions'){
 						if(metadata.get('image_width') && metadata.get('image_height')){
 							var width = metadata.get('image_width');
 							var height = metadata.get('image_height');
@@ -386,14 +386,11 @@ Class.create("InfoPanel", AjxpPane, {
 							dimAttr = 'height="64" width="64"';
 						}
 						this[attName] = dimAttr;
-					}
-					else if(attName == 'preview_rich'){
+					} else if(attName == 'preview_rich'){
 						this[attName] = oThis.getPreviewElement(fileNode, true);
-					}
-					else if(attName == 'encoded_filename' && metadata.get('filename')){
+					} else if(attName == 'encoded_filename' && metadata.get('filename')){
 						this[attName] = encodeURIComponent(metadata.get('filename'));					
-					}
-					else if(attName == 'escaped_filename' && metadata.get('filename')){
+					} else if(attName == 'escaped_filename' && metadata.get('filename')){
 						this[attName] = escape(encodeURIComponent(metadata.get('filename')));					
 					}else if(attName == 'formated_date' && metadata.get('ajxp_modiftime')){
 						var modiftime = metadata.get('ajxp_modiftime');
@@ -404,8 +401,7 @@ Class.create("InfoPanel", AjxpPane, {
 							date.setTime(parseInt(metadata.get('ajxp_modiftime'))*1000);
 							this[attName] = formatDate(date);
 						}
-					}
-					else if(attName == 'uri'){
+					} else if(attName == 'uri'){
 						var url = document.location.href;
 						if(url[(url.length-1)] == '/'){
 							url = url.substr(0, url.length-1);
@@ -413,11 +409,9 @@ Class.create("InfoPanel", AjxpPane, {
 							url = url.substr(0, url.lastIndexOf('/'));
 						}
 						this[attName] = url;
-					}
-					else if(metadata.get(attName)){
+					} else if(metadata.get(attName)){
 						this[attName] = metadata.get(attName);
-					}
-					else{ 
+					} else{
 						this[attName] = '';
 					}
 				}.bind(tArgs));
@@ -436,6 +430,15 @@ Class.create("InfoPanel", AjxpPane, {
 				modifierFunc(this.contentContainer, fileNode);
 			}
 		}
+        if(this.contentContainer.down('#info_panel_primary') && this.contentContainer.down('div.infoPanelAllMetadata')){
+            this.contentContainer.select('[data-infoPanelPosition]').each(function(ip){
+                if(ip.readAttribute('data-infoPanelPosition') == 'first'){
+                    this.contentContainer.down('#info_panel_primary').insert({after:ip});
+                }else if(ip.readAttribute('data-infoPanelPosition') == 'last'){
+                    this.contentContainer.down('div.infoPanelAllMetadata').insert(ip);
+                }
+            }.bind(this));
+        }
 	},
 		
 	/**
@@ -443,6 +446,28 @@ Class.create("InfoPanel", AjxpPane, {
 	 * @param selectionType String 'empty', 'multiple', 'unique'
 	 */
 	addActions: function(selectionType){
+        if(this.contentContainer.down('div.toolbar_placeholder')){
+            this.contentContainer.select('div.toolbar_placeholder').each(function(placeholder){
+                var tbId = placeholder.readAttribute("data-toolbarId");
+                var bar = new ActionsToolbar(placeholder, {
+                    toolbarsList : $A([tbId]),
+                    manager:ajaxplorer.actionBar
+                });
+                bar.actionsLoaded();
+                if(bar.registeredButtons){
+                    bar.registeredButtons.each(function(B){
+                        B.ACTION.fireSelectionChange(ajaxplorer.getContextHolder());
+                    });
+                }
+                placeholder.select('a.disabled,a.action_hidden').invoke('remove');
+                if(placeholder.select('a').length>1){
+                    placeholder.addClassName('has_many');
+                    placeholder.up('div').addClassName('one_has_many');
+                }else{
+                    placeholder.addClassName('one_or_less');
+                }
+            }.bind(this));
+        }
         if(this.options.skipActions) return;
 		var actions = ajaxplorer.actionBar.getActionsForAjxpWidget("InfoPanel", this.htmlElement.id);
 		if(!actions.length) return;
@@ -501,6 +526,7 @@ Class.create("InfoPanel", AjxpPane, {
             }
 			var messages = new Hash();
 			var modifier = panels[i].getAttribute('modifier') || '';
+			var position = panels[i].getAttribute('position') || '';
 			var htmlContent = '';
 			var panelChilds = panels[i].childNodes;
 			for(j=0;j<panelChilds.length;j++){
@@ -519,7 +545,7 @@ Class.create("InfoPanel", AjxpPane, {
 			if(this.mimesTemplates.get(tId)){
 				continue;
 			}
-			this.mimesTemplates.set(tId, $A([htmlContent,attributes, messages, modifier]));
+			this.mimesTemplates.set(tId, $A([htmlContent,attributes, messages, modifier,position]));
             var primary = panels[i].getAttribute('primary');
 
 			$A(panelMimes.split(",")).each(function(mime){

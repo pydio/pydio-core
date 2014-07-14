@@ -33,10 +33,10 @@
                             <div id="files_list_header" ajxpClass="AjxpPane">
                                 <div id="display_toolbar" class="text_only" ajxpClass="ActionsToolbar" ajxpOptions='{"flexTo":"files_list_header", "submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                                 <div style="float:left;" ajxpClass="AjxpPane"  id="buttons_bar_cont">
-                                    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["navigation","get"],"groupOtherToolbars":["more", "change", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                                    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["navigation", "change_main"],"groupOtherToolbars":["more", "change", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                                 </div>
                             </div>
-                            <div id="vertical_splitter" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA":"70%", "minB":260,"fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"B", "invisibleBar": true}'>
+                            <div id="vertical_splitter" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA":"70%", "minB":290,"fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"B", "invisibleBar": true}'>
                                 <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"files_lit_pane", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
                                 <div id="info_panel" ajxpClass="InfoPanel" style="top:0;" ajxpOptions='{"replaceScroller":"true", "skipActions":true,"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["filter","vertical_splitter-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'></div>
                             </div>

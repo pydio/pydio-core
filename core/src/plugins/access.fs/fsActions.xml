@@ -145,7 +145,7 @@
 			<gui text="88" title="88" src="download_manager.png" iconClass="icon-download-alt" accessKey="download_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="true"
-					actionBarGroup="get,inline">
+					actionBarGroup="get,inline,info_panel">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="false" enableRoot="true"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
@@ -322,11 +322,26 @@
                 </serverCallback>
 				</processing>
 		</action>
+        <action name="open_with_unique">
+            <gui text="462" title="462" src="fileopen.png" iconClass="icon-eye-close" accessKey="preview_access_key" hasAccessKey="true">
+                <context selection="true" dir="" recycle="hidden"  behaviour="hidden"
+                         actionBar="true" contextMenu="true" infoPanel="false"
+                         actionBarGroup="inline,info_panel" inZip="false">
+                </context>
+                <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE,^ajxp_browsable_archive,^zip" behaviour="hidden"/></gui>
+            <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
+            <processing>
+                <clientCallback prepareModal="false"><![CDATA[
+                    var editorData = window.actionArguments[0];
+                    ajaxplorer.openCurrentSelectionInEditor(editorData);
+                ]]></clientCallback>
+            </processing>
+        </action>
         <action name="open_with" fileDefault="true">
             <gui text="316" title="316" src="fileopen.png" iconClass="icon-eye-close" accessKey="open_with_access" hasAccessKey="true">
                 <context selection="true" dir="" recycle="hidden"  behaviour="hidden"
                     actionBar="true" contextMenu="true" infoPanel="false"
-                    actionBarGroup="get" inZip="false">
+                    actionBarGroup="get,info_panel" inZip="false">
                 </context>
                 <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE,^ajxp_browsable_archive,^zip" behaviour="hidden"/></gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
@@ -368,21 +383,6 @@
                     }
                 ]]></dynamicBuilder>
             </subMenu>
-            <processing>
-                <clientCallback prepareModal="false"><![CDATA[
-                    var editorData = window.actionArguments[0];
-                    ajaxplorer.openCurrentSelectionInEditor(editorData);
-                ]]></clientCallback>
-                </processing>
-        </action>
-        <action name="open_with_unique">
-            <gui text="462" title="462" src="fileopen.png" iconClass="icon-eye-close" accessKey="preview_access_key" hasAccessKey="true">
-                <context selection="true" dir="" recycle="hidden"  behaviour="hidden"
-                    actionBar="true" contextMenu="true" infoPanel="false"
-                    actionBarGroup="inline" inZip="false">
-                </context>
-                <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE,^ajxp_browsable_archive,^zip" behaviour="hidden"/></gui>
-            <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
             <processing>
                 <clientCallback prepareModal="false"><![CDATA[
                     var editorData = window.actionArguments[0];
@@ -581,7 +581,7 @@
 			<gui text="6" title="158" src="applix.png" accessKey="rename_access_key" iconClass="icon-pencil" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="change" inZip="false">
+					actionBarGroup="change_main" inZip="false">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="true" image="false" editable="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
@@ -738,7 +738,7 @@
 			<gui text="70" title="160" src="editpaste.png" iconClass="icon-paste" accessKey="move_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="change" inZip="false">
+					actionBarGroup="change_main" inZip="false">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" editable="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
@@ -819,7 +819,7 @@
 			<gui text="7" title="161" src="editdelete.png" iconClass="icon-trash" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="change" inZip="false">
+					actionBarGroup="change_main" inZip="false">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" editable="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
@@ -1051,12 +1051,14 @@
 					<message key="header_string" id="341"/>
 				</messages>
 				<html><![CDATA[
-				<div class="infoPanelBasenameTitle">#{basename}</div>
                 <div class="infoPanelImagePreview">
+				    <div class="infoPanelBasenameTitle">#{basename}</div>
                     #{preview_rich}
+                    <br><div class="toolbar_placeholder" data-toolbarId="info_panel" style="margin-top: 15px;"></div>
+                    <div class="toolbar_placeholder" data-toolbarId="info_panel_share"></div>
                 </div>
 				<div class="infoPanelAllMetadata">
-				    <div>
+				    <div id="info_panel_primary">
                         <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
                             <tr class="even">
                                 <td class="infoPanelLabel">#{size_string}</td>
@@ -1111,12 +1113,14 @@
 					<message key="header_string" id="342"/>
 				</messages>
 				<html><![CDATA[
-                    <div class="infoPanelBasenameTitle">#{basename}</div>
                     <div class="infoPanelImagePreview">
+                        <div class="infoPanelBasenameTitle">#{basename}</div>
                         <img src="AJXP_THEME_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
+                        <br><div class="toolbar_placeholder" data-toolbarId="info_panel" style="margin-top: 15px;"></div>
+                        <div class="toolbar_placeholder" data-toolbarId="info_panel_share"></div>
                     </div>
                     <div class="infoPanelAllMetadata">
-                        <div>
+                        <div id="info_panel_primary">
                             <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
                                 <tr>
                                     <td colspan="2" class="infoPanelLabel">#{modif_string}</td>

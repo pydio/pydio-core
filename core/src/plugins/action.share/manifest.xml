@@ -77,7 +77,7 @@
                      iconClass="icon-share" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden"
                              actionBar="true" contextMenu="true" infoPanel="true"
-                             actionBarGroup="get" behaviour="hidden">
+                             actionBarGroup="get,info_panel_share" behaviour="hidden">
                     </context>
                     <selectionContext dir="true" unique="false" behaviour="hidden"
                                       evalMetadata="(!metadata.get('ajxp_mime') || !metadata.get('ajxp_mime').startsWith('shared_')) &amp;&amp; !metadata.get('ajxp_shared')"
@@ -94,8 +94,7 @@
             </action>
             <action name="share">
                 <gui text="292" title="292" src="share.png" iconClass="icon-share" hasAccessKey="false">
-                    <context selection="true" dir="" recycle="hidden" actionBar="false" contextMenu="false" infoPanel="false">
-                    </context>
+                    <context selection="true" dir="" recycle="hidden" actionBar="false" contextMenu="false" infoPanel="false"/>
                     <selectionContext dir="false" evalMetadata="!metadata.get('ajxp_mime') || !metadata.get('ajxp_mime').startsWith('shared_')" file="true" recycle="false" unique="false"/>
                 </gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
@@ -303,7 +302,7 @@
             </action>
             <action name="share-edit-shared">
                 <gui src="share.png" iconClass="icon-share" text="share_center.125" title="share_center.126">
-                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="get,share_list_toolbar" behaviour="hidden"/>
+                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="get,share_list_toolbar,info_panel_share" behaviour="hidden"/>
                     <selectionContext dir="true" file="true" evalMetadata="metadata.get('ajxp_shared')" recycle="false" unique="true" behaviour="hidden"/>
                 </gui>
                 <processing>
@@ -578,7 +577,7 @@
                         <message key="type_string" id="share_center.50"/>
                     </messages>
                     <html><![CDATA[
-                        <div id="ajxp_shared_info_panel">
+                        <div id="ajxp_shared_info_panel" data-infoPanelPosition="first">
                             <div class="panelHeader infoPanelGroup" colspan="2"><span class="icon-share" data-ajxpAction="share-edit-shared" title="AJXP_MESSAGE[share_center.55]"></span>#{type_string}</div>
                             <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0"></table>
                         </div>

@@ -435,9 +435,11 @@ Class.create("ActionsToolbar", {
 
 		action.observe("hide", function(){
 			button.hide();
+            button.addClassName("action_hidden");
 		}.bind(this));
 		action.observe("show", function(){
 			button.show();
+            button.removeClassName("action_hidden");
 		}.bind(this));
 		action.observe("disable", function(){
 			button.addClassName("disabled");

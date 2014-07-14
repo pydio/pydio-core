@@ -117,12 +117,14 @@
                         <message key="dim_string" id="135"/>
                     </messages>
                     <html><![CDATA[
-                        <div class="infoPanelBasenameTitle">#{basename}</div>
                         <div class="infoPanelImagePreview">
+                            <div class="infoPanelBasenameTitle">#{basename}</div>
                             #{preview_rich}
+                            <div class="toolbar_placeholder" data-toolbarId="info_panel" style="margin-top: 15px;"></div>
+                            <div class="toolbar_placeholder" data-toolbarId="info_panel_share"></div>
                         </div>
                         <div class="infoPanelAllMetadata">
-                            <div>
+                            <div id="info_panel_primary">
                                 <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
                                     <tr class="even">
                                         <td class="infoPanelLabel">#{size_string}</td>
