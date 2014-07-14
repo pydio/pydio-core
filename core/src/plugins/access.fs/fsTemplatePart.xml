@@ -3,9 +3,9 @@
     <client_configs>
         <template_part ajxpClass="AjxpPane" ajxpId="orbit_content" ajxpOptions="{}" theme="orbit"><![CDATA[
             <div id="workspace_toolbar" ajxpClass="AjxpPane" class="skipSibling">
-                <div id="repo_chooser" style="width:15px;" ajxpClass="RepositorySelect" ajxpOptions='{"menuPosition": "bottom middle", "menuOffsetTop":5, "menuOffsetLeft":126, "menuMaxHeight":535, "menuEvent":"over", "simpleLabel":"<span class=\"icon-caret-down\"></span>"}'></div>
+                <div id="repo_chooser" style="width:15px;" ajxpClass="RepositorySelect" ajxpOptions='{"menuPosition": "bottom middle", "menuOffsetTop":5, "menuOffsetLeft":116, "menuEvent":"over", "simpleLabel":"<span class=\"icon-caret-down\"></span>"}'></div>
                 <div id="breadcrumb" class="breadcrumbs-one" ajxpClass="Breadcrumb" ajxpOptions='{"use_ul":true, "always_show_root":true, "hide_home_icon":true, "flexTo":"workspace_toolbar", "flexToMargin":80, "checkSiblings":true}'></div>
-                <div style="float:right;width:210px;margin-top:14px;" ajxpClass="AjxpPane" ajxpOptions='{}' id="search_engine_cont">
+                <div style="float:right;margin-top:14px;" ajxpClass="AjxpPane" ajxpOptions='{}' id="search_engine_cont">
                     <div id="buttons_bar_top" style="float:right;" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                 </div>
                 <div id="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "openSearchInput":"true", "toggleResultsFitTo":"ajxp_desktop", "fitMarginBottom":20}'></div>

@@ -324,10 +324,12 @@ Class.create("NotificationLoader", {
                     pane.ajxpPaneObject.resize();
                 },0.2);
             }
-            if(!fRp._rootNode.getChildren().length){
-                container.down('#ajxp_activity_panel > div.panelHeader').hide();
-            }else{
-                container.down('#ajxp_activity_panel > div.panelHeader').show();
+            if(container.down('#ajxp_activity_panel > div.panelHeader')){
+                if(!fRp._rootNode.getChildren().length){
+                    container.down('#ajxp_activity_panel > div.panelHeader').hide();
+                }else{
+                    container.down('#ajxp_activity_panel > div.panelHeader').show();
+                }
             }
         });
         fRp.showElement(true);

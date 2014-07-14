@@ -36,7 +36,7 @@ Class.create("UserDashboardHome", AjxpPane, {
             }
             oFormObject.down("#logo_div").down("img").src = url;
         }
-        oFormObject.down("#welcome").update( MessageHash['user_dash.40'].replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME") || ajaxplorer.user.id));
+        oFormObject.down("#welcome").update( MessageHash['user_home.40'].replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME") || ajaxplorer.user.id));
 
         var wsElement = oFormObject.down('#workspaces_list');
         attachMobileScroll(wsElement, 'vertical');
@@ -60,6 +60,31 @@ Class.create("UserDashboardHome", AjxpPane, {
             ajaxplorer.triggerRepositoryChange(repoId);
         };
 
+        var updateWsLegend = function(repoObject){
+            var legendBlock = this.htmlElement.down('#ws_legend');
+            if(!repoObject && this.htmlElement.down('#go_to_ws').CURRENT_REPO_OBJECT){
+                repoObject = this.htmlElement.down('#go_to_ws').CURRENT_REPO_OBJECT;
+            }
+            if(this.timer){
+                window.clearTimeout(this.timer);
+            }
+            if(!repoObject) {
+                //return;
+                this.timer = window.setTimeout(function(){
+                    if(! legendBlock.up('#home_center_panel') ) return;
+                    legendBlock.update('');
+                    legendBlock.up('#home_center_panel').removeClassName('legend_visible');
+                }, 3500);
+                return;
+            }
+            legendBlock.update(repoObject.getLabel() + '<small>' + repoObject.getDescription() + '</small>');
+            legendBlock.insert('<a>Enter workspace</a>');
+            legendBlock.down('a').observe('click', function(){
+                switchToRepo(repoObject.getId());
+            });
+            legendBlock.up('#home_center_panel').addClassName('legend_visible');
+        }.bind(this);
+
         var renderElement = function(repoObject){
 
             var repoId = repoObject.getId();
@@ -76,6 +101,7 @@ Class.create("UserDashboardHome", AjxpPane, {
                 oFormObject.down('#go_to_ws').removeClassName("disabled");
                 oFormObject.down('#save_ws_choice').removeClassName("disabled").disabled = false;
                 oFormObject.down('#go_to_ws').CURRENT_REPO_ID = repoId;
+                oFormObject.down('#go_to_ws').CURRENT_REPO_OBJECT = repoObject;
             };
             repoEl.observe("click", select);
             attachMobilTouchForClick(repoEl, select);
@@ -85,16 +111,22 @@ Class.create("UserDashboardHome", AjxpPane, {
                 Event.findElement(e, "li").setOpacity(0.7);
                 switchToRepo(repoId);
             });
+            repoEl.observe("mouseover", function(){
+                updateWsLegend(repoObject);
+            });
+            repoEl.observe("mouseout", function(){
+                updateWsLegend(null);
+            });
 
         };
 
         var myWS = ajaxplorer.user.repositories.filter(function(pair){
-            return (pair.value.owner === '' && pair.value.getAccessType() != 'ajxp_user');
+            return (pair.value.owner === '' && !pair.value.getAccessType().startsWith('ajxp_'));
         }).sortBy(function(pair){
             return (pair.value.getLabel());
         });
         var sharedWS = ajaxplorer.user.repositories.filter(function(pair){
-            return (pair.value.owner !== '' && pair.value.getAccessType() != 'ajxp_user');
+            return (pair.value.owner !== '' && !pair.value.getAccessType().startsWith('ajxp_'));
         }).sortBy(function(pair){
             return (pair.value.getLabel());
         });
@@ -109,87 +141,43 @@ Class.create("UserDashboardHome", AjxpPane, {
             sharedWS.each(function(pair){renderElement(pair.value);});
         }
 
+        if(oFormObject.next('div#videos_pane')){
+            oFormObject.next('div#videos_pane').select('div.tutorial_load_button').invoke("observe", "click", function(e){
+                var t = Event.findElement(e, 'div.tutorial_load_button');
+                try{
+                    var main = t.up('div.tutorial_legend');
+                    main.next('iframe').src = main.readAttribute('data-videoSrc');
+                }catch(e){}
+            });
+        }
+
         oFormObject.down('#go_to_ws').observe("click", function(e){
             var target = e.target;
             switchToRepo(target.CURRENT_REPO_ID);
         });
 
-        var notifCenter = ajaxplorer.NotificationLoaderInstance;
-        var notificationElement = oFormObject.down("#notifications_center");
-        attachMobileScroll(notificationElement, "vertical");
-
-        if(false && notifCenter){
-            notifCenter.ajxpNode.observe("loaded", function(){
-                notifCenter.pFactory.setThumbSize(64);
-                var existingItems = notificationElement.select('li');
-                notifCenter.childrenToMenuItems(function(obj){
-                    var a = new Element('li', {title:obj['alt'],style:'position:relative;'}).update(obj['name']);
-                    notificationElement.insert(a);
-                    var img = obj.pFactory.generateBasePreview(obj.ajxpNode);
-                    if(!img.src && !obj.ajxpNode.isLeaf()){
-                        img.src = window.ajxpResourcesFolder + '/images/mimes/64/folder.png';
-                    }
-                    a.IMAGE_ELEMENT = img;
-                    a.insert({top:img});
-                    obj.pFactory.enrichBasePreview(obj.ajxpNode, a);
-                    var moreMenu = new Element('div', {style:'float:right;cursor:pointer;margin-top:20px;margin-right:10px;'});
-                    a.insert({top:moreMenu});
-                    obj.moreActions.each(function(mA){
-                        var mAButton = new Element('span', {className:mA.icon_class, title:mA.name});
-                        mAButton.observe("click", function(e){
-                            mA.callback(e);
-                        });
-                        attachMobilTouchForClick(mAButton, mA.callback);
-                        moreMenu.insert(mAButton);
-                    });
-                });
-                existingItems.invoke('remove');
-                window.setTimeout(function(){
-                    notifCenter.pFactory.setThumbSize(22);
-                }, 10000);
-            });
-
-            var clicker = function(e, skipsave){
-                var save;
-                if(oFormObject.down("#notifications_center").hasClassName('folded')){
-                    oFormObject.down("#workspaces_center").setStyle({marginLeft: '15%'});
-                    oFormObject.down("#notifications_center").setStyle({width: '30%'});
-                    save = 'opened';
-                }else{
-                    oFormObject.down("#workspaces_center").setStyle({marginLeft: '30%'});
-                    oFormObject.down("#notifications_center").setStyle({width: '0'});
-                    save = 'closed';
-                }
-                oFormObject.down("#notifications_center").toggleClassName('folded');
-                if(!skipsave){
-                    this.setUserPreference('dashboard-notification-center', save);
-                }
-            }.bind(this);
-            oFormObject.down("#close-icon").observe("click", clicker);
-
-            var pref = this.getUserPreference('dashboard-notification-center');
-            if(pref == undefined){
-                window.setTimeout(function(){clicker(null, true);}, 4000);
-            }else if(pref == 'closed'){
-                clicker(null, true);
-            }
-        }else{
-            //oFormObject.down("#workspaces_center").setStyle({marginLeft: '30%'});
-            notificationElement.hide();
-        }
-
-        if(ajaxplorer.getPluginConfigs('ajxpdriver[@id=\'access.ajxp_user\']').get("ENABLE_GETTING_STARTED")){
-            oFormObject.down("#welcome").insert(MessageHash["user_dash.55"].replace("<a>", "<a id='get_started_link' href='#' onclick='javascript:$(\"userdashboard_main_tab\").ajxpPaneObject.switchTabulator(\"tutorials\")'>"));
-        }
-
         if(ajaxplorer.actionBar.getActionByName("logout")){
-            oFormObject.down("#welcome").insert('<small>'+MessageHash["user_dash.67"].replace("%logout", "<span id='disconnect_link'></span>").replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME") || ajaxplorer.user.id)+'</small>');
+            oFormObject.down("#welcome").insert('<small>'+MessageHash["user_home.67"].replace("%logout", "<span id='disconnect_link'></span>").replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME") || ajaxplorer.user.id)+'</small>');
             oFormObject.down('#disconnect_link').update("<a>"+ajaxplorer.actionBar.getActionByName("logout").options.text.toLowerCase()+"</a>");
             oFormObject.down('#disconnect_link').observe("click", function(e){
                 ajaxplorer.actionBar.fireAction("logout");
             });
         }
 
+        if(ajaxplorer.getPluginConfigs('ajxpdriver[@id=\'access.ajxp_home\']').get("ENABLE_GETTING_STARTED")){
+            var obj = oFormObject.down("#welcome");
+            if(oFormObject.down("#welcome > small")) obj = oFormObject.down("#welcome > small");
+            var span = new Element('span').update('<br>' + MessageHash["user_home.55"]);
+            span.down('a').observe('click', function(){ $('videos_pane').setStyle({display:'block'}); });
+            obj.insert(span);
+        }
+
+
+        try{
+            window.setTimeout(function(){
+                $("orbit_content").ajxpPaneObject.resize();
+            }, 0);
+        }catch(e){}
 
     },
 
@@ -197,7 +185,7 @@ Class.create("UserDashboardHome", AjxpPane, {
 
         $super(size);
 
-        fitHeightToBottom(this.htmlElement.down('#workspaces_center'), this.htmlElement, 0);
+        //fitHeightToBottom(this.htmlElement.down('#workspaces_center'), this.htmlElement, 0);
     }
 
 

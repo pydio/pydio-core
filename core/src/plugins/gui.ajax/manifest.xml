@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<guidriver name="ajxp_client" label="CONF_MESSAGE[Client Plugin]" description="CONF_MESSAGE[Browser-based rich interface. Contains configurations for theming, custom welcome message, etc.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<guidriver id="gui.ajax" label="CONF_MESSAGE[Client Plugin]" description="CONF_MESSAGE[Browser-based rich interface. Contains configurations for theming, custom welcome message, etc.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
             <i18n namespace="ajax_gui" path="plugins/gui.ajax/res/i18n"/>
@@ -45,6 +45,79 @@
 		<global_param name="GOOGLE_ANALYTICS_ID" group="CONF_MESSAGE[Google Analytics]" type="string" label="CONF_MESSAGE[Analytics ID]" description="CONF_MESSAGE[Id of your GA account, something like UE-XXXX-YY]" mandatory="false"/>
 		<global_param name="GOOGLE_ANALYTICS_DOMAIN" group="CONF_MESSAGE[Google Analytics]" type="string" label="CONF_MESSAGE[Analytics Domain]" description="CONF_MESSAGE[Set the domain for yuor analytics reports (not mandatory!)]" mandatory="false"/>
 		<global_param name="GOOGLE_ANALYTICS_EVENT" group="CONF_MESSAGE[Google Analytics]" type="boolean" label="CONF_MESSAGE[Analytics Events]" description="CONF_MESSAGE[Use Events Logging, experimental only implemented on download action in Pydio]" mandatory="false" default="false"/>
+
+        <global_param name="WELCOME_PAGE_BACKGROUND_1" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Custom Background (1)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/01.jpg"
+                      expose="true"
+                />
+        <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_1" group="CONF_MESSAGE[Page Background Images]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:140%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
+                      label="CONF_MESSAGE[Background Attributes(1)]" description="CONF_MESSAGE[Image used as a background]"
+                      mandatory="false" expose="true" default="background-repeat:repeat;background-size:140%;background-position:50% 50%;"/>
+
+        <global_param name="WELCOME_PAGE_BACKGROUND_2" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Custom Background (2)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/02.jpg"
+                      expose="true"
+                />
+        <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_2" group="CONF_MESSAGE[Page Background Images]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:140%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
+                      label="CONF_MESSAGE[Background Attributes(2)]" description="CONF_MESSAGE[Image used as a background]"
+                      mandatory="false" expose="true" default="background-repeat:repeat;background-size:140%;background-position:50% 50%;"/>
+
+        <global_param name="WELCOME_PAGE_BACKGROUND_3" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Custom Background (3)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/03.jpg"
+                      expose="true"
+                />
+        <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_3" group="CONF_MESSAGE[Page Background Images]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:140%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
+                      label="CONF_MESSAGE[Background Attributes(3)]" description="CONF_MESSAGE[Image used as a background]"
+                      mandatory="false" expose="true" default="background-repeat:repeat;background-size:140%;background-position:50% 50%;"/>
+
+        <global_param name="WELCOME_PAGE_BACKGROUND_4" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Custom Background (4)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/04.jpg"
+                      expose="true"
+                />
+        <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_4" group="CONF_MESSAGE[Page Background Images]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:140%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
+                      label="CONF_MESSAGE[Background Attributes(4)]" description="CONF_MESSAGE[Image used as a background]"
+                      mandatory="false" expose="true" default="background-repeat:repeat;background-size:140%;background-position:50% 50%;"/>
+
+        <global_param name="WELCOME_PAGE_BACKGROUND_5" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Custom Background (5)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/05.jpg"
+                      expose="true"
+                />
+        <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_5" group="CONF_MESSAGE[Page Background Images]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:140%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
+                      label="CONF_MESSAGE[Background Attributes(5)]" description="CONF_MESSAGE[Image used as a background]"
+                      mandatory="false" expose="true" default="background-repeat:repeat;background-size:140%;background-position:50% 50%;"/>
+
+        <global_param name="WELCOME_PAGE_BACKGROUND_6" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Custom Background (6)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/06.jpg"
+                      expose="true"
+                />
+        <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_6" group="CONF_MESSAGE[Page Background Images]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:140%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
+                      label="CONF_MESSAGE[Background Attributes(6)]" description="CONF_MESSAGE[Image used as a background]"
+                      mandatory="false" expose="true" default="background-repeat:repeat;background-size:140%;background-position:50% 50%;"/>
+
 	</server_settings>
 	<class_definition filename="plugins/gui.ajax/class.AJXP_ClientDriver.php" classname="AJXP_ClientDriver"/>
 	<registry_contributions>
@@ -161,10 +234,16 @@
 				</div>
 			]]></template>
             <template name="main_orbit" element="ajxp_desktop" position="top" theme="orbit"><![CDATA[
-                <div id="global_toolbar" ajxpClass="LogoWidget">
-                    <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over"}'></div>
+                <div id="background-imager" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_"}'>
+                    <div id="global_toolbar" ajxpClass="LogoWidget">
+                        <div id="clickable_home" title="Home"></div>
+                        <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over"}'></div>
+                    </div>
+                    <div id="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'></div>
                 </div>
-                <div id="orbit_content" ajxpClass="AjxpPane"></div>
+                <script>
+                    $('clickable_home').observe('click', function(){ ajaxplorer.triggerRepositoryChange('ajxp_home'); });
+                </script>
 			]]></template>
             <template name="widget_umbra" element="ajxp_widget" position="top" theme="umbra"><![CDATA[
 				<div id="toolbars">

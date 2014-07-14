@@ -295,8 +295,8 @@ Class.create("AjxpPane", {
         var plugin = exp[0];
         var paramPrefix = exp[1];
         var registry = ajaxplorer.getXmlRegistry();
-        var configs = XPathSelectNodes(registry, "plugins/ajxp_plugin[@id='"+plugin+"']/plugin_configs/property[contains(@name, '"+paramPrefix+"')]");
-        var defaults = XPathSelectNodes(registry, "plugins/ajxp_plugin[@id='"+plugin+"']/server_settings/global_param[contains(@name, '"+paramPrefix+"') and @defaultImage]");
+        var configs = XPathSelectNodes(registry, "plugins/*[@id='"+plugin+"']/plugin_configs/property[contains(@name, '"+paramPrefix+"')]");
+        var defaults = XPathSelectNodes(registry, "plugins/*[@id='"+plugin+"']/server_settings/global_param[contains(@name, '"+paramPrefix+"') and @defaultImage]");
 
         var bgrounds = {};
         configs.each(function(c){
