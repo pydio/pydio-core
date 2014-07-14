@@ -3,9 +3,16 @@ table.sort-table tr:nth-child(even)
     background-color: #f9f9f9;
 }
 
+/* FONTS */
+
 *{
-    font-family: "Open sans", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-weight: lighter;
+    font-family: "Open Sans Light", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+}
+
+#content_pane div.thumbnail_selectable_cell.detailed div.thumbLabel,
+div.infoPanelBasenameTitle
+{
+    font-family: "Open Sans Regular", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;;
 }
 
 *:focus{
@@ -216,7 +223,6 @@ kbd {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    font-weight: normal;
 }
 
 .thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata{
@@ -3221,7 +3227,7 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
 }
 
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed{
-    padding: 7px 1px;
+    padding: 3px 1px;
     cursor: default;
 }
 
@@ -3230,8 +3236,7 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
 }
 
 #info_panel div.class-FetchedResultPane  div.thumbnail_selectable_cell.detailed div.thumbLabel{
-    font-weight: lighter;
-    font-size: 1.4em;
+    font-size: 1.2em;
     color: #555;
 }
 
@@ -3315,7 +3320,7 @@ div.infoPanelRow
 td.infoPanelValue,
 div.infoPanelValue
 {
-    padding: 0px 0 20px;
+    padding: 0px 0 15px;
     font-size: 1.5em;
     color: #555;
     line-height: 1.3em;
@@ -3330,7 +3335,7 @@ td.infoPanelLabel,
 div.infoPanelLabel
 {
     width: 50%;
-    color: #999;
+    color: #000;
     text-transform: uppercase;
     font-size: 0.9em;
 }
@@ -3349,9 +3354,12 @@ div.infoPanelLabel{
 .panelContent div.panelHeader{
     font-size: 1.3em;
     padding: 16px 0 16px 0;
-
     text-transform: uppercase;
-    color: #555;
+    color: #222;
+}
+
+.panelContent div.panelHeader:before{
+    content:"> ";
 }
 
 .panelContent.scrolling div.panelHeader{
@@ -5144,7 +5152,7 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
 }
 
 .breadcrumbs-one span::before{
-    border-left-color: #fb725c;
+    border-left-color: #ccc;
     right: -1.05em;
     z-index: 1;
 }
@@ -5173,7 +5181,7 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
     display: inline-block;
     cursor: pointer;
     padding: 20px 25px;
-    color: #fb725c;
+    color: #ccc;
 }
 .breadcrumbs-one i.ajxp-goto:hover{
     color: #fb725c;

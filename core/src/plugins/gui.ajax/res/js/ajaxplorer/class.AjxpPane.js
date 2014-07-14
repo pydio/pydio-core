@@ -310,13 +310,14 @@ Class.create("AjxpPane", {
         var paramPrefix = exp[1];
         var registry = ajaxplorer.getXmlRegistry();
         var configs = XPathSelectNodes(registry, "plugins/*[@id='"+plugin+"']/plugin_configs/property[contains(@name, '"+paramPrefix+"')]");
-        var defaults = XPathSelectNodes(registry, "plugins/*[@id='"+plugin+"']/server_settings/global_param[contains(@name, '"+paramPrefix+"') and @defaultImage]");
+        var defaults = XPathSelectNodes(registry, "plugins/*[@id='"+plugin+"']/server_settings/global_param[contains(@name, '"+paramPrefix+"')]");
 
         var bgrounds = {};
         configs.each(function(c){
             bgrounds[c.getAttribute("name")] = c.firstChild.nodeValue.replace(/"/g, '');
         });
         defaults.each(function(d){
+            if(!d.getAttribute('defaultImage')) return;
             var n = d.getAttribute("name");
             if(!bgrounds[n]){
                 bgrounds[n] = d.getAttribute("defaultImage");
