@@ -118,6 +118,17 @@ $REPOSITORIES["ajxp_user"] = array(
     )
 );
 
+$REPOSITORIES["ajxp_home"] = array(
+    "DISPLAY"		    =>	"Welcome",
+    "AJXP_SLUG"		    =>  "welcome",
+    "DISPLAY_ID"		=>	"user_home.title",
+    "DESCRIPTION_ID"	=>	"user_home.desc",
+    "DRIVER"		    =>	"ajxp_home",
+    "DRIVER_OPTIONS"    => array(
+        "DEFAULT_RIGHTS" => "rw"
+    )
+);
+
 // ADMIN REPOSITORY
 $REPOSITORIES["ajxp_conf"] = array(
     "DISPLAY"		    =>	"Settings",
