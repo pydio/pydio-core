@@ -58,6 +58,15 @@ Class.create("AjxpPane", {
 
             }
         }
+        if(this.options.resize_events){
+            this.resizeEvents = $H();
+            this.options.resize_events.each(function(eventName){
+                var binder = this.resize.bind(this);
+                this.resizeEvents.set("ajaxplorer:" + eventName, binder);
+                document.observe("ajaxplorer:" + eventName, binder);
+            }.bind(this) );
+        }
+
         if(this.options.messageBoxReference && ajaxplorer){
             ajaxplorer.registerAsMessageBoxReference(this.htmlElement);
         }
@@ -173,6 +182,11 @@ Class.create("AjxpPane", {
 		this.htmlElement = null;
         if(this.boundSizeEvents){
             this.boundSizeEvents.each(function(pair){
+                document.stopObserving(pair.key, pair.value);
+            });
+        }
+        if(this.resizeEvents){
+            this.resizeEvents.each(function(pair){
                 document.stopObserving(pair.key, pair.value);
             });
         }

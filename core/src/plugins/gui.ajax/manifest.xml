@@ -237,7 +237,7 @@
                 <div id="background-imager" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_"}'>
                     <div id="global_toolbar" ajxpClass="LogoWidget">
                         <div id="clickable_home" title="Home"></div>
-                        <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over"}'></div>
+                        <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over","menuOffsetLeft":11,"menuOffsetTop":11}'></div>
                     </div>
                     <div id="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'></div>
                 </div>
