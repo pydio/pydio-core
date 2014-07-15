@@ -242,7 +242,10 @@
                     <div id="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'></div>
                 </div>
                 <script>
-                    $('clickable_home').observe('click', function(){ ajaxplorer.triggerRepositoryChange('ajxp_home'); });
+                if($('clickable_home')){
+                    if(!$('clickable_home').OBSERVER) $('clickable_home').observe('click', function(){ ajaxplorer.triggerRepositoryChange('ajxp_home'); });
+                    $('clickable_home').OBSERVER = true;
+                }
                 </script>
 			]]></template>
             <template name="widget_umbra" element="ajxp_widget" position="top" theme="umbra"><![CDATA[

@@ -79,23 +79,26 @@ Class.create("Breadcrumb", AjxpPane, {
                     clickPath = "<li>"+clickPath+"</li>";
                 }
             }
+            var pos = 0;
+            var length = parts.keys().length;
             parts.each(function(pair){
                 var refresh = '';
                 if(this.options["use_ul"]){
-                    if(pair.value == lastValue){
+                    if(pos == length-1){
                         refresh = '<i class="icon-refresh ajxp-goto-refresh" title="'+MessageHash[149]+'"></i>';
                     }
-                    var first = pair.value == firstValue ? ' first-bread':'';
+                    var first = pos == 0 ? ' first-bread':'';
                     clickPath += "<li><span class='ajxp-goto "+first+"' data-goTo='"+pair.key+"'><em>"+pair.value+"</em></span></li>";
                     if(refresh){
                         clickPath += "<li><i class='ajxp-goto' data-goTo='"+pair.key+"'>"+refresh+"</i></li>";
                     }
                 }else{
-                    if(pair.value == lastValue){
+                    if(pos == length-1){
                         refresh = '<span class="icon-refresh ajxp-goto-refresh" title="'+MessageHash[149]+'"></span>';
                     }
-                    clickPath += (pair.value != firstValue || !this.options['hide_home_icon'] ? chevron : "") + "<span class='ajxp-goto' data-goTo='"+pair.key+"'>"+pair.value+refresh+"</span>";
+                    clickPath += (pair.value != pos == 0 || !this.options['hide_home_icon'] ? chevron : "") + "<span class='ajxp-goto' data-goTo='"+pair.key+"'>"+pair.value+refresh+"</span>";
                 }
+                pos ++;
             }.bind(this));
             if(this.options['use_ul']){
                 this.element.update("<div class='inner_bread'><ul>" + clickPath + "</ul></div>");
