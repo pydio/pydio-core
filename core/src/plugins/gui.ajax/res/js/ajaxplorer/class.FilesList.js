@@ -1298,6 +1298,7 @@ Class.create("FilesList", SelectableElements, {
         newItem = renderer(child);
         newItem.ajxpNode = child;
         newItem.addClassName("ajxpNodeProvider");
+        if(child.isLeaf()) newItem.addClassName("ajxpNodeLeaf");
         newItem.REPLACE_OBS = this.makeItemRefreshObserver(child, newItem, renderer);
         newItem.REMOVE_OBS = this.makeItemRemovedObserver(child, newItem);
         child.observe("node_replaced", newItem.REPLACE_OBS);
@@ -1389,6 +1390,7 @@ Class.create("FilesList", SelectableElements, {
             newItem = renderer(child);
 			newItem.ajxpNode = child;
             newItem.addClassName("ajxpNodeProvider");
+            if(child.isLeaf()) newItem.addClassName("ajxpNodeLeaf");
             newItem.REPLACE_OBS = this.makeItemRefreshObserver(child, newItem, renderer);
             newItem.REMOVE_OBS = this.makeItemRemovedObserver(child, newItem);
             child.observe("node_replaced", newItem.REPLACE_OBS);

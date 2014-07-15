@@ -312,7 +312,7 @@ Class.create("NotificationLoader", {
                 "connexion_discrete":true,
                 "format":"xml", "current_repository":"true",
                 "feed_type":"notif",
-                "limit":5,
+                "limit":(node.isRoot() ? 15 : 5),
                 "path":(node.isLeaf() || node.isRoot()?node.getPath():node.getPath()+'/'),
                 "merge_description":"true",
                 "description_as_label":node.isLeaf()?"true":"false"

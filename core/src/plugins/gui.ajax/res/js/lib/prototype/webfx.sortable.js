@@ -348,6 +348,7 @@ SortableTable = Class.create({
 			var p = tBody.parentNode;
 			p.removeChild(tBody);
 		}
+        tBody.select('div[data-groupbyvalue]').invoke('remove');
 	
 		// insert in the new order
 		var l = a.length;
@@ -383,6 +384,7 @@ SortableTable = Class.create({
             keys.sort();
             for(var z=0 ; z<keys.length;z++){
                 tBody.insert(all_blocks[keys[z]]);
+                all_blocks[keys[z]].down('h3').insert('<span class="groupBy-count"> ('+all_blocks[keys[z]].select('.ajxpNodeProvider').length+')</span>');
             }
         }
 

@@ -30,6 +30,15 @@ Class.create("VisibilityToggler", AjxpPane, {
 
         var togId = options['widget_id'];
         var detectionId= options['detection_id'] ? options['detection_id'] : options['widget_id'];
+        var updaterScroller = function(){
+            try{
+                if(htmlElement.up('[ajxpClass]').ajxpPaneObject.scrollbar){
+                    htmlElement.up('[ajxpClass]').ajxpPaneObject.scrollbar.recalculateLayout();
+                }
+            }catch(e){}
+        };
+        updaterScroller();
+        window.setTimeout(updaterScroller, 1500);
         htmlElement.observe("click", function(){
             if(!$(togId) || !$(detectionId)) return;
             if($(togId).ajxpPaneObject){
@@ -42,6 +51,8 @@ Class.create("VisibilityToggler", AjxpPane, {
             htmlElement.removeClassName('simple-toggler-show').removeClassName('simple-toggler-hide');
             htmlElement.addClassName($(detectionId).visible()?'simple-toggler-hide':'simple-toggler-show');
             htmlElement.update($(detectionId).visible()?"Hide":"Show");
+            updaterScroller();
+            window.setTimeout(updaterScroller, 1500);
         });
 
     }

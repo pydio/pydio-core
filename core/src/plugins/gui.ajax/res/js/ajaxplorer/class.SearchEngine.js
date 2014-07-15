@@ -77,7 +77,12 @@ Class.create("SearchEngine", AjxpPane, {
 
          this._dataModel.observe("selection_changed", function(){
              var selectedNode = this._dataModel.getSelectedNodes()[0];
-             if(selectedNode) ajaxplorer.goTo(selectedNode);
+             if(selectedNode) {
+                 if(this._ajxpOptions.openSearchInput){
+                     this.closeSearchInput();
+                 }
+                 ajaxplorer.goTo(selectedNode);
+             }
          }.bind(this));
 
     },
@@ -312,8 +317,10 @@ Class.create("SearchEngine", AjxpPane, {
             dataModel:this._dataModel,
             columnsDef:[{attributeName:"ajxp_label", messageId:1, sortType:'String'},
                 {attributeName:"search_score", messageString:'Score', sortType:'Number'},
-                {attributeName:"filename", messageString:'Path', sortType:'String'}
+                {attributeName:"filename", messageString:'Path', sortType:'String'},
+                {attributeName:"mimestring_id", messageString:'Type', sortType:'String'}
             ],
+            groupByData:'mimestring_id',
             displayMode: 'detail',
             fixedDisplayMode: 'detail',
             defaultSortTypes:["String", "String", "String"],
@@ -323,7 +330,7 @@ Class.create("SearchEngine", AjxpPane, {
             replaceScroller:true,
             fit:'height',
             fitParent : this.options.toggleResultsVisibility,
-            detailThumbSize:22,
+            detailThumbSize: this.options.detailThumbSize?this.options.detailThumbSize:22,
             skipSelectFirstOnFocus:true
         });
         ajaxplorer.registerFocusable(this._fileList);
@@ -341,21 +348,23 @@ Class.create("SearchEngine", AjxpPane, {
 			if(e.keyCode == Event.KEY_TAB) return false;
 			return true;		
 		}.bind(this));
-		
-		this._inputBox.observe("focus", function(e){
-			ajaxplorer.disableShortcuts();
-			ajaxplorer.disableNavigation();
-			this.hasFocus = true;
-			this._inputBox.select();
+
+        var opener = function(e){
+            ajaxplorer.disableShortcuts();
+            ajaxplorer.disableNavigation();
+            this.hasFocus = true;
+            this._inputBox.select();
             if(this.hasResults && this._ajxpOptions.toggleResultsVisibility && !$(this._ajxpOptions.toggleResultsVisibility).visible()){
                 this.showToggleResult(true);
             }
             if(this._ajxpOptions.openSearchInput){
                 this.openSearchInput();
             }
-			return false;
-		}.bind(this));
-			
+            return false;
+        }.bind(this);
+		this._inputBox.observe("focus", opener);
+		this._inputBox.observe("click", opener);
+
 		this._inputBox.observe("blur", function(e){
 			ajaxplorer.enableShortcuts();
             ajaxplorer.enableNavigation();
@@ -400,15 +409,22 @@ Class.create("SearchEngine", AjxpPane, {
         container.setStyle({width:width+'px',left:leftPos+'px'});
         container.addClassName("search_active");
         container.addClassName("skipSibling");
+        if(this._inputBox.getValue()){
+            window.setTimeout(function(){
+                this.showToggleResult(true);
+            }.bind(this), 1000);
+        }
     },
     closeSearchInput: function(){
         var container = this.htmlElement;
         container.removeClassName("search_active");
+        this.showToggleResult(false);
+        this._inputBox.blur();
         window.setTimeout(function(){
             container.relativize();
             container.setStyle({position:'relative'});
             container.removeClassName("skipSibling");
-        }, 1000);
+        }.bind(this), 1000);
     },
 
     showToggleResult: function(show){
@@ -441,7 +457,7 @@ Class.create("SearchEngine", AjxpPane, {
             fitHeightToBottom($(this._ajxpOptions.toggleResultsVisibility), (this._ajxpOptions.toggleResultsFitTo?$(this._ajxpOptions.toggleResultsFitTo):null), (this._ajxpOptions.fitMarginBottom?this._ajxpOptions.fitMarginBottom:0));
             fitHeightToBottom($(this._resultsBoxId));
             if(this._ajxpOptions.toggleResultsFitTo && $(this._ajxpOptions.toggleResultsFitTo) && $(this._ajxpOptions.toggleResultsVisibility)){
-                $(this._ajxpOptions.toggleResultsVisibility).setStyle({width:(parseInt($(this._ajxpOptions.toggleResultsFitTo).getWidth()) - 20)+'px'});
+                $(this._ajxpOptions.toggleResultsVisibility).setStyle({width:(parseInt($(this._ajxpOptions.toggleResultsFitTo).getWidth()) - (this._ajxpOptions.toggleResultsOffsetRight!==undefined?this._ajxpOptions.toggleResultsOffsetRight:20))+'px'});
             }
         }else{
             fitHeightToBottom($(this._resultsBoxId), null, (this._ajxpOptions.fitMarginBottom?this._ajxpOptions.fitMarginBottom:0));
@@ -611,7 +627,7 @@ Class.create("SearchEngine", AjxpPane, {
 		$('stop_'+this._searchButtonName).removeClassName("disabled");
         if(this._ajxpOptions.toggleResultsVisibility){
             if(!$(this._ajxpOptions.toggleResultsVisibility).down("div.panelHeader.toggleResults")){
-                $(this._ajxpOptions.toggleResultsVisibility).insert({top:"<div class='panelHeader toggleResults'>Results<span class='close_results icon-remove-sign'></span><div id='display_toolbar'></div></div>"});
+                $(this._ajxpOptions.toggleResultsVisibility).insert({top:"<div class='panelHeader toggleResults'><span class='results_string'>Results</span><span class='close_results icon-remove-sign'></span><div id='display_toolbar'></div></div>"});
                 this.tb = new ActionsToolbar($(this._ajxpOptions.toggleResultsVisibility).down("#display_toolbar"), {submenuClassName:"panelHeaderMenu",submenuPosition:"bottom right",submenuOffsetTop:12,toolbarsList:["ajxp-search-result-bar"],skipBubbling:true, skipCarousel:true,submenuOffsetTop:2});
                 this.tb.actionsLoaded({memo:ajaxplorer.actionBar.actions});
                 this.tb.element.select('a').invoke('show');
@@ -624,8 +640,8 @@ Class.create("SearchEngine", AjxpPane, {
             }
             if($(this._ajxpOptions.toggleResultsVisibility).down("span.close_results")){
                 $(this._ajxpOptions.toggleResultsVisibility).down("span.close_results").observe("click", function(){
-                    this.showToggleResult(false);
                     if(this._ajxpOptions.openSearchInput) this.closeSearchInput();
+                    else this.showToggleResult(false);
                 }.bind(this));
             }
 
@@ -638,7 +654,7 @@ Class.create("SearchEngine", AjxpPane, {
 	},
 
     updateSearchResultPosition:function(panel){
-        var top = (this._inputBox.positionedOffset().top + this._inputBox.getHeight() + 3);
+        var top = (this._inputBox.positionedOffset().top + this._inputBox.getHeight() + (this._ajxpOptions.toggleResultsOffsetTop!==undefined?this._ajxpOptions.toggleResultsOffsetTop:3));
         var left = (this._inputBox.positionedOffset().left);
         if((left + this._fileList.htmlElement.getWidth()) > document.viewport.getWidth() + 10){
             left = document.viewport.getWidth() - this._fileList.htmlElement.getWidth() - 15;
@@ -919,6 +935,7 @@ Class.create("SearchEngine", AjxpPane, {
 		}		
 		if(this._fileList){
             this._fileList.reload();
+            this._fileList._sortableTable.sort(0);
         }
 	},
 	
@@ -935,6 +952,7 @@ Class.create("SearchEngine", AjxpPane, {
 			this.addResult(currentFolder, ajxpNode);
             if(this._fileList){
                 this._fileList.reload();
+                this._fileList._sortableTable.sort(0);
             }
             return;
 		}
@@ -945,6 +963,7 @@ Class.create("SearchEngine", AjxpPane, {
 				this.addResult(currentFolder, ajxpNode, meta);
                 if(this._fileList){
                     this._fileList.reload();
+                    this._fileList._sortableTable.sort(0);
                 }
                 return;
 			}

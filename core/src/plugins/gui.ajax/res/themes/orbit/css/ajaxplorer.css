@@ -1311,7 +1311,6 @@ div#navigation_toolbar {
 #sidebar_splitter div.panelHeader,
 #search_panel div.panelHeader{
     color: #555;
-    padding: 8px;
 }
 
 #search_panel div.panelHeader{
@@ -1642,7 +1641,31 @@ div.class-FetchedResultPane > div.panelHeader
 
 #navigation_pane,#notif_pane{
     /*background-color: #333;*/
-    overflow: auto;
+    /*overflow: auto;*/
+}
+
+#navigation_pane div.thumbnail_selectable_cell.detailed > div.thumbnail_selectable_cell{
+    display: none;
+}
+
+#navigation_pane div.thumbnail_selectable_cell.detailed div.thumbLabel{
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+#navigation_pane div.thumbnail_selectable_cell.detailed div.thumbLabel:before{
+    content: "\f114";
+    font-size: 1.3em;
+    font-family: FontAwesome;
+    padding: 13px 13px;
+    font-weight: normal;
+    font-style: normal;
+    text-decoration: inherit;
+    -webkit-font-smoothing: antialiased;
+}
+
+#navigation_pane div.thumbnail_selectable_cell.detailed.ajxpNodeLeaf div.thumbLabel:before{
+    content: "\f016";
 }
 
 #notif_pane div.thumbLabel small {
@@ -1681,6 +1704,7 @@ div.class-FetchedResultPane > div.panelHeader
     padding: 0 8px;
     font-weight: normal;
     font-size: 0.7em;
+    margin-left: 3px;
 }
 
 #topPane h3:hover small,
@@ -2654,12 +2678,13 @@ div#upload_files_list span.item_relative_path{
     z-index: 1000;
     opacity: 0.7;
     padding-right: 1px;
+    top:0;
 }
 .scroller_handle{
     -webkit-border-radius: 5px;
     border-radius: 5px;
     background: rgb(190, 190, 190)!important;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, height 0.1s ease;
 }
 
 .scroller_handle:hover{
@@ -2827,7 +2852,7 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
     text-align: right;
     overflow: visible;
     position: relative;
-    z-index: 5;
+    z-index: 1015;
 }
 
 #search_form, #search_state
@@ -2889,6 +2914,7 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
     text-align: left;
     padding-right: 0;
     font-size: 40px;
+    font-family: "Open Sans Regular", sans-serif;
 }
 
 #search_meta {
@@ -2899,6 +2925,7 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
     letter-spacing: 1px;
     border-right: 1px solid rgb(194, 196, 199);
     float: left;
+    display: none;
 }
 
 #search_meta.toggle_open{
@@ -3050,11 +3077,9 @@ span.search_meta_opt.checked > span {
     display: none;
     position: absolute;
     z-index: 1010;
-    border: 1px solid rgb(138, 149, 160);
-    border-radius: 4px;
-    box-shadow: 1px 10px 40px rgba(0,0,0,0.5);
-    background-color: #ebedf0;
+    background-color: #eeeeee;
     text-align: left;
+    box-shadow: inset 0 1px 6px rgba(0,0,0,0.2);
 }
 
 #search_results
@@ -3063,16 +3088,35 @@ span.search_meta_opt.checked > span {
     width: 100%;
 }
 
-.close_results.icon-remove-sign {
-    float: right;
-    display: inline-block;
-    padding: 2px 5px;
-    cursor:pointer;
+#search_results_cont span.results_string{
+    display: none;
 }
 
-#search_results em {
-    color: red;
-    font-style:normal;
+.close_results.icon-remove-sign {
+    position: absolute;
+    display: inline-block;
+    right: 13px;
+    cursor: pointer;
+    font-size: 1.4em;
+    color: #999;
+    top: 9px;
+}
+
+#search_results div[data-groupByValue]{
+    clear: left;
+    max-height: 480px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+#search_results div[data-groupByValue]:first-child{
+    margin-top: 10px;
+}
+
+#search_results h3 {
+    font-size: 30px;
+    margin: 10px 0 10px 14px;
+    color: #333;
 }
 
 div.class-FetchedResultPane{
@@ -3084,7 +3128,27 @@ div.class-FetchedResultPane div.ajxpNodeProvider
 {
     cursor: pointer;
     background-color: transparent !important;
+}
 
+#search_results div.thumbnail_selectable_cell.detailed{
+    border-radius: 6px;
+    width:29%;
+    margin: 0 1% !important;
+    padding-top: 0px;
+    padding-bottom: 10px;
+    overflow: hidden;
+    height: 51px;
+}
+
+#search_results div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata {
+    transition:opacity 0.4s ease;
+    opacity: 0;
+}
+
+#search_results div.thumbnail_selectable_cell.detailed.selected-focus div.thumbnail_cell_metadata,
+#search_results div.thumbnail_selectable_cell.detailed:hover div.thumbnail_cell_metadata
+{
+    opacity: 1;
 }
 
 div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed{
@@ -3107,10 +3171,9 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail
     display: none;
 }
 
-#search_results div.ajxpNodeProvider:hover,
-div.class-FetchedResultPane div.ajxpNodeProvider:hover
+#search_results div.ajxpNodeProvider:hover
 {
-    background-color: #666 !important;
+    background-color: #ffffff !important;
 }
 
 div.class-FetchedResultPane div.ajxpNodeProvider.selected-focus,
@@ -3119,10 +3182,14 @@ div.class-FetchedResultPane div.ajxpNodeProvider.selected-focus,
     background-color: #fb725c !important;
 }
 
-div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel,
-#search_results div.thumbnail_selectable_cell.detailed div.thumbLabel{
+div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel{
     font-size: 13px;
     padding-top: 4px;
+}
+
+#search_results div.thumbnail_selectable_cell.detailed div.thumbLabel{
+    font-size: 20px;
+    padding-top: 11px;
 }
 
 #topPane div.thumbnail_selectable_cell.detailed div.thumbLabel{

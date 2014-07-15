@@ -75,6 +75,22 @@ Class.create("AjxpPane", {
             this.buildImageBackgroundFromConfigs(this.options.imageBackgroundFromConfigs);
         }
 
+        if(options.replaceScroller){
+            this.scroller = new Element('div', {
+                id:'scroller_'+this.htmlElement.id,
+                className:'scroller_track'
+            });
+            this.scroller.insert(new Element('div', {
+                id:'scrollbar_handle_'+this.htmlElement.id,
+                className:'scroller_handle'
+            }));
+            this.htmlElement.insert(this.scroller);
+            this.htmlElement.setStyle({overflow:"hidden"});
+            fitHeightToBottom(this.scroller);
+            this.scrollbar = new Control.ScrollBar(this.htmlElement,this.scroller, {fixed_scroll_distance:50});
+        }
+
+
     },
 
     resizeBound : function(event){
@@ -132,6 +148,10 @@ Class.create("AjxpPane", {
     			try{marginBottom = parseInt(eval(expr));}catch(e){}
     		}
     		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null), marginBottom);
+            if(this.scrollbar){
+                fitHeightToBottom(this.scroller);
+                this.scrollbar.recalculateLayout();
+            }
     	}
         if(this.options.flexTo){
             var parentWidth = $(this.options.flexTo).getWidth();
