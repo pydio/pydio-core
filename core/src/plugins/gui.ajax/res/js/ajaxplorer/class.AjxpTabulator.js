@@ -52,14 +52,16 @@ Class.create("AjxpTabulator", AjxpPane, {
 		// Add drop shadow here, otherwise the negative value gets stuck in the CSS compilation...
 		var div = new Element('div', {className:'tabulatorContainer panelHeader'});
 		$(this.htmlElement).insert({top:div});
-		this.tabulatorData.each(function(tabInfo){
+        var shortener = this.shortenLabel;
+
+        this.tabulatorData.each(function(tabInfo){
             var tab = this._renderTab(tabInfo);
 			div.insert(tab);
 			this.selectedTabInfo = tabInfo; // select last one by default
             var paneObject = this.getAndSetAjxpObject(tabInfo);
             if(!tabInfo.label && paneObject){
                 paneObject.getDomNode().observe("editor:updateTitle", function(event){
-                    tabInfo.headerElement.down(".tab_label").update(event.memo);
+                    tabInfo.headerElement.down(".tab_label").update(shortener(event.memo));
                 });
                 paneObject.getDomNode().observe("editor:updateIconClass", function(event){
                     tabInfo.headerElement.down("span").replace(new Element('span',{className:event.memo}));
@@ -67,7 +69,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             }
             if($(tabInfo.element)){
                 $(tabInfo.element).observe("widget:updateTitle", function(event){
-                    tabInfo.headerElement.down(".tab_label").update(event.memo);
+                    tabInfo.headerElement.down(".tab_label").update(shortener(event.memo));
                 });
             }
             if(this.options.saveState){
@@ -113,11 +115,13 @@ Class.create("AjxpTabulator", AjxpPane, {
             if(tabInfo.label){
                 label = MessageHash[tabInfo.label] || tabInfo.label;
             }
+            var forceTabsTips = false;
             var title = MessageHash[tabInfo.title] || label.stripTags();
             var options = {className:'toggleHeader toggleInactive'};
             if(!this.options.tabsTips){ options.title = title; }
             var td = new Element('span', options);
-            if(this.options.tabsTips){
+            var short = this.shortenLabel(label);
+            if(this.options.tabsTips || short!=label){
                 var horizontal = this.htmlElement.hasClassName('left_tabulator');
                 modal.simpleTooltip(
                     td,
@@ -132,7 +136,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             if(tabInfo.iconClass){
                 td.insert(new Element('span', {className:tabInfo.iconClass}));
             }
-            td.insert('<span class="tab_label" ajxp_message_id="'+tabInfo.label+'">'+label+'</span>');
+            td.insert('<span class="tab_label" ajxp_message_id="'+tabInfo.label+'">'+short+'</span>');
             td.observe('click', function(){
                 this.switchTabulator(tabInfo.id);
             }.bind(this) );
@@ -147,6 +151,24 @@ Class.create("AjxpTabulator", AjxpPane, {
             return td;
         }
 
+    },
+
+    shortenLabel: function(label){
+        if(label && label.innerHTML){
+            if(label.down('.filenameSpan')){
+                var cont = label.down('.filenameSpan').innerText;
+                if(cont.length > 25){
+                    cont = cont.substr(0,7)+"[...]"+cont.substr(-13);
+                    label.down('.filenameSpan').update(cont);
+                }
+            }
+            return label;
+        }
+        if(!label || !label.length) return '';
+        if(label.length > 25){
+            return label.substr(0,7)+"[...]"+label.substr(-13);
+        }
+        return label;
     },
 
     openEditorForNode:function(ajxpNode, editorData){
@@ -242,6 +264,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 
         $(this.htmlElement).insert(new Element("div", {id:tabInfo.element}));
         fitHeightToBottom($(this.htmlElement).down("#"+tabInfo.element), null, this.options.fitMarginBottom);
+        var shortener = this.shortenLabel;
 
         if(paneInfo.type == 'editor' && paneInfo.node && paneInfo.node.getPath){
             var editorData;
@@ -267,7 +290,7 @@ Class.create("AjxpTabulator", AjxpPane, {
                 };
                 var editor = eval ( 'new '+editorData.editorClass+'(oForm, editorOptions)' );
                 editor.getDomNode().observe("editor:updateTitle", function(event){
-                    tabInfo.headerElement.down(".tab_label").update(event.memo);
+                    tabInfo.headerElement.down(".tab_label").update(shortener(event.memo));
                 });
                 editor.getDomNode().observe("editor:updateIconClass", function(event){
                     tabInfo.headerElement.down("span").replace(new Element('span',{className:event.memo}));
@@ -293,7 +316,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             if(paneInfo.widgetClass && paneInfo.widgetOptions){
                 var widgetInstance = new paneInfo.widgetClass($(tabInfo.element), paneInfo.widgetOptions);
                 $(tabInfo.element).observe("widget:updateTitle", function(event){
-                    tabInfo.headerElement.down(".tab_label").update(event.memo);
+                    tabInfo.headerElement.down(".tab_label").update(shortener(event.memo));
                 });
                 // SERIALIZE CONFIG
                 if(confPaneInfo){

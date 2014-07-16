@@ -164,7 +164,7 @@ Class.create("Diaporama", AbstractEditor, {
 			this.jsImageLoading = false;
 			this.imgTag.src = this.jsImage.src;
 			this.resizeImage(true);
-			var text = getBaseName(this.currentFile) + ' ('+this.sizes.get(this.currentFile).width+' X '+this.sizes.get(this.currentFile).height+')';
+			var text = getBaseName(this.currentFile);// + ' ('+this.sizes.get(this.currentFile).width+' X '+this.sizes.get(this.currentFile).height+')';
 			this.updateTitle(text);
 		}.bind(this);
 		Event.observe(this.zoomInput, "keypress", function(e){

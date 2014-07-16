@@ -1233,6 +1233,8 @@ Class.create("FilesList", SelectableElements, {
                 item.insert({before: newItem});
                 item.remove();
                 newItem.ajxpNode = ajxpNode;
+                newItem.addClassName("ajxpNodeProvider");
+                if(ajxpNode.isLeaf()) newItem.addClassName("ajxpNodeLeaf");
                 this.initRows();
                 item.ajxpNode = null;
                 delete item;

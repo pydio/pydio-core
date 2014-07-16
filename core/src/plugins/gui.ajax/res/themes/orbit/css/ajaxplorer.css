@@ -2249,22 +2249,18 @@ div.header_resizer div.ascending {
 
 .paginator
 {
-    background-color:#fff8d1;
-    border-bottom-color:#dddddd;
-    border-bottom-style:solid;
-    border-bottom-width:1px;
-    font-family:"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif ;
-    font-size:11px;
-    height:20px;
-    padding-top:2px;
-    text-align:center;
+    background-color: #FFFCE8;
+    border: 0;
+    font-size: 12px;
+    padding: 5px;
+    text-align: center;
 }
 
 .paginatorInput
 {
     width:21px;
     padding: 0 2px;
-    height: 14px;
+    height: 17px;
     text-align: right;
     border: 1px solid #CCCCCC;
     margin-right: 2px;

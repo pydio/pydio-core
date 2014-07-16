@@ -75,7 +75,7 @@ Class.create("AjxpPane", {
             this.buildImageBackgroundFromConfigs(this.options.imageBackgroundFromConfigs);
         }
 
-        if(options.replaceScroller){
+        if(this.options.replaceScroller){
             this.scroller = new Element('div', {
                 id:'scroller_'+this.htmlElement.id,
                 className:'scroller_track'
