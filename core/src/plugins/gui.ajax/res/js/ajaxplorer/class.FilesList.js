@@ -616,6 +616,13 @@ Class.create("FilesList", SelectableElements, {
         if(this.slider){
             this.slider.destroy();
         }
+        $A(['list', 'thumb', 'detail']).each(function(f){
+            if(this._displayMode == f){
+                this.htmlElement.addClassName('fl-displayMode-' + f);
+            } else {
+                this.htmlElement.removeClassName('fl-displayMode-' + f);
+            }
+        }.bind(this));
 		if(this._displayMode == "list")
 		{
 			var buffer = '';
@@ -1033,6 +1040,9 @@ Class.create("FilesList", SelectableElements, {
     	if(this.htmlElement.down('.table_rows_container') && Prototype.Browser.IE && this.gridStyle == "file"){
             this.htmlElement.down('.table_rows_container').setStyle({width:'100%'});
     	}
+        if(this._displayMode == 'thumb'){
+            this.resizeThumbnails();
+        }
 		this.notify("resize");
         document.fire("ajaxplorer:resize-FilesList-" + this.htmlElement.id, this.htmlElement.getDimensions());
     },
@@ -1127,10 +1137,11 @@ Class.create("FilesList", SelectableElements, {
 		// Disable text select on elements
 		if(this._displayMode == "thumb" || this._displayMode == "detail")
 		{
-			this.resizeThumbnails();		
+			var adjusted = this.resizeThumbnails();
 			if(this.protoMenu) this.protoMenu.addElements('#selectable_div-'+this.__currentInstanceIndex);
 			window.setTimeout(function(){
-                this._previewFactory.setThumbSize((this._displayMode=='detail'? this._detailThumbSize:this._thumbSize));
+                if(adjusted) this._previewFactory.setThumbSize(adjusted);
+                else this._previewFactory.setThumbSize((this._displayMode=='detail'? this._detailThumbSize:this._thumbSize));
                 this._previewFactory.loadNextImage();
             }.bind(this),10);
 		}
@@ -2122,6 +2133,7 @@ Class.create("FilesList", SelectableElements, {
             elList = this._htmlElement.select('div.thumbnail_selectable_cell.detailed');
         }
         var ellipsisDetected;
+        var tSize=0;
 		elList.each(function(element){
             //if(element.up('div.thumbnail_selectable_cell.detailed')) return;
 			var node = element.ajxpNode;
@@ -2132,11 +2144,19 @@ Class.create("FilesList", SelectableElements, {
                 return;
             }
             var elementsAreSiblings = (label_element && (label_element.siblings().indexOf(image_element) !== -1));
-            var tSize = (this._displayMode=='detail'? this._detailThumbSize:this._thumbSize);
+            tSize = this.getAdjustedThumbSize(element);
+
+            element.removeClassName('fl-displayMode-thumbsize-small');
+            element.removeClassName('fl-displayMode-thumbsize-medium');
+            element.removeClassName('fl-displayMode-thumbsize-large');
+            if(tSize < 80) element.addClassName('fl-displayMode-thumbsize-small');
+            else if(tSize < 150) element.addClassName('fl-displayMode-thumbsize-medium');
+            else element.addClassName('fl-displayMode-thumbsize-large');
+
             if(element.down('div.thumbnail_selectable_cell')){
                 element.down('div.thumbnail_selectable_cell').setStyle({width:tSize+5+'px', height:tSize+10 +'px'});
             }else{
-                element.setStyle({width:tSize+25+'px', height:tSize+ 30 +'px'});
+                element.setStyle({width:tSize+25+'px', height:tSize + 10 + 'px'});
             }
             this._previewFactory.setThumbSize(tSize);
             if(image_element){
@@ -2164,8 +2184,24 @@ Class.create("FilesList", SelectableElements, {
         if(this.options.fit && this.options.fit == 'content'){
             this.resize();
         }
-
+        return tSize;
     },
+
+    getAdjustedThumbSize:function(referenceElement){
+        var tSize = (this._displayMode=='detail'? this._detailThumbSize:this._thumbSize);
+        if(this._displayMode == 'thumb'){
+            // Readjust tSize
+            var w = this._htmlElement.getWidth();
+            var margin = parseInt(referenceElement.getStyle('marginLeft')) + parseInt(referenceElement.getStyle('marginRight'));
+            var realBlockSize = tSize + 25 + margin;
+            var number = Math.ceil(w / realBlockSize);
+            var blockSize = w / number;
+            tSize = blockSize - 25 - margin;
+        }
+        return tSize;
+    },
+
+
 	/**
 	 * For list mode, recompute alternate BG distribution
 	 * Should use CSS3 when possible!

@@ -10,7 +10,8 @@ table.sort-table tr:nth-child(even)
 }
 
 #content_pane div.thumbnail_selectable_cell.detailed div.thumbLabel,
-div.infoPanelBasenameTitle
+div.infoPanelBasenameTitle,
+.table_rows_container span#ajxp_label
 {
     font-family: "Open Sans Regular", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;;
 }
@@ -187,6 +188,32 @@ kbd {
     color: rgb(111, 121, 131);
 }
 
+.fl-displayMode-thumb div.thumbnail_selectable_cell{
+    margin: 1px;
+    background-color: #f9f9f9;
+    border-radius: 2px;
+    padding: 0 0 3px;
+}
+
+.fl-displayMode-thumb div.thumbnail_selectable_cell div.thumbLabel{
+
+    margin-top: -31px;
+    opacity: 1;
+    background-color: rgba(245, 245, 245, 0.35);
+    padding: 8px 3px;
+}
+
+.fl-displayMode-thumb div.thumbnail_selectable_cell.fl-displayMode-thumbsize-medium div.thumbLabel{
+    padding:1px;
+    margin-top: -18px;
+    font-size: 0.8em;
+}
+
+.fl-displayMode-thumb div.thumbnail_selectable_cell.fl-displayMode-thumbsize-small div.thumbLabel,
+.fl-displayMode-thumb div.thumbnail_selectable_cell.selected-focus div.thumbLabel{
+    display: none;
+}
+
 .thumbnail_selectable_cell.detailed {;
     margin: 0px 0px !important;
     margin-bottom: 2px;
@@ -255,7 +282,7 @@ div.thumbnail_cell_metadata span.metadata_chunk{
 }
 
 .thumbnail_iconlike_shadow{
-    border: 1px solid white;
+    border: 0px solid white;
     /*
     -webkit-box-shadow: 0 0 5px #5C5C5C;
     -moz-box-shadow: 0 0 5px #5C5C5C;
@@ -394,7 +421,7 @@ div.shadow_class
     position: absolute;
     top: 30%;
     left: 30%;
-    z-index: 1002;
+    z-index: 1018;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size: 11px;
     padding: 0;
@@ -2094,7 +2121,7 @@ div.resizeGhost{
     width: 1px;
     border-right: 1px solid #ccc;
     position:absolute;
-    z-index:1000;
+    z-index:1017;
     opacity:0.7;
 }
 
@@ -3303,8 +3330,32 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
 }
 
 #info_panel div.class-FetchedResultPane  div.thumbnail_selectable_cell.detailed div.thumbLabel{
-    font-size: 1.2em;
-    color: #555;
+    font-size: 1.3em;
+    color: #222;
+    white-space: normal;
+    line-height: 1.5em;
+    padding-bottom: 4px;
+}
+
+#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel small
+{
+    color: #666;
+    display: block;
+    font-size: 11px;
+    line-height: 15px;
+}
+
+#info_panel div.class-FetchedResultPane.leaf_activity div.thumbnail_selectable_cell.detailed div.thumbLabel
+{
+    color: #666;
+    display: block;
+    font-size: 13px;
+    line-height: 17px;
+}
+
+#info_panel div.ajxpNodeProvider.selected-focus
+{
+    background-color: transparent !important;
 }
 
 #info_panel div.class-FetchedResultPane div.ajxpNodeProvider:hover{
@@ -3501,7 +3552,7 @@ div.one_has_many > div.toolbar_placeholder.one_or_less > div.toolbarGroup a {
     text-align:center;
     padding: 10px 6px;
     position: relative;
-    background-color: white; 
+    background-color: white;
     margin: 10px 14px;
     border-radius: 5px;
     box-shadow: 0 0 7px rgba(0,0,0,0.25);

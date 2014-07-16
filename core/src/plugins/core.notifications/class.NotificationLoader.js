@@ -298,6 +298,9 @@ Class.create("NotificationLoader", {
     loadInfoPanel : function(container, node){
         container.down("#ajxp_activity_panel").update('<div class="panelHeader" style="display: none;">'+(node.isLeaf()?'File Activity':'Folder Activity')+'</div><div id="activity_results">Nothing</div>');
         var resultPane = container.down("#activity_results");
+        if(node.isLeaf()) resultPane.addClassName('leaf_activity');
+        else resultPane.removeClassName('leaf_activity');
+
         var fRp = new FetchedResultPane(resultPane, {
             "fit":"content",
             "columnsDef":[
@@ -312,7 +315,7 @@ Class.create("NotificationLoader", {
                 "connexion_discrete":true,
                 "format":"xml", "current_repository":"true",
                 "feed_type":"notif",
-                "limit":(node.isRoot() ? 15 : 5),
+                "limit":(node.isLeaf() || node.isRoot() ? 12 : 4),
                 "path":(node.isLeaf() || node.isRoot()?node.getPath():node.getPath()+'/'),
                 "merge_description":"true",
                 "description_as_label":node.isLeaf()?"true":"false"
