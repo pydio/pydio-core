@@ -428,11 +428,10 @@ div.shadow_class
     top: 30%;
     left: 30%;
     z-index: 1018;
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-size: 11px;
     padding: 0;
-    -moz-border-radius:5px;
     border-radius: 3px;
+    min-width: 420px;
 }
 
 .editBox
@@ -548,9 +547,9 @@ label.checkbox_label_left{
 
 .dialogLegend
 {
-    color: #5C5C5C;
-    padding-bottom: 5px;
+    padding: 5px;
     line-height: 16px;
+    font-size: 13px;
 }
 
 .dialogButtons
@@ -587,6 +586,48 @@ fieldSet input.dialogButton
     float: left;
     margin-top: 9px;
 
+}
+
+/************************/
+/* ORBIT RESIZE DIALOGS */
+/************************/
+span#delete_message{
+    font-size: 16px;
+    display: block;
+    padding: 30px 10px;
+}
+
+div#copymove_form > div
+{
+    width: 390px !important;
+    height: auto !important;
+}
+select#external_repository{
+    width: 390px !important;
+    height: 26px !important;
+}
+div#copymove_form div#treeCopy{
+    height: 254px !important;
+}
+
+div#copymove_form > input{
+    background-color: #fff;
+    padding: 5px;
+    width: 380px !important;
+}
+
+div#properties_box{
+    margin: 20px auto;
+    width: 250px;
+}
+
+input#ajxp_link_container{
+    width: 340px !important;
+}
+
+div#mkfile_form input,
+div#mkdir_form input{
+    width: 390px;
 }
 
 span.ajxp-caret-up{
