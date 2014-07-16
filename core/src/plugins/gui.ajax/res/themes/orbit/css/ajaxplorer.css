@@ -477,7 +477,6 @@ div.shadow_class
 #search_txt
 {
     margin-left: 0;
-    width: 174px;
     border: 1px solid #aaa;
     background-repeat: no-repeat;
     background-position: top left;
@@ -489,7 +488,7 @@ div.shadow_class
 }
 
 .dialogContent select{
-    height: 22px;
+    height: 26px;
 }
 
 .dialogContent select[multiple]{
@@ -926,7 +925,6 @@ div.accordion_content{
     padding: 5px;
 }
 
-
 div.oneFieldForm{
     margin-bottom: 13px;
     background-color: #EEEEEE;
@@ -967,6 +965,16 @@ div.oneFieldForm input.SF_input{
 div.SF_element{
     padding-top: 5px;
     clear:left;
+    width: 100%;
+    margin: 0 40px;
+}
+
+div.SF_element div.SF_element{
+    margin: 0;
+}
+
+div.dialogContent div.SF_element{
+    margin: 0 15px;
 }
 
 div.SF_disabled{
@@ -975,17 +983,11 @@ div.SF_disabled{
 }
 
 div.SF_label{
-    float: left;
-    width: 39%;
-    text-align: right;
-    padding-right:1%;
-    padding-left:0;
-    padding-top: 5px;
-    padding-bottom: 8px;
-    line-height: 18px;
-    font-size: 12px;
-    /*white-space: nowrap; /* css-3 */
-    /*word-wrap: no break-word; /* Internet Explorer 5.5+ */
+    text-transform: uppercase;
+    width: 100% !important;
+    line-height: 22px !important;
+    letter-spacing: 1px;
+    margin-top: 3px;
 }
 
 input.SF_fieldCheckBox{
@@ -997,19 +999,16 @@ input.SF_fieldCheckBox{
 }
 
 .SF_input{
-    float:left;
     padding: 2px 3px !important;
-    width: 54% !important;
-    _width:54% !important; /*IE*/
+    margin-left: 0;
+    width: 100%;
+    max-width: 355px !important;
 }
-
-div.SF_element.SF_largeLabel > div.SF_label{
-    width: 56% !important;
-    _width:54% !important; /*IE*/
-}
-
-div.SF_element.SF_largeLabel > .SF_input{
-    width: 39% !important;
+.SF_element textarea, .SF_element select, .SF_element div.SF_image_block{
+    margin-left: 0 !important;
+    background-color: white;
+    width: 100%;
+    max-width: 355px !important;
 }
 
 div.SF_element.SF_largeLabel > input.SF_input.SF_number,
@@ -1163,6 +1162,12 @@ input.SF_input.SF_number{
 
 .SF_horizontal_action_destructive{
     color: #A00;
+}
+
+div.tabbed_editor div.innerTitle{
+    margin: 10px !important;
+    padding: 8px !important;
+    letter-spacing: 1px !important;
 }
 
 /****************
