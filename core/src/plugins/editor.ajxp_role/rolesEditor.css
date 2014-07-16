@@ -52,7 +52,7 @@ div.tabbed_editor div.SF_input{
 }
 
 div.tabbed_editor div.SF_image_block{
-    max-width: 80px;
+    max-width: 80px !important;
     float: left;
     margin-left: 11px;
     border: 1px solid #C8CCD3;
@@ -402,4 +402,22 @@ div.documentation{
     border-radius: 3px;
     margin: 0 10px;
     box-shadow: 0px 1px 1px rgba(0,0,0,0.15);
+}
+
+/* ORBIT THEME */
+
+.ajxp_theme_orbit div.tabbed_editor input[type="text"],
+.ajxp_theme_orbit div.tabbed_editor input[type="password"]{
+    width: inherit !important;
+}
+
+.ajxp_theme_orbit div#parameters-selected span.list_remove_item {
+    top: 42px;
+    left: 400px;
+    right: inherit;
+}
+
+.ajxp_theme_orbit div#account_actions {
+    text-align: left;
+    padding: 12px 40px 18px;
 }

@@ -164,6 +164,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             }
             return label;
         }
+        if(label.stripTags() != label) return label;
         if(!label || !label.length) return '';
         if(label.length > 25){
             return label.substr(0,7)+"[...]"+label.substr(-13);

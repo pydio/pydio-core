@@ -452,7 +452,7 @@ Class.create("FormManager", {
                 var ref = parseInt(form.getWidth()) + (Prototype.Browser.IE?40:0);
                 if(ref > (Prototype.Browser.IE?40:0)){
                     var lab = div.down('.SF_label');
-                    if(lab){
+                    if(lab && lab.getStyle('float') == 'left'){
                         var fontSize = lab.getStyle('fontSize');
                         lab.setStyle({fontSize:fontSize});
                         lab.setStyle({width:parseInt(39*ref/100)+'px'});

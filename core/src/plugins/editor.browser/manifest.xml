@@ -11,7 +11,7 @@
         </resources>
     </client_settings>
 	<clientForm id="open_box"><![CDATA[
-		<div id="open_box" action="editer" box_width="185">
+		<div id="open_box" action="editer" box_width="185" class="editor_container">
 		AJXP_MESSAGE[openbrowser.3]
 		</div>
 	]]></clientForm>

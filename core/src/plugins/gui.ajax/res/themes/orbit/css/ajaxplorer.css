@@ -43,6 +43,12 @@ div.selected-webfx-tree-item-inactive{
     background: #fb725c !important; /* Old browsers */ /* FF3.6+ */ /* Chrome,Safari4+ */ /* Chrome10+,Safari5.1+ */ /* Opera11.10+ */ /* IE10+ */ /* IE6-9 */ /* W3C */
 }
 
+.settings_main_pane div.selected-webfx-tree-item,
+.settings_main_pane div.selected-focus,
+.settings_main_pane tr.selected-focus{
+    background-color: rgb(78, 167, 165);
+}
+
 .grey_gradient_light_inputs, .dialogContent input, .dialogContent input[type="text"], .dialogContent input[type="password"], .dialogContent select, #search_txt, #location_form,#treeCopy
 {
     background: rgb(243,243,243); /* Old browsers */
@@ -1358,10 +1364,14 @@ div#navigation_toolbar {
 }
 .action_bar.editor_action_bar {
     height: 37px;
-    background-color: #ddd;
-    right: 29px;
+    right: 14px;
     position: absolute;
     z-index: 10;
+    background-color: #ccc;
+}
+
+.editor_container{
+    background-color: #fff;
 }
 
 #codemirror_box div.action_bar.editor_action_bar {
@@ -1497,11 +1507,10 @@ div.action_bar.text_only  span.actionbar_button_label{
     padding: 5px 10px 7px 9px;
     text-align: center;
     overflow: visible;
-    color: #fff;
     outline: none;
-    border-radius: 2px;
+    border-radius: 17px;
     margin: 5px 2px 0 1px;
-    background: #4dc5c3; /* Old browsers */   /* FF3.6+ */   /* Chrome,Safari4+ */   /* Chrome10+,Safari5.1+ */   /* Opera 11.10+ */   /* IE10+ */   /* W3C */   /* IE6-9 */;
+    background: #fff; /* Old browsers */   /* FF3.6+ */   /* Chrome,Safari4+ */   /* Chrome10+,Safari5.1+ */   /* Opera 11.10+ */   /* IE10+ */   /* W3C */   /* IE6-9 */;
     letter-spacing: 1px;
     float: left;
 }
@@ -2789,6 +2798,10 @@ span.toggleHeader{
     border-bottom: 3px solid #FB725C;
 }
 
+.flat_tabulator span.toggleHeader{
+    border-bottom-color: rgb(61, 129, 128);
+}
+
 span.toggleHeader.toggleInactive{
     cursor: pointer;
     border-bottom-color: transparent;
@@ -2799,6 +2812,14 @@ span.toggleHeader span[class*=" icon-"]{
     margin-right: 4px;
     display: none;
 }
+
+.flat_tabulator span.toggleHeader span[class^="icon-"],
+.flat_tabulator span.toggleHeader span[class*=" icon-"]{
+    margin-right: 4px;
+    display: inline;
+}
+
+
 
 div.tabulator-vertical div {
     display: none;
@@ -4876,7 +4897,7 @@ td.ip_geo_cell{
 .tabrow {
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: 2px 0;
     line-height: 24px;
     overflow: hidden;
     font-size: 13px;
@@ -5057,25 +5078,18 @@ DASHBOARD TABULATOR
 .flat_tabulator  div.panelHeader.tabulatorContainer
 {
     padding: 0 0 0 0;
-    height: 34px;
-    background-color: transparent;
+    height: 72px;
+    background-color: #fff;
     border-bottom: 0;
 }
 
 .flat_tabulator span.toggleHeader{
-    padding: 8px 10px 8px;
+    padding: 36px 14px 15px;
     font-size: 13px;
-    border-bottom: 0 solid #399C9B;
-    color: #ffffff;
-    background-color: rgb(78, 167, 165);
-    margin-right: 1px;
-    border-right: 0;
-    box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.26);
-    border-radius: 3px 3px 0 0;
 }
 
 .flat_tabulator span.toggleHeader:first-of-type{
-    background-color: rgb(111,123,136) !important;
+    color: rgb(78, 167, 165);
 }
 
 .flat_tabulator[data-ajxpTabsCount="1"] span.toggleHeader
@@ -5084,12 +5098,6 @@ DASHBOARD TABULATOR
 }
 
 .flat_tabulator span.toggleHeader.toggleInactive {
-    border-bottom: 0;
-    color: rgba(255, 255, 255, 0.62);
-    font-size: 13px;
-    background-color: rgba(78, 167, 165, 0.5);
-    box-shadow: none;
-    padding-bottom: 7px;
 }
 
 div.flat_tabulator > div.tabulatorContainer > #display_toolbar a:hover,

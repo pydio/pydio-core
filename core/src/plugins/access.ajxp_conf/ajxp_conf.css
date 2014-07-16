@@ -205,3 +205,35 @@
 .settings_main_pane div.tabulator-vertical div.toolbarGroup{
     font-size: 1em;
 }
+
+.ajxp_theme_orbit #leftTabulator span.toggleHeader {
+    color: white;
+}
+
+.ajxp_theme_orbit div.settings_search_container #search_form a{
+    top:51px;
+    right: 24px;
+}
+
+.ajxp_theme_orbit div.settings_search_container #search_form input{
+    text-align: left;
+    float: left !important;
+    width: 84%;
+    margin-left: 7px;
+}
+
+.ajxp_theme_orbit div.settings_main_pane #breadcrumb_container{
+    padding: 9px 11px 6px;
+}
+
+.ajxp_theme_orbit div.settings_main_pane .buttons_bar_container {
+   background-color: #ddd;
+}
+
+.settings_main_pane div#breadcrumb span {
+    margin: 0 4px;
+}
+
+.settings_main_pane span.icon-bookmark-empty{
+    display: inline !important;
+}
