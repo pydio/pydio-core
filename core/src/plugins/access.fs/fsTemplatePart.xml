@@ -8,7 +8,7 @@
                 <div style="float:right;margin-top:14px;" ajxpClass="AjxpPane" ajxpOptions='{}' id="search_engine_cont">
                     <div id="buttons_bar_top" style="float:right;" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                 </div>
-                <div id="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "openSearchInput":"true", "toggleResultsFitTo":"files_list_pane", "fitMarginBottom":0, "toggleResultsOffsetRight":0, "toggleResultsOffsetTop":0, "detailThumbSize":24}'></div>
+                <div id="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "openSearchInput":"true", "searchChooserAsResultsHeader":true, "toggleResultsFitTo":"cpane_tabs", "fitMarginBottom":0, "toggleResultsOffsetRight":0, "toggleResultsOffsetTop":0, "detailThumbSize":24}'></div>
                 <div style="clear:both;" class="skipSibling"></div>
             </div>
             <div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
@@ -46,6 +46,10 @@
             <style>
             .breadcrumbs-one li:nth-child(1) span:before{
                 border-left-color: #f5f5f5;
+            }
+            #global_toolbar{
+                background-color: #345E79;
+                background-image: url("plugins/gui.ajax/res/themes/orbit/images/white_logo.png");
             }
             </style>
         ]]></template_part>

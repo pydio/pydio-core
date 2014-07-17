@@ -49,7 +49,7 @@ div.selected-webfx-tree-item-inactive{
     background-color: rgb(78, 167, 165);
 }
 
-.grey_gradient_light_inputs, .dialogContent input, .dialogContent input[type="text"], .dialogContent input[type="password"], .dialogContent select, #search_txt, #location_form,#treeCopy
+.grey_gradient_light_inputs, .dialogContent input[type="text"], .dialogContent input[type="password"], .dialogContent select, #search_txt, #location_form,#treeCopy
 {
     background: rgb(243,243,243); /* Old browsers */
     background: rgb(243,243,243); /* Old browsers */
@@ -178,6 +178,10 @@ kbd {
 {
     vertical-align: bottom;
     height: 20px;
+}
+
+.fit_background_height{
+    background-size: auto 100% !important;
 }
 
 .thumbnail_selectable_cell
@@ -561,15 +565,19 @@ label.checkbox_label_left{
 .dialogButtons input,
 fieldSet input.dialogButton
 {
-    margin-left: 6px;
-    width: 22px;
-    height: 22px;
-    padding: 2px;
-    background-image: none;
-    background-color: #eee;
-    border-radius: 2px;
-    -moz-border-radius: 3px;
-    box-shadow: inset 1px 1px 1px white;
+    margin-left: 3px;
+    width: 32px;
+    height: 32px;
+    padding: 2px 0;
+    background-color: transparent;
+    border: 0;
+}
+
+.dialogButtons input:focus,
+fieldSet input.dialogButton:focus
+{
+    border: 0;
+    background-color: transparent;
 }
 
 .dialogButtons.inlineEdition input
@@ -1231,7 +1239,7 @@ div.tabbed_editor div.innerTitle{
 #login_form,
 #login_form_dynamic
 {
-    margin: 0 53px;
+    margin: 0 40px;
     font-size: 15px;
     padding-top: 20px;
     padding-bottom: 20px;
@@ -1239,7 +1247,7 @@ div.tabbed_editor div.innerTitle{
 
 #login_form div.SF_label,
 #login_form_dynamic div.SF_label{
-    display: none;
+    padding-left: 4px;
 }
 
 #login_form.no_placeholder div.SF_label,
@@ -1258,22 +1266,112 @@ div.tabbed_editor div.innerTitle{
 
 #login_form div.SF_input > input,
 #login_form_dynamic div.SF_input > input{
-    width: 200px !important;
-    padding: 4px !important;
+    width: 280px !important;
+    padding: 7px !important;
     font-size: 17px;
+    border: 0 !important;
 }
 
 .ajxp_login_error {
-    margin-top: 10px;
+    margin: 12px 27px 6px 12px;
     font-size: 14px !important;
-    background-color: transparent !important;
-    color: rgb(219, 0, 0) !important;
-    border: 1px solid rgb(216, 0, 0);
+    background-color: rgba(180, 57, 57, 0.4) !important;
+    color: white !important;
     padding: 7px !important;
 }
 
 .ajxp_password_auth div.SF_element:first-of-type{
     display: none !important;
+}
+
+div.dialogBox.form-login_form,
+div.dialogBox.form-login_form_dynamic
+{
+    /*
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.23);
+    -webkit-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.23);
+    -moz-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.23);
+    */
+    box-shadow: none;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    background-color: rgba(34,34,34,0.4);
+    border-radius: 0;
+
+}
+
+div.dialogBox.form-login_form div.dialogContent,
+div.dialogBox.form-login_form_dynamic div.dialogContent
+{
+    height: 100%;
+    background-color: transparent;
+    color: white;
+    padding-top: 37% !important;
+}
+
+div.dialogBox.form-login_form div.dialogTitle,
+div.dialogBox.form-login_form_dynamic div.dialogTitle
+{
+    position: absolute;
+    top: 35%;
+    right: -113%;
+    background-color: transparent;
+    background-image: url('../images/Logo_White_300.png') !important;
+}
+
+div.dialogBox.form-login_form div#progressCustomMessage,
+div.dialogBox.form-login_form_dynamic div#progressCustomMessage
+{
+    font-size: 30px !important;
+    text-align: center;
+}
+
+div.dialogBox.form-login_form a.icon-flag,
+div.dialogBox.form-login_form_dynamic a.icon-flag
+{
+    position:absolute;
+    top:10px;
+    right:10px;
+    font-size:20px !important;
+    color: white !important;
+}
+
+div.dialogBox.form-login_form div.dialogLegend,
+div.dialogBox.form-login_form_dynamic div.dialogLegend
+{
+    text-align: center;
+    font-style: italic;
+    color: #ddd;
+    display: none !important;
+}
+
+div.dialogBox.form-login_form a.forgot-password-link,
+div.dialogBox.form-login_form_dynamic a.forgot-password-link
+{
+    color: white !important;
+    margin-right: 45px;
+    margin-top: 6px;
+    text-decoration: underline;
+    color: #ddd;
+    font-size: 13px;
+    text-align: right;
+    display: block;
+    float: right;
+}
+
+div.dialogBox.form-login_form div.dialogButtons,
+div.dialogBox.form-login_form_dynamic div.dialogButtons
+{
+    margin-top: 50px;
+    text-align: center;
+}
+
+div.dialogBox.form-login_form div.dialogButtons input.dialogButton,
+div.dialogBox.form-login_form_dynamic div.dialogButtons input.dialogButton
+{
+    width: 70px;
+    height: 70px;
 }
 
 /********************************/
@@ -1283,10 +1381,11 @@ div.tabbed_editor div.innerTitle{
 }
 
 #global_toolbar{
-    background-color: #345E79;
+/*    background-color: #345E79;
+    background-image: url("../images/white_logo.png");
+*/
     height: 47px;
     padding: 0 15px 0 5px;
-    background-image: url("../images/white_logo.png");
     background-repeat: no-repeat;
     background-position: 7px;
 }
@@ -3011,20 +3110,35 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
     font-size: 12px;
     padding: 0;
     background-color: rgb(255, 255, 255);
-    color: rgb(143, 162, 182);
-    letter-spacing: 1px;
-    border-right: 1px solid rgb(194, 196, 199);
     float: left;
-    display: none;
+    width: 0;
+    overflow: hidden;
+    margin-left: 0;
+    transition: width 1s ease, margin-left 1s ease;
+}
+
+#search_meta > div{
+    width: 280px;
 }
 
 #search_meta.toggle_open{
+    margin-left: -280px;
+    width: 280px;
+}
+
+div.meta_toggle_button {
+    display: inline-block;
+    padding: 1px 20px;
+    background-color: #fff;
+    border-radius: 30px;
+    margin: 10px 10px 0;
+    cursor: pointer;
+    color: #555;
 }
 
 #search_meta input.c3,
 #search_meta span.c3
 {
-    width: 21%;
     margin-left: 0;
     margin-right: 0;
     border: 1px solid #ACB2BB;
@@ -3057,14 +3171,23 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
 
 #search_meta span.c4 {
     display: inline-block;
-    width: 18%;
-    text-align: left;
+    width: 30% !important;
+    text-align: right;
+    padding-right: 2%;
 }
 
 #search_meta span.c6 {
-    display: inline-block;
-    width: 14%;
-    text-align: center;
+    display: block;
+    width: 30%;
+    text-align: right;
+    clear: left;
+    float: left;
+    padding-right: 2%;
+}
+
+#search_meta div.advanced_search_section span[class^="icon-"],
+#search_meta div.advanced_search_section span[class*=" icon-"]{
+    display: none;
 }
 
 .advanced_search {
@@ -3079,7 +3202,7 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
 }
 
 #search_meta_detailed {
-    padding:10px 5px;
+    padding:5px 5px 10px;
     line-height: 28px;
     overflow: hidden;
     background-color: rgba(235, 237, 240, 0.36);
@@ -3102,33 +3225,55 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
     display: none;
 }
 
-.search_label.open,
-.search_label.close
+.search_label.open
 {
     display: inline-block;
     padding: 2px;
     height: 20px;
 }
+
 .search_label.close{
-    display: none;
+    display: block;
+    font-size: 16px;
+    padding: 0 4px;
 }
 
 #refresh_search_button{
     cursor: pointer;
 }
 
-#search_meta.toggle_open span.search_label.open{
+.toggle_open span.search_label.open{
     display: none;
 }
 
-#search_meta.toggle_open span.search_label.close{
+span.toggle_button.open,span.toggle_button.close{
+    background-color: white;
+    border-radius: 20px;
+    padding: 2px 15px;
+    font-size: 0.8em;
+    cursor: pointer;
+}
+
+span.toggle_button.open > span,
+span.toggle_button.close > span
+{
+    display: none;
+}
+
+span.toggle_button.close{
+    display: none;
+}
+
+.toggle_open span.toggle_button.close,
+span.toggle_button.open
+{
     display: inline-block;
 }
 
-#search_meta.toggle_open span.toggle_button.close,
-#search_meta span.toggle_button.open
+.toggle_open span.toggle_button.open,
+.toggle_open span#search_meta_options
 {
-    display: inline-block;
+    display: none;
 }
 
 #search_meta div.advanced_search_section{
@@ -3239,6 +3384,10 @@ div.class-FetchedResultPane div.ajxpNodeProvider
 #search_results div.thumbnail_selectable_cell.detailed:hover div.thumbnail_cell_metadata
 {
     opacity: 1;
+}
+
+#search_results div.thumbnail_selectable_cell div.overlay_icon_div{
+    display: none !important;
 }
 
 div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed{
@@ -3654,16 +3803,10 @@ div.infoPanelAllMetadata > div {
     margin: 6px 20px;
 }
 
-div.double div.infoPanelAllMetadata > div{
-    float: left;
-    margin: 1%;
-    width: 48%;
-}
-
 div.triple div.infoPanelAllMetadata > div{
     float: left;
-    margin: 1%;
-    width: 31%;
+    margin: 2%;
+    width: 46%;
 }
 
 #browser
@@ -4825,14 +4968,6 @@ div.dialogBox div.dialogBox.css_boxshadow{
 
 div.dialogBox div.dialogBox.css_boxshadow > div{
     background-color: transparent;
-}
-
-div.dialogBox.form-login_form,
-div.dialogBox.form-login_form_dynamic
-{
-    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.23);
-    -webkit-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.23);
-    -moz-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.23);
 }
 
 #progressBox

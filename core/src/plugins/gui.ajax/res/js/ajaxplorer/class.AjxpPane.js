@@ -177,6 +177,15 @@ Class.create("AjxpPane", {
                 this.htmlElement.setStyle({width:newWidth + 'px'});
             }
         }
+
+        if(this.options.imageBackgroundFromConfigs && this.htmlElement.getHeight()){
+            var ratio = this.htmlElement.getWidth() / this.htmlElement.getHeight();
+            if(ratio < 1){
+                this.htmlElement.addClassName('fit_background_height');
+            }else{
+                this.htmlElement.removeClassName('fit_background_height');
+            }
+        }
     	this.childrenPanes.invoke('resize');
 	},
 	

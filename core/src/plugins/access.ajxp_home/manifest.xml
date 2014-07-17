@@ -83,7 +83,6 @@
                 <style>
                     #global_toolbar{
                         height: 0;
-                        background-image: none;
                     }
                     #clickable_home{
                         display:none;

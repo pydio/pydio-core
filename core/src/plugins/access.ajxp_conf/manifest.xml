@@ -116,6 +116,12 @@
                         if($("browser")) $("browser").ajxpPaneObject.resize();
                     });
                 </script>
+                <style>
+                    #global_toolbar{
+                        background-color: #345E79;
+                        background-image: url("plugins/gui.ajax/res/themes/orbit/images/white_logo.png");
+                    }
+                </style>
 			]]></template_part>
 		</client_configs>
 		<external_file filename="plugins/access.ajxp_conf/ajxp_confActions.xml" include="actions/*"/>
