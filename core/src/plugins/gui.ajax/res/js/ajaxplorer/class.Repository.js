@@ -104,6 +104,15 @@ Class.create("Repository", {
 		this.label = label;
 	},
 
+    getHtmlBadge : function(){
+        if(!this.label) return '';
+        if(!this.badge){
+            var letters = this.label.split(" ").map(function(word){return word.substr(0,1)}).join("");
+            this.badge = "<span class='letter_badge'>"+ letters +"</span>";
+        }
+        return this.badge;
+    },
+
     /**
      * @return String
      */

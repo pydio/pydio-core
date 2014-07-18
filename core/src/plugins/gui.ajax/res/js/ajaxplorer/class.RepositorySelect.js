@@ -130,13 +130,17 @@ Class.create("RepositorySelect", {
                     return;
                 }
 
-                var label = '<span class="menu_label">' + repoObject.getLabel() + '</span>';
+                var label =  repoObject.getHtmlBadge() + '<span class="menu_label">' + repoObject.getLabel() + '</span>';
+                var alt = repoObject.getLabel();
                 if(repoObject.getDescription()){
                     label += '<span class="menu_description">' + repoObject.getDescription() + '</span>';
+                    alt += '-' + repoObject.getDescription();
+                }else{
+                    alt += (repoObject.getOwner() ? " ("+MessageHash[413]+" " + repoObject.getOwner()+ ")":"");
                 }
                 var actionData = {
 					name:label,
-					alt:repoObject.getLabel() + (repoObject.getOwner() ? " ("+MessageHash[413]+" " + repoObject.getOwner()+ ")":""),
+					alt:alt,
 					image:repoObject.getIcon(),
                     icon_class:"icon-hdd",
                     overlay:repoObject.getOverlay(),
@@ -223,7 +227,7 @@ Class.create("RepositorySelect", {
 			this.repoMenu.refreshList();
 		}else{
 			this.repoMenu = new Proto.Menu({			
-				className: 'menu rootDirChooser menuDetails',
+				className: 'menu rootDirChooser menuDetails workspacesMenu',
 				mouseClick:(this.options.menuEvent? this.options.menuEvent : 'left'),
 				anchor:button,
                 position: (this.options.menuPosition? this.options.menuPosition : 'bottom'),
@@ -236,6 +240,7 @@ Class.create("RepositorySelect", {
 				menuTitle:MessageHash[468],
 				menuItems: actions,
                 menuMaxHeight:this.options.menuMaxHeight,
+                menuFitHeight:this.options.menuFitHeight,
 				fade:true,
 				zIndex:1500
 			});

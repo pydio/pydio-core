@@ -18,18 +18,8 @@
     padding-left: 0;
 }
 
-span.letter_badge {
-    display: inline-block;
-    float: left;
-    width: 32px;
-    background-color: #111;
-    border-radius: 34px;
+#workspaces_list span.letter_badge {
     margin: 9px 13px 2px 50px;
-    color: white;
-    text-align: center;
-    padding: 7px 0;
-    font-size: 0.8em;
-    font-family: "Open Sans Regular";
 }
 
 #home_left_bar{

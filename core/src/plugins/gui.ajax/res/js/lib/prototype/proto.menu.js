@@ -382,11 +382,13 @@ Proto.Menu = Class.create({
 		var vpHeight = getViewPortHeight()-10;
         if(this.options.menuMaxHeight){
             vpHeight = Math.min(this.options.menuMaxHeight, vpHeight);
+        }else if(this.options.menuFitHeight){
+            var vpHeight = getViewPortHeight();
         }
 		var vpOff = document.viewport.getScrollOffsets();
 		var elDim = this.container.getDimensions();
 		var y = parseInt(offsetTop);
-		if((y - vpOff.top + elDim.height) >= vpHeight){
+		if((y - vpOff.top + elDim.height) >= vpHeight || this.options.menuFitHeight){
 			this.container.setStyle({height:(vpHeight-(y - vpOff.top))+'px',overflowY:'scroll'}); 
 			if(!this.containerShrinked) this.container.setStyle({width:elDim.width+16+'px'});
 			this.containerShrinked = true;

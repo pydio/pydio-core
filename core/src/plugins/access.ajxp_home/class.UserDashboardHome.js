@@ -88,10 +88,7 @@ Class.create("UserDashboardHome", AjxpPane, {
         var renderElement = function(repoObject){
 
             var repoId = repoObject.getId();
-            var startLetters;
-            var label = repoObject.getLabel();
-            startLetters = label.split(" ").map(function(word){return word.substr(0,1)}).join("");
-            var repoEl = new Element('li').update("<span class='letter_badge'>"+ startLetters +"</span><h3>"+repoObject.getLabel() + "</h3><h4>" + repoObject.getDescription()+"</h4>");
+            var repoEl = new Element('li').update(repoObject.getHtmlBadge() + "<h3>"+repoObject.getLabel() + "</h3><h4>" + repoObject.getDescription()+"</h4>");
             wsElement.insert(repoEl);
             var select = function(e){
                 var target = Event.findElement(e, "li");
