@@ -47,9 +47,10 @@
 
         }
 		this.createMenu();
-		document.observe("ajaxplorer:registry_loaded", function(event){
-			this.parseXml(event.memo);
-		}.bind(this) );
+        this.regObserver = function(event){
+            this.parseXml(event.memo);
+        }.bind(this);
+        document.observe("ajaxplorer:registry_loaded", this.regObserver);
 		document.observeOnce("ajaxplorer:actions_loaded", function(){
 			var bmAction = ajaxplorer.actionBar.actions.get('bookmark');
             if(!bmAction) return;
@@ -62,15 +63,21 @@
 				}.bind(this)
 			};		
 		}.bind(this));
-		document.observe("ajaxplorer:add_bookmark", function(){
-			var node = ajaxplorer.getUserSelection().getUniqueNode();
+        this.bmObserver = function(){
+            var node = ajaxplorer.getUserSelection().getUniqueNode();
             if(node.getMetadata().get('ajxp_bookmarked') && node.getMetadata().get('ajxp_bookmarked') == 'true'){
                 this.removeBookmark(node.getPath(), function(){ajaxplorer.fireNodeRefresh(node);});
             }else{
                 this.addBookmark(node.getPath(), node.getLabel(),function(){ajaxplorer.fireNodeRefresh(node);});
             }
-		}.bind(this) );
+        }.bind(this);
+		document.observe("ajaxplorer:add_bookmark", this.bmObserver );
 	},
+
+     destroy:function(){
+         document.stopObserving("ajaxplorer:add_bookmark", this.bmObserver);
+         document.stopObserving("ajaxplorer:registry_loaded", this.regObserver);
+     },
 	/**
 	 * Parses the registry to find the bookmarks definition
 	 * @param registry XMLDocument
@@ -191,7 +198,10 @@
 		actionsParameters.set('get_action', 'get_bookmarks');
 		connexion.setParameters(actionsParameters);
         if(onComplete){
-            connexion.onComplete = onComplete;
+            connexion.onComplete = function(transport){
+                onComplete();
+                ajaxplorer.notify('server_message:tree/reload_bookmarks');
+            };
         }else{
             connexion.onComplete = function(transport){
                 document.observeOnce("ajaxplorer:registry_part_loaded", function(event){
@@ -203,8 +213,10 @@
                     this.bmMenu.refreshList();
                     if(!silently) this.bmMenu.show();
                 }
+                ajaxplorer.notify('server_message:tree/reload_bookmarks');
             }.bind(this);
         }
+
 		connexion.sendAsync();
 	},
 	

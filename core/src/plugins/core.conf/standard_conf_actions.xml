@@ -173,7 +173,7 @@
                 <clientListener name="init"><![CDATA[
                 window.setTimeout(function(){
                     if(!$('get_bookmarks_button')) {
-                        ajaxplorer.bookmarkBar = new BookmarksBar(null, {});
+                        if(!ajaxplorer.bookmarkBar) ajaxplorer.bookmarkBar = new BookmarksBar(null, {});
                         return;
                     }
                     var bmBar = new BookmarksBar($('get_bookmarks_button'), {bookmarksMenuOptions:{

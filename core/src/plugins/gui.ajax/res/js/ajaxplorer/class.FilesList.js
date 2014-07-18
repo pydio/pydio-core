@@ -1715,7 +1715,7 @@ Class.create("FilesList", SelectableElements, {
                             );
                             if(this.protoMenu) this.protoMenu.addElements(innerSpan);
                         }
-                        if(!ajxpNode.isLeaf())
+                        if(!ajxpNode.isLeaf() && (this.options.droppable === undefined || this.options.droppable === true ))
                         {
                             AjxpDroppables.add(innerSpan, ajxpNode);
                         }
@@ -1857,7 +1857,7 @@ Class.create("FilesList", SelectableElements, {
 				}, this, 'filesList');
 			}.bind(this), 500);
 		}
-		if(!ajxpNode.isLeaf())
+		if(!ajxpNode.isLeaf() && (this.options.droppable === undefined || this.options.droppable === true ))
 		{
 			AjxpDroppables.add(newRow, ajxpNode);
 		}
@@ -2005,7 +2005,7 @@ Class.create("FilesList", SelectableElements, {
 				}, this, 'filesList');
 			}.bind(this), 500);
 		}
-		if(!ajxpNode.isLeaf())
+		if(!ajxpNode.isLeaf() && (this.options.droppable === undefined || this.options.droppable === true ))
 		{
 			AjxpDroppables.add(largeRow, ajxpNode);
 		}
@@ -2037,7 +2037,7 @@ Class.create("FilesList", SelectableElements, {
                         Event.stop(event);
                         dm.setSelectedNodes([ajxpNode]);
                         window.setTimeout(function(){
-                            button.ACTION.apply();
+                            button.ACTION.apply([ajxpNode]);
                         }, 20);
                     });
                 });

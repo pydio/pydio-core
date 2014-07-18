@@ -55,6 +55,36 @@ Class.create("VisibilityToggler", AjxpPane, {
             window.setTimeout(updaterScroller, 1500);
         });
 
+        this.parentElement = htmlElement.up();
+        Droppables.add(this.parentElement, {
+            hoverclass:'',
+            accept:'ajxp_draggable',
+            onHover:function(draggable, droppable, event)
+            {
+                if(!$(togId) || !$(detectionId)) return;
+                if($(detectionId).visible()) return;
+                if($(togId).ajxpPaneObject){
+                    $(togId).ajxpPaneObject.showElement(!$(detectionId).visible());
+                }else{
+                    var show = !$(detectionId).visible();
+                    if(show) $(togId).show();
+                    else $(togId).hide();
+                }
+                htmlElement.removeClassName('simple-toggler-show').removeClassName('simple-toggler-hide');
+                htmlElement.addClassName($(detectionId).visible()?'simple-toggler-hide':'simple-toggler-show');
+                htmlElement.update($(detectionId).visible()?"Hide":"Show");
+                updaterScroller();
+                window.setTimeout(updaterScroller, 1500);
+            }.bind(this)
+        });
+
+
+    },
+
+    destroy:function($super){
+        Droppables.remove(this.parentElement);
+        $super();
     }
+
 
 });

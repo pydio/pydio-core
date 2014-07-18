@@ -1796,6 +1796,25 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
     min-width: 400px;
 }
 
+#topPane div.FL-inlineToolbar{
+    position: absolute;
+    top: 10px;
+    right: 40px;
+    margin: 0;
+}
+
+#topPane div.FL-inlineToolbar div.toolbarGroup{
+    min-width: 0;
+}
+
+#topPane div.FL-inlineToolbar span.ajxp_icon_span{
+    color:#ccc;
+}
+
+#topPane div.FL-inlineToolbar span.actionbar_button_label{
+    display: none !important;
+}
+
 
 a.carousel-disabled{
     background-color: transparent;
@@ -2398,7 +2417,10 @@ div.header_resizer div.ascending {
 .thumbnail_selectable_cell.detailed.droppableZone
 {
     background-color: #c3d9ff !important;
-    /*border: 1px dotted #5C5C5C;*/
+}
+
+#topPane div.droppableZone{
+    background-color: rgba(255,255,255,0.2) !important;
 }
 
 .paginator
@@ -3439,6 +3461,13 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabe
 div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_label,
 #search_results div.thumbnail_selectable_cell.detailed span.text_label{
     padding-top: 0;
+}
+
+#topPane div.no-results-found{
+    padding: 0 24px;
+    font-size: 12px;
+    font-style: italic;
+    color: #ccc;
 }
 
 #no-results-found {
@@ -4684,6 +4713,15 @@ span.letter_badge {
     padding: 7px 0;
     font-size: 0.8em;
     font-family: "Open Sans Regular";
+}
+
+span#alerts_number {
+    display: inline-block;
+    font-size: 13px;
+    background-color: rgba(245, 199, 129, 1);
+    color: black;
+    border-radius: 20px;
+    padding: 0 6px;
 }
 
 

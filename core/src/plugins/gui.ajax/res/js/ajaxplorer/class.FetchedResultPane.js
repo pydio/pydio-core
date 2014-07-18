@@ -49,6 +49,9 @@ Class.create("FetchedResultPane", FilesList, {
             columnsTemplate:"search_results",
             selectable: true,
             draggable: false,
+            droppable: false,
+            containerDroppableAction:null,
+            emptyChildrenMessage:'',
             replaceScroller:true,
             fit:'height',
             detailThumbSize:22,
@@ -90,10 +93,37 @@ Class.create("FetchedResultPane", FilesList, {
                 var newValue = XPathSelectSingleNode(event, ajxpOptions.reloadOnServerMessage);
                 if(newValue) this.reloadDataModel();
             }.bind(this));
+            ajaxplorer.observe("server_message:" + ajxpOptions.reloadOnServerMessage, function(){
+                this.reloadDataModel();
+            }.bind(this));
+        }
+
+        if(ajxpOptions.containerDroppableAction){
+
+            Droppables.add(this.htmlElement, {
+                hoverclass:'droppableZone',
+                accept:'ajxp_draggable',
+                onDrop:function(draggable, droppable, event)
+                {
+                    if(draggable.getAttribute('user_selection')){
+                        ajaxplorer.actionBar.fireAction(ajxpOptions.containerDroppableAction);
+                    }else if(draggable.ajxpNode){
+                        ajaxplorer.actionBar.fireAction(ajxpOptions.containerDroppableAction, draggable.ajxpNode);
+                    }
+                }
+            });
+
         }
 
         //ajaxplorer.registerFocusable(this);
 
+    },
+
+    destroy:function($super){
+        if(this.options.containerDroppableAction){
+            Droppables.remove(this.htmlElement);
+        }
+        $super();
     },
 
     reloadDataModel: function(){
@@ -122,6 +152,16 @@ Class.create("FetchedResultPane", FilesList, {
         rNodeProvider.initProvider(ajxpOptions.nodeProviderProperties);
         this._rootNode = new AjxpNode("/", false, "Results", "folder.png", rNodeProvider);
         dataModel.setRootNode(this._rootNode);
+        if(ajxpOptions.emptyChildrenMessage){
+            var emptyMessage = MessageHash[ajxpOptions.emptyChildrenMessage]?MessageHash[ajxpOptions.emptyChildrenMessage]:ajxpOptions.emptyChildrenMessage;
+            this._rootNode.observe("loaded", function(){
+                this.htmlElement.select('div.no-results-found').invoke('remove');
+                if(!this._rootNode.getChildren().length){
+                    this.htmlElement.insert({bottom:'<div class="no-results-found">'+emptyMessage+'</div>'});
+                }
+            }.bind(this));
+        }
+
         return dataModel;
 
     },
