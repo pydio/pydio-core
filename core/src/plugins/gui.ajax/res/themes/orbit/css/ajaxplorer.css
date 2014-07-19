@@ -2966,9 +2966,12 @@ div.tabulatorContainer div#display_toolbar{
     margin-right: 0;
 }
 
-#info_panel h3 {
-    padding: 0 18px;
-    color: #fb725c;
+#info_panel span.user_meta_change {
+    display: inline-block !important;
+    text-transform: lowercase;
+    font-size: 11px !important;
+    margin: 3px 0;
+    border-bottom: 1px dotted #999;
 }
 
 span.toggleHeader{
@@ -5384,13 +5387,11 @@ DASHBOARD TABULATOR
 .flat_tabulator  div.panelHeader.tabulatorContainer
 {
     padding: 0 0 0 0;
-    height: 72px;
     background-color: #fff;
     border-bottom: 0;
 }
 
 .flat_tabulator span.toggleHeader{
-    padding: 36px 14px 15px;
     font-size: 13px;
 }
 

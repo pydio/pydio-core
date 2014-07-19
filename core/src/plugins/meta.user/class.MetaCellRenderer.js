@@ -226,6 +226,7 @@ Class.create("MetaCellRenderer", {
                 case "text":
                 case "string":
                 case "textarea":
+                    /*
                     if(typeof td.contentEditable != 'undefined'){
                         enableTextSelection(td);
                         var editableDiv = new Element("div", {
@@ -234,7 +235,8 @@ Class.create("MetaCellRenderer", {
                             style:"padding:2px;border:1px solid #bbb; border-radius:2px;"}).update(td.innerHTML);
                         td.update(editableDiv);
                         obj.linkEditableDiv(editableDiv);
-                    }
+                    }*/
+                    if(!td.innerHTML) td.update('No value');
                 break;
                 default:
                 break;
