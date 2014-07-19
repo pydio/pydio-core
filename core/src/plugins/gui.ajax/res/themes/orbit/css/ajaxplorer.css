@@ -1519,6 +1519,12 @@ div#navigation_toolbar {
     padding: 4px;
 }
 
+.create_file_alt_link{
+    font-family: "Open Sans Regular";
+    font-style: italic;
+    cursor: pointer;
+}
+
 .action_bar.editor_action_bar div.separator{
     display: none;
 }
@@ -1883,6 +1889,16 @@ div.class-FetchedResultPane > div.panelHeader
     display: block;
     clear: left;
     font-weight: lighter;
+}
+
+#topPane span.expand_label_hide,
+#topPane small.expand_button_hide span.expand_label_show
+{
+    display: none;
+}
+
+#topPane small.expand_button_hide span.expand_label_hide{
+    display: inline;
 }
 
 #search_meta div.advanced_search_section_title{
@@ -2948,6 +2964,11 @@ div.tabulatorContainer div#display_toolbar{
     margin-right: 0;
 }
 
+#info_panel h3 {
+    padding: 0 18px;
+    color: #fb725c;
+}
+
 span.toggleHeader{
     display: inline-block;
     overflow: hidden;
@@ -3216,7 +3237,8 @@ div.meta_toggle_button {
 }
 
 #basic_search{
-    padding: 7px;
+    padding: 8px;
+    min-height: 27px;
 }
 
 #search_meta.toggle_open #basic_search{
@@ -3889,6 +3911,20 @@ div.selectable_div, .table_rows_container, #tree_container, #bottomSplitPane, .a
 .table_rows_container tr.even:hover
 {
     background-color: rgb(253, 252, 228);
+}
+
+*{
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+input, .selectable{
+    -moz-user-select: auto;
+    -khtml-user-select: auto;
+    -webkit-user-select: auto;
+    user-select: auto;
 }
 
 .no_select_bg::selection {
@@ -4578,6 +4614,7 @@ div.menu a {
     width:expression("150px");
     -moz-border-radius : 0 5px 5px 5px;
     border-radius: 4px;
+    min-width: 160px;
 }
 
 .bmbarMenu div.moreActions {
@@ -5299,6 +5336,7 @@ TABULATOR IN A TABULATOR
     background-color: #ddd;
     color: rgb(111, 123, 136);
     border-right: 0;
+    overflow: hidden;
 }
 
 .innerTabulator  div.panelHeader.tabulatorContainer
@@ -5561,6 +5599,7 @@ div.horizontal_tabulator > div:not(.tabulatorContainer){
     color: #666;
     position: relative;
     background-color: #f5f5f5;
+    height: 22px;
 }
 
 .breadcrumbs-one li:first-child span{
