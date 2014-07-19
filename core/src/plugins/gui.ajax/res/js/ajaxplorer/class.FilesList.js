@@ -73,7 +73,9 @@ Class.create("FilesList", SelectableElements, {
                 this._instanciatedToolbars = $A();
             }
 		}
-        //this.options.replaceScroller = false;
+        if(this.options.fit && this.options.fit == "content"){
+            this.options.replaceScroller = false;
+        }
         if(!FilesList.staticIndex) {
             FilesList.staticIndex = 1;
         }else{

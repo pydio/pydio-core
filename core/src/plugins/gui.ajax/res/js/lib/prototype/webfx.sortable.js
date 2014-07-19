@@ -346,7 +346,7 @@ SortableTable = Class.create({
 			// remove from doc
 			var nextSibling = tBody.nextSibling;
 			var p = tBody.parentNode;
-			p.removeChild(tBody);
+            if(p) p.removeChild(tBody);
 		}
         tBody.select('div[data-groupbyvalue]').invoke('remove');
 	
@@ -388,7 +388,7 @@ SortableTable = Class.create({
             }
         }
 
-		if (this.removeBeforeSort) {
+		if (this.removeBeforeSort && p) {
 			// insert into doc
 			p.insertBefore(tBody, nextSibling);
 		}

@@ -1316,6 +1316,7 @@ div.dialogBox.form-login_form_dynamic div.dialogContent
 div.dialogBox.form-login_form div.dialogTitle,
 div.dialogBox.form-login_form_dynamic div.dialogTitle
 {
+    display: block !important;
     position: absolute;
     top: 35%;
     right: -113%;
@@ -2440,6 +2441,14 @@ div.header_resizer div.ascending {
 #topPane div.droppableZone{
     background-color: rgba(255,255,255,0.2) !important;
 }
+
+#topPane div#flagged_elements.droppableZone{
+
+/*    background-color: transparent !important;
+    border-bottom: 1px solid #ddd;
+*/
+}
+
 
 .paginator
 {
@@ -5116,9 +5125,13 @@ div.dialogBox div.dialogBox.css_boxshadow > div{
     z-index: 2002;
     left: 40%;
     position: absolute;
-    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.23);
-    -webkit-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.23);
-    -moz-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.23);
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.23);
+    -webkit-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.23);
+    -moz-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.23);
+}
+
+#progressBox div.dialogTitle{
+    display: none;
 }
 
 div.overlay.form-login_form,

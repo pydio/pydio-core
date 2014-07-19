@@ -68,7 +68,7 @@ Class.create("Modal", {
             if(sIconClass){
                 hString = "<span class=\"titleString\"><span class='"+sIconClass+" ajxp_icon_span'></span>";
             }
-            closeBtn = '<span id="modalCloseBtn" class="icon-remove-sign" style="cursor:pointer;float:right;"></span>';
+            closeBtn = '<span id="modalCloseBtn" class="icon-remove" style="cursor:pointer;float:right;"></span>';
         }else{
             closeBtn = '<img id="modalCloseBtn" style="cursor:pointer;float:right;margin-top:2px;" src="'+ajxpResourcesFolder+'/images/actions/16/window_close.png" />';
         }

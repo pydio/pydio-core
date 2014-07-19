@@ -29,7 +29,7 @@ Class.create("InfoPanel", AjxpPane, {
 	 * @param htmlElement HTMLElement
 	 */
 	initialize: function($super, htmlElement, options){
-		$super(htmlElement, options);
+		$super(htmlElement, Object.extend({replaceScroller:false},options));
 		disableTextSelection(htmlElement);
         var id = htmlElement.id;
         var container = new Element("div", {className:"panelContent", id:"ip_content_"+id});

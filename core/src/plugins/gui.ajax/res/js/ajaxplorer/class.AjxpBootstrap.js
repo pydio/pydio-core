@@ -278,7 +278,7 @@ Class.create("AjxpBootstrap", {
 			}else{
 				html+='	<div style="padding:4px 7px;position: relative;"><div>Build your own box! <span id="version_span"></span></div>';
 			}
-			html+='	Copyright C. du Jeu 2008-2013 - AGPL License';
+			html+='	Copyright C. du Jeu 2008-2014 - AGPL License';
             html+='<div id="progressState" style="float:left; display: none;">Booting...</div>';
 			html+='	<div id="progressBarContainer" style="margin-top:3px; margin-left: 126px;display: none;"><span id="loaderProgress"></span></div>';
             html+= '<div id="progressBarHeighter" style="height:10px;display: none;"></div>';

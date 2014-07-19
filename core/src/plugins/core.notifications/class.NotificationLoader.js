@@ -301,9 +301,12 @@ Class.create("NotificationLoader", {
         var resultPane = container.down("#activity_results");
         if(node.isLeaf()) resultPane.addClassName('leaf_activity');
         else resultPane.removeClassName('leaf_activity');
+        var timer = NotificationLoader.prototype.loaderTimer;
+        if(timer) window.clearTimeout(timer);
 
         var fRp = new FetchedResultPane(resultPane, {
             "fit":"content",
+            "replaceScroller": false,
             "columnsDef":[
                 {"attributeName":"ajxp_label", "messageId":1, "sortType":"String"},
                 {"attributeName":"event_time", "messageString":"Time", "sortType":"MyDate"},
@@ -336,10 +339,14 @@ Class.create("NotificationLoader", {
                 }
             }
         });
-        fRp.showElement(true);
+        // fRp.showElement(true);
+        NotificationLoader.prototype.loaderTimer = window.setTimeout(function(){
+            fRp.showElement(true);
+        }, 0.5);
 
-        // TODO , RESIZE CONTAINER PANEL WHEN DATAMODEL IS REFRESHED - OR HIDE THE TITLE
-    }
+    },
+
+    loaderTimer: null,
 
 });
 

@@ -53,6 +53,7 @@ Class.create("FetchedResultPane", FilesList, {
             containerDroppableAction:null,
             emptyChildrenMessage:'',
             replaceScroller:true,
+            forceClearOnRepoSwitch:false,
             fit:'height',
             detailThumbSize:22,
             updateGlobalContext:false,
@@ -75,13 +76,15 @@ Class.create("FetchedResultPane", FilesList, {
             dataModel.observe("selection_changed", this.options.selectionChangeCallback);
         }
 
-        document.observe("ajaxplorer:repository_list_refreshed", function(){
-            this._rootNode.clear();
-            this._dataLoaded = false;
-            if(this.htmlElement && this.htmlElement.visible()){
-                this.showElement(true);
-            }
-        }.bind(this));
+        if(this.options.forceClearOnRepoSwitch){
+            document.observe("ajaxplorer:repository_list_refreshed", function(){
+                this._rootNode.clear();
+                this._dataLoaded = false;
+                if(this.htmlElement && this.htmlElement.visible()){
+                    this.showElement(true);
+                }
+            }.bind(this));
+        }
 
         this.hiddenColumns.push("is_file");
         this._sortableTable.sort(2, false);

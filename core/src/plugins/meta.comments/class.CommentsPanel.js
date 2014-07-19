@@ -56,6 +56,8 @@
 
 Class.create("CommentsPanel", {
 
+    loaderTimer: null,
+
     // Warning, method is called statically, there is no "this"
     loadInfoPanel : function(container, node){
 
@@ -68,6 +70,9 @@ Class.create("CommentsPanel", {
         });
 
         if(node.getMetadata().get("ajxp_has_comments_feed")){
+
+            var timer = CommentsPanel.prototype.loaderTimer;
+            if(timer) window.clearTimeout(timer);
 
             var loader = function(pe){
 
@@ -102,7 +107,11 @@ Class.create("CommentsPanel", {
                 conn.sendAsync();
 
             }
-            loader();
+
+            CommentsPanel.prototype.loaderTimer = window.setTimeout(function(){
+                loader();
+            }, 0.3);
+
             var pe = new PeriodicalExecuter(loader, 5);
 
         }

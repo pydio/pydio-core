@@ -295,14 +295,19 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, listen)
 	if(!element) return;
 	if(typeof(parentElement) == "undefined" || parentElement == null){
 		parentElement = Position.offsetParent($(element));
-	}else{
+	}else if(parentElement == "window") {
+        parentElement = window;
+    }else{
 		parentElement = $(parentElement);
 	}
+    if(!parentElement){
+        if(console) console.log('Warning, trying to fitHeightToBottom on null parent!', element.id);
+        return;
+    }
 	if(typeof(addMarginBottom) == "undefined" || addMarginBottom == null){
 		addMarginBottom = 0;
 	}
-    if(parentElement == "window") parentElement = window;
-		
+
 	var observer = function(){	
 		if(!element) return;	
 		var top =0;

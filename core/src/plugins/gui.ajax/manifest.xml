@@ -13,7 +13,7 @@
                     editable="true"
                     uploadAction="store_binary_temp"
                     loadAction="get_global_binary_param"
-                    defaultImage="plugins/gui.ajax/LoginBoxLogo.png"
+                    defaultImage="plugins/gui.ajax/res/themes/orbit/images/Logo_White_300.png"
                     mandatory="false"
                 />
         <global_param name="CUSTOM_ICON" group="CONF_MESSAGE[Start Up Screen]" type="string" label="CONF_MESSAGE[Icon Path (Legacy)]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]" default="plugins/gui.ajax/LoginBoxLogo.png" mandatory="false"/>
@@ -234,12 +234,12 @@
 				</div>
 			]]></template>
             <template name="main_orbit" element="ajxp_desktop" position="top" theme="orbit"><![CDATA[
-                <div id="background-imager" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_"}'>
+                <div id="background-imager" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop","imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_"}'>
                     <div id="global_toolbar" ajxpClass="LogoWidget">
                         <div id="clickable_home" title="Home"></div>
                         <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over","menuOffsetLeft":11,"menuOffsetTop":11}'></div>
                     </div>
-                    <div id="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'></div>
+                    <div id="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop"}'></div>
                 </div>
                 <script>
                 if($('clickable_home')){

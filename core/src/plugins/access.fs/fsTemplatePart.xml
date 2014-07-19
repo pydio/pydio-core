@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <registry_contributions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_configs>
-        <template_part ajxpClass="AjxpPane" ajxpId="orbit_content" ajxpOptions="{}" theme="orbit"><![CDATA[
+        <template_part ajxpClass="AjxpPane" ajxpId="orbit_content" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}' theme="orbit"><![CDATA[
             <div id="workspace_toolbar" ajxpClass="AjxpPane" class="skipSibling">
                 <div id="repo_chooser" style="width:15px;" ajxpClass="RepositorySelect" ajxpOptions='{"menuPosition": "bottom middle", "menuOffsetTop":0, "menuOffsetLeft":116, "menuFitHeight":true, "menuEvent":"over", "simpleLabel":"<span class=\"icon-caret-down\"></span>"}'></div>
                 <div id="breadcrumb" class="breadcrumbs-one" ajxpClass="Breadcrumb" ajxpOptions='{"use_ul":true, "always_show_root":true, "hide_home_icon":true, "flexTo":"workspace_toolbar", "flexToMargin":80, "checkSiblings":true, "resize_events":["actions_refreshed"]}'></div>
@@ -14,7 +14,7 @@
             <div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
                 <div id="topPane" ajxpClass="AjxpPane" ajxpOptions=''>
                     <div id="navigation_pane" style="position:relative;" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}' >
-                        <div id="navigation_scroller" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "replaceScroller":true}'>
+                        <div id="navigation_scroller" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop", "replaceScroller":true}'>
                             <div id="navigation_bookmarks" ajxp_position="1">
                                 <h3 class="colorcode-bookmark" ajxp_message_id="147">AJXP_MESSAGE[147]
                                     <small id="bookmarks_toggler" class="simple-toggler-show" ajxpClass="VisibilityToggler" ajxpOptions='{"widget_id":"flagged_elements"}'>AJXP_MESSAGE[513]</small>
