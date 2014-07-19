@@ -19,12 +19,12 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connection data",
-"2" => "Host",
-"3" => "Optional data",
+"1" => "Verbindungsdaten",
+"2" => "Servername",
+"3" => "Optionale Daten",
 "4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
+"5" => "Protokoll",
+"6" => "Zeichensatz",
+"7" => "Aktiv",
 "8" => "Port",
 );
