@@ -16,7 +16,7 @@
     </server_settings>
     <registry_contributions>
         <client_configs>
-            <component_config className="AjxpTabulator::userdashboard_parameters_tab">
+            <component_config className="AjxpTabulator::userdashboard_main_tab">
                 <additional_tab id="apikeys_pane"
                                 tabInfo='{"id":"my-api-data","iconClass":"icon-cog","element":"apikeys_pane","closeable":false,"label":"403","title":"403","dontFocus":true,"position":2}'
                                 paneInfo='{"type":"widget"}'><![CDATA[

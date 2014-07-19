@@ -80,10 +80,15 @@
     opacity: 1;
 }
 
-.flat_tabulator[data-ajxpTabsCount="1"] span.toggleHeader
-{
-/*    background-color: white;*/
+#editor_tabs > div.tabulatorContainer{
+    box-shadow: inset 0px 2px 4px rgba(0,0,0,0.15);
 }
+
+#editor_tabs[data-ajxpTabsCount="1"] div.tabulatorContainer
+{
+    display: none;
+}
+
 
 .settings_search_container{
     display: block;

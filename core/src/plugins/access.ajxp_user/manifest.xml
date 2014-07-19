@@ -135,7 +135,7 @@
                     background-color: #e35d52;
                 }
                 .action_bar{
-                    background-color: #ebedf0;
+                    background-color: #cccccc;
                     padding: 4px;
                     border-left:1px solid #5C5C5C;
                 }
@@ -149,6 +149,7 @@
                     background-color: #e35d52;
                     margin-top:3px;
                     cursor: pointer;
+                    color: white;
                 }
                 div.class-FetchedResultPane{
                     background-color: #f8f8f8;
@@ -176,26 +177,20 @@
                 }
                 #global_toolbar{
                     background-image: url("plugins/gui.ajax/res/themes/orbit/images/white_logo.png");
+                    background-color: rgba(43, 44, 44, 0.89);
                 }
                 </style>
-                <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="dashboard_main_pane horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "tabsTips":"middle right", "defaultTabId": "parameters","tabInfos" : [{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"parameters_pane"},{"id":"info","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"files_list_pane"}]}'>
-                    <div id="files_list_pane" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                        <div id="userdashboard_addressbook_tab" ajxpClass="AjxpTabulator" class="horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "tabsTips":"middle right", "saveState":false,"events":{}, "defaultTabId": "my-users","tabInfos" : [{"id":"my-users","label":"user_dash.48", "title":"user_dash.49","iconClass":"icon-user", "element":"my-users-pane"}]}'>
-                            <div id="my-users-pane" ajxpClass="AjxpPane" class="tabbed_editor">
-                                <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                                <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
-                            </div>
-                        </div>
+                <div id="userdashboard_myparams_title" ajxp_message_id="user_dash.title">AJXP_MESSAGE[user_dash.title]</div>
+                <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="dashboard_main_pane horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "tabsTips":"middle right", "defaultTabId": "parameters","tabInfos" : [{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"account_pane"},{"id":"info","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"my-users-pane"}]}'>
+                    <div id="my-users-pane" ajxpClass="AjxpPane" class="tabbed_editor">
+                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                        <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
                     </div>
-                    <div id="parameters_pane" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                        <div id="userdashboard_parameters_tab" ajxpClass="AjxpTabulator" class="horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "tabsTips":"middle right", "saveState":false,"events":{}, "defaultTabId": "account","tabInfos" : [{"id":"account","label":"user_dash.44", "title":"user_dash.45","iconClass":"icon-reorder", "element":"account_pane"}]}'>
-                            <div id="account_pane" ajxpClass="UserProfileEditor" class="tabbed_editor">
-                                <div class="action_bar">
-                                    <div class="toolbarGroup"></div>
-                                </div>
-                                <div id="user_profile_form"></div>
-                            </div>
+                    <div id="account_pane" ajxpClass="UserProfileEditor" class="tabbed_editor" ajxpOptions='{"fit":"height"}'>
+                        <div class="action_bar">
+                            <div class="toolbarGroup"></div>
                         </div>
+                        <div id="user_profile_form"></div>
                     </div>
                 </div>
 			]]></template_part>
