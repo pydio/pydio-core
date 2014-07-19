@@ -1103,6 +1103,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
      */
     public function loadNodeInfo(&$ajxpNode, $parentNode = false, $details = false)
     {
+        $mess = ConfService::getMessages();
+
         $nodeName = basename($ajxpNode->getPath());
         $metaData = $ajxpNode->metadata;
         if (!isSet($metaData["is_file"])) {
@@ -1114,7 +1116,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $metaData["filename"] = $ajxpNode->getPath();
 
         if (RecycleBinManager::recycleEnabled() && $ajxpNode->getPath() == RecycleBinManager::getRelativeRecycle()) {
-            $mess = ConfService::getMessages();
             $recycleIcon = ($this->countFiles($ajxpNode->getUrl(), false, true)>0?"trashcan_full.png":"trashcan.png");
             $metaData["icon"] = $recycleIcon;
             $metaData["mimestring"] = $mess[122];
@@ -1158,7 +1159,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $metaData["file_perms"] = $fPerms;
         $datemodif = $this->date_modif($ajxpNode->getUrl());
         $metaData["ajxp_modiftime"] = ($datemodif ? $datemodif : "0");
-        $metaData["ajxp_description"] =$metaData["ajxp_relativetime"] = "modified ".AJXP_Utils::relativeDate($datemodif, ConfService::getMessages());
+        $metaData["ajxp_description"] =$metaData["ajxp_relativetime"] = strtolower($mess[4])." ".AJXP_Utils::relativeDate($datemodif, $mess);
         $metaData["bytesize"] = 0;
         if ($isLeaf) {
             $metaData["bytesize"] = $this->filesystemFileSize($ajxpNode->getUrl());

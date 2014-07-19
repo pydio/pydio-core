@@ -137,5 +137,6 @@ $mess = array(
 "128" => "Migrer les anciens partages",
 "129" => "Copier le lien",
 "130" => "Copier l'URL dans votre presse-papier",
+"131" => "Vous n'avez pas partagé de fichiers ou de dossiers.",
 // will be replaced by the filename to download
 );

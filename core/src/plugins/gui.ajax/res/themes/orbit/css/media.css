@@ -9,6 +9,16 @@ and (max-width : 800px) {
 }
 
 @media only screen
+and (max-width : 1000px) {
+    #display_toolbar span.actionbar_button_label{
+        display: none !important;
+    }
+    #display_toolbar span.ajxp_icon_span{
+        display: inline-block !important;
+    }
+}
+
+@media only screen
 and (max-width : 680px) {
     .ws-label{
         display: none !important;
@@ -23,6 +33,26 @@ and (max-width : 680px) {
     {
         display: none !important;
     }
+    div.toolbarGroup span.ajxp_icon_span
+    {
+        display: inline-block !important;
+        padding: 5px 2px 4px;
+    }
+
+    div.toolbarGroup a{
+        padding-bottom: 2px !important;
+    }
+
+    div.toolbarGroup a span.ajxp_icon_span{
+        display: inline-block !important;
+
+    }
+
+    #group_more_action_button{
+        padding-top: 6px !important;
+        padding-bottom: 4px !important;
+    }
+
     #simple_repository_label{
         font-size: 16px;
         width: 100px !important;
@@ -33,15 +63,21 @@ and (max-width : 680px) {
     #workspace_toolbar {
         padding-top: 0;
     }
-    #group_more_action_button{
-        height:17px;
-    }
     .user_widget_label.withImage i{
         width: 30px;
         overflow: hidden;
     }
     .thumbnail_selectable_cell > div > div.overlay_icon_div{
         top: 32px !important;
+    }
+    #topPane{
+        width: 200px;
+    }
+
+    .breadcrumbs-one span.reduced.first-bread, .breadcrumbs-arrow span.reduced.first-bread{
+        width: 121px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 }
 

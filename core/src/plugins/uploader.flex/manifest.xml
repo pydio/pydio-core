@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<uploader id="uploader.flex" text="51" title="162" label="CONF_MESSAGE[Flash uploader]" description="CONF_MESSAGE[Legacy flash uploader, used when the browser does not support HTML5. If you want to force the usage of this uploader, deactivate the uploader.html, and remove the activeCondition tag from the uploader.flex manifest file.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<uploader id="uploader.flex" text="51" order="1" title="162" label="CONF_MESSAGE[Flash uploader]" description="CONF_MESSAGE[Legacy flash uploader, used when the browser does not support HTML5. If you want to force the usage of this uploader, deactivate the uploader.html, and remove the activeCondition tag from the uploader.flex manifest file.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/uploader.flex/class.FlexUploadProcessor.php" classname="FlexUploadProcessor"/>
     <client_settings>
         <resources>

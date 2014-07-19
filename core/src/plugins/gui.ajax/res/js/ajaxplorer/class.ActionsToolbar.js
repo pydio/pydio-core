@@ -21,14 +21,15 @@
 /**
  * Toolbar to display actions buttons
  */
-Class.create("ActionsToolbar", {
+Class.create("ActionsToolbar", AjxpPane, {
 	__implements : "IAjxpWidget",
 	/**
 	 * Constructor
 	 * @param oElement Element The dom node
 	 * @param options Object The toolbar options. Contains a buttonRenderer and a toolbarsList array.
 	 */
-	initialize : function(oElement, options){
+	initialize : function($super, oElement, options){
+        $super(oElement, options);
 		this.element = oElement;		
 		this.element.ajxpPaneObject = this;
 		this.options = Object.extend({
@@ -632,7 +633,8 @@ Class.create("ActionsToolbar", {
 	/**
 	 * Resize the widget. May trigger the apparition/disparition of the Carousel buttons.
 	 */
-	resize : function(){
+	resize : function($super){
+        $super();
         if(this.options.skipCarousel) {
             return;
         }

@@ -78,7 +78,7 @@ Class.create("UserDashboardHome", AjxpPane, {
                 return;
             }
             legendBlock.update(repoObject.getLabel() + '<small>' + repoObject.getDescription() + '</small>');
-            legendBlock.insert('<a>Enter workspace</a>');
+            legendBlock.insert('<a>'+MessageHash['user_home.42']+'</a>');
             legendBlock.down('a').observe('click', function(){
                 switchToRepo(repoObject.getId());
             });

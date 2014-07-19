@@ -26,4 +26,8 @@ $mess=array(
 "5" => "Todos os Eventos",
 "6" => "Ir para ...",
 "7" => "Descartar",
+"8" => "No alerts - Watch files/folders to be alerted when they are consulted/modified by other users.",
+"9" => "Workspace Activity",
+"10" => "Folder Activity",
+"11" => "File Activity",
 );

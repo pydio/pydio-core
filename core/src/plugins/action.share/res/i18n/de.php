@@ -136,4 +136,5 @@ $mess = array(
 "128" => "Migrate legacy shares",
 "129" => "Copy URL",
 "130" => "Copy URL to your clipboard",
+"131" => "No shared files or folders yet.",
 );

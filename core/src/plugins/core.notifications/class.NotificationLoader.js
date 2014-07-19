@@ -296,7 +296,8 @@ Class.create("NotificationLoader", {
     },
 
     loadInfoPanel : function(container, node){
-        container.down("#ajxp_activity_panel").update('<div class="panelHeader" style="display: none;">'+(node.isLeaf()?'File Activity':'Folder Activity')+'</div><div id="activity_results">Nothing</div>');
+        var label= MessageHash['notification_center.'+(node.isLeaf()?'11': (node.isRoot()?'9': '10'))];
+        container.down("#ajxp_activity_panel").update('<div class="panelHeader" style="display: none;">'+label+'</div><div id="activity_results">Nothing</div>');
         var resultPane = container.down("#activity_results");
         if(node.isLeaf()) resultPane.addClassName('leaf_activity');
         else resultPane.removeClassName('leaf_activity');

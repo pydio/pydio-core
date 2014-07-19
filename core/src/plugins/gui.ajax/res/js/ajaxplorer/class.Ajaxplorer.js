@@ -815,6 +815,11 @@ Class.create("Ajaxplorer", {
 					$('all_forms').insert(clientForm.firstChild.nodeValue);
 				}
 			}
+            if(xmlNode.getAttribute("order")){
+                extensionDefinition.order = parseInt(xmlNode.getAttribute("order"));
+            }else{
+                extensionDefinition.order = 0;
+            }
 			var extensionOnInit = XPathSelectSingleNode(xmlNode, 'processing/extensionOnInit');
 			if(extensionOnInit && extensionOnInit.firstChild){
 				try{eval(extensionOnInit.firstChild.nodeValue);}catch(e){}

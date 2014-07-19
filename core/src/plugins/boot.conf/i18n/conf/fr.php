@@ -58,4 +58,6 @@ $mess = array(
 "Mail address of the user" => "Adresse Email de l'utilsateur, de l'utilisatrice",
 "Display name" => "Nom d'affichage",
 "Password" => "Mot de passe",
+"Configurations storage" => "&lt;span class='icon-save'&gt;&lt;/span&gt; Configurations storage",
+"Database system (production environments, requires a DBMS supported by APPLICATION_TITLE))" => "Database (production environments, requires a DBMS supported by APPLICATION_TITLE)",
 );

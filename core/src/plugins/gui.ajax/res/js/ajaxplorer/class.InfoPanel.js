@@ -133,6 +133,7 @@ Class.create("InfoPanel", AjxpPane, {
         if(objectOrEvent.__className && objectOrEvent.__className == "AjxpNode"){
             var passedNode = objectOrEvent;
         }
+        this.insertedTemplates = $A();
         var userSelection = ajaxplorer.getUserSelection();
         var contextNode = userSelection.getContextNode();
 		this.empty();
@@ -141,6 +142,15 @@ Class.create("InfoPanel", AjxpPane, {
 		if(!contextNode) {
 			return;
 		}
+        var repoOptions = {};
+        if(ajaxplorer.user && ajaxplorer.user.getActiveRepository()){
+            var repo = ajaxplorer.user.repositories.get(ajaxplorer.user.getActiveRepository());
+            repoOptions = {
+                ws_label: repo.getLabel(),
+                ws_badge: repo.getHtmlBadge()
+            }
+        }
+
 		if(!passedNode && userSelection.isEmpty())
 		{
 			var currentRep;
@@ -166,13 +176,16 @@ Class.create("InfoPanel", AjxpPane, {
 					size += parseInt(itemData.get("bytesize"));
 				}
 			}
-			
-			this.evalTemplateForMime((contextNode.getPath() =="/" && this.registeredMimes.get("ajxp_root_node") ? "ajxp_root_node": "no_selection"), (contextNode.getPath() =="/" ? contextNode : null), {
-				filelist_folders_count:folderNumber,
-				filelist_files_count:filesNumber,
-				filelist_totalsize:roundSize(size, (MessageHash?MessageHash[266]:'B')),
-				current_folder:currentRep
-			});
+			var options = Object.extend({
+                filelist_folders_count:folderNumber,
+                filelist_files_count:filesNumber,
+                filelist_totalsize:roundSize(size, (MessageHash?MessageHash[266]:'B')),
+                current_folder:currentRep
+            }, repoOptions);
+			this.evalTemplateForMime(
+                (contextNode.getPath() =="/" && this.registeredMimes.get("ajxp_root_node") ? "ajxp_root_node": "no_selection"),
+                (contextNode.getPath() =="/" ? contextNode : null),
+                options);
             try{
 				if(!folderNumber && $(this.contentContainer).select('[id="filelist_folders_count"]').length){
 					$(this.contentContainer).select('[id="filelist_folders_count"]')[0].hide();
@@ -208,7 +221,11 @@ Class.create("InfoPanel", AjxpPane, {
         this.updateTitle(uniqNode.getLabel());
 		var isFile = false;
 		if(uniqNode) isFile = uniqNode.isLeaf();
-		this.evalTemplateForMime((isFile?'generic_file':'generic_dir'), uniqNode);
+        if(!isFile && uniqNode && uniqNode.isRoot()){
+            this.evalTemplateForMime("ajxp_root_node", uniqNode, repoOptions);
+        }else{
+    		this.evalTemplateForMime((isFile?'generic_file':'generic_dir'), uniqNode);
+        }
 
 		var extension = getAjxpMimeType(uniqNode);
         var metadata = uniqNode.getMetadata();
@@ -353,6 +370,9 @@ Class.create("InfoPanel", AjxpPane, {
             if(skipId && skipId == registeredTemplates[i]){
                 continue;
             }
+            if(this.insertedTemplates.indexOf(registeredTemplates[i]) > -1){
+                continue;
+            }
             var templateData = this.mimesTemplates.get(registeredTemplates[i]);
             if(primaryId && genericId && genericId == registeredTemplates[i]){
                 //replace;
@@ -425,6 +445,7 @@ Class.create("InfoPanel", AjxpPane, {
             }else{
                 this.contentContainer.insert(template.evaluate(tArgs));
             }
+            this.insertedTemplates.push(registeredTemplates[i]);
 			if(tModifier){
 				var modifierFunc = eval(tModifier);
 				modifierFunc(this.contentContainer, fileNode);

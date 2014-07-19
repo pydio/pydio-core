@@ -28,6 +28,7 @@ Class.create("VisibilityToggler", AjxpPane, {
      */
     initialize : function($super, htmlElement, options){
 
+        $super(htmlElement, options);
         var togId = options['widget_id'];
         var detectionId= options['detection_id'] ? options['detection_id'] : options['widget_id'];
         var updaterScroller = function(){
@@ -50,7 +51,7 @@ Class.create("VisibilityToggler", AjxpPane, {
             }
             htmlElement.removeClassName('simple-toggler-show').removeClassName('simple-toggler-hide');
             htmlElement.addClassName($(detectionId).visible()?'simple-toggler-hide':'simple-toggler-show');
-            htmlElement.update($(detectionId).visible()?"Hide":"Show");
+            htmlElement.update($(detectionId).visible()?MessageHash[514]:MessageHash[513]);
             updaterScroller();
             window.setTimeout(updaterScroller, 1500);
         });
@@ -72,7 +73,7 @@ Class.create("VisibilityToggler", AjxpPane, {
                 }
                 htmlElement.removeClassName('simple-toggler-show').removeClassName('simple-toggler-hide');
                 htmlElement.addClassName($(detectionId).visible()?'simple-toggler-hide':'simple-toggler-show');
-                htmlElement.update($(detectionId).visible()?"Hide":"Show");
+                htmlElement.update($(detectionId).visible()?MessageHash[514]:MessageHash[513]);
                 updaterScroller();
                 window.setTimeout(updaterScroller, 1500);
             }.bind(this)

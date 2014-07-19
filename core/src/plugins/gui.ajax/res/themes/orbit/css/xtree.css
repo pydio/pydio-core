@@ -67,6 +67,7 @@
     background-position: 4px 1px;
     background-repeat: no-repeat;
     font-size: 13px;
+    background-size: 16px;
 }
 
 *::-moz-focus-inner { 

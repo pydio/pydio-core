@@ -120,8 +120,10 @@
                         <div class="infoPanelImagePreview">
                             <div class="infoPanelBasenameTitle">#{basename}</div>
                             #{preview_rich}
-                            <div class="toolbar_placeholder" data-toolbarId="info_panel" style="margin-top: 15px;"></div>
-                            <div class="toolbar_placeholder" data-toolbarId="info_panel_share"></div>
+                            <div>
+                                <div class="toolbar_placeholder" data-toolbarId="info_panel" style="margin-top: 15px;"></div>
+                                <div class="toolbar_placeholder" data-toolbarId="info_panel_share"></div>
+                            </div>
                         </div>
                         <div class="infoPanelAllMetadata">
                             <div id="info_panel_primary">

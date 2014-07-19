@@ -449,7 +449,7 @@ div.shadow_class
 .dialogTitle
 {
     cursor:move;
-    font-size: 13px !important;
+    font-size: 15px !important;
 }
 
 .dialogTitle span.ajxp_icon_span,
@@ -462,19 +462,22 @@ div.shadow_class
 }
 
 .dialogTitle span#modalCloseBtn{
-    font-size: 13px;
-    margin-top:2px
+    font-size: 17px;
+    margin-top: 0;
+    color: #AFAFAF;
 }
 
+.dialogTitle span.string-only-title {
+    font-family: "Open Sans Regular";
+}
 
 .dialogContent
 {
     background-color: #fff;
     padding: 10px 10px;
-    border: 1px solid #dddddd;
-    -moz-border-radius: 0 0 3px 3px;
-    border-radius: 0 0 3px 3px;
-    background-image: url('../images/grid_tl.png');
+    -moz-border-radius: 0 0 5px 5px;
+    border-radius: 0 0 5px 5px;
+    /* background-image: url('../images/grid_tl.png'); */
     border-top: 0;
     color: #5C5C5C;
 }
@@ -1478,12 +1481,11 @@ div#navigation_toolbar {
     background-color: #4dc5c3;
     border-bottom: 1px solid rgb(67, 156, 155);
     */
-    border-radius: 2px 2px 0 0;
-    background-color: #145170;
-    border-bottom: 0px solid #b5b5b5;
-    color: #fff;
-    padding: 9px 4px 9px 10px;
-    font-weight: normal;
+    border-radius: 4px 4px 0 0;
+    background-color: #F3F3F3;
+    border-bottom: 1px solid #CFCFCF;
+    color: #555;
+    padding: 11px 4px 13px 10px;
 }
 
 #sidebar_splitter div.panelHeader,
@@ -5077,7 +5079,7 @@ div.menuActions img{
 .dialogBox, div.dialogBox.css_boxshadow{
     -moz-box-shadow: 5px 5px 60px #222;
     -webkit-box-shadow: 5px 5px 60px #222;
-    box-shadow: 5px 5px 60px #222;
+    box-shadow: 1px 2px 4px rgba(0,0,0,0.4);
 }
 
 div.dialogBox div.dialogBox.css_boxshadow{

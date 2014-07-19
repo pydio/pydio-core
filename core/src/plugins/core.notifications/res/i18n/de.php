@@ -26,4 +26,8 @@ $mess=array(
 "5" => "Aktuelle Geschehen",
 "6" => "Go to ...",
 "7" => "Dismiss",
+"8" => "No alerts - Watch files/folders to be alerted when they are consulted/modified by other users.",
+"9" => "Workspace Activity",
+"10" => "Folder Activity",
+"11" => "File Activity",
 );

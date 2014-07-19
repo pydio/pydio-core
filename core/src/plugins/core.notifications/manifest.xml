@@ -97,7 +97,7 @@
         </hooks>
         <client_configs>
             <component_config className="InfoPanel">
-                <infoPanelExtension mime="generic_dir,generic_file" attributes="" modifier="NotificationLoader.prototype.loadInfoPanel">
+                <infoPanelExtension mime="ajxp_root_node,generic_dir,generic_file" attributes="" modifier="NotificationLoader.prototype.loadInfoPanel">
                     <messages>
                         <message key="type_string" id="share_center.50"/>
                     </messages>
@@ -106,6 +106,14 @@
                         </div>
                     ]]></html>
                 </infoPanelExtension>
+            </component_config>
+            <component_config className="AjxpPane::navigation_scroller">
+                <additional_content id="navigation_alerts"><![CDATA[
+                <div id="navigation_alerts" ajxp_position="0">
+                    <h3 class="colorcode-alert" ajxp_message_id="notification_center.3">AJXP_MESSAGE[notification_center.3] <span class="alerts_number_badge" id="alerts_number" ajxpClass="DataModelProperty" ajxpOptions='{"dmID":"notif_pane","property":"metadata","metadata_sum":"event_occurence"}'></span><small id="alerts_toggler"  class="simple-toggler-hide" ajxpClass="VisibilityToggler" ajxpOptions='{"widget_id":"notif_pane"}'>AJXP_MESSAGE[514]</small></h3>
+                    <div id="notif_pane" ajxpClass="FetchedResultPane" ajxpOptions='{"inlineToolbarOptions":{"toolbarsList":["inline-notifications"]}, "fit":"content", "columnsDef":[{"attributeName":"ajxp_label", "messageId":1, "sortType":"String"},{"attributeName":"event_time", "messageString":"Time", "sortType":"MyDate"},{"attributeName":"event_type", "messageString":"Type", "sortType":"String"}], "reloadOnServerMessage":"tree/reload_user_feed", "silentLoading":true, "fixedSortColumn":"event_time", "fixedSortDirection":"desc","nodeProviderProperties":{"get_action":"get_my_feed", "connexion_discrete":true, "format":"xml", "current_repository":"true", "feed_type":"alert", "merge_description":"true"}, "emptyChildrenMessage":"notification_center.8"}'></div>
+                </div>
+                ]]></additional_content>
             </component_config>
         </client_configs>
     </registry_contributions>

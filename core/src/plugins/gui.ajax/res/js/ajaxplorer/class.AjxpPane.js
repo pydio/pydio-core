@@ -75,6 +75,13 @@ Class.create("AjxpPane", {
             this.buildImageBackgroundFromConfigs(this.options.imageBackgroundFromConfigs);
         }
 
+        this.configObserver = function(event){
+            if(event.memo.className == "AjxpPane::"+htmlElement.id){
+                this.parseComponentConfig(event.memo.classConfig.get("all"));
+            }
+        }.bind(this);
+        document.observe("ajaxplorer:component_config_changed", this.configObserver);
+
         if(this.options.replaceScroller){
             this.scroller = new Element('div', {
                 id:'scroller_'+this.htmlElement.id,
@@ -92,6 +99,42 @@ Class.create("AjxpPane", {
 
 
     },
+
+    parseComponentConfig: function(domNode){
+        var change = false;
+        XPathSelectNodes(domNode, "additional_content").each(function(addNode){
+            var cdataContent = addNode.firstChild.nodeValue;
+            var anchor = this.htmlElement;
+            if(cdataContent && anchor){
+                if(!anchor.down('#'+addNode.getAttribute("id"))){
+                    anchor.insert(cdataContent);
+                    var compReg = $A();
+                    ajaxplorer.buildGUI(anchor.down('#'+addNode.getAttribute("id")), compReg);
+                    if(compReg.length) ajaxplorer.initAjxpWidgets(compReg);
+                    change = true;
+                }
+            }
+        }.bind(this));
+        if(change){
+            this.resize();
+            this.reorderContents();
+        }
+    },
+
+    reorderContents: function(){
+        var pos = {};
+        this.htmlElement.select('> div[ajxp_position]').each(function(d){
+            pos[parseInt(d.readAttribute('ajxp_position'))] = d;
+        });
+        var keys = $H(pos).keys();
+        if(keys.length){
+            keys.sort();
+            keys.each(function(k){
+                this.htmlElement.insert(pos[k]);
+            }.bind(this));
+        }
+    },
+
 
     resizeBound : function(event){
         "use strict";
@@ -218,6 +261,9 @@ Class.create("AjxpPane", {
             this.resizeEvents.each(function(pair){
                 document.stopObserving(pair.key, pair.value);
             });
+        }
+        if(this.configObserver){
+            document.stopObserving("ajaxplorer:component_config_changed", this.configObserver);
         }
 	},
 	

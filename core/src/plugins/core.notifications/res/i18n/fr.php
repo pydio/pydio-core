@@ -26,4 +26,8 @@ $mess=array(
 "5" => "Tous les événements",
 "6" => "Aller à ...",
 "7" => "Supprimer",
+"8" => "Pas d'alerte - Surveillez des fichiers/dossiers pour être alerté lorsqu'ils sont modifiés/consultés par d'autres utilisateurs",
+"9" => "Activité du workspace",
+"10" => "Activité du dossier",
+"11" => "Activité du fichier",
 );

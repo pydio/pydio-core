@@ -58,5 +58,8 @@ $mess = array(
 "Mail address of the user" => "Mailadresse der Benutzern, des Benutzers",
 "Display name" => "Angezeigter Name",
 "Password" => "Passwort wählen",
+"Configurations storage" => "&lt;span class='icon-save'&gt;&lt;/span&gt; Configurations storage",
+"Select how the configurations will be stored" => "Select how the configurations will be stored",
+"Database system (production environments, requires a DBMS supported by APPLICATION_TITLE))" => "Database (production environments, requires a DBMS supported by APPLICATION_TITLE)",
 
 );

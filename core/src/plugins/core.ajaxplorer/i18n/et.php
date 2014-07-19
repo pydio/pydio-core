@@ -569,5 +569,11 @@ $mess=array(
 "510" => "Please enter a team label",
 "511" => "My %s",
 "512" => "Desktop Full Screen",
+"513" => "show",
+"514" => "hide",
+"515" => "No bookmarks - Drop files or folders here for quick access.",
+"516" => "expand",
+"517" => "collapse",
+"518" => "Alternatively, you can <a class='create_file_alt_link'>create a new empty file</a>.",
 /* END SENTENCE */
 );

@@ -321,6 +321,7 @@
                     <xs:attribute name="className" type="xs:NCName"/>
                     <xs:attribute name="text" use="required" type="xs:integer"/>
                     <xs:attribute name="title" use="required" type="xs:integer"/>
+                    <xs:attribute name="order" type="xs:integer"/>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
