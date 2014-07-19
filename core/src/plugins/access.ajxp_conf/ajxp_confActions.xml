@@ -573,7 +573,7 @@
         </action>
         <action name="pydio-go-pro">
             <gui src="gopro" text="ajxp_conf.120" title="ajxp_conf.121" iconClass="icon-rocket">
-                <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="user"/>
+                <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="admin"/>
             </gui>
             <processing>
                 <clientCallback><![CDATA[

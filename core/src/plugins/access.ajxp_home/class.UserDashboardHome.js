@@ -172,7 +172,8 @@ Class.create("UserDashboardHome", AjxpPane, {
 
         try{
             window.setTimeout(function(){
-                $("orbit_content").ajxpPaneObject.resize();
+                if($("orbit_content")) $("orbit_content").ajxpPaneObject.resize();
+                else if($("browser")) $("browser").ajxpPaneObject.resize();
             }, 0);
         }catch(e){}
 

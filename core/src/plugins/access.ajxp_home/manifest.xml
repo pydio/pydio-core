@@ -29,8 +29,13 @@
             <template_part ajxpClass="AjxpPane" ajxpId="workspace_toolbar" ajxpOptions='{"fit":"none"}' theme="vision"><![CDATA[
                 <div id="search_container_settings" class="settings_search_container" style="display:none;" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}'></div>
                 <style>
-                #workspace_toolbar, #global_toolbar{display:none;}
-                #browser{padding:0}
+                #workspace_toolbar{
+                    display:none;
+                }
+                #browser{
+                    padding:0;
+                    background-color: #ACB2B9;
+                }
                 div.flat_tabulator span.toggleHeader{
                     background-color: #e35d52;
                 }
@@ -78,6 +83,26 @@
                     background-color: rgba(119, 119, 119, 0.35) !important;
                 }
                 </style>
+            ]]></template_part>
+            <template_part ajxpClass="AjxpPane" ajxpId="browser" ajxpOptions='{"fit":"height"}' theme="vision"><![CDATA[
+                <div id="home_account_pane" ajxpClass="UserDashboardHome">
+                    <div id="home_left_bar" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
+                        <div id="welcome"></div>
+                        <div id="workspaces_center" ajxpClass="AjxpPane"  ajxpOptions='{"fit":"height"}'>
+                            <div id="list_cont" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitMarginBottom":100}'>
+                                <ul id="workspaces_list"></ul>
+                            </div>
+                            <div id="workspaces_button">
+                                <input type="checkbox" name="save_ws_choice" id="save_ws_choice" class="disabled" disabled><label for="save_ws_choice">AJXP_MESSAGE[user_home.41]</label>
+                                <input type="button" name="go_to_ws" id="go_to_ws" value="AJXP_MESSAGE[user_home.42]" class="disabled">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="home_center_panel" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","flexTo":"browser"}'>
+                        <div id="logo_div"><img src="plugins/gui.ajax/res/themes/orbit/images/Logo_White_300.png"></div>
+                        <div id="ws_legend"></div>
+                    </div>
+                </div>
             ]]></template_part>
             <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "imageBackgroundFromConfigs":"access.ajxp_home/WELCOME_PAGE_BACKGROUND_","messageBoxReference":true}' theme="orbit"><![CDATA[
                 <style>

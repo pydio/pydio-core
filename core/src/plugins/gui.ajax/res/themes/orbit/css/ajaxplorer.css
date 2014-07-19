@@ -1403,6 +1403,7 @@ div.dialogBox.form-login_form_dynamic div.dialogButtons input.dialogButton
 
 #top_toolbar{
     float:right;
+    margin-top:11px;
 }
 
 #workspace_toolbar{

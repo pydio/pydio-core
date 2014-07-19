@@ -196,7 +196,7 @@
 				<div id="toolbars" ajxpClass="AjxpPane">
 					<div id="global_toolbar" ajxpClass="LogoWidget">
 					    <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over"}'></div>
-						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["user"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["user", "admin"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
 						<div id="repo_chooser" ajxpClass="RepositorySelect" ajxpOptions='{"menuPosition": "bottom middle", "menuOffsetTop":11, "menuOffsetLeft":0, "menuMaxHeight":535, "menuEvent":"over", "simpleLabel":"<span class=\"icon-sitemap\"></span><span class=\"ws-label\" ajxp_message_id=\"455\">AJXP_MESSAGE[455]</span><span class=\"icon-caret-down\"></span>"}'></div>
 					</div>
 					<div id="workspace_toolbar" ajxpClass="AjxpPane">
@@ -238,6 +238,7 @@
                     <div id="global_toolbar" ajxpClass="LogoWidget">
                         <div id="clickable_home" title="Home"></div>
                         <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over","menuOffsetLeft":11,"menuOffsetTop":11}'></div>
+						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["admin"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                     </div>
                     <div id="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop"}'></div>
                 </div>

@@ -23,7 +23,7 @@
                 <gui text="updater.1" title="updater.2" iconClass="icon-lightbulb" src="download_manager.png" hasAccessKey="false">
                     <context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
                         actionBar="true" contextMenu="false" infoPanel="false"
-                        actionBarGroup="user" inZip="false">
+                        actionBarGroup="admin" inZip="false">
                     </context>
                 </gui>
                 <processing>
