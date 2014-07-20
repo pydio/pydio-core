@@ -27,6 +27,6 @@ $mess=array(
 "Id of the repository to use for testing connexion" => "Id du dépot à utiliser pour récupérer les informations de connexion FTP.",
 "Admin user" => "Utilisateur admin",
 "The ID of an existing admin for Pydio (using conf.serial)" => "ID d'un utilisateur admin récupéré dans conf.serial.",
-"Test Connexion" => "Test Connexion",
-"Test connexion to the FTP server" => "Test connexion to the FTP server",
+"Test connection" => "Tester la connexon",
+"Test connection to the FTP server" => "Tester la connexion vers le serveur FTP",
 );
