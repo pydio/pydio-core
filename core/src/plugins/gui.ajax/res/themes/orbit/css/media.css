@@ -36,8 +36,10 @@ and (max-width : 680px) {
     div.toolbarGroup span.ajxp_icon_span
     {
         display: inline-block !important;
-        padding: 5px 2px 4px;
-    }
+        padding: 7px 2px 4px;
+    
+        font-size: 16px;
+}
 
     div.toolbarGroup a{
         padding-bottom: 2px !important;
@@ -83,6 +85,12 @@ and (max-width : 680px) {
 
 @media only screen
 and (max-width : 400px){
+
+    #topPane{
+        width: 0;
+        display: none;
+    }
+
     #simple_repository_label{
         display:none;
         font-size: 12px;
@@ -95,13 +103,39 @@ and (max-width : 400px){
         display:none;
     }
     #search_engine_cont{
-        width:15% !important;
+        width:100% !important;
     }
     #buttons_bar_cont{
-        margin-left: 15px;
+        margin-left: 0;
     }
     #workspace_toolbar{
         padding-top:0;
     }
+
+    #buttons_bar a, #buttons_bar_top a{
+        padding: 0px 8px 0px 11px;
+        margin: 0 3px 0 0;
+    
+        border-radius: 12px;
+    }
+
+    a#group_more_action_button {
+        height: 20px;
+    }
+
+    .tabulatorContainer.panelHeader.icons_only {
+        width: 37px;
+    }
+
+    #userdashboard_myparams_title{
+        display: none;
+    }
+
+    div#background-imager{
+        background-image: url(../images/hires-photos/03-mobile.jpg) !important;
+        background-position: 50% 50%;
+        background-repeat: repeat repeat;
+    }
+
 
 }

@@ -39,7 +39,7 @@ Class.create("UserDashboardHome", AjxpPane, {
         oFormObject.down("#welcome").update( MessageHash['user_home.40'].replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME") || ajaxplorer.user.id));
 
         var wsElement = oFormObject.down('#workspaces_list');
-        attachMobileScroll(wsElement, 'vertical');
+        attachMobileScroll(oFormObject.down('#list_cont'), 'vertical');
 
         var switchToRepo = function(repoId){
             if(!repoId) return;
@@ -99,6 +99,9 @@ Class.create("UserDashboardHome", AjxpPane, {
                 oFormObject.down('#save_ws_choice').removeClassName("disabled").disabled = false;
                 oFormObject.down('#go_to_ws').CURRENT_REPO_ID = repoId;
                 oFormObject.down('#go_to_ws').CURRENT_REPO_OBJECT = repoObject;
+                if(window.ajxpMobile){
+                    switchToRepo(repoId);
+                }
             };
             repoEl.observe("click", select);
             attachMobilTouchForClick(repoEl, select);

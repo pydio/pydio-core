@@ -194,7 +194,7 @@ div.legend_visible div#logo_div{
     text-align: left;
     padding: 32px 0;
     margin: 0 30px;
-    border-bottom: 1px solid #fff;
+    border-bottom: 1px solid #555;
     font-size: 1.3em;
     font-weight: normal;
 }
@@ -343,21 +343,38 @@ and (max-width : 800px){
         display: none;
     }
 
+    #home_left_bar{
+        width: 380px;
+    }
+
+    #home_account_pane #welcome{
+        font-size: 1em;
+        padding-top: 30px;
+        padding-bottom: 10px;
+        border-bottom-color: #555;
+    }
+
+    #home_account_pane #welcome small{
+        padding-top: 10px;
+    }
+
+    #workspaces_list li.ws_selector_title h3{
+        padding: 0 30px;
+    }
+
+
 
 }
 
 @media only screen
 and (max-width : 400px){
-
-    #notifications_center li > div:first-of-type,
-    #notifications_center div.notif_event_repository,
-    #notifications_center div.notif_event_description,
-    #notifications_center div.notif_event_date{
-        display: none;
+    #home_left_bar{
+        width: 100%;
+        position: absolute;
+        top:0;
     }
-
-    #logo_div img{
-        width: 100px;
+    #workspaces_button {
+        padding: 38px 0;
+        width: 100%;
     }
-
 }

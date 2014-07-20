@@ -103,3 +103,9 @@ a.m-2.disabled {
 #browser{
     background-image: url('../gui.ajax/res/themes/vision/images/grid_t.png');
 }
+
+.ajxp_theme_orbit div#background-imager{
+    background-image: url(../gui.ajax/res/themes/orbit/images/hires-photos/03-mobile.jpg) !important;
+    background-position: 50% 50%;
+    background-repeat: repeat repeat;
+}

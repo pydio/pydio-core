@@ -5119,7 +5119,7 @@ div.dialogBox div.dialogBox.css_boxshadow > div{
     top: 20%;
     -moz-border-radius : 5px;
     border-radius : 5px;
-    width: 305px;
+    width: 305px !important;
     padding: 3px;
     display: block;
     top: 30%;
@@ -5129,6 +5129,7 @@ div.dialogBox div.dialogBox.css_boxshadow > div{
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.23);
     -webkit-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.23);
     -moz-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.23);
+    min-width: 305px;
 }
 
 #progressBox div.dialogTitle{
