@@ -21,12 +21,12 @@
 $mess=array(
 "FTP authentication" => "Authentification FTP",
 "Authenticate users by validating their credentials against an FTP server." => "Interrogation d'un serveur FTP pour valider une identification.",
-"FTP Login Screen" => "Ecran de login FTP",
-"Replace the default connection screen (username and passwrd) by a screen allowing users to enter their own FTP connection data (server, port, etc.)" => "Remplace l'écran de connexion standard (login/mot de passe) et permet à l'utilisateur d'entrer les informations de connexions au serveur FTP (serveur, port, etc) lui-même.",
+"FTP login screen" => "Ecran de login FTP",
+"Replace the default connection screen (username and password) by a screen allowing users to enter their own FTP connection data (server, port, etc.)" => "Remplace l'écran de connexion standard (login/mot de passe) et permet à l'utilisateur d'entrer les informations de connexions au serveur FTP (serveur, port, etc) lui-même.",
 "Workspace" => "Dépôt",
 "ID of the workspace used to validate credentials" => "ID du dépot à utiliser pour récupérer les informations de la connexion FTP.",
 "Admin user" => "Utilisateur admin",
 "The ID of an existing admin for Pydio (using conf.serial)" => "ID d'un utilisateur admin récupéré dans conf.serial.",
-"Test connection" => "Tester la connexon",
+"Test connection" => "Tester la connexion",
 "Test connection to the FTP server" => "Tester la connexion vers le serveur FTP",
 );
