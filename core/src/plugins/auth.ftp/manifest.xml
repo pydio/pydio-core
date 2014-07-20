@@ -7,7 +7,7 @@
     </client_settings>
 	<server_settings>
         <param name="TEST_CONNEXION" type="button" choices="run_plugin_action:auth.ftp:testParameters" default="auth.ftp" label="CONF_MESSAGE[Test connection]" description="CONF_MESSAGE[Test connection to the FTP server]" mandatory="false"/>
-        <param name="FTP_LOGIN_SCREEN" type="boolean" label="CONF_MESSAGE[FTP Login Screen]" description="CONF_MESSAGE[Whether to display a generic 'FTP connexion' dialog at startup (allowing the user to enter his own host/port data) or the standard login dialog.]" mandatory="true" default="false"/>
+        <param name="FTP_LOGIN_SCREEN" type="boolean" label="CONF_MESSAGE[FTP Login Screen]" description="CONF_MESSAGE[Replace the default connection screen (username and passwrd) by a screen allowing users to enter their own FTP connection data (server, port, etc.)]" mandatory="true" default="false"/>
         <param name="REPOSITORY_ID" type="select" choices="json_list:list_all_repositories_json" label="CONF_MESSAGE[Workspace]" description="CONF_MESSAGE[ID of the repository to use for testing the connection]" mandatory="true"/>
 	</server_settings>
 	<class_definition filename="plugins/auth.ftp/class.ftpAuthDriver.php" classname="ftpAuthDriver"/>
