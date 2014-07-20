@@ -20,7 +20,7 @@
 */
 $mess=array(
 "FTP authentication" => "Authentification FTP",
-"Authenticate user directly to an FTP server, and connect him to this server." => "Interrogation d'un serveur FTP pour valider une identification",
+"Authenticate users by validating their credentials against an FTP server." => "Interrogation d'un serveur FTP pour valider une identification.",
 "FTP Login Screen" => "Ecran de login FTP",
 "Whether to display a generic 'FTP connexion' dialog at startup (allowing the user to enter his own host/port data) or the standard login dialog." => "Remplace l'écran de connexion standard (login/mot de passe) et permet à l'utilisateur d'entrer les informations de connexions au serveur FTP (serveur, port, etc).",
 "Workspace" => "Dépôt",
