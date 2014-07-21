@@ -137,5 +137,20 @@ and (max-width : 400px){
         background-repeat: repeat repeat;
     }
 
+    div.dialogBox{
+        min-width: 99%;
+    }
 
+    div.dialogBox.form-login_form div.dialogContent, div.dialogBox.form-login_form_dynamic div.dialogContent {
+        height: 100%;
+        padding-top: 20%!important;
+    }
+
+    #login_form, #login_form_dynamic {
+        margin: 0;
+    }
+
+    div.dialogContent div.SF_element {
+        margin: 0 10px;
+    }
 }
