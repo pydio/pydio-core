@@ -31,6 +31,60 @@
                     </div>
                 ]]></additional_tab>
             </component_config>
+            <component_config className="AjxpPane::navigation_scroller">
+                <additional_content id="action_cart"><![CDATA[
+                        <div ajxp_position="9" id="action_cart">
+                            <h3 style="color:#E2DECB;" ajxp_message_id="action.cart.10">AJXP_MESSAGE[action.cart.10]</h3>
+                            <div id="cart-manager-header" class="innerTabulator" style="height: 200px;" ajxpClass="AjxpTabulator" ajxpOptions='{"saveState":true, "defaultTabId": "default-cart","tabInfos": [{"id":"default-cart","label":"action.cart.9","iconClass":"icon-suitcase", "element":"default-cart"}], "headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["ajxp-cart-manager", "ajxp-cart-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'>
+                                <div id="default-cart" ajxpClass="CartManager" ajxpOptions='{"fit":"content", "nodeProviderProperties":{}}'></div>
+                            </div>
+                        </div>
+                        <style>
+                        #action_cart{
+                            position: relative;
+                        }
+                        #action_cart #display_toolbar{
+                            position: absolute;
+                            display: block;
+                            top: 12px;
+                            right: 10px;
+                        }
+                        #action_cart div.tabulatorContainer.panelHeader{
+                            margin: 0 15px;
+                            border-radius: 5px;
+                            padding: 3px 2px;
+                            background-color: transparent;
+                        }
+                        #action_cart div.tabulatorContainer.panelHeader div.toolbarGroup a{
+                            color: #ccc !important;
+                        }
+                        div[ajxpClass="CartManager"]{
+                            height: auto !important;
+                            min-height: 180px;
+                        }
+                        #action_cart .innerTabulator span.toggleHeader{
+                            background-color: #E2DECB;
+                            border: 1px solid #E2DECB;
+                            color: #555;
+                            border-radius: 16px;
+                            margin-right: 4px;
+                            padding: 2px 6px;
+                        }
+                        #action_cart .innerTabulator span.toggleHeader.toggleInactive{
+                            background-color: transparent;
+                            color: #ccc;
+                        }
+                        #search_panel div#display_toolbar {
+                            margin-right: 40px;
+                            margin-top: 5px;
+                        }
+                        a#create-cart-from-search_button{
+                            color: #999 !important;
+                            font-size: 1.4em;
+                        }
+                        </style>
+                ]]></additional_content>
+            </component_config>
         </client_configs>
         <actions>
             <action name="create-cart">
