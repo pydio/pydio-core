@@ -19,7 +19,7 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Flash uploader" => "Uploader Flash",
+"Flash uploader" => "Flash",
 "Legacy flash uploader, used when the browser does not support HTML5. If you want to force the usage of this uploader, deactivate the uploader.html, and remove the activeCondition tag from the uploader.flex manifest file." => "Alternative à l'upload HTML5. Pour forcer l'utilisation de cet uploader, désactiver les autres, et commenter la partie activeCondition dans le manifest de ce plugin.",
 "Miscalleneous" => "Divers",
 "HTTPS Policy" => "HTTPS Policy",

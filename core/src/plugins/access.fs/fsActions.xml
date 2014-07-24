@@ -128,6 +128,9 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var uploaders = ajaxplorer.getActiveExtensionByType("uploader");
+                    uploaders.sort(function(objA, objB){
+                        return objA.order - objB.order;
+                    });
 					if(uploaders.length){
 					    var uploader;
 					    if(window.actionArguments[0]){
@@ -157,9 +160,6 @@
 						    form.insert({top:chooser});
 						    var chooserList = new Element('ul');
                             chooser.insert(chooserList);
-                            uploaders.sort(function(objA, objB){
-                                return objA.order - objB.order;
-                            });
                             uploaders.each(function(up){
                                 var label = up.xmlNode.getAttribute("label");
                                 var desc = up.xmlNode.getAttribute("description")

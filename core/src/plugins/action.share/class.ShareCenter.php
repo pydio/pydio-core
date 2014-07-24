@@ -1348,7 +1348,10 @@ class ShareCenter extends AJXP_Plugin
                 "REPOSITORY"=>$newId
             );
         }
-        if(isSet($httpVars["create_guest_user"]) && isSet($userId)){
+        if(isSet($data["PRELOG_USER"]))unset($data["PRELOG_USER"]);
+        if(isSet($data["PRESET_LOGIN"]))unset($data["PRESET_LOGIN"]);
+        if((isSet($httpVars["create_guest_user"]) && isSet($userId)) || (isSet($httpVars["guest_user_id"]))){
+            if(!isset($userId)) $userId = $httpVars["guest_user_id"];
             if(empty($httpVars["guest_user_pass"])){
                 $data["PRELOG_USER"] = $userId;
             }else{

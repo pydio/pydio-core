@@ -1111,6 +1111,7 @@ Class.create("FilesList", SelectableElements, {
 			ajaxplorer.user.setPreference("display", this._displayMode);
 			ajaxplorer.user.savePreference("display");
 		}
+        document.fire("ajaxplorer:switchDisplayMode-FilesList-" + this.htmlElement.id);
 		return this._displayMode;
 	},
 	

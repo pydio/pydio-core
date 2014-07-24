@@ -232,6 +232,10 @@ Class.create("Modal", {
 		this.currentListensToWidth = false;
 		this.currentListensToHeight = false;
 		// WIDTH / HEIGHT
+        $(elementName).setStyle({
+            width:'auto',
+            height:'auto'
+        });
 		if(boxWidth != null){
 			if(boxWidth.indexOf("%") ==-1 && parseInt(boxWidth) > winWidth){
 				boxWidth = '90%';

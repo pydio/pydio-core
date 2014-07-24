@@ -236,7 +236,7 @@ Class.create("MetaCellRenderer", {
                         td.update(editableDiv);
                         obj.linkEditableDiv(editableDiv);
                     }*/
-                    if(!td.innerHTML) td.update('No value');
+                    if(!td.innerHTML) td.update(MessageHash['meta.user.9']);
                 break;
                 default:
                 break;
