@@ -675,7 +675,7 @@ Class.create("ShareCenter", {
     },
 
     loadInfoPanel : function(container, node){
-        container.down('#ajxp_shared_info_panel table').update('<div class="infoPanelRow">\
+        container.down('#ajxp_shared_info_panel .infoPanelTable').update('<div class="infoPanelRow">\
             <div class="infoPanelLabel">'+MessageHash['share_center.55']+'</div>\
             <div class="infoPanelValue"><span class="icon-spinner"></span></div>\
             </div>\
@@ -717,7 +717,7 @@ Class.create("ShareCenter", {
                     }
                 }
 
-                container.down('#ajxp_shared_info_panel table').update('\
+                container.down('#ajxp_shared_info_panel .infoPanelTable').update('\
                     <div class="infoPanelRow">\
                         <div class="infoPanelLabel">'+MessageHash['share_center.59']+'</div>\
                         <div class="infoPanelValue"><textarea style="width:100%;height: 45px;" readonly="true">'+ jsonData.publiclet_link +'</textarea></div>\
@@ -735,44 +735,61 @@ Class.create("ShareCenter", {
                 ');
 
                 if(linksCount > 1){
-                    container.down('#ajxp_shared_info_panel table').insert({bottom:'<div class="infoPanelRow">\
+                    container.down('#ajxp_shared_info_panel .infoPanelTable').insert({bottom:'<div class="infoPanelRow">\
                         <div class="infoPanelLabel" colspan="2" style="text-align: center;font-style: italic;">'+MessageHash['share_center.'+(linksCount>2?'104':'105')].replace('%s', linksCount-1)+'</div>\
                     </div>'});
                 }
 
             }else{
+                var mainCont = container.down("#ajxp_shared_info_panel .infoPanelTable");
                 var entries = [];
                 $A(jsonData.entries).each(function(entry){
                     entries.push(entry.LABEL + ' ('+ entry.RIGHT +')');
                 });
-                var linkString = '';
-                if(jsonData.minisite){
-                    linkString = '\
-                    <div class="infoPanelRow">\
-                        <div class="infoPanelLabel">'+MessageHash['share_center.62']+'</div>\
-                        <div class="infoPanelValue"><textarea style="width:100%;height: 40px;" readonly="true">'+ jsonData.minisite.public_link +'</textarea></div>\
-                    </div>\
-                    <div class="infoPanelRow">\
-                        <div class="infoPanelLabel">'+MessageHash['share_center.61']+'</div>\
-                        <div class="infoPanelValue"><textarea style="width:100%;height: 80px;" id="embed_code" readonly="true"></textarea></div>\
-                    </div>\
-                    ';
-                }
-                container.down('#ajxp_shared_info_panel table').update(linkString + '\
+
+                if(node.isLeaf()){
+                    // LEAF SHARE
+                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.140"]+'</div>');
+                    mainCont.insert('<div class="infoPanelRow">\
+                            <div class="infoPanelLabel">'+MessageHash['share_center.121']+'</div>\
+                            <div class="infoPanelValue"><input type="text" class="share_info_panel_link" readonly="true" value="'+ jsonData.minisite.public_link +'"></div>\
+                        </div>\
+                    ');
+
+                }else if(jsonData.minisite){
+                    // MINISITE FOLDER SHARE
+                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.138"]+'</div>');
+                    // Label
+                    /*
+                    mainCont.insert('\
                     <div class="infoPanelRow">\
                         <div class="infoPanelLabel">'+MessageHash['share_center.35']+'</div>\
                         <div class="infoPanelValue">'+ jsonData.label +'</div>\
-                    </div>\
-                    <div class="infoPanelRow">\
+                    </div>');
+                    */
+                    // Links textearea
+                    mainCont.insert('\
+                        <div class="infoPanelRow">\
+                            <div class="infoPanelLabel">'+MessageHash['share_center.62']+'</div>\
+                            <div class="infoPanelValue"><input type="text" class="share_info_panel_link" readonly="true" value="'+ jsonData.minisite.public_link +'"></div>\
+                        </div>\
+                        <div class="infoPanelRow">\
+                            <div class="infoPanelLabel">'+MessageHash['share_center.61']+'</div>\
+                            <div class="infoPanelValue"><textarea style="padding: 4px;width:97%;height: 80px;" id="embed_code" readonly="true"></textarea></div>\
+                        </div>\
+                    ');
+                    mainCont.down("#embed_code").setValue("<iframe height='500' width='600' style='border:1px solid black;' src='"+jsonData.minisite.public_link+"'></iframe>");
+                }else{
+                    // WORKSPACE FOLDER
+                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.139"]+'</div>');
+                    mainCont.insert('<div class="infoPanelRow">\
                         <div class="infoPanelLabel">'+MessageHash['share_center.54']+'</div>\
                         <div class="infoPanelValue">'+ entries.join(', ') +'</div>\
                     </div>\
-                ');
-                if(jsonData.minisite){
-                    container.down("#embed_code").setValue("<iframe height='500' width='600' style='border:1px solid black;' src='"+jsonData.minisite.public_link+"'></iframe>");
+                    ');
                 }
             }
-            container.select("textarea").each(function(t){
+            mainCont.select('textarea,input').each(function(t){
                 t.observe("focus", function(e){ ajaxplorer.disableShortcuts();});
                 t.observe("blur", function(e){ ajaxplorer.enableShortcuts();});
                 t.observe("click", function(event){event.target.select();});

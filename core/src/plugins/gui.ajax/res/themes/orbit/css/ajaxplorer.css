@@ -4467,6 +4467,23 @@ div.autocomplete_readonly span.delete_user_entry{
     max-width: 400px;
 }
 
+.share_info_panel_main_legend {
+    padding: 10px 0;
+    font-size: 1.5em;
+    color: #555;
+    line-height: 1.4em;
+}
+
+input.share_info_panel_link {
+    margin: 0;
+    width: 96%;
+    padding: 5px;
+    text-align: center;
+    font-size: 1em;
+    background-color: transparent;
+    border-color: #ccc;
+}
+
 #share_container{
     clear: left;
     width: 95%;

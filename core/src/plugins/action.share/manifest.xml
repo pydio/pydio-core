@@ -560,8 +560,11 @@
                     </messages>
                     <html><![CDATA[
                         <div id="ajxp_shared_info_panel" data-infoPanelPosition="first">
-                            <div class="panelHeader infoPanelGroup" colspan="2"><span class="icon-share" data-ajxpAction="share-edit-shared" title="AJXP_MESSAGE[share_center.55]"></span>#{type_string}</div>
-                            <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0"></table>
+                            <div class="panelHeader infoPanelGroup" colspan="2">
+                                <span class="user_meta_change" style="display: none;" data-ajxpaction="share-edit-shared" >AJXP_MESSAGE[457]</span>
+                                <span class="icon-share" data-ajxpAction="share-edit-shared" title="AJXP_MESSAGE[share_center.55]"></span>#{type_string}
+                                </div>
+                            <div class="infoPanelTable" cellspacing="0" border="0" cellpadding="0"></div>
                         </div>
                     ]]></html>
                 </infoPanelExtension>
