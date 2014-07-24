@@ -293,8 +293,13 @@
                     </div>
 				</div>
 			]]></template>
-            <template name="minisite_orbit" element="ajxp_shared_folder" position="top" label="Simple List" theme="orbit"><![CDATA[
+            <template name="minisite_orbit" element="ajxp_shared_folder" position="top" label="share_center.153" theme="orbit"><![CDATA[
                 <style>
+                    div#overlay.form-login_form_dynamic {
+                        opacity: 1;
+                        background-image: url(plugins/gui.ajax/res/themes/orbit/images/grid_t.png) !important;
+                        background-color: rgb(0, 0, 0) !important;
+                    }
                     #browser{
                         background-color: #345E79;
                     }
@@ -362,8 +367,13 @@
 				</div>
                 <link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
 			]]></template>
-            <template name="minisite_film_strip" element="ajxp_film_strip" position="top" label="Film Strip" theme="orbit"><![CDATA[
+            <template name="minisite_film_strip" element="ajxp_film_strip" position="top" label="share_center.154" theme="orbit"><![CDATA[
 				<style type="text/css">
+                div#overlay.form-login_form_dynamic {
+                    opacity: 1;
+                    background-image: url(plugins/gui.ajax/res/themes/orbit/images/grid_t.png) !important;
+                    background-color: rgb(0, 0, 0) !important;
+                }
 				#browser{
 				    -webkit-font-smoothing: antialiased;
 				}
@@ -486,6 +496,11 @@
 			]]></template>
             <template name="unique_preview_file" element="ajxp_unique_strip" position="top" label="Unique File Preview"><![CDATA[
 				<style type="text/css">
+                    div#overlay.form-login_form_dynamic {
+                        opacity: 1;
+                        background-image: url(plugins/gui.ajax/res/themes/orbit/images/grid_t.png) !important;
+                        background-color: rgb(0, 0, 0) !important;
+                    }
                 #browser{
                     background-color: #345E79;
                     -webkit-font-smoothing: antialiased;
@@ -578,6 +593,11 @@
 			]]></template>
             <template name="unique_preview_download" element="ajxp_unique_dl" position="top" label="Big download button"><![CDATA[
 				<style type="text/css">
+                    div#overlay.form-login_form_dynamic {
+                        opacity: 1;
+                        background-image: url(plugins/gui.ajax/res/themes/orbit/images/grid_t.png) !important;
+                        background-color: rgb(0, 0, 0) !important;
+                    }
 				#browser{
 				    background-color: #000;
                     -webkit-font-smoothing: antialiased;
@@ -671,7 +691,7 @@
                     });
 				</script>
 			]]></template>
-            <template name="minisite_bare" element="ajxp_embed_template" position="top" label="Embedded"><![CDATA[
+            <template name="minisite_bare" element="ajxp_embed_template" position="top" label="share_center.155"><![CDATA[
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
                     <div id="cpane_header" class="panelHeader">
                         <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["minisite", "inline","default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>

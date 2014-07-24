@@ -1273,7 +1273,16 @@ class ShareCenter extends AJXP_Plugin
     public function createSharedMinisite($httpVars, $repository, $accessDriver)
     {
         $uniqueUser = null;
-        if (isSet($httpVars["create_guest_user"])) {
+        if(isSet($httpVars["repository_id"]) && isSet($httpVars["guest_user_id"])){
+
+            $uniqueUser = $httpVars["guest_user_id"];
+            if(!empty($httpVars["guest_user_pass"])){
+                //$userPass = $httpVars["guest_user_pass"];
+                // UPDATE GUEST USER PASS HERE
+                AuthService::updatePassword($uniqueUser, $httpVars["guest_user_pass"]);
+            }
+
+        }else if (isSet($httpVars["create_guest_user"])) {
             // Create a guest user
             $userId = substr(md5(time()), 0, 12);
             $pref = $this->getFilteredOption("SHARED_USERS_TMP_PREFIX", $this->repository->getId());
@@ -1285,38 +1294,44 @@ class ShareCenter extends AJXP_Plugin
             }else{
                 $userPass = substr(md5(time()), 13, 24);
             }
-            $httpVars["user_0"] = $userId;
-            $httpVars["user_pass_0"] = $httpVars["shared_pass"] = $userPass;
+            $uniqueUser = $userId;
+        }
+        if(isSet($uniqueUser)){
+            if(isSet($userPass)) {
+                $httpVars["user_pass_0"] = $httpVars["shared_pass"] = $userPass;
+            }
+            $httpVars["user_0"] = $uniqueUser;
             $httpVars["entry_type_0"] = "user";
             $httpVars["right_read_0"] = (isSet($httpVars["simple_right_read"]) ? "true" : "false");
             $httpVars["right_write_0"] = (isSet($httpVars["simple_right_write"]) ? "true" : "false");
             $httpVars["right_watch_0"] = "false";
             $httpVars["disable_download"] = (isSet($httpVars["simple_right_download"]) ? false : true);
-            if ($httpVars["right_write_0"] == "false" && $httpVars["right_read_0"] == "false") {
-                return "share_center.58";
-            }
             if ($httpVars["right_read_0"] == "false" && !$httpVars["disable_download"]) {
                 $httpVars["right_read_0"] = "true";
             }
-            $uniqueUser = $userId;
+            if ($httpVars["right_write_0"] == "false" && $httpVars["right_read_0"] == "false") {
+                return "share_center.58";
+            }
         }
 
         $httpVars["minisite"] = true;
         $httpVars["selection"] = true;
-        $userSelection = new UserSelection($repository, $httpVars);
-        $setFilter = false;
-        if($userSelection->isUnique()){
-            $node = $userSelection->getUniqueNode($this->accessDriver);
-            $node->loadNodeInfo();
-            if($node->isLeaf()){
+        if(!isSet($userSelection)){
+            $userSelection = new UserSelection($repository, $httpVars);
+            $setFilter = false;
+            if($userSelection->isUnique()){
+                $node = $userSelection->getUniqueNode($this->accessDriver);
+                $node->loadNodeInfo();
+                if($node->isLeaf()){
+                    $setFilter = true;
+                    $httpVars["file"] = "/";
+                }
+            }else{
                 $setFilter = true;
-                $httpVars["file"] = "/";
             }
-        }else{
-            $setFilter = true;
-        }
-        if($setFilter){
-            $httpVars["filter_nodes"] = $userSelection->buildNodes($this->accessDriver);
+            if($setFilter){
+                $httpVars["filter_nodes"] = $userSelection->buildNodes($this->accessDriver);
+            }
         }
         $newRepo = $this->createSharedRepository($httpVars, $repository, $accessDriver, $uniqueUser);
 
@@ -1326,9 +1341,13 @@ class ShareCenter extends AJXP_Plugin
         $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
         $this->initPublicFolder($downloadFolder);
 
-        $data = array(
-            "REPOSITORY"=>$newId
-        );
+        if(isset($httpVars["repository_id"])){
+            $data = $this->shareStore->loadShare($httpVars["hash"]);
+        }else{
+            $data = array(
+                "REPOSITORY"=>$newId
+            );
+        }
         if(isSet($httpVars["create_guest_user"]) && isSet($userId)){
             if(empty($httpVars["guest_user_pass"])){
                 $data["PRELOG_USER"] = $userId;
@@ -1336,10 +1355,7 @@ class ShareCenter extends AJXP_Plugin
                 $data["PRESET_LOGIN"] = $userId;
             }
         }
-        if ($httpVars["disable_download"]) {
-            $data["DOWNLOAD_DISABLED"] = true;
-        }
-
+        $data["DOWNLOAD_DISABLED"] = $httpVars["disable_download"];
         $data["AJXP_APPLICATION_BASE"] = AJXP_Utils::detectServerURL(true);
         if(isSet($httpVars["minisite_layout"])){
             $data["AJXP_TEMPLATE_NAME"] = $httpVars["minisite_layout"];
@@ -1354,21 +1370,38 @@ class ShareCenter extends AJXP_Plugin
             $data["OWNER_ID"] = AuthService::getLoggedUser()->getId();
         }
 
-        try{
-            $hash = $this->getShareStore()->storeShare($repository->getId(), $data);
-        }catch(Exception $e){
-            return $e->getMessage();
+        if(!isSet($httpVars["repository_id"])){
+            try{
+                $hash = $this->getShareStore()->storeShare($repository->getId(), $data);
+            }catch(Exception $e){
+                return $e->getMessage();
+            }
+            $url = $this->buildPublicletLink($hash);
+            AJXP_Controller::applyHook("node.share.create", array(
+                'type' => 'minisite',
+                'repository' => &$repository,
+                'accessDriver' => &$accessDriver,
+                'data' => &$data,
+                'url' => $url,
+                'new_repository' => &$newRepo
+            ));
+        }else{
+            try{
+                $hash = $httpVars["hash"];
+                $this->getShareStore()->storeShare($repository->getId(), $data, "minisite", $hash);
+            }catch(Exception $e){
+                return $e->getMessage();
+            }
+            $url = $this->buildPublicletLink($hash);
+            AJXP_Controller::applyHook("node.share.update", array(
+                'type' => 'minisite',
+                'repository' => &$repository,
+                'accessDriver' => &$accessDriver,
+                'data' => &$data,
+                'url' => $url,
+                'new_repository' => &$newRepo
+            ));
         }
-        $url = $this->buildPublicletLink($hash);
-
-        AJXP_Controller::applyHook("node.share.create", array(
-            'type' => 'minisite',
-            'repository' => &$repository,
-            'accessDriver' => &$accessDriver,
-            'data' => &$data,
-            'url' => $url,
-            'new_repository' => &$newRepo
-        ));
 
         return array($hash, $url);
     }
@@ -1519,11 +1552,16 @@ class ShareCenter extends AJXP_Plugin
         }
         if (isSet($editingRepo)) {
             $newRepo = $editingRepo;
+            $replace = false;
             if ($editingRepo->getDisplay() != $label) {
                 $newRepo->setDisplay($label);
-                ConfService::replaceRepository($httpVars["repository_id"], $newRepo);
+                $replace= true;
             }
-            $editingRepo->setDescription($description);
+            if($editingRepo->getDescription() != $description){
+                $newRepo->setDescription($description);
+                $replace = true;
+            }
+            if($replace) ConfService::replaceRepository($httpVars["repository_id"], $newRepo);
         } else {
             if ($repository->getOption("META_SOURCES")) {
                 $options["META_SOURCES"] = $repository->getOption("META_SOURCES");
@@ -1623,6 +1661,11 @@ class ShareCenter extends AJXP_Plugin
             // CREATE USER WITH NEW REPO RIGHTS
             $userObject->personalRole->setAcl($newRepo->getUniqueId(), $uRights[$userName]);
             if (isSet($httpVars["minisite"])) {
+                if(isset($editingRepo)){
+                    try{
+                        AuthService::deleteRole("AJXP_SHARED-".$newRepo->getUniqueId());
+                    }catch (Exception $e){}
+                }
                 $newRole = new AJXP_Role("AJXP_SHARED-".$newRepo->getUniqueId());
                 $r = AuthService::getRole("MINISITE");
                 if (is_a($r, "AJXP_Role")) {
@@ -1682,7 +1725,7 @@ class ShareCenter extends AJXP_Plugin
         }
 
         if (array_key_exists("minisite", $httpVars) && $httpVars["minisite"] != true) {
-            AJXP_Controller::applyHook("node.share.create", array(
+            AJXP_Controller::applyHook( (isSet($editingRepo) ? "node.share.update" : "node.share.create"), array(
                 'type' => 'repository',
                 'repository' => &$repository,
                 'accessDriver' => &$accessDriver,
@@ -2076,7 +2119,7 @@ class ShareCenter extends AJXP_Plugin
                 $minisiteData = $this->getShareStore()->loadShare($shareId);
                 $repoId = $minisiteData["REPOSITORY"];
                 $minisiteIsPublic = isSet($minisiteData["PRELOG_USER"]);
-                $dlDisabled = isSet($minisiteData["DOWNLOAD_DISABLED"]);
+                $dlDisabled = isSet($minisiteData["DOWNLOAD_DISABLED"]) && $minisiteData["DOWNLOAD_DISABLED"] === true;
                 if (isSet($shareData["short_form_url"])) {
                     $minisiteLink = $shareData["short_form_url"];
                 } else {
@@ -2131,15 +2174,21 @@ class ShareCenter extends AJXP_Plugin
                     $jsonData["download_limit"] = $minisiteData["DOWNLOAD_LIMIT"];
                 }
                 if(!empty($minisiteData["EXPIRE_TIME"])){
+                    $delta = $minisiteData["EXPIRE_TIME"] - time();
+                    $days = round($delta / (60*60*24));
                     $jsonData["expire_time"] = date($messages["date_format"], $minisiteData["EXPIRE_TIME"]);
+                    $jsonData["expire_after"] = $days;
+                }else{
+                    $jsonData["expire_after"] = 0;
                 }
                 if(isSet($minisiteData["AJXP_TEMPLATE_NAME"])){
                     $jsonData["minisite_layout"] = $minisiteData["AJXP_TEMPLATE_NAME"];
                 }
                 $jsonData["minisite"] = array(
-                    "public" => $minisiteIsPublic?"true":"false",
-                    "public_link" => $minisiteLink,
-                    "disable_download" => $dlDisabled
+                    "public"            => $minisiteIsPublic?"true":"false",
+                    "public_link"       => $minisiteLink,
+                    "disable_download"  => $dlDisabled,
+                    "hash"              => $shareId
                 );
                 foreach($this->getShareStore()->modifiableShareKeys as $key){
                     if(isSet($minisiteData[$key])) $jsonData[$key] = $minisiteData[$key];
