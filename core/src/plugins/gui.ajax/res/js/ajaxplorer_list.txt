@@ -28,6 +28,7 @@ js/lib/webfx/ajxptree.js
 js/ajaxplorer/class.User.js
 js/ajaxplorer/class.ResourcesManager.js
 js/ajaxplorer/class.RemoteNodeProvider.js
+js/ajaxplorer/class.EmptyNodeProvider.js
 js/ajaxplorer/class.Repository.js
 js/ajaxplorer/class.AjxpDraggable.js
 js/ajaxplorer/class.AjxpSortable.js

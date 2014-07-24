@@ -251,11 +251,8 @@ Class.create("Modal", {
 			}
 			$(elementName).setStyle({height:boxHeight+'px'});
 		}else{
-			//if (Prototype.Browser.IE){
-				//$(elementName).setStyle({height:'1%'});
-			//}else{
-				$(elementName).setStyle({height:'auto'});
-			//}
+            $(elementName).setStyle({height:'auto'});
+            $(elementName).down('.dialogContent').setStyle({height:'auto'});
 		}
 		this.refreshDialogPosition();
 		if(boxAutoResize && (this.currentListensToWidth || this.currentListensToHeight) ){
@@ -352,10 +349,10 @@ Class.create("Modal", {
             $(element).down("#element_overlay").insert({after:box});
             $(element).down("#element_overlay").setStyle({opacity:0.9});
             if(element.up('div.dialogBox')){
-                Effect.BlindDown(box, {
-                    duration:0.6,
-                    transition:Effect.Transitions.sinoidal
-                });
+                //Effect.BlindDown(box, {
+                //    duration:0.6,
+                //    transition:Effect.Transitions.sinoidal
+                //});
             }
         }
         this.currentLightBoxElement = $(element);
@@ -433,7 +430,10 @@ Class.create("Modal", {
         var element = $(this.elementName);
 		var boxWidth = element.getWidth();
 		var boxHeight = element.getHeight();
-		
+        var dContent = element.down('.dialogContent');
+        var dContentScrollHeight = dContent.scrollHeight;
+        var dTitle = element.down('.dialogTitle');
+
 		if(checkHeight && boxHeight > parseInt(winHeight*90/100)){
 			var maxHeight = parseInt(winHeight*90/100);
 			var crtScrollHeight = elementToScroll.getHeight();
@@ -442,10 +442,26 @@ Class.create("Modal", {
 				elementToScroll.setStyle({
 					overflow:'auto',
 					height:(maxHeight-crtOffset)+'px'
-				});		
+				});
+                if (window.ajxpMobile){
+                    attachMobileScroll(dContent, "vertical");
+                }
 				boxHeight = element.getHeight();
 			}
-		}
+		}else if(!checkHeight && dContentScrollHeight > winHeight){
+            dContent.setStyle({
+                height:(winHeight- parseInt(dTitle.getHeight()) - 20)+'px',
+                overflow:'auto'
+            });
+            if (window.ajxpMobile){
+                attachMobileScroll(dContent, "vertical");
+            }
+            boxHeight = element.getHeight();
+        }else if(dContentScrollHeight > dContent.getHeight()){
+            dContent.setStyle({height: 'auto'});
+            boxHeight = element.getHeight();
+        }
+
 		var offsetLeft = parseInt((winWidth - parseInt(boxWidth)) / 2);
 		var offsetTop = parseInt(((winHeight - parseInt(boxHeight))/3));
         
