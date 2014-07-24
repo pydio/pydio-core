@@ -1009,7 +1009,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 }
                 $users = "";
                 $index = 0;
-                if ($regexp != null && (!count($allUsers) /*|| !array_key_exists($crtValue, $allUsers)*/)  && ConfService::getCoreConf("USER_CREATE_USERS", "conf") && !$existingOnly) {
+                if ($regexp != null && (!count($allUsers) || (!empty($crtValue) && !array_key_exists(strtolower($crtValue), $allUsers)))  && ConfService::getCoreConf("USER_CREATE_USERS", "conf") && !$existingOnly) {
                     $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue'><span class='user_entry_label'>$crtValue (".$mess["448"].")</span></li>";
                 } else if ($existingOnly && !empty($crtValue)) {
                     $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue' data-entry_id='$crtValue'><span class='user_entry_label'>$crtValue</span></li>";
