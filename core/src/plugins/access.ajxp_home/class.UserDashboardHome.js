@@ -141,8 +141,8 @@ Class.create("UserDashboardHome", AjxpPane, {
             sharedWS.each(function(pair){renderElement(pair.value);});
         }
 
-        if(oFormObject.next('div#videos_pane')){
-            oFormObject.next('div#videos_pane').select('div.tutorial_load_button').invoke("observe", "click", function(e){
+        if($('videos_pane')){
+            $('videos_pane').select('div.tutorial_load_button').invoke("observe", "click", function(e){
                 var t = Event.findElement(e, 'div.tutorial_load_button');
                 try{
                     var main = t.up('div.tutorial_legend');
@@ -168,7 +168,11 @@ Class.create("UserDashboardHome", AjxpPane, {
             var obj = oFormObject.down("#welcome");
             if(oFormObject.down("#welcome > small")) obj = oFormObject.down("#welcome > small");
             var span = new Element('span').update('<br>' + MessageHash["user_home.55"]);
-            span.down('a').observe('click', function(){ $('videos_pane').setStyle({display:'block'}); });
+            if($('videos_pane')){
+                span.down('a').observe('click', function(){ $('videos_pane').setStyle({display:'block'}); });
+            }else{
+                span.down('a').remove();
+            }
             obj.insert(span);
         }
 

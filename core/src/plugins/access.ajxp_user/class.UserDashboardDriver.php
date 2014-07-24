@@ -34,28 +34,6 @@ class UserDashboardDriver extends AbstractAccessDriver
         require_once AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareCenter.php";
     }
 
-    public function parseSpecificContributions(&$contribNode){
-        parent::parseSpecificContributions($contribNode);
-        if($contribNode->nodeName == "client_configs"){
-            $actionXpath=new DOMXPath($contribNode->ownerDocument);
-            $gettingStartedList = $actionXpath->query('component_config/additional_tab[@id="tutorials_pane"]', $contribNode);
-            if(!$gettingStartedList->length) return ;
-            if($this->getFilteredOption("ENABLE_GETTING_STARTED") === false){
-                $compConfig = $gettingStartedList->item(0)->parentNode;
-                $contribNode->removeChild($compConfig);
-            }else{
-                $cdata = $gettingStartedList->item(0)->firstChild;
-                $keys = array("URL_APP_IOSAPPSTORE", "URL_APP_ANDROID", "URL_APP_SYNC_WIN", "URL_APP_SYNC_MAC");
-                $values = array();
-                foreach($keys as $k) $values[] = $this->getFilteredOption($k);
-                $newData = str_replace($keys, $values, $cdata->nodeValue);
-                $newCData = $contribNode->ownerDocument->createCDATASection($newData);
-                $gettingStartedList->item(0)->appendChild($newCData);
-                $gettingStartedList->item(0)->replaceChild($newCData, $cdata);
-            }
-        }
-    }
-
     public function switchAction($action, $httpVars, $fileVars)
     {
         if(!isSet($this->actions[$action])) return;

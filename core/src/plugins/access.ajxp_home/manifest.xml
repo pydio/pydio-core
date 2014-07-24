@@ -6,6 +6,7 @@
             <js className="UserDashboardHome" file="plugins/access.ajxp_home/class.UserDashboardHome.js" autoload="true"/>
             <css file="plugins/access.ajxp_home/home.css" autoload="true"/>
 		</resources>
+        <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>
 	</client_settings>
     <server_settings>
         <global_param name="ENABLE_GETTING_STARTED" type="boolean"
@@ -131,7 +132,9 @@
                         <div id="ws_legend"></div>
                     </div>
                 </div>
-                <div id="videos_pane" style="display:none;" class="skipSibling" ajxpClass="AjxpPane" ajxpOptions='{"replaceScroller":true}' style="overflow-y: scroll;">
+			]]></template_part>
+            <template element="ajxp_desktop" name="tutorial_pane" position="bottom" theme="orbit"><![CDATA[
+                <div id="videos_pane" style="display:none;" class="skipSibling" ajxpClass="AjxpPane" ajxpOptions='{}' style="overflow-y: scroll;">
                     <div style="float:right;font-size: 2em;margin-right: 6px;margin-top: 6px; cursor:pointer;" onclick="$('videos_pane').hide();" class="icon-remove-sign"></div>
                     <div style="clear:left; font-size: 25px; text-align:center; margin: 40px 0 30px;">AJXP_MESSAGE[user_home.56]</div>
                     <div id="tutorial_dl_apps_pane">
@@ -177,29 +180,8 @@
                     <div style="clear:left; text-align:center;">
                         <a href="http://pyd.io/end-user-tutorials/" target="_blank" style="text-align: center;font-size: 25px;background-color: #e35d52;padding: 10px;border-radius: 5px;color: white;display: inline-block;margin: 40px 0;"><i class="icon-youtube-play"></i> AJXP_MESSAGE[user_home.65]</a></div>
                 </div>
-			]]></template_part>
+            ]]></template>
         </client_configs>
-        <actions>
-            <action name="ls" dirDefault="true">
-                <gui text="32" title="32" src="fileopen.png"
-                     accessKey="folder_access_key">
-                    <context selection="true" dir="" recycle="false"
-                             actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="true">
-                    </context>
-                    <selectionContext dir="true" file="true" recycle="false"
-                                      unique="true" allowedMimes="AJXP_MIMES_ZIP">
-                    </selectionContext>
-                </gui>
-                <rightsContext noUser="true" userLogged="only" read="true"
-                               write="false" adminOnly="false">
-                </rightsContext>
-                <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                    ]]></clientCallback>
-                    <serverCallback methodName="switchAction"/>
-                </processing>
-            </action>
-        </actions>
 	</registry_contributions>
-    <class_definition filename="plugins/access.ajxp_user/class.UserDashboardDriver.php" classname="UserDashboardDriver"/>
+    <class_definition filename="plugins/access.ajxp_home/class.HomePagePlugin.php" classname="HomePagePlugin"/>
 </ajxpdriver>

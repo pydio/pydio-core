@@ -8,17 +8,8 @@
             <js className="WebDAVprefsEditor" file="plugins/access.ajxp_user/class.WebDAVprefsEditor.js" autoload="true"/>
             <css file="plugins/access.ajxp_user/dashboard.css"/>
 		</resources>
+        <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>
 	</client_settings>
-    <server_settings>
-        <global_param name="URL_APP_IOSAPPSTORE" type="string"
-                      label="iOS App URL" description="URL of the iOS application" default="https://itunes.apple.com/us/app/pydio/id709275884?mt=8"/>
-        <global_param name="URL_APP_ANDROID" type="string"
-                      label="iOS App URL" description="URL of the iOS application" default="https://play.google.com/store/apps/details?id=com.pydio.android.Client"/>
-        <global_param name="URL_APP_SYNC_WIN" type="string"
-                      label="iOS App URL" description="URL of the iOS application" default="http://pyd.io/apps/desktop-sync-client/"/>
-        <global_param name="URL_APP_SYNC_MAC" type="string"
-                      label="iOS App URL" description="URL of the iOS application" default="http://pyd.io/apps/desktop-sync-client/"/>
-    </server_settings>
 	<registry_contributions>
 		<client_configs>
             <template_part theme="umbra" ajxpId="sidebar_splitter" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fake":"option"}'><![CDATA[
