@@ -22,4 +22,9 @@ $mess = array(
     "1" => "Email successfully sent to %s user(s)",
     "2" => "No address found to send the email!",
     "3" => "No mailer configured to send emails, contact your administrator",
+    "4" => "From",
+    "5" => "To",
+    "6" => "Subject",
+    "7" => "Message",
+    "8" => "User or email",
 );

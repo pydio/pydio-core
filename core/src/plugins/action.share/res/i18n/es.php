@@ -149,8 +149,8 @@ $mess = array(
 "140" => "You have shared this file via a public link",
 "141" => "Change parameters",
 "142" => "Hide parameters",
-"143" => "Use <kbd>Ctrl</kbd>+<kbd>C</kbd>to copy the url to your clipboard",
-"144" => "Use <kbd>&#8984;</kbd>+<kbd>C</kbd> to copy the url to your clipboard",
+"143" => "Use <kbd>Ctrl</kbd>+<kbd>C</kbd>to copy the link",
+"144" => "Use <kbd>&#8984;</kbd>+<kbd>C</kbd> to copy the link",
 "145" => "Description",
 "146" => "Will be displayed to the shared users",
 "147" => "Security",
@@ -162,4 +162,5 @@ $mess = array(
 "153" => "Standard (file list with application header)",
 "154" => "Film Strip (good for image galleries)",
 "155" => "Embedded (smaller header, for widgets)",
+"156" => "Successfully published link %s",
 );

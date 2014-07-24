@@ -130,7 +130,6 @@ kbd {
     font-size: 11px;
     font-family: Arial,Helvetica,sans-serif;
     background-color: #f7f7f7;
-    color: #333;
     -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
     -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
     box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px #fff inset;
@@ -4528,6 +4527,10 @@ span.only_share_leaf
     display: inline !important;
 }
 
+input#shared_user{
+    width: 370px !important;
+}
+
 div#target_repository_toggle{
     display: none !important;
 }
@@ -4538,6 +4541,13 @@ div#target_repository_toggle{
 
 .share_edit div#target_repository_toggle span{
     display: inline;
+}
+
+.share_edit div#target_repository_toggle div.SF_horizontal_actions{
+    text-align: right;
+    margin-top: 10px;
+    margin-bottom: -20px;
+    padding-right: 0;
 }
 
 .share_edit div#target_repository,

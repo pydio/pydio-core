@@ -7,7 +7,7 @@
         <global_param name="FILE_MAX_EXPIRATION" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Maximum share expiration limit for file, 0 = unlimited]" label="CONF_MESSAGE[Maximum file expiration limit]" type="integer" default="0" expose="true"/>
         <global_param name="FILE_MAX_DOWNLOAD" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Maximum download limit for file, 0 = unlimited]" label="CONF_MESSAGE[Maximum file download limit]" type="integer" default="0" expose="true"/>
         <global_param name="EMAIL_INVITE_EXTERNAL" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Use external mailer for invitations]" label="CONF_MESSAGE[Force External Mailer]" type="boolean" default="false" expose="true"/>
-        <global_param name="CREATE_QRCODE" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Create and display QRCode for shared link]" label="CONF_MESSAGE[Create QRCode]" type="boolean" default="true" expose="true"/>
+        <global_param name="CREATE_QRCODE" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Create and display QRCode for shared link]" label="CONF_MESSAGE[Create QRCode]" type="boolean" default="false" expose="true"/>
         <global_param name="ENABLE_FOLDER_SHARING" group="CONF_MESSAGE[Folder Sharing]" description="CONF_MESSAGE[Enable folder sharing (workspace and minisite)]" label="CONF_MESSAGE[Enable folder sharing]" type="boolean" default="true" expose="true"/>
         <global_param name="AVOID_SHARED_FOLDER_SAME_LABEL" group="CONF_MESSAGE[Folder Sharing]" description="CONF_MESSAGE[Disallow users to create shared folders if a workspace already exists with the same label]" label="CONF_MESSAGE[Avoid labels duplication]" type="boolean" default="false"/>
         <global_param name="SHARED_USERS_TMP_PREFIX" group="CONF_MESSAGE[Shared users configurations]" description="CONF_MESSAGE[Mandatory prefix for users created temporary users login]" label="CONF_MESSAGE[Tmp users prefix]" type="string" expose="true"/>
@@ -167,13 +167,13 @@
                                 <span class="mode-ws no_share_leaf">AJXP_MESSAGE[share_center.139]</span>
                                 <span class="mode-minipub only_share_leaf">AJXP_MESSAGE[share_center.140]</span>
                                 <a><span class="params_view">AJXP_MESSAGE[share_center.141]</span><span class="params_hide">AJXP_MESSAGE[share_center.142]</span></a>
+                                <div class="SF_horizontal_actions SF_horizontal_pastilles"></div>
                             </div>
                             <div style="display:none;position:relative;margin:10px;min-height:85px;" id="share_result" class="">
                                 <div class="dialogContentMainTitle" style="margin-bottom: 5px;" ajxp_message_id="share_center.29">AJXP_MESSAGE[share_center.29]</div>
                                 <div id="generate_indicator" style="position:absolute;top:2px;right:4px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
                                 <div class="SF_horizontal_fieldsRow">
-                                    <div class="SF_horizontal_actions SF_horizontal_pastilles"></div>
-                                    <input type="text" id="share_container" style="clear:left; width: 95%; margin:0 5px; font-size:13px;"/>
+                                    <input type="text" id="share_container" style="clear:left; width: 95%; margin:15px 5px 0; font-size:13px;"/>
                                     <div class="non_macos">AJXP_MESSAGE[share_center.143]</div>
 					                <div class="macos_only" style="display:none;">AJXP_MESSAGE[share_center.144]</div>
                                     <div class="share_qrcode" style="margin-top:5px; clear:left; display:none;"></div>
@@ -225,7 +225,7 @@
                                     <div class="largeButton">AJXP_MESSAGE[share_center.152]</div>
                                 </div>
                             </div>
-                            <div id="target_user" style="margin:0 5px;position:relative;display:none;" class="mode-ws mode-minipriv">
+                            <div id="target_user" style="margin:0 12px;position:relative;display:none;" class="mode-ws mode-minipriv">
                                 <div class="dialogContentMainTitle mode-ws" ajxp_message_id="share_center.30" style="display:none;">AJXP_MESSAGE[share_center.30]</div>
                                 <div style="clear: both; margin-top:20px;" class="mode-minipriv">&nbsp;</div>
                                 <div class="editable_users_header">

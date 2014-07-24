@@ -193,7 +193,7 @@ Class.create("ShareCenter", {
                     }else{
                         this.currentNode.getMetadata().set("ajxp_shared", "true");
                         ajaxplorer.fireNodeRefresh(this.currentNode);
-                        ajaxplorer.displayMessage('SUCCESS', 'Created a new public folder at ' + response);
+                        ajaxplorer.displayMessage('SUCCESS', MessageHash["share_center.156"].replace("%s", response));
                         oForm.down("#share_container").setValue(response);
                         this._currentRepositoryLink = response;
                         this._currentRepositoryLabel = oForm.down("#repo_label").getValue();
@@ -393,7 +393,7 @@ Class.create("ShareCenter", {
                     }
 
                     if(this.shareFolderMode != "workspace"){
-                        this.updateDialogButtons(oForm.down('#share_result').down("div.SF_horizontal_fieldsRow"), oForm, "folder", json);
+                        this.updateDialogButtons(oForm.down('#target_repository_toggle'), oForm, "folder", json);
                     }else{
                         var El = new Element('div', {className:"SF_horizontal_fieldsRow"}).update('<div class="SF_horizontal_actions SF_horizontal_pastilles" style="padding-top: 12px;padding-left: 7px;"></div>');
                         oForm.down("#shareDialogButtons").insert({top:El});
@@ -920,7 +920,7 @@ Class.create("ShareCenter", {
         // WATCH BUTTON
         if(ajaxplorer.hasPluginOfType("meta", "watch")){
             var st = (shareType == "folder" ? MessageHash["share_center.38"] : MessageHash["share_center.39"]);
-            if(!dialogButtonsOrRow.down('#watch_folder')) {
+            if(!dialogButtonsOrRow.down('#watch_folder_eye')) {
                 dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:"<span class='icon-eye-close simple_tooltip_observer' id='watch_folder_eye' data-tooltipTitle='"+MessageHash["share_center."+(shareType=='folder'?'83b':'83')]+"'> "+MessageHash["share_center.82"]+"<input type='checkbox' id='watch_folder' style='display:none;'></span>"});
             }
             var folderEye = dialogButtonsOrRow.down('#watch_folder_eye');
@@ -995,17 +995,25 @@ Class.create("ShareCenter", {
                     link = dialogButtonsOrRow.down('[name="link_url"]').getValue();
                     message = s + "\n\n " + "<a href='"+link+"'>"+link+"</a>";
                 }else{
-                    s = MessageHash["share_center.43"];
+                    if(this.currentNode.isLeaf()){
+                        s = MessageHash["share_center.42"]
+                    }else{
+                        s = MessageHash["share_center.43"];
+                    }
                     if(s) s = s.replace("%s", ajaxplorer.appTitle);
                     link = this._currentRepositoryLink;
-                    message = s + "\n\n " + "<a href='" + this._currentRepositoryLink+"'>" + MessageHash["share_center.46"].replace("%s1", this._currentRepositoryLabel).replace("%s2", ajaxplorer.appTitle) + "</a>";
+                    if(this.shareFolderMode == 'workspace'){
+                        message = s + "\n\n " + "<a href='" + link +"'>" + MessageHash["share_center.46"].replace("%s1", this._currentRepositoryLabel).replace("%s2", ajaxplorer.appTitle) + "</a>";
+                    }else{
+                        message = s + "\n\n " + "<a href='" + link +"'>" + MessageHash["share_center.46" + (this.currentNode.isLeaf()?'_file':'_mini')].replace("%s1", this._currentRepositoryLabel) + "</a>";
+                    }
                 }
                 if(dialogButtonsOrRow.down('.share_qrcode') && dialogButtonsOrRow.down('.share_qrcode').visible() && dialogButtonsOrRow.down('.share_qrcode > img')){
                     message += "\n\n "+ MessageHash["share_center.108"] + "\n\n" + dialogButtonsOrRow.down('.share_qrcode').innerHTML;
                 }
                 var mailer = new AjxpMailer();
                 var usersList = null;
-                if(shareType == 'folder' && oForm) {
+                if(this.shareFolderMode == 'workspace' && oForm) {
                     usersList = oForm.down(".editable_users_list");
                 }
                 console.log(mailerShower);

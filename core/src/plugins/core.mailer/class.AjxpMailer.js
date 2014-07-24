@@ -56,9 +56,9 @@ Class.create("AjxpMailer", {
         }
         var fromString = ajaxplorer.user.id;
         $("mailer_message").update("<div id='mailer_message' style='position: relative;'><div id='emails_autocomplete' style='position:absolute;z-index:1200;'></div><div class='message_body'><form>" +
-            "<div class='grey_gradient_light_inputs mailer_input_line'><span class='mailer_input_label'>From:</span><input class='mailer_input_field' type='text' name='from' value='"+fromString+"'/></div>" +
-            "<div class='grey_gradient_light_inputs mailer_input_line mailer_tofield_line'><span class='mailer_input_label' style='float: left;'>To:</span><input class='mailer_input_field' type='text' name='to' id='tofield' value=''/></div>" +
-            "<div class='grey_gradient_light_inputs mailer_input_line'><span class='mailer_input_label'>Subject:</span><input class='mailer_input_field' type='text' name='subject' value='"+subject+"'/></div>" +
+            "<div class='grey_gradient_light_inputs mailer_input_line' style='display: none;'><span class='mailer_input_label'>"+MessageHash['core.mailer.4']+":</span><input class='mailer_input_field' type='text' name='from' value='"+fromString+"'/></div>" +
+            "<div class='grey_gradient_light_inputs mailer_input_line mailer_tofield_line'><span class='mailer_input_label' style='float: left;'>"+MessageHash['core.mailer.5']+":</span><input placeholder='"+MessageHash['core.mailer.8']+"' class='mailer_input_field' type='text' name='to' id='tofield' value=''/></div>" +
+            "<div class='grey_gradient_light_inputs mailer_input_line'><span class='mailer_input_label'>"+MessageHash['core.mailer.6']+":</span><input class='mailer_input_field' type='text' name='subject' value='"+subject+"'/></div>" +
             "<textarea name='message' class='grey_gradient_light_inputs'>"+body+"</textarea>" +
             "</form></div></div>");
         if(paneTitle){

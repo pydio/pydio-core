@@ -22,4 +22,9 @@ $mess = array(
     "1" => "L'email a été envoyé avec succès à %s utilisateur(s)",
     "2" => "Impossible de trouver une adresse pour envoyer le mail!",
     "3" => "Pas d'extension trouvée pour envoyer des mails, contactez votre administrateur",
+    "4" => "De",
+    "5" => "A",
+    "6" => "Sujet",
+    "7" => "Message",
+    "8" => "Utilisateur ou email",
 );
