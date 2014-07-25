@@ -220,15 +220,16 @@
 }
 
 .ajxp_theme_orbit div.settings_search_container #search_form a{
-    top:51px;
-    right: 24px;
+    top: 50px;
+    right: 16px;
 }
 
 .ajxp_theme_orbit div.settings_search_container #search_form input{
     text-align: left;
     float: left !important;
-    width: 84%;
-    margin-left: 7px;
+    width: 93%;
+    margin: 0 2%;
+    padding: 3px 1%;
 }
 
 .ajxp_theme_orbit div.settings_main_pane #breadcrumb_container{
@@ -245,4 +246,54 @@
 
 .settings_main_pane span.icon-bookmark-empty{
     display: inline !important;
+}
+
+.ajxp_theme_orbit div#tree_container div[data-node-icon="user.png"]>a>span:before {
+    content: "\f007";
+}
+
+.ajxp_theme_orbit div#tree_container div[data-node-icon="hdd_external_unmount.png"]>a>span:before {
+    content: "\f0A0";
+}
+
+.ajxp_theme_orbit div#tree_container div[data-node-icon="users-folder.png"]>a>span:before {
+    content: "\f0C0";
+}
+
+.ajxp_theme_orbit div#tree_container div[data-node-icon="user-acl.png"]>a>span:before {
+    content: "\f00A";
+}
+
+.ajxp_theme_orbit div#tree_container div[data-node-icon="preferences_desktop.png"]>a>span:before {
+    content: "\f085";
+}
+
+.ajxp_theme_orbit div#tree_container div[data-node-icon="folder_development.png"]>a>span:before {
+    content: "\f013";
+}
+
+.ajxp_theme_orbit div#tree_container div[data-node-icon="toggle_log.png"]>a>span:before {
+    content: "\f02D";
+}
+
+.ajxp_theme_orbit div#tree_container div[data-node-icon="susehelpcenter.png"]>a>span:before {
+    content: "\f0f1";
+}
+
+.ajxp_theme_orbit div#tree_container div[data-node-icon="x-office-calendar.png"]>a>span:before {
+    content: "\f073";
+}
+
+.ajxp_theme_orbit div#tree_container div[data-node-icon="applications_engineering.png"]>a>span:before,
+.ajxp_theme_orbit div#tree_container div[data-node-icon="book.png"]>a>span:before,
+.ajxp_theme_orbit div#tree_container div[data-node-icon="book.png"]>a>span:before
+{
+    content: "\f0AD";
+}
+
+.ajxp_theme_orbit div.settings_main_pane div.flat_tree_pane>#tree_container>.webfx-tree-container>.webfx-tree-item{
+    background-color: #ccc;
+    background-color: #505050;
+    padding-bottom: 8px;
+    margin: 1px 0;
 }
