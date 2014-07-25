@@ -25,6 +25,29 @@ Class.create("ShareCenter", {
     _currentFolderWatchValue:false,
     _dataModel:null,
 
+    initialize: function(){
+        document.observe("ajaxplorer:afterApply-delete", function(){
+            try{
+                var u = ajaxplorer.getContextHolder().getUniqueNode();
+                if(u.getMetadata().get("ajxp_shared")){
+                    var leaf = u.isLeaf();
+                    var f = $("generic_dialog_box").down("#delete_message");
+                    if(!f.down("#share_delete_alert")){
+                        var message;
+                        if(u.isLeaf()){
+                            message = MessageHash["share_center.158"];
+                        }else{
+                            message = MessageHash["share_center.157"];
+                        }
+                        f.insert("<div id='share_delete_alert' style='padding-top: 10px;color: rgb(192, 0, 0);'><span style='float: left;display: block;height: 60px;margin: 4px 7px 4px 0;font-size: 2.4em;' class='icon-warning-sign'></span>"+message+"</div>");
+                    }
+                }
+            }catch(e){
+                if(console) console.log(e);
+            }
+        });
+    },
+
     performShareAction : function(dataModel){
         var userSelection;
         if(dataModel){
@@ -35,11 +58,7 @@ Class.create("ShareCenter", {
         }
         this.currentNode = userSelection.getUniqueNode();
         this.shareFolderMode = "workspace";
-        if(this.currentNode.getMetadata().get('share_data')) {
-            this.readonlyMode = true;
-        }else{
-            this.readonlyMode = false;
-        }
+        this.readonlyMode = this.currentNode.getMetadata().get('share_data') ? true : false;
         if(( userSelection.hasDir() && !userSelection.hasMime($A(['ajxp_browsable_archive'])))
             || userSelection.isMultiple()
             || (this.currentNode.getMetadata().get('share_data') && !this.currentNode.getMetadata().get('share_link'))
@@ -1146,3 +1165,7 @@ Class.create("ShareCenter", {
     }
 
 });
+
+if(ajaxplorer && ajaxplorer.actionBar){
+    ajaxplorer.actionBar.shareCenter = new ShareCenter();
+}

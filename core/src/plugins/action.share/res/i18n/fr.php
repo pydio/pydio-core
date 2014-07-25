@@ -165,5 +165,7 @@ $mess = array(
 "154" => "Pellicule (pour galleries de photos)",
 "155" => "Minimal (header plus petit, pour un widget)",
 "156" => "Le lien %s a été publié",
+"157" => "Le répertoire est actuallement partagé. Si vous le supprimez, le partage sera désactivé.",
+"158" => "Le fichier est actuallement partagé. Si vous le supprimez, le partage sera désactivé."
 // will be replaced by the filename to download
 );

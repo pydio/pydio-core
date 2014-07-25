@@ -128,8 +128,10 @@ class multiAuthDriver extends AbstractAuthDriver
             $xmlContent = str_replace("AJXP_MULTIAUTH_SOURCES", json_encode($sources), $xmlContent);
             $xmlContent = str_replace("AJXP_MULTIAUTH_MASTER", $this->getOption("MASTER_DRIVER"), $xmlContent);
             $xmlContent = str_replace("AJXP_USER_ID_SEPARATOR", $this->getOption("USER_ID_SEPARATOR"), $xmlContent);
-            $callbackNode->removeChild($callbackNode->firstChild);
-            $callbackNode->appendChild($contribNode->ownerDocument->createCDATASection($xmlContent));
+            if($callbackNode) {
+                $callbackNode->removeChild($callbackNode->firstChild);
+                $callbackNode->appendChild($contribNode->ownerDocument->createCDATASection($xmlContent));
+            }
 
         }
     }

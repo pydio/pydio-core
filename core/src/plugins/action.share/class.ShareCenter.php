@@ -710,6 +710,17 @@ class ShareCenter extends AJXP_Plugin
         if($oldNode != null && !$copy){
             $this->logDebug("Should update node");
 
+            $delete = false;
+            if($newNode == null) {
+                $delete = true;
+            }else{
+                $repo = $newNode->getRepository();
+                $recycle = $repo->getOption("RECYCLE_BIN");
+                if(!empty($recycle) && strpos($newNode->getPath(), $recycle) === 1){
+                    $delete = true;
+                }
+            }
+
             $this->getSharesFromMeta($oldNode, $shares, true);
             if(empty($shares)) {
                 return;
@@ -718,7 +729,7 @@ class ShareCenter extends AJXP_Plugin
             $newShares = array();
             foreach($shares as $id => $data){
                 $type = $data["type"];
-                if($newNode == null){
+                if($delete){
                     $this->getShareStore()->deleteShare($type, $id);
                     continue;
                 }
