@@ -65,25 +65,26 @@ Class.create("FetchedResultPane", FilesList, {
         }, ajxpOptions));
 
         if(this.options.updateGlobalContext){
-            dataModel.observe("selection_changed", function(){
+            this._registerObserver(dataModel, "selection_changed", function(){
                 if(!this._dataLoaded) return;
                 var selectedNodes = this._dataModel.getSelectedNodes();
                 if(selectedNodes){
                     ajaxplorer.getContextHolder().setSelectedNodes(selectedNodes, this);
                 }
-            }.bind(this));
+            }.bind(this), true);
         }else if(this.options.selectionChangeCallback){
-            dataModel.observe("selection_changed", this.options.selectionChangeCallback);
+            this._registerObserver(dataModel, "selection_changed", this.options.selectionChangeCallback, true);
         }
 
         if(this.options.forceClearOnRepoSwitch){
-            document.observe("ajaxplorer:repository_list_refreshed", function(){
+            var repoSwitchObserver = function(){
                 this._rootNode.clear();
                 this._dataLoaded = false;
                 if(this.htmlElement && this.htmlElement.visible()){
                     this.showElement(true);
                 }
-            }.bind(this));
+            }.bind(this);
+            this._registerObserver(document, "ajaxplorer:repository_list_refreshed", repoSwitchObserver);
         }
 
         this.hiddenColumns.push("is_file");
@@ -92,13 +93,13 @@ Class.create("FetchedResultPane", FilesList, {
         mainElementName.addClassName('class-FetchedResultPane');
 
         if(ajxpOptions.reloadOnServerMessage){
-            ajaxplorer.observe("server_message", function(event){
+            this._registerObserver(ajaxplorer, "server_message", function(event){
                 var newValue = XPathSelectSingleNode(event, ajxpOptions.reloadOnServerMessage);
                 if(newValue) this.reloadDataModel();
-            }.bind(this));
-            ajaxplorer.observe("server_message:" + ajxpOptions.reloadOnServerMessage, function(){
+            }.bind(this), true);
+            this._registerObserver(ajaxplorer, "server_message:" + ajxpOptions.reloadOnServerMessage, function(){
                 this.reloadDataModel();
-            }.bind(this));
+            }.bind(this), true);
         }
 
         if(ajxpOptions.containerDroppableAction){

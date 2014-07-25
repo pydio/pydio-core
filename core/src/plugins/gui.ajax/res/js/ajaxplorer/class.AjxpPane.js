@@ -116,6 +116,7 @@ Class.create("AjxpPane", {
             }
         }.bind(this));
         if(change){
+            this.scanChildrenPanes(this.htmlElement, true);
             this.resize();
             this.reorderContents();
         }
