@@ -292,8 +292,26 @@
 }
 
 .ajxp_theme_orbit div.settings_main_pane div.flat_tree_pane>#tree_container>.webfx-tree-container>.webfx-tree-item{
-    background-color: #ccc;
     background-color: #505050;
     padding-bottom: 8px;
     margin: 1px 0;
+}
+
+.settings_main_pane #search_results_cont{
+    box-shadow: 3px 3px 20px rgba(0,0,0,0.3);
+    text-shadow: none;
+    margin-top: 5px;
+    width: 280px;
+}
+
+.settings_main_pane div#search_results div.thumbnail_selectable_cell.detailed{
+    width: 100%;
+}
+
+.settings_main_pane #search_results div.ajxpNodeProvider:hover{
+    background-color: transparent !important;
+}
+
+.settings_main_pane #search_results div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata{
+    opacity: 1 !important;
 }

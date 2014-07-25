@@ -50,4 +50,13 @@ $mess=array(
 "Configuration Store Instance" => "Configuration Store Instance",
 "Instance" => "Instance",
 "Choose the configuration plugin" => "Choose the configuration plugin",
+"Name" => "Name",
+"Full name displayed to others" => "Full name displayed to others",
+"Avatar" => "Avatar",
+"Image displayed next to the user name" => "Image displayed next to the user name",
+"Email" => "Email",
+"Address used for notifications" => "Address used for notifications",
+"Country" => "Country",
+"Language" => "Language",
+"User Language" => "User Language",
 );

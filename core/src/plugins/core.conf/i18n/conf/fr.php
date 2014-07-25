@@ -50,4 +50,13 @@ $mess=array(
 "Configuration Store Instance" => "Configuration Store Instance",
 "Instance" => "Instance",
 "Choose the configuration plugin" => "Choose the configuration plugin",
+"Name" => "Nom",
+"Full name displayed to others" => "Nom complet, affiché à tous les utilisateurs",
+"Avatar" => "Avatar",
+"Image displayed next to the user name" => "Image affichée à côté du nom",
+"Email" => "Email",
+"Address used for notifications" => "Addresse utilisée pour les notifications",
+"Country" => "Pays",
+"Language" => "Langue",
+"User Language" => "Langue de l'interface pour cet utilisateur",
 );

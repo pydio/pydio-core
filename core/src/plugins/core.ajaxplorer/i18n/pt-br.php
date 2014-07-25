@@ -576,5 +576,11 @@ $mess=array(
 "516" => "expand",
 "517" => "collapse",
 "518" => "Alternatively, you can <a class='create_file_alt_link'>create a new empty file</a>.",
+"519" => "Update user",
+"520" => "Update user data and password",
+"521" => "User was update successfully",
+"522" => "User ID",
+"523" => "Password",
+"524" => "Update Password",
 /* END SENTENCE */
 );

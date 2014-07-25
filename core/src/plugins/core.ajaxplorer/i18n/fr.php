@@ -574,5 +574,11 @@ $mess=array(
 "516"=> "déplier",
 "517"=> "plier",
 "518" => "Vous pouvez aussi <a class='create_file_alt_link'>créer un fichier vide</a>.",
+"519"=> "Mettre à jour",
+"520"=> "Mettre à jour les données utilisateurs et mot de passe",
+"521"=> "L'utilisateur a été mis à jour",
+"522"=> "ID Utilisateur",
+"523"=> "Mot de passe",
+"524"=> "Nouveau mot de passe",
 /* END SENTENCE */
 );

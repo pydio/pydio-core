@@ -3395,6 +3395,7 @@ span.search_meta_opt.checked > span {
     font-size: 1.4em;
     color: #999;
     top: 9px;
+    z-index: 10;
 }
 
 #search_results div[data-groupByValue]{

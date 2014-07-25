@@ -268,6 +268,83 @@
                 <serverCallback methodName="switchAction"></serverCallback>
             </processing>
         </action>
+        <action name="user_update_user">
+            <gui text="519" title="520" src="edit_user.png" iconClass="icon-user" accessKey="" hasAccessKey="false">
+                <context selection="true" dir="" recycle="true" actionBar="true" actionBarGroup="address_book" contextMenu="false" infoPanel="false"/>
+                <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="shared_user"/>
+            </gui>
+            <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
+            <processing>
+                <clientCallback prepareModal="true" dialogOpenForm="user_create_user" dialogOkButtonOnly="false" dialogSkipButtons="false">
+                    <dialogOnOpen><![CDATA[
+
+                        var user = window.actionManager.getDataModel().getUniqueNode();
+                        if(user && user.getAjxpMime() == "shared_user"){
+                            var user_id = getBaseName(user.getPath());
+                            var conn = new Connexion();
+                            conn.setParameters({
+                                get_action:'user_update_user',
+                                user_id:user_id
+                            });
+                            conn.onComplete = function(transport){
+                                var values = $H(transport.responseJSON);
+                                values.set("existing_user_id", user_id);
+
+                                var params = $A(ajaxplorer.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(','));
+                                for(var i=0;i<params.length;i++){
+                                    params[i] = "user/preferences/pref[@exposed]|//param[@name='"+params[i]+"']";
+                                }
+                                var f = new FormManager();
+                                var def1 = $A();
+                                def1.push($H({
+                                    description: MessageHash[522],
+                                    editable: "true",
+                                    expose: "true",
+                                    label: MessageHash[522],
+                                    name: "existing_user_id",
+                                    scope: "user",
+                                    type: "hidden"
+                                }),$H({
+                                    description: MessageHash[524],
+                                    editable: "true",
+                                    expose: "true",
+                                    label: MessageHash[524],
+                                    name: "new_password",
+                                    scope: "user",
+                                    type: "password-create"
+                                }));
+                                var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), params.join('|'));
+                                definitions.each(function(el){ def1.push(el); });
+                                f.createParametersInputs(oForm.down('#user_create_user'), def1, true, values, false, true);
+                                modal.refreshDialogPosition();
+
+                            };
+                            conn.sendAsync();
+                        }
+                    ]]></dialogOnOpen>
+                    <dialogOnComplete hideDialog="true"><![CDATA[
+                        var params = $H();
+                        var f = new FormManager();
+                          f.serializeParametersInputs(oForm.down('#user_create_user'), params, 'NEW_');
+                          var conn = new Connexion();
+                          params.set("get_action", "user_create_user");
+                          conn.setParameters(params);
+                          conn.setMethod("POST");
+                          conn.onComplete = function(transport){
+                                if(transport.responseText == "SUCCESS"){
+                                   if($("address_book")){
+                                        $("address_book").ajxpPaneObject.reloadDataModel();
+                                  }
+                                  ajaxplorer.displayMessage("SUCCESS", MessageHash[521]);
+                                }
+                          };
+                          conn.sendAsync();
+                    ]]></dialogOnComplete>
+                    <dialogOnCancel><![CDATA[]]></dialogOnCancel>
+                </clientCallback>
+                <serverCallback methodName="switchAction"></serverCallback>
+            </processing>
+        </action>
         <action name="user_create_user">
       			<gui text="484" title="485" src="edit_user.png" iconClass="icon-user" accessKey="" hasAccessKey="false">
       				<context selection="false" dir="" recycle="true" actionBar="true" actionBarGroup="address_book" contextMenu="false" infoPanel="false"/>
@@ -283,18 +360,18 @@
                         var f = new FormManager();
                         var def1 = $A();
                         def1.push($H({
-                            description: "User ID",
+                            description: MessageHash[522],
                             editable: "true",
                             expose: "true",
-                            label: "User ID",
+                            label: MessageHash[522],
                             name: "new_user_id",
                             scope: "user",
                             type: "string"
                         }),$H({
-                            description: "New user password",
+                            description: MessageHash[523],
                             editable: "true",
                             expose: "true",
-                            label: "Password",
+                            label: MessageHash[523],
                             name: "new_password",
                             scope: "user",
                             type: "password-create"

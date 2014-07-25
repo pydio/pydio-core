@@ -148,6 +148,13 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 $publicUrlNode = $publicUrlNodeList->item(0);
                 $contribNode->removeChild($publicUrlNode);
             }
+            unset($this->actions["user_update_user"]);
+            $actionXpath=new DOMXPath($contribNode->ownerDocument);
+            $publicUrlNodeList = $actionXpath->query('action[@name="user_update_user"]', $contribNode);
+            if ($publicUrlNodeList->length) {
+                $publicUrlNode = $publicUrlNodeList->item(0);
+                $contribNode->removeChild($publicUrlNode);
+            }
             unset($this->actions["user_delete_user"]);
             $actionXpath=new DOMXPath($contribNode->ownerDocument);
             $publicUrlNodeList = $actionXpath->query('action[@name="user_delete_user"]', $contribNode);
@@ -700,13 +707,13 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
                 $data = array();
 
-                if ($action == "user_create_user") {
+                if ($action == "user_create_user" && isSet($httpVars["NEW_new_user_id"])) {
+                    $updating = false;
                     AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "NEW_");
                     $data["new_user_id"] = AJXP_Utils::decodeSecureMagic($data["new_user_id"], AJXP_SANITIZE_EMAILCHARS);
                     if (AuthService::userExists($data["new_user_id"])) {
                         throw new Exception('Please choose another user id');
                     }
-                    AJXP_Controller::applyHook("user.before_create", array($data["new_user_id"]));
                     $loggedUser = AuthService::getLoggedUser();
                     $limit = $loggedUser->personalRole->filterParameterValue("core.conf", "USER_SHARED_USERS_LIMIT", AJXP_REPO_SCOPE_ALL, "");
                     if (!empty($limit) && intval($limit) > 0) {
@@ -724,7 +731,24 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     $userObject->setGroupPath($loggedUser->getGroupPath());
                     $userObject->setProfile("shared");
 
+                } else if($action == "user_create_user" && isSet($httpVars["NEW_existing_user_id"])){
+
+                    $updating = true;
+                    AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "NEW_");
+                    $userId = $data["existing_user_id"];
+                    if(!AuthService::userExists($userId)){
+                        throw new Exception("Cannot find user");
+                    }
+                    $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
+                    if($userObject->getParent() != AuthService::getLoggedUser()->getId()){
+                        throw new Exception("Cannot find user");
+                    }
+                    if(!empty($data["new_password"])){
+                        AuthService::updatePassword($userId, $data["new_password"]);
+                    }
+
                 } else {
+                    $updating = false;
                     $userObject = AuthService::getLoggedUser();
                     AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "PREFERENCES_");
                 }
@@ -758,7 +782,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 }
 
                 if ($action == "user_create_user") {
-                    AJXP_Controller::applyHook("user.after_create", array($userObject));
+
+                    AJXP_Controller::applyHook($updating?"user.after_update":"user.after_create", array($userObject));
                     if (isset($data["send_email"]) && $data["send_email"] == true && !empty($data["email"])) {
                         $mailer = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("mailer");
                         if ($mailer !== false) {
@@ -780,6 +805,29 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
             break;
 
+            case "user_update_user":
+
+                if(!isSet($httpVars["user_id"])) {
+                    throw new Exception("invalid arguments");
+                }
+                $userId = $httpVars["user_id"];
+                if(!AuthService::userExists($userId)){
+                    throw new Exception("Cannot find user");
+                }
+                $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
+                if($userObject->getParent() != AuthService::getLoggedUser()->getId()){
+                    throw new Exception("Cannot find user");
+                }
+                $paramsString = ConfService::getCoreConf("NEWUSERS_EDIT_PARAMETERS", "conf");
+                $result = array();
+                $params = explode(",", $paramsString);
+                foreach($params as $p){
+                    $result[$p] = $userObject->personalRole->filterParameterValue("core.conf", $p, AJXP_REPO_SCOPE_ALL, "");
+                }
+                HTMLWriter::charsetHeader("application/json");
+                echo json_encode($result);
+
+            break;
 
             //------------------------------------
             // WEBDAV PREFERENCES

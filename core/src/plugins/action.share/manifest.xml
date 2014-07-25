@@ -434,6 +434,7 @@
                     ]]></clientCallback>
                 </processing>
             </action>
+            <!--
             <action name="sharelist-copyUrl">
                 <gui text="share_center.129" title="share_center.130" iconClass="icon-copy" src="editcopy.png" accessKey="" hasAccessKey="false">
                     <context selection="true" dir="" recycle="false"
@@ -469,6 +470,7 @@
                     <serverCallback methodName="switchAction"/>
                 </processing>
             </action>
+            -->
             <action name="sharelist-load">
                 <gui src="share.png" iconClass="icon-refresh" text="149" title="149">
                     <context dir="true" recycle="false" selection="false" actionBar="true" actionBarGroup="share_list_toolbar" behaviour="hidden"/>

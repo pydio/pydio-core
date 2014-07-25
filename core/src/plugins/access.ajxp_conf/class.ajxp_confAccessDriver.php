@@ -1988,7 +1988,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 <column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/>
                 <column messageId="ajxp_conf.9" attributeName="accessType" sortType="String"/>
                 <column messageId="ajxp_conf.125" attributeName="slug" sortType="String"/>
-                <column messageId="ajxp_conf.106" attributeName="repository_id" sortType="String"/>
             </columns>');
         }
 

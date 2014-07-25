@@ -152,7 +152,7 @@
         <noscript><h2>AJXP_MESSAGE[share_center.77]</h2></noscript>
     </head>
 
-    <body marginheight="0" marginwidth="0" leftmargin="0" topmargin="0" class="AJXP_PRELOGED_USER">
+    <body marginheight="0" marginwidth="0" leftmargin="0" topmargin="0" style="overflow: hidden;" class="AJXP_PRELOGED_USER">
         <div id="AJXP_TEMPLATE_NAME" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"window"}'></div>
     </body>
 </html>

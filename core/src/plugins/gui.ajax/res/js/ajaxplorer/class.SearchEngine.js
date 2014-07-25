@@ -844,9 +844,9 @@ Class.create("SearchEngine", AjxpPane, {
             }
             connexion.onComplete = function(transport){
                 ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                this.removeOnLoad($(this._resultsBoxId));
                 this._parseResults(transport.responseXML, currentFolder);
                 this.updateStateFinished();
-                this.removeOnLoad($(this._resultsBoxId));
             }.bind(this);
             this.setOnLoad($(this._resultsBoxId));
             connexion.sendAsync();
@@ -862,8 +862,8 @@ Class.create("SearchEngine", AjxpPane, {
                     connexion.addParameter('fields', this.getSearchColumns().join(','));
                 }
                 connexion.onComplete = function(transport){
-                    this._parseResults(transport.responseXML, currentFolder);
                     this.removeOnLoad($(this._resultsBoxId));
+                    this._parseResults(transport.responseXML, currentFolder);
                     this.searchNext();
                 }.bind(this);
                 this.setOnLoad($(this._resultsBoxId));

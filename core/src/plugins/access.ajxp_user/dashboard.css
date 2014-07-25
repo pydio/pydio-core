@@ -20,6 +20,18 @@
     border:0;
 }
 
+#userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed{
+    padding: 6px 4px;
+}
+
+#userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed:nth-child(odd){
+    background-color: #f1f1f1 !important;
+}
+
+#userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed:nth-child(odd).selected{
+    background-color: #fb725c !important;
+}
+
 #userdashboard_main_tab #content_pane.dropareaHover{
     border-color: #e35d52 !important;
 }

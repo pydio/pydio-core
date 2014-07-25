@@ -162,4 +162,6 @@ $mess = array(
 "154" => "Film Strip (good for image galleries)",
 "155" => "Embedded (smaller header, for widgets)",
 "156" => "Successfully published link %s",
+"46_mini" => "Open mini %s1",
+"46_file" => "Open file %s1",
 );
