@@ -1274,9 +1274,11 @@ class ShareCenter extends AJXP_Plugin
     {
         $uniqueUser = null;
         if(isSet($httpVars["repository_id"]) && isSet($httpVars["guest_user_id"])){
-
+            $existingData = $this->getShareStore()->loadShare($httpVars["hash"]);
+            if(isSet($existingData["PRELOG_USER"])) $existingU = $existingData["PRELOG_USER"];
+            else if(isSet($existingData["PRESET_LOGIN"])) $existingU = $existingData["PRESET_LOGIN"];
             $uniqueUser = $httpVars["guest_user_id"];
-            if(!empty($httpVars["guest_user_pass"])){
+            if(!empty($httpVars["guest_user_pass"]) && $uniqueUser == $existingU){
                 //$userPass = $httpVars["guest_user_pass"];
                 // UPDATE GUEST USER PASS HERE
                 AuthService::updatePassword($uniqueUser, $httpVars["guest_user_pass"]);
@@ -1341,8 +1343,8 @@ class ShareCenter extends AJXP_Plugin
         $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
         $this->initPublicFolder($downloadFolder);
 
-        if(isset($httpVars["repository_id"])){
-            $data = $this->shareStore->loadShare($httpVars["hash"]);
+        if(isset($existingData)){
+            $data = $existingData;
         }else{
             $data = array(
                 "REPOSITORY"=>$newId
