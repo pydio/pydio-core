@@ -357,6 +357,7 @@ Class.create("AjxpPane", {
 
     setUserPreference : function(prefName, prefValue){
         if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return;
+        if(ajaxplorer.user.getPreference("SKIP_USER_HISTORY") == "true") return;
         var guiPref = ajaxplorer.user.getPreference("gui_preferences", true);
         if(!guiPref) guiPref = {};
         var classkey = this.htmlElement.id+"_"+this.__className;
