@@ -64,7 +64,7 @@ interface AJXP_FeedStore
      * @abstract
      * @param $userId
      * @param null $repositoryIdFilter
-     * @return mixed
+     * @return AJXP_Notification[]
      */
     public function loadAlerts($userId, $repositoryIdFilter = null);
 

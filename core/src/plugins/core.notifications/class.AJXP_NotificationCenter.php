@@ -179,7 +179,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     } catch (Exception $e) {
                         continue;
                     }
-                    $node->event_description = ucfirst($notif->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notif->getAuthor();
+                    $node->event_description = ucfirst($notif->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notif->getAuthorLabel();
                     $node->event_description_long = $notif->getDescriptionLong(true);
                     $node->event_date = AJXP_Utils::relativeDate($notif->getDate(), $mess);
                     $node->event_time = $notif->getDate();
@@ -255,6 +255,9 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         $res = $this->eventStore->loadAlerts($userId, $repositoryFilter);
         if(!count($res)) return;
 
+        // Recompute children notifs
+
+
         $format = $httpVars["format"];
         $skipContainingTags = (isSet($httpVars["skip_container_tags"]));
         $mess = ConfService::getMessages();
@@ -266,6 +269,8 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                 AJXP_XMLWriter::header();
             }
         }
+        $parentRepository = ConfService::getRepositoryById($repositoryFilter);
+        $parentRoot = $parentRepository->getOption("PATH");
         $cumulated = array();
         foreach ($res as $notification) {
             if ($format == "html") {
@@ -275,6 +280,26 @@ class AJXP_NotificationCenter extends AJXP_Plugin
             } else {
                 $node = $notification->getNode();
                 $path = $node->getPath();
+
+                if($node->getRepository()->hasParent() && $node->getRepository()->getParentId() == $repositoryFilter){
+                    $nodeRepo = $node->getRepository();
+                    $currentRoot = $nodeRepo->getOption("PATH");
+                    $contentFilter = $nodeRepo->getContentFilter();
+                    if(isSet($contentFilter)){
+                        $nodePath = $contentFilter->filterExternalPath($node->getPath());
+                        if($nodePath == "/"){
+                            $k = array_keys($contentFilter->filters);
+                            $nodePath = $k[0];
+                        }
+                    }else{
+                        $nodePath = $node->getPath();
+                    }
+                    $relative = rtrim( substr($currentRoot, strlen($parentRoot)), "/"). rtrim($nodePath, "/");
+                    $parentNodeURL = $node->getScheme()."://".$repositoryFilter.$relative;
+                    $this->logDebug("action.share", "Recompute alert to ".$parentNodeURL);
+                    $node = new AJXP_Node($parentNodeURL);
+                }
+
 
                 if (isSet($cumulated[$path])) {
                     $cumulated[$path]->event_occurence ++;
@@ -289,7 +314,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     continue;
                 }
                 $node->event_is_alert = true;
-                $node->event_description = ucfirst($notification->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notification->getAuthor();
+                $node->event_description = ucfirst($notification->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notification->getAuthorLabel();
                 $node->event_description_long = $notification->getDescriptionLong(true);
                 $node->event_date = AJXP_Utils::relativeDate($notification->getDate(), $mess);
                 $node->event_type = "alert";
@@ -309,15 +334,20 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         }
         $index = 1;
         foreach ($cumulated as $nodeToSend) {
-            if ($nodeToSend->event_occurence > 1) {
-                $nodeToSend->setLabel(basename($nodeToSend->getPath()) . " (". $nodeToSend->event_occurence .")" );
-            } else {
-                $nodeToSend->setLabel(basename($nodeToSend->getPath()));
+            $nodeOcc = $nodeToSend->event_occurence > 1 ? "(".$nodeToSend->event_occurence.")" : "";
+            if(isSet($httpVars["merge_description"]) && $httpVars["merge_description"] == "true"){
+                if(isSet($httpVars["description_as_label"]) && $httpVars["description_as_label"] == "true"){
+                    $nodeToSend->setLabel($nodeToSend->event_description." ". $nodeOcc." ".$nodeToSend->event_date);
+                }else{
+                    $nodeToSend->setLabel(basename($nodeToSend->getPath())." ". $nodeOcc." "." <small class='notif_desc'>".$nodeToSend->event_description." ".$nodeToSend->event_date."</small>");
+                }
+            }else{
+                $nodeToSend->setLabel(basename($nodeToSend->getPath()) . $nodeOcc);
             }
             // Replace PATH
             $nodeToSend->real_path = $path;
             $url = parse_url($nodeToSend->getUrl());
-            $nodeToSend->setUrl($url["scheme"]."://".$url["host"]."/alert_".$index);
+            //$nodeToSend->setUrl($url["scheme"]."://".$url["host"]."/alert_".$index);
             $index ++;
             AJXP_XMLWriter::renderAjxpNode($nodeToSend);
 

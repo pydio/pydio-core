@@ -1804,8 +1804,8 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
 
 #topPane div.FL-inlineToolbar{
     position: absolute;
-    top: 10px;
-    right: 40px;
+    top: 4px;
+    right: 33px;
     margin: 0;
 }
 
@@ -1877,6 +1877,15 @@ div.class-FetchedResultPane > div.panelHeader
 #notif_pane div.thumbLabel small {
     font-style: italic;
     opacity: 0.7;
+    display: block;
+    margin-left: 40px;
+    width: 217px;
+    overflow: hidden;
+    height: auto;
+}
+
+#notif_pane div.thumbLabel {
+    padding: 4px 0 !important;
 }
 
 #topPane h3,
@@ -3502,7 +3511,10 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabe
 
 #topPane div.thumbnail_selectable_cell.detailed div.thumbLabel{
     color: #ccc;
-    font-weight: lighter;
+}
+
+#topPane div.thumbnail_selectable_cell.detailed.selected.selected-focus div.thumbLabel{
+    color: #fff;
 }
 
 div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_label,
