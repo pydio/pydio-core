@@ -6,7 +6,7 @@
         </resources>
     </client_settings>
 	<server_settings>
-        <global_param name="GUI_THEME" group="CONF_MESSAGE[Main Options]" type="select" choices="vision|Vision,orbit|Orbit,umbra|Umbra,oxygen|Oxygen (Legacy)" label="CONF_MESSAGE[Theme]" description="CONF_MESSAGE[Theme used for display]" mandatory="true" default="vision"/>
+        <global_param name="GUI_THEME" group="CONF_MESSAGE[Main Options]" type="select" choices="vision|Vision,orbit|Orbit,umbra|Umbra,oxygen|Oxygen (Legacy)" label="CONF_MESSAGE[Theme]" description="CONF_MESSAGE[Theme used for display]" mandatory="true" default="orbit"/>
         <global_param name="JS_RESOURCES_BEFORE" group="CONF_MESSAGE[Main Options]" type="string" label="CONF_MESSAGE[Additional JS frameworks]" description="CONF_MESSAGE[List of pathes to JS files that must be loaded BEFORE the main Pydio framework is loaded, comma separated. The preferred way should be using plugins resources declaration, but in some cases one may want to load some JS at the very start up of the page.]" mandatory="false" default="plugins/gui.ajax/res/js/jquery_backbone-min.js"/>
         <global_param name="CUSTOM_ICON_ONLY" group="CONF_MESSAGE[Start Up Screen]" type="boolean" label="CONF_MESSAGE[Icon Only]" description="CONF_MESSAGE[Skip the title, only display an image]" mandatory="false" default="true"/>
         <global_param name="CUSTOM_ICON_BINARY" group="CONF_MESSAGE[Start Up Screen]" type="image" label="CONF_MESSAGE[Custom Icon]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]"

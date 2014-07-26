@@ -312,7 +312,7 @@
             </action>
             <action name="share-edit-shared">
                 <gui src="share.png" iconClass="icon-share" text="share_center.125" title="share_center.126">
-                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="get,share_list_toolbar,info_panel_share" behaviour="hidden"/>
+                    <context dir="true" recycle="hidden" selection="true" actionBar="true" actionBarGroup="get,share_list_toolbar,info_panel_share" behaviour="hidden"/>
                     <selectionContext dir="true" file="true" evalMetadata="metadata.get('ajxp_shared')" recycle="false" unique="true" behaviour="hidden"/>
                 </gui>
                 <processing>
@@ -324,7 +324,7 @@
             </action>
             <action name="share-folder-workspace">
                 <gui src="share.png" iconClass="icon-share" text="share_center.113" title="share_center.114">
-                    <context dir="true" recycle="false" selection="true"/>
+                    <context dir="true" recycle="hidden" selection="true"/>
                     <selectionContext dir="true" file="false" evalMetadata="!metadata.get('ajxp_shared')"  recycle="false" unique="true"/>
                 </gui>
                 <processing>
@@ -336,7 +336,7 @@
             </action>
             <action name="share-file-minisite">
                 <gui src="share.png" iconClass="icon-share" text="292" title="292">
-                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="get,info_panel_share" />
+                    <context dir="true" recycle="hidden" selection="true" actionBar="true" actionBarGroup="get,info_panel_share" />
                     <selectionContext dir="false" file="true" recycle="false" unique="true" evalMetadata="!metadata.get('ajxp_shared')" />
                 </gui>
                 <processing>
@@ -360,7 +360,7 @@
             </action>
             <action name="share-folder-minisite-public">
                 <gui src="share.png" iconClass="icon-share" text="292" title="292">
-                    <context dir="true" recycle="false" selection="true" actionBar="true" actionBarGroup="get,info_panel_share"/>
+                    <context dir="true" recycle="hidden" selection="true" actionBar="true" actionBarGroup="get,info_panel_share"/>
                     <selectionContext dir="true" file="false" recycle="false" unique="true" evalMetadata="!metadata.get('ajxp_shared')" />
                 </gui>
                 <processing>
@@ -512,6 +512,7 @@
                     <serverCallback methodName="switchAction" developerComment="Clear expired links" restParams="/"/>
                 </processing>
             </action>
+            <!--
             <action name="sharelist-migrate">
                 <gui src="share.png" iconClass="icon-sort-by-attributes-alt" text="share_center.127" title="share_center.128">
                     <context dir="false" recycle="false" selection="false" actionBar="true" actionBarGroup="share_list_toolbar" behaviour="hidden"/>
@@ -523,9 +524,10 @@
                             var id = window.actionManager.getDataModel().getRootNode().getPath();
                         }
                     ]]></clientCallback>
+                    <serverCallback methodName="switchAction" developerComment="Migrate old publiclets to new format"/>
                 </processing>
             </action>
-
+            -->
             <action name="share_current_page">
                 <gui src="" iconClass="icon-share" text="share_center.110" title="share_center.110">
                     <context dir="true" recycle="false" selection="false" actionBarGroup="minisite-share-actions" actionBar="true"/>

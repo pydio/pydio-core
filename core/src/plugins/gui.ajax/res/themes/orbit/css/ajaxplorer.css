@@ -54,15 +54,21 @@ div.selected-webfx-tree-item-inactive{
     background-color: #ffffff;
 }
 
-.colorcode-alert{
+.colorcode-alert,
+span.overlay-class-span.icon-eye-open
+{
     color: #F5C781;
 }
 
-.colorcode-shared{
+.colorcode-shared,
+span.overlay-class-span.icon-share-sign
+{
     color: #4Aceb0;
 }
 
-.colorcode-bookmark{
+.colorcode-bookmark,
+span.overlay-class-span.icon-bookmark
+{
     color: #77b8e2;
 }
 
@@ -222,7 +228,7 @@ kbd {
     width: 100%;
     display: block;;
     height: auto;
-
+    position: relative;
     border-radius: 0;
     padding: 6px 4px;
 }
@@ -2634,6 +2640,9 @@ div#upload_files_list, div#multiple_download_container
 
 .droparea {
     background: url("../../../../../../index.php?get_action=get_drop_bg") no-repeat scroll left bottom transparent;
+}
+
+.uploadFilesList.droparea{
     background-position: center;
 }
 
@@ -6026,8 +6035,7 @@ div#buttons_bar_top {
 }
 
 a#up_dir_button {
-    padding-top: 1px;
-    padding-bottom: 5px;
+    height:22px;
 }
 
 a#up_dir_button span.ajxp_icon_span{
