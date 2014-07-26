@@ -144,7 +144,7 @@ $mess=array(
 "124" => "Sorgente",
 "125" => "Alias",
 "126" => "Sei sicuro di voler eliminare gli elementi selezionati(s)?",
-"113" => "Role status was successfully modified",
-"114" => "Applies to",
-"115" => "Scheme",
+"113" => "Status del ruolo correttamente aggiornato",
+"114" => "Applicato a",
+"115" => "Schema",
 );
