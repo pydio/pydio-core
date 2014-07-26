@@ -158,17 +158,26 @@ class AjxpLuceneIndexer extends AJXP_Plugin
                 $this->applyAction("index", array("inner_apply" => "true"), array());
                 throw new Exception($messages["index.lucene.7"]);
             }
+            $textQuery = $httpVars["query"];
+            if($this->getFilteredOption("AUTO_WILDCARD") === true && strlen($textQuery) > 0){
+                $isQuote = false;
+                if($textQuery[0] == '"' && $textQuery[strlen($textQuery)-1] == '"'){
+                    $textQuery = substr($textQuery, 1, -1);
+                }else if($textQuery[strlen($textQuery)-1] != "*" ){
+                    $textQuery.="*";
+                }
+            }
             if ((isSet($this->metaFields) || $this->indexContent) && isSet($httpVars["fields"])) {
                 $sParts = array();
                 foreach (explode(",",$httpVars["fields"]) as $searchField) {
                     if ($searchField == "filename") {
-                        $sParts[] = "basename:".$httpVars["query"];
+                        $sParts[] = "basename:".$textQuery;
                     } else if (in_array($searchField, $this->metaFields)) {
-                        $sParts[] = "ajxp_meta_".$searchField.":".$httpVars["query"];
+                        $sParts[] = "ajxp_meta_".$searchField.":".$textQuery;
                     } else if ($searchField == "ajxp_document_content") {
-                        $sParts[] = "title:".$httpVars["query"];
-                        $sParts[] = "body:".$httpVars["query"];
-                        $sParts[] = "keywords:".$httpVars["query"];
+                        $sParts[] = "title:".$textQuery;
+                        $sParts[] = "body:".$textQuery;
+                        $sParts[] = "keywords:".$textQuery;
                     }
                 }
                 $query = implode(" OR ", $sParts);
@@ -176,7 +185,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin
                 $this->logDebug("Query : $query");
             } else {
                 $index->setDefaultSearchField("basename");
-                $query = $this->filterSearchRangesKeywords($httpVars["query"]);
+                $query = $this->filterSearchRangesKeywords($textQuery);
             }
             $this->setDefaultAnalyzer();
             if ($query == "*") {

@@ -3811,6 +3811,10 @@ div.infoPanelValue
     vertical-align: top;
 }
 
+div[data-metatype="stars_rate"] {
+    padding: 3px 0 30px;
+}
+
 .panelContent.scrolling td.infoPanelValue{
     padding-right: 18px;
 }

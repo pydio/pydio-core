@@ -272,26 +272,46 @@ class UserMetaManager extends AJXP_Plugin
 
     /**
      *
-     * @param AJXP_Node $oldFile
-     * @param AJXP_Node $newFile
+     * @param AJXP_Node $oldNode
+     * @param AJXP_Node $newNode
      * @param Boolean $copy
      */
-    public function updateMetaLocation($oldFile, $newFile = null, $copy = false)
+    public function updateMetaLocation($oldNode, $newNode = null, $copy = false)
     {
-        if($oldFile == null) return;
-        if(!$copy && $this->metaStore->inherentMetaMove()) return;
+        $defs = $this->getMetaDefinition();
+        $updateField = $createField = null;
+        foreach($defs as $f => $data){
+            if($data["type"] == "updater") $updateField = $f;
+            else if($data["type"] == "creator") $createField = $f;
+        }
+        $valuesUpdate = (isSet($updateField) || isSet($createField));
+        $currentUser = null;
+        if($valuesUpdate){
+            $currentUser = AuthService::getLoggedUser()->getId();
+        }
 
-        $oldMeta = $this->metaStore->retrieveMetadata($oldFile, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
+        if($oldNode == null && !$valuesUpdate) return;
+        if(!$copy && !$valuesUpdate && $this->metaStore->inherentMetaMove()) return;
+
+        if($oldNode == null){
+            $oldMeta = $this->metaStore->retrieveMetadata($newNode, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
+        }else{
+            $oldMeta = $this->metaStore->retrieveMetadata($oldNode, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
+        }
+        if($valuesUpdate){
+            if(isSet($updateField))$oldMeta[$updateField] = $currentUser;
+            if(isSet($createField) && $oldNode == null) $oldMeta[$createField] = $currentUser;
+        }
         if (!count($oldMeta)) {
             return;
         }
         // If it's a move or a delete, delete old data
-        if (!$copy) {
-            $this->metaStore->removeMetadata($oldFile, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
+        if ($oldNode != null && !$copy) {
+            $this->metaStore->removeMetadata($oldNode, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
         }
         // If copy or move, copy data.
-        if ($newFile != null) {
-            $this->metaStore->setMetadata($newFile, "users_meta", $oldMeta, false, AJXP_METADATA_SCOPE_GLOBAL);
+        if ($newNode != null) {
+            $this->metaStore->setMetadata($newNode, "users_meta", $oldMeta, false, AJXP_METADATA_SCOPE_GLOBAL);
         }
     }
 
