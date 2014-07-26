@@ -52,9 +52,13 @@ Ultreia many fixes
 	Modernizr 	http://modernizr.com (BSD / MIT)
 	Webfx widgets (selectable, sortable, xtree) : http://webfx.eae.net/ (Apache 2)
 
-[Images]
+[Images and Fonts]
 	Oxygen : http://www.oxygen-icons.org/ (Creative Common SA 3.0 / LGPL)
 	Font Awesome by Dave Gandy : http://fortawesome.github.com/Font-Awesome/ (SIL Open Font License)
+	Open Sans by Steve Matteson : http://www.opensans.com/ (Apache Licence v2)
+	Background Photos : from http://unsplash.com/,
+	Embedded photos credits: http://www.gratisography.com/, Nick West, Martin Staněk, Sonja Langford
+	Orbit theme by Thomas Nicot & Charles du Jeu
 	
 [Core PHP Classes]
 	SabreDAV Library http://code.google.com/p/sabredav (New BSD)
