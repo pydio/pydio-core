@@ -355,7 +355,7 @@ Class.create("AbstractEditor" , {
 			left:0,
 			marginBottom:0,
 			backgroundColor:'#fff',
-			width:parseInt(document.viewport.getWidth())+'px',
+			width:'100%',
 			height:parseInt(document.viewport.getHeight())+"px",
 			zIndex:3000});
 		this.actions.get("fsButton").hide();

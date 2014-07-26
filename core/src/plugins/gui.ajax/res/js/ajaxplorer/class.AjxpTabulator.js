@@ -459,7 +459,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             this.htmlElement.select('> div:not(.tabulatorContainer)').invoke('setStyle', {width:pWidth+'px'});
         }
 		var ajxpObject = this.getAndSetAjxpObject(this.selectedTabInfo);
-		if(ajxpObject){
+		if(ajxpObject && !ajxpObject.fullScreenMode){
             var nodeElement = $(this.htmlElement).down("#"+this.selectedTabInfo.element);
             fitHeightToBottom(nodeElement, null, this.options.fitMarginBottom);
             ajxpObject.resize(nodeElement?nodeElement.getHeight():this.htmlElement.getHeight());

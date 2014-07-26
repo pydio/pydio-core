@@ -1606,12 +1606,17 @@ div.editor_header > span.header_label{
 
 .action_bar.floatingBar{
     position: absolute;
-    border-radius: 20px;
+    border-radius: 5px;
     padding-right: 10px;
     padding-left: 10px;
     cursor: move;
     opacity: 0.90;
-    background-color: rgb(138, 149, 160);
+    background-color: #333;
+}
+
+
+.action_bar.floatingBar.icons_only a {
+    color: white;
 }
 
 .action_bar span.actionbar_button_label {
@@ -1745,6 +1750,19 @@ div.separator
     padding-top: 0;
     text-align: center;
     width: 0;
+}
+
+.action_bar.floatingBar a.separator,
+.action_bar.floatingBar div.separator {
+    border-right: 1px solid rgba(148, 148, 148, 1);
+    display: block !important;
+    float: left;
+    font-size: 10px;
+    height: 29px;
+    padding-top: 0;
+    text-align: center;
+    width: 0;
+    margin: 2px 5px 4px 2px;
 }
 
 a.carousel-control{

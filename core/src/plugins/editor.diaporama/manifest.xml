@@ -4,6 +4,7 @@
 		<global_param name="META_EXTRACTION_REMOTEWRAPPERS" type="array" label="CONF_MESSAGE[Remote Wrappers]" description="CONF_MESSAGE[When connected to a remote server, metadata extraction can make the listing action very long, as it must first copy each file locally. For plugins using the defined wrappers and files whose size is greater than this threshold, the image type and dimension will be skipped.]" default="ftpAccessWrapper"/>
 		<global_param name="META_EXTRACTION_THRESHOLD" type="string" label="CONF_MESSAGE[Size Threshold]" description="CONF_MESSAGE[Threshold]" default="50000"/>
 		<global_param name="GENERATE_THUMBNAIL" type="boolean" label="CONF_MESSAGE[Thumbnails]" description="CONF_MESSAGE[Generate thumbnails or not]" default="true"/>
+		<global_param name="PREVIEWER_LOWRES_SIZES" type="string" label="CONF_MESSAGE[Low-res Sizes]" description="CONF_MESSAGE[Threshold for low-res versions of images]" default="300,700,1000,1300" expose="true"/>
 		<global_param name="THUMBNAIL_QUALITY" type="integer" label="CONF_MESSAGE[Quality]" description="CONF_MESSAGE[Thumbs quality]" default="2"/>
     <global_param name="EXIF_ROTATION" type="boolean" label="CONF_MESSAGE[Exif Rotation]" description="CONF_MESSAGE[Rotate image using exif rotation]" default="true"/>
 	</server_settings>
@@ -19,15 +20,16 @@
 		<div id="diaporama_box" action="view_diapo" box_width="90%" box_height="90%" box_resize="true" box_padding="0">
 			<div class="action_bar" style="width: 100%;" title="AJXP_MESSAGE[414]">
 				<div align="right" id="diaporama_input_boxes" style="float:right; padding-top: 1px; padding-right: 5px; height: 21px;margin-top:28px;margin-left:30px;">
-					<input id="zoomValue" type="text" style="text-align: center; width: 34px;height: 16px;padding:0px;border: 1px solid #ccc; padding-right: 1px;"/><input id="time" type="text" value="3 s" style="text-align: center; width: 26px;height: 16px;padding:0px;border: 1px solid #ccc; padding-right: 1px;margin-left:10px;"/>
+				    <a href="#" id="showLowResButton" class="icon-picture" style="float: none; display:none;padding: 0 !important;margin-top: 0;font-size: 10px;"><span message_id="526">AJXP_MESSAGE[526]</span></a>
+				    <a href="#" id="showOriginalButton" class="icon-picture" style="float: none; display:none;padding: 0 !important;margin-top: 0;font-size: 14px;"><span message_id="525">AJXP_MESSAGE[525]</span></a>
+					<input id="zoomValue" type="text" style="text-align: center;width: 40px;height: 16px;padding: 2px;border: 1px solid #222;padding-right: 1px;background-color: #666;color: #fff;margin-top: -2px;"/>
+					<a href="#" class="icon-screenshot" id="actualSizeButton" style="float: none;padding: 0 !important;margin-top: 0;font-size: 14px;" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/zoom-original.png" alt="" border="0"><br><span message_id="327">AJXP_MESSAGE[327]</span></a>
 				</div>
 				<a href="#" class="icon-arrow-left" access_key="KEY_LEFT" id="prevButton" onclick="return false;"><img  width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/back_22.png" alt="" border="0"><br><span message_id="178">AJXP_MESSAGE[178]</span></a>
 				<a href="#" class="icon-stop" access_key="s" id="stopButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/player_stop.png" alt="AJXP_MESSAGE[233]" border="0"><br><span message_id="232">AJXP_MESSAGE[232]</span></a>
+                <input id="time" type="text" value="3 s" style="text-align: center;width: 26px;height: 17px;padding: 0px 2px 2px 2px;background-color: #666;color: #fff;margin: 6px 1px;float: left;border: 1px solid #222;border-radius: 2px;"/>
 				<a href="#" class="icon-play" access_key="p" id="playButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/player_play.png" alt="AJXP_MESSAGE[231]" border="0"><br><span message_id="230">AJXP_MESSAGE[230]</span></a>
 				<a href="#" class="icon-arrow-right" access_key="KEY_RIGHT" id="nextButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/forward_22.png" alt="" border="0"><br><span message_id="179">AJXP_MESSAGE[179]</span></a>
-				<div class="separator"></div>
-				<a href="#" class="icon-screenshot" id="actualSizeButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/zoom-original.png" alt="" border="0"><br><span message_id="327">AJXP_MESSAGE[327]</span></a>
-				<a href="#" class="icon-fullscreen" id="fitToScreenButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/zoom-fit-best.png" alt="AJXP_MESSAGE[325]" border="0"><br><span message_id="325">AJXP_MESSAGE[325]</span></a>
 			</div>
             <div style="text-align:center; vertical-align:center;overflow:auto; background-color:rgb(85,85,85);" id="imageContainer">
                 <div id="imageBorder" style="background-color:transparent;-webkit-box-shadow:rgb(51, 51, 51) 2px 2px 6px;-moz-box-shadow:rgb(51, 51, 51) 2px 2px 6px;box-shadow:rgb(51, 51, 51) 2px 2px 6px;"><img id="mainImage" src=""></div>

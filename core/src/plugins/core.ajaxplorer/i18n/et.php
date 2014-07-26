@@ -581,5 +581,8 @@ $mess=array(
 "522" => "User ID",
 "523" => "Password",
 "524" => "Update Password",
-/* END SENTENCE */
+    "525"=> "Show original picture",
+    "526"=> "Low-resolution version",
+
+    /* END SENTENCE */
 );
