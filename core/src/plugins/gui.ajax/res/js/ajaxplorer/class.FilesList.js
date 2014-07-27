@@ -1428,7 +1428,7 @@ Class.create("FilesList", SelectableElements, {
             }.bind(this));
             if(col){
                 var index = this.columnsDef.indexOf(col);
-                this._sortableTable.sort(index, (this.options.fixedSortDirection=="asc"));
+                this._sortableTable.sort(index, (this.options.fixedSortDirection=="desc"));
                 this._sortableTable.updateHeaderArrows();
             }
         }else if(contextNode.getMetadata().get("filesList.sortColumn") && this.columnsDef[contextNode.getMetadata().get("filesList.sortColumn")]){

@@ -309,7 +309,7 @@ Class.create("NotificationLoader", {
             "replaceScroller": false,
             "columnsDef":[
                 {"attributeName":"ajxp_label", "messageId":1, "sortType":"String"},
-                {"attributeName":"event_time", "messageString":"Time", "sortType":"MyDate"},
+                {"attributeName":"event_time", "messageString":"Time", "sortType":"Number"},
                 {"attributeName":"event_type", "messageString":"Type", "sortType":"String"}],
             "silentLoading":true,
             "fixedSortColumn":"event_time",
@@ -319,7 +319,7 @@ Class.create("NotificationLoader", {
                 "connexion_discrete":true,
                 "format":"xml", "current_repository":"true",
                 "feed_type":"notif",
-                "limit":(node.isLeaf() || node.isRoot() ? 12 : 4),
+                "limit":(node.isLeaf() || node.isRoot() ? 18 : 4),
                 "path":(node.isLeaf() || node.isRoot()?node.getPath():node.getPath()+'/'),
                 "merge_description":"true",
                 "description_as_label":node.isLeaf()?"true":"false"
