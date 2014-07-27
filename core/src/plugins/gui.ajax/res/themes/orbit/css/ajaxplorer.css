@@ -1290,6 +1290,7 @@ div.tabbed_editor div.innerTitle{
     display: none !important;
 }
 
+div.dialogBox.form-switch_language_form,
 div.dialogBox.form-login_form,
 div.dialogBox.form-login_form_dynamic
 {
@@ -1307,6 +1308,7 @@ div.dialogBox.form-login_form_dynamic
 
 }
 
+div.dialogBox.form-switch_language_form div.dialogContent,
 div.dialogBox.form-login_form div.dialogContent,
 div.dialogBox.form-login_form_dynamic div.dialogContent
 {
@@ -1316,6 +1318,7 @@ div.dialogBox.form-login_form_dynamic div.dialogContent
     padding-top: 37% !important;
 }
 
+div.dialogBox.form-switch_language_form div.dialogTitle,
 div.dialogBox.form-login_form div.dialogTitle,
 div.dialogBox.form-login_form_dynamic div.dialogTitle
 {
@@ -1325,6 +1328,10 @@ div.dialogBox.form-login_form_dynamic div.dialogTitle
     right: -113%;
     background-color: transparent;
     background-image: url('../images/Logo_White_300.png') !important;
+}
+
+div.dialogBox.form-switch_language_form select#language_selector{
+    width: 280px !important
 }
 
 div.dialogBox.form-login_form div#progressCustomMessage,
@@ -1366,6 +1373,7 @@ div.dialogBox.form-login_form_dynamic a.forgot-password-link
     float: right;
 }
 
+div.dialogBox.form-switch_language_form div.dialogButtons,
 div.dialogBox.form-login_form div.dialogButtons,
 div.dialogBox.form-login_form_dynamic div.dialogButtons
 {
@@ -1373,6 +1381,7 @@ div.dialogBox.form-login_form_dynamic div.dialogButtons
     text-align: center;
 }
 
+div.dialogBox.form-switch_language_form div.dialogButtons input.dialogButton,
 div.dialogBox.form-login_form div.dialogButtons input.dialogButton,
 div.dialogBox.form-login_form_dynamic div.dialogButtons input.dialogButton
 {
