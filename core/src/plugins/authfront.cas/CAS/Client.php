@@ -1938,7 +1938,21 @@ class CAS_Client
 			$final_uri .= $this->getServerUrl();
 			$request_uri = $_SERVER['REQUEST_URI'];
 			$request_uri = preg_replace('/\?.*$/','',$request_uri);
-			$final_uri .= $request_uri;
+            /*
+             * modify for pydio
+             */
+            $arr_uri = explode('/', $request_uri);
+            if(count($arr_uri) >= 3){
+                array_pop($arr_uri);
+                $request_uri = implode('/', $arr_uri).'/';
+            }else if(count($arr_uri) == 2){
+                $request_uri = '/'.$arr_uri[1].'/';
+            }else{
+                $request_uri = '/';
+            }
+
+            $final_uri .= $request_uri;
+            /**************************************/
 			$this->setCallbackURL($final_uri);
 		}
 		return $this->_callback_url;
@@ -2172,6 +2186,7 @@ class CAS_Client
 		// build the URL to retrieve the PT
 		$cas_url = $this->getServerProxyURL().'?targetService='.urlencode($target_service).'&pgt='.$this->getPGT();
 
+        phpCAS::trace("cas_url: ".$cas_url);
 		// open and read the URL
 		if ( !$this->readURL($cas_url,$headers,$cas_response,$err_msg) ) {
 			phpCAS::trace('could not open URL \''.$cas_url.'\' to validate ('.$err_msg.')');
@@ -2393,6 +2408,11 @@ class CAS_Client
 				if ($proxiedService instanceof CAS_ProxiedService_Testable)
 					$proxiedService->setCasClient($this);
 				return $proxiedService;
+
+            // For service samba
+            case PHPCAS_PROXIED_SERVICE_SAMBA;
+                $proxiedService = new CAS_ProxiedService_Samba();
+                return $proxiedService;
 			default:
 				throw new CAS_InvalidArgumentException("Unknown proxied-service type, $type.");
 		}
@@ -2495,6 +2515,33 @@ class CAS_Client
 			return FALSE;
 		}
 	}
+
+    /**
+     * This method is used to access Samba service.
+     *
+     */
+    public function serviceSamba($serviceUrl, &$err_code)
+    {
+        try {
+            $service = $this->getProxiedService(PHPCAS_PROXIED_SERVICE_SAMBA);
+            //$service = new CAS_ProxiedService_Samba();
+            $service->setServiceUrl($serviceUrl);
+
+            $err_code = PHPCAS_SERVICE_OK;
+            $pt = $service->getSambaProxyTicket();
+            return $pt;
+        } catch (CAS_ProxyTicketException $e) {
+            $err_msg = $e->getMessage();
+            $err_code = $e->getCode();
+            $pt = FALSE;
+            return FALSE;
+        } catch (CAS_ProxiedService_Exception $e) {
+            $err_msg = sprintf($this->getString(CAS_STR_SERVICE_UNAVAILABLE), $serviceUrl, $e->getMessage());
+            $err_code = PHPCAS_SERVICE_NOT_AVAILABLE;
+            $pt = FALSE;
+            return FALSE;
+        }
+    }
 
 	/** @} **/
 
