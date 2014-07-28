@@ -115,10 +115,12 @@ abstract class CAS_ProxiedService_Abstract
 			throw new CAS_OutOfSequenceException('Already initialized, cannot initialize again.');
 		
 		// Allow usage of a particular CAS_Client for unit testing.
+        phpCAS::traceBegin();
 		if (empty($this->_casClient))
 			phpCAS::initializeProxiedService($this);
 		else
 			$this->_casClient->initializeProxiedService($this);
+        phpCAS::traceEnd();
 	}
 	
 }

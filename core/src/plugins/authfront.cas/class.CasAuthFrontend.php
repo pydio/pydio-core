@@ -21,6 +21,10 @@
 defined('AJXP_EXEC') or die('Access not allowed');
 
 require_once 'CAS.php';
+require_once 'CAS/ProxiedService/Samba.php';
+
+define(PHPCAS_MODE_CLIENT, 'client');
+define(PHPCAS_MODE_PROXY, 'proxy');
 
 class CasAuthFrontend extends AbstractAuthFrontend
 {
@@ -30,55 +34,146 @@ class CasAuthFrontend extends AbstractAuthFrontend
     private $cas_uri;
     private $is_AutoCreateUser;
     private $cas_logoutUrl;
-    private $forceRedirect;
+    //private $forceRedirect;
 
+    private $cas_mode; // client | proxy
+    private $cas_certificate_path;
+    private $cas_proxied_service; //
+    private $pgt_storage_mode; //file | db
+
+    private $cas_debug_mode;
+    private $cas_debug_file;
+    private $cas_modify_login_page;
 
     function tryToLogUser($httpVars, $isLast = false)
     {
-        if (isset($this->pluginConf["CAS_SERVER"])) {
-            $this->cas_server = $this->pluginConf["CAS_SERVER"];
-        }
+        $this->loadConfig();
 
-        if (isset($this->pluginConf["CAS_PORT"])) {
-            $this->cas_port = intval($this->pluginConf["CAS_PORT"]);
-        }
+        // log out
+        //return false;
 
-        if (isset($this->pluginConf["CAS_URI"])) {
-            $this->cas_uri = $this->pluginConf["CAS_URI"];
-        }
+        if ($this->cas_modify_login_page) {
+            if (!empty($httpVars['put_action_enable_redirect'])) {
+                $_SESSION['AUTHENTICATE_BY_CAS'] = "yes";
+            }
 
-        if (isset($this->pluginConf["CREATE_USER"])) {
-            $this->is_AutoCreateUser = ($this->pluginConf["CREATE_USER"] == "true");
-        }
-
-        if (isset($this->pluginConf["LOGOUT_URL"])) {
-            $this->cas_logoutUrl = $this->pluginConf["LOGOUT_URL"];
-        }
-
-        if (isset($this->pluginConf["FORCE_REDIRECT"])) {
-            $this->forceRedirect = $this->pluginConf["FORCE_REDIRECT"];
-        }
-
-        if(empty($this->cas_server)) return false;
-
-        phpCAS::setDebug(AJXP_DATA_PATH . "/logs/debug.log");
-        if ($GLOBALS['PHPCAS_CLIENT'] == null) {
-            phpCAS::client(CAS_VERSION_2_0, $this->cas_server, $this->cas_port, $this->cas_uri, false);
-        }
-        phpCAS::setNoCasServerValidation();
-        AJXP_Logger::debug(__FUNCTION__, "Call forceAuthentication ", "");
-
-        if($this->forceRedirect) {
-            // if forceRedirect is enable, redirect webpage to CAS web to do the authentication.
-            // After login successfully, CAS will go back to pydio webpage.
-            phpCAS::forceAuthentication();
-        }else{
-            // Otherwise, verify user has already logged by using CAS or not?
-            if(!phpCAS::isAuthenticated()){
-                // In case of NO, return false to bypass the authentication by CAS and continue to use another method
-                // in authfront list.
+            /**
+             * By pass callback from CAS with GET['pgtIou'] or
+             *
+             */
+            if (!isset($_SESSION['AUTHENTICATE_BY_CAS']) && empty($httpVars['pgtIou'])) {
                 return false;
             }
+        }
+
+        /**
+         * Depend on phpCAS mode configuration
+         */
+        switch ($this->cas_mode) {
+            case PHPCAS_MODE_CLIENT:
+                if ($this->checkConfigurationForClientMode()) {
+
+                    AJXP_Logger::info(__FUNCTION__, "Start phpCAS mode Client: ", "sucessfully");
+
+                    phpCAS::client(CAS_VERSION_2_0, $this->cas_server, $this->cas_port, $this->cas_uri, false);
+
+                    if (!empty($this->cas_certificate_path)) {
+                        phpCAS::setCasServerCACert($this->cas_certificate_path);
+                    } else {
+                        phpCAS::setNoCasServerValidation();
+                    }
+
+                    if ($this->cas_debug_mode) {
+                        $file_path = "";
+                        empty($this->cas_debug_file) ? $file_path = AJXP_DATA_PATH . '/logs/phpCAS_debug.log' : $file_path = $this->cas_debug_file;
+                        phpCAS::setDebug($file_path);
+                    }
+
+
+                    phpCAS::forceAuthentication();
+                    /*
+                    if ($this->forceRedirect) {
+                        // if forceRedirect is enable, redirect webpage to CAS web to do the authentication.
+                        // After login successfully, CAS will go back to pydio webpage.
+                        phpCAS::forceAuthentication();
+                    } else {
+                        // Otherwise, verify user has already logged by using CAS or not?
+                        if (!phpCAS::isAuthenticated()) {
+                            // In case of NO, return false to bypass the authentication by CAS and continue to use another method
+                            // in authfront list.
+                            return false;
+                        }
+                    }*/
+                } else {
+                    AJXP_Logger::error(__FUNCTION__, "Could not start phpCAS mode CLIENT, please verify the configuration", "");
+                    return false;
+                }
+                break;
+            case PHPCAS_MODE_PROXY:
+                /**
+                 * If in login page, user click on login via CAS, the page will be reload with manuallyredirectocas is set.
+                 * Or force redirect to cas login page even the force redirect is set in configuration of this module
+                 *
+                 */
+
+
+                if ($this->checkConfigurationForProxyMode()) {
+                    AJXP_Logger::info(__FUNCTION__, "Start phpCAS mode Proxy: ", "sucessfully");
+                    /**
+                     * init phpCAS in mode proxy
+                     */
+
+                    phpCAS::proxy(CAS_VERSION_2_0, $this->cas_server, $this->cas_port, $this->cas_uri, false);
+
+                    if (!empty($this->cas_certificate_path)) {
+                        phpCAS::setCasServerCACert($this->cas_certificate_path);
+                    } else {
+                        phpCAS::setNoCasServerValidation();
+                    }
+
+                    /**
+                     * Debug
+                     */
+                    if ($this->cas_debug_mode) {
+                         // logfile name by date:
+                        $today = getdate();
+                        $file_path = AJXP_DATA_PATH. '/logs/phpcas_'.$today['year'].'-'.$today['month'].'-'.$today['mday'].'.txt';
+                        empty($this->cas_debug_file) ? $file_path: $file_path = $this->cas_debug_file;
+                        phpCAS::setDebug($file_path);
+                    }
+
+                    /**
+                     * PTG storage
+                     */
+                    $this->setPTGStorage();
+
+                    phpCAS::forceAuthentication();
+
+                    /**
+                     * Get proxy ticket (PT) for SAMBA to authentication at CAS via pam_cas
+                     * In fact, we can use any other service. Of course, it should be enabled in CAS
+                     *
+                     */
+                    $err_code = null;
+                    $serviceURL = $this->cas_proxied_service;
+                    AJXP_Logger::debug(__FUNCTION__, "Try to get proxy ticket for service: ", $serviceURL);
+                    $res = phpCAS::serviceSMB($serviceURL, $err_code);
+
+                    if (!empty($res)) {
+                        $_SESSION['PROXYTICKET'] = $res;
+                        AJXP_Logger::info(__FUNCTION__, "Get Proxy ticket successfully ", "");
+                    } else {
+                        AJXP_Logger::info(__FUNCTION__, "Could not get Proxy ticket. ", "");
+                    }
+                    break;
+                } else {
+                    AJXP_Logger::error(__FUNCTION__, "Could not start phpCAS mode PROXY, please verify the configuration", "");
+                    return false;
+                }
+
+            default:
+                return false;
+                break;
         }
 
         AJXP_Logger::debug(__FUNCTION__, "Call phpCAS::getUser() after forceAuthentication ", "");
@@ -89,6 +184,8 @@ class CasAuthFrontend extends AbstractAuthFrontend
         if (AuthService::userExists($cas_user)) {
             $res = AuthService::logUser($cas_user, "", true);
             if ($res > 0) {
+                AJXP_Safe::storeCredentials($cas_user, $_SESSION['PROXYTICKET']);
+                $_SESSION['LOGGED_IN_BY_CAS'] = true;
                 return true;
             }
         }
@@ -102,15 +199,141 @@ class CasAuthFrontend extends AbstractAuthFrontend
 
         switch ($action) {
             case "logoutCAS":
-                AuthService::disconnect();
-                AJXP_XMLWriter::header("url");
-                echo $this->pluginConf["LOGOUT_URL"];
-                AJXP_XMLWriter::close("url");
-                session_unset();
-                session_destroy();
+                if(isset($_SESSION['LOGGED_IN_BY_CAS'])){
+                    AuthService::disconnect();
+
+                    $this->loadConfig();
+                    if (!empty($this->pluginConf["LOGOUT_URL"])) {
+                        $this->cas_logoutUrl = trim($this->pluginConf["LOGOUT_URL"]);
+                    } else {
+                        empty($this->pluginConf["CAS_URI"]) ? $logout_default = 'logout' : $logout_default = '/logout';
+                        $this->cas_logoutUrl = 'https://' . $this->cas_server . ':' . $this->cas_port . $this->cas_uri . '/logout';
+                    }
+
+                    AJXP_XMLWriter::header("url");
+                    echo $this->cas_logoutUrl;
+                    AJXP_XMLWriter::close("url");
+                    session_unset();
+                    session_destroy();
+                }else{
+                    AuthService::disconnect();
+                    AJXP_XMLWriter::header("url");
+                    echo "#";
+                    AJXP_XMLWriter::close("url");
+                    session_unset();
+                    session_destroy();
+                }
+                break;
+            default:
+
+                break;
+        }
+    }
+
+    function loadConfig()
+    {
+        if (!empty($this->pluginConf["CAS_SERVER"])) {
+            $this->cas_server = trim($this->pluginConf["CAS_SERVER"]);
+        }
+
+        if (!empty($this->pluginConf["CAS_PORT"])) {
+            $this->cas_port = intval($this->pluginConf["CAS_PORT"]);
+        } else {
+            $this->cas_port = 443;
+        }
+
+        if (!empty($this->pluginConf["CAS_URI"])) {
+            $this->cas_uri = trim($this->pluginConf["CAS_URI"]);
+        } else {
+            $this->cas_uri = "/";
+        }
+
+        if (!empty($this->pluginConf["CREATE_USER"])) {
+            $this->is_AutoCreateUser = ($this->pluginConf["CREATE_USER"] == "true");
+        }
+
+        if (!empty($this->pluginConf["LOGOUT_URL"])) {
+            $this->cas_logoutUrl = trim($this->pluginConf["LOGOUT_URL"]);
+        } else {
+            empty($this->pluginConf["CAS_URI"]) ? $logout_default = 'logout' : $logout_default = '/logout';
+            $this->cas_logoutUrl = 'https://' . $this->cas_server . ':' . $this->cas_port . $this->cas_uri . '/logout';
+        }
+
+        /*
+        if (!empty($this->pluginConf["FORCE_REDIRECT"])) {
+            $this->forceRedirect = $this->pluginConf["FORCE_REDIRECT"];
+        }
+        */
+
+        if (!empty($this->pluginConf["PHPCAS_MODE"]["casmode"])) {
+            $this->cas_mode = $this->pluginConf["PHPCAS_MODE"]["casmode"];
+        }
+        if (!empty($this->pluginConf["CERTIFICATE_PATH"])) {
+            $this->cas_certificate_path = trim($this->pluginConf["CERTIFICATE_PATH"]);
+        }
+        if (!empty($this->pluginConf["PHPCAS_MODE"]["PTG_STORE_MODE"])) {
+            $this->pgt_storage_mode = $this->pluginConf["PHPCAS_MODE"]["PTG_STORE_MODE"];
+        }
+        if (!empty($this->pluginConf["PHPCAS_MODE"]["PROXIED_SERVICE_SMB"])) {
+            $this->cas_proxied_service = $this->pluginConf["PHPCAS_MODE"]["PROXIED_SERVICE_SMB"];
+        }
+
+        if (!empty($this->pluginConf["DEBUG_MODE"])) {
+            $this->cas_debug_mode = $this->pluginConf["DEBUG_MODE"];
+        }
+        if (!empty($this->pluginConf["DEBUG_FILE"]) && $this->cas_debug_mode) {
+            $this->cas_debug_file = trim($this->pluginConf["DEBUG_FILE"]);
+        }
+
+        if (!empty($this->pluginConf["MODIFY_LOGIN_SCREEN"])) {
+            $this->cas_modify_login_page = trim($this->pluginConf["MODIFY_LOGIN_SCREEN"]);
+        }
+    }
+
+    function checkConfigurationForClientMode()
+    {
+        return !empty($this->cas_server) &&
+        (strcmp($this->cas_mode, PHPCAS_MODE_CLIENT) === 0);
+    }
+
+    function checkConfigurationForProxyMode()
+    {
+        return !empty($this->cas_server) &&
+        !empty($this->cas_uri) &&
+        (strcmp($this->cas_mode, PHPCAS_MODE_PROXY) === 0) &&
+        !empty($this->cas_proxied_service);
+    }
+
+    private function setPTGStorage()
+    {
+        switch (strtolower($this->pgt_storage_mode)) {
+            case 'file':
+                phpCAS::setPGTStorageFile(session_save_path());
+                break;
+            case 'db':
+                $dbconfig = ConfService::getConfStorageImpl();
+                /**
+                 * support only for mySQL
+                 */
+                if ($dbconfig instanceof sqlConfDriver) {
+                    if (!empty($dbconfig->sqlDriver["username"])) {
+                        $db_username = $dbconfig->sqlDriver["username"];
+                        $db_password = $dbconfig->sqlDriver["password"];
+                        $db_database = "mysql:host=" . $dbconfig->sqlDriver["host"] . ";dbname=" . $dbconfig->sqlDriver["database"];
+                        $db_table = "ajxp_cas_pgt";
+                        phpCAS::setPGTStorageDB($db_database, $db_username, $db_password, $db_table);
+                    }
+                }
                 break;
             default:
                 break;
         }
+    }
+
+    public function installSQLTables()
+    {
+        $param = ConfService::getConfStorageImpl();
+        $p = $param->sqlDriver;
+        return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir() . '/createPGTStorage.mysql');
     }
 } 

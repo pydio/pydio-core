@@ -197,6 +197,11 @@ define("PHPCAS_PROXIED_SERVICE_HTTP_POST", 'CAS_ProxiedService_Http_Post');
  */
 define("PHPCAS_PROXIED_SERVICE_IMAP", 'CAS_ProxiedService_Imap');
 
+/**
+ * phpCAS::getProxiedService() type for SAMBA
+ */
+define("PHPCAS_PROXIED_SERVICE_SAMBA", 'CAS_ProxiedService_Samba');
+
 
 /** @} */
 // ------------------------------------------------------------------------
@@ -978,6 +983,36 @@ class phpCAS
         phpCAS :: traceEnd($res);
         return $res;
     }
+
+
+    public static function serviceSMB($url, $err_code)
+    {
+        global $PHPCAS_CLIENT, $PHPCAS_AUTH_CHECK_CALL;
+
+        phpCAS :: traceBegin();
+        if (!is_object($PHPCAS_CLIENT)) {
+            phpCAS :: error('this method should only be called after ' . __CLASS__ . '::proxy()');
+        }
+        if (!$PHPCAS_CLIENT->isProxy()) {
+            phpCAS :: error('this method should only be called after ' . __CLASS__ . '::proxy()');
+        }
+        if (!$PHPCAS_AUTH_CHECK_CALL['done']) {
+            phpCAS :: error('this method should only be called after the programmer is sure the user has been authenticated (by calling ' . __CLASS__ . '::checkAuthentication() or ' . __CLASS__ . '::forceAuthentication()');
+        }
+        if (!$PHPCAS_AUTH_CHECK_CALL['result']) {
+            phpCAS :: error('authentication was checked (by ' . $PHPCAS_AUTH_CHECK_CALL['method'] . '() at ' . $PHPCAS_AUTH_CHECK_CALL['file'] . ':' . $PHPCAS_AUTH_CHECK_CALL['line'] . ') but the method returned FALSE');
+        }
+        if (gettype($url) != 'string') {
+            phpCAS :: error('type mismatched for parameter $url (should be `string\')');
+        }
+
+        $res = $PHPCAS_CLIENT->serviceSamba($url, $err_code);
+        //$res = $PHPCAS_CLIENT->serviceMail($url, $service, $flags, $err_code, $err_msg, $pt);
+
+        phpCAS :: traceEnd($res);
+        return $res;
+    }
+
 
     /** @} */
     // ########################################################################
