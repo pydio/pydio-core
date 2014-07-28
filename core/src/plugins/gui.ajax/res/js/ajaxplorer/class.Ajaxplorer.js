@@ -863,7 +863,11 @@ Class.create("Ajaxplorer", {
 	},
 	
 	getPluginConfigs : function(pluginQuery){
-		var properties = XPathSelectNodes(this._registry, 'plugins/'+pluginQuery+'/plugin_configs/property | plugins/*[@id="core.'+pluginQuery+'"]/plugin_configs/property | plugins/*[@id="'+pluginQuery+'"]/plugin_configs/property');
+        var xpath = 'plugins/*[@id="core.'+pluginQuery+'"]/plugin_configs/property | plugins/*[@id="'+pluginQuery+'"]/plugin_configs/property';
+        if(pluginQuery.indexOf('.') == -1){
+            xpath = 'plugins/'+pluginQuery+'/plugin_configs/property |' + xpath;
+        }
+		var properties = XPathSelectNodes(this._registry, xpath );
 		var configs = $H();
 		for(var i = 0; i<properties.length; i++){
 			var propNode = properties[i];
