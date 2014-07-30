@@ -49,19 +49,33 @@ class CasAuthFrontend extends AbstractAuthFrontend
     {
         $this->loadConfig();
 
-        // log out
-        //return false;
+        if(isset($_SESSION['AUTHENTICATE_BY_CAS'])){
+            $flag = $_SESSION['AUTHENTICATE_BY_CAS'];
+        }else{
+            $flag = 0;
+        }
+
+        $pgtIou = !empty($httpVars['pgtIou']);
+        $logged = isset($_SESSION['LOGGED_IN_BY_CAS']);
+        $enre = !empty($httpVars['put_action_enable_redirect']);
+        $ticket = !empty($httpVars['ticket']);
 
         if ($this->cas_modify_login_page) {
-            if (!empty($httpVars['put_action_enable_redirect'])) {
-                $_SESSION['AUTHENTICATE_BY_CAS'] = "yes";
+            if(($flag == 0) && ($enre) && !$logged && !$pgtIou){
+                $_SESSION['AUTHENTICATE_BY_CAS'] = 1;
+            }elseif(($flag == 1) && (!$enre) && !$logged && !$pgtIou && !$ticket){
+                $_SESSION['AUTHENTICATE_BY_CAS'] = 0;
+            }elseif(($flag == 1) && ($enre) && !$logged && !$pgtIou){
+                $_SESSION['AUTHENTICATE_BY_CAS'] = 1;
+            }elseif($pgtIou){
+                $_SESSION['AUTHENTICATE_BY_CAS'] = 1;
+            }elseif($logged && $pgtIou){
+                $_SESSION['AUTHENTICATE_BY_CAS'] = 2;
+            }elseif($ticket){
+                $_SESSION['AUTHENTICATE_BY_CAS'] = 1;
             }
 
-            /**
-             * By pass callback from CAS with GET['pgtIou'] or
-             *
-             */
-            if (!isset($_SESSION['AUTHENTICATE_BY_CAS']) && empty($httpVars['pgtIou'])) {
+            if ($_SESSION['AUTHENTICATE_BY_CAS'] < 1) {
                 return false;
             }
         }
@@ -83,27 +97,19 @@ class CasAuthFrontend extends AbstractAuthFrontend
                         phpCAS::setNoCasServerValidation();
                     }
 
+                    /**
+                     * Debug
+                     */
                     if ($this->cas_debug_mode) {
-                        $file_path = "";
-                        empty($this->cas_debug_file) ? $file_path = AJXP_DATA_PATH . '/logs/phpCAS_debug.log' : $file_path = $this->cas_debug_file;
+                        // logfile name by date:
+                        $today = getdate();
+                        $file_path = AJXP_DATA_PATH. '/logs/phpcas_'.$today['year'].'-'.$today['month'].'-'.$today['day'].'.txt';
+                        empty($this->cas_debug_file) ? $file_path: $file_path = $this->cas_debug_file;
                         phpCAS::setDebug($file_path);
                     }
 
+                   phpCAS::forceAuthentication();
 
-                    phpCAS::forceAuthentication();
-                    /*
-                    if ($this->forceRedirect) {
-                        // if forceRedirect is enable, redirect webpage to CAS web to do the authentication.
-                        // After login successfully, CAS will go back to pydio webpage.
-                        phpCAS::forceAuthentication();
-                    } else {
-                        // Otherwise, verify user has already logged by using CAS or not?
-                        if (!phpCAS::isAuthenticated()) {
-                            // In case of NO, return false to bypass the authentication by CAS and continue to use another method
-                            // in authfront list.
-                            return false;
-                        }
-                    }*/
                 } else {
                     AJXP_Logger::error(__FUNCTION__, "Could not start phpCAS mode CLIENT, please verify the configuration", "");
                     return false;
@@ -115,7 +121,6 @@ class CasAuthFrontend extends AbstractAuthFrontend
                  * Or force redirect to cas login page even the force redirect is set in configuration of this module
                  *
                  */
-
 
                 if ($this->checkConfigurationForProxyMode()) {
                     AJXP_Logger::info(__FUNCTION__, "Start phpCAS mode Proxy: ", "sucessfully");
@@ -137,7 +142,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
                     if ($this->cas_debug_mode) {
                          // logfile name by date:
                         $today = getdate();
-                        $file_path = AJXP_DATA_PATH. '/logs/phpcas_'.$today['year'].'-'.$today['month'].'-'.$today['mday'].'.txt';
+                        $file_path = AJXP_DATA_PATH. '/logs/phpcas_'.$today['year'].'-'.$today['month'].'-'.$today['day'].'.txt';
                         empty($this->cas_debug_file) ? $file_path: $file_path = $this->cas_debug_file;
                         phpCAS::setDebug($file_path);
                     }
@@ -148,7 +153,6 @@ class CasAuthFrontend extends AbstractAuthFrontend
                     $this->setPTGStorage();
 
                     phpCAS::forceAuthentication();
-
                     /**
                      * Get proxy ticket (PT) for SAMBA to authentication at CAS via pam_cas
                      * In fact, we can use any other service. Of course, it should be enabled in CAS
