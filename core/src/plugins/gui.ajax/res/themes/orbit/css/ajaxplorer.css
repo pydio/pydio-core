@@ -203,22 +203,25 @@ kbd {
 }
 
 .fl-displayMode-thumb div.thumbnail_selectable_cell div.thumbLabel{
-
-    margin-top: -31px;
-    opacity: 1;
-    background-color: rgba(245, 245, 245, 0.35);
+    margin-top: -29px;
+    opacity: 0;
+    background-color: rgba(58, 58, 58, 0.52);
     padding: 8px 3px;
+    color: #FFF;
 }
 
 .fl-displayMode-thumb div.thumbnail_selectable_cell.fl-displayMode-thumbsize-medium div.thumbLabel{
     padding:1px;
-    margin-top: -18px;
+    margin-top: -15px;
     font-size: 0.8em;
 }
 
-.fl-displayMode-thumb div.thumbnail_selectable_cell.fl-displayMode-thumbsize-small div.thumbLabel,
-.fl-displayMode-thumb div.thumbnail_selectable_cell.selected-focus div.thumbLabel{
+.fl-displayMode-thumb div.thumbnail_selectable_cell.fl-displayMode-thumbsize-small div.thumbLabel{
     display: none;
+}
+
+.fl-displayMode-thumb div.thumbnail_selectable_cell.selected-focus div.thumbLabel{
+    opacity: 1;
 }
 
 .thumbnail_selectable_cell.detailed {;
