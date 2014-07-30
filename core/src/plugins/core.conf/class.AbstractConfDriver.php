@@ -429,9 +429,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin
     /**
      * @abstract
      * @param string $repositoryId
-     * @return Integer
+     * @param boolean $details
+     * @return Integer|Array
      */
-    abstract public function countUsersForRepository($repositoryId);
+    abstract public function countUsersForRepository($repositoryId, $details = false);
 
 
     /**
@@ -1099,6 +1100,19 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     print("<ul>".$users."</ul>");
                 }
                 AuthService::setGroupFiltering(true);
+
+                break;
+
+            case "load_repository_info":
+
+                $data = array();
+                $users = AuthService::countUsersForRepository(ConfService::getRepository()->getId(), true);
+                $data["core.users"] = $users;
+                if(isSet($httpVars["collect"]) && $httpVars["collect"] == "true"){
+                    AJXP_Controller::applyHook("repository.load_info", array(&$data));
+                }
+                HTMLWriter::charsetHeader("application/json");
+                echo json_encode($data);
 
                 break;
 

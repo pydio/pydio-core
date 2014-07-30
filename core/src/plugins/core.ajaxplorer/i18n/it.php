@@ -600,5 +600,10 @@ $mess=array(
 "524" => "Aggiorna Password",
 "525" => "Mostra immagine originale",
 "526" => "Versione a bassa risoluzione",
+    "527"=> "Shared with",
+    "528"=> "Internal users",
+    "530"=> "External users",
+    "531"=> "Int.",
+    "532"=> "Ext.",
     /* END SENTENCE */
 );
