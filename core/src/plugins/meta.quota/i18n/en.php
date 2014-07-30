@@ -19,7 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Quota usage...",
+"1" => "Quota usage (loading...)",
 "2" => "Click to reload quota usage",
 "3" => "You are exceeding your quota",
+"4" => "Quota usage",
 );

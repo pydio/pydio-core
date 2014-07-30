@@ -584,5 +584,10 @@ $mess=array(
 "524" => "Update Password",
     "525"=> "Show original picture",
     "526"=> "Low-resolution version",
+    "527"=> "Shared with",
+    "528"=> "Internal users",
+    "530"=> "External users",
+    "531"=> "Int.",
+    "532"=> "Ext.",
     /* END SENTENCE */
 );

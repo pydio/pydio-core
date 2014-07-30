@@ -618,9 +618,10 @@ class BootConfLoader extends AbstractConfDriver
 
     /**
      * @param string $repositoryId
-     * @return array('INTERNAL' => count, 'SHARED' => count)
+     * @param boolean $details
+     * @return array('internal' => count, 'external' => count)
      */
-    public function countUsersForRepository($repositoryId){
+    public function countUsersForRepository($repositoryId, $details = false){
 
     }
 

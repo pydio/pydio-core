@@ -19,8 +19,13 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Uso da Quota...",
-"2" => "Clique aqui para recalcular a Quota",
-"3" => "Ultrapassou o Limite da sua Quota",
-"4" => "Uso da Quota",
+"Use CAS authentication." => "Usa autenticazione CAS.",
+"CAS Server" => "Server CAS",
+"CAS server address" => "Indirizzo del Server CAS",
+"CAS Port" => "Porta CAS",
+"Port where CAS server is running on" => "Porta sulla quale il server CAS è in ascolto",
+"CAS URI" => "CAS URI",
+"URI for CAS service" => "URI per il servizio CAS",
+"SQL Driver" => "Driver SQL",
+"SQL configuration using the same syntax as auth.sql plugin" => "La configurazione SQL usa la stessa sintassi come nel plugin auth.sql"
 );

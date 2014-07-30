@@ -718,8 +718,9 @@ class AJXP_Utils
 
     //Relative Date Function
 
-    public static function relativeDate($time, $messages)
+    public static function relativeDate($time, $messages, $shortestForm = false)
     {
+        $crtYear = date('Y');
         $today = strtotime(date('M j, Y'));
         $reldays = ($time - $today)/86400;
         $relTime = date($messages['date_relative_time_format'], $time);
@@ -746,7 +747,14 @@ class AJXP_Utils
 
         }
 
-        return str_replace("DATE", date($messages["date_relative_date_format"], $time ? $time : time()), $messages["date_relative_date"]);
+        $finalDate = date($messages["date_relative_date_format"], $time ? $time : time());
+        if(!$shortestForm || strpos($finalDate, $crtYear) !== false){
+            $finalDate = str_replace($crtYear, '', $finalDate);
+            return str_replace("DATE", $finalDate, $messages["date_relative_date"]);
+        }else{
+            return $finalDate = date("M Y", $time ? $time : time());
+        }
+        //return str_replace("DATE", $finalDate, $messages["date_relative_date"]);
 
     }
 

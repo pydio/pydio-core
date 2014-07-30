@@ -582,5 +582,10 @@ $mess=array(
 "524"=> "Nouveau mot de passe",
 "525"=> "Voir la photo originale",
 "526"=> "Version basse-résolution",
+"527"=> "Partagé",
+"528"=> "Utilisateurs internes",
+"530"=> "Utilisateurs externes",
+"531"=> "Int.",
+"532"=> "Ext.",
 /* END SENTENCE */
 );

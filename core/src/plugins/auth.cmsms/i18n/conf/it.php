@@ -19,8 +19,17 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Uso da Quota...",
-"2" => "Clique aqui para recalcular a Quota",
-"3" => "Ultrapassou o Limite da sua Quota",
-"4" => "Uso da Quota",
+"DB Storage" => "Database",
+"Login URL" => "URL di Login",
+"if direct access, redirect to the given URL" => "Se l'accesso è diretto, redirigi all'URL specificato",
+"Logout URL" => "URL di Logout",
+"Redirect to the given URL on loggin out" => "Reindirizzamento all'URL specificato al logout",
+"Secret key" => "Chiave segreta",
+"This key must only be known by remote end" => "Questa chiave deve essere nota solo al terminale remoto",
+"Connexion" => "Connessione",
+"The Database Connexion" => "La Connessione al Database",
+"Prefix tables" => "Prefisso Tabelle",
+"Prefix of CMSMS tables " => "Prefisso delle tabelle CMSMS ",
+"CMSMS Authentication" => "Autenticazione CMSMS",
+"Stores the Authentication data in CMSMS FEU" => "Immagazina i dati di Autenticazione in CMSMS FEU",
 );

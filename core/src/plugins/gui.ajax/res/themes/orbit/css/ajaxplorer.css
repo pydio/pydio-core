@@ -465,7 +465,7 @@ div.shadow_class
 }
 
 .dialogTitle span.string-only-title {
-    font-family: "Open Sans Regular";
+    font-family: "Open Sans Regular", Helvetica, sans-serif;
 }
 
 .dialogContent
@@ -1291,6 +1291,8 @@ div.tabbed_editor div.innerTitle{
 }
 
 div.dialogBox.form-switch_language_form,
+div.dialogBox.form-reset-password,
+div.dialogBox.form-reset-password-ask,
 div.dialogBox.form-login_form,
 div.dialogBox.form-login_form_dynamic
 {
@@ -1309,6 +1311,8 @@ div.dialogBox.form-login_form_dynamic
 }
 
 div.dialogBox.form-switch_language_form div.dialogContent,
+div.dialogBox.form-reset-password div.dialogContent,
+div.dialogBox.form-reset-password-ask div.dialogContent,
 div.dialogBox.form-login_form div.dialogContent,
 div.dialogBox.form-login_form_dynamic div.dialogContent
 {
@@ -1319,6 +1323,8 @@ div.dialogBox.form-login_form_dynamic div.dialogContent
 }
 
 div.dialogBox.form-switch_language_form div.dialogTitle,
+div.dialogBox.form-reset-password div.dialogTitle,
+div.dialogBox.form-reset-password-ask div.dialogTitle,
 div.dialogBox.form-login_form div.dialogTitle,
 div.dialogBox.form-login_form_dynamic div.dialogTitle
 {
@@ -1374,6 +1380,8 @@ div.dialogBox.form-login_form_dynamic a.forgot-password-link
 }
 
 div.dialogBox.form-switch_language_form div.dialogButtons,
+div.dialogBox.form-reset-password div.dialogButtons,
+div.dialogBox.form-reset-password-ask div.dialogButtons,
 div.dialogBox.form-login_form div.dialogButtons,
 div.dialogBox.form-login_form_dynamic div.dialogButtons
 {
@@ -1382,6 +1390,8 @@ div.dialogBox.form-login_form_dynamic div.dialogButtons
 }
 
 div.dialogBox.form-switch_language_form div.dialogButtons input.dialogButton,
+div.dialogBox.form-reset-password div.dialogButtons input.dialogButton,
+div.dialogBox.form-reset-password-ask div.dialogButtons input.dialogButton,
 div.dialogBox.form-login_form div.dialogButtons input.dialogButton,
 div.dialogBox.form-login_form_dynamic div.dialogButtons input.dialogButton
 {
@@ -1535,7 +1545,7 @@ div#navigation_toolbar {
 }
 
 .create_file_alt_link{
-    font-family: "Open Sans Regular";
+    font-family: "Open Sans Regular", Helvetica, sans-serif;
     font-style: italic;
     cursor: pointer;
 }
@@ -2065,6 +2075,7 @@ div.class-FetchedResultPane > div.panelHeader
     cursor: pointer;
     padding: 21px 15px 21px 15px;
     border-right: 2px solid #333;
+    height: 20px;
 }
 
 #repo_chooser:hover{
@@ -3735,7 +3746,7 @@ div.foldedPanel_tooltip td{
     letter-spacing: 1px;
     background-color: rgba(107, 107, 107, 0.87);
     color: #fff;
-    font-family: "Open Sans Regular";
+    font-family: "Open Sans Regular", Helvetica, sans-serif;
     -webkit-font-smoothing:auto;
 }
 
@@ -5002,7 +5013,7 @@ span.letter_badge {
     text-align: center;
     padding: 7px 0;
     font-size: 0.8em;
-    font-family: "Open Sans Regular";
+    font-family: "Open Sans Regular", Helvetica, sans-serif;
 }
 
 span#alerts_number {
@@ -5377,7 +5388,9 @@ div.dialogBox div.dialogBox.css_boxshadow > div{
 
 div.overlay.form-login_form,
 div.overlay.form-login_form_dynamic,
-div.overlay.form-switch_language_form
+div.overlay.form-switch_language_form,
+div.overlay.form-reset-password,
+div.overlay.form-reset-password-ask
 {
     opacity: 0;
     background-image: none !important;

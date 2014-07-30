@@ -128,6 +128,13 @@ class QuotaComputer extends AJXP_Plugin
         return;
     }
 
+    public function loadRepositoryInfo(&$data){
+        $data['meta.quota'] = array(
+            'usage' => $u = $this->getUsage($this->getWorkingPath()),
+            'total' => $this->getAuthorized()
+        );
+    }
+
     public function recomputeQuotaUsage($oldNode = null, $newNode = null, $copy = false)
     {
         $path = $this->getWorkingPath();

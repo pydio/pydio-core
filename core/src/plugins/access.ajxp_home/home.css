@@ -32,6 +32,37 @@
     float: left;
 }
 
+.repoInfoBadge {
+    display: inline-block;
+    font-size: 30px;
+    width: 190px;
+    line-height: 30px;
+    border: 1px solid rgba(255,255,255,0.7);
+    border-radius: 8px;
+    margin: 10px 16px;
+    height: 116px;
+    font-family: "Open sans Regular", Arial, sans-serif;
+    vertical-align: top;
+    padding: 3px 8px;
+    text-align: left;
+}
+
+.repoInfoTitle {
+    text-transform: uppercase;
+    font-family: "Open sans Light", Arial, sans-serif;
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 9px;
+}
+
+.repoInfoBadge span {
+    display: block;
+    font-size: 50px;
+    float: left;
+    margin: 6px 16px 0 14px;
+    opacity: 0.9;
+}
+
 #home_account_pane #close-icon{
     position: absolute;
     margin-left: 2px;
@@ -181,9 +212,16 @@ div.legend_visible div#logo_div{
     margin: 0 20px;
 }
 
-#home_account_pane div#ws_legend small{
+#home_account_pane div#ws_legend > small {
     display: block;
-    font-size: 0.7em;
+    font-size: 0.6em;
+    line-height: 1em;
+    visibility: hidden;
+}
+
+#home_account_pane div#ws_legend > small.show_description {
+    line-height: 1.9em;
+    visibility: visible;
 }
 
 #home_account_pane div#ws_legend a{

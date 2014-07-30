@@ -452,6 +452,9 @@ Class.create("AjxpTabulator", AjxpPane, {
 	 */
 	resize : function(size, loop){
 		if(!this.selectedTabInfo || !this.htmlElement) return;
+        if(this.options.fit && this.options.fit == 'height'){
+            fitHeightToBottom(this.htmlElement, this.options.fitParent);
+        }
         if(this.htmlElement.hasClassName('horizontal_tabulator')){
             var tabContainer = this.htmlElement.down('div.tabulatorContainer');
             fitHeightToBottom(tabContainer, null, this.options.fitMarginBottom);
@@ -461,7 +464,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 		var ajxpObject = this.getAndSetAjxpObject(this.selectedTabInfo);
 		if(ajxpObject && !ajxpObject.fullScreenMode){
             var nodeElement = $(this.htmlElement).down("#"+this.selectedTabInfo.element);
-            fitHeightToBottom(nodeElement, null, this.options.fitMarginBottom);
+            fitHeightToBottom(nodeElement, this.htmlElement, this.options.fitMarginBottom);
             ajxpObject.resize(nodeElement?nodeElement.getHeight():this.htmlElement.getHeight());
             var left ;
             var total = 0;
