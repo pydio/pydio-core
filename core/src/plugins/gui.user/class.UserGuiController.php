@@ -70,6 +70,7 @@ class UserGuiController extends AJXP_Plugin
                     "USER_GUI_ACTION" => $action
                 );
                 AJXP_Controller::findActionAndApply("get_boot_gui", array(), array());
+                unset($_SESSION['OVERRIDE_GUI_START_PARAMETERS']);
 
                 break;
             case "reset-password-ask":

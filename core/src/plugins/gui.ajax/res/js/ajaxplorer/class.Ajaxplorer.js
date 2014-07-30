@@ -76,6 +76,14 @@ Class.create("Ajaxplorer", {
 				}.bind(this));
 			}
             this.loadActiveRepository();
+            if(ajxpBootstrap.parameters.get("USER_GUI_ACTION")){
+                var a= ajxpBootstrap.parameters.get("USER_GUI_ACTION");
+                ajxpBootstrap.parameters.unset("USER_GUI_ACTION");
+                var aBar = this.actionBar;
+                window.setTimeout(function(){
+                    aBar.fireAction(a);
+                }, 2000);
+            }
 		}.bind(this));
 
 		modal.setLoadingStepCounts(5);

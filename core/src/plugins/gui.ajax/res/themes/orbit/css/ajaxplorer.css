@@ -1291,6 +1291,8 @@ div.tabbed_editor div.innerTitle{
 }
 
 div.dialogBox.form-switch_language_form,
+div.dialogBox.form-reset-password,
+div.dialogBox.form-reset-password-ask,
 div.dialogBox.form-login_form,
 div.dialogBox.form-login_form_dynamic
 {
@@ -1309,6 +1311,8 @@ div.dialogBox.form-login_form_dynamic
 }
 
 div.dialogBox.form-switch_language_form div.dialogContent,
+div.dialogBox.form-reset-password div.dialogContent,
+div.dialogBox.form-reset-password-ask div.dialogContent,
 div.dialogBox.form-login_form div.dialogContent,
 div.dialogBox.form-login_form_dynamic div.dialogContent
 {
@@ -1319,6 +1323,8 @@ div.dialogBox.form-login_form_dynamic div.dialogContent
 }
 
 div.dialogBox.form-switch_language_form div.dialogTitle,
+div.dialogBox.form-reset-password div.dialogTitle,
+div.dialogBox.form-reset-password-ask div.dialogTitle,
 div.dialogBox.form-login_form div.dialogTitle,
 div.dialogBox.form-login_form_dynamic div.dialogTitle
 {
@@ -1374,6 +1380,8 @@ div.dialogBox.form-login_form_dynamic a.forgot-password-link
 }
 
 div.dialogBox.form-switch_language_form div.dialogButtons,
+div.dialogBox.form-reset-password div.dialogButtons,
+div.dialogBox.form-reset-password-ask div.dialogButtons,
 div.dialogBox.form-login_form div.dialogButtons,
 div.dialogBox.form-login_form_dynamic div.dialogButtons
 {
@@ -1382,6 +1390,8 @@ div.dialogBox.form-login_form_dynamic div.dialogButtons
 }
 
 div.dialogBox.form-switch_language_form div.dialogButtons input.dialogButton,
+div.dialogBox.form-reset-password div.dialogButtons input.dialogButton,
+div.dialogBox.form-reset-password-ask div.dialogButtons input.dialogButton,
 div.dialogBox.form-login_form div.dialogButtons input.dialogButton,
 div.dialogBox.form-login_form_dynamic div.dialogButtons input.dialogButton
 {
@@ -5378,7 +5388,9 @@ div.dialogBox div.dialogBox.css_boxshadow > div{
 
 div.overlay.form-login_form,
 div.overlay.form-login_form_dynamic,
-div.overlay.form-switch_language_form
+div.overlay.form-switch_language_form,
+div.overlay.form-reset-password,
+div.overlay.form-reset-password-ask
 {
     opacity: 0;
     background-image: none !important;
