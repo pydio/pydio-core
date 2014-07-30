@@ -170,7 +170,6 @@ class ChangesTracker extends AJXP_Plugin
         }else if(strpos($row->target, '/'.$recycle) === 0){
             $row->target = 'NULL';
             $row->type   = 'delete';
-            $row->node   = array();
         }
     }
 
