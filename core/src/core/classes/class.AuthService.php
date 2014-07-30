@@ -595,7 +595,15 @@ class AuthService
     */
     public static function updateAdminRights($adminUser)
     {
-        if($adminUser->personalRole->getAcl('ajxp_conf') != "rw"){
+        if(!ConfService::getCoreConf("SKIP_ADMIN_RIGHTS_ALL_REPOS")){
+            foreach (ConfService::getRepositoriesList() as $repoId => $repoObject) {
+                if(!self::allowedForCurrentGroup($repoObject, $adminUser)) continue;
+                if($repoObject->hasParent() && $repoObject->getParentId() != $adminUser->getId()) continue;
+                $adminUser->personalRole->setAcl($repoId, "rw");
+            }
+            $adminUser->recomputeMergedRole();
+            $adminUser->save("superuser");
+        }else if($adminUser->personalRole->getAcl('ajxp_conf') != "rw"){
             $adminUser->personalRole->setAcl('ajxp_conf', 'rw');
             $adminUser->save("superuser");
         }
