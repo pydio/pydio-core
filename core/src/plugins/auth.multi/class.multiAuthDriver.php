@@ -379,6 +379,10 @@ class multiAuthDriver extends AbstractAuthDriver
                     }
                     return true;
                 } else {
+                    if(!$this->getFilteredOption("CACHE_MASTER_USERS_TO_SLAVE") && $this->drivers[$this->slaveName]->userExists($login)){
+                        // User may in fact be a SLAVE user
+                        return $this->drivers[$this->slaveName]->checkPassword($login, $pass, $seed);
+                    }
                     return false;
                 }
             } else {
