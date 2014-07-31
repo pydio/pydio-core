@@ -399,7 +399,7 @@ class JumploaderProcessor extends AJXP_Plugin
                     fclose($newDest);
                 }
 
-                if (!self::$remote) {
+                if (!self::$remote && $relPath != $httpVars["partitionRealName"]) {
                     $err = copy($current, $target);
                 } else {
                     for ($i=0, $count=count($newPartitions); $i<$count; $i++) {
