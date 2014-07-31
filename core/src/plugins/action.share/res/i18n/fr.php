@@ -166,6 +166,8 @@ $mess = array(
 "155" => "Minimal (header plus petit, pour un widget)",
 "156" => "Le lien %s a été publié",
 "157" => "Le répertoire est actuallement partagé. Si vous le supprimez, le partage sera désactivé.",
-"158" => "Le fichier est actuallement partagé. Si vous le supprimez, le partage sera désactivé."
+"158" => "Le fichier est actuallement partagé. Si vous le supprimez, le partage sera désactivé.",
+"159" => "Propriétaire",
+"160" => "Vous n'êtes pas autorisé à supprimer cet élément partagé",
 // will be replaced by the filename to download
 );
