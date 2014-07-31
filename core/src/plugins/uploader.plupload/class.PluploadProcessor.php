@@ -60,6 +60,7 @@ class PluploadProcessor extends AJXP_Plugin
             }
             $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
             $streamData = $plugin->detectStreamWrapper(true);
+            $wrapperName = $streamData["classname"];
             $dir = AJXP_Utils::securePath($httpVars["dir"]);
             $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir."/";
 
@@ -71,11 +72,19 @@ class PluploadProcessor extends AJXP_Plugin
                 // Make tmp folder a bit more unique using secure_token
                 $tmpFolder = $destCopy."/".$httpVars["secure_token"];
                 if(!is_dir($tmpFolder)){
-                    @mkdir($destCopy."/".$httpVars["secure_token"], 0700, true);
+                    @mkdir($tmpFolder, 0700, true);
                 }
                 $target = $tmpFolder.'/'.$filename;
                 $fileVars["file"]["destination"] = base64_encode($dir);
+            }else if(call_user_func(array($wrapperName, "isRemote"))){
+                $remote = true;
+                $tmpFolder = AJXP_Utils::getAjxpTmpDir()."/".$httpVars["secure_token"];
+                if(!is_dir($tmpFolder)){
+                    @mkdir($tmpFolder, 0700, true);
+                }
+                $target = $tmpFolder.'/'.$filename;
             }else{
+
                 $target = $destStreamURL.$filename;
             }
 
@@ -138,10 +147,20 @@ class PluploadProcessor extends AJXP_Plugin
                 if(!$remote){
                     AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($destStreamURL.$filename), false));
                 }else{
-                    $fileVars["file"]["tmp_name"] = $target;
-                    $fileVars["file"]["name"] = $filename;
-                    $driver->storeFileToCopy($fileVars["file"]);
-                    AJXP_Controller::findActionAndApply("next_to_remote", array(), array());
+                    if(method_exists($driver, "storeFileToCopy")){
+                        $fileVars["file"]["tmp_name"] = $target;
+                        $fileVars["file"]["name"] = $filename;
+                        $driver->storeFileToCopy($fileVars["file"]);
+                        AJXP_Controller::findActionAndApply("next_to_remote", array(), array());
+                    }else{
+                        // Remote Driver case: copy temp file to destination
+                        $node = new AJXP_Node($destStreamURL.$filename);
+                        AJXP_Controller::applyHook("node.before_create", array($node, filesize($target)));
+                        AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($destStreamURL)));
+                        $res = copy($target, $destStreamURL.$filename);
+                        if($res) @unlink($target);
+                        AJXP_Controller::applyHook("node.change", array(null, $node, false));
+                    }
                 }
             }
             // Return JSON-RPC response

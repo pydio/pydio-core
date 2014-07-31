@@ -97,7 +97,7 @@ $(function() {
 		});
 		Uploader.bind('FileUploaded', function(up, file, res) {
 			if(this.total.queued <= 1) {
-				//parent.ajaxplorer.fireContextRefresh();
+				parent.ajaxplorer.fireContextRefresh();
                 parent.document.fire("ajaxplorer:longtask_finished");
 			}
 			$.get(upurl);

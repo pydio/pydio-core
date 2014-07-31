@@ -90,6 +90,11 @@ class s3AccessDriver extends fsAccessDriver
         return true;
     }
 
+    public static function isRemote()
+    {
+        return true;
+    }
+
     public function loadNodeInfo(&$node, $parentNode = false, $details = false)
     {
         parent::loadNodeInfo($node, $parentNode, $details);

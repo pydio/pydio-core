@@ -753,7 +753,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $errorMessage));
                 } else {
                     $this->logDebug("Return success");
-                    if($already_existed){
+                    if(isSet($already_existed) && $already_existed === true){
                         return array("SUCCESS" => true, "UPDATED_NODE" => $createdNode);
                     }else{
                         return array("SUCCESS" => true, "CREATED_NODE" => $createdNode);
