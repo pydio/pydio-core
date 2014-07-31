@@ -52,7 +52,7 @@
         <external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude="actions/action[@name='logoutCAS']"/>
         <actions>
             <action name="logoutCAS" expireDefault="true">
-                <gui text="164" title="169" src="logout.png" accessKey="" hasAccessKey="false">
+                <gui text="164" title="169" src="" accessKey="" hasAccessKey="false">
                     <context selection="false" dir="" recycle="false" contextMenu="false" infoPanel="false" actionBarGroup="user" ajxpWidgets="UserWidget::logging_string"></context>
                 </gui>
                 <rightsContext noUser="false" userLogged="only" guestLogged="show" read="false" write="false" adminOnly=""></rightsContext>
