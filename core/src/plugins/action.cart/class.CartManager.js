@@ -57,6 +57,7 @@ Class.create("CartManager", FetchedResultPane, {
         this.stateChangeBuffer = window.setTimeout(function(){
             oEl.fire("widget:updateState");
         }, 1500);
+        this.reload();
     },
 
     clearContent: function(){
@@ -210,6 +211,7 @@ Class.create("CartManager", FetchedResultPane, {
         var newNode = new AjxpNode(n.getPath(), n.isLeaf(), n.getLabel(), n.getIcon());
         newNode.setMetadata($H(Object.clone(n.getMetadata().toObject())));
         this._rootNode.addChild(newNode);
+        this.reload();
 
     },
 
