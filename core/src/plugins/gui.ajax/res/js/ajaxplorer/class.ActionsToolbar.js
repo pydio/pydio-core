@@ -393,7 +393,18 @@ Class.create("ActionsToolbar", AjxpPane, {
         if(!this.options.skipBubbling){
             img.setStyle("width:18px;height:18px;margin-top:8px;");
         }
-		button.hide();
+        button.hideButton = function(){
+            this.hide();
+            this.removeClassName("action_visible");
+            this.addClassName("action_hidden");
+        }.bind(button);
+        button.showButton = function(){
+            this.show();
+            this.removeClassName("action_hidden");
+            this.addClassName("action_visible");
+        }.bind(button);
+
+		button.hideButton();
 		this.attachListeners(button, action);
         if(!this.registeredButtons){
             this.registeredButtons = $A();
@@ -402,7 +413,7 @@ Class.create("ActionsToolbar", AjxpPane, {
 		return button;
 		
 	},
-	
+
 	/**
 	 * Attach various listeners to an action to reflect its state on the button
 	 * @param button HTMLElement The button
@@ -416,9 +427,9 @@ Class.create("ActionsToolbar", AjxpPane, {
             fakeDm.setSelectedNodes([this.options.attachToNode]);
             action.fireSelectionChange(fakeDm);
             if(action.deny) {
-                button.hide();
+                button.hideButton();
             }  else {
-                button.show();
+                button.showButton();
             }
             button.ACTION = action;
             return;
@@ -426,8 +437,8 @@ Class.create("ActionsToolbar", AjxpPane, {
 
 
         button.OBSERVERS = $H();
-        button.OBSERVERS.set("hide", function(){button.hide()}.bind(this));
-        button.OBSERVERS.set("show", function(){button.show()}.bind(this));
+        button.OBSERVERS.set("hide", function(){button.hideButton()}.bind(this));
+        button.OBSERVERS.set("show", function(){button.showButton()}.bind(this));
 
         button.OBSERVERS.each(function(pair){
             action.observe(pair.key, pair.value);
@@ -435,12 +446,10 @@ Class.create("ActionsToolbar", AjxpPane, {
         button.ACTION = action;
 
 		action.observe("hide", function(){
-			button.hide();
-            button.addClassName("action_hidden");
+			button.hideButton();
 		}.bind(this));
 		action.observe("show", function(){
-			button.show();
-            button.removeClassName("action_hidden");
+			button.showButton();
 		}.bind(this));
 		action.observe("disable", function(){
 			button.addClassName("disabled");
