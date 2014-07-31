@@ -623,22 +623,32 @@
         <component_config className="InfoPanel">
             <infoPanelExtension mime="ajxp_root_node" attributes="">
                 <messages>
-                    <message key="type_string" id="share_center.50"/>
+                    <message key="shared_string" id="527"/>
+                    <message key="internal_string" id="528"/>
+                    <message key="external_string" id="530"/>
                 </messages>
                 <html><![CDATA[
                     <div id="ajxp_workspace_info_panel" data-infoPanelPosition="top" style="margin:6px 20px;">
-                        <div class="panelHeader">Shared With...</div>
+                        <div class="panelHeader">#{shared_string}</div>
                         <div id="ajxp_workspace_info_panel_content"></div>
                         <script>
-                            var conn = new Connexion();
-                            conn.setParameters({get_action:'load_repository_info'});
-                            conn.onComplete = function(transport){
-                                if(transport.responseJSON && $('ajxp_workspace_info_panel_content')){
-                                    var data = transport.responseJSON;
-                                    $('ajxp_workspace_info_panel_content').update('Internal users: ' + data['core.users']['internal'] + ' <br/> External users: ' + data['core.users']['external']);
+                            if(window.load_repo_info_timer){
+                                window.clearTimeout(window.load_repo_info_timer);
+                            }
+                            window.load_repo_info_timer = window.setTimeout(function(){
+                                if(!$('ajxp_workspace_info_panel_content') || !$('ajxp_workspace_info_panel_content').visible()){
+                                    return;
                                 }
-                            };
-                            conn.sendAsync();
+                                var conn = new Connexion();
+                                conn.setParameters({get_action:'load_repository_info'});
+                                conn.onComplete = function(transport){
+                                    if(transport.responseJSON && $('ajxp_workspace_info_panel_content')){
+                                        var data = transport.responseJSON;
+                                        $('ajxp_workspace_info_panel_content').update('#{internal_string}: ' + data['core.users']['internal'] + ' <br/> #{external_string}: ' + data['core.users']['external']);
+                                    }
+                                };
+                                conn.sendAsync();
+                            }, 300);
                         </script>
                     </div>
                 ]]></html>
