@@ -711,9 +711,13 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 if ($action == "user_create_user" && isSet($httpVars["NEW_new_user_id"])) {
                     $updating = false;
                     AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "NEW_");
+                    $original_id = AJXP_Utils::decodeSecureMagic($data["new_user_id"]);
                     $data["new_user_id"] = AJXP_Utils::decodeSecureMagic($data["new_user_id"], AJXP_SANITIZE_EMAILCHARS);
+                    if($original_id != $data["new_user_id"]){
+                        throw new Exception(str_replace("%s", $data["new_user_id"], $mess["ajxp_conf.127"]));
+                    }
                     if (AuthService::userExists($data["new_user_id"])) {
-                        throw new Exception('Please choose another user id');
+                        throw new Exception($mess["ajxp_conf.43"]);
                     }
                     $loggedUser = AuthService::getLoggedUser();
                     $limit = $loggedUser->personalRole->filterParameterValue("core.conf", "USER_SHARED_USERS_LIMIT", AJXP_REPO_SCOPE_ALL, "");

@@ -147,4 +147,5 @@ $mess=array(
 "113" => "Status del ruolo correttamente aggiornato",
 "114" => "Applicato a",
 "115" => "Schema",
+"127" => "Warning, please do not use special characters, user would be created with login id '%s'",
 );
