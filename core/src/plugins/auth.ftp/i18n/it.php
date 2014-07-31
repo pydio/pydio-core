@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -19,12 +19,12 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connection data",
+"1" => "Inserire parametri connessione",
 "2" => "Host",
-"3" => "Optional data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"3" => "Dati Opzionali",
+"4" => "Avvia",
+"5" => "Protocollo",
+"6" => "Codifica",
+"7" => "Attivo",
+"8" => "Porta",
 );
