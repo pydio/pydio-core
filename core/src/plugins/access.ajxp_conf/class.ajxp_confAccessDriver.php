@@ -725,12 +725,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     AJXP_XMLWriter::close();
                     return;
                 }
-                $new_user_login = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($httpVars["new_user_login"]), AJXP_SANITIZE_EMAILCHARS);
+                $original_login = SystemTextEncoding::magicDequote($httpVars["new_user_login"]);
+                $new_user_login = AJXP_Utils::sanitize($original_login, AJXP_SANITIZE_EMAILCHARS);
+                if($original_login != $new_user_login){
+                    throw new Exception(str_replace("%s", $new_user_login, $mess["ajxp_conf.127"]));
+                }
                 if (AuthService::userExists($new_user_login, "w") || AuthService::isReservedUserId($new_user_login)) {
-                    AJXP_XMLWriter::header();
-                    AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.43"]);
-                    AJXP_XMLWriter::close();
-                    return;
+                    throw new Exception($mess["ajxp_conf.43"]);
                 }
 
                 AuthService::createUser($new_user_login, $httpVars["new_user_pwd"]);

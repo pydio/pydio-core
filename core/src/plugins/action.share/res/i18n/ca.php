@@ -166,5 +166,7 @@ $mess = array(
 "46_mini" => "Open mini %s1",
 "46_file" => "Open file %s1",
 "157" => "This folder is currently shared. If you delete it, associated share will be disabled.",
-"158" => "This file is currently shared. If you delete it, associated share will be disabled. "
+"158" => "This file is currently shared. If you delete it, associated share will be disabled. ",
+"159" => "Owner",
+"160" => "You are not allowed to delete this shared item",
 );

@@ -167,5 +167,7 @@ $mess = array(
     "155" => "Embedded (smaller header, for widgets)",
     "156" => "Successfully published link %s",
     "157" => "This folder is currently shared. If you delete it, associated share will be disabled.",
-    "158" => "This file is currently shared. If you delete it, associated share will be disabled. "
+    "158" => "This file is currently shared. If you delete it, associated share will be disabled. ",
+    "159" => "Owner",
+    "160" => "You are not allowed to delete this shared item",
 );

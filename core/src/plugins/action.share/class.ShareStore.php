@@ -223,7 +223,7 @@ class ShareStore {
 
         if(empty($userId)){
             $mess = ConfService::getMessages();
-            throw new Exception($mess["ajxp_shared.12"]);
+            throw new Exception($mess["share_center.160"]);
         }
         $crtUser = AuthService::getLoggedUser();
         if($crtUser->getId() == $userId) return true;
@@ -233,7 +233,7 @@ class ShareStore {
             return true;
         }
         $mess = ConfService::getMessages();
-        throw new Exception($mess["ajxp_shared.12"]);
+        throw new Exception($mess["share_center.160"]);
     }
 
     /**
@@ -316,7 +316,7 @@ class ShareStore {
                     $this->confStorage->simpleStoreClear("share", $element);
                 }
             } else {
-                throw new Exception($mess["ajxp_shared.12"]);
+                throw new Exception($mess["share_center.160"]);
             }
         }
     }

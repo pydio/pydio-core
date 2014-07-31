@@ -164,7 +164,7 @@ Class.create("PluginEditor", AbstractEditor, {
                 docDiv.select('img').each(function(img){
                     img.setStyle({width:'220px'});
                     img.setAttribute('src', 'plugins/'+ this.pluginId+'/'+img.getAttribute('src'));
-                });
+                }.bind(this));
                 this.docPane.insert({bottom:docDiv});
 
                 var pluginfo = docDiv.down("ul.pluginfo_list");

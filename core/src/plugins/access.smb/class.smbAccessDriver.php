@@ -57,6 +57,17 @@ class smbAccessDriver extends fsAccessDriver
         $wrapperData = $this->detectStreamWrapper(true);
         $this->wrapperClassName = $wrapperData["classname"];
         $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+
+        if ($recycle!= "" && !is_dir($this->urlBase."/".$recycle)) {
+            @mkdir($this->urlBase."/".$recycle);
+            if (!is_dir($this->urlBase."/".$recycle)) {
+                throw new AJXP_Exception("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
+            }
+        }
+        if ($recycle != "") {
+            RecycleBinManager::init($this->urlBase, "/".$recycle);
+        }
+
     }
 
     public function detectStreamWrapper($register = false)

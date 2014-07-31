@@ -163,5 +163,7 @@ $mess = array(
     "155" => "Embedded (intestazione più piccola, indicato per widgets)",
     "156" => "Link %s pubblicato correttamente",
     "157" => "Questa cartella è attualmente condivisa. Se la cancelli, le condivisioni associate verranno disabilitate.",
-    "158" => "Questo file è attualmente condiviso. Se lo cancelli, le condivisioni associate verranno disabilitate. "
+    "158" => "Questo file è attualmente condiviso. Se lo cancelli, le condivisioni associate verranno disabilitate. ",
+    "159" => "Owner",
+    "160" => "You are not allowed to delete this shared item",
 );

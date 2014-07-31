@@ -642,6 +642,7 @@ class smb_stream_wrapper extends smb
             case 'r+':
             case 'rb':
             case 'a':
+            case 'ab':
             case 'a+':
                 // REFERENCE STREAM BUT DO NOT OPEN IT UNTIL READING IS REALLY NECESSARY!
                 /*

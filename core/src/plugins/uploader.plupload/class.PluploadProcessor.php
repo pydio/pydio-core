@@ -45,7 +45,9 @@ class PluploadProcessor extends AJXP_Plugin
 
     public function unifyChunks($action, &$httpVars, &$fileVars)
     {
-            $filename = SystemTextEncoding::fromUTF8($httpVars["name"]);
+
+            $filename = AJXP_Utils::decodeSecureMagic($httpVars["name"]);
+
             $tmpName = $fileVars["file"]["tmp_name"];
             $chunk = $httpVars["chunk"];
             $chunks = $httpVars["chunks"];
@@ -58,8 +60,25 @@ class PluploadProcessor extends AJXP_Plugin
             }
             $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
             $streamData = $plugin->detectStreamWrapper(true);
-            $dir = $httpVars["dir"];
+            $dir = AJXP_Utils::securePath($httpVars["dir"]);
             $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir."/";
+
+            $driver = ConfService::loadDriverForRepository($repository);
+            $remote = false;
+            if (method_exists($driver, "storeFileToCopy")) {
+                $remote = true;
+                $destCopy = AJXP_XMLWriter::replaceAjxpXmlKeywords($repository->getOption("TMP_UPLOAD"));
+                // Make tmp folder a bit more unique using secure_token
+                $tmpFolder = $destCopy."/".$httpVars["secure_token"];
+                if(!is_dir($tmpFolder)){
+                    @mkdir($destCopy."/".$httpVars["secure_token"], 0700, true);
+                }
+                $target = $tmpFolder.'/'.$filename;
+                $fileVars["file"]["destination"] = base64_encode($dir);
+            }else{
+                $target = $destStreamURL.$filename;
+            }
+
 
             //error_log("Directory: ".$dir);
 
@@ -79,7 +98,7 @@ class PluploadProcessor extends AJXP_Plugin
                     //error_log("tmpName: ".$tmpName);
 
                     // Open temp file
-                    $out = fopen($destStreamURL.$filename, $chunk == 0 ? "wb" : "ab");
+                    $out = fopen($target, $chunk == 0 ? "wb" : "ab");
                     if ($out) {
                         // Read binary input stream and append it to temp file
                         $in = fopen($tmpName, "rb");
@@ -98,7 +117,7 @@ class PluploadProcessor extends AJXP_Plugin
                     die('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Failed to move uploaded file."}, "id" : "id"}');
             } else {
                 // Open temp file
-                $out = fopen($destStreamURL.$filename, $chunk == 0 ? "wb" : "ab");
+                $out = fopen($target, $chunk == 0 ? "wb" : "ab");
                 if ($out) {
                     // Read binary input stream and append it to temp file
                     $in = fopen("php://input", "rb");
@@ -115,8 +134,16 @@ class PluploadProcessor extends AJXP_Plugin
                     die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
             }
             /* we apply the hook if we are uploading the last chunk */
-            if($chunk == $chunks-1)
-                AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($destStreamURL.$filename), false));
+            if($chunk == $chunks-1){
+                if(!$remote){
+                    AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($destStreamURL.$filename), false));
+                }else{
+                    $fileVars["file"]["tmp_name"] = $target;
+                    $fileVars["file"]["name"] = $filename;
+                    $driver->storeFileToCopy($fileVars["file"]);
+                    AJXP_Controller::findActionAndApply("next_to_remote", array(), array());
+                }
+            }
             // Return JSON-RPC response
             die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
     }

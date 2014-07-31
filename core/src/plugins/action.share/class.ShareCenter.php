@@ -409,23 +409,6 @@ class ShareCenter extends AJXP_Plugin
 
             break;
 
-            case "clear_expired" :
-
-                $mess = ConfService::getMessages();
-                $shareCenter = ShareCenter::getShareCenter();
-                $deleted = $shareCenter->clearExpiredFiles(false);
-                AJXP_XMLWriter::header();
-                if (count($deleted)) {
-                    AJXP_XMLWriter::sendMessage(sprintf($mess["ajxp_shared.23"], count($deleted).""), null);
-                    AJXP_XMLWriter::reloadDataNode();
-                } else {
-                    AJXP_XMLWriter::sendMessage($mess["ajxp_shared.24"], null);
-                }
-                AJXP_XMLWriter::close();
-
-            break;
-
-
             case "update_shared_element_data":
 
                 if(!in_array($httpVars["p_name"], array("counter", "tags"))){
@@ -479,7 +462,7 @@ class ShareCenter extends AJXP_Plugin
                 }else{
                     AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.repositories">
                     <column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/>
-                    <column messageId="ajxp_shared.27" attributeName="owner" sortType="String"/>
+                    <column messageId="share_center.159" attributeName="owner" sortType="String"/>
                     <column messageId="3" attributeName="share_type_readable" sortType="String"/>
                     <column messageId="share_center.52" attributeName="share_data" sortType="String"/>
                     </columns>');
@@ -1670,7 +1653,7 @@ class ShareCenter extends AJXP_Plugin
                 if(isSet($httpVars["minisite"])){
                     $mess = ConfService::getMessages();
                     $userObject->setHidden(true);
-                    $userObject->personalRole->setParameterValue("core.conf", "USER_DISPLAY_NAME", "[".$mess["share_center.109"]."] ".$newRepo->getDisplay());
+                    $userObject->personalRole->setParameterValue("core.conf", "USER_DISPLAY_NAME", "[".$mess["share_center.109"]."] ". AJXP_Utils::sanitize($newRepo->getDisplay(), AJXP_SANITIZE_EMAILCHARS));
                 }
                 AJXP_Controller::applyHook("user.after_create", array($userObject));
             }
