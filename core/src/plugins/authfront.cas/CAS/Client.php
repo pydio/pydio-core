@@ -1946,7 +1946,12 @@ class CAS_Client
                 array_pop($arr_uri);
                 $request_uri = implode('/', $arr_uri).'/';
             }else if(count($arr_uri) == 2){
-                $request_uri = '/'.$arr_uri[1].'/';
+                if(!empty($arr_uri[1])){
+                    $request_uri = '/'.$arr_uri[1].'/';
+                }
+                else{
+                    $request_uri = '/';
+                }
             }else{
                 $request_uri = '/';
             }
