@@ -19,14 +19,14 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"FTP Authentification" => "Autenticação FTP",
-"Authenticate user directly to an FTP server, and connect him to this server." => "Autenticar um utilizador directamente a um servidor FTP e liga-lo a este servidor.",
+"FTP authentication" => "Autenticação FTP",
+"Authenticate users by validating their credentials against an FTP server." => "Autenticar um utilizador directamente a um servidor FTP e liga-lo a este servidor.",
 "FTP Login Screen" => "Ecrã de Sessão FTP",
-"Whether to display a generic 'FTP connexion' dialog at startup (allowing the user to enter his own host/port data) or the standard login dialog." => "Mostrar um diálogo genérico de 'Ligação FTP' no ecrã de arranque (permitindo ao utilizador introduzir o seu próprio servidor/porta) ou o diálogo genérico pré definido.",
-"Repository" => "Repositório",
-"Id of the repository to use for testing connexion" => "ID da Área de Trabalho a ser usada para testar a ligação",
+"Replace the default connection screen (username and password) by a screen allowing users to enter their own FTP connection data (server, port, etc.)" => "Mostrar um diálogo genérico de 'Ligação FTP' no ecrã de arranque (permitindo ao utilizador introduzir o seu próprio servidor/porta) ou o diálogo genérico pré definido.",
+"Workspace" => "Repositório",
+"ID of the workspace used to validate credentials" => "ID do workspace utilizado para validar as credenciais",
 "Admin user" => "Administrador",
 "The ID of an existing admin for Pydio (using conf.serial)" => "Introduzir o ID de um administrador existente do Pydio (utilizando conf.serial)",
-"Test Connexion" => "Test Connexion",
-"Test connexion to the FTP server" => "Test connexion to the FTP server",
+"Test connection" => "Testar a conexão",
+"Test connection to the FTP server" => "Teste a conexão com o servidor FTP",
 );
