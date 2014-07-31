@@ -1938,23 +1938,13 @@ class CAS_Client
 			$final_uri .= $this->getServerUrl();
 			$request_uri = $_SERVER['REQUEST_URI'];
 			$request_uri = preg_replace('/\?.*$/','',$request_uri);
+            
             /*
              * modify for pydio
              */
-            $arr_uri = explode('/', $request_uri);
-            if(count($arr_uri) >= 3){
-                array_pop($arr_uri);
-                $request_uri = implode('/', $arr_uri).'/';
-            }else if(count($arr_uri) == 2){
-                if(!empty($arr_uri[1])){
-                    $request_uri = '/'.$arr_uri[1].'/';
-                }
-                else{
-                    $request_uri = '/';
-                }
-            }else{
-                $request_uri = '/';
-            }
+            $str_pattern = 'index|plugins|dashboard|settings|welcome|ws-(.*)';
+            $request_uri = preg_replace($str_pattern,'',$request_uri);
+
 
             $final_uri .= $request_uri;
             /**************************************/
