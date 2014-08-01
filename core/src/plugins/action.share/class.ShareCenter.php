@@ -1312,6 +1312,7 @@ class ShareCenter extends AJXP_Plugin
 
         $httpVars["minisite"] = true;
         $httpVars["selection"] = true;
+        $createRestDownloadLink = false;
         if(!isSet($userSelection)){
             $userSelection = new UserSelection($repository, $httpVars);
             $setFilter = false;
@@ -1319,6 +1320,7 @@ class ShareCenter extends AJXP_Plugin
                 $node = $userSelection->getUniqueNode($this->accessDriver);
                 $node->loadNodeInfo();
                 if($node->isLeaf()){
+                    $createRestDownloadLink = true;
                     $setFilter = true;
                     $httpVars["file"] = "/";
                 }
@@ -1368,6 +1370,21 @@ class ShareCenter extends AJXP_Plugin
         if(AuthService::usersEnabled()){
             $data["OWNER_ID"] = AuthService::getLoggedUser()->getId();
         }
+        /*
+        if($createRestDownloadLink && !isSet($data["DIRECT_DOWNLOAD_LINK"])){
+            // BUILD DIRECT DOWNLOAD LINK ON REST API
+            // http://user:password@server/api/newrepositoryID/download/contentFilterPathForNode
+            $repoId = $newRepo->getUniqueId();
+            $credentials = $userId;
+            if(empty($httpVars["guest_user_pass"]) && isSet($userPass)){
+                $credentials.=":".$userPass;
+            }
+            $cFilter = $newRepo->getContentFilter();
+            $virtualPath = array_pop(array_values($cFilter->filters));
+            $data["DIRECT_DOWNLOAD_LINK"] = "/api/".$repoId."/download".$virtualPath;
+            $data["DIRECT_DOWNLOAD_LINK_CREDENTIALS"] = $credentials;
+        }
+        */
 
         if(!isSet($httpVars["repository_id"])){
             try{
