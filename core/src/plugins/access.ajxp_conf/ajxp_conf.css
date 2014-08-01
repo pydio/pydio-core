@@ -66,6 +66,10 @@
     background-color: rgb(255, 255, 255);
 }
 
+.ajxp_theme_orbit .settings_main_pane #content_pane{
+    border: none;
+}
+
 .settings_main_pane #buttons_bar{
     padding-left: 7px;
     padding-top: 2px;

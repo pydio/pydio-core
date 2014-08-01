@@ -2688,13 +2688,11 @@ div#upload_files_list, div#multiple_download_container
 }
 
 .dropareaHover{
-    background-color: #c3d9ff !important;
+    background-color: #FAF3ED !important;
 }
 
-#content_pane.dropareaHover {
-    border-color: #D96252 !important;
-    border-style: dashed;
-    background-color: white !important;
+#content_pane.dropareaHover div.thumbnail_selectable_cell{
+    background-color: transparent !important;
 }
 
 #uploader_chooser{
