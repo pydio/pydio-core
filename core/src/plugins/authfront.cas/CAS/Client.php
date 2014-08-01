@@ -1942,7 +1942,7 @@ class CAS_Client
             /*
              * modify for pydio
              */
-            $str_pattern = '/(index)|(plugins)|(dashboard)|(settings)|(welcome)|(ws-(.*))$/';
+            $str_pattern = '/index|plugins|dashboard|settings|welcome|ws-(.*)$/';
             $request_uri = preg_replace($str_pattern,'',$request_uri);
 
 
