@@ -3044,6 +3044,12 @@ div.tabulatorContainer div#display_toolbar{
     border-bottom: 1px dotted #999;
 }
 
+#info_panel div.ip_geo_cell {
+    position: absolute;
+    right: 17px;
+    margin-top: -36px;
+}
+
 span.toggleHeader{
     display: inline-block;
     overflow: hidden;
