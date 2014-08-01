@@ -28,7 +28,7 @@ Class.create("ExifCellRenderer", {
 			var object = new ExifCellRenderer();
 			object.transformGeoCells(latiCell, longiCell);
 		}else if(latiCell && longiCell){
-            latiCell.up('table').up('div').hide();
+            latiCell.up('div.infoPanelTable').up('div').hide();
         }
 	},
 	
@@ -43,7 +43,7 @@ Class.create("ExifCellRenderer", {
 			className:'fakeUploadButton',
 			style:'padding-top:6px;width:50px;margin-bottom:0px;padding-bottom:3px;text-align:center; font-size: 11px;'
 		}).update('<img src="plugins/meta.exif/world.png" style="margin-bottom: 0;"><br>'+MessageHash['meta.exif.2']);
-		var buttonCell = new Element('td', {
+		var buttonCell = new Element('div', {
 			rowspan:2,
 			align:'center',
 			valign:'center',
@@ -53,12 +53,29 @@ Class.create("ExifCellRenderer", {
 		latiCell.insert({after:buttonCell});		
 		// Set all other cells colspan to 2.
 		latiCell.up().nextSiblings().each(function(tr){
-			tr.down('td.infoPanelValue').setAttribute('colspan', 2);
+			tr.down('div.infoPanelValue').setAttribute('colspan', 2);
 		});
 		longiCell.setAttribute("colspan", "1");
 		button.observe("click", function(){
 			this.openLocator(latiCell.getAttribute('latiDegree'), longiCell.getAttribute("longiDegree"));
-		}.bind(this) );		
+		}.bind(this) );
+        var editors = ajaxplorer.findEditorsForMime("ol_layer");
+        var editorData;
+        if(editors.length){
+            editorData = editors[0];
+        }
+        if(editorData){
+            var ajxpNode = ajaxplorer.getUserSelection().getUniqueNode();
+            var metadata = ajxpNode.getMetadata();
+            ajxpNode.setMetadata(metadata.merge({
+                'ol_layers' : [{type:'Google', google_type:'hybrid'}, {type:'Google', google_type:'streets'}, {type:'OSM'}],
+                'ol_center' : {latitude:parseFloat(latiCell.getAttribute('latiDegree')),longitude:parseFloat(longiCell.getAttribute("longiDegree"))}
+            }));
+            latiCell.up('div.infoPanelTable').insert({top:'<div id="small_map" style="height: 250px;"></div>'});
+            ajaxplorer.loadEditorResources(editorData.resourcesManager);
+            OLViewer.prototype.createOLMap(ajxpNode, "small_map", false, false);
+        }
+
 	},
 	
 	openLocator : function(latitude, longitude){
@@ -66,6 +83,7 @@ Class.create("ExifCellRenderer", {
 		// Call openLayer editor!
 		// TEST : WestHausen : longitude=10.2;latitude = 48.9;
 		var editors = ajaxplorer.findEditorsForMime("ol_layer");
+        var editorData;
 		if(editors.length){
 			editorData = editors[0];							
 		}					

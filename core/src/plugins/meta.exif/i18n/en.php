@@ -1,6 +1,6 @@
 <?php
 
 $mess = array(
-"1" => "Exif GeoLocation",
+"1" => "GeoLocation",
 "2" => "Locate",
 );

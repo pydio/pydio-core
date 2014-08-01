@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Géolocalisation Exif",
+"1" => "Géolocalisation",
 "2" => "Localiser",
 );

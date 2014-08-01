@@ -54,14 +54,14 @@ class ExifMetaManager extends AJXP_Plugin
         }
         $cdataHead = '<div>
                         <div class="panelHeader infoPanelGroup" colspan="2">AJXP_MESSAGE[meta.exif.1]</div>
-                        <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">';
-        $cdataFoot = '</table></div>';
+                        <div class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">';
+        $cdataFoot = '</div></div>';
         $cdataParts = "";
         $even = false;
         foreach ($def as $key=>$label) {
             $trClass = ($even?" class=\"even\"":"");
             $even = !$even;
-            $cdataParts .= '<tr'.$trClass.'><td class="infoPanelLabel">'.$label.'</td><td class="infoPanelValue" id="ip_'.$key.'">#{'.$key.'}</td></tr>';
+            $cdataParts .= '<div'.$trClass.'><div class="infoPanelLabel">'.$label.'</div><div class="infoPanelValue" id="ip_'.$key.'">#{'.$key.'}</div></div>';
         }
 
         $selection = $this->xPath->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
