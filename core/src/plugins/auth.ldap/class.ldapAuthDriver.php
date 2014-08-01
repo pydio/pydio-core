@@ -558,6 +558,8 @@ class ldapAuthDriver extends AbstractAuthDriver
 
     public function updateUserObject(&$userObject)
     {
+
+        parent::updateUserObject($userObject);
         if(!empty($this->separateGroup)) $userObject->setGroupPath("/".$this->separateGroup);
         // SHOULD BE DEPRECATED
         if (!empty($this->customParamsMapping)) {
@@ -697,7 +699,6 @@ class ldapAuthDriver extends AbstractAuthDriver
             if ($changes) {
                 $userObject->save("superuser");
             }
-
         }
     }
 
