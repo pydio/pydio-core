@@ -443,7 +443,10 @@ Class.create("ShareCenter", {
                             }
                         }
                     }
-                    generateButton.observe("click", function(){submitFunc(oForm);} );
+                    generateButton.observe("click", function(){
+                        generateButton.hide();
+                        submitFunc(oForm);
+                    } );
                 }
             }
             if(ajaxplorer.hasPluginOfType("meta", "watch")){
