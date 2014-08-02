@@ -4880,7 +4880,7 @@ div.menu a {
 }
 
 .menu.desktop {
-    width: 10em;
+    width: 15em;
     padding: 0;
     padding-top: 0;
     padding-bottom: 1px;
@@ -4889,14 +4889,14 @@ div.menu a {
 }
 
 .menu.desktop.toolbarmenu {
-    background: #eee;
+    background: #fff;
     padding-bottom: 0;
     width: auto;
     /* IE */
     width:expression("150px");
     -moz-border-radius : 0 5px 5px 5px;
     border-radius: 4px;
-    min-width: 160px;
+    min-width: 15em;
 }
 
 .bmbarMenu div.moreActions {
@@ -4967,7 +4967,7 @@ div.menu a {
 
 .menu.desktop li.separator {
     padding: 0;
-    height: 1px;
+    height: 0;
 }
 .menu.desktop a img{
     margin-right: 9px;
@@ -4977,15 +4977,51 @@ div.menu a {
 .menu.desktop span.ajxp_icon_span{
     font-size: 1.1em;
     padding-right: 10px;
-    display: none;
+    color: #555;
+    opacity: 0.2;
+}
+
+.menu.desktop a:hover span.ajxp_icon_span,
+.menu.desktop li.menuAnchorSelected span.ajxp_icon_span
+{
+    color: white;
+    opacity: 1;
 }
 
 .menu.desktop a {
-    color: rgb(123, 134, 145);
-    padding: 5px 8px 3px;
+    color: #222;
+    padding: 9px 12px 10px;
     margin: 0;
     font-size: 12px;
     line-height: 20px;
+}
+
+.menu.desktop a u {
+    text-decoration: none;
+    display: inline-block;
+    border: 1px solid white;
+    border-radius: 3px;
+}
+
+.menu.desktop a:hover u,
+.menu.desktop li.menuAnchorSelected u
+{
+    padding: .1em .2em;
+    border: 1px solid #ccc;
+    font-size: 11px;
+    font-family: Arial,Helvetica,sans-serif;
+    background-color: #f7f7f7;
+    -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px#fff inset;
+    -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px#fff inset;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px#fff inset;
+    border-radius: 3px;
+    display: inline-block;
+    margin: 1px;
+    text-shadow: 0 1px 0#fff;
+    line-height: 1.4;
+    white-space: nowrap;
+    color: #222;
+
 }
 
 .menu.desktop.toolbarmenu a img{
@@ -4994,7 +5030,7 @@ div.menu a {
 
 .menu.desktop.toolbarmenu a {
     color: #333;
-    padding: 8px 20px 5px 8px;
+    padding: 10px 20px 8px 8px;
     margin: 0;
     font-size: 13px;
 }
@@ -5005,17 +5041,17 @@ div.menu a {
     zoom: 1;
 }
 .menu.desktop li.separator {
-    border-bottom: 1px solid #ebedf0;
-    margin: 1px 1px 0 1px;
+    border-bottom: 1px solid #eeeeee;
+    margin: 0 10px;
     line-height: 1px !important;
 }
 .menu.desktop.toolbarmenu li.separator{
-    border-bottom: 1px solid #666;
+    border-bottom: 1px solid #eeeeee;
 }
 
 .bookmarksMenu li.separator {
     border-bottom: 1px solid #fff;
-    margin: 0 1px 0 1px;
+    margin: 0 1px;
     line-height: 1px !important;
     padding: 0;
     height: 1px !important;
@@ -5046,13 +5082,13 @@ span#alerts_number {
 
 /* we need explicit enabled class to overcome css deficiences (without creating unnecessary markup) */
 .menu.desktop a.enabled:hover {
-    background-color: #73a2d7;
+    background-color: #fb725c;
     color: #fff;
 }
 
 .menu.desktop li.menuAnchorSelected,
 .menu.desktop li.menuAnchorSelected a {
-    background-color: #73a2d7;
+    background-color: #fb725c;
     color: #fff !important;
 }
 
@@ -5351,9 +5387,7 @@ div.menuActions img{
 /* Generally applied after a Modernizr test */
 /********************************************/
 .css_boxshadow,div.menu{
-    -moz-box-shadow : 5px 5px 40px rgba(100, 100, 100, 0.5);
-    -webkit-box-shadow : 5px 5px 40px rgba(100, 100, 100, 0.5);
-    box-shadow : 5px 5px 40px rgba(100, 100, 100, 0.5);
+    box-shadow : 1px 1px 4px rgba(100, 100, 100, 0.7);
 }
 
 .dialogBox, div.dialogBox.css_boxshadow{
