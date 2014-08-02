@@ -72,26 +72,6 @@
     </client_settings>
     <registry_contributions>
         <actions>
-            <action name="share-menu">
-                <gui text="share_center.110b" title="292" src="share.png"
-                     iconClass="icon-share" hasAccessKey="false">
-                    <context selection="true" dir="" recycle="hidden"
-                             actionBar="false" contextMenu="true" infoPanel="true"
-                             actionBarGroup="get" behaviour="hidden">
-                    </context>
-                    <selectionContext dir="true" unique="false" behaviour="hidden"
-                                      evalMetadata="(!metadata.get('ajxp_mime') || !metadata.get('ajxp_mime').startsWith('shared_')) &amp;&amp; !metadata.get('ajxp_shared')"
-                                      file="true" recycle="false"/>
-                </gui>
-                <subMenu>
-                    <dynamicItems>
-                        <item actionId="share-folder-minisite-public"/>
-                        <item actionId="share-folder-workspace"/>
-                        <item actionId="share-file-minisite"/>
-                        <item actionId="share-selection-minisite"/>
-                    </dynamicItems>
-                </subMenu>
-            </action>
             <action name="share">
                 <gui text="292" title="292" src="share.png" iconClass="icon-share" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden" actionBar="false" contextMenu="false" infoPanel="false"/>
@@ -434,43 +414,6 @@
                     ]]></clientCallback>
                 </processing>
             </action>
-            <!--
-            <action name="sharelist-copyUrl">
-                <gui text="share_center.129" title="share_center.130" iconClass="icon-copy" src="editcopy.png" accessKey="" hasAccessKey="false">
-                    <context selection="true" dir="" recycle="false"
-                             actionBar="true" contextMenu="true" infoPanel="true"
-                             actionBarGroup="share_list_toolbar-selection" inZip="false">
-                    </context>
-                    <selectionContext dir="false" file="true" recycle="false" unique="true" evalMetadata="metadata.get('copy_url')" behaviour="hidden"/></gui>
-                <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
-                <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-						var onLoad = function(oForm){
-						    if(window.navigator.platform.startsWith("Mac")){
-						        $(oForm).select(".macos_only").invoke("show");
-						        $(oForm).select(".non_macos").invoke("hide");
-						    }
-							var firstNode = window.actionManager.getDataModel().getUniqueNode();
-			   		    	var copyDiv = $(oForm).down('input[id="text_copy"]');
-			   		    	copyDiv.setValue(firstNode.getMetadata().get('copy_url').stripTags());
-			   		    	copyDiv.select();
-						};
-						modal.showDialogForm('Delete', 'copy_url_form', onLoad, function(){
-							hideLightBox(true);
-							return false;
-						},null,true);
-						]]></clientCallback>
-                    <clientForm id="copy_url_form"><![CDATA[
-					<div id="copy_url_form" action="copy" box_width="280">
-					    <div class="non_macos" style="font-size:1.5em;padding:5px 0;">Use <kbd>Ctrl</kbd>+<kbd>C</kbd>to copy the url to your clipboard</div>
-					    <div class="macos_only" style="display:none; font-size:1.2em;padding:5px 0;">Use <kbd>&#8984;</kbd>+<kbd>C</kbd> to copy the url to your clipboard</div>
-						<input  style="font-size:1.2em; width: 98%;" id="text_copy" class="dialogFocus"/>
-					</div>
-					]]></clientForm>
-                    <serverCallback methodName="switchAction"/>
-                </processing>
-            </action>
-            -->
             <action name="sharelist-load">
                 <gui src="share.png" iconClass="icon-refresh" text="149" title="149">
                     <context dir="true" recycle="false" selection="false" actionBar="true" actionBarGroup="share_list_toolbar" behaviour="hidden"/>

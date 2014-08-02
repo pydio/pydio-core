@@ -21,7 +21,7 @@
 
 $mess = array(
 
-    "1" => "Ajouter le panier",
+    "1" => "Ajouter au panier",
     "2" => "Ajouter les éléments sélectionnés au panier",
     "3" => "Vider",
     "4" => "Vider le panier courant",

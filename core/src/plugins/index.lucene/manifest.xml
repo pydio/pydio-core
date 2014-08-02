@@ -57,7 +57,7 @@
 			<action name="index">
 				<gui text="index.lucene.1" title="index.lucene.2" iconClass="icon-book" src="lucene_images/ICON_SIZE/ark_view.png" accessKey="folder_access_key">
                     <context selection="false" dir="true" recycle="hidden"
-                             actionBar="true" contextMenu="true" infoPanel="false"
+                             actionBar="true" contextMenu="false" infoPanel="false"
                              actionBarGroup="remote" inZip="false">
                     </context>
                 </gui>

@@ -21,7 +21,7 @@
 Class.create("CartManager", FetchedResultPane, {
 
     __maxChildren: 100,
-    __label:MessageHash["action.cart.9"],
+    __label:null,
 
     initialize: function($super, element, options){
 
@@ -32,6 +32,7 @@ Class.create("CartManager", FetchedResultPane, {
         $super(element, options);
 
         if(options.label) this.__label = options.label;
+        else this.__label = MessageHash["action.cart.9"];
         element.ajxpNode = this._rootNode;
         element.applyDragMove = this.applyDragMove.bind(this);
         AjxpDroppables.add(element, this._rootNode);
@@ -58,6 +59,9 @@ Class.create("CartManager", FetchedResultPane, {
             oEl.fire("widget:updateState");
         }, 1500);
         this.reload();
+        if(this.options.fit && this.options.fit=="content"){
+            this.htmlElement.up('[ajxpClass="AjxpPane"]').ajxpPaneObject.resize();
+        }
     },
 
     clearContent: function(){

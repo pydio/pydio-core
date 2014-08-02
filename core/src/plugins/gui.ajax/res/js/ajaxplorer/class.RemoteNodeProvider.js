@@ -73,13 +73,14 @@ Class.create("RemoteNodeProvider", {
 			});
 		}
 		conn.onComplete = function (transport){
-			try{
+			//try{
 				this.parseNodes(node, transport, nodeCallback, childCallback);
-			}catch(e){
+			/*}catch(e){
                 if(window.console) window.console.error(e);
 				else if(ajaxplorer) ajaxplorer.displayMessage('ERROR', 'Loading error :'+e.message);
 				else alert('Loading error :'+ e.message);
 			}
+			*/
 		}.bind(this);	
 		conn.sendAsync();
 	},

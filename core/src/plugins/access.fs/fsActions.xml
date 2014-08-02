@@ -89,7 +89,7 @@
         <action name="mkfile">
             <gui text="156" title="157" src="filenew.png" accessKey="file_access_key" iconClass="icon-file-alt" hasAccessKey="false">
                 <context selection="false" dir="true" recycle="hidden" actionBar="true"
-                         contextMenu="true" infoPanel="false" actionBarGroup="create" inZip="false"/>
+                         contextMenu="false" infoPanel="false" actionBarGroup="create" inZip="false"/>
             </gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
             <processing>
@@ -206,7 +206,7 @@
 		<action name="download" fileDefault="false">
 			<gui text="88" title="88" src="download_manager.png" iconClass="icon-download-alt" accessKey="download_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="false"
-					actionBar="true" contextMenu="true" infoPanel="true"
+					actionBar="true" contextMenu="false" infoPanel="true"
 					actionBarGroup="get,inline,info_panel">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="false" enableRoot="true"/></gui>
@@ -387,7 +387,7 @@
         <action name="open_with_unique">
             <gui text="462" title="462" src="fileopen.png" iconClass="icon-eye-close" accessKey="preview_access_key" hasAccessKey="true">
                 <context selection="true" dir="" recycle="hidden"  behaviour="hidden"
-                         actionBar="true" contextMenu="true" infoPanel="false"
+                         actionBar="true" contextMenu="false" infoPanel="false"
                          actionBarGroup="inline,info_panel" inZip="false">
                 </context>
                 <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE,^ajxp_browsable_archive,^zip" behaviour="hidden"/></gui>
@@ -455,7 +455,7 @@
 		<action name="ajxp_link">
 			<gui text="369" title="369" src="ajxp-link.png" iconClass="icon-link" hasAccessKey="false">
 				<context selection="true" dir="" recycle="false" actionBar="true" actionBarGroup="remote"
-                         contextMenu="true" infoPanel="true"/>
+                         contextMenu="false" infoPanel="true"/>
 				<selectionContext dir="true" file="true" recycle="false" unique="true"/>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly="false"/>
@@ -549,7 +549,7 @@
 		<action name="restore">
 			<gui text="222" title="223" src="folder1_important.png" iconClass="icon-undo" accessKey="restore_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="only"
-					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="change_main">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="true" image="false" editable="false"/></gui>
@@ -577,7 +577,7 @@
 		<action name="rename">
 			<gui text="6" title="158" src="applix.png" accessKey="rename_access_key" iconClass="icon-pencil" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
-					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="change_main" inZip="false">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="true" image="false" editable="false"/></gui>
@@ -734,7 +734,7 @@
 		<action name="move" dragndropDefault="true">
 			<gui text="70" title="160" src="editpaste.png" iconClass="icon-paste" accessKey="move_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
-					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="change_main" inZip="false">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" editable="false"/></gui>
@@ -815,7 +815,7 @@
 		<action name="delete">
 			<gui text="7" title="161" src="editdelete.png" iconClass="icon-trash" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
 				<context selection="true" dir="" recycle="false"
-					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="change_main" inZip="false">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" editable="false"></selectionContext></gui>

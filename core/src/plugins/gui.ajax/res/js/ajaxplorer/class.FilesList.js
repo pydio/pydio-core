@@ -1155,7 +1155,10 @@ Class.create("FilesList", SelectableElements, {
 		if(this._displayMode == "thumb" || this._displayMode == "detail")
 		{
 			var adjusted = this.resizeThumbnails();
-			if(this.protoMenu) this.protoMenu.addElements('#selectable_div-'+this.__currentInstanceIndex);
+			if(this.protoMenu) {
+                this.protoMenu.addElements('#selectable_div-'+this.__currentInstanceIndex);
+                this.protoMenu.addElements('#selectable_div-'+this.__currentInstanceIndex + ' > .ajxpNodeProvider');
+            }
 			window.setTimeout(function(){
                 if(adjusted) this._previewFactory.setThumbSize(adjusted);
                 else this._previewFactory.setThumbSize((this._displayMode=='detail'? this._detailThumbSize:this._thumbSize));
@@ -1164,12 +1167,14 @@ Class.create("FilesList", SelectableElements, {
 		}
 		else
 		{
-			if(this.protoMenu) this.protoMenu.addElements('#table_rows_container-'+this.__currentInstanceIndex);
+			if(this.protoMenu){
+                this.protoMenu.addElements('#table_rows_container-'+this.__currentInstanceIndex);
+                this.protoMenu.addElements('#table_rows_container-'+this.__currentInstanceIndex+ ' > .ajxpNodeProvider');
+            }
 			if(this._headerResizer){
 				this._headerResizer.resize(this.htmlElement.getWidth()-2);
 			}
 		}
-		if(this.protoMenu)this.protoMenu.addElements('.ajxp_draggable');
 		var allItems = this.getItems();
 		for(var i=0; i<allItems.length;i++)
 		{
