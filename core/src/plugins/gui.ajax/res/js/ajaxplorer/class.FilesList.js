@@ -253,6 +253,8 @@ Class.create("FilesList", SelectableElements, {
         if(window[this.htmlElement.id]){
             try{delete window[this.htmlElement.id];}catch(e){}
         }
+        if(this.slider) this.slider.destroy();
+        if(this.headerMenu) this.headerMenu.destroy();
 		this.htmlElement = null;
 	},
 	
@@ -398,10 +400,10 @@ Class.create("FilesList", SelectableElements, {
 			columns.each(function(col){
 				var obj = {};
 				$A(col.attributes).each(function(att){
-					obj[att.nodeName]=att.nodeValue;
+					obj[att.nodeName]=att.value;
 					if(att.nodeName == "sortType"){
-						sortTypes.push(att.nodeValue);
-					}else if(att.nodeName == "defaultVisibilty" && att.nodeValue == "hidden"){
+						sortTypes.push(att.value);
+					}else if(att.nodeName == "defaultVisibilty" && att.value == "hidden"){
                         this.hiddenColumns.push(col.getAttribute("attributeName"));
                     }
 				}.bind(this));
@@ -757,33 +759,35 @@ Class.create("FilesList", SelectableElements, {
 				}
 			}.bind(this);
 			this.observe("resize", this.observer);
-		
-			if(this.headerMenu){
-				this.headerMenu.destroy();
-				delete this.headerMenu;
-			}
-			this.headerMenu = new Proto.Menu({
-			  selector: '#selectable_div_header-'+this.__currentInstanceIndex,
-			  className: 'menu desktop',
-			  menuItems: [],
-			  fade:true,
-			  zIndex:2000,
-			  beforeShow : function(){
-			  	var items = $A([]);
-			  	this.columnsDef.each(function(column){
-					var isVisible = !this.hiddenColumns.include(column.attributeName);
-					items.push({
-						name:(column.messageId?MessageHash[column.messageId]:column.messageString),
-						alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
-						image:resolveImageSource((isVisible?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
-						isDefault:false,
-						callback:function(e){this.setColumnVisible(column.attributeName, !isVisible);}.bind(this)
-					});
-				}.bind(this) );		
-				this.headerMenu.options.menuItems = items;
-				this.headerMenu.refreshList();
-			  }.bind(this)
-			});
+
+            if(!this.options.noContextualMenu){
+                if(this.headerMenu){
+                    this.headerMenu.destroy();
+                    delete this.headerMenu;
+                }
+                this.headerMenu = new Proto.Menu({
+                    selector: '#selectable_div_header-'+this.__currentInstanceIndex,
+                    className: 'menu desktop',
+                    menuItems: [],
+                    fade:true,
+                    zIndex:2000,
+                    beforeShow : function(){
+                        var items = $A([]);
+                        this.columnsDef.each(function(column){
+                            var isVisible = !this.hiddenColumns.include(column.attributeName);
+                            items.push({
+                                name:(column.messageId?MessageHash[column.messageId]:column.messageString),
+                                alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
+                                image:resolveImageSource((isVisible?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
+                                isDefault:false,
+                                callback:function(e){this.setColumnVisible(column.attributeName, !isVisible);}.bind(this)
+                            });
+                        }.bind(this) );
+                        this.headerMenu.options.menuItems = items;
+                        this.headerMenu.refreshList();
+                    }.bind(this)
+                });
+            }
 		}
 		else if(this._displayMode == "thumb" || this._displayMode == "detail")
 		{
@@ -827,58 +831,65 @@ Class.create("FilesList", SelectableElements, {
                 ctxt.getMetadata().set("filesList.sortColumn", ''+this._sortableTable.sortColumn);
                 ctxt.getMetadata().set("filesList.descending", this._sortableTable.descending);
             }.bind(this);
-            if(this.headerMenu){
-                this.headerMenu.destroy();
-                delete this.headerMenu;
+            if(!this.options.noContextualMenu){
+                if(this.headerMenu){
+                    this.headerMenu.destroy();
+                    delete this.headerMenu;
+                }
+                this.headerMenu = new Proto.Menu({
+                    selector: '#content_pane div.panelHeader',
+                    className: 'menu desktop',
+                    menuItems: [],
+                    fade:true,
+                    zIndex:2000,
+                    beforeShow : function(){
+                        var items = $A([]);
+                        var index = 0;
+                        this.columnsDef.each(function(column){
+                            var isSorted = this._sortableTable.sortColumn == index;
+                            items.push({
+                                name:(column.messageId?MessageHash[column.messageId]:column.messageString),
+                                alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
+                                image:resolveImageSource((isSorted?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
+                                isDefault:false,
+                                callback:function(e){
+                                    var clickIndex = this.columnsDef.indexOf(column);
+                                    var sorted = (this._sortableTable.sortColumn == clickIndex);
+                                    if(sorted) this._sortableTable.descending = !this._sortableTable.descending;
+                                    this._sortableTable.sort(clickIndex, this._sortableTable.descending);
+                                }.bind(this)
+                            });
+                            index++;
+                        }.bind(this) );
+                        this.headerMenu.options.menuItems = items;
+                        this.headerMenu.refreshList();
+                    }.bind(this)
+                });
             }
-            this.headerMenu = new Proto.Menu({
-                selector: '#content_pane div.panelHeader',
-                className: 'menu desktop',
-                menuItems: [],
-                fade:true,
-                zIndex:2000,
-                beforeShow : function(){
-                    var items = $A([]);
-                    var index = 0;
-                    this.columnsDef.each(function(column){
-                        var isSorted = this._sortableTable.sortColumn == index;
-                        items.push({
-                            name:(column.messageId?MessageHash[column.messageId]:column.messageString),
-                            alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
-                            image:resolveImageSource((isSorted?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
-                            isDefault:false,
-                            callback:function(e){
-                                var clickIndex = this.columnsDef.indexOf(column);
-                                var sorted = (this._sortableTable.sortColumn == clickIndex);
-                                if(sorted) this._sortableTable.descending = !this._sortableTable.descending;
-                                this._sortableTable.sort(clickIndex, this._sortableTable.descending);
-                            }.bind(this)
-                        });
-                        index++;
-                    }.bind(this) );
-                    this.headerMenu.options.menuItems = items;
-                    this.headerMenu.refreshList();
-                }.bind(this)
-            });
 
-			this.slider = new SliderInput($("slider-input-1"), {
-				range : $R(30, 250),
-				sliderValue : this._thumbSize,
-				leftOffset:0,
-				onSlide : function(value)
-				{
-					this._thumbSize = value;
-					this.resizeThumbnails();
-				}.bind(this),
-				onChange : function(value){
-                    if(this.options.replaceScroller){
-                        this.notify("resize");
-                    }
-					if(!ajaxplorer || !ajaxplorer.user) return;
-					ajaxplorer.user.setPreference("thumb_size", this._thumbSize);
-					ajaxplorer.user.savePreference("thumb_size");								
-				}.bind(this)
-			});
+            if(this._displayMode == 'thumb'){
+                if(this.slider){
+                    this.slider.destroy();
+                }
+                this.slider = new SliderInput($("slider-input-1"), {
+                    range : $R(30, 250),
+                    sliderValue : this._thumbSize,
+                    leftOffset:0,
+                    onSlide : function(value)
+                    {
+                        this._thumbSize = value;
+                        this.resizeThumbnails();
+                    }.bind(this),
+                    onChange : function(value){
+                        if(this.options.replaceScroller){
+                            this.notify("resize");
+                        }
+                        if(!ajaxplorer || !ajaxplorer.user) return;
+                        ajaxplorer.user.setPreference("thumb_size", this._thumbSize);
+                        ajaxplorer.user.savePreference("thumb_size");
+                    }.bind(this)
+                });
+            }
 
 			this.disableTextSelection(scrollElement, true);
             if(this.options.selectable == undefined || this.options.selectable === true){

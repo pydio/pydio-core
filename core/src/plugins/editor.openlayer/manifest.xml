@@ -33,7 +33,7 @@
 	</processing>
 	<clientForm id="openlayer_box"><![CDATA[
 		<div id="openlayer_box" action="ol_view" box_width="80%" box_height="90%" box_padding="0">
-			<div class="action_bar" style="border-bottom:1px solid #DDDDDD;position:relative;right: 0;padding-left: 5px;">
+			<div class="action_bar full_width_action_bar" style="border-bottom:1px solid #DDDDDD;position:relative;right: 0;padding-left: 5px;">
 				<div id="filterButton" style="cursor:pointer;-moz-border-radius:3px 3px 0 0;border-radius:3px 3px 0 0;background-color:#FFF8D1;border:1px solid #CCCCCC;padding:1px 5px;border-bottom:0px;position: absolute;right: 8px;bottom: 0px;"><b>AJXP_MESSAGE[openlayer.2]</b> <img width="10" height="6" border="0" src="AJXP_THEME_FOLDER/images/arrow_down.png" align="top" style="margin-left:3px;margin-top:5px"></div>
 				<div style="padding-top: 1px; padding-right: 5px; font-size:11px;position: absolute;bottom: 1px;right: 77px;height: 16px;">
 					<b>AJXP_MESSAGE[openlayer.3] :</b> <span id="location"></span>

@@ -58,6 +58,9 @@ Class.create("RepositorySelect", {
 	destroy : function(){
 		this.element = null;
         document.stopObserving("ajaxplorer:repository_list_refreshed", this.observer);
+        if(this.repoMenu){
+            this.repoMenu.destroy();
+        }
 	},
 	
 	/**

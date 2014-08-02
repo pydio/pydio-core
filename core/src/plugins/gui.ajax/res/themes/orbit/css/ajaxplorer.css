@@ -1491,6 +1491,7 @@ div#navigation_toolbar {
 }
 
 #tree_container{
+    overflow-x: hidden !important;
 }
 
 .panelHeader, .dialogTitle{
@@ -1531,11 +1532,18 @@ div#navigation_toolbar {
     line-height: 15px;
 }
 .action_bar.editor_action_bar {
-    height: 37px;
-    right: 14px;
+    height: 34px;
+    right: 3px;
     position: absolute;
     z-index: 10;
-    background-color: #ccc;
+    background-color: transparent;
+}
+
+.action_bar.editor_action_bar.full_width_action_bar{
+    position: relative;
+    background-color: #ddd;
+    padding-left:5px;
+    right: 0;
 }
 
 .editor_container{
@@ -1585,7 +1593,10 @@ div.editor_header > div.editor_action_bar > div.separator{
 }
 
 .editor_action_bar a {
-    padding: 3px 5px !important;
+    padding: 1px 8px 2px !important;
+}
+.editor_action_bar.full_width_action_bar a{
+    border:0;
 }
 
 .editor_action_bar span.actionbar_button_label {
@@ -1633,7 +1644,7 @@ div.editor_header > span.header_label{
     padding-left: 10px;
     cursor: move;
     opacity: 0.90;
-    background-color: #333;
+    background-color: #333 !important;
 }
 
 

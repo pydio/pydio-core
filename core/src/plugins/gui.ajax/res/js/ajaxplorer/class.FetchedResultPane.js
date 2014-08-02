@@ -50,6 +50,7 @@ Class.create("FetchedResultPane", FilesList, {
             selectable: true,
             draggable: false,
             droppable: false,
+            noContextualMenu:true,
             containerDroppableAction:null,
             emptyChildrenMessage:'',
             replaceScroller:true,

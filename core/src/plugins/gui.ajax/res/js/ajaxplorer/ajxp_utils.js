@@ -509,7 +509,7 @@ function getDomNodeText(node){
 		return a.join("");
 
 		case 2: // NODE_ATTRIBUTE
-		return node.nodeValue;
+		return node.value;
 		break;
 
 		case 3: // NODE_TEXT
