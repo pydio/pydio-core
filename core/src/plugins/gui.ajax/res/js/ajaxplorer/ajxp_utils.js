@@ -800,3 +800,10 @@ function attachMobilTouchForClick(oElement, callback){
 
 
 }
+
+function bufferCallback(name, time, callback){
+    if(window[name]){
+        window.clearTimeout(window[name]);
+    }
+    window[name] = window.setTimeout(callback, time);
+}

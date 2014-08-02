@@ -632,10 +632,7 @@
                         <div class="panelHeader">#{shared_string}</div>
                         <div id="ajxp_workspace_info_panel_content"></div>
                         <script>
-                            if(window.load_repo_info_timer){
-                                window.clearTimeout(window.load_repo_info_timer);
-                            }
-                            window.load_repo_info_timer = window.setTimeout(function(){
+                            bufferCallback("ajxp_load_repo_info_timer", 300,function(){
                                 if(!$('ajxp_workspace_info_panel_content') || !$('ajxp_workspace_info_panel_content').visible()){
                                     return;
                                 }
@@ -648,7 +645,7 @@
                                     }
                                 };
                                 conn.sendAsync();
-                            }, 300);
+                            });
                         </script>
                     </div>
                 ]]></html>
