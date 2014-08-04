@@ -21,6 +21,8 @@
  */
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
+require_once("aws.phar");
+use Aws\S3\S3Client;
 
 /**
  * AJXP_Plugin to access a webdav enabled server
@@ -36,6 +38,7 @@ class s3AccessDriver extends fsAccessDriver
     public $driverConf;
     protected $wrapperClassName;
     protected $urlBase;
+    protected $s3Client;
 
     public function performChecks()
     {
@@ -48,15 +51,18 @@ class s3AccessDriver extends fsAccessDriver
 
     public function initRepository()
     {
-        require_once($this->getBaseDir()."/aS3StreamWrapper/lib/wrapper/aS3StreamWrapper.class.php");
-        if (!in_array("s3", stream_get_wrappers())) {
-            $wrapper = new aS3StreamWrapper();
-            $wrapper->register(array('protocol' => 's3',
-                  'acl' => AmazonS3::ACL_OWNER_FULL_CONTROL,
-                  'key' => $this->repository->getOption("API_KEY"),
-                  'secretKey' => $this->repository->getOption("SECRET_KEY"),
-                  'region' => $this->repository->getOption("REGION")));
+        $options = array(
+            'key'    => $this->repository->getOption("API_KEY"),
+            'secret' => $this->repository->getOption("SECRET_KEY")
+        );
+        $baseURL = $this->repository->getOption("STORAGE_URL");
+        if(!empty($baseURL)){
+            $options["base_url"] = $baseURL;
+        }else{
+            $options["region"] = $this->repository->getOption("REGION");
         }
+        $this->s3Client = S3Client::factory($options);
+        $this->s3Client->registerStreamWrapper();
 
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;
@@ -72,6 +78,10 @@ class s3AccessDriver extends fsAccessDriver
         if ($recycle != "") {
             RecycleBinManager::init($this->urlBase, "/".$recycle);
         }
+    }
+
+    public function getS3Service(){
+        return $this->s3Client;
     }
 
     /**
