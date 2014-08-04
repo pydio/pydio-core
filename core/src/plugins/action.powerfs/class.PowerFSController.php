@@ -39,7 +39,7 @@ class PowerFSController extends AJXP_Plugin
         if(!isSet($this->actions[$action])) return;
         $selection = new UserSelection();
         $dir = $httpVars["dir"] OR "";
-        $dir = AJXP_Utils::securePath($dir);
+        $dir = AJXP_Utils::decodeSecureMagic($dir);
         if($dir == "/") $dir = "";
         $selection->initFromHttpVars($httpVars);
         if (!$selection->isEmpty()) {

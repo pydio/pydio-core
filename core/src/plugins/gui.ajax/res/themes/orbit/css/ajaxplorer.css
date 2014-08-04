@@ -624,6 +624,17 @@ div#copymove_form div#treeCopy{
     height: 254px !important;
 }
 
+div.treeCopyContainer div.webfx-tree-item a {
+    color: #555 !important;
+}
+
+div.treeCopyContainer div.selected-webfx-tree-item a,
+div.treeCopyContainer div.webfx-tree-item:hover a,
+div.treeCopyContainer div.selected-webfx-tree-item-inactive a
+{
+    color: white !important;
+}
+
 div#copymove_form > input{
     background-color: #fff;
     padding: 5px;
