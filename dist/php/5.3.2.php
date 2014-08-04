@@ -6,9 +6,3 @@ if (is_file(AJXP_INSTALL_PATH."/conf/bootstrap_repositories.php".".new-".date("Y
 }
 
 echo "The bootstrap_repositories files was replaced by the new version, the .pre-update version is kept.";
-
-$root_role = AuthService::getRole("ROOT_ROLE");
-if($root_role !== false){
-    $root_role->setParameterValue("core.conf", "DEFAULT_START_REPOSITORY", "ajxp_home");
-    AuthService::updateRole($root_role);
-}
