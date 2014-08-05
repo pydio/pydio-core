@@ -28,7 +28,7 @@ require_once(AJXP_INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
-class hpcAccessWrapper extends fsAccessWrapper
+class swiftAccessWrapper extends fsAccessWrapper
 {
     public static $lastException;
     private static $cloudContext;

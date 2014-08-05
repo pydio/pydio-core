@@ -21,12 +21,13 @@
  */
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
+use \OpenStack\Bootstrap;
 /**
  * AJXP_Plugin to access a webdav enabled server
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
-class hpcAccessDriver extends fsAccessDriver
+class swiftAccessDriver extends fsAccessDriver
 {
     /**
     * @var Repository
@@ -51,13 +52,25 @@ class hpcAccessDriver extends fsAccessDriver
 
     public function initRepository()
     {
-        include_once("libraryLoader.php");
-
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;
         } else {
             $this->driverConf = array();
         }
+
+        require_once($this->getBaseDir()."/openstack-sdk-php/vendor/autoload.php");
+
+        Bootstrap::useStreamWrappers();
+
+        Bootstrap::setConfiguration(array(
+            'username' => $this->repository->getOption("USERNAME"),
+            'password' => $this->repository->getOption("PASSWORD"),
+            'tenantid' => $this->repository->getOption("TENANT_ID"),
+            'endpoint' => $this->repository->getOption("ENDPOINT"),
+            'openstack.swift.region'   => $this->repository->getOption("REGION"),
+            'transport.ssl.verify' => false
+        ));
+
 
         $path = $this->repository->getOption("PATH");
         $recycle = $this->repository->getOption("RECYCLE_BIN");

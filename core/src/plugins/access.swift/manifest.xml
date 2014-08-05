@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="hpcloud" enabled="false" label="CONF_MESSAGE[HPCloud (HPCloud Driver)]" description="CONF_MESSAGE[Access HPCloud (Open Stack) Object Storage]" mixins="filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition filename="plugins/access.hpcloud/class.hpcAccessDriver.php" classname="hpcAccessDriver"/>
+<ajxpdriver name="swift" enabled="false" label="CONF_MESSAGE[HPCloud (HPCloud Driver)]" description="CONF_MESSAGE[Access HPCloud (Open Stack) Object Storage]" mixins="filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition filename="plugins/access.swift/class.swiftAccessDriver.php" classname="swiftAccessDriver"/>
     <client_settings icon="plugins/access.fs/icon.png">
         <resources>
-            <i18n namespace="hpc_access" path="plugins/access.hpc/i18n"/>
+            <i18n namespace="swift_access" path="plugins/access.swift/i18n"/>
         </resources>
     </client_settings>
 
@@ -25,5 +25,5 @@
     <dependencies>
         <pluginClass pluginName="access.fs"/>
     </dependencies>
-    <class_stream_wrapper filename="plugins/access.hpcloud/class.hpcAccessWrapper.php" classname="hpcAccessWrapper" protocol="ajxp.hpc"/>
+    <class_stream_wrapper filename="plugins/access.swift/class.swiftAccessWrapper.php" classname="swiftAccessWrapper" protocol="ajxp.swift"/>
 </ajxpdriver>
