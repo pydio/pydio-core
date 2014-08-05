@@ -21,8 +21,8 @@
  */
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
-require_once("aws.phar");
 use Aws\S3\S3Client;
+use Guzzle\Plugin\Log\LogPlugin;
 
 /**
  * AJXP_Plugin to access a webdav enabled server
@@ -44,13 +44,13 @@ class s3AccessDriver extends fsAccessDriver
     {
         // Check CURL, OPENSSL & AWS LIBRARY
         if(!extension_loaded("curl")) throw new Exception("Cannot find php_curl extension!");
-        if(!extension_loaded("openssl")) throw new Exception("Cannot find openssl extension!");
-        if(!file_exists($this->getBaseDir()."/aws-sdk/sdk.class.php")) throw new Exception("Cannot find AWS PHP SDK. Make sure it is installed in the aws-sdk folder.");
-       }
+        if(!file_exists($this->getBaseDir()."/aws.phar")) throw new Exception("Cannot find AWS PHP SDK v2. Make sure the aws.phar package is installed inside access.s3 plugin.");
+    }
 
 
     public function initRepository()
     {
+        require_once("aws.phar");
         $options = array(
             'key'    => $this->repository->getOption("API_KEY"),
             'secret' => $this->repository->getOption("SECRET_KEY")
