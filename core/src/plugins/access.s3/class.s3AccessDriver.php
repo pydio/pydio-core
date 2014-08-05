@@ -63,6 +63,7 @@ class s3AccessDriver extends fsAccessDriver
         }
         $this->s3Client = S3Client::factory($options);
         $this->s3Client->registerStreamWrapper();
+        //$this->s3Client->addSubscriber(LogPlugin::getDebugPlugin());
 
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;
