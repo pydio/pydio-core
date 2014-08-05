@@ -58,6 +58,7 @@ class hpcAccessWrapper extends fsAccessWrapper
                     'password' => $repoObject->getOption("PASSWORD"),
                     'tenantid' => $repoObject->getOption("TENANT_ID"),
                     'endpoint' => $repoObject->getOption("ENDPOINT"),
+                    'openstack.swift.region'   => $repoObject->getOption("REGION")
                 ))
             );
         }
@@ -106,8 +107,17 @@ class hpcAccessWrapper extends fsAccessWrapper
     {
         // File and zip case
         // AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Stating $path");
-        $stat = @stat($this->initPath($path, "file"));
-        if($stat == null) return null;
+
+        $url = parse_url($path);
+        if(empty($url["path"])){
+            // This is root, return fake stat;
+            return $this->fakeStat(true);
+        }
+        //$handle = fopen($this->initPath($path, "file"), "r", null, self::$cloudContext);
+        $p = $this->initPath($path, "file");
+        $stat = @stat($p);
+        //fclose($handle);
+        if($stat == null || $stat === false) return null;
         if ($stat["mode"] == 0666) {
             $stat[2] = $stat["mode"] |= 0100000; // S_ISREG
         }
@@ -121,6 +131,43 @@ class hpcAccessWrapper extends fsAccessWrapper
         // Non existing file
            return null;
     }
+
+    /**
+     * Fake stat data.
+     *
+     * Under certain conditions we have to return totally trumped-up
+     * stats. This generates those.
+     */
+    protected function fakeStat($dir = false)
+    {
+        $request_time = time();
+
+        // Set inode type to directory or file.
+        $type = $dir ? 040000 : 0100000;
+        // Fake world-readable
+        $mode = $type + 0777;
+
+        $values = array(
+            'dev' => 0,
+            'ino' => 0,
+            'mode' => $mode,
+            'nlink' => 0,
+            'uid' => posix_getuid(),
+            'gid' => posix_getgid(),
+            'rdev' => 0,
+            'size' => 0,
+            'atime' => $request_time,
+            'mtime' => $request_time,
+            'ctime' => $request_time,
+            'blksize' => -1,
+            'blocks' => -1,
+        );
+
+        $final = array_values($values) + $values;
+
+        return $final;
+    }
+
 
     /**
      * Opens a handle to the dir

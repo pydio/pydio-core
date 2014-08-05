@@ -12,6 +12,7 @@
 		<param name="PASSWORD" type="password" label="CONF_MESSAGE[Console Password]" description="CONF_MESSAGE[Console password]" mandatory="true"/>
 		<param name="TENANT_ID" type="string" label="CONF_MESSAGE[Tenant ID]" description="CONF_MESSAGE[Tenant ID (see API Keys page)]" mandatory="true"/>
 		<param name="ENDPOINT" type="string" label="CONF_MESSAGE[Endpoint]" description="CONF_MESSAGE[Endpoint (see API Keys page, Identity endpoint)]" mandatory="true"/>
+		<param name="REGION" type="string" label="CONF_MESSAGE[Region]" description="CONF_MESSAGE[Your region identifier]" mandatory="true"/>
         <param name="CONTAINER" type="string" label="CONF_MESSAGE[Container]" description="CONF_MESSAGE[Base Container]" mandatory="true"/>
     </server_settings>
 	<registry_contributions>
