@@ -29,8 +29,8 @@ CREATE TABLE ajxp_user_bookmarks (
 CREATE TABLE ajxp_repo (
   uuid varchar(33) PRIMARY KEY,
   parent_uuid varchar(33) default NULL,
-  owner_user_id varchar(50) default NULL,
-  child_user_id varchar(50) default NULL,
+  owner_user_id varchar(255) default NULL,
+  child_user_id varchar(255) default NULL,
   path varchar(255),
   display varchar(255),
   "accessType" varchar(20),
