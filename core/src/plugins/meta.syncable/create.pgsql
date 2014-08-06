@@ -27,6 +27,8 @@ CREATE TABLE ajxp_index (
 CREATE INDEX ajxp_index_repo_id ON ajxp_index (repository_identifier);
 CREATE INDEX ajxp_index_md5 ON ajxp_index (md5);
 
+/** SEPARATOR **/
+/** BLOCK **/
 CREATE FUNCTION ajxp_index_delete() RETURNS trigger AS $ajxp_index_delete$
     BEGIN
       INSERT INTO ajxp_changes (repository_identifier, node_id,source,target,type)
@@ -35,6 +37,8 @@ CREATE FUNCTION ajxp_index_delete() RETURNS trigger AS $ajxp_index_delete$
     END;
 $ajxp_index_delete$ LANGUAGE plpgsql;
 
+/** SEPARATOR **/
+/** BLOCK **/
 CREATE FUNCTION ajxp_index_insert() RETURNS trigger AS $ajxp_index_insert$
     BEGIN
       INSERT INTO ajxp_changes (repository_identifier, node_id,source,target,type)
@@ -43,6 +47,8 @@ CREATE FUNCTION ajxp_index_insert() RETURNS trigger AS $ajxp_index_insert$
     END;
 $ajxp_index_insert$ LANGUAGE plpgsql;
 
+/** SEPARATOR **/
+/** BLOCK **/
 CREATE FUNCTION ajxp_index_update() RETURNS trigger AS $ajxp_index_update$
     BEGIN
       IF OLD.node_path = NEW.node_path THEN
@@ -55,6 +61,7 @@ CREATE FUNCTION ajxp_index_update() RETURNS trigger AS $ajxp_index_update$
       RETURN NEW;
     END;
 $ajxp_index_update$ LANGUAGE plpgsql;
+/** SEPARATOR **/
 
 CREATE TRIGGER LOG_DELETE AFTER DELETE ON ajxp_index
 FOR EACH ROW EXECUTE PROCEDURE ajxp_index_delete();

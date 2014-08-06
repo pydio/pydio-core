@@ -1690,19 +1690,31 @@ class AJXP_Utils
         $result = array();
         $file = dirname($file) ."/". str_replace(".sql", $ext, basename($file) );
         $sql = file_get_contents($file);
-        $parts = explode(";", $sql);
-        $remove = array();
-        for ($i = 0 ; $i < count($parts); $i++) {
-            $part = $parts[$i];
-            if (strpos($part, "BEGIN") && isSet($parts[$i+1])) {
-                $parts[$i] .= ';'.$parts[$i+1];
-                $remove[] = $i+1;
+        $separators = explode("/** SEPARATOR **/", $sql);
+
+        $allParts = array();
+
+        foreach($separators as $sep){
+            $firstLine = array_shift(explode("\n", trim($sep)));
+            if($firstLine == "/** BLOCK **/"){
+                $allParts[] = $sep;
+            }else{
+                $parts = explode(";", $sep);
+                $remove = array();
+                for ($i = 0 ; $i < count($parts); $i++) {
+                    $part = $parts[$i];
+                    if (strpos($part, "BEGIN") && isSet($parts[$i+1])) {
+                        $parts[$i] .= ';'.$parts[$i+1];
+                        $remove[] = $i+1;
+                    }
+                }
+                foreach($remove as $rk) unset($parts[$rk]);
+                $allParts = array_merge($allParts, $parts);
             }
         }
-        foreach($remove as $rk) unset($parts[$rk]);
         dibi::connect($p);
         dibi::begin();
-        foreach ($parts as $createPart) {
+        foreach ($allParts as $createPart) {
             $sqlPart = trim($createPart);
             if (empty($sqlPart)) continue;
             try {

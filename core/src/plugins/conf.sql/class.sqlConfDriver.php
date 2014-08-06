@@ -313,6 +313,9 @@ class sqlConfDriver extends AbstractConfDriver
         $repo_row = $res->fetchAll();
         if (count($repo_row) > 0) {
             $repo_row = $repo_row[0];
+            if($this->sqlDriver["driver"] == "postgre"){
+                dibi::nativeQuery("SET bytea_output=escape");
+            }
             $res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
             $opts = $res_opts->fetchPairs('name', 'val');
             $repository = $this->repoFromDb($repo_row, $opts);
@@ -335,6 +338,9 @@ class sqlConfDriver extends AbstractConfDriver
         $repo_row = $res->fetchAll();
         if (count($repo_row) > 0) {
             $repo_row = $repo_row[0];
+            if($this->sqlDriver["driver"] == "postgre"){
+                dibi::nativeQuery("SET bytea_output=escape");
+            }
             $res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
             $opts = $res_opts->fetchPairs('name', 'val');
             $repository = $this->repoFromDb($repo_row, $opts);
@@ -439,7 +445,7 @@ class sqlConfDriver extends AbstractConfDriver
                 case "sqlite":
                 case "sqlite3":
                 case "postgre":
-                    dibi::query("SET bytea_output=escape");
+                    dibi::nativeQuery("SET bytea_output=escape");
                     $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
                     break;
                 case "mysql":
@@ -608,7 +614,7 @@ class sqlConfDriver extends AbstractConfDriver
             $wClauses[] = array('[role_id] NOT LIKE %like~', 'AJXP_');
         }
         if($this->sqlDriver["driver"] == "postgre"){
-            dibi::query("SET bytea_output=escape");
+            dibi::nativeQuery("SET bytea_output=escape");
         }
         $res = dibi::query('SELECT * FROM [ajxp_roles] %if', count($wClauses), 'WHERE %and', $wClauses);
         $all = $res->fetchAll();
@@ -818,7 +824,7 @@ class sqlConfDriver extends AbstractConfDriver
     public function simpleStoreGet($storeID, $dataID, $dataType, &$data)
     {
         if($this->sqlDriver["driver"] == "postgre"){
-            dibi::query("SET bytea_output=escape");
+            dibi::nativeQuery("SET bytea_output=escape");
         }
         $children_results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id]=%s", $storeID, $dataID);
         $value = $children_results->fetchAll();
