@@ -271,7 +271,7 @@ class sqlConfDriver extends AbstractConfDriver
                     $wheres[] = array("[$cName] = $type", $cValue);
                 }
             }else if($cName == "CURSOR"){
-                $limit = "LIMIT ".$cValue["OFFSET"].",".$cValue["LIMIT"];
+                $limit = $cValue;
             }else if($cName == "ORDERBY"){
                 $order = "ORDER BY ".$cValue["KEY"]." ".$cValue["DIR"];
             }else if($cName == "GROUPBY"){
@@ -284,7 +284,11 @@ class sqlConfDriver extends AbstractConfDriver
             $count = $res->fetchSingle();
         }
 
-        $res = dibi::query("SELECT * FROM [ajxp_repo] WHERE %and $groupBy $order $limit", $wheres);
+        if(!empty($limit) && is_array($limit)){
+            $res = dibi::query("SELECT * FROM [ajxp_repo] WHERE %and $groupBy $order %lmt %ofs", $wheres, $limit["LIMIT"], $limit["OFFSET"]);
+        }else{
+            $res = dibi::query("SELECT * FROM [ajxp_repo] WHERE %and $groupBy $order", $wheres);
+        }
         $all = $res->fetchAll();
         return $this->initRepoArrayFromDbFetch($all);
 
@@ -834,10 +838,11 @@ class sqlConfDriver extends AbstractConfDriver
         }
         $limit = '';
         if($cursor != null){
-            $limit = "LIMIT ".$cursor[0].','.$cursor[1];
-        }
+            $children_results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE %and %lmt %ofs", $wheres, $cursor[1], $cursor[0]);
+        }else{
+            $children_results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE %and", $wheres);
 
-        $children_results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE %and $limit", $wheres);
+        }
         $values = $children_results->fetchAll();
         $result = array();
         foreach($values as $value){
