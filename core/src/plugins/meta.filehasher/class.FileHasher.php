@@ -181,6 +181,8 @@ class FileHasher extends AJXP_Plugin
                     rsync_patch_file($file, $deltaFile, $patched);
                     rename($patched, $file);
                     unlink($deltaFile);
+                    $node = $selection->getUniqueNode($this->accessDriver);
+                    AJXP_Controller::applyHook("node.change", array($node, $node, false));
                     header("Content-Type:text/plain");
                     echo md5_file($file);
                 }
