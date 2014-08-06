@@ -541,18 +541,23 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     //$repos = ConfService::getAccessibleRepositories($userObject, true, true, ($userObject == null ? false:true));
                     $allReps = ConfService::getRepositoriesList("all", ($userObject == null ? false:true));
                     $repos = array();
-                    foreach ($allReps as $repositoryId => $repositoryObject) {
-                        if (!ConfService::repositoryIsAccessible($repositoryId, $repositoryObject, $userObject, true, ($userObject == null ? false:true))) {
-                            continue;
+                    if(!empty($userObject)){
+                        // USER
+                        foreach ($allReps as $repositoryId => $repositoryObject) {
+                            if (!ConfService::repositoryIsAccessible($repositoryId, $repositoryObject, $userObject, true, ($userObject == null ? false:true))) {
+                                continue;
+                            }
+                            $repos[$repositoryId] = SystemTextEncoding::toUTF8($repositoryObject->getDisplay());
                         }
-                        $repos[$repositoryId] = SystemTextEncoding::toUTF8($repositoryObject->getDisplay());
+                    }else{
+                        foreach ($allReps as $repositoryId => $repositoryObject) {
+                            if (!AuthService::canAdministrate($repositoryObject)) {
+                                continue;
+                            }
+                            $repos[$repositoryId] = SystemTextEncoding::toUTF8($repositoryObject->getDisplay());
+                        }
                     }
                     // Make sure it's utf8
-                    /*
-                    foreach($repos as $r => $rLabel){
-                        $repos[$r] = SystemTextEncoding::toUTF8($rLabel);
-                    }
-                    */
                     $data = array(
                         "ROLE" => $roleData,
                         "ALL"  => array(
