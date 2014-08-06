@@ -97,6 +97,9 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         if($this->sqlDriver["password"] == "XXXX") return array();
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
+        if($this->sqlDriver["driver"] == "postgre"){
+            dibi::query("SET bytea_output=escape");
+        }
         if ($enlargeToOwned) {
             $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND
             ( [repository_id] IN (%s) OR [repository_owner] = %s )

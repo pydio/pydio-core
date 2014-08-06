@@ -77,6 +77,9 @@ class sqlConfDriver extends AbstractConfDriver
 
     public function _loadPluginConfig($pluginId, &$options)
     {
+        if($this->sqlDriver["driver"] == "postgre"){
+            dibi::query("SET bytea_output=escape");
+        }
         $res_opts = dibi::query('SELECT * FROM [ajxp_plugin_configs] WHERE [id] = %s', $pluginId);
         $config_row = $res_opts->fetchPairs();
         $confOpt = unserialize($config_row[$pluginId]);
@@ -195,7 +198,9 @@ class sqlConfDriver extends AbstractConfDriver
     protected function initRepoArrayFromDbFetch($array){
         $repositories = array();
         foreach ($array as $repo_row) {
-
+            if($this->sqlDriver["driver"] == "postgre"){
+                dibi::query("SET bytea_output=escape");
+            }
             $res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
             $opts = $res_opts->fetchPairs('name', 'val');
             $repo = $this->repoFromDb($repo_row, $opts);
@@ -267,7 +272,7 @@ class sqlConfDriver extends AbstractConfDriver
                     $wheres[] = array("[$cName] IS NULL");
                 }else{
                     $type = "%s";
-                    if($cName == 'isTemplate') $type = "%i";
+                    if($cName == 'isTemplate') $type = "%b";
                     $wheres[] = array("[$cName] = $type", $cValue);
                 }
             }else if($cName == "CURSOR"){
@@ -434,6 +439,7 @@ class sqlConfDriver extends AbstractConfDriver
                 case "sqlite":
                 case "sqlite3":
                 case "postgre":
+                    dibi::query("SET bytea_output=escape");
                     $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
                     break;
                 case "mysql":
@@ -600,6 +606,9 @@ class sqlConfDriver extends AbstractConfDriver
         }
         if ($excludeReserved) {
             $wClauses[] = array('[role_id] NOT LIKE %like~', 'AJXP_');
+        }
+        if($this->sqlDriver["driver"] == "postgre"){
+            dibi::query("SET bytea_output=escape");
         }
         $res = dibi::query('SELECT * FROM [ajxp_roles] %if', count($wClauses), 'WHERE %and', $wClauses);
         $all = $res->fetchAll();
@@ -808,6 +817,9 @@ class sqlConfDriver extends AbstractConfDriver
 
     public function simpleStoreGet($storeID, $dataID, $dataType, &$data)
     {
+        if($this->sqlDriver["driver"] == "postgre"){
+            dibi::query("SET bytea_output=escape");
+        }
         $children_results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id]=%s", $storeID, $dataID);
         $value = $children_results->fetchAll();
         if(!count($value)) return false;
