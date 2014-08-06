@@ -636,6 +636,7 @@
                                 if(!$('ajxp_workspace_info_panel_content') || !$('ajxp_workspace_info_panel_content').visible()){
                                     return;
                                 }
+                                if(!ajaxplorer.user) return;
                                 var conn = new Connexion();
                                 conn.setParameters({get_action:'load_repository_info'});
                                 conn.onComplete = function(transport){
