@@ -10,6 +10,10 @@ CREATE TABLE ajxp_changes (
   constraint pk primary key(seq)
 );
 
+CREATE INDEX ajxp_changes_node_id ON ajxp_changes (node_id);
+CREATE INDEX ajxp_changes_repo_id ON ajxp_changes (repository_identifier);
+CREATE INDEX ajxp_changes_type ON ajxp_changes (type);
+
 CREATE TABLE ajxp_index (
   node_id BIGSERIAL ,
   node_path text NOT NULL,
@@ -20,6 +24,8 @@ CREATE TABLE ajxp_index (
   PRIMARY KEY (node_id)
 );
 
+CREATE INDEX ajxp_index_repo_id ON ajxp_index (repository_identifier);
+CREATE INDEX ajxp_index_md5 ON ajxp_index (md5);
 
 CREATE FUNCTION ajxp_index_delete() RETURNS trigger AS $ajxp_index_delete$
     BEGIN
