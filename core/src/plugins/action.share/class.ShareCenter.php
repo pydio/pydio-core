@@ -960,10 +960,12 @@ class ShareCenter extends AJXP_Plugin
         if (!empty($data["PRELOG_USER"])) {
             AuthService::logUser($data["PRELOG_USER"], "", true);
             $html = str_replace("AJXP_PRELOGED_USER", "ajxp_preloged_user", $html);
-        } else {
+        } else if(isSet($data["PRESET_LOGIN"])) {
             $_SESSION["PENDING_REPOSITORY_ID"] = $repository;
             $_SESSION["PENDING_FOLDER"] = "/";
             $html = str_replace("AJXP_PRELOGED_USER", $data["PRESET_LOGIN"], $html);
+        } else{
+            $html = str_replace("AJXP_PRELOGED_USER", "ajxp_legacy_minisite", $html);
         }
         if(isSet($hash)){
             $_SESSION["CURRENT_MINISITE"] = $hash;

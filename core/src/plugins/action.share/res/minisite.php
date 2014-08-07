@@ -129,6 +129,10 @@
                 "PASSWORD_AUTH_ONLY":true,
                 "SERVER_PERMANENT_PARAMS":"minisite_session=AJXP_LINK_HASH"
             };
+            if(startParameters["PRESET_LOGIN"] == "ajxp_legacy_minisite"){
+                delete startParameters["PRESET_LOGIN"];
+                startParameters["PASSWORD_AUTH_ONLY"] = false;
+            }
             document.observe("ajaxplorer:before_gui_load", function(e){
                ajaxplorer.currentThemeUsesIconFonts = true;
                document.documentElement.className += " ajxp_theme_AJXP_THEME";
