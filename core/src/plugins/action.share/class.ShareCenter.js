@@ -704,7 +704,12 @@ Class.create("ShareCenter", {
         ');
         ShareCenter.prototype.loadSharedElementData(node, function(jsonData){
             "use strict";
-            if(node.isLeaf() && !jsonData['repositoryId']){
+
+            if(jsonData.error){
+
+                container.down("#ajxp_shared_info_panel .infoPanelTable").update('<div class="share_info_panel_main_legend"><span class="icon-warning-sign"></span> '+jsonData["label"]+'</div>');
+
+            }else if(node.isLeaf() && !jsonData['repositoryId']){
 
                 if(!jsonData) return ;
                 var linksCount = jsonData.length;

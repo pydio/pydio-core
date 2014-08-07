@@ -134,6 +134,7 @@ class ShareStore {
             $publicletData["DOWNLOAD_COUNT"] = PublicletCounter::getCount($hash);
         }
         $publicletData["PUBLICLET_PATH"] = $file;
+        /*
         if($this->sqlSupported){
             // Move old file to DB-storage
             $type = (isset($publicletData["REPOSITORY"]) ? "minisite" : "publiclet");
@@ -142,6 +143,7 @@ class ShareStore {
             $this->confStorage->simpleStoreSet("share", $hash, $publicletData, "serial");
             unlink($file);
         }
+        */
 
         return $publicletData;
 

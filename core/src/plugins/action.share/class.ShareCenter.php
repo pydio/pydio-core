@@ -2143,24 +2143,26 @@ class ShareCenter extends AJXP_Plugin
                 }
 
             }
+
+            $notExistsData = array(
+                "error"         => true,
+                "repositoryId"  => $repoId,
+                "users_number"  => 0,
+                "label"         => "Error - Cannot find shared data",
+                "description"   => "Cannot find repository",
+                "entries"       => array(),
+                "element_watch" => false,
+                "repository_url"=> ""
+            );
+
             $repo = ConfService::getRepositoryById($repoId);
             if($repo == null && $node != null){
                 if($minisite){
                     $this->removeShareFromMeta($node, $shareId);
                 }
+                return $notExistsData;
             } else if (!AuthService::getLoggedUser()->isAdmin() && $repo->getOwner() != AuthService::getLoggedUser()->getId()) {
-
-                $jsonData = array(
-                    "repositoryId"  => $repoId,
-                    "users_number"  => AuthService::countUsersForRepository($repoId),
-                    "label"         => "Error - Cannot find shared data",
-                    "description"   => "Cannot find repository",
-                    "entries"       => array(),
-                    "element_watch" => false,
-                    "repository_url"=> ""
-                );
-                return $jsonData;
-
+                return $notExistsData;
             }
             if ($this->watcher != false && $node != null) {
                 $elementWatch = $this->watcher->hasWatchOnNode(
