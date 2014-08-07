@@ -254,6 +254,14 @@ Class.create("ShareCenter", {
             oForm.removeClassName('share_leaf');
             oForm.removeClassName('type-ws');
             if(this.currentNode.isLeaf()) oForm.addClassName('share_leaf');
+            this.maxexpiration = parseInt(ajaxplorer.getPluginConfigs("action.share").get("FILE_MAX_EXPIRATION"));
+            if(this.maxexpiration > 0){
+                oForm.down("[name='expiration']").setValue(this.maxexpiration);
+            }
+            this.maxdownload = parseInt(ajaxplorer.getPluginConfigs("action.share").get("FILE_MAX_DOWNLOAD"));
+            if(this.maxdownload > 0){
+                oForm.down("[name='downloadlimit']").setValue(this.maxdownload);
+            }
             if(this.shareFolderMode == "minisite_public"){
 
                 oForm.select(".mode-ws").invoke('hide');
