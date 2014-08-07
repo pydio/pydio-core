@@ -2050,7 +2050,7 @@ class ShareCenter extends AJXP_Plugin
                     $additionalData = array();
                 }
                 if($type == "detect"){
-                    if(ConfService::getRepositoryById($hashOrRepoId) != null) $type == "repository";
+                    if(ConfService::getRepositoryById($hashOrRepoId) != null) $type = "repository";
                     else $type = "file";
                 }
                 if($this->getShareStore()->shareExists($type,$hashOrRepoId)){
