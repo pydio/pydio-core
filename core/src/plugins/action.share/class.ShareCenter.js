@@ -311,7 +311,7 @@ Class.create("ShareCenter", {
                 modal.refreshDialogPosition();
             });
 
-            this.createQRCode = ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("CREATE_QRCODE");
+            this.createQRCode = ajaxplorer.getPluginConfigs("action.share").get("CREATE_QRCODE");
             var disableAutocompleter = (nodeMeta.get("ajxp_shared") && ( this.shareFolderMode != "workspace" || this.readonlyMode ));
             var updateUserEntryAfterCreate = function(li, assignedRights, watchValue){
                 if(assignedRights == undefined) assignedRights = "r";
@@ -335,7 +335,7 @@ Class.create("ShareCenter", {
             };
             oForm.down('#repo_label').setValue(getBaseName(this.currentNode.getPath()));
             if(!$('share_folder_form').autocompleter){
-                var pref = ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("SHARED_USERS_TMP_PREFIX");
+                var pref = ajaxplorer.getPluginConfigs("action.share").get("SHARED_USERS_TMP_PREFIX");
                 $('share_folder_form').autocompleter = new AjxpUsersCompleter(
                     $("shared_user"),
                     $("shared_users_summary"),
@@ -996,7 +996,7 @@ Class.create("ShareCenter", {
         }
 
         // MAILER BUTTON
-        var forceOldSchool = ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("EMAIL_INVITE_EXTERNAL");
+        var forceOldSchool = ajaxplorer.getPluginConfigs("action.share").get("EMAIL_INVITE_EXTERNAL");
         var mailerButton, mailerShower;
         if(shareType == "file" && !dialogButtonsOrRow.down('#mailer_button')){
             dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:"<span class='simple_tooltip_observer' id='mailer_button' data-tooltipTitle='"+MessageHash['share_center.'+(shareType=='file'?'80':'80b')]+"'><span class='icon-envelope'></span> "+MessageHash['share_center.79']+"</span>"});

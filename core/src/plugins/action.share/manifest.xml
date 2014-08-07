@@ -255,7 +255,7 @@
                         ]]>
                     </clientForm>
                     <clientListener name="init"><![CDATA[
-                        if(ajaxplorer.user && !ajaxplorer.user.canWrite() || ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("ENABLE_FOLDER_SHARING") === false ){
+                        if(ajaxplorer.user && !ajaxplorer.user.canWrite() || ajaxplorer.getPluginConfigs("action.share").get("ENABLE_FOLDER_SHARING") === false ){
                             var action = ajaxplorer.getActionBar().getActionByName('share');
                             action.selectionContext.dir = false;
                         }
