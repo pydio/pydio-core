@@ -609,7 +609,7 @@ Class.create("ShareCenter", {
 
         oRow.down('[name="link_url"]').select();
 
-        this.updateDialogButtons(oRow, oForm, "file", linkData);
+        this.updateDialogButtons(oRow, null, "file", linkData);
 
         if(linkData['tags']){
             oRow.down('[name="link_tag"]').setValue(linkData['tags']);
@@ -643,11 +643,13 @@ Class.create("ShareCenter", {
             'Get',
             'share_form',
             function(oForm){
+                /*
                 new Protopass(oForm.down('input[name="password"]'), {
                     barContainer : $('public_pass_container'),
                     barPosition:'bottom',
                     labelWidth: 58
                 });
+                */
                 if(nodeMeta.get("ajxp_shared")){
                     oForm.down('div#share_result').show();
                     oForm.down('div#generate_indicator').show();
@@ -664,14 +666,14 @@ Class.create("ShareCenter", {
                             firstRow.parentNode.insert(row);
                             row.setStyle({display:'block'});
                             this.populateLinkData(linkData, row);
-                            oForm.down('div#generate_indicator').hide();
                         }.bind(this));
 
-                        return;
+                        oForm.down('div#generate_indicator').hide();
 
                     }.bind(this));
 
                 }
+                /*
                 this.maxexpiration = parseInt(ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("FILE_MAX_EXPIRATION"));
                 if(this.maxexpiration > 0){
                     oForm.down("[name='expiration']").setValue(this.maxexpiration);
@@ -682,6 +684,7 @@ Class.create("ShareCenter", {
                 }
                 var button = $(oForm).down('#generate_publiclet');
                 button.observe("click", this.generatePublicLinkCallback.bind(this));
+                */
             }.bind(this),
             function(oForm){
                 oForm.down('#generate_publiclet').stopObserving("click");
@@ -987,18 +990,16 @@ Class.create("ShareCenter", {
         // MAILER BUTTON
         var forceOldSchool = ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("EMAIL_INVITE_EXTERNAL");
         var mailerButton, mailerShower;
-        if(!dialogButtonsOrRow.down('#mailer_button') && !bottomButtonsContainer.down('#mailer_button')){
-            if(shareType == "file"){
-                dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:"<span class='simple_tooltip_observer' id='mailer_button' data-tooltipTitle='"+MessageHash['share_center.'+(shareType=='file'?'80':'80b')]+"'><span class='icon-envelope'></span> "+MessageHash['share_center.79']+"</span>"});
-                mailerButton = dialogButtonsOrRow.down('#mailer_button');
-                mailerButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.41"]);
-                mailerShower = dialogButtonsOrRow.up(".dialogContent");
-            }else{
-                bottomButtonsContainer.insert("<div class='largeButton' id='mailer_button'><span title='"+MessageHash['share_center.'+(shareType=='file'?'80':'80b')]+"'><span class='icon-envelope'></span> "+MessageHash['share_center.79']+"</span></div>");
-                mailerButton = bottomButtonsContainer.down("#mailer_button");
-                mailerShower = bottomButtonsContainer.up(".dialogContent");
-                bottomButtonsContainer.show();
-            }
+        if(shareType == "file" && !dialogButtonsOrRow.down('#mailer_button')){
+            dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:"<span class='simple_tooltip_observer' id='mailer_button' data-tooltipTitle='"+MessageHash['share_center.'+(shareType=='file'?'80':'80b')]+"'><span class='icon-envelope'></span> "+MessageHash['share_center.79']+"</span>"});
+            mailerButton = dialogButtonsOrRow.down('#mailer_button');
+            mailerButton.writeAttribute("data-tooltipTitle", MessageHash["share_center.41"]);
+            mailerShower = dialogButtonsOrRow.up(".dialogContent");
+        }else if(!bottomButtonsContainer.down('#mailer_button')){
+            bottomButtonsContainer.insert("<div class='largeButton' id='mailer_button'><span title='"+MessageHash['share_center.'+(shareType=='file'?'80':'80b')]+"'><span class='icon-envelope'></span> "+MessageHash['share_center.79']+"</span></div>");
+            mailerButton = bottomButtonsContainer.down("#mailer_button");
+            mailerShower = bottomButtonsContainer.up(".dialogContent");
+            bottomButtonsContainer.show();
         }
         var oForm = dialogButtonsOrRow.up('.dialogContent');
 

@@ -300,9 +300,9 @@ class AJXP_NotificationCenter extends AJXP_Plugin
             } else {
                 $node = $notification->getNode();
                 $path = $node->getPath();
+                $nodeRepo = $node->getRepository();
 
-                if($node->getRepository()->hasParent() && $node->getRepository()->getParentId() == $repositoryFilter){
-                    $nodeRepo = $node->getRepository();
+                if($nodeRepo != null && $nodeRepo->hasParent() && $nodeRepo->getParentId() == $repositoryFilter){
                     $currentRoot = $nodeRepo->getOption("PATH");
                     $contentFilter = $nodeRepo->getContentFilter();
                     if(isSet($contentFilter)){

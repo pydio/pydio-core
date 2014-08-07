@@ -84,22 +84,9 @@
                         ajaxplorer.actionBar.shareCenter.performShareAction();
                     ]]></clientCallback>
                     <clientForm id="share_form"><![CDATA[
-                        <div id="share_form" box_width="420" action="share"><div class="dialogContentMainTitle" ajxp_message_id="share_center.92">AJXP_MESSAGE[share_center.92]</div>
-                            <div id="share_optional_fields">
-                                <div class="SF_horizontal_labelRow">
-                                    <div class="SF_label" ajxp_message_id="share_center.23" style="width:130px;" title="AJXP_MESSAGE[share_center.23]">AJXP_MESSAGE[share_center.23]</div>
-                                    <div class="SF_label" ajxp_message_id="share_center.21" style="width:100px;" title="AJXP_MESSAGE[share_center.21]">AJXP_MESSAGE[share_center.21]</div>
-                                    <div class="SF_label" ajxp_message_id="share_center.22" style="width:100px;" title="AJXP_MESSAGE[share_center.22]">AJXP_MESSAGE[share_center.22]</div>
-                                </div>
-                                <div class="SF_horizontal_fieldsRow">
-                                    <input type="password" name="password" value="" placeholder="AJXP_MESSAGE[share_center.23]" autocomplete="off" class="SF_input" style="width:130px !important;">
-                                    <input type="text" name="expiration" value="0" placeholder="AJXP_MESSAGE[share_center.21]" class="SF_input SF_number" style="width:100px !important;">
-                                    <input type="text" name="downloadlimit" value="0" placeholder="AJXP_MESSAGE[share_center.22]" class="SF_input SF_number" style="width:100px !important;">
-                                    <div class="SF_horizontal_actions"><span id="generate_publiclet" class="SF_horizontal_action icon-plus-sign dialogFocus"></span></div>
-                                </div>
-                                <div class="SF_element" id="public_pass_container" style="display:none;height:20px;"></div>
-                            </div>
-                            <div class="dialogLegend" ajxp_message_id="share_center.24" style="clear: both;padding: 10px 1px 0;font-size: 13px;line-height: 19px;">AJXP_MESSAGE[share_center.24]</div>
+                        <div id="share_form" box_width="420" action="share">
+                            <div class="dialogContentMainTitle" ajxp_message_id="share_center.161">AJXP_MESSAGE[share_center.161]</div>
+                            <div class="dialogContentLegend" ajxp_message_id="share_center.162">AJXP_MESSAGE[share_center.162]</div>
                             <div style="display:none;position:relative;margin-bottom:20px;clear:left; padding-top: 20px;" id="share_result">
                                 <div class="dialogContentMainTitle" ajxp_message_id="share_center.93">AJXP_MESSAGE[share_center.93]</div>
                                 <div class="SF_horizontal_fieldsRow" style="display:none; margin-bottom:7px;">
