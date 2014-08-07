@@ -4592,6 +4592,23 @@ input.share_info_panel_link {
     float: none;
 }
 
+#share_form input#share_container{
+    padding: 3px !important;
+    border-radius: 2px;
+    background-color: #fff;
+}
+
+#share_form div.dialogContentLegend{
+    font-size: 13px;
+    padding: 0 2px;
+}
+
+#share_form span.SF_horizontal_action.icon-minus-sign.SF_horizontal_action_destructive {
+    position: absolute;
+    margin-top: -29px;
+    right: 14px;
+}
+
 #share_folder_form div.dialogContentMainTitle{
     clear: left;
     margin-top: 20px;
