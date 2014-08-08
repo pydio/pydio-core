@@ -19,12 +19,13 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Use CAS authentication." => "Utilizza autenticaizone CAS.",
+"CAS Server" => "Server CAS",
+"CAS server address" => "Indirizzo del server CAS",
+"CAS Port" => "Porta CAS",
+"Port where CAS server is running on" => "Porta sulla quale sta girando il server CAS",
+"CAS URI" => "URI CAS",
+"URI for CAS service" => "URI del servizio CAS",
+"SQL Driver" => "Driver SQL",
+"SQL configuration using the same syntax as auth.sql plugin" => "Configurazione SQL utilizzando la stessa sintassi del plugin auth.sql"
 );

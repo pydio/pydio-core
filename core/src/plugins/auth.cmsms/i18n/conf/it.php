@@ -19,12 +19,17 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"DB Storage" => "Database",
+"Login URL" => "URL Login",
+"if direct access, redirect to the given URL" => "se accesso diretto, reindirizza all'URL fornito",
+"Logout URL" => "URL Logout",
+"Redirect to the given URL on loggin out" => "Reindirizza all'URL fornito quando ci si disconnette",
+"Secret key" => "Secret key",
+"This key must only be known by remote end" => "This key must only be known by remote end",
+"Connexion" => "Connessione",
+"The Database Connexion" => "La connessione del Database",
+"Prefix tables" => "Prefisso tabelle",
+"Prefix of CMSMS tables " => "Prefisso delle tabelle CMSMS ",
+"CMSMS Authentication" => "Autenticazione CMSMS",
+"Stores the Authentication data in CMSMS FEU" => "Salva i dati di Autenticazione in CMSMSFEU",
 );

@@ -19,12 +19,12 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Skeleton Plugin" => "Plugin Skeleton",
+"This is an empty container to demonstrate the basics of plugins coding." => "Questo &egrave; un contenitore vuoto per mostrare le basi della creazione di plugin.",
+"Custom Footer" => "Footer Personalizzato",
+"Show a custom footer div" => "Mostra il div del footer personalizzato",
+"Footer Content" => "Contenuto Footer",
+"Display this content in the footer" => "Mostra questo contenuto nel footer",
+"Button Target Url" => "URL Obiettivo Bottone",
+"The target URL of the button that will be added to the application" => "L'URL obiettivo del bottone che sar&agrave; aggiunto all'applicazione",
 );

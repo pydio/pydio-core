@@ -19,12 +19,11 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"DB Storage" => "Database",
+"Stores the Authentication data in an SQL database." => "Salva i dati di autenticazione in un database SQL.",
+"Connexion" => "Connessione",
+"The Database Connexion" => "La connessione del database",
+"DB Auth Storage" => "DB Auth Storage",
+"SQL Tables" => "Tabelle SQL",
+"Install SQL Tables" => "Installa tabelle SQL",
 );

@@ -19,12 +19,14 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Dropbox" => "Dropbox",
+"This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension." => "Questo plugin permette l'accesso ad un account Dropbox. &Egrave; ancora in fase sperimentale, necessita dell'estensione PEAR/HTTP_OAuth.",
+"Consumer Key" => "Consumer Key",
+"Key" => "Key",
+"Consumer Secret" => "Consumer Secret",
+"Secret" => "Secret",
+"User Mail" => "Email utente",
+"User account" => "Account utente",
+"Password" => "Password",
+"User Password" => "Password utente",
 );

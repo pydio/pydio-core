@@ -19,12 +19,12 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"DB Storage" => "Database",
+"Stores the conf data in an SQL database." => "Salva i dati di configurazione in un database SQL.",
+"Connexion" => "Connessione",
+"The Database Connexion" => "La connessione del database",
+"Users Tmp Folder" => "Cartella Temporanea Utenti",
+"The folder in which all temporary files will be stored" => "La cartella in cui verranno salvati tutti i file temporanei",
+"SQL Tables" => "Tabelle SQL",
+"Install SQL Tables" => "Installa tabelle SQL",
 );
