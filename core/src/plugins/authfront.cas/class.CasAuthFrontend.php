@@ -351,7 +351,3 @@ class CasAuthFrontend extends AbstractAuthFrontend
         return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir() . '/createPGTStorage.mysql');
     }
 }
-
-/**
- * return $this->convertValueToRightString($this->convertRightStringToValue($right1) & $this->convertRightStringToValue($right2));
- */
