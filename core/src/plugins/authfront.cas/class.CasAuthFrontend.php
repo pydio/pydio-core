@@ -44,6 +44,8 @@ class CasAuthFrontend extends AbstractAuthFrontend
     private $cas_debug_mode;
     private $cas_debug_file;
     private $cas_modify_login_page;
+    private $cas_additional_role;
+
 
     function tryToLogUser($httpVars, $isLast = false)
     {
@@ -73,6 +75,8 @@ class CasAuthFrontend extends AbstractAuthFrontend
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 2;
             }elseif($ticket){
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 1;
+            }else{
+                $_SESSION['AUTHENTICATE_BY_CAS'] = 0;
             }
 
             if ($_SESSION['AUTHENTICATE_BY_CAS'] < 1) {
@@ -103,7 +107,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
                     if ($this->cas_debug_mode) {
                         // logfile name by date:
                         $today = getdate();
-                        $file_path = AJXP_DATA_PATH. '/logs/phpcas_'.$today['year'].'-'.$today['month'].'-'.$today['day'].'.txt';
+                        $file_path = AJXP_DATA_PATH. '/logs/phpcas_'.$today['year'].'-'.$today['month'].'-'.$today['mday'].'.txt';
                         empty($this->cas_debug_file) ? $file_path: $file_path = $this->cas_debug_file;
                         phpCAS::setDebug($file_path);
                     }
@@ -142,7 +146,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
                     if ($this->cas_debug_mode) {
                          // logfile name by date:
                         $today = getdate();
-                        $file_path = AJXP_DATA_PATH. '/logs/phpcas_'.$today['year'].'-'.$today['month'].'-'.$today['day'].'.txt';
+                        $file_path = AJXP_DATA_PATH. '/logs/phpcas_'.$today['year'].'-'.$today['month'].'-'.$today['mday'].'.txt';
                         empty($this->cas_debug_file) ? $file_path: $file_path = $this->cas_debug_file;
                         phpCAS::setDebug($file_path);
                     }
@@ -190,6 +194,14 @@ class CasAuthFrontend extends AbstractAuthFrontend
             if ($res > 0) {
                 AJXP_Safe::storeCredentials($cas_user, $_SESSION['PROXYTICKET']);
                 $_SESSION['LOGGED_IN_BY_CAS'] = true;
+
+                if(!empty($this->cas_additional_role)){
+                    $userObj = ConfService::getConfStorageImpl()->createUserObject($cas_user);
+                    $roles = $userObj->getRoles();
+                    $cas_RoleID = $this->cas_additional_role;
+                    $userObj->addRole(AuthService::getRole($cas_RoleID, false));
+                    AuthService::updateUser($userObj);
+                }
                 return true;
             }
         }
@@ -263,11 +275,9 @@ class CasAuthFrontend extends AbstractAuthFrontend
             $this->cas_logoutUrl = 'https://' . $this->cas_server . ':' . $this->cas_port . $this->cas_uri . '/logout';
         }
 
-        /*
-        if (!empty($this->pluginConf["FORCE_REDIRECT"])) {
-            $this->forceRedirect = $this->pluginConf["FORCE_REDIRECT"];
+        if (!empty($this->pluginConf["ADDITIONAL_ROLE"])) {
+            $this->cas_additional_role = $this->pluginConf["ADDITIONAL_ROLE"];
         }
-        */
 
         if (!empty($this->pluginConf["PHPCAS_MODE"]["casmode"])) {
             $this->cas_mode = $this->pluginConf["PHPCAS_MODE"]["casmode"];
@@ -340,4 +350,8 @@ class CasAuthFrontend extends AbstractAuthFrontend
         $p = $param->sqlDriver;
         return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir() . '/createPGTStorage.mysql');
     }
-} 
+}
+
+/**
+ * return $this->convertValueToRightString($this->convertRightStringToValue($right1) & $this->convertRightStringToValue($right2));
+ */
