@@ -1,0 +1,25 @@
+<?php
+$mess = array(
+    "1" => "DL Remoto",
+    "2" => "Scarica file dal server remoto",
+    "3" => "m",
+    "4" => "Inserisci almeno un URL che punta ad un file che vuoi scaricare direttamente da un server HTTP esterno, nella cartella attuale. Questa azione sar&agrave; avviata in background e tu potrai continuare ad utilizzare Pydio durante il download.",
+    "5" => "URL",
+    "6" => "Scaricando",
+    "7" => "al server",
+    "8" => "File scaricato, ricarica la pagina!",
+    "9" => "Genera Bookmarklet",
+    "10"=> "Scarica in Pydio",
+    "10a"=> "Scarica in %s",
+    "10b"=> "DL in %s",
+    "10c"=> "DL in %s",
+    "10d"=> "AjXp Download (%s)",
+    "11"=> "Sposta uno dei seguenti collegamenti nella tua barra degli inidirizzi : ",
+    "12"=> "Lancia il download del file remoto",
+    "13"=> "Dal computer",
+    "14"=> "Dal server remoto",
+    "15"=> "O crea un segnalibro manualmente ed utilzza il codice qui sotto come collegamento url : ",
+    "16"=> "Spostami nella tua barra dei segnalibri!",
+    "17"=> "Scarica file",
+    "18"=> "File Parziale"
+);
