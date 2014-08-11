@@ -19,12 +19,15 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Timestamp" => "Timestamp",
+"Allow Timestamp file with Universign." => "Permetti il timestamp del file con Universign.",
+"msgBox1" => "Per favore conferma che vuoi aggiungere un timestamp a questo file",
+"URL" => "URL",
+"Timestamp provider API URL" => "URL API del fornitore del timestamp",
+"User Mail" => "Email Utente",
+"Password" => "Password",
+"User account" => "Account Utente",
+"User Password" => "Password Utente",
+"timestamp" => "timestamp",
+"Allow timestamp files with Universign." => "Permetti di aggiungere timestamp ai file con Universign.",
 );

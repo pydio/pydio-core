@@ -19,12 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Comments Feed" => "Feed Commenti",
+"Display a chat-like feed on all nodes" => "Mostra un feed simile ad una chat su tutti i nodi",
 );

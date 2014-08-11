@@ -19,12 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Exif Metadata" => "Metatada Exif",
+"Extracts the EXIF metadata of a JPG image. Used in conjunction with editor.exif" => "Estrae i metadata EXIF da un'immagine JPG. Utilizzato insieme a editor.exif",
+"Info Panel Fields" => "Pannello Informazioni Campi",
+"Comma separated list of fields, use syntax 'EXIF_SECTION.ExifName'." => "Lista di campi separati da virgola, utilizza la sintassi 'EXIT_SECTION.ExifName'.",
+"Info Panel Labels" => "Pannello Informazioni Etichette",
+"Associated list of labels, be sure to define as many as fields!" => "Lista di etichette associata, assicurati di definire tante etichette quanti sono i campi!",
 );

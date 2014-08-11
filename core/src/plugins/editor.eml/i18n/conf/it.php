@@ -19,12 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Email Viewer" => "Visualizzatore Email",
+"Email reader, supports eml format and eml mimetypes. Detects if a folder contains only email and display columns accordingly." => "Lettore email, supporta formato eml e mimetype eml. Controlla se una cartella contiene solo email e mostra determinate colonne.",
 );

@@ -19,12 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Open Documents Viewer" => "Visualizzatore Documenti",
+"Open Document Formats viewer - based on WebODF.js library" => "Visualizzatore documenti - basato sulla libreria WebODF.js",
 );

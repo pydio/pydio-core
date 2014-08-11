@@ -18,13 +18,11 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
-$mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+
+defined('AJXP_EXEC') or die('Access not allowed');
+
+$mess = array(
+    "Git-based Versioning" => "Git-based Versioning",
+    "Keep tracks of all files modifications using a local Git workspace" => "Tieni tracca delle modifiche su titti i file utilizzando uno spazio di lavoro Git locale",
+    "Keep tracks of all files modifications using a local Git repository" => "Tieni traccia di tutte le modifiche ai file utilizzando una repository Git locale",
 );

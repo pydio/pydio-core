@@ -19,12 +19,19 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"1" => "Editor Plugin",
+"2" => "Editor plugin",
+"3" => "Opzioni",
+"4" => "Documentazione",
+"5" => "Seleziona funzionalità",
+"6" => "Modifica parametri",
+"7" => "Usa il selettore qui sotto per attivare i plugin che aggiungeranno funzionalità allo spazio di lavoro.",
+"8" => "Clicca su un plugin per modificarne i parametri, o semplicemente rimuovi la funzionalità",
+"9" => "%s Plugin",
+"10" => "Sorgenti Meta",
+"11" => "Aggiungi una sorgente",
+"12" => "Plugin Meta",
+"13" => "Sei sicuro di voler eliminare questa sorgente?",
+"14" => "Per favore scegli un driver!",
+"15" => "Questo spazio di lavoro è definito nel file di configurazione (vedi conf/bootstrap_repositories.php), non puoi modificare le sue funzionalità dall'interfaccia web.",
 );

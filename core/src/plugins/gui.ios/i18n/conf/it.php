@@ -19,12 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"iOS" => "iOS",
+"Template for redirecting to iPhone application" => "Templare per reindirizzare all'applicazione iPhone",
+"iOS Application URL" => "URL Applicazione iOS",
+"iOS Application" => "Applicazione iOS",
+"Android Application URL" => "URL Applicazione Android",
+"Android App" => "App Android",
 );

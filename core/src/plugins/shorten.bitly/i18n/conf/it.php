@@ -19,12 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Bit.ly URL Shortener" => "Bit.ly URL Shortener",
+"Shorten Download Links before sending them back to the user. Requires a Bit.ly account." => "Abbrevia Collegamenti Download prima di inviarli all'utente. Necessita di un account Bit.ly.",
+"User Name" => "Nome Utente",
+"Bit.ly account user name" => "Nome utente account Bit.ly",
+"API Key" => "Chaive API",
+"Bit.ly account API Key" => "Chiave API account Bit.ly",
 );

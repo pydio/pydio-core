@@ -19,12 +19,7 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Jumploader" => "Jumploader",
+"Third-party JumpLoader JAVA applet allowing to upload folders, chunk big files, etc." => "Applicazione JAVA di terze parti JumpLoader per caricare le cartelle, spezzare file grandi, ecc.",
+"Install Applet" => "Installa Applicazione",
 );

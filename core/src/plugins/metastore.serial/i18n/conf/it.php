@@ -19,12 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Files MetaStore" => "File MetaStore",
+"Stores metadata inside local hidden files." => "Salva i metadata in file locali nascosti.",
+"File location" => "Posizione File",
+"Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder." => "Dove salvare i metadata del file : LOCAL significa che un file nascosto verrà creato in ogni cartella, GLOBAL significa che un unico file sarà creato nella cartella AJXP_DATA_PATH/plugins/action.share.",
+"Meta File" => "File Meta",
+"Hidden file used inside folders to save meta data" => "File nascosto all'interno della cartella per salvare i dati meta",
 );

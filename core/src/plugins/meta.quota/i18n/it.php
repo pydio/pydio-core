@@ -19,12 +19,7 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"1" => "Utilizzo quota...",
+"2" => "Clicca per ricaricare l'utilizzo della quota",
+"3" => "Stai superando la tua quota",
 );

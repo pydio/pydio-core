@@ -19,12 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Subversion Repository" => "Repository Subversion",
+"Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline." => "Extrae informazioni SVN (revisioni, log modifiche, ecc) se la repository è una copia di lavoro, ed SVN è disponibile da linea di comando.",
 );

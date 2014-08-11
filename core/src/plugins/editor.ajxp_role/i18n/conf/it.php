@@ -19,12 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Text Editor" => "Editor Testo",
+"Very basic text editor" => "Editor di testo di base",
+"Role Editor" => "Editor Ruolo",
+"Administrator Role Editor" => "Amministratore Editor Ruolo",
 );

@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2012 Charles du Jeu <charles (at) cdujeu.me>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -18,13 +18,8 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
-$mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+$mess = array(
+    "1" => "Email inviata correttamente a %s",
+    "2" => "non è stato trovato nessun indirizzo email a cui inviare il messaggio!",
+    "3" => "Non è stato configurato nessun servizio per inviare email, contatta il tuo amministratore",
 );

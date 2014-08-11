@@ -19,12 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Video Player" => "Player Video",
+"Inserts a video player in the info panel, either HTML5 or Flash depending on the format." => "inserisce un player video nel pannello informazioni, HTML5 o Flash in base al formato.",
 );

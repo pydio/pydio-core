@@ -19,12 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Basic HTTP" => "HTTP di Base",
+"Use the standard http authentication." => "Usa autenticazione http standard.",
+"Users" => "Utenti",
+"The users list" => "La lista di utenti",
+"Logout URL" => "URL Disconnetti",
+"Redirect to the given URL on loggin out" => "Reindirizza all'URL fornito quando ci si disconnette",
 );

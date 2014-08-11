@@ -19,12 +19,14 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Text logger" => "Logger Testuale",
+"Stores the logs as readable tab delimited text." => "Salva i log in un file di testo leggibile delimitato da tab.",
+"Logpath" => "Destinazione Log",
+"The path to where the logs are kept." => "La destinazione in cui sono conservati i log.",
+"Logfile" => "File log",
+"The name of the log file" => "Il nome del file di log",
+"Files Permissions" => "Permessi File",
+"" => "",
+"Log Folder" => "Cartella Log",
+"Files Name Pattern" => "Pattern Nome File",
 );

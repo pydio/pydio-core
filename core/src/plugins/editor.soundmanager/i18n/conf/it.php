@@ -19,12 +19,7 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Audio Player" => "Player Audio",
+"Uses HTML5 or Flash to play a sound" => "Utilizza HTML5 o Flash per ascoltare audio",
+"Sound Player" => "Player Audio",
 );

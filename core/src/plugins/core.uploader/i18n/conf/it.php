@@ -19,12 +19,13 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Allowed Extensions" => "Estensioni autorizzate",
+"Extensions List" => "Lista Estensioni",
+"Ext. Label" => "Etichetta Est.",
+"Limitations" => "Limitazioni",
+"Files Number" => "Numero di file",
+"File Size" => "Dimensione file",
+"Cumul. Size" => "Dimensione cumulativa",
+"Uploaders Options" => "Opzioni uploader",
+"Options shared by all uploaders plugins" => "Opzioni condivise da tutti i plugin per il caricamento",
 );

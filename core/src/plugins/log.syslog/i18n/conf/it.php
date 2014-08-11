@@ -19,12 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Syslog logger" => "Logger Syslog",
+"Send the logs to the system syslog" => "Invia i log al syslog di sistema",
+"Identifier" => "Identificatore",
+"How the logs will be identified in the system logs" => "Come verranno identificati i log nel sistema",
 );

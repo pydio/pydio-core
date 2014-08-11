@@ -19,12 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"DB Storage" => "Storage DB",
+"Stores the logs in an SQL database." => "Salva i log in un database SQL.",
+"Connexion" => "Connessione",
+"The Database Connexion" => "La connessione del database",
+"SQL Tables" => "Tabelle SQL",
+"Install SQL Tables" => "Installa Tabelle SQL",
 );

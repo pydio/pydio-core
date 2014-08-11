@@ -19,12 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Open in..." => "Apri in...",
+"Simple Picker to open any type of file in any available editor." => "Semplice selezionatore per aprire qualunque tipo di file in qualunque editor disponibile.",
 );

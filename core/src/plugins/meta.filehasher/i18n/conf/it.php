@@ -19,12 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"File Hasher" => "Hasher File",
+"Compute on-demand a hash of the file content and stores it in the metadata if a metastore is provided" => "Computa su richiesta l'hash del contenuto diun file e lo salva nei metadata se è stato fornito un metastore",
 );

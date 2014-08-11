@@ -19,12 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"FS Mount" => "FS Mount",
+"Mount a remote location on the file system before accessing the repository" => "Monta una location remota sul file system prima di accedere allo spazio di lavoro",
+"User quota" => "Quota utente",
+"Maintain the size of a given directory for each user" => "Mantieni la dimensione fornita per la cartella di ogni utente",
 );

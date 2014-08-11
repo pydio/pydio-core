@@ -19,12 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Enter connexion data",
-"2" => "Host",
-"3" => "Optional Data",
-"4" => "Start",
-"5" => "Protocol",
-"6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"Audio Player" => "Player Audio",
+"Inserts a flash player for reading mp3 files online, and playing a whole folder in a separate window." => "Inserisci un player flash per leggere i file mp3 online, e mettere in esecuzione un'intera cartella in una finestra separata.",
 );
