@@ -20,11 +20,11 @@
  */
 
 $mess = array(
-    "1" => "Setup Wizard di Pydio",
-    "2" => "Benvenuto nel Setup Wizard di Pydio",
-    "3" => "Grazie per aver installato Pydio!<br> Questo strumento si assicura che la tua nuova piattaforma di condivisione venga installa correttamente in poco tempo: naviga attraverso le varie sezioni per impostare i comportamenti generali dell'applicazione. Posiziona il puntatore del mouse sulle etichette dei campi per avere maggiori informazioni. <br>Sei pronto ? ",
+    "1" => "Installazione Wizard Pydio",
+    "2" => "Benvenuto nell'Installazione Wizard di Pydio",
+    "3" => "Grazei per aver installato Pydio!<br> Questo tool si assicurerà che la tua piattaforma di condivisione sia funzionante in poco tempo: naviga nelle varie sezioni per impostare i comportamenti generali dell'applicazione. Puoi posizionare il puntatore del mouse sulle etichette dei campi per maggiori informazioni. <br>Sei pronto ? ",
     "4" => "Inizia!",
-    "5" => "Per favore attendi mentre Pydio viene configurato! Sar&agrave; pronto tra pochi secondi...",
+    "5" => "Per favore attendi mentre viene configurato Pydio! Sarà disponibile in pochi secondi...",
     "6" => "Installa Pydio Ora",
     "7" => "Lingua",
 );

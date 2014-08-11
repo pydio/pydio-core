@@ -22,7 +22,7 @@ $mess=array(
 "Files MetaStore" => "File MetaStore",
 "Stores metadata inside local hidden files." => "Salva i metadata in file locali nascosti.",
 "File location" => "Posizione File",
-"Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder." => "Dove salvare i metadata del file : LOCAL significa che un file nascosto verr&agrave; creato in ogni cartella, GLOBAL significa che un unico file sar&agrave; creato nella cartella AJXP_DATA_PATH/plugins/action.share.",
+"Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder." => "Dove salvare i metadata del file : LOCAL significa che un file nascosto verrà creato in ogni cartella, GLOBAL significa che un unico file sarà creato nella cartella AJXP_DATA_PATH/plugins/action.share.",
 "Meta File" => "File Meta",
 "Hidden file used inside folders to save meta data" => "File nascosto all'interno della cartella per salvare i dati meta",
 );

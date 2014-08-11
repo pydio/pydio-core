@@ -27,6 +27,6 @@ $mess=array(
 "Threshold" => "Soglia",
 "Thumbnails" => "Miniature",
 "Generate thumbnails or not" => "Generare o meno miniature",
-"Quality" => "Qualit&agrave;",
-"Thumbs quality" => "Qualit&agrave; miniature",
+"Quality" => "Qualità",
+"Thumbs quality" => "Qualità miniature",
 );

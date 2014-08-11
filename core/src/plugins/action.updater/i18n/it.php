@@ -33,7 +33,7 @@ $mess = array(
     "9" => "Ora inizia l'importazione reale",
     "10"=> "This is a 'dry-run'. Please review the logs of all actions that will be performed, and if it's ok for you press 'Run real import now'",
     "11"=> "Migra meta.serial",
-    "12"=> "Il vecchio plugin meta.serial &egrave; stato rimosso e diviso in metastore.serial e meta.user",
+    "12"=> "Il vecchio plugin meta.serial è stato rimosso e diviso in metastore.serial e meta.user",
     "13"=> "Simula migrazione",
     "14"=> "Inizia migrazione ora",
 );

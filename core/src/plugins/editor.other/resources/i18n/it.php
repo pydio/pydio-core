@@ -22,6 +22,6 @@ $mess=array(
 "1" => "Scegli altro...",
 "2" => "Scegli un altro editor",
 "3" => "Seleziona un altro editor con cui aprire questo file",
-"4" => "Attenzione, questi editor non dichiarano il supporto per questo tipo di file, il loro funzionamento non &egrave; assicurato!",
+"4" => "Attenzione, questi editor non dichiarano il supporto per questo tipo di file, il loro funzionamento non è assicurato!",
 "5" => "Reimposta associazioni esistenti",
 );

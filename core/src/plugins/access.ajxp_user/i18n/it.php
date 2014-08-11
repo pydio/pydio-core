@@ -34,7 +34,7 @@ $mess=array(
 "11"=> "Sei sicuro di voler eliminare gli elementi selezionati?",
 "12"=> "Non hai i permessi necessari per eliminare questo elemento.",
 "13"=> "File pubblico eliminato con successo",
-"14"=> "Integrit&agrave;",
+"14"=> "Integrità",
 "15"=> "Ok",
 "16"=> "Danneggiato",
 "17"=> "URL Download",
@@ -84,7 +84,7 @@ $mess=array(
     "60"=>"Mac OS (Beta)",
     "61"=>"Windows (Beta)",
     "62"=>"<h2>Inizia</h2>
-            Questo video &egrave; un'introduzione all'applicazione web Pydio:
+            Questo video è un'introduzione all'applicazione web Pydio:
             <ul>
                 <li>Bacheca utente</li>
                 <li>Panoramica Interfaccia</li>
@@ -100,7 +100,7 @@ $mess=array(
                                 <li>Inviarli a utenti interno o esterni</li>
                                 <li>Ricevi notifiche se quel link viene scaricato</li>
                                 <li>Creare link protetti da password</li>
-                                <li>Creare pi&ugrave; link con un file</li>
+                                <li>Creare più link con un file</li>
                                 <li>Bloccare completamente la condivisione di un file</li>
             </ul>",
     "64"=>"<h2>Condividere cartelle con Pydio</h2>
@@ -109,9 +109,9 @@ $mess=array(
                                 <li>Condividere come nuovo spazio di lavoro</li>
                                 <li>Condividere come mini sito pubblico</li>
             </ul>",
-    "65"=> "Scopri di pi&ugrave; sul canale di Pydio!",
+    "65"=> "Scopri di più sul canale di Pydio!",
     "66"=>"<h2>Utilizzare Pydio su un dispositivo con iOS</h2>
-                            Questo video mostra come utilizzare l'applicazione per iOS di Pydio (disponibile sul App Store). Il processo &egrave; simile per i dispositivi Android:
+                            Questo video mostra come utilizzare l'applicazione per iOS di Pydio (disponibile sul App Store). Il processo è simile per i dispositivi Android:
 <ul><li>Configurare la connessione al server</li>
 <li>Navigare attraverso i file</li>
 <li>Mantenere i file offline e interagire con applicazioni esterne</li>

@@ -19,7 +19,7 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Generic Auth Features" => "Funzionalit&agrave; Generiche",
+"Generic Auth Features" => "Funzionalità Generiche",
 "Enable Users" => "Abilita Utenti",
 "Guest Browsing" => "Navigazione Ospite",
 "Password length" => "Lunghezza Password",
@@ -34,7 +34,7 @@ $mess=array(
 "Set the users credentials in the session after a successful login, this can be necessary when bridging specific auth and access plugins." => "Imposta le credenziali degli utenti in una sessione dopo aver effettuato il login con successo, questo potrebbe essere necessario con determinati plugin di accesso e autentificazione.",
 "Login Form" => "Modulo Login",
 "Secure Login Form" => "Modulo Login Sicuro",
-"Raise the security of the login form by disabling autocompletion and remember me feature" => "Aumenta la sicurezza del modulo di login disabilitanto l'autocompletamento e la funzionalit&agrave; 'Ricordati di me'",
+"Raise the security of the login form by disabling autocompletion and remember me feature" => "Aumenta la sicurezza del modulo di login disabilitanto l'autocompletamento e la funzionalità 'Ricordati di me'",
 "Enable Forgot Password" => "Abilita Password Dimenticata",
 "Add a Forgot Password link at the bottom of the login form" => "Aggiungi un collegamento 'Password Dimenticata' in fondo al modulo di login",
 "Forgot Password Action" => "Azione Password Dimenticata",
@@ -43,12 +43,12 @@ $mess=array(
 "Instance Type" => "Tipo di Istanza",
 "Choose the configuration plugin" => "Seleziona il plugin di configurazione",
 "Secondary Instance (optional)" => "Istanza Secondaria (opzionale)",
-"Mode" => "Modalit&agrave;",
+"Mode" => "Modalità",
 "Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features. User Choice will allow the user to manually choose its authentification method at startup." => "Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features. User Choice will allow the user to manually choose its authentification method at startup.",
 "Separator" => "Separatore",
-"This is necessary to discriminate users data loaded from various sources. Warning, use foldername compliant characters. For example :: does not work!" => "Necessario per evitare il caricamento dei dati utente da diverse sorgenti. Attenzione, utilizza caratteri conformi ai nomi delle cartelle. Per esempio :: non funzioner&agrave;!",
+"This is necessary to discriminate users data loaded from various sources. Warning, use foldername compliant characters. For example :: does not work!" => "Necessario per evitare il caricamento dei dati utente da diverse sorgenti. Attenzione, utilizza caratteri conformi ai nomi delle cartelle. Per esempio :: non funzionerà!",
 "Master Authentifiaction Label" => "Master Authentifiaction Label",
-"Will be shown to the user at login" => "Verr&agrave; mostrata all'utente durante il login",
+"Will be shown to the user at login" => "Verrà mostrata all'utente durante il login",
 "Slave Authentifiaction Label" => "Slave Authentifiaction Label",
 "Users Listing" => "Users Listing",
 "In Master_Slave mode, use this option to limit the users listing in the administration to one driver only (leave empty if you want to see all users)" => "In Master_Slave mode, use this option to limit the users listing in the administration to one driver only (leave empty if you want to see all users)",

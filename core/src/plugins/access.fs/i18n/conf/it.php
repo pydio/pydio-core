@@ -20,7 +20,7 @@
 */
 $mess=array(
 "File System (Standard)" => "File System (Standard)",
-"The most standard access to a filesystem located on the server." => "L'accesso pi&ugrave; comune ad un filesystem su un server.",
+"The most standard access to a filesystem located on the server." => "L'accesso più comune ad un filesystem su un server.",
 "Path" => "Destinazione",
 "Real path to the root folder on the server" => "Destinazione reale della cartella principale su un server",
 "Create" => "Crea",
@@ -28,7 +28,7 @@ $mess=array(
 "File Creation Mask" => "Maschera di Creazione FIle",
 "Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." => "Applica operazione chmod opzionalmente. Il valore deve essere numerico, come 0777, 0644, ecc.",
 "Purge Days" => "Giorni di eliminazione",
-"Option to purge documents after a given number of days. This require a manual set up of a CRON task. Leave to 0 if you don't wan't to use this feature." => "Opzione per eliminare documenti dopo un dato numero di giorni. Richiede l'impostazione manuale di un task CRON. Lascia 0 se non vuoi utilizzare questa funzionalit&agrave;.",
+"Option to purge documents after a given number of days. This require a manual set up of a CRON task. Leave to 0 if you don't wan't to use this feature." => "Opzione per eliminare documenti dopo un dato numero di giorni. Richiede l'impostazione manuale di un task CRON. Lascia 0 se non vuoi utilizzare questa funzionalità.",
 "Real Size Probing" => "Metodo di elettura Dimensione Reale",
 "Use system command line to get the filesize instead of php built-in function (fixes the 2Go limitation)" => "Utilizza la linea di comando del sistema per ottenere la dimensione del file invece che la funzione php (corregge la limitazione di 2Go)",
 "X-SendFile Active" => "X-SendFile Active",

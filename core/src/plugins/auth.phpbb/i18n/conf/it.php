@@ -21,7 +21,7 @@
 $mess=array(
 "Remote authentication" => "Autenticazione remota",
 "Authentication is done remotely (useful in CMS system)." => "L'autenticazione viene effettuata in remoto (utile per i sistemi CMS).",
-"Authentication mode" => "modalit&agrave; di autenticazione",
+"Authentication mode" => "modalità di autenticazione",
 "If set, the remote end calls us to register upon login, else, we will be calling the remote end when login is required" => "If set, the remote end calls us to register upon login, else, we will be calling the remote end when login is required",
 "Login URL" => "URL Login",
 "When not in slave mode, AJXP calls the given URL as URL?name=XXX&amp;pass=XXX&amp;key=XXX. Else it redirect to the given URL" => "When not in slave mode, AJXP calls the given URL as URL?name=XXX&amp;pass=XXX&amp;key=XXX. Else it redirect to the given URL",

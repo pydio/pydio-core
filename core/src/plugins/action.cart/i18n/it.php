@@ -34,6 +34,6 @@ $mess = array(
     "11"=> "Comprimi e Condividi",
     "12"=> "Crea archivi dalla selezione attuale e condividi questo archivio",
     "13"=> "Fornisci un etichetta per questa selezione del carrello",
-    "14"=> "Questo creer&agrave; un archivio con tutti i file e lo condivider&agrave;. Seleziona un nome da utilizzare per questo archivio:",
-    "15"=> "Rilascia elementi nella selezione dei carrelli per scaricarli o condividerli pi&ugrave; tardi",
+    "14"=> "Questo creerà un archivio con tutti i file e lo condividerà. Seleziona un nome da utilizzare per questo archivio:",
+    "15"=> "Rilascia elementi nella selezione dei carrelli per scaricarli o condividerli più tardi",
 );

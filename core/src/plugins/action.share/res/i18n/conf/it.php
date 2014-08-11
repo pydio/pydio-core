@@ -19,12 +19,12 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Sharing Features" => "Funzionalit&agrave; Condivisione",
+"Sharing Features" => "Funzionalità Condivisione",
 "Share Center actions and hooks" => "Centro Condivisione azioni e ganci",
 "Metadata File" => "File Metadata",
 "Hidden file containing shared metadata" => "File nasconsti che contengono metadata",
 "File location" => "Posizione file",
-"Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder." => "Dove salvare il file metadata : LOCAL significa che verr&agrave; creato un file nascosto in ogni cartella, GLOBAL significa che verr&agrave; creato un file nella cartella AJXP_DATA_PATH/plugins/action.share.",
+"Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder." => "Dove salvare il file metadata : LOCAL significa che verrà creato un file nascosto in ogni cartella, GLOBAL significa che verrà creato un file nella cartella AJXP_DATA_PATH/plugins/action.share.",
 "Link Generation" => "Generazione Collegamenti",
 "Use web server RewriteEngine mechanism to generate prettier URLs" => "Utilizza il meccanismo di RewriteEngine del web server per generare URL migliori",
 "Use Rewrite Rule" => "Utilizza Rewrite Rule",
@@ -41,7 +41,7 @@ $mess=array(
 "Folder Sharing" => "Condivisione Cartella",
 "Enable folder sharing (workspace and minisite)" => "Abilita la condivisione delle cartelle (spazi di lavoro e mini sito)",
 "Enable folder sharing" => "Abilita condivisine cartella",
-"Disallow users to create shared folders if a workspace already exists with the same label" => "Non permettere agli utenti di creare cartelle condivise se esiste gi&agrave; uno spazio di lavoro con la stessa etichetta",
+"Disallow users to create shared folders if a workspace already exists with the same label" => "Non permettere agli utenti di creare cartelle condivise se esiste già uno spazio di lavoro con la stessa etichetta",
 "Avoid labels duplication" => "Non permettere duplicazione delle etichette",
 "Shared users configurations" => "Condividi configurazioni utenti",
 "Minimum number of characters to start getting results by auto-completion when sharing a folder with other users" => "Numero minimo di caratteri per ottenere risultati dall'autocompletamento quando viene condivisa una cartella con altri utenti",
@@ -57,7 +57,7 @@ $mess=array(
 "Download text" => "Testo del download",
 "Text displayed below the download button. Use AJXP_FILENAME keyword to display the file name, and AJXP_APPLICATION_TITLE for the application title." => "Testo mostrato sotto il bottone per il download. Utilizza la parola chiave AJXP_FILENAME  per mostrare il nome del file, e AJXP_APPLICATION_TITLE per il titolo dell'applicazione.",
 "Download text w/ Pass" => "Testo del download w/ Pass",
-"Text displayed below the download button when a password is mandatory. Use AJXP_FILENAME keyword to display the file name, and AJXP_APPLICATION_TITLE for the application title." => "Testo mostrato sotto il bottone per il download quando la password &egrave; obbligatoria. Utilizza la parola chiave AJXP_FILENAME  per mostrare il nome del file, e AJXP_APPLICATION_TITLE per il titolo dell'applicazione.",
+"Text displayed below the download button when a password is mandatory. Use AJXP_FILENAME keyword to display the file name, and AJXP_APPLICATION_TITLE for the application title." => "Testo mostrato sotto il bottone per il download quando la password è obbligatoria. Utilizza la parola chiave AJXP_FILENAME  per mostrare il nome del file, e AJXP_APPLICATION_TITLE per il titolo dell'applicazione.",
 "Download Button" => "Bottone Download",
 "Image used as a button for downloading the file" => "Immagine utilizzata come bottone per scaricare il file",
 "Background Color" => "Colore di Sfondo",

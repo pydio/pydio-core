@@ -19,12 +19,12 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1.ios" => "C'&egrave; un applicazione nativa per accedere a %s da iPhone/iPad!",
-"2.ios" => "Ce l'ho gi&agrave;, aprila e aggiungi questo server ai miei server remoti",
+"1.ios" => "C'è un applicazione nativa per accedere a %s da iPhone/iPad!",
+"2.ios" => "Ce l'ho già, aprila e aggiungi questo server ai miei server remoti",
 "3.ios" => "Non ce l'ho, portami ora all'App Store!",
 "4.ios" => "Non mi interessa, lasciami utilizzare la versione web di %s.",
-"1.android" => "C'&egrave; un client nativo per Pydio per accedere a %s da OS Android.",
-"2.android" => "Ce l'ho gi&agrave;, aprilo e aggiungi questo server ai miei server remoti preconfigurati",
+"1.android" => "C'è un client nativo per Pydio per accedere a %s da OS Android.",
+"2.android" => "Ce l'ho già, aprilo e aggiungi questo server ai miei server remoti preconfigurati",
 "3.android" => "Non ce l'ho, portami ora all'Android Market!",
 "4.android" => "Non mi interessa, lasciami utilizzare la versione web di %s.",
 );

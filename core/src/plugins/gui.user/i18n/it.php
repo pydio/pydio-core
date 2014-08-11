@@ -23,7 +23,7 @@ $mess=array(
     "2" => "Imposta la tua nuova password",
     "3" => "Inserisci il tuo ID utente",
     "4" => "Il tuo identificatore",
-    "5" => "Una richiesta di reimpostazione della password &egrave; stata inviata all'indirizzo email registrato con il tuo account. Clicca sul collegamento nell'email per reimpostare la password.",
+    "5" => "Una richiesta di reimpostazione della password è stata inviata all'indirizzo email registrato con il tuo account. Clicca sul collegamento nell'email per reimpostare la password.",
     "6" => "Grazie, ora puoi entrare!",
-    "7" => "Una richiesta di reimpostazione della password &egrave; stata inviata all'account associato a questo indirizzo email. Se l'hai richiesto tu, puoi semplicemente ignorare questa email. Altrimenti clicca sul seguente collegamento per reimpostare la tua password:",
+    "7" => "Una richiesta di reimpostazione della password è stata inviata all'account associato a questo indirizzo email. Se l'hai richiesto tu, puoi semplicemente ignorare questa email. Altrimenti clicca sul seguente collegamento per reimpostare la tua password:",
 );

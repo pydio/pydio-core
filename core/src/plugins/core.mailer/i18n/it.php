@@ -20,6 +20,6 @@
 */
 $mess = array(
     "1" => "Email inviata correttamente a %s",
-    "2" => "non &egrave; stato trovato nessun indirizzo email a cui inviare il messaggio!",
-    "3" => "Non &egrave; stato configurato nessun servizio per inviare email, contatta il tuo amministratore",
+    "2" => "non è stato trovato nessun indirizzo email a cui inviare il messaggio!",
+    "3" => "Non è stato configurato nessun servizio per inviare email, contatta il tuo amministratore",
 );

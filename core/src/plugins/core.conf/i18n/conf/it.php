@@ -19,7 +19,7 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Generic Conf Features" => "Conf. Funzionalit&agrave; Generiche",
+"Generic Conf Features" => "Conf. Funzionalità Generiche",
 "Let user create repositories" => "Permetti agli utenti di creare nuovi spazi di lavoro",
 "Remember guest preferences" => "Ricorda preferenze ospiti",
 "Configurations Management" => "Gestione Configurazioni",
@@ -30,13 +30,13 @@ $mess=array(
 "Shared users limit" => "Limite utenti condivisi",
 "Core SQL Connexion" => "Connessione SQL Core",
 "SQL Connexion" => "Connessione SQL",
-"Simple SQL Connexion definition that can be used by other sql-based plugins" => "Definizione della Connessione SQL che pu&ograve; essere usata da altri plugin basati su SQL",
+"Simple SQL Connexion definition that can be used by other sql-based plugins" => "Definizione della Connessione SQL che può essere usata da altri plugin basati su SQL",
 "Preferences Saving" => "Salvataggio Preferenze",
 "Skip user history" => "Salta storia utente",
 "Internal / External Users" => "Utenti Interni / Esterni",
 "Maximum number of users displayed in the users autocompleter" => "Maximum number of users displayed in the users autocompleter",
 "Users completer limit" => "Users completer limit",
-"Minimum number of characters to trigger the auto completion feature" => "Numero minimo di caratteri per avviare la funzionalit&agrave; di autocompletamento",
+"Minimum number of characters to trigger the auto completion feature" => "Numero minimo di caratteri per avviare la funzionalità di autocompletamento",
 "Users completer min chars" => "Users completer min chars",
 "Do not display real login in parenthesis" => "Non mostrare il login reale nelle parentesi",
 "Hide real login" => "Nascondi login reale",

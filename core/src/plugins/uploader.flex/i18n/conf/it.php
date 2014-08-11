@@ -23,5 +23,5 @@ $mess=array(
 "Legacy flash uploader, used when the browser does not support HTML5. If you want to force the usage of this uploader, deactivate the uploader.html, and remove the activeCondition tag from the uploader.flex manifest file." => "Flash uploader, utilizzato se il browser non supporta HTML5. Se vuoi forzare l'utilizzo di questo uploader, deattiva il file uploader.html, e rimuovi il tag activeCondition dal file manifest uploader.flex.",
 "Miscalleneous" => "Varie",
 "HTTPS Policy" => "Policy HTTPS",
-"An Https Policy file maybe used to solve Flash upload problems when in Https. Use path relative to the web root." => "Un file Policy HTTPS pu&ograve; essere utilizzato per risolvere problem con il caricamento Flash quando si &egrave; in HTTPS. Utilizza una destinazione relativa alla cartella principale web.",
+"An Https Policy file maybe used to solve Flash upload problems when in Https. Use path relative to the web root." => "Un file Policy HTTPS può essere utilizzato per risolvere problem con il caricamento Flash quando si è in HTTPS. Utilizza una destinazione relativa alla cartella principale web.",
 );
