@@ -165,6 +165,15 @@ function WebFXTreeAbstractNode(sText, sAction) {
 	webFXTreeHandler.all[this.id] = this;
 }
 
+function WebFXTreeBufferTreeChange(){
+    if (window.webfxtreebufferTimer) {
+        window.clearTimeout(window.webfxtreebufferTimer);
+    }
+    window.webfxtreebufferTimer = window.setTimeout(function(){
+        document.fire("ajaxplorer:tree_change");
+    }, 200);
+}
+
 /*
  * To speed thing up if you're adding multiple nodes at once (after load)
  * use the bNoIdent parameter to prevent automatic re-indentation and call
@@ -254,7 +263,7 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
             }, 100);
         }
 	}
-    document.fire("ajaxplorer:tree_change");
+    WebFXTreeBufferTreeChange();
 	return node;
 };
 
@@ -402,7 +411,7 @@ WebFXTreeAbstractNode.prototype.doExpand = function() {
 	if (webFXTreeConfig.usePersistence) {
 		webFXTreeHandler.cookies.setCookie(this.id.substr(18,this.id.length - 18), '1');
 	}
-    document.fire("ajaxplorer:tree_change");
+    WebFXTreeBufferTreeChange();
 } ;
 
 WebFXTreeAbstractNode.prototype.doCollapse = function() {
@@ -414,7 +423,7 @@ WebFXTreeAbstractNode.prototype.doCollapse = function() {
 	if (webFXTreeConfig.usePersistence) {
 		webFXTreeHandler.cookies.setCookie(this.id.substr(18,this.id.length - 18), '0');
 	}
-    document.fire("ajaxplorer:tree_change");
+    WebFXTreeBufferTreeChange();
 } ;
 
 WebFXTreeAbstractNode.prototype.expandAll = function() {
