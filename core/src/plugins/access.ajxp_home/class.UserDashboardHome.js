@@ -232,7 +232,7 @@ Class.create("UserDashboardHome", AjxpPane, {
             window.setTimeout(function(){
                 if($("orbit_content")) $("orbit_content").ajxpPaneObject.resize();
                 else if($("browser")) $("browser").ajxpPaneObject.resize();
-            }, 0);
+            }, 50);
         }catch(e){}
 
     },
