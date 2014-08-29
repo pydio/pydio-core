@@ -215,7 +215,7 @@ Class.create("UserDashboardHome", AjxpPane, {
             });
         }
 
-        if(ajaxplorer.getPluginConfigs('ajxpdriver[@id=\'access.ajxp_home\']').get("ENABLE_GETTING_STARTED")){
+        if(ajaxplorer.getPluginConfigs('access.ajxp_home').get("ENABLE_GETTING_STARTED")){
             var obj = oFormObject.down("#welcome");
             if(oFormObject.down("#welcome > small")) obj = oFormObject.down("#welcome > small");
             var span = new Element('span').update('<br>' + MessageHash["user_home.55"]);
