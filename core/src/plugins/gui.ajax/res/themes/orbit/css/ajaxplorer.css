@@ -5528,7 +5528,7 @@ input#webdav_password{
     margin-left: 10px !important;
 }
 
-#cpane_tabs .video-js-box{
+#cpane_tabs div.video-js-box{
     margin-left: 0 !important;
 }
 
