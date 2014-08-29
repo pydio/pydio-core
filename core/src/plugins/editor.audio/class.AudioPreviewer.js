@@ -27,7 +27,7 @@ Class.create("AudioPreviewer", AbstractEditor, {
 		
 	getPreview : function(ajxpNode, rich){
 		if(rich){			
-			var escapedFilename = 'base64encoded:'+encodeURIComponent(base64_encode(ajxpNode.getPath()));
+			var escapedFilename = encodeURIComponent(base64_encode(ajxpNode.getPath()));
 			var escapedUrl = encodeURIComponent(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&get_action=audio_proxy&file='+escapedFilename);
 			var player = 'dewplayer-bubble.swf';
 			var flashVars = 'mp3='+escapedUrl+'&showtime=1';
