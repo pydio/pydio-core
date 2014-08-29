@@ -118,8 +118,8 @@ class EncfsMounter extends AJXP_Plugin
                             $cmd = "mv ". escapeshellarg($dir . DIRECTORY_SEPARATOR . $fileOrFolder)." ". escapeshellarg($clear . DIRECTORY_SEPARATOR);
                             $exec = shell_exec($cmd);
                         }
-                        self::umountFolder($clear);
                         rmdir($dir);
+                        self::umountFolder($clear);
                     }
                 } else if (substr(basename($dir), 0, strlen("ENCFS_CLEAR_")) == "ENCFS_CLEAR_") {
                     // SIMPLY UNMOUNT
