@@ -75,6 +75,8 @@ Class.create("RepositorySimpleLabel", AjxpPane, {
                     }
                 }
             }
+            var upDiv = this.htmlElement.up('[ajxpClass="AjxpPane"]');
+            if(upDiv) upDiv.ajxpPaneObject.resize();
         }.bind(this);
         document.observe("ajaxplorer:repository_list_refreshed", this.observer);
     },

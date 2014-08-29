@@ -1206,8 +1206,13 @@ Class.create("FilesList", SelectableElements, {
     empty : function(skipFireChange){
         this._previewFactory.clear();
         if(this.protoMenu){
-            this.protoMenu.removeElements('.ajxp_draggable');
-            this.protoMenu.removeElements('.selectable_div');
+            if(this._displayMode == "thumb" || this._displayMode == "detail"){
+                this.protoMenu.removeElements('#selectable_div-'+this.__currentInstanceIndex + ' > .ajxpNodeProvider');
+                this.protoMenu.removeElements('#selectable_div-'+this.__currentInstanceIndex);
+            }else{
+                this.protoMenu.removeElements('#table_rows_container-'+this.__currentInstanceIndex);
+                this.protoMenu.removeElements('#table_rows_container-'+this.__currentInstanceIndex+ ' > .ajxpNodeProvider');
+            }
         }
         for(var i = 0; i< AllAjxpDroppables.length;i++){
             var el = AllAjxpDroppables[i];
