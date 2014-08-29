@@ -35,6 +35,12 @@ Class.create("VideoPreviewer", AbstractEditor, {
             this.element.down("#videojs_previewer").setStyle({height:'297px'});
             this.element.down("#videojs_previewer").insert(this.currentRichPreview);
             this.currentRichPreview.resizePreviewElement({width:380, height:260, maxHeight:260}, true);
+            if(this.element.down('.vjs-flash-fallback')){
+                fitHeightToBottom(this.element.down('.vjs-flash-fallback'));
+            }
+            if(this.element.down('object')){
+                this.element.down('object').setAttribute('height', this.element.getHeight());
+            }
         }
         modal.setCloseValidation(function(){
             this.currentRichPreview.destroyElement();
@@ -54,6 +60,12 @@ Class.create("VideoPreviewer", AbstractEditor, {
                 maxHeight:this.element.getHeight()
             }, true);
         }catch(e){}
+        if(this.element.down('.vjs-flash-fallback')){
+            fitHeightToBottom(this.element.down('.vjs-flash-fallback'));
+        }
+        if(this.element.down('object')){
+            this.element.down('object').setAttribute('height', this.element.getHeight());
+        }
 
     },
 
@@ -203,6 +215,10 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
 				div.update(content);
 				div.resizePreviewElement = function(dimensionObject){
 					// do nothing;
+                    var h =dimensionObject.height;
+                    if(h > 400) div.down('object').setAttribute('height', 400);
+                    else if(h > 300) div.down('object').setAttribute('height', 300);
+                    else if(h > 200) div.down('object').setAttribute('height', 200);
 				};
                 div.destroyElement = function(){
                     div.update('');
