@@ -74,4 +74,5 @@ $mess=array(
 "50"=> "Mes équipes",
 "51"=> "Groupes d'utilisateurs accessibles comme des raccourcis lors du partage",
 "52"=> "Voulez-vous vraiment supprimer cette équipe? Ca ne supprimera pas les utilisateurs.",
+    "53"=> "Retour aux workspaces",
 );
