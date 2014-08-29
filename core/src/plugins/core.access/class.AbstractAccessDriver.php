@@ -247,7 +247,11 @@ class AbstractAccessDriver extends AJXP_Plugin
             if ($move) {
                 AJXP_Controller::applyHook("node.before_path_change", array(new AJXP_Node($realSrcFile)));
                 if(file_exists($destFile)) unlink($destFile);
-                $res = rename($realSrcFile, $destFile);
+                if(strcmp($srcWrapperName,$destWrapperName) === 0){
+                    $res = rename($realSrcFile, $destFile);
+                }else{
+                    $res = copy($realSrcFile, $destFile);
+                }
                 AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), false));
             } else {
                 try {
