@@ -73,8 +73,8 @@ $mess=array(
 "49"=> "Utenti esterni che hai creato",
 "50"=> "I Miei Team",
 "51"=> "Team di utenti, utilizzati come scorciatoie durante la condivisione",
-"52"=> "Sei sicuro di voler eliminare questo team? Gli utenti non verranno eliminati",
-"53"=> "Inizia",
+"52"=> "Sei sicuro di voler eliminare questo team? Questa operazione non cancellerà gli utenti associati...",
+"53"=> "Torna agli spazi di lavoro",
 "54"=> "Inizia ad utilizzare Pydio guardando questi video",
 "55"=> "Hai bisogno di aiuto <a>per iniziare?</a>",
 "56"=> "Prima volta con Pydio? Ecco dei video per te!",
@@ -116,5 +116,5 @@ $mess=array(
 <li>Navigare attraverso i file</li>
 <li>Mantenere i file offline e interagire con applicazioni esterne</li>
 <li>Proteggere l'app con un codice PIN</li>
-<li>Utilizzare i segnalibri e il motore di ricerca</li></ul>",
+<li>Utilizzare i segnalibri e il motore di ricerca</li></ul>"
 );

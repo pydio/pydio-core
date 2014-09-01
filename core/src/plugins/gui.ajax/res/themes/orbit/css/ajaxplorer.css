@@ -4038,7 +4038,7 @@ div.selectable_div, .table_rows_container, #tree_container, #bottomSplitPane, .a
 }
 
 input, textarea, .selectable{
-    -moz-user-select: auto;
+    -moz-user-select: all;
     -khtml-user-select: auto;
     -webkit-user-select: auto;
     user-select: auto;
@@ -5528,7 +5528,7 @@ input#webdav_password{
     margin-left: 10px !important;
 }
 
-#cpane_tabs .video-js-box{
+#cpane_tabs div.video-js-box{
     margin-left: 0 !important;
 }
 
@@ -5537,7 +5537,7 @@ input#webdav_password{
 }
 
 #video_container{
-    margin: 5px 20px 5px 10px !important;
+    /*margin: 5px 20px 5px 10px !important;*/
 }
 
 td.ip_geo_cell{
@@ -5782,7 +5782,7 @@ div.flat_tabulator > div:not(.tabulatorContainer){
 }
 
 div#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer{
-    padding-top: 77px;
+    padding-top: 95px;
 }
 
 div#userdashboard_myparams_title{

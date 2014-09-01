@@ -227,6 +227,27 @@ class QuotaComputer extends AJXP_Plugin
                 echo 'can not create object';
             }
         } else {
+            // Try to get quota via smbclient if accessDriver is smb.
+            if ($this->accessDriver->id == 'access.smb') {
+                $credential = AJXP_Safe::tryLoadingCredentialsFromSources("",$this->accessDriver->repository);
+                $strcmd = 'smbclient //'. $this->accessDriver->repository->options['HOST'] .'/' . $credential['user'] . ' -U ' . $credential['user'] . '%' . $credential['password'] . ' -c du';
+                $io = popen($strcmd, 'r');
+                $size = fgets($io, 4096);
+                $size = fgets($io, 4096);
+                $size = fgets($io, 4096);
+                $size = trim($size);
+
+                $num = explode(' ', $size);
+                if (!empty($num)) {
+                    pclose($io);
+                    $s = floatval(array_pop($num));
+                    return $s;
+                }
+                else{
+                    return 0;
+                }
+            }
+            
             if(PHP_OS == "Darwin") $option = "-sk";
             else $option = "-sb";
             $io = popen ( '/usr/bin/du '.$option.' ' . escapeshellarg($dir), 'r' );
