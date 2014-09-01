@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<guidriver enabled="false" name="backbone" label="CONF_MESSAGE[Backbone]" description="CONF_MESSAGE[Backbone]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <!--
+    TO ADD IN HTML TEMPLATE DIRECTLY
+<script id="main-layout" type="layout">
+    <div class="actions"><a data-viewName="ThumbEntryView">Thumbs</a> | <a data-viewName="ListEntryView">List</a></div>
+    <div>
+        <div class="left"></div>
+        <div class="right"></div>
+    </div>
+    <div class="viewer"></div>
+</script>
+
+    -->
+    <plugin_info>
+        <plugin_author>Charles du Jeu</plugin_author>
+        <plugin_version>0.2</plugin_version>
+        <core_relation packaged="false" tested_version="4.3.0"/>
+    </plugin_info>
+    <client_settings>
+        <resources>
+            <js className="jQuery" file="plugins/gui.backbone/jquery-1.8.2.js" autoload="true"/>
+            <js className="jQueryUI" file="plugins/gui.backbone/jquery-ui-1.9.1.custom.js" autoload="true"/>
+            <js className="Underscore" file="plugins/gui.backbone/underscore.js" autoload="true"/>
+            <js className="Backbone" file="plugins/gui.backbone/backbone.js" autoload="true"/>
+            <js className="LayoutManager" file="plugins/gui.backbone/backbone.layoutmanager.js" autoload="true"/>
+            <js className="Jath" file="plugins/gui.backbone/jath.js" autoload="true"/>
+            <js className="App" file="plugins/gui.backbone/application.js" autoload="true"/>
+            <js className="Bootstrap" file="plugins/gui.backbone/bootstrap/js/bootstrap.js" autoload="true"/>
+        </resources>
+    </client_settings>
+	<registry_contributions>
+		<client_configs uuidAttr="name">
+			<template name="scripts" element="head" position="bottom"><![CDATA[
+			<link type="text/css" rel="stylesheet" href="../../plugins/gui.backbone/css/smoothness/jquery-ui-1.9.1.custom.css"></link>
+			<link type="text/css" rel="stylesheet" href="../../plugins/gui.backbone/bootstrap/css/bootstrap.css"></link>
+            <style type="text/css">
+            body{
+            overflow:auto !important;
+            }
+                li
+                {
+                    list-style-type: none;
+                }
+
+                ul.node-tree
+                {
+                    padding-left: 5px;
+                }
+
+                ul.node-tree li
+                {
+                    border-left: 1px solid gray;
+                    padding-left: 20px;
+                }
+
+
+                /* This combination enables a border that extends to the correct location
+                   and looks nice */
+                ul.node-tree li.last-item
+                {
+                    border-left-color: transparent;
+                }
+                ul.node-tree li.dummy-item
+                {
+                    height: 0.75em;
+                    margin-bottom: -0.75em;
+                }
+
+                div.left{
+                    float:left;
+                    width: 30%;
+                }
+
+                div.right{
+                    float: right;
+                    width: 70%;
+                }
+                div.edit{
+                    width: 250px;
+                    float: left;
+                }
+                .edit img {
+                    float: left;
+                }
+                .selected{
+                    background-color: #4488AA;
+                }
+</style>
+			]]></template>
+			<template name="main_umbra" element="ajxp_desktop" position="top" theme="umbra"><![CDATA[
+                    ]]></template>
+		</client_configs>
+	</registry_contributions>
+    <dependencies>
+        <activePlugin pluginName="gui.ajax"/>
+    </dependencies>
+</guidriver>
