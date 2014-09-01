@@ -20,13 +20,13 @@
 */
 $mess=array(
 "FTP Authentification" => "Autenticazione FTP",
-"Authenticate user directly to an FTP server, and connect him to this server." => "Autenticazione diretta degli utenti sul server FTP, e connessione ad esso.",
-"FTP Login Screen" => "Schermata Login FTP Login",
-"Whether to display a generic 'FTP connexion' dialog at startup (allowing the user to enter his own host/port data) or the standard login dialog." => "Mostrare una generica finestra 'Connessione FTP' all'avvio (consentendo all'utente di inserire il proprio host o la propria porta) o la finestra standard di login.",
+"Authenticate user directly to an FTP server, and connect him to this server." => "Autentica l'utente direttamente su un server FTP, e connettilo a questo server.",
+"FTP Login Screen" => "Schermata di login FTP",
+"Whether to display a generic 'FTP connexion' dialog at startup (allowing the user to enter his own host/port data) or the standard login dialog." => "Indica se mostrare o meno una finestra di 'Connessione FTP' generica (permettendo all'utente di accedere ai dati del suo host/porta) o la finestra di login di default.",
 "Repository" => "Repository",
-"Id of the repository to use for testing connexion" => "ID del repository da usare per testare la connessione",
-"Admin user" => "Utente Amministratore",
-"The ID of an existing admin for Pydio (using conf.serial)" => "L'ID di un utente amministratore esistente per Pydio (conf.serial)",
-"Test Connexion" => "Prova Connessione",
-"Test connexion to the FTP server" => "Prova della connessione al server FTP",
+"Id of the repository to use for testing connexion" => "ID dello spazio di lavoro da utilizzare per testare la connessione",
+"Admin user" => "Utente amministratore",
+"The ID of an existing admin for Pydio (using conf.serial)" => "l'ID di un utente amministratore di Pydio (utilizzando conf.serial)",
+"Test Connexion" => "Testa Connessione",
+"Test connexion to the FTP server" => "Testa la connessione al server FTP",
 );
