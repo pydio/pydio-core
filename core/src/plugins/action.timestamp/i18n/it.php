@@ -1,7 +1,7 @@
 <?php
 $mess = array(
-"1" => "ATTENZIONE: Un token con il timestamp è già allegato a questo file. Cancella il token manualmente prima di poterne aggiungere uno nuovo.",
-"2" => "ATTENZIONE: non puoi aggiungere un timestamp al token",
-"3" => "Un token con il timestamp è già stato creato per il file ",
-"4" => "ATTENZIONE: Problemi di configurazione. Contatta l'amministratore di sistema il prima possibile.",
+"1" => "Attenzione, un token timestamp è allegato a questo file. Cancella il token manualmente per aggiungerne uno nuovo",
+"2" => "Attenzione, non puoi aggiungere un timestamp ad un token",
+"3" => "Il token del timestamp è stato già creato per il file ",
+"4" => "ATTENZIONE: Problema di configurazione, per favore contatta l'amministratore di sistema il prima possibile.",
 );
