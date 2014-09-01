@@ -1226,8 +1226,8 @@ Class.create("Ajaxplorer", {
 	/**
 	 * Accessor for datamodel.requireContextChange()
 	 */
-	fireNodeRefresh : function(nodePathOrNode){
-		this.getContextHolder().requireNodeReload(nodePathOrNode);
+	fireNodeRefresh : function(nodePathOrNode, completeCallback){
+		this.getContextHolder().requireNodeReload(nodePathOrNode, completeCallback);
 	},
 	
 	/**

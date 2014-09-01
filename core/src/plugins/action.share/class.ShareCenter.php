@@ -79,11 +79,26 @@ class ShareCenter extends AJXP_Plugin
                 && !(isset($_GET["get_action"]) && $_GET["get_action"]=="list_all_plugins_actions")){
                 $disableSharing = true;
             }
+            $xpathesToRemove = array();
             if ($disableSharing) {
-                unset($this->actions["share"]);
+                // All share- actions
+                $xpathesToRemove[] = 'action[contains(@name, "share-")]';
+            }else{
+                $folderSharingMode = $this->pluginConf["ENABLE_FOLDER_SHARING"];
+                $fileSharingAllowed = $this->pluginConf["ENABLE_FILE_PUBLIC_LINK"];
+                if($fileSharingAllowed === false){
+                    // Share file button
+                    $xpathesToRemove[] = 'action[@name="share-file-minisite"]';
+                }
+                if($folderSharingMode == 'disable'){
+                    // Share folder button
+                    $xpathesToRemove[] = 'action[@name="share-folder-minisite-public"]';
+                }
+            }
+            foreach($xpathesToRemove as $xpath){
                 $actionXpath=new DOMXPath($contribNode->ownerDocument);
-                $publicUrlNodeList = $actionXpath->query('action[contains(@name, "share-")]', $contribNode);
-                foreach($publicUrlNodeList as $shareActionNode){
+                $nodeList = $actionXpath->query($xpath, $contribNode);
+                foreach($nodeList as $shareActionNode){
                     $contribNode->removeChild($shareActionNode);
                 }
             }
@@ -196,6 +211,8 @@ class ShareCenter extends AJXP_Plugin
                 } else {
                     $httpVars["expiration"] = min($expiration,$maxexpiration);
                 }
+                $httpHash = null;
+                $originalHash = null;
 
                 if ($subAction == "delegate_repo") {
                     header("Content-type:text/plain");
@@ -209,12 +226,16 @@ class ShareCenter extends AJXP_Plugin
                     print($numResult);
                 } else if ($subAction == "create_minisite") {
                     header("Content-type:text/plain");
+                    if(isSet($httpVars["hash"]) && !empty($httpVars["hash"])) $httpHash = $httpVars["hash"];
                     $res = $this->createSharedMinisite($httpVars, $this->repository, $this->accessDriver);
                     if (!is_array($res)) {
                         $url = $res;
                     } else {
                         list($hash, $url) = $res;
                         $newMeta = array("id" => $hash, "type" => "minisite");
+                        if($httpHash != null && $hash != $httpHash){
+                            $originalHash = $httpHash;
+                        }
                     }
                     print($url);
                 } else {
@@ -240,7 +261,7 @@ class ShareCenter extends AJXP_Plugin
                     flush();
                 }
                 if ($newMeta != null && $ajxpNode->hasMetaStore() && !$ajxpNode->isRoot()) {
-                    $this->addShareInMeta($ajxpNode, $newMeta["type"], $newMeta["id"]);
+                    $this->addShareInMeta($ajxpNode, $newMeta["type"], $newMeta["id"], $originalHash);
                 }
                 AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
                 // as the result can be quite small (e.g error code), make sure it's output in case of OB active.
@@ -869,7 +890,7 @@ class ShareCenter extends AJXP_Plugin
     {
         $addLang = ConfService::getLanguage() != ConfService::getCoreConf("DEFAULT_LANGUAGE");
         if ($this->getFilteredOption("USE_REWRITE_RULE", $this->repository->getId()) == true) {
-            if($addLang) return $this->buildPublicDlURL()."/".$hash."-".ConfService::getLanguage();
+            if($addLang) return $this->buildPublicDlURL()."/".$hash."--".ConfService::getLanguage();
             else return $this->buildPublicDlURL()."/".$hash;
         } else {
             if($addLang) return $this->buildPublicDlURL()."/".$hash.".php?lang=".ConfService::getLanguage();
@@ -908,9 +929,9 @@ class ShareCenter extends AJXP_Plugin
         RewriteBase '.$path.'
         RewriteCond %{REQUEST_FILENAME} !-f
         RewriteCond %{REQUEST_FILENAME} !-d
-        RewriteRule ^([a-z0-9]+)\.php$ share.php?hash=$1 [QSA]
-        RewriteRule ^([a-z0-9]+)-([a-z]+)$ share.php?hash=$1&lang=$2 [QSA]
-        RewriteRule ^([a-z0-9]+)$ share.php?hash=$1 [QSA]
+        RewriteRule ^([a-zA-Z0-9_-]+)\.php$ share.php?hash=$1 [QSA]
+        RewriteRule ^([a-zA-Z0-9_-]+)--([a-z]+)$ share.php?hash=$1&lang=$2 [QSA]
+        RewriteRule ^([a-zA-Z0-9_-]+)$ share.php?hash=$1 [QSA]
         </IfModule>
         ';
         file_put_contents($downloadFolder."/.htaccess", $htaccessContent);
@@ -1406,7 +1427,15 @@ class ShareCenter extends AJXP_Plugin
         }else{
             try{
                 $hash = $httpVars["hash"];
-                $this->getShareStore()->storeShare($repository->getId(), $data, "minisite", $hash);
+                $updateHash = null;
+                if(isSet($httpVars["minisite_hash_update"]) && !empty($httpVars["minisite_hash_update"]) && $httpVars["minisite_hash_update"] != $httpVars["hash"]){
+                    // Existing already
+                    $test = $this->getShareStore()->loadShare($httpVars["minisite_hash_update"]);
+                    if(!empty($test)) throw new Exception("Sorry hash already exists");
+                    $updateHash = $httpVars["minisite_hash_update"];
+
+                }
+                $hash = $this->getShareStore()->storeShare($repository->getId(), $data, "minisite", $hash, $updateHash);
             }catch(Exception $e){
                 return $e->getMessage();
             }
@@ -1446,7 +1475,7 @@ class ShareCenter extends AJXP_Plugin
             return 100;
         }
         $foldersharing = $this->getFilteredOption("ENABLE_FOLDER_SHARING", $this->repository->getId());
-        if (isset($foldersharing) && $foldersharing === false) {
+        if (isset($foldersharing) && ($foldersharing === false || $foldersharing == "disable" )) {
             return 103;
         }
         $loggedUser = AuthService::getLoggedUser();
@@ -1962,10 +1991,13 @@ class ShareCenter extends AJXP_Plugin
      * @param $shareType
      * @param $shareId
      */
-    public function addShareInMeta($node, $shareType, $shareId){
+    public function addShareInMeta($node, $shareType, $shareId, $originalShareId=null){
         $this->getSharesFromMeta($node, $shares, true);
         if(empty($shares)){
             $shares = array();
+        }
+        if(!empty($shares) && $originalShareId != null && isSet($shares[$originalShareId])){
+            unset($shares[$originalShareId]);
         }
         $shares[$shareId] = array("type" => $shareType);
         $node->setMetadata("ajxp_shared", array("shares" => $shares), true, AJXP_METADATA_SCOPE_REPOSITORY, true);
