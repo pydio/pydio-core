@@ -695,9 +695,20 @@
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
                     <div id="cpane_header" class="panelHeader">
                         <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["minisite", "inline","default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                        <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header"}'></div>
+                        <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":30}'></div>
                     </div>
                     <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
+                    <div class="widget_logo"></div>
+				</div>
+			]]></template>
+            <template name="minisite_dropbox" element="ajxp_dropbox_template" position="top" label="share_center.163"><![CDATA[
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
+                    <div id="cpane_header" class="panelHeader">
+                        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["minisite", "inline","default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                        <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":30}'></div>
+                    </div>
+                    <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
+                    <div class="widget_logo"></div>
 				</div>
 			]]></template>
 			<component_config className="FilesList">

@@ -29,6 +29,35 @@
                 font-size: 12px;
             }
 
+            #open_with_unique_button{
+                display: none;
+            }
+
+            #ajxp_embed_template #cpane_header,
+            #ajxp_dropbox_template #cpane_header
+            {
+                background: rgb(54, 60, 68);
+                padding: 6px 11px 10px;
+            }
+
+            #ajxp_embed_template #breadcrumb,
+            #ajxp_dropbox_template #breadcrumb
+            {
+                color: white;
+                margin-top: 2px;
+            }
+
+            #ajxp_embed_template #display_toolbar,
+            #ajxp_dropbox_template #display_toolbar
+            {
+                width: 200px;
+            }
+
+            #breadcrumb span.icon-refresh.ajxp-goto-refresh {
+                margin-left: 5px;
+                opacity: 0.2;
+            }
+
             .widget_logo {
                 background-image: url('AJXP_MINISITE_LOGO');
                 background-repeat: no-repeat;
@@ -38,16 +67,53 @@
                 position: absolute;
                 top: 0;
                 right: 0;
-                height: 90px;
+                height: 70px;
                 width: 180px;
                 z-index: 50;
             }
+
+            #ajxp_embed_template .widget_logo
+            {
+                top: inherit;
+                bottom: 0;
+                left: 0;
+                right: inherit;
+                height: 95px;
+            }
+
+            #ajxp_dropbox_template .widget_logo {
+                top: inherit;
+                bottom: 19px;
+                right: 12px;
+                height: 95px;
+            }
+
+            #ajxp_dropbox_template .droparea{
+                background-position: 50% 50%;
+                background-size: 220px;
+            }
+            #ajxp_dropbox_template .thumbnail_selectable_cell{
+                background-color: transparent;
+            }
+            #ajxp_dropbox_template #browser{
+                background-color: rgb(54, 60, 68);
+            }
+            #ajxp_dropbox_template #content_pane{
+                border: 5px dotted rgb(233, 233, 233) !important;
+                margin: 8px 8px 20px;
+                padding: 10px;
+                border-radius: 10px;
+            }
+
             #ajxp_shared_folder{
                 width:100%;
                 text-align:left;
                 /* THESE ONE ARE IMPORTANT */
                 overflow:hidden;
                 position:relative;
+            }
+            #ajxp_shared_folder .widget_logo {
+                height: 90px;
             }
             .action_bar{
                 background-color: #ffffff;
@@ -70,21 +136,6 @@
                 margin-left: -8px;
                 min-width: 0;
             }
-            /*
-            div#inline_toolbar a {
-                font-size: 11px;
-                border: 1px solid rgba(111, 123, 136, 0.42);
-                font-size: 11px;
-                display: inline-block;
-                color: rgb(111, 123, 136);
-                border-radius: 3px;
-                padding: 0 7px;
-                margin-top: 4px;
-                margin-bottom: 4px;
-                background-color: rgba(111, 123, 136, 0.09);
-                box-shadow: inset 1px 1px 1px white;
-            }
-            */
             .ajxpNodeProvider span.actionbar_button_label {
                 display: none;
             }
@@ -116,6 +167,12 @@
             body.ajxp_preloged_user a#logout_button{
                 display: none;
             }
+
+            @media only screen and (max-width: 680px){
+                #ajxp_embed_template div.toolbarGroup span.ajxp_icon_span {
+                    padding: inherit !important;
+                }
+            }
         </style>
         <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/ajaxplorer_boot.js"></script>
         <script type="text/javascript">
@@ -139,9 +196,11 @@
            });
             window.ajxpBootstrap = new AjxpBootstrap(startParameters);
             window.ajxpMinisite = true;
-            window.onunload = function(){
+            /*
+            window.onbeforeunload = function(){
                 if(ajaxplorer && !Prototype.Browser.Gecko) ajaxplorer.actionBar.fireAction("logout");
             }
+            */
             document.observe("dom:loaded", function(){
                 var cookieEnabled=(navigator.cookieEnabled)? true : false
                    if (typeof navigator.cookieEnabled=="undefined" && !cookieEnabled) {
