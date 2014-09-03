@@ -117,7 +117,7 @@ class AuthService
      */
     public static function preLogUser($httpVars)
     {
-        if(self::getLoggedUser() != null) return ;
+        if(self::getLoggedUser() != null && self::getLoggedUser()->getId() != "guest") return ;
 
         $frontends = AJXP_PluginsService::getInstance()->getActivePluginsForType("authfront");
         $index = 0;

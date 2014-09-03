@@ -207,11 +207,16 @@ Class.create("UserDashboardHome", AjxpPane, {
             switchToRepo(target.CURRENT_REPO_ID);
         });
 
-        if(ajaxplorer.actionBar.getActionByName("logout")){
+        if(ajaxplorer.actionBar.getActionByName("logout") && ajaxplorer.user.id != "guest"){
             oFormObject.down("#welcome").insert('<small>'+MessageHash["user_home.67"].replace("%logout", "<span id='disconnect_link'></span>").replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME") || ajaxplorer.user.id)+'</small>');
             oFormObject.down('#disconnect_link').update("<a>"+ajaxplorer.actionBar.getActionByName("logout").options.text.toLowerCase()+"</a>");
             oFormObject.down('#disconnect_link').observe("click", function(e){
                 ajaxplorer.actionBar.fireAction("logout");
+            });
+        }else if(ajaxplorer.user.id == "guest" && ajaxplorer.actionBar.getActionByName("login")){
+            oFormObject.down("#welcome").insert("<small>You can <a id='disconnect_link'>login</a> if you are not guest.</small>");
+            oFormObject.down('#disconnect_link').observe("click", function(e){
+                ajaxplorer.actionBar.fireAction("login");
             });
         }
 
