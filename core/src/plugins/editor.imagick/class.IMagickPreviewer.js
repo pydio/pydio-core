@@ -159,7 +159,14 @@ Class.create("IMagickPreviewer", Diaporama, {
 		});		
 		return img;
 	},
-	
+
+    getRESTPreviewLinks:function(node){
+        return {
+            "First Page Thumbnail": "&file=" + encodeURIComponent(node.getPath())
+        };
+    },
+
+
 	getThumbnailSource : function(ajxpNode){
         var repoString = "";
         if(ajaxplorer.repositoryId && ajxpNode.getMetadata().get("repository_id") && ajxpNode.getMetadata().get("repository_id") != ajaxplorer.repositoryId){

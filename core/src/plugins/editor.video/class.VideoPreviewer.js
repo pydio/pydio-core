@@ -91,7 +91,12 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
 
     },
 
-	getPreview : function(ajxpNode, rich){
+    getRESTPreviewLinks:function(node){
+        return {"Video Stream": "&file=" + encodeURIComponent(node.getPath())};
+    },
+
+
+    getPreview : function(ajxpNode, rich){
 		if(rich){
 			var url = document.location.href;
 			if(url[(url.length-1)] == '/'){

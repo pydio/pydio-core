@@ -475,6 +475,22 @@
                     <clientCallback dialogOpenForm="share_current_url" dialogSkipButtons="true" prepareModal="true">
                         <dialogOnOpen><![CDATA[
                             modal.getForm().down("#crt-page-url").setValue(document.location.href);
+                            if(!ajaxplorer.getContextHolder().isEmpty()){
+                                var tpl = new Template('<div style="font-size: 16px; padding-top:15px; text-align:left;">#{title} <a href="#{link}" target="_blank" class="icon-link" style="font-size: 0.8em;"></a></div><input type="text" value="#{link}" style="width: 98%;">');
+                                var node = ajaxplorer.getContextHolder().getUniqueNode();
+                                var editors = ajaxplorer.findEditorsForMime(node.getAjxpMime(), true);
+                                if(editors.length){
+                                    var staticClass = Class.getByName(editors[0].editorClass).prototype;
+                                    if(staticClass.getRESTPreviewLinks){
+                                        var links = staticClass.getRESTPreviewLinks(node);
+                                        $H(links).each(function(pair){
+                                            modal.getForm().down("#additional_links").insert(tpl.evaluate({title:pair.key,link:document.location.href + "?dl=true&ct=true"+pair.value}));
+                                        });
+                                    }
+                                }
+                                var dlLink = document.location.href + "?dl=true&file=" + encodeURIComponent(node.getPath());
+                                modal.getForm().down("#additional_links").insert(tpl.evaluate({title:"Direct Download",link:dlLink}));
+                            }
                         ]]></dialogOnOpen>
                         <dialogOnComplete><![CDATA[
                             hideLightBox();
@@ -487,6 +503,7 @@
                             <div class="non_macos">AJXP_MESSAGE[share_center.143]</div>
                             <div class="macos_only" style="display:none;">AJXP_MESSAGE[share_center.144]</div>
                             <br>
+                            <div id="additional_links" style="padding-bottom:10px;"></div>
                         </div>
                     ]]></clientForm>
                 </processing>

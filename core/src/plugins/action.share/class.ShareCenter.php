@@ -784,6 +784,26 @@ class ShareCenter extends AJXP_Plugin
         }
     }
 
+    protected function storeSafeCredentialsIfNeeded(&$data, $accessDriver, $repository){
+        $storeCreds = false;
+        if ($repository->getOption("META_SOURCES")) {
+            $options["META_SOURCES"] = $repository->getOption("META_SOURCES");
+            foreach ($options["META_SOURCES"] as $metaSource) {
+                if (isSet($metaSource["USE_SESSION_CREDENTIALS"]) && $metaSource["USE_SESSION_CREDENTIALS"] === true) {
+                    $storeCreds = true;
+                    break;
+                }
+            }
+        }
+        if ($storeCreds || $accessDriver->hasMixin("credentials_consumer")) {
+            $cred = AJXP_Safe::tryLoadingCredentialsFromSources(array(), $repository);
+            if (isSet($cred["user"]) && isset($cred["password"])) {
+                $data["SAFE_USER"] = $cred["user"];
+                $data["SAFE_PASS"] = $cred["password"];
+            }
+        }
+    }
+
     /** Cypher the publiclet object data and write to disk.
      * @param Array $data The publiclet data array to write
                      The data array must have the following keys:
@@ -815,23 +835,7 @@ class ShareCenter extends AJXP_Plugin
         if (AuthService::usersEnabled()) {
             $data["OWNER_ID"] = AuthService::getLoggedUser()->getId();
         }
-        $storeCreds = false;
-        if ($repository->getOption("META_SOURCES")) {
-            $options["META_SOURCES"] = $repository->getOption("META_SOURCES");
-            foreach ($options["META_SOURCES"] as $metaSource) {
-                if (isSet($metaSource["USE_SESSION_CREDENTIALS"]) && $metaSource["USE_SESSION_CREDENTIALS"] === true) {
-                    $storeCreds = true;
-                    break;
-                }
-            }
-        }
-        if ($storeCreds || $accessDriver->hasMixin("credentials_consumer")) {
-            $cred = AJXP_Safe::tryLoadingCredentialsFromSources(array(), $repository);
-            if (isSet($cred["user"]) && isset($cred["password"])) {
-                $data["SAFE_USER"] = $cred["user"];
-                $data["SAFE_PASS"] = $cred["password"];
-            }
-        }
+        $this->storeSafeCredentialsIfNeeded($data, $accessDriver, $repository);
 
         // Force expanded path in publiclet
         $copy = clone $repository;
@@ -974,9 +978,13 @@ class ShareCenter extends AJXP_Plugin
         $guiConfigs = AJXP_PluginsService::findPluginById("gui.ajax")->getConfigs();
         $html = str_replace("AJXP_THEME", $guiConfigs["GUI_THEME"] , $html);
 
-        session_name("AjaXplorer_Shared".$hash);
-        session_start();
-        AuthService::disconnect();
+        if(isSet($_GET["dl"]) && isSet($_GET["file"])){
+            AuthService::$useSession = false;
+        }else{
+            session_name("AjaXplorer_Shared".$hash);
+            session_start();
+            AuthService::disconnect();
+        }
 
         if (!empty($data["PRELOG_USER"])) {
             AuthService::logUser($data["PRELOG_USER"], "", true);
@@ -991,6 +999,41 @@ class ShareCenter extends AJXP_Plugin
         if(isSet($hash)){
             $_SESSION["CURRENT_MINISITE"] = $hash;
         }
+
+        if(isSet($_GET["dl"]) && isSet($_GET["file"])){
+            ConfService::switchRootDir($repository);
+            ConfService::loadRepositoryDriver();
+            AJXP_PluginsService::deferBuildingRegistry();
+            AJXP_PluginsService::getInstance()->initActivePlugins();
+            AJXP_PluginsService::flushDeferredRegistryBuilding();
+            try {
+                $params = $_GET;
+                $ACTION = "download";
+                if(isset($_GET["ct"])){
+                    $mime = pathinfo($params["file"], PATHINFO_EXTENSION);
+                    $editors = AJXP_PluginsService::searchAllManifests("//editor[contains(@mimes,'$mime') and @previewProvider='true']", "node", true, true, false);
+                    if (count($editors)) {
+                        foreach ($editors as $editor) {
+                            $xPath = new DOMXPath($editor->ownerDocument);
+                            $callbacks = $xPath->query("//action[@contentTypedProvider]", $editor);
+                            if ($callbacks->length) {
+                                $ACTION = $callbacks->item(0)->getAttribute("name");
+                                if($ACTION == "audio_proxy") {
+                                    $params["file"] = "base64encoded:".base64_encode($params["file"]);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                AJXP_Controller::registryReset();
+                AJXP_Controller::findActionAndApply($ACTION, $params, null);
+            } catch (Exception $e) {
+                die($e->getMessage());
+            }
+            return;
+        }
+
         if (isSet($_GET["lang"])) {
             $loggedUser = &AuthService::getLoggedUser();
             if ($loggedUser != null) {
