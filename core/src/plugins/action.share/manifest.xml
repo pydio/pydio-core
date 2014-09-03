@@ -475,11 +475,11 @@
                     <clientCallback dialogOpenForm="share_current_url" dialogSkipButtons="true" prepareModal="true">
                         <dialogOnOpen><![CDATA[
                             modal.getForm().down("#crt-page-url").setValue(document.location.href);
-                            if(!ajaxplorer.getContextHolder().isEmpty()){
+                            if(!ajaxplorer.getContextHolder().isEmpty() && ajaxplorer.getActionBar().getActionByName("download")){
                                 var tpl = new Template('<div style="font-size: 16px; padding-top:15px; text-align:left;">#{title} <a href="#{link}" target="_blank" class="icon-link" style="font-size: 0.8em;"></a></div><input type="text" value="#{link}" style="width: 98%;">');
                                 var node = ajaxplorer.getContextHolder().getUniqueNode();
                                 var editors = ajaxplorer.findEditorsForMime(node.getAjxpMime(), true);
-                                if(editors.length){
+                                if(editors.length && Class.getByName(editors[0].editorClass)){
                                     var staticClass = Class.getByName(editors[0].editorClass).prototype;
                                     if(staticClass.getRESTPreviewLinks){
                                         var links = staticClass.getRESTPreviewLinks(node);

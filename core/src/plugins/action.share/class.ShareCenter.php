@@ -1000,7 +1000,7 @@ class ShareCenter extends AJXP_Plugin
             $_SESSION["CURRENT_MINISITE"] = $hash;
         }
 
-        if(isSet($_GET["dl"]) && isSet($_GET["file"])){
+        if(isSet($_GET["dl"]) && isSet($_GET["file"]) && (!isSet($data["DOWNLOAD_DISABLED"]) || $data["DOWNLOAD_DISABLED"] === false)){
             ConfService::switchRootDir($repository);
             ConfService::loadRepositoryDriver();
             AJXP_PluginsService::deferBuildingRegistry();
