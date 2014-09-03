@@ -179,6 +179,7 @@ class Repository implements AjxpGroupPathProvider
         if ($parentId == null) {
             $parentId = $this->getId();
         }
+        $repo->setInferOptionsFromParent(true);
         $repo->setOwnerData($parentId, $owner, $uniqueUser);
         return $repo;
     }
