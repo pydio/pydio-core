@@ -284,10 +284,13 @@ class GitManager extends AJXP_Plugin
         $command = $git->getCommand("commit");
         $command->setOption("a", true);
         $userId = "no user";
+        $mail = "mail@mail.com";
         if (AuthService::getLoggedUser()!=null) {
             $userId = AuthService::getLoggedUser()->getId();
+            $mail = AuthService::getLoggedUser()->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "mail@mail.com");
         }
         $command->setOption("m", $userId);
+        $command->setOption("author", "$userId <$mail>");
         //$command->addArgument($path);
 
         try {
