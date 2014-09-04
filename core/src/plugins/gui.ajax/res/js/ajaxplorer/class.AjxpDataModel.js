@@ -146,7 +146,7 @@ Class.create("AjxpDataModel", {
 		}
 	},
 
-    requireNodeReload: function(nodeOrPath){
+    requireNodeReload: function(nodeOrPath, completeCallback){
         if(Object.isString(nodeOrPath)){
             nodeOrPath = new AjxpNode(nodeOrPath);
         }
@@ -164,6 +164,7 @@ Class.create("AjxpDataModel", {
                     this._selectedNodes.push(newNode);
                     this._selectionSource = {};
                     this.publish("selection_changed", this);
+                    if(completeCallback) completeCallback(newNode);
                 }.bind(this);
             }
         }

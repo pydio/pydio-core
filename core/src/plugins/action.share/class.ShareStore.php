@@ -69,7 +69,7 @@ class ShareStore {
      * @return string $hash
      * @throws Exception
      */
-    public function storeShare($parentRepositoryId, $shareData, $type="minisite", $existingHash = null){
+    public function storeShare($parentRepositoryId, $shareData, $type="minisite", $existingHash = null, $updateHash = null){
 
         $data = serialize($shareData);
         if($existingHash){
@@ -80,6 +80,10 @@ class ShareStore {
         if($this->sqlSupported){
             $this->createGenericLoader();
             $shareData["SHARE_TYPE"] = $type;
+            if($updateHash != null){
+                $this->confStorage->simpleStoreClear("share", $existingHash);
+                $hash = $updateHash;
+            }
             $this->confStorage->simpleStoreSet("share", $hash, $shareData, "serial", $parentRepositoryId);
             return $hash;
         }

@@ -154,11 +154,13 @@ Class.create("Ajaxplorer", {
                 this.router.navigate("/.");
             }else{
                 var repositoryObject = repList.get(repId);
-                var slug = repositoryObject.getSlug();
-                if(!repositoryObject.getAccessType().startsWith("ajxp_")){
-                    slug = "ws-" + slug;
+                if(repositoryObject){
+                    var slug = repositoryObject.getSlug();
+                    if(!repositoryObject.getAccessType().startsWith("ajxp_")){
+                        slug = "ws-" + slug;
+                    }
+                    this.router.navigate(slug);
                 }
-                this.router.navigate(slug);
             }
         }.bind(this);
 
@@ -648,6 +650,7 @@ Class.create("Ajaxplorer", {
 			//return;
 		}
         this._contextHolder.setSelectedNodes([]);
+        if(repository == null) return;
 		
 		repository.loadResources();
 		var repositoryId = repository.getId();		
@@ -1226,8 +1229,8 @@ Class.create("Ajaxplorer", {
 	/**
 	 * Accessor for datamodel.requireContextChange()
 	 */
-	fireNodeRefresh : function(nodePathOrNode){
-		this.getContextHolder().requireNodeReload(nodePathOrNode);
+	fireNodeRefresh : function(nodePathOrNode, completeCallback){
+		this.getContextHolder().requireNodeReload(nodePathOrNode, completeCallback);
 	},
 	
 	/**

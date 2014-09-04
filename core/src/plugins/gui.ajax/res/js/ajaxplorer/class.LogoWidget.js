@@ -29,28 +29,39 @@ Class.create("LogoWidget", AjxpPane, {
                 if(MessageHash[options.linkTitle]) linkTitle = MessageHash[options.linkTitle];
                 else linkTitle = options.linkTitle;
             }
+            var clickObs = function(){
+                if(options.link.startsWith('triggerRepositoryChange:')){
+                    ajaxplorer.triggerRepositoryChange(options.link.replace('triggerRepositoryChange:',''));
+                }else{
+                    if(options.linkTarget && options.linkTarget == 'new'){
+                        window.open(options.link);
+                    }else{
+                        document.location.href = options.link;
+                    }
+                }
+            };
+            var observeElement;
             if(this.image){
-                if(linkTitle) this.image.writeAttribute("title", linkTitle);
-                this.image.observe("click", function(){
-                    if(options.linkTarget && options.linkTarget == 'new'){
-                        window.open(options.link);
-                    }else{
-                        document.location.href = options.link;
-                    }
+                observeElement = this.image;
+            }else if(this.titleDiv){
+                observeElement = this.titleDiv;
+            }else{
+                var clickable = new Element('div', {title:linkTitle});
+                clickable.setStyle({
+                    cursor:'pointer',
+                    height:element.getHeight() + 'px',
+                    position:'absolute',
+                    top:0,
+                    left:0,
+                    width:'180px'
                 });
-                this.image.addClassName("linked");
+                element.insert({top:clickable});
+                observeElement = clickable;
             }
-            if(this.titleDiv){
-                if(linkTitle) this.titleDiv.writeAttribute("title", linkTitle);
-                this.titleDiv.observe("click", function(){
-                    if(options.linkTarget && options.linkTarget == 'new'){
-                        window.open(options.link);
-                    }else{
-                        document.location.href = options.link;
-                    }
-                });
-                this.titleDiv.addClassName("linked");
-            }
+            if(linkTitle) observeElement.writeAttribute("title", linkTitle);
+            observeElement.observe("click", clickObs);
+            observeElement.addClassName("linked");
+
         }
 
     },

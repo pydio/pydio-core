@@ -1183,6 +1183,9 @@ class ConfService
         }
         $this->switchRootDirInst();
         $crtRepository = $this->getRepositoryInst();
+        if($crtRepository == null){
+            throw new Exception("No active repository found for user!");
+        }
         $accessType = $crtRepository->getAccessType();
         $pServ = AJXP_PluginsService::getInstance();
         $plugInstance = $pServ->getPluginByTypeName("access", $accessType);

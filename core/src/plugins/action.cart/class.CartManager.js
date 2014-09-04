@@ -282,3 +282,9 @@ Class.create("CartManager", FetchedResultPane, {
     }
 
 });
+
+if(window.ajxpMinisite){
+    document.observe("ajaxplorer:actions_loaded", function(){
+        ajaxplorer.actionBar.actions.unset("send-selection-to-cart");
+    });
+}

@@ -2253,6 +2253,43 @@ div#upload_files_list, div#multiple_download_container
     background-color: #c3d9ff !important;
 }
 
+#uploader_chooser{
+    width: 100%;
+}
+
+#uploader_chooser ul{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: block;
+    position: relative;
+    border-bottom: 1px solid #77b8e2;
+}
+
+#uploader_chooser li {
+    display: inline-block;
+    padding: 12px 14px;
+    border-radius: 4px 4px 0 0;
+    margin: 8px 2px;
+    margin-bottom: 0;
+    border-bottom: 0;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+#uploader_chooser li:hover {
+    background-color: #f5f5f5;
+    border-bottom: 2px solid #f5f5f5;
+}
+#uploader_chooser li.current:hover {
+}
+#uploader_chooser li.current {
+    font-weight: bold;
+    cursor: default;
+    border-bottom: 2px solid #77b8e2;
+}
+
+
 #content_pane.dropareaHover {
     border-color: #D96252 !important;
     border-style: dashed;
@@ -3801,6 +3838,7 @@ div#target_repository_toggle{
 
 .share_edit div#target_repository_toggle{
     display: block !important;
+    width: 400px;
 }
 
 .share_edit div#target_repository_toggle span{
@@ -3809,7 +3847,7 @@ div#target_repository_toggle{
 
 .share_edit div#target_repository_toggle div.SF_horizontal_actions{
     text-align: right;
-    margin-top: 10px;
+    margin-top: 5px;
     margin-bottom: -20px;
     padding-right: 0;
 }
