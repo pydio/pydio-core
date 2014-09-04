@@ -43,13 +43,20 @@ Class.create("GraphsViewer", AbstractEditor, {
     open : function($super, node){
         $super(node);
         this.node = node;
+        if(this.node.getMetadata().get("graph_viewer_class")){
+            this.element.addClassName(this.node.getMetadata().get("graph_viewer_class"));
+        }
         this.loadQueries();
     },
 
     loadQueries : function(){
+        var action = "analytic_list_queries";
+        if(this.node.getMetadata().get("graph_load_all")){
+            action = this.node.getMetadata().get("graph_load_all");
+        }
         var conn = new Connexion();
         conn.setParameters($H({
-            get_action: 'analytic_list_queries'
+            get_action: action
         }));
         conn.onComplete = function(transport){
             this.parseAndLoadQueries(transport.responseJSON);
@@ -83,11 +90,15 @@ Class.create("GraphsViewer", AbstractEditor, {
     },
 
     loadData : function(queryName, chart, start, count){
+        var action = "analytic_query";
+        if(this.node.getMetadata().get("graph_load_query")){
+            action = this.node.getMetadata().get("graph_load_query");
+        }
         var conn = new Connexion();
         if(!start) start = 0;
         if(!count) count = this.defaultCount;
         conn.setParameters($H({
-            get_action: 'analytic_query',
+            get_action: action,
             query_name: queryName,
             start:start,
             count:count
@@ -117,17 +128,27 @@ Class.create("GraphsViewer", AbstractEditor, {
             chart.defaultColors[0] = new dimple.color(this.colors[colorIndex]);
             this.colorIndex ++;
             chart.setMargins(80, 20, 40, 80);
-            if(qData["DIRECTION"] && qData["DIRECTION"] == "horizontal"){
+            if(qData["DIAGRAM"] && qData["DIAGRAM"] == "pie"){
+                chart.addMeasureAxis("p", qData['AXIS']['x']);
+            }else if(qData["DIRECTION"] && qData["DIRECTION"] == "horizontal"){
                 chart.addMeasureAxis("x", qData['AXIS']['x']);
                 chart.addCategoryAxis("y", qData['AXIS']['y']);
                 chart.setMargins('40%', 20, 40, 80);
             }else{
+                // Default vertical bars
                 chart.addCategoryAxis("x", qData['AXIS']['x']);
                 chart.addMeasureAxis("y", qData['AXIS']['y']);
             }
 
             if(qData["DIAGRAM"]){
-                chart.addSeries(null, dimple.plot[qData["DIAGRAM"]]);
+                if(qData["DIAGRAM"] == "pie"){
+                    var ring = chart.addSeries(qData['AXIS']['y'], dimple.plot[qData["DIAGRAM"]]);
+                    if(qData["PIE_RING"]){
+                        ring.innerRadius = qData["PIE_RING"];
+                    }
+                }else{
+                    chart.addSeries(null, dimple.plot[qData["DIAGRAM"]]);
+                }
             }else{
                 chart.addSeries(null, dimple.plot.line);
             }
