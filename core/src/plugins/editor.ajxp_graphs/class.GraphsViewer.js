@@ -131,9 +131,9 @@ Class.create("GraphsViewer", AbstractEditor, {
             if(qData["DIAGRAM"] && qData["DIAGRAM"] == "pie"){
                 chart.addMeasureAxis("p", qData['AXIS']['x']);
             }else if(qData["DIRECTION"] && qData["DIRECTION"] == "horizontal"){
+                chart.setMargins('40%', 20, 40, 80);
                 chart.addMeasureAxis("x", qData['AXIS']['x']);
                 chart.addCategoryAxis("y", qData['AXIS']['y']);
-                chart.setMargins('40%', 20, 40, 80);
             }else{
                 // Default vertical bars
                 chart.addCategoryAxis("x", qData['AXIS']['x']);
@@ -147,10 +147,11 @@ Class.create("GraphsViewer", AbstractEditor, {
                         ring.innerRadius = qData["PIE_RING"];
                     }
                 }else{
-                    chart.addSeries(null, dimple.plot[qData["DIAGRAM"]]);
+                    chart.addSeries(qData['AXIS']['y'], dimple.plot[qData["DIAGRAM"]]);
                 }
             }else{
-                chart.addSeries(null, dimple.plot.line);
+                var s = chart.addSeries(null, dimple.plot.line);
+                s.interpolation = 'cardinal';
             }
             chart.draw();
             div.insert({top:('<div class="innerTitle">'+qData['LABEL']+'</div>')});
