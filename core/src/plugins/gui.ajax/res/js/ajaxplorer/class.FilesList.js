@@ -746,8 +746,8 @@ Class.create("FilesList", SelectableElements, {
                     this.getCurrentContextNode().reload();
 				}.bind(this), this.getVisibleColumns(), this.paginationData.get('currentOrderCol')||-1, this.paginationData.get('currentOrderDir') );
 			}
-			this.disableTextSelection(this.htmlElement.down('div.sort-table'), true);
-			this.disableTextSelection(contentContainer, true);
+			//this.disableTextSelection(this.htmlElement.down('div.sort-table'), true);
+			//this.disableTextSelection(contentContainer, true);
 			this.observer = function(e){
                 if(this.options.fit && this.options.fit == 'height') fitHeightToBottom(contentContainer, this.htmlElement);
 				if(Prototype.Browser.IE){
@@ -891,7 +891,7 @@ Class.create("FilesList", SelectableElements, {
                 });
             }
 
-			this.disableTextSelection(scrollElement, true);
+			//this.disableTextSelection(scrollElement, true);
             if(this.options.selectable == undefined || this.options.selectable === true){
 			    this.initSelectableItems(scrollElement, true, scrollElement, true);
             }else{
@@ -1175,11 +1175,13 @@ Class.create("FilesList", SelectableElements, {
 				this._headerResizer.resize(this.htmlElement.getWidth()-2);
 			}
 		}
+        /*
 		var allItems = this.getItems();
 		for(var i=0; i<allItems.length;i++)
 		{
 			this.disableTextSelection.bind(this).defer(allItems[i], true);
 		}
+		*/
         this.notify("resize");
         this.notify("rows:didInitialize");
 	},
@@ -1753,12 +1755,12 @@ Class.create("FilesList", SelectableElements, {
 				var date = new Date();
 				date.setTime(parseInt(metaData.get(s))*1000);
 				newRow.ajxp_modiftime = date;
-				tableCell.update('<span class="text_label'+fullview+'">' + formatDate(date) + '</span>');
+				tableCell.innerHTML = '<span class="text_label'+fullview+'">' + formatDate(date) + '</span>';
 			}
 			else
 			{
 				var metaValue = metaData.get(s) || "";
-				tableCell.update('<span class="text_label'+fullview+'">' + metaValue  + "</span>");
+				tableCell.innerHTML = '<span class="text_label'+fullview+'">' + metaValue  + "</span>";
 			}
 			if(this.gridStyle == "grid"){
 				tableCell.setAttribute('valign', 'top');				

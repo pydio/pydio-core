@@ -41,7 +41,7 @@ Class.create("AjxpNode", {
 		this._isLeaf = isLeaf || false;
 		this._label = label || '';
 		this._icon = icon || '';
-		this._children = $A([]);
+		this._children = $H();
 		this._isRoot = false;
 		
 		this._isLoaded = false;
@@ -95,8 +95,11 @@ Class.create("AjxpNode", {
 	 * @param iAjxpNodeProvider IAjxpNodeProvider Optionnal
 	 */
 	reload : function(iAjxpNodeProvider){
-		this._children.each(function(child){
-			this.removeChild(child);
+		this._children.each(function(pair){
+            pair.value.notify("node_removed");
+            pair.value._parentNode = null;
+            this._children.unset(pair.key);
+            this.notify("child_removed", pair.value);
 		}.bind(this));
 		this._isLoaded = false;		
 		this.load(iAjxpNodeProvider);
@@ -105,8 +108,11 @@ Class.create("AjxpNode", {
 	 * Unload child and notify "force_clear"
 	 */
 	clear : function(){
-		this._children.each(function(child){
-			this.removeChild(child);
+		this._children.each(function(pair){
+            pair.value.notify("node_removed");
+            pair.value._parentNode = null;
+            this._children.unset(pair.key);
+            this.notify("child_removed", pair.value);
 		}.bind(this));
 		this._isLoaded = false;		
 		this.notify("force_clear");
@@ -122,15 +128,18 @@ Class.create("AjxpNode", {
 	 * @param ajxpNodes AjxpNodes[]
 	 */
 	setChildren : function(ajxpNodes){
-		this._children = $A(ajxpNodes);
-		this._children.invoke('setParent', this);
+		this._children = $H();
+        $A(ajxpNodes).each(function(n){
+            this._children.set(n.getPath(), n);
+            n.setParent(this);
+        }.bind(this));
 	},
 	/**
 	 * Get all children as a bunch
 	 * @returns AjxpNode[]
 	 */
 	getChildren : function(){
-		return this._children;
+		return this._children.values();
 	},
 	/**
 	 * Adds a child to children
@@ -143,7 +152,7 @@ Class.create("AjxpNode", {
 		if(existingNode && !Object.isString(existingNode)){
 			existingNode.replaceBy(ajxpNode, "override");
 		}else{			
-			this._children.push(ajxpNode);
+			this._children.set(ajxpNode.getPath(), ajxpNode);
 			this.notify("child_added", ajxpNode.getPath());
 		}
 	},
@@ -155,9 +164,10 @@ Class.create("AjxpNode", {
 		var removePath = ajxpNode.getPath();
 		ajxpNode.notify("node_removed");
         ajxpNode._parentNode = null;
-		this._children = this._children.without(ajxpNode);
+		this._children.unset(ajxpNode.getPath());
 		this.notify("child_removed", removePath);
 	},
+
 	/**
 	 * Replaces the current node by a new one. Copy all properties deeply
 	 * @param ajxpNode AjxpNode
@@ -209,9 +219,7 @@ Class.create("AjxpNode", {
 	 * @returns AjxpNode
 	 */
 	findChildByPath : function(path){
-		return $A(this._children).find(function(child){
-			return (child.getPath() == path);
-		});
+        return this._children.get(path);
 	},
 	/**
 	 * Sets the metadata as a bunch
