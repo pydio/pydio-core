@@ -383,8 +383,27 @@ class sqlLogDriver extends AbstractLogDriver
             $q = 'SELECT * FROM [ajxp_log] WHERE [logdate] BETWEEN %t AND %t';
             $result = dibi::query($q, $start_time, $end_time);
             $log_items = "";
-
+            $currentCount = 1;
             foreach ($result as $r) {
+
+                if(isSet($buffer) && $buffer["user"] == $r["user"] && $buffer["message"] == $r["message"]){
+                    $currentCount ++;
+                    continue;
+                }
+                if(isSet($buffer)){
+                    $log_items .= SystemTextEncoding::toUTF8($this->formatXmlLogItem(
+                        $nodeName,
+                        'toggle_log.png',
+                        $buffer['logdate'],
+                        $date,
+                        $buffer['remote_ip'],
+                        $buffer['severity'],
+                        $buffer['user'],
+                        $buffer['source'],
+                        $buffer['message'].($currentCount > 1?" (".$currentCount.")":""),
+                        $buffer['params'],
+                        $rootPath));
+                }
                 $log_items .= SystemTextEncoding::toUTF8($this->formatXmlLogItem(
                     $nodeName,
                     'toggle_log.png',
@@ -397,6 +416,11 @@ class sqlLogDriver extends AbstractLogDriver
                     $r['message'],
                     $r['params'],
                     $rootPath));
+
+                $currentCount = 1;
+
+                $buffer = $r;
+
             }
 
             print($log_items);
