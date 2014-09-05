@@ -379,7 +379,7 @@ class AuthService
         if ($authDriver->autoCreateUser() && !$user->storageExists()) {
             $user->save("superuser"); // make sure update rights now
         }
-        AJXP_Logger::info(__CLASS__, "Log In", "");
+        AJXP_Logger::info(__CLASS__, "Log In", array("context"=>self::$useSession?"WebUI":"API"));
         return 1;
     }
     /**
