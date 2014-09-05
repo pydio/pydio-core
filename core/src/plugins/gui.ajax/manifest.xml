@@ -572,6 +572,10 @@
                                 }
                                 var root = dm.getRootNode();
                                 if(root.getChildren().length){
+                                    var first = root.getChildren().first();
+                                    if((first.getAjxpMime() == 'mp3' || first.getAjxpMime() == 'wav') && !(window.soundManager && window.soundManager.enabled)){
+                                        return;
+                                    }
                                     dm.setSelectedNodes([root.getChildren().first()], "dataModel");
                                     window.setTimeout(function(){ajaxplorer.actionBar.fireDefaultAction("file");}, 1);
                                     p.stop();
@@ -593,6 +597,7 @@
                     }
 				#browser{
 				    background-color: #000;
+				    width:102%;
                     -webkit-font-smoothing: antialiased;
 				}
 				#cpane_container{
@@ -621,6 +626,9 @@
                     background-color: rgba(0,0,0,0.5);
                     padding: 20px 10px;
                     border-radius: 5px;
+                }
+                div.widget_logo{
+                    height: 75px;
                 }
                 div#widget_title{
                     color: rgba(255,255,255,0.8);

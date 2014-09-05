@@ -57,3 +57,8 @@
 .volume_slider_active{
     background-color: rgba(255,255,255,0.7);
 }
+
+#smplayer_editor div.smplayer_preview_element {
+    margin: 0 auto;
+    width: 242px;
+}
