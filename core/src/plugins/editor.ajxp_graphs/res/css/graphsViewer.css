@@ -6,23 +6,35 @@ div.cumulated_figure{
     border-radius: 4px;
 }
 
-div.cumulated_figure:nth-child(2){
+div.cumulated_figure:nth-child(2),
+div.cumulated_figure:nth-child(7),
+div.cumulated_figure:nth-child(12)
+{
     background-color: #77b8e2;
 }
 
-div.cumulated_figure:nth-child(3){
+div.cumulated_figure:nth-child(3),
+div.cumulated_figure:nth-child(8),
+div.cumulated_figure:nth-child(13)
+{
     background-color: #e35d52;
 }
 
-div.cumulated_figure:nth-child(4){
+div.cumulated_figure:nth-child(4),
+div.cumulated_figure:nth-child(9)
+{
     background-color: #d7a76A;
 }
 
-div.cumulated_figure:nth-child(5){
+div.cumulated_figure:nth-child(5),
+div.cumulated_figure:nth-child(10)
+{
     background-color: rgb(78,167,165);
 }
 
-div.cumulated_figure:nth-child(6){
+div.cumulated_figure:nth-child(6),
+div.cumulated_figure:nth-child(11)
+{
     background-color: #156FAF;
 }
 
