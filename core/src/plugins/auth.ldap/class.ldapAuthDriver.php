@@ -598,7 +598,9 @@ class ldapAuthDriver extends AbstractAuthDriver
                     $key = strtolower($params['MAPPING_LDAP_PARAM']);
                     if (isSet($entry[$key])) {
                         $value = $entry[$key][0];
+
                         $memberValues = array();
+
                         if ($key == "memberof") {
                             // get CN from value
                                     foreach ($entry[$key] as $possibleValue) {
@@ -633,6 +635,13 @@ class ldapAuthDriver extends AbstractAuthDriver
                                             $userObject->recomputeMergedRole();
                                             $changes = true;
                                         }
+                                    }
+                                }else{
+                                    $uniqValue = $value;
+                                    if ((!in_array($uniqValue, array_keys($userObject->getRoles()))) && !empty($uniqValue)) {
+                                        $userObject->addRole(AuthService::getRole($uniqValue, true));
+                                        $userObject->recomputeMergedRole();
+                                        $changes = true;
                                     }
                                 }
                                 break;
