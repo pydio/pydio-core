@@ -49,6 +49,12 @@
 					</div>
 				</div>
 			]]></template>
+			<template name="main_vision" element="ajxp_desktop" position="top" theme="vision"><![CDATA[
+                <div id="actions_log" style="overflow: hidden;font-size: 17px;height: 128px;border-radius: 5px;background-color: #BBB;padding: 3px;"></div>
+			]]></template>
+			<template name="main_orbit" element="ajxp_desktop" position="top" theme="orbit"><![CDATA[
+                <div id="actions_log" style="overflow: hidden;font-size: 17px;height: 128px;border-radius: 5px;background-color: #BBB;padding: 3px;"></div>
+			]]></template>
 		</client_configs>
 	</registry_contributions>
     <dependencies>
