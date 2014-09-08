@@ -146,7 +146,18 @@ class CommentsMetaManager extends AJXP_Plugin
                     $sortDir = isSet($httpVars["sort_dir"])?AJXP_Utils::decodeSecureMagic($httpVars["sort_dir"]):"asc";
                     $offset = isSet($httpVars["offset"]) ? intval($httpVars["offset"]) : 0;
                     $limit = isSet($httpVars["limit"]) ? intval($httpVars["limit"]) : 100;
-                    $data = $feedStore->findMetaObjectsByIndexPath($this->accessDriver->repository->getId(), $uniqNode->getPath(), AuthService::getLoggedUser()->getId(), AuthService::getLoggedUser()->getGroupPath(), $offset, $limit, $sortBy, $sortDir);
+                    $uniqNode->loadNodeInfo();
+                    $data = $feedStore->findMetaObjectsByIndexPath(
+                        $this->accessDriver->repository->getId(),
+                        $uniqNode->getPath(),
+                        AuthService::getLoggedUser()->getId(),
+                        AuthService::getLoggedUser()->getGroupPath(),
+                        $offset,
+                        $limit,
+                        $sortBy,
+                        $sortDir,
+                        !$uniqNode->isLeaf()
+                    );
                     $theFeed = array();
                     foreach ($data as $stdObject) {
                         $rPath = substr($stdObject->path, strlen($uniqNode->getPath()));
