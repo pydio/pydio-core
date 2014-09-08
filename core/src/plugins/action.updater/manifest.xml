@@ -32,6 +32,7 @@
                             var conn = new Connexion();
                             $(oForm).down('div[id="upgrade_checking"]').show();
                             $(oForm).down('div[id="upgrade_checking"]').update('Checking for available upgrades');
+                            fitHeightToBottom($(oForm), null, 40);
                             conn.addParameter("get_action", "get_upgrade_path");
                             conn.onComplete = function(transport){
                                 var response = transport.responseJSON;
@@ -42,11 +43,12 @@
                                     var pList = response.packages.join(" ");
                                     $(oForm).down('div[id="upgrade_status"]').show();
                                     $(oForm).down('div[id="upgrade_status"]').insert({top:'The following packages will be downloaded and installed : <ul style="margin-top:4px;">'+ pList+'</ul> <br>'});
+                                    var stepsContainer = $(oForm).down('iframe[id="upgrade_steps"]');
+                                    fitHeightToBottom(stepsContainer, null, 40);
                                     if(response.latest_note){
-                                        $(oForm).down('iframe[id="upgrade_steps"]').src = response.latest_note;
+                                        stepsContainer.src = response.latest_note;
                                     }
                                     var startButton = $(oForm).down('div[id="start_upgrade_button"]');
-                                    var stepsContainer = $(oForm).down('iframe[id="upgrade_steps"]');
                                     startButton.observe("click", function(){
                                         if(window.confirm('Are you sure you want to perform the upgrade?')){
                                             var conn = new Connexion();
@@ -69,7 +71,7 @@
                         <dialogOnCancel><![CDATA[]]></dialogOnCancel>
                     </clientCallback>
                     <clientForm id="upgrade_form"><![CDATA[
-                        <div id="upgrade_form" action="perform_upgrade" box_width="500">
+                        <div id="upgrade_form" action="perform_upgrade" box_width="70%" box_height="85%">
                             <div id="upgrade_checking"></div>
                             <div id="upgrade_status" style="display:none;">
                                 <p><div id="start_upgrade_button" style="float: right;border: 1px solid #BBB;padding: 7px;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius: 5px;background-color: #EEE;color: #333;margin-left: 5px;border-image: initial;box-shadow: 1px 1px 7px #ddd;cursor: pointer;font-weight: bold;"> AJXP_MESSAGE[updater.4] </div>AJXP_MESSAGE[updater.3]</p>
