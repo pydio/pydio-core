@@ -346,7 +346,8 @@ Class.create("AjxpNode", {
 			}else{
                 if(fakeNodes === undefined) return false;
 				crtNode = new AjxpNode(crtPath, false, getBaseName(crtPath));
-				crtNode.fake = true;				
+				crtNode.fake = true;
+                crtNode.getMetadata().set("text", getBaseName(crtPath));
 				fakeNodes.push(crtNode);
 				crtParentNode.addChild(crtNode);
 			}
