@@ -156,9 +156,11 @@ class EncfsMounter extends AJXP_Plugin
             $ajxpNode->ENCFS_clear_folder = true;
             $ajxpNode->overlay_icon = "cypher.encfs/overlay_ICON_SIZE.png";
             $ajxpNode->overlay_class = "icon-lock";
+            $ajxpNode->__set("ajxp_readonly", "true");
             if (is_file($ajxpNode->getUrl()."/.ajxp_mount")) {
                 $ajxpNode->setLabel(substr($ajxpNode->getLabel(), strlen("ENCFS_CLEAR_")));
                 $ajxpNode->ENCFS_clear_folder_mounted = true;
+                $ajxpNode->__set("ajxp_readonly", "false");
             } else {
                 $ajxpNode->setLabel(substr($ajxpNode->getLabel(), strlen("ENCFS_CLEAR_")) . " (encrypted)");
             }
