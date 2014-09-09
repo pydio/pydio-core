@@ -971,6 +971,9 @@ Class.create("Ajaxplorer", {
             this._editorOpener = null;
         }
     },
+    getEditorOpener:function(){
+        return this._editorOpener;
+    },
     _messageBoxReference:null,
     registerAsMessageBoxReference: function(element){
         this._messageBoxReference = element;
