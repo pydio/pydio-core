@@ -30,7 +30,7 @@ Class.create("GraphsViewer", AbstractEditor, {
     initialize: function($super, oFormObject, editorOptions)
     {
         editorOptions = Object.extend({
-            fullscreen:false
+            fullscreen:true
         }, editorOptions);
         $super(oFormObject, editorOptions);
         this.charts = $H();
@@ -70,20 +70,23 @@ Class.create("GraphsViewer", AbstractEditor, {
     },
 
     parseAndLoadQueries: function(queriesData){
-        this.element.update('');
+        if(this.element.down("#graph_viewer_loader")){
+            this.element.down("#graph_viewer_loader").remove();
+        }
+        this.element.down("#graph_viewer_container").update('');
         this.queriesData = $A(queriesData);
         this.queriesData.each(function(qData){
             var div;
             if(qData['SEPARATOR']){
                 div = new Element('div', {class:'tabrow', style:'clear:left;'}).update('<li class="selected">' + qData['LABEL'] + '</li>');
-                this.element.insert(div);
+                this.element.down("#graph_viewer_container").insert(div);
                 if(qData['UPDATER']){
                     this.buildUpdaterButtons(div, qData['UPDATER']);
                 }
                 return;
             }
             div = new Element('div', {id:qData['NAME']+'_container'});
-            this.element.insert(div);
+            this.element.down("#graph_viewer_container").insert(div);
             if(qData["FIGURE"]){
                 div.addClassName("cumulated_figure");
                 div.update('<div class="innerTitle">'+qData['LABEL']+'</div>' + '<div class="figure">&nbsp;</div>');

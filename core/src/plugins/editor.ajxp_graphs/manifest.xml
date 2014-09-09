@@ -18,7 +18,8 @@
 	</client_settings>
 	<clientForm id="graph_viewer_box"><![CDATA[
 		<div id="graph_viewer_box" class="tabbed_editor" style="background-color:#f8f8f8; overflow-y: scroll; border-radius:0 4px 0 0;" box_resize="true" box_padding="0">
-		<div style="text-align:center; padding-top: 40px;"> Loading analytics data ... </div>
+		    <div id="graph_viewer_loader" style="text-align:center; padding-top: 40px;"> Loading analytics data ... </div>
+		    <div id="graph_viewer_container"></div>
 		</div>
 	]]></clientForm>
 	<dependencies>
