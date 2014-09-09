@@ -87,6 +87,7 @@ a:link, a:visited, a:hover, a:active, a:focus {
 
 .linked{
     cursor: pointer;
+    z-index: 10;
 }
 
 body, html
@@ -1451,7 +1452,8 @@ div.dialogBox.form-login_form_dynamic div.dialogButtons input.dialogButton
 #topPane{
     float:left;
     width:280px;
-    background-color: rgba(50,50,50,0.80);
+    background-color: rgba(50,50,50,0.93);
+    /*background-color: rgba(32, 32, 32, 0.93);*/
 }
 
 #cpane_container{
