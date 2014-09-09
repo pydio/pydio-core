@@ -224,6 +224,7 @@ class ShareCenter extends AJXP_Plugin
                         $numResult = $result;
                     }
                     print($numResult);
+                    ob_flush();
                 } else if ($subAction == "create_minisite") {
                     header("Content-type:text/plain");
                     if(isSet($httpVars["hash"]) && !empty($httpVars["hash"])) $httpHash = $httpVars["hash"];
@@ -238,6 +239,7 @@ class ShareCenter extends AJXP_Plugin
                         }
                     }
                     print($url);
+                    ob_flush();
                 } else {
                     $data = $this->accessDriver->makePublicletOptions($file, $httpVars["password"], $httpVars["expiration"], $httpVars["downloadlimit"], $this->repository);
                     $customData = array();
@@ -258,14 +260,14 @@ class ShareCenter extends AJXP_Plugin
                         header("Content-type:text/plain");
                         echo $url;
                     }
-                    flush();
+                    ob_flush();
                 }
                 if ($newMeta != null && $ajxpNode->hasMetaStore() && !$ajxpNode->isRoot()) {
                     $this->addShareInMeta($ajxpNode, $newMeta["type"], $newMeta["id"], $originalHash);
                 }
                 AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
                 // as the result can be quite small (e.g error code), make sure it's output in case of OB active.
-                flush();
+                ob_flush();
 
                 break;
 
