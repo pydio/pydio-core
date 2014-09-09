@@ -2334,11 +2334,10 @@ div.header_resizer div.header_cell{
 }
 
 div.header_resizer div.header_label{
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-size: 12px;
-    padding: 4px 5px 4px;
+    font-size: 11px;
+    padding: 5px 5px 4px;
     background-color: rgb(255, 255, 255);
-    color: rgb(104, 120, 136);
+    color: rgb(86, 101, 117);
     letter-spacing: 1px;
     border-bottom: 0;
     height: 18px;
