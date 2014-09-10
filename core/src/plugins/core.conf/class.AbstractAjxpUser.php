@@ -207,12 +207,18 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
 
     public function setLock($lockAction)
     {
-        $this->rights["ajxp.lock"] = $lockAction;
+        //$this->rights["ajxp.lock"] = $lockAction;
+        $this->personalRole->setParameterValue('core.conf', 'USER_LOCK_ACTION', $lockAction);
+        $this->recomputeMergedRole();
     }
 
     public function removeLock()
     {
-        $this->rights["ajxp.lock"] = false;
+        if(isSet($this->rights['ajxp.lock'])){
+            $this->rights["ajxp.lock"] = false;
+        }
+        $this->personalRole->setParameterValue('core.conf', 'USER_LOCK_ACTION', AJXP_VALUE_CLEAR);
+        $this->recomputeMergedRole();
     }
 
     public function getLock()
@@ -220,7 +226,8 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
         if (!empty($this->rights["ajxp.lock"])) {
             return $this->rights["ajxp.lock"];
         }
-        return false;
+        return $this->mergedRole->filterParameterValue('core.conf', 'USER_LOCK_ACTION', AJXP_REPO_SCOPE_ALL, false);
+        //return false;
     }
 
     public function isAdmin()
@@ -250,13 +257,13 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
 
     public function canRead($rootDirId)
     {
-        if(!empty($this->rights["ajxp.lock"])) return false;
+        if($this->getLock() != false) return false;
         return $this->mergedRole->canRead($rootDirId);
     }
 
     public function canWrite($rootDirId)
     {
-        if(!empty($this->rights["ajxp.lock"])) return false;
+        if($this->getLock() != false) return false;
         return $this->mergedRole->canWrite($rootDirId);
     }
 
