@@ -32,7 +32,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
         parent::init($options);
     }
 
-    function detectVar($httpVars, $varName){
+    function detectVar(&$httpVars, $varName){
         if(isSet($httpVars[$varName])) return $httpVars[$varName];
         if(isSet($_SERVER["HTTP_PYDIO_".strtoupper($varName)])) return $_SERVER["HTTP_".strtoupper($varName)];
         return "";

@@ -34,7 +34,7 @@ class OtpAuthFrontend extends AbstractAuthFrontend
     private $yubikey2;
     private $additionalRole;
 
-    function tryToLogUser($httpVars, $isLast = false)
+    function tryToLogUser(&$httpVars, $isLast = false)
     {
         require_once 'Auth/Yubico.php';
         $this->loadConfig();
