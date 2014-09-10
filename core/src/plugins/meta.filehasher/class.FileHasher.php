@@ -26,9 +26,8 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class FileHasher extends AJXP_Plugin
+class FileHasher extends AJXP_AbstractMetaSource
 {
-    protected $accessDriver;
     const METADATA_HASH_NAMESPACE = "file_hahser";
     /**
     * @var MetaStoreProvider
@@ -83,7 +82,7 @@ class FileHasher extends AJXP_Plugin
 
     public function initMeta($accessDriver)
     {
-        $this->accessDriver = $accessDriver;
+        parent::initMeta($accessDriver);
         $store = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
         if ($store === false) {
             throw new Exception("The 'meta.simple_lock' plugin requires at least one active 'metastore' plugin");

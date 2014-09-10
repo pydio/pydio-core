@@ -26,9 +26,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class ExifMetaManager extends AJXP_Plugin
+class ExifMetaManager extends AJXP_AbstractMetaSource
 {
-    protected $accessDriver;
     protected $metaDefinitions;
 
     public function init($options)
@@ -45,7 +44,7 @@ class ExifMetaManager extends AJXP_Plugin
 
     public function initMeta($accessDriver)
     {
-        $this->accessDriver = $accessDriver;
+        parent::initMeta($accessDriver);
         if(!function_exists("exif_read_data")) return ;
         //$messages = ConfService::getMessages();
         $def = $this->getMetaDefinition();

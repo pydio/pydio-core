@@ -296,8 +296,15 @@ class sqlLogDriver extends AbstractLogDriver
                     if (is_a($date, "DibiDateTime")) {
                         $date = $date->format("Y-m-d");
                     }
-                    $xml_strings[$date] = $this->formatXmlLogList($nodeName, 'toggle_log.png', $date, $date, $date, "$rootPath/$fullYear/$logM/$date");
-                    //"<$nodeName icon=\"toggle_log.png\" date=\"$display\" display=\"$display\" text=\"$date\" is_file=\"0\" filename=\"/logs/$fullYear/$fullMonth/$date\"/>";
+                    $path = "$rootPath/$fullYear/$logM/$date";
+                    $metadata = array(
+                        "icon" => "toggle_log.png",
+                        "date"=> $date,
+                        "ajxp_mime" => "datagrid",
+                        "grid_datasource" => "get_action=ls&dir=".urlencode($path),
+                        "grid_header_title" => "Application Logs for $date"
+                    );
+                    $xml_strings[$date] = AJXP_XMLWriter::renderNode($path, $date, true, $metadata, true, false);
                 }
 
             } else if ($year != null) { // Get months
@@ -318,7 +325,7 @@ class sqlLogDriver extends AbstractLogDriver
 
                     $fullYear = date('Y', $month_time);
                     $fullMonth = date('F', $month_time);
-                    $logMDisplay = date('M', $month_time);
+                    $logMDisplay = date('F', $month_time);
                     $logM = date('m', $month_time);
 
                     $xml_strings[$r['month']] = $this->formatXmlLogList($nodeName, 'x-office-calendar.png', $logM, $logMDisplay, $logMDisplay, "$rootPath/$fullYear/$logM");

@@ -26,17 +26,13 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Metastore
  */
-class s3MetaStore extends AJXP_Plugin implements MetaStoreProvider
+class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
 {
     private static $currentMetaName;
     private static $metaCache;
     private static $fullMetaCache;
 
     protected $globalMetaFile;
-    /**
-     * @var AbstractAccessDriver
-     */
-    protected $accessDriver;
     protected $bucketName;
 
 
@@ -49,7 +45,7 @@ class s3MetaStore extends AJXP_Plugin implements MetaStoreProvider
 
     public function initMeta($accessDriver)
     {
-        $this->accessDriver = $accessDriver;
+        parent::initMeta($accessDriver);
         $this->bucketName = $this->accessDriver->repository->getOption("CONTAINER");
     }
 

@@ -155,7 +155,7 @@ Class.create("FetchedResultPane", FilesList, {
         var rNodeProvider = new RemoteNodeProvider();
         dataModel.setAjxpNodeProvider(rNodeProvider);
         rNodeProvider.initProvider(ajxpOptions.nodeProviderProperties);
-        this._rootNode = new AjxpNode("/", false, "Results", "folder.png", rNodeProvider);
+        this._rootNode = new AjxpNode("/", false, ajxpOptions.rootNodeLabel?ajxpOptions.rootNodeLabel:"Results", "folder.png", rNodeProvider);
         dataModel.setRootNode(this._rootNode);
         if(ajxpOptions.emptyChildrenMessage){
             var emptyMessage = MessageHash[ajxpOptions.emptyChildrenMessage]?MessageHash[ajxpOptions.emptyChildrenMessage]:ajxpOptions.emptyChildrenMessage;

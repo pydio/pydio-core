@@ -77,7 +77,7 @@ Class.create("LogoWidget", AjxpPane, {
             }
             if(!configs.get("CUSTOM_TOP_LOGO") || configs.get("CUSTOM_TOP_LOGO") == 'ajxp-remove-original'){
                 if(this.image){
-                    this.image.remove();
+                    if(this.image.parentNode) this.image.remove();
                     this.image = null;
                 }
                 this.resizeImage(configs, true);
@@ -99,6 +99,7 @@ Class.create("LogoWidget", AjxpPane, {
             }
             if(!this.image){
                 this.image  = new Image();
+                this.image.addClassName('custom_logo_image');
                 this.image.src = url;
                 this.image.onload = function(){
                     this.resizeImage(configs, true);
@@ -110,7 +111,7 @@ Class.create("LogoWidget", AjxpPane, {
                 }.bind(this);
             }
         }else if(configs.get("CUSTOM_TOP_LOGO") == 'ajxp-remove-original' && this.image){
-            this.image.remove();
+            if(this.image.parentNode) this.image.remove();
             this.image = null;
             this.htmlElement.setAttribute('style', '');
         }
@@ -149,7 +150,7 @@ Class.create("LogoWidget", AjxpPane, {
             imgH = 0;
         }
         // Reset height
-        this.htmlElement.setStyle({paddingTop:'9px'});
+        this.htmlElement.setStyle({paddingTop:(ajxpBootstrap.parameters.get("theme") == 'orbit' ? 0: '9px')});
         if(imgH > parseInt(this.htmlElement.getHeight())){
             var elPadding = parseInt(this.htmlElement.getStyle('paddingTop')) + (imgH - parseInt(this.htmlElement.getHeight()));
             this.htmlElement.setStyle({paddingTop: elPadding + 'px'});
@@ -160,21 +161,26 @@ Class.create("LogoWidget", AjxpPane, {
             this.htmlElement.setStyle({
                 backgroundImage : 'url(' + window.ajxpResourcesFolder + '/images/white_by.png)',
                 backgroundSize : '66px',
-                backgroundPosition : (imgW+10) + 'px '+ (htHeight - 16) +'px'
+                backgroundPosition : (imgW+8) + 'px '+ (htHeight - 16) +'px'
             });
         }
         if(this.titleDiv){
             this.titleDiv.setStyle({
                 position:'absolute',
                 left : (imgW + 8) + 'px',
-                top : (htHeight - 37) + 'px',
+                top : (htHeight - 39) + 'px',
                 fontSize : '19px'
             });
         }
 
-        if(insert){
+        if(!(this.htmlElement.down('img.custom_logo_image'))){
             this.htmlElement.insert(this.image);
         }
+
+        if(this.htmlElement.down('.linked')){
+            this.htmlElement.down('.linked').setStyle({height:htHeight+'px'});
+        }
+
 
     }
 

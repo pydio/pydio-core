@@ -22,59 +22,116 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 class OtpAuthFrontend extends AbstractAuthFrontend
 {
-
+/*
     private $enable_Create_User;
     private $modifyLoginScreen;
     private $userFilePath;
     private $yubicoSecretKey;
     private $yubicoClientId;
+*/
     private $google;
     private $googleLast;
     private $yubikey1;
     private $yubikey2;
-    private $additionalRole;
 
     function tryToLogUser(&$httpVars, $isLast = false)
     {
-        require_once 'Auth/Yubico.php';
-        $this->loadConfig();
+        $exceptionMsg = "Login information is not correct! Please try again with OTP at the end of your password";
+        if(empty($httpVars) || empty($httpVars["userid"])){
+            return false;
+        } else{
+            $userid = $httpVars["userid"];
+            $this->loadConfig($userid);
+            // if there is no configuration for OTP, this means that this user don't have OTP
+            if ((empty($this->google) &&
+                empty($this->googleLast) &&
+                empty($this->yubikey1) &&
+                empty($this->yubikey2))) {
+                return false;
+            }
 
-        return false;
+            // load Yubico class
+            if(!empty($this->yubikey1)) {
+                require_once 'Auth/Yubico.php';
+            }
+
+            // cut off password and otp in pass field
+            if(strlen($httpVars["password"]) > 6){
+                $codeOTP = substr($httpVars["password"], -6);
+            }else{
+                throw new Excetion($exceptionMsg);
+                //return $this->FalseAndClearPassword($httpVars);
+            }
+
+            //Just the Google Authenticator set
+            if (!empty($this->google) &&
+                empty($this->yubikey1) &&
+                empty($this->yubikey2)) {
+                if($this->checkGooglePass($userid, $codeOTP, $this->google, $this->googleLast)){
+                    $this->logDebug(__CLASS__, __FUNCTION__, "Check OTP: matched");
+                    $httpVars["password"] = substr($httpVars["password"], 0, strlen($httpVars["password"]) - 6);
+                    //$this->logDebug(__CLASS__, __FUNCTION__, "cut off password: ".$httpVars["password"]);
+                    //return false and cut off otp from password for next authfront.
+                    return false;
+                }
+                else{
+                    throw new Excetion($exceptionMsg);
+                }
+            }elseif
+            // YubiKey1 or YubiKey2 set
+            (empty($this->google) &&
+                (!empty($this->yubikey1) || !empty($this->yubikey2))
+            ){
+               if ($this->checkYubiPass($httpVars["password"], $this->yubikey1, $this->yubikey2)){
+                   return false;
+               }else{
+                   throw new Excetion($exceptionMsg);
+               }
+            }elseif
+            // Both Yubikey and Google Authenticator set
+            // If the last character of the password is digit, it is Google Authenticator
+            (ctype_digit(substr($httpVars["password"], -1))) {
+                if($this->checkGooglePass($userid, $codeOTP, $this->google, $this->googleLast)){
+                    $httpVars["password"] = substr($httpVars["password"], 0, strlen($httpVars["password"]) - 6);
+                    return false;
+                }
+                else{
+                    throw new Excetion($exceptionMsg);
+                }
+            }
+            else{
+                if ($this->checkYubiPass($httpVars["password"], $this->yubikey1, $this->yubikey2)){
+                    return false;
+                }
+                else{
+                    throw new Excetion($exceptionMsg);
+                }
+            }
+        }
+        throw new Excetion($exceptionMsg);
+        //return $this->FalseAndClearPassword($httpVars);
     }
 
 
-    private function loadConfig()
+    private function loadConfig($userid)
     {
-        if (!empty($this->pluginConf["CREATE_USER"])) {
-            $this->enable_Create_User = trim($this->pluginConf["CREATE_USER"]);
+        $confStorage = ConfService::getConfStorageImpl();
+        $userObject = $confStorage->createUserObject($userid);
+        $role = $userObject->personalRole;
+        if ($role === false) {
+            throw new Exception("Cant find role! ");
         }
-        if (!empty($this->pluginConf["MODIFY_LOGIN_SCREEN"])) {
-            $this->modifyLoginScreen = trim($this->pluginConf["MODIFY_LOGIN_SCREEN"]);
-        }
-        if (!empty($this->pluginConf["USERS_FILEPATH"])) {
-            $this->userFilePath = trim($this->pluginConf["USERS_FILEPATH"]);
-        }
-        if (!empty($this->pluginConf["YUBICO_SECRET_KEY"])) {
-            $this->yubicoSecretKey = trim($this->pluginConf["YUBICO_SECRET_KEY"]);
-        }
-        if (!empty($this->pluginConf["YUBICO_CLIENT_ID"])) {
-            $this->yubicoClientId = trim($this->pluginConf["YUBICO_CLIENT_ID"]);
-        }
-        if (!empty($this->pluginConf["GOOGLE"])) {
-            $this->google = trim($this->pluginConf["GOOGLE"]);
-        }
-        if (!empty($this->pluginConf["GOOGLE_LAST"])) {
-            $this->googleLast = trim($this->pluginConf["GOOGLE_LAST"]);
-        }
-        if (!empty($this->pluginConf["YUBIKEY1"])) {
-            $this->yubikey1 = trim($this->pluginConf["YUBIKEY1"]);
-        }
-        if (!empty($this->pluginConf["YUBIKEY2"])) {
-            $this->yubikey2 = trim($this->pluginConf["YUBIKEY2"]);
-        }
-        if (!empty($this->pluginConf["ADDITIONAL_ROLE"])) {
-            $this->additionalRole = trim($this->pluginConf["ADDITIONAL_ROLE"]);
-        }
+        $roleData = $role->getDataArray();
+
+        $this->google = !empty($roleData['PARAMETERS']['AJXP_REPO_SCOPE_ALL']['authfront.otp']['google']) ?
+            $roleData['PARAMETERS']['AJXP_REPO_SCOPE_ALL']['authfront.otp']['google'] : '';
+        $this->googleLast = !empty($roleData["PARAMETERS"]["AJXP_REPO_SCOPE_ALL"]["authfront.otp"]["google_last"]) ?
+            $roleData["PARAMETERS"]["AJXP_REPO_SCOPE_ALL"]['authfront.otp']["google_last"] : '';
+        $this->yubikey1 = !empty($roleData["PARAMETERS"]["AJXP_REPO_SCOPE_ALL"]['authfront.otp']["yubikey1"]) ?
+            $roleData["PARAMETERS"]["AJXP_REPO_SCOPE_ALL"]['authfront.otp']["yubikey1"] : '';
+        $this->yubikey2 = !empty($roleData["PARAMETERS"]["AJXP_REPO_SCOPE_ALL"]["authfront.otp"]["yubikey2"]) ?
+            $roleData["PARAMETERS"]["AJXP_REPO_SCOPE_ALL"]['authfront.otp']["yubikey2"] : '';
+
     }
 
     // Google Authenticator
@@ -143,14 +200,9 @@ class OtpAuthFrontend extends AbstractAuthFrontend
         return $out2;
     }
 
-    public function checkGooglePass($login, $pass, $userStoredPass, $userToken, $userInvalid)
+    public function checkGooglePass($loginId, $codeOTP, $userToken, $userInvalid)
     {
-        // last six character belongs to token code, not the password
-
         $userToken = $this->base32ToHex($userToken);
-
-        $code = substr($pass, -6);
-        $pass = substr($pass, 0, strlen($pass) - 6);
 
         $now = time();
         $totpSkew = 2; // how many tokens in either side we should check. 2 means +-1 min
@@ -163,31 +215,37 @@ class OtpAuthFrontend extends AbstractAuthFrontend
         $en = ((int) ($latest / $tokenTimer));
 
         $valid = 0;
+        $this->logDebug(__CLASS__, __FUNCTION__, "codeOTP ".$codeOTP);
         for ($i=$st; ($i<=$en && $valid == 0); $i++) {
             if ($i > $userInvalid) {
                 $stest = $this->oath_hotp($userToken, $i);
-                if ($code == $stest) {
+                $this->logDebug(__CLASS__, __FUNCTION__, "stest ".$stest);
+                if ($codeOTP == $stest) {
                     $valid = 1;
                     // save google_last
                     $confStorage = ConfService::getConfStorageImpl();
-                    $userObject = $confStorage->createUserObject($login);
+                    $userObject = $confStorage->createUserObject($loginId);
                     $role = $userObject->personalRole;
                     if ($role === false) {
                         throw new Exception("Cant find role! ");
                     }
-                    $role->setParameterValue("auth.serial_otp", "google_last", $i);
+                    $role->setParameterValue("authfront.otp", "google_last", $i);
                     AuthService::updateRole($role, $userObject);
+
+                    return true;
                 }
             }
         }
 
-        return ( AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass) && $valid == 1);
+        return false;
+        //return ( AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass) && $valid == 1);
     }
 
     // YubiKey
 
-    public function checkYubiPass($pass, $userStoredPass, $yubikey1, $yubikey2)
+    public function checkYubiPass($pass, $yubikey1, $yubikey2)
     {
+
         // yubikey generates 44 character, identity is the first 12 character
         $yubi1_identity = substr($yubikey1, 0, 12);
         $yubi2_identity = substr($yubikey2, 0, 12);
@@ -203,7 +261,11 @@ class OtpAuthFrontend extends AbstractAuthFrontend
         $yubi = new Auth_Yubico($this->yubico_client_id, $this->yubico_secret_key);
         $auth = $yubi->verify($yotp);
 
-        return ((!PEAR::isError($auth)) &&  AJXP_Utils::pbkdf2_validate_password($pass, $userStoredPass));
+        return (!PEAR::isError($auth));
     }
 
+    private function FalseAndClearPassword(&$httpVars){
+        $httpVars["password"] = "";
+        return false;
+    }
 }
