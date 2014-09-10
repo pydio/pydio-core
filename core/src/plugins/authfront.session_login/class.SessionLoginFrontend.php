@@ -28,7 +28,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
         return parent::isEnabled();
     }
 
-    function tryToLogUser($httpVars, $isLast = false){
+    function tryToLogUser(&$httpVars, $isLast = false){
 
         if(!isSet($httpVars["get_action"]) || $httpVars["get_action"] != "login"){
             return false;

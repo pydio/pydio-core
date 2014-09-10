@@ -47,7 +47,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
     private $cas_additional_role;
 
 
-    function tryToLogUser($httpVars, $isLast = false)
+    function tryToLogUser(&$httpVars, $isLast = false)
     {
         $this->loadConfig();
 
