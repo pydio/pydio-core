@@ -30,6 +30,6 @@ abstract class AbstractAuthFrontend extends AJXP_Plugin {
      * @param bool $isLast Whether this is is the last plugin called.
      * @return bool
      */
-    abstract function tryToLogUser($httpVars, $isLast = false);
+    abstract function tryToLogUser(&$httpVars, $isLast = false);
 
 } 

@@ -38,7 +38,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
         return "";
     }
 
-    function tryToLogUser($httpVars, $isLast = false){
+    function tryToLogUser(&$httpVars, $isLast = false){
 
         $token = $this->detectVar($httpVars, "auth_token");
         if(empty($token)){
