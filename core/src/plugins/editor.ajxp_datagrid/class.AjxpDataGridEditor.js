@@ -36,8 +36,9 @@ Class.create("AjxpDataGridEditor", AbstractEditor, {
             this.fRP = new FetchedResultPane(this.element.down("#grid_container"), {
                 displayMode:'list',
                 fixedDisplayMode:'list',
+                rootNodeLabel:this.node.getLabel(),
                 selectionChangeCallback:function(){},
-                nodeProviderProperties: this._dataSource.toQueryParams()
+                nodeProviderProperties: this._uniqueSource.toQueryParams()
             });
             this.fRP._dataLoaded = false;
             this.fRP.showElement(true);
@@ -57,6 +58,7 @@ Class.create("AjxpDataGridEditor", AbstractEditor, {
                     fit:'content',
                     displayMode:'list',
                     fixedDisplayMode:'list',
+                    rootNodeLabel:this.node.getLabel(),
                     selectionChangeCallback:function(){},
                     nodeProviderProperties: dS.toQueryParams()
                 });
@@ -66,6 +68,7 @@ Class.create("AjxpDataGridEditor", AbstractEditor, {
                 i++;
             }
         }
+        this.element.fire("editor:updateTitle", this.node.getLabel());
 
     },
 

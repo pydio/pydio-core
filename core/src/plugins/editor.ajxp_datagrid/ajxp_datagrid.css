@@ -20,9 +20,3 @@
     color: rgb(71,71,71);
     padding-left: 0;
 }
-
-#grid_container td:nth-child(1) span.text_label{
-    text-align: center;
-    font-family: 'Open Sans Regular';
-    font-size: 13px;
-}
