@@ -154,9 +154,11 @@ Class.create("InfoPanel", AjxpPane, {
         var repoOptions = {};
         if(ajaxplorer.user && ajaxplorer.user.getActiveRepository()){
             var repo = ajaxplorer.user.repositories.get(ajaxplorer.user.getActiveRepository());
-            repoOptions = {
-                ws_label: repo.getLabel(),
-                ws_badge: repo.getHtmlBadge()
+            if(repo){
+                repoOptions = {
+                    ws_label: repo.getLabel(),
+                    ws_badge: repo.getHtmlBadge()
+                }
             }
         }
 

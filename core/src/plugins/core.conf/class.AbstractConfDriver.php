@@ -1110,10 +1110,13 @@ abstract class AbstractConfDriver extends AJXP_Plugin
             case "load_repository_info":
 
                 $data = array();
-                $users = AuthService::countUsersForRepository(ConfService::getRepository()->getId(), true);
-                $data["core.users"] = $users;
-                if(isSet($httpVars["collect"]) && $httpVars["collect"] == "true"){
-                    AJXP_Controller::applyHook("repository.load_info", array(&$data));
+                $repo = ConfService::getRepository();
+                if($repo != null){
+                    $users = AuthService::countUsersForRepository(ConfService::getRepository()->getId(), true);
+                    $data["core.users"] = $users;
+                    if(isSet($httpVars["collect"]) && $httpVars["collect"] == "true"){
+                        AJXP_Controller::applyHook("repository.load_info", array(&$data));
+                    }
                 }
                 HTMLWriter::charsetHeader("application/json");
                 echo json_encode($data);

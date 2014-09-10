@@ -143,11 +143,13 @@ Class.create("Ajaxplorer", {
         if(this.user && this.user.getActiveRepository()){
             var repoList = this.user.getRepositoriesList();
             var activeRepo = repoList.get(this.user.getActiveRepository());
-            var slug = activeRepo.getSlug();
-            if(!activeRepo.getAccessType().startsWith("ajxp_")){
-                slug = "ws-" + slug;
+            if(activeRepo){
+                var slug = activeRepo.getSlug();
+                if(!activeRepo.getAccessType().startsWith("ajxp_")){
+                    slug = "ws-" + slug;
+                }
+                this.router.navigate(slug);
             }
-            this.router.navigate(slug);
         }
         var navigate = function(repList, repId){
             if(repId === false){

@@ -563,7 +563,9 @@ class ConfService
     {
         // APPEND CONF FILE REPOSITORIES
         $loggedUser = AuthService::getLoggedUser();
+        $l = $loggedUser->getLock();
         $objList = array();
+        if(!empty($l)) return $objList;
         foreach ($this->configs["DEFAULT_REPOSITORIES"] as $index=>$repository) {
             $repo = self::createRepositoryFromArray($index, $repository);
             if($scope == "user" && $loggedUser != null && !self::repositoryIsAccessible($index, $repo, $loggedUser)){
