@@ -26,7 +26,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class QuotaComputer extends AJXP_Plugin
+class QuotaComputer extends AJXP_AbstractMetaSource
 {
     /**
      * @var AbstractAccessDriver
@@ -40,11 +40,6 @@ class QuotaComputer extends AJXP_Plugin
      * @var AjxpMailer
      */
     protected $mailer;
-
-    public function initMeta($accessDriver)
-    {
-        $this->accessDriver = $accessDriver;
-    }
 
     protected function getWorkingPath()
     {

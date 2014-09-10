@@ -26,24 +26,20 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class SimpleLockManager extends AJXP_Plugin
+class SimpleLockManager extends AJXP_AbstractMetaSource
 {
-    /**
-     * @var AbstractAccessDriver
-     */
-    protected $accessDriver;
     const METADATA_LOCK_NAMESPACE = "simple_lock";
     /**
     * @var MetaStoreProvider
     */
     protected $metaStore;
 
-       public function initMeta($accessDriver)
-       {
-           $this->accessDriver = $accessDriver;
+    public function initMeta($accessDriver)
+    {
+        parent::initMeta($accessDriver);
         $store = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
         if ($store === false) {
-           throw new Exception("The 'meta.simple_lock' plugin requires at least one active 'metastore' plugin");
+            throw new Exception("The 'meta.simple_lock' plugin requires at least one active 'metastore' plugin");
         }
         $this->metaStore = $store;
         $this->metaStore->initMeta($accessDriver);

@@ -27,13 +27,8 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @subpackage Meta
  *
  */
-class FilesystemMounter extends AJXP_Plugin
+class FilesystemMounter extends AJXP_AbstractMetaSource
 {
-    /**
-     * @var AbstractAccessDriver
-     */
-    protected $accessDriver;
-
     /**
      * @var Repository
      */
@@ -56,7 +51,7 @@ class FilesystemMounter extends AJXP_Plugin
      */
     public function initMeta($accessDriver)
     {
-        $this->accessDriver = $accessDriver;
+        parent::initMeta($accessDriver);
         $this->repository = $this->accessDriver->repository;
         /*
         if($this->isAlreadyMounted()) return;

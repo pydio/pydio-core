@@ -58,15 +58,22 @@ class AJXP_NotificationCenter extends AJXP_Plugin
     protected function parseSpecificContributions(&$contribNode)
     {
            parent::parseSpecificContributions($contribNode);
-           if($contribNode->nodeName != "actions") return;
 
-           // WEBDAV ACTION
+           // DISABLE STUFF
            if (empty($this->pluginConf["USER_EVENTS"])) {
-               unset($this->actions["get_my_feed"]);
-               $actionXpath=new DOMXPath($contribNode->ownerDocument);
-               $publicUrlNodeList = $actionXpath->query('action[@name="get_my_feed"]', $contribNode);
-               $publicUrlNode = $publicUrlNodeList->item(0);
-               $contribNode->removeChild($publicUrlNode);
+               if($contribNode->nodeName == "actions"){
+                   unset($this->actions["get_my_feed"]);
+                   $actionXpath=new DOMXPath($contribNode->ownerDocument);
+                   $publicUrlNodeList = $actionXpath->query('action[@name="get_my_feed"]', $contribNode);
+                   $publicUrlNode = $publicUrlNodeList->item(0);
+                   $contribNode->removeChild($publicUrlNode);
+               }else if($contribNode->nodeName == "client_configs"){
+                   $actionXpath=new DOMXPath($contribNode->ownerDocument);
+                   $children = $actionXpath->query('component_config', $contribNode);
+                   foreach($children as $child){
+                       $contribNode->removeChild($child);
+                   }
+               }
            }
     }
 

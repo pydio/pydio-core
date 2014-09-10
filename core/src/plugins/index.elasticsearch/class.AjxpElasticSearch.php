@@ -47,7 +47,7 @@ spl_autoload_register('__autoload_elastica');
  * @property Elastica\Index $currentIndex
  * @property Elastica\Type $currentType
  */
-class AjxpElasticSearch extends AJXP_Plugin
+class AjxpElasticSearch extends AJXP_AbstractMetaSource
 {
     private $client;
     private $currentIndex;
@@ -55,10 +55,6 @@ class AjxpElasticSearch extends AJXP_Plugin
     private $nextId;
     private $lastIdPath;
 
-    /**
-     * @var AbstractAccessDriver
-     */
-    private $accessDriver;
     private $metaFields = array();
     private $indexContent = false;
     private $specificId = "";
@@ -85,7 +81,7 @@ class AjxpElasticSearch extends AJXP_Plugin
 
     public function initMeta($accessDriver)
     {
-        $this->accessDriver = $accessDriver;
+        parent::initMeta($accessDriver);
         if (!empty($this->metaFields) || $this->indexContent) {
             $metaFields = $this->metaFields;
             $el = $this->xPath->query("/indexer")->item(0);

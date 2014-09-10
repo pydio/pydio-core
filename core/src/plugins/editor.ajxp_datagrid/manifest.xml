@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor id="editor.ajxp_datagrid" openable="true" order="10" text="ajxp_datagrid.1"
+        title="ajxp_datagrid.2" iconClass="icon-table" icon="edit.png" className="AjxpDataGridEditor"
+        mimes="datagrid" formId="ajxp_datagridbox" label="CONF_MESSAGE[Data Grid]"
+        description="CONF_MESSAGE[Data Grid]"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<client_settings>
+        <resources>
+            <js className="AjxpDataGridEditor" file="plugins/editor.ajxp_datagrid/class.AjxpDataGridEditor.js"/>
+            <css file="plugins/editor.ajxp_datagrid/ajxp_datagrid.css"/>
+            <i18n namespace="ajxp_datagrid" path="plugins/editor.ajxp_datagrid/i18n"/>
+        </resources>
+	</client_settings>
+	<clientForm id="ajxp_datagridbox"><![CDATA[
+		<div id="ajxp_datagridbox" box_resize="true" box_padding="0">
+		    <div id="grid_container"></div>
+		</div>
+	]]></clientForm>
+</editor>

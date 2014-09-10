@@ -29,13 +29,11 @@ if (SVNLIB_PATH != "") {
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class SvnManager extends AJXP_Plugin
+class SvnManager extends AJXP_AbstractMetaSource
 {
     private static $svnListDir;
     private static $svnListCache;
     private $commitMessageParams;
-
-    protected $accessDriver;
 
     public function init($options)
     {
@@ -46,10 +44,8 @@ class SvnManager extends AJXP_Plugin
     public function initMeta($accessDriver)
     {
         require_once("svn_lib.inc.php");
-
-        $this->accessDriver = $accessDriver;
+        parent::initMeta($accessDriver);
         parent::init($this->options);
-
     }
 
     protected function initDirAndSelection($httpVars, $additionnalPathes = array(), $testRecycle = false)
