@@ -26,13 +26,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Index
  */
-class AjxpLuceneIndexer extends AJXP_Plugin
+class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
 {
     private $currentIndex;
-    /**
-     * @var AbstractAccessDriver
-     */
-    private $accessDriver;
     private $metaFields = array();
     private $indexContent = false;
     private $specificId = "";
@@ -55,7 +51,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin
 
     public function initMeta($accessDriver)
     {
-        $this->accessDriver = $accessDriver;
+        parent::initMeta($accessDriver);
         if (!empty($this->metaFields) || $this->indexContent) {
             $metaFields = $this->metaFields;
             $el = $this->xPath->query("/indexer")->item(0);

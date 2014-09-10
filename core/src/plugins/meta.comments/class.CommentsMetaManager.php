@@ -1,20 +1,27 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: admin
- * Date: 11/09/13
- * Time: 11:14
- * To change this template use File | Settings | File Templates.
+/*
+ * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
+ *
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <http://pyd.io/>.
  */
-
 define("AJXP_META_SPACE_COMMENTS", "AJXP_META_SPACE_COMMENTS");
 
-class CommentsMetaManager extends AJXP_Plugin
+class CommentsMetaManager extends AJXP_AbstractMetaSource
 {
-    /**
-     * @var AbstractAccessDriver
-     */
-    private $accessDriver;
     /**
      * @var MetaStoreProvider
      */
@@ -28,7 +35,7 @@ class CommentsMetaManager extends AJXP_Plugin
 
     public function initMeta($accessDriver)
     {
-        $this->accessDriver = $accessDriver;
+        parent::initMeta($accessDriver);
         $feed = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("feed");
         if ($feed) {
             $this->storageMode = "FEED";

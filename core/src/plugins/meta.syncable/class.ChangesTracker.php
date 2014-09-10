@@ -26,23 +26,14 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class ChangesTracker extends AJXP_Plugin
+class ChangesTracker extends AJXP_AbstractMetaSource
 {
-    /**
-     * @var AbstractAccessDriver
-     */
-    protected $accessDriver;
     private $sqlDriver;
 
     public function init($options)
     {
         $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters(array("group_switch_value" => "core"));
         parent::init($options);
-    }
-
-    public function initMeta($accessDriver)
-    {
-        $this->accessDriver = $accessDriver;
     }
 
     public function switchActions($actionName, $httpVars, $fileVars)

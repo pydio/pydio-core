@@ -26,14 +26,13 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Metastore
  */
-class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider
+class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
 {
     private static $currentMetaName;
     private static $metaCache;
     private static $fullMetaCache;
 
     protected $globalMetaFile;
-    protected $accessDriver;
 
 
     public function init($options)
@@ -41,11 +40,6 @@ class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider
         $this->options = $options;
         $this->loadRegistryContributions();
         $this->globalMetaFile = AJXP_DATA_PATH."/plugins/metastore.serial/ajxp_meta";
-    }
-
-    public function initMeta($accessDriver)
-    {
-        $this->accessDriver = $accessDriver;
     }
 
     /**

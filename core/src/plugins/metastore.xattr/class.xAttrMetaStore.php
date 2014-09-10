@@ -26,12 +26,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Metastore
  */
-class xAttrMetaStore extends AJXP_Plugin implements MetaStoreProvider
+class xAttrMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
 {
-    /**
-     * @var fsAccessDriver
-     */
-    protected $accessDriver;
     protected $rootPath;
 
     public function performChecks()
@@ -39,12 +35,6 @@ class xAttrMetaStore extends AJXP_Plugin implements MetaStoreProvider
         if (!function_exists("xattr_list")) {
             throw new Exception("The PHP Xattr Extension does not seem to be loaded");
         }
-    }
-
-    public function initMeta($accessDriver)
-    {
-        $this->accessDriver = $accessDriver;
-        //$this->rootPath = ConfService::getRepository()->getOption("PATH");
     }
 
     private function getMetaKey($namespace, $scope, $user)

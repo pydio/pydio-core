@@ -26,7 +26,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class GitManager extends AJXP_Plugin
+class GitManager extends AJXP_AbstractMetaSource
 {
 
     private $repoBase;
@@ -45,6 +45,7 @@ class GitManager extends AJXP_Plugin
      */
     public function initMeta($accessDriver)
     {
+        parent::initMeta($accessDriver);
         require_once("VersionControl/Git.php");
         $repo = $accessDriver->repository;
         $this->repoBase = $repo->getOption("PATH");
