@@ -25,10 +25,10 @@ class OtpAuthFrontend extends AbstractAuthFrontend
 /*
     private $enable_Create_User;
     private $modifyLoginScreen;
-    private $userFilePath;
+    private $userFilePath;*/
+    
     private $yubicoSecretKey;
     private $yubicoClientId;
-*/
     private $google;
     private $googleLast;
     private $yubikey1;
@@ -59,7 +59,7 @@ class OtpAuthFrontend extends AbstractAuthFrontend
             if(strlen($httpVars["password"]) > 6){
                 $codeOTP = substr($httpVars["password"], -6);
             }else{
-                throw new Excetion($exceptionMsg);
+                throw new AJXP_Excetion($exceptionMsg);
                 //return $this->FalseAndClearPassword($httpVars);
             }
 
@@ -75,7 +75,7 @@ class OtpAuthFrontend extends AbstractAuthFrontend
                     return false;
                 }
                 else{
-                    throw new Excetion($exceptionMsg);
+                    throw new AJXP_Excetion($exceptionMsg);
                 }
             }elseif
             // YubiKey1 or YubiKey2 set
@@ -85,7 +85,7 @@ class OtpAuthFrontend extends AbstractAuthFrontend
                if ($this->checkYubiPass($httpVars["password"], $this->yubikey1, $this->yubikey2)){
                    return false;
                }else{
-                   throw new Excetion($exceptionMsg);
+                   throw new AJXP_Excetion($exceptionMsg);
                }
             }elseif
             // Both Yubikey and Google Authenticator set
@@ -96,7 +96,7 @@ class OtpAuthFrontend extends AbstractAuthFrontend
                     return false;
                 }
                 else{
-                    throw new Excetion($exceptionMsg);
+                    throw new AJXP_Excetion($exceptionMsg);
                 }
             }
             else{
@@ -104,11 +104,11 @@ class OtpAuthFrontend extends AbstractAuthFrontend
                     return false;
                 }
                 else{
-                    throw new Excetion($exceptionMsg);
+                    throw new AJXP_Excetion($exceptionMsg);
                 }
             }
         }
-        throw new Excetion($exceptionMsg);
+        throw new AJXP_Excetion($exceptionMsg);
         //return $this->FalseAndClearPassword($httpVars);
     }
 
@@ -132,6 +132,12 @@ class OtpAuthFrontend extends AbstractAuthFrontend
         $this->yubikey2 = !empty($roleData["PARAMETERS"]["AJXP_REPO_SCOPE_ALL"]["authfront.otp"]["yubikey2"]) ?
             $roleData["PARAMETERS"]["AJXP_REPO_SCOPE_ALL"]['authfront.otp']["yubikey2"] : '';
 
+        if (!empty($this->pluginConf["YUBICO_CLIENT_ID"])) {
+            $this->yubicoClientId = trim($this->pluginConf["YUBICO_CLIENT_ID"]);
+        }
+        if (!empty($this->pluginConf["YUBICO_SECRET_KEY"])) {
+            $this->$yubicoSecretKey = trim($this->pluginConf["YUBICO_SECRET_KEY"]);
+        }
     }
 
     // Google Authenticator
@@ -258,7 +264,7 @@ class OtpAuthFrontend extends AbstractAuthFrontend
         $yotp = substr($pass, -44);
         $pass = substr($pass, 0, strlen($pass) - 44);
 
-        $yubi = new Auth_Yubico($this->yubico_client_id, $this->yubico_secret_key);
+        $yubi = new Auth_Yubico($this->yubicoClientId, $this->yubicoSecretKey);
         $auth = $yubi->verify($yotp);
 
         return (!PEAR::isError($auth));
