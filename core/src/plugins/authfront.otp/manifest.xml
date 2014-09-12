@@ -12,19 +12,18 @@
         </resources>
     </client_settings>
     <server_settings>
-        <global_param name="ORDER" type="integer" label="Order" description="Order this plugin with other auth frontends" default="100"/>
+        <global_param name="ORDER" type="integer" label="Order" description="Order this plugin with other auth frontends" default="13"/>
         <global_param name="PROTOCOL_TYPE" type="select"
                       choices="session_only|Sessions Only"
                       label="Protocol Type" description="Enable/disable automatically based on the protocol used" default="session_only" editable="false"/>
         <global_param  expose="true" name="MODIFY_LOGIN_SCREEN" group="CONF_MESSAGE[General]" type="boolean" label="Modify login page"
                        description="Login page will be modified to give user a OTP textbox." default="true"/>
-        <global_param name="USERS_FILEPATH" type="string" label="CONF_MESSAGE[Users]" description="CONF_MESSAGE[The users list]" mandatory="true"/>
         <global_param name="YUBICO_SECRET_KEY" type="string" label="CONF_MESSAGE[Yubico Secret Key]" description="CONF_MESSAGE[Yubico secret key attached to your account]" mandatory="false"/>
         <global_param name="YUBICO_CLIENT_ID" type="string" label="CONF_MESSAGE[Yubico Client ID]" description="CONF_MESSAGE[Yubico client id attached to your account]" mandatory="false"/>
-        <global_param name="yubikey1" type="string" label="CONF_MESSAGE[YubiKey 1]"  description="CONF_MESSAGE[YubiKey 1]" mandatory="false"/>
-        <global_param name="yubikey2" type="string" label="CONF_MESSAGE[YubiKey 2]"  description="CONF_MESSAGE[YubiKey 2]" mandatory="false"/>
-        <global_param name="google" type="string" label="CONF_MESSAGE[Google Authenticator]"  description="CONF_MESSAGE[Google Authenticator Secret]" mandatory="false"/>
-        <global_param name="google_last" type="integer" label="CONF_MESSAGE[Google Authenticator Last]"  description="CONF_MESSAGE[Google Authenticator replay protection, do not edit]" mandatory="false" editable="false"/>
+        <param name="yubikey1" type="string" label="CONF_MESSAGE[YubiKey 1]"  description="CONF_MESSAGE[YubiKey 1]" mandatory="false"/>
+        <param name="yubikey2" type="string" label="CONF_MESSAGE[YubiKey 2]"  description="CONF_MESSAGE[YubiKey 2]" mandatory="false"/>
+        <param name="google" type="string" label="CONF_MESSAGE[Google Authenticator]"  description="CONF_MESSAGE[Google Authenticator Secret]" mandatory="false"/>
+        <param name="google_last" type="integer" label="CONF_MESSAGE[Google Authenticator Last]"  description="CONF_MESSAGE[Google Authenticator replay protection, do not edit]" mandatory="false" editable="false"/>
     </server_settings>
     <class_definition filename="plugins/authfront.otp/class.OtpAuthFrontend.php" classname="OtpAuthFrontend"/>
     <registry_contributions>
