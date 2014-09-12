@@ -1041,6 +1041,27 @@ class AuthService
     }
 
     /**
+     * @param String $pluginId
+     * @param Repository $repository
+     * @param String $optionName
+     * @param bool $safe
+     * @return Mixed
+     */
+    public static function getFilteredRepositoryOption($pluginId, $repository, $optionName, $safe = false){
+        $logged = self::getLoggedUser();
+        $test = null;
+        if($logged != null){
+            $test = $logged->mergedRole->filterParameterValue($pluginId, $optionName, $repository->getId(), null);
+            if(!empty($test) && !$safe) $test = AJXP_VarsFilter::filter($test);
+        }
+        if(empty($test)){
+            return $repository->getOption($optionName, $safe);
+        }else{
+            return $test;
+        }
+    }
+
+    /**
      * @param AJXP_User $parentUser
      * @return AJXP_Role
      */
