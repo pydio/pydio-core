@@ -36,7 +36,7 @@ class OtpAuthFrontend extends AbstractAuthFrontend
 
     function tryToLogUser(&$httpVars, $isLast = false)
     {
-        $exceptionMsg = "Login information is not correct! Please try again with OTP at the end of your password";
+        $exceptionMsg = "Login information is not correct! Please try again with the one-time-password at the end of your password";
         if(empty($httpVars) || empty($httpVars["userid"])){
             return false;
         } else{
@@ -56,11 +56,14 @@ class OtpAuthFrontend extends AbstractAuthFrontend
             }
 
             // cut off password and otp in pass field
-            if(strlen($httpVars["password"]) > 6){
+            $cutPassword = false;
+            if(isSet($httpVars["otp_code"]) && !empty($httpVars["otp_code"])){
+                $codeOTP = $httpVars["otp_code"];
+            }else if(strlen($httpVars["password"]) > 6){
                 $codeOTP = substr($httpVars["password"], -6);
+                $cutPassword = true;
             }else{
-                throw new AJXP_Excetion($exceptionMsg);
-                //return $this->FalseAndClearPassword($httpVars);
+                $this->breakAndSendError($exceptionMsg);
             }
 
             //Just the Google Authenticator set
@@ -69,13 +72,14 @@ class OtpAuthFrontend extends AbstractAuthFrontend
                 empty($this->yubikey2)) {
                 if($this->checkGooglePass($userid, $codeOTP, $this->google, $this->googleLast)){
                     $this->logDebug(__CLASS__, __FUNCTION__, "Check OTP: matched");
-                    $httpVars["password"] = substr($httpVars["password"], 0, strlen($httpVars["password"]) - 6);
-                    //$this->logDebug(__CLASS__, __FUNCTION__, "cut off password: ".$httpVars["password"]);
                     //return false and cut off otp from password for next authfront.
+                    if($cutPassword){
+                        $httpVars["password"] = substr($httpVars["password"], 0, strlen($httpVars["password"]) - 6);
+                    }
                     return false;
                 }
                 else{
-                    throw new AJXP_Excetion($exceptionMsg);
+                    $this->breakAndSendError($exceptionMsg);
                 }
             }elseif
             // YubiKey1 or YubiKey2 set
@@ -85,18 +89,20 @@ class OtpAuthFrontend extends AbstractAuthFrontend
                if ($this->checkYubiPass($httpVars["password"], $this->yubikey1, $this->yubikey2)){
                    return false;
                }else{
-                   throw new AJXP_Excetion($exceptionMsg);
+                   $this->breakAndSendError($exceptionMsg);
                }
             }elseif
             // Both Yubikey and Google Authenticator set
             // If the last character of the password is digit, it is Google Authenticator
             (ctype_digit(substr($httpVars["password"], -1))) {
                 if($this->checkGooglePass($userid, $codeOTP, $this->google, $this->googleLast)){
-                    $httpVars["password"] = substr($httpVars["password"], 0, strlen($httpVars["password"]) - 6);
+                    if($cutPassword){
+                        $httpVars["password"] = substr($httpVars["password"], 0, strlen($httpVars["password"]) - 6);
+                    }
                     return false;
                 }
                 else{
-                    throw new AJXP_Excetion($exceptionMsg);
+                    $this->breakAndSendError($exceptionMsg);
                 }
             }
             else{
@@ -104,12 +110,21 @@ class OtpAuthFrontend extends AbstractAuthFrontend
                     return false;
                 }
                 else{
-                    throw new AJXP_Excetion($exceptionMsg);
+                    $this->breakAndSendError($exceptionMsg);
                 }
             }
         }
-        throw new AJXP_Excetion($exceptionMsg);
-        //return $this->FalseAndClearPassword($httpVars);
+    }
+
+    protected function breakAndSendError($exceptionMsg){
+
+        AJXP_XMLWriter::header();
+        AJXP_XMLWriter::loggingResult(-1, null, null, null);
+        AJXP_XMLWriter::sendMessage("ERROR", $exceptionMsg);
+        AJXP_XMLWriter::close();
+        //throw new AJXP_Exception($exceptionMsg);
+        exit();
+
     }
 
 
@@ -117,21 +132,13 @@ class OtpAuthFrontend extends AbstractAuthFrontend
     {
         $confStorage = ConfService::getConfStorageImpl();
         $userObject = $confStorage->createUserObject($userid);
-        $role = $userObject->personalRole;
-        if ($role === false) {
-            throw new Exception("Cant find role! ");
+
+        if($userObject != null){
+            $this->google = $userObject->mergedRole->filterParameterValue("authfront.otp", "google", AJXP_REPO_SCOPE_ALL, '');
+            $this->googleLast = $userObject->mergedRole->filterParameterValue("authfront.otp", "google_last", AJXP_REPO_SCOPE_ALL, '');
+            $this->yubikey1 = $userObject->mergedRole->filterParameterValue("authfront.otp", "yubikey1", AJXP_REPO_SCOPE_ALL, '');
+            $this->yubikey2 = $userObject->mergedRole->filterParameterValue("authfront.otp", "yubikey2", AJXP_REPO_SCOPE_ALL, '');
         }
-        $roleData = $role->getDataArray();
-
-        $this->google = !empty($roleData['PARAMETERS']['AJXP_REPO_SCOPE_ALL']['authfront.otp']['google']) ?
-            $roleData['PARAMETERS']['AJXP_REPO_SCOPE_ALL']['authfront.otp']['google'] : '';
-        $this->googleLast = !empty($roleData["PARAMETERS"]["AJXP_REPO_SCOPE_ALL"]["authfront.otp"]["google_last"]) ?
-            $roleData["PARAMETERS"]["AJXP_REPO_SCOPE_ALL"]['authfront.otp']["google_last"] : '';
-        $this->yubikey1 = !empty($roleData["PARAMETERS"]["AJXP_REPO_SCOPE_ALL"]['authfront.otp']["yubikey1"]) ?
-            $roleData["PARAMETERS"]["AJXP_REPO_SCOPE_ALL"]['authfront.otp']["yubikey1"] : '';
-        $this->yubikey2 = !empty($roleData["PARAMETERS"]["AJXP_REPO_SCOPE_ALL"]["authfront.otp"]["yubikey2"]) ?
-            $roleData["PARAMETERS"]["AJXP_REPO_SCOPE_ALL"]['authfront.otp']["yubikey2"] : '';
-
         if (!empty($this->pluginConf["YUBICO_CLIENT_ID"])) {
             $this->yubicoClientId = trim($this->pluginConf["YUBICO_CLIENT_ID"]);
         }
@@ -270,8 +277,4 @@ class OtpAuthFrontend extends AbstractAuthFrontend
         return (!PEAR::isError($auth));
     }
 
-    private function FalseAndClearPassword(&$httpVars){
-        $httpVars["password"] = "";
-        return false;
-    }
 }
