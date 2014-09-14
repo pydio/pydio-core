@@ -40,14 +40,13 @@
                     <clientCallback prepareModal="true" dialogOpenForm="duosecurity_box" dialogOkButtonOnly="false" dialogSkipButtons="false">
                         <dialogOnOpen><![CDATA[
                             modal.getForm().insert('<iframe id="duo_iframe" width="620" height="330" frameborder="0"></iframe>');
-                            modal.getForm().insert('<form method="POST" id="duo_form">
-                                <input type="hidden" name="get_action" value="duo_post_verification_code" />
-                                <input type="hidden" name="secure_token" value="'+Connexion.SECURE_TOKEN+'" />
-                            </form>');
+                            modal.getForm().insert('<form method="POST" id="duo_form">'+
+                                '<input type="hidden" name="get_action" value="duo_post_verification_code" />'+
+                            '</form>');
                             Duo.init({
-                                'host':ajaxplorer.getPluginConfigs('authfront.duosecurity').get('DUO_AUTH_HOST'),
-                                'sig_request':ajaxplorer.getPluginConfigs('authfront.duosecurity').get('DUO_AUTH_LAST_SIGNATURE'),
-                                'post_action':''
+                                host:ajaxplorer.getPluginConfigs('authfront.duosecurity').get('DUO_AUTH_HOST'),
+                                sig_request:ajaxplorer.getPluginConfigs('authfront.duosecurity').get('DUO_AUTH_LAST_SIGNATURE'),
+                                post_action:''
                             });
                             Duo.ready();
                         ]]></dialogOnOpen>
@@ -60,7 +59,7 @@
 					]]></clientForm>
                 </processing>
             </action>
-            <action name="duo_post_verification_code">
+            <action name="duo_post_verification_code" skipSecureToken="true">
                 <processing>
                     <serverCallback methodName="postVerificationCode"/>
                 </processing>

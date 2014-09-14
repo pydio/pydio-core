@@ -113,7 +113,7 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
     {
         if($action!="duo_post_verification_code") return;
 
-        $u= AuthService::getLoggedUser();
+        $u = AuthService::getLoggedUser();
         if($u == null) return;
         $sigResponse = $httpVars["sig_response"];
         require_once($this->getBaseDir()."/duo_php/duo_web.php");
