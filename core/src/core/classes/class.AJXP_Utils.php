@@ -1477,6 +1477,15 @@ class AJXP_Utils
     {
         return (stripos($_SERVER["HTTP_USER_AGENT"], "android") !== false);
     }
+
+    public static function userAgentIsNativePydioApp(){
+
+        return (stripos($_SERVER["HTTP_USER_AGENT"], "ajaxplorer-ios-client") !== false
+                || stripos($_SERVER["HTTP_USER_AGENT"], "Apache-HttpClient") !== false
+                || stripos($_SERVER["HTTP_USER_AGENT"], "python-requests") !== false
+        );
+    }
+
     /**
      * Try to remove a file without errors
      * @static

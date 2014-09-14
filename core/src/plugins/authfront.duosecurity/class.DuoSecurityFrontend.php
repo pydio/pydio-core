@@ -29,6 +29,10 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
         if(!isSet($httpVars["get_action"]) || $httpVars["get_action"] != "login"){
             return false;
         }
+        if(AJXP_Utils::userAgentIsNativePydioApp()){
+            return false;
+        }
+
         $userId = (isSet($httpVars["userid"])?trim($httpVars["userid"]):null);
         $duoActive = false;
         if(!empty($userId)){
