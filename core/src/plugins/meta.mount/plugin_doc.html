@@ -1,1 +1,9 @@
 <p><b>Linux Only</b> : Generic purpose meta plugin that is triggered before the repository is opened, and can be configured to mount any filesystem and unmount it when the user either switch to another repository or logs out.</p>
+        <p>
+            If you have permissions issues, you can use the "sudo" parameter to sudo all system operations.
+            In that case, make sure to set the sudoers permission accordingly: apache user (www-data or httpd generaly) must be allowed to
+            perform a mount operation using sudo.
+        </p>
+        <p>
+            To strengthen the security, use the parameter to pass password via the system environment and not via the command line itself. Sudo file must also be adapted to be allowed for that ( something like defaults@pydio-*-app* env_keep += "PASSWD").
+        </p>
