@@ -47,7 +47,7 @@ Class.create("ActivityMonitor", {
         }
 		if(clientSessionTime == -1){
 			this._renewTime = serverSessionTime - this._renewMinutes*60;
-			this.serverInterval = window.setInterval(this.serverObserver.bind(this), this._renewTime*1000);
+			this.serverInterval = window.setInterval(this.serverObserver.bind(this), Math.min((Math.pow(2,31)-1), this._renewTime*1000));
 			return;
 		}
 		this._serverSessionTime = serverSessionTime;
@@ -78,7 +78,7 @@ Class.create("ActivityMonitor", {
 				$(document.body).observe("mousemove", activityObserver );
 				document.observe("ajaxplorer:server_answer", activityObserver );
 				this.interval = window.setInterval(this.idleObserver.bind(this), 5000);
-				this.serverInterval = window.setInterval(this.serverObserver.bind(this), this._renewTime*1000);
+				this.serverInterval = window.setInterval(this.serverObserver.bind(this), Math.min((Math.pow(2,31)-1), this._renewTime*1000));
 			}
 		}.bind(this));
         document.observe("ajaxplorer:longtask_starting", function(){
