@@ -34,5 +34,5 @@ $mess=array(
 "Smbclient" => "Smbclient",
 "Path to smbclient executable, considered to be in the path by default." => "Path to smbclient executable, considered to be in the path by default.",
 "Enable Zip" => "Enable Zip",
-"Enable zip creation for repositories using Samba access. Make sure that you are using a very fast network, otherwise it will be very long!" => "Enable zip creation for repositories using Samba access. Make sure that you are using a very fast network, otherwise it will be very long!",
+"Enable zip creation for repositories using Samba access. Make sure that you are using a very fast network, otherwise it will be very slow!" => "Enable zip creation for repositories using Samba access. Make sure that you are using a very fast network, otherwise it will be very long!",
 );

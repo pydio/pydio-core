@@ -24,22 +24,22 @@ $mess=array(
 "39"=> "Workspace auswählen",
 "40"=> "Willkommen, %s",
 "41"=> "Diesen Workspace standardmässig verwenden",
-"42"=> "Enter",
+"42"=> "Betreten",
 "43"=> "Mein Profil",
-"43t"=> "All meine persönlichen Dateien",
+"43t"=> "Alle meine persönlichen Dateien",
 "44"=> "Mein Konto",
 "45"=> "Persönliche Daten",
 "46"=> "Adressbuch",
-"47"=> "Benutzer und Teams die Sie erstellt haben",
+"47"=> "Benutzer und Teams, die Sie erstellt haben",
 "48"=> "Meine Benutzer",
-"49"=> "External users that you created",
+"49"=> "Externe Benutzer, die Sie erstellt haben",
 "50"=> "Meine Teams",
-"51"=> "Teams of users, used as shortcuts when sharing",
-"52"=> "Are you sure you want to delete this team? This will not remove any users.",
+"51"=> "Teams von Benutzern zum schnellen Teilen von Inhalten",
+"52"=> "Wollen Sie dieses Team wirklich löschen? Es werden dabei keine Benutzer gelöscht.",
     "53"=> "Erste Schritte",
-    "54"=> "Maschen Sie Ihre ersten Schritte mit APPLICATION_TITLE mit folgenden Video-Kurzanleitungen",
+    "54"=> "Machen Sie Ihre ersten Schritte mit APPLICATION_TITLE mit folgenden Video-Kurzanleitungen",
     "55"=> "Brauchen Sie Unterstützung für die <a>ersten Schritte?</a>",
-    "56"=> "Ihre ersten Schritte mit APPLICATION_TITLE? Hier finden Sie einigen Videos für Sie!",
+    "56"=> "Ihre ersten Schritte mit APPLICATION_TITLE? Hier finden Sie einige Videos dazu.",
     "57"=> "APPLICATION_TITLE herunterladen für...",
     "58"=> "Android-Geräte",
     "59"=> "iPhone/iPad",
@@ -53,31 +53,31 @@ $mess=array(
                 <li>Dateien und Ordner verwalten</li>
                 <li>Vorschau und Bearbeitung von Dateien</li>
                 <li>Schellzugriff über Lesezeichen oder die Suche</li>
-                <li>Auswahlkorb</li>
+                <li>Auswahl-Liste</li>
             </ul>",
     "63"=>"<h2>Dateien mit APPLICATION_TITLE teilen</h2>
-                            In this tutorial, we will cover the basics of file sharing with APPLICATION_TITLE:
+                            In dieser Erklärung finden Sie die Grundlagen zum Teilen von Dateien mit APPLICATION_TITLE:
                             <ul>
                                 <li>Neue Web-Links erstellen</li>
-                                <li>Send them to internal or external users</li>
-                                <li>Get notified that a link was downloaded</li>
-                                <li>Create a password-protected link</li>
-                                <li>Create many links on one file</li>
-                                <li>Stop sharing a file totally</li>
+                                <li>Links internen oder externen Benutzern senden</li>
+                                <li>Benachrichtigungen beim Download eines Links</li>
+                                <li>Erstellen eines Passwort-geschützten Links</li>
+                                <li>Erstellen mehrerer Links zu einer Datei</li>
+                                <li>Teilen einer Datei beenden</li>
             </ul>",
     "64"=>"<h2>Ordner mit APPLICATION_TITLE teilen</h2>
-                            This video covers the various options to share folders in APPLICATION_TITLE
+                            Das folgende Video erklärt das Teilen von Ordnern mit APPLICATION_TITLE
                             <ul>
                                 <li>Als neuen Workspace teilen</li>
                                 <li>Als öffentliche Miniseite teilen</li>
             </ul>",
     "65"=> "Mehr über APPLICATION_TITLE im YouTube-Kanal erfahren!",
     "66"=>"<h2>APPLICATION_TITLE auf iOS-Geräten verwenden</h2>
-                            This video explains how to use the APPLICATION_TITLE application (available on the App Store). Process is quite similar on Android as well.
+                            Das folgende Video erklärt die Verwendung der APPLICATION_TITLE App (verfügbar im App Store). Die Nutzung auf Android ist ähnlich.
 <ul><li>Serververbindung einrichten</li>
 <li>Dateinavigation</li>
 <li>Dateien offline speichern</li>
 <li>App mit einem PIN-Code schützen</li>
 <li>Verwenden von Lesezeichen und der Suchfunktion</li></ul>",
-    "67"=> "You are not %s, %logout",
+    "67"=> "Sie sind nicht %s? %logout",
 );
