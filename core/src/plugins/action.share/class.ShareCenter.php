@@ -920,7 +920,7 @@ class ShareCenter extends AJXP_Plugin
         $sLegend = $messages[20];
 
         @copy($pDir."/res/dl.png", $downloadFolder."/dl.png");
-        @copy($pDir."/res/favi.png", $downloadFolder."/davi.png");
+        @copy($pDir."/res/favi.png", $downloadFolder."/favi.png");
         @copy($pDir."/res/grid_t.png", $downloadFolder."/grid_t.png");
         @copy($pDir."/res/button_cancel.png", $downloadFolder."/button_cancel.png");
         @copy(AJXP_INSTALL_PATH."/server/index.html", $downloadFolder."/index.html");
