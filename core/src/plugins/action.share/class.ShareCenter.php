@@ -925,7 +925,8 @@ class ShareCenter extends AJXP_Plugin
         @copy($pDir."/res/button_cancel.png", $downloadFolder."/button_cancel.png");
         @copy(AJXP_INSTALL_PATH."/server/index.html", $downloadFolder."/index.html");
         $dlUrl = $this->buildPublicDlURL();
-        $htaccessContent = "ErrorDocument 404 ".$dlUrl."/404.html\n<Files \".ajxp_*\">\ndeny from all\n</Files>\n";
+        $htaccessContent = "Order Deny,Allow\nAllow from all\n";
+        $htaccessContent .= "\n<Files \".ajxp_*\">\ndeny from all\n</Files>\n";
         $path = parse_url($dlUrl, PHP_URL_PATH);
         $htaccessContent .= '
         <IfModule mod_rewrite.c>
