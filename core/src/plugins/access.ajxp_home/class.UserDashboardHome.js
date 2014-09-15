@@ -224,11 +224,7 @@ Class.create("UserDashboardHome", AjxpPane, {
             var obj = oFormObject.down("#welcome");
             if(oFormObject.down("#welcome > small")) obj = oFormObject.down("#welcome > small");
             var span = new Element('span').update('<br>' + MessageHash["user_home.55"]);
-            if($('videos_pane')){
-                span.down('a').observe('click', function(){ $('videos_pane').setStyle({display:'block'}); });
-            }else{
-                span.down('a').remove();
-            }
+            span.down('a').observe('click', function(){ ajaxplorer.getActionBar().fireAction("open_tutorial_pane"); });
             obj.insert(span);
         }
 

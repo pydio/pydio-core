@@ -3254,12 +3254,13 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
 #search_meta {
     font-size: 12px;
     padding: 0;
-    background-color: rgb(255, 255, 255);
+    background-color: rgba(221, 221, 221, 0.97);
     float: left;
     width: 0;
     overflow: hidden;
     margin-left: 0;
     transition: width 1s ease, margin-left 1s ease;
+    margin-top: -62px;
 }
 
 #search_meta > div{
@@ -3289,6 +3290,7 @@ div.meta_toggle_button {
     border: 1px solid #ACB2BB;
     background-color: #ffffff;
     padding: 2px 3px;
+    width:90% !important;
 }
 #search_meta input.c3:disabled{
     opacity: 0.35;
@@ -3303,6 +3305,12 @@ div.meta_toggle_button {
 
 #modiftime_fixed_radio span.c3{
     border-right-width: 0 !important;
+    padding: 4px 2px;
+    font-size: 10px;
+}
+
+div#modiftime_fixed_radio {
+    margin-top: 16px;
 }
 
 #modiftime_fixed_radio span.c3:last-of-type{
@@ -3330,6 +3338,16 @@ div.meta_toggle_button {
     padding-right: 2%;
 }
 
+#search_meta span.c4,
+#search_meta span.c6
+{
+    display: block;
+    width: 100% !important;
+    text-align: left;
+    line-height: 17px;
+    padding-top: 2px;
+}
+
 #search_meta div.advanced_search_section span[class^="icon-"],
 #search_meta div.advanced_search_section span[class*=" icon-"]{
     display: none;
@@ -3351,7 +3369,7 @@ div.meta_toggle_button {
     padding:5px 5px 10px;
     line-height: 28px;
     overflow: hidden;
-    background-color: rgba(235, 237, 240, 0.36);
+    color: rgb(77, 85, 94);
 }
 
 #search_meta span.toggle_button {
@@ -3380,12 +3398,19 @@ div.meta_toggle_button {
 
 .search_label.close{
     display: block;
-    font-size: 16px;
-    padding: 0 4px;
+    font-size: 30px;
+    padding: 15px 10px 17px;
 }
 
 #refresh_search_button{
     cursor: pointer;
+    font-size: 0.8em;
+    float: right;
+}
+
+#search_meta div.advanced_search_section_title {
+    font-size: 19px;
+    padding: 8px 8px 9px 10px;
 }
 
 .toggle_open span.search_label.open{
@@ -3498,7 +3523,7 @@ span.search_meta_opt.checked > span {
 #search_results h3 {
     font-size: 30px;
     margin: 10px 0 10px 14px;
-    color: #333;
+    color: rgb(77, 85, 94);
 }
 
 
@@ -4039,7 +4064,7 @@ div.selectable_div, .table_rows_container, #tree_container, #bottomSplitPane, .a
 }
 
 input, textarea, .selectable{
-    -moz-user-select: all;
+    -moz-user-select: text;
     -khtml-user-select: auto;
     -webkit-user-select: auto;
     user-select: auto;

@@ -150,7 +150,7 @@ Class.create("SearchEngine", AjxpPane, {
 
         formPanel.insert('<div>' +
             '<div class="scroller_track"><div class="scroller_handle"></div></div> ' +
-            '<div id="search_meta_detailed"><div class="advanced_search_section_title"><span class="icon-circle"></span> '+MessageHash[489]+'</div><div class="advanced_search_section"></div></div>' +
+            '<div id="search_meta_detailed"><div class="advanced_search_section_title"><span class="icon-circle"></span> '+MessageHash[489]+'</div><div class="advanced_search_section search_section_freemeta"></div></div>' +
         '</div>');
 
         var oThis = this;
@@ -176,9 +176,10 @@ Class.create("SearchEngine", AjxpPane, {
             this.initMetaOption(simpleMeta, advancedMeta, key, metadataColumns[key], false);
         }
 
-        var docPropertyTemplate = '<div class="advanced_search">' +
+        var docPropertyTemplate =
+            '<div class="advanced_search">' +
             '<div class="advanced_search_section_title"><span class="icon-circle"></span> '+MessageHash[490]+'</div>'+
-            '<div class="advanced_search_section">'+
+            '<div class="advanced_search_section search_section_date">'+
             '<span class="c4"><span class="icon-calendar"></span> '+MessageHash[491]+' </span><input id="ajxp_modiftime_from" class="c3" type="text" placeholder="YYYY/MM/DD"><span class="c6">'+MessageHash[492]+'</span><input class="c3" type="text"  id="ajxp_modiftime_to" placeholder="YYYY/MM/DD">'+
             '<div id="modiftime_fixed_radio"><span id="ajxp_modiftime_fixed" class="c3" data-value="AJXP_SEARCH_RANGE_TODAY" type="text">'+MessageHash[493]+'</span>' +
             '<span id="ajxp_modiftime_fixed" class="c3" data-value="AJXP_SEARCH_RANGE_YESTERDAY" type="text">'+MessageHash[494]+'</span>' +
@@ -187,12 +188,12 @@ Class.create("SearchEngine", AjxpPane, {
             '<span id="ajxp_modiftime_fixed" class="c3" data-value="AJXP_SEARCH_RANGE_LAST_YEAR" type="text">'+MessageHash[497]+'</span></div>'+
             '</div>'+
             '<div class="advanced_search_section_title"><span class="icon-circle"></span> '+MessageHash[498]+'</div>'+
-            '<div class="advanced_search_section">'+
+            '<div class="advanced_search_section search_section_property">'+
             '<span class="c4"><span class="icon-file"></span> '+MessageHash[499]+' </span><input id="ajxp_mime" class="c3" type="text" placeholder="'+MessageHash[500]+'"><span class="c6">'+MessageHash[501]+'</span><span class="c3" id="ajxp_folder"><span class="icon-folder-open"></span>'+MessageHash[502]+'</span>'+
             '<br><span class="c4"><span class="icon-cloud-download"></span> '+MessageHash[503]+'</span><input  id="ajxp_bytesize_from" type="text" class="c3" placeholder="'+MessageHash[504]+'..."><span class="c6"> '+MessageHash[505]+' </span><input  id="ajxp_bytesize_to" type="text" class="c3" placeholder="'+MessageHash[504]+'..."></div>'+
             '</div>' +
             '';
-        formPanel.down('#search_meta_detailed').insert({top:docPropertyTemplate});
+        formPanel.down('#search_meta_detailed').insert({bottom:docPropertyTemplate});
         if(this._ajxpOptions.searchChooserAsResultsHeader){
             formPanel.down('#search_meta_detailed').insert({top:searchChooser.down('span.search_label.close')});
             formPanel.down('#refresh_search_button').observe('click', function(e){
@@ -426,6 +427,7 @@ Class.create("SearchEngine", AjxpPane, {
         if(this._inputBox.getValue()){
             window.setTimeout(function(){
                 this.showToggleResult(true);
+                this.resize();
             }.bind(this), 1000);
         }
     },
@@ -435,9 +437,14 @@ Class.create("SearchEngine", AjxpPane, {
         this.showToggleResult(false);
         this._inputBox.blur();
         window.setTimeout(function(){
+            if(this.htmlElement.down('#search_meta')){
+                this.htmlElement.down('#search_meta').removeClassName("toggle_open");
+            }
             container.relativize();
             container.setStyle({position:'relative'});
             container.removeClassName("skipSibling");
+            // Resize parent
+            container.up('[ajxpClass]').ajxpPaneObject.resize();
         }.bind(this), 1000);
     },
 
