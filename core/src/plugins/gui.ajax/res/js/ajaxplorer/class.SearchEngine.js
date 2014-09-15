@@ -189,7 +189,7 @@ Class.create("SearchEngine", AjxpPane, {
             '<div class="advanced_search_section_title"><span class="icon-circle"></span> '+MessageHash[498]+'</div>'+
             '<div class="advanced_search_section">'+
             '<span class="c4"><span class="icon-file"></span> '+MessageHash[499]+' </span><input id="ajxp_mime" class="c3" type="text" placeholder="'+MessageHash[500]+'"><span class="c6">'+MessageHash[501]+'</span><span class="c3" id="ajxp_folder"><span class="icon-folder-open"></span>'+MessageHash[502]+'</span>'+
-            '<br><span class="c4"><span class="icon-cloud-download"></span> '+MessageHash[503]+'</span><input  id="ajxp_bytesize_from" type="text" class="c3" placeholder="'+MessageHash[504]+'..."><span class="c6"> '+MessageHash[505]+' </span><input  id="ajxp_modiftime_to" type="text" class="c3" placeholder="'+MessageHash[504]+'..."></div>'+
+            '<br><span class="c4"><span class="icon-cloud-download"></span> '+MessageHash[503]+'</span><input  id="ajxp_bytesize_from" type="text" class="c3" placeholder="'+MessageHash[504]+'..."><span class="c6"> '+MessageHash[505]+' </span><input  id="ajxp_bytesize_to" type="text" class="c3" placeholder="'+MessageHash[504]+'..."></div>'+
             '</div>' +
             '';
         formPanel.down('#search_meta_detailed').insert({top:docPropertyTemplate});
@@ -538,6 +538,12 @@ Class.create("SearchEngine", AjxpPane, {
 			option.toggleClassName('checked');
 		});
         var fName = (optionValue == 'filename'?'basename':'ajxp_meta_'+optionValue);
+        /*
+        var fName;
+        if(optionValue == 'ajxp_document_content') fName = optionValue;
+        else if (optionValue == 'filename') fName = 'basename';
+        else fName = "ajxp_meta_" + optionValue;
+        */
         advancedPanel.insert('<div><span class="c4" style="width: 35%;"><span class="icon-tag"></span> '+optionLabel+'</span><input style="width: 35%;" type="text" class="c3" id="'+fName+'"></div>');
 
         /*
