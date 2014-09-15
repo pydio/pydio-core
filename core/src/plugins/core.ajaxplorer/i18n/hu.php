@@ -26,6 +26,7 @@ $mess=array(
 "languageLabel" => "Hungarian",
 "date_format"  => "Y/m/d H:i",
 "byte_unit_symbol" => "b",
+"date_intl_locale" => "hu-HU",
 "0" => "Utolsó változat",
 "1" => "Fájlnév",
 "2" => "Fájlméret",

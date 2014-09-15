@@ -21,6 +21,7 @@
 //  French Translation by Charles du Jeu, corrected by GravuTrad
 $mess=array(
 "languageLabel" => "Français",
+"date_intl_locale" => "fr-FR",
 "date_format"  => "d/m/Y H:i",
 "date_relative_date" => "le DATE",
 "date_relative_time" => "TIME",

@@ -31,6 +31,7 @@ $mess=array(
 "languageLabel" => "한국어",
 "date_format"  => "Y/m/d H:i",
 "byte_unit_symbol" => "b",
+"date_intl_locale" => "ko-KR",
 "0" => "최신 버전",
 "1" => "파일 이름",
 "2" => "크기",

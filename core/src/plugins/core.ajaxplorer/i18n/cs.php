@@ -22,6 +22,7 @@ $mess=array(
 "languageLabel" => "Čeština",
 "date_format"  => "d/m/Y H:i",
 "byte_unit_symbol" => "b",
+"date_intl_locale" => "cs-CZ",
 "0" => "Poslední verze",
 "1" => "Název souboru",
 "2" => "Velikost",

@@ -20,6 +20,7 @@
 */
 $mess=array(
 "languageLabel" => "Português (Portugal)",
+"date_intl_locale" => "pl-PL",
 "date_format"  => "d/m/Y H:i",
 "date_relative_date" => "em DATE",
 "date_relative_time" => "TIME",

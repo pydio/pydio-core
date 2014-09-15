@@ -22,6 +22,7 @@ $mess=array(
 "languageLabel" => "עברית",
 "date_format"  => "Y/m/d H:i",
 "byte_unit_symbol" => "b",
+"date_intl_locale" => "he-IL",
 "0" => "גרסה אחרונה",
 "1" => "שם קובץ",
 "2" => "גודל",

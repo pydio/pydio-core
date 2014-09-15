@@ -23,6 +23,7 @@
 //	Last update: 27.05.2013
 $mess=array(
 "languageLabel" => "Estonian",
+"date_intl_locale" => "et-EE",
 "date_format"  => "d/m/Y H:i",
 "date_relative_date" => "DATE",
 "date_relative_time" => "TIME",

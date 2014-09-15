@@ -746,15 +746,19 @@ class AJXP_Utils
             }
 
         }
-
         $finalDate = date($messages["date_relative_date_format"], $time ? $time : time());
+        if(strpos($messages["date_relative_date_format"], "F") !== false && isSet($messages["date_intl_locale"]) && class_exists("IntlDateFormatter")){
+            $intl = IntlDateFormatter::create($messages["date_intl_locale"], IntlDateFormatter::FULL, IntlDateFormatter::FULL, null, null, "MMMM");
+            $localizedMonth = $intl->format($time ? $time : time());
+            $dateFuncMonth = date("F", $time ? $time : time());
+            $finalDate = str_replace($dateFuncMonth, $localizedMonth, $finalDate);
+        }
         if(!$shortestForm || strpos($finalDate, $crtYear) !== false){
             $finalDate = str_replace($crtYear, '', $finalDate);
             return str_replace("DATE", $finalDate, $messages["date_relative_date"]);
         }else{
             return $finalDate = date("M Y", $time ? $time : time());
         }
-        //return str_replace("DATE", $finalDate, $messages["date_relative_date"]);
 
     }
 

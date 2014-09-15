@@ -42,6 +42,7 @@ $mess=array(
 "languageLabel" => "Italiano",
 "date_format"  => "Y/m/d H:i",
 "byte_unit_symbol" => "b",
+"date_intl_locale" => "it-IT",
 "0" => "Ultima versione",
 "1" => "Nome file",
 "2" => "Dimensione",

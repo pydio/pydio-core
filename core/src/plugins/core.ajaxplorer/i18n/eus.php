@@ -23,6 +23,7 @@ $mess=array(
 "languageLabel" => "Euskaraz",
 "date_format"  => "Y/m/d H:i",
 "byte_unit_symbol" => "b",
+"date_intl_locale" => "eu-ES",
 "0" => "Azken bertsioa",
 "1" => "Izena",
 "2" => "Tamaina",

@@ -22,6 +22,7 @@ $mess=array(
 "languageLabel" => "Svenska",
 "date_format"  => "Y/m/d H:i",
 "byte_unit_symbol" => "b",
+"date_intl_locale" => "sv-SE",
 "0" => "Senaste version",
 "1" => "Filnamn",
 "2" => "Storlek",

@@ -27,6 +27,7 @@ $mess=array(
 "languageLabel" => "Danish",
 "date_format"  => "Y/m/d H:i",
 "byte_unit_symbol" => "b",
+"date_intl_locale" => "da-DK",
 "0" => "Aktuel Version",
 "1" => "Filnavn",
 "2" => "Størrelse",

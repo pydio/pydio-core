@@ -20,6 +20,7 @@
  */
 $mess=array(
 "languageLabel" => "English",
+"date_intl_locale" => "en_US",
 "date_format"  => "Y/m/d H:i",
 "date_relative_date" => "on DATE",
 "date_relative_time" => "TIME",

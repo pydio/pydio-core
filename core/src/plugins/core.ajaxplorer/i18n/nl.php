@@ -28,6 +28,7 @@ $mess=array(
 "languageLabel" => "Nederlands",
 "date_format"  => "Y/m/d H:i",
 "byte_unit_symbol" => "b",
+"date_intl_locale" => "nl-NL",
 "0" => "Laatste versie",
 "1" => "Bestandsnaam",
 "2" => "Grootte",
