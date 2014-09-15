@@ -41,7 +41,7 @@ abstract class AJXP_AbstractMetaSource extends AJXP_Plugin {
             if($parentRepo != null){
                 $sources = $parentRepo->getOption("META_SOURCES");
                 $qParent = $sources["meta.quota"];
-                $this->options = array_merge($this->options, $qParent);
+                if(is_array($qParent)) $this->options = array_merge($this->options, $qParent);
             }
         }
 

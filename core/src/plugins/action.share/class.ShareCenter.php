@@ -1515,7 +1515,7 @@ class ShareCenter extends AJXP_Plugin
             return 100;
         }
         $foldersharing = $this->getFilteredOption("ENABLE_FOLDER_SHARING", $this->repository->getId());
-        if (isset($foldersharing) && ($foldersharing === false || $foldersharing == "disable" )) {
+        if (isset($foldersharing) && ($foldersharing === false || (is_string($foldersharing) && $foldersharing == "disable"))) {
             return 103;
         }
         $loggedUser = AuthService::getLoggedUser();

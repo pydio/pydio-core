@@ -87,6 +87,9 @@ class ShareStore {
             $this->confStorage->simpleStoreSet("share", $hash, $shareData, "serial", $parentRepositoryId);
             return $hash;
         }
+        if(!empty($existingHash)){
+            throw new Exception("Current storage method does not support parameters edition!");
+        }
 
         $loader = 'ShareCenter::loadMinisite($data);';
         if($type == "publiclet"){

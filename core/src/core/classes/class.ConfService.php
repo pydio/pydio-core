@@ -525,7 +525,7 @@ class ConfService
                     $repositories[$repoId] = $repoObject;
                 }else if($value == AJXP_FILTER_NOT_EMPTY && !empty($comp)){
                     $repositories[$repoId] = $repoObject;
-                }else if(strpos($value, "regexp:")===0 && preg_match(str_replace("regexp:", "", $value), $comp)){
+                }else if(is_string($value) && strpos($value, "regexp:")===0 && preg_match(str_replace("regexp:", "", $value), $comp)){
                     $repositories[$repoId] = $repoObject;
                 }else if($value == $comp){
                     $repositories[$repoId] = $repoObject;
