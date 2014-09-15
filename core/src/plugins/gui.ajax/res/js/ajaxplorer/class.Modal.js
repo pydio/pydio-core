@@ -423,12 +423,28 @@ Class.create("Modal", {
 	getForm: function()	{
 		return this.currentForm;
 	},
-	/**
+
+    _dialogPositionRefreshBuffer: null,
+    /**
+     * Refresh position after a window change
+     * @param checkHeight Boolean
+     * @param elementToScroll HTMLElement
+     */
+    refreshDialogPosition: function(checkHeight, elementToScroll){
+        if(this._dialogPositionRefreshBuffer){
+            window.clearTimeout(this._dialogPositionRefreshBuffer);
+        }
+        this._dialogPositionRefreshBuffer = window.setTimeout(function(){
+            this._bufferedRefreshDialogPosition(checkHeight, elementToScroll);
+        }.bind(this), 200);
+    },
+    /**
 	 * Refresh position after a window change
+     * Used internally by the public function to buffer multiple calls
 	 * @param checkHeight Boolean
 	 * @param elementToScroll HTMLElement
 	 */
-	refreshDialogPosition: function(checkHeight, elementToScroll){
+    _bufferedRefreshDialogPosition: function(checkHeight, elementToScroll){
 		var winWidth = document.viewport.getWidth();
 		var winHeight = document.viewport.getHeight();
         var element = $(this.elementName);
@@ -461,7 +477,7 @@ Class.create("Modal", {
                 attachMobileScroll(dContent, "vertical");
             }
             boxHeight = element.getHeight();
-        }else if(dContentScrollHeight > dContent.getHeight()){
+        }else if(dContentScrollHeight >= dContent.getHeight()){
             dContent.setStyle({height: 'auto'});
             boxHeight = element.getHeight();
         }
