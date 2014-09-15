@@ -27,4 +27,5 @@ $mess = array(
     "5" => "Veuillez patienter pendant la configuration! Pydio sera prêt à l'emploi dans quelques secondes...",
     "6" => "Installer Pydio",
     "7" => "Langue",
+    "8" => "Cliquez sur chaque section pour éditer les paramètres",
 );

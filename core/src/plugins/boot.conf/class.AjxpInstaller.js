@@ -98,10 +98,11 @@ Class.create("AjxpInstaller", AjxpPane, {
             }.bind(this));
             this.htmlElement.down("#start_button").observe("click", function(){
                 new Effect.Morph(this.htmlElement.down(".install_pydio_logo"), {
-                    style:'height:30px',
+                    style:'height:60px',
                     duration:0.5
                 });
-                this.htmlElement.down(".installerWelcome").update("Click on each section to edit parameters");
+                this.htmlElement.down(".installerLang").hide();
+                this.htmlElement.down(".installerWelcome").update(MessageHash["installer.8"]);
                 new Effect.Appear(this.formElement, {afterFinish : function(){
                     this.formElement.SF_accordion.activate(this.formElement.down('.accordion_toggle'));
                 }.bind(this)});

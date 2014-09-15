@@ -93,7 +93,7 @@
                                 clear: left;
                                 width: 220px !important;
                                 padding: 5px !important;
-                                margin: 5px 174px !important;
+                                margin: 5px 126px !important;
                             }
                             #installer_form #save_button.disabled{
                                 color: rgba(255,255,255,0.5);
