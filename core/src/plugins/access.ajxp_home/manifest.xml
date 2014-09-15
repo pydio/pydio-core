@@ -157,25 +157,25 @@
                         AJXP_MESSAGE[user_home.62]
                         <div class="tutorial_load_button"><i class="icon-youtube-play"></i> Play Video</div>
                     </div>
-                    <iframe class="tutorial_video" width="640" height="360" frameborder="0" src=""></iframe>
+                    <iframe class="tutorial_video" width="640" height="360" frameborder="0" allowfullscreen src="http://img.youtube.com/vi/C6L_9QT0lDE/0.jpg"></iframe>
 
                     <div class="tutorial_legend" data-videoSrc="//www.youtube.com/embed/Nj3d0AXfJXI?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
                         AJXP_MESSAGE[user_home.63]
                         <div class="tutorial_load_button"><i class="icon-youtube-play"></i> Play Video</div>
                     </div>
-                    <iframe class="tutorial_video" width="640" height="360" frameborder="0" src=""></iframe>
+                    <iframe class="tutorial_video" width="640" height="360" frameborder="0" allowfullscreen src="http://img.youtube.com/vi/Nj3d0AXfJXI/0.jpg"></iframe>
 
                     <div class="tutorial_legend" data-videoSrc="//www.youtube.com/embed/1o62QF_ATYA?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
                         AJXP_MESSAGE[user_home.64]
                         <div class="tutorial_load_button"><i class="icon-youtube-play"></i> Play Video</div>
                     </div>
-                    <iframe class="tutorial_video" width="640" height="360" frameborder="0" src=""></iframe>
+                    <iframe class="tutorial_video" width="640" height="360" frameborder="0" allowfullscreen src="http://img.youtube.com/vi/1o62QF_ATYA/0.jpg"></iframe>
 
                     <div class="tutorial_legend" src="//www.youtube.com/embed/ot2Nq-RAnYE?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
                         AJXP_MESSAGE[user_home.66]
                         <div class="tutorial_load_button"><i class="icon-youtube-play"></i> Play Video</div>
                     </div>
-                    <iframe width="640" height="360" class="tutorial_video" frameborder="0" allowfullscreen></iframe>
+                    <iframe width="640" height="360" class="tutorial_video" frameborder="0" allowfullscreen src="http://img.youtube.com/vi/ot2Nq-RAnYE/0.jpg"></iframe>
 
                     <div style="clear:left; text-align:center;">
                         <a href="http://pyd.io/end-user-tutorials/" target="_blank" style="text-align: center;font-size: 25px;background-color: #e35d52;padding: 10px;border-radius: 5px;color: white;display: inline-block;margin: 40px 0;"><i class="icon-youtube-play"></i> AJXP_MESSAGE[user_home.65]</a></div>

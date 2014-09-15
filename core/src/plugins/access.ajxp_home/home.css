@@ -292,18 +292,20 @@ div.legend_visible div#logo_div{
 }
 
 #videos_pane {
-    color: rgb(111,123,136);
-    background-color: #f8f8f8;
+    color: rgb(64, 68, 71);
+    background-color: rgba(248, 248, 248, 0.92);
     position: absolute;
-    top: 5%;
-    left: 5%;
-    width: 90%;
-    height: 90%;
-    border-radius: 10px;
+    top: 0;
+    right: 0;
+    width: 70%;
+    height: 100%;
+    border-radius: 0;
     overflow: auto;
-    opacity: 0.95;
-    box-shadow: 9px 6px 25px rgba(0,0,0,0.5);
+    opacity: 1;
+    box-shadow: -5px -8px 9px rgba(0, 0, 0, 0.36);
     display: none;
+    max-width: 930px;
+    -webkit-font-smoothing: antialiased;
 }
 
 #tutorials_pane h2{
@@ -321,15 +323,15 @@ div.legend_visible div#logo_div{
 .tutorial_legend{
     clear: left;
     float: left;
-    width: 30%;
+    width: 40%;
     margin-left: 5%;
     font-size: 14px;
     margin-top: 20px;
 }
 
 .tutorial_video{
-    width: 59%;
-    height: 350px;
+    width: 49%;
+    height: 300px;
     margin-top: 20px;
     margin-right: 5%;
     margin-bottom: 20px;
