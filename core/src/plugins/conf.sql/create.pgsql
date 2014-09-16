@@ -11,6 +11,9 @@ CREATE TABLE ajxp_user_rights (
   rights text NOT NULL
 );
 
+CREATE INDEX ajxp_user_rights_i ON ajxp_user_rights(repo_uuid);
+CREATE INDEX ajxp_user_rights_k ON ajxp_user_rights(login);
+
 CREATE TABLE ajxp_user_prefs (
   rid serial PRIMARY KEY,
   login varchar(255) NOT NULL,
