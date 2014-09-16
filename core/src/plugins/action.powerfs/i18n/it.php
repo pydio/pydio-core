@@ -20,7 +20,7 @@
  */
 $mess = array(
     // will be replaced by the application title
-    "1" => "Creazione archivio. Attendere...",
-    "2" => "Ricaricamento cartella corrente",
-    "3" => "Il download dell'archivio partità automaticamente"
+    "1" => "Creazione archivio, attendere",
+    "2" => "Ricarica cartella attuale",
+    "3" => "Il download dell'archivio dovrebbe iniziare automaticamente"
 );
