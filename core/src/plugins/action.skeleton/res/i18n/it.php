@@ -19,14 +19,14 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-defined('AJXP_EXEC') or die( 'Accesso non consentito');
+defined('AJXP_EXEC') or die( 'Access not allowed');
 
 $mess = array(
-    "1" => "Link Esterno",
-    "2" => "Link aggiunyo dal plugin action.skeleton",
-    "3" => "Sicuro di voler aprire %s in una nuova finestra?",
-    "4" => "Link Modale",
-    "5" => "Apri il link in una finestra modale",
-    "6" => "Contenuto dinamico",
-    "7" => "Caricamento contenuto..."
+    "1" => "Collegamento Esterno",
+    "2" => "Collegamento aggiunto dal plugin action.skeleton",
+    "3" => "Sei sicuro di voler aprire %s in una nuova finestra?",
+    "4" => "Collegamento Pop up",
+    "5" => "Apri il collegamento in una Pop up",
+    "6" => "Contenuto Dinamico",
+    "7" => "Caricamento contenuto, attendere..."
 );
