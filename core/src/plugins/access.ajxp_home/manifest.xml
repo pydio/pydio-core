@@ -142,10 +142,20 @@
                 <processing>
                     <clientCallback><![CDATA[
                         $('videos_pane').setStyle({display:'block'});
+                        if(!$('videos_pane')._OBSERVER_SET){
+                            $('videos_pane').select('div.tutorial_load_button').invoke("observe", "click", function(e){
+                                var t = Event.findElement(e, 'div.tutorial_load_button');
+                                try{
+                                    var main = t.up('div.tutorial_legend');
+                                    main.next('iframe').src = main.readAttribute('data-videoSrc');
+                                }catch(e){}
+                            });
+                            $('videos_pane')._OBSERVER_SET = true;
+                        }
                     ]]></clientCallback>
                     <clientForm id="videos_pane"><![CDATA[
                         <div id="videos_pane" style="display:none;" class="skipSibling" ajxpClass="AjxpPane" ajxpOptions='{}' style="overflow-y: scroll;">
-                            <div style="float:right;font-size: 2em;margin-right: 6px;margin-top: 6px; cursor:pointer;" onclick="$('videos_pane').hide();" class="icon-remove-sign"></div>
+                            <div style="float: left;font-size: 1.5em;margin-left: 16px;margin-top: 16px;cursor: pointer;" onclick="$('videos_pane').hide();" class="icon-remove-sign"></div>
                             <div style="clear:left; font-size: 25px; text-align:center; margin: 40px 0 30px;">AJXP_MESSAGE[user_home.56]</div>
                             <div id="tutorial_dl_apps_pane">
                                 <div style="width: 750px; margin: 0 auto;" id="dl_pydio_cont">

@@ -34,13 +34,13 @@
 
 .repoInfoBadge {
     display: inline-block;
-    font-size: 30px;
+    font-size: 25px;
     width: 190px;
     line-height: 30px;
     border: 1px solid rgba(255,255,255,0.7);
     border-radius: 8px;
     margin: 10px 16px;
-    height: 116px;
+    min-height: 116px;
     font-family: "Open sans Regular", Arial, sans-serif;
     vertical-align: top;
     padding: 3px 8px;
