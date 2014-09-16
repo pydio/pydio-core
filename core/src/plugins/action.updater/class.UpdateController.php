@@ -99,6 +99,18 @@ class UpdateController extends AJXP_Plugin
 
             break;
 
+            case "test_upgrade_scripts":
+
+                if(!AJXP_SERVER_DEBUG
+                    || AuthService::getLoggedUser() == null
+                    || !AuthService::getLoggedUser()->isAdmin()){
+                    break;
+                }
+                $upgrader = new AjaXplorerUpgrader("", "", "");
+                $upgrader->testUpgradeScripts();
+
+            break;
+
             case "perform_upgrade" :
 
                 AJXP_Utils::safeIniSet("output_buffering", "Off");

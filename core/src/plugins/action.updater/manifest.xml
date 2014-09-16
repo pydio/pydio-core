@@ -182,6 +182,11 @@
                     <serverCallback methodName="switchAction"/>
                 </processing>
             </action>
+            <action name="test_upgrade_scripts">
+                <processing>
+                    <serverCallback methodName="switchAction"/>
+                </processing>
+            </action>
         </actions>
 	</registry_contributions>
 	<class_definition filename="plugins/action.updater/class.UpdateController.php" classname="UpdateController"/>
