@@ -205,14 +205,18 @@ class BootConfLoader extends AbstractConfDriver
         if($data["ENCODING"] != (defined('AJXP_LOCALE')?AJXP_LOCALE:SystemTextEncoding::getEncoding())){
             file_put_contents($this->getPluginWorkDir()."/encoding.php", "<?php \$ROOT_ENCODING='".$data["ENCODING"]."';");
         }
+
+        $tpl = file_get_contents($this->getBaseDir()."/htaccess.tpl");
         if(!empty($data["SERVER_URI"]) && $data["SERVER_URI"] != "/"){
-            $tpl = file_get_contents($this->getBaseDir()."/htaccess.tpl");
             $htContent = str_replace('${APPLICATION_ROOT}', $data["SERVER_URI"], $tpl);
-            if(is_writeable(AJXP_INSTALL_PATH."/.htaccess")){
-                file_put_contents(AJXP_INSTALL_PATH."/.htaccess", $htContent);
-            }else{
-                $htAccessToUpdate = AJXP_INSTALL_PATH."/.htaccess";
-            }
+        }else{
+            $htContent = str_replace('${APPLICATION_ROOT}/', "/", $tpl);
+            $htContent = str_replace('${APPLICATION_ROOT}', "/", $htContent);
+        }
+        if(is_writeable(AJXP_INSTALL_PATH."/.htaccess")){
+            file_put_contents(AJXP_INSTALL_PATH."/.htaccess", $htContent);
+        }else{
+            $htAccessToUpdate = AJXP_INSTALL_PATH."/.htaccess";
         }
 
         if ($storageType == "db") {
