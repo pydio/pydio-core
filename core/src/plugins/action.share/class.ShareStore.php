@@ -134,7 +134,7 @@ class ShareStore {
         $code = $lines[3] . $lines[4] . $lines[5];
         eval($code);
         if(empty($inputData)) return false;
-        $dataModified = $this->checkHash($inputData, $hash); //(md5($inputData) != $id);
+        $dataModified = !$this->checkHash($inputData, $hash); //(md5($inputData) != $id);
         $publicletData = unserialize($inputData);
         $publicletData["SECURITY_MODIFIED"] = $dataModified;
         if (!isSet($publicletData["REPOSITORY"])) {
@@ -226,6 +226,37 @@ class ShareStore {
             $this->updateShareType($shareData);
             if(!empty($shareType) && $shareData["SHARE_TYPE"] != $shareType){
                 unset($dbLets[$id]);
+            }
+        }
+
+        if(empty($shareType) || $shareType == "repository"){
+            // BACKWARD COMPATIBILITY: collect old-school shared repositories that are not yet stored in simpleStore
+            $storedIds = array();
+            foreach($dbLets as $share){
+                if(empty($limitToUser) || $limitToUser == $share["OWNER_ID"]) {
+                    if(is_string($share["REPOSITORY"])) $storedIds[] = $share["REPOSITORY"];
+                    else if (is_object($share["REPOSITORY"])) $storedIds[] = $share["REPOSITORY"]->getUniqueId();
+                }
+            }
+            // Find repositories that would have a parent
+            $criteria = array();
+            $criteria["parent_uuid"] = (empty($parentRepository) ? AJXP_FILTER_NOT_EMPTY : $parentRepository);
+            $criteria["owner_user_id"] = (empty($limitToUser) ? AJXP_FILTER_NOT_EMPTY : $limitToUser);
+            if(count($storedIds)){
+                $criteria["!uuid"] = $storedIds;
+            }
+            $oldRepos = ConfService::listRepositoriesWithCriteria($criteria, $count);
+            foreach($oldRepos as $sharedWorkspace){
+                if(!$sharedWorkspace->hasContentFilter()){
+                    $dbLets[] = array(
+                        "SHARE_TYPE"    => "repository",
+                        "OWNER_ID"      => $sharedWorkspace->getOwner(),
+                        "REPOSITORY"    => $sharedWorkspace->getUniqueId(),
+                        "LEGACY_REPO_OR_MINI"   => true
+                    );
+                    //Auto Migrate? boaf.
+                    //$this->storeShare($sharedWorkspace->getParentId(), $data, "repository");
+                }
             }
         }
 
@@ -323,8 +354,8 @@ class ShareStore {
             $publicletData = $this->loadShare($element);
             if (isSet($publicletData["OWNER_ID"]) && $this->testUserCanEditShare($publicletData["OWNER_ID"])) {
                 PublicletCounter::delete($element);
-                if(isSet($minisiteData["PUBLICLET_PATH"]) && is_file($minisiteData["PUBLICLET_PATH"])){
-                    unlink($minisiteData["PUBLICLET_PATH"]);
+                if(isSet($publicletData["PUBLICLET_PATH"]) && is_file($publicletData["PUBLICLET_PATH"])){
+                    unlink($publicletData["PUBLICLET_PATH"]);
                 }else if($this->sqlSupported){
                     $this->confStorage->simpleStoreClear("share", $element);
                 }

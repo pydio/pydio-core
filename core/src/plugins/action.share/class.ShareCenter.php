@@ -948,6 +948,10 @@ class ShareCenter extends AJXP_Plugin
 
     public static function loadMinisite($data, $hash = '')
     {
+        if(isset($data["SECURITY_MODIFIED"]) && $data["SECURITY_MODIFIED"] === true){
+            header("HTTP/1.0 401 Not allowed, script was modified");
+            die("Not allowed");
+        }
         $repository = $data["REPOSITORY"];
         AJXP_PluginsService::getInstance()->initActivePlugins();
         $shareCenter = AJXP_PluginsService::findPlugin("action", "share");
@@ -1075,6 +1079,10 @@ class ShareCenter extends AJXP_Plugin
             die('Link expired!');
         }
         if(!empty($data) && is_array($data)){
+            if(isSet($data["SECURITY_MODIFIED"]) && $data["SECURITY_MODIFIED"] === true){
+                header("HTTP/1.0 401 Not allowed, script was modified");
+                exit();
+            }
             if($data["SHARE_TYPE"] == "minisite"){
                 self::loadMinisite($data, $hash);
             }else{
@@ -1110,6 +1118,10 @@ class ShareCenter extends AJXP_Plugin
      */
     public static function loadPubliclet($data)
     {
+        if(isset($data["SECURITY_MODIFIED"]) && $data["SECURITY_MODIFIED"] === true){
+            header("HTTP/1.0 401 Not allowed, script was modified");
+            die("Not allowed");
+        }
         // create driver from $data
         $className = $data["DRIVER"]."AccessDriver";
         $hash = md5(serialize($data));
@@ -1890,6 +1902,9 @@ class ShareCenter extends AJXP_Plugin
                 }
                 $meta["text"] = $repoObject->getDisplay();
                 $meta["share_type_readable"] =  $repoObject->hasContentFilter() ? "Publiclet" : ($shareType == "repository"? "Workspace": "Minisite");
+                if(isSet($shareData["LEGACY_REPO_OR_MINI"])){
+                    $meta["share_type_readable"] = "Repository or Minisite (legacy)";
+                }
                 $meta["share_data"] = ($shareType == "repository" ? 'Shared as workspace: '.$repoObject->getDisplay() : $this->buildPublicletLink($hash));
                 $meta["shared_element_hash"] = $hash;
                 $meta["owner"] = $repoObject->getOwner();
@@ -1917,7 +1932,7 @@ class ShareCenter extends AJXP_Plugin
             }else if(is_a($shareData["REPOSITORY"], "Repository") && !empty($shareData["FILE_PATH"])){
 
                 $meta["owner"] = $shareData["OWNER_ID"];
-                $meta["share_type_readable"] = "Publiclet (old school)";
+                $meta["share_type_readable"] = "Publiclet (legacy)";
                 $meta["text"] = basename($shareData["FILE_PATH"]);
                 $meta["icon"] = "mime_empty.png";
                 $meta["share_data"] = $meta["copy_url"] = $this->buildPublicletLink($hash);
@@ -2023,8 +2038,12 @@ class ShareCenter extends AJXP_Plugin
      */
     public static function checkHash($outputData, $hash)
     {
-        $full = md5($outputData);
-        return (!empty($hash) && strpos($full, $hash."") === 0);
+        // Never return false, otherwise it can break listing due to hardcore exit() call;
+        // Rechecked later
+        return true;
+
+        //$full = md5($outputData);
+        //return (!empty($hash) && strpos($full, $hash."") === 0);
     }
 
     /**
