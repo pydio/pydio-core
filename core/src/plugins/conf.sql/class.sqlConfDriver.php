@@ -260,14 +260,19 @@ class sqlConfDriver extends AbstractConfDriver
 
         $searchableKeys = array("uuid", "parent_uuid", "owner_user_id", "display", "accessType", "isTemplate", "slug", "groupPath");
         foreach($criteria as $cName => $cValue){
-            if(in_array($cName, $searchableKeys)){
+            if(in_array($cName, $searchableKeys) || in_array(substr($cName,1), $searchableKeys)){
                 if(is_array($cValue)){
-                    $wheres[] = array("[$cName] IN (%s)", $cValue);
+                    if($cName[0] == "!"){
+                        $cName = substr($cName, 1);
+                        $wheres[] = array("[$cName] NOT IN (%s)", $cValue);
+                    }else{
+                        $wheres[] = array("[$cName] IN (%s)", $cValue);
+                    }
                 }else if(strpos($cValue, "regexp:") === 0){
                     $regexp = str_replace("regexp:", "", $cValue);
                     $wheres[] = array("[$cName] ".AJXP_Utils::regexpToLike($regexp), AJXP_Utils::cleanLike($regexp));
                 }else if ($cValue == AJXP_FILTER_NOT_EMPTY){
-                    $wheres[] = array("[$cName] NOT NULL");
+                    $wheres[] = array("[$cName] IS NOT NULL");
                 }else if ($cValue == AJXP_FILTER_EMPTY){
                     $wheres[] = array("[$cName] IS NULL");
                 }else{
