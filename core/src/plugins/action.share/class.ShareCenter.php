@@ -384,7 +384,12 @@ class ShareCenter extends AJXP_Plugin
                             $sKeys = array_keys($shares);
                             $elementId = $sKeys[0];
                         }
-                        $this->getShareStore()->deleteShare($shares[$elementId]["type"], $elementId);
+                        if(isSet($shares[$elementId]) && isSet($shares[$elementId]["type"])){
+                            $t = $shares[$elementId]["type"];
+                        }else{
+                            $t = "file";
+                        }
+                        $this->getShareStore()->deleteShare($t, $elementId);
                         $this->removeShareFromMeta($ajxpNode, $elementId);
                         AJXP_Controller::applyHook("msg.instant", array("<reload_shared_elements/>", ConfService::getRepository()->getId()));
                     }
