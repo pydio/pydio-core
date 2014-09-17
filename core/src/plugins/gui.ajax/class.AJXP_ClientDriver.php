@@ -174,7 +174,9 @@ class AJXP_ClientDriver extends AJXP_Plugin
                 }
                 // PRECOMPUTE BOOT CONF
                 if (!preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) && !preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])) {
-                    $START_PARAMETERS["PRELOADED_BOOT_CONF"] = $this->computeBootConf();
+                    $preloadedBootConf = $this->computeBootConf();
+                    AJXP_Controller::applyHook("loader.filter_boot_conf", array(&$preloadedBootConf));
+                    $START_PARAMETERS["PRELOADED_BOOT_CONF"] = $preloadedBootConf;
                 }
 
                 // PRECOMPUTE REGISTRY
