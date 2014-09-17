@@ -34,7 +34,6 @@
 }
 
 .settings_main_pane .buttons_bar_container a{
-    height: 25px !important;
     padding-top: 2px;
 }
 
@@ -72,7 +71,7 @@
 
 .settings_main_pane #buttons_bar{
     padding-left: 7px;
-    padding-top: 2px;
+    padding-top: 4px;
 }
 
 .settings_main_pane #leftPane #settings_pane{
