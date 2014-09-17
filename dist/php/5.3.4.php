@@ -11,7 +11,7 @@ if (is_file(AJXP_INSTALL_PATH."/conf/bootstrap_repositories.php".".new-".date("Y
     rename(AJXP_INSTALL_PATH."/conf/bootstrap_repositories.php".".new-".date("Ymd"), AJXP_INSTALL_PATH."/conf/bootstrap_repositories.php");
 }
 
-echo "The bootstrap_context and bootstrap_repositories files were replaced by the new version, the .pre-update version is kept.";
+echo "The bootstrap_context and bootstrap_repositories files were replaced by the new version, the .pre-update version is kept.\n";
 
 $sqliteUpgrade = 'CREATE TABLE ajxp_changes (
   seq INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -254,3 +254,81 @@ if (is_a($confDriver, "sqlConfDriver")) {
     echo "Nothing to do for the DB";
 
 }
+
+
+function buildPublicHtaccessContent()
+{
+    $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
+    $dlURL = ConfService::getCoreConf("PUBLIC_DOWNLOAD_URL");
+    if ($dlURL != "") {
+        $url = rtrim($dlURL, "/");
+    } else {
+        $fullUrl = AJXP_Utils::detectServerURL(true);
+        $url =  str_replace("\\", "/", rtrim($fullUrl, "/").rtrim(str_replace(AJXP_INSTALL_PATH, "", $downloadFolder), "/"));
+    }
+    $htaccessContent = "Order Deny,Allow\nAllow from all\n";
+    $htaccessContent .= "\n<Files \".ajxp_*\">\ndeny from all\n</Files>\n";
+    $path = parse_url($url, PHP_URL_PATH);
+    $htaccessContent .= '
+        <IfModule mod_rewrite.c>
+        RewriteEngine on
+        RewriteBase '.$path.'
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteRule ^([a-zA-Z0-9_-]+)\.php$ share.php?hash=$1 [QSA]
+        RewriteRule ^([a-zA-Z0-9_-]+)--([a-z]+)$ share.php?hash=$1&lang=$2 [QSA]
+        RewriteRule ^([a-zA-Z0-9_-]+)$ share.php?hash=$1 [QSA]
+        </IfModule>
+        ';
+    return $htaccessContent;
+}
+
+function updateBaseHtaccessContent(){
+
+    $uri = $_SERVER["REQUEST_URI"];
+    if(strpos($uri, '.php') !== false) $uri = AJXP_Utils::safeDirname($uri);
+    if(empty($uri)) $uri = "/";
+
+    $tpl = file_get_contents(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/boot.conf/htaccess.tpl");
+    if($uri == "/"){
+        $htContent = str_replace('${APPLICATION_ROOT}/', "/", $tpl);
+        $htContent = str_replace('${APPLICATION_ROOT}', "/", $htContent);
+    }else{
+        $htContent = str_replace('${APPLICATION_ROOT}', $uri, $tpl);
+    }
+
+    if(is_writeable(AJXP_INSTALL_PATH."/.htaccess")){
+        echo 'Updating Htaccess';
+        file_put_contents(AJXP_INSTALL_PATH."/.htaccess", $htContent);
+    }else{
+        echo 'Cannot write htaccess file, please copy and paste the code below: <pre>'.$htContent.'</pre>';
+    }
+}
+
+function upgradeRootRoleForWelcome(){
+    $rootRole = AuthService::getRole("ROOT_ROLE");
+    if(!empty($rootRole)){
+        echo 'Upgrading Root Role to let users access the new welcome page';
+        $rootRole->setAcl("ajxp_home", "rw");
+        $rootRole->setParameterValue("core.conf", "DEFAULT_START_REPOSITORY", "ajxp_home");
+        AuthService::updateRole($rootRole);
+    }
+
+}
+
+// Update HTACCESS PUBLIC FILE
+$publicHtaccess = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/.htaccess";
+if(file_exists($publicHtaccess)){
+    $content = file_get_contents($publicHtaccess);
+    if(strpos($content, "RewriteCond") === false){
+        if(is_writable($publicHtaccess)){
+            echo '\nUpdating public folder htaccess file\n';
+            file_put_contents($publicHtaccess, buildPublicHtaccessContent());
+        }else{
+            echo 'You should update your public htaccess file to server the new shares : <pre>'.buildPublicHtaccessContent().'</pre>';
+        }
+    }
+}
+
+// Update HTACCESS FILE
+updateBaseHtaccessContent();
