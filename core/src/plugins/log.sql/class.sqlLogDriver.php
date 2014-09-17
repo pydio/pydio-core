@@ -113,8 +113,12 @@ class sqlLogDriver extends AbstractLogDriver
         foreach($all as $row => &$data){
             if(isSet($data["Date"])){
                 $key = date($dKeyFormat, $data["Date"]->getTimestamp());
+                $data["Date_sortable"] = $data["Date"]->getTimestamp();
                 $data["Date"] = $key;
                 $allDates[$key] = true;
+            }
+            if(isSet($data["File Name"])){
+                $data["File Name"] = AJXP_Utils::safeBasename($data["File Name"]);
             }
         }
 
@@ -126,6 +130,12 @@ class sqlLogDriver extends AbstractLogDriver
                     array_push($all, array("Date" => $dateK));
                 }
             }
+        }
+
+        if(isSet($query["FIGURE"]) && isSet($all[0][$query["FIGURE"]])){
+            $f = $all[0][$query["FIGURE"]];
+            if($f > 1000) $f = number_format($f / 1000, 1, ".", " ") . 'K';
+            $all[0] = array($query["FIGURE"] => $f);
         }
 
 
