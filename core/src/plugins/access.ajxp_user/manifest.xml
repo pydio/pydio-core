@@ -143,7 +143,7 @@
                     background-color: rgba(119, 119, 119, 0.35) !important;
                 }
                 #global_toolbar{
-                    background-image: url("plugins/gui.ajax/res/themes/orbit/images/white_logo.png");
+                    display: block;
                     background-color: rgba(43, 44, 44, 0.89);
                 }
                 </style>

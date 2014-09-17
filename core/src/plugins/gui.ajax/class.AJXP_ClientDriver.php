@@ -266,10 +266,12 @@ class AJXP_ClientDriver extends AJXP_Plugin
         }
         $config["zipEnabled"] = ConfService::zipEnabled();
         $config["multipleFilesDownloadEnabled"] = ConfService::getCoreConf("ZIP_CREATION");
+        $customIcon = $this->getFilteredOption("CUSTOM_ICON");
+        self::filterXml($customIcon);
         $config["customWording"] = array(
             "welcomeMessage" => $this->getFilteredOption("CUSTOM_WELCOME_MESSAGE"),
             "title"			 => ConfService::getCoreConf("APPLICATION_TITLE"),
-            "icon"			 => $this->getFilteredOption("CUSTOM_ICON"),
+            "icon"			 => $customIcon,
             "iconWidth"		 => $this->getFilteredOption("CUSTOM_ICON_WIDTH"),
             "iconHeight"     => $this->getFilteredOption("CUSTOM_ICON_HEIGHT"),
             "iconOnly"       => $this->getFilteredOption("CUSTOM_ICON_ONLY"),

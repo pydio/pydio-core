@@ -118,8 +118,8 @@
                 </script>
                 <style>
                     #global_toolbar{
+                        display: block;
                         background-color: #345E79;
-                        background-image: url("plugins/gui.ajax/res/themes/orbit/images/white_logo.png");
                     }
                 </style>
 			]]></template_part>

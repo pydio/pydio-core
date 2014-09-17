@@ -86,16 +86,22 @@ Class.create("LogoWidget", AjxpPane, {
             this.titleDiv.remove();
             this.titleDiv = null;
         }
-
-        if(configs.get("CUSTOM_TOP_LOGO") && configs.get("CUSTOM_TOP_LOGO") != 'ajxp-remove-original'){
+        var defaultImage = ajaxplorer.getDefaultImageFromParameters("gui.ajax", "CUSTOM_TOP_LOGO");
+        if((configs.get("CUSTOM_TOP_LOGO") || defaultImage) && configs.get("CUSTOM_TOP_LOGO") != 'ajxp-remove-original'){
             var parameter = 'binary_id';
             if(configs.get("CUSTOM_TOP_LOGO_ISTMP")){
                 parameter = 'tmp_file';
             }
-            var url = window.ajxpServerAccessPath + "&get_action=get_global_binary_param&"+parameter+"=" + configs.get("CUSTOM_TOP_LOGO");
-            if(configs.get("CUSTOM_TOP_LOGO").indexOf('plugins/') === 0){
-                // It's not a binary but directly an image.
-                url = configs.get("CUSTOM_TOP_LOGO");
+            var url;
+            if(configs.get("CUSTOM_TOP_LOGO")){
+                var url = window.ajxpServerAccessPath + "&get_action=get_global_binary_param&"+parameter+"=" + configs.get("CUSTOM_TOP_LOGO");
+                if(configs.get("CUSTOM_TOP_LOGO").indexOf('plugins/') === 0){
+                    // It's not a binary but directly an image.
+                    url = configs.get("CUSTOM_TOP_LOGO");
+                }
+            }else{
+                url = defaultImage;
+                this.imageIsDefault = true;
             }
             if(!this.image){
                 this.image  = new Image();
@@ -141,7 +147,7 @@ Class.create("LogoWidget", AjxpPane, {
             this.image.setStyle({
                 position    : 'absolute',
                 height      : imgH + 'px',
-                width       : imgW + 'px',
+                /*width       : imgW + 'px',*/
                 top         : imgTop + 'px',
                 left        : imgLeft + 'px'
             });
@@ -157,17 +163,17 @@ Class.create("LogoWidget", AjxpPane, {
         }
         var htHeight = parseInt(this.htmlElement.getHeight());
 
-        if(!configs.get('SKIP_BY_LOGO')){
+        if(!configs.get('SKIP_BY_LOGO') && !this.imageIsDefault){
             this.htmlElement.setStyle({
                 backgroundImage : 'url(' + window.ajxpResourcesFolder + '/images/white_by.png)',
                 backgroundSize : '66px',
-                backgroundPosition : (imgW+8) + 'px '+ (htHeight - 16) +'px'
+                backgroundPosition : (imgW+16) + 'px '+ (htHeight - 16) +'px'
             });
         }
         if(this.titleDiv){
             this.titleDiv.setStyle({
                 position:'absolute',
-                left : (imgW + 8) + 'px',
+                left : (imgW + 16) + 'px',
                 top : (htHeight - 39) + 'px',
                 fontSize : '19px'
             });

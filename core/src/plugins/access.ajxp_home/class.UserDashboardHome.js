@@ -29,7 +29,9 @@ Class.create("UserDashboardHome", AjxpPane, {
         $super(oFormObject, editorOptions);
         this._repoInfos = $H();
         this._repoInfosLoading = $H();
-        var dashLogo = ajaxplorer.getPluginConfigs("guidriver").get("CUSTOM_DASH_LOGO");
+        var dashLogo = ajaxplorer.getPluginConfigs("gui.ajax").get("CUSTOM_DASH_LOGO");
+        if(!dashLogo)
+            dashLogo = ajaxplorer.getDefaultImageFromParameters("gui.ajax", "CUSTOM_DASH_LOGO");
         if(dashLogo){
             var url;
             if(dashLogo.indexOf('plugins/') === 0){

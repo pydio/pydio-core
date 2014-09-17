@@ -100,7 +100,7 @@
                         </div>
                     </div>
                     <div id="home_center_panel" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","flexTo":"browser"}'>
-                        <div id="logo_div"><img src="plugins/gui.ajax/res/themes/orbit/images/Logo_White_300.png"></div>
+                        <div id="logo_div"><img src=""></div>
                         <div id="ws_legend"></div>
                     </div>
                 </div>
@@ -108,9 +108,12 @@
             <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "imageBackgroundFromConfigs":"access.ajxp_home/WELCOME_PAGE_BACKGROUND_","messageBoxReference":true}' theme="orbit"><![CDATA[
                 <style>
                     #global_toolbar{
-                        height: 0;
+                        position: absolute;
+                        display: block;
+                        width:99%;
+                        background-image: none !important;
                     }
-                    #clickable_home{
+                    #clickable_home, div.custom_top_title, img.custom_logo_image.linked {
                         display:none;
                     }
                 </style>
@@ -128,7 +131,7 @@
                         </div>
                     </div>
                     <div id="home_center_panel" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","flexTo":"orbit_content"}'>
-                        <div id="logo_div"><img src="plugins/gui.ajax/res/themes/orbit/images/Logo_White_300.png"></div>
+                        <div id="logo_div"><img src=""></div>
                         <div id="ws_legend"></div>
                     </div>
                 </div>

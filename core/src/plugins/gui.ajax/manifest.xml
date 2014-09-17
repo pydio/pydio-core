@@ -13,10 +13,11 @@
                     editable="true"
                     uploadAction="store_binary_temp"
                     loadAction="get_global_binary_param"
-                    defaultImage="plugins/gui.ajax/res/themes/orbit/images/Logo_White_300.png"
+                    defaultImage="AJXP_THEME_FOLDER/images/LoginBoxLogo.png"
                     mandatory="false"
+                    expose="true"
                 />
-        <global_param name="CUSTOM_ICON" group="CONF_MESSAGE[Start Up Screen]" type="string" label="CONF_MESSAGE[Icon Path (Legacy)]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]" default="plugins/gui.ajax/LoginBoxLogo.png" mandatory="false"/>
+        <global_param name="CUSTOM_ICON" group="CONF_MESSAGE[Start Up Screen]" type="string" label="CONF_MESSAGE[Icon Path (Legacy)]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]" default="AJXP_THEME_FOLDER/images/LoginBoxLogo.png" mandatory="false" expose="true"/>
         <global_param name="CUSTOM_ICON_WIDTH" group="CONF_MESSAGE[Start Up Screen]" type="string" label="CONF_MESSAGE[Icon Width]" description="CONF_MESSAGE[Width of the custom image (by default 35px)]" mandatory="false" default="250px"/>
         <global_param name="CUSTOM_ICON_HEIGHT" group="CONF_MESSAGE[Start Up Screen]" type="string" label="CONF_MESSAGE[Icon Height]" description="CONF_MESSAGE[Height of the custom icon (with the px mention)]" mandatory="false" default="120px"/>
         <global_param name="CUSTOM_FONT_SIZE" group="CONF_MESSAGE[Start Up Screen]" type="string" label="CONF_MESSAGE[Title Font Size]" description="CONF_MESSAGE[Font sized used for the title in the start up screen]" mandatory="false" default=""/>
@@ -31,13 +32,13 @@
                 />
         <global_param name="CUSTOM_TOP_LOGO_H" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Height]" description="CONF_MESSAGE[Manually set a logo height]" mandatory="false" default="39" expose="true"/>
         <global_param name="CUSTOM_TOP_LOGO_W" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Width]" description="CONF_MESSAGE[Manually set a logo width]" mandatory="false" default="" expose="true"/>
-        <global_param name="CUSTOM_TOP_LOGO_T" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Top]" description="CONF_MESSAGE[Manually set a top offset]" mandatory="false" default="0" expose="true"/>
+        <global_param name="CUSTOM_TOP_LOGO_T" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Top]" description="CONF_MESSAGE[Manually set a top offset]" mandatory="false" default="2" expose="true"/>
         <global_param name="CUSTOM_TOP_LOGO_L" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Left]" description="CONF_MESSAGE[Manually set a left offset]" mandatory="false" default="0" expose="true"/>
         <global_param name="CUSTOM_DASH_LOGO" group="CONF_MESSAGE[Dashboard]"  label="CONF_MESSAGE[Dashboard Logo]" description="CONF_MESSAGE[Replace the logo displayed in the user dashboard. Use 250 X 131 png image]"  type="image"
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/PydioLogo250.png"
+                      defaultImage="AJXP_THEME_FOLDER/images/PydioLogo250.png"
                       expose="true"
                 />
         <global_param name="CLIENT_TIMEOUT_TIME" group="CONF_MESSAGE[Client Session Config]" type="integer" label="CONF_MESSAGE[Client Timeout]" description="CONF_MESSAGE[The length of the client session in SECONDS. By default, it's copying the server session length. In most PHP installation, it will be 1440, ie 24minutes. You can set this value to 0, this will make the client session 'infinite' by pinging the server at regular occasions (thus keeping the PHP session alive). This is not a recommanded setting for evident security reasons.]" mandatory="false"/>
@@ -349,7 +350,7 @@
                     }
                 </style>
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div class="widget_logo"></div>
+                    <div class="widget_logo" ajxpClass="LogoWidget"></div>
                     <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
                     <div id="breadcrumb" ajxpClass="Breadcrumb" ajxpOptions='{}'></div>
                     <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>

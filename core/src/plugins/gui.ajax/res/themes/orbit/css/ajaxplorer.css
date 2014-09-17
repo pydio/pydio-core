@@ -1348,7 +1348,6 @@ div.dialogBox.form-login_form_dynamic div.dialogTitle
     top: 35%;
     right: -113%;
     background-color: transparent;
-    background-image: url('../images/Logo_White_300.png') !important;
 }
 
 div.dialogBox.form-switch_language_form select#language_selector{
@@ -1421,13 +1420,11 @@ div.dialogBox.form-login_form_dynamic div.dialogButtons input.dialogButton
 }
 
 #global_toolbar{
-/*    background-color: #345E79;
-    background-image: url("../images/white_logo.png");
-*/
     height: 47px;
     padding: 0 15px 0 5px;
     background-repeat: no-repeat;
     background-position: 7px;
+    display: none;
 }
 
 #clickable_home{

@@ -889,6 +889,10 @@ Class.create("Ajaxplorer", {
 		return configs;
 	},
 
+    getDefaultImageFromParameters: function(pluginId, paramName){
+        return XPathSelectSingleNode(this._registry, "plugins/*[@id='"+pluginId+"']/server_settings/global_param[@name='"+paramName+"']").getAttribute("defaultImage");
+    },
+
     hasPluginOfType : function(type, name){
         if(name == null){
             var node = XPathSelectSingleNode(this._registry, 'plugins/ajxp_plugin[contains(@id, "'+type+'.")] | plugins/' + type + '[@id]');

@@ -52,7 +52,10 @@
     padding: 7px 11px 4px;
     border-radius: 0 3px 0 0 !important;
     background-color: rgb(111, 123, 136);
-;
+}
+
+.ajxp_theme_orbit .settings_main_pane #breadcrumb_container{
+    border-radius: 0;
 }
 
 .settings_main_pane #content_pane{
