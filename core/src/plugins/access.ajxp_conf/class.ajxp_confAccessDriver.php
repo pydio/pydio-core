@@ -1677,13 +1677,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         $this->logInfo("Listing plugins",""); // make sure that the logger is started!
         $pServ = AJXP_PluginsService::getInstance();
         $types = $pServ->getDetectedPlugins();
+        $mess = ConfService::getMessages();
         $uniqTypes = array("core");
         $coreTypes = array("auth", "conf", "boot", "feed", "log", "mailer", "mq");
         if ($dir == "/plugins" || $dir == "/core_plugins") {
             if($dir == "/core_plugins") $uniqTypes = $coreTypes;
             else $uniqTypes = array_diff(array_keys($types), $coreTypes);
-            if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.plugins_folder">
+            if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="detail"  template_name="ajxp_conf.plugins_folder">
             <column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
+            <column messageId="ajxp_conf.103" attributeName="plugin_description" sortType="String"/>
+            <column messageId="ajxp_conf.102" attributeName="plugin_id" sortType="String"/>
             </columns>');
             ksort($types);
             foreach ($types as $t => $tPlugs) {
@@ -1692,7 +1695,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $nodeKey = "/".$root.$dir."/".$t;
                 $meta = array(
                     "icon" 		=> "folder_development.png",
-                    "plugin_id" => $t
+                    "plugin_id" => $t,
+                    "text" => $mess["plugtype.title.".$t],
+                    "plugin_description" => $mess["plugtype.desc.".$t]
                 );
                 if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
                 $xml = AJXP_XMLWriter::renderNode($nodeKey, ucfirst($t), false, $meta, true, false);
