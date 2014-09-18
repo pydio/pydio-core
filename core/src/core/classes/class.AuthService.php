@@ -63,7 +63,7 @@ class AuthService
     /**
      * Put a secure token in the session
      * @static
-     * @return
+     * @return string
      */
     public static function generateSecureToken()
     {
@@ -852,6 +852,11 @@ class AuthService
         self::$groupFiltering = $boolean;
     }
 
+    /**
+     * Automatically set the group to the current user base
+     * @param $baseGroup
+     * @return string
+     */
     public static function filterBaseGroup($baseGroup)
     {
         if(!self::$groupFiltering) {
@@ -870,12 +875,25 @@ class AuthService
         }
     }
 
+    /**
+     * List children groups of current base
+     * @param string $baseGroup
+     * @return string[]
+     */
     public static function listChildrenGroups($baseGroup = "/")
     {
         return ConfService::getAuthDriverImpl()->listChildrenGroups(self::filterBaseGroup($baseGroup));
 
     }
 
+    /**
+     * Create a new group at the given path
+     *
+     * @param $baseGroup
+     * @param $groupName
+     * @param $groupLabel
+     * @throws Exception
+     */
     public static function createGroup($baseGroup, $groupName, $groupLabel)
     {
         if(empty($groupName)) throw new Exception("Please provide a name for this new group!");
@@ -883,21 +901,42 @@ class AuthService
         ConfService::getConfStorageImpl()->createGroup(rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName, $groupLabel);
     }
 
+    /**
+     * Delete group by name
+     * @param $baseGroup
+     * @param $groupName
+     */
     public static function deleteGroup($baseGroup, $groupName)
     {
         ConfService::getConfStorageImpl()->deleteGroup(rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName);
     }
 
+    /**
+     * Count the number of children a given user has already created
+     * @param $parentUserId
+     * @return AbstractAjxpUser[]
+     */
     public static function getChildrenUsers($parentUserId)
     {
         return ConfService::getConfStorageImpl()->getUserChildren($parentUserId);
     }
 
+    /**
+     * Retrieve the current users who have either read or write access to a repository
+     * @param $repositoryId
+     * @return array
+     */
     public static function getUsersForRepository($repositoryId)
     {
         return ConfService::getConfStorageImpl()->getUsersForRepository($repositoryId);
     }
 
+    /**
+     * Count the number of users who have either read or write access to a repository
+     * @param $repositoryId
+     * @param bool $details
+     * @return Array|int
+     */
     public static function countUsersForRepository($repositoryId, $details = false)
     {
         return ConfService::getConfStorageImpl()->countUsersForRepository($repositoryId, $details);
@@ -947,6 +986,13 @@ class AuthService
         return $allUsers;
     }
 
+    /**
+     * Depending on the plugin, tried to compute the actual page where a given user can be located
+     *
+     * @param $userLogin
+     * @param $usersPerPage
+     * @return int
+     */
     public static function findUserPage($userLogin, $usersPerPage){
         if(ConfService::getAuthDriverImpl()->supportsUsersPagination()){
             return ConfService::getAuthDriverImpl()->findUserPage($userLogin, $usersPerPage);
@@ -955,24 +1001,50 @@ class AuthService
         }
     }
 
+    /**
+     * Whether the current auth driver supports paginated listing
+     *
+     * @return bool
+     */
     public static function authSupportsPagination()
     {
         $authDriver = ConfService::getAuthDriverImpl();
         return $authDriver->supportsUsersPagination();
     }
 
+
+    /**
+     * Count the total number of users inside a group (recursive).
+     * Regexp can be used to limit the users IDs with a specific expression
+     * Property can be used for basic filtering, either on "parent" or "admin".
+     *
+     * @param string $baseGroup
+     * @param string $regexp
+     * @param null $filterProperty Can be "parent" or "admin"
+     * @param null $filterValue Can be a string, or constants AJXP_FILTER_EMPTY / AJXP_FILTER_NOT_EMPTY
+     * @return int
+     */
     public static function authCountUsers($baseGroup="/", $regexp="", $filterProperty = null, $filterValue = null)
     {
         $authDriver = ConfService::getAuthDriverImpl();
         return $authDriver->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue);
     }
 
+    /**
+     * Makes a correspondance between a user and its auth scheme, for multi auth
+     * @param $userName
+     * @return String
+     */
     public static function getAuthScheme($userName)
     {
         $authDriver = ConfService::getAuthDriverImpl();
         return $authDriver->getAuthScheme($userName);
     }
 
+    /**
+     * Check if auth implementation supports schemes detection
+     * @return bool
+     */
     public static function driverSupportsAuthSchemes()
     {
         $authDriver = ConfService::getAuthDriverImpl();
@@ -1134,6 +1206,12 @@ class AuthService
         return self::$roles;
     }
 
+    /**
+     * Check if the current user is allowed to see the GroupPathProvider object
+     * @param AjxpGroupPathProvider $provider
+     * @param AbstractAjxpUser $userObject
+     * @return bool
+     */
     public static function allowedForCurrentGroup(AjxpGroupPathProvider $provider, $userObject = null)
     {
         $l = ($userObject == null ? self::getLoggedUser() : $userObject);
@@ -1143,6 +1221,12 @@ class AuthService
         return (strpos($l->getGroupPath(), $pGP, 0) === 0);
     }
 
+    /**
+     * Check if the current user can administrate the GroupPathProvider object
+     * @param AjxpGroupPathProvider $provider
+     * @param AbstractAjxpUser $userObject
+     * @return bool
+     */
     public static function canAdministrate(AjxpGroupPathProvider $provider, $userObject = null)
     {
         $l = ($userObject == null ? self::getLoggedUser() : $userObject);
@@ -1152,6 +1236,12 @@ class AuthService
         return (strpos($pGP, $l->getGroupPath(), 0) === 0);
     }
 
+    /**
+     * Check if the current user can assign administration for the GroupPathProvider object
+     * @param AjxpGroupPathProvider $provider
+     * @param AbstractAjxpUser $userObject
+     * @return bool
+     */
     public static function canAssign(AjxpGroupPathProvider $provider, $userObject = null)
     {
         $l = ($userObject == null ? self::getLoggedUser() : $userObject);
