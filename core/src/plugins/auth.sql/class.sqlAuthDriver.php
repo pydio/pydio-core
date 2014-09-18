@@ -109,7 +109,7 @@ class sqlAuthDriver extends AbstractAuthDriver
             }else if($filterValue == AJXP_FILTER_NOT_EMPTY){
                 $select = "SELECT COUNT(*) FROM [ajxp_users] AS u, [ajxp_user_rights] AS r WHERE %and";
                 $ands[] = array("[r.login]=[u.login]");
-                $ands[] = array("[ajxp_user_rights].[repo_uuid] = %s", $filterProperty);
+                $ands[] = array("[r.repo_uuid] = %s", $filterProperty);
             }else{
                 $select = "SELECT COUNT(*) FROM [ajxp_users] AS u, [ajxp_user_rights] AS r WHERE %and";
                 $ands[] = array("[r.login]=[u.login]");
