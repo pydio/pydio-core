@@ -317,7 +317,7 @@ class ldapAuthDriver extends AbstractAuthDriver
     }
 
     // $baseGroup = "/"
-    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit)
+    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive = true)
     {
         if (!empty($this->hasGroupsMapping)) {
             if ($baseGroup == "/") {

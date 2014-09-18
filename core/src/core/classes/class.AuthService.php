@@ -951,7 +951,7 @@ class AuthService
      * @param bool $cleanLosts
      * @return array
      */
-    public static function listUsers($baseGroup = "/", $regexp = null, $offset = -1, $limit = -1, $cleanLosts = true)
+    public static function listUsers($baseGroup = "/", $regexp = null, $offset = -1, $limit = -1, $cleanLosts = true, $recursive = true)
     {
         $baseGroup = self::filterBaseGroup($baseGroup);
         $authDriver = ConfService::getAuthDriverImpl();
@@ -959,7 +959,7 @@ class AuthService
         $allUsers = array();
         $paginated = false;
         if (($regexp != null || $offset != -1 || $limit != -1) && $authDriver->supportsUsersPagination()) {
-            $users = $authDriver->listUsersPaginated($baseGroup, $regexp, $offset, $limit);
+            $users = $authDriver->listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive);
             $paginated = true;
         } else {
             $users = $authDriver->listUsers($baseGroup);

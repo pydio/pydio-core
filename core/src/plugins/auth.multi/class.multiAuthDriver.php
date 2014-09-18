@@ -218,13 +218,13 @@ class multiAuthDriver extends AbstractAuthDriver
     }
 
     // $baseGroup = "/"
-    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit)
+    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive = true)
     {
         if (!empty($this->baseName) && $regexp == null) {
-            return $this->drivers[$this->baseName]->listUsersPaginated($baseGroup, $regexp, $offset, $limit);
+            return $this->drivers[$this->baseName]->listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive);
         } else {
             $keys = array_keys($this->drivers);
-            return $this->drivers[$keys[0]]->listUsersPaginated($baseGroup, $regexp, $offset, $limit) +  $this->drivers[$keys[1]]->listUsersPaginated($baseGroup, $regexp, $offset, $limit);
+            return $this->drivers[$keys[0]]->listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive) +  $this->drivers[$keys[1]]->listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive);
         }
     }
 

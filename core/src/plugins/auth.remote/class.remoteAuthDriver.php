@@ -124,7 +124,7 @@ class remoteAuthDriver extends AbstractAuthDriver
         return $users;
     }
 
-    public function listUsersPaginated($baseGroup, $regexp, $offset = -1 , $limit = -1)
+    public function listUsersPaginated($baseGroup, $regexp, $offset = -1 , $limit = -1, $recursive = true)
     {
         $users = $this->listUsers();
         $result = array();

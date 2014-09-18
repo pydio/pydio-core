@@ -233,7 +233,7 @@ class AbstractAuthDriver extends AJXP_Plugin
         return -1;
     }
 
-    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit)
+    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive = true)
     {
         return $this->listUsers($baseGroup);
     }

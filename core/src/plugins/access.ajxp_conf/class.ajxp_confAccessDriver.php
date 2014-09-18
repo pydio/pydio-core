@@ -1834,7 +1834,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         if (AuthService::authSupportsPagination() && $count >= $USER_PER_PAGE) {
             $offset = ($hashValue - 1) * $USER_PER_PAGE;
             if(!$returnNodes) AJXP_XMLWriter::renderPaginationData($count, $hashValue, ceil($count/$USER_PER_PAGE));
-            $users = AuthService::listUsers($baseGroup, "", $offset, $USER_PER_PAGE);
+            $users = AuthService::listUsers($baseGroup, "", $offset, $USER_PER_PAGE, true, false);
             if ($hashValue == 1) {
                 $groups = AuthService::listChildrenGroups($baseGroup);
             } else {

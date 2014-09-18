@@ -58,16 +58,20 @@ class sqlAuthDriver extends AbstractAuthDriver
     }
 
     // $baseGroup = "/"
-    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit)
+    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive = true)
     {
         $ignoreHiddens = "NOT EXISTS (SELECT * FROM [ajxp_user_rights] AS c WHERE [c.login]=[u.login] AND [c.repo_uuid] = 'ajxp.hidden')";
-
+        if($recursive){
+            $groupPathCondition = "[groupPath] LIKE %like~";
+        }else{
+            $groupPathCondition = "[groupPath] = %s";
+        }
         if ($regexp != null) {
-            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE [login] ".AJXP_Utils::regexpToLike($regexp)." AND [groupPath] LIKE %like~ AND $ignoreHiddens ORDER BY [login] ASC %lmt %ofs", AJXP_Utils::cleanRegexp($regexp), $baseGroup, $limit, $offset) ;
+            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE [login] ".AJXP_Utils::regexpToLike($regexp)." AND $groupPathCondition AND $ignoreHiddens ORDER BY [login] ASC %lmt %ofs", AJXP_Utils::cleanRegexp($regexp), $baseGroup, $limit, $offset) ;
         } else if ($offset != -1 || $limit != -1) {
-            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE [groupPath] LIKE %like~ AND $ignoreHiddens ORDER BY [login] ASC %lmt %ofs", $baseGroup, $limit, $offset);
+            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE $groupPathCondition AND $ignoreHiddens ORDER BY [login] ASC %lmt %ofs", $baseGroup, $limit, $offset);
         } else {
-            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE [groupPath] LIKE %like~ AND $ignoreHiddens ORDER BY [login] ASC", $baseGroup);
+            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE $groupPathCondition AND $ignoreHiddens ORDER BY [login] ASC", $baseGroup);
         }
         $pairs = $res->fetchPairs('login', 'password');
            return $pairs;
