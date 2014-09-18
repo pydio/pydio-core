@@ -11,7 +11,7 @@ if (is_file(AJXP_INSTALL_PATH."/conf/bootstrap_repositories.php".".new-".date("Y
     rename(AJXP_INSTALL_PATH."/conf/bootstrap_repositories.php".".new-".date("Ymd"), AJXP_INSTALL_PATH."/conf/bootstrap_repositories.php");
 }
 
-echo "The bootstrap_context and bootstrap_repositories files were replaced by the new version, the .pre-update version is kept.\n";
+echo "<br>The bootstrap_context and bootstrap_repositories files were replaced by the new version, the .pre-update version is kept.";
 
 $sqliteUpgrade = 'CREATE TABLE ajxp_changes (
   seq INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -245,13 +245,13 @@ if (is_a($confDriver, "sqlConfDriver")) {
 
     } else {
 
-        echo "DB Already upgraded via the script";
+        echo "<br>DB Already upgraded via the script<br>";
 
     }
 
 } else {
 
-    echo "Nothing to do for the DB";
+    echo "<br>Nothing to do for the DB<br>";
 
 }
 
@@ -298,17 +298,17 @@ function updateBaseHtaccessContent(){
     }
 
     if(is_writeable(AJXP_INSTALL_PATH."/.htaccess")){
-        echo 'Updating Htaccess';
+        echo '<br>Updating Htaccess';
         file_put_contents(AJXP_INSTALL_PATH."/.htaccess", $htContent);
     }else{
-        echo 'Cannot write htaccess file, please copy and paste the code below: <pre>'.$htContent.'</pre>';
+        echo '<br>Cannot write htaccess file, please copy and paste the code below: <br><pre>'.$htContent.'</pre>';
     }
 }
 
 function upgradeRootRoleForWelcome(){
     $rootRole = AuthService::getRole("ROOT_ROLE");
     if(!empty($rootRole)){
-        echo 'Upgrading Root Role to let users access the new welcome page';
+        echo '<br>Upgrading Root Role to let users access the new welcome page<br>';
         $rootRole->setAcl("ajxp_home", "rw");
         $rootRole->setParameterValue("core.conf", "DEFAULT_START_REPOSITORY", "ajxp_home");
         AuthService::updateRole($rootRole);
@@ -322,10 +322,10 @@ if(file_exists($publicHtaccess)){
     $content = file_get_contents($publicHtaccess);
     if(strpos($content, "RewriteCond") === false){
         if(is_writable($publicHtaccess)){
-            echo '\nUpdating public folder htaccess file\n';
+            echo '<br>Updating public folder htaccess file<br>';
             file_put_contents($publicHtaccess, buildPublicHtaccessContent());
         }else{
-            echo 'You should update your public htaccess file to server the new shares : <pre>'.buildPublicHtaccessContent().'</pre>';
+            echo '<br>You should update your public htaccess file to server the new shares : <br><pre>'.buildPublicHtaccessContent().'</pre>';
         }
     }
 }
