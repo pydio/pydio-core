@@ -42,7 +42,6 @@ class DisclaimerProvider extends AJXP_Plugin
 
             $u->removeLock();
             $u->save("superuser");
-            $u->recomputeMergedRole();
             AuthService::updateUser($u);
             ConfService::switchUserToActiveRepository($u);
             $force = $u->mergedRole->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);

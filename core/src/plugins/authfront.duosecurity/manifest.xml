@@ -5,7 +5,7 @@
 	<class_definition filename="plugins/authfront.duosecurity/class.DuoSecurityFrontend.php" classname="DuoSecurityFrontend"/>
     <client_settings>
         <resources>
-            <js className="DuoSecurity" file="plugins/authfront.duosecurity/duo_php/js/Duo-Web-v1-PydioMod.js" autoload="true"/>
+            <js className="DuoSecurity" file="plugins/authfront.duosecurity/duo_php/js/Duo-Web-v1-PydioMod.js"/>
             <i18n namespace="duosecurity" path="plugins/authfront.duosecurity/i18n"/>
         </resources>
     </client_settings>
@@ -40,6 +40,7 @@
                 <processing>
                     <clientCallback prepareModal="true" dialogOpenForm="duosecurity_box" dialogOkButtonOnly="false" dialogSkipButtons="true">
                         <dialogOnOpen><![CDATA[
+                            new ResourcesManager().loadJSResource('plugins/authfront.duosecurity/duo_php/js/Duo-Web-v1-PydioMod.js', 'DuoSecurity');
                             modal.getForm().down("#duosecurity_box").insert('<iframe id="duo_iframe" width="420" height="330" frameborder="0"></iframe>');
                             modal.getForm().insert('<form method="POST" id="duo_form"></form>');
                             modal.refreshDialogPosition();
