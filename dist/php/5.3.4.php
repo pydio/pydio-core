@@ -332,3 +332,4 @@ if(file_exists($publicHtaccess)){
 
 // Update HTACCESS FILE
 updateBaseHtaccessContent();
+upgradeRootRoleForWelcome();
