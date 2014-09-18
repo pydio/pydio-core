@@ -145,8 +145,13 @@
     font-size: 12px;
 }
 
+.settings_main_pane div.tabbed_editor{
+    position: relative;
+}
+
 .settings_main_pane div.action_bar.editor_action_bar{
     background-color: transparent;
+    top: 2px;
 }
 
 .flat_tree_pane > #tree_container > .webfx-tree-container > .webfx-tree-item{
