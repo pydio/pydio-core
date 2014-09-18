@@ -32,8 +32,8 @@
                 />
         <global_param name="CUSTOM_TOP_LOGO_H" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Height]" description="CONF_MESSAGE[Manually set a logo height]" mandatory="false" default="39" expose="true"/>
         <global_param name="CUSTOM_TOP_LOGO_W" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Width]" description="CONF_MESSAGE[Manually set a logo width]" mandatory="false" default="" expose="true"/>
-        <global_param name="CUSTOM_TOP_LOGO_T" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Top]" description="CONF_MESSAGE[Manually set a top offset]" mandatory="false" default="2" expose="true"/>
-        <global_param name="CUSTOM_TOP_LOGO_L" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Left]" description="CONF_MESSAGE[Manually set a left offset]" mandatory="false" default="0" expose="true"/>
+        <global_param name="CUSTOM_TOP_LOGO_T" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Top]" description="CONF_MESSAGE[Manually set a top offset]" mandatory="false" default="4" expose="true"/>
+        <global_param name="CUSTOM_TOP_LOGO_L" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Left]" description="CONF_MESSAGE[Manually set a left offset]" mandatory="false" default="6" expose="true"/>
         <global_param name="CUSTOM_DASH_LOGO" group="CONF_MESSAGE[Dashboard]"  label="CONF_MESSAGE[Dashboard Logo]" description="CONF_MESSAGE[Replace the logo displayed in the user dashboard. Use 250 X 131 png image]"  type="image"
                       editable="true"
                       uploadAction="store_binary_temp"

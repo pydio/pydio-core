@@ -102,6 +102,10 @@ Class.create("LogoWidget", AjxpPane, {
             }else{
                 url = defaultImage;
                 this.imageIsDefault = true;
+                // Get parameters defaults
+                $A(["CUSTOM_TOP_LOGO_H", "CUSTOM_TOP_LOGO_W","CUSTOM_TOP_LOGO_L", "CUSTOM_TOP_LOGO_T"]).each(function(param){
+                    configs.set(param, parseInt(XPathGetSingleNodeText(ajaxplorer.getXmlRegistry(), "plugins/*[@id='gui.ajax']/server_settings/global_param[@name='"+param+"']/@default")));
+                });
             }
             if(!this.image){
                 this.image  = new Image();
@@ -183,8 +187,8 @@ Class.create("LogoWidget", AjxpPane, {
             this.htmlElement.insert(this.image);
         }
 
-        if(this.htmlElement.down('.linked')){
-            this.htmlElement.down('.linked').setStyle({height:htHeight+'px'});
+        if(this.htmlElement.down('div.linked')){
+            this.htmlElement.down('div.linked').setStyle({height:htHeight+'px'});
         }
 
 
