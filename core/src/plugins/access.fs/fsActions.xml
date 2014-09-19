@@ -779,7 +779,7 @@
 						var oForm = modal.getForm();
 						var getAction = oForm.down('input[name="get_action"]');
 						var selectedNode = this.treeSelector.getSelectedNode();
-						if(selectedNode == ajaxplorer.getContextNode().getPath()){
+						if(!this.treeSelector.getFilterActive(activeRepository) && selectedNode == ajaxplorer.getContextNode().getPath()){
 							alert(MessageHash[183]);
 							return false;
 						}
