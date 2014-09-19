@@ -111,7 +111,7 @@ Class.create("Breadcrumb", AjxpPane, {
                 "use strict";
                 var target = Event.findElement(event, "span[data-goTo]").getAttribute("data-goTo");// event.target.getAttribute("data-goTo");
                 event.target.setAttribute("title", "Go to " + target);
-                if(event.target.down('span.ajxp-goto-refresh')){
+                if(event.target.hasClassName('ajxp-goto-refresh') || event.target.down('span.ajxp-goto-refresh')){
                     window.ajaxplorer.fireContextRefresh();
                 }else{
                     window.ajaxplorer.goTo(target);

@@ -696,9 +696,12 @@ Class.create("FilesList", SelectableElements, {
             var scrollElement = contentContainer;
 			var oElement = this.htmlElement.down(".selectable_div");
 			
-			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){				
+			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){
+                this.htmlElement.addClassName("paginated");
 				contentContainer.insert({before:this.createPaginator()});
-			}
+			}else{
+                this.htmlElement.removeClassName("paginated");
+            }
 
             if(this.options.selectable == undefined || this.options.selectable === true){
                 this.initSelectableItems(oElement, true, contentContainer, true);
@@ -804,8 +807,11 @@ Class.create("FilesList", SelectableElements, {
                 attachMobileScroll(this.htmlElement.down(".selectable_div"), "vertical");
             }
 			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){
+                this.htmlElement.addClassName("paginated");
                 this.htmlElement.down(".selectable_div").insert({before:this.createPaginator()});
-			}
+			}else{
+                this.htmlElement.removeClassName("paginated");
+            }
             var scrollElement = this.htmlElement.down(".selectable_div");
             if(this.options.horizontalScroll){
                 scrollElement.setStyle({width:'100000px'});

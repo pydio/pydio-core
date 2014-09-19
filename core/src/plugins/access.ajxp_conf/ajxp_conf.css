@@ -209,6 +209,12 @@
     color: white !important;
 }
 
+#search_container_settings #search_results div.thumbnail_selectable_cell.detailed {
+    margin: 0 !important;
+    border-radius: 0;
+    padding-bottom: 20px;
+}
+
 #leftTabulator div.panelHeader{
     background-color: #30383A;
     border-bottom: 0;
@@ -253,6 +259,18 @@
 
 .settings_main_pane div#breadcrumb span {
     margin: 0 4px;
+}
+
+.ajxp_theme_orbit .settings_main_pane div#breadcrumb span.ajxp-goto {
+    cursor: pointer;
+}
+
+.ajxp_theme_orbit .settings_main_pane div#breadcrumb span.ajxp-goto-refresh {
+    opacity: 0.25;
+}
+
+.ajxp_theme_orbit .settings_main_pane div#breadcrumb span.ajxp-goto-refresh:hover {
+    opacity: 1;
 }
 
 .settings_main_pane span.icon-bookmark-empty{
@@ -312,7 +330,7 @@
     box-shadow: 3px 3px 20px rgba(0,0,0,0.3);
     text-shadow: none;
     margin-top: 5px;
-    width: 280px;
+    width: 95%;
 }
 
 .settings_main_pane div#search_results div.thumbnail_selectable_cell.detailed{
@@ -320,7 +338,7 @@
 }
 
 .settings_main_pane #search_results div.ajxpNodeProvider:hover{
-    background-color: transparent !important;
+/*    background-color: transparent !important;*/
 }
 
 .settings_main_pane #search_results div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata{
