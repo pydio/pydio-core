@@ -341,7 +341,7 @@ class ldapAuthDriver extends AbstractAuthDriver
         }
         return $persons;
     }
-    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null)
+    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null, $recursive = true)
     {
         if (!empty($this->hasGroupsMapping)) {
             if ($baseGroup == "/") {
@@ -414,7 +414,7 @@ class ldapAuthDriver extends AbstractAuthDriver
     }
 
 
-    public function listUsers($baseGroup = "/")
+    public function listUsers($baseGroup = "/", $recursive = true)
     {
         return $this->listUsersPaginated($baseGroup, null, -1, -1);
     }

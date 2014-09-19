@@ -77,15 +77,15 @@ class sqlAuthDriver extends AbstractAuthDriver
            return $pairs;
     }
 
-    public function findUserPage($userLogin, $usersPerPage){
+    public function findUserPage($baseGroup, $userLogin, $usersPerPage, $offset){
 
         $res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [login] <= %s", $userLogin);
         $count = $res->fetchSingle();
-        return ceil($count / $usersPerPage) - 1;
+        return ceil(($count - $offset) / $usersPerPage) - 1;
 
     }
 
-    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null)
+    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null, $recursive = true)
     {
         // WITH PARENT
         // SELECT COUNT(*) FROM ajxp_users AS u, ajxp_user_rights AS r WHERE u.groupPath LIKE '/%' AND r.login=u.login AND r.repo_uuid = 'ajxp.parent_user'
@@ -99,7 +99,11 @@ class sqlAuthDriver extends AbstractAuthDriver
         if(!empty($regexp)){
             $ands[] = array("[u.login] ".AJXP_Utils::regexpToLike($regexp), AJXP_Utils::cleanRegexp($regexp));
         }
-        $ands[] = array("[u.groupPath] LIKE %like~", $baseGroup);
+        if($recursive){
+            $ands[] = array("[u.groupPath] LIKE %like~", $baseGroup);
+        }else{
+            $ands[] = array("[u.groupPath] = %s", $baseGroup);
+        }
         $ands[] = array("NOT EXISTS (SELECT * FROM [ajxp_user_rights] AS c WHERE [c.login]=[u.login] AND [c.repo_uuid] = 'ajxp.hidden')");
 
         if($filterProperty !== null && $filterValue !== null){

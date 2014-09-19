@@ -61,13 +61,13 @@ class serialAuthDriver extends AbstractAuthDriver
         return $users;
     }
 
-    public function listUsers($baseGroup = "/")
+    public function listUsers($baseGroup = "/", $recursive = true)
     {
         $users = AJXP_Utils::loadSerialFile($this->usersSerFile);
         if (AuthService::ignoreUserCase()) {
             $users = array_combine(array_map("strtolower", array_keys($users)), array_values($users));
         }
-        ConfService::getConfStorageImpl()->filterUsersByGroup($users, $baseGroup, false);
+        ConfService::getConfStorageImpl()->filterUsersByGroup($users, $baseGroup, !$recursive);
         ksort($users);
         return $users;
     }
@@ -97,9 +97,9 @@ class serialAuthDriver extends AbstractAuthDriver
         }
         return $result;
     }
-    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null)
+    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null, $recursive = true)
     {
-        return count($this->listUsersPaginated($baseGroup, $regexp));
+        return count($this->listUsersPaginated($baseGroup, $regexp, -1, -1, $recursive));
     }
 
 

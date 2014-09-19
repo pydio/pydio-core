@@ -226,7 +226,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         foreach ($groups as $groupId => $groupLabel) {
 
             if (preg_match("/$term/i", $groupLabel) == TRUE ) {
-                $nodeKey = "/data/users/".trim($baseGroup, "/")."/".ltrim($groupId,"/");
+                $trimmedG = trim($baseGroup, "/");
+                if(!empty($trimmedG)) $trimmedG .= "/";
+                $nodeKey = "/data/users/".$trimmedG.ltrim($groupId,"/");
                 $meta = array(
                     "icon" => "users-folder.png",
                     "ajxp_mime" => "group"
@@ -240,8 +242,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
         $users = AuthService::listUsers($baseGroup, $term);
         foreach ($users as $userId => $userObject) {
+            $trimmedG = trim($userObject->getGroupPath(), "/");
+            if(!empty($trimmedG)) $trimmedG .= "/";
 
-            $nodeKey = "/data/users/".trim($userObject->getGroupPath(),"/")."/".$userId;
+            $nodeKey = "/data/users/".$trimmedG.$userId;
             $meta = array(
                 "icon" => "user.png",
                 "ajxp_mime" => "user"
@@ -1782,7 +1786,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
         if ($findNodePosition != null && $hashValue == null) {
 
-            $position = AuthService::findUserPage($findNodePosition, $USER_PER_PAGE);
+            // Add groups offset
+            $groups = AuthService::listChildrenGroups($baseGroup);
+            $offset = 0;
+            if(count($groups)){
+                $offset = count($groups);
+            }
+            $position = AuthService::findUserPage($baseGroup, $findNodePosition, $USER_PER_PAGE);
             if($position != -1){
 
                 $key = "/data/".$root."/".$findNodePosition;
@@ -1830,7 +1840,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         if(!AuthService::usersEnabled()) return ;
         if(empty($hashValue)) $hashValue = 1;
 
-        $count = AuthService::authCountUsers($baseGroup);
+        $count = AuthService::authCountUsers($baseGroup, "", null, null, false);
         if (AuthService::authSupportsPagination() && $count >= $USER_PER_PAGE) {
             $offset = ($hashValue - 1) * $USER_PER_PAGE;
             if(!$returnNodes) AJXP_XMLWriter::renderPaginationData($count, $hashValue, ceil($count/$USER_PER_PAGE));
@@ -1841,7 +1851,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $groups = array();
             }
         } else {
-            $users = AuthService::listUsers($baseGroup);
+            $users = AuthService::listUsers($baseGroup, "", -1, -1, true, false);
             $groups = AuthService::listChildrenGroups($baseGroup);
         }
         foreach ($groups as $groupId => $groupLabel) {

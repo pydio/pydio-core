@@ -949,7 +949,8 @@ class AuthService
      * @param $offset
      * @param $limit
      * @param bool $cleanLosts
-     * @return array
+     * @param bool $recursive
+     * @return AbstractAjxpUser[]
      */
     public static function listUsers($baseGroup = "/", $regexp = null, $offset = -1, $limit = -1, $cleanLosts = true, $recursive = true)
     {
@@ -989,13 +990,14 @@ class AuthService
     /**
      * Depending on the plugin, tried to compute the actual page where a given user can be located
      *
+     * @param $baseGroup
      * @param $userLogin
      * @param $usersPerPage
      * @return int
      */
-    public static function findUserPage($userLogin, $usersPerPage){
+    public static function findUserPage($baseGroup, $userLogin, $usersPerPage, $offset = 0){
         if(ConfService::getAuthDriverImpl()->supportsUsersPagination()){
-            return ConfService::getAuthDriverImpl()->findUserPage($userLogin, $usersPerPage);
+            return ConfService::getAuthDriverImpl()->findUserPage($baseGroup, $userLogin, $usersPerPage, $offset);
         }else{
             return -1;
         }
@@ -1024,10 +1026,10 @@ class AuthService
      * @param null $filterValue Can be a string, or constants AJXP_FILTER_EMPTY / AJXP_FILTER_NOT_EMPTY
      * @return int
      */
-    public static function authCountUsers($baseGroup="/", $regexp="", $filterProperty = null, $filterValue = null)
+    public static function authCountUsers($baseGroup="/", $regexp="", $filterProperty = null, $filterValue = null, $recursive = true)
     {
         $authDriver = ConfService::getAuthDriverImpl();
-        return $authDriver->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue);
+        return $authDriver->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
     }
 
     /**

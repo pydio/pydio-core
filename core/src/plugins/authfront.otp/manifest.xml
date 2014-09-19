@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <authdriver id="authfront.otp" enabled="false" name="authfront.otp" label="CONF_MESSAGE[Authentication One-time-password]" description="CONF_MESSAGE[Use Google Authenticator, Yubikey or standard password to authenticate users.]" mixins="authdriver_commons"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <plugin_info>
-        <plugin_author>Janos Milus</plugin_author>
-        <plugin_version>0.1</plugin_version>
-        <plugin_uri>http://pyd.io/plugins/auth/serial_otp</plugin_uri>
-        <core_relation packaged="false" tested_version="5.3.2"/>
+        <plugin_author>Janos Milus / Tran Cuong</plugin_author>
+        <plugin_version>0.8</plugin_version>
+        <plugin_uri>http://pyd.io/plugins/authfront/otp</plugin_uri>
+        <core_relation packaged="true" tested_version="follow_core"/>
     </plugin_info>
     <client_settings>
         <resources>
