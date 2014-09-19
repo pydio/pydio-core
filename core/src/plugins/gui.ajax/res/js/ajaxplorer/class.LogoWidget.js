@@ -19,9 +19,17 @@
  */
 Class.create("LogoWidget", AjxpPane, {
 
+    _imageParameter:null,
+    _imagePlugin:null,
+
     initialize : function($super, element, options){
         $super(element, options);
-        var configs = ajaxplorer.getPluginConfigs("guidriver");
+        var paramLocation = options.imageParameter || "gui.ajax/CUSTOM_TOP_LOGO";
+        var parts = paramLocation.split("/");
+        this._imagePlugin = parts[0];
+        this._imageParameter = parts[1];
+
+        var configs = ajaxplorer.getPluginConfigs(this._imagePlugin);
         this.updateConfig(configs);
         if(options.link){
             var linkTitle;
@@ -75,7 +83,7 @@ Class.create("LogoWidget", AjxpPane, {
             }else{
                 this.titleDiv.update(configs.get("CUSTOM_TOP_TITLE"));
             }
-            if(!configs.get("CUSTOM_TOP_LOGO") || configs.get("CUSTOM_TOP_LOGO") == 'ajxp-remove-original'){
+            if(!configs.get(this._imageParameter) || configs.get(this._imageParameter) == 'ajxp-remove-original'){
                 if(this.image){
                     if(this.image.parentNode) this.image.remove();
                     this.image = null;
@@ -86,25 +94,27 @@ Class.create("LogoWidget", AjxpPane, {
             this.titleDiv.remove();
             this.titleDiv = null;
         }
-        var defaultImage = ajaxplorer.getDefaultImageFromParameters("gui.ajax", "CUSTOM_TOP_LOGO");
-        if((configs.get("CUSTOM_TOP_LOGO") || defaultImage) && configs.get("CUSTOM_TOP_LOGO") != 'ajxp-remove-original'){
+        var defaultImage = ajaxplorer.getDefaultImageFromParameters(this._imagePlugin, this._imageParameter);
+        if((configs.get(this._imageParameter) || defaultImage) && configs.get(this._imageParameter) != 'ajxp-remove-original'){
             var parameter = 'binary_id';
-            if(configs.get("CUSTOM_TOP_LOGO_ISTMP")){
+            if(configs.get( this._imageParameter + "_ISTMP")){
                 parameter = 'tmp_file';
             }
             var url;
-            if(configs.get("CUSTOM_TOP_LOGO")){
-                var url = window.ajxpServerAccessPath + "&get_action=get_global_binary_param&"+parameter+"=" + configs.get("CUSTOM_TOP_LOGO");
-                if(configs.get("CUSTOM_TOP_LOGO").indexOf('plugins/') === 0){
+            if(configs.get(this._imageParameter)){
+                var url = window.ajxpServerAccessPath + "&get_action=get_global_binary_param&"+parameter+"=" + configs.get(this._imageParameter);
+                if(configs.get(this._imageParameter).indexOf('plugins/') === 0){
                     // It's not a binary but directly an image.
-                    url = configs.get("CUSTOM_TOP_LOGO");
+                    url = configs.get(this._imageParameter);
                 }
             }else{
                 url = defaultImage;
                 this.imageIsDefault = true;
                 // Get parameters defaults
-                $A(["CUSTOM_TOP_LOGO_H", "CUSTOM_TOP_LOGO_W","CUSTOM_TOP_LOGO_L", "CUSTOM_TOP_LOGO_T"]).each(function(param){
-                    configs.set(param, parseInt(XPathGetSingleNodeText(ajaxplorer.getXmlRegistry(), "plugins/*[@id='gui.ajax']/server_settings/global_param[@name='"+param+"']/@default")));
+                $A([this._imageParameter + "_H", this._imageParameter + "_W",this._imageParameter + "_L", this._imageParameter + "_T"]).each(function(param){
+                    var v = XPathGetSingleNodeText(ajaxplorer.getXmlRegistry(), "plugins/*[@id='gui.ajax']/server_settings/global_param[@name='"+param+"']/@default");
+                    if(!v) v = 0;
+                    configs.set(param, parseInt(v));
                 });
             }
             if(!this.image){
@@ -120,7 +130,7 @@ Class.create("LogoWidget", AjxpPane, {
                     this.resizeImage(configs, false);
                 }.bind(this);
             }
-        }else if(configs.get("CUSTOM_TOP_LOGO") == 'ajxp-remove-original' && this.image){
+        }else if(configs.get(this._imageParameter) == 'ajxp-remove-original' && this.image){
             if(this.image.parentNode) this.image.remove();
             this.image = null;
             this.htmlElement.setAttribute('style', '');
@@ -135,19 +145,19 @@ Class.create("LogoWidget", AjxpPane, {
         if(this.image){
             var w = this.image.width;
             var h = this.image.height;
-            if(configs.get("CUSTOM_TOP_LOGO_H")){
-                imgH = parseInt(configs.get("CUSTOM_TOP_LOGO_H")) || h;
+            if(configs.get(this._imageParameter + "_H")){
+                imgH = parseInt(configs.get(this._imageParameter + "_H")) || h;
                 imgW = parseInt(imgH * w / h);
-            }else if(configs.get("CUSTOM_TOP_LOGO_W")){
-                imgW = parseInt(configs.get("CUSTOM_TOP_LOGO_W"));
+            }else if(configs.get(this._imageParameter + "_W")){
+                imgW = parseInt(configs.get(this._imageParameter + "_W"));
                 imgH = parseInt(imgW * h / w);
             }
             if(!imgW){
                 imgW = w;
                 imgH = h;
             }
-            var imgTop = parseInt(configs.get("CUSTOM_TOP_LOGO_T")) || 0;
-            var imgLeft = parseInt(configs.get("CUSTOM_TOP_LOGO_L")) || 0;
+            var imgTop = parseInt(configs.get(this._imageParameter + "_T")) || 0;
+            var imgLeft = parseInt(configs.get(this._imageParameter + "_L")) || 0;
             this.image.setStyle({
                 position    : 'absolute',
                 height      : imgH + 'px',
@@ -163,6 +173,9 @@ Class.create("LogoWidget", AjxpPane, {
         this.htmlElement.setStyle({paddingTop:(ajxpBootstrap.parameters.get("theme") == 'orbit' ? 0: '9px')});
         if(imgH > parseInt(this.htmlElement.getHeight())){
             var elPadding = parseInt(this.htmlElement.getStyle('paddingTop')) + (imgH - parseInt(this.htmlElement.getHeight()));
+            if(ajxpBootstrap.parameters.get("theme") == 'orbit'){
+                elPadding += 9;
+            }
             this.htmlElement.setStyle({paddingTop: elPadding + 'px'});
         }
         var htHeight = parseInt(this.htmlElement.getHeight());

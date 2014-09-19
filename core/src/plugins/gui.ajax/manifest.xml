@@ -348,9 +348,15 @@
                         background-color: #ccc;
                         padding: 9px 9px 8px;
                     }
+                    img.custom_logo_image{
+                        height:90px !important;
+                        right: 0;
+                        top: 5px !important;
+                        left: inherit !important;
+                    }
                 </style>
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div class="widget_logo" ajxpClass="LogoWidget"></div>
+                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"action.share/CUSTOM_MINISITE_LOGO"}'></div>
                     <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
                     <div id="breadcrumb" ajxpClass="Breadcrumb" ajxpOptions='{}'></div>
                     <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
@@ -410,16 +416,16 @@
                     background-color: #222;
                     box-shadow: 0 2px 4px rgba(0,0,0,0.5);
                     margin-bottom:5px;
-                    padding-top: 16px;
-                    padding-left: 16px;
-                    height: 112px !important;
+                    padding-top: 3px;
+                    padding-left: 3px;
+                    height: 60px !important;
                 }
                 .fl-displayMode-thumb div.thumbnail_selectable_cell div.thumbLabel {
                     color: #555;
                     background-color: transparent;
                 }
                 .fl-displayMode-thumb div.thumbnail_selectable_cell{
-                    margin: 1px 6px;
+                    margin: 2px 2px;
                 }
                 div.thumbnail_selectable_cell{
                     background-color: transparent;
@@ -441,17 +447,22 @@
                 #diaporama_box{
                     position:relative;
                 }
+                img.custom_logo_image{
+                    right: 0px !important;
+                    left: inherit !important;
+                    height: 65px !important;
+                }
 
 				</style>
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div class="widget_logo"></div>
+                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"action.share/CUSTOM_MINISITE_LOGO"}'></div>
                     <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
                     <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
                         <div id="cpane_header" class="panelHeader">
                             <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["minisite", "inline"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                             <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":50}'></div>
                         </div>
-                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"thumb", "fixedDisplayMode":"thumb", "fixedThumbSize":80,"replaceScroller":false, "horizontalScroll":true, "messageBoxReference":true, "fit":"content", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}'></div>
+                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"thumb", "fixedDisplayMode":"thumb", "fixedThumbSize":40,"replaceScroller":false, "horizontalScroll":true, "messageBoxReference":true, "fit":"content", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}'></div>
                         <div id="cpane_tabs" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"cpane_container","registerAsEditorOpener":true, "saveState":false, "defaultTabId": "","tabInfos" : [], "uniqueTab":true}'></div>
                     </div>
 				</div>
@@ -551,9 +562,14 @@
                     display: inline-block !important;
                     margin-left: 4px !important;
                 }
+                img.custom_logo_image{
+                    right: 0 !important;
+                    left: inherit !important;
+                    height: 66px !important;
+                }
 				</style>
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div class="widget_logo"></div>
+                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"action.share/CUSTOM_MINISITE_LOGO"}'></div>
                     <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["inline", "minisite-share-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                     <div id="widget_title" style="padding: 28px 0 22px 20px;" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
                     <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
@@ -629,7 +645,8 @@
                     border-radius: 5px;
                 }
                 div.widget_logo{
-                    height: 75px;
+                    height: 90px;
+                    background-position: 86px 76px !important;
                 }
                 div#widget_title{
                     color: rgba(255,255,255,0.8);
@@ -658,11 +675,16 @@
                     bottom: 37px;
                     font-size: 21px;
                 }
+                img.custom_logo_image{
+                    right: 6px !important;
+                    left: inherit !important;
+                    height: 90px !important;
+                }
                 </style>
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
                     <div id="background_container" ajxpClass="AjxpPane" ajxpOptions='{"imageBackgroundFromConfigs":"action.share/CUSTOM_SHAREPAGE_BACKGROUND_"}'></div>
                     <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
-                        <div class="widget_logo"></div>
+                        <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"action.share/CUSTOM_MINISITE_LOGO"}'></div>
                         <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'>
                         </div>
                         <div id="dl_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["inline"], "skipCarousel":true}'></div>
@@ -700,8 +722,10 @@
                         <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":30}'></div>
                     </div>
                     <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
-                    <div class="widget_logo"></div>
+                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"action.share/CUSTOM_MINISITE_LOGO"}'></div>
 				</div>
+				<link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
+				<style>img.custom_logo_image{ height: 85px !important; top: inherit !important; bottom: 25px; }</style>
 			]]></template>
             <template name="minisite_dropbox" element="ajxp_dropbox_template" position="top" label="share_center.163"><![CDATA[
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
@@ -710,8 +734,10 @@
                         <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":30}'></div>
                     </div>
                     <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
-                    <div class="widget_logo"></div>
+                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"action.share/CUSTOM_MINISITE_LOGO"}'></div>
 				</div>
+				<link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
+				<style>img.custom_logo_image{ right: 6px !important; left: inherit !important; height: 87px !important; bottom: 3px; top: inherit !important; }</style>
 			]]></template>
 			<component_config className="FilesList">
 				<property name="thumbSize" value="64"/>

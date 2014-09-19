@@ -50,35 +50,21 @@
             #ajxp_embed_template #display_toolbar,
             #ajxp_dropbox_template #display_toolbar
             {
-                width: 200px;
+                width: 430px;
+                white-space: nowrap;
+                font-size: 12px;
             }
 
-            #breadcrumb span.icon-refresh.ajxp-goto-refresh {
-                margin-left: 5px;
-                opacity: 0.2;
-            }
-
-            .widget_logo {
-                background-image: url('AJXP_MINISITE_LOGO');
-                background-repeat: no-repeat;
-                background-position: right 5px;
-                background-size: 170px;
-                margin-right: 5px;
-                position: absolute;
-                top: 0;
-                right: 0;
-                height: 70px;
-                width: 180px;
-                z-index: 50;
-            }
-
-            #ajxp_embed_template .widget_logo
+            #ajxp_dropbox_template #inline_toolbar span.actionbar_button_label,
+            #ajxp_embed_template #inline_toolbar span.actionbar_button_label,
+            #ajxp_embed_template #minisite_toolbar span.actionbar_button_label,
+            #ajxp_dropbox_template #minisite_toolbar span.actionbar_button_label,
+            #ajxp_film_strip #minisite_toolbar span.actionbar_button_label,
+            #ajxp_film_strip #inline_toolbar span.actionbar_button_label
             {
-                top: inherit;
-                bottom: 0;
-                left: 0;
-                right: inherit;
-                height: 95px;
+                display: inline-block;
+                margin-left: 2px;
+                margin-right: 6px;
             }
 
             #ajxp_dropbox_template .widget_logo {
@@ -97,12 +83,43 @@
             }
             #ajxp_dropbox_template #browser{
                 background-color: rgb(54, 60, 68);
+                padding: 15px;
             }
             #ajxp_dropbox_template #content_pane{
                 border: 5px dotted rgb(233, 233, 233) !important;
-                margin: 8px 8px 20px;
+                margin: 0 5px 30px;
                 padding: 10px;
                 border-radius: 10px;
+            }
+
+            #breadcrumb span.icon-refresh.ajxp-goto-refresh {
+                margin-left: 5px;
+                opacity: 0.2;
+            }
+
+            .widget_logo {
+                /*
+                background-image: url('AJXP_MINISITE_LOGO');
+                background-position: right 5px;
+                background-size: 170px;
+                */
+                background-repeat: no-repeat;
+                margin-right: 5px;
+                position: absolute;
+                top: 0;
+                right: 0;
+                height: 70px;
+                width: 180px;
+                z-index: 50;
+            }
+
+            #ajxp_embed_template .widget_logo
+            {
+                top: inherit;
+                bottom: 0;
+                left: inherit;
+                right: 0;
+                height: 95px;
             }
 
             #ajxp_shared_folder{
@@ -113,7 +130,8 @@
                 position:relative;
             }
             #ajxp_shared_folder .widget_logo {
-                height: 90px;
+                height: 43px;
+                padding-top: 0 !important;
             }
             .action_bar{
                 background-color: #ffffff;
