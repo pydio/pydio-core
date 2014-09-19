@@ -223,11 +223,11 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
 
     public function getLock()
     {
+        if($this->isAdmin() && $this->getGroupPath() == "/") return false;
         if (!empty($this->rights["ajxp.lock"])) {
             return $this->rights["ajxp.lock"];
         }
         return $this->mergedRole->filterParameterValue('core.conf', 'USER_LOCK_ACTION', AJXP_REPO_SCOPE_ALL, false);
-        //return false;
     }
 
     public function isAdmin()
@@ -431,14 +431,14 @@ abstract class AbstractAjxpUser implements AjxpGroupPathProvider
             //... but we want the parent user's role, filtered with inheritable properties only.
             $stretchedParentUserRole = AuthService::limitedRoleFromParent($this->parentUser);
             if ($stretchedParentUserRole !== null) {
-                $this->parentRole = $this->parentRole->override($stretchedParentUserRole);
+                $this->parentRole = $stretchedParentUserRole->override($this->parentRole);  //$this->parentRole->override($stretchedParentUserRole);
                 // REAPPLY SPECIFIC "SHARED" ROLES
                 foreach ($this->roles as $role) {
                     if(! $role->autoAppliesTo("shared")) continue;
                     $this->parentRole = $role->override($this->parentRole);
                 }
             }
-            $this->mergedRole = $this->parentRole->override($this->personalRole);
+            $this->mergedRole = $this->personalRole->override($this->parentRole);  // $this->parentRole->override($this->personalRole);
         }
     }
 
