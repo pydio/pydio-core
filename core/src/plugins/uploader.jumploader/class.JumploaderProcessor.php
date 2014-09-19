@@ -35,6 +35,7 @@ class JumploaderProcessor extends AJXP_Plugin
      */
     private static $skipDecoding = false;
     private static $remote = false;
+    private static $wrapperIsRemote = false;
     private static $partitions = array();
 
     public function preProcess($action, &$httpVars, &$fileVars)
@@ -54,6 +55,8 @@ class JumploaderProcessor extends AJXP_Plugin
                 $this->logDebug("Skip decoding");
                 self::$skipDecoding = true;
             }
+            $this->logDebug("Stream ",$streamData);
+            self::$wrapperIsRemote = call_user_func(array($streamData["classname"], "isRemote"));
         }
         $this->logDebug("Jumploader HttpVars", $httpVars);
         $this->logDebug("Jumploader FileVars", $fileVars);
@@ -65,7 +68,7 @@ class JumploaderProcessor extends AJXP_Plugin
 
         /* if fileId is not set, request for cross-session resume (only if the protocol is not ftp)*/
         if (!isSet($httpVars["fileId"])) {
-            AJXP_LOGGER::debug("Cross-Session Resume request");
+            AJXP_LOGGER::debug("Trying Cross-Session Resume request");
 
             $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
             $streamData = $plugin->detectStreamWrapper(true);
@@ -93,8 +96,10 @@ class JumploaderProcessor extends AJXP_Plugin
                 }
 
                 /* no valid temp file found. return. */
-                if (empty ($resumeIndexes))
+                if (empty ($resumeIndexes)){
+                    AJXP_LOGGER::debug("No Cross-Session Resume request");
                     return;
+                }
 
                 AJXP_LOGGER :: debug("ResumeFileID: " . $resumeFileId);
                 AJXP_LOGGER :: debug("Max Resume Index: " . max($resumeIndexes));
@@ -122,18 +127,17 @@ class JumploaderProcessor extends AJXP_Plugin
             AJXP_LOGGER::debug("Filename: " . $realName . ", File hash: " . $fileHash);
             $fileVars["userfile_0"]["name"] = "$fileHash.$fileId.$index";
             $httpVars["lastPartition"] = false;
-        }else
-        /*
-         * If we wan to upload a folderUpload to folderServer
-         * Temporarily,put all files in this folder to folderServer.
-         * But a same file name may be existed in folderServer,
-         * this can cause error of uploading.
-         *
-         * We rename this file by his relativePath. At the postProcess session, we will use this name
-         * to copy to right location
-         *
-         */
-        {
+        }else{
+            /*
+             * If we wan to upload a folderUpload to folderServer
+             * Temporarily,put all files in this folder to folderServer.
+             * But a same file name may be existed in folderServer,
+             * this can cause error of uploading.
+             *
+             * We rename this file by his relativePath. At the postProcess session, we will use this name
+             * to copy to right location
+             *
+             */
             $file_tmp_md5 = md5($httpVars["relativePath"]);
             $fileVars["userfile_0"]["name"] = $file_tmp_md5;
         }
@@ -399,7 +403,7 @@ class JumploaderProcessor extends AJXP_Plugin
                     fclose($newDest);
                 }
 
-                if (!self::$remote && $relPath != $httpVars["partitionRealName"]) {
+                if (!self::$remote && (!self::$wrapperIsRemote || $relPath != $httpVars["partitionRealName"])) {
                     $err = copy($current, $target);
                 } else {
                     for ($i=0, $count=count($newPartitions); $i<$count; $i++) {
