@@ -1871,9 +1871,14 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
 
 #topPane div.FL-inlineToolbar{
     position: absolute;
-    top: 4px;
-    right: 33px;
+    top: 6px;
+    right: 40px;
     margin: 0;
+    display: none;
+}
+
+#topPane div.thumbnail_selectable_cell:hover div.FL-inlineToolbar {
+    display: block;
 }
 
 #topPane div.FL-inlineToolbar div.toolbarGroup{
@@ -1881,7 +1886,7 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
 }
 
 #topPane div.FL-inlineToolbar span.ajxp_icon_span{
-    color:#ccc;
+    color:#eee;
 }
 
 #topPane div.FL-inlineToolbar span.actionbar_button_label{
@@ -1942,13 +1947,15 @@ div.class-FetchedResultPane > div.panelHeader
 }
 
 #notif_pane div.thumbLabel small {
+    display: none;
+    /*
     font-style: italic;
     opacity: 0.7;
-    display: block;
     margin-left: 40px;
     width: 217px;
     overflow: hidden;
     height: auto;
+    */
 }
 
 #notif_pane div.thumbLabel {
@@ -1966,6 +1973,11 @@ div.class-FetchedResultPane > div.panelHeader
     clear: left;
     font-weight: lighter;
 }
+
+#topPane div.scrolling h3{
+    padding-right: 16px;
+}
+
 
 #topPane span.expand_label_hide,
 #topPane small.expand_button_hide span.expand_label_show

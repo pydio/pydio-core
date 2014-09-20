@@ -103,7 +103,7 @@ and (max-width : 400px){
         display:none;
     }
     #search_engine_cont{
-        width:100% !important;
+        /*width:100% !important;*/
     }
     #buttons_bar_cont{
         margin-left: 0;
