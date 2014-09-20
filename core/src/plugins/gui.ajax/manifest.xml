@@ -635,7 +635,6 @@
                     left:-5px;
                     bottom:-5px;
                     right:-5px;
-                    opacity:0.5;
                 }
                 div#dl_toolbar {
                     margin: 27% auto;

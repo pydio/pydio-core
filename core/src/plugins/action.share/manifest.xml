@@ -30,7 +30,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/action.share/res/hi-res/PARIS.jpg"
+                      defaultImage="plugins/action.share/res/hi-res/01.jpg"
                       expose="true"
         />
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_1" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -41,7 +41,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/action.share/res/hi-res/NORMANDY.jpg"
+                      defaultImage="plugins/action.share/res/hi-res/02.jpg"
                       expose="true"
         />
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_2" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -51,7 +51,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/action.share/res/hi-res/CRETE.jpg"
+                      defaultImage="plugins/action.share/res/hi-res/03.jpg"
                       expose="true"
         />
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_3" group="CONF_MESSAGE[Page Background Images]" type="select"
