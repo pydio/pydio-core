@@ -467,7 +467,7 @@ class AuthService
                 "conf.serial"=> array("get_bookmarks"),
                 "conf.sql"=> array("get_bookmarks"),
                 "index.lucene" => array("index"),
-                "action.share" => array("share"),
+                "action.share" => array("share", "share-edit-shared", "share-folder-workspace", "share-file-minisite", "share-selection-minisite", "share-folder-minisite-public"),
                 "gui.ajax" => array("bookmark"),
                 "auth.serial" => array("pass_change"),
                 "auth.sql" => array("pass_change"),
