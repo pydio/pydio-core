@@ -55,7 +55,7 @@
 }
 
 .ajxp_theme_orbit .settings_main_pane #breadcrumb_container{
-    border-radius: 0;
+    border-radius: 0 !important;
 }
 
 .settings_main_pane #content_pane{
@@ -164,7 +164,6 @@
 
 #leftTabulator{
     background-color: #30383A;
-    text-shadow: 0 1px rgba(0, 0, 0, 1);
 }
 
 #leftTabulator div.tabulatorContainer {
@@ -197,6 +196,7 @@
 
 #leftTabulator span.toggleHeader.toggleInactive{
     float: right;
+    padding-top: 11px;
 }
 
 .settings_main_pane div.class-FetchedResultPane {
@@ -237,16 +237,19 @@
 }
 
 .ajxp_theme_orbit div.settings_search_container #search_form a{
-    top: 50px;
+    top: 48px;
     right: 16px;
 }
 
 .ajxp_theme_orbit div.settings_search_container #search_form input{
     text-align: left;
     float: left !important;
-    width: 93%;
+    width: 90%;
     margin: 0 2%;
-    padding: 3px 1%;
+    padding: 3px 2%;
+    background-color: #4B4B4B; 
+    border: 0;
+    font-size: 15px;
 }
 
 .ajxp_theme_orbit div.settings_main_pane #breadcrumb_container{
@@ -321,9 +324,10 @@
 }
 
 .ajxp_theme_orbit div.settings_main_pane div.flat_tree_pane>#tree_container>.webfx-tree-container>.webfx-tree-item{
-    background-color: #505050;
+    background-color: transparent !important;
     padding-bottom: 8px;
-    margin: 1px 0;
+    margin: 7px 4px 0px;
+    padding-left: 6px;
 }
 
 .settings_main_pane #search_results_cont{

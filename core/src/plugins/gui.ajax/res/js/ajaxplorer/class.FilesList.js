@@ -1828,7 +1828,7 @@ Class.create("FilesList", SelectableElements, {
         var textNode = ajxpNode.getLabel();
 		var label = new Element('div', {
 			className:"thumbLabel",
-			title:textNode
+			title:textNode.stripTags()
 		}).update(textNode);
 		
 		innerSpan.insert({"bottom":img});
@@ -1925,7 +1925,7 @@ Class.create("FilesList", SelectableElements, {
         var textNode = ajxpNode.getLabel();
 		var label = new Element('div', {
 			className:"thumbLabel",
-			title:textNode
+			title:textNode.stripTags()
 		}).update(textNode);
 
 		innerSpan.insert({"bottom":img});
