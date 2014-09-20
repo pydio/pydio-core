@@ -111,6 +111,7 @@
                 height: 70px;
                 width: 180px;
                 z-index: 50;
+                padding:0 !important;
             }
 
             #ajxp_embed_template .widget_logo
