@@ -1,7 +1,7 @@
 Pydio ##VERSION_NUMBER## Release Note
 
 This is a development release, but it is already pretty stable, and hopefully next one will be final.
-Upgrading is available on dev channel from both last dev release (5.3.1) and last stable release (5.2.3):
+Upgrading is available on dev channel from both last dev release (5.3.2) and last stable release (5.2.3):
 upgrading from v5.2.3 stable should be done in a staging environment only, but would it be helpful to test
 it and report us feedbacks about migration process.
 
