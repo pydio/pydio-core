@@ -484,7 +484,7 @@
                                     if(staticClass.getRESTPreviewLinks){
                                         var links = staticClass.getRESTPreviewLinks(node);
                                         $H(links).each(function(pair){
-                                            modal.getForm().down("#additional_links").insert(tpl.evaluate({title:pair.key,link:document.location.href + "?dl=true&ct=true"+pair.value}));
+                                            modal.getForm().down("#additional_links").insert(tpl.evaluate({title:pair.key,link:document.location.href.split('?').shift() + "?dl=true&ct=true"+pair.value}));
                                         });
                                     }
                                 }
