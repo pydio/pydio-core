@@ -488,7 +488,7 @@
                                         });
                                     }
                                 }
-                                var dlLink = document.location.href + "?dl=true&file=" + encodeURIComponent(node.getPath());
+                                var dlLink = document.location.href.split('?').shift() + "?dl=true&file=" + encodeURIComponent(node.getPath());
                                 modal.getForm().down("#additional_links").insert(tpl.evaluate({title:"Direct Download",link:dlLink}));
                             }
                         ]]></dialogOnOpen>

@@ -350,6 +350,7 @@
                     }
                     img.custom_logo_image{
                         height:90px !important;
+                        width: auto;
                         right: 0;
                         top: 5px !important;
                         left: inherit !important;
@@ -451,6 +452,7 @@
                     right: 0px !important;
                     left: inherit !important;
                     height: 65px !important;
+                    width: auto;
                 }
 
 				</style>
@@ -566,6 +568,7 @@
                     right: 0 !important;
                     left: inherit !important;
                     height: 66px !important;
+                    width: auto;
                 }
 				</style>
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
@@ -679,6 +682,7 @@
                     right: 6px !important;
                     left: inherit !important;
                     height: 90px !important;
+                    width: auto;
                 }
                 </style>
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
@@ -725,7 +729,7 @@
                     <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"action.share/CUSTOM_MINISITE_LOGO"}'></div>
 				</div>
 				<link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
-				<style>img.custom_logo_image{ height: 85px !important; top: inherit !important; bottom: 25px; }</style>
+				<style>img.custom_logo_image{ width: auto; height: 85px !important; top: inherit !important; bottom: 25px; }</style>
 			]]></template>
             <template name="minisite_dropbox" element="ajxp_dropbox_template" position="top" label="share_center.163"><![CDATA[
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
@@ -737,7 +741,7 @@
                     <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"action.share/CUSTOM_MINISITE_LOGO"}'></div>
 				</div>
 				<link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
-				<style>img.custom_logo_image{ right: 6px !important; left: inherit !important; height: 87px !important; bottom: 3px; top: inherit !important; }</style>
+				<style>img.custom_logo_image{ width: auto; right: 6px !important; left: inherit !important; height: 87px !important; bottom: 3px; top: inherit !important; }</style>
 			]]></template>
 			<component_config className="FilesList">
 				<property name="thumbSize" value="64"/>
