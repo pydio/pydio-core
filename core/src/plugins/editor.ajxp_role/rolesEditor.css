@@ -5,6 +5,10 @@ div.tabbed_editor{
     border-right: 1px solid #bbbbbb;
     line-height: initial;
 }
+.ajxp_theme_orbit div.tabbed_editor{
+    background-color: #f8f8f8;
+    border: 0;
+}
 
 div.tabbed_editor div.accordion_content{
     padding-bottom: 20px;
