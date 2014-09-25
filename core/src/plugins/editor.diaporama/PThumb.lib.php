@@ -581,7 +581,7 @@ class PThumb{
                         $outputed = @imagegif($thumbnail);
                         break;
                     case 2:
-                        $outputed = @imageJPEG($thumbnail,'',100);
+                        $outputed = @imageJPEG($thumbnail,null,100);
                         break;
                     case 3:
                         $outputed = @imagepng($thumbnail);
