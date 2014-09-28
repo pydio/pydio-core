@@ -21,12 +21,12 @@
 $mess=array(
 "title" => "Mein Dashboard",
 "desc" => "Eigene Kontoeinstellungen, eigenes Adressbuch, geteilte Elemente, etc. verwalten",
-"39"=> "Workspace auswählen",
+"39"=> "Repository auswählen",
 "40"=> "Willkommen, %s",
-"41"=> "Diesen Workspace standardmässig verwenden",
+"41"=> "Dieses Repository standardmässig verwenden",
 "42"=> "Betreten",
 "43"=> "Mein Profil",
-"43t"=> "Alle meine persönlichen Dateien",
+"43t"=> "Alle meine privaten Dateien",
 "44"=> "Mein Konto",
 "45"=> "Persönliche Daten",
 "46"=> "Adressbuch",
@@ -68,7 +68,7 @@ $mess=array(
     "64"=>"<h2>Ordner mit APPLICATION_TITLE teilen</h2>
                             Das folgende Video erklärt das Teilen von Ordnern mit APPLICATION_TITLE
                             <ul>
-                                <li>Als neuen Workspace teilen</li>
+                                <li>Als neues Repository teilen</li>
                                 <li>Als öffentliche Miniseite teilen</li>
             </ul>",
     "65"=> "Mehr über APPLICATION_TITLE im YouTube-Kanal erfahren!",
