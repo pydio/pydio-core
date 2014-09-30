@@ -20,7 +20,7 @@
 */
 $mess=array(
 "1" => "Gemeinsame Benutzer",
-"2" => "Gemeinsame Repository",
+"2" => "Gemeinsame Repositorys",
 "3" => "Öffentliche Dateien",
 "4"	=> "Dateipfad",
 "5"	=> "Repository",
