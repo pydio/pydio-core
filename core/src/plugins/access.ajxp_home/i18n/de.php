@@ -23,7 +23,7 @@ $mess=array(
 "desc" => "Eigene Kontoeinstellungen, eigenes Adressbuch, geteilte Elemente, etc. verwalten",
 "39"=> "Workspace auswählen",
 "40"=> "Willkommen, %s",
-"41"=> "Diesen Workspace standardmässig verwenden",
+"41"=> "Diese Workspace standardmässig verwenden",
 "42"=> "Betreten",
 "43"=> "Mein Profil",
 "43t"=> "Alle meine persönlichen Dateien",
@@ -68,7 +68,7 @@ $mess=array(
     "64"=>"<h2>Ordner mit APPLICATION_TITLE teilen</h2>
                             Das folgende Video erklärt das Teilen von Ordnern mit APPLICATION_TITLE
                             <ul>
-                                <li>Als neuen Workspace teilen</li>
+                                <li>Als neue Workspace teilen</li>
                                 <li>Als öffentliche Miniseite teilen</li>
             </ul>",
     "65"=> "Mehr über APPLICATION_TITLE im YouTube-Kanal erfahren!",
