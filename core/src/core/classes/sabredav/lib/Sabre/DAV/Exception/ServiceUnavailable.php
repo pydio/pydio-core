@@ -11,20 +11,20 @@ use Sabre\DAV;
  * is currently not available (e.g. down for maintenance).
  *
  * @author Thomas Müller <thomas.mueller@tmit.eu>
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class ServiceUnavailable extends DAV\Exception
-{
-    /**
-     * Returns the HTTP statuscode for this exception
-     *
-     * @return int
-     */
-    public function getHTTPCode()
-    {
-        return 503;
+class ServiceUnavailable extends DAV\Exception {
 
-    }
+	/**
+	 * Returns the HTTP statuscode for this exception
+	 *
+	 * @return int
+	 */
+	public function getHTTPCode() {
+
+		return 503;
+
+	}
 
 }

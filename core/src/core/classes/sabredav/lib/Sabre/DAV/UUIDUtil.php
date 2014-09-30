@@ -9,12 +9,12 @@ namespace Sabre\DAV;
  * UUIDs are used a decent amount within various *DAV standards, so it made
  * sense to include it.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class UUIDUtil
-{
+class UUIDUtil {
+
     /**
      * Returns a pseudo-random v4 UUID
      *
@@ -23,8 +23,8 @@ class UUIDUtil
      * @see http://www.php.net/manual/en/function.uniqid.php#94959
      * @return string
      */
-    public static function getUUID()
-    {
+    static function getUUID() {
+
         return sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
             // 32 bits for "time_low"
             mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),
@@ -52,8 +52,8 @@ class UUIDUtil
      * @param string $uuid
      * @return bool
      */
-    public static function validateUUID($uuid)
-    {
+    static function validateUUID($uuid) {
+
         return preg_match(
             '/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i',
             $uuid

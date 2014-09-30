@@ -11,12 +11,12 @@ use Sabre\DAV;
  * This is used by the Server class to encode items within a multistatus
  * response.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class ResponseList extends DAV\Property
-{
+class ResponseList extends DAV\Property {
+
     /**
      * Response objects.
      *
@@ -30,9 +30,9 @@ class ResponseList extends DAV\Property
      *
      * @param array $responses;
      */
-    public function __construct($responses)
-    {
-        foreach ($responses as $response) {
+    public function __construct($responses) {
+
+        foreach($responses as $response) {
             if (!($response instanceof Response)) {
                 throw new \InvalidArgumentException('You must pass an array of Sabre\DAV\Property\Response objects');
             }
@@ -48,9 +48,9 @@ class ResponseList extends DAV\Property
      * @param \DOMElement $dom
      * @return void
      */
-    public function serialize(DAV\Server $server,\DOMElement $dom)
-    {
-        foreach ($this->responses as $response) {
+    public function serialize(DAV\Server $server,\DOMElement $dom) {
+
+        foreach($this->responses as $response) {
             $response->serialize($server, $dom);
         }
 

@@ -12,13 +12,13 @@ use Sabre\HTTP;
  * Most of the digest logic is handled, implementors just need to worry about
  * the validateUserPass method.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
  * @author James David Low (http://jameslow.com/)
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-abstract class AbstractBasic implements BackendInterface
-{
+abstract class AbstractBasic implements BackendInterface {
+
     /**
      * This variable holds the currently logged in username.
      *
@@ -45,8 +45,7 @@ abstract class AbstractBasic implements BackendInterface
      *
      * @return string|null
      */
-    public function getCurrentUser()
-    {
+    public function getCurrentUser() {
         return $this->currentUser;
     }
 
@@ -62,8 +61,8 @@ abstract class AbstractBasic implements BackendInterface
      * @throws DAV\Exception\NotAuthenticated
      * @return bool
      */
-    public function authenticate(DAV\Server $server, $realm)
-    {
+    public function authenticate(DAV\Server $server, $realm) {
+
         $auth = new HTTP\BasicAuth();
         $auth->setHTTPRequest($server->httpRequest);
         $auth->setHTTPResponse($server->httpResponse);
@@ -85,3 +84,4 @@ abstract class AbstractBasic implements BackendInterface
 
 
 }
+

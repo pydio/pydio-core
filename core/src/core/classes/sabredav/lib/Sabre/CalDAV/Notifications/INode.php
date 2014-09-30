@@ -12,19 +12,19 @@ namespace Sabre\CalDAV\Notifications;
  * For a complete example, check out the Notification class, which contains
  * some helper functions.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-interface INode
-{
+interface INode {
+
     /**
      * This method must return an xml element, using the
      * Sabre\CalDAV\Notifications\INotificationType classes.
      *
      * @return INotificationType
      */
-    public function getNotificationType();
+    function getNotificationType();
 
     /**
      * Returns the etag for the notification.
@@ -33,6 +33,6 @@ interface INode
      *
      * @return string
      */
-    public function getETag();
+    function getETag();
 
 }

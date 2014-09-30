@@ -7,12 +7,12 @@ namespace Sabre\DAV;
  *
  * Implement this interface to support custom WebDAV properties requested and sent from clients.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-interface IProperties extends INode
-{
+interface IProperties extends INode {
+
     /**
      * Updates properties on this node,
      *
@@ -48,7 +48,7 @@ interface IProperties extends INode
      * @param array $mutations
      * @return bool|array
      */
-    public function updateProperties($mutations);
+    function updateProperties($mutations);
 
     /**
      * Returns a list of properties for this nodes.
@@ -65,6 +65,7 @@ interface IProperties extends INode
      * @param array $properties
      * @return void
      */
-    public function getProperties($properties);
+    function getProperties($properties);
 
 }
+

@@ -14,12 +14,15 @@ namespace Sabre\DAV;
  * ). Since these are reserved, but don't have a reserved meaning in url, these characters are
  * kept as-is.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * It was also discovered that versions of the SOGO connector for thunderbird
+ * has issues with urlencoded colons.
+ *
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class URLUtil
-{
+class URLUtil {
+
     /**
      * Encodes the path of a url.
      *
@@ -28,9 +31,9 @@ class URLUtil
      * @param string $path
      * @return string
      */
-    public static function encodePath($path)
-    {
-        return preg_replace_callback('/([^A-Za-z0-9_\-\.~\(\)\/])/',function($match) {
+    static function encodePath($path) {
+
+        return preg_replace_callback('/([^A-Za-z0-9_\-\.~\(\)\/:])/',function($match) {
 
             return '%'.sprintf('%02x',ord($match[0]));
 
@@ -46,9 +49,9 @@ class URLUtil
      * @param string $pathSegment
      * @return string
      */
-    public static function encodePathSegment($pathSegment)
-    {
-        return preg_replace_callback('/([^A-Za-z0-9_\-\.~\(\)])/',function($match) {
+    static function encodePathSegment($pathSegment) {
+
+        return preg_replace_callback('/([^A-Za-z0-9_\-\.~\(\):])/',function($match) {
 
             return '%'.sprintf('%02x',ord($match[0]));
 
@@ -61,8 +64,8 @@ class URLUtil
      * @param string $path
      * @return string
      */
-    public static function decodePath($path)
-    {
+    static function decodePath($path) {
+
         return self::decodePathSegment($path);
 
     }
@@ -73,12 +76,12 @@ class URLUtil
      * @param string $path
      * @return string
      */
-    public static function decodePathSegment($path)
-    {
+    static function decodePathSegment($path) {
+
         $path = rawurldecode($path);
         $encoding = mb_detect_encoding($path, array('UTF-8','ISO-8859-1'));
 
-        switch ($encoding) {
+        switch($encoding) {
 
             case 'ISO-8859-1' :
                 $path = utf8_encode($path);
@@ -107,10 +110,10 @@ class URLUtil
      * @param string $path
      * @return array
      */
-    public static function splitPath($path)
-    {
+    static function splitPath($path) {
+
         $matches = array();
-        if (preg_match('/^(?:(?:(.*)(?:\/+))?([^\/]+))(?:\/?)$/u',$path,$matches)) {
+        if(preg_match('/^(?:(?:(.*)(?:\/+))?([^\/]+))(?:\/?)$/u',$path,$matches)) {
             return array($matches[1],$matches[2]);
         } else {
             return array(null,null);

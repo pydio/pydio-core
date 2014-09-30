@@ -5,12 +5,12 @@ namespace Sabre\DAV\Auth\Backend;
 /**
  * This is the base class for any authentication object.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-interface BackendInterface
-{
+interface BackendInterface {
+
     /**
      * Authenticates the user based on the current request.
      *
@@ -21,7 +21,7 @@ interface BackendInterface
      * @param string $realm
      * @return bool
      */
-    public function authenticate(\Sabre\DAV\Server $server,$realm);
+    function authenticate(\Sabre\DAV\Server $server,$realm);
 
     /**
      * Returns information about the currently logged in username.
@@ -30,6 +30,7 @@ interface BackendInterface
      *
      * @return string|null
      */
-    public function getCurrentUser();
+    function getCurrentUser();
 
 }
+

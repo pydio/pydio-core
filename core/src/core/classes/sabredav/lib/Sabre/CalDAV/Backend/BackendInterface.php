@@ -5,12 +5,12 @@ namespace Sabre\CalDAV\Backend;
 /**
  * Every CalDAV backend must at least implement this interface.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-interface BackendInterface
-{
+interface BackendInterface {
+
     /**
      * Returns a list of calendars for a principal.
      *
@@ -126,9 +126,11 @@ interface BackendInterface
      * 'calendardata' object is required here though, while it's not required
      * for getCalendarObjects.
      *
+     * This method must return null if the object did not exist.
+     *
      * @param mixed $calendarId
      * @param string $objectUri
-     * @return array
+     * @return array|null
      */
     public function getCalendarObject($calendarId,$objectUri);
 

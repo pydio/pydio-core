@@ -10,12 +10,12 @@ use Sabre\DAVACL\PrincipalBackend;
  * This object is responsible for generating a list of calendar-homes for each
  * user.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class CalendarRootNode extends \Sabre\DAVACL\AbstractPrincipalCollection
-{
+class CalendarRootNode extends \Sabre\DAVACL\AbstractPrincipalCollection {
+
     /**
      * CalDAV backend
      *
@@ -37,8 +37,8 @@ class CalendarRootNode extends \Sabre\DAVACL\AbstractPrincipalCollection
      * @param Backend\BackendInterface $caldavBackend
      * @param string $principalPrefix
      */
-    public function __construct(PrincipalBackend\BackendInterface $principalBackend,Backend\BackendInterface $caldavBackend, $principalPrefix = 'principals')
-    {
+    public function __construct(PrincipalBackend\BackendInterface $principalBackend,Backend\BackendInterface $caldavBackend, $principalPrefix = 'principals') {
+
         parent::__construct($principalBackend, $principalPrefix);
         $this->caldavBackend = $caldavBackend;
 
@@ -52,8 +52,8 @@ class CalendarRootNode extends \Sabre\DAVACL\AbstractPrincipalCollection
      *
      * @return string
      */
-    public function getName()
-    {
+    public function getName() {
+
         return Plugin::CALENDAR_ROOT;
 
     }
@@ -68,8 +68,8 @@ class CalendarRootNode extends \Sabre\DAVACL\AbstractPrincipalCollection
      * @param array $principal
      * @return \Sabre\DAV\INode
      */
-    public function getChildForPrincipal(array $principal)
-    {
+    public function getChildForPrincipal(array $principal) {
+
         return new UserCalendars($this->caldavBackend, $principal);
 
     }

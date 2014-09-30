@@ -157,7 +157,7 @@ namespace Sabre\CalDAV\Backend;
  * ==============================================
  *
  * If Sabre\CalDAV\Property\AllowedSharingModes is returned from
- * getCalendarsByUser, this allows the server to specify wether either sharing,
+ * getCalendarsByUser, this allows the server to specify whether either sharing,
  * or publishing is supported.
  *
  * This allows a client to determine in advance which features are available,
@@ -165,12 +165,12 @@ namespace Sabre\CalDAV\Backend;
  * the backend, the SharingPlugin automatically injects it and assumes both
  * features are available.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-interface SharingSupport extends NotificationSupport
-{
+interface SharingSupport extends NotificationSupport {
+
     /**
      * Updates the list of shares.
      *
@@ -194,7 +194,7 @@ interface SharingSupport extends NotificationSupport
      * @param array $remove
      * @return void
      */
-    public function updateShares($calendarId, array $add, array $remove);
+    function updateShares($calendarId, array $add, array $remove);
 
     /**
      * Returns the list of people whom this calendar is shared with.
@@ -214,7 +214,7 @@ interface SharingSupport extends NotificationSupport
      * @param mixed $calendarId
      * @return array
      */
-    public function getShares($calendarId);
+    function getShares($calendarId);
 
     /**
      * This method is called when a user replied to a request to share.
@@ -229,7 +229,7 @@ interface SharingSupport extends NotificationSupport
      * @param string $summary A description of the reply
      * @return null|string
      */
-    public function shareReply($href, $status, $calendarUri, $inReplyTo, $summary = null);
+    function shareReply($href, $status, $calendarUri, $inReplyTo, $summary = null);
 
     /**
      * Publishes a calendar
@@ -238,6 +238,6 @@ interface SharingSupport extends NotificationSupport
      * @param bool $value
      * @return void
      */
-    public function setPublishStatus($calendarId, $value);
+    function setPublishStatus($calendarId, $value);
 
 }

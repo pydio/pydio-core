@@ -9,12 +9,12 @@ use Sabre\DAV;
  *
  * Simply append ?mount to any collection to generate the davmount response.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class Plugin extends DAV\ServerPlugin
-{
+class Plugin extends DAV\ServerPlugin {
+
     /**
      * Reference to Server class
      *
@@ -28,8 +28,8 @@ class Plugin extends DAV\ServerPlugin
      * @param DAV\Server $server
      * @return void
      */
-    public function initialize(DAV\Server $server)
-    {
+    public function initialize(DAV\Server $server) {
+
         $this->server = $server;
         $this->server->subscribeEvent('beforeMethod',array($this,'beforeMethod'), 90);
 
@@ -43,8 +43,8 @@ class Plugin extends DAV\ServerPlugin
      * @param string $uri
      * @return bool
      */
-    public function beforeMethod($method, $uri)
-    {
+    public function beforeMethod($method, $uri) {
+
         if ($method!='GET') return;
         if ($this->server->httpRequest->getQueryString()!='mount') return;
 
@@ -66,8 +66,8 @@ class Plugin extends DAV\ServerPlugin
      * @param string $uri absolute uri
      * @return void
      */
-    public function davMount($uri)
-    {
+    public function davMount($uri) {
+
         $this->server->httpResponse->sendStatus(200);
         $this->server->httpResponse->setHeader('Content-Type','application/davmount+xml');
         ob_start();

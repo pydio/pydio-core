@@ -15,12 +15,12 @@ use Sabre\CalDAV;
  * means that this calendar will not be taken into consideration when a
  * different user queries for free-busy information. If it's 'opaque', it will.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class ScheduleCalendarTransp extends DAV\Property
-{
+class ScheduleCalendarTransp extends DAV\Property {
+
     const TRANSPARENT = 'transparent';
     const OPAQUE = 'opaque';
 
@@ -31,8 +31,8 @@ class ScheduleCalendarTransp extends DAV\Property
      *
      * @param string $value
      */
-    public function __construct($value)
-    {
+    public function __construct($value) {
+
         if ($value !== self::TRANSPARENT && $value !== self::OPAQUE) {
             throw new \InvalidArgumentException('The value must either be specified as "transparent" or "opaque"');
         }
@@ -45,8 +45,8 @@ class ScheduleCalendarTransp extends DAV\Property
      *
      * @return string
      */
-    public function getValue()
-    {
+    public function getValue() {
+
         return $this->value;
 
     }
@@ -58,10 +58,10 @@ class ScheduleCalendarTransp extends DAV\Property
      * @param \DOMElement $node
      * @return void
      */
-    public function serialize(DAV\Server $server,\DOMElement $node)
-    {
+    public function serialize(DAV\Server $server,\DOMElement $node) {
+
         $doc = $node->ownerDocument;
-        switch ($this->value) {
+        switch($this->value) {
             case self::TRANSPARENT :
                 $xval = $doc->createElement('cal:transparent');
                 break;
@@ -80,11 +80,11 @@ class ScheduleCalendarTransp extends DAV\Property
      * @param \DOMElement $node
      * @return ScheduleCalendarTransp
      */
-    public static function unserialize(\DOMElement $node)
-    {
+    static function unserialize(\DOMElement $node) {
+
         $value = null;
-        foreach ($node->childNodes as $childNode) {
-            switch (DAV\XMLUtil::toClarkNotation($childNode)) {
+        foreach($node->childNodes as $childNode) {
+            switch(DAV\XMLUtil::toClarkNotation($childNode)) {
                 case '{' . CalDAV\Plugin::NS_CALDAV . '}opaque' :
                     $value = self::OPAQUE;
                     break;

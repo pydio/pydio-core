@@ -8,12 +8,12 @@ use Sabre\CalDAV;
 /**
  * InvalidComponentType
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class InvalidComponentType extends DAV\Exception\Forbidden
-{
+class InvalidComponentType extends DAV\Exception\Forbidden {
+
     /**
      * Adds in extra information in the xml response.
      *
@@ -23,8 +23,8 @@ class InvalidComponentType extends DAV\Exception\Forbidden
      * @param \DOMElement $errorNode
      * @return void
      */
-    public function serialize(DAV\Server $server, \DOMElement $errorNode)
-    {
+    public function serialize(DAV\Server $server, \DOMElement $errorNode) {
+
         $doc = $errorNode->ownerDocument;
 
         $np = $doc->createElementNS(CalDAV\Plugin::NS_CALDAV,'cal:supported-calendar-component');
