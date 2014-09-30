@@ -31,7 +31,9 @@ Class.create("LocalAPINodeProvider", {
 	initProvider : function(properties){
 		this.properties = properties;
 	},
-	
+
+    loadLeafNodeSync: function(node, callback){},
+
 	/**
 	 * 
 	 * @param node AjxpNode

@@ -40,6 +40,10 @@ Class.create("EmptyNodeProvider", {
      */
     loadNode : function(node, nodeCallback, childCallback){
 
+    },
+
+    loadLeafNodeSync: function(node, callback){
+
     }
 
 });
