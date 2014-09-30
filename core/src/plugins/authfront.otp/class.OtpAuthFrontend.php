@@ -86,7 +86,7 @@ class OtpAuthFrontend extends AbstractAuthFrontend
             (empty($this->google) &&
                 (!empty($this->yubikey1) || !empty($this->yubikey2))
             ){
-               if ($this->checkYubiPass($httpVars["password"], $this->yubikey1, $this->yubikey2)){
+               if ($this->checkYubiOTP($httpVars["otp_code"], $this->yubikey1, $this->yubikey2)){
                    return false;
                }else{
                    $this->breakAndSendError($exceptionMsg);
@@ -106,7 +106,7 @@ class OtpAuthFrontend extends AbstractAuthFrontend
                 }
             }
             else{
-                if ($this->checkYubiPass($httpVars["password"], $this->yubikey1, $this->yubikey2)){
+                if ($this->checkYubiOTP($httpVars["otp_code"], $this->yubikey1, $this->yubikey2)){
                     return false;
                 }
                 else{
@@ -143,7 +143,7 @@ class OtpAuthFrontend extends AbstractAuthFrontend
             $this->yubicoClientId = trim($this->pluginConf["YUBICO_CLIENT_ID"]);
         }
         if (!empty($this->pluginConf["YUBICO_SECRET_KEY"])) {
-            $this->$yubicoSecretKey = trim($this->pluginConf["YUBICO_SECRET_KEY"]);
+            $this->yubicoSecretKey = trim($this->pluginConf["YUBICO_SECRET_KEY"]);
         }
     }
 
@@ -256,20 +256,20 @@ class OtpAuthFrontend extends AbstractAuthFrontend
 
     // YubiKey
 
-    public function checkYubiPass($pass, $yubikey1, $yubikey2)
+    public function checkYubiOTP($otp_code, $yubikey1, $yubikey2)
     {
 
         // yubikey generates 44 character, identity is the first 12 character
         $yubi1_identity = substr($yubikey1, 0, 12);
         $yubi2_identity = substr($yubikey2, 0, 12);
-        $pass_identity = substr($pass, -44, 12);
-        if (($pass_identity != $yubi1_identity) and ($pass_identity != $yubi2_identity)) {
+        $otp_identity = substr($otp_code, -44, 12);
+        if (($otp_identity != $yubi1_identity) and ($otp_identity != $yubi2_identity)) {
             // YubiKey not listed in account
             return false;
         }
 
-        $yotp = substr($pass, -44);
-        $pass = substr($pass, 0, strlen($pass) - 44);
+        $yotp = substr($otp_code, -44);
+        $otp_code = substr($otp_code, 0, strlen($otp_code) - 44);
 
         $yubi = new Auth_Yubico($this->yubicoClientId, $this->yubicoSecretKey);
         $auth = $yubi->verify($yotp);
