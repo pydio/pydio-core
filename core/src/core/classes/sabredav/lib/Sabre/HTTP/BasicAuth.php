@@ -7,12 +7,12 @@ namespace Sabre\HTTP;
  *
  * Use this class for easy http authentication setup
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class BasicAuth extends AbstractAuth
-{
+class BasicAuth extends AbstractAuth {
+
     /**
      * Returns the supplied username and password.
      *
@@ -24,8 +24,8 @@ class BasicAuth extends AbstractAuth
      *
      * @return mixed
      */
-    public function getUserPass()
-    {
+    public function getUserPass() {
+
         // Apache and mod_php
         if (($user = $this->httpRequest->getRawServerValue('PHP_AUTH_USER')) && ($pass = $this->httpRequest->getRawServerValue('PHP_AUTH_PW'))) {
 
@@ -57,8 +57,8 @@ class BasicAuth extends AbstractAuth
      *
      * @return void
      */
-    public function requireLogin()
-    {
+    public function requireLogin() {
+
         $this->httpResponse->setHeader('WWW-Authenticate','Basic realm="' . $this->realm . '"');
         $this->httpResponse->sendStatus(401);
 

@@ -10,12 +10,12 @@ use Sabre\DAV;
  * The 403-need privileges is thrown when a user didn't have the appropriate
  * permissions to perform an operation
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class NeedPrivileges extends DAV\Exception\Forbidden
-{
+class NeedPrivileges extends DAV\Exception\Forbidden {
+
     /**
      * The relevant uri
      *
@@ -36,8 +36,8 @@ class NeedPrivileges extends DAV\Exception\Forbidden
      * @param string $uri
      * @param array $privileges
      */
-    public function __construct($uri,array $privileges)
-    {
+    public function __construct($uri,array $privileges) {
+
         $this->uri = $uri;
         $this->privileges = $privileges;
 
@@ -54,14 +54,14 @@ class NeedPrivileges extends DAV\Exception\Forbidden
      * @param \DOMElement $errorNode
      * @return void
      */
-    public function serialize(DAV\Server $server,\DOMElement $errorNode)
-    {
+    public function serialize(DAV\Server $server,\DOMElement $errorNode) {
+
         $doc = $errorNode->ownerDocument;
 
         $np = $doc->createElementNS('DAV:','d:need-privileges');
         $errorNode->appendChild($np);
 
-        foreach ($this->privileges as $privilege) {
+        foreach($this->privileges as $privilege) {
 
             $resource = $doc->createElementNS('DAV:','d:resource');
             $np->appendChild($resource);
@@ -80,3 +80,4 @@ class NeedPrivileges extends DAV\Exception\Forbidden
     }
 
 }
+

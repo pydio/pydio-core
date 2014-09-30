@@ -10,12 +10,12 @@ namespace Sabre\DAV\Exception;
  *
  * See RFC5689 section 3.3
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class InvalidResourceType extends Forbidden
-{
+class InvalidResourceType extends Forbidden {
+
     /**
      * This method allows the exception to include additional information into the WebDAV error response
      *
@@ -23,8 +23,8 @@ class InvalidResourceType extends Forbidden
      * @param \DOMElement $errorNode
      * @return void
      */
-    public function serialize(\Sabre\DAV\Server $server,\DOMElement $errorNode)
-    {
+    public function serialize(\Sabre\DAV\Server $server,\DOMElement $errorNode) {
+
         $error = $errorNode->ownerDocument->createElementNS('DAV:','d:valid-resourcetype');
         $errorNode->appendChild($error);
 

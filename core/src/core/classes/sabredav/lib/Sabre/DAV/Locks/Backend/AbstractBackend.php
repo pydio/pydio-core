@@ -11,10 +11,11 @@ use Sabre\DAV\Locks;
  * to ensure that if default code is required in the backend, there will be a
  * non-bc-breaking way to do so.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-abstract class AbstractBackend implements BackendInterface
-{
+abstract class AbstractBackend implements BackendInterface {
+
 }
+

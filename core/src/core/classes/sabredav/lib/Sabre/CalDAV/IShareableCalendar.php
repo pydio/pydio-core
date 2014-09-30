@@ -5,12 +5,12 @@ namespace Sabre\CalDAV;
 /**
  * This interface represents a Calendar that can be shared with other users.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-interface IShareableCalendar extends ICalendar
-{
+interface IShareableCalendar extends ICalendar {
+
     /**
      * Updates the list of shares.
      *
@@ -29,7 +29,7 @@ interface IShareableCalendar extends ICalendar
      * @param array $remove
      * @return void
      */
-    public function updateShares(array $add, array $remove);
+    function updateShares(array $add, array $remove);
 
     /**
      * Returns the list of people whom this calendar is shared with.
@@ -43,6 +43,6 @@ interface IShareableCalendar extends ICalendar
      *
      * @return array
      */
-    public function getShares();
+    function getShares();
 
 }

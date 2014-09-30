@@ -9,17 +9,17 @@ namespace Sabre\DAV\Property;
  * This is used by certain subsystems to aquire more information about for example
  * the owner of a file
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-interface IHref
-{
+interface IHref {
+
     /**
      * getHref
      *
      * @return string
      */
-    public function getHref();
+    function getHref();
 
 }

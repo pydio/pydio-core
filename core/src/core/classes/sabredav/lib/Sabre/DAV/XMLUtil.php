@@ -5,12 +5,12 @@ namespace Sabre\DAV;
 /**
  * XML utilities for WebDAV
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class XMLUtil
-{
+class XMLUtil {
+
     /**
      * Returns the 'clark notation' for an element.
      *
@@ -29,8 +29,8 @@ class XMLUtil
      * @param \DOMNode $dom
      * @return string
      */
-    public static function toClarkNotation(\DOMNode $dom)
-    {
+    static function toClarkNotation(\DOMNode $dom) {
+
         if ($dom->nodeType !== XML_ELEMENT_NODE) return null;
 
         // Mapping back to the real namespace, in case it was dav
@@ -51,8 +51,8 @@ class XMLUtil
      * @throws InvalidArgumentException
      * @return array
      */
-    public static function parseClarkNotation($str)
-    {
+    static function parseClarkNotation($str) {
+
         if (!preg_match('/^{([^}]*)}(.*)$/',$str,$matches)) {
             throw new \InvalidArgumentException('\'' . $str . '\' is not a valid clark-notation formatted string');
         }
@@ -74,8 +74,8 @@ class XMLUtil
      * @param string $xmlDocument
      * @return array|string|null
      */
-    public static function convertDAVNamespace($xmlDocument)
-    {
+    static function convertDAVNamespace($xmlDocument) {
+
         // This is used to map the DAV: namespace to urn:DAV. This is needed, because the DAV:
         // namespace is actually a violation of the XML namespaces specification, and will cause errors
         return preg_replace("/xmlns(:[A-Za-z0-9_]*)?=(\"|\')DAV:(\\2)/","xmlns\\1=\\2urn:DAV\\2",$xmlDocument);
@@ -92,8 +92,8 @@ class XMLUtil
      * @throws Sabre\DAV\Exception\BadRequest
      * @return DOMDocument
      */
-    public static function loadDOMDocument($xml)
-    {
+    static function loadDOMDocument($xml) {
+
         if (empty($xml))
             throw new Exception\BadRequest('Empty XML document sent');
 
@@ -113,6 +113,9 @@ class XMLUtil
 
         // Retaining old error setting
         $oldErrorSetting =  libxml_use_internal_errors(true);
+        // Fixes an XXE vulnerability on PHP versions older than 5.3.23 or
+        // 5.4.13.
+        $oldEntityLoaderSetting = libxml_disable_entity_loader(true);
 
         // Clearing any previous errors
         libxml_clear_errors();
@@ -131,6 +134,7 @@ class XMLUtil
 
         // Restoring old mechanism for error handling
         if ($oldErrorSetting===false) libxml_use_internal_errors(false);
+        if ($oldEntityLoaderSetting===false) libxml_disable_entity_loader(false);
 
         return $dom;
 
@@ -158,14 +162,14 @@ class XMLUtil
      * @param array $propertyMap
      * @return array
      */
-    public static function parseProperties(\DOMElement $parentNode, array $propertyMap = array())
-    {
+    static function parseProperties(\DOMElement $parentNode, array $propertyMap = array()) {
+
         $propList = array();
-        foreach ($parentNode->childNodes as $propNode) {
+        foreach($parentNode->childNodes as $propNode) {
 
             if (self::toClarkNotation($propNode)!=='{DAV:}prop') continue;
 
-            foreach ($propNode->childNodes as $propNodeData) {
+            foreach($propNode->childNodes as $propNodeData) {
 
                 /* If there are no elements in here, we actually get 1 text node, this special case is dedicated to netdrive */
                 if ($propNodeData->nodeType != XML_ELEMENT_NODE) continue;

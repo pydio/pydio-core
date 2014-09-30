@@ -10,19 +10,19 @@ use Sabre\DAV;
  * The PaymentRequired exception may be thrown in a case where a user must pay
  * to access a certain resource or operation.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class PaymentRequired extends DAV\Exception
-{
+class PaymentRequired extends DAV\Exception {
+
     /**
      * Returns the HTTP statuscode for this exception
      *
      * @return int
      */
-    public function getHTTPCode()
-    {
+    public function getHTTPCode() {
+
         return 402;
 
     }

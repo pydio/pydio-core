@@ -7,20 +7,20 @@ use Sabre\DAV;
 /**
  * File class
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class File extends Node implements DAV\IFile
-{
+class File extends Node implements DAV\IFile {
+
     /**
      * Updates the data
      *
      * @param resource $data
      * @return void
      */
-    public function put($data)
-    {
+    public function put($data) {
+
         file_put_contents($this->path,$data);
 
     }
@@ -30,8 +30,8 @@ class File extends Node implements DAV\IFile
      *
      * @return string
      */
-    public function get()
-    {
+    public function get() {
+
         return fopen($this->path,'r');
 
     }
@@ -41,8 +41,8 @@ class File extends Node implements DAV\IFile
      *
      * @return void
      */
-    public function delete()
-    {
+    public function delete() {
+
         unlink($this->path);
 
     }
@@ -52,8 +52,8 @@ class File extends Node implements DAV\IFile
      *
      * @return int
      */
-    public function getSize()
-    {
+    public function getSize() {
+
         return filesize($this->path);
 
     }
@@ -68,8 +68,8 @@ class File extends Node implements DAV\IFile
      *
      * @return mixed
      */
-    public function getETag()
-    {
+    public function getETag() {
+
         return null;
 
     }
@@ -81,10 +81,11 @@ class File extends Node implements DAV\IFile
      *
      * @return mixed
      */
-    public function getContentType()
-    {
+    public function getContentType() {
+
         return null;
 
     }
 
 }
+

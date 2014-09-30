@@ -10,12 +10,12 @@ use Sabre\DAV;
  * The href property represents a url within a {DAV:}href element.
  * This is used by many WebDAV extensions, but not really within the WebDAV core spec
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class Href extends DAV\Property implements IHref
-{
+class Href extends DAV\Property implements IHref {
+
     /**
      * href
      *
@@ -36,8 +36,8 @@ class Href extends DAV\Property implements IHref
      * @param string $href
      * @param bool $autoPrefix
      */
-    public function __construct($href, $autoPrefix = true)
-    {
+    public function __construct($href, $autoPrefix = true) {
+
         $this->href = $href;
         $this->autoPrefix = $autoPrefix;
 
@@ -48,8 +48,8 @@ class Href extends DAV\Property implements IHref
      *
      * @return string
      */
-    public function getHref()
-    {
+    public function getHref() {
+
         return $this->href;
 
     }
@@ -63,12 +63,18 @@ class Href extends DAV\Property implements IHref
      * @param \DOMElement $dom
      * @return void
      */
-    public function serialize(DAV\Server $server, \DOMElement $dom)
-    {
-        $prefix = $server->xmlNamespaces['DAV:'];
+    public function serialize(DAV\Server $server, \DOMElement $dom) {
 
+        $prefix = $server->xmlNamespaces['DAV:'];
         $elem = $dom->ownerDocument->createElement($prefix . ':href');
-        $elem->nodeValue = ($this->autoPrefix?$server->getBaseUri():'') . $this->href;
+
+        if ($this->autoPrefix) {
+            $value = $server->getBaseUri() . DAV\URLUtil::encodePath($this->href);
+        } else {
+            $value = $this->href;
+        }
+        $elem->appendChild($dom->ownerDocument->createTextNode($value));
+
         $dom->appendChild($elem);
 
     }
@@ -82,8 +88,8 @@ class Href extends DAV\Property implements IHref
      * @param \DOMElement $dom
      * @return DAV\Property\Href
      */
-    public static function unserialize(\DOMElement $dom)
-    {
+    static function unserialize(\DOMElement $dom) {
+
         if ($dom->firstChild && DAV\XMLUtil::toClarkNotation($dom->firstChild)==='{DAV:}href') {
             return new self($dom->firstChild->textContent,false);
         }

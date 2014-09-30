@@ -16,12 +16,12 @@ namespace Sabre\CalDAV\Backend;
  *
  * The primary usecase is to allow for calendar-sharing.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-interface NotificationSupport extends BackendInterface
-{
+interface NotificationSupport extends BackendInterface {
+
     /**
      * Returns a list of notifications for a given principal url.
      *

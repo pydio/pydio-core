@@ -9,12 +9,12 @@ use Sabre\DAV;
  *
  * Implement this interface to define your own principals
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-interface IPrincipal extends DAV\INode
-{
+interface IPrincipal extends DAV\INode {
+
     /**
      * Returns a list of alternative urls for a principal
      *
@@ -22,14 +22,14 @@ interface IPrincipal extends DAV\INode
      *
      * @return array
      */
-    public function getAlternateUriSet();
+    function getAlternateUriSet();
 
     /**
      * Returns the full principal url
      *
      * @return string
      */
-    public function getPrincipalUrl();
+    function getPrincipalUrl();
 
     /**
      * Returns the list of group members
@@ -39,7 +39,7 @@ interface IPrincipal extends DAV\INode
      *
      * @return array
      */
-    public function getGroupMemberSet();
+    function getGroupMemberSet();
 
     /**
      * Returns the list of groups this principal is member of
@@ -49,7 +49,7 @@ interface IPrincipal extends DAV\INode
      *
      * @return array
      */
-    public function getGroupMembership();
+    function getGroupMembership();
 
     /**
      * Sets a list of group members
@@ -62,7 +62,7 @@ interface IPrincipal extends DAV\INode
      * @param array $principals
      * @return void
      */
-    public function setGroupMemberSet(array $principals);
+    function setGroupMemberSet(array $principals);
 
     /**
      * Returns the displayname
@@ -72,6 +72,6 @@ interface IPrincipal extends DAV\INode
      *
      * @return string
      */
-    public function getDisplayName();
+    function getDisplayName();
 
 }

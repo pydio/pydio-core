@@ -14,12 +14,12 @@ use Sabre\HTTP;
  * This class uses unix timestamps internally, and converts them to RFC 1123 times for
  * serialization
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class GetLastModified extends DAV\Property
-{
+class GetLastModified extends DAV\Property {
+
     /**
      * time
      *
@@ -32,8 +32,8 @@ class GetLastModified extends DAV\Property
      *
      * @param int|DateTime $time
      */
-    public function __construct($time)
-    {
+    public function __construct($time) {
+
         if ($time instanceof \DateTime) {
             $this->time = $time;
         } elseif (is_int($time) || ctype_digit($time)) {
@@ -54,8 +54,8 @@ class GetLastModified extends DAV\Property
      * @param \DOMElement $prop
      * @return void
      */
-    public function serialize(DAV\Server $server, \DOMElement $prop)
-    {
+    public function serialize(DAV\Server $server, \DOMElement $prop) {
+
         $doc = $prop->ownerDocument;
         //$prop->setAttribute('xmlns:b','urn:uuid:c2f41010-65b3-11d1-a29f-00aa00c14882/');
         //$prop->setAttribute('b:dt','dateTime.rfc1123');
@@ -68,10 +68,11 @@ class GetLastModified extends DAV\Property
      *
      * @return \DateTime
      */
-    public function getTime()
-    {
+    public function getTime() {
+
         return $this->time;
 
     }
 
 }
+
