@@ -24,7 +24,7 @@ $mess = array(
 "Global options" => "&lt;span class='icon-cogs'&gt;&lt;/span&gt; Globale Einstellungen",
 "Configuration storage" => "&lt;span class='icon-save'&gt;&lt;/span&gt; Konfigurationsspeicher",
 "Add some users" => "&lt;span class='icon-group'&gt;&lt;/span&gt; Benutzer hinzufügen",
-"Please set up a login and password for the administrator user. This step is necessary to let you login the first time. You can create more administrators later by going to the 'Settings' workspace." => "Please set up a login and password for the administrator user. This step is necessary to let you login the first time. You can create more administrators later by going to the 'Settings' workspace.",
+"Please set up a login and password for the administrator user. This step is necessary to let you login the first time. You can create more administrators later by going to the 'Settings' workspace." => "Bitte geben Sie Benutzername und Passwort für den Administrator ein. Dieser Schritt ist notwendig um sich anfangs Anzumelden. Sie könenn später über die Einstellungen mehr Benutzer mit Administratorrechten erstellen.",
 "Admin Login" => "Benutzername",
 "Alphanumeric login" => "Benutzernamen bestehen aus alphanumerischen Zeichen",
 "Admin Display Name" => "Angezeigter Name",
