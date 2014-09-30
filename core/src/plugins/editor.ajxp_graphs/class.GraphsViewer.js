@@ -162,7 +162,7 @@ Class.create("GraphsViewer", AbstractEditor, {
             }else if(qData["DIAGRAM"] && qData["DIAGRAM"] == "pie"){
                 height = 320;
             }
-            var svg = dimple.newSvg("#"+this.element.parentNode.id+" #"+queryName+'_container', '100%', height);
+            var svg = dimple.newSvg("#"+this.element.id+" #"+queryName+'_container', '100%', height);
             var chart = new dimple.chart(svg, jsonData['data']);
             var colorIndex = this.colorIndex % this.colors.length;
             chart.defaultColors[0] = new dimple.color(this.colors[colorIndex]);
