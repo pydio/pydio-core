@@ -19,13 +19,11 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Allowed Extensions" => "Erlaubte Erweiterungen",
-"Extensions List" => "Erweiterungsliste",
-"Ext. Label" => "Ext. Label",
-"Limitations" => "Limitierungen",
-"Files Number" => "Anzahl Dateien",
-"File Size" => "Dateigröße",
-"Cumul. Size" => "Gesamtgröße",
-"Uploaders Options" => "Uploaders Options",
-"Options shared by all uploaders plugins" => "Options shared by all uploaders plugins",
+    "1" => "Passwort zurücksetzen",
+    "2" => "Neues Passwort setzen",
+    "3" => "Please enter your login, a reset password will be sent to you by email.",
+    "4" => "Your identifier",
+    "5" => "A reset password request has been sent to the email registered with your account. Click on the link in the email to recreate a password.",
+    "6" => "Vielen Dank, Sie können sich jetzt einloggen!",
+    "7" => "A password reset has been requested on the account associated to this email address. If you are not the author of this request, you can safely ignore this email. Otherwise click on the following link to reset your password:",
 );

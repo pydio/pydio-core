@@ -19,13 +19,25 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+defined('AJXP_EXEC') or die('Access not allowed');
+
 $mess = array(
-    "1" => "Pydio Installationsassistent",
-    "2" => "Willkommen beim Pydio Installationsassistenten",
-    "3" => "Danke dass Sie Pydio installieren!</br> Dieser Assistent hilft Ihnen, ihre neue Sharing-Plattform in Kürze aufzusetzen. Blättern Sie durch die verschiedenen Abschnitte um die Grundeinstellungen einzurichten. Zusätzliche Informationen erhalten Sie, wenn Sie den Mauszeiger über die Bezeichnungen halten.<br></br>Sind Sie bereit? ",
-    "4" => "Assistent starten!",
-    "5" => "Bitte warten Sie während Pydio konfiguriert wird! Pydio wird in einigen Sekunden vollständig bereit stehen ...",
-    "6" => "Pydio jetzt installieren",
-    "7" => "Sprache",
-    "8" => "Klicken Sie auf den einzelnen Abschnitt, um die Parameter zu bearbeiten.",
+    "1" => "Versionen",
+    "2" => "Document previous versions",
+    "3" => "Download",
+    "4" => "Ausgewählte Version Downloaden",
+    "5" => "Vorschau(browser)",
+    "6" => "Ausgewählte Version in einen Browserfenster öffnen",
+    "7" => "Revert to...",
+    "8" => "Revert the file to the selected revision on the server",
+    "9" => "#",
+    "10" => "Date",
+    "11" => "Author",
+    "12" => "Modification",
+    "13" => "Are you sure you want to do this? Reverting to an old version will now create a new version of the document with the selected revision.",
+    "RENAME"        => "Datei umbenannt",
+    "MOVE"          => "Datei verschoben",
+    "MODIFICATION"  => "Inhalt bearbeitet",
+    "DELETION"      => "Datei gelöscht",
+    "CREATION"      => "Datei erstellt"
 );

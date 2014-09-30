@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2012 Charles du Jeu <charles (at) cdujeu.me>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -18,14 +18,13 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
-$mess=array(
-"Allowed Extensions" => "Erlaubte Erweiterungen",
-"Extensions List" => "Erweiterungsliste",
-"Ext. Label" => "Ext. Label",
-"Limitations" => "Limitierungen",
-"Files Number" => "Anzahl Dateien",
-"File Size" => "Dateigröße",
-"Cumul. Size" => "Gesamtgröße",
-"Uploaders Options" => "Uploaders Options",
-"Options shared by all uploaders plugins" => "Options shared by all uploaders plugins",
+$mess = array(
+    "1" => "Email erfolgreich an %s Benuter gesendet",
+    "2" => "Keine Email Adresse gefunden!",
+    "3" => "Email Programm nicht Konfiguriert. Kontaktieren Sie ihren Administrator.",
+    "4" => "Von",
+    "5" => "An",
+    "6" => "Betreff",
+    "7" => "Nachricht",
+    "8" => "Benuter oder Email",
 );

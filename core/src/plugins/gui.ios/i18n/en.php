@@ -25,6 +25,6 @@ $mess=array(
 "4.ios" => "I don't care, let me use the web version of %s.",
 "1.android" => "There is a native APPLICATION_TITLE client available for accessing %s on Android OS.",
 "2.android" => "I have it already, open it and add this server to my preconfigured remote servers",
-"3.android" => "I don't have it, send me to the Android Market now!",
+"3.android" => "I don't have it, send me to the Play Store now!",
 "4.android" => "I don't care, let me use the web version of %s.",
 );
