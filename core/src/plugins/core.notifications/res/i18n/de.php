@@ -27,7 +27,7 @@ $mess=array(
 "6" => "Gehe zu ...",
 "7" => "Verwerfen",
 "8" => "Kein Alarm",
-"9" => "Repository Aktivitäten",
+"9" => "Workspace Aktivitäten",
 "10" => "Ordner Aktivitäten",
 "11" => "Datei Aktivitäten",
 );

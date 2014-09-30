@@ -20,12 +20,12 @@
 */
 $mess=array(
 "Generic Conf Features" => "Standard Konfiguration",
-"Let user create repositories" => "Benutzer dürfen Repositories erstellen",
+"Let user create repositories" => "Benutzer dürfen Workspaces erstellen",
 "Remember guest preferences" => "Gasteinstellungen merken",
 "Configurations Management" => "Configurations Management",
 "Sets how the application core data (users,roles,etc) is stored." => "Sets how the application core data (users,roles,etc) is stored.",
-"Default start repository" => "Standard Start Repository",
-"Default repository" => "Standard Repository",
+"Default start repository" => "Standard Start Workspace",
+"Default repository" => "Standard Workspace",
 "Maximum number of shared users per user" => "Maximum number of shared users per user",
 "Shared users limit" => "Shared users limit",
 "Core SQL Connexion" => "Core SQL Connexion",
