@@ -19,12 +19,12 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess = array(
-    "1" => "Email erfolgreich an %s Benuter gesendet",
+    "1" => "Email erfolgreich an %s Benutzer gesendet",
     "2" => "Keine Email Adresse gefunden!",
     "3" => "Email Programm nicht Konfiguriert. Kontaktieren Sie ihren Administrator.",
     "4" => "Von",
     "5" => "An",
     "6" => "Betreff",
     "7" => "Nachricht",
-    "8" => "Benuter oder Email",
+    "8" => "Benutzer oder Email",
 );
