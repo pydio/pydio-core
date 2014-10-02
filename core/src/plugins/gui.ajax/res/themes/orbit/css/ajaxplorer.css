@@ -87,6 +87,7 @@ a:link, a:visited, a:hover, a:active, a:focus {
 
 .linked{
     cursor: pointer;
+    z-index: 10;
 }
 
 body, html
@@ -203,22 +204,25 @@ kbd {
 }
 
 .fl-displayMode-thumb div.thumbnail_selectable_cell div.thumbLabel{
-
-    margin-top: -31px;
-    opacity: 1;
-    background-color: rgba(245, 245, 245, 0.35);
+    margin-top: -29px;
+    opacity: 0;
+    background-color: rgba(58, 58, 58, 0.52);
     padding: 8px 3px;
+    color: #FFF;
 }
 
 .fl-displayMode-thumb div.thumbnail_selectable_cell.fl-displayMode-thumbsize-medium div.thumbLabel{
     padding:1px;
-    margin-top: -18px;
+    margin-top: -15px;
     font-size: 0.8em;
 }
 
-.fl-displayMode-thumb div.thumbnail_selectable_cell.fl-displayMode-thumbsize-small div.thumbLabel,
-.fl-displayMode-thumb div.thumbnail_selectable_cell.selected-focus div.thumbLabel{
+.fl-displayMode-thumb div.thumbnail_selectable_cell.fl-displayMode-thumbsize-small div.thumbLabel{
     display: none;
+}
+
+.fl-displayMode-thumb div.thumbnail_selectable_cell.selected-focus div.thumbLabel{
+    opacity: 1;
 }
 
 .thumbnail_selectable_cell.detailed {;
@@ -465,7 +469,7 @@ div.shadow_class
 }
 
 .dialogTitle span.string-only-title {
-    font-family: "Open Sans Regular";
+    font-family: "Open Sans Regular", Helvetica, sans-serif;
 }
 
 .dialogContent
@@ -497,13 +501,13 @@ div.shadow_class
 }
 
 .dialogContent select{
-    height: 28px;
+    height: 30px !important;
     font-size: 13px;
     width: 97%;
 }
 
 .dialogContent select[multiple]{
-    height: 66px;
+    height: 66px !important;
 }
 
 .dialogContent input:focus,
@@ -619,6 +623,17 @@ select#external_repository{
 }
 div#copymove_form div#treeCopy{
     height: 254px !important;
+}
+
+div.treeCopyContainer div.webfx-tree-item a {
+    color: #555 !important;
+}
+
+div.treeCopyContainer div.selected-webfx-tree-item a,
+div.treeCopyContainer div.webfx-tree-item:hover a,
+div.treeCopyContainer div.selected-webfx-tree-item-inactive a
+{
+    color: white !important;
 }
 
 div#copymove_form > input{
@@ -1064,7 +1079,7 @@ input.SF_fieldCheckBox{
 .SF_element textarea, .SF_element select, .SF_element div.SF_image_block{
     margin-left: 0 !important;
     background-color: white;
-    width: 98%;
+    width: 98% !important;
     max-width: 450px !important;
 }
 
@@ -1291,6 +1306,8 @@ div.tabbed_editor div.innerTitle{
 }
 
 div.dialogBox.form-switch_language_form,
+div.dialogBox.form-reset-password,
+div.dialogBox.form-reset-password-ask,
 div.dialogBox.form-login_form,
 div.dialogBox.form-login_form_dynamic
 {
@@ -1309,6 +1326,8 @@ div.dialogBox.form-login_form_dynamic
 }
 
 div.dialogBox.form-switch_language_form div.dialogContent,
+div.dialogBox.form-reset-password div.dialogContent,
+div.dialogBox.form-reset-password-ask div.dialogContent,
 div.dialogBox.form-login_form div.dialogContent,
 div.dialogBox.form-login_form_dynamic div.dialogContent
 {
@@ -1319,6 +1338,8 @@ div.dialogBox.form-login_form_dynamic div.dialogContent
 }
 
 div.dialogBox.form-switch_language_form div.dialogTitle,
+div.dialogBox.form-reset-password div.dialogTitle,
+div.dialogBox.form-reset-password-ask div.dialogTitle,
 div.dialogBox.form-login_form div.dialogTitle,
 div.dialogBox.form-login_form_dynamic div.dialogTitle
 {
@@ -1327,7 +1348,6 @@ div.dialogBox.form-login_form_dynamic div.dialogTitle
     top: 35%;
     right: -113%;
     background-color: transparent;
-    background-image: url('../images/Logo_White_300.png') !important;
 }
 
 div.dialogBox.form-switch_language_form select#language_selector{
@@ -1374,6 +1394,8 @@ div.dialogBox.form-login_form_dynamic a.forgot-password-link
 }
 
 div.dialogBox.form-switch_language_form div.dialogButtons,
+div.dialogBox.form-reset-password div.dialogButtons,
+div.dialogBox.form-reset-password-ask div.dialogButtons,
 div.dialogBox.form-login_form div.dialogButtons,
 div.dialogBox.form-login_form_dynamic div.dialogButtons
 {
@@ -1382,6 +1404,8 @@ div.dialogBox.form-login_form_dynamic div.dialogButtons
 }
 
 div.dialogBox.form-switch_language_form div.dialogButtons input.dialogButton,
+div.dialogBox.form-reset-password div.dialogButtons input.dialogButton,
+div.dialogBox.form-reset-password-ask div.dialogButtons input.dialogButton,
 div.dialogBox.form-login_form div.dialogButtons input.dialogButton,
 div.dialogBox.form-login_form_dynamic div.dialogButtons input.dialogButton
 {
@@ -1396,13 +1420,11 @@ div.dialogBox.form-login_form_dynamic div.dialogButtons input.dialogButton
 }
 
 #global_toolbar{
-/*    background-color: #345E79;
-    background-image: url("../images/white_logo.png");
-*/
     height: 47px;
     padding: 0 15px 0 5px;
     background-repeat: no-repeat;
     background-position: 7px;
+    display: none;
 }
 
 #clickable_home{
@@ -1427,7 +1449,8 @@ div.dialogBox.form-login_form_dynamic div.dialogButtons input.dialogButton
 #topPane{
     float:left;
     width:280px;
-    background-color: rgba(50,50,50,0.80);
+    background-color: rgba(50,50,50,0.93);
+    /*background-color: rgba(32, 32, 32, 0.93);*/
 }
 
 #cpane_container{
@@ -1478,6 +1501,7 @@ div#navigation_toolbar {
 }
 
 #tree_container{
+    overflow-x: hidden !important;
 }
 
 .panelHeader, .dialogTitle{
@@ -1518,11 +1542,18 @@ div#navigation_toolbar {
     line-height: 15px;
 }
 .action_bar.editor_action_bar {
-    height: 37px;
-    right: 14px;
+    height: 34px;
+    right: 3px;
     position: absolute;
     z-index: 10;
-    background-color: #ccc;
+    background-color: transparent;
+}
+
+.action_bar.editor_action_bar.full_width_action_bar{
+    position: relative;
+    background-color: #ddd;
+    padding-left:5px;
+    right: 0;
 }
 
 .editor_container{
@@ -1535,7 +1566,7 @@ div#navigation_toolbar {
 }
 
 .create_file_alt_link{
-    font-family: "Open Sans Regular";
+    font-family: "Open Sans Regular", Helvetica, sans-serif;
     font-style: italic;
     cursor: pointer;
 }
@@ -1572,7 +1603,10 @@ div.editor_header > div.editor_action_bar > div.separator{
 }
 
 .editor_action_bar a {
-    padding: 3px 5px !important;
+    padding: 1px 8px 2px !important;
+}
+.editor_action_bar.full_width_action_bar a{
+    border:0;
 }
 
 .editor_action_bar span.actionbar_button_label {
@@ -1620,7 +1654,7 @@ div.editor_header > span.header_label{
     padding-left: 10px;
     cursor: move;
     opacity: 0.90;
-    background-color: #333;
+    background-color: #333 !important;
 }
 
 
@@ -1837,9 +1871,14 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
 
 #topPane div.FL-inlineToolbar{
     position: absolute;
-    top: 4px;
-    right: 33px;
+    top: 6px;
+    right: 40px;
     margin: 0;
+    display: none;
+}
+
+#topPane div.thumbnail_selectable_cell:hover div.FL-inlineToolbar {
+    display: block;
 }
 
 #topPane div.FL-inlineToolbar div.toolbarGroup{
@@ -1847,7 +1886,7 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
 }
 
 #topPane div.FL-inlineToolbar span.ajxp_icon_span{
-    color:#ccc;
+    color:#eee;
 }
 
 #topPane div.FL-inlineToolbar span.actionbar_button_label{
@@ -1908,13 +1947,15 @@ div.class-FetchedResultPane > div.panelHeader
 }
 
 #notif_pane div.thumbLabel small {
+    display: none;
+    /*
     font-style: italic;
     opacity: 0.7;
-    display: block;
     margin-left: 40px;
     width: 217px;
     overflow: hidden;
     height: auto;
+    */
 }
 
 #notif_pane div.thumbLabel {
@@ -1932,6 +1973,11 @@ div.class-FetchedResultPane > div.panelHeader
     clear: left;
     font-weight: lighter;
 }
+
+#topPane div.scrolling h3{
+    padding-right: 16px;
+}
+
 
 #topPane span.expand_label_hide,
 #topPane small.expand_button_hide span.expand_label_show
@@ -2065,6 +2111,7 @@ div.class-FetchedResultPane > div.panelHeader
     cursor: pointer;
     padding: 21px 15px 21px 15px;
     border-right: 2px solid #333;
+    height: 20px;
 }
 
 #repo_chooser:hover{
@@ -2296,11 +2343,10 @@ div.header_resizer div.header_cell{
 }
 
 div.header_resizer div.header_label{
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-size: 12px;
-    padding: 4px 5px 4px;
+    font-size: 11px;
+    padding: 5px 5px 4px;
     background-color: rgb(255, 255, 255);
-    color: rgb(104, 120, 136);
+    color: rgb(86, 101, 117);
     letter-spacing: 1px;
     border-bottom: 0;
     height: 18px;
@@ -2674,13 +2720,11 @@ div#upload_files_list, div#multiple_download_container
 }
 
 .dropareaHover{
-    background-color: #c3d9ff !important;
+    background-color: #FAF3ED !important;
 }
 
-#content_pane.dropareaHover {
-    border-color: #D96252 !important;
-    border-style: dashed;
-    background-color: white !important;
+#content_pane.dropareaHover div.thumbnail_selectable_cell{
+    background-color: transparent !important;
 }
 
 #uploader_chooser{
@@ -2949,8 +2993,16 @@ div#upload_files_list span.item_relative_path{
     top:0;
 }
 
+div[ajxpClass="FilesList"].paginated div.scroller_track{
+    top: 30px;
+}
+
 div.fl-displayMode-list div.scroller_track {
     top: 26px;
+}
+
+div.fl-displayMode-list.paginated div.scroller_track {
+    top: 56px;
 }
 
 .scroller_handle{
@@ -3028,6 +3080,12 @@ div.tabulatorContainer div#display_toolbar{
     font-size: 11px !important;
     margin: 3px 0;
     border-bottom: 1px dotted #999;
+}
+
+#info_panel div.ip_geo_cell {
+    position: absolute;
+    right: 17px;
+    margin-top: -36px;
 }
 
 span.toggleHeader{
@@ -3213,12 +3271,13 @@ div.tabulatorContainer span.toggleInactive span.tab_close_button:hover {
 #search_meta {
     font-size: 12px;
     padding: 0;
-    background-color: rgb(255, 255, 255);
+    background-color: rgba(221, 221, 221, 0.97);
     float: left;
     width: 0;
     overflow: hidden;
     margin-left: 0;
     transition: width 1s ease, margin-left 1s ease;
+    margin-top: -62px;
 }
 
 #search_meta > div{
@@ -3248,6 +3307,7 @@ div.meta_toggle_button {
     border: 1px solid #ACB2BB;
     background-color: #ffffff;
     padding: 2px 3px;
+    width:90% !important;
 }
 #search_meta input.c3:disabled{
     opacity: 0.35;
@@ -3262,6 +3322,12 @@ div.meta_toggle_button {
 
 #modiftime_fixed_radio span.c3{
     border-right-width: 0 !important;
+    padding: 4px 2px;
+    font-size: 10px;
+}
+
+div#modiftime_fixed_radio {
+    margin-top: 16px;
 }
 
 #modiftime_fixed_radio span.c3:last-of-type{
@@ -3289,6 +3355,16 @@ div.meta_toggle_button {
     padding-right: 2%;
 }
 
+#search_meta span.c4,
+#search_meta span.c6
+{
+    display: block;
+    width: 100% !important;
+    text-align: left;
+    line-height: 17px;
+    padding-top: 2px;
+}
+
 #search_meta div.advanced_search_section span[class^="icon-"],
 #search_meta div.advanced_search_section span[class*=" icon-"]{
     display: none;
@@ -3310,7 +3386,7 @@ div.meta_toggle_button {
     padding:5px 5px 10px;
     line-height: 28px;
     overflow: hidden;
-    background-color: rgba(235, 237, 240, 0.36);
+    color: rgb(77, 85, 94);
 }
 
 #search_meta span.toggle_button {
@@ -3339,12 +3415,19 @@ div.meta_toggle_button {
 
 .search_label.close{
     display: block;
-    font-size: 16px;
-    padding: 0 4px;
+    font-size: 30px;
+    padding: 15px 10px 17px;
 }
 
 #refresh_search_button{
     cursor: pointer;
+    font-size: 0.8em;
+    float: right;
+}
+
+#search_meta div.advanced_search_section_title {
+    font-size: 19px;
+    padding: 8px 8px 9px 10px;
 }
 
 .toggle_open span.search_label.open{
@@ -3457,7 +3540,7 @@ span.search_meta_opt.checked > span {
 #search_results h3 {
     font-size: 30px;
     margin: 10px 0 10px 14px;
-    color: #333;
+    color: rgb(77, 85, 94);
 }
 
 
@@ -3735,7 +3818,7 @@ div.foldedPanel_tooltip td{
     letter-spacing: 1px;
     background-color: rgba(107, 107, 107, 0.87);
     color: #fff;
-    font-family: "Open Sans Regular";
+    font-family: "Open Sans Regular", Helvetica, sans-serif;
     -webkit-font-smoothing:auto;
 }
 
@@ -3998,7 +4081,7 @@ div.selectable_div, .table_rows_container, #tree_container, #bottomSplitPane, .a
 }
 
 input, textarea, .selectable{
-    -moz-user-select: auto;
+    -moz-user-select: text;
     -khtml-user-select: auto;
     -webkit-user-select: auto;
     user-select: auto;
@@ -4552,6 +4635,23 @@ input.share_info_panel_link {
     float: none;
 }
 
+#share_form input#share_container{
+    padding: 3px !important;
+    border-radius: 2px;
+    background-color: #fff;
+}
+
+#share_form div.dialogContentLegend{
+    font-size: 13px;
+    padding: 0 2px;
+}
+
+#share_form span.SF_horizontal_action.icon-minus-sign.SF_horizontal_action_destructive {
+    position: absolute;
+    margin-top: -29px;
+    right: 14px;
+}
+
 #share_folder_form div.dialogContentMainTitle{
     clear: left;
     margin-top: 20px;
@@ -4851,7 +4951,7 @@ div.menu a {
 }
 
 .menu.desktop {
-    width: 10em;
+    width: 15em;
     padding: 0;
     padding-top: 0;
     padding-bottom: 1px;
@@ -4860,14 +4960,14 @@ div.menu a {
 }
 
 .menu.desktop.toolbarmenu {
-    background: #eee;
+    background: #fff;
     padding-bottom: 0;
     width: auto;
     /* IE */
     width:expression("150px");
     -moz-border-radius : 0 5px 5px 5px;
     border-radius: 4px;
-    min-width: 160px;
+    min-width: 15em;
 }
 
 .bmbarMenu div.moreActions {
@@ -4938,7 +5038,7 @@ div.menu a {
 
 .menu.desktop li.separator {
     padding: 0;
-    height: 1px;
+    height: 0;
 }
 .menu.desktop a img{
     margin-right: 9px;
@@ -4948,15 +5048,51 @@ div.menu a {
 .menu.desktop span.ajxp_icon_span{
     font-size: 1.1em;
     padding-right: 10px;
-    display: none;
+    color: #555;
+    opacity: 0.2;
+}
+
+.menu.desktop a:hover span.ajxp_icon_span,
+.menu.desktop li.menuAnchorSelected span.ajxp_icon_span
+{
+    color: white;
+    opacity: 1;
 }
 
 .menu.desktop a {
-    color: rgb(123, 134, 145);
-    padding: 5px 8px 3px;
+    color: #222;
+    padding: 9px 12px 10px;
     margin: 0;
     font-size: 12px;
     line-height: 20px;
+}
+
+.menu.desktop a u {
+    text-decoration: none;
+    display: inline-block;
+    border: 1px solid white;
+    border-radius: 3px;
+}
+
+.menu.desktop a:hover u,
+.menu.desktop li.menuAnchorSelected u
+{
+    padding: .1em .2em;
+    border: 1px solid #ccc;
+    font-size: 11px;
+    font-family: Arial,Helvetica,sans-serif;
+    background-color: #f7f7f7;
+    -moz-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px#fff inset;
+    -webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px#fff inset;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px#fff inset;
+    border-radius: 3px;
+    display: inline-block;
+    margin: 1px;
+    text-shadow: 0 1px 0#fff;
+    line-height: 1.4;
+    white-space: nowrap;
+    color: #222;
+
 }
 
 .menu.desktop.toolbarmenu a img{
@@ -4965,7 +5101,7 @@ div.menu a {
 
 .menu.desktop.toolbarmenu a {
     color: #333;
-    padding: 8px 20px 5px 8px;
+    padding: 10px 20px 8px 8px;
     margin: 0;
     font-size: 13px;
 }
@@ -4976,17 +5112,17 @@ div.menu a {
     zoom: 1;
 }
 .menu.desktop li.separator {
-    border-bottom: 1px solid #ebedf0;
-    margin: 1px 1px 0 1px;
+    border-bottom: 1px solid #eeeeee;
+    margin: 0 10px;
     line-height: 1px !important;
 }
 .menu.desktop.toolbarmenu li.separator{
-    border-bottom: 1px solid #666;
+    border-bottom: 1px solid #eeeeee;
 }
 
 .bookmarksMenu li.separator {
     border-bottom: 1px solid #fff;
-    margin: 0 1px 0 1px;
+    margin: 0 1px;
     line-height: 1px !important;
     padding: 0;
     height: 1px !important;
@@ -5002,7 +5138,7 @@ span.letter_badge {
     text-align: center;
     padding: 7px 0;
     font-size: 0.8em;
-    font-family: "Open Sans Regular";
+    font-family: "Open Sans Regular", Helvetica, sans-serif;
 }
 
 span#alerts_number {
@@ -5017,13 +5153,13 @@ span#alerts_number {
 
 /* we need explicit enabled class to overcome css deficiences (without creating unnecessary markup) */
 .menu.desktop a.enabled:hover {
-    background-color: #73a2d7;
+    background-color: #fb725c;
     color: #fff;
 }
 
 .menu.desktop li.menuAnchorSelected,
 .menu.desktop li.menuAnchorSelected a {
-    background-color: #73a2d7;
+    background-color: #fb725c;
     color: #fff !important;
 }
 
@@ -5322,9 +5458,7 @@ div.menuActions img{
 /* Generally applied after a Modernizr test */
 /********************************************/
 .css_boxshadow,div.menu{
-    -moz-box-shadow : 5px 5px 40px rgba(100, 100, 100, 0.5);
-    -webkit-box-shadow : 5px 5px 40px rgba(100, 100, 100, 0.5);
-    box-shadow : 5px 5px 40px rgba(100, 100, 100, 0.5);
+    box-shadow : 1px 1px 4px rgba(100, 100, 100, 0.7);
 }
 
 .dialogBox, div.dialogBox.css_boxshadow{
@@ -5377,7 +5511,9 @@ div.dialogBox div.dialogBox.css_boxshadow > div{
 
 div.overlay.form-login_form,
 div.overlay.form-login_form_dynamic,
-div.overlay.form-switch_language_form
+div.overlay.form-switch_language_form,
+div.overlay.form-reset-password,
+div.overlay.form-reset-password-ask
 {
     opacity: 0;
     background-image: none !important;
@@ -5435,7 +5571,7 @@ input#webdav_password{
     margin-left: 10px !important;
 }
 
-#cpane_tabs .video-js-box{
+#cpane_tabs div.video-js-box{
     margin-left: 0 !important;
 }
 
@@ -5444,7 +5580,7 @@ input#webdav_password{
 }
 
 #video_container{
-    margin: 5px 20px 5px 10px !important;
+    /*margin: 5px 20px 5px 10px !important;*/
 }
 
 td.ip_geo_cell{
@@ -5689,7 +5825,7 @@ div.flat_tabulator > div:not(.tabulatorContainer){
 }
 
 div#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer{
-    padding-top: 77px;
+    padding-top: 95px;
 }
 
 div#userdashboard_myparams_title{

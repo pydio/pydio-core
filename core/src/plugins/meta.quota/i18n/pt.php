@@ -22,4 +22,5 @@ $mess=array(
 "1" => "Uso da Quota...",
 "2" => "Clique aqui para recalcular a Quota",
 "3" => "Ultrapassou o Limite da sua Quota",
+"4" => "Uso da Quota",
 );

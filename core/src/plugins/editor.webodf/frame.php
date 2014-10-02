@@ -1,6 +1,6 @@
 <?php
-$AJXP_SECURE_TOKEN = $_GET["token"];
-$AJXP_FILE_URL = $_GET["file"];
+require_once('../../core/classes/class.AJXP_Utils.php');
+$AJXP_FILE_URL = AJXP_Utils::securePath(AJXP_Utils::sanitize($_GET["file"], AJXP_SANITIZE_FILENAME));
 ?>
 <html>
 <head>

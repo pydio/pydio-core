@@ -8,19 +8,27 @@
 	<server_settings>
         <global_param name="GUI_THEME" group="CONF_MESSAGE[Main Options]" type="select" choices="vision|Vision,orbit|Orbit,umbra|Umbra,oxygen|Oxygen (Legacy)" label="CONF_MESSAGE[Theme]" description="CONF_MESSAGE[Theme used for display]" mandatory="true" default="orbit"/>
         <global_param name="JS_RESOURCES_BEFORE" group="CONF_MESSAGE[Main Options]" type="string" label="CONF_MESSAGE[Additional JS frameworks]" description="CONF_MESSAGE[List of pathes to JS files that must be loaded BEFORE the main Pydio framework is loaded, comma separated. The preferred way should be using plugins resources declaration, but in some cases one may want to load some JS at the very start up of the page.]" mandatory="false" default="plugins/gui.ajax/res/js/jquery_backbone-min.js"/>
-        <global_param name="CUSTOM_ICON_ONLY" group="CONF_MESSAGE[Start Up Screen]" type="boolean" label="CONF_MESSAGE[Icon Only]" description="CONF_MESSAGE[Skip the title, only display an image]" mandatory="false" default="true"/>
-        <global_param name="CUSTOM_ICON_BINARY" group="CONF_MESSAGE[Start Up Screen]" type="image" label="CONF_MESSAGE[Custom Icon]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]"
+        <global_param name="CUSTOM_ICON_ONLY" group="CONF_MESSAGE[Login Screen]" type="boolean" label="CONF_MESSAGE[Icon Only]" description="CONF_MESSAGE[Skip the title, only display an image]" mandatory="false" default="true"/>
+        <global_param name="CUSTOM_ICON_BINARY" group="CONF_MESSAGE[Login Screen]" type="image" label="CONF_MESSAGE[Custom Icon]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]"
                     editable="true"
                     uploadAction="store_binary_temp"
                     loadAction="get_global_binary_param"
-                    defaultImage="plugins/gui.ajax/res/themes/orbit/images/Logo_White_300.png"
+                    defaultImage="AJXP_THEME_FOLDER/images/LoginBoxLogo.png"
                     mandatory="false"
+                    expose="true"
                 />
-        <global_param name="CUSTOM_ICON" group="CONF_MESSAGE[Start Up Screen]" type="string" label="CONF_MESSAGE[Icon Path (Legacy)]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]" default="plugins/gui.ajax/LoginBoxLogo.png" mandatory="false"/>
-        <global_param name="CUSTOM_ICON_WIDTH" group="CONF_MESSAGE[Start Up Screen]" type="string" label="CONF_MESSAGE[Icon Width]" description="CONF_MESSAGE[Width of the custom image (by default 35px)]" mandatory="false" default="250px"/>
-        <global_param name="CUSTOM_ICON_HEIGHT" group="CONF_MESSAGE[Start Up Screen]" type="string" label="CONF_MESSAGE[Icon Height]" description="CONF_MESSAGE[Height of the custom icon (with the px mention)]" mandatory="false" default="120px"/>
-        <global_param name="CUSTOM_FONT_SIZE" group="CONF_MESSAGE[Start Up Screen]" type="string" label="CONF_MESSAGE[Title Font Size]" description="CONF_MESSAGE[Font sized used for the title in the start up screen]" mandatory="false" default=""/>
-        <global_param name="CUSTOM_WELCOME_MESSAGE" group="CONF_MESSAGE[Start Up Screen]" type="textarea" label="CONF_MESSAGE[Welcome Message]" description="CONF_MESSAGE[An additionnal message displayed in the start up screen]" mandatory="false" default="Welcome to Pydio"/>
+        <global_param name="CUSTOM_ICON" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Icon Path (Legacy)]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]" default="AJXP_THEME_FOLDER/images/LoginBoxLogo.png" mandatory="false" expose="true"/>
+        <global_param name="CUSTOM_ICON_WIDTH" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Icon Width]" description="CONF_MESSAGE[Width of the custom image (by default 35px)]" mandatory="false" default="250px"/>
+        <global_param name="CUSTOM_ICON_HEIGHT" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Icon Height]" description="CONF_MESSAGE[Height of the custom icon (with the px mention)]" mandatory="false" default="120px"/>
+        <global_param name="CUSTOM_FONT_SIZE" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Title Font Size]" description="CONF_MESSAGE[Font sized used for the title in the start up screen]" mandatory="false" default=""/>
+        <global_param name="CUSTOM_WELCOME_MESSAGE" group="CONF_MESSAGE[Login Screen]" type="textarea" label="CONF_MESSAGE[Welcome Message]" description="CONF_MESSAGE[An additionnal message displayed in the start up screen]" mandatory="false" default="Welcome to Pydio"/>
+        <global_param name="CUSTOM_DASH_LOGO" group="CONF_MESSAGE[Welcome Page]"  label="CONF_MESSAGE[Logo]" description="CONF_MESSAGE[Replace the logo displayed in the welcome page]"  type="image"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="AJXP_THEME_FOLDER/images/PydioLogo250.png"
+                      expose="true"
+                />
         <global_param name="CUSTOM_TOP_TITLE" group="CONF_MESSAGE[Top Toolbar]" type="string" label="CONF_MESSAGE[Title]" description="CONF_MESSAGE[Append a title to the image logo]" mandatory="false" default="" expose="true"/>
         <global_param name="CUSTOM_TOP_LOGO" group="CONF_MESSAGE[Top Toolbar]"  label="CONF_MESSAGE[Logo]" description="CONF_MESSAGE[Replace the top left logo in the top toolbar]"  type="image"
                       editable="true"
@@ -31,15 +39,8 @@
                 />
         <global_param name="CUSTOM_TOP_LOGO_H" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Height]" description="CONF_MESSAGE[Manually set a logo height]" mandatory="false" default="39" expose="true"/>
         <global_param name="CUSTOM_TOP_LOGO_W" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Width]" description="CONF_MESSAGE[Manually set a logo width]" mandatory="false" default="" expose="true"/>
-        <global_param name="CUSTOM_TOP_LOGO_T" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Top]" description="CONF_MESSAGE[Manually set a top offset]" mandatory="false" default="0" expose="true"/>
-        <global_param name="CUSTOM_TOP_LOGO_L" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Left]" description="CONF_MESSAGE[Manually set a left offset]" mandatory="false" default="0" expose="true"/>
-        <global_param name="CUSTOM_DASH_LOGO" group="CONF_MESSAGE[Dashboard]"  label="CONF_MESSAGE[Dashboard Logo]" description="CONF_MESSAGE[Replace the logo displayed in the user dashboard. Use 250 X 131 png image]"  type="image"
-                      editable="true"
-                      uploadAction="store_binary_temp"
-                      loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/PydioLogo250.png"
-                      expose="true"
-                />
+        <global_param name="CUSTOM_TOP_LOGO_T" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Top]" description="CONF_MESSAGE[Manually set a top offset]" mandatory="false" default="4" expose="true"/>
+        <global_param name="CUSTOM_TOP_LOGO_L" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Left]" description="CONF_MESSAGE[Manually set a left offset]" mandatory="false" default="6" expose="true"/>
         <global_param name="CLIENT_TIMEOUT_TIME" group="CONF_MESSAGE[Client Session Config]" type="integer" label="CONF_MESSAGE[Client Timeout]" description="CONF_MESSAGE[The length of the client session in SECONDS. By default, it's copying the server session length. In most PHP installation, it will be 1440, ie 24minutes. You can set this value to 0, this will make the client session 'infinite' by pinging the server at regular occasions (thus keeping the PHP session alive). This is not a recommanded setting for evident security reasons.]" mandatory="false"/>
 		<global_param name="CLIENT_TIMEOUT_WARN" group="CONF_MESSAGE[Client Session Config]" type="integer" label="CONF_MESSAGE[Warning Before]" description="CONF_MESSAGE[Number of MINUTES before the session expiration for issuing an alert to the user]" mandatory="false" default="3"/>
 		<global_param name="GOOGLE_ANALYTICS_ID" group="CONF_MESSAGE[Google Analytics]" type="string" label="CONF_MESSAGE[Analytics ID]" description="CONF_MESSAGE[Id of your GA account, something like UE-XXXX-YY]" mandatory="false"/>
@@ -118,6 +119,47 @@
                       label="CONF_MESSAGE[Background Attributes(6)]" description="CONF_MESSAGE[Image used as a background]"
                       mandatory="false" expose="true" default="background-repeat:repeat;background-size:140%;background-position:50% 50%;"/>
 
+        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_1" group="CONF_MESSAGE[Minisite]" type="image" label="CONF_MESSAGE[Custom Background (1)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/02.jpg"
+                      expose="true"
+                />
+        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_1" group="CONF_MESSAGE[Minisite]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:100%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
+                      label="CONF_MESSAGE[Background Attributes(1)]" description="CONF_MESSAGE[Image used as a background]"
+                      mandatory="false" expose="true" default="background-repeat:repeat;background-size:100%;background-position:50% 50%;"/>
+        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_2" group="CONF_MESSAGE[Minisite]" type="image" label="CONF_MESSAGE[Custom Background (2)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/03.jpg"
+                      expose="true"
+                />
+        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_2" group="CONF_MESSAGE[Minisite]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:100%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
+                      label="CONF_MESSAGE[Background Attributes(2)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false" expose="true"  default="background-repeat:repeat;background-size:100%;background-position:50% 50%;"/>
+        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_3" group="CONF_MESSAGE[Minisite]" type="image" label="CONF_MESSAGE[Custom Background (3)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/05.jpg"
+                      expose="true"
+                />
+        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_3" group="CONF_MESSAGE[Minisite]" type="select"
+                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:100%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
+                      label="CONF_MESSAGE[Background Attributes(3)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false" expose="true"  default="background-repeat:repeat;background-size:100%;background-position:50% 50%;"/>
+
+
+        <global_param name="CUSTOM_MINISITE_LOGO" group="CONF_MESSAGE[Minisite]" type="image" label="CONF_MESSAGE[Minisite Logo]" description="CONF_MESSAGE[Top-right logo displayed on minisite page]" mandatory="false"
+                      editable="true"
+                      uploadAction="store_binary_temp"
+                      loadAction="get_global_binary_param"
+                      defaultImage="plugins/gui.ajax/PydioLogo250.png"
+                      expose="true"
+                />
+
 	</server_settings>
 	<class_definition filename="plugins/gui.ajax/class.AJXP_ClientDriver.php" classname="AJXP_ClientDriver"/>
 	<registry_contributions>
@@ -194,7 +236,7 @@
 			]]></template>
             <template name="main_vision" element="ajxp_desktop" position="top" theme="vision"><![CDATA[
 				<div id="toolbars" ajxpClass="AjxpPane">
-					<div id="global_toolbar" ajxpClass="LogoWidget">
+					<div id="global_toolbar" ajxpClass="LogoWidget" ajxpOptions='{"link":"triggerRepositoryChange:ajxp_home", "linkTitle":"Back to Home"}'>
 					    <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over"}'></div>
 						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["user", "admin"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
 						<div id="repo_chooser" ajxpClass="RepositorySelect" ajxpOptions='{"menuPosition": "bottom middle", "menuOffsetTop":11, "menuOffsetLeft":0, "menuMaxHeight":535, "menuEvent":"over", "simpleLabel":"<span class=\"icon-sitemap\"></span><span class=\"ws-label\" ajxp_message_id=\"455\">AJXP_MESSAGE[455]</span><span class=\"icon-caret-down\"></span>"}'></div>
@@ -222,7 +264,7 @@
                                     <div id="files_list_pane" ajxpClass="AjxpPane">
                                         <div id="files_list_header" ajxpClass="AjxpPane">
                                             <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                                            <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_tabs"}'></div>
+                                            <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_tabs","flexToMargin":20}'></div>
                                         </div>
                                         <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"files_lit_pane", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}' style="border-left: 1px solid #bbb;"></div>
                                     </div>
@@ -235,19 +277,12 @@
 			]]></template>
             <template name="main_orbit" element="ajxp_desktop" position="top" theme="orbit"><![CDATA[
                 <div id="background-imager" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop","imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_"}'>
-                    <div id="global_toolbar" ajxpClass="LogoWidget">
-                        <div id="clickable_home" title="Home"></div>
+                    <div id="global_toolbar" ajxpClass="LogoWidget" ajxpOptions='{"link":"triggerRepositoryChange:ajxp_home", "linkTitle":"Back to Home"}'>
                         <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over","menuOffsetLeft":11,"menuOffsetTop":11}'></div>
 						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["admin"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                     </div>
                     <div id="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop"}'></div>
                 </div>
-                <script>
-                if($('clickable_home')){
-                    if(!$('clickable_home').OBSERVER) $('clickable_home').observe('click', function(){ ajaxplorer.triggerRepositoryChange('ajxp_home'); });
-                    $('clickable_home').OBSERVER = true;
-                }
-                </script>
 			]]></template>
             <template name="widget_umbra" element="ajxp_widget" position="top" theme="umbra"><![CDATA[
 				<div id="toolbars">
@@ -354,9 +389,16 @@
                         background-color: #ccc;
                         padding: 9px 9px 8px;
                     }
+                    img.custom_logo_image{
+                        height:90px !important;
+                        width: auto;
+                        right: 0;
+                        top: 5px !important;
+                        left: inherit !important;
+                    }
                 </style>
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div class="widget_logo"></div>
+                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
                     <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
                     <div id="breadcrumb" ajxpClass="Breadcrumb" ajxpOptions='{}'></div>
                     <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
@@ -416,16 +458,16 @@
                     background-color: #222;
                     box-shadow: 0 2px 4px rgba(0,0,0,0.5);
                     margin-bottom:5px;
-                    padding-top: 16px;
-                    padding-left: 16px;
-                    height: 112px !important;
+                    padding-top: 3px;
+                    padding-left: 3px;
+                    height: 60px !important;
                 }
                 .fl-displayMode-thumb div.thumbnail_selectable_cell div.thumbLabel {
                     color: #555;
                     background-color: transparent;
                 }
                 .fl-displayMode-thumb div.thumbnail_selectable_cell{
-                    margin: 1px 6px;
+                    margin: 2px 2px;
                 }
                 div.thumbnail_selectable_cell{
                     background-color: transparent;
@@ -447,17 +489,23 @@
                 #diaporama_box{
                     position:relative;
                 }
+                img.custom_logo_image{
+                    right: 0px !important;
+                    left: inherit !important;
+                    height: 65px !important;
+                    width: auto;
+                }
 
 				</style>
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div class="widget_logo"></div>
+                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
                     <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
                     <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
                         <div id="cpane_header" class="panelHeader">
                             <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["minisite", "inline"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                             <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":50}'></div>
                         </div>
-                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"thumb", "fixedDisplayMode":"thumb", "fixedThumbSize":80,"replaceScroller":false, "horizontalScroll":true, "messageBoxReference":true, "fit":"content", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}'></div>
+                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"thumb", "fixedDisplayMode":"thumb", "fixedThumbSize":40,"replaceScroller":false, "horizontalScroll":true, "messageBoxReference":true, "fit":"content", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}'></div>
                         <div id="cpane_tabs" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"cpane_container","registerAsEditorOpener":true, "saveState":false, "defaultTabId": "","tabInfos" : [], "uniqueTab":true}'></div>
                     </div>
 				</div>
@@ -557,11 +605,17 @@
                     display: inline-block !important;
                     margin-left: 4px !important;
                 }
+                img.custom_logo_image{
+                    right: 0 !important;
+                    left: inherit !important;
+                    height: 66px !important;
+                    width: auto;
+                }
 				</style>
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div class="widget_logo"></div>
+                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
                     <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["inline", "minisite-share-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                    <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
+                    <div id="widget_title" style="padding: 28px 0 22px 20px;" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
                     <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
                         <div id="cpane_tabs" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"cpane_container","registerAsEditorOpener":true, "saveState":false, "defaultTabId": "","tabInfos" : [], "uniqueTab":true}'></div>
                     </div>
@@ -579,6 +633,10 @@
                                 }
                                 var root = dm.getRootNode();
                                 if(root.getChildren().length){
+                                    var first = root.getChildren().first();
+                                    if((first.getAjxpMime() == 'mp3' || first.getAjxpMime() == 'wav') && !(window.soundManager && window.soundManager.enabled)){
+                                        return;
+                                    }
                                     dm.setSelectedNodes([root.getChildren().first()], "dataModel");
                                     window.setTimeout(function(){ajaxplorer.actionBar.fireDefaultAction("file");}, 1);
                                     p.stop();
@@ -600,6 +658,7 @@
                     }
 				#browser{
 				    background-color: #000;
+				    width:102%;
                     -webkit-font-smoothing: antialiased;
 				}
 				#cpane_container{
@@ -617,7 +676,6 @@
                     left:-5px;
                     bottom:-5px;
                     right:-5px;
-                    opacity:0.5;
                 }
                 div#dl_toolbar {
                     margin: 27% auto;
@@ -625,9 +683,10 @@
                     width: 400px;
                     font-size: 62px;
                     text-align: center;
-                    background-color: rgba(0,0,0,0.5);
-                    padding: 20px 10px;
-                    border-radius: 5px;
+                }
+                div.widget_logo{
+                    height: 90px;
+                    background-position: 86px 76px !important;
                 }
                 div#widget_title{
                     color: rgba(255,255,255,0.8);
@@ -645,6 +704,9 @@
                     display:block !important;
                     text-align: center;
                     color: rgba(255,255,255,0.8);
+                    background-color: rgba(0,0,0,0.5);
+                    padding: 20px 10px;
+                    border-radius: 5px;
                 }
                 a#download_button span.ajxp_icon{
                     display: inline-block;
@@ -656,11 +718,17 @@
                     bottom: 37px;
                     font-size: 21px;
                 }
+                img.custom_logo_image{
+                    right: 6px !important;
+                    left: inherit !important;
+                    height: 90px !important;
+                    width: auto;
+                }
                 </style>
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div id="background_container" ajxpClass="AjxpPane" ajxpOptions='{"imageBackgroundFromConfigs":"action.share/CUSTOM_SHAREPAGE_BACKGROUND_"}'></div>
+                    <div id="background_container" ajxpClass="AjxpPane" ajxpOptions='{"imageBackgroundFromConfigs":"gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_"}'></div>
                     <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
-                        <div class="widget_logo"></div>
+                        <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
                         <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'>
                         </div>
                         <div id="dl_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["inline"], "skipCarousel":true}'></div>
@@ -695,10 +763,25 @@
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
                     <div id="cpane_header" class="panelHeader">
                         <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["minisite", "inline","default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                        <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header"}'></div>
+                        <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":30}'></div>
                     </div>
                     <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
+                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
 				</div>
+				<link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
+				<style>img.custom_logo_image{ width: auto; height: 85px !important; top: inherit !important; bottom: 25px; }</style>
+			]]></template>
+            <template name="minisite_dropbox" element="ajxp_dropbox_template" position="top" label="share_center.163"><![CDATA[
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
+                    <div id="cpane_header" class="panelHeader">
+                        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["minisite", "inline","default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                        <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":30}'></div>
+                    </div>
+                    <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
+                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
+				</div>
+				<link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
+				<style>img.custom_logo_image{ width: auto; right: 6px !important; left: inherit !important; height: 87px !important; bottom: 3px; top: inherit !important; }</style>
 			]]></template>
 			<component_config className="FilesList">
 				<property name="thumbSize" value="64"/>

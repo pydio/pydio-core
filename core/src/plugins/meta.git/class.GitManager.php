@@ -26,7 +26,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class GitManager extends AJXP_Plugin
+class GitManager extends AJXP_AbstractMetaSource
 {
 
     private $repoBase;
@@ -45,6 +45,7 @@ class GitManager extends AJXP_Plugin
      */
     public function initMeta($accessDriver)
     {
+        parent::initMeta($accessDriver);
         require_once("VersionControl/Git.php");
         $repo = $accessDriver->repository;
         $this->repoBase = $repo->getOption("PATH");
@@ -284,10 +285,13 @@ class GitManager extends AJXP_Plugin
         $command = $git->getCommand("commit");
         $command->setOption("a", true);
         $userId = "no user";
+        $mail = "mail@mail.com";
         if (AuthService::getLoggedUser()!=null) {
             $userId = AuthService::getLoggedUser()->getId();
+            $mail = AuthService::getLoggedUser()->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "mail@mail.com");
         }
         $command->setOption("m", $userId);
+        $command->setOption("author", "$userId <$mail>");
         //$command->addArgument($path);
 
         try {

@@ -453,7 +453,7 @@ Class.create("Action", {
 								var item = {};
 								for(var z=0;z<node.childNodes[j].childNodes[k].attributes.length;z++){
 									var attribute = node.childNodes[j].childNodes[k].attributes[z];
-									item[attribute.nodeName] = attribute.nodeValue;
+									item[attribute.nodeName] = attribute.value;
 								}
 								this.subMenuItems[node.childNodes[j].nodeName].push(item);
 							}

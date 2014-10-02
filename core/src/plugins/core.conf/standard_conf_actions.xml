@@ -19,6 +19,11 @@
 				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
+		<action name="load_repository_info">
+			<processing>
+				<serverCallback methodName="switchAction"/>
+			</processing>
+		</action>
         <action name="user_create_repository">
             <gui text="417" title="418" src="user-create-repository.png" accessKey="" hasAccessKey="false" iconClass="icon-plus-sign">
                 <context selection="false" dir="" recycle="true" ajxpWidgets="RepositorySelect"/>
@@ -37,7 +42,7 @@
                             Event.stop(e);
                             new Effect.Parallel([
                                 new Effect.Morph('user_templates_selector', {style:'left:0px;'}),
-                                new Effect.Morph('user_template_parameters', {style:'left:250px;'}),
+                                new Effect.Morph('user_template_parameters', {style:'left:420px;'}),
                                 new Effect.Morph('user_tpl_container', {style:'height:'+conn.ORIGINAL_HEIGHT+'px;'}),
                                 new Effect.Opacity(okButton, {sync:true,from:1.0,to:0}),
                                 new Effect.Opacity(backButton, {sync:true,from:1.0,to:0})
@@ -69,7 +74,7 @@
                             var targetHeight = parseInt($('user_template_parameters').getHeight());
                              if(!targetHeight) targetHeight = params.length * 40 + 80;
                             new Effect.Parallel([
-                                new Effect.Morph('user_templates_selector', {style:'left:-250px;'}),
+                                new Effect.Morph('user_templates_selector', {style:'left:-420px;'}),
                                 new Effect.Morph('user_template_parameters', {style:'left:0px;'}),
                                 new Effect.Morph('user_tpl_container', {style:'height:'+targetHeight+'px;'}),
                                 new Effect.Opacity(okButton, {sync:true,from:0,to:1.0}),
@@ -87,13 +92,12 @@
                                 var tplId = templates[i].getAttribute('repository_id');
                                 var labelDiv = new Element('div').update(label);
                                 labelDiv.setStyle({
-                                    padding:'6px',
-                                    paddingLeft:'32px',
+                                    padding:'12px 6px 12px 35px',
                                     fontSize:'1.3em',
                                     cursor:'pointer',
                                     borderBottom:'1px solid #EEE',
                                     backgroundRepeat: 'no-repeat',
-                                    backgroundPosition: '5px 5px',
+                                    backgroundPosition: '5px 10px',
                                     backgroundImage:'url('+conn._baseUrl+'&get_action=get_user_template_logo&template_id='+tplId+'&icon_format=big)'
                                 });
                                 var tplDiv = new Element('div', {"data-templateId":tplId,"data-templateLabel":label}).update(labelDiv);
@@ -125,10 +129,10 @@
 					]]></dialogOnComplete>
 				</clientCallback>
 				<clientForm id="user_create_repository_form"><![CDATA[
-					<div id="user_create_repository_form" action="user_create_repository" box_width="270">
-					    <div id="user_tpl_container" style="position:relative;width:248px;overflow:hidden;height:130px;border:1px solid #ddd; background-color: #f4f4f4;">
-						<div id="user_templates_selector" style="position:absolute;width:250px;"><div class="panelHeader">AJXP_MESSAGE[419]</div></div>
-						<div id="user_template_parameters" style="position:absolute;left:250px;width:250px;">
+					<div id="user_create_repository_form" action="user_create_repository" box_width="420" box_padding="0">
+					    <div id="user_tpl_container" style="position:relative;width:418px;overflow:hidden;height:130px;border:1px solid #ddd; background-color: #f4f4f4;">
+						<div id="user_templates_selector" style="position:absolute;width:420px;"><div class="panelHeader">AJXP_MESSAGE[419]</div></div>
+						<div id="user_template_parameters" style="position:absolute;left:420px;width:420px;">
 						    <div id="user_tpl_params_title" class="panelHeader panelHeaderWithIcon"></div>
 						    <div style="padding:5px;">
 						        <div class="dialogLegend" style="clear:left;">AJXP_MESSAGE[422]</div>
@@ -614,6 +618,38 @@
                     <input type="hidden" name="get_action" value="webdav_preferences">
                 </div>
                 ]]></additional_tab>
+        </component_config>
+        <component_config className="InfoPanel">
+            <infoPanelExtension mime="ajxp_root_node" attributes="">
+                <messages>
+                    <message key="shared_string" id="527"/>
+                    <message key="internal_string" id="528"/>
+                    <message key="external_string" id="530"/>
+                </messages>
+                <html><![CDATA[
+                    <div id="ajxp_workspace_info_panel" data-infoPanelPosition="top" style="margin:6px 20px;">
+                        <div class="panelHeader">#{shared_string}</div>
+                        <div id="ajxp_workspace_info_panel_content"></div>
+                        <script>
+                            bufferCallback("ajxp_load_repo_info_timer", 300,function(){
+                                if(!$('ajxp_workspace_info_panel_content') || !$('ajxp_workspace_info_panel_content').visible()){
+                                    return;
+                                }
+                                if(!ajaxplorer.user) return;
+                                var conn = new Connexion();
+                                conn.setParameters({get_action:'load_repository_info'});
+                                conn.onComplete = function(transport){
+                                    if(transport.responseJSON && $('ajxp_workspace_info_panel_content')){
+                                        var data = transport.responseJSON;
+                                        $('ajxp_workspace_info_panel_content').update('#{internal_string}: ' + data['core.users']['internal'] + ' <br/> #{external_string}: ' + data['core.users']['external']);
+                                    }
+                                };
+                                conn.sendAsync();
+                            });
+                        </script>
+                    </div>
+                ]]></html>
+            </infoPanelExtension>
         </component_config>
     </client_configs>
 </registry_contributions>

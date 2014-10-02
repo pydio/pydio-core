@@ -218,27 +218,27 @@ class multiAuthDriver extends AbstractAuthDriver
     }
 
     // $baseGroup = "/"
-    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit)
+    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive = true)
     {
         if (!empty($this->baseName) && $regexp == null) {
-            return $this->drivers[$this->baseName]->listUsersPaginated($baseGroup, $regexp, $offset, $limit);
+            return $this->drivers[$this->baseName]->listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive);
         } else {
             $keys = array_keys($this->drivers);
-            return $this->drivers[$keys[0]]->listUsersPaginated($baseGroup, $regexp, $offset, $limit) +  $this->drivers[$keys[1]]->listUsersPaginated($baseGroup, $regexp, $offset, $limit);
+            return $this->drivers[$keys[0]]->listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive) +  $this->drivers[$keys[1]]->listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive);
         }
     }
 
-    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null)
+    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null, $recursive = true)
     {
         if (empty($this->baseName)) {
             if ($this->masterSlaveMode) {
-                return $this->drivers[$this->slaveName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue) +  $this->drivers[$this->masterName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue);
+                return $this->drivers[$this->slaveName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive) +  $this->drivers[$this->masterName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
             } else {
                 $keys = array_keys($this->drivers);
-                return $this->drivers[$keys[0]]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue) +  $this->drivers[$keys[1]]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue);
+                return $this->drivers[$keys[0]]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive) +  $this->drivers[$keys[1]]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
             }
         } else {
-            return $this->drivers[$this->baseName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue);
+            return $this->drivers[$this->baseName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
         }
     }
 
@@ -248,17 +248,17 @@ class multiAuthDriver extends AbstractAuthDriver
         return ($this->drivers[$keys[0]]->getOption("AJXP_ADMIN_LOGIN") === $login) ||  ($this->drivers[$keys[1]]->getOption("AJXP_ADMIN_LOGIN") === $login);
     }
 
-    public function listUsers($baseGroup="/")
+    public function listUsers($baseGroup="/", $recursive = true)
     {
         if ($this->masterSlaveMode) {
             if (!empty($this->baseName)) {
-                $users = $this->drivers[$this->baseName]->listUsers($baseGroup);
+                $users = $this->drivers[$this->baseName]->listUsers($baseGroup, $recursive);
                 $this->addToCache(array_keys($users), $this->baseName);
                 return $users;
             }
-            $masterUsers = $this->drivers[$this->slaveName]->listUsers($baseGroup);
+            $masterUsers = $this->drivers[$this->slaveName]->listUsers($baseGroup, $recursive);
             $this->addToCache(array_keys($masterUsers), $this->slaveName);
-            $slaveUsers = $this->drivers[$this->masterName]->listUsers($baseGroup);
+            $slaveUsers = $this->drivers[$this->masterName]->listUsers($baseGroup, $recursive);
             $this->addToCache(array_keys($slaveUsers), $this->masterName);
             return array_merge($masterUsers, $slaveUsers);
         }
@@ -267,7 +267,7 @@ class multiAuthDriver extends AbstractAuthDriver
         }
         $allUsers = array();
         foreach ($this->drivers as $driver) {
-            $allUsers = array_merge($allUsers, $driver->listUsers($baseGroup));
+            $allUsers = array_merge($allUsers, $driver->listUsers($baseGroup, $recursive));
         }
         return $allUsers;
     }
@@ -379,6 +379,10 @@ class multiAuthDriver extends AbstractAuthDriver
                     }
                     return true;
                 } else {
+                    if(!$this->getFilteredOption("CACHE_MASTER_USERS_TO_SLAVE") && $this->drivers[$this->slaveName]->userExists($login)){
+                        // User may in fact be a SLAVE user
+                        return $this->drivers[$this->slaveName]->checkPassword($login, $pass, $seed);
+                    }
                     return false;
                 }
             } else {

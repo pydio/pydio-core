@@ -26,13 +26,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Index
  */
-class AjxpLuceneIndexer extends AJXP_Plugin
+class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
 {
     private $currentIndex;
-    /**
-     * @var AbstractAccessDriver
-     */
-    private $accessDriver;
     private $metaFields = array();
     private $indexContent = false;
     private $specificId = "";
@@ -55,7 +51,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin
 
     public function initMeta($accessDriver)
     {
-        $this->accessDriver = $accessDriver;
+        parent::initMeta($accessDriver);
         if (!empty($this->metaFields) || $this->indexContent) {
             $metaFields = $this->metaFields;
             $el = $this->xPath->query("/indexer")->item(0);
@@ -159,7 +155,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin
                 throw new Exception($messages["index.lucene.7"]);
             }
             $textQuery = $httpVars["query"];
-            if($this->getFilteredOption("AUTO_WILDCARD") === true && strlen($textQuery) > 0){
+            if($this->getFilteredOption("AUTO_WILDCARD") === true && strlen($textQuery) > 0 && ctype_alnum($textQuery)){
                 $isQuote = false;
                 if($textQuery[0] == '"' && $textQuery[strlen($textQuery)-1] == '"'){
                     $textQuery = substr($textQuery, 1, -1);
@@ -167,11 +163,18 @@ class AjxpLuceneIndexer extends AJXP_Plugin
                     $textQuery.="*";
                 }
             }
-            if ((isSet($this->metaFields) || $this->indexContent) && isSet($httpVars["fields"])) {
+            if(strpos($textQuery, ":") !== false){
+                $textQuery = str_replace("ajxp_meta_ajxp_document_content:","body:", $textQuery);
+                $textQuery = $this->filterSearchRangesKeywords($textQuery);
+                $query = "ajxp_scope:shared AND ($textQuery)";
+            }
+            else if ((isSet($this->metaFields) || $this->indexContent) && isSet($httpVars["fields"])) {
                 $sParts = array();
                 foreach (explode(",",$httpVars["fields"]) as $searchField) {
                     if ($searchField == "filename") {
                         $sParts[] = "basename:".$textQuery;
+                    } else if ($searchField == "ajxp_document_content"){
+                        $sParts[] = $textQuery;
                     } else if (in_array($searchField, $this->metaFields)) {
                         $sParts[] = "ajxp_meta_".$searchField.":".$textQuery;
                     } else if ($searchField == "ajxp_document_content") {

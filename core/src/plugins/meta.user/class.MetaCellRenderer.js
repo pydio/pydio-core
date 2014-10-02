@@ -48,11 +48,13 @@ Class.create("MetaCellRenderer", {
         }
         if(!MetaCellRenderer.staticMetadataCache.get(metadataDef.attributeName)){
             var values = {};
-            metadataDef['metaAdditional'].split(",").each(function(keyLabel){
-                var parts = keyLabel.split("|");
-                values[parts[0]] = parts[1];
-            });
-            MetaCellRenderer.staticMetadataCache.set(metadataDef.attributeName, values);
+            if(metadataDef['metaAdditional']){
+                metadataDef['metaAdditional'].split(",").each(function(keyLabel){
+                    var parts = keyLabel.split("|");
+                    values[parts[0]] = parts[1];
+                });
+                MetaCellRenderer.staticMetadataCache.set(metadataDef.attributeName, values);
+            }
         }
         var values = MetaCellRenderer.staticMetadataCache.get(metadataDef.attributeName);
         if((type == 'row' || type == 'detail') && element != null){

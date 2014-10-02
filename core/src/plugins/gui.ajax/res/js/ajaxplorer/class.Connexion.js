@@ -17,7 +17,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-
+var PydioLog = $A();
 /**
  * Pydio encapsulation of Ajax.Request
  */
@@ -108,7 +108,11 @@ Class.create("Connexion", {
 	/**
 	 * Send Asynchronously
 	 */
-	sendAsync : function(){	
+	sendAsync : function(){
+        PydioLog.push({
+            action:this._parameters.get("get_action"),
+            type:"async"
+        });
 		this.addSecureToken();
         this.showLoader();
 		var t = new Ajax.Request(this._baseUrl,
@@ -123,7 +127,11 @@ Class.create("Connexion", {
 	/**
 	 * Send synchronously
 	 */
-	sendSync : function(){	
+	sendSync : function(){
+        PydioLog.push({
+            action:this._parameters.get("get_action"),
+            type:"sync"
+        });
 		this.addSecureToken();
         this.showLoader();
 		var t = new Ajax.Request(this._baseUrl,

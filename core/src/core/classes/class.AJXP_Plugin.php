@@ -137,6 +137,7 @@ class AJXP_Plugin implements Serializable
 
     protected function getFilteredOption($optionName, $repositoryScope = AJXP_REPO_SCOPE_ALL)
     {
+        if(!is_array($this->options)) $this->options = array();
         $merged = $this->options;
         if(is_array($this->pluginConf)) $merged = array_merge($merged, $this->pluginConf);
         $loggedUser = AuthService::getLoggedUser();

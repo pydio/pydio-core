@@ -122,6 +122,15 @@ Class.create("InfoPanel", AjxpPane, {
             this.currentPreviewElement.destroyElement();
             this.currentPreviewElement = null;
         }
+        if(this.actionsToolbars){
+            this.actionsToolbars.invoke('destroy');
+            delete this.actionsToolbars;
+        }
+        if(this.htmlElement){
+            this.htmlElement.select(".class-FetchedResultPane").each(function(el){
+                el.ajxpPaneObject.destroy();
+            });
+        }
 		this.setContent('');
 	},
 	
@@ -145,9 +154,11 @@ Class.create("InfoPanel", AjxpPane, {
         var repoOptions = {};
         if(ajaxplorer.user && ajaxplorer.user.getActiveRepository()){
             var repo = ajaxplorer.user.repositories.get(ajaxplorer.user.getActiveRepository());
-            repoOptions = {
-                ws_label: repo.getLabel(),
-                ws_badge: repo.getHtmlBadge()
+            if(repo){
+                repoOptions = {
+                    ws_label: repo.getLabel(),
+                    ws_badge: repo.getHtmlBadge()
+                }
             }
         }
 
@@ -470,6 +481,7 @@ Class.create("InfoPanel", AjxpPane, {
         if(this.contentContainer.down('div.toolbar_placeholder')){
             this.contentContainer.select('div.toolbar_placeholder').each(function(placeholder){
                 var tbId = placeholder.readAttribute("data-toolbarId");
+                if(!this.actionsToolbars) this.actionsToolbars= $A();
                 var bar = new ActionsToolbar(placeholder, {
                     toolbarsList : $A([tbId]),
                     manager:ajaxplorer.actionBar
@@ -480,6 +492,7 @@ Class.create("InfoPanel", AjxpPane, {
                         B.ACTION.fireSelectionChange(ajaxplorer.getContextHolder());
                     });
                 }
+                this.actionsToolbars.push(bar);
                 placeholder.select('a.disabled,a.action_hidden').invoke('remove');
                 if(placeholder.select('a').length>1){
                     placeholder.addClassName('has_many');

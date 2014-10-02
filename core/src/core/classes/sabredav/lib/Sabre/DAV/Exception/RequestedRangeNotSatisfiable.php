@@ -10,21 +10,22 @@ use Sabre\DAV;
  * This exception is normally thrown when the user
  * request a range that is out of the entity bounds.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class RequestedRangeNotSatisfiable extends DAV\Exception
-{
+class RequestedRangeNotSatisfiable extends DAV\Exception {
+
     /**
      * returns the http statuscode for this exception
      *
      * @return int
      */
-    public function getHTTPCode()
-    {
+    public function getHTTPCode() {
+
         return 416;
 
     }
 
 }
+

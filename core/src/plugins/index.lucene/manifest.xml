@@ -57,7 +57,7 @@
 			<action name="index">
 				<gui text="index.lucene.1" title="index.lucene.2" iconClass="icon-book" src="lucene_images/ICON_SIZE/ark_view.png" accessKey="folder_access_key">
                     <context selection="false" dir="true" recycle="hidden"
-                             actionBar="true" contextMenu="true" infoPanel="false"
+                             actionBar="true" contextMenu="false" infoPanel="false"
                              actionBarGroup="remote" inZip="false">
                     </context>
                 </gui>
@@ -88,7 +88,7 @@
                 <additional_content id="navigation_shared"><![CDATA[
                     <div ajxp_position="2" id="navigation_shared">
                         <h3 class="colorcode-shared" ajxp_message_id="share_center.98">AJXP_MESSAGE[share_center.98] <small id="shared_files_toggler" class="simple-toggler-show" ajxpClass="VisibilityToggler" ajxpOptions='{"widget_id":"shared_files_list"}'>AJXP_MESSAGE[513]</small></h3>
-                        <div style="display:none;" id="shared_files_list" ajxpClass="FetchedResultPane" ajxpOptions='{"fit":"content","silentLoading":true, "nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_shared", "connexion_discrete":true}, "emptyChildrenMessage":"share_center.131","containerDroppableAction":"share"}'></div>
+                        <div style="display:none;" id="shared_files_list" ajxpClass="FetchedResultPane" ajxpOptions='{"fit":"content","silentLoading":true, "nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_shared", "connexion_discrete":true}, "emptyChildrenMessage":"share_center.131","containerDroppableAction":"share-file-minisite"}'></div>
                     </div>
             ]]></additional_content>
             </component_config>

@@ -608,13 +608,17 @@ Class.create("ActionsManager", {
                 var errorId = false;
 				if(result == '1')
 				{
-                    modal.setCloseValidation(null);
-					hideLightBox(true);
-					if(childs[i].getAttribute('remember_login') && childs[i].getAttribute('remember_pass')){
-						var login = childs[i].getAttribute('remember_login');
-						var pass = childs[i].getAttribute('remember_pass');
-						storeRememberData(login, pass);
-					}
+                    try{
+                        modal.setCloseValidation(null);
+                        hideLightBox(true);
+                        if(childs[i].getAttribute('remember_login') && childs[i].getAttribute('remember_pass')){
+                            var login = childs[i].getAttribute('remember_login');
+                            var pass = childs[i].getAttribute('remember_pass');
+                            storeRememberData(login, pass);
+                        }
+                    }catch(e){
+                        if(console) console.log('Error after login, could prevent registry loading!', e);
+                    }
 					ajaxplorer.loadXmlRegistry();
 				}
 				else if(result == '0' || result == '-1')

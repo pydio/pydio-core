@@ -147,5 +147,6 @@ $mess=array(
 "124" => "Source",
 "125" => "Alias",
 "126" => "Voulez-vous vraiment supprimer les éléments sélectionnés?",
+"127" => "Attention, veuillez ne pas utiliser de caractères spéciaux, l'utilisateur serait créé avec l'identifiant '%s'",
 /* END SENTENCE */
 );

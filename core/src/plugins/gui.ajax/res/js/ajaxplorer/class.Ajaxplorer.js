@@ -76,6 +76,14 @@ Class.create("Ajaxplorer", {
 				}.bind(this));
 			}
             this.loadActiveRepository();
+            if(ajxpBootstrap.parameters.get("USER_GUI_ACTION")){
+                var a= ajxpBootstrap.parameters.get("USER_GUI_ACTION");
+                ajxpBootstrap.parameters.unset("USER_GUI_ACTION");
+                var aBar = this.actionBar;
+                window.setTimeout(function(){
+                    aBar.fireAction(a);
+                }, 2000);
+            }
 		}.bind(this));
 
 		modal.setLoadingStepCounts(5);
@@ -135,22 +143,26 @@ Class.create("Ajaxplorer", {
         if(this.user && this.user.getActiveRepository()){
             var repoList = this.user.getRepositoriesList();
             var activeRepo = repoList.get(this.user.getActiveRepository());
-            var slug = activeRepo.getSlug();
-            if(!activeRepo.getAccessType().startsWith("ajxp_")){
-                slug = "ws-" + slug;
+            if(activeRepo){
+                var slug = activeRepo.getSlug();
+                if(!activeRepo.getAccessType().startsWith("ajxp_")){
+                    slug = "ws-" + slug;
+                }
+                this.router.navigate(slug);
             }
-            this.router.navigate(slug);
         }
         var navigate = function(repList, repId){
             if(repId === false){
                 this.router.navigate("/.");
             }else{
                 var repositoryObject = repList.get(repId);
-                var slug = repositoryObject.getSlug();
-                if(!repositoryObject.getAccessType().startsWith("ajxp_")){
-                    slug = "ws-" + slug;
+                if(repositoryObject){
+                    var slug = repositoryObject.getSlug();
+                    if(!repositoryObject.getAccessType().startsWith("ajxp_")){
+                        slug = "ws-" + slug;
+                    }
+                    this.router.navigate(slug);
                 }
-                this.router.navigate(slug);
             }
         }.bind(this);
 
@@ -640,6 +652,7 @@ Class.create("Ajaxplorer", {
 			//return;
 		}
         this._contextHolder.setSelectedNodes([]);
+        if(repository == null) return;
 		
 		repository.loadResources();
 		var repositoryId = repository.getId();		
@@ -876,6 +889,12 @@ Class.create("Ajaxplorer", {
 		return configs;
 	},
 
+    getDefaultImageFromParameters: function(pluginId, paramName){
+        var node = XPathSelectSingleNode(this._registry, "plugins/*[@id='"+pluginId+"']/server_settings/global_param[@name='"+paramName+"']");
+        if(node) return node.getAttribute("defaultImage");
+        return '';
+    },
+
     hasPluginOfType : function(type, name){
         if(name == null){
             var node = XPathSelectSingleNode(this._registry, 'plugins/ajxp_plugin[contains(@id, "'+type+'.")] | plugins/' + type + '[@id]');
@@ -959,6 +978,9 @@ Class.create("Ajaxplorer", {
             this._editorOpener.stopObserving("switch", this._editorObserver);
             this._editorOpener = null;
         }
+    },
+    getEditorOpener:function(){
+        return this._editorOpener;
     },
     _messageBoxReference:null,
     registerAsMessageBoxReference: function(element){
@@ -1218,8 +1240,8 @@ Class.create("Ajaxplorer", {
 	/**
 	 * Accessor for datamodel.requireContextChange()
 	 */
-	fireNodeRefresh : function(nodePathOrNode){
-		this.getContextHolder().requireNodeReload(nodePathOrNode);
+	fireNodeRefresh : function(nodePathOrNode, completeCallback){
+		this.getContextHolder().requireNodeReload(nodePathOrNode, completeCallback);
 	},
 	
 	/**

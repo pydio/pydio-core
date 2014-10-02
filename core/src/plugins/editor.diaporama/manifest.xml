@@ -18,7 +18,7 @@
     </client_settings>
 	<clientForm id="diaporama_box"><![CDATA[
 		<div id="diaporama_box" action="view_diapo" box_width="90%" box_height="90%" box_resize="true" box_padding="0">
-			<div class="action_bar" style="width: 100%;" title="AJXP_MESSAGE[414]">
+			<div class="action_bar full_width_action_bar" style="width: 100%;" title="AJXP_MESSAGE[414]">
 				<div align="right" id="diaporama_input_boxes" style="float:right; padding-top: 1px; padding-right: 5px; height: 21px;margin-top:28px;margin-left:30px;">
 				    <a href="#" id="showLowResButton" class="icon-picture" style="float: none; display:none;padding: 0 !important;margin-top: 0;font-size: 10px;"><span message_id="526">AJXP_MESSAGE[526]</span></a>
 				    <a href="#" id="showOriginalButton" class="icon-picture" style="float: none; display:none;padding: 0 !important;margin-top: 0;font-size: 14px;"><span message_id="525">AJXP_MESSAGE[525]</span></a>

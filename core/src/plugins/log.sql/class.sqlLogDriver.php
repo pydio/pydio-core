@@ -113,8 +113,12 @@ class sqlLogDriver extends AbstractLogDriver
         foreach($all as $row => &$data){
             if(isSet($data["Date"])){
                 $key = date($dKeyFormat, $data["Date"]->getTimestamp());
+                $data["Date_sortable"] = $data["Date"]->getTimestamp();
                 $data["Date"] = $key;
                 $allDates[$key] = true;
+            }
+            if(isSet($data["File Name"])){
+                $data["File Name"] = AJXP_Utils::safeBasename($data["File Name"]);
             }
         }
 
@@ -126,6 +130,12 @@ class sqlLogDriver extends AbstractLogDriver
                     array_push($all, array("Date" => $dateK));
                 }
             }
+        }
+
+        if(isSet($query["FIGURE"]) && isSet($all[0][$query["FIGURE"]])){
+            $f = $all[0][$query["FIGURE"]];
+            if($f > 1000) $f = number_format($f / 1000, 1, ".", " ") . 'K';
+            $all[0] = array($query["FIGURE"] => $f);
         }
 
 
@@ -296,8 +306,15 @@ class sqlLogDriver extends AbstractLogDriver
                     if (is_a($date, "DibiDateTime")) {
                         $date = $date->format("Y-m-d");
                     }
-                    $xml_strings[$date] = $this->formatXmlLogList($nodeName, 'toggle_log.png', $date, $date, $date, "$rootPath/$fullYear/$logM/$date");
-                    //"<$nodeName icon=\"toggle_log.png\" date=\"$display\" display=\"$display\" text=\"$date\" is_file=\"0\" filename=\"/logs/$fullYear/$fullMonth/$date\"/>";
+                    $path = "$rootPath/$fullYear/$logM/$date";
+                    $metadata = array(
+                        "icon" => "toggle_log.png",
+                        "date"=> $date,
+                        "ajxp_mime" => "datagrid",
+                        "grid_datasource" => "get_action=ls&dir=".urlencode($path),
+                        "grid_header_title" => "Application Logs for $date"
+                    );
+                    $xml_strings[$date] = AJXP_XMLWriter::renderNode($path, $date, true, $metadata, true, false);
                 }
 
             } else if ($year != null) { // Get months
@@ -318,7 +335,7 @@ class sqlLogDriver extends AbstractLogDriver
 
                     $fullYear = date('Y', $month_time);
                     $fullMonth = date('F', $month_time);
-                    $logMDisplay = date('M', $month_time);
+                    $logMDisplay = date('F', $month_time);
                     $logM = date('m', $month_time);
 
                     $xml_strings[$r['month']] = $this->formatXmlLogList($nodeName, 'x-office-calendar.png', $logM, $logMDisplay, $logMDisplay, "$rootPath/$fullYear/$logM");
@@ -383,8 +400,27 @@ class sqlLogDriver extends AbstractLogDriver
             $q = 'SELECT * FROM [ajxp_log] WHERE [logdate] BETWEEN %t AND %t';
             $result = dibi::query($q, $start_time, $end_time);
             $log_items = "";
-
+            $currentCount = 1;
             foreach ($result as $r) {
+
+                if(isSet($buffer) && $buffer["user"] == $r["user"] && $buffer["message"] == $r["message"]){
+                    $currentCount ++;
+                    continue;
+                }
+                if(isSet($buffer)){
+                    $log_items .= SystemTextEncoding::toUTF8($this->formatXmlLogItem(
+                        $nodeName,
+                        'toggle_log.png',
+                        $buffer['logdate'],
+                        $date,
+                        $buffer['remote_ip'],
+                        $buffer['severity'],
+                        $buffer['user'],
+                        $buffer['source'],
+                        $buffer['message'].($currentCount > 1?" (".$currentCount.")":""),
+                        $buffer['params'],
+                        $rootPath));
+                }
                 $log_items .= SystemTextEncoding::toUTF8($this->formatXmlLogItem(
                     $nodeName,
                     'toggle_log.png',
@@ -397,6 +433,11 @@ class sqlLogDriver extends AbstractLogDriver
                     $r['message'],
                     $r['params'],
                     $rootPath));
+
+                $currentCount = 1;
+
+                $buffer = $r;
+
             }
 
             print($log_items);

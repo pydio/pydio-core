@@ -167,5 +167,10 @@ $mess = array(
     "155" => "Embedded (smaller header, for widgets)",
     "156" => "Successfully published link %s",
     "157" => "This folder is currently shared. If you delete it, associated share will be disabled.",
-    "158" => "This file is currently shared. If you delete it, associated share will be disabled. "
+    "158" => "This file is currently shared. If you delete it, associated share will be disabled. ",
+    "159" => "Owner",
+    "160" => "You are not allowed to delete this shared item",
+    "161" => "Deprecated Link",
+    "162" => "You have one or more legacy link on this file. Links are still active, but you can replace them with a new share link by stopping this share and recreating a new one. Copy the share 'hash' (the last part of the link, e.g. http://yourpydio.com/data/public/<em style='color:red;'>206a51</em>.php) and apply it to the new link using the 'Change Parameters' form.",
+    "163" => "Drop Files Here (for upload-enabled minisites)"
 );

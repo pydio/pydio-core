@@ -97,6 +97,9 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         if($this->sqlDriver["password"] == "XXXX") return array();
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
+        if($this->sqlDriver["driver"] == "postgre"){
+            dibi::query("SET bytea_output=escape");
+        }
         if ($enlargeToOwned) {
             $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND
             ( [repository_id] IN (%s) OR [repository_owner] = %s )
@@ -278,15 +281,22 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore
         }
     }
 
-    public function findMetaObjectsByIndexPath($repositoryId, $indexPath, $userId, $userGroup, $offset = 0, $limit = 20, $orderBy = "date", $orderDir = "desc")
+    public function findMetaObjectsByIndexPath($repositoryId, $indexPath, $userId, $userGroup, $offset = 0, $limit = 20, $orderBy = "date", $orderDir = "desc", $recurring = true)
     {
         if($this->sqlDriver["password"] == "XXXX") return array();
         require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
         dibi::connect($this->sqlDriver);
-        $res = dibi::query("SELECT * FROM [ajxp_feed]
-            WHERE [etype] = %s AND [repository_id] = %s AND [index_path] LIKE %like~
-            ORDER BY %by %lmt %ofs
-        ", "meta", $repositoryId, $indexPath, array('edate' => $orderDir), $limit, $offset);
+        if($recurring){
+            $res = dibi::query("SELECT * FROM [ajxp_feed]
+                WHERE [etype] = %s AND [repository_id] = %s AND [index_path] LIKE %like~
+                ORDER BY %by %lmt %ofs
+            ", "meta", $repositoryId, $indexPath, array('edate' => $orderDir), $limit, $offset);
+        }else{
+            $res = dibi::query("SELECT * FROM [ajxp_feed]
+                WHERE [etype] = %s AND [repository_id] = %s AND [index_path] = %s
+                ORDER BY %by %lmt %ofs
+            ", "meta", $repositoryId, $indexPath, array('edate' => $orderDir), $limit, $offset);
+        }
 
         $data = array();
         foreach ($res as $n => $row) {

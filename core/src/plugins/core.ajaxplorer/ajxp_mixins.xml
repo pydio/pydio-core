@@ -47,6 +47,7 @@
             <param group="MIXIN_MESSAGE[Auth Driver Commons]" name="AUTOCREATE_AJXPUSER" type="boolean" label="MIXIN_MESSAGE[Auto Create User]" description="MIXIN_MESSAGE[When set to true, the user object is created automatically if the authentication succeed. Used by remote authentication systems.]" mandatory="false" default="false"/>
             <param group="MIXIN_MESSAGE[Auth Driver Commons]" name="LOGIN_REDIRECT" type="string" label="MIXIN_MESSAGE[Login Redirect]" description="MIXIN_MESSAGE[If set to a given URL, the login action will not trigger the display of login screen but redirect to this URL.]" mandatory="false"/>
             <param group="MIXIN_MESSAGE[Auth Driver Commons]" name="AJXP_ADMIN_LOGIN" type="string" label="MIXIN_MESSAGE[Admin Login]" description="MIXIN_MESSAGE[For exotic auth drivers, an user ID that must be considered as admin by default.]" mandatory="false"/>
+            <param group="MIXIN_MESSAGE[Auth Driver Commons]" name="AUTO_APPLY_ROLE" type="string" label="MIXIN_MESSAGE[Auto apply role]" description="MIXIN_MESSAGE[For multiple authentication, apply this role to users authenticated via this driver]" mandatory="false"/>
         </server_settings>
     </authdriver_commons>
     <dibidriver_consumer>

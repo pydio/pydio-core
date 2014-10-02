@@ -243,6 +243,9 @@ soundManager.setup({\n\
 
     },
 
+    getRESTPreviewLinks:function(node){
+        return {"MP3 Stream": "&file=" + encodeURIComponent(node.getPath())};
+    },
 
 	getPreview : function(ajxpNode, rich){
         if(!window.soundManager || !window.soundManager.enabled){

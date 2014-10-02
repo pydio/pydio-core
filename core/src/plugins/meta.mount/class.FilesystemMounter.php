@@ -27,13 +27,8 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @subpackage Meta
  *
  */
-class FilesystemMounter extends AJXP_Plugin
+class FilesystemMounter extends AJXP_AbstractMetaSource
 {
-    /**
-     * @var AbstractAccessDriver
-     */
-    protected $accessDriver;
-
     /**
      * @var Repository
      */
@@ -56,7 +51,7 @@ class FilesystemMounter extends AJXP_Plugin
      */
     public function initMeta($accessDriver)
     {
-        $this->accessDriver = $accessDriver;
+        parent::initMeta($accessDriver);
         $this->repository = $this->accessDriver->repository;
         /*
         if($this->isAlreadyMounted()) return;
@@ -141,7 +136,13 @@ class FilesystemMounter extends AJXP_Plugin
 
         $cmd = ($MOUNT_SUDO? "sudo ": ""). "mount -t " .$MOUNT_TYPE. (empty( $MOUNT_OPTIONS )? " " : " -o " .$MOUNT_OPTIONS. " " ) .$UNC_PATH. " " .$MOUNT_POINT;
         $res = null;
+        if($this->getOption("MOUNT_ENV_PASSWD") === true){
+            putenv("PASSWD=$password");
+        }
         system($cmd, $res);
+        if($this->getOption("MOUNT_ENV_PASSWD") === true){
+            putenv("PASSWD=");
+        }
         if($res === null){
             // Check it is correctly mounted now!
             // Could not get the output return code

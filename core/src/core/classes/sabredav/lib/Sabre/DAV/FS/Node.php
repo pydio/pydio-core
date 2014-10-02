@@ -9,12 +9,12 @@ use Sabre\DAV;
  *
  * The node class implements the method used by both the File and the Directory classes
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-abstract class Node implements DAV\INode
-{
+abstract class Node implements DAV\INode {
+
     /**
      * The path to the current node
      *
@@ -27,8 +27,8 @@ abstract class Node implements DAV\INode
      *
      * @param string $path
      */
-    public function __construct($path)
-    {
+    public function __construct($path) {
+
         $this->path = $path;
 
     }
@@ -40,8 +40,8 @@ abstract class Node implements DAV\INode
      *
      * @return string
      */
-    public function getName()
-    {
+    public function getName() {
+
         list(, $name)  = DAV\URLUtil::splitPath($this->path);
         return $name;
 
@@ -53,8 +53,8 @@ abstract class Node implements DAV\INode
      * @param string $name The new name
      * @return void
      */
-    public function setName($name)
-    {
+    public function setName($name) {
+
         list($parentPath, ) = DAV\URLUtil::splitPath($this->path);
         list(, $newName) = DAV\URLUtil::splitPath($name);
 
@@ -72,10 +72,11 @@ abstract class Node implements DAV\INode
      *
      * @return int
      */
-    public function getLastModified()
-    {
+    public function getLastModified() {
+
         return filemtime($this->path);
 
     }
 
 }
+

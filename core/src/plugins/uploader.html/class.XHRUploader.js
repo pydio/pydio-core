@@ -800,21 +800,21 @@ Class.create("XHRUploader", {
             return;
         }
 
-        if(this.dataModel.fileNameExists(item.file.name, false, parentNode))
-		{
-			var behaviour = this.optionPane.getExistingBehaviour();
-			if(behaviour == 'rename'){
-				auto_rename = true;
-			}else if(behaviour == 'alert'){
+		var behaviour = this.optionPane.getExistingBehaviour();
+		if(behaviour == 'rename'){
+			auto_rename = true;
+		}else if(behaviour == 'alert'){
+			if(this.dataModel.fileNameExists(item.file.name, false, parentNode))
+			{
 				if(!confirm(MessageHash[124])){
 					item.remove();
-                    item.submitNext();
+					item.submitNext();
 					return;
 				}
-			}else{
-				// 'overwrite' : do nothing!
 			}
-		}		
+		}else{
+			// 'overwrite' : do nothing!
+		}
 		
 		var xhr = this.initializeXHR(item, (auto_rename?"auto_rename=true":""), currentDir);
 		var file = item.file;

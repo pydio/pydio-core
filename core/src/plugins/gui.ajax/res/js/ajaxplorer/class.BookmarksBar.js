@@ -77,6 +77,7 @@
      destroy:function(){
          document.stopObserving("ajaxplorer:add_bookmark", this.bmObserver);
          document.stopObserving("ajaxplorer:registry_loaded", this.regObserver);
+         if(this.bmMenu) this.bmMenu.destroy();
      },
 	/**
 	 * Parses the registry to find the bookmarks definition

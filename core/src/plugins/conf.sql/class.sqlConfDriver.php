@@ -77,6 +77,9 @@ class sqlConfDriver extends AbstractConfDriver
 
     public function _loadPluginConfig($pluginId, &$options)
     {
+        if($this->sqlDriver["driver"] == "postgre"){
+            dibi::query("SET bytea_output=escape");
+        }
         $res_opts = dibi::query('SELECT * FROM [ajxp_plugin_configs] WHERE [id] = %s', $pluginId);
         $config_row = $res_opts->fetchPairs();
         $confOpt = unserialize($config_row[$pluginId]);
@@ -195,7 +198,9 @@ class sqlConfDriver extends AbstractConfDriver
     protected function initRepoArrayFromDbFetch($array){
         $repositories = array();
         foreach ($array as $repo_row) {
-
+            if($this->sqlDriver["driver"] == "postgre"){
+                dibi::query("SET bytea_output=escape");
+            }
             $res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
             $opts = $res_opts->fetchPairs('name', 'val');
             $repo = $this->repoFromDb($repo_row, $opts);
@@ -255,23 +260,28 @@ class sqlConfDriver extends AbstractConfDriver
 
         $searchableKeys = array("uuid", "parent_uuid", "owner_user_id", "display", "accessType", "isTemplate", "slug", "groupPath");
         foreach($criteria as $cName => $cValue){
-            if(in_array($cName, $searchableKeys)){
+            if(in_array($cName, $searchableKeys) || in_array(substr($cName,1), $searchableKeys)){
                 if(is_array($cValue)){
-                    $wheres[] = array("[$cName] IN (%s)", $cValue);
+                    if($cName[0] == "!"){
+                        $cName = substr($cName, 1);
+                        $wheres[] = array("[$cName] NOT IN (%s)", $cValue);
+                    }else{
+                        $wheres[] = array("[$cName] IN (%s)", $cValue);
+                    }
                 }else if(strpos($cValue, "regexp:") === 0){
                     $regexp = str_replace("regexp:", "", $cValue);
                     $wheres[] = array("[$cName] ".AJXP_Utils::regexpToLike($regexp), AJXP_Utils::cleanLike($regexp));
                 }else if ($cValue == AJXP_FILTER_NOT_EMPTY){
-                    $wheres[] = array("[$cName] NOT NULL");
+                    $wheres[] = array("[$cName] IS NOT NULL");
                 }else if ($cValue == AJXP_FILTER_EMPTY){
                     $wheres[] = array("[$cName] IS NULL");
                 }else{
                     $type = "%s";
-                    if($cName == 'isTemplate') $type = "%i";
+                    if($cName == 'isTemplate') $type = "%b";
                     $wheres[] = array("[$cName] = $type", $cValue);
                 }
             }else if($cName == "CURSOR"){
-                $limit = "LIMIT ".$cValue["OFFSET"].",".$cValue["LIMIT"];
+                $limit = $cValue;
             }else if($cName == "ORDERBY"){
                 $order = "ORDER BY ".$cValue["KEY"]." ".$cValue["DIR"];
             }else if($cName == "GROUPBY"){
@@ -284,7 +294,11 @@ class sqlConfDriver extends AbstractConfDriver
             $count = $res->fetchSingle();
         }
 
-        $res = dibi::query("SELECT * FROM [ajxp_repo] WHERE %and $groupBy $order $limit", $wheres);
+        if(!empty($limit) && is_array($limit)){
+            $res = dibi::query("SELECT * FROM [ajxp_repo] WHERE %and $groupBy $order %lmt %ofs", $wheres, $limit["LIMIT"], $limit["OFFSET"]);
+        }else{
+            $res = dibi::query("SELECT * FROM [ajxp_repo] WHERE %and $groupBy $order", $wheres);
+        }
         $all = $res->fetchAll();
         return $this->initRepoArrayFromDbFetch($all);
 
@@ -304,6 +318,9 @@ class sqlConfDriver extends AbstractConfDriver
         $repo_row = $res->fetchAll();
         if (count($repo_row) > 0) {
             $repo_row = $repo_row[0];
+            if($this->sqlDriver["driver"] == "postgre"){
+                dibi::nativeQuery("SET bytea_output=escape");
+            }
             $res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
             $opts = $res_opts->fetchPairs('name', 'val');
             $repository = $this->repoFromDb($repo_row, $opts);
@@ -326,6 +343,9 @@ class sqlConfDriver extends AbstractConfDriver
         $repo_row = $res->fetchAll();
         if (count($repo_row) > 0) {
             $repo_row = $repo_row[0];
+            if($this->sqlDriver["driver"] == "postgre"){
+                dibi::nativeQuery("SET bytea_output=escape");
+            }
             $res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
             $opts = $res_opts->fetchPairs('name', 'val');
             $repository = $this->repoFromDb($repo_row, $opts);
@@ -430,6 +450,7 @@ class sqlConfDriver extends AbstractConfDriver
                 case "sqlite":
                 case "sqlite3":
                 case "postgre":
+                    dibi::nativeQuery("SET bytea_output=escape");
                     $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
                     break;
                 case "mysql":
@@ -510,24 +531,58 @@ class sqlConfDriver extends AbstractConfDriver
 
     /**
      * @param string $repositoryId
-     * @return Integer
+     * @param boolean $details
+     * @return Integer|Array
      */
-    public function countUsersForRepository($repositoryId){
+    public function countUsersForRepository($repositoryId, $details = false){
+        $object = ConfService::getRepositoryById($repositoryId);
+        if($object->securityScope() == "USER"){
+            if($details) return array('internal' => 1);
+            else return 1;
+        }else if($object->securityScope() == "GROUP"){
+            // Count users from current group
+            $groupUsers = AuthService::authCountUsers(AuthService::getLoggedUser()->getGroupPath());
+            if($details) return array('internal' => $groupUsers);
+            else return $groupUsers;
+        }
         // NEW METHOD : SEARCH PERSONAL ROLE
+        if(is_numeric($repositoryId)){
+            $likeValue = "i:$repositoryId;s:";
+        }else{
+            $likeValue = '"'.$repositoryId.'";s:';
+        }
         switch ($this->sqlDriver["driver"]) {
             case "sqlite":
             case "sqlite3":
             case "postgre":
-                $res = dibi::query('SELECT count([role_id]) FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %~like~', '"'.$repositoryId.'";s:');
+                $q = 'SELECT count([role_id]) FROM [ajxp_roles] WHERE [role_id] LIKE \'AJXP_USR_/%\' AND [searchable_repositories] LIKE %~like~';
                 break;
             case "mysql":
-                $res = dibi::query('SELECT count([role_id]) as c FROM [ajxp_roles] WHERE [serial_role] LIKE %~like~', '"'.$repositoryId.'";s:');
+                $q = 'SELECT count([role_id]) as c FROM [ajxp_roles] WHERE [role_id] LIKE \'AJXP_USR_/%\' AND [serial_role] LIKE %~like~';
                 break;
             default:
                 return "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
         }
-        $all = $res->fetchAll();
-        return intval($all[0]['c']);
+        if($details){
+            if($this->sqlDriver["driver"] == "sqlite" || $this->sqlDriver["driver"] == "sqlite3"){
+                $internalClause = " AND NOT EXISTS (SELECT * FROM [ajxp_user_rights] WHERE [ajxp_roles].[role_id]='AJXP_USR_/'||[ajxp_user_rights].[login] AND [ajxp_user_rights].[repo_uuid] = 'ajxp.parent_user')";
+                $externalClause = " AND EXISTS (SELECT * FROM [ajxp_user_rights] WHERE [ajxp_roles].[role_id]='AJXP_USR_/'||[ajxp_user_rights].[login] AND [ajxp_user_rights].[repo_uuid] = 'ajxp.parent_user')";
+            }else{
+                $internalClause = " AND NOT EXISTS (SELECT * FROM [ajxp_user_rights] WHERE [ajxp_roles].[role_id]=CONCAT('AJXP_USR_/',[ajxp_user_rights].[login]) AND [ajxp_user_rights].[repo_uuid] = 'ajxp.parent_user')";
+                $externalClause = " AND EXISTS (SELECT * FROM [ajxp_user_rights] WHERE [ajxp_roles].[role_id]=CONCAT('AJXP_USR_/',[ajxp_user_rights].[login]) AND [ajxp_user_rights].[repo_uuid] = 'ajxp.parent_user')";
+            }
+            $intRes = dibi::query($q.$internalClause, $likeValue);
+            $extRes = dibi::query($q.$externalClause, $likeValue);
+            return array(
+                'internal' => $intRes->fetchSingle(),
+                'external' => $extRes->fetchSingle()
+            );
+        }else{
+            $res = dibi::query($q, $likeValue);
+            return $res->fetchSingle();
+
+        }
+        //$all = $res->fetchAll();
     }
 
 
@@ -562,6 +617,9 @@ class sqlConfDriver extends AbstractConfDriver
         }
         if ($excludeReserved) {
             $wClauses[] = array('[role_id] NOT LIKE %like~', 'AJXP_');
+        }
+        if($this->sqlDriver["driver"] == "postgre"){
+            dibi::nativeQuery("SET bytea_output=escape");
         }
         $res = dibi::query('SELECT * FROM [ajxp_roles] %if', count($wClauses), 'WHERE %and', $wClauses);
         $all = $res->fetchAll();
@@ -770,6 +828,9 @@ class sqlConfDriver extends AbstractConfDriver
 
     public function simpleStoreGet($storeID, $dataID, $dataType, &$data)
     {
+        if($this->sqlDriver["driver"] == "postgre"){
+            dibi::nativeQuery("SET bytea_output=escape");
+        }
         $children_results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id]=%s", $storeID, $dataID);
         $value = $children_results->fetchAll();
         if(!count($value)) return false;
@@ -800,10 +861,11 @@ class sqlConfDriver extends AbstractConfDriver
         }
         $limit = '';
         if($cursor != null){
-            $limit = "LIMIT ".$cursor[0].','.$cursor[1];
-        }
+            $children_results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE %and %lmt %ofs", $wheres, $cursor[1], $cursor[0]);
+        }else{
+            $children_results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE %and", $wheres);
 
-        $children_results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE %and $limit", $wheres);
+        }
         $values = $children_results->fetchAll();
         $result = array();
         foreach($values as $value){

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpcore id="authfront.duosecurity" enabled="false" label="CONF_MESSAGE[Dual-form Authentication]"
+          description="CONF_MESSAGE[Dual-form authentication using the DuoSecurity web service]"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<class_definition filename="plugins/authfront.duosecurity/class.DuoSecurityFrontend.php" classname="DuoSecurityFrontend"/>
+    <client_settings>
+        <resources>
+            <js className="DuoSecurity" file="plugins/authfront.duosecurity/duo_php/js/Duo-Web-v1-PydioMod.js"/>
+            <i18n namespace="duosecurity" path="plugins/authfront.duosecurity/i18n"/>
+        </resources>
+    </client_settings>
+    <server_settings>
+        <global_param name="ORDER" type="integer" label="Order" description="Order this plugin with other auth frontends" default="15"/>
+        <global_param name="PROTOCOL_TYPE" type="select"
+                      choices="session_only|Sessions Only,no_session|REST Only,both|Session-based or Rest"
+                      label="Protocol Type" description="Enable/disable automatically based on the protocol used" default="session_only"/>
+        <global_param name="DUO_AUTH_HOST" type="string" label="Api Host"
+                      description="DuoSecurity Host" group="DuoSecurity Config" expose="true"/>
+        <global_param name="DUO_AUTH_IKEY" type="string" label="Integration Key"
+                      description="DuoSecurity Integration Key" group="DuoSecurity Config"/>
+        <global_param name="DUO_AUTH_SKEY" type="string" label="Secret Key"
+                      description="DuoSecurity Secret Key" group="DuoSecurity Config"/>
+        <global_param name="DUO_AUTH_AKEY" type="string" label="Application Key"
+                      description="DuoSecurity Application Key (generate your own)" group="DuoSecurity Config"/>
+        <global_param name="DUO_AUTH_ACTIVE" group="Dual-level Authentication" type="boolean" label="Duo Authentication Active"
+                      description="Active dual-form authentication" default="false" scope="user"/>
+        <global_param name="DUO_AUTH_LAST_SIGNATURE" group="Dual-level Authentication" type="string" label="Request Signature (leave empty)"
+                      description="Used internally" default="false" expose="true"/>
+    </server_settings>
+    <registry_contributions>
+        <actions>
+            <action name="duo_show_iframe">
+                <gui text="duosecurity.1" title="duosecurity.2" src="encrypted.png" iconClass="icon-signin"
+                     accessKey="" hasAccessKey="false">
+                    <context selection="false" dir="" recycle="false"
+                             actionBar="false" contextMenu="false" infoPanel="false"
+                             actionBarGroup="user">
+                    </context>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true" dialogOpenForm="duosecurity_box" dialogOkButtonOnly="false" dialogSkipButtons="true">
+                        <dialogOnOpen><![CDATA[
+                            new ResourcesManager().loadJSResource('plugins/authfront.duosecurity/duo_php/js/Duo-Web-v1-PydioMod.js', 'DuoSecurity');
+                            modal.getForm().down("#duosecurity_box").insert('<iframe id="duo_iframe" width="420" height="330" frameborder="0"></iframe>');
+                            modal.getForm().insert('<form method="POST" id="duo_form"></form>');
+                            modal.refreshDialogPosition();
+                            new PeriodicalExecuter(function(pe){
+                                var sigResponse = modal.getForm().down('input[name="sig_response"]');
+                                if(! sigResponse ) return;
+                                pe.stop();
+                                var conn = new Connexion();
+                                conn.setParameters({
+                                    sig_response: sigResponse.getValue(),
+                                    get_action  : 'duo_post_verification_code'
+                                });
+                                conn.onComplete = function(){
+                                    window.setTimeout(function(){
+	                                    ajaxplorer.loadXmlRegistry();
+                                    }, 400);
+                                    hideLightBox();
+                                };
+                                conn.sendAsync();
+                            }, 1);
+                            Duo.init({
+                                host:ajaxplorer.getPluginConfigs('authfront.duosecurity').get('DUO_AUTH_HOST'),
+                                sig_request:ajaxplorer.getPluginConfigs('authfront.duosecurity').get('DUO_AUTH_LAST_SIGNATURE'),
+                                post_action:''
+                            });
+                            Duo.ready();
+
+                        ]]></dialogOnOpen>
+                        <dialogOnComplete><![CDATA[
+                                ]]></dialogOnComplete>
+                    </clientCallback>
+                    <clientForm id="duosecurity_box"><![CDATA[
+                         <div id="duosecurity_box" box_width="420" box_padding="0"></div>
+					]]></clientForm>
+                </processing>
+            </action>
+            <action name="duo_post_verification_code">
+                <processing>
+                    <serverCallback methodName="postVerificationCode"/>
+                </processing>
+            </action>
+        </actions>
+    </registry_contributions>
+</ajxpcore>

@@ -156,7 +156,7 @@ Class.create("AjxpTabulator", AjxpPane, {
     shortenLabel: function(label){
         if(label && label.innerHTML){
             if(label.down('.filenameSpan')){
-                var cont = label.down('.filenameSpan').innerText;
+                var cont = label.down('.filenameSpan').innerHTML;
                 if(cont.length > 25){
                     cont = cont.substr(0,7)+"[...]"+cont.substr(-13);
                     label.down('.filenameSpan').update(cont);

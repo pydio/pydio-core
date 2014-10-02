@@ -26,23 +26,14 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class ChangesTracker extends AJXP_Plugin
+class ChangesTracker extends AJXP_AbstractMetaSource
 {
-    /**
-     * @var AbstractAccessDriver
-     */
-    protected $accessDriver;
     private $sqlDriver;
 
     public function init($options)
     {
         $this->sqlDriver = AJXP_Utils::cleanDibiDriverParameters(array("group_switch_value" => "core"));
         parent::init($options);
-    }
-
-    public function initMeta($accessDriver)
-    {
-        $this->accessDriver = $accessDriver;
     }
 
     public function switchActions($actionName, $httpVars, $fileVars)
@@ -53,6 +44,8 @@ class ChangesTracker extends AJXP_Plugin
         dibi::connect($this->sqlDriver);
         $filter = null;
         $currentRepo = $this->accessDriver->repository;
+        $recycle = $currentRepo->getOption("RECYCLE_BIN");
+        $recycle = (!empty($recycle)?$recycle:false);
 
         HTMLWriter::charsetHeader('application/json', 'UTF-8');
         if(isSet($httpVars["filter"])){
@@ -90,6 +83,7 @@ class ChangesTracker extends AJXP_Plugin
                 $row->node[$att] = $row->$att;
                 unset($row->$att);
             }
+            if(!empty($recycle)) $this->cancelRecycleNodes($row, $recycle);
             if(!isSet($httpVars["flatten"]) || $httpVars["flatten"] == "false"){
 
                 if(!$this->filterRow($row, $filter)){
@@ -126,13 +120,21 @@ class ChangesTracker extends AJXP_Plugin
                 $lastSeq = $row->seq;
                 flush();
             }
-            if (isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content") && !$this->filterRow($previousRow, $filter)) {
-                if($valuesSent) echo $separator;
-                echo json_encode($previousRow);
-                $valuesSent = true;
-            }
-
+	    //CODES HERE HAVE BEEN MOVE OUT OF THE LOOP
         }
+
+        /**********RETURN TO SENDER************/
+        // is 'not NULL' included in isSet()?
+        if ($previousRow && isSet($previousRow) && ($previousRow->source != $previousRow->target || $previousRow->type == "content") && !$this->filterRow($previousRow, $filter)) {
+            if($valuesSent) echo $separator;
+            echo json_encode($previousRow);
+            if ($previousRow->seq > $lastSeq){
+                $lastSeq = $previousRow->seq;
+            }
+            $valuesSent = true;
+        }
+        /*************************************/
+
         if (isSet($lastSeq)) {
             if($stream){
                 echo("\nLAST_SEQ:".$lastSeq);
@@ -149,6 +151,17 @@ class ChangesTracker extends AJXP_Plugin
             }
         }
 
+    }
+
+    protected function cancelRecycleNodes(&$row, $recycle){
+        if($row->type != 'path') return;
+        if(strpos($row->source, '/'.$recycle) === 0){
+            $row->source = 'NULL';
+            $row->type  = 'create';
+        }else if(strpos($row->target, '/'.$recycle) === 0){
+            $row->target = 'NULL';
+            $row->type   = 'delete';
+        }
     }
 
     protected function filterRow(&$previousRow, $filter = null){
@@ -194,6 +207,16 @@ class ChangesTracker extends AJXP_Plugin
             $parts[] = AuthService::getLoggedUser()->getGroupPath();
         }
         return implode("-", $parts);
+    }
+
+    /**
+     * @param Repository $repository
+     * @return float
+     */
+    public function getRepositorySpaceUsage($repository){
+        $id = $this->computeIdentifier($repository);
+        $res = dibi::query("SELECT SUM([bytesize]) FROM [ajxp_index] WHERE [repository_identifier] = %s", $id);
+        return floatval($res->fetchSingle());
     }
 
     /**
@@ -269,9 +292,11 @@ class ChangesTracker extends AJXP_Plugin
      * @return bool
      */
     protected function excludeNode($node){
-        $repo = $node->getRepository();
-        $recycle = $repo->getOption("RECYCLE_BIN");
-        if(!empty($recycle) && strpos($node->getPath(), "/".trim($recycle, "/")) === 0) return true;
+        // DO NOT EXCLUDE RECYCLE INDEXATION, OTHERWISE RESTORED DATA IS NOT DETECTED!
+        //$repo = $node->getRepository();
+        //$recycle = $repo->getOption("RECYCLE_BIN");
+        //if(!empty($recycle) && strpos($node->getPath(), "/".trim($recycle, "/")) === 0) return true;
+
         // Other exclusions conditions here?
         return false;
     }

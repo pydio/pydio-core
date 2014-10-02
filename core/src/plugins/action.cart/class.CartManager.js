@@ -21,7 +21,7 @@
 Class.create("CartManager", FetchedResultPane, {
 
     __maxChildren: 100,
-    __label:MessageHash["action.cart.9"],
+    __label:null,
 
     initialize: function($super, element, options){
 
@@ -32,6 +32,7 @@ Class.create("CartManager", FetchedResultPane, {
         $super(element, options);
 
         if(options.label) this.__label = options.label;
+        else this.__label = MessageHash["action.cart.9"];
         element.ajxpNode = this._rootNode;
         element.applyDragMove = this.applyDragMove.bind(this);
         AjxpDroppables.add(element, this._rootNode);
@@ -57,6 +58,10 @@ Class.create("CartManager", FetchedResultPane, {
         this.stateChangeBuffer = window.setTimeout(function(){
             oEl.fire("widget:updateState");
         }, 1500);
+        this.reload();
+        if(this.options.fit && this.options.fit=="content"){
+            this.htmlElement.up('[ajxpClass="AjxpPane"]').ajxpPaneObject.resize();
+        }
     },
 
     clearContent: function(){
@@ -210,6 +215,7 @@ Class.create("CartManager", FetchedResultPane, {
         var newNode = new AjxpNode(n.getPath(), n.isLeaf(), n.getLabel(), n.getIcon());
         newNode.setMetadata($H(Object.clone(n.getMetadata().toObject())));
         this._rootNode.addChild(newNode);
+        this.reload();
 
     },
 
@@ -276,3 +282,9 @@ Class.create("CartManager", FetchedResultPane, {
     }
 
 });
+
+if(window.ajxpMinisite){
+    document.observe("ajaxplorer:actions_loaded", function(){
+        ajaxplorer.actionBar.actions.unset("send-selection-to-cart");
+    });
+}

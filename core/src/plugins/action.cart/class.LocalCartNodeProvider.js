@@ -43,6 +43,8 @@ Class.create("LocalCartNodeProvider", {
         node.getChildren().each(function(n){
             childCallback(n);
         });
-	}
+	},
+
+    loadLeafNodeSync: function(node, callback){}
 	
 });

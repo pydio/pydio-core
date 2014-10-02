@@ -58,30 +58,34 @@ class sqlAuthDriver extends AbstractAuthDriver
     }
 
     // $baseGroup = "/"
-    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit)
+    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive = true)
     {
         $ignoreHiddens = "NOT EXISTS (SELECT * FROM [ajxp_user_rights] AS c WHERE [c.login]=[u.login] AND [c.repo_uuid] = 'ajxp.hidden')";
-
+        if($recursive){
+            $groupPathCondition = "[groupPath] LIKE %like~";
+        }else{
+            $groupPathCondition = "[groupPath] = %s";
+        }
         if ($regexp != null) {
-            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE [login] ".AJXP_Utils::regexpToLike($regexp)." AND [groupPath] LIKE %like~ AND $ignoreHiddens ORDER BY [login] ASC %lmt %ofs", AJXP_Utils::cleanRegexp($regexp), $baseGroup, $limit, $offset) ;
+            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE [login] ".AJXP_Utils::regexpToLike($regexp)." AND $groupPathCondition AND $ignoreHiddens ORDER BY [login] ASC %lmt %ofs", AJXP_Utils::cleanRegexp($regexp), $baseGroup, $limit, $offset) ;
         } else if ($offset != -1 || $limit != -1) {
-            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE [groupPath] LIKE %like~ AND $ignoreHiddens ORDER BY [login] ASC %lmt %ofs", $baseGroup, $limit, $offset);
+            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE $groupPathCondition AND $ignoreHiddens ORDER BY [login] ASC %lmt %ofs", $baseGroup, $limit, $offset);
         } else {
-            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE [groupPath] LIKE %like~ AND $ignoreHiddens ORDER BY [login] ASC", $baseGroup);
+            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE $groupPathCondition AND $ignoreHiddens ORDER BY [login] ASC", $baseGroup);
         }
         $pairs = $res->fetchPairs('login', 'password');
            return $pairs;
     }
 
-    public function findUserPage($userLogin, $usersPerPage){
+    public function findUserPage($baseGroup, $userLogin, $usersPerPage, $offset){
 
         $res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [login] <= %s", $userLogin);
         $count = $res->fetchSingle();
-        return ceil($count / $usersPerPage) - 1;
+        return ceil(($count - $offset) / $usersPerPage) - 1;
 
     }
 
-    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null)
+    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null, $recursive = true)
     {
         // WITH PARENT
         // SELECT COUNT(*) FROM ajxp_users AS u, ajxp_user_rights AS r WHERE u.groupPath LIKE '/%' AND r.login=u.login AND r.repo_uuid = 'ajxp.parent_user'
@@ -95,7 +99,11 @@ class sqlAuthDriver extends AbstractAuthDriver
         if(!empty($regexp)){
             $ands[] = array("[u.login] ".AJXP_Utils::regexpToLike($regexp), AJXP_Utils::cleanRegexp($regexp));
         }
-        $ands[] = array("[u.groupPath] LIKE %like~", $baseGroup);
+        if($recursive){
+            $ands[] = array("[u.groupPath] LIKE %like~", $baseGroup);
+        }else{
+            $ands[] = array("[u.groupPath] = %s", $baseGroup);
+        }
         $ands[] = array("NOT EXISTS (SELECT * FROM [ajxp_user_rights] AS c WHERE [c.login]=[u.login] AND [c.repo_uuid] = 'ajxp.hidden')");
 
         if($filterProperty !== null && $filterValue !== null){
@@ -109,7 +117,7 @@ class sqlAuthDriver extends AbstractAuthDriver
             }else if($filterValue == AJXP_FILTER_NOT_EMPTY){
                 $select = "SELECT COUNT(*) FROM [ajxp_users] AS u, [ajxp_user_rights] AS r WHERE %and";
                 $ands[] = array("[r.login]=[u.login]");
-                $ands[] = array("[ajxp_user_rights].[repo_uuid] = %s", $filterProperty);
+                $ands[] = array("[r.repo_uuid] = %s", $filterProperty);
             }else{
                 $select = "SELECT COUNT(*) FROM [ajxp_users] AS u, [ajxp_user_rights] AS r WHERE %and";
                 $ands[] = array("[r.login]=[u.login]");

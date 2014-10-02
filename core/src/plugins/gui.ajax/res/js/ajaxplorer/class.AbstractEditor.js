@@ -370,10 +370,11 @@ Class.create("AbstractEditor" , {
 		this.fullScreenMode = true;
 		this.element.fire("editor:enterFSend");
         if(this._supportsBrowserFullScreen(this.element) && !this.element.down('#computer_fullscreen')){
+            var rightPos = this.editorOptions.floatingToolbar ? 10 : 100;
             var button = new Element('span', {
                 id          :'computer_fullscreen',
                 className   :'icon-resize-full',
-                style       :'display: block; cursor:pointer; position:absolute; top:10px; right:10px;color:white;font-size:15px;'
+                style       :'display: block; cursor:pointer; position:absolute; right:'+rightPos+'px; top:10px;color:white;font-size:15px;'
             }).update('&nbsp;&nbsp;'+MessageHash[512]);
             button.observe('click', function(){
                 this._browserFullScreen(this.element);
@@ -386,6 +387,9 @@ Class.create("AbstractEditor" , {
 	 */
 	exitFullScreen : function(){
 		if(!this.fullScreenMode) return;
+        if(this._supportsBrowserFullScreen(this.element) && this.element.down('#computer_fullscreen')){
+            this.element.down('#computer_fullscreen').remove();
+        }
 		this.element.fire("editor:exitFS");
 		Event.stopObserving(window, "resize", this.fullScreenListener);
         var dContent;

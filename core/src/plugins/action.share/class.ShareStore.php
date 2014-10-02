@@ -69,7 +69,7 @@ class ShareStore {
      * @return string $hash
      * @throws Exception
      */
-    public function storeShare($parentRepositoryId, $shareData, $type="minisite", $existingHash = null){
+    public function storeShare($parentRepositoryId, $shareData, $type="minisite", $existingHash = null, $updateHash = null){
 
         $data = serialize($shareData);
         if($existingHash){
@@ -80,8 +80,15 @@ class ShareStore {
         if($this->sqlSupported){
             $this->createGenericLoader();
             $shareData["SHARE_TYPE"] = $type;
+            if($updateHash != null){
+                $this->confStorage->simpleStoreClear("share", $existingHash);
+                $hash = $updateHash;
+            }
             $this->confStorage->simpleStoreSet("share", $hash, $shareData, "serial", $parentRepositoryId);
             return $hash;
+        }
+        if(!empty($existingHash)){
+            throw new Exception("Current storage method does not support parameters edition!");
         }
 
         $loader = 'ShareCenter::loadMinisite($data);';
@@ -127,13 +134,14 @@ class ShareStore {
         $code = $lines[3] . $lines[4] . $lines[5];
         eval($code);
         if(empty($inputData)) return false;
-        $dataModified = $this->checkHash($inputData, $hash); //(md5($inputData) != $id);
+        $dataModified = !$this->checkHash($inputData, $hash); //(md5($inputData) != $id);
         $publicletData = unserialize($inputData);
         $publicletData["SECURITY_MODIFIED"] = $dataModified;
         if (!isSet($publicletData["REPOSITORY"])) {
             $publicletData["DOWNLOAD_COUNT"] = PublicletCounter::getCount($hash);
         }
         $publicletData["PUBLICLET_PATH"] = $file;
+        /*
         if($this->sqlSupported){
             // Move old file to DB-storage
             $type = (isset($publicletData["REPOSITORY"]) ? "minisite" : "publiclet");
@@ -142,6 +150,7 @@ class ShareStore {
             $this->confStorage->simpleStoreSet("share", $hash, $publicletData, "serial");
             unlink($file);
         }
+        */
 
         return $publicletData;
 
@@ -197,7 +206,11 @@ class ShareStore {
             $id = array_shift($ar);
             $publicletData = $this->loadShare($id);
             if($publicletData === false) continue;
-            if ($limitToUser && ( !isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $limitToUser )) {
+            if (!empty($limitToUser) && ( !isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $limitToUser )) {
+                continue;
+            }
+            if(!empty($parentRepository) && ( (is_string($publicletData["REPOSITORY"]) && $publicletData["REPOSITORY"] != $parentRepository)
+                    || (is_object($publicletData["REPOSITORY"]) && $publicletData["REPOSITORY"]->getUniqueId() != $parentRepository ) )){
                 continue;
             }
             $publicletData["SHARE_TYPE"] = "file";
@@ -216,6 +229,37 @@ class ShareStore {
             }
         }
 
+        if(empty($shareType) || $shareType == "repository"){
+            // BACKWARD COMPATIBILITY: collect old-school shared repositories that are not yet stored in simpleStore
+            $storedIds = array();
+            foreach($dbLets as $share){
+                if(empty($limitToUser) || $limitToUser == $share["OWNER_ID"]) {
+                    if(is_string($share["REPOSITORY"])) $storedIds[] = $share["REPOSITORY"];
+                    else if (is_object($share["REPOSITORY"])) $storedIds[] = $share["REPOSITORY"]->getUniqueId();
+                }
+            }
+            // Find repositories that would have a parent
+            $criteria = array();
+            $criteria["parent_uuid"] = (empty($parentRepository) ? AJXP_FILTER_NOT_EMPTY : $parentRepository);
+            $criteria["owner_user_id"] = (empty($limitToUser) ? AJXP_FILTER_NOT_EMPTY : $limitToUser);
+            if(count($storedIds)){
+                $criteria["!uuid"] = $storedIds;
+            }
+            $oldRepos = ConfService::listRepositoriesWithCriteria($criteria, $count);
+            foreach($oldRepos as $sharedWorkspace){
+                if(!$sharedWorkspace->hasContentFilter()){
+                    $dbLets[] = array(
+                        "SHARE_TYPE"    => "repository",
+                        "OWNER_ID"      => $sharedWorkspace->getOwner(),
+                        "REPOSITORY"    => $sharedWorkspace->getUniqueId(),
+                        "LEGACY_REPO_OR_MINI"   => true
+                    );
+                    //Auto Migrate? boaf.
+                    //$this->storeShare($sharedWorkspace->getParentId(), $data, "repository");
+                }
+            }
+        }
+
         return $dbLets;
     }
 
@@ -223,7 +267,7 @@ class ShareStore {
 
         if(empty($userId)){
             $mess = ConfService::getMessages();
-            throw new Exception($mess["ajxp_shared.12"]);
+            throw new Exception($mess["share_center.160"]);
         }
         $crtUser = AuthService::getLoggedUser();
         if($crtUser->getId() == $userId) return true;
@@ -233,7 +277,7 @@ class ShareStore {
             return true;
         }
         $mess = ConfService::getMessages();
-        throw new Exception($mess["ajxp_shared.12"]);
+        throw new Exception($mess["share_center.160"]);
     }
 
     /**
@@ -310,13 +354,13 @@ class ShareStore {
             $publicletData = $this->loadShare($element);
             if (isSet($publicletData["OWNER_ID"]) && $this->testUserCanEditShare($publicletData["OWNER_ID"])) {
                 PublicletCounter::delete($element);
-                if(isSet($minisiteData["PUBLICLET_PATH"]) && is_file($minisiteData["PUBLICLET_PATH"])){
-                    unlink($minisiteData["PUBLICLET_PATH"]);
+                if(isSet($publicletData["PUBLICLET_PATH"]) && is_file($publicletData["PUBLICLET_PATH"])){
+                    unlink($publicletData["PUBLICLET_PATH"]);
                 }else if($this->sqlSupported){
                     $this->confStorage->simpleStoreClear("share", $element);
                 }
             } else {
-                throw new Exception($mess["ajxp_shared.12"]);
+                throw new Exception($mess["share_center.160"]);
             }
         }
     }

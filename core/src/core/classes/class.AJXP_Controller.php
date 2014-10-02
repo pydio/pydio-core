@@ -94,7 +94,7 @@ class AJXP_Controller
         }
         $parameters = $loggedUser->mergedRole->listParameters();
         foreach ($parameters as $scope => $paramsPlugs) {
-            if ($scope == AJXP_REPO_SCOPE_ALL || $scope == $crtRepoId || ($crtRepo->hasParent() && $scope == AJXP_REPO_SCOPE_SHARED)) {
+            if ($scope == AJXP_REPO_SCOPE_ALL || $scope == $crtRepoId || ($crtRepo!=null && $crtRepo->hasParent() && $scope == AJXP_REPO_SCOPE_SHARED)) {
                 foreach ($paramsPlugs as $plugId => $params) {
                     foreach ($params as $name => $value) {
                         // Search exposed plugin_configs, replace if necessary.

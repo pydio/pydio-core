@@ -6,12 +6,12 @@ namespace Sabre\CalDAV;
  * This object represents a CalDAV calendar that can be shared with other
  * users.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class ShareableCalendar extends Calendar implements IShareableCalendar
-{
+class ShareableCalendar extends Calendar implements IShareableCalendar {
+
     /**
      * Updates the list of shares.
      *
@@ -30,8 +30,8 @@ class ShareableCalendar extends Calendar implements IShareableCalendar
      * @param array $remove
      * @return void
      */
-    public function updateShares(array $add, array $remove)
-    {
+    public function updateShares(array $add, array $remove) {
+
         $this->caldavBackend->updateShares($this->calendarInfo['id'], $add, $remove);
 
     }
@@ -48,8 +48,8 @@ class ShareableCalendar extends Calendar implements IShareableCalendar
      *
      * @return array
      */
-    public function getShares()
-    {
+    public function getShares() {
+
         return $this->caldavBackend->getShares($this->calendarInfo['id']);
 
     }
@@ -63,8 +63,8 @@ class ShareableCalendar extends Calendar implements IShareableCalendar
      * @param bool $value
      * @return void
      */
-    public function setPublishStatus($value)
-    {
+    public function setPublishStatus($value) {
+
         $this->caldavBackend->setPublishStatus($this->calendarInfo['id'], $value);
 
     }

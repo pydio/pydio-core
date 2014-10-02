@@ -45,7 +45,8 @@ class smbAccessWrapper extends fsAccessWrapper
         if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
         $path = $url["path"];
         // Fix if the host is defined as //MY_HOST/path/to/folder
-        $host = str_replace("//", "", $repoObject->getOption("HOST"));
+        $hostOption = AuthService::getFilteredRepositoryOption("access.smb", $repoObject, "HOST");
+        $host = str_replace("//", "", $hostOption);
         $credentials = "";
         $safeCreds = AJXP_Safe::tryLoadingCredentialsFromSources($url, $repoObject);
         if ($safeCreds["user"] != "" && $safeCreds["password"] != "") {

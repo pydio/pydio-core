@@ -88,7 +88,7 @@ Class.create("Diaporama", AbstractEditor, {
         }
         this.imgContainer.observe("scroll", this.imageNavigator.bind(this));
 
-		new SliderInput(this.zoomInput, {
+		this.s1 = new SliderInput(this.zoomInput, {
 			onSlide:function(value){
 				this.setZoomValue(parseInt(value));
 				this.zoomInput.value = parseInt(value) + ' %';
@@ -97,7 +97,7 @@ Class.create("Diaporama", AbstractEditor, {
 			range : $R(this._minZoom, this._maxZoom),
 			increment : 1
 		});
-		new SliderInput(this.timeInput, {
+        this.s2 = new SliderInput(this.timeInput, {
 			onSlide:function(value){				
 				this.timeInput.value = parseInt(value) + ' s';
 			}.bind(this),
@@ -216,6 +216,8 @@ Class.create("Diaporama", AbstractEditor, {
 			if(this.slideShowPlaying){
 				this.stop();
 			}
+            this.s1.destroy();
+            this.s2.destroy();
 		}.bind(this) );
 		
 		this.element.observe("editor:enterFSend", function(e){
@@ -694,6 +696,14 @@ Class.create("Diaporama", AbstractEditor, {
         return new Template('<img width="#{WIDTH}" height="#{HEIGHT}" src="#{DL_CT_LINK}">');
 
     },
+
+    getRESTPreviewLinks:function(node){
+        return {
+            "Original image": "&file=" + encodeURIComponent(node.getPath()),
+            "Thumbnail (200px)": "&get_thumb=true&dimension=200&file=" + encodeURIComponent(node.getPath())
+        };
+    },
+
 
 	/**
 	 * 

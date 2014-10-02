@@ -94,6 +94,7 @@
         <hooks>
             <serverCallback methodName="persistChangeHookToFeed" hookName="node.change" defer="true"/>
             <serverCallback methodName="persistNotificationToAlerts" hookName="msg.notification"/>
+            <serverCallback methodName="loadRepositoryInfo" hookName="repository.load_info"/>
         </hooks>
         <client_configs>
             <component_config className="InfoPanel">

@@ -143,11 +143,14 @@
                     background-color: rgba(119, 119, 119, 0.35) !important;
                 }
                 #global_toolbar{
-                    background-image: url("plugins/gui.ajax/res/themes/orbit/images/white_logo.png");
+                    display: block;
                     background-color: rgba(43, 44, 44, 0.89);
                 }
                 </style>
-                <div id="userdashboard_myparams_title" ajxp_message_id="user_dash.title">AJXP_MESSAGE[user_dash.title]</div>
+                <div id="userdashboard_myparams_title" ajxp_message_id="user_dash.title">
+                    <a style="font-size: 0.5em;display: block;color: white;padding-bottom: 6px;cursor:pointer;"  onclick="ajaxplorer.triggerRepositoryChange('ajxp_home'); return false;"><span class="icon-chevron-left"></span> AJXP_MESSAGE[user_dash.53]</a>
+                    AJXP_MESSAGE[user_dash.title]
+                </div>
                 <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="dashboard_main_pane horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "tabsTips":"middle right", "defaultTabId": "parameters","tabInfos" : [{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"account_pane"},{"id":"info","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"my-users-pane"}]}'>
                     <div id="my-users-pane" ajxpClass="AjxpPane" class="tabbed_editor">
                         <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>

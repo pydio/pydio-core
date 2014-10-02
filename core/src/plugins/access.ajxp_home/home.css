@@ -32,6 +32,37 @@
     float: left;
 }
 
+.repoInfoBadge {
+    display: inline-block;
+    font-size: 25px;
+    width: 190px;
+    line-height: 30px;
+    border: 1px solid rgba(255,255,255,0.7);
+    border-radius: 8px;
+    margin: 10px 16px;
+    min-height: 116px;
+    font-family: "Open sans Regular", Arial, sans-serif;
+    vertical-align: top;
+    padding: 3px 8px;
+    text-align: left;
+}
+
+.repoInfoTitle {
+    text-transform: uppercase;
+    font-family: "Open sans Light", Arial, sans-serif;
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 9px;
+}
+
+.repoInfoBadge span {
+    display: block;
+    font-size: 50px;
+    float: left;
+    margin: 6px 16px 0 14px;
+    opacity: 0.9;
+}
+
 #home_account_pane #close-icon{
     position: absolute;
     margin-left: 2px;
@@ -181,9 +212,16 @@ div.legend_visible div#logo_div{
     margin: 0 20px;
 }
 
-#home_account_pane div#ws_legend small{
+#home_account_pane div#ws_legend > small {
     display: block;
-    font-size: 0.7em;
+    font-size: 0.6em;
+    line-height: 1em;
+    visibility: hidden;
+}
+
+#home_account_pane div#ws_legend > small.show_description {
+    line-height: 1.9em;
+    visibility: visible;
 }
 
 #home_account_pane div#ws_legend a{
@@ -254,18 +292,20 @@ div.legend_visible div#logo_div{
 }
 
 #videos_pane {
-    color: rgb(111,123,136);
-    background-color: #f8f8f8;
+    color: rgb(64, 68, 71);
+    background-color: rgba(248, 248, 248, 0.92);
     position: absolute;
-    top: 5%;
-    left: 5%;
-    width: 90%;
-    height: 90%;
-    border-radius: 10px;
+    top: 0;
+    right: 0;
+    width: 70%;
+    height: 100%;
+    border-radius: 0;
     overflow: auto;
-    opacity: 0.95;
-    box-shadow: 9px 6px 25px rgba(0,0,0,0.5);
+    opacity: 1;
+    box-shadow: -5px -8px 9px rgba(0, 0, 0, 0.36);
     display: none;
+    max-width: 930px;
+    -webkit-font-smoothing: antialiased;
 }
 
 #tutorials_pane h2{
@@ -283,15 +323,15 @@ div.legend_visible div#logo_div{
 .tutorial_legend{
     clear: left;
     float: left;
-    width: 30%;
+    width: 40%;
     margin-left: 5%;
     font-size: 14px;
     margin-top: 20px;
 }
 
 .tutorial_video{
-    width: 59%;
-    height: 350px;
+    width: 49%;
+    height: 300px;
     margin-top: 20px;
     margin-right: 5%;
     margin-bottom: 20px;

@@ -11,20 +11,20 @@ use Sabre\DAVACL;
  * calendar-proxy-write sub-principals, as defined by the caldav-proxy
  * specification.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class Collection extends DAVACL\AbstractPrincipalCollection
-{
+class Collection extends DAVACL\AbstractPrincipalCollection {
+
     /**
      * Returns a child object based on principal information
      *
      * @param array $principalInfo
      * @return User
      */
-    public function getChildForPrincipal(array $principalInfo)
-    {
+    public function getChildForPrincipal(array $principalInfo) {
+
         return new User($this->principalBackend, $principalInfo);
 
     }

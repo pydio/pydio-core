@@ -8,12 +8,12 @@ use Sabre\DAV\Locks;
  * If you are defining your own Locks backend, you must implement this
  * interface.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-interface BackendInterface
-{
+interface BackendInterface {
+
     /**
      * Returns a list of Sabre\DAV\Locks\LockInfo objects
      *
@@ -48,3 +48,4 @@ interface BackendInterface
     public function unlock($uri,Locks\LockInfo $lockInfo);
 
 }
+

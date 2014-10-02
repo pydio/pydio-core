@@ -74,8 +74,5 @@ $mess=array(
 "50"=> "I Miei Teams",
 "51"=> "Teams di utenti, usati come scorciatoia durante la condivisione",
 "52"=> "Sei sicuro di voler cancellare questo team? Questa operazione non cancellerà gli utenti associati..",
-"53"=> "Partenza!",
-"54"=> "Capisci come iniziare con APPLICATION_TITLE seguendo i video 'How-to'",
-"55"=> "Hai bisogno di aiuto <a>per iniziare?</a>",
-"56"=> "Capisci come iniziare con APPLICATION_TITLE? Ecco alcuni video per te!",
+    "53"=> "Back to my workspaces",
 );

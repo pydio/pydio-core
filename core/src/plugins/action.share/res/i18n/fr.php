@@ -166,6 +166,11 @@ $mess = array(
 "155" => "Minimal (header plus petit, pour un widget)",
 "156" => "Le lien %s a été publié",
 "157" => "Le répertoire est actuallement partagé. Si vous le supprimez, le partage sera désactivé.",
-"158" => "Le fichier est actuallement partagé. Si vous le supprimez, le partage sera désactivé."
+"158" => "Le fichier est actuallement partagé. Si vous le supprimez, le partage sera désactivé.",
+"159" => "Propriétaire",
+"160" => "Vous n'êtes pas autorisé à supprimer cet élément partagé",
+    "161" => "Lien obsolète",
+    "162" => "Ce lien a été generé par une ancienne version de l'application. Veuillez le remplacer en le stoppant puis en le recréant. Vous pouvez copier le 'hash' (la dernière partie du lien, soit par exemple http://votrepydio.com/data/public/<em style='color:red;'>206a51</em>.php) et l'utiliser pour regénérer un nouveau lien qui aura donc toujours la même addresse.",
+    "163" => "Drop Files Here (for upload-enabled minisites)"
 // will be replaced by the filename to download
 );

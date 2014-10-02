@@ -26,7 +26,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class MetaWatchRegister extends AJXP_Plugin
+class MetaWatchRegister extends AJXP_AbstractMetaSource
 {
     public static $META_WATCH_CHANGE = "META_WATCH_CHANGE";
     public static $META_WATCH_READ = "META_WATCH_READ";
@@ -43,18 +43,13 @@ class MetaWatchRegister extends AJXP_Plugin
     protected $metaStore;
 
     /**
-     * @var AbstractAccessDriver
-     */
-    protected $accessDriver;
-
-    /**
      * @var AJXP_NotificationCenter
      */
     protected $notificationCenter;
 
     public function initMeta($accessDriver)
     {
-        $this->accessDriver = $accessDriver;
+        parent::initMeta($accessDriver);
         $this->notificationCenter = AJXP_PluginsService::findPluginById("core.notifications");
         $store = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
         if ($store === false) {

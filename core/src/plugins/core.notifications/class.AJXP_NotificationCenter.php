@@ -58,15 +58,22 @@ class AJXP_NotificationCenter extends AJXP_Plugin
     protected function parseSpecificContributions(&$contribNode)
     {
            parent::parseSpecificContributions($contribNode);
-           if($contribNode->nodeName != "actions") return;
 
-           // WEBDAV ACTION
+           // DISABLE STUFF
            if (empty($this->pluginConf["USER_EVENTS"])) {
-               unset($this->actions["get_my_feed"]);
-               $actionXpath=new DOMXPath($contribNode->ownerDocument);
-               $publicUrlNodeList = $actionXpath->query('action[@name="get_my_feed"]', $contribNode);
-               $publicUrlNode = $publicUrlNodeList->item(0);
-               $contribNode->removeChild($publicUrlNode);
+               if($contribNode->nodeName == "actions"){
+                   unset($this->actions["get_my_feed"]);
+                   $actionXpath=new DOMXPath($contribNode->ownerDocument);
+                   $publicUrlNodeList = $actionXpath->query('action[@name="get_my_feed"]', $contribNode);
+                   $publicUrlNode = $publicUrlNodeList->item(0);
+                   $contribNode->removeChild($publicUrlNode);
+               }else if($contribNode->nodeName == "client_configs"){
+                   $actionXpath=new DOMXPath($contribNode->ownerDocument);
+                   $children = $actionXpath->query('component_config', $contribNode);
+                   foreach($children as $child){
+                       $contribNode->removeChild($child);
+                   }
+               }
            }
     }
 
@@ -102,6 +109,19 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         ));
         $this->eventStore->persistEvent("node.change", func_get_args(), $repoId, $repositoryScope, $repositoryOwner, $userId, $userGroup);
 
+    }
+
+    public function loadRepositoryInfo(&$data){
+        $f = $this->loadUserFeed("get_my_feed", array(
+                'format' => 'array',
+                'current_repository'=>true,
+                'feed_type'=>'notif',
+                'limit' => 1,
+                'path'=>'/',
+                'merge_description'=>true,
+                'description_as_label'=>false
+        ), array());
+        $data["core.notifications"] = $f;
     }
 
     public function loadUserFeed($actionName, $httpVars, $fileVars)
@@ -144,7 +164,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
             echo("<ul class='notification_list'>");
         } else if($format == "json"){
             $jsonNodes = array();
-        } else {
+        } else if($format != 'array') {
             AJXP_XMLWriter::header();
         }
 
@@ -182,6 +202,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     $node->event_description = ucfirst($notif->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notif->getAuthorLabel();
                     $node->event_description_long = $notif->getDescriptionLong(true);
                     $node->event_date = AJXP_Utils::relativeDate($notif->getDate(), $mess);
+                    $node->short_date = AJXP_Utils::relativeDate($notif->getDate(), $mess, true);
                     $node->event_time = $notif->getDate();
                     $node->event_type = "notification";
                     $node->event_id = $object->event_id;
@@ -205,13 +226,17 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                     $url = parse_url($node->getUrl());
                     $node->setUrl($url["scheme"]."://".$url["host"]."/notification_".$index);
                     $index ++;
-                    if($format == "json"){
+                    if($format == "json" || $format == "array"){
                         $keys = $node->listMetaKeys();
                         $data = array();
                         foreach($keys as $k){
                             $data[$k] = $node->$k;
                         }
-                        $jsonNodes[] = json_encode($data);
+                        if($format == "json"){
+                            $jsonNodes[] = json_encode($data);
+                        }else{
+                            $jsonNodes[] = $data;
+                        }
                     }else{
                         AJXP_XMLWriter::renderAjxpNode($node);
                     }
@@ -223,6 +248,8 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         } else if($format == "json"){
             HTMLWriter::charsetHeader("application/json");
             echo('[' . implode(",", $jsonNodes). ']');
+        } else if($format == "array"){
+            return $jsonNodes;
         } else {
             AJXP_XMLWriter::close();
         }
@@ -280,9 +307,9 @@ class AJXP_NotificationCenter extends AJXP_Plugin
             } else {
                 $node = $notification->getNode();
                 $path = $node->getPath();
+                $nodeRepo = $node->getRepository();
 
-                if($node->getRepository()->hasParent() && $node->getRepository()->getParentId() == $repositoryFilter){
-                    $nodeRepo = $node->getRepository();
+                if($nodeRepo != null && $nodeRepo->hasParent() && $nodeRepo->getParentId() == $repositoryFilter){
                     $currentRoot = $nodeRepo->getOption("PATH");
                     $contentFilter = $nodeRepo->getContentFilter();
                     if(isSet($contentFilter)){

@@ -76,4 +76,5 @@ $mess=array(
 "50"=> "My Teams",
 "51"=> "Teams of users, used as shortcuts when sharing",
 "52"=> "Are you sure you want to delete this team? This will not remove any users.",
+    "53"=> "Back to my workspaces",
 );

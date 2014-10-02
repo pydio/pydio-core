@@ -21,12 +21,17 @@
 Class.create("UserDashboardHome", AjxpPane, {
 
     _formManager: null,
+    _repoInfos: null,
+    _repoInfosLoading:null,
 
     initialize: function($super, oFormObject, editorOptions){
 
         $super(oFormObject, editorOptions);
-
-        var dashLogo = ajaxplorer.getPluginConfigs("guidriver").get("CUSTOM_DASH_LOGO");
+        this._repoInfos = $H();
+        this._repoInfosLoading = $H();
+        var dashLogo = ajaxplorer.getPluginConfigs("gui.ajax").get("CUSTOM_DASH_LOGO");
+        if(!dashLogo)
+            dashLogo = ajaxplorer.getDefaultImageFromParameters("gui.ajax", "CUSTOM_DASH_LOGO");
         if(dashLogo){
             var url;
             if(dashLogo.indexOf('plugins/') === 0){
@@ -60,6 +65,27 @@ Class.create("UserDashboardHome", AjxpPane, {
             ajaxplorer.triggerRepositoryChange(repoId);
         };
 
+        var updateRepoInfo = function(block, repoId){
+            var data = this._repoInfos.get(repoId);
+            var blocks = 0;
+            if(data['core.users'] && data['core.users']['internal'] != undefined && data['core.users']['external'] != undefined){
+                blocks++;
+                block.insert('<div class="repoInfoBadge"><div class="repoInfoTitle">'+MessageHash[527]+'</div><span class="icon-group"></span>'+MessageHash[531]+' ' + data['core.users']['internal'] + ' <br>'+MessageHash[532]+' ' + data['core.users']['external']+"</div>");
+            }
+            if(data['meta.quota']){
+                blocks++;
+                block.insert('<div class="repoInfoBadge"><div class="repoInfoTitle">'+MessageHash['meta.quota.4']+'</div><span class="icon-dashboard"></span>' + parseInt(100*data['meta.quota']['usage']/data['meta.quota']['total']) + '% <br><small>' + roundSize(data['meta.quota']['total'], MessageHash["byte_unit_symbol"]) +"</small></div>");
+            }
+            if(data['core.notifications'] && data['core.notifications'][0]){
+                var date = data['core.notifications'][0]['short_date'];
+                blocks++;
+                block.insert('<div class="repoInfoBadge"><div class="repoInfoTitle">'+MessageHash[4]+'</div><span class="icon-calendar"></span>' + date + "</div>");
+            }
+            if(!blocks){
+                block.previous('small').addClassName('show_description');
+            }
+        }.bind(this);
+
         var updateWsLegend = function(repoObject){
             var legendBlock = this.htmlElement.down('#ws_legend');
             if(!repoObject && this.htmlElement.down('#go_to_ws').CURRENT_REPO_OBJECT){
@@ -73,16 +99,43 @@ Class.create("UserDashboardHome", AjxpPane, {
                 this.timer = window.setTimeout(function(){
                     if(! legendBlock.up('#home_center_panel') ) return;
                     legendBlock.update('');
+                    legendBlock.writeAttribute("data-repoId", "");
                     legendBlock.up('#home_center_panel').removeClassName('legend_visible');
                 }, 3500);
                 return;
             }
-            legendBlock.update(repoObject.getLabel() + '<small>' + repoObject.getDescription() + '</small>');
+            var repoId = repoObject.getId();
+            legendBlock.writeAttribute("data-repoId", repoId);
+            legendBlock.update(repoObject.getLabel() + '<small>' + repoObject.getDescription() + '</small><div class="repoInfo"></div>');
             legendBlock.insert('<a>'+MessageHash['user_home.42']+'</a>');
             legendBlock.down('a').observe('click', function(){
-                switchToRepo(repoObject.getId());
+                switchToRepo(repoId);
             });
             legendBlock.up('#home_center_panel').addClassName('legend_visible');
+            if(!this._repoInfosLoading.get(repoId) && !this._repoInfos.get(repoId)){
+                var conn = new Connexion();
+                this._repoInfosLoading.set(repoId, 'loading');
+                conn.setParameters({
+                    get_action:'load_repository_info',
+                    tmp_repository_id:repoObject.getId(),
+                    collect:'true'
+                });
+                conn.onComplete = function(transport){
+                    this._repoInfosLoading.unset(repoId);
+                    if(transport.responseJSON){
+                        var data = transport.responseJSON;
+                        this._repoInfos.set(repoId, data);
+                        if(legendBlock.readAttribute("data-repoId") == repoId){
+                            updateRepoInfo(legendBlock.down(".repoInfo"), repoId);
+                        }else{
+
+                        }
+                    }
+                }.bind(this);
+                conn.sendAsync();
+            }else if(this._repoInfos.get(repoId)){
+                updateRepoInfo(legendBlock.down(".repoInfo"), repoId);
+            }
         }.bind(this);
 
         var renderElement = function(repoObject){
@@ -156,23 +209,24 @@ Class.create("UserDashboardHome", AjxpPane, {
             switchToRepo(target.CURRENT_REPO_ID);
         });
 
-        if(ajaxplorer.actionBar.getActionByName("logout")){
+        if(ajaxplorer.actionBar.getActionByName("logout") && ajaxplorer.user.id != "guest"){
             oFormObject.down("#welcome").insert('<small>'+MessageHash["user_home.67"].replace("%logout", "<span id='disconnect_link'></span>").replace('%s', ajaxplorer.user.getPreference("USER_DISPLAY_NAME") || ajaxplorer.user.id)+'</small>');
             oFormObject.down('#disconnect_link').update("<a>"+ajaxplorer.actionBar.getActionByName("logout").options.text.toLowerCase()+"</a>");
             oFormObject.down('#disconnect_link').observe("click", function(e){
                 ajaxplorer.actionBar.fireAction("logout");
             });
+        }else if(ajaxplorer.user.id == "guest" && ajaxplorer.actionBar.getActionByName("login")){
+            oFormObject.down("#welcome").insert("<small>You can <a id='disconnect_link'>login</a> if you are not guest.</small>");
+            oFormObject.down('#disconnect_link').observe("click", function(e){
+                ajaxplorer.actionBar.fireAction("login");
+            });
         }
 
-        if(ajaxplorer.getPluginConfigs('ajxpdriver[@id=\'access.ajxp_home\']').get("ENABLE_GETTING_STARTED")){
+        if(ajaxplorer.getPluginConfigs('access.ajxp_home').get("ENABLE_GETTING_STARTED")){
             var obj = oFormObject.down("#welcome");
             if(oFormObject.down("#welcome > small")) obj = oFormObject.down("#welcome > small");
             var span = new Element('span').update('<br>' + MessageHash["user_home.55"]);
-            if($('videos_pane')){
-                span.down('a').observe('click', function(){ $('videos_pane').setStyle({display:'block'}); });
-            }else{
-                span.down('a').remove();
-            }
+            span.down('a').observe('click', function(){ ajaxplorer.getActionBar().fireAction("open_tutorial_pane"); });
             obj.insert(span);
         }
 
@@ -181,7 +235,7 @@ Class.create("UserDashboardHome", AjxpPane, {
             window.setTimeout(function(){
                 if($("orbit_content")) $("orbit_content").ajxpPaneObject.resize();
                 else if($("browser")) $("browser").ajxpPaneObject.resize();
-            }, 0);
+            }, 50);
         }catch(e){}
 
     },

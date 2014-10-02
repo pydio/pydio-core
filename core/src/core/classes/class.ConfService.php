@@ -525,7 +525,7 @@ class ConfService
                     $repositories[$repoId] = $repoObject;
                 }else if($value == AJXP_FILTER_NOT_EMPTY && !empty($comp)){
                     $repositories[$repoId] = $repoObject;
-                }else if(strpos($value, "regexp:")===0 && preg_match(str_replace("regexp:", "", $value), $comp)){
+                }else if(is_string($value) && strpos($value, "regexp:")===0 && preg_match(str_replace("regexp:", "", $value), $comp)){
                     $repositories[$repoId] = $repoObject;
                 }else if($value == $comp){
                     $repositories[$repoId] = $repoObject;
@@ -564,6 +564,10 @@ class ConfService
         // APPEND CONF FILE REPOSITORIES
         $loggedUser = AuthService::getLoggedUser();
         $objList = array();
+        if($loggedUser != null){
+            $l = $loggedUser->getLock();
+            if( !empty($l)) return $objList;
+        }
         foreach ($this->configs["DEFAULT_REPOSITORIES"] as $index=>$repository) {
             $repo = self::createRepositoryFromArray($index, $repository);
             if($scope == "user" && $loggedUser != null && !self::repositoryIsAccessible($index, $repo, $loggedUser)){
@@ -1183,6 +1187,9 @@ class ConfService
         }
         $this->switchRootDirInst();
         $crtRepository = $this->getRepositoryInst();
+        if($crtRepository == null){
+            throw new Exception("No active repository found for user!");
+        }
         $accessType = $crtRepository->getAccessType();
         $pServ = AJXP_PluginsService::getInstance();
         $plugInstance = $pServ->getPluginByTypeName("access", $accessType);

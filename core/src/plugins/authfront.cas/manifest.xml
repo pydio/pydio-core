@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin id="authfront.cas" enabled="false" label="CONF_MESSAGE[CAS FrontEnd]" description="CONF_MESSAGE[Authentication by CAS]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/authfront.cas/class.CasAuthFrontend.php" classname="CasAuthFrontend"/>
+    <class_definition filename="plugins/authfront.cas/class.CasAuthFrontend.php" classname="CasAuthFrontend"/>
     <client_settings>
         <resources>
             <js className="CAS_LoginForm" file="plugins/authfront.cas/class.CAS_LoginForm.js" autoload="true"/>
@@ -22,7 +22,13 @@
         <!-- global_param name="FORCE_REDIRECT" group="CONF_MESSAGE[General]" type="boolean" label="Force redirect"
                       description="In Client mode, redirect to CAS server for authentication. Otherwise, bypass this and use another following authfront. In mode Proxy, force redirect is mandatory" default="false"/ -->
         <global_param  expose="true" name="MODIFY_LOGIN_SCREEN" group="CONF_MESSAGE[General]" type="boolean" label="Modify login page"
-                      description="Login page will be modified to give user a link to authenticate via CAS manually. Otherwise Pydio will redirect automatically to CAS login page." default="true"/>
+                       description="Login page will be modified to give user a link to authenticate via CAS manually. Otherwise Pydio will redirect automatically to CAS login page." default="true"/>
+        <global_param expose="true" name="AUTH_CAS_MESS_STRING" group="General" type="string" label="String for CAS auth" default="Use CAS credential" description="This message will be appeared in login page. Ex: Use CAS credential"/>
+        <global_param expose="true" name="AUTH_PYD_MESS_STRING" group="General" type="string" label="String for Pydio auth" default="Use Pydio credential" description="This message will be appeared in login page. Ex: Use Pydio credential"/>
+
+        <global_param name="ADDITIONAL_ROLE" group="General" type="string" label="Additional roles for user logged in by CAS" default="" description="Additional roles for user logged in by CAS"/>
+
+
         <global_param name="CERTIFICATE_PATH" type="string" group="CONF_MESSAGE[General]"  label="CONF_MESSAGE[Certificate path]"
                       description="CONF_MESSAGE[Path to the ca chain that issued the cas server certificate]" />
 
@@ -32,7 +38,7 @@
                       description="Log to file. If null, use yyyy-mm-dd.txt"/>
 
         <global_param name="PHPCAS_MODE" type="group_switch:casmode" group="CONF_MESSAGE[phpCAS mode]"  label="CONF_MESSAGE[phpCAS mode]"
-                      description="In mode proxy, phpCAS works as a CAS Proxy who provides Proxy ticket for others services such as SMB, IMAP." mandatory="true" />
+                      description="In mode proxy, phpCAS works as a CAS Proxy who provides Proxy ticket for others services such as SMB, IMAP" mandatory="true" />
         <global_param group_switch_name="casmode" group_switch_label="Client" group_switch_value="client" name="casmode" type="hidden" label="" description="" default="client"/>
         <global_param group_switch_name="casmode" group_switch_label="Proxy"  group_switch_value="proxy"  name="casmode"  type="hidden" label="" description="" default="proxy"/>
         <global_param group_switch_name="casmode" group_switch_label="proxy" group_switch_value="proxy" name="PROXIED_SERVICE_SMB"  type="string" label="CONF_MESSAGE[Proxied Service]"
@@ -48,12 +54,12 @@
         <external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude="actions/action[@name='logoutCAS']"/>
         <actions>
             <action name="logoutCAS" expireDefault="true">
-                <gui text="164" title="169" src="logout.png" accessKey="" hasAccessKey="false">
+                <gui text="164" title="169" src="decrypted.png" accessKey="" iconClass="icon-signout" hasAccessKey="false">
                     <context selection="false" dir="" recycle="false" contextMenu="false" infoPanel="false" actionBarGroup="user" ajxpWidgets="UserWidget::logging_string"></context>
                 </gui>
                 <rightsContext noUser="false" userLogged="only" guestLogged="show" read="false" write="false" adminOnly=""></rightsContext>
                 <processing>
-                        <clientCallback prepareModal="false"><![CDATA[
+                    <clientCallback prepareModal="false"><![CDATA[
                   clearRememberData();
                   var connexion = new Connexion();
                   connexion.addParameter('get_action', 'logoutCAS');
@@ -80,5 +86,4 @@
         </actions>
 
     </registry_contributions>
-
 </ajxp_plugin>

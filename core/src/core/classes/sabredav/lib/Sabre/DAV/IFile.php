@@ -9,12 +9,12 @@ namespace Sabre\DAV;
  * this specific node a PUT or GET method may be performed, to either update,
  * or retrieve the contents of the file.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-interface IFile extends INode
-{
+interface IFile extends INode {
+
     /**
      * Updates the data
      *
@@ -35,7 +35,7 @@ interface IFile extends INode
      * @param resource $data
      * @return string|null
      */
-    public function put($data);
+    function put($data);
 
     /**
      * Returns the data
@@ -44,7 +44,7 @@ interface IFile extends INode
      *
      * @return mixed
      */
-    public function get();
+    function get();
 
     /**
      * Returns the mime-type for a file
@@ -53,7 +53,7 @@ interface IFile extends INode
      *
      * @return string|null
      */
-    public function getContentType();
+    function getContentType();
 
     /**
      * Returns the ETag for a file
@@ -64,13 +64,14 @@ interface IFile extends INode
      *
      * @return void
      */
-    public function getETag();
+    function getETag();
 
     /**
      * Returns the size of the node, in bytes
      *
      * @return int
      */
-    public function getSize();
+    function getSize();
 
 }
+

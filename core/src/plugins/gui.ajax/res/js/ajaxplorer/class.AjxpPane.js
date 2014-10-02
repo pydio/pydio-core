@@ -381,13 +381,30 @@ Class.create("AjxpPane", {
     },
 
 
-    buildImageBackgroundFromConfigs:function(configName){
+    buildImageBackgroundFromConfigs:function(configName, forceConfigs){
+        if(forceConfigs){
+            var bgrounds = forceConfigs;
+            var paramPrefix = configName;
+            var bStyles = [];
+            var index = 1;
+            while(bgrounds[paramPrefix+index]){
+                bStyles.push("background-image:url('"+bgrounds[paramPrefix+index]+"');" + (bgrounds[paramPrefix + 'ATTRIBUTES_'+index]?bgrounds[paramPrefix + 'ATTRIBUTES_'+index]:''));
+                index++;
+            }
+            if (bStyles.length) {
+                var i = Math.floor( Math.random() * bStyles.length);
+                this.htmlElement.setAttribute("style", bStyles[i]);
+            }
+            return;
+        }
+
         var exp = configName.split("/");
         var plugin = exp[0];
         var paramPrefix = exp[1];
         var registry = ajaxplorer.getXmlRegistry();
         var configs = XPathSelectNodes(registry, "plugins/*[@id='"+plugin+"']/plugin_configs/property[contains(@name, '"+paramPrefix+"')]");
         var defaults = XPathSelectNodes(registry, "plugins/*[@id='"+plugin+"']/server_settings/global_param[contains(@name, '"+paramPrefix+"')]");
+
 
         var bgrounds = {};
         configs.each(function(c){
@@ -399,7 +416,9 @@ Class.create("AjxpPane", {
             if(!bgrounds[n]){
                 bgrounds[n] = d.getAttribute("defaultImage");
             }else{
-                bgrounds[n] = window.ajxpServerAccessPath+"&get_action=get_global_binary_param&binary_id="+bgrounds[n];
+                if(getBaseName(bgrounds[n]) == bgrounds[n]){
+                    bgrounds[n] = window.ajxpServerAccessPath+"&get_action=get_global_binary_param&binary_id="+bgrounds[n];
+                }
             }
         });
         var bStyles = [];

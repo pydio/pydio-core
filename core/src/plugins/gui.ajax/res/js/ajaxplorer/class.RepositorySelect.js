@@ -58,6 +58,9 @@ Class.create("RepositorySelect", {
 	destroy : function(){
 		this.element = null;
         document.stopObserving("ajaxplorer:repository_list_refreshed", this.observer);
+        if(this.repoMenu){
+            this.repoMenu.destroy();
+        }
 	},
 	
 	/**
@@ -201,26 +204,26 @@ Class.create("RepositorySelect", {
             return;
         }
 
-        var menuItems = $A();
-        if(!this.loadedOnce) {
-            ajaxplorer.actionBar.loadActionsFromRegistry(ajaxplorer.getXmlRegistry());
-            this.loadedOnce = true;
-        }
-        var otherActions = ajaxplorer.actionBar.getActionsForAjxpWidget("RepositorySelect", this.element.id).each(function(otherAction){
-            menuItems.push({
-                name:otherAction.getKeyedText(),
-                alt:otherAction.options.title,
-                action_id:otherAction.options.name,
-                icon_class:otherAction.options.icon_class,
-                className:"edit",
-                image:resolveImageSource(otherAction.options.src, '/images/actions/ICON_SIZE', 16),
-                callback:function(e){this.apply();}.bind(otherAction)
+        var menuActionsLoader = function(){
+            var menuItems = $A();
+            ajaxplorer.actionBar.getActionsForAjxpWidget("RepositorySelect", this.element.id).each(function(otherAction){
+                menuItems.push({
+                    name:otherAction.getKeyedText(),
+                    alt:otherAction.options.title,
+                    action_id:otherAction.options.name,
+                    icon_class:otherAction.options.icon_class,
+                    className:"edit",
+                    image:resolveImageSource(otherAction.options.src, '/images/actions/ICON_SIZE', 16),
+                    callback:function(e){this.apply();}.bind(otherAction)
+                });
             });
-        });
-        if(menuItems.length){
-            actions.push({separator:true});
-            actions = actions.concat(menuItems);
-        }
+            if(menuItems.length){
+                actions.push({separator:true});
+                actions = actions.concat(menuItems);
+            }
+            this.repoMenu.options.menuItems = actions;
+            this.repoMenu.refreshList();
+        }.bind(this);
 
 		if(this.repoMenu){
 			this.repoMenu.options.menuItems = actions;
@@ -242,6 +245,7 @@ Class.create("RepositorySelect", {
                 menuMaxHeight:this.options.menuMaxHeight,
                 menuFitHeight:this.options.menuFitHeight,
 				fade:true,
+                beforeShow:menuActionsLoader,
 				zIndex:1500
 			});
 			this.notify("createMenu");

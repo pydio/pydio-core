@@ -5,6 +5,10 @@ div.tabbed_editor{
     border-right: 1px solid #bbbbbb;
     line-height: initial;
 }
+.ajxp_theme_orbit div.tabbed_editor{
+    background-color: #f8f8f8;
+    border: 0;
+}
 
 div.tabbed_editor div.accordion_content{
     padding-bottom: 20px;
@@ -396,6 +400,11 @@ div.documentation{
     border-radius: 3px;
     border: 1px solid #F1F1F1;
     box-shadow: 0px 1px 1px rgba(0,0,0,0.25);
+}
+
+.ajxp_theme_orbit .innerContainer{
+    border: 0;
+    box-shadow: none;
 }
 
 .innerTabRow{

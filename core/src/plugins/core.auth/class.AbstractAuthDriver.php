@@ -38,103 +38,8 @@ class AbstractAuthDriver extends AJXP_Plugin
     public function switchAction($action, $httpVars, $fileVars)
     {
         if(!isSet($this->actions[$action])) return;
-        $mess = ConfService::getMessages();
 
         switch ($action) {
-/*
-            case "login" :
-
-                if(!AuthService::usersEnabled()) return;
-                $rememberLogin = "";
-                $rememberPass = "";
-                $secureToken = "";
-                $loggedUser = null;
-                include_once(AJXP_BIN_FOLDER."/class.CaptchaProvider.php");
-                if (AuthService::suspectBruteForceLogin() && (!isSet($httpVars["captcha_code"]) || !CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]))) {
-                    $loggingResult = -4;
-                } else {
-                    $userId = (isSet($httpVars["userid"])?trim($httpVars["userid"]):null);
-                    $userPass = (isSet($httpVars["password"])?trim($httpVars["password"]):null);
-                    $rememberMe = ((isSet($httpVars["remember_me"]) && $httpVars["remember_me"] == "true")?true:false);
-                    $cookieLogin = (isSet($httpVars["cookie_login"])?true:false);
-                    $loggingResult = AuthService::logUser($userId, $userPass, false, $cookieLogin, $httpVars["login_seed"]);
-                    if ($rememberMe && $loggingResult == 1) {
-                        $rememberLogin = "notify";
-                        $rememberPass = "notify";
-                        $loggedUser = AuthService::getLoggedUser();
-                    }
-                    if ($loggingResult == 1) {
-                        session_regenerate_id(true);
-                        $secureToken = AuthService::generateSecureToken();
-                    }
-                    if ($loggingResult < 1 && AuthService::suspectBruteForceLogin()) {
-                        $loggingResult = -4; // Force captcha reload
-                    }
-                }
-                $loggedUser = AuthService::getLoggedUser();
-                if ($loggedUser != null) {
-                       $force = $loggedUser->mergedRole->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
-                       $passId = -1;
-                       if (isSet($httpVars["tmp_repository_id"])) {
-                           $passId = $httpVars["tmp_repository_id"];
-                       } else if ($force != "" && $loggedUser->canSwitchTo($force) && !isSet($httpVars["tmp_repository_id"]) && !isSet($_SESSION["PENDING_REPOSITORY_ID"])) {
-                           $passId = $force;
-                       }
-                       $res = ConfService::switchUserToActiveRepository($loggedUser, $passId);
-                       if (!$res) {
-                           AuthService::disconnect();
-                           $loggingResult = -3;
-                       }
-                   }
-
-                if ($loggedUser != null && (AuthService::hasRememberCookie() || (isSet($rememberMe) && $rememberMe ==true))) {
-                    AuthService::refreshRememberCookie($loggedUser);
-                }
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken);
-                AJXP_XMLWriter::close();
-
-
-            break;
-
-            case "logout" :
-
-                AuthService::disconnect();
-                $loggingResult = 2;
-                session_destroy();
-                AJXP_XMLWriter::header();
-                AJXP_XMLWriter::loggingResult($loggingResult, null, null, null);
-                AJXP_XMLWriter::close();
-
-
-            break;
-
-            case "get_seed" :
-                $seed = AuthService::generateSeed();
-                if (AuthService::suspectBruteForceLogin()) {
-                    HTMLWriter::charsetHeader('application/json');
-                    print json_encode(array("seed" => $seed, "captcha" => true));
-                } else {
-                    HTMLWriter::charsetHeader("text/plain");
-                    print $seed;
-                }
-                //exit(0);
-            break;
-
-            case "get_captcha":
-                include_once(AJXP_BIN_FOLDER."/class.CaptchaProvider.php");
-                CaptchaProvider::sendCaptcha();
-                //exit(0) ;
-            break;
-
-            case "back":
-                AJXP_XMLWriter::header("url");
-                  echo AuthService::getLogoutAddress(false);
-                  AJXP_XMLWriter::close("url");
-                //exit(1);
-
-            break;
-*/
 
             case "get_secure_token" :
                 HTMLWriter::charsetHeader("text/plain");
@@ -222,30 +127,68 @@ class AbstractAuthDriver extends AJXP_Plugin
         $contribNode->removeChild($passChangeNode);
     }
 
+    /**
+     * Old way of prelogging user, replaced by authentication frontends
+     * @param String $sessionId
+     */
     public function preLogUser($sessionId){}
 
+    /**
+     * Wether users can be listed using offset and limit
+     * @return bool
+     */
     public function supportsUsersPagination()
     {
         return false;
     }
 
-    public function findUserPage($userLogin, $usersPerPage){
+    /**
+     * Applicable if supportsUsersPagination(), try to detect at what page the user is
+     * @param string $baseGroup
+     * @param string $userLogin
+     * @param int $usersPerPage
+     * @param int $offset
+     * @return int
+     */
+    public function findUserPage($baseGroup, $userLogin, $usersPerPage, $offset = 0){
         return -1;
     }
 
-    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit)
+    /**
+     * List users using offsets
+     * @param string $baseGroup
+     * @param string $regexp
+     * @param int $offset
+     * @param int $limit
+     * @param bool $recursive
+     * @return AbstractAjxpUser[]
+     */
+    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive = true)
     {
-        return $this->listUsers($baseGroup);
+        return $this->listUsers($baseGroup, $recursive);
     }
-    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null)
+
+    /**
+     * @param string $baseGroup
+     * @param string $regexp
+     * @param null|string $filterProperty Can be "admin" or "parent"
+     * @param null|string $filterValue Can be a user Id, or AJXP_FILTER_EMPTY or AJXP_FILTER_NOT_EMPTY
+     * @param bool $recursive
+     * @return int
+     */
+    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null, $recursive = true)
     {
         return -1;
     }
 
     /**
-     * @return Array
+     *
+     * @param string $baseGroup
+     * @param bool $recursive
+     * @return AbstractAjxpUser[]
      */
-    public function listUsers($baseGroup = "/"){}
+    public function listUsers($baseGroup = "/", $recursive = true){}
+
     /**
      * @param $login
      * @return boolean
@@ -370,6 +313,12 @@ class AbstractAuthDriver extends AJXP_Plugin
      */
     public function updateUserObject(&$userObject)
     {
+        $applyRole = $this->getOption("AUTO_APPLY_ROLE");
+        if(!empty($applyRole)){
+            $rObject = AuthService::getRole($applyRole, true);
+            $userObject->addRole($rObject);
+            $userObject->save("superuser");
+        }
     }
 
 }

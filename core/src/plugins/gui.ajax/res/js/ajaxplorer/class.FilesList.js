@@ -253,6 +253,8 @@ Class.create("FilesList", SelectableElements, {
         if(window[this.htmlElement.id]){
             try{delete window[this.htmlElement.id];}catch(e){}
         }
+        if(this.slider) this.slider.destroy();
+        if(this.headerMenu) this.headerMenu.destroy();
 		this.htmlElement = null;
 	},
 	
@@ -398,10 +400,10 @@ Class.create("FilesList", SelectableElements, {
 			columns.each(function(col){
 				var obj = {};
 				$A(col.attributes).each(function(att){
-					obj[att.nodeName]=att.nodeValue;
+					obj[att.nodeName]=att.value;
 					if(att.nodeName == "sortType"){
-						sortTypes.push(att.nodeValue);
-					}else if(att.nodeName == "defaultVisibilty" && att.nodeValue == "hidden"){
+						sortTypes.push(att.value);
+					}else if(att.nodeName == "defaultVisibilty" && att.value == "hidden"){
                         this.hiddenColumns.push(col.getAttribute("attributeName"));
                     }
 				}.bind(this));
@@ -694,9 +696,12 @@ Class.create("FilesList", SelectableElements, {
             var scrollElement = contentContainer;
 			var oElement = this.htmlElement.down(".selectable_div");
 			
-			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){				
+			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){
+                this.htmlElement.addClassName("paginated");
 				contentContainer.insert({before:this.createPaginator()});
-			}
+			}else{
+                this.htmlElement.removeClassName("paginated");
+            }
 
             if(this.options.selectable == undefined || this.options.selectable === true){
                 this.initSelectableItems(oElement, true, contentContainer, true);
@@ -744,8 +749,8 @@ Class.create("FilesList", SelectableElements, {
                     this.getCurrentContextNode().reload();
 				}.bind(this), this.getVisibleColumns(), this.paginationData.get('currentOrderCol')||-1, this.paginationData.get('currentOrderDir') );
 			}
-			this.disableTextSelection(this.htmlElement.down('div.sort-table'), true);
-			this.disableTextSelection(contentContainer, true);
+			//this.disableTextSelection(this.htmlElement.down('div.sort-table'), true);
+			//this.disableTextSelection(contentContainer, true);
 			this.observer = function(e){
                 if(this.options.fit && this.options.fit == 'height') fitHeightToBottom(contentContainer, this.htmlElement);
 				if(Prototype.Browser.IE){
@@ -757,33 +762,35 @@ Class.create("FilesList", SelectableElements, {
 				}
 			}.bind(this);
 			this.observe("resize", this.observer);
-		
-			if(this.headerMenu){
-				this.headerMenu.destroy();
-				delete this.headerMenu;
-			}
-			this.headerMenu = new Proto.Menu({
-			  selector: '#selectable_div_header-'+this.__currentInstanceIndex,
-			  className: 'menu desktop',
-			  menuItems: [],
-			  fade:true,
-			  zIndex:2000,
-			  beforeShow : function(){
-			  	var items = $A([]);
-			  	this.columnsDef.each(function(column){
-					var isVisible = !this.hiddenColumns.include(column.attributeName);
-					items.push({
-						name:(column.messageId?MessageHash[column.messageId]:column.messageString),
-						alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
-						image:resolveImageSource((isVisible?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
-						isDefault:false,
-						callback:function(e){this.setColumnVisible(column.attributeName, !isVisible);}.bind(this)
-					});
-				}.bind(this) );		
-				this.headerMenu.options.menuItems = items;
-				this.headerMenu.refreshList();
-			  }.bind(this)
-			});
+
+            if(!this.options.noContextualMenu){
+                if(this.headerMenu){
+                    this.headerMenu.destroy();
+                    delete this.headerMenu;
+                }
+                this.headerMenu = new Proto.Menu({
+                    selector: '#selectable_div_header-'+this.__currentInstanceIndex,
+                    className: 'menu desktop',
+                    menuItems: [],
+                    fade:true,
+                    zIndex:2000,
+                    beforeShow : function(){
+                        var items = $A([]);
+                        this.columnsDef.each(function(column){
+                            var isVisible = !this.hiddenColumns.include(column.attributeName);
+                            items.push({
+                                name:(column.messageId?MessageHash[column.messageId]:column.messageString),
+                                alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
+                                image:resolveImageSource((isVisible?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
+                                isDefault:false,
+                                callback:function(e){this.setColumnVisible(column.attributeName, !isVisible);}.bind(this)
+                            });
+                        }.bind(this) );
+                        this.headerMenu.options.menuItems = items;
+                        this.headerMenu.refreshList();
+                    }.bind(this)
+                });
+            }
 		}
 		else if(this._displayMode == "thumb" || this._displayMode == "detail")
 		{
@@ -800,8 +807,11 @@ Class.create("FilesList", SelectableElements, {
                 attachMobileScroll(this.htmlElement.down(".selectable_div"), "vertical");
             }
 			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){
+                this.htmlElement.addClassName("paginated");
                 this.htmlElement.down(".selectable_div").insert({before:this.createPaginator()});
-			}
+			}else{
+                this.htmlElement.removeClassName("paginated");
+            }
             var scrollElement = this.htmlElement.down(".selectable_div");
             if(this.options.horizontalScroll){
                 scrollElement.setStyle({width:'100000px'});
@@ -827,60 +837,67 @@ Class.create("FilesList", SelectableElements, {
                 ctxt.getMetadata().set("filesList.sortColumn", ''+this._sortableTable.sortColumn);
                 ctxt.getMetadata().set("filesList.descending", this._sortableTable.descending);
             }.bind(this);
-            if(this.headerMenu){
-                this.headerMenu.destroy();
-                delete this.headerMenu;
+            if(!this.options.noContextualMenu){
+                if(this.headerMenu){
+                    this.headerMenu.destroy();
+                    delete this.headerMenu;
+                }
+                this.headerMenu = new Proto.Menu({
+                    selector: '#content_pane div.panelHeader',
+                    className: 'menu desktop',
+                    menuItems: [],
+                    fade:true,
+                    zIndex:2000,
+                    beforeShow : function(){
+                        var items = $A([]);
+                        var index = 0;
+                        this.columnsDef.each(function(column){
+                            var isSorted = this._sortableTable.sortColumn == index;
+                            items.push({
+                                name:(column.messageId?MessageHash[column.messageId]:column.messageString),
+                                alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
+                                image:resolveImageSource((isSorted?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
+                                isDefault:false,
+                                callback:function(e){
+                                    var clickIndex = this.columnsDef.indexOf(column);
+                                    var sorted = (this._sortableTable.sortColumn == clickIndex);
+                                    if(sorted) this._sortableTable.descending = !this._sortableTable.descending;
+                                    this._sortableTable.sort(clickIndex, this._sortableTable.descending);
+                                }.bind(this)
+                            });
+                            index++;
+                        }.bind(this) );
+                        this.headerMenu.options.menuItems = items;
+                        this.headerMenu.refreshList();
+                    }.bind(this)
+                });
             }
-            this.headerMenu = new Proto.Menu({
-                selector: '#content_pane div.panelHeader',
-                className: 'menu desktop',
-                menuItems: [],
-                fade:true,
-                zIndex:2000,
-                beforeShow : function(){
-                    var items = $A([]);
-                    var index = 0;
-                    this.columnsDef.each(function(column){
-                        var isSorted = this._sortableTable.sortColumn == index;
-                        items.push({
-                            name:(column.messageId?MessageHash[column.messageId]:column.messageString),
-                            alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
-                            image:resolveImageSource((isSorted?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
-                            isDefault:false,
-                            callback:function(e){
-                                var clickIndex = this.columnsDef.indexOf(column);
-                                var sorted = (this._sortableTable.sortColumn == clickIndex);
-                                if(sorted) this._sortableTable.descending = !this._sortableTable.descending;
-                                this._sortableTable.sort(clickIndex, this._sortableTable.descending);
-                            }.bind(this)
-                        });
-                        index++;
-                    }.bind(this) );
-                    this.headerMenu.options.menuItems = items;
-                    this.headerMenu.refreshList();
-                }.bind(this)
-            });
 
-			this.slider = new SliderInput($("slider-input-1"), {
-				range : $R(30, 250),
-				sliderValue : this._thumbSize,
-				leftOffset:0,
-				onSlide : function(value)
-				{
-					this._thumbSize = value;
-					this.resizeThumbnails();
-				}.bind(this),
-				onChange : function(value){
-                    if(this.options.replaceScroller){
-                        this.notify("resize");
-                    }
-					if(!ajaxplorer || !ajaxplorer.user) return;
-					ajaxplorer.user.setPreference("thumb_size", this._thumbSize);
-					ajaxplorer.user.savePreference("thumb_size");								
-				}.bind(this)
-			});
+            if(this._displayMode == 'thumb'){
+                if(this.slider){
+                    this.slider.destroy();
+                }
+                this.slider = new SliderInput($("slider-input-1"), {
+                    range : $R(30, 250),
+                    sliderValue : this._thumbSize,
+                    leftOffset:0,
+                    onSlide : function(value)
+                    {
+                        this._thumbSize = value;
+                        this.resizeThumbnails();
+                    }.bind(this),
+                    onChange : function(value){
+                        if(this.options.replaceScroller){
+                            this.notify("resize");
+                        }
+                        if(!ajaxplorer || !ajaxplorer.user) return;
+                        ajaxplorer.user.setPreference("thumb_size", this._thumbSize);
+                        ajaxplorer.user.savePreference("thumb_size");
+                    }.bind(this)
+                });
+            }
 
-			this.disableTextSelection(scrollElement, true);
+			//this.disableTextSelection(scrollElement, true);
             if(this.options.selectable == undefined || this.options.selectable === true){
 			    this.initSelectableItems(scrollElement, true, scrollElement, true);
             }else{
@@ -1144,7 +1161,10 @@ Class.create("FilesList", SelectableElements, {
 		if(this._displayMode == "thumb" || this._displayMode == "detail")
 		{
 			var adjusted = this.resizeThumbnails();
-			if(this.protoMenu) this.protoMenu.addElements('#selectable_div-'+this.__currentInstanceIndex);
+			if(this.protoMenu) {
+                this.protoMenu.addElements('#selectable_div-'+this.__currentInstanceIndex);
+                this.protoMenu.addElements('#selectable_div-'+this.__currentInstanceIndex + ' > .ajxpNodeProvider');
+            }
 			window.setTimeout(function(){
                 if(adjusted) this._previewFactory.setThumbSize(adjusted);
                 else this._previewFactory.setThumbSize((this._displayMode=='detail'? this._detailThumbSize:this._thumbSize));
@@ -1153,17 +1173,21 @@ Class.create("FilesList", SelectableElements, {
 		}
 		else
 		{
-			if(this.protoMenu) this.protoMenu.addElements('#table_rows_container-'+this.__currentInstanceIndex);
+			if(this.protoMenu){
+                this.protoMenu.addElements('#table_rows_container-'+this.__currentInstanceIndex);
+                this.protoMenu.addElements('#table_rows_container-'+this.__currentInstanceIndex+ ' > .ajxpNodeProvider');
+            }
 			if(this._headerResizer){
 				this._headerResizer.resize(this.htmlElement.getWidth()-2);
 			}
 		}
-		if(this.protoMenu)this.protoMenu.addElements('.ajxp_draggable');
+        /*
 		var allItems = this.getItems();
 		for(var i=0; i<allItems.length;i++)
 		{
 			this.disableTextSelection.bind(this).defer(allItems[i], true);
 		}
+		*/
         this.notify("resize");
         this.notify("rows:didInitialize");
 	},
@@ -1190,8 +1214,13 @@ Class.create("FilesList", SelectableElements, {
     empty : function(skipFireChange){
         this._previewFactory.clear();
         if(this.protoMenu){
-            this.protoMenu.removeElements('.ajxp_draggable');
-            this.protoMenu.removeElements('.selectable_div');
+            if(this._displayMode == "thumb" || this._displayMode == "detail"){
+                this.protoMenu.removeElements('#selectable_div-'+this.__currentInstanceIndex + ' > .ajxpNodeProvider');
+                this.protoMenu.removeElements('#selectable_div-'+this.__currentInstanceIndex);
+            }else{
+                this.protoMenu.removeElements('#table_rows_container-'+this.__currentInstanceIndex);
+                this.protoMenu.removeElements('#table_rows_container-'+this.__currentInstanceIndex+ ' > .ajxpNodeProvider');
+            }
         }
         for(var i = 0; i< AllAjxpDroppables.length;i++){
             var el = AllAjxpDroppables[i];
@@ -1732,12 +1761,12 @@ Class.create("FilesList", SelectableElements, {
 				var date = new Date();
 				date.setTime(parseInt(metaData.get(s))*1000);
 				newRow.ajxp_modiftime = date;
-				tableCell.update('<span class="text_label'+fullview+'">' + formatDate(date) + '</span>');
+				tableCell.innerHTML = '<span class="text_label'+fullview+'">' + formatDate(date) + '</span>';
 			}
 			else
 			{
 				var metaValue = metaData.get(s) || "";
-				tableCell.update('<span class="text_label'+fullview+'">' + metaValue  + "</span>");
+				tableCell.innerHTML = '<span class="text_label'+fullview+'">' + metaValue  + "</span>";
 			}
 			if(this.gridStyle == "grid"){
 				tableCell.setAttribute('valign', 'top');				
@@ -1799,7 +1828,7 @@ Class.create("FilesList", SelectableElements, {
         var textNode = ajxpNode.getLabel();
 		var label = new Element('div', {
 			className:"thumbLabel",
-			title:textNode
+			title:textNode.stripTags()
 		}).update(textNode);
 		
 		innerSpan.insert({"bottom":img});
@@ -1896,7 +1925,7 @@ Class.create("FilesList", SelectableElements, {
         var textNode = ajxpNode.getLabel();
 		var label = new Element('div', {
 			className:"thumbLabel",
-			title:textNode
+			title:textNode.stripTags()
 		}).update(textNode);
 
 		innerSpan.insert({"bottom":img});

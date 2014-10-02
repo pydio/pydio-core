@@ -23,16 +23,17 @@ Class.create("GraphsViewer", AbstractEditor, {
     queriesData: null,
     charts: null,
     defaultCount:31,
+    defaultLinksUnits:"days",
     colors: [ '#77b8e2', '#e35d52', '#d7a76A', '#399C9B', '#156FAF', '#4ACEB0' ],
     colorIndex:1,
 
     initialize: function($super, oFormObject, editorOptions)
     {
         editorOptions = Object.extend({
-            fullscreen:false
+            fullscreen:true
         }, editorOptions);
         $super(oFormObject, editorOptions);
-        this.charts = $A();
+        this.charts = $H();
 
     },
 
@@ -43,14 +44,25 @@ Class.create("GraphsViewer", AbstractEditor, {
     open : function($super, node){
         $super(node);
         this.node = node;
+        if(this.node.getMetadata().get("graph_viewer_class")){
+            this.element.addClassName(this.node.getMetadata().get("graph_viewer_class"));
+        }
+        if(this.node.getMetadata().get("graph_default_count")){
+            this.defaultCount = parseInt(this.node.getMetadata().get("graph_default_count"));
+        }
+        if(this.node.getMetadata().get("graph_default_links_units")){
+            this.defaultLinksUnits = this.node.getMetadata().get("graph_default_links_units");
+        }
         this.loadQueries();
     },
 
     loadQueries : function(){
+        var action = "get_action=analytic_list_queries";
+        if(this.node.getMetadata().get("graph_load_all")){
+            action = this.node.getMetadata().get("graph_load_all");
+        }
         var conn = new Connexion();
-        conn.setParameters($H({
-            get_action: 'analytic_list_queries'
-        }));
+        conn.setParameters($H(action.toQueryParams()));
         conn.onComplete = function(transport){
             this.parseAndLoadQueries(transport.responseJSON);
         }.bind(this);
@@ -58,22 +70,50 @@ Class.create("GraphsViewer", AbstractEditor, {
     },
 
     parseAndLoadQueries: function(queriesData){
-        $('graph_viewer_box').update('');
+        if(this.element.down("#graph_viewer_loader")){
+            this.element.down("#graph_viewer_loader").remove();
+        }
+        this.element.down("#graph_viewer_container").update('');
         this.queriesData = $A(queriesData);
         this.queriesData.each(function(qData){
             var div;
             if(qData['SEPARATOR']){
                 div = new Element('div', {class:'tabrow', style:'clear:left;'}).update('<li class="selected">' + qData['LABEL'] + '</li>');
-                this.element.insert(div);
+                this.element.down("#graph_viewer_container").insert(div);
+                if(qData['UPDATER']){
+                    this.buildUpdaterButtons(div, qData['UPDATER']);
+                }
                 return;
             }
             div = new Element('div', {id:qData['NAME']+'_container'});
-            this.element.insert(div);
-            div.insert({top:('<div class="innerTitle">'+qData['LABEL']+'</div>')});
-            div.insert(('<div style="text-align: center; padding:100px;">Loading...</div>'));
+            this.element.down("#graph_viewer_container").insert(div);
+            if(qData["FIGURE"]){
+                div.addClassName("cumulated_figure");
+                div.update('<div class="innerTitle">'+qData['LABEL']+'</div>' + '<div class="figure">&nbsp;</div>');
+            }else{
+                div.insert({top:('<div class="innerTitle">'+qData['LABEL']+'</div>')});
+                div.insert(('<div style="text-align: center; padding:100px;">Loading...</div>'));
+            }
             if(!qData["COUNT"]) qData["COUNT"] = this.defaultCount;
             this.loadData(qData['NAME'], null, 0, qData['COUNT']);
         }.bind(this));
+    },
+
+    buildUpdaterButtons:function(div, updaterData){
+        $A(updaterData['buttons']).each(function(b){
+            var button = new Element('a').update(b['label']).observe("click", function(e){
+                var params = b['parameters'];
+                var charts = updaterData['charts'];
+                $A(charts).each(function(c){
+                    this.loadData(c, this.charts.get(c), null, null, params);
+                }.bind(this));
+                div.select('a').invoke("removeClassName", "selected");
+                button.addClassName("selected");
+            }.bind(this));
+            if(b['default']) button.addClassName("selected");
+            div.insert(button);
+        }.bind(this));
+
     },
 
     getQueryByName: function(queryName){
@@ -82,16 +122,24 @@ Class.create("GraphsViewer", AbstractEditor, {
         });
     },
 
-    loadData : function(queryName, chart, start, count){
+    loadData : function(queryName, chart, start, count, additionalParameters){
+        var action = "get_action=analytic_query";
+        if(this.node.getMetadata().get("graph_load_query")){
+            action = this.node.getMetadata().get("graph_load_query");
+        }
         var conn = new Connexion();
         if(!start) start = 0;
         if(!count) count = this.defaultCount;
-        conn.setParameters($H({
-            get_action: 'analytic_query',
+        var params = action.toQueryParams();
+        params = Object.extend(params, {
             query_name: queryName,
             start:start,
             count:count
-        }));
+        });
+        if(additionalParameters){
+            params = Object.extend(params, additionalParameters);
+        }
+        conn.setParameters($H(params));
         conn.onComplete = function(transport){
             if(chart){
                 this.updateChart(chart, queryName, transport.responseJSON);
@@ -108,33 +156,58 @@ Class.create("GraphsViewer", AbstractEditor, {
         div.update('');
         if(qData['AXIS']){
             var height = 300;
+            var legendY = 260;
             if(qData["DIRECTION"] && qData["DIRECTION"] == "horizontal"){
                 height = 600;
+            }else if(qData["DIAGRAM"] && qData["DIAGRAM"] == "pie"){
+                height = 320;
             }
-            var svg = dimple.newSvg("#"+queryName+'_container', '100%', height);
+            var svg = dimple.newSvg("#"+this.element.id+" #"+queryName+'_container', '100%', height);
             var chart = new dimple.chart(svg, jsonData['data']);
             var colorIndex = this.colorIndex % this.colors.length;
             chart.defaultColors[0] = new dimple.color(this.colors[colorIndex]);
             this.colorIndex ++;
             chart.setMargins(80, 20, 40, 80);
-            if(qData["DIRECTION"] && qData["DIRECTION"] == "horizontal"){
+            if(qData["DIAGRAM"] && qData["DIAGRAM"] == "pie"){
+                chart.addMeasureAxis("p", qData['AXIS']['y']);
+                chart.setMargins(80, 30, 40, 80);
+                legendY = 270;
+            }else if(qData["DIRECTION"] && qData["DIRECTION"] == "horizontal"){
+                chart.setMargins('40%', 20, 40, 80);
                 chart.addMeasureAxis("x", qData['AXIS']['x']);
                 chart.addCategoryAxis("y", qData['AXIS']['y']);
-                chart.setMargins('40%', 20, 40, 80);
             }else{
-                chart.addCategoryAxis("x", qData['AXIS']['x']);
+                // Default vertical bars
+                var x;
+                if(qData["AXIS"]["sery"]){
+                    x = chart.addCategoryAxis("x", [qData['AXIS']['x'], qData['AXIS']['sery']]);
+                }else{
+                    x = chart.addCategoryAxis("x", qData['AXIS']['x']);
+                }
                 chart.addMeasureAxis("y", qData['AXIS']['y']);
+                if(qData['AXIS']['order']){
+                    x.addOrderRule(qData['AXIS']['order']);
+                }
             }
 
             if(qData["DIAGRAM"]){
-                chart.addSeries(null, dimple.plot[qData["DIAGRAM"]]);
+                if(qData["DIAGRAM"] == "pie"){
+                    var ring = chart.addSeries(qData['AXIS']['x'], dimple.plot[qData["DIAGRAM"]]);
+                    if(qData["PIE_RING"]){
+                        ring.innerRadius = qData["PIE_RING"];
+                    }
+                }else{
+                    chart.addSeries(qData["AXIS"]["sery"], dimple.plot[qData["DIAGRAM"]]);
+                }
             }else{
-                chart.addSeries(null, dimple.plot.line);
+                var s = chart.addSeries(qData["AXIS"]["sery"], dimple.plot.line);
+                s.interpolation = 'cardinal';
             }
+            chart.addLegend("5%", legendY, "90%", 40, "center");
             chart.draw();
             div.insert({top:('<div class="innerTitle">'+qData['LABEL']+'</div>')});
             this.updateLinks(chart, queryName, jsonData);
-            this.charts.push(chart);
+            this.charts.set(queryName, chart);
         }else if(qData["FIGURE"]){
             div.addClassName("cumulated_figure");
             div.update('<div class="innerTitle">'+qData['LABEL']+'</div>' + '<div class="figure">' + jsonData['data'][0]['total'] + '</div>');
@@ -143,7 +216,7 @@ Class.create("GraphsViewer", AbstractEditor, {
 
     updateChart : function(chart, queryName, jsonData){
         chart.data = jsonData["data"];
-        chart.draw();
+        chart.draw(1000);
         this.updateLinks(chart, queryName, jsonData);
     },
 
@@ -152,13 +225,13 @@ Class.create("GraphsViewer", AbstractEditor, {
         var container = this.element.down('#' + queryName+'_container');
         var linkCont = container.down('.chart_links');
         if(!linkCont){
-            linkCont = new Element('div', {className:'chart_links', style:'float: right;margin: 10px 20px;min-width: 180px;text-align: right;'});
+            linkCont = new Element('div', {className:'chart_links', style:'float: right;margin: 10px 20px;min-width: 190px;text-align: right;'});
             container.insert({top:linkCont});
         }else{
             linkCont.update('');
         }
 
-        $A(["next", "count", "previous", "first"]).each(function(relName){
+        $A(["last", "next", "count", "previous", "first"]).each(function(relName){
             if(relName == "count"){
                 var qData = this.getQueryByName(queryName);
                 var input = new Element("input", {type:"text", value:qData["COUNT"], style:'width: 20px !important;height: 19px;text-align:right'});
@@ -169,7 +242,7 @@ Class.create("GraphsViewer", AbstractEditor, {
                     }
                 }.bind(this));
                 linkCont.insert(input);
-                linkCont.insert('<span> days</span>');
+                linkCont.insert('<span> '+this.defaultLinksUnits+'</span>');
                 return;
             }
             var linkData = jsonData['links'].detect(function(l){
@@ -236,8 +309,8 @@ Class.create("GraphsViewer", AbstractEditor, {
         this.element.select('svg').each(function(chart){
             //chart.setStyle('width')
         });
-        this.charts.each(function(c){
-            c.draw();
+        this.charts.each(function(pair){
+            pair.value.draw(500);
         });
         this.element.fire("editor:resize", size);
     },

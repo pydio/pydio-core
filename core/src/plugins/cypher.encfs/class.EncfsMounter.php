@@ -118,8 +118,8 @@ class EncfsMounter extends AJXP_Plugin
                             $cmd = "mv ". escapeshellarg($dir . DIRECTORY_SEPARATOR . $fileOrFolder)." ". escapeshellarg($clear . DIRECTORY_SEPARATOR);
                             $exec = shell_exec($cmd);
                         }
-                        self::umountFolder($clear);
                         rmdir($dir);
+                        self::umountFolder($clear);
                     }
                 } else if (substr(basename($dir), 0, strlen("ENCFS_CLEAR_")) == "ENCFS_CLEAR_") {
                     // SIMPLY UNMOUNT
@@ -156,9 +156,11 @@ class EncfsMounter extends AJXP_Plugin
             $ajxpNode->ENCFS_clear_folder = true;
             $ajxpNode->overlay_icon = "cypher.encfs/overlay_ICON_SIZE.png";
             $ajxpNode->overlay_class = "icon-lock";
+            $ajxpNode->ajxp_readonly = "true";
             if (is_file($ajxpNode->getUrl()."/.ajxp_mount")) {
                 $ajxpNode->setLabel(substr($ajxpNode->getLabel(), strlen("ENCFS_CLEAR_")));
                 $ajxpNode->ENCFS_clear_folder_mounted = true;
+                $ajxpNode->ajxp_readonly = "false";
             } else {
                 $ajxpNode->setLabel(substr($ajxpNode->getLabel(), strlen("ENCFS_CLEAR_")) . " (encrypted)");
             }

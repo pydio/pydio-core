@@ -23,28 +23,40 @@ Class.create("CAS_LoginForm", {
         document.observe("ajaxplorer:afterApply-login", this.observer.bind(this));
     },
     observer: function(){
+        // String for login page
+        var auth_cas_msg = "Use CAS Credential";
+        var auth_pyd_msg = "Use Pydio Credential";
+        if(ajaxplorer.getPluginConfigs("authfront.cas")._object.AUTH_CAS_MESS_STRING){
+            auth_cas_msg = ajaxplorer.getPluginConfigs("authfront.cas")._object.AUTH_CAS_MESS_STRING;
+        }
+        if(ajaxplorer.getPluginConfigs("authfront.cas")._object.AUTH_PYD_MESS_STRING){
+            auth_pyd_msg = ajaxplorer.getPluginConfigs("authfront.cas")._object.AUTH_PYD_MESS_STRING;
+        }
+
         // string form
         var login_via_cas_form = '<form id="enableredirecttocas" method="post" action=""> \
                                   <input type="hidden" name="put_action_enable_redirect" value="yes"> \
                                   </form>';
-        var cas_session_span = '<span id="span_to_modify_login_form_with_cas" class="icon-chevron-right"></span><span style=" font-size: 16px;">Use CAS credentials</span>';
+        var cas_session_span = '<span id="span_to_modify_login_form_with_cas" class="icon-chevron-right"></span><span style=" font-size: 16px;">' + auth_cas_msg + '</span>';
         var cas_session_a_tag = '<div style="width:100%;margin-top: 7px;" id="gui_login_nas_nasos" > \
                                                          <a href="javascript:document.forms[\'enableredirecttocas\'].submit();"  style="margin-left: 12px;text-decoration: underline; ">Click here</a> \
                                                         </div><br/>';
-        var login_session_span = '<span class="icon-chevron-right"></span><span style=" font-size: 16px;">Use Pydio credentials</span>';
+        var login_session_span = '<span class="icon-chevron-right"></span><span style=" font-size: 16px;">' + auth_pyd_msg + '</span>';
 
-        if(!$("all_forms").down("#enableredirecttocas")){
-            $("all_forms").insert({top:login_via_cas_form});
+        objallforms = $("all_forms");
+        if(!objallforms.down("#enableredirecttocas")){
+            objallforms.insert({top:login_via_cas_form});
         }
-        if(!$("login_form").down(("#span_to_modify_login_form_with_cas"))){
-            $("login_form").insert({top:login_session_span});
-            $("login_form").insert({top:cas_session_a_tag});
-            $("login_form").insert({top:cas_session_span});
+        obj_loginform = $("login_form");
+        if(!obj_loginform.down(("#span_to_modify_login_form_with_cas"))){
+            obj_loginform.insert({top:login_session_span});
+            obj_loginform.insert({top:cas_session_a_tag});
+            obj_loginform.insert({top:cas_session_span});
         }
 
     }
 });
-var enableModifyGUI = ajaxplorer.getPluginConfigs("ajxp_plugin[@id='authfront.cas']")._object.MODIFY_LOGIN_SCREEN;
+var enableModifyGUI = ajaxplorer.getPluginConfigs("authfront.cas")._object.MODIFY_LOGIN_SCREEN;
 if(enableModifyGUI){
     window.CASFORM = new CAS_LoginForm();
 }

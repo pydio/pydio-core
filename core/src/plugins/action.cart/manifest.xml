@@ -82,6 +82,14 @@
                             color: #999 !important;
                             font-size: 1.4em;
                         }
+                        #action_cart div.class-FetchedResultPane{
+                            border-radius: 15px;
+                            margin: 0px 15px 10px;
+                            background-color: rgba(255, 255, 255, 0.1);
+                        }
+                        #action_cart div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed{
+                            padding: 2px 0px;
+                        }
                         </style>
                 ]]></additional_content>
             </component_config>
@@ -128,7 +136,7 @@
             </action>
             <action name="send-selection-to-cart">
                 <gui src="" text="action.cart.1" title="action.cart.2" iconClass="icon-suitcase">
-                    <context dir="true" recycle="true" selection="true" actionBar="false" contextMenu="true" actionBarGroup="change"/>
+                    <context dir="true" recycle="true" selection="true" actionBar="false" contextMenu="true" actionBarGroup="more"/>
                     <selectionContext dir="true" file="true" recycle="false" unique="false"  evalMetadata="!metadata.get('ajxp_mime') || !metadata.get('ajxp_mime').startsWith('shared_')"/>
                 </gui>
                 <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="false"/>

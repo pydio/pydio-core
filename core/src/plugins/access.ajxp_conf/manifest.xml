@@ -105,27 +105,26 @@
                     </div>
                 </div>
                 <script>
-                    if($("browser")) $("browser").ajxpPaneObject.resize();
-                    document.observeOnce("ajaxplorer:context_changed", function(){
+                    if($("leftTabulator")) $("leftTabulator").ajxpPaneObject.resize();
+                    window.setTimeout(function(){
                         try{
                             $A($("settings_pane").ajxpPaneObject.tree.childNodes).each(function(c){
                                 c._webfxtree_expand();
                                 $(c._loadingItem).remove();
                             })
                         }catch(e){}
-                        if($("browser")) $("browser").ajxpPaneObject.resize();
-                    });
+                        if($("leftTabulator")) $("leftTabulator").ajxpPaneObject.resize();
+                    }, 2000);
                 </script>
                 <style>
                     #global_toolbar{
+                        display: block;
                         background-color: #345E79;
-                        background-image: url("plugins/gui.ajax/res/themes/orbit/images/white_logo.png");
                     }
                 </style>
 			]]></template_part>
 		</client_configs>
 		<external_file filename="plugins/access.ajxp_conf/ajxp_confActions.xml" include="actions/*"/>
-		<external_file filename="plugins/access.ajxp_shared/manifest.xml" include='registry_contributions/actions/action[@name="clear_expired"]'/>
 		<external_file filename="plugins/access.ajxp_conf/ajxp_confActions.xml" include="client_configs/*"/>
 	</registry_contributions>
 	<class_definition filename="plugins/access.ajxp_conf/class.ajxp_confAccessDriver.php" classname="ajxp_confAccessDriver"/>

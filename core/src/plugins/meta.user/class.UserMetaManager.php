@@ -27,12 +27,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class UserMetaManager extends AJXP_Plugin
+class UserMetaManager extends AJXP_AbstractMetaSource
 {
-    /**
-     * @var AbstractAccessDriver
-     */
-    protected $accessDriver;
     /**
      * @var MetaStoreProvider
      */
@@ -48,7 +44,7 @@ class UserMetaManager extends AJXP_Plugin
 
     public function initMeta($accessDriver)
     {
-        $this->accessDriver = $accessDriver;
+        parent::initMeta($accessDriver);
 
         $store = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
         if ($store === false) {
@@ -165,13 +161,16 @@ class UserMetaManager extends AJXP_Plugin
                 else if(substr($val, 0,5) == "area_") $this->options["meta_types"].="textarea";
                 else $this->options["meta_types"].="string";
             }
+            if(!empty($this->options["meta_additional"])){
+                $this->fieldsAdditionalData[$this->options["meta_fields"]] = $this->options["meta_additional"];
+            }
             foreach ($this->options as $key => $val) {
                 $matches = array();
                 if (preg_match('/^meta_fields_(.*)$/', $key, $matches) != 0) {
                     $repIndex = $matches[1];
                     $this->options["meta_fields"].=",".$val;
                     $this->options["meta_labels"].=",".$this->options["meta_labels_".$repIndex];
-                    if (isSet($this->options["meta_additional_".$repIndex])) {
+                    if (!empty($this->options["meta_additional_".$repIndex])) {
                         $this->fieldsAdditionalData[$val] = $this->options["meta_additional_".$repIndex];
                     }
                     if (isSet($this->options["meta_types_".$repIndex])) {

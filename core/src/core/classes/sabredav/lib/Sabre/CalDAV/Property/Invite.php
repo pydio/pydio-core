@@ -14,12 +14,12 @@ use Sabre\CalDAV;
  * namespace.
  *
  * @see https://trac.calendarserver.org/browser/CalendarServer/trunk/doc/Extensions/caldav-sharing-02.txt
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class Invite extends DAV\Property
-{
+class Invite extends DAV\Property {
+
     /**
      * The list of users a calendar has been shared to.
      *
@@ -61,8 +61,8 @@ class Invite extends DAV\Property
      *
      * @param array $users
      */
-    public function __construct(array $users, array $organizer = null)
-    {
+    public function __construct(array $users, array $organizer = null) {
+
         $this->users = $users;
         $this->organizer = $organizer;
 
@@ -73,8 +73,8 @@ class Invite extends DAV\Property
      *
      * @return array
      */
-    public function getValue()
-    {
+    public function getValue() {
+
         return $this->users;
 
     }
@@ -86,8 +86,8 @@ class Invite extends DAV\Property
      * @param \DOMElement $node
      * @return void
      */
-    public function serialize(DAV\Server $server,\DOMElement $node)
-    {
+    public function serialize(DAV\Server $server,\DOMElement $node) {
+
        $doc = $node->ownerDocument;
 
        if (!is_null($this->organizer)) {
@@ -119,7 +119,7 @@ class Invite extends DAV\Property
 
        }
 
-       foreach ($this->users as $user) {
+       foreach($this->users as $user) {
 
            $xuser = $doc->createElement('cs:user');
 
@@ -133,7 +133,7 @@ class Invite extends DAV\Property
                $xuser->appendChild($commonName);
            }
 
-           switch ($user['status']) {
+           switch($user['status']) {
 
                case SharingPlugin::STATUS_ACCEPTED :
                    $status = $doc->createElement('cs:invite-accepted');
@@ -188,15 +188,15 @@ class Invite extends DAV\Property
      * @param \DOMElement $prop
      * @return DAV\IProperty
      */
-    public static function unserialize(\DOMElement $prop)
-    {
+    static function unserialize(\DOMElement $prop) {
+
         $xpath = new \DOMXPath($prop->ownerDocument);
         $xpath->registerNamespace('cs', CalDAV\Plugin::NS_CALENDARSERVER);
         $xpath->registerNamespace('d',  'urn:DAV');
 
         $users = array();
 
-        foreach ($xpath->query('cs:user', $prop) as $user) {
+        foreach($xpath->query('cs:user', $prop) as $user) {
 
             $status = null;
             if ($xpath->evaluate('boolean(cs:invite-accepted)', $user)) {

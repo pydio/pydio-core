@@ -317,7 +317,7 @@ class ldapAuthDriver extends AbstractAuthDriver
     }
 
     // $baseGroup = "/"
-    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit)
+    public function listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive = true)
     {
         if (!empty($this->hasGroupsMapping)) {
             if ($baseGroup == "/") {
@@ -341,7 +341,7 @@ class ldapAuthDriver extends AbstractAuthDriver
         }
         return $persons;
     }
-    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null)
+    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null, $recursive = true)
     {
         if (!empty($this->hasGroupsMapping)) {
             if ($baseGroup == "/") {
@@ -414,7 +414,7 @@ class ldapAuthDriver extends AbstractAuthDriver
     }
 
 
-    public function listUsers($baseGroup = "/")
+    public function listUsers($baseGroup = "/", $recursive = true)
     {
         return $this->listUsersPaginated($baseGroup, null, -1, -1);
     }
@@ -558,6 +558,8 @@ class ldapAuthDriver extends AbstractAuthDriver
 
     public function updateUserObject(&$userObject)
     {
+
+        parent::updateUserObject($userObject);
         if(!empty($this->separateGroup)) $userObject->setGroupPath("/".$this->separateGroup);
         // SHOULD BE DEPRECATED
         if (!empty($this->customParamsMapping)) {
@@ -596,7 +598,9 @@ class ldapAuthDriver extends AbstractAuthDriver
                     $key = strtolower($params['MAPPING_LDAP_PARAM']);
                     if (isSet($entry[$key])) {
                         $value = $entry[$key][0];
+
                         $memberValues = array();
+
                         if ($key == "memberof") {
                             // get CN from value
                                     foreach ($entry[$key] as $possibleValue) {
@@ -631,6 +635,13 @@ class ldapAuthDriver extends AbstractAuthDriver
                                             $userObject->recomputeMergedRole();
                                             $changes = true;
                                         }
+                                    }
+                                }else{
+                                    $uniqValue = $value;
+                                    if ((!in_array($uniqValue, array_keys($userObject->getRoles()))) && !empty($uniqValue)) {
+                                        $userObject->addRole(AuthService::getRole($uniqValue, true));
+                                        $userObject->recomputeMergedRole();
+                                        $changes = true;
                                     }
                                 }
                                 break;
@@ -697,7 +708,6 @@ class ldapAuthDriver extends AbstractAuthDriver
             if ($changes) {
                 $userObject->save("superuser");
             }
-
         }
     }
 

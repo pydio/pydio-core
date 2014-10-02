@@ -615,15 +615,19 @@ class AJXP_XMLWriter
                 $slugString = "repositorySlug=\"$slug\"";
             }
             $isSharedString = "";
+            $ownerLabel = null;
             if ($repoObject->hasOwner()) {
                 $uId = $repoObject->getOwner();
                 $uObject = ConfService::getConfStorageImpl()->createUserObject($uId);
                 $label = $uObject->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $uId);
                 if(empty($label)) $label = $uId;
+                $ownerLabel = $label;
                 $isSharedString =  'owner="'.AJXP_Utils::xmlEntities($label).'"';
             }
             $descTag = "";
-            $description = $repoObject->getDescription();
+            $public = false;
+            if(!empty($_SESSION["CURRENT_MINISITE"])) $public = true;
+            $description = $repoObject->getDescription($public);
             if (!empty($description)) {
                 $descTag = '<description>'.AJXP_Utils::xmlEntities($description, true).'</description>';
             }

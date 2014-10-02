@@ -7,14 +7,15 @@ namespace Sabre\DAV;
  *
  * Implement this interface to create new complex properties
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-interface PropertyInterface
-{
+interface PropertyInterface {
+
     public function serialize(Server $server, \DOMElement $prop);
 
-    public static function unserialize(\DOMElement $prop);
+    static function unserialize(\DOMElement $prop);
 
 }
+

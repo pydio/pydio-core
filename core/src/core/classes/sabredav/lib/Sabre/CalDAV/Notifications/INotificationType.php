@@ -6,12 +6,12 @@ use Sabre\DAV;
 /**
  * This interface reflects a single notification type.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-interface INotificationType extends DAV\PropertyInterface
-{
+interface INotificationType extends DAV\PropertyInterface {
+
     /**
      * This method serializes the entire notification, as it is used in the
      * response body.
@@ -20,7 +20,7 @@ interface INotificationType extends DAV\PropertyInterface
      * @param \DOMElement $node
      * @return void
      */
-    public function serializeBody(DAV\Server $server, \DOMElement $node);
+    function serializeBody(DAV\Server $server, \DOMElement $node);
 
     /**
      * Returns a unique id for this notification
@@ -30,7 +30,7 @@ interface INotificationType extends DAV\PropertyInterface
      *
      * @return string
      */
-    public function getId();
+    function getId();
 
     /**
      * Returns the ETag for this notification.
@@ -39,6 +39,6 @@ interface INotificationType extends DAV\PropertyInterface
      *
      * @return string
      */
-    public function getETag();
+    function getETag();
 
 }

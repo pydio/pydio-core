@@ -115,12 +115,13 @@
 .flat_tree_pane div.webfx-tree-item{
     background-color: transparent;
     cursor: pointer;
-    padding: 3px 6px;
+    padding: 4px 20px;
 }
 
 .flat_tree_pane  div.webfx-tree-item a{
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.9) !important;
     cursor: pointer;
+    letter-spacing: 1px;
 }
 
 .flat_tree_pane  div.webfx-tree-item a span{
@@ -149,12 +150,17 @@
 }
 
 .flat_tree_pane > #tree_container >  .webfx-tree-container > .webfx-tree-item a span{
-    color: #FFFFFF;
+    color: rgba(255, 255, 255, 0.55);
     background-image: none!important;
-    padding-left: 4px;
+    padding-left: 0;
     margin-top: 5px;
-    font-size: 14px;
+    font-size: 10px;
     letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.flat_tree_pane > #tree_container > .webfx-tree-container > .webfx-tree-item a span:before{
+	display: none;
 }
 
 .flat_tree_pane div.webfx-tree-container.first_container {
@@ -170,7 +176,7 @@
 }
 
 .flat_tree_pane  div.webfx-tree-container > .webfx-tree-container{
-    /*background-color: rgba(255, 255, 255, 0.44);*/
+    /* background-color: rgba(255, 255, 255, 0.44); */
 }
 
 .flat_tree_pane  div.webfx-tree-container > .webfx-tree-container > .webfx-tree-container{
@@ -189,15 +195,19 @@
 }
 
 .flat_tree_pane  div.webfx-tree-container > .webfx-tree-container  div.webfx-tree-container  div.webfx-tree-item{
-    padding-left: 20px;
-}
-
-.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container > .webfx-tree-container div.webfx-tree-container  div.webfx-tree-item{
     padding-left: 40px;
 }
 
-.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container > .webfx-tree-container > .webfx-tree-container  div.webfx-tree-container  div.webfx-tree-item{
+.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container > .webfx-tree-container div.webfx-tree-container  div.webfx-tree-item{
     padding-left: 60px;
+}
+
+.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container > .webfx-tree-container > .webfx-tree-container > div.webfx-tree-container  div.webfx-tree-item{
+    padding-left: 80px;
+}
+
+.flat_tree_pane  div.webfx-tree-container > .webfx-tree-container > .webfx-tree-container > .webfx-tree-container > div.webfx-tree-container  > div.webfx-tree-container  div.webfx-tree-item{
+    padding-left: 100px;
 }
 
 div#tree_container > div:first-child {

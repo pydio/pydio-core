@@ -109,6 +109,9 @@
 							if(oForm.captcha_code){
 								connexion.addParameter('captcha_code', oForm.captcha_code.value);
 							}
+							oForm.select('input[data-ajxpLoginAdditionalParameter]').each(function(i){
+							    connexion.addParameter(i.name, i.getValue());
+							});
 							connexion.onComplete = function(transport){
 								var success = ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
 								if(transport.responseXML && XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){

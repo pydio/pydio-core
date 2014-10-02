@@ -21,7 +21,7 @@
 $mess=array(
     "1" => "Réinitialisation",
     "2" => "Mot de passe perdu",
-    "3" => "Entrez votre identifiant utilisateur",
+    "3" => "Entrez votre identifiant utilisateur, une demande de réinitialisation vous sera envoyée par email.",
     "4" => "Identifiant",
     "5" => "Un email contenant une demande de réinitialisation du mot de passe a été envoyé à l'adresse enregistrée avec votre compte. Cliquez sur le lien du mail pour créer un nouveau mot de passe.",
     "6" => "Merci, vous pouvez à présent vous connecter avec ce nouveau mot de passe!",

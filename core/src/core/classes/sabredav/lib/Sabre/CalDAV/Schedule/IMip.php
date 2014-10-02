@@ -15,12 +15,12 @@ use Sabre\DAV;
  * If you want to customize the email that gets sent out, you can do so by
  * extending this class and overriding the sendMessage method.
  *
- * @copyright Copyright (C) 2007-2013 Rooftop Solutions. All rights reserved.
- * @author Evert Pot (http://www.rooftopsolutions.nl/)
- * @license http://code.google.com/p/sabredav/wiki/License Modified BSD License
+ * @copyright Copyright (C) 2007-2014 fruux GmbH (https://fruux.com/).
+ * @author Evert Pot (http://evertpot.com/)
+ * @license http://sabre.io/license/ Modified BSD License
  */
-class IMip
-{
+class IMip {
+
     /**
      * Email address used in From: header.
      *
@@ -36,8 +36,8 @@ class IMip
      *                             generally be some kind of no-reply email
      *                             address you own.
      */
-    public function __construct($senderEmail)
-    {
+    public function __construct($senderEmail) {
+
         $this->senderEmail = $senderEmail;
 
     }
@@ -51,15 +51,15 @@ class IMip
      * @param string $principal Principal Url of the originator
      * @return void
      */
-    public function sendMessage($originator, array $recipients, VObject\Component $vObject, $principal)
-    {
-        foreach ($recipients as $recipient) {
+    public function sendMessage($originator, array $recipients, VObject\Component $vObject, $principal) {
+
+        foreach($recipients as $recipient) {
 
             $to = $recipient;
             $replyTo = $originator;
             $subject = 'SabreDAV iTIP message';
 
-            switch (strtoupper($vObject->METHOD)) {
+            switch(strtoupper($vObject->METHOD)) {
                 case 'REPLY' :
                     $subject = 'Response for: ' . $vObject->VEVENT->SUMMARY;
                     break;
@@ -74,7 +74,7 @@ class IMip
             $headers = array();
             $headers[] = 'Reply-To: ' . $replyTo;
             $headers[] = 'From: ' . $this->senderEmail;
-            $headers[] = 'Content-Type: text/calendar; method=' . (string) $vObject->method . '; charset=utf-8';
+            $headers[] = 'Content-Type: text/calendar; method=' . (string)$vObject->method . '; charset=utf-8';
             if (DAV\Server::$exposeVersion) {
                 $headers[] = 'X-Sabre-Version: ' . DAV\Version::VERSION . '-' . DAV\Version::STABILITY;
             }
@@ -99,8 +99,9 @@ class IMip
      * @param array $headers List of headers
      * @return void
      */
-    protected function mail($to, $subject, $body, array $headers)
-    {
+    protected function mail($to, $subject, $body, array $headers) {
+
+
         mail($to, $subject, $body, implode("\r\n", $headers));
 
     }

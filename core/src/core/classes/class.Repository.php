@@ -179,6 +179,7 @@ class Repository implements AjxpGroupPathProvider
         if ($parentId == null) {
             $parentId = $this->getId();
         }
+        $repo->setInferOptionsFromParent(true);
         $repo->setOwnerData($parentId, $owner, $uniqueUser);
         return $repo;
     }
@@ -557,9 +558,10 @@ class Repository implements AjxpGroupPathProvider
     }
 
     /**
+     * @param bool $public
      * @return String
      */
-    public function getDescription ()
+    public function getDescription( $public = false, $ownerLabel = null )
     {
         $m = ConfService::getMessages();
         if (isset($this->options["USER_DESCRIPTION"]) && !empty($this->options["USER_DESCRIPTION"])) {
@@ -568,12 +570,20 @@ class Repository implements AjxpGroupPathProvider
             } else {
                 return $this->options["USER_DESCRIPTION"];
             }
-        }if (isSet($this->parentId) && isset($this->owner)) {
+        }
+        if (isSet($this->parentId) && isset($this->owner)) {
             if (isSet($this->options["CREATION_TIME"])) {
                 $date = AJXP_Utils::relativeDate($this->options["CREATION_TIME"], $m);
-                return str_replace(array("%date", "%user"), array($date, $this->owner), $m["473"]);
+                return str_replace(
+                    array("%date", "%user"),
+                    array($date, $ownerLabel!= null ? $ownerLabel : $this->owner),
+                    $public?$m["470"]:$m["473"]);
             } else {
-                return str_replace(array("%user"), array($this->owner), $m["472"]);
+                if($public) return $m["474"];
+                else return str_replace(
+                    array("%user"),
+                    array($ownerLabel!= null ? $ownerLabel : $this->owner),
+                    $m["472"]);
             }
         } else if ($this->isWriteable() && isSet($this->options["CREATION_TIME"])) {
             $date = AJXP_Utils::relativeDate($this->options["CREATION_TIME"], $m);

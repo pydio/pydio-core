@@ -202,7 +202,10 @@ Class.create("UserWidget", {
 		document.stopObserving("ajaxplorer:actions_loaded", this.actLoaded );		
 		if(Prototype.Browser.IE) {
 			document.stopObserving("ajaxplorer:actions_refreshed", this.actLoaded );
-		}		
+		}
+        if(this.menu){
+            this.menu.destroy();
+        }
 		this.element = null;
 	}
 	

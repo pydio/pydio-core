@@ -2,13 +2,15 @@
 <ajxp_plugin name="share" label="CONF_MESSAGE[Sharing Features]" description="CONF_MESSAGE[Share Center actions and hooks]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <server_settings>
         <global_param name="FORK_EVENT_FORWARDING" type="boolean" label="Fork Events Forwarding" description="If you detect performances issues while modifiyng files under deep trees, try activating that one. Please be sure of what you do, this may trigger a whole lot of php processes on the server." default="false"/>
+        <global_param name="ENABLE_FILE_PUBLIC_LINK" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Enable public link generation for files]" label="CONF_MESSAGE[Enable public links for files]" type="boolean" default="true" expose="true"/>
         <global_param name="USE_REWRITE_RULE" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Use web server RewriteEngine mechanism to generate prettier URLs]" label="CONF_MESSAGE[Use Rewrite Rule]" type="boolean" default="false"/>
         <global_param name="HASH_MIN_LENGTH" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Minimum length of the generated hash]" label="CONF_MESSAGE[Hash minimum length]" type="integer" default="6"/>
+        <global_param name="HASH_USER_EDITABLE" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Allow users to manually choose a hash for the generated links]" label="CONF_MESSAGE[Hash user-editable]" type="boolean" default="true" expose="true"/>
         <global_param name="FILE_MAX_EXPIRATION" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Maximum share expiration limit for file, 0 = unlimited]" label="CONF_MESSAGE[Maximum file expiration limit]" type="integer" default="0" expose="true"/>
         <global_param name="FILE_MAX_DOWNLOAD" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Maximum download limit for file, 0 = unlimited]" label="CONF_MESSAGE[Maximum file download limit]" type="integer" default="0" expose="true"/>
         <global_param name="EMAIL_INVITE_EXTERNAL" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Use external mailer for invitations]" label="CONF_MESSAGE[Force External Mailer]" type="boolean" default="false" expose="true"/>
         <global_param name="CREATE_QRCODE" group="CONF_MESSAGE[Link Generation]" description="CONF_MESSAGE[Create and display QRCode for shared link]" label="CONF_MESSAGE[Create QRCode]" type="boolean" default="false" expose="true"/>
-        <global_param name="ENABLE_FOLDER_SHARING" group="CONF_MESSAGE[Folder Sharing]" description="CONF_MESSAGE[Enable folder sharing (workspace and minisite)]" label="CONF_MESSAGE[Enable folder sharing]" type="boolean" default="true" expose="true"/>
+        <global_param name="ENABLE_FOLDER_SHARING" group="CONF_MESSAGE[Folder Sharing]" description="CONF_MESSAGE[Enable folder sharing (workspace and minisite)]" label="CONF_MESSAGE[Enable folder sharing]" type="select" choices="both|Minisites and Workspaces,minisite|Minisites only,workspace|Workspaces only,disable|Disable Folder Sharing" mandatory="true" default="both" expose="true"/>
         <global_param name="AVOID_SHARED_FOLDER_SAME_LABEL" group="CONF_MESSAGE[Folder Sharing]" description="CONF_MESSAGE[Disallow users to create shared folders if a workspace already exists with the same label]" label="CONF_MESSAGE[Avoid labels duplication]" type="boolean" default="false"/>
         <global_param name="SHARED_USERS_TMP_PREFIX" group="CONF_MESSAGE[Shared users configurations]" description="CONF_MESSAGE[Mandatory prefix for users created temporary users login]" label="CONF_MESSAGE[Tmp users prefix]" type="string" expose="true"/>
         <global_param name="CUSTOM_SHAREPAGE_TITLE" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Page Title]" description="CONF_MESSAGE[Share page title. Use AJXP_FILENAME keyword to display the file name.]" mandatory="false" default=""/>
@@ -24,44 +26,6 @@
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_COLOR" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Background Color]" description="CONF_MESSAGE[Share page background color.]" mandatory="false" default="#FFFFFF"/>
         <global_param name="CUSTOM_SHAREPAGE_TEXT_COLOR" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Text Color]" description="CONF_MESSAGE[Share page text color.]" mandatory="false" default="#399c9b"/>
         <global_param name="CUSTOM_SHAREPAGE_TEXTSHADOW_COLOR" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Text Shadow]" description="CONF_MESSAGE[Share page text shadow color.]" mandatory="false" default="#FFFFFF"/>
-        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_1" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Custom Background (1)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
-                      editable="true"
-                      uploadAction="store_binary_temp"
-                      loadAction="get_global_binary_param"
-                      defaultImage="plugins/action.share/res/hi-res/PARIS.jpg"
-                      expose="true"
-        />
-        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_1" group="CONF_MESSAGE[Page Background Images]" type="select"
-                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:100%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
-                      label="CONF_MESSAGE[Background Attributes(1)]" description="CONF_MESSAGE[Image used as a background]"
-                      mandatory="false" expose="true" default="background-repeat:repeat;background-size:100%;background-position:50% 50%;"/>
-        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_2" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Custom Background (2)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
-                      editable="true"
-                      uploadAction="store_binary_temp"
-                      loadAction="get_global_binary_param"
-                      defaultImage="plugins/action.share/res/hi-res/NORMANDY.jpg"
-                      expose="true"
-        />
-        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_2" group="CONF_MESSAGE[Page Background Images]" type="select"
-                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:100%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
-                      label="CONF_MESSAGE[Background Attributes(2)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false" expose="true"  default="background-repeat:repeat;background-size:100%;background-position:50% 50%;"/>
-        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_3" group="CONF_MESSAGE[Page Background Images]" type="image" label="CONF_MESSAGE[Custom Background (3)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false"
-                      editable="true"
-                      uploadAction="store_binary_temp"
-                      loadAction="get_global_binary_param"
-                      defaultImage="plugins/action.share/res/hi-res/CRETE.jpg"
-                      expose="true"
-        />
-        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_3" group="CONF_MESSAGE[Page Background Images]" type="select"
-                      choices="background-repeat:no-repeat;background-position:50% 50%;|Center in Page (no-repeat),background-repeat:repeat;background-size:100%;background-position:50% 50%;|Fetch Window (repeat vertically),background-repeat:no-repeat;background-size:100%; background-position:center center;|Fetch Window (no repeat),background-repeat:repeat;|Tile (repeat both directions)"
-                      label="CONF_MESSAGE[Background Attributes(3)]" description="CONF_MESSAGE[Image used as a background]" mandatory="false" expose="true"  default="background-repeat:repeat;background-size:100%;background-position:50% 50%;"/>
-        <global_param name="CUSTOM_MINISITE_LOGO" group="CONF_MESSAGE[Minisite]" type="image" label="CONF_MESSAGE[Minisite Logo]" description="CONF_MESSAGE[Top-right logo displayed on minisite page]" mandatory="false"
-                      editable="true"
-                      uploadAction="store_binary_temp"
-                      loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/PydioLogo250.png"
-                      expose="true"
-        />
     </server_settings>
     <client_settings>
         <resources>
@@ -72,26 +36,6 @@
     </client_settings>
     <registry_contributions>
         <actions>
-            <action name="share-menu">
-                <gui text="share_center.110b" title="292" src="share.png"
-                     iconClass="icon-share" hasAccessKey="false">
-                    <context selection="true" dir="" recycle="hidden"
-                             actionBar="false" contextMenu="true" infoPanel="true"
-                             actionBarGroup="get" behaviour="hidden">
-                    </context>
-                    <selectionContext dir="true" unique="false" behaviour="hidden"
-                                      evalMetadata="(!metadata.get('ajxp_mime') || !metadata.get('ajxp_mime').startsWith('shared_')) &amp;&amp; !metadata.get('ajxp_shared')"
-                                      file="true" recycle="false"/>
-                </gui>
-                <subMenu>
-                    <dynamicItems>
-                        <item actionId="share-folder-minisite-public"/>
-                        <item actionId="share-folder-workspace"/>
-                        <item actionId="share-file-minisite"/>
-                        <item actionId="share-selection-minisite"/>
-                    </dynamicItems>
-                </subMenu>
-            </action>
             <action name="share">
                 <gui text="292" title="292" src="share.png" iconClass="icon-share" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden" actionBar="false" contextMenu="false" infoPanel="false"/>
@@ -104,22 +48,9 @@
                         ajaxplorer.actionBar.shareCenter.performShareAction();
                     ]]></clientCallback>
                     <clientForm id="share_form"><![CDATA[
-                        <div id="share_form" box_width="420" action="share"><div class="dialogContentMainTitle" ajxp_message_id="share_center.92">AJXP_MESSAGE[share_center.92]</div>
-                            <div id="share_optional_fields">
-                                <div class="SF_horizontal_labelRow">
-                                    <div class="SF_label" ajxp_message_id="share_center.23" style="width:130px;" title="AJXP_MESSAGE[share_center.23]">AJXP_MESSAGE[share_center.23]</div>
-                                    <div class="SF_label" ajxp_message_id="share_center.21" style="width:100px;" title="AJXP_MESSAGE[share_center.21]">AJXP_MESSAGE[share_center.21]</div>
-                                    <div class="SF_label" ajxp_message_id="share_center.22" style="width:100px;" title="AJXP_MESSAGE[share_center.22]">AJXP_MESSAGE[share_center.22]</div>
-                                </div>
-                                <div class="SF_horizontal_fieldsRow">
-                                    <input type="password" name="password" value="" placeholder="AJXP_MESSAGE[share_center.23]" autocomplete="off" class="SF_input" style="width:130px !important;">
-                                    <input type="text" name="expiration" value="0" placeholder="AJXP_MESSAGE[share_center.21]" class="SF_input SF_number" style="width:100px !important;">
-                                    <input type="text" name="downloadlimit" value="0" placeholder="AJXP_MESSAGE[share_center.22]" class="SF_input SF_number" style="width:100px !important;">
-                                    <div class="SF_horizontal_actions"><span id="generate_publiclet" class="SF_horizontal_action icon-plus-sign dialogFocus"></span></div>
-                                </div>
-                                <div class="SF_element" id="public_pass_container" style="display:none;height:20px;"></div>
-                            </div>
-                            <div class="dialogLegend" ajxp_message_id="share_center.24" style="clear: both;padding: 10px 1px 0;font-size: 13px;line-height: 19px;">AJXP_MESSAGE[share_center.24]</div>
+                        <div id="share_form" box_width="420" action="share">
+                            <div class="dialogContentMainTitle" ajxp_message_id="share_center.161">AJXP_MESSAGE[share_center.161]</div>
+                            <div class="dialogContentLegend" ajxp_message_id="share_center.162">AJXP_MESSAGE[share_center.162]</div>
                             <div style="display:none;position:relative;margin-bottom:20px;clear:left; padding-top: 20px;" id="share_result">
                                 <div class="dialogContentMainTitle" ajxp_message_id="share_center.93">AJXP_MESSAGE[share_center.93]</div>
                                 <div class="SF_horizontal_fieldsRow" style="display:none; margin-bottom:7px;">
@@ -181,6 +112,7 @@
                             </div>
                             <div id="target_repository" style="margin-bottom:15px;">
                                 <div id="public_link_parameters" style="margin:0 5px;min-height: 20px;">
+                                    <!-- LABEL & DESCRIPTION -->
                                     <div class="SF_element">
                                         <div class="SF_label" ajxp_message_id="share_center.35" title="AJXP_MESSAGE[share_center.35]">AJXP_MESSAGE[share_center.35]</div>
                                         <input type="text" value="" id="repo_label" name="repo_label" class="SF_input" placeholder="AJXP_MESSAGE[share_center.35]"/>
@@ -191,8 +123,13 @@
                                         <br style="clear:both;">
                                     </div>
                                     <div class="mode-minipub">
-                                        <div id="target_user_simple" class="mode-minipub" style="margin:0 5px;">
+                                        <div id="target_user_simple" class="mode-minipub" style="margin:0 5px;"></div>
+                                        <!-- EDITABLE HASH -->
+                                        <div id="editable_hash_container">
+                                            <div class="dialogContentMainTitle">Link</div>
+                                            <div id="editable_hash_link" style="margin:10px;font-size:13px;"><input type="text" name="minisite_hash_update" value="" style="width: 90px;padding: 0 2px;margin: 0 1px;"></div>
                                         </div>
+                                        <!-- SECURITY -->
                                         <div class="dialogContentMainTitle">AJXP_MESSAGE[share_center.147]</div>
                                         <div class="SF_element">
                                             <div class="SF_label" ajxp_message_id="share_center.23" style="width:130px;" title="AJXP_MESSAGE[share_center.23]">AJXP_MESSAGE[share_center.23]</div>
@@ -213,6 +150,7 @@
                                                 <input type="checkbox" style="clear:none;" id="simple_right_write" name="simple_right_write" class=""> <label class="" for="simple_right_write"> AJXP_MESSAGE[share_center.74]</label>
                                             </div>
                                         </div>
+                                        <!-- LAYOUT -->
                                         <div class="dialogContentMainTitle no_share_leaf">AJXP_MESSAGE[share_center.151]</div>
                                         <div class="no_share_leaf" style="padding-top:8px;">
                                             <div class="layout_template_container SF_element"></div>
@@ -288,9 +226,9 @@
                         ]]>
                     </clientForm>
                     <clientListener name="init"><![CDATA[
-                        if(ajaxplorer.user && !ajaxplorer.user.canWrite() || ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.share']").get("ENABLE_FOLDER_SHARING") === false ){
+                        if(ajaxplorer.user && !ajaxplorer.user.canWrite() || ajaxplorer.getPluginConfigs("action.share").get("ENABLE_FOLDER_SHARING") == "disable" ){
                             var action = ajaxplorer.getActionBar().getActionByName('share');
-                            action.selectionContext.dir = false;
+                            if(action) action.selectionContext.dir = false;
                         }
                     ]]></clientListener>
                     <serverCallback methodName="switchAction" developerComment="Main action for sharing a file or a folder">
@@ -434,43 +372,6 @@
                     ]]></clientCallback>
                 </processing>
             </action>
-            <!--
-            <action name="sharelist-copyUrl">
-                <gui text="share_center.129" title="share_center.130" iconClass="icon-copy" src="editcopy.png" accessKey="" hasAccessKey="false">
-                    <context selection="true" dir="" recycle="false"
-                             actionBar="true" contextMenu="true" infoPanel="true"
-                             actionBarGroup="share_list_toolbar-selection" inZip="false">
-                    </context>
-                    <selectionContext dir="false" file="true" recycle="false" unique="true" evalMetadata="metadata.get('copy_url')" behaviour="hidden"/></gui>
-                <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
-                <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-						var onLoad = function(oForm){
-						    if(window.navigator.platform.startsWith("Mac")){
-						        $(oForm).select(".macos_only").invoke("show");
-						        $(oForm).select(".non_macos").invoke("hide");
-						    }
-							var firstNode = window.actionManager.getDataModel().getUniqueNode();
-			   		    	var copyDiv = $(oForm).down('input[id="text_copy"]');
-			   		    	copyDiv.setValue(firstNode.getMetadata().get('copy_url').stripTags());
-			   		    	copyDiv.select();
-						};
-						modal.showDialogForm('Delete', 'copy_url_form', onLoad, function(){
-							hideLightBox(true);
-							return false;
-						},null,true);
-						]]></clientCallback>
-                    <clientForm id="copy_url_form"><![CDATA[
-					<div id="copy_url_form" action="copy" box_width="280">
-					    <div class="non_macos" style="font-size:1.5em;padding:5px 0;">Use <kbd>Ctrl</kbd>+<kbd>C</kbd>to copy the url to your clipboard</div>
-					    <div class="macos_only" style="display:none; font-size:1.2em;padding:5px 0;">Use <kbd>&#8984;</kbd>+<kbd>C</kbd> to copy the url to your clipboard</div>
-						<input  style="font-size:1.2em; width: 98%;" id="text_copy" class="dialogFocus"/>
-					</div>
-					]]></clientForm>
-                    <serverCallback methodName="switchAction"/>
-                </processing>
-            </action>
-            -->
             <action name="sharelist-load">
                 <gui src="share.png" iconClass="icon-refresh" text="149" title="149">
                     <context dir="true" recycle="false" selection="false" actionBar="true" actionBarGroup="share_list_toolbar" behaviour="hidden"/>
@@ -536,6 +437,22 @@
                     <clientCallback dialogOpenForm="share_current_url" dialogSkipButtons="true" prepareModal="true">
                         <dialogOnOpen><![CDATA[
                             modal.getForm().down("#crt-page-url").setValue(document.location.href);
+                            if(!ajaxplorer.getContextHolder().isEmpty() && ajaxplorer.getActionBar().getActionByName("download")){
+                                var tpl = new Template('<div style="font-size: 16px; padding-top:15px; text-align:left;">#{title} <a href="#{link}" target="_blank" class="icon-link" style="font-size: 0.8em;"></a></div><input type="text" value="#{link}" style="width: 98%;">');
+                                var node = ajaxplorer.getContextHolder().getUniqueNode();
+                                var editors = ajaxplorer.findEditorsForMime(node.getAjxpMime(), true);
+                                if(editors.length && Class.getByName(editors[0].editorClass)){
+                                    var staticClass = Class.getByName(editors[0].editorClass).prototype;
+                                    if(staticClass.getRESTPreviewLinks){
+                                        var links = staticClass.getRESTPreviewLinks(node);
+                                        $H(links).each(function(pair){
+                                            modal.getForm().down("#additional_links").insert(tpl.evaluate({title:pair.key,link:document.location.href.split('?').shift() + "?dl=true&ct=true"+pair.value}));
+                                        });
+                                    }
+                                }
+                                var dlLink = document.location.href.split('?').shift() + "?dl=true&file=" + encodeURIComponent(node.getPath());
+                                modal.getForm().down("#additional_links").insert(tpl.evaluate({title:"Direct Download",link:dlLink}));
+                            }
                         ]]></dialogOnOpen>
                         <dialogOnComplete><![CDATA[
                             hideLightBox();
@@ -543,9 +460,12 @@
                         <dialogOnCancel><![CDATA[]]></dialogOnCancel>
                     </clientCallback>
                     <clientForm id="share_current_url"><![CDATA[
-                        <div id="share_current_url" box_width="300">
-                            AJXP_MESSAGE[share_center.112] :
-                            <input type="text" id="crt-page-url" value="">
+                        <div id="share_current_url" box_width="300" style="text-align:center;">
+                            <input type="text" id="crt-page-url" onclick="$(this).select();" value="" style="width: 387px;text-align: center;font-size: 19px;margin: 10px 0;padding: 5px;">
+                            <div class="non_macos">AJXP_MESSAGE[share_center.143]</div>
+                            <div class="macos_only" style="display:none;">AJXP_MESSAGE[share_center.144]</div>
+                            <br>
+                            <div id="additional_links" style="padding-bottom:10px;"></div>
                         </div>
                     ]]></clientForm>
                 </processing>

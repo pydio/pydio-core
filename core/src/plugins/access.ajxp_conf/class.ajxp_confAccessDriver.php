@@ -226,7 +226,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         foreach ($groups as $groupId => $groupLabel) {
 
             if (preg_match("/$term/i", $groupLabel) == TRUE ) {
-                $nodeKey = "/data/users/".trim($baseGroup, "/")."/".ltrim($groupId,"/");
+                $trimmedG = trim($baseGroup, "/");
+                if(!empty($trimmedG)) $trimmedG .= "/";
+                $nodeKey = "/data/users/".$trimmedG.ltrim($groupId,"/");
                 $meta = array(
                     "icon" => "users-folder.png",
                     "ajxp_mime" => "group"
@@ -240,8 +242,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
         $users = AuthService::listUsers($baseGroup, $term);
         foreach ($users as $userId => $userObject) {
+            $trimmedG = trim($userObject->getGroupPath(), "/");
+            if(!empty($trimmedG)) $trimmedG .= "/";
 
-            $nodeKey = "/data/users/".trim($userObject->getGroupPath(),"/")."/".$userId;
+            $nodeKey = "/data/users/".$trimmedG.$userId;
             $meta = array(
                 "icon" => "user.png",
                 "ajxp_mime" => "user"
@@ -541,18 +545,23 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     //$repos = ConfService::getAccessibleRepositories($userObject, true, true, ($userObject == null ? false:true));
                     $allReps = ConfService::getRepositoriesList("all", ($userObject == null ? false:true));
                     $repos = array();
-                    foreach ($allReps as $repositoryId => $repositoryObject) {
-                        if (!ConfService::repositoryIsAccessible($repositoryId, $repositoryObject, $userObject, true, ($userObject == null ? false:true))) {
-                            continue;
+                    if(!empty($userObject)){
+                        // USER
+                        foreach ($allReps as $repositoryId => $repositoryObject) {
+                            if (!ConfService::repositoryIsAccessible($repositoryId, $repositoryObject, $userObject, true, ($userObject == null ? false:true))) {
+                                continue;
+                            }
+                            $repos[$repositoryId] = SystemTextEncoding::toUTF8($repositoryObject->getDisplay());
                         }
-                        $repos[$repositoryId] = SystemTextEncoding::toUTF8($repositoryObject->getDisplay());
+                    }else{
+                        foreach ($allReps as $repositoryId => $repositoryObject) {
+                            if (!AuthService::canAdministrate($repositoryObject)) {
+                                continue;
+                            }
+                            $repos[$repositoryId] = SystemTextEncoding::toUTF8($repositoryObject->getDisplay());
+                        }
                     }
                     // Make sure it's utf8
-                    /*
-                    foreach($repos as $r => $rLabel){
-                        $repos[$r] = SystemTextEncoding::toUTF8($rLabel);
-                    }
-                    */
                     $data = array(
                         "ROLE" => $roleData,
                         "ALL"  => array(
@@ -725,12 +734,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     AJXP_XMLWriter::close();
                     return;
                 }
-                $new_user_login = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($httpVars["new_user_login"]), AJXP_SANITIZE_EMAILCHARS);
+                $original_login = SystemTextEncoding::magicDequote($httpVars["new_user_login"]);
+                $new_user_login = AJXP_Utils::sanitize($original_login, AJXP_SANITIZE_EMAILCHARS);
+                if($original_login != $new_user_login){
+                    throw new Exception(str_replace("%s", $new_user_login, $mess["ajxp_conf.127"]));
+                }
                 if (AuthService::userExists($new_user_login, "w") || AuthService::isReservedUserId($new_user_login)) {
-                    AJXP_XMLWriter::header();
-                    AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.43"]);
-                    AJXP_XMLWriter::close();
-                    return;
+                    throw new Exception($mess["ajxp_conf.43"]);
                 }
 
                 AuthService::createUser($new_user_login, $httpVars["new_user_pwd"]);
@@ -1671,13 +1681,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         $this->logInfo("Listing plugins",""); // make sure that the logger is started!
         $pServ = AJXP_PluginsService::getInstance();
         $types = $pServ->getDetectedPlugins();
+        $mess = ConfService::getMessages();
         $uniqTypes = array("core");
         $coreTypes = array("auth", "conf", "boot", "feed", "log", "mailer", "mq");
         if ($dir == "/plugins" || $dir == "/core_plugins") {
             if($dir == "/core_plugins") $uniqTypes = $coreTypes;
             else $uniqTypes = array_diff(array_keys($types), $coreTypes);
-            if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.plugins_folder">
+            if(!$returnNodes) AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="detail"  template_name="ajxp_conf.plugins_folder">
             <column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
+            <column messageId="ajxp_conf.103" attributeName="plugin_description" sortType="String"/>
+            <column messageId="ajxp_conf.102" attributeName="plugin_id" sortType="String"/>
             </columns>');
             ksort($types);
             foreach ($types as $t => $tPlugs) {
@@ -1686,7 +1699,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $nodeKey = "/".$root.$dir."/".$t;
                 $meta = array(
                     "icon" 		=> "folder_development.png",
-                    "plugin_id" => $t
+                    "plugin_id" => $t,
+                    "text" => $mess["plugtype.title.".$t],
+                    "plugin_description" => $mess["plugtype.desc.".$t]
                 );
                 if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
                 $xml = AJXP_XMLWriter::renderNode($nodeKey, ucfirst($t), false, $meta, true, false);
@@ -1771,7 +1786,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
         if ($findNodePosition != null && $hashValue == null) {
 
-            $position = AuthService::findUserPage($findNodePosition, $USER_PER_PAGE);
+            // Add groups offset
+            $groups = AuthService::listChildrenGroups($baseGroup);
+            $offset = 0;
+            if(count($groups)){
+                $offset = count($groups);
+            }
+            $position = AuthService::findUserPage($baseGroup, $findNodePosition, $USER_PER_PAGE);
             if($position != -1){
 
                 $key = "/data/".$root."/".$findNodePosition;
@@ -1819,18 +1840,18 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         if(!AuthService::usersEnabled()) return ;
         if(empty($hashValue)) $hashValue = 1;
 
-        $count = AuthService::authCountUsers($baseGroup);
+        $count = AuthService::authCountUsers($baseGroup, "", null, null, false);
         if (AuthService::authSupportsPagination() && $count >= $USER_PER_PAGE) {
             $offset = ($hashValue - 1) * $USER_PER_PAGE;
             if(!$returnNodes) AJXP_XMLWriter::renderPaginationData($count, $hashValue, ceil($count/$USER_PER_PAGE));
-            $users = AuthService::listUsers($baseGroup, "", $offset, $USER_PER_PAGE);
+            $users = AuthService::listUsers($baseGroup, "", $offset, $USER_PER_PAGE, true, false);
             if ($hashValue == 1) {
                 $groups = AuthService::listChildrenGroups($baseGroup);
             } else {
                 $groups = array();
             }
         } else {
-            $users = AuthService::listUsers($baseGroup);
+            $users = AuthService::listUsers($baseGroup, "", -1, -1, true, false);
             $groups = AuthService::listChildrenGroups($baseGroup);
         }
         foreach ($groups as $groupId => $groupLabel) {

@@ -128,7 +128,7 @@ $mess=array(
 "106" => "Unique Identifier",
 "107" => "Plugin Configurations",
 "108" => "Documentation",
-"109" => "Global Configurations",
+"109" => "Application Parameters",
 "110" => "Workspaces & Users",
 "111" => "Logs & Other Data",
 "112" => "<b>Apply this role by default</b> to all new users.",
@@ -147,4 +147,5 @@ $mess=array(
 "124" => "Source",
 "125" => "Alias",
 "126" => "Are you sure that you want to delete the selected element(s)?",
+"127" => "Warning, please do not use special characters, user would be created with login id '%s'",
 );
