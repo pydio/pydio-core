@@ -19,13 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Allowed Extensions" => "Erlaubte Erweiterungen",
-"Extensions List" => "Erweiterungsliste",
-"Ext. Label" => "Ext. Bezeichnung",
-"Limitations" => "Limitierungen",
-"Files Number" => "Anzahl Dateien",
-"File Size" => "Dateigröße",
-"Cumul. Size" => "Gesamtgröße",
-"Uploaders Options" => "Uploaders Options",
-"Options shared by all uploaders plugins" => "Options shared by all uploaders plugins",
+"DB Storage" => "DB Speicherung",
+"Stores the logs in an SQL database." => "Speichert die Logs in einer SQL Datenbank.",
+"Connexion" => "Verbindung",
+"The Database Connexion" => "Die Datenbank Verbindung",
+"SQL Tables" => "SQL-Tabellen",
+"Install SQL Tables" => "SQL-Tabellen installieren",
 );

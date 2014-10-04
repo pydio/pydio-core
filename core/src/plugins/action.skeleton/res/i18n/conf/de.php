@@ -19,13 +19,12 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Allowed Extensions" => "Erlaubte Erweiterungen",
-"Extensions List" => "Erweiterungsliste",
-"Ext. Label" => "Ext. Bezeichnung",
-"Limitations" => "Limitierungen",
-"Files Number" => "Anzahl Dateien",
-"File Size" => "Dateigröße",
-"Cumul. Size" => "Gesamtgröße",
-"Uploaders Options" => "Uploaders Options",
-"Options shared by all uploaders plugins" => "Options shared by all uploaders plugins",
+"Skeleton Plugin" => "Skeleton Plugin",
+"This is an empty container to demonstrate the basics of plugins coding." => "Dies ist ein leerer Container um die Grundlagen der Plugin-Entwicklung zu Demonstrieren.",
+"Custom Footer" => "Angepasste Fusszeile",
+"Show a custom footer div" => "Eine angepasste Fusszeile anzeigen",
+"Footer Content" => "Fusszeile Inhalt",
+"Display this content in the footer" => "Zeigt diesen Inhalt in der Fusszeile an",
+"Button Target Url" => "Button Ziel-URL",
+"The target URL of the button that will be added to the application" => "Die Ziel-URL des Button der der Anwendung hinzugefügt wird.",
 );

@@ -19,13 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Allowed Extensions" => "Erlaubte Erweiterungen",
-"Extensions List" => "Erweiterungsliste",
-"Ext. Label" => "Ext. Bezeichnung",
-"Limitations" => "Limitierungen",
-"Files Number" => "Anzahl Dateien",
-"File Size" => "Dateigröße",
-"Cumul. Size" => "Gesamtgröße",
-"Uploaders Options" => "Uploaders Options",
-"Options shared by all uploaders plugins" => "Options shared by all uploaders plugins",
+"EXIF Extractor" => "EXIF Extractor",
+"Display the Exif metadata contained inside the JPG files. Can locate the image on a map if it contains geolocation data." => "Zeigt die EXIF-Metadaten von JPG-Dateien an. Kann Bilder auf einer Karte lokalisieren, wenn es GPS-Daten enthält.",
 );

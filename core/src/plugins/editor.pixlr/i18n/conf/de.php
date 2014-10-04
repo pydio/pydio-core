@@ -19,13 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Allowed Extensions" => "Erlaubte Erweiterungen",
-"Extensions List" => "Erweiterungsliste",
-"Ext. Label" => "Ext. Bezeichnung",
-"Limitations" => "Limitierungen",
-"Files Number" => "Anzahl Dateien",
-"File Size" => "Dateigröße",
-"Cumul. Size" => "Gesamtgröße",
-"Uploaders Options" => "Uploaders Options",
-"Options shared by all uploaders plugins" => "Options shared by all uploaders plugins",
+"Pixlr Editor" => "Pixlr Editor",
+"Bridge to the Pixlr.com webservice that allow online image edition via a photoshop-like GUI." => "Verbindung zu Pixlr.com-Webservice die es erlaubt Bilder mit einer Photoshop ähnlichen Benutzeroberfläche zu bearbeiten.",
+"Add a secure token to the target script to make sure that we are downloading an authorized image. The .htaccess file contained in the plugin must be correctly configured (apache)" => "Fügen Sie einen secure Token hinzu damit wir sicher sind, dass wir autorisierte sind Bilder herunterzuladen. Die im Plugin enthalten htaccess-Datei muss korrekt konfiguriert werden (Apache).",
+"Secure Token" => "Secure Token",
 );

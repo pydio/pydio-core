@@ -19,13 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Allowed Extensions" => "Erlaubte Erweiterungen",
-"Extensions List" => "Erweiterungsliste",
-"Ext. Label" => "Ext. Bezeichnung",
-"Limitations" => "Limitierungen",
-"Files Number" => "Anzahl Dateien",
-"File Size" => "Dateigröße",
-"Cumul. Size" => "Gesamtgröße",
-"Uploaders Options" => "Uploaders Options",
-"Options shared by all uploaders plugins" => "Options shared by all uploaders plugins",
+"Audio Player" => "Audioplayer",
+"Inserts a flash player for reading mp3 files online, and playing a whole folder in a separate window." => "Fügt einen Flash-Player für das Abspielen von MP3-Dateien hinzu und kann einen ganzen Ordner in einen eigenen Fenster abspielen.",
 );

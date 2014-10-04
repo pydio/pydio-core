@@ -19,13 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Allowed Extensions" => "Erlaubte Erweiterungen",
-"Extensions List" => "Erweiterungsliste",
-"Ext. Label" => "Ext. Bezeichnung",
-"Limitations" => "Limitierungen",
-"Files Number" => "Anzahl Dateien",
-"File Size" => "Dateigröße",
-"Cumul. Size" => "Gesamtgröße",
-"Uploaders Options" => "Uploaders Options",
-"Options shared by all uploaders plugins" => "Options shared by all uploaders plugins",
+"Email Viewer" => "Email Betrachter",
+"Email reader, supports eml format and eml mimetypes. Detects if a folder contains only email and display columns accordingly." => "Email Betrachter, unterstützt eml-Formate und eml-MIME-Typen. Erkennt wenn ein Ordner nur Emails enthält und zeigt die Spalten entsprechend an.",
 );
