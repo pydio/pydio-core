@@ -2,7 +2,7 @@
 
 $mess = array(
     // will be replaced by the application title
-    "1" => "%s публичный доступ",
+    "1" => "%s общий доступ",
     // will be replaced by the filename to download
     "2" => "Нажмите на изображение для загрузки <b>%s</b> на ваш локальный диск",
     "3" => "пароль неверен",
