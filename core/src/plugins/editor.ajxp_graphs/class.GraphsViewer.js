@@ -39,6 +39,7 @@ Class.create("GraphsViewer", AbstractEditor, {
 
     destroy: function(){
         // TODO: Shall we destroy the SVG objects?
+        this.charts = $H();
     },
 
     open : function($super, node){
@@ -235,11 +236,15 @@ Class.create("GraphsViewer", AbstractEditor, {
             if(relName == "count"){
                 var qData = this.getQueryByName(queryName);
                 var input = new Element("input", {type:"text", value:qData["COUNT"], style:'width: 20px !important;height: 19px;text-align:right'});
-                input.observe("keydown", function(e){
-                    if(e.keyCode == Event.KEY_RETURN){
+                input.observe("keyup", function(e){
+                    //if(e.keyCode == Event.KEY_RETURN){
+                    if(e.keyCode == Event.KEY_UP) input.setValue(parseInt(input.getValue())+1);
+                    else if(e.keyCode == Event.KEY_DOWN) input.setValue(parseInt(input.getValue())-1);
+                    if(input.getValue()){
                         qData["COUNT"] = parseInt(input.getValue());
                         this.loadData(queryName, chart, 0, qData["COUNT"]);
                     }
+                    //}
                 }.bind(this));
                 linkCont.insert(input);
                 linkCont.insert('<span> '+this.defaultLinksUnits+'</span>');
