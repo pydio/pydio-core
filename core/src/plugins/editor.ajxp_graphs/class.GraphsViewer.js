@@ -157,7 +157,7 @@ Class.create("GraphsViewer", AbstractEditor, {
         div.update('');
         if(qData['AXIS']){
             var height = 300;
-            var legendY = 260;
+            var legendY = 270;
             if(qData["DIRECTION"] && qData["DIRECTION"] == "horizontal"){
                 height = 600;
             }else if(qData["DIAGRAM"] && qData["DIAGRAM"] == "pie"){
@@ -213,6 +213,7 @@ Class.create("GraphsViewer", AbstractEditor, {
             div.addClassName("cumulated_figure");
             div.update('<div class="innerTitle">'+qData['LABEL']+'</div>' + '<div class="figure">' + jsonData['data'][0]['total'] + '</div>');
         }
+        this.element.fire("editor:resize");
     },
 
     updateChart : function(chart, queryName, jsonData){
@@ -307,7 +308,8 @@ Class.create("GraphsViewer", AbstractEditor, {
      */
     resize : function(size){
         if(size){
-            fitHeightToBottom(this.element);
+            this.element.setStyle({height:size+'px'});
+            //fitHeightToBottom(this.element);
         }else{
             fitHeightToBottom(this.element);
         }
