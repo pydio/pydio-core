@@ -23,10 +23,8 @@
 		</div>
 	]]></clientForm>
 	<dependencies>
-        <!--
 		<activePlugin pluginName="access.ajxp_conf"/>
 		<activePlugin pluginName="log.sql"/>
-		-->
-        <activePlugin pluginName="action.rpt_computer"/>
+    <activePlugin pluginName="action.rpt_computer"/>
 	</dependencies>
 </editor>
