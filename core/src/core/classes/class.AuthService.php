@@ -67,6 +67,10 @@ class AuthService
      */
     public static function generateSecureToken()
     {
+        if(isSet($_SESSION["FORCE_SECURE_TOKEN"])){
+            $_SESSION["SECURE_TOKEN"] = $_SESSION["FORCE_SECURE_TOKEN"];
+            return $_SESSION["SECURE_TOKEN"];
+        }
         $_SESSION["SECURE_TOKEN"] = AJXP_Utils::generateRandomString(32); //md5(time());
         return $_SESSION["SECURE_TOKEN"];
     }
