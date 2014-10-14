@@ -19,13 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Allowed Extensions" => "Erlaubte Erweiterungen",
-"Extensions List" => "Erweiterungsliste",
-"Ext. Label" => "Ext. Bezeichnung",
-"Limitations" => "Limitierungen",
-"Files Number" => "Anzahl Dateien",
-"File Size" => "Dateigröße",
-"Cumul. Size" => "Gesamtgröße",
-"Uploaders Options" => "Uploaders Options",
-"Options shared by all uploaders plugins" => "Options shared by all uploaders plugins",
+"CKEditor" => "CKEditor",
+"Wysiwyg HTML Editor, requires separate library to be downloaded." => "Wysiwyg HTML Editor. Es muss eine seperate Bibliothek heruntergeladen werden.",
 );

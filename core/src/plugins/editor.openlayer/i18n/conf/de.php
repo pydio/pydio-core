@@ -19,13 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Allowed Extensions" => "Erlaubte Erweiterungen",
-"Extensions List" => "Erweiterungsliste",
-"Ext. Label" => "Ext. Bezeichnung",
-"Limitations" => "Limitierungen",
-"Files Number" => "Anzahl Dateien",
-"File Size" => "Dateigröße",
-"Cumul. Size" => "Gesamtgröße",
-"Uploaders Options" => "Uploaders Options",
-"Options shared by all uploaders plugins" => "Options shared by all uploaders plugins",
+"Map viewer" => "Karten Betrachter",
+"Geolocation feature to either display a WMS layer or simply place an exif-localized photo. Requires OpenLayers" => "Geolokalisierung-Funktion, unterstützt das Anzeigen einer WMS-Schicht (Web  Map Service) oder den Aufnahmeort eines durch EXIF-Daten lokalisierten Photos. Erfordert OpenLayers.",
 );

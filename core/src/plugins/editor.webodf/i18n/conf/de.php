@@ -19,13 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Allowed Extensions" => "Erlaubte Erweiterungen",
-"Extensions List" => "Erweiterungsliste",
-"Ext. Label" => "Ext. Bezeichnung",
-"Limitations" => "Limitierungen",
-"Files Number" => "Anzahl Dateien",
-"File Size" => "Dateigröße",
-"Cumul. Size" => "Gesamtgröße",
-"Uploaders Options" => "Uploaders Options",
-"Options shared by all uploaders plugins" => "Options shared by all uploaders plugins",
+"Open Documents Viewer" => "Open Documents Betrachter",
+"Open Document Formats viewer - based on WebODF.js library" => "Open Document Formate Betrachter - basierend auf der WebODF.js Bibliothek",
 );

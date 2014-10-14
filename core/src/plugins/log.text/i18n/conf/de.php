@@ -19,13 +19,14 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Allowed Extensions" => "Erlaubte Erweiterungen",
-"Extensions List" => "Erweiterungsliste",
-"Ext. Label" => "Ext. Bezeichnung",
-"Limitations" => "Limitierungen",
-"Files Number" => "Anzahl Dateien",
-"File Size" => "Dateigröße",
-"Cumul. Size" => "Gesamtgröße",
-"Uploaders Options" => "Uploaders Options",
-"Options shared by all uploaders plugins" => "Options shared by all uploaders plugins",
+"Text logger" => "Text logger",
+"Stores the logs as readable tab delimited text." => "Speichert die Logs in einen durch Tabulatoren getrennten, lesbaren Text",
+"Logpath" => "Logpfad",
+"The path to where the logs are kept." => "Der Pfad, wo die Protokolle aufbewahrt werden.",
+"Logfile" => "Logdatei",
+"The name of the log file" => "Der Name der Logdatei",
+"Files Permissions" => "Dateirechte",
+"" => "",
+"Log Folder" => "Log Ordner",
+"Files Name Pattern" => "Namensmuster der Dateien",
 );

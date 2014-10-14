@@ -19,13 +19,19 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Allowed Extensions" => "Erlaubte Erweiterungen",
-"Extensions List" => "Erweiterungsliste",
-"Ext. Label" => "Ext. Bezeichnung",
-"Limitations" => "Limitierungen",
-"Files Number" => "Anzahl Dateien",
-"File Size" => "Dateigröße",
-"Cumul. Size" => "Gesamtgröße",
-"Uploaders Options" => "Uploaders Options",
-"Options shared by all uploaders plugins" => "Options shared by all uploaders plugins",
+"1" => "Arbeitsumgebung Editor",
+"2" => "Arbeitsumgebung Editor",
+"3" => "Treiber Optionen",
+"4" => "Arbeitsumgebung Funktionen",
+"5" => "Funktionen auswählen",
+"6" => "Parameter bearbeiten",
+"7" => "Use the selector below to activate plugins that will add more functionnalities to the workspace. Don't forget to click on the Add a Source button to apply your changes.",
+"8" => "Click on a plugin to edit its parameters, or simply remove the feature",
+"9" => "%s Plugins",
+"10" => "Meta Sources",
+"11" => "Add a source",
+"12" => "Meta Plugin",
+"13" => "Are you sure you want to delete this source?",
+"14" => "Wählen Sie bitte einen Treiber!",
+"15" => "Diese Arbeitsumgebung wurde in der Konfigurationsdatei erstellt (siehe conf/bootstrap_repositories.php) und kann deshalb nicht in der GUI bearbeitet werden.",
 );

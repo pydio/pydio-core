@@ -19,13 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Allowed Extensions" => "Erlaubte Erweiterungen",
-"Extensions List" => "Erweiterungsliste",
-"Ext. Label" => "Ext. Bezeichnung",
-"Limitations" => "Limitierungen",
-"Files Number" => "Anzahl Dateien",
-"File Size" => "Dateigröße",
-"Cumul. Size" => "Gesamtgröße",
-"Uploaders Options" => "Uploaders Options",
-"Options shared by all uploaders plugins" => "Options shared by all uploaders plugins",
+"Syslog logger" => "Syslog Logger",
+"Send the logs to the system syslog" => "Sendet die Logs zu dem Systemlogger",
+"Identifier" => "Datenbezeichnung",
+"How the logs will be identified in the system logs" => "Wie die Logs in den Systemlogs identifiziert werden",
 );
