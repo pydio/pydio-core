@@ -50,15 +50,23 @@ Class.create("ExifCellRenderer", {
 			style:'padding:2px;width:60px;',
             className:'ip_geo_cell'
 		}).update(button);
-		latiCell.insert({after:buttonCell});		
+		latiCell.insert({after:buttonCell});
 		// Set all other cells colspan to 2.
 		latiCell.up().nextSiblings().each(function(tr){
 			tr.down('div.infoPanelValue').setAttribute('colspan', 2);
 		});
 		longiCell.setAttribute("colspan", "1");
-		button.observe("click", function(){
-			this.openLocator(latiCell.getAttribute('latiDegree'), longiCell.getAttribute("longiDegree"));
-		}.bind(this) );
+        var clicker = function(){
+            this.openLocator(latiCell.getAttribute('latiDegree'), longiCell.getAttribute("longiDegree"));
+        }.bind(this);
+		button.observe("click", clicker);
+        try{
+            var userMetaButton = latiCell.up('div.infoPanelTable').previous('div.infoPanelGroup').down('span.user_meta_change');
+            userMetaButton.observe("click", clicker);
+        }catch(e){
+
+        }
+
         var editors = ajaxplorer.findEditorsForMime("ol_layer");
         var editorData;
         if(editors.length){
@@ -71,9 +79,10 @@ Class.create("ExifCellRenderer", {
                 'ol_layers' : [{type:'Google', google_type:'hybrid'}, {type:'Google', google_type:'streets'}, {type:'OSM'}],
                 'ol_center' : {latitude:parseFloat(latiCell.getAttribute('latiDegree')),longitude:parseFloat(longiCell.getAttribute("longiDegree"))}
             }));
-            latiCell.up('div.infoPanelTable').insert({top:'<div id="small_map" style="height: 250px;"></div>'});
+            var  id = "small_map_" + Math.random();
+            latiCell.up('div.infoPanelTable').insert({top:'<div id="'+id+'" style="height: 250px;"></div>'});
             ajaxplorer.loadEditorResources(editorData.resourcesManager);
-            OLViewer.prototype.createOLMap(ajxpNode, "small_map", false, false);
+            OLViewer.prototype.createOLMap(ajxpNode, id, false, false);
         }
 
 	},

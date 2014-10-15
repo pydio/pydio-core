@@ -551,7 +551,7 @@ Class.create("ActionsManager", {
                         if(!parent && getRepName(newNode.getPath()) == "") parent = dm.getRootNode();
                         if(parent){
                             parent.addChild(newNode);
-                            if(dm.getContextNode() == parent){
+                            if(dm.getContextNode() == parent && !window.currentLightBox){
                                 dm.setSelectedNodes([newNode], {});
                             }
                         }
@@ -582,7 +582,7 @@ Class.create("ActionsManager", {
                             if(n){
                                 newNode._isLoaded = n._isLoaded;
                                 n.replaceBy(newNode, "override");
-                                dm.setSelectedNodes([n], {});
+                                if(!window.currentLightBox) dm.setSelectedNodes([n], {});
                             }
                         }
                     });

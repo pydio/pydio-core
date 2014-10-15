@@ -3085,6 +3085,8 @@ div.tabulatorContainer div#display_toolbar{
     font-size: 11px !important;
     margin: 3px 0;
     border-bottom: 1px dotted #999;
+    float: right;
+    cursor: pointer;
 }
 
 #info_panel div.ip_geo_cell {

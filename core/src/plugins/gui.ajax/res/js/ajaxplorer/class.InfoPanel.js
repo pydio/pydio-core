@@ -27,15 +27,16 @@ Class.create("InfoPanel", AjxpPane, {
 	 * Constructor
 	 * @param $super klass Superclass reference
 	 * @param htmlElement HTMLElement
+     * @param options Object
 	 */
 	initialize: function($super, htmlElement, options){
-		$super(htmlElement, Object.extend({replaceScroller:false},options));
-		disableTextSelection(htmlElement);
-        var id = htmlElement.id;
-        var container = new Element("div", {className:"panelContent", id:"ip_content_"+id});
         if(!options){
             options = {replaceScroller:true};
         }
+		$super(htmlElement, Object.extend(Object.clone(options), {replaceScroller:false}));
+		disableTextSelection(htmlElement);
+        var id = htmlElement.id;
+        var container = new Element("div", {className:"panelContent", id:"ip_content_"+id});
         if(options.replaceScroller){
             this.scroller = new Element('div', {id:'ip_scroller_'+id, className:'scroller_track'});
             this.scroller.insert(new Element('div', {id:'ip_scrollbar_handle_'+id, className:'scroller_handle'}));
