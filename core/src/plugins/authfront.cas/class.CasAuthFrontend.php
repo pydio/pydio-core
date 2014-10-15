@@ -218,7 +218,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
         if (!isSet($this->actions[$action])) return;
 
         switch ($action) {
-            case "logoutCAS":
+            case "logout":
                 if(isset($_SESSION['LOGGED_IN_BY_CAS'])){
                     AuthService::disconnect();
 
