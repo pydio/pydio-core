@@ -1,4 +1,5 @@
 <?php
+define('AJXP_EXEC', true);
 require_once('../../core/classes/class.AJXP_Utils.php');
 $AJXP_FILE_URL = AJXP_Utils::securePath(AJXP_Utils::sanitize($_GET["file"], AJXP_SANITIZE_FILENAME));
 ?>
