@@ -120,7 +120,6 @@ class multiShortener extends AJXP_Plugin
                 break;
 
             case 4:
-                $url = $params["ob_output"];
                 if (!isSet($type["YOURLS_DOMAIN"])) {
                     print($url);
                     $this->logError("Config", "yourls Shortener : you must set the domain name");
