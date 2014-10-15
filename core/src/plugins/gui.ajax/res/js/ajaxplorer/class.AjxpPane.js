@@ -97,8 +97,21 @@ Class.create("AjxpPane", {
             this.scrollbar = new Control.ScrollBar(this.htmlElement,this.scroller, {fixed_scroll_distance:50});
         }
 
-        if(this.getUserPreference('rootElementClassPreference')){
-            this.htmlElement.addClassName(this.getUserPreference('rootElementClassPreference'));
+        var cPref = this.getUserPreference('rootElementClassPreference');
+        if(cPref){
+            if(Object.isString(cPref))cPref= {className:cPref};
+            var cName = cPref['className'];
+            if(cName){
+                if(cName[0] == '!'){
+                    cName = cName.substring(1);
+                    this.htmlElement.removeClassName(cName);
+                }else{
+                    this.htmlElement.addClassName(cName);
+                }
+                if(cPref['externalButtonId']){
+                    $(cPref['externalButtonId']).toggleClassName(cPref['externalButtonClassName'])
+                }
+            }
         }
 
     },
@@ -320,13 +333,14 @@ Class.create("AjxpPane", {
 	addPaneHeader : function(headerLabel, headerIcon){
         var label = new Element('span', {ajxp_message_id:headerLabel}).update(MessageHash[headerLabel]);
         var header = new Element('div', {className:'panelHeader'}).update(label);
+        var ic;
         if(headerIcon){
-            var ic = resolveImageSource(headerIcon, '/images/actions/ICON_SIZE', 16);
+            ic = resolveImageSource(headerIcon, '/images/actions/ICON_SIZE', 16);
             header.insert({top: new Element("img", {src:ic, className:'panelHeaderIcon'})});
             header.addClassName('panelHeaderWithIcon');
         }
         if(this.options.headerClose){
-            var ic = resolveImageSource(this.options.headerClose.icon, '/images/actions/ICON_SIZE', 16);
+            ic = resolveImageSource(this.options.headerClose.icon, '/images/actions/ICON_SIZE', 16);
             var img = new Element("img", {src:ic, className:'panelHeaderCloseIcon', title:MessageHash[this.options.headerClose.title]});
             header.insert({top: img});
             var sp = this.options.headerClose.splitter;
@@ -355,9 +369,27 @@ Class.create("AjxpPane", {
 		}.bind(this));
 	},
 
-    toggleClassNameSavingPref:function(className){
+    toggleClassNameSavingPref:function(className, externalButtonId, externalButtonClassName){
+        var invert = false;
+        if(className[0] == '!') {
+            className = className.substring(1);
+            invert = true;
+        }
         this.htmlElement.toggleClassName(className);
-        this.setUserPreference('rootElementClassPreference', this.htmlElement.hasClassName(className)?className:'');
+        if(externalButtonId){
+            $(externalButtonId).toggleClassName(externalButtonClassName);
+        }
+        var pref = {
+            externalButtonId:externalButtonId,
+            externalButtonClassName: externalButtonClassName
+        };
+        if(invert){
+            pref['className'] = this.htmlElement.hasClassName(className)?'':'!'+className;
+        }else{
+            pref['className'] = this.htmlElement.hasClassName(className)?className:'';
+
+        }
+        this.setUserPreference('rootElementClassPreference', pref)
     },
 
     getUserPreference : function(prefName){
