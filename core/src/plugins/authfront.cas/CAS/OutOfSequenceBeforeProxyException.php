@@ -17,29 +17,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
+ *
  * PHP Version 5
  *
- * @file     CAS/Request/Exception.php
+ * @file     CAS/OutOfSequenceBeforeProxyException.php
  * @category Authentication
  * @package  PhpCAS
- * @author   Adam Franco <afranco@middlebury.edu>
+ * @author   Joachim Fritschi <jfritschi@freenet.de>
  * @license  http://www.apache.org/licenses/LICENSE-2.0  Apache License 2.0
  * @link     https://wiki.jasig.org/display/CASC/phpCAS
  */
 
 /**
- * An Exception for problems performing requests
+ * This class defines Exceptions that should be thrown when the sequence of
+ * operations is invalid. In this case it should be thrown when the proxy() call
+ * has not yet happened and no proxy object exists.
  *
- * @class    CAS_Request_Exception
+ * @class    CAS_OutOfSequenceBeforeProxyException
  * @category Authentication
  * @package  PhpCAS
- * @author   Adam Franco <afranco@middlebury.edu>
+ * @author   Joachim Fritschi <jfritschi@freenet.de>
  * @license  http://www.apache.org/licenses/LICENSE-2.0  Apache License 2.0
  * @link     https://wiki.jasig.org/display/CASC/phpCAS
  */
-class CAS_Request_Exception
-extends Exception
+class CAS_OutOfSequenceBeforeProxyException
+extends CAS_OutOfSequenceException
 implements CAS_Exception
 {
 
+    /**
+     * Return standard error message
+     *
+     * @return void
+     */
+    public function __construct ()
+    {
+        parent::__construct(
+            'this method cannot be called before phpCAS::proxy()'
+        );
+    }
 }

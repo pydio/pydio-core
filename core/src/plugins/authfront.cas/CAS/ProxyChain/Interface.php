@@ -19,7 +19,7 @@
  *
  * PHP Version 5
  *
- * @file     CAS/Request/Exception.php
+ * @file     CAS/ProxyChain/Interface.php
  * @category Authentication
  * @package  PhpCAS
  * @author   Adam Franco <afranco@middlebury.edu>
@@ -28,18 +28,26 @@
  */
 
 /**
- * An Exception for problems performing requests
+ * An interface for classes that define a list of allowed proxies in front of
+ * the current application.
  *
- * @class    CAS_Request_Exception
+ * @class    CAS_ProxyChain_Interface
  * @category Authentication
  * @package  PhpCAS
  * @author   Adam Franco <afranco@middlebury.edu>
  * @license  http://www.apache.org/licenses/LICENSE-2.0  Apache License 2.0
  * @link     https://wiki.jasig.org/display/CASC/phpCAS
  */
-class CAS_Request_Exception
-extends Exception
-implements CAS_Exception
+interface CAS_ProxyChain_Interface
 {
+
+    /**
+     * Match a list of proxies.
+     *
+     * @param array $list The list of proxies in front of this service.
+     *
+     * @return bool
+     */
+    public function matches(array $list);
 
 }
