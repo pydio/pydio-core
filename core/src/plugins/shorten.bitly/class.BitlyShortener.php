@@ -80,7 +80,12 @@ class BitlyShortener extends AJXP_Plugin
                 }
                 $metadata["element"][$elementId]["short_form_url"] = $shortUrl;
             } else {
-                $metadata['short_form_url'] = $shortUrl;
+                if(isSet($metadata["shares"])){
+                    $key = array_pop(array_keys($metadata["shares"]));
+                    $metadata["shares"][$key]["short_form_url"] = $shortUrl;
+                }else{
+                    $metadata['short_form_url'] = $shortUrl;
+                }
             }
             $node->setMetadata(
                 "ajxp_shared",
