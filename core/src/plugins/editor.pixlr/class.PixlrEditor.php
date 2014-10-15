@@ -53,7 +53,7 @@ class PixlrEditor extends AJXP_Plugin
         AJXP_Controller::applyHook("node.read", array($node));
 
 
-        $httpClient = new HttpClient("pixlr.com");
+        $httpClient = new HttpClient("apps.pixlr.com");
       //$httpClient->setDebug(true);
       $postData = array();
       $httpClient->setHandleRedirects(false);
