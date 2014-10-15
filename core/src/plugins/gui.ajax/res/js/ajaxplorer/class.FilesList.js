@@ -248,10 +248,29 @@ Class.create("FilesList", SelectableElements, {
 	/**
 	 * Implementation of the IAjxpWidget methods
 	 */
-	destroy : function(){
+	destroy : function($super){
+        $super();
         this._clearObservers();
         if(window[this.htmlElement.id]){
             try{delete window[this.htmlElement.id];}catch(e){}
+        }
+        if(this.boundSizeEvents){
+            this.boundSizeEvents.each(function(pair){
+                document.stopObserving(pair.key, pair.value);
+            });
+        }
+        if(this.resizeEvents){
+            this.resizeEvents.each(function(pair){
+                document.stopObserving(pair.key, pair.value);
+            });
+        }
+        if(Class.objectImplements(this, 'IFocusable')){
+            ajaxplorer.unregisterFocusable(this);
+        }
+        if(Class.objectImplements(this, "IActionProvider")){
+            this.getActions().each(function(act){
+                ajaxplorer.guiActions.unset(act.key);
+            }.bind(this));
         }
         if(this.slider) this.slider.destroy();
         if(this.headerMenu) this.headerMenu.destroy();
@@ -488,7 +507,7 @@ Class.create("FilesList", SelectableElements, {
 			selection:false,
 			dir:true,
 			actionBar:true,
-			actionBarGroup:'default',
+			actionBarGroup:oThis.htmlElement.id+'-actions',
 			contextMenu:false,
 			infoPanel:false			
 			};
@@ -534,7 +553,7 @@ Class.create("FilesList", SelectableElements, {
 			selection:false,
 			dir:true,
 			actionBar:true,
-			actionBarGroup:'default',
+			actionBarGroup:oThis.htmlElement.id+'-actions',
 			contextMenu:false,
 			infoPanel:false
 		};
@@ -573,7 +592,7 @@ Class.create("FilesList", SelectableElements, {
 			selection:false,
 			dir:true,
 			actionBar:true,
-			actionBarGroup:'default',
+			actionBarGroup:oThis.htmlElement.id+'-actions',
 			contextMenu:false,
 			infoPanel:false
 		};
@@ -606,7 +625,11 @@ Class.create("FilesList", SelectableElements, {
 		// Create an action from these options!
 		var thumbSortAction = new Action(options3, context3, {}, {}, submenuItems3);
 
-		return $H({thumb_size:thumbsizeAction, thumb_sort:thumbSortAction, multi_display:multiAction});
+        var butts = $H();
+        butts.set(this.htmlElement.id+'-thumb_size', thumbsizeAction);
+        butts.set(this.htmlElement.id+'-thumb_sort', thumbSortAction);
+        butts.set(this.htmlElement.id+'-multi_display', multiAction);
+        return butts;
 	},
 	
 	/**

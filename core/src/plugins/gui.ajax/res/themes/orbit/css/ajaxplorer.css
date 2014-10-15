@@ -3074,6 +3074,11 @@ div.tabulatorContainer div#display_toolbar{
     margin-right: 0;
 }
 
+#display_toolbar span.icon-caret-down.ajxp_icon_arrow {
+    margin-left: 3px;
+    color: #888;
+}
+
 #info_panel span.user_meta_change {
     display: inline-block !important;
     text-transform: lowercase;
@@ -5007,11 +5012,11 @@ div.menu a {
 .menu.desktop.panelHeaderMenu li.menuTitle {
     display: block;
     font-size: 12px;
-    color: #333;
-    border-bottom: 1px solid #333;
-    padding: 7px;
+    color: #555555;
+    border-bottom: 1px solid #AAAAAA;
+    padding: 11px 7px;
     text-align: left;
-    background-color: rgba(255,255,255,0.2);
+    background-color: rgba(227, 227, 227, 0.20);
 }
 
 .menu.desktop li.separator {

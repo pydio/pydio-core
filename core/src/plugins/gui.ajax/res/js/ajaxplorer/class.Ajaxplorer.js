@@ -471,6 +471,7 @@ Class.create("Ajaxplorer", {
 		if(ajxpOptionsString){
 			ajxpOptions = ajxpOptionsString.evalJSON();			
 		}
+        /*
 		if(Class.objectImplements(oldObj, "IFocusable")){
 			this._focusables = this.unregisterFocusable(oldObj);
 		}
@@ -478,7 +479,7 @@ Class.create("Ajaxplorer", {
 			oldObj.getActions().each(function(act){
 				this.guiActions.unset(act.key);// = this.guiActions.without(act);
 			}.bind(this) );
-		}
+		}*/
 		if(oldObj.htmlElement) var anchor = oldObj.htmlElement;
 		oldObj.destroy();
 
@@ -491,6 +492,7 @@ Class.create("Ajaxplorer", {
             if(compReg.length) this.initAjxpWidgets(compReg);
         }
 		var obj = new ajxpClass($(ajxpId), ajxpOptions);
+
 		if(Class.objectImplements(obj, "IFocusable")){
 			obj.setFocusBehaviour();
 			this.registerFocusable(obj);
@@ -502,6 +504,7 @@ Class.create("Ajaxplorer", {
 			if(!this.guiActions) this.guiActions = new Hash();
 			this.guiActions.update(obj.getActions());
 		}
+
         if($(ajxpId).up('[ajxpClass]') && $(ajxpId).up('[ajxpClass]').ajxpPaneObject && $(ajxpId).up('[ajxpClass]').ajxpPaneObject.scanChildrenPanes){
             $(ajxpId).up('[ajxpClass]').ajxpPaneObject.scanChildrenPanes($(ajxpId).up('[ajxpClass]').ajxpPaneObject.htmlElement, true);
         }
@@ -1334,6 +1337,9 @@ Class.create("Ajaxplorer", {
 	 * @param object IAjxpFocusable
 	 */
 	focusOn : function(object){
+        if(!this._focusables || this._focusables.indexOf(object) == -1) {
+            return;
+        }
 		this._focusables.each(function(obj){
 			if(obj != object) obj.blur();
 		});

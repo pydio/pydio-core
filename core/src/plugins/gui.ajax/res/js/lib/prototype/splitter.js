@@ -202,6 +202,9 @@ Class.create("Splitter", AjxpPane, {
         document.stopObserving("ajaxplorer:user_logged",this.userLoggedObs);
         document.stopObserving("ajaxplorer:component_config_changed", this.compConfigObs);
         this.splitbar.remove();
+        this.getActions().each(function(act){
+            ajaxplorer.guiActions.unset(act.key);
+        }.bind(this));
         if(this.paneA.ajxpPaneObject) {
             this.paneA.ajxpPaneObject.destroy();
             this.paneA.remove();
@@ -438,7 +441,11 @@ Class.create("Splitter", AjxpPane, {
         if(this.effectWorking) return;
         if(!this.prefoldValue){
             this.prefoldValue = 150;
-            //this.paneA.setStyle(this.makeStyleObject(this.options.adjust, target+'px'));
+            if(this.options.foldingButton == "A" && this.paneA._min && this.options.foldingMinSize !== undefined) {
+                this.prefoldValue = this.paneA._min;
+            } else if(this.options.foldingButton == "B" && this.paneB._min && this.options.foldingMinSize !== undefined) {
+                this.prefoldValue = this.paneB._min;
+            }
         }
         var target = this.options.foldingButton == "A" ? this.prefoldValue : (this.group._adjust - this.prefoldValue);
         var presetAdjust = this.prefoldValue;

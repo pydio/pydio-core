@@ -492,7 +492,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
         }
         if ( ConfService::getCoreConf("SKIP_USER_HISTORY", "conf") === true ) {
             $stringPrefs = array("display","lang","pending_folder", "thumb_size","plugins_preferences","upload_auto_send","upload_auto_close", "upload_existing","action_bar_style");
-            $jsonPrefs = array();
+            $jsonPrefs = array("columns_size", "columns_visibility", "gui_preferences");
             $prefs["SKIP_USER_HISTORY"] = array("value" => "true", "type" => "string" );
         }
         foreach ($stringPrefs as $pref) {

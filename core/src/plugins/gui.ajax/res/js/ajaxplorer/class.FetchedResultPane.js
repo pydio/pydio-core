@@ -129,10 +129,10 @@ Class.create("FetchedResultPane", FilesList, {
     },
 
     destroy:function($super){
+        $super();
         if(this.options.containerDroppableAction){
             Droppables.remove(this.htmlElement);
         }
-        $super();
     },
 
     reloadDataModel: function(){
@@ -199,7 +199,7 @@ Class.create("FetchedResultPane", FilesList, {
 	},
 
     getActions : function(){
-
+        return $H();
     }
 
 });

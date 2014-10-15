@@ -97,6 +97,9 @@ Class.create("AjxpPane", {
             this.scrollbar = new Control.ScrollBar(this.htmlElement,this.scroller, {fixed_scroll_distance:50});
         }
 
+        if(this.getUserPreference('rootElementClassPreference')){
+            this.htmlElement.addClassName(this.getUserPreference('rootElementClassPreference'));
+        }
 
     },
 
@@ -263,6 +266,14 @@ Class.create("AjxpPane", {
                 document.stopObserving(pair.key, pair.value);
             });
         }
+        if(Class.objectImplements(this, 'IFocusable')){
+            ajaxplorer.unregisterFocusable(this);
+        }
+        if(Class.objectImplements(this, "IActionProvider")){
+            this.getActions().each(function(act){
+                ajaxplorer.guiActions.unset(act.key);
+            }.bind(this));
+        }
         if(this.configObserver){
             document.stopObserving("ajaxplorer:component_config_changed", this.configObserver);
         }
@@ -344,6 +355,10 @@ Class.create("AjxpPane", {
 		}.bind(this));
 	},
 
+    toggleClassNameSavingPref:function(className){
+        this.htmlElement.toggleClassName(className);
+        this.setUserPreference('rootElementClassPreference', this.htmlElement.hasClassName(className)?className:'');
+    },
 
     getUserPreference : function(prefName){
         if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return;
@@ -358,7 +373,7 @@ Class.create("AjxpPane", {
 
     setUserPreference : function(prefName, prefValue){
         if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return;
-        if(ajaxplorer.user.getPreference("SKIP_USER_HISTORY") == "true") return;
+        //if(ajaxplorer.user.getPreference("SKIP_USER_HISTORY") == "true") return;
         var guiPref = ajaxplorer.user.getPreference("gui_preferences", true);
         if(!guiPref) guiPref = {};
         var classkey = this.htmlElement.id+"_"+this.__className;
