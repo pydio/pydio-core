@@ -55,7 +55,7 @@ class smbAccessWrapper extends fsAccessWrapper
             $_SESSION["AJXP_SESSION_REMOTE_PASS"] = $pass;
             $credentials = "$login:$pass@";
             $domain = $repoObject->getOption("DOMAIN");
-            if($domain != "") $credentials = $domain."/".$credentials;
+            if($domain != "") $credentials = $domain.$credentials;
         }
         $basePath = $repoObject->getOption("PATH");
         $fullPath = "smb://".$credentials.$host."/";//.$basePath."/".$path;

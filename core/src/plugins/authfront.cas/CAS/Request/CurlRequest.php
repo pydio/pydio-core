@@ -1,155 +1,199 @@
 <?php
-/*
- * Copyright © 2003-2010, The ESUP-Portail consortium & the JA-SIG Collaborative.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *	   * Redistributions of source code must retain the above copyright notice,
- *		 this list of conditions and the following disclaimer.
- *	   * Redistributions in binary form must reproduce the above copyright notice,
- *		 this list of conditions and the following disclaimer in the documentation
- *		 and/or other materials provided with the distribution.
- *	   * Neither the name of the ESUP-Portail consortium & the JA-SIG
- *		 Collaborative nor the names of its contributors may be used to endorse or
- *		 promote products derived from this software without specific prior
- *		 written permission.
 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/**
+ * Licensed to Jasig under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.
+ *
+ * Jasig licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at:
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * PHP Version 5
+ *
+ * @file     CAS/Request/CurlRequest.php
+ * @category Authentication
+ * @package  PhpCAS
+ * @author   Adam Franco <afranco@middlebury.edu>
+ * @license  http://www.apache.org/licenses/LICENSE-2.0  Apache License 2.0
+ * @link     https://wiki.jasig.org/display/CASC/phpCAS
  */
-
-require_once dirname(__FILE__) . '/RequestInterface.php';
-require_once dirname(__FILE__) . '/AbstractRequest.php';
 
 /**
  * Provides support for performing web-requests via curl
+ *
+ * @class    CAS_Request_CurlRequest
+ * @category Authentication
+ * @package  PhpCAS
+ * @author   Adam Franco <afranco@middlebury.edu>
+ * @license  http://www.apache.org/licenses/LICENSE-2.0  Apache License 2.0
+ * @link     https://wiki.jasig.org/display/CASC/phpCAS
  */
-class CAS_CurlRequest
-	extends CAS_AbstractRequest
-	implements CAS_RequestInterface
+class CAS_Request_CurlRequest
+extends CAS_Request_AbstractRequest
+implements CAS_Request_RequestInterface
 {
 
-	/**
-	 * Set additional curl options
-	 *
-	 * @param array $options
-	 * @return void
-	 */
-	public function setCurlOptions (array $options) {
-		$this->curlOptions = $options;
-	}
-	private $curlOptions = array();
+    /**
+     * Set additional curl options
+     *
+     * @param array $options option to set
+     *
+     * @return void
+     */
+    public function setCurlOptions (array $options)
+    {
+        $this->_curlOptions = $options;
+    }
+    private $_curlOptions = array();
 
-	/**
-	 * Send the request and store the results.
-	 *
-	 * @return boolean TRUE on success, FALSE on failure.
-	 */
-	protected function _sendRequest () {
-		phpCAS::traceBegin();
+    /**
+     * Send the request and store the results.
+     *
+     * @return bool true on success, false on failure.
+     */
+    protected function sendRequest ()
+    {
+        phpCAS::traceBegin();
 
-		/*********************************************************
-		 * initialize the CURL session
-		 *********************************************************/
-		$ch = curl_init($this->url);
+        /*********************************************************
+         * initialize the CURL session
+        *********************************************************/
+        $ch = $this->_initAndConfigure();
 
-		if (version_compare(PHP_VERSION,'5.1.3','>=')) {
-			//only avaible in php5
-			curl_setopt_array($ch, $this->curlOptions);
-		} else {
-			foreach ($this->curlOptions as $key => $value) {
-				curl_setopt($ch, $key, $value);
-			}
-		}
+        /*********************************************************
+         * Perform the query
+        *********************************************************/
+        $buf = curl_exec($ch);
+        if ( $buf === false ) {
+            phpCAS::trace('curl_exec() failed');
+            $this->storeErrorMessage(
+                'CURL error #'.curl_errno($ch).': '.curl_error($ch)
+            );
+            $res = false;
+        } else {
+            $this->storeResponseBody($buf);
+            phpCAS::trace("Response Body: \n".$buf."\n");
+            $res = true;
 
-		/*********************************************************
-		 * Set SSL configuration
-		 *********************************************************/
-		if ($this->caCertPath) {
-			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 1);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
-			curl_setopt($ch, CURLOPT_CAINFO, $this->caCertPath);
-			phpCAS::trace('CURL: Set CURLOPT_CAINFO');
-		} else {
-			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 1);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-		}
+        }
+        // close the CURL session
+        curl_close($ch);
 
-		/*********************************************************
-		 * Configure curl to capture our output.
-		 *********************************************************/
-		// return the CURL output into a variable
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        phpCAS::traceEnd($res);
+        return $res;
+    }
 
-		// get the HTTP header with a callback
-		curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, '_curlReadHeaders'));
+    /**
+     * Internal method to initialize our cURL handle and configure the request.
+     * This method should NOT be used outside of the CurlRequest or the
+     * CurlMultiRequest.
+     *
+     * @return resource The cURL handle on success, false on failure
+     */
+    private function _initAndConfigure()
+    {
+        /*********************************************************
+         * initialize the CURL session
+        *********************************************************/
+        $ch = curl_init($this->url);
 
-		/*********************************************************
-		 * Add cookie headers to our request.
-		 *********************************************************/
-		if (count($this->cookies)) {
-			$cookieStrings = array();
-			foreach ($this->cookies as $name => $val) {
-				$cookieStrings[] = $name.'='.$val;
-			}
-			curl_setopt($ch, CURLOPT_COOKIE, implode(';', $cookieStrings));
-		}
+        if (version_compare(PHP_VERSION, '5.1.3', '>=')) {
+            //only avaible in php5
+            curl_setopt_array($ch, $this->_curlOptions);
+        } else {
+            foreach ($this->_curlOptions as $key => $value) {
+                curl_setopt($ch, $key, $value);
+            }
+        }
 
-		/*********************************************************
-		 * Add any additional headers
-		 *********************************************************/
-		if (count($this->headers)) {
-			curl_setopt($ch, CURLOPT_HTTPHEADER, $this->headers);
-		}
+        /*********************************************************
+         * Set SSL configuration
+        *********************************************************/
+        if ($this->caCertPath) {
+            if ($this->validateCN) {
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+            } else {
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            }
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
+            curl_setopt($ch, CURLOPT_CAINFO, $this->caCertPath);
+            phpCAS::trace('CURL: Set CURLOPT_CAINFO ' . $this->caCertPath);
+        } else {
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        }
 
-		/*********************************************************
-		 * Flag and Body for POST requests
-		 *********************************************************/
-		if ($this->isPost) {
-			curl_setopt($ch, CURLOPT_POST, 1);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $this->postBody);
-		}
+        /*********************************************************
+         * Configure curl to capture our output.
+        *********************************************************/
+        // return the CURL output into a variable
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-		/*********************************************************
-		 * Perform the query
-		 *********************************************************/
-		$buf = curl_exec ($ch);
-		if ( $buf === FALSE ) {
-			phpCAS::trace('curl_exec() failed');
-			$this->storeErrorMessage('CURL error #'.curl_errno($ch).': '.curl_error($ch));
-			$res = FALSE;
-		} else {
-			$this->storeResponseBody($buf);
-			phpCAS::trace("Response Body: \n".$buf."\n");
-			$res = TRUE;
+        // get the HTTP header with a callback
+        curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, '_curlReadHeaders'));
 
-		}
-		// close the CURL session
-		curl_close ($ch);
+        /*********************************************************
+         * Add cookie headers to our request.
+        *********************************************************/
+        if (count($this->cookies)) {
+            $cookieStrings = array();
+            foreach ($this->cookies as $name => $val) {
+                $cookieStrings[] = $name.'='.$val;
+            }
+            curl_setopt($ch, CURLOPT_COOKIE, implode(';', $cookieStrings));
+        }
 
-		phpCAS::traceEnd($res);
-		return $res;
-	}
+        /*********************************************************
+         * Add any additional headers
+        *********************************************************/
+        if (count($this->headers)) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $this->headers);
+        }
 
-	/**
-	 * Internal method for capturing the headers from a curl request.
-	 *
-	 * @param handle $ch
-	 * @param string $header
-	 * @return void
-	 */
-	public function _curlReadHeaders ($ch, $header) {
-		$this->storeResponseHeader($header);
-		return strlen($header);
-	}
+        /*********************************************************
+         * Flag and Body for POST requests
+        *********************************************************/
+        if ($this->isPost) {
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $this->postBody);
+        }
+
+        return $ch;
+    }
+
+    /**
+     * Store the response body.
+     * This method should NOT be used outside of the CurlRequest or the
+     * CurlMultiRequest.
+     *
+     * @param string $body body to stor
+     *
+     * @return void
+     */
+    private function _storeResponseBody ($body)
+    {
+        $this->storeResponseBody($body);
+    }
+
+    /**
+     * Internal method for capturing the headers from a curl request.
+     *
+     * @param handle $ch     handle of curl
+     * @param string $header header
+     *
+     * @return void
+     */
+    private function _curlReadHeaders ($ch, $header)
+    {
+        $this->storeResponseHeader($header);
+        return strlen($header);
+    }
 }

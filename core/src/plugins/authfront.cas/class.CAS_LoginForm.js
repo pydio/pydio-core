@@ -38,15 +38,19 @@ Class.create("CAS_LoginForm", {
                                   <input type="hidden" name="put_action_enable_redirect" value="yes"> \
                                   </form>';
         var cas_session_span = '<span id="span_to_modify_login_form_with_cas" class="icon-chevron-right"></span><span style=" font-size: 16px;">' + auth_cas_msg + '</span>';
-        var cas_session_a_tag = '<div style="width:100%;margin-top: 7px;" id="gui_login_nas_nasos" > \
-                                                         <a href="javascript:document.forms[\'enableredirecttocas\'].submit();"  style="margin-left: 12px;text-decoration: underline; ">Click here</a> \
-                                                        </div><br/>';
+        var cas_session_a_tag = '<div style="width:100%;margin-top: 10px;margin-bottom: 10px; margin-left: 10px;" id="gui_login_nas_nasos" > \
+                                                         <a href="javascript:document.forms[\'enableredirecttocas\'].submit();" \
+                                                         style=" border-style:solid;padding-left:30px; padding-right: 30px; block;width: 125px;height: 12px;background: #ffffff;padding-top: 5px; padding-bottom:5px;text-align: center;border:1px;border-radius: 15px;color: #000000;font-weight: bold;" \
+                                                         > Entrer</a>\
+                                                         </div><br/>';
+                                                        
         var login_session_span = '<span class="icon-chevron-right"></span><span style=" font-size: 16px;">' + auth_pyd_msg + '</span>';
 
         objallforms = $("all_forms");
         if(!objallforms.down("#enableredirecttocas")){
             objallforms.insert({top:login_via_cas_form});
         }
+        $$("div.dialogContent").first().setStyle("padding-top: 17% !important");
         obj_loginform = $("login_form");
         if(!obj_loginform.down(("#span_to_modify_login_form_with_cas"))){
             obj_loginform.insert({top:login_session_span});

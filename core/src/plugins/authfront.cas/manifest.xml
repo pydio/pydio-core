@@ -43,6 +43,8 @@
         <global_param group_switch_name="casmode" group_switch_label="Proxy"  group_switch_value="proxy"  name="casmode"  type="hidden" label="" description="" default="proxy"/>
         <global_param group_switch_name="casmode" group_switch_label="proxy" group_switch_value="proxy" name="PROXIED_SERVICE_SMB"  type="string" label="CONF_MESSAGE[Proxied Service]"
                       description="CONF_MESSAGE[Proxied service who uses Proxy Ticket provided by this CAS Proxy.Ex smb://pydio.com]" />
+        <global_param group_switch_name="casmode" group_switch_label="proxy" group_switch_value="proxy" name="FIXED_CALLBACK_URL"  type="string" label="CONF_MESSAGE[Set Fixed Callback Url]"
+                      description="CONF_MESSAGE[CAS will call this url to pass pgtID and pgtIOU. It's very useful when you deploy Pydio in several nodes]" />
         <global_param group_switch_name="casmode" group_switch_label="proxy" group_switch_value="proxy" name="PTG_STORE_MODE"  type="select" label="CONF_MESSAGE[PTG store mode]" choices="file|File,db|DB"
                       description="Config for Proxy Granting Ticket Storage. If is file option, location for storate is session_save_path()" default="file"/>
         <global_param group_switch_name="casmode" group_switch_label="proxy" group_switch_value="proxy"  type="button" name="INSTALL_SQL" choices="run_plugin_action:authfront.cas:installSQLTables" label="CONF_MESSAGE[mySQL Tables]"

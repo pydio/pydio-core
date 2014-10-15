@@ -450,7 +450,10 @@ class smb
             trigger_error('rename(): error in URL', E_USER_ERROR);
         }
         smb::clearstatcache ($url_from);
-        return smb::execute ('rename "'.$from['path'].'" "'.$to['path'].'"', $to);
+        $res = smb::execute ('rename "'.$from['path'].'" "'.$to['path'].'"', $to);
+        if(empty($res)) return true;
+        AJXP_Logger::info(__CLASS__, "SmbClient rename error: ".$res);
+        return false;
     }
 
     public function mkdir ($url, $mode, $options)
