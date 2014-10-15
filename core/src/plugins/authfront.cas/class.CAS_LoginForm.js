@@ -41,7 +41,7 @@ Class.create("CAS_LoginForm", {
         var cas_session_a_tag = '<div style="width:100%;margin-top: 10px;margin-bottom: 10px; margin-left: 10px;" id="gui_login_nas_nasos" > \
                                                          <a href="javascript:document.forms[\'enableredirecttocas\'].submit();" \
                                                          style=" border-style:solid;padding-left:30px; padding-right: 30px; block;width: 125px;height: 12px;background: #ffffff;padding-top: 5px; padding-bottom:5px;text-align: center;border:1px;border-radius: 15px;color: #000000;font-weight: bold;" \
-                                                         > Entrer</a>\
+                                                         > Enter</a>\
                                                          </div><br/>';
                                                         
         var login_session_span = '<span class="icon-chevron-right"></span><span style=" font-size: 16px;">' + auth_pyd_msg + '</span>';
