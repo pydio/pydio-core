@@ -21,8 +21,8 @@
 // spanish translation: Ion Rey Bakaikoa <ionrei@gmail.com>, 2010
 // spanish corrections: Cristóbal Sabroe Yde <cristyde at gmail.com>, 2010
 $mess=array(
-"title" => "My Dashboard",
-"desc" => "Manage my account preferences, my address book, shared elements, etc.",
+"title"=> "Home",
+"desc" => "Welcome page",
 "39"=> "Select a workspace",
 "40"=> "Welcome, %s",
 "41"=> "Use this workspace as default",

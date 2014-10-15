@@ -19,8 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"title" => "Mein Dashboard",
-"desc" => "Eigene Kontoeinstellungen, eigenes Adressbuch, geteilte Elemente, etc. verwalten",
+"title"=> "Home",
+"desc" => "Welcome page",
 "39"=> "Arbeitsumgebung auswählen",
 "40"=> "Willkommen, %s",
 "41"=> "Diese Arbeitsumgebung standardmässig verwenden",
