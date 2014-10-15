@@ -59,24 +59,10 @@ Class.create("WebodfEditor", AbstractEditor, {
         this.contentMainContainer.src = 'plugins/editor.webodf/frame.php?token='+Connexion.SECURE_TOKEN+'&file='+fileName;
 
         this.resize();
+        this.element.fire("editor:updateTitle", getBaseName(this.node.getPath()));
         this.element.observe('editor:close', function(){
             this.contentMainContainer.src = '';
         }.bind(this));
-        /*
-        var conn = new Connexion();
-        conn.addParameter("get_action", "get_content");
-        conn.addParameter("file", fileName);
-
-        conn.onComplete = function(transport){
-            var data = transport.responseJSON;
-            this.padID = data.padID;
-            this.sessionID = data.sessionID;
-            $("ether_box").down("#ether_box_frame").src = data.url;
-            fitHeightToBottom($("ether_box").down("#ether_box_frame"));
-        }.bind(this);
-        conn.sendAsync();
-        */
-
 		if(window.ajxpMobile){
 			this.setFullScreen();
 			attachMobileScroll(this.textarea, "vertical");

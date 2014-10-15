@@ -1,7 +1,12 @@
 <?php
 define('AJXP_EXEC', true);
 require_once('../../core/classes/class.AJXP_Utils.php');
-$AJXP_FILE_URL = AJXP_Utils::securePath(AJXP_Utils::sanitize($_GET["file"], AJXP_SANITIZE_FILENAME));
+$AJXP_FILE_URL = AJXP_Utils::securePath(AJXP_Utils::sanitize($_GET["file"], 5));
+$parts = explode("/", AJXP_Utils::securePath($_GET["file"]));
+foreach($parts as  $i => $part){
+    $parts[$i] = AJXP_Utils::sanitize($part, AJXP_SANITIZE_FILENAME);
+}
+$AJXP_FILE_URL = implode("/", $parts);
 ?>
 <html>
 <head>
