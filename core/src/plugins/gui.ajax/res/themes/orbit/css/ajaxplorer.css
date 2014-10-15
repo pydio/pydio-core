@@ -3677,66 +3677,8 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
     -webkit-font-smoothing: antialiased;
 }
 
-#info_panel div.panelHeader.panelHeaderWithIcon{
-    background-color: #4dc5c3;
-    border-bottom: 2px solid #399997;
-    -webkit-transition-property: height;
-    -webkit-transition-duration: 0.2s;
-    -webkit-transition-timing-function: ease-out;
-    -moz-transition-property: height;
-    -moz-transition-duration: 0.2s;
-    -moz-transition-timing-function: ease-out;
-    transition-property: height;
-    transition-duration: 0.2s;
-    transition-timing-function: ease-out;
-
-    padding-left: 6px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    border-radius: 0;
-}
-
-#info_panel.folded div.panelHeader{
-    height: 100%;
-}
-
-#info_panel.folded div.panelHeader a{
-    font-size: 1.4em;
-}
-
-#info_panel.folded{
-    /*width: 26px !important;*/
-}
-
-#info_panel.folded span[ajxp_message_id]{
-    display: none;
-}
-
 #info_panel div.folded_icons{
     display: none;
-}
-
-#info_panel.folded div.folded_icons{
-    display: block;
-    position: absolute;
-    top: 29px;
-    left: 0px;
-    background-color: #399997;
-    width: 27px;
-    height: 100%;
-}
-
-#info_panel.folded div.folded_icons span{
-    display: block;
-    margin: 10px 0 21px 0;
-    font-size: 13px;
-    text-align: center;
-}
-
-#info_panel.folded div.folded_icons span.clickable{
-    cursor: pointer;
 }
 
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed{
@@ -3884,6 +3826,7 @@ div.infoPanelBasenameTitle{
     line-height: 1.5em;
     text-align: left;
     margin-top: 0;
+    word-break:break-all;
 }
 
 .infoPanelTable,
@@ -5188,14 +5131,20 @@ span#alerts_number {
 
 /* we need explicit enabled class to overcome css deficiences (without creating unnecessary markup) */
 .menu.desktop a.enabled:hover {
-    background-color: #fb725c;
+    background-color: rgba(107, 107, 107, 0.87);
     color: #fff;
 }
 
-.menu.desktop li.menuAnchorSelected,
 .menu.desktop li.menuAnchorSelected a {
-    background-color: #fb725c;
+    background-color: rgba(107, 107, 107, 0.87);
     color: #fff !important;
+}
+
+.menu.desktop a#action_instance_share-file-minisite.enabled:hover,
+.menu.desktop a#action_instance_share-folder-minisite-public.enabled:hover,
+.menu.desktop a#action_instance_share-edit-shared.enabled:hover
+{
+    background-color: #4aCEB0;
 }
 
 .rootDirChooser
@@ -5692,6 +5641,11 @@ td.ip_geo_cell{
     margin-right: 1px;
 }
 
+#default_toolbar span.icon-caret-down.ajxp_icon_arrow {
+    color: #797979;
+    margin-left: 3px;
+}
+
 #display_toolbar a:hover{
     color: rgb(253, 252, 228);
 }
@@ -5729,6 +5683,10 @@ td.ip_geo_cell{
 
 #display_toolbar.text_only a::after{
     content:' |';
+}
+
+#display_toolbar span#vertical_splitter_folding_action_button_label::before {
+    content: '| ';
 }
 
 #display_toolbar.text_only a:last-child::after{

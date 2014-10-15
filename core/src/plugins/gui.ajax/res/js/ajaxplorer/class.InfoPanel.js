@@ -340,14 +340,23 @@ Class.create("InfoPanel", AjxpPane, {
 	 * Resize the panel
 	 */
 	resize : function(){
-        this.contentContainer.removeClassName('double');
-        this.contentContainer.removeClassName('triple');
+        this.contentContainer.removeClassName('double')
+            .removeClassName('triple')
+            .removeClassName('small')
+            .removeClassName('tiny');
         var previewMaxHeight = 200;
-        if(parseInt(this.contentContainer.getWidth()) > 500) {
+        var currentWidth = parseInt(this.contentContainer.getWidth());
+        if(currentWidth < 280) {
+            this.contentContainer.addClassName('small');
+        }
+        if(currentWidth < 100) {
+            this.contentContainer.addClassName('tiny');
+        }
+        if(currentWidth > 500) {
             this.contentContainer.addClassName('double');
             previewMaxHeight = 300;
         }
-        if(parseInt(this.contentContainer.getWidth()) > 750) {
+        if(currentWidth > 750) {
             this.contentContainer.addClassName('triple');
             previewMaxHeight = 450;
         }
