@@ -1,6 +1,12 @@
 <?php
-$AJXP_SECURE_TOKEN = $_GET["token"];
-$AJXP_FILE_URL = $_GET["file"];
+define('AJXP_EXEC', true);
+require_once('../../core/classes/class.AJXP_Utils.php');
+$AJXP_FILE_URL = AJXP_Utils::securePath(AJXP_Utils::sanitize($_GET["file"], 5));
+$parts = explode("/", AJXP_Utils::securePath($_GET["file"]));
+foreach($parts as  $i => $part){
+    $parts[$i] = AJXP_Utils::sanitize($part, AJXP_SANITIZE_FILENAME);
+}
+$AJXP_FILE_URL = implode("/", $parts);
 ?>
 <html>
 <head>
@@ -10,7 +16,7 @@ $AJXP_FILE_URL = $_GET["file"];
         {
             var odfelement = document.getElementById("odf");
             window.odfcanvas = new odf.OdfCanvas(odfelement);
-            window.odfcanvas.load("../../index.php?secure_token=<?php echo $AJXP_SECURE_TOKEN; ?>&get_action=download&file=<?php echo $AJXP_FILE_URL; ?>");
+            window.odfcanvas.load("../../" + window.parent.ajxpServerAccessPath + "&get_action=download&file=<?php echo $AJXP_FILE_URL; ?>");
             //window.odfcanvas.setEditable(true);
             /*
             odfcanvas.odfContainer().save(function(err){
