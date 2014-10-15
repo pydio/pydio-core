@@ -1130,15 +1130,24 @@
                     </div>
 				]]></html>
 			</infoPanel>
-			<infoPanel mime="ajxp_root_node" attributes="icon,formated_date,ajxp_description" theme="orbit">
-				<messages>
-					<message key="name_string" id="133"/>
-					<message key="modif_string" id="138"/>
-					<message key="header_string" id="342"/>
-				</messages>
+			<infoPanel mime="ajxp_root_node" attributes="" theme="orbit">
 				<html><![CDATA[
                     <div class="infoPanelAllMetadata">
                         <div id="info_panel_primary"></div>
+                    </div>
+				]]></html>
+			</infoPanel>
+			<infoPanel mime="generic_multiple" attributes="preview_simple" theme="orbit">
+				<html><![CDATA[
+                    <div class="infoPanelAllMetadata">
+                        <div id="info_panel_primary" class="info_panel_primary_multiple">
+                            <center><i>#{selectedCountSentence}</i></center>
+                            <div style="margin-top:10px;">
+                            #{preview_simple}
+                            </div>
+                            <br style="clear:left;">
+                            <div class="toolbar_placeholder" data-toolbarId="info_panel" style="margin-top: 15px; width:89%; text-align:center;"></div>
+                        </div>
                     </div>
 				]]></html>
 			</infoPanel>

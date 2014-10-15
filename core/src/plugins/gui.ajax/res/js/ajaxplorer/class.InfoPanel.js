@@ -216,7 +216,12 @@ Class.create("InfoPanel", AjxpPane, {
 		}
 		if(!passedNode && !userSelection.isUnique())
 		{
-			this.setContent('<br><br><center><i>'+ userSelection.getFileNames().length + ' '+MessageHash[128]+'</i></center><br><br>');
+            if(this.registeredMimes.get('generic_multiple')){
+                this.evalTemplateForMime('generic_multiple', null, {
+                    selectedCountSentence:userSelection.getFileNames().length + ' '+MessageHash[128]
+                }, userSelection.getSelectedNodes());
+            }
+			//this.setContent('<br><br><center><i>'+ userSelection.getFileNames().length + ' '+MessageHash[128]+'</i></center><br><br>');
 			this.addActions('multiple');
             if(this.scrollbar) this.scrollbar.recalculateLayout();
             disableTextSelection(this.contentContainer);
@@ -366,7 +371,7 @@ Class.create("InfoPanel", AjxpPane, {
 	 * @param fileNode AjxpNode
 	 * @param tArgs Object
 	 */
-	evalTemplateForMime: function(mimeType, fileNode, tArgs){
+	evalTemplateForMime: function(mimeType, fileNode, tArgs, multipleNodes){
 		if(!this.htmlElement) return;
 		if(!this.registeredMimes.get(mimeType)) return;
 		var registeredTemplates = this.registeredMimes.get(mimeType);
@@ -395,13 +400,18 @@ Class.create("InfoPanel", AjxpPane, {
 			var tModifier = templateData[3];
             var tPosition = templateData[4];
 			if(!tArgs){
-				tArgs = new Object();
+				tArgs = {};
 			}
 			var panelWidth = this.htmlElement.getWidth();
 			var oThis = this;
-			if(fileNode){
-				var metadata = fileNode.getMetadata();			
-				tAttributes.each(function(attName){				
+			if(fileNode || multipleNodes){
+                var metadata;
+                if(fileNode){
+    				metadata = fileNode.getMetadata();
+                }else{
+                    metadata = $H();
+                }
+				tAttributes.each(function(attName){
 					if(attName == 'basename' && metadata.get('filename')){
 						this[attName] = getBaseName(metadata.get('filename'));
 					} else if(attName == 'compute_image_dimensions'){
@@ -418,7 +428,22 @@ Class.create("InfoPanel", AjxpPane, {
 						}
 						this[attName] = dimAttr;
 					} else if(attName == 'preview_rich'){
-						this[attName] = oThis.getPreviewElement(fileNode, true);
+    					this[attName] = oThis.getPreviewElement(fileNode, true, true);
+					} else if(attName == 'preview_simple'){
+                        if(multipleNodes){
+                            var s ='';
+                            var simpleTpl = new Template('<div class="info_panel_multiple_tile"><div class="tile_preview">#{preview}</div><div class="tile_label">#{label}</div></div>');
+                            multipleNodes.each(function(n){
+                                var p = oThis.getPreviewElement(n, false, false);
+                                var args = {label:getBaseName(n.getMetadata().get('filename'))};
+                                if(Object.isString(p)) args['preview']=p;
+                                else if(Object.isElement(p) && p.outerHTML) args['preview']= p.outerHTML;
+                                s += simpleTpl.evaluate(args);
+                            });
+                            this[attName] = s;
+                        }else{
+    						this[attName] = oThis.getPreviewElement(fileNode, false, false);
+                        }
 					} else if(attName == 'encoded_filename' && metadata.get('filename')){
 						this[attName] = encodeURIComponent(metadata.get('filename'));					
 					} else if(attName == 'escaped_filename' && metadata.get('filename')){
@@ -524,9 +549,11 @@ Class.create("InfoPanel", AjxpPane, {
 	 * Use editors extensions to find a preview element for the current node
 	 * @param ajxpNode AjxpNode
 	 * @param getTemplateElement Boolean If true, will return a fake div that can be inserted in template and replaced later
+     * @param rich will be set to true by default
 	 * @returns String
 	 */
-	getPreviewElement : function(ajxpNode, getTemplateElement){
+	getPreviewElement : function(ajxpNode, getTemplateElement, rich){
+        if(rich == undefined) rich = true;
 		var editors = ajaxplorer.findEditorsForMime(ajxpNode.getAjxpMime(), true);
 		if(editors && editors.length)
 		{
@@ -537,8 +564,7 @@ Class.create("InfoPanel", AjxpPane, {
 				if(getTemplateElement){
 					return '<div id="preview_rich_fake_element"></div>';
 				}else{
-					var element = editorClass.prototype.getPreview(ajxpNode, true);
-					return element;	
+					return editorClass.prototype.getPreview(ajxpNode, rich);
 				}
 			}
 		}

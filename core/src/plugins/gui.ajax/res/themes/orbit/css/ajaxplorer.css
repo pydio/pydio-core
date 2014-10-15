@@ -3931,6 +3931,41 @@ div.infoPanelLabel{
     padding: 1px;
 }
 
+div.info_panel_primary_multiple{
+    margin: 6px 2px 6px 3px !important;
+}
+
+.info_panel_multiple_tile {
+    width: 27%;
+    height: 76px;
+    float: left;
+    padding: 7px 2%;
+    background-color: white;
+    margin: 0 1% 6px;
+    border-radius: 4px;
+    position: relative;
+    text-align: center;
+    box-shadow: 0 0 2px rgba(211, 211, 211, 0.6);
+}
+
+.info_panel_multiple_tile div.tile_preview img {
+    max-width: 90%;
+    max-height: 60px;
+}
+
+.info_panel_multiple_tile div.tile_label {
+    position: absolute;
+    bottom: 1px;
+    font-size: 0.7em;
+    overflow: hidden;
+    width: 89%;
+    text-overflow: ellipsis;
+    padding: 2px 2px 0;
+    text-align: center;
+    color: #646464;
+    white-space: nowrap;
+}
+
 .panelContent div.panelHeader{
     font-size: 1.3em;
     padding: 24px 0 8px 0;
