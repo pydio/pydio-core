@@ -26,6 +26,7 @@ Class.create("CAS_LoginForm", {
         // String for login page
         var auth_cas_msg = "Use CAS Credential";
         var auth_pyd_msg = "Use Pydio Credential";
+        var auth_button_msg = "Click here";
         if(ajaxplorer.getPluginConfigs("authfront.cas")._object.AUTH_CAS_MESS_STRING){
             auth_cas_msg = ajaxplorer.getPluginConfigs("authfront.cas")._object.AUTH_CAS_MESS_STRING;
         }
