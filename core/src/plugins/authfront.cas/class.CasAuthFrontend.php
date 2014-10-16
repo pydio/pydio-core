@@ -203,7 +203,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
                     $userObj = ConfService::getConfStorageImpl()->createUserObject($cas_user);
                     $roles = $userObj->getRoles();
                     $cas_RoleID = $this->cas_additional_role;
-                    $userObj->addRole(AuthService::getRole($cas_RoleID, false));
+                    $userObj->addRole(AuthService::getRole($cas_RoleID, true));
                     AuthService::updateUser($userObj);
                 }
                 return true;
