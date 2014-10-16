@@ -20,7 +20,7 @@
  */
 $mess=array(
 "1" => "Créer une table",
-"2" => "Tapez votre requête SQL ici",
-"3"	=> "Executer la requête",
+"2" => "Saisissez votre requête SQL ici",
+"3"	=> "Rechercher",
 "4"	=> "Effacer"
 );

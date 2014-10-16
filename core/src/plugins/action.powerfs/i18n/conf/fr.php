@@ -21,5 +21,5 @@
 $mess = array(
     // will be replaced by the application title
     "Power FS" => "Power FS",
-    "This set of extensions assume that you have an administration access to your server: ability to tweak the webserver and the php configuration, ability to access the command line, etc." => "Ces extensions ne sont utiles que si vous avez un accès étendu au serveur : configs php et webserver, accès ligne de commande, etc"
+    "This set of extensions assume that you have an administration access to your server: ability to tweak the webserver and the php configuration, ability to access the command line, etc." => "Ces extensions ne sont utiles que si vous disposez d'un accès d'administration au serveur : configuration du serveur web et de php, accès en ligne de commande, ..."
 );
