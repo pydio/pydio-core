@@ -157,7 +157,7 @@ Class.create("GraphsViewer", AbstractEditor, {
         div.update('');
         if(qData['AXIS']){
             var height = 300;
-            var legendY = 270;
+            var legendY = 280;
             if(qData["DIRECTION"] && qData["DIRECTION"] == "horizontal"){
                 height = 600;
             }else if(qData["DIAGRAM"] && qData["DIAGRAM"] == "pie"){
@@ -206,7 +206,7 @@ Class.create("GraphsViewer", AbstractEditor, {
             }
             chart.addLegend("5%", legendY, "90%", 40, "center");
             chart.draw();
-            div.insert({top:('<div class="innerTitle">'+qData['LABEL']+'</div>')});
+            div.insert({top:('<table class="innerTitle"><tr><td>'+qData['LABEL']+'</td></tr></table>')});
             this.updateLinks(chart, queryName, jsonData);
             this.charts.set(queryName, chart);
         }else if(qData["FIGURE"]){
@@ -218,17 +218,21 @@ Class.create("GraphsViewer", AbstractEditor, {
 
     updateChart : function(chart, queryName, jsonData){
         chart.data = jsonData["data"];
-        chart.draw(1000);
+        var qType = this.getQueryByName(queryName)['DIAGRAM'];
+        if(Prototype.Browser.Gecko && (qType == 'bar' || qType == 'plot')){
+            chart.setMargins(80, 20, 40, 145);
+        }
+        chart.draw(500);
         this.updateLinks(chart, queryName, jsonData);
     },
 
     updateLinks : function(chart, queryName, jsonData){
 
-        var container = this.element.down('#' + queryName+'_container');
-        var linkCont = container.down('.chart_links');
+        var container = this.element.down('#' + queryName+'_container').down('tr');
+        var linkCont = container.down('td.chart_links');
         if(!linkCont){
-            linkCont = new Element('div', {className:'chart_links', style:'float: right;margin: 10px 20px;min-width: 190px;text-align: right;'});
-            container.insert({top:linkCont});
+            linkCont = new Element('td', {className:'chart_links', style:'text-align: right;'});
+            container.insert(linkCont);
         }else{
             linkCont.update('');
         }
@@ -248,7 +252,7 @@ Class.create("GraphsViewer", AbstractEditor, {
                     //}
                 }.bind(this));
                 linkCont.insert(input);
-                linkCont.insert('<span> '+this.defaultLinksUnits+'</span>');
+                linkCont.insert('<span> '+this.defaultLinksUnits+' </span>');
                 return;
             }
             var linkData = jsonData['links'].detect(function(l){
@@ -288,7 +292,7 @@ Class.create("GraphsViewer", AbstractEditor, {
                 label = "icon-fast-forward";
                 break;
         }
-        var link = new Element('a').update("<a class='"+label+"' style='display:inline-block; margin: 0 5px;"+(linkActive?"cursor:pointer;color:#399C9B;":"color:#CCCCCC;")+"'></a>");
+        var link = new Element('a').update("<a class='"+label+"' style='display:inline-block; margin: 0 1px;"+(linkActive?"cursor:pointer;color:#399C9B;":"color:#CCCCCC;")+"'></a>");
         if(!Object.isString(linkData)){
             link.observe("click", function(){
                 this.loadData(queryName, chart, linkData['cursor'], linkData['count']);
@@ -317,8 +321,14 @@ Class.create("GraphsViewer", AbstractEditor, {
             //chart.setStyle('width')
         });
         this.charts.each(function(pair){
-            pair.value.draw(500);
-        });
+            var queryName = pair.key;
+            var chart = pair.value;
+            var qType = this.getQueryByName(queryName)['DIAGRAM'];
+            if(Prototype.Browser.Gecko && !Prototype.Browser.IE10plus && (!qType || qType == 'bar' || qType == 'area')){
+                chart.setMargins(80, 20, 40, 145);
+            }
+            chart.draw(500);
+        }.bind(this));
         this.element.fire("editor:resize", size);
     },
 
