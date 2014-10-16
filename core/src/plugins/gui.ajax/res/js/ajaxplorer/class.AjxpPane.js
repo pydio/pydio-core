@@ -108,7 +108,7 @@ Class.create("AjxpPane", {
                 }else{
                     this.htmlElement.addClassName(cName);
                 }
-                if(cPref['externalButtonId']){
+                if(cPref['externalButtonId'] && $(cPref['externalButtonId'])){
                     $(cPref['externalButtonId']).toggleClassName(cPref['externalButtonClassName'])
                 }
             }

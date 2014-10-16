@@ -578,11 +578,11 @@ Class.create("FilesList", SelectableElements, {
 				init:function(){
                     var actBar = window.ajaxplorer.actionBar;
                     oThis.observe('switch-display-mode', function(e){
-                        if(oThis._displayMode == 'list') actBar.getActionByName("thumbs_sortby").disable();
+                        if(oThis._displayMode == 'list') actBar.getActionByName(oThis.htmlElement.id+'-thumbs_sortby').disable();
                         else actBar.getActionByName("thumbs_sortby").enable();
                     });
                     window.setTimeout(function(){
-                        if(oThis._displayMode == 'list') actBar.getActionByName("thumbs_sortby").disable();
+                        if(oThis._displayMode == 'list') actBar.getActionByName(oThis.htmlElement.id+'-thumbs_sortby').disable();
                         else actBar.getActionByName("thumbs_sortby").enable();
                     }.bind(window.listenerContext), 800);
                 }
