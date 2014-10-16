@@ -206,6 +206,10 @@ Class.create("GraphsViewer", AbstractEditor, {
             }
             chart.addLegend("5%", legendY, "90%", 40, "center");
             chart.draw();
+            if(qData['LEGEND']){
+                var el= this.element.down('#'+queryName+'_container');
+                el.down('.dimple-legend-text').innerHTML = qData['LEGEND'];
+            }
             div.insert({top:('<table class="innerTitle"><tr><td>'+qData['LABEL']+'</td></tr></table>')});
             this.updateLinks(chart, queryName, jsonData);
             this.charts.set(queryName, chart);
@@ -223,6 +227,10 @@ Class.create("GraphsViewer", AbstractEditor, {
             chart.setMargins(80, 20, 40, 145);
         }
         chart.draw(500);
+        if(qData['LEGEND']){
+            var el= this.element.down('#'+queryName+'_container');
+            el.down('.dimple-legend-text').innerHTML = qData['LEGEND'];
+        }
         this.updateLinks(chart, queryName, jsonData);
     },
 
@@ -323,11 +331,17 @@ Class.create("GraphsViewer", AbstractEditor, {
         this.charts.each(function(pair){
             var queryName = pair.key;
             var chart = pair.value;
-            var qType = this.getQueryByName(queryName)['DIAGRAM'];
+            var qData = this.getQueryByName(queryName);
+            var qType = qData['DIAGRAM'];
             if(Prototype.Browser.Gecko && !Prototype.Browser.IE10plus && (!qType || qType == 'bar' || qType == 'area')){
                 chart.setMargins(80, 20, 40, 145);
             }
             chart.draw(500);
+            if(qData['LEGEND']){
+                var el = this.element.down('#'+queryName+'_container');
+                el.down('.dimple-legend-text').innerHTML = qData['LEGEND'];
+            }
+
         }.bind(this));
         this.element.fire("editor:resize", size);
     },
