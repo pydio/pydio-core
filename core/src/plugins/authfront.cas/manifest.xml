@@ -25,7 +25,7 @@
                        description="Login page will be modified to give user a link to authenticate via CAS manually. Otherwise Pydio will redirect automatically to CAS login page." default="true"/>
         <global_param expose="true" name="AUTH_CAS_MESS_STRING" group="General" type="string" label="String for CAS auth" default="Use CAS credential" description="This message will be appeared in login page. Ex: Use CAS credential"/>
         <global_param expose="true" name="AUTH_PYD_MESS_STRING" group="General" type="string" label="String for Pydio auth" default="Use Pydio credential" description="This message will be appeared in login page. Ex: Use Pydio credential"/>
-
+        <global_param expose="true" name="AUTH_CLICK_MESS_STRING" group="General" type="string" label="String for button click here" default="Click Here" description=""/>
         <global_param name="ADDITIONAL_ROLE" group="General" type="string" label="Additional roles for user logged in by CAS" default="" description="Additional roles for user logged in by CAS"/>
 
 
