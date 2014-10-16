@@ -19,12 +19,12 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"DB Storage" => "Configuration DB",
-"Stores the conf data in an SQL database." => "Les données de configuration sont stockées dans une base de données",
+"DB Storage" => "Configuration BDD",
+"Stores the conf data in an SQL database." => "Stockage des configurations dans une base de données.",
 "Connexion" => "Connexion",
-"The Database Connexion" => "Connexion à la base de données, tableau DIBI.",
-"Users Tmp Folder" => "Répertoire temporaire",
-"The folder in which all temporary files will be stored" => "Répertoire pour stocker les données temporaires des users.",
-"SQL Tables" => "SQL Tables",
-"Install SQL Tables" => "Install SQL Tables",
+"The Database Connexion" => "Connexion à la base de données",
+"Users Tmp Folder" => "Répertoire des utilisateurs temporaires",
+"The folder in which all temporary files will be stored" => "Répertoire de stockage des fichiers temporaires",
+"SQL Tables" => "Tables SQL",
+"Install SQL Tables" => "Installer les tables SQL",
 );

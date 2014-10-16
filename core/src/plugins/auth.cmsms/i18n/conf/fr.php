@@ -31,5 +31,5 @@ $mess=array(
 "Prefix tables" => "Préfixe de tables",
 "Prefix of CMSMS tables " => "Préfixe des tables CMSMS",
 "CMSMS Authentication" => "Authentification CMSMS",
-"Stores the Authentication data in CMSMS FEU" => "Enregistre les données d'authentification dans CMSMS FEU",
+"Stores the Authentication data in CMSMS FEU" => "Enregistrer les données d'authentification dans CMSMS FEU",
 );
