@@ -629,8 +629,57 @@ class ldapAuthDriver extends AbstractAuthDriver
                         switch ($params['MAPPING_LOCAL_TYPE']) {
                             case "role_id":
                                 if ($key == "memberof") {
+                                    // ldap_search to get all remote groups matching gfilter
+                                    if ($this->ldapconn == null) {
+                                        $this->startConnexion();
+                                    }
+                                    $conn = array();
+                                    if (isset($this->ldapGDN)) $gdn = $this->ldapGDN;
+                                    else $gdn = $this->ldapDN;
+                                    if (is_array($gdn)) {
+                                        foreach ($gdn as $dn) {
+                                            $conn[] = $this->ldapconn;
+                                        }
+                                    } else {
+                                        $conn = array($this->ldapconn);
+                                    }
+                                    foreach ($conn as $dn => $ldapc) {
+                                        if (!$ldapc) {
+                                            unset($conn[$dn]);
+                                        }
+                                    }
+                                    $ret = ldap_search($conn,$gdn,array($this->ldapGFilter), array($this->ldapGroupAttr,"name"));
+                                    $remoteLDAPGroups = array();
+                                    foreach ($ret as $i => $res) {
+                                        if ($res) {
+                                            $entries = ldap_get_entries($conn[$i],$res);
+                                            for ($i=0; $i < $entries["count"]; $i++) {
+                                                $remoteLDAPGroups[$entries[$i]["dn"]] = $entries[$i][$this->ldapGroupAttr][0];
+                                                $remoteLDAPGroups[$entries[$i][$this->ldapGroupAttr][0]] = $entries[$i]["dn"];
+                                            }
+                                        }
+                                    }
+
+                                    // get the roles the user object currently has
+                                    $localRoles = $userObject->getRoles();
+
+                                    // Remove roles the user is no longer memberOf, or roles that are not in the GFilter.
+                                    // Do not remove roles that are in neither memberOf nor GFilter, otherwise local-only roles (ROOT_ROLE) will get removed
+                                    $this->logDebug(__FUNCTION__,'Updating Roles ('.$userObject->getId().')');
+                                    foreach ($localRoles as $localRole=>$roleEnabled) {
+                                        if ( (!in_array($localRole, array_keys($remoteLDAPGroups)) && in_array($localRole, array_keys($memberValues))) ||
+                                           (in_array($localRole, array_keys($remoteLDAPGroups)) && !in_array($localRole, array_keys($memberValues))) ) {
+                                            $this->logDebug(__FUNCTION__,'Remove role '.$localRole.' from '.$userObject->getId());
+                                            $roleToRemove = AuthService::getRole($localRole);
+                                            $userObject->removeRole($roleToRemove->getId());
+                                            $userObject->recomputeMergedRole();
+                                            $changes = true;
+                                        }
+                                    }
+
                                     foreach ($memberValues as $uniqValue => $fullDN) {
-                                        if (!in_array($uniqValue, array_keys($userObject->getRoles()))) {
+                                        if (in_array($uniqValue, array_keys($remoteLDAPGroups)) && !in_array($uniqValue, array_keys($localRoles))) {
+                                            $this->logDebug(__FUNCTION__,'Add role '.$localRole.' to '.$userObject->getId());
                                             $userObject->addRole(AuthService::getRole($uniqValue, true));
                                             $userObject->recomputeMergedRole();
                                             $changes = true;
