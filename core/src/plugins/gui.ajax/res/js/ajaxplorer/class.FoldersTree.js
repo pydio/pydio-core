@@ -89,7 +89,6 @@ Class.create("FoldersTree", AjxpPane, {
 		}.bind(this));
 	
 		this.rootNodeId = this.tree.id;
-		this.hasFocus;
 
         var ctxChangedObs =function(event){
 			var path = event.memo.getPath();
@@ -125,7 +124,7 @@ Class.create("FoldersTree", AjxpPane, {
 
 	},
 
-    destroy : function(){
+    destroy : function($super){
         this.registeredObservers.each(function (pair){
             document.stopObserving(pair.key, pair.value);
         });
@@ -134,6 +133,7 @@ Class.create("FoldersTree", AjxpPane, {
         if(window[this.htmlElement.id]){
             try{delete window[this.htmlElement.id];}catch(e){}
         }
+        $super();
     },
 
 	/**

@@ -248,10 +248,29 @@ Class.create("FilesList", SelectableElements, {
 	/**
 	 * Implementation of the IAjxpWidget methods
 	 */
-	destroy : function(){
+	destroy : function($super){
+        $super();
         this._clearObservers();
         if(window[this.htmlElement.id]){
             try{delete window[this.htmlElement.id];}catch(e){}
+        }
+        if(this.boundSizeEvents){
+            this.boundSizeEvents.each(function(pair){
+                document.stopObserving(pair.key, pair.value);
+            });
+        }
+        if(this.resizeEvents){
+            this.resizeEvents.each(function(pair){
+                document.stopObserving(pair.key, pair.value);
+            });
+        }
+        if(Class.objectImplements(this, 'IFocusable')){
+            ajaxplorer.unregisterFocusable(this);
+        }
+        if(Class.objectImplements(this, "IActionProvider")){
+            this.getActions().each(function(act){
+                ajaxplorer.guiActions.unset(act.key);
+            }.bind(this));
         }
         if(this.slider) this.slider.destroy();
         if(this.headerMenu) this.headerMenu.destroy();
@@ -446,8 +465,10 @@ Class.create("FilesList", SelectableElements, {
 	getActions : function(){
 		// function may be bound to another context
 		var oThis = this;
+        var oThisId = this.htmlElement.id;
+
 		var options1 = {
-			name:'multi_display',
+			name:oThisId+'-multi_display',
 			src:'view_icon.png',
             icon_class:'icon-th-large',
 			text_id:150,
@@ -488,7 +509,7 @@ Class.create("FilesList", SelectableElements, {
 			selection:false,
 			dir:true,
 			actionBar:true,
-			actionBarGroup:'default',
+			actionBarGroup:oThisId+'-actions',
 			contextMenu:false,
 			infoPanel:false			
 			};
@@ -503,7 +524,7 @@ Class.create("FilesList", SelectableElements, {
 		var multiAction = new Action(options1, context1, {}, {}, subMenuItems1);
 
         var options2 = {
-			name:'thumb_size',
+			name:oThisId+'-thumb_size',
 			src:'view_icon.png',
             icon_class:'icon-resize-full',
 			text_id:452,
@@ -520,12 +541,12 @@ Class.create("FilesList", SelectableElements, {
 				init:function(){
                     var actBar = window.ajaxplorer.actionBar;
                     oThis.observe('switch-display-mode', function(e){
-                        if(oThis._displayMode != 'thumb') actBar.getActionByName("thumb_size").disable();
-                        else actBar.getActionByName("thumb_size").enable();
+                        if(oThis._displayMode != 'thumb') actBar.getActionByName(oThisId+'-thumb_size').disable();
+                        else actBar.getActionByName(oThisId+'-thumb_size').enable();
                     });
                     window.setTimeout(function(){
-                        if(oThis._displayMode != 'thumb') actBar.getActionByName("thumb_size").disable();
-                        else actBar.getActionByName("thumb_size").enable();
+                        if(oThis._displayMode != 'thumb') actBar.getActionByName(oThisId+'-thumb_size').disable();
+                        else actBar.getActionByName(oThisId+'-thumb_size').enable();
                     }.bind(window.listenerContext), 800);
                 }
 			}
@@ -534,7 +555,7 @@ Class.create("FilesList", SelectableElements, {
 			selection:false,
 			dir:true,
 			actionBar:true,
-			actionBarGroup:'default',
+			actionBarGroup:oThisId+'-actions',
 			contextMenu:false,
 			infoPanel:false
 		};
@@ -542,7 +563,7 @@ Class.create("FilesList", SelectableElements, {
 		var thumbsizeAction = new Action(options2, context2, {}, {});
 
         var options3 = {
-			name:'thumbs_sortby',
+			name:oThisId+'-thumbs_sortby',
 			src:'view_icon.png',
             icon_class:'icon-sort',
 			text_id:450,
@@ -559,12 +580,12 @@ Class.create("FilesList", SelectableElements, {
 				init:function(){
                     var actBar = window.ajaxplorer.actionBar;
                     oThis.observe('switch-display-mode', function(e){
-                        if(oThis._displayMode == 'list') actBar.getActionByName("thumbs_sortby").disable();
-                        else actBar.getActionByName("thumbs_sortby").enable();
+                        if(oThis._displayMode == 'list') actBar.getActionByName(oThisId+'-thumbs_sortby').disable();
+                        else actBar.getActionByName(oThisId+'-thumbs_sortby').enable();
                     });
                     window.setTimeout(function(){
-                        if(oThis._displayMode == 'list') actBar.getActionByName("thumbs_sortby").disable();
-                        else actBar.getActionByName("thumbs_sortby").enable();
+                        if(oThis._displayMode == 'list') actBar.getActionByName(oThisId+'-thumbs_sortby').disable();
+                        else actBar.getActionByName(oThisId+'-thumbs_sortby').enable();
                     }.bind(window.listenerContext), 800);
                 }
 			}
@@ -573,7 +594,7 @@ Class.create("FilesList", SelectableElements, {
 			selection:false,
 			dir:true,
 			actionBar:true,
-			actionBarGroup:'default',
+			actionBarGroup:oThisId+'-actions',
 			contextMenu:false,
 			infoPanel:false
 		};
@@ -606,7 +627,11 @@ Class.create("FilesList", SelectableElements, {
 		// Create an action from these options!
 		var thumbSortAction = new Action(options3, context3, {}, {}, submenuItems3);
 
-		return $H({thumb_size:thumbsizeAction, thumb_sort:thumbSortAction, multi_display:multiAction});
+        var butts = $H();
+        butts.set(oThisId+'-thumb_size', thumbsizeAction);
+        butts.set(oThisId+'-thumb_sort', thumbSortAction);
+        butts.set(oThisId+'-multi_display', multiAction);
+        return butts;
 	},
 	
 	/**
@@ -2640,7 +2665,7 @@ Class.create("FilesList", SelectableElements, {
 	getItems: function () {
 		if(this._displayMode == "list")
 		{
-			return this._htmlElement.rows;
+			return this._htmlElement.rows || [];
 		}
 		else
 		{

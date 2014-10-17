@@ -59,3 +59,19 @@ div.cumulated_figure div.figure {
 svg text {
     font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif !important;
 }
+
+.tabbed_editor table.innerTitle {
+    border-bottom: 1px solid #6F7B88;
+    text-align: left;
+    color: #4C555F;
+    font-size: 15px;
+    margin: 10px !important;
+    padding: 8px !important;
+    letter-spacing: 1px;
+    width: 94%;
+}
+
+.tabbed_editor table.innerTitle td.chart_links{
+    letter-spacing: 0;
+    font-size: 13px;
+}

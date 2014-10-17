@@ -147,7 +147,7 @@ class sqlAuthDriver extends AbstractAuthDriver
     public function userExists($login)
     {
         $res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [login]=%s", $login);
-        return ($res->fetchSingle() > 0);
+        return (intval($res->fetchSingle()) > 0);
     }
 
     public function checkPassword($login, $pass, $seed)

@@ -469,6 +469,7 @@
             </xs:sequence>
             <xs:attribute name="attributes" use="required"/>
             <xs:attribute name="mime" use="required" type="xs:NCName"/>
+            <xs:attribute name="theme" type="xs:NCName"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="template">
