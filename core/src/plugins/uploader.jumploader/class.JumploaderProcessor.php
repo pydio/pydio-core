@@ -68,7 +68,7 @@ class JumploaderProcessor extends AJXP_Plugin
 
         /* if fileId is not set, request for cross-session resume (only if the protocol is not ftp)*/
         if (!isSet($httpVars["fileId"])) {
-            AJXP_LOGGER::debug("Trying Cross-Session Resume request");
+            $this->logDebug("Trying Cross-Session Resume request");
 
             $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
             $streamData = $plugin->detectStreamWrapper(true);
@@ -89,7 +89,7 @@ class JumploaderProcessor extends AJXP_Plugin
                             $resumeFileId = $explodedSubPathName[1];
                             $resumeIndexes[] = $explodedSubPathName[2];
 
-                            AJXP_LOGGER :: debug("Current Index: " . $explodedSubPathName[2]);
+                            $this->logDebug("Current Index: " . $explodedSubPathName[2]);
                         }
                     }
                     $it->next();
@@ -97,7 +97,7 @@ class JumploaderProcessor extends AJXP_Plugin
 
                 /* no valid temp file found. return. */
                 if (empty ($resumeIndexes)){
-                    AJXP_LOGGER::debug("No Cross-Session Resume request");
+                    $this->logDebug("No Cross-Session Resume request");
                     return;
                 }
 
@@ -107,7 +107,7 @@ class JumploaderProcessor extends AJXP_Plugin
                 AJXP_LOGGER :: debug("Next Resume Index: " . $nextResumeIndex);
 
                 if (isSet($resumeFileId)) {
-                    AJXP_LOGGER::debug("ResumeFileId is set. Returning values: fileId: " . $resumeFileId . ", partitionIndex: " . $nextResumeIndex);
+                    $this->logDebug("ResumeFileId is set. Returning values: fileId: " . $resumeFileId . ", partitionIndex: " . $nextResumeIndex);
                     $httpVars["resumeFileId"] = $resumeFileId;
                     $httpVars["resumePartitionIndex"] = $nextResumeIndex;
                 }
@@ -117,14 +117,14 @@ class JumploaderProcessor extends AJXP_Plugin
 
         /* if the file has to be partitioned */
         if (isSet($httpVars["partitionCount"]) && intval($httpVars["partitionCount"]) > 1) {
-            AJXP_LOGGER::debug("Partitioned upload");
+            $this->logDebug("Partitioned upload");
             $fileId = $httpVars["fileId"];
             $fileHash = md5($realName);
 
             /* In order to enable cross-session resume, temp files must not depend on session.
              * Now named after and md5() of the original file name.
              */
-            AJXP_LOGGER::debug("Filename: " . $realName . ", File hash: " . $fileHash);
+            $this->logDebug("Filename: " . $realName . ", File hash: " . $fileHash);
             $fileVars["userfile_0"]["name"] = "$fileHash.$fileId.$index";
             $httpVars["lastPartition"] = false;
         }else{
@@ -216,7 +216,7 @@ class JumploaderProcessor extends AJXP_Plugin
             $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir."/";
 
             /* we check if the current file has a relative path (aka we want to upload an entire directory) */
-            AJXP_LOGGER::debug("Now dispatching relativePath dest:", $httpVars["relativePath"]);
+            $this->logDebug("Now dispatching relativePath dest:", $httpVars["relativePath"]);
             $subs = explode("/", $httpVars["relativePath"]);
             $userfile_name = array_pop($subs);
 
@@ -345,7 +345,7 @@ class JumploaderProcessor extends AJXP_Plugin
                 $this->logDebug("Should now rebuild file!", $httpVars);
                 // Now move the final file to the right folder
                 // Currently the file is at the base of the current
-                AJXP_LOGGER::debug("PartitionRealName", $destStreamURL.$httpVars["partitionRealName"]);
+                $this->logDebug("PartitionRealName", $destStreamURL.$httpVars["partitionRealName"]);
 
                 // Get file by name (md5 value)
                 $relPath_md5 = AJXP_Utils::decodeSecureMagic(md5($httpVars["relativePath"]));
