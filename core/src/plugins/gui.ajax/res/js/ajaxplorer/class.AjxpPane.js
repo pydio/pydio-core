@@ -97,6 +97,22 @@ Class.create("AjxpPane", {
             this.scrollbar = new Control.ScrollBar(this.htmlElement,this.scroller, {fixed_scroll_distance:50});
         }
 
+        var cPref = this.getUserPreference('rootElementClassPreference');
+        if(cPref){
+            if(Object.isString(cPref))cPref= {className:cPref};
+            var cName = cPref['className'];
+            if(cName){
+                if(cName[0] == '!'){
+                    cName = cName.substring(1);
+                    this.htmlElement.removeClassName(cName);
+                }else{
+                    this.htmlElement.addClassName(cName);
+                }
+                if(cPref['externalButtonId'] && $(cPref['externalButtonId'])){
+                    $(cPref['externalButtonId']).toggleClassName(cPref['externalButtonClassName'])
+                }
+            }
+        }
 
     },
 
@@ -263,6 +279,14 @@ Class.create("AjxpPane", {
                 document.stopObserving(pair.key, pair.value);
             });
         }
+        if(Class.objectImplements(this, 'IFocusable')){
+            ajaxplorer.unregisterFocusable(this);
+        }
+        if(Class.objectImplements(this, "IActionProvider")){
+            this.getActions().each(function(act){
+                ajaxplorer.guiActions.unset(act.key);
+            }.bind(this));
+        }
         if(this.configObserver){
             document.stopObserving("ajaxplorer:component_config_changed", this.configObserver);
         }
@@ -309,13 +333,14 @@ Class.create("AjxpPane", {
 	addPaneHeader : function(headerLabel, headerIcon){
         var label = new Element('span', {ajxp_message_id:headerLabel}).update(MessageHash[headerLabel]);
         var header = new Element('div', {className:'panelHeader'}).update(label);
+        var ic;
         if(headerIcon){
-            var ic = resolveImageSource(headerIcon, '/images/actions/ICON_SIZE', 16);
+            ic = resolveImageSource(headerIcon, '/images/actions/ICON_SIZE', 16);
             header.insert({top: new Element("img", {src:ic, className:'panelHeaderIcon'})});
             header.addClassName('panelHeaderWithIcon');
         }
         if(this.options.headerClose){
-            var ic = resolveImageSource(this.options.headerClose.icon, '/images/actions/ICON_SIZE', 16);
+            ic = resolveImageSource(this.options.headerClose.icon, '/images/actions/ICON_SIZE', 16);
             var img = new Element("img", {src:ic, className:'panelHeaderCloseIcon', title:MessageHash[this.options.headerClose.title]});
             header.insert({top: img});
             var sp = this.options.headerClose.splitter;
@@ -344,6 +369,28 @@ Class.create("AjxpPane", {
 		}.bind(this));
 	},
 
+    toggleClassNameSavingPref:function(className, externalButtonId, externalButtonClassName){
+        var invert = false;
+        if(className[0] == '!') {
+            className = className.substring(1);
+            invert = true;
+        }
+        this.htmlElement.toggleClassName(className);
+        if(externalButtonId){
+            $(externalButtonId).toggleClassName(externalButtonClassName);
+        }
+        var pref = {
+            externalButtonId:externalButtonId,
+            externalButtonClassName: externalButtonClassName
+        };
+        if(invert){
+            pref['className'] = this.htmlElement.hasClassName(className)?'':'!'+className;
+        }else{
+            pref['className'] = this.htmlElement.hasClassName(className)?className:'';
+
+        }
+        this.setUserPreference('rootElementClassPreference', pref)
+    },
 
     getUserPreference : function(prefName){
         if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return;
@@ -358,7 +405,7 @@ Class.create("AjxpPane", {
 
     setUserPreference : function(prefName, prefValue){
         if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return;
-        if(ajaxplorer.user.getPreference("SKIP_USER_HISTORY") == "true") return;
+        //if(ajaxplorer.user.getPreference("SKIP_USER_HISTORY") == "true") return;
         var guiPref = ajaxplorer.user.getPreference("gui_preferences", true);
         if(!guiPref) guiPref = {};
         var classkey = this.htmlElement.id+"_"+this.__className;

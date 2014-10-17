@@ -1,1 +1,1 @@
-To get started, please <a href="http://www.clahub.com/agreements/ajaxplorer/ajaxplorer-core">sign the Contributor License Agreement</a>.
+To get started, please <a href="https://pyd.io/contribute/cla/">sign the Contributor License Agreement</a>.

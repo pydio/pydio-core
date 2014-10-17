@@ -125,8 +125,8 @@ class smbAccessDriver extends fsAccessDriver
 
     public function isWriteable($dir, $type="dir")
     {
-        if(substr_count($dir, '/') == 3 && $dir[strlen($dir) - 1] == '/') $rc = true;
-    else $rc = is_writable($dir);
-    return $rc;
+        if(substr_count($dir, '/') <= 3) $rc = true;
+    	else $rc = is_writable($dir);
+    	return $rc;
     }
 }

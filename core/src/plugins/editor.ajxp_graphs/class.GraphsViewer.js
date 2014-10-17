@@ -39,6 +39,7 @@ Class.create("GraphsViewer", AbstractEditor, {
 
     destroy: function(){
         // TODO: Shall we destroy the SVG objects?
+        this.charts = $H();
     },
 
     open : function($super, node){
@@ -156,7 +157,7 @@ Class.create("GraphsViewer", AbstractEditor, {
         div.update('');
         if(qData['AXIS']){
             var height = 300;
-            var legendY = 260;
+            var legendY = 280;
             if(qData["DIRECTION"] && qData["DIRECTION"] == "horizontal"){
                 height = 600;
             }else if(qData["DIAGRAM"] && qData["DIAGRAM"] == "pie"){
@@ -205,28 +206,41 @@ Class.create("GraphsViewer", AbstractEditor, {
             }
             chart.addLegend("5%", legendY, "90%", 40, "center");
             chart.draw();
-            div.insert({top:('<div class="innerTitle">'+qData['LABEL']+'</div>')});
+            if(qData['LEGEND']){
+                var el= this.element.down('#'+queryName+'_container');
+                el.down('.dimple-legend-text').innerHTML = qData['LEGEND'];
+            }
+            div.insert({top:('<table class="innerTitle"><tr><td>'+qData['LABEL']+'</td></tr></table>')});
             this.updateLinks(chart, queryName, jsonData);
             this.charts.set(queryName, chart);
         }else if(qData["FIGURE"]){
             div.addClassName("cumulated_figure");
             div.update('<div class="innerTitle">'+qData['LABEL']+'</div>' + '<div class="figure">' + jsonData['data'][0]['total'] + '</div>');
         }
+        this.element.fire("editor:resize");
     },
 
     updateChart : function(chart, queryName, jsonData){
         chart.data = jsonData["data"];
-        chart.draw(1000);
+        var qType = this.getQueryByName(queryName)['DIAGRAM'];
+        if(Prototype.Browser.Gecko && (qType == 'bar' || qType == 'plot')){
+            chart.setMargins(80, 20, 40, 145);
+        }
+        chart.draw(500);
+        if(qData['LEGEND']){
+            var el= this.element.down('#'+queryName+'_container');
+            el.down('.dimple-legend-text').innerHTML = qData['LEGEND'];
+        }
         this.updateLinks(chart, queryName, jsonData);
     },
 
     updateLinks : function(chart, queryName, jsonData){
 
-        var container = this.element.down('#' + queryName+'_container');
-        var linkCont = container.down('.chart_links');
+        var container = this.element.down('#' + queryName+'_container').down('tr');
+        var linkCont = container.down('td.chart_links');
         if(!linkCont){
-            linkCont = new Element('div', {className:'chart_links', style:'float: right;margin: 10px 20px;min-width: 190px;text-align: right;'});
-            container.insert({top:linkCont});
+            linkCont = new Element('td', {className:'chart_links', style:'text-align: right;'});
+            container.insert(linkCont);
         }else{
             linkCont.update('');
         }
@@ -235,14 +249,18 @@ Class.create("GraphsViewer", AbstractEditor, {
             if(relName == "count"){
                 var qData = this.getQueryByName(queryName);
                 var input = new Element("input", {type:"text", value:qData["COUNT"], style:'width: 20px !important;height: 19px;text-align:right'});
-                input.observe("keydown", function(e){
-                    if(e.keyCode == Event.KEY_RETURN){
+                input.observe("keyup", function(e){
+                    //if(e.keyCode == Event.KEY_RETURN){
+                    if(e.keyCode == Event.KEY_UP) input.setValue(parseInt(input.getValue())+1);
+                    else if(e.keyCode == Event.KEY_DOWN) input.setValue(parseInt(input.getValue())-1);
+                    if(input.getValue()){
                         qData["COUNT"] = parseInt(input.getValue());
                         this.loadData(queryName, chart, 0, qData["COUNT"]);
                     }
+                    //}
                 }.bind(this));
                 linkCont.insert(input);
-                linkCont.insert('<span> '+this.defaultLinksUnits+'</span>');
+                linkCont.insert('<span> '+this.defaultLinksUnits+' </span>');
                 return;
             }
             var linkData = jsonData['links'].detect(function(l){
@@ -282,7 +300,7 @@ Class.create("GraphsViewer", AbstractEditor, {
                 label = "icon-fast-forward";
                 break;
         }
-        var link = new Element('a').update("<a class='"+label+"' style='display:inline-block; margin: 0 5px;"+(linkActive?"cursor:pointer;color:#399C9B;":"color:#CCCCCC;")+"'></a>");
+        var link = new Element('a').update("<a class='"+label+"' style='display:inline-block; margin: 0 1px;"+(linkActive?"cursor:pointer;color:#399C9B;":"color:#CCCCCC;")+"'></a>");
         if(!Object.isString(linkData)){
             link.observe("click", function(){
                 this.loadData(queryName, chart, linkData['cursor'], linkData['count']);
@@ -302,7 +320,8 @@ Class.create("GraphsViewer", AbstractEditor, {
      */
     resize : function(size){
         if(size){
-            fitHeightToBottom(this.element);
+            this.element.setStyle({height:size+'px'});
+            //fitHeightToBottom(this.element);
         }else{
             fitHeightToBottom(this.element);
         }
@@ -310,8 +329,20 @@ Class.create("GraphsViewer", AbstractEditor, {
             //chart.setStyle('width')
         });
         this.charts.each(function(pair){
-            pair.value.draw(500);
-        });
+            var queryName = pair.key;
+            var chart = pair.value;
+            var qData = this.getQueryByName(queryName);
+            var qType = qData['DIAGRAM'];
+            if(Prototype.Browser.Gecko && !Prototype.Browser.IE10plus && (!qType || qType == 'bar' || qType == 'area')){
+                chart.setMargins(80, 20, 40, 145);
+            }
+            chart.draw(500);
+            if(qData['LEGEND']){
+                var el = this.element.down('#'+queryName+'_container');
+                el.down('.dimple-legend-text').innerHTML = qData['LEGEND'];
+            }
+
+        }.bind(this));
         this.element.fire("editor:resize", size);
     },
 

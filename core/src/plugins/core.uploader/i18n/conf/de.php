@@ -21,7 +21,7 @@
 $mess=array(
 "Allowed Extensions" => "Erlaubte Erweiterungen",
 "Extensions List" => "Erweiterungsliste",
-"Ext. Label" => "Ext. Label",
+"Ext. Label" => "Ext. Bezeichnung",
 "Limitations" => "Limitierungen",
 "Files Number" => "Anzahl Dateien",
 "File Size" => "Dateigröße",

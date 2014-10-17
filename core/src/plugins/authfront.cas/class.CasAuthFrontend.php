@@ -45,6 +45,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
     private $cas_debug_file;
     private $cas_modify_login_page;
     private $cas_additional_role;
+    private $cas_setFixedCallbackURL;
 
 
     function tryToLogUser(&$httpVars, $isLast = false)
@@ -61,24 +62,23 @@ class CasAuthFrontend extends AbstractAuthFrontend
         $logged = isset($_SESSION['LOGGED_IN_BY_CAS']);
         $enre = !empty($httpVars['put_action_enable_redirect']);
         $ticket = !empty($httpVars['ticket']);
+        $pgt = !empty($_SESSION['phpCAS']['pgt']);
 
         if ($this->cas_modify_login_page) {
+
             if(($flag == 0) && ($enre) && !$logged && !$pgtIou){
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 1;
-            }elseif(($flag == 1) && (!$enre) && !$logged && !$pgtIou && !$ticket){
+            }elseif(($flag == 1) && (!$enre) && !$logged && !$pgtIou && !$ticket && !$pgt){
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 0;
             }elseif(($flag == 1) && ($enre) && !$logged && !$pgtIou){
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 1;
-            }elseif($pgtIou){
+            }elseif($pgtIou || $ticket || $pgt){
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 1;
             }elseif($logged && $pgtIou){
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 2;
-            }elseif($ticket){
-                $_SESSION['AUTHENTICATE_BY_CAS'] = 1;
             }else{
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 0;
             }
-
             if ($_SESSION['AUTHENTICATE_BY_CAS'] < 1) {
                 return false;
             }
@@ -151,6 +151,10 @@ class CasAuthFrontend extends AbstractAuthFrontend
                         phpCAS::setDebug($file_path);
                     }
 
+                    if(!empty($this->cas_setFixedCallbackURL)){
+                        phpCAS::setFixedCallbackURL($this->cas_setFixedCallbackURL);
+                    }
+                    //
                     /**
                      * PTG storage
                      */
@@ -199,7 +203,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
                     $userObj = ConfService::getConfStorageImpl()->createUserObject($cas_user);
                     $roles = $userObj->getRoles();
                     $cas_RoleID = $this->cas_additional_role;
-                    $userObj->addRole(AuthService::getRole($cas_RoleID, false));
+                    $userObj->addRole(AuthService::getRole($cas_RoleID, true));
                     AuthService::updateUser($userObj);
                 }
                 return true;
@@ -214,7 +218,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
         if (!isSet($this->actions[$action])) return;
 
         switch ($action) {
-            case "logoutCAS":
+            case "logout":
                 if(isset($_SESSION['LOGGED_IN_BY_CAS'])){
                     AuthService::disconnect();
 
@@ -291,7 +295,9 @@ class CasAuthFrontend extends AbstractAuthFrontend
         if (!empty($this->pluginConf["PHPCAS_MODE"]["PROXIED_SERVICE_SMB"])) {
             $this->cas_proxied_service = $this->pluginConf["PHPCAS_MODE"]["PROXIED_SERVICE_SMB"];
         }
-
+        if (!empty($this->pluginConf["PHPCAS_MODE"]["FIXED_CALLBACK_URL"])) {
+            $this->cas_setFixedCallbackURL = $this->pluginConf["PHPCAS_MODE"]["FIXED_CALLBACK_URL"];
+        }
         if (!empty($this->pluginConf["DEBUG_MODE"])) {
             $this->cas_debug_mode = $this->pluginConf["DEBUG_MODE"];
         }
@@ -333,9 +339,10 @@ class CasAuthFrontend extends AbstractAuthFrontend
                     if (!empty($dbconfig->sqlDriver["username"])) {
                         $db_username = $dbconfig->sqlDriver["username"];
                         $db_password = $dbconfig->sqlDriver["password"];
-                        $db_database = "mysql:host=" . $dbconfig->sqlDriver["host"] . ";dbname=" . $dbconfig->sqlDriver["database"];
+                        $db_database = "mysql:"."dbname=".$dbconfig->sqlDriver["database"].";host=".$dbconfig->sqlDriver["host"];
                         $db_table = "ajxp_cas_pgt";
-                        phpCAS::setPGTStorageDB($db_database, $db_username, $db_password, $db_table);
+                        AJXP_Logger::info(__CLASS__, __FUNCTION__, $db_database);
+                        phpCAS::setPGTStorageDB($db_database, $db_username, $db_password, $db_table, "");
                     }
                 }
                 break;

@@ -3074,12 +3074,19 @@ div.tabulatorContainer div#display_toolbar{
     margin-right: 0;
 }
 
+#display_toolbar span.icon-caret-down.ajxp_icon_arrow {
+    margin-left: 3px;
+    color: #888;
+}
+
 #info_panel span.user_meta_change {
     display: inline-block !important;
     text-transform: lowercase;
     font-size: 11px !important;
     margin: 3px 0;
     border-bottom: 1px dotted #999;
+    float: right;
+    cursor: pointer;
 }
 
 #info_panel div.ip_geo_cell {
@@ -3677,66 +3684,8 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed span.text_lab
     -webkit-font-smoothing: antialiased;
 }
 
-#info_panel div.panelHeader.panelHeaderWithIcon{
-    background-color: #4dc5c3;
-    border-bottom: 2px solid #399997;
-    -webkit-transition-property: height;
-    -webkit-transition-duration: 0.2s;
-    -webkit-transition-timing-function: ease-out;
-    -moz-transition-property: height;
-    -moz-transition-duration: 0.2s;
-    -moz-transition-timing-function: ease-out;
-    transition-property: height;
-    transition-duration: 0.2s;
-    transition-timing-function: ease-out;
-
-    padding-left: 6px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    border-radius: 0;
-}
-
-#info_panel.folded div.panelHeader{
-    height: 100%;
-}
-
-#info_panel.folded div.panelHeader a{
-    font-size: 1.4em;
-}
-
-#info_panel.folded{
-    /*width: 26px !important;*/
-}
-
-#info_panel.folded span[ajxp_message_id]{
-    display: none;
-}
-
 #info_panel div.folded_icons{
     display: none;
-}
-
-#info_panel.folded div.folded_icons{
-    display: block;
-    position: absolute;
-    top: 29px;
-    left: 0px;
-    background-color: #399997;
-    width: 27px;
-    height: 100%;
-}
-
-#info_panel.folded div.folded_icons span{
-    display: block;
-    margin: 10px 0 21px 0;
-    font-size: 13px;
-    text-align: center;
-}
-
-#info_panel.folded div.folded_icons span.clickable{
-    cursor: pointer;
 }
 
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed{
@@ -3884,6 +3833,7 @@ div.infoPanelBasenameTitle{
     line-height: 1.5em;
     text-align: left;
     margin-top: 0;
+    word-break:break-all;
 }
 
 .infoPanelTable,
@@ -3929,6 +3879,41 @@ div.infoPanelLabel{
 {
     border-radius: 0;
     padding: 1px;
+}
+
+div.info_panel_primary_multiple{
+    margin: 6px 2px 6px 3px !important;
+}
+
+.info_panel_multiple_tile {
+    width: 27%;
+    height: 76px;
+    float: left;
+    padding: 7px 2%;
+    background-color: white;
+    margin: 0 1% 6px;
+    border-radius: 4px;
+    position: relative;
+    text-align: center;
+    box-shadow: 0 0 2px rgba(211, 211, 211, 0.6);
+}
+
+.info_panel_multiple_tile div.tile_preview img {
+    max-width: 90%;
+    max-height: 60px;
+}
+
+.info_panel_multiple_tile div.tile_label {
+    position: absolute;
+    bottom: 1px;
+    font-size: 0.7em;
+    overflow: hidden;
+    width: 89%;
+    text-overflow: ellipsis;
+    padding: 2px 2px 0;
+    text-align: center;
+    color: #646464;
+    white-space: nowrap;
 }
 
 .panelContent div.panelHeader{
@@ -4807,7 +4792,6 @@ textarea.editor
     font-family:monospace;
     font-size:13px;
     line-height:16px;
-    white-space:normal;
 }
 
 .diaporamaButton
@@ -5029,11 +5013,11 @@ div.menu a {
 .menu.desktop.panelHeaderMenu li.menuTitle {
     display: block;
     font-size: 12px;
-    color: #333;
-    border-bottom: 1px solid #333;
-    padding: 7px;
+    color: #555555;
+    border-bottom: 1px solid #AAAAAA;
+    padding: 11px 7px;
     text-align: left;
-    background-color: rgba(255,255,255,0.2);
+    background-color: rgba(227, 227, 227, 0.20);
 }
 
 .menu.desktop li.separator {
@@ -5153,14 +5137,20 @@ span#alerts_number {
 
 /* we need explicit enabled class to overcome css deficiences (without creating unnecessary markup) */
 .menu.desktop a.enabled:hover {
-    background-color: #fb725c;
+    background-color: rgba(107, 107, 107, 0.87);
     color: #fff;
 }
 
-.menu.desktop li.menuAnchorSelected,
 .menu.desktop li.menuAnchorSelected a {
-    background-color: #fb725c;
+    background-color: rgba(107, 107, 107, 0.87);
     color: #fff !important;
+}
+
+.menu.desktop a#action_instance_share-file-minisite.enabled:hover,
+.menu.desktop a#action_instance_share-folder-minisite-public.enabled:hover,
+.menu.desktop a#action_instance_share-edit-shared.enabled:hover
+{
+    background-color: #4aCEB0;
 }
 
 .rootDirChooser
@@ -5657,6 +5647,11 @@ td.ip_geo_cell{
     margin-right: 1px;
 }
 
+#default_toolbar span.icon-caret-down.ajxp_icon_arrow {
+    color: #797979;
+    margin-left: 3px;
+}
+
 #display_toolbar a:hover{
     color: rgb(253, 252, 228);
 }
@@ -5694,6 +5689,10 @@ td.ip_geo_cell{
 
 #display_toolbar.text_only a::after{
     content:' |';
+}
+
+#display_toolbar span#vertical_splitter_folding_action_button_label::before {
+    content: '| ';
 }
 
 #display_toolbar.text_only a:last-child::after{

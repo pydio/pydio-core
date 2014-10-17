@@ -1,3 +1,7 @@
+#ajxp_datagridbox{
+    overflow: auto;
+}
+
 #ajxp_datagridbox .tabrow{
     padding: 5px 10px 7px;
     color: white;

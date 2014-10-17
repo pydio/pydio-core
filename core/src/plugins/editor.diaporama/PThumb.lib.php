@@ -1089,8 +1089,8 @@ class PThumb{
 
     function exiforientation($image, $fetch)
     {
-        if (!$this -> exif_rotation)
-            return;
+        if (!$this -> exif_rotation || !function_exists('exif_read_data'))
+            return false;
 
         if ($fetch)
         {

@@ -47,6 +47,8 @@ Class.create("FetchedResultPane", FilesList, {
             fixedDisplayMode: 'detail',
             defaultSortTypes:["String", "String", "String", "MyDate"],
             columnsTemplate:"search_results",
+            defaultSortColumn:2,
+            defaultSortDescending:false,
             selectable: true,
             draggable: false,
             droppable: false,
@@ -89,7 +91,9 @@ Class.create("FetchedResultPane", FilesList, {
         }
 
         this.hiddenColumns.push("is_file");
-        this._sortableTable.sort(2, false);
+        if(this.options.defaultSortColumn != undefined){
+            this._sortableTable.sort(this.options.defaultSortColumn , this.options.defaultSortDescending);
+        }
 
         mainElementName.addClassName('class-FetchedResultPane');
 
@@ -125,10 +129,10 @@ Class.create("FetchedResultPane", FilesList, {
     },
 
     destroy:function($super){
+        $super();
         if(this.options.containerDroppableAction){
             Droppables.remove(this.htmlElement);
         }
-        $super();
     },
 
     reloadDataModel: function(){
@@ -195,7 +199,7 @@ Class.create("FetchedResultPane", FilesList, {
 	},
 
     getActions : function(){
-
+        return $H();
     }
 
 });

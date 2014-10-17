@@ -18,6 +18,7 @@ Class.create("AjxpDataGridEditor", AbstractEditor, {
         this._lists.each(function(resultPane){
             resultPane.destroy();
         });
+        this._lists = $A();
     },
 
     open : function($super, node){
@@ -54,14 +55,19 @@ Class.create("AjxpDataGridEditor", AbstractEditor, {
                 var newContainer = new Element("div", {id:'grid_container_'+i,className:'multiple_grid_container'});
                 this.element.down("#grid_container").insert(newContainer);
                 // Add a File List  with correct parameters
-                var frp = new FetchedResultPane(newContainer, {
+                var params = {
                     fit:'content',
                     displayMode:'list',
                     fixedDisplayMode:'list',
                     rootNodeLabel:this.node.getLabel(),
                     selectionChangeCallback:function(){},
                     nodeProviderProperties: dS.toQueryParams()
-                });
+                };
+                if(this.node.getMetadata().get("filesList.sortColumn") != undefined){
+                    params['defaultSortColumn'] = this.node.getMetadata().get("filesList.sortColumn");
+                    params['defaultSortDescending'] = this.node.getMetadata().get("filesList.sortDescending");
+                }
+                var frp = new FetchedResultPane(newContainer, params);
                 frp._dataLoaded = false;
                 frp.showElement(true);
                 this._lists.push(frp);

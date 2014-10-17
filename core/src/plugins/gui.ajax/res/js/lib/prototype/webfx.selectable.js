@@ -554,6 +554,8 @@ SelectableElements = Class.create({
 	},
 	
 	destroy: function () {
+        if(!this._htmlElement) return;
+
 		if (this._htmlElement.removeEventListener)
 			this._htmlElement.removeEventListener("click", this._onclick, false);
 		else if (this._htmlElement.detachEvent)

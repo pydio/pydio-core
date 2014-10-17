@@ -445,9 +445,13 @@ Class.create("ShareCenter", {
                             oForm.down('#simple_right_write').checked = (json.entries[0].RIGHT.indexOf('w') !== -1);
                         }
                         if(this.authorizations.editable_hash && this._currentMinisiteHash){
-                            oForm.down('#editable_hash_container').show();
-                            oForm.down('#editable_hash_link').update(this._currentRepositoryLink.replace(this._currentMinisiteHash, oForm.down('#editable_hash_link').innerHTML));
-                            oForm.down('#editable_hash_link').down('input').setValue(this._currentMinisiteHash);
+                            if(json.minisite.hash_is_shorten){
+                                oForm.down('#editable_hash_container').hide();
+                            }else{
+                                oForm.down('#editable_hash_container').show();
+                                oForm.down('#editable_hash_link').update(this._currentRepositoryLink.replace(this._currentMinisiteHash, oForm.down('#editable_hash_link').innerHTML));
+                                oForm.down('#editable_hash_link').down('input').setValue(this._currentMinisiteHash);
+                            }
                         }
                     }
                     $A(json['entries']).each(function(u){

@@ -2305,7 +2305,8 @@ class ShareCenter extends AJXP_Plugin
                     "public"            => $minisiteIsPublic?"true":"false",
                     "public_link"       => $minisiteLink,
                     "disable_download"  => $dlDisabled,
-                    "hash"              => $shareId
+                    "hash"              => $shareId,
+                    "hash_is_shorten"   => isSet($shareData["short_form_url"])
                 );
                 foreach($this->getShareStore()->modifiableShareKeys as $key){
                     if(isSet($minisiteData[$key])) $jsonData[$key] = $minisiteData[$key];

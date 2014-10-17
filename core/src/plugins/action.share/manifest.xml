@@ -250,7 +250,7 @@
             </action>
             <action name="share-edit-shared">
                 <gui src="share.png" iconClass="icon-share" text="share_center.125" title="share_center.126">
-                    <context dir="true" recycle="hidden" selection="true" actionBar="true" actionBarGroup="get,share_list_toolbar,info_panel_share" behaviour="hidden"/>
+                    <context dir="true" recycle="hidden" selection="true" actionBar="true" contextMenu="true" actionBarGroup="get,share_list_toolbar,info_panel_share" behaviour="hidden"/>
                     <selectionContext dir="true" file="true" evalMetadata="metadata.get('ajxp_shared')" recycle="false" unique="true" behaviour="hidden"/>
                 </gui>
                 <processing>
@@ -260,21 +260,9 @@
                     ]]></clientCallback>
                 </processing>
             </action>
-            <action name="share-folder-workspace">
-                <gui src="share.png" iconClass="icon-share" text="share_center.113" title="share_center.114">
-                    <context dir="true" recycle="hidden" selection="true"/>
-                    <selectionContext dir="true" file="false" evalMetadata="!metadata.get('ajxp_shared')"  recycle="false" unique="true"/>
-                </gui>
-                <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        if(!ajaxplorer.actionBar.shareCenter) ajaxplorer.actionBar.shareCenter = new ShareCenter();
-                        ajaxplorer.actionBar.shareCenter.performShare('workspace');
-                    ]]></clientCallback>
-                </processing>
-            </action>
             <action name="share-file-minisite">
                 <gui src="share.png" iconClass="icon-share" text="292" title="292">
-                    <context dir="true" recycle="hidden" selection="true" actionBar="true" actionBarGroup="get,info_panel_share" />
+                    <context dir="true" recycle="hidden" selection="true" actionBar="true" contextMenu="true" actionBarGroup="get,info_panel_share" />
                     <selectionContext dir="false" file="true" recycle="false" unique="true" evalMetadata="!metadata.get('ajxp_shared')" />
                 </gui>
                 <processing>
@@ -298,7 +286,7 @@
             </action>
             <action name="share-folder-minisite-public">
                 <gui src="share.png" iconClass="icon-share" text="292" title="292">
-                    <context dir="true" recycle="hidden" selection="true" actionBar="true" actionBarGroup="get,info_panel_share"/>
+                    <context dir="true" recycle="hidden" selection="true" actionBar="true" contextMenu="true" actionBarGroup="get,info_panel_share"/>
                     <selectionContext dir="true" file="false" recycle="false" unique="true" evalMetadata="!metadata.get('ajxp_shared')" />
                 </gui>
                 <processing>
