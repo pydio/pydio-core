@@ -1,49 +1,52 @@
 Pydio ##VERSION_NUMBER## Release Note
 
-This is a bugfix and security release, upgrade is recommended.
+This is a security release, upgrade is highly recommended. It also includes bugfixes picked from develop branch.
 
 License: Affero GPL
 Copyright: Charles du Jeu 2014
 Demo: https://demo.pyd.io/
-Date: 20th, March 2014
-Contributors: cdujeu, ellega
+Date: 17th, Oct. 2014
+Contributors: Cdujeu, Signalwerk, Ellega, StephanHuber, c12simple, JohnRegan, SMandon
 
-Update README.md (details)
-Command smbclient if Windows OS (details)
-Make sure the slug is applied at workspace creation even if from a template. (details)
-Make sure mkfile is compatible with the node signature (details)
-Higher filtering level for filename (details)
-Fix tabs re-opening / Fix 'circular JSON structure' error by filtering data before saving. (details)
-Do not remove all whitespaces, too restrictive (details)
-Activate rest for stat_hash action (details)
-Add an option to fix #195 : force all emails to be sent by a unique adress (details)
-Fix PowerFS charset problems (details)
-Should fix some errors with nodes parameter array when sending to background (details)
-Sanitize and decode archive name (see #480) (details)
-Meta.exif : ignore UndefinedTag: key (details)
-WS selector: visually show that element was selected (details)
-Fix simple tabs, fix #373 date modified sorts wrong (details)
-Defer registry building when initiating repository driver. (details)
-Default folder / mime_empty images in preview factory (details)
-Exclude mime shared_* for "Share" and "To selection cart" actions, to avoid having them appear in user dashboard. (details)
-Clear user selection before switching repository (details)
-Correct metadata expression (details)
-Order WS list in dashboard fix #484 (details)
-Goto shortcut and default_start_repository were colliding (details)
-Missing message in group creation / deletion (details)
-Conf.sql : deleting a group was deleting all groups with the same prefix! (details)
-Fix PowerFS + Download All in minisite combination (details)
-Installer style and messaging (details)
-Path to jumploader archive changed on their website. (details)
-Last compile (details)
-Update plupload plugin to support their version 2.1 (details)
-Refix powerfs cmd building (details)
-Fix problems with specific values when saving roles parameters. (details)
-Make share button transparent (details)
-Fix openlayer "Fullscreen" button (details)
-Fix notification when it's pointing to Root. (details)
-Integrate new video (iOS device) (details)
-Add optional filters for users counting (e.g parent or admin) (details)
+Handle a path filter on the changes feed to synchronize only a subfolder 
+Add the missing German translation 
+Make sure to update $lastSeq if we "continue" the loop 
+Make sure the like $filter expression ends up with a slash, otherwise it can take files beginning with the same prefix. 
+Update CLA link 
+smb.php with Windows OS 
+Update README.md 
+Remove scrutinizer badge it's too depressing. 
+Add Docker folder 
+Add Docker folder 
+Add Docker folder 
+Add Docker folder 
+Create configure_php_modules.sh 
+Adding options for separate client/server websocket settings 
+smb.php don't work with lot of files or folders if "Windows OS" 
+SSL detection correction 
+New action test_upgrade_scripts to ease production (cherry picked from commit a75f9a4) 
+Fix WebODF file sanitization (cherry picked from commit bd1cd3f) 
+Pixlr have changed their domain to apps.pixlr.com - Fix #500 (cherry picked from commit 5a0187e) 
+Update SabreDAV to 1.8.10 (cherry picked from commit bbc1137) 
+Fix #629: false negative alert when moving a file to another workspace with same folder path (cherry picked from commit 5b1a77f) 
+Strengthen meta.mount security by passing the password via environment variable instead of the command line. Still an optional parameter as upgrading will require changing sudo file as well. (cherry picked from commit 5449444) 
+ActivityMonitor: cap the intervalue by max 32bit integer to avoid GUI hanging if php session.gc_maxlifetime is too big. Should fix #639 (cherry picked from commit 6fefa80) 
+Add author to the Git commit command, otherwise it can prevent auto-commit (cherry picked from commit 50fa673) 
+Fix error moving files between different wrapper (cherry picked from commit 5025634) 
+Set update site to https (cherry picked from commit 2d63ac6) 
+Fix apache pydio.conf for RPM (cherry picked from commit 14cdc03) 
+Typo in SQL UpgradeDB step. Probably non-functionnal in 5.2.3 ! (cherry picked from commit a85eef4) 
+Fix radio button problem in Role Editor (cherry picked from commit cdcc459) 
+Fix WebDAV enabler & password form (close #556) (cherry picked from commit 5e78246) 
+Allow WS creation on read-only FS if option CREATE is not set. (cherry picked from commit ca130b5) 
+Silently delete failing alert to avoid filling error logs (cherry picked from commit 357805d) 
+Fix Session Credentials & WebDAV Basic Auth (cherry picked from commit 0552dfd) 
+[edito.pixlr] Fix #500, properly close editor tab after saving (cherry picked from commit 85260f5) 
+core.mailer: Make sure to add a typed email to the list of "to", if people don't explicitely click on the auto-complete list. (cherry picked from commit 9581bf0) 
+Update CONTRIBUTING.md (cherry picked from commit 77ce3d6) 
+Disable saveState on Tabulator 
+Fix IE9 error in FilesList 
+Fix IE11 carriage return not working in Text Editor 
 
 --
 See core/doc/PREVIOUS_RELEASES file to learn more about previous releases.
