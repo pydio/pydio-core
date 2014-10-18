@@ -19,10 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Exif Metadata" => "Métadonnées EXIF",
-"Extracts the EXIF metadata of a JPG image. Used in conjunction with editor.exif" => "Extraction des données EXIF des images JPG. Utilisation en conjonction avec \"editor.exif\"",
-"Info Panel Fields" => "Champs du panneau d'info.",
-"Comma separated list of fields, use syntax 'EXIF_SECTION.ExifName'." => "Liste, séparée par des virgules, des champs, utilisez la syntaxe 'EXIF_SECTION.ExifName'.",
-"Info Panel Labels" => "Libellés du panneau d'info.",
-"Associated list of labels, be sure to define as many as fields!" => "Libellés associés à la liste des champs précédente.",
+"Comments Feed" => "Flux de commentaires",
+"Display a chat-like feed on all nodes" => "Afficher un flux type chat sur tous les noeuds",
 );
