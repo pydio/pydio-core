@@ -20,7 +20,7 @@
 */
 $mess=array(
 "Image viewer" => "Image viewer",
-"Image viewer, used for previewing images and browsing them in a diaporam. Generates a thumbnail version of the images." => "Image viewer, used for previewing images and browsing them in a diaporam. Generates a thumbnail version of the images.",
+"Image viewer, used for previewing images and browsing them in a diaporam. Generates a thumbnail version of the images." => "Image viewer, used for previewing images and browsing them in a diaporama. Generates a thumbnail version of the images.",
 "Remote Wrappers" => "Remote Wrappers",
 "When connected to a remote server, metadata extraction can make the listing action very long, as it must first copy each file locally. For plugins using the defined wrappers and files whose size is greater than this threshold, the image type and dimension will be skipped." => "When connected to a remote server, metadata extraction can make the listing action very long, as it must first copy each file locally. For plugins using the defined wrappers and files whose size is greater than this threshold, the image type and dimension will be skipped.",
 "Size Threshold" => "Size Threshold",
