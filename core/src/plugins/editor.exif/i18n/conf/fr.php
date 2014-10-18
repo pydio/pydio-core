@@ -20,5 +20,5 @@
 */
 $mess=array(
 "EXIF Extractor" => "Extraction EXIF",
-"Display the Exif metadata contained inside the JPG files. Can locate the image on a map if it contains geolocation data." => "Affichage des données Exif contenues dans une image JPG.",
+"Display the Exif metadata contained inside the JPG files. Can locate the image on a map if it contains geolocation data." => "Affichage des données Exif contenues dans une image JPG. Peut localiser l'image sur une carte si elle contient des données de localisation.",
 );

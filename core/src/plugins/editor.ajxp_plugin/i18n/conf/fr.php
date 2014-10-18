@@ -20,5 +20,5 @@
 */
 $mess=array(
 "Repository Editor" => "Editeur de dépôts",
-"Plugin Editor" => "Plugin Editor",
+"Plugin Editor" => "Editeur de plugin",
 );

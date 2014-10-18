@@ -19,9 +19,5 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Choisissez un autre...",
-"2" => "Choisissez un autre éditeur",
-"3" => "Choisissez un autre éditeur pour ouvrir ce fichier",
-"4" => "Attention, ces éditeurs ne déclarent pas supporter ce type de fichier. Leur comportement peut-être imprévisible !",
-"5" => "Effacer les associations existantes",
+"1" => "Lecteur multimédia",
 );

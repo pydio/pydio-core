@@ -19,9 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Choisissez un autre...",
-"2" => "Choisissez un autre éditeur",
-"3" => "Choisissez un autre éditeur pour ouvrir ce fichier",
-"4" => "Attention, ces éditeurs ne déclarent pas supporter ce type de fichier. Leur comportement peut-être imprévisible !",
-"5" => "Effacer les associations existantes",
+"CKEditor" => "CKEditor",
+"Wysiwyg HTML Editor, requires separate library to be downloaded." => "Editeur HTML Wysiwyg, requiert le téléchargement d'une librairie tierce.",
 );

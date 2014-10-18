@@ -19,9 +19,7 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Choisissez un autre...",
-"2" => "Choisissez un autre éditeur",
-"3" => "Choisissez un autre éditeur pour ouvrir ce fichier",
-"4" => "Attention, ces éditeurs ne déclarent pas supporter ce type de fichier. Leur comportement peut-être imprévisible !",
-"5" => "Effacer les associations existantes",
+"Audio Player" => "Lecteur audio",
+"Uses HTML5 or Flash to play a sound" => "Utilise HTML5 ou Flash pour lire un fichier audio",
+"Sound Player" => "Lecteur audio",
 );

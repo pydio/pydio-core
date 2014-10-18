@@ -41,7 +41,7 @@ $mess=array(
 "Default Rights" => "Droits par défaut",
 "This right pattern (empty, r, or rw) will be applied at user creation for this repository." => "Ces droits (rien, r, rw) seront appliqués lors de la création des utilisateurs pour ce dépôt.",
 "Pagination Threshold" => "Seuil de pagination",
-"When a folder will contain more items than this number, display will switch to pagination mode, for better performances." => "Nombre d'items à partir duquel la liste sera paginée pour améliorer les performances.",
+"When a folder will contain more items than this number, display will switch to pagination mode, for better performances." => "Nombre d'items à partir duquel la liste sera paginée afin d'améliorer les performances.",
 "#Items per page" => "Nombre d'éléments par page",
 "Once in pagination mode, number of items to display per page." => "En mode paginé, nombre d'items à afficher par page.",
 );
