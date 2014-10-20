@@ -223,13 +223,13 @@ Class.create("GraphsViewer", AbstractEditor, {
     updateChart : function(chart, queryName, jsonData){
         chart.data = jsonData["data"];
         var qType = this.getQueryByName(queryName)['DIAGRAM'];
-        if(Prototype.Browser.Gecko && (qType == 'bar' || qType == 'plot')){
+        if(Prototype.Browser.Gecko && !Prototype.Browser.IE10plus && (!qType || qType == 'bar' || qType == 'area')){
             chart.setMargins(80, 20, 40, 145);
         }
         chart.draw(500);
-        if(qData['LEGEND']){
+        if(jsonData['LEGEND']){
             var el= this.element.down('#'+queryName+'_container');
-            el.down('.dimple-legend-text').innerHTML = qData['LEGEND'];
+            el.down('.dimple-legend-text').innerHTML = jsonData['LEGEND'];
         }
         this.updateLinks(chart, queryName, jsonData);
     },
