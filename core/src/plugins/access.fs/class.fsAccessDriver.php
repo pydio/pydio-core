@@ -691,6 +691,14 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         $errorMessage = $e->getMessage();
                         break;
                     }
+                    $partialUpload = false;
+                    if(isSet($httpVars["partial_upload"]) && $httpVars["partial_upload"] == 'true' && isSet($httpVars["partial_target_bytesize"])){
+                        $partialUpload = true;
+                        $partialTargetSize = intval($httpVars["partial_target_bytesize"]);
+                        if(!isSet($httpVars["appendto_urlencoded_part"])){
+                            $userfile_name .= ".dlpart";
+                        }
+                    }
                     if (isSet($boxData["input_upload"])) {
                         try {
                             $this->logDebug("Begining reading INPUT stream");
@@ -724,6 +732,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     }
                     if (isSet($httpVars["appendto_urlencoded_part"])) {
                         $appendTo = AJXP_Utils::sanitize(SystemTextEncoding::fromUTF8(urldecode($httpVars["appendto_urlencoded_part"])), AJXP_SANITIZE_FILENAME);
+                        if(isSet($httpVars["partial_upload"]) && $httpVars["partial_upload"] == 'true'){
+                            $originalAppendTo = $appendTo;
+                            $appendTo .= ".dlpart";
+                        }
+                        $this->logDebug("AppendTo FILE".$appendTo);
                         if (file_exists($destination ."/" . $appendTo)) {
                             $already_existed = true;
                             $this->logDebug("Should copy stream from $userfile_name to $appendTo");
@@ -739,6 +752,15 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         }
                         @unlink($destination."/".$userfile_name);
                         $userfile_name = $appendTo;
+                        if($partialUpload && $partialTargetSize == filesize($destination."/".$userfile_name)){
+                            // This was the last part. We can now rename to the original name.
+                            if(is_file($destination."/".$originalFileName)){
+                                unlink($destination."/".$originalFileName);
+                            }
+                            rename($destination."/".$userfile_name, $destination."/".$originalAppendTo);
+                            $userfile_name = $originalAppendTo;
+                            $partialUpload = false;
+                        }
                     }
 
                     $this->changeMode($destination."/".$userfile_name,$repoData);
@@ -751,6 +773,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if (isSet($errorMessage)) {
                     $this->logDebug("Return error $errorCode $errorMessage");
                     return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $errorMessage));
+                } else if($partialUpload){
+                    $this->logDebug("Return Partial Upload: SUCESS but no event yet");
+                    if(isSet($already_existed) && $already_existed === true){
+                        return array("SUCCESS" => true, "PARTIAL_NODE" => $createdNode);
+                    }
                 } else {
                     $this->logDebug("Return success");
                     if(isSet($already_existed) && $already_existed === true){
