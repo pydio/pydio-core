@@ -1346,11 +1346,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             header("Content-Length: ".$size);
             header('Cache-Control: public');
         } else {
-            /*
-            if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']) || preg_match('/ WebKit /',$_SERVER['HTTP_USER_AGENT'])) {
-                $localName = str_replace("+", " ", urlencode(SystemTextEncoding::toUTF8($localName)));
-            }
-            */
             if ($isFile) {
                 header("Accept-Ranges: 0-$size");
                 $this->logDebug("Sending accept range 0-$size");
