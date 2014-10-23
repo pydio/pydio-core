@@ -419,7 +419,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             case "copy";
             case "move";
 
-            //throw new AJXP_Exception("", 113);
                 if ($selection->isEmpty()) {
                     throw new AJXP_Exception("", 113);
                 }
