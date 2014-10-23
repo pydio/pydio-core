@@ -628,20 +628,31 @@ class ldapAuthDriver extends AbstractAuthDriver
                         }
                         switch ($params['MAPPING_LOCAL_TYPE']) {
                             case "role_id":
+                                $filter = $params["MAPPING_LOCAL_PARAM"];
+                                if (strpos($filter, "preg:") !== false) {
+                                    $matchFilter = "/".str_replace("preg:", "", $filter)."/i";
+                                } else if(!empty($filter)) {
+                                    $valueFilters = array_map("trim", explode(",", $filter));
+                                }
                                 if ($key == "memberof") {
                                     foreach ($memberValues as $uniqValue => $fullDN) {
                                         if (!in_array($uniqValue, array_keys($userObject->getRoles()))) {
+                                            if(isSet($matchFilter) && !preg_match($matchFilter, $uniqValue)) continue;
+                                            if(isSet($valueFilters) && !in_array($uniqValue, $valueFilters)) continue;
                                             $userObject->addRole(AuthService::getRole($uniqValue, true));
                                             $userObject->recomputeMergedRole();
                                             $changes = true;
                                         }
                                     }
-                                }else{
-                                    $uniqValue = $value;
-                                    if ((!in_array($uniqValue, array_keys($userObject->getRoles()))) && !empty($uniqValue)) {
-                                        $userObject->addRole(AuthService::getRole($uniqValue, true));
-                                        $userObject->recomputeMergedRole();
-                                        $changes = true;
+                                } else {
+                                    foreach ($entry[$key] as $uniqValue) {
+                                        if(isSet($matchFilter) && !preg_match($matchFilter, $uniqValue)) continue;
+                                        if(isSet($valueFilters) && !in_array($uniqValue, $valueFilters)) continue;
+                                        if ((!in_array($uniqValue, array_keys($userObject->getRoles()))) && !empty($uniqValue)) {
+                                            $userObject->addRole(AuthService::getRole($uniqValue, true));
+                                            $userObject->recomputeMergedRole();
+                                            $changes = true;
+                                        }
                                     }
                                 }
                                 break;
