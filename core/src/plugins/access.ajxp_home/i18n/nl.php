@@ -20,66 +20,66 @@
  */
 $mess=array(
 "title"=> "Home",
-"desc" => "Welcome page",
-"39"=> "Below is a list of the workspaces you can access to. They can be personal or shared with/by others users.",
-"40"=> "Welcome, %s! ",
-"41"=> "Use this workspace as default",
-"42"=> "Enter",
-"43"=> "My Profile",
-"43t"=> "All my personal data",
-"44"=> "My Account",
-"45"=> "Personal data",
-"46"=> "Address Book",
-"47"=> "Users and teams that you created",
-"48"=> "My Users",
-"49"=> "External users that you created",
-"50"=> "My Teams",
+"desc" => "Welkom pagina",
+"39"=> "Hieronder is een lijst van werkplekken waar je toegang tot hebt. Dit kunnen persoonlijke zijn maar ook gedeelde door andere gebruikers.",
+"40"=> "Welkom, %s! ",
+"41"=> "Gebruik deze werkplek als standaard",
+"42"=> "Bekijk",
+"43"=> "Mijn Profiel",
+"43t"=> "Al mijn persoonlijke gegevens",
+"44"=> "Mijn account",
+"45"=> "Persoonlijk gegevens",
+"46"=> "Adresboek",
+"47"=> "Gebruikers en teams welke jij hebt gemaakt",
+"48"=> "Mijn gebruikers",
+"49"=> "Externe gebruikers welke jij gemaakt hebt",
+"50"=> "Mijn Teams",
 "51"=> "Teams of users, used as shortcuts when sharing",
-"52"=> "Are you sure you want to delete this team? This will not remove any users.",
-"53"=> "Getting Started",
-"54"=> "Get started with APPLICATION_TITLE by following How-to videos",
-"55"=> "New to APPLICATION_TITLE? <a>Watch our tutorials.</a>",
-"56"=> "Getting started with APPLICATION_TITLE? Here are some videos for you!",
-"57"=> "Download APPLICATION_TITLE for...",
-"58"=> "Android device",
+"52"=> "Weet je zeker dat je dit team wilt verwijderen? Deze actie verwijdert niet de gebruikers.",
+"53"=> "Aan de slag",
+"54"=> "Aan de slag met APPLICATION_TITLE door de How-to videos te volgen",
+"55"=> "Nieuw bij APPLICATION_TITLE? <a>Bekijk onze tutorials.</a>",
+"56"=> "Aan de slag met APPLICATION_TITLE? Hier zijn wat videos!",
+"57"=> "Download APPLICATION_TITLE voor...",
+"58"=> "Android",
 "59"=> "iPhone/iPad",
     "60"=>"Mac OS (Beta)",
     "61"=>"Windows (Beta)",
-    "62"=>"<h2>Getting started</h2>
-            This video is an introduction to APPLICATION_TITLE web application:
+    "62"=>"<h2>Aan de slag</h2>
+            Deze video is een introductie voor de APPLICATION_TITLE web applicatie:
             <ul>
-                <li>User Dashboard</li>
-                <li>GUI Overview</li>
-                <li>Managing files and folders</li>
-                <li>Previewing and editing files</li>
-                <li>Quick access through bookmarks and search engine</li>
-                <li>Selection cart</li>
+                <li>Gebruikers Dashboard</li>
+                <li>GUI Overzicht</li>
+                <li>Beheer bestanden en mappen</li>
+                <li>Preview en wijzig bestanden</li>
+                <li>Snel toegang tot favorieten en de zoekmachine</li>
+                <li>Selectie wagen</li>
             </ul>",
-    "63"=>"<h2>Sharing files with APPLICATION_TITLE</h2>
-                            In this tutorial, we will cover the basics of file sharing with APPLICATION_TITLE:
+    "63"=>"<h2>Deel bestanden met APPLICATION_TITLE</h2>
+                            In deze tutorial, leggen we de basis van bestandsdeling met APPLICATION_TITLE uit:
                             <ul>
-                                <li>Create web links</li>
-                                <li>Send them to internal or external users</li>
-                                <li>Get notified that a link was downloaded</li>
-                                <li>Create a password-protected link</li>
-                                <li>Create many links on one file</li>
-                                <li>Stop sharing a file totally</li>
+                                <li>Maak web links</li>
+                                <li>Stuur ze naar interne of externe gebruikers</li>
+                                <li>Ontvang een notificatie als een link gedownload is</li>
+                                <li>Maak een wachtwoord beschermde link aan</li>
+                                <li>Maak veel links van 1 bestand</li>
+                                <li>Stop al het delen</li>
             </ul>",
     "64"=>"<h2>Sharing folders with APPLICATION_TITLE</h2>
-                            This video covers the various options to share folders in APPLICATION_TITLE
+                            Deze video laat de diverse opties voor bestandsdeling in APPLICATION_TITLE zien
                             <ul>
-                                <li>Share as new workspace</li>
-                                <li>Share as a public minisite</li>
+                                <li>Deel als een nieuwe werkplek</li>
+                                <li>Deel als een publieke mini-site</li>
             </ul>",
-    "65"=> "Discover more on the APPLICATION_TITLE channel!",
-    "66"=>"<h2>Using APPLICATION_TITLE on iOS device</h2>
-                            This video explains how to use the APPLICATION_TITLE application (available on the App Store). Process is quite similar on Android as well.
-<ul><li>Setup the server connection</li>
-<li>Navigating through the files</li>
-<li>Keeping files offline and interacting with external applications</li>
-<li>Protecting the app with a PIN-code</li>
-<li>Using bookmarks and search engine</li></ul>",
-"67"=> "If you are not %s, %logout.",
+    "65"=> "Ontdek meer op het APPLICATION_TITLE kanaal!",
+    "66"=>"<h2>Gebruik van APPLICATION_TITLE op een iOS apparaat</h2>
+                            Deze video laat zien hoe de APPLICATION_TITLE applicatie werkt (beschikbaar in de App Store). Het proces is bijna gelijk aan de Android versie.
+<ul><li>Setup de server verbinding</li>
+<li>Navigeer door de bestandenen</li>
+<li>Houdt bestanden offline en interactie met externe applicaties mogelijk</li>
+<li>Bescherm de app met een PIN-code</li>
+<li>Gebruik favorieten en zoekmachine</li></ul>",
+"67"=> "Als je niet %s bent, %logout.",
 
 );
 
