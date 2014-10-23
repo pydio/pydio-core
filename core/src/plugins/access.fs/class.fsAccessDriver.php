@@ -113,6 +113,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         }
     }
 
+    /**
+     * @param DOMNode $contribNode
+     */
     public function disableArchiveBrowsingContributions(&$contribNode)
     {
         // Cannot use zip features on FTP !
