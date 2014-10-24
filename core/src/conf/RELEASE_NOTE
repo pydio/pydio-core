@@ -1,5 +1,15 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+This is a hotfix for a blocking issue introduced by last update (workspace creation).
+
+License: Affero GPL
+Copyright: Charles du Jeu 2014
+Demo: https://demo.pyd.io/
+Date: 24th, Oct. 2014
+Contributors: cdujeu
+
+Pydio 5.2.4 Release Note
+
 This is a security release, upgrade is highly recommended. It also includes bugfixes picked from develop branch.
 
 License: Affero GPL
@@ -7,6 +17,7 @@ Copyright: Charles du Jeu 2014
 Demo: https://demo.pyd.io/
 Date: 17th, Oct. 2014
 Contributors: Cdujeu, Signalwerk, Ellega, StephanHuber, c12simple, JohnRegan, SMandon
+
 
 Handle a path filter on the changes feed to synchronize only a subfolder 
 Add the missing German translation 
