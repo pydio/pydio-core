@@ -102,10 +102,11 @@ class s3AccessWrapper extends fsAccessWrapper
         if ($stat["mode"] == 0666) {
             $stat[2] = $stat["mode"] |= 0100000; // S_ISREG
         }
+
         $parsed = parse_url($path);
         if ($stat["mtime"] == $stat["ctime"]  && $stat["ctime"] == $stat["atime"] && $stat["atime"] == 0 && $parsed["path"] != "/") {
             //AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Nullifying stats");
-            return null;
+            //return null;
         }
         return $stat;
 
