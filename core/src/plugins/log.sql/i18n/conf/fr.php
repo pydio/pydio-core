@@ -19,10 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"DB Storage" => "Logs en DB",
-"Stores the logs in an SQL database." => "Stockage des logs dans une base de données",
+"DB Storage" => "Logs en BDD",
+"Stores the logs in an SQL database." => "Stockage des journaux dans une base de données",
 "Connexion" => "Connexion",
-"The Database Connexion" => "Tableau de connexion à la base, DIBI.",
-"SQL Tables" => "SQL Tables",
-"Install SQL Tables" => "Install SQL Tables",
+"The Database Connexion" => "Connexion à la base de données",
+"SQL Tables" => "Tables SQL",
+"Install SQL Tables" => "Installer les tables SQL",
 );

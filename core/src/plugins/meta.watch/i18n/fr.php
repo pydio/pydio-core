@@ -8,13 +8,13 @@
  */
 $mess = array(
     "1" => "Surveiller...",
-    "2" => "Etre alerté quand il y a une modification",
-    "3" => "Stopper la surveillance",
-    "4" => "Ne plus être alerté en cas de modification",
+    "2" => "Être alerté lors de l'accès à ce dossier",
+    "3" => "Arrêter la surveillance",
+    "4" => "Ne plus surveiller l'accès à ce dossier",
     "5" => "Surveiller...",
-    "6" => "Surveiller les modifications de fichier ",
+    "6" => "Surveiller les modifications de ce fichier",
     "7" => "Ne plus surveiller",
-    "8" => "Ne plus être alerté en cas de modification",
+    "8" => "Ne plus surveiller les modifications de ce fichier",
     "9" => "Consultation",
     "10"=> "Un utilisateur ouvre le fichier",
     "10b"=> "Un utilisateur explore ce répertoire",

@@ -20,9 +20,9 @@
 */
 $mess=array(
 "Basic HTTP" => "Basic-HTTP",
-"Use the standard http authentication." => "Authentification Http Basic.",
+"Use the standard http authentication." => "Utiliser l'authentification http standard.",
 "Users" => "Utilisateurs",
 "The users list" => "Liste des utilisateurs",
-"Logout URL" => "Logout URL",
-"Redirect to the given URL on loggin out" => "Redirect to the given URL on loggin out",
+"Logout URL" => "URL de déconnexion",
+"Redirect to the given URL on loggin out" => "Rediriger vers l'URL donnée lors de la déconnexion",
 );

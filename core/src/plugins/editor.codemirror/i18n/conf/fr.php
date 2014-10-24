@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Source Viewer" => "Afficheur de Sources",
-"Syntax Highlighter for all major code source files" => "Syntax Highlight pour la plupart des code source",
+"Source Viewer" => "Afficheur de sources",
+"Syntax Highlighter for all major code source files" => "Coloration syntaxique pour la plupart des fichiers de code source",
 );

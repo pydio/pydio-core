@@ -20,6 +20,6 @@
 */
 $mess=array(
 "1" => "Fenêtre externe",
-"2" => "Fenêtre externe",
-"3" => "Ouvrir le fichier dans une nouvelle fenêtre du navigateur.",
+"2" => "Fenêtre externe du navigateur",
+"3" => "Ouvrir le fichier dans une nouvelle fenêtre du navigateur, veuillez patienter, cette fenêtre se fermera automatiquement",
 );

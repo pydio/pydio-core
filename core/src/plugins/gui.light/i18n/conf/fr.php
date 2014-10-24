@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Light" => "Light",
-"Simple Template for Bookmarklets" => "Template ultra-simple pour la gestion du bookmarklet",
+"Light" => "Léger",
+"Simple Template for Bookmarklets" => "Modèle ultra-simple pour la gestion du bookmarklet",
 );

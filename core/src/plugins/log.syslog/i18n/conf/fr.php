@@ -19,8 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Syslog logger" => "Log Système",
-"Send the logs to the system syslog" => "Envoyer les logs dans le syslog du système",
+"Syslog logger" => "Journaux système",
+"Send the logs to the system syslog" => "Envoyer les journaux dans le syslog du système",
 "Identifier" => "Identifiant",
-"How the logs will be identified in the system logs" => "Identifiant des logs dans les journaux systèmes",
+"How the logs will be identified in the system logs" => "Identifiant des logs dans les journaux système",
 );

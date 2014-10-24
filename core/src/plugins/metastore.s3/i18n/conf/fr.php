@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-    "Stores metadata s3 metadata" => "Stores metadata s3 metadata",
-    "S3 MetaStore" => "MetaStore S3",
+	"S3 MetaStore" => "Stockage Meta S3",
+	"Stores metadata s3 metadata" => "Stocke les méta-données dans les méta-données s3",
 );

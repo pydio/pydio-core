@@ -21,6 +21,6 @@
 $mess=array(
 "WMS Server" => "Serveur WMS",
 "Browse the layers served by a WMS server." => "Visualiser les 'layers' publiés sur un serveur WMS.",
-"Wms Server" => "Serveur WMS",
-"Wms server url" => "Url du serveur",
+"Wms Server" => "Serveur Wms",
+"Wms server url" => "Url du serveur Wms",
 );
