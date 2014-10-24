@@ -47,7 +47,9 @@ class fsAccessTest extends AbstractTest
         if(strstr($path, "AJXP_USER")!==false) return TRUE; // CANNOT TEST THIS CASE!
         if (!$create && !@is_dir($path)) {
             $this->failedInfo .= "Selected repository path ".$path." doesn't exist, and the CREATE option is false"; return FALSE;
-        } else if ($create && !is_writeable($path)) { $this->failedInfo .= "Selected repository path ".$path." isn't writeable"; return FALSE; }
+        }/* else if ($create && !is_writeable($path)) {
+            $this->failedInfo .= "Selected repository path ".$path." isn't writeable"; return FALSE;
+        }*/
         // Do more tests here
         return TRUE;
     }
