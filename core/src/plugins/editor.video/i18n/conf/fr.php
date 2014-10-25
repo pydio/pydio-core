@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Video Player" => "Player Video",
-"Inserts a video player in the info panel, either HTML5 or Flash depending on the format." => "Player HTML5 avec fallback en flash pour pouvoir visualiser un maximum de vidéos en ligne.",
+"Video Player" => "Lecteur vidéo",
+"Inserts a video player in the info panel, either HTML5 or Flash depending on the format." => "Insére un lecteur vidéo dans le panneau d'informations, sera HTML5 ou Flash en fonction du format.",
 );

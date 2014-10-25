@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Exif Reader",
-"2" => "Display Exif data",
+"1" => "Lecteur Exif",
+"2" => "Afficher les données Exif",
 );

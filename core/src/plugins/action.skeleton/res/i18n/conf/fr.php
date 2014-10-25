@@ -20,11 +20,11 @@
 */
 $mess=array(
 "Skeleton Plugin" => "Plugin Squelette",
-"This is an empty container to demonstrate the basics of plugins coding." => "Plugin vide pour expliquer les fonctionnalités de base d'un plugin. Ajoute un bouton dans la toolbar pour ouvrir une URL externe, et un header/footer customisé.",
-"Custom Footer" => "Pied de page",
-"Show a custom footer div" => "Afficher un pied de page custom",
-"Footer Content" => "Contenu du pied",
-"Display this content in the footer" => "Contenu affiché si le pied de page est activé.",
-"Button Target Url" => "Cible du bouton",
-"The target URL of the button that will be added to the application" => "URL du bouton ajouté à l'application.",
+"This is an empty container to demonstrate the basics of plugins coding." => "Plugin vide pour expliquer les fonctionnalités de base d'un plugin.",
+"Custom Footer" => "Pied de page personnalisé",
+"Show a custom footer div" => "Afficher un pied de page personnalisé",
+"Footer Content" => "Contenu du pied de page",
+"Display this content in the footer" => "Afficher ce contenu dans le pied de page.",
+"Button Target Url" => "Cible (URL) du bouton",
+"The target URL of the button that will be added to the application" => "Cible (URL) du bouton qui sera ajouté à l'application.",
 );

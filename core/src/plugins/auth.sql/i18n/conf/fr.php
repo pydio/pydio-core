@@ -19,11 +19,11 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"DB Storage" => "Auth Base de données",
-"Stores the Authentication data in an SQL database." => "Stockage des informations dans une base de données.",
+"DB Storage" => "Stockage BDD",
+"Stores the Authentication data in an SQL database." => "Stockage des informations d'authentification dans une base de données.",
 "Connexion" => "Connexion",
-"The Database Connexion" => "Connexion Base de données, tableau de valeurs DIBI.",
-"DB Auth Storage" => "DB Auth Storage",
-"SQL Tables" => "SQL Tables",
-"Install SQL Tables" => "Install SQL Tables",
+"The Database Connexion" => "Connexion à la base de données",
+"DB Auth Storage" => "Stockage en BDD des authentifications",
+"SQL Tables" => "Tables SQL",
+"Install SQL Tables" => "Installer les tables SQL",
 );

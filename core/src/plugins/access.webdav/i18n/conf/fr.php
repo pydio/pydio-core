@@ -20,11 +20,11 @@
 */
 $mess=array(
 "WebDAV (PEAR)" => "WebDAV (PEAR)",
-"Access a WebDAV server. Requires PEAR/HTTP_WebDAVClient installed with the patched found in the plugin folder applied." => "Accès à un répertoire partagé par le protocol WebDAV. L'extension PEAR/HTTP_WebDAVClient doit être installée et patchée. Voir la doc du plugin.",
+"Access a WebDAV server. Requires PEAR/HTTP_WebDAVClient installed with the patched found in the plugin folder applied." => "Accès à un serveur WebDAV. Requiert l'extension PEAR/HTTP_WebDAVClient avec le correctif présent dans le dossier du plug-in.",
 "Host" => "Hôte",
-"Host of the WebDAV server, with http/https and without trailing slash. Can contain user:password too." => "Chemin du serveur webdav, avec http ou https, et éventuellement les user et passsword.",
-"Uri" => "URI",
-"Path to the root folder on the server" => "Chemin relatif du partage.",
-"File Creation Mask" => "File Creation Mask",
-"Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." => "Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc.",
+"Host of the WebDAV server, with http/https and without trailing slash. Can contain user:password too." => "Chemin du serveur WebDAV, avec http ou https, sans les slashs.",
+"Uri" => "Uri",
+"Path to the root folder on the server" => "Chemin du répertoire de base sur le serveur",
+"File Creation Mask" => "Masque de création des fichiers",
+"Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." => "Optionellement, appliquer un chmod operation. La valeur doit-être numérique, tel 0777, 0644, ...",
 );

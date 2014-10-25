@@ -1,28 +1,37 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
-* This file is part of Pydio.
-*
-* Pydio is free software: you can redistribute it and/or modify
-* it under the terms of the GNU Affero General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* Pydio is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU Affero General Public License for more details.
-*
-* You should have received a copy of the GNU Affero General Public License
-* along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
-*
-* The latest code can be found at <http://pyd.io/>.
-*/
+ * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
+ *
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <http://pyd.io/>.
+ */
 $mess=array(
 "languageLabel" => "Russian",
-"date_format"  => "Y/m/d H:i",
+"date_intl_locale" => "ru_RU",
+"date_format"  => "d/m/Y H:i",
 "byte_unit_symbol" => "b",
-"date_intl_locale" => "ru-RU",
+"date_relative_date" => "on DATE",
+"date_relative_time" => "TIME",
+"date_relative_date_format" => "F, jS Y",
+"date_relative_time_format" => "H:i",
+"date_relative_today" => "сегодня в TIME",
+"date_relative_yesterday" => "вчера в TIME",
+"date_relative_tomorrow" => "завтра в TIME",
+"date_relative_days_ago" => "%s дней назад",
+"date_relative_days_ahead" => "in %s days",
 "0" => "Версия",
 "1" => "Имя файла",
 "2" => "Размер",
@@ -187,9 +196,9 @@ $mess=array(
 "162"=> "Редактировать текстовый файл онлайн",
 "163"=> "Войти",
 "164"=> "Выйти",
-"165"=> "Настройки",
+"165"=> "Администрирование",
 "166"=> "О программе",
-"167"=> "Об Pydio",
+"167"=> "О Pydio",
 "168" => "Подключиться к APPLICATION_TITLE",
 "169" => "Отключиться от APPLICATION_TITLE",
 "170" => "Текущая папка",
@@ -248,6 +257,7 @@ $mess=array(
 "204" => "Файл \"",
 "205" => "\" превышает допустимый размер (",
 "206" => "Mb).\\nОн не будет загружен.",
+/* END SENTENCE */
 "207" => "У вас нет прав для записи в эту папку",
 "208" => "У вас нет прав для чтения этой папки",
 "209" => "Внутренняя ошибка сервера, пожалуйста обратитесь к администратору!",
@@ -333,8 +343,8 @@ $mess=array(
 "288" => "Пользователь",
 "289" => "Группа",
 "290" => "Все",
-"291" => "Применить рекурсивно?",
-"292" => "Общедоступная ссылка",
+"291" => "Применить к вложенным папкам и файлам?",
+"292" => "Общий доступ",
 "293" => "Создать общедоступную ссылку на этот файл",
 "294" => "Время жизни ссылки (в днях)",
 "295" => "Пароль (оставьте пустым на данный момент)",
@@ -360,9 +370,9 @@ $mess=array(
 "313" => "Сжать...",
 "314" => "Сжать выбранное в zip...",
 "315" => "Сжать выбор в",
-"316" => "Открыть с помощью...",
+"316" => "Просмотр/редактирование",
 "open_with_access" => "O",
-"317" => "Посмотреть источник",
+"317" => "Редактор кода",
 "318" => "Просмотрщик кода CodePress",
 "319" => "Редактор HTML",
 "320" => "Визуальный редактор для HTML",
@@ -403,12 +413,12 @@ $mess=array(
 "355" => "Имя пользователя",
 "356" => "Пароль пользователя",
 "357" => "Целевое хранилище",
-"358" => "Выберите имя для разделяемых элементов и присвойте права доступа вашему пользователю.",
+"358" => "Выберите имя для общего рабочего пространства.",
 "359" => "Метка",
 "360" => "Права",
 "361" => "Чтение",
 "362" => "Запись",
-"363" => "Общие элементы",
+"363" => "Общее",
 "364" => "У Вас нет прав для выполнения этой операции",
 "365" => "Вы не можете загрузить больше чем %s файлов за один раз.",
 "366" => "У этого пользователя нет активных репозиториев.",
@@ -423,6 +433,7 @@ $mess=array(
 "375" => "Предупреждение: Вы неактивны с более чем __IDLE__, сессия прервётся в __LOGOUT__",
 "376" => "Щелкните в любом месте, чтобы активировать",
 "378" => "Предупреждение: пароль пустой или слишком короткий!",
+/* password strength tester */
 "379" => "Небезопасное слово!",
 "380" => "Очень коротко",
 "381" => "Очень слабый",
@@ -439,7 +450,7 @@ $mess=array(
 "394" => "Извините, в данный момент сделать папку общей невозможно (система авторизации не может редактировать пользователей). Делать общими файлы можно.",
 "395" => "Это похоже на папку, а папки не могут быть загружены на сервер! Вы уверены, что хотите загрузить??",
 "396" => "Метод авторизации",
-"397" => "Скачать поблочного",
+"397" => "Скачать по частям",
 "398" => "Скачать выбранный файл по частям",
 "399" => "Enter the number of pieces you want to download, then click the button and click on each file to download them.",
 "400" => "Количество частей :",
@@ -455,7 +466,7 @@ $mess=array(
 "410" => "Обновление пароля для webDav успешно",
 "411" => "Открыть",
 "412" => "Только загрузка",
-"413" => "Разделяют",
+"413" => "Общее с",
 "414" => "Используйте стрелки для перемещения и +/- для масштабирования",
 "415" => "Переключение видимости левой панели",
 "416" => "Левая панель",
@@ -479,7 +490,7 @@ $mess=array(
 "433" => "готов",
 "434" => "отправка",
 "435" => "сделано",
-"436" => "error",
+"436" => "ошибка",
 "437" => "Ключ безопасности (token) просрочен! Пожалуйста, %s нажав обновить или F5 в браузере!",
 "438" => "перезагрузить страницуe",
 "439" => "Основные настройки",
@@ -499,31 +510,22 @@ $mess=array(
 "453" => "Установить размер миниатюр",
 "454" => "Выберите файлы на своём компьютере",
 "455" => "Файлы",
-"456" => "Дальше",
+"456" => "Дополнительно",
 "457" => "обновить",
 "458" => "удалить",
 "459" => "Top folder",
 "460" => "Детали",
 "461" => "Переключить на подробное представление",
-"detail_access_key" => "D",
-"date_relative_date" => "on DATE",
-"date_relative_time" => "TIME",
-"date_relative_date_format" => "Y/m/d",
-"date_relative_time_format" => "H:i",
-"date_relative_today" => "today at TIME",
-"date_relative_yesterday" => "yesterday at TIME",
-"date_relative_tomorrow" => "tomorrow at TIME",
-"date_relative_days_ago" => "%s days ago",
-"date_relative_days_ahead" => "in %s days",
+"detail_access_key" => "L",
 "462" => "Предпросмотр",
 "preview_access_key" => "e",
 "463" => "Скачать всё",
 "464" => "Скачать всё содержимое рабочего пространства сразу (zip-архив)",
-"465" => "Показать альтернативные URL (смонтировать рабочие простанства отдельно)",
+"465" => "Показать альтернативные URL (смонтировать рабочие пространства отдельно)",
 "466" => "Загрузка...",
 "467" => "Все общие элементы",
-"468" => "Мои рабочие простанства",
-"469" => "Разделено со мной",
+"468" => "Рабочие пространства",
+"469" => "Общее со мной",
 "470" => "Создано %date",
 "471" => "Создано пользователем %user %date",
 "472" => "Сделал общим %user",
@@ -565,7 +567,7 @@ $mess=array(
 "508" => "Создана учётная запись на %s. Для соединения нажмите следующую ссылку %link с использованием:  <br><br> Имя: %user <br><br> Пароль: %pass",
 "509" => "Сохранить текущий список пользователей в качестве личной группы пользователей",
 "510" => "Введите метку группы пользователей",
-"511" => "Мои(ё) %s",
+"511" => "Мой %s",
 "512" => "На полный экран",
 "513" => "показать",
 "514" => "скрыть",
@@ -581,11 +583,11 @@ $mess=array(
 "524" => "Обновить пароль",
 "525"=> "Показать оригинальное изображение",
 "526"=> "версия с низким разрешением",
-"527"=> "Shared with",
-"528"=> "Internal users",
-"530"=> "External users",
-"531"=> "Int.",
-"532"=> "Ext.",
+"527"=> "Общее с",
+"528"=> "Внутренних",
+"530"=> "Внешних",
+"531"=> "Внутр.",
+"532"=> "Внеш.",
 "plugtype.title.access" => "Workspaces Drivers",
 "plugtype.desc.access" => "Plugins defining how a workspace will both access its backend (a file storage or whatever else) and major layouts and actions.",
 "plugtype.title.action" => "Action plugins",
@@ -622,5 +624,4 @@ $mess=array(
 "plugtype.desc.mailer" => "Tools for letting the application send emails",
 "plugtype.title.mq" => "Instant Messaging",
 "plugtype.desc.mq" => "Implementations of a simple PUB/SUB server",
-/* END SENTENCE */
 );

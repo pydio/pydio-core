@@ -20,8 +20,8 @@
 */
 $mess=array(
 "1" => "Versions",
-"11" => "SVN Log du répertoire courant",
-"2" => "Log sélection",
-"21" => "SVN Log des fichiers ou répertoires sélectionnés",
-"3" => "Basculer à la révision",
+"11" => "Journal SVN du répertoire courant",
+"2" => "Versions",
+"21" => "Version précédentes de l'item selectionné",
+"3" => "Aller à la révision",
 );
