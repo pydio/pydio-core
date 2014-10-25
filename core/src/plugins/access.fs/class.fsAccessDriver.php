@@ -600,7 +600,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if (isSet($httpVars["content"])) {
                     $content = $httpVars["content"];
                 }
-                $error = $this->createEmptyFile($dir, $filename, $content);
+                $forceCreation = false;
+                if (isSet($httpVars["force"]) && $httpVars["force"] == "true"){
+                    $forceCreation = true;
+                }
+                $error = $this->createEmptyFile($dir, $filename, $content, $forceCreation);
                 if (isSet($error)) {
                     throw new AJXP_Exception($error);
                 }
@@ -1715,14 +1719,14 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         return null;
     }
 
-    public function createEmptyFile($crtDir, $newFileName, $content = "")
+    public function createEmptyFile($crtDir, $newFileName, $content = "", $force = false)
     {
         AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($this->urlBase.$crtDir)));
         $mess = ConfService::getMessages();
         if ($newFileName=="") {
             return "$mess[37]";
         }
-        if (file_exists($this->urlBase."$crtDir/$newFileName")) {
+        if (!$force && file_exists($this->urlBase."$crtDir/$newFileName")) {
             return "$mess[71]";
         }
         if (!$this->isWriteable($this->urlBase."$crtDir")) {
