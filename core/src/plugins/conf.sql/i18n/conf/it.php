@@ -19,11 +19,12 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"DB Storage" => "DB Storage",
-"Stores the Authentication data in an SQL database." => "Stores the Authentication data in an SQL database.",
-"Connexion" => "Connection",
-"The Database Connexion" => "The Database Connection",
-"DB Auth Storage" => "DB Auth Storage",
-"SQL Tables" => "SQL Tables",
-"Install SQL Tables" => "Install SQL Tables",
+"DB Storage" => "Conservazione DB",
+"Stores the conf data in an SQL database." => "Conserva i dati d'Autenticazione in un database SQL.",
+"Connexion" => "Connessione",
+"The Database Connexion" => "Connessione al Database",
+"Users Tmp Folder" => "Cartella Temp Utenti",
+"The folder in which all temporary files will be stored" => "La cartella nella quale tutti i file temporanei verranno memorizzati",
+"SQL Tables" => "Tabelle SQL",
+"Install SQL Tables" => "Installa le tabelle SQL",
 );

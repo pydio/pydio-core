@@ -21,8 +21,8 @@
 $mess=array(
 "DB Storage" => "DB Storage",
 "Stores the conf data in an SQL database." => "Stores the conf data in an SQL database.",
-"Connexion" => "Connexion",
-"The Database Connexion" => "The Database Connexion",
+"Connexion" => "Connection",
+"The Database Connexion" => "The Database Connection",
 "Users Tmp Folder" => "Users Tmp Folder",
 "The folder in which all temporary files will be stored" => "The folder in which all temporary files will be stored",
 "SQL Tables" => "SQL Tables",

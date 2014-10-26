@@ -19,11 +19,18 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"DB Storage" => "DB Storage",
-"Stores the Authentication data in an SQL database." => "Stores the Authentication data in an SQL database.",
-"Connexion" => "Connection",
-"The Database Connexion" => "The Database Connection",
-"DB Auth Storage" => "DB Auth Storage",
-"SQL Tables" => "SQL Tables",
-"Install SQL Tables" => "Install SQL Tables",
+"Remote AJXP" => "AJXP Remoto",
+"Use another AJXP intall to log in." => "Utilizza un'altra installazione AJXP per autenticarsi.",
+"Server" => "Server",
+"The host URL" => "URL del server",
+"Port" => "Porta",
+"The host port" => "Porta del server",
+"User name" => "Nome Utente",
+"User on the remote host" => "Utente sul server remoto",
+"Password" => "Password",
+"Password on the remote host" => "Password sul server remoto",
+"Session Name" => "Nome Sessione",
+"Parameter name to pass the session id" => "Nome parametro per passare l'ID della sessione",
+"URI" => "URI",
+"Script URI on the remote server" => "URI dello script sul server remoto",
 );

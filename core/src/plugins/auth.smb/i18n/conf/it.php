@@ -19,11 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"DB Storage" => "DB Storage",
-"Stores the Authentication data in an SQL database." => "Stores the Authentication data in an SQL database.",
-"Connexion" => "Connection",
-"The Database Connexion" => "The Database Connection",
-"DB Auth Storage" => "DB Auth Storage",
-"SQL Tables" => "SQL Tables",
-"Install SQL Tables" => "Install SQL Tables",
+"SMB Authentification" => "Autenticazione SMB",
+"Authenticate user by directly connecting to an SMB share" => "Autentica gli utenti collegandoli direttamente ad una condivisione SMB",
+"Repository" => "Repository",
+"Id of the repository to use for testing connexion" => "ID del repository da usare per provare la connessione",
+"Admin user" => "Utente Admin",
+"The ID of an existing admin for Pydio (using conf.serial)" => "ID di un utente amministratore esistente per Pydio (usando conf.serial)",
 );

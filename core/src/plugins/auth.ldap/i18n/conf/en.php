@@ -52,7 +52,7 @@ $mess=array(
 "Plugin parameter" => "Plugin parameter",
 "Name of the custom local parameter to set" => "Name of the custom local parameter to set",
 "Test User" => "Test User",
-"Use the Test Connexion button to check if this user is correctly found in your LDAP directory." => "Use the Test Connexion button to check if this user is correctly found in your LDAP directory.",
-"Test Connexion" => "Test Connexion",
+"Use the Test Connexion button to check if this user is correctly found in your LDAP directory." => "Use the Test Connection button to check if this user is correctly found in your LDAP directory.",
+"Test Connexion" => "Test Connection",
 "Try to connect to LDAP" => "Try to connect to LDAP",
 );
