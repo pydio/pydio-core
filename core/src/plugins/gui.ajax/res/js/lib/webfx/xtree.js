@@ -623,16 +623,13 @@ WebFXTreeItem.prototype.remove = function() {
 		prevSibling.open = false;
 		if($(prevSibling.id + '-plus'))
 		{
-			iconSrc = $(prevSibling.id + '-plus').src;
-			iconSrc = iconSrc.replace('minus', '').replace('plus', '');
-			$(prevSibling.id + '-plus').src = iconSrc;
+			$(prevSibling.id + '-plus').src = this.zeroIcon;
 			prevSibling.setLabelIcon((webFXTreeHandler.all[prevSibling.id].icon?webFXTreeHandler.all[prevSibling.id].icon:webFXTreeConfig.fileIcon));
 		}
 	}
 	if ($(prevSibling.id + '-plus')) {
 		if (parentNode == prevSibling.parentNode) {
-			iconSrc = iconSrc.replace('minus', '').replace('plus', '');
-			$(prevSibling.id + '-plus').src = iconSrc;
+			$(prevSibling.id + '-plus').src = this.zeroIcon;
 		}
 	}
 } ;
@@ -804,6 +801,7 @@ WebFXTreeItem.prototype.toString = function (nItem, nItemCount) {
 	for (var i = 0; i < this.childNodes.length; i++) {
 		sb[i] = this.childNodes[i].toString(i,this.childNodes.length);
 	}
+	this.zeroIcon = ((this.parentNode._last)?webFXTreeConfig.lIcon:webFXTreeConfig.tIcon);
 	this.plusIcon = ((this.parentNode._last)?webFXTreeConfig.lPlusIcon:webFXTreeConfig.tPlusIcon);
 	this.minusIcon = ((this.parentNode._last)?webFXTreeConfig.lMinusIcon:webFXTreeConfig.tMinusIcon);
 	return str + sb.join("") + "</div>";
