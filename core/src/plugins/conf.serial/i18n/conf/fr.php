@@ -31,5 +31,5 @@ $mess=array(
 "Users Folder" => "Répertoire des utilisateurs",
 "Roles File" => "Fichier des rôles",
 "Fast Checks" => "Vérifications rapides",
-"When using a custom stream wrapper to read the files, this can increase performances by skipping various is_file,is_dir checks" => "Lors de l'utilisation d'un wrapper personnalisé pour lire les fichiers, cela peut améliorer les performances en ignorant des vérifications de type \"is_file,is_dir\"",
+"When using a custom stream wrapper to read the files, this can increase performances by skipping various is_file,is_dir checks" => "Lors de l'utilisation d'un wrapper personnalisé pour lire les fichiers, cela peut améliorer les performances en ignorant des vérifications de type 'is_file,is_dir'",
 );

@@ -45,5 +45,5 @@ $mess=array(
 "Create" => "Créer",
 "Create folder if it does not exists" => "Créer les répertoires s'ils n'existent pas",
 "User Id" => "ID de l'utilisateur",
-"To fetch the user id you have to run a listing command on your ftp client (ls or dir most of the time) and take the first of the two last numbers as the user id. It can be possible that there is more than one number. If you experience errors using one id try to use another one." => "Pour obtenir l'ID de l'utilisateur, vous devez effectuer une commande de listage (généralement \"ls\" ou \"dir\") dans votre client FTP, puis utiliser le premier des deux derniers nombres comme ID de l'utilisateur. Il est possible qu'il y ait plus d'un nombre, en cas d'erreurs avec l'un, essayez d'utiliser un autre.",
+"To fetch the user id you have to run a listing command on your ftp client (ls or dir most of the time) and take the first of the two last numbers as the user id. It can be possible that there is more than one number. If you experience errors using one id try to use another one." => "Pour obtenir l'ID de l'utilisateur, vous devez effectuer une commande de listage (généralement ls ou dir) dans votre client FTP, puis utiliser le premier des deux derniers nombres comme ID de l'utilisateur. Il est possible qu'il y ait plus d'un nombre, en cas d'erreurs avec l'un, essayez d'utiliser un autre.",
 );

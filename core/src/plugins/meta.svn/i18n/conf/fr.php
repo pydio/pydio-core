@@ -20,5 +20,5 @@
 */
 $mess=array(
 "Subversion Repository" => "Dépôt Subversion",
-"Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline." => "Extrait les informations SVN (révision, journal de modifications, ...) si le dépôt est une \"Working-Copy\" et que SVN est accessible en ligne de commande.",
+"Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline." => "Extrait les informations SVN (révision, journal de modifications, ...) si le dépôt est une 'Working-Copy' et que SVN est accessible en ligne de commande.",
 );

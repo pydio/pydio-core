@@ -20,7 +20,7 @@
  */
 $mess=array(
 "SSH File Transfer Protocol (SFTP)" => "SSH File Transfer Protocol (SFTP)",
-"The SSH File Transfer Protocol is a network protocol that provides file access, file transfer, and file management functionalities over SSH2." => "\"SSH File Transfer Protocol\" est un protocle réseau permettant l'accès, le transfert et la gestion de fichiers, à travers SSH2.",
+"The SSH File Transfer Protocol is a network protocol that provides file access, file transfer, and file management functionalities over SSH2." => "SSH File Transfer Protocol est un protocle réseau permettant l'accès, le transfert et la gestion de fichiers, à travers SSH2.",
 "Host" => "Hôte",
 "SFTP Host to connect to" => "Hôte SFTP auquel il faut se connecter",
 "Port" => "Port",

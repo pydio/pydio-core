@@ -52,7 +52,7 @@ $mess=array(
 "Plugin parameter" => "Paramètres du plugin",
 "Name of the custom local parameter to set" => "Nom du paramètre personnalisé à définir",
 "Test User" => "Tester l'utilisateur",
-"Use the Test Connexion button to check if this user is correctly found in your LDAP directory." => "Utiliser le bouton \"Tester la connexion\" pour vérifier la présence de cet utilisateur dans l'annuaire LDAP.",
+"Use the Test Connexion button to check if this user is correctly found in your LDAP directory." => "Utiliser le bouton 'Tester la connexion' pour vérifier la présence de cet utilisateur dans l'annuaire LDAP.",
 "Test Connexion" => "Tester la connexion",
 "Try to connect to LDAP" => "Essayer de se connecter à LDAP",
 );

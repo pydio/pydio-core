@@ -21,7 +21,7 @@
 $mess=array(
 "Generic Conf Features" => "Configurations génériques",
 "Let user create repositories" => "Autoriser les utilisateurs à créer des dépôts",
-"Remember guest preferences" => "Se souvenir des préférences de l'utilisateur \"Invité\".",
+"Remember guest preferences" => "Se souvenir des préférences de l'utilisateur 'Invité'.",
 "Configurations Management" => "Gestion des configurations",
 "Sets how the application core data (users,roles,etc) is stored." => "Définit le stockage des données principales de l'application (utilisateurs, rôles, ...).",
 "Default start repository" => "Dépôt par défaut au démarrage",
