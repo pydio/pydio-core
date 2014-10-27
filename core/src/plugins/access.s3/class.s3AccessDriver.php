@@ -47,23 +47,36 @@ class s3AccessDriver extends fsAccessDriver
         if(!file_exists($this->getBaseDir()."/aws.phar")) throw new Exception("Cannot find AWS PHP SDK v2. Make sure the aws.phar package is installed inside access.s3 plugin.");
     }
 
+    /**
+     * @param bool $register
+     * @return array|bool|void
+     * Override parent to register underlying wrapper (s3) as well
+     */
+    public function detectStreamWrapper($register = false){
+
+        if(isSet($this->repository)){
+            require_once("aws.phar");
+            $options = array(
+                'key'    => $this->repository->getOption("API_KEY"),
+                'secret' => $this->repository->getOption("SECRET_KEY")
+            );
+            $baseURL = $this->repository->getOption("STORAGE_URL");
+            if(!empty($baseURL)){
+                $options["base_url"] = $baseURL;
+            }else{
+                $options["region"] = $this->repository->getOption("REGION");
+            }
+            $this->s3Client = S3Client::factory($options);
+            $this->s3Client->registerStreamWrapper();
+            //$this->s3Client->addSubscriber(LogPlugin::getDebugPlugin());
+        }
+
+        return parent::detectStreamWrapper($register);
+    }
 
     public function initRepository()
     {
-        require_once("aws.phar");
-        $options = array(
-            'key'    => $this->repository->getOption("API_KEY"),
-            'secret' => $this->repository->getOption("SECRET_KEY")
-        );
-        $baseURL = $this->repository->getOption("STORAGE_URL");
-        if(!empty($baseURL)){
-            $options["base_url"] = $baseURL;
-        }else{
-            $options["region"] = $this->repository->getOption("REGION");
-        }
-        $this->s3Client = S3Client::factory($options);
-        $this->s3Client->registerStreamWrapper();
-        //$this->s3Client->addSubscriber(LogPlugin::getDebugPlugin());
+        $wrapperData = $this->detectStreamWrapper(true);
 
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;
@@ -73,7 +86,6 @@ class s3AccessDriver extends fsAccessDriver
 
         $recycle = $this->repository->getOption("RECYCLE_BIN");
         ConfService::setConf("PROBE_REAL_SIZE", false);
-        $wrapperData = $this->detectStreamWrapper(true);
         $this->wrapperClassName = $wrapperData["classname"];
         $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
         if ($recycle != "") {
