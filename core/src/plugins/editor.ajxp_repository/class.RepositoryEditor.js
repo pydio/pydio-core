@@ -92,8 +92,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
             conn.onComplete = function(transport){
                 ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
                 this.loadRepository(this.repositoryId);
-                ajaxplorer.fireNodeRefresh(this.node);
-
+                ajaxplorer.fireContextRefresh();
                 this.setClean();
             }.bind(this);
             conn.sendAsync();

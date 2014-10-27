@@ -166,7 +166,7 @@ Class.create("RoleEditor", AbstractEditor, {
                 if(this.roleData.USER)response.USER = this.roleData.USER;
                 if(this.roleData.GROUP)response.GROUP = this.roleData.GROUP;
                 this.initJSONResponse(response);
-                ajaxplorer.fireNodeRefresh(this.node);
+                ajaxplorer.fireContextRefresh();
                 this.setClean();
             }else{
                 ajaxplorer.displayMessage("ERROR", response.ERROR);
