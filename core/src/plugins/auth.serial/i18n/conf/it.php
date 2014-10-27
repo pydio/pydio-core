@@ -19,11 +19,11 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"DB Storage" => "DB Storage",
-"Stores the Authentication data in an SQL database." => "Stores the Authentication data in an SQL database.",
-"Connexion" => "Connection",
-"The Database Connexion" => "The Database Connection",
-"DB Auth Storage" => "DB Auth Storage",
-"SQL Tables" => "SQL Tables",
-"Install SQL Tables" => "Install SQL Tables",
+"Serialized authentication storage" => "Autenticazione Serializzata",
+"Stores the Authentication data as serialized PHP values on the filesystem." => "Salva i dati d'Autenticazione come valori serializzati, in un file PHP, sul filesystem.",
+"Users" => "Utenti",
+"The users list" => "Lista utenti",
+"Users File" => "File utenti",
+"Fast Checks" => "Controlli Rapidi",
+"When using a custom stream wrapper to read the files, this can increase performances by skipping various is_file,is_dir checks" => "Quando si utilizza un wrapper personalizzato per leggere i file, questa opzione può aumentare le performance saltando diversi controlli 'is_file' e 'is_dir'",
 );
