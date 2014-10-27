@@ -248,7 +248,7 @@ class ShareStore {
             $oldRepos = ConfService::listRepositoriesWithCriteria($criteria, $count);
             foreach($oldRepos as $sharedWorkspace){
                 if(!$sharedWorkspace->hasContentFilter()){
-                    $dbLets[] = array(
+                    $dbLets['repo-'.$sharedWorkspace->getId()] = array(
                         "SHARE_TYPE"    => "repository",
                         "OWNER_ID"      => $sharedWorkspace->getOwner(),
                         "REPOSITORY"    => $sharedWorkspace->getUniqueId(),
@@ -293,6 +293,7 @@ class ShareStore {
         AJXP_Logger::debug(__CLASS__, __FILE__, "Deleting shared element ".$type."-".$element);
 
         if ($type == "repository") {
+            if(strpos($element, "repo-") === 0) $element = str_replace("repo-", "", $element);
             $repo = ConfService::getRepositoryById($element);
             if($repo == null) {
                 // Maybe a share has

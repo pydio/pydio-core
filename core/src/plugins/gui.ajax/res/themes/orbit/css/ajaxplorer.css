@@ -4780,6 +4780,10 @@ div#share_result div.macos_only
     background-color: #A00;
 }
 
+.readonly_mode div#share_update {
+    display: none !important;
+}
+
 div.user_entry span.cbContainer{
 
 }

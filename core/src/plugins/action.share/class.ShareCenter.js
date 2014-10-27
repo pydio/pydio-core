@@ -261,9 +261,11 @@ Class.create("ShareCenter", {
             });
 
             oForm.removeClassName('share_leaf');
+            oForm.removeClassName('readonly_mode');
             oForm.removeClassName('type-ws');
             var pluginConfigs = ajaxplorer.getPluginConfigs("action.share");
             if(this.currentNode.isLeaf()) oForm.addClassName('share_leaf');
+            if(this.readonlyMode) oForm.addClassName('readonly_mode');
             this.maxexpiration = parseInt(pluginConfigs.get("FILE_MAX_EXPIRATION"));
             if(this.maxexpiration > 0){
                 oForm.down("[name='expiration']").setValue(this.maxexpiration);
@@ -470,9 +472,7 @@ Class.create("ShareCenter", {
                     }else{
                         var El = new Element('div', {className:"SF_horizontal_fieldsRow"}).update('<div class="SF_horizontal_actions SF_horizontal_pastilles" style="padding-top: 12px;padding-left: 7px;"></div>');
                         oForm.down("#shareDialogButtons").insert({top:El});
-                        this.updateDialogButtons(El, oForm, "folder", json, function(){
-                            submitFunc(oForm);
-                        });
+                        this.updateDialogButtons(El, oForm, "folder", json, !this.readonlyMode?function(){submitFunc(oForm);}:null);
                     }
                     oForm.select('span.simple_tooltip_observer').each(function(e){
                         modal.simpleTooltip(e, e.readAttribute('data-tooltipTitle'), 'top center', 'down_arrow_tip', 'element');
