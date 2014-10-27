@@ -9,7 +9,6 @@ js/lib/prototype/webfx.selectable.js
 js/lib/prototype/webfx.sortable.js
 js/lib/prototype/proto.menu.js
 js/lib/prototype/splitter.js
-js/lib/prototype/proto.history.js
 js/lib/prototype/cookiejar.js
 js/lib/prototype/protopass.js
 js/lib/prototype/resizable.js
