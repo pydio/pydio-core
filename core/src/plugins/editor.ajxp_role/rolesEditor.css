@@ -325,15 +325,16 @@ div#parameters-selected span.list_remove_item{
 span.m-2 {
     display: inline-block;
     font-size: 11px;
-    padding: 5px 10px 7px 9px;
+    padding: 5px 12px 7px 12px;
     text-align: center;
     overflow: visible;
     color: #fff;
     outline: none;
-    border-radius: 2px;
-    margin: 5px 3px 0 1px;
+    border-radius: 14px;
+    margin: 5px 6px 0 5px;
     background: #4dc5c3;
     letter-spacing: 1px;
+    cursor: pointer;
 }
 
 .pluginfo_list {
