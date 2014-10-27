@@ -115,6 +115,7 @@ Class.create("Ajaxplorer", {
             switchToWorkspace: function(workspace, path) {
                 if(!ajaxplorer.user) {return;}
                 if(path) path = '/' + path;
+                else path = '/';
                 var repos = ajaxplorer.user.getRepositoriesList();
                 workspace = workspace.replace("ws-", "");
                 var object = $H(repos).detect(function(pair){
