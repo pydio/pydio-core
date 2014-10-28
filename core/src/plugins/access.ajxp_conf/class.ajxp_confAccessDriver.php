@@ -1823,6 +1823,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         $allNodes = array();
         $columns = '<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.users">
                     <column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String" defaultWidth="40%"/>
+                    <column messageId="ajxp_conf.102" attributeName="object_id" sortType="String" defaultWidth="10%"/>
                     <column messageId="ajxp_conf.7" attributeName="isAdmin" sortType="String" defaultWidth="10%"/>
                     <column messageId="ajxp_conf.70" attributeName="ajxp_roles" sortType="String" defaultWidth="15%"/>
                     <column messageId="ajxp_conf.62" attributeName="rights_summary" sortType="String" defaultWidth="15%"/>
@@ -1830,6 +1831,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         if (AuthService::driverSupportsAuthSchemes()) {
             $columns = '<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.users_authscheme">
                         <column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String" defaultWidth="40%"/>
+                        <column messageId="ajxp_conf.102" attributeName="object_id" sortType="String" defaultWidth="10%"/>
                         <column messageId="ajxp_conf.115" attributeName="auth_scheme" sortType="String" defaultWidth="5%"/>
                         <column messageId="ajxp_conf.7" attributeName="isAdmin" sortType="String" defaultWidth="5%"/>
                         <column messageId="ajxp_conf.70" attributeName="ajxp_roles" sortType="String" defaultWidth="15%"/>
@@ -1859,7 +1861,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $nodeKey = "/data/".$root."/".ltrim($groupId,"/");
             $meta = array(
                 "icon" => "users-folder.png",
-                "ajxp_mime" => "group"
+                "ajxp_mime" => "group",
+                "object_id" => $groupId
             );
             if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
             $xml = AJXP_XMLWriter::renderNode($nodeKey,
@@ -1915,6 +1918,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $meta = array(
                 "isAdmin" => $mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")],
                 "icon" => $icon.".png",
+                "object_id" => $userId,
                 "auth_scheme" => ($scheme != null? $scheme : ""),
                 "rights_summary" => $rightsString,
                 "ajxp_roles" => implode(", ", $roles),
