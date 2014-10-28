@@ -43,6 +43,7 @@ class UserDashboardDriver extends AbstractAccessDriver
             if(!$tplNodeList->length) return ;
             $contribNode->removeChild($tplNodeList->item(0));
         }
+        parent::parseSpecificContributions($contribNode);
     }
 
     public function switchAction($action, $httpVars, $fileVars)
