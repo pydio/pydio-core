@@ -20,6 +20,67 @@
                     <serverCallback methodName="userTeamsActions"/>
                 </processing>
             </action>
+            <action name="user_team_add_user">
+                <processing>
+                    <serverCallback methodName="userTeamsActions"/>
+                </processing>
+            </action>
+            <action name="user_team_edit_users">
+                <gui src="delete.png" iconClass="icon-edit" text="519" title="519">
+                    <context dir="false" recycle="false" selection="true" actionBar="true" actionBarGroup="team_address_book"/>
+                    <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="ajxp_team"/>
+                </gui>
+                <processing>
+                    <clientCallback dialogOpenForm="team_edit_form" prepareModal="true">
+                        <dialogOnOpen><![CDATA[
+                            var oForm = modal.getForm();
+                            var users = ajaxplorer.getContextHolder().getUniqueNode().getMetadata().get('users').stripTags().strip();
+                            oForm.down('#team_edit_input').setValue(users.replace(/, /g, '\n') + '\n');
+                            var completer = new AjxpUsersCompleter(
+                                oForm.down('#team_edit_input'),
+                                null,
+                                oForm.down('#team_edit_container'),
+                                {
+                                    tmpUsersPrefix:'',
+                                    usersOnly: true,
+                                    existingOnly: true,
+                                    updateUserEntryAfterCreate:null,
+                                    createUserPanel:null,
+                                    indicator: null,
+                                    minChars:parseInt(ajaxplorer.getPluginConfigs("conf").get("USERS_LIST_COMPLETE_MIN_CHARS"))
+                                }
+                            );
+                        ]]></dialogOnOpen>
+                        <dialogOnComplete><![CDATA[
+                             var newValues = modal.getForm().down('#team_edit_input').getValue().strip().split('\n');
+                             var teamId = getBaseName(ajaxplorer.getContextHolder().getUniqueNode().getPath());
+                             var teamLabel = ajaxplorer.getContextHolder().getUniqueNode().getLabel();
+                             console.log(teamId, newValues);
+                             var c = new Connexion();
+                             c.setParameters($H({
+                                get_action:'user_team_edit_users',
+                                team_id:teamId,
+                                team_label:teamLabel,
+                                'users[]':newValues
+                             }));
+                             c.setMethod('POST');
+                             c.onComplete = function(t){
+                                hideLightBox();
+                                $('team_panel').ajxpPaneObject.reloadDataModel();
+                             };
+                             c.sendAsync();
+                        ]]></dialogOnComplete>
+                        <dialogOnCancel><![CDATA[]]></dialogOnCancel>
+                    </clientCallback>
+                    <clientForm id="team_edit_form"><![CDATA[
+                         <div id="team_edit_form">
+                            <textarea type="text" style="width:410px; min-height: 100px;" id="team_edit_input"></textarea>
+                            <div id="team_edit_container"></div>
+                         </div>
+                    ]]></clientForm>
+                    <serverCallback methodName="userTeamsActions"/>
+                </processing>
+            </action>
             <action name="user_team_delete">
                 <gui src="delete.png" iconClass="icon-trash" text="7" title="7">
                     <context dir="false" recycle="false" selection="true" actionBar="true" actionBarGroup="team_address_book"/>
@@ -47,11 +108,6 @@
                     <serverCallback methodName="userTeamsActions"/>
                 </processing>
             </action>
-            <action name="user_team_add_user">
-                <processing>
-                    <serverCallback methodName="userTeamsActions"/>
-                </processing>
-            </action>
             <action name="user_team_delete_user">
                 <processing>
                     <serverCallback methodName="userTeamsActions"/>
@@ -61,12 +117,12 @@
         <client_configs>
             <component_config className="AjxpTabulator::userdashboard_main_tab">
                 <additional_tab id="team_pane"
-                                tabInfo='{"id":"team_pane","position":3,"iconClass":"icon-group","element":"team_pane","closeable":false,"label":"user_dash.50","title":"user_dash.51","dontFocus":true}'
+                                tabInfo='{"id":"team_pane","position":2,"iconClass":"icon-group","element":"team_pane","closeable":false,"label":"user_dash.50","title":"user_dash.51","dontFocus":true}'
                                 paneInfo='{"type":"widget"}'><![CDATA[
                 <div id="team_pane" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
                     <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["team_address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                     <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.50]</h3>
-                    <div id="team_panel" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"teams"}}' class="tabbed_editor"></div>
+                    <div id="team_panel" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"teams"}}' class="tabbed_editor display_metadata"></div>
                 </div>
                 ]]></additional_tab>
             </component_config>

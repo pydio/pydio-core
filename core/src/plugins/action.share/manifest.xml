@@ -483,7 +483,7 @@
             </component_config>
             <component_config className="AjxpTabulator::userdashboard_main_tab">
                 <additional_tab id="shared_pane2"
-                                tabInfo='{"id":"my-shared2","iconClass":"icon-share","element":"shared_pane2","closeable":false,"label":"share_center.98","title":"share_center.99","dontFocus":true,"position":3}'
+                                tabInfo='{"id":"my-shared2","iconClass":"icon-share","element":"shared_pane2","closeable":false,"label":"share_center.98","title":"share_center.99","dontFocus":true,"position":4}'
                                 paneInfo='{"type":"widget"}'><![CDATA[
                     <div id="shared_pane2" ajxpClass="AjxpPane">
                         <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"dataModelElementId":"shared_files_list","toolbarsList":["share_list_toolbar-selection", "share_list_toolbar"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>

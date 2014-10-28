@@ -607,7 +607,7 @@
                 <div id="webdav_pane" ajxpClass="WebDAVprefsEditor" class="tabbed_editor">
                     <div class="action_bar" style="height: 33px;">&nbsp;</div>
                     <h3 class="dashboard_panel_title">AJXP_MESSAGE[403]</h3>
-                    <div style="padding:10px;">
+                    <div style="padding:10px;overflow: auto;" class="fit_me_to_bottom">
                         <div class="dialogLegend" style="margin-bottom: 2px;padding: 10px;" ajxp_message_id="404">AJXP_MESSAGE[404]</div>
                         <div style="padding:10px;"><input type="checkbox" id="webdav_activator" style="width:16px;" name="webdav_activator"> <label for="webdav_activator">AJXP_MESSAGE[406]</label></div>
                         <div class="dialogButtons" id="webdav_password_form" style="display:none;text-align: left;padding-left: 15px;height: 42px;font-size: 0.9em;padding-top: 5px;">

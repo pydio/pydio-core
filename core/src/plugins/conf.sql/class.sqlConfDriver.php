@@ -1049,6 +1049,23 @@ class sqlConfDriver extends AbstractConfDriver
         );
     }
 
+    private function editTeamUsers($teamId, $users, $teamLabel = null)
+    {
+        if ($teamLabel == null) {
+            $res = dibi::query("SELECT [team_label] FROM [ajxp_user_teams] WHERE [team_id] = %s AND  [owner_id] = %s",
+                $teamId, AuthService::getLoggedUser()->getId());
+            $teamLabel = $res->fetchSingle();
+        }
+        // Remove old users
+        dibi::query("DELETE FROM [ajxp_user_teams] WHERE [team_id] = %s", $teamId);
+        foreach($users as $userId){
+            if(!AuthService::userExists($userId, "r")) continue;
+            dibi::query("INSERT INTO [ajxp_user_teams] ([team_id],[user_id],[team_label],[owner_id]) VALUES (%s,%s,%s,%s)",
+                $teamId, $userId, $teamLabel, AuthService::getLoggedUser()->getId()
+            );
+        }
+    }
+
     private function removeUserFromTeam($teamId, $userId = null)
     {
         if ($userId == null) {
@@ -1079,6 +1096,9 @@ class sqlConfDriver extends AbstractConfDriver
                 break;
             case "user_team_add_user":
                 $this->addUserToTeam($httpVars["team_id"], $httpVars["user_id"], null);
+                break;
+            case "user_team_edit_users":
+                $this->editTeamUsers($httpVars["team_id"], $httpVars["users"], $httpVars["team_label"]);
                 break;
             case "user_team_delete_user":
                 $this->removeUserFromTeam($httpVars["team_id"], $httpVars["user_id"]);
