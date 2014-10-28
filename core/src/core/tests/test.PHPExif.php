@@ -28,7 +28,9 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHPExif extends AbstractTest
 {
-    public function PHPDomXML() { parent::AbstractTest("Exif Extension enabled", "Installing php-exif extension is recommended if you plan to handle images"); }
+    public function PHPExif() {
+        parent::AbstractTest("Exif Extension enabled", "Installing php-exif extension is recommended if you plan to handle images");
+    }
     public function doTest()
     {
         $this->failedLevel = "warning";
