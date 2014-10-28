@@ -24,7 +24,7 @@ Class.create("AjxpCkEditor", TextEditor, {
 	initialize: function($super, oFormObject, options)
 	{
 		$super(oFormObject, options);
-        CKEDITOR_BASEPATH = CKEDITOR.basePath = document.location.href.split('#').shift()+"plugins/editor.ckeditor/ckeditor/";
+        window.CKEDITOR_BASEPATH = CKEDITOR.basePath = document.location.href.split('#').shift()+"plugins/editor.ckeditor/ckeditor/";
 
 		this.editorConfig = {
 			resize_enabled:false,
