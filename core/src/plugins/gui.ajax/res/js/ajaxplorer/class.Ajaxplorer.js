@@ -174,6 +174,7 @@ Class.create("Ajaxplorer", {
             navigate(repList, repId);
         });
         document.observe("ajaxplorer:context_changed", function(event){
+            if(!this.user) return;
             var repoList = this.user.getRepositoriesList();
             var activeRepo = repoList.get(this.user.getActiveRepository());
             if(activeRepo){
