@@ -1065,7 +1065,7 @@ input.SF_input.SF_number{
 select.SF_input {
     max-width: 464px !important;
     width: 99% !important;
-    padding: 0;
+    padding: 0 1% !important;
 }
 
 .SF_box{
@@ -3595,6 +3595,10 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail
     display: none;
 }
 
+div.class-FetchedResultPane.display_metadata div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata{
+    display: inherit;
+}
+
 #search_results div.ajxpNodeProvider:hover
 {
     background-color: #ffffff !important;
@@ -5520,9 +5524,8 @@ div.overlay.form-reset-password-ask
 }
 
 #webdav_repo_list{
-    height: 200px;
-    overflow: auto;
-    border: 1px solid #BBB;
+    height: auto !important;
+    background-color: white;
 }
 
 #webdav_repo_list div{
@@ -5535,7 +5538,8 @@ div.overlay.form-reset-password-ask
 }
 
 #webdav_repo_list input {
-    width: 73%;
+    width: 92% !important;
+    margin-top: 11px;
 }
 
 input#webdav_password{
