@@ -1480,9 +1480,11 @@ class ShareCenter extends AJXP_Plugin
                 $updateHash = null;
                 if(isSet($httpVars["minisite_hash_update"]) && !empty($httpVars["minisite_hash_update"]) && $httpVars["minisite_hash_update"] != $httpVars["hash"]){
                     // Existing already
-                    $test = $this->getShareStore()->loadShare($httpVars["minisite_hash_update"]);
+                    $value = AJXP_Utils::sanitize($httpVars["minisite_hash_update"], AJXP_SANITIZE_ALPHANUM);
+                    $value = strtolower($value);
+                    $test = $this->getShareStore()->loadShare($value);
                     if(!empty($test)) throw new Exception("Sorry hash already exists");
-                    $updateHash = $httpVars["minisite_hash_update"];
+                    $updateHash = $value;
 
                 }
                 $hash = $this->getShareStore()->storeShare($repository->getId(), $data, "minisite", $hash, $updateHash);
