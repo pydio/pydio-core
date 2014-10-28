@@ -47,6 +47,7 @@ class MobileGuiPlugin extends AJXP_Plugin
 
     private function orbitExtensionActive(){
         $confs = ConfService::getConfStorageImpl()->loadPluginConfig("gui", "ajax");
+        if(!isset($confs) || !isSet($confs["GUI_THEME"])) $confs["GUI_THEME"] = "orbit";
         if($confs["GUI_THEME"] == "orbit"){
             $pServ = AJXP_PluginsService::getInstance();
             $activePlugs    = $pServ->getActivePlugins();

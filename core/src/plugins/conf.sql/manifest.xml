@@ -65,7 +65,8 @@
                                 paneInfo='{"type":"widget"}'><![CDATA[
                 <div id="team_pane" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
                     <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["team_address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                    <div id="team_panel" style="border-left:1px solid #5C5C5C;border-radius:0;" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"teams"}}' class="tabbed_editor"></div>
+                    <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.50]</h3>
+                    <div id="team_panel" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"teams"}}' class="tabbed_editor"></div>
                 </div>
                 ]]></additional_tab>
             </component_config>

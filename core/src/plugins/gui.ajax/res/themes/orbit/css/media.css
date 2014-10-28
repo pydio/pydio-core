@@ -10,7 +10,9 @@ and (max-width : 800px) {
 
 @media only screen
 and (max-width : 1000px) {
-    #display_toolbar span.actionbar_button_label{
+    #display_toolbar span.actionbar_button_label,
+    #display_toolbar span.icon-caret-down.ajxp_icon_arrow
+    {
         display: none !important;
     }
     #display_toolbar span.ajxp_icon_span{
@@ -19,7 +21,7 @@ and (max-width : 1000px) {
 }
 
 @media only screen
-and (max-width : 680px) {
+and (max-width : 720px) {
     .ws-label{
         display: none !important;
     }
@@ -36,10 +38,8 @@ and (max-width : 680px) {
     div.toolbarGroup span.ajxp_icon_span
     {
         display: inline-block !important;
-        padding: 7px 2px 4px;
-    
-        font-size: 16px;
-}
+        padding: 5px 1px 4px;
+    }
 
     div.toolbarGroup a{
         padding-bottom: 2px !important;
@@ -84,7 +84,7 @@ and (max-width : 680px) {
 }
 
 @media only screen
-and (max-width : 400px){
+and (max-width : 420px){
 
     #topPane{
         width: 0;
@@ -112,15 +112,14 @@ and (max-width : 400px){
         padding-top:0;
     }
 
+    #buttons_bar, #buttons_bar_top{
+        padding-top: 6px;
+    }
+
     #buttons_bar a, #buttons_bar_top a{
         padding: 0px 8px 0px 11px;
         margin: 0 3px 0 0;
-    
         border-radius: 12px;
-    }
-
-    a#group_more_action_button {
-        height: 20px;
     }
 
     .tabulatorContainer.panelHeader.icons_only {
@@ -129,6 +128,26 @@ and (max-width : 400px){
 
     #userdashboard_myparams_title{
         display: none;
+    }
+
+    #userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer {
+        width: 40px !important;
+    }
+
+    div#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer {
+        padding-top: 0;
+    }
+
+    div#userdashboard_main_tab.horizontal_tabulator span.toggleHeader {
+        text-align: left;
+        padding: 8px 12px;
+        color: #ffffff !important;
+        border: 0;
+        display: block;
+        font-size: 20px;
+        font-weight: lighter;
+        text-transform: uppercase;
+        margin: 0px 0;
     }
 
     div#background-imager{

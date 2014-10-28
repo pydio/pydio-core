@@ -3099,7 +3099,7 @@ span.toggleHeader.toggleInactive{
 
 span.toggleHeader span[class^="icon-"],
 span.toggleHeader span[class*=" icon-"]{
-    margin-right: 4px;
+    margin-right: 9px;
     display: none;
 }
 
@@ -5803,41 +5803,76 @@ div.flat_tabulator > div:not(.tabulatorContainer){
 
 .horizontal_tabulator div.tabulatorContainer {
     float: left;
-    width: 300px;
+    width: 240px;
     padding: 0;
-    background-color: rgba(51, 51, 51, 0.75) !important;
+    background-color: #30383A;
 }
 
 div#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer{
-    padding-top: 95px;
+    padding-top: 62px;
 }
 
 div#userdashboard_myparams_title{
     position: absolute;
-    color: white;
+    color: rgb(204, 204, 204);
     font-weight: normal;
-    padding: 8px 0;
-    font-size: 30px;
-    -webkit-font-smoothing: antialiased;
-    border-bottom: 1px solid #eee;
-    width: 284px;
-    left: 7px;
+    padding: 22px;
+    height: 17px;
+    font-size: 13px;
+    width: 257px;
+    left: 0;
+    background-color: #222;
+    letter-spacing: 1px;
+}
+
+div#userdashboard_myparams_title span#dash_title{
+    display: none;
+}
+
+div#userdashboard_myparams_title a#dash_back_workspace{
+    display: block;
+    cursor: pointer;
+}
+
+div#userdashboard_myparams_title a#dash_back_workspace:hover{
+    color:rgb(204, 204, 204);
+}
+
+div#userdashboard_main_tab div#team_pane,
+div#userdashboard_main_tab div#my-users-pane,
+div#userdashboard_main_tab div#account_pane,
+div#userdashboard_main_tab div#webdav_pane,
+div#userdashboard_main_tab div#shared_files_pane,
+div#userdashboard_main_tab div#shared_pane,
+div#userdashboard_main_tab div#shared_pane2,
+div#userdashboard_main_tab div#home_account_pane{
+    position: relative;
+}
+
+div#userdashboard_main_tab h3.dashboard_panel_title{
+    position: absolute;
+    top: 12px;
+    font-size: 29px;
+    margin: 0;
+    left: 19px;
+    color: #444;
 }
 
 div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer {
-    background-color: rgba(51, 51, 51, 0.55) !important;
+    background-color: #30383A;
 }
 
 .horizontal_tabulator span.toggleHeader{
     text-align: left;
-    padding: 9px 0 10px 8px;
-    background-color: #e35d52 !important;
+    padding: 10px 0 12px 22px;
+    background-color: #fb725c !important;
     color: #ffffff !important;
     border: 0;
     display: block;
-    font-size: 18px;
+    font-size: 12px;
     font-weight: lighter;
-    -webkit-font-smoothing: antialiased;
+    text-transform: uppercase;
+    margin: 5px 0;
 }
 
 .horizontal_tabulator span.toggleHeader span.tab_label{
@@ -5847,7 +5882,7 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
     width: auto !important;
     border-width: 0 !important;
     background-color: transparent !important;
-    color: #fff !important;
+    color: #BDBDBD !important;
     text-shadow: none;
 }
 
