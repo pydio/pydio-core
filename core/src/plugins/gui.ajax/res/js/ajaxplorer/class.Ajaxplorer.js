@@ -744,6 +744,10 @@ Class.create("Ajaxplorer", {
             }
 		}
 
+        var current = this._contextHolder.getContextNode();
+        if(current && current.getPath() == path){
+            return;
+        }
         var gotoNode;
         if(path == "" || path == "/") {
             gotoNode = new AjxpNode("/");
@@ -751,9 +755,8 @@ Class.create("Ajaxplorer", {
             return;
         }
         window.setTimeout(function(){
-
             this._contextHolder.loadPathInfoSync(path, function(foundNode){
-                if(foundNode.isLeaf()) {
+                if(foundNode.isLeaf() && foundNode.getAjxpMime()!='ajxp_browsable_archive') {
                     this._contextHolder.setPendingSelection(getBaseName(path));
                     gotoNode = new AjxpNode(getRepName(path));
                 }else{
