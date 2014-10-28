@@ -10,6 +10,9 @@
 		</resources>
         <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>
 	</client_settings>
+    <server_settings>
+        <global_param name="DASH_DISABLE_ADDRESS_BOOK" type="boolean" default="false" label="Disable Address Book" description="Do not display address book in user account panel."/>
+    </server_settings>
 	<registry_contributions>
 		<client_configs>
             <template_part theme="umbra" ajxpId="sidebar_splitter" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fake":"option"}'><![CDATA[
@@ -142,12 +145,7 @@
                     <a id="dash_back_workspace" onclick="ajaxplorer.triggerRepositoryChange('ajxp_home'); return false;"><span class="icon-chevron-left"></span> AJXP_MESSAGE[user_dash.53]</a>
                     <span id="dash_title">AJXP_MESSAGE[user_dash.title]</span>
                 </div>
-                <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="dashboard_main_pane horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "tabsTips":"middle right", "defaultTabId": "parameters","tabInfos" : [{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"account_pane"},{"id":"info","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"my-users-pane"}]}'>
-                    <div id="my-users-pane" ajxpClass="AjxpPane" class="tabbed_editor">
-                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                        <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.46]</h3>
-                        <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
-                    </div>
+                <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="dashboard_main_pane horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "tabsTips":"middle right", "defaultTabId": "parameters","tabInfos" : [{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"account_pane"}]}'>
                     <div id="account_pane" ajxpClass="UserProfileEditor" class="tabbed_editor" ajxpOptions='{"fit":"height"}'>
                         <div class="action_bar">
                             <div class="toolbarGroup"></div>
@@ -157,6 +155,17 @@
                     </div>
                 </div>
 			]]></template_part>
+            <component_config className="AjxpTabulator::userdashboard_main_tab">
+                <additional_tab id="my-users-pane"
+                                tabInfo='{"id":"info","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"my-users-pane", "position":2,"dontFocus":true}'
+                                paneInfo='{"type":"widget"}'><![CDATA[
+                    <div id="my-users-pane" ajxpClass="AjxpPane" class="tabbed_editor">
+                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                        <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.46]</h3>
+                        <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
+                    </div>
+                ]]></additional_tab>
+            </component_config>
         </client_configs>
 		<actions>
 			<action name="ls" dirDefault="true">

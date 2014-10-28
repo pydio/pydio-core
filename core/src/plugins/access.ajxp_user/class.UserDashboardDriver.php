@@ -34,6 +34,17 @@ class UserDashboardDriver extends AbstractAccessDriver
         require_once AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareCenter.php";
     }
 
+    public function parseSpecificContributions(&$contribNode){
+        $disableAddressBook = $this->getFilteredOption("DASH_DISABLE_ADDRESS_BOOK") === true;
+        if($contribNode->nodeName == "client_configs" && $disableAddressBook){
+            // remove template_part for orbit_content
+            $xPath=new DOMXPath($contribNode->ownerDocument);
+            $tplNodeList = $xPath->query('component_config[@className="AjxpTabulator::userdashboard_main_tab"]', $contribNode);
+            if(!$tplNodeList->length) return ;
+            $contribNode->removeChild($tplNodeList->item(0));
+        }
+    }
+
     public function switchAction($action, $httpVars, $fileVars)
     {
         if(!isSet($this->actions[$action])) return;
