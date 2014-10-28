@@ -115,22 +115,6 @@ textarea{
     background-color: #fff;
 }
 
-.titre {
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-size: 14px;
-    font-weight: bold;
-    color: black;
-    width: 100%;
-    text-align: left;
-}
-
-.titre input, .backImage{
-    margin-top: 0;
-    margin-left: 0;
-    padding: 2px;
-    border: 1px solid #5E7C90;
-}
-
 kbd {
     padding: .1em .6em;
     border: 1px solid #ccc;
@@ -193,7 +177,7 @@ kbd {
     -moz-border-radius : 2px;
     border-radius: 2px;
     padding: 4px 6px;
-    color: rgb(111, 121, 131);
+    color: #666;
 }
 
 .fl-displayMode-thumb div.thumbnail_selectable_cell{
@@ -270,7 +254,7 @@ kbd {
     font-size: 11px;
     white-space: nowrap;
     margin-top: 1px;
-    opacity: 0.9;
+    opacity: 0.7;
 }
 
 .thumbnail_selectable_cell.detailed.metadata_empty div.thumbLabel{
@@ -293,26 +277,11 @@ div.thumbnail_cell_metadata span.metadata_chunk{
 }
 
 .thumbnail_iconlike_shadow{
-    border: 0px solid white;
-    /*
-    -webkit-box-shadow: 0 0 5px #5C5C5C;
-    -moz-box-shadow: 0 0 5px #5C5C5C;
-    box-shadow: 0 0 5px #5C5C5C;
-    */
+    border: 0 solid white;
 }
 
-.selectable_div div.selected{
-    /*
-	-webkit-box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);
-	-moz-box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);
-	box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);*/
-}
-.selectable_div div.selected-focus{
-    /*
-	-webkit-box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);
-	-moz-box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);
-	box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);*/
-}
+.selectable_div div.selected{}
+.selectable_div div.selected-focus{}
 
 .thumbLabel
 {
@@ -356,7 +325,7 @@ div.thumbnail_cell_metadata span.metadata_chunk{
     font-size: 12px;
     padding-left: 27px !important;
     background-position: 5px 4px;
-    color: rgb(80, 82, 83);
+    color: #444;
     letter-spacing: 1px;
 }
 
@@ -732,8 +701,8 @@ textarea#myCode
 .SF_input.SF_inlineButton
 {
     display: inline-block;
-    font-size: 15px;
-    padding: 7px 0 !important;
+    font-size: 13px;
+    padding: 4px 13px !important;
     text-align: center;
     overflow: visible;
     color: #fff;
@@ -744,6 +713,10 @@ textarea#myCode
     float: left;
     cursor: pointer;
     border-radius: 30px;
+}
+
+div#meta_source_button_add{
+    margin-top: 20px;
 }
 
 .largeButton img{
@@ -1071,7 +1044,7 @@ input.SF_fieldCheckBox{
 }
 
 .SF_input{
-    padding: 2px 3px !important;
+    padding: 1% !important;
     margin-left: 0;
     width: 97%;
     max-width: 450px !important;
@@ -1079,7 +1052,7 @@ input.SF_fieldCheckBox{
 .SF_element textarea, .SF_element select, .SF_element div.SF_image_block{
     margin-left: 0 !important;
     background-color: white;
-    width: 98% !important;
+    width: 97% !important;
     max-width: 450px !important;
 }
 
@@ -1087,6 +1060,12 @@ div.SF_element.SF_largeLabel > input.SF_input.SF_number,
 input.SF_input.SF_number{
     width: 30px !important;
     text-align: right;
+}
+
+select.SF_input {
+    max-width: 464px !important;
+    width: 99% !important;
+    padding: 0;
 }
 
 .SF_box{
@@ -1136,6 +1115,8 @@ input.SF_input.SF_number{
     position: relative;
     margin-bottom: 5px;
     border-radius: 5px;
+    padding-bottom: 20px;
+    margin-top: 8px;
 }
 
 .SF_replication_Add,
@@ -4202,7 +4183,7 @@ ADMIN STYLES
 .metaPane{
     margin-bottom:5px;
     margin-top:2px;
-    padding:6px 5px 8px;
+    padding:0px 5px 31px;
     width:96%;
 }
 

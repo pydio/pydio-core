@@ -401,7 +401,11 @@ Class.create("FormManager", {
                 element.observe('blur', fObs);
             }
 			if(desc && type != "legend"){
-				modal.simpleTooltip(div.down('.SF_label').down('span'), '<div class="simple_tooltip_title">'+label+'</div>'+desc, 'middle left', "right_arrow_tip", "element");
+                var ttSpan = div.down('.SF_label').down('span');
+				modal.simpleTooltip(ttSpan, '<div class="simple_tooltip_title">'+label+'</div>'+desc,
+                    'middle left', "right_arrow_tip", "element");
+                ttSpan.writeAttribute('data-tooltipLabel', label);
+                ttSpan.writeAttribute('data-tooltipDescription', desc);
 			}
             if(json_list){
                 var conn = new Connexion();
@@ -770,6 +774,7 @@ Class.create("FormManager", {
 			var inputs = tr.select('input', 'select', 'textarea');
 			inputs.each(function(input){
 				var newName = input.getAttribute('name')+'_'+repIndex;
+                input.writeAttribute('data-originalName', input.getAttribute('name'));
 				input.setAttribute('name', newName);
 				if(form && Prototype.Browser.IE){form[newName] = input;}
                 if(values && values.get(newName)){
@@ -787,6 +792,12 @@ Class.create("FormManager", {
                     tr.insert(templateRow.select('.SF_replication_Add')[0]);
                 }
             }
+            tr.select(".simple_tooltip_observer[data-toolTipLabel]").each(function(sT){
+                var label = sT.readAttribute('data-tooltipLabel');
+                var desc = sT.readAttribute('data-tooltipDescription');
+                modal.simpleTooltip(sT, '<div class="simple_tooltip_title">'+label+'</div>'+desc,
+                    'middle left', "right_arrow_tip", "element");
+            });
             var removeButton = new Element('a', {className:'SF_replication_Remove', title:'Remove this group'})
                 .update('&nbsp;')
                 .observe('click', function(){

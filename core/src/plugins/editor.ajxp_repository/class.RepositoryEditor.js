@@ -336,9 +336,10 @@ Class.create("RepositoryEditor", AbstractEditor, {
             addForm.insert(formEl);
             addForm.insert('<div style="clear: both"></div>');
             formEl.insert(this.metaSelector);
+            new Chosen(this.metaSelector, {placeholder_text_single:'Add a feature to this workspace'});
             metaPane.down("div.dialogLegend").update(MessageHash["ajxp_repository_editor.7"]);
             metaPane.down("div.dialogLegend").insert({after:addForm});
-            var addFormDetail = new Element("div");
+            var addFormDetail = new Element("div", {className:'meta_plugin_new_form empty'});
             addForm.insert(addFormDetail);
 
         }
@@ -346,19 +347,25 @@ Class.create("RepositoryEditor", AbstractEditor, {
         this.metaSelector.observe("change", function(){
             var plugId = this.metaSelector.getValue();
             addFormDetail.update("");
+            addFormDetail.addClassName("empty");
             if(plugId){
+                addFormDetail.removeClassName("empty");
                 var metaDefNodes = XPathSelectNodes(xmlData, 'admin_data/metasources/meta[@id="'+plugId+'"]/param');
                 var driverParamsHash = $A([]);
                 for(var i=0;i<metaDefNodes.length;i++){
                     driverParamsHash.push(this.formManager.parameterNodeToHash(metaDefNodes[i]));
                 }
-                this.formManager.createParametersInputs(addFormDetail, driverParamsHash, true, null, null, true);
-                this.formManager.disableShortcutsOnForm(addFormDetail);
+                if(driverParamsHash.length){
+                    this.formManager.createParametersInputs(addFormDetail, driverParamsHash, true, null, null, true);
+                    this.formManager.disableShortcutsOnForm(addFormDetail);
+                }else{
+                    addFormDetail.insert('<div class="meta_source_new_empty_params">No parameters for this plugin</div>')
+                }
 
             }
             modal.refreshDialogAppearance();
             modal.refreshDialogPosition();
-            addFormDetail.insert("<div class='largeButton' style='width:100px;margin-top: 20px;margin-left: 0; float: right;'><span class='icon-plus-sign'></span> <span>"+MessageHash['ajxp_repository_editor.11']+"</span></div><div style='clear:both;'></div>");
+            addFormDetail.insert("<div class='largeButton' id='meta_source_button_add'><span class='icon-plus-sign'></span> <span>"+MessageHash['ajxp_repository_editor.11']+"</span></div><div style='clear:both;'></div>");
             addFormDetail.down(".largeButton")._form = addForm;
             addFormDetail.down(".largeButton").observe("click", this.metaActionClick.bind(this));
             this.resize();

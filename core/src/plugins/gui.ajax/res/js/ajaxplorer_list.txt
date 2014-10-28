@@ -24,6 +24,8 @@ js/lib/prototype/carousel.js
 js/lib/prototype/accordion.js
 js/lib/webfx/xtree.js
 js/lib/webfx/ajxptree.js
+js/lib/chosen/event.simulate.js
+js/lib/chosen/chosen.proto.js
 js/ajaxplorer/class.User.js
 js/ajaxplorer/class.ResourcesManager.js
 js/ajaxplorer/class.RemoteNodeProvider.js
