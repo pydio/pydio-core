@@ -1642,6 +1642,9 @@ div.editor_header > span.header_label{
 .action_bar.floatingBar.icons_only a {
     color: white;
 }
+.action_bar.floatingBar.icons_only a.disabled {
+    opacity: 0.5;
+}
 
 .action_bar span.actionbar_button_label {
     cursor: pointer;
