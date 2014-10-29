@@ -918,7 +918,7 @@ Class.create("ShareCenter", {
         conn.onComplete = function(){
             if(this._dataModel){
                 hideLightBox(true);
-                this._dataModel.requireContextChange(this.currentNode, true);
+                this._dataModel.requireContextChange(this._dataModel.getRootNode(), true);
                 return;
             }
             if(removeRow){

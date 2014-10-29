@@ -205,11 +205,14 @@ Class.create("FormManager", {
 				element = element + '<input type="radio" data-ajxp_type="'+type+'" class="SF_box" name="'+name+'" id="'+name+'-false"  '+(selectFalse?'checked':'')+' value="false"'+disabledString+'><label for="'+name+'-false">'+MessageHash[441] + '</label>';
 				element = '<div class="SF_input">'+element+'</div>';
 			}else if(type == 'select'){
-                var choices, json_list;
+                var choices, json_list, json_file;
                 if(Object.isString(param.get("choices"))){
                     if(param.get("choices").startsWith("json_list:")){
                         choices = ["loading|"+MessageHash[466]+"..."];
                         json_list = param.get("choices").split(":")[1];
+                    }else if(param.get("choices").startsWith("json_file:")){
+                        choices = ["loading|"+MessageHash[466]+"..."];
+                        json_file = param.get("choices").split(":")[1];
                     }else if(param.get("choices") == "AJXP_AVAILABLE_LANGUAGES"){
                         var object = window.ajxpBootstrap.parameters.get("availableLanguages");
                         choices = [];
@@ -431,8 +434,23 @@ Class.create("FormManager", {
                             element.insert(option);
                         }
                     }
+                    element.fire("chosen:updated");
                 };
                 conn.sendAsync();
+            }else if(json_file){
+                var req = new Connexion(json_file);
+                req.onComplete = function(transport){
+                    element = div.down("select");
+                    if(defaultValue) element.defaultValue = defaultValue;
+                    element.down('option[value="loading"]').remove();
+                    $A(transport.responseJSON).each(function(entry){
+                        var option = new Element('OPTION', {value:entry.key}).update(entry.label);
+                        if(entry.key == defaultValue) option.setAttribute("selected", "true");
+                        element.insert(option);
+                    });
+                    element.fire("chosen:updated");
+                };
+                req.sendAsync();
             }
 
             if(param.get('replicationGroup')){
