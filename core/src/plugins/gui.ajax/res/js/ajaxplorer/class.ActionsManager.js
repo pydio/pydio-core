@@ -645,7 +645,7 @@ Class.create("ActionsManager", {
                     error = true;
                     if($("generic_dialog_box") && $("generic_dialog_box").visible() && $("generic_dialog_box").down("div.dialogLegend")){
                         $("generic_dialog_box").down("div.dialogLegend").insert({bottom:'<div class="ajxp_login_error" style="background-color: #D33131;display: block;font-size: 9px;color: white;border-radius: 3px;padding: 2px 6px;">'+MessageHash[errorId]+'</div>'});
-                        $("generic_dialog_box").shake();
+                        Effect.ErrorShake($("generic_dialog_box").down('.ajxp_login_error'));
                     }else{
                         alert(MessageHash[errorId]);
                     }

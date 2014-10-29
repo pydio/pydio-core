@@ -26,7 +26,7 @@
                 </processing>
             </action>
             <action name="user_team_edit_users">
-                <gui src="delete.png" iconClass="icon-edit" text="519" title="519">
+                <gui src="delete.png" iconClass="icon-edit" text="user_dash.54" title="user_dash.55">
                     <context dir="false" recycle="false" selection="true" actionBar="true" actionBarGroup="team_address_book"/>
                     <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="ajxp_team"/>
                 </gui>
@@ -34,8 +34,10 @@
                     <clientCallback dialogOpenForm="team_edit_form" prepareModal="true">
                         <dialogOnOpen><![CDATA[
                             var oForm = modal.getForm();
+                            var textA = oForm.down('#team_edit_input');
                             var users = ajaxplorer.getContextHolder().getUniqueNode().getMetadata().get('users').stripTags().strip();
-                            oForm.down('#team_edit_input').setValue(users.replace(/, /g, '\n') + '\n');
+                            textA.setValue(users.replace(/, /g, '\n') + '\n');
+                            moveCaretToEnd(textA);
                             var completer = new AjxpUsersCompleter(
                                 oForm.down('#team_edit_input'),
                                 null,
@@ -46,13 +48,24 @@
                                     existingOnly: true,
                                     updateUserEntryAfterCreate:null,
                                     createUserPanel:null,
-                                    indicator: null,
-                                    minChars:parseInt(ajaxplorer.getPluginConfigs("conf").get("USERS_LIST_COMPLETE_MIN_CHARS"))
+                                    indicator: oForm.down("#team_loader"),
+                                    minChars:parseInt(ajaxplorer.getPluginConfigs("conf").get("USERS_LIST_COMPLETE_MIN_CHARS")),
+                                    afterUpdateElement: function(elem, selectedLi){
+                                        var label = selectedLi.readAttribute('data-label');
+                                        var id = selectedLi.readAttribute('data-entry_id') || selectedLi.readAttribute('data-group');
+                                        var isGroup = selectedLi.hasClassName('complete_group_entry');
+                                        var composedLabel = label + ' (' + id + ')';
+                                        var currentValue = textA.getValue().strip();
+                                        currentValue = currentValue.replace(composedLabel, id);
+                                        var users = currentValue.strip().split(new RegExp('[ ,\n]+', 'g'));
+                                        textA.setValue($A(users).uniq().join('\n') + '\n');
+                                        moveCaretToEnd(textA);
+                                    }
                                 }
                             );
                         ]]></dialogOnOpen>
                         <dialogOnComplete><![CDATA[
-                             var newValues = modal.getForm().down('#team_edit_input').getValue().strip().split('\n');
+                             var newValues = modal.getForm().down('#team_edit_input').getValue().strip().split(new RegExp('[ ,\n]+', 'g'));
                              var teamId = getBaseName(ajaxplorer.getContextHolder().getUniqueNode().getPath());
                              var teamLabel = ajaxplorer.getContextHolder().getUniqueNode().getLabel();
                              console.log(teamId, newValues);
@@ -74,8 +87,12 @@
                     </clientCallback>
                     <clientForm id="team_edit_form"><![CDATA[
                          <div id="team_edit_form">
-                            <textarea type="text" style="width:410px; min-height: 100px;" id="team_edit_input"></textarea>
-                            <div id="team_edit_container"></div>
+                            <div class="dialogLegend" style="width: 400px;padding: 10px 0;">AJXP_MESSAGE[user_dash.56]</div>
+                            <div style="position: relative;">
+                                <div id="team_loader" style="position: absolute;top: 2px;right: 3px;font-size: 17px;display: none;"><span class="icon-spinner"></span></div>
+                                <textarea type="text" style="width:410px; min-height: 100px;" id="team_edit_input"></textarea>
+                                <div id="team_edit_container"></div>
+                            </div>
                          </div>
                     ]]></clientForm>
                     <serverCallback methodName="userTeamsActions"/>

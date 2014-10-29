@@ -75,6 +75,24 @@
     margin-bottom: 20px;
 }
 
+div#team_edit_container {
+    max-height: 200px;
+    overflow: auto;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+}
+
+#team_edit_container ul {
+    margin: 0;
+    padding: 0;
+}
+
+#team_edit_container ul li{
+    list-style: none;
+}
+
+
 @media only screen
 and (max-width : 980px){
     #notifications_center div.notif_event_container{
