@@ -77,5 +77,7 @@ $mess=array(
 "51"=> "Teams of users, used as shortcuts when sharing",
 "52"=> "Are you sure you want to delete this team? This will not remove any users.",
     "53"=> "Back to my workspaces",
-
+    "54"=> "Update Members",
+    "55"=> "Add/Remove users from this team",
+    "56"=> "Add one user per line, type in the textarea to see the auto-completion list appear.",
 );

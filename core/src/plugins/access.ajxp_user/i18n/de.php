@@ -75,4 +75,7 @@ $mess=array(
 "51"=> "Teams von Benutzern, die während des Teilens als Favoriten verfügbar sind.",
 "52"=> "Sind Sie sicher, dass Sie dieses Team löschen möchten? Es werden dabei keine Benutzer entfernt.",
 "53"=> "Zurück zu meinen Arbeitsumgebungen",
+    "54"=> "Update Members",
+    "55"=> "Add/Remove users from this team",
+    "56"=> "Add one user per line, type in the textarea to see the auto-completion list appear.",
 );

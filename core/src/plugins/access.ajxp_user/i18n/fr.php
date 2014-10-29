@@ -75,4 +75,7 @@ $mess=array(
 "51"=> "Groupes d'utilisateurs, utilisés comme raccourcis lors d'un partage",
 "52"=> "Voulez-vous vraiment supprimer cette équipe ? Aucun utilisateur ne sera supprimé.",
 "53"=> "Retour aux dépôts",
+    "54"=> "Editer les membres",
+    "55"=> "Ajouter/retirer des utilisateurs de cette liste",
+    "56"=> "Ajouter un identifiant par ligne. Tapez quelques lettres pour voir apparaitre la liste de complétion automatique.",
 );

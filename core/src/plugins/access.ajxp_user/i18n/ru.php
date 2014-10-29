@@ -74,4 +74,8 @@ $mess=array(
 "50"=> "Мои сообщества",
 "51"=> "Команды из пользователей, которые служат для быстрого доступа при обмене информацией",
 "52"=> "Вы уверены, что хотите удалить сообщество? Это не удалит пользователей.",
+"53"=> "Back to my workspaces",
+"54"=> "Update Members",
+"55"=> "Add/Remove users from this team",
+"56"=> "Add one user per line, type in the textarea to see the auto-completion list appear.",
 );
