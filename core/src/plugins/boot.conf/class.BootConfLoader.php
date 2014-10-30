@@ -344,10 +344,10 @@ class BootConfLoader extends AbstractConfDriver
             $mailerPlug = AJXP_PluginsService::findPluginById("mailer.phpmailer-lite");
             $mailerPlug->loadConfigs(array("MAILER" => $data["MAILER_ENABLE"]["MAILER_SYSTEM"]));
             $mailerPlug->sendMail(
-                array($data["MAILER_ENABLE"]["MAILER_ADMIN"]),
+                array("adress" => $data["MAILER_ENABLE"]["MAILER_ADMIN"]),
                 "Pydio Test Mail",
                 "Body of the test",
-                array($data["MAILER_ENABLE"]["MAILER_ADMIN"])
+                array("adress" => $data["MAILER_ENABLE"]["MAILER_ADMIN"])
             );
             echo 'SUCCESS:Mail sent to the admin adress, please check it is in your inbox!';
 
