@@ -75,7 +75,7 @@ CREATE TABLE ajxp_plugin_configs (
 CREATE TABLE ajxp_simple_store (
    object_id varchar(255) NOT NULL,
    store_id varchar(50) NOT NULL,
-   serialized_data text,
+   serialized_data bytea,
    binary_data bytea,
    related_object_id varchar(255),
    insertion_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
