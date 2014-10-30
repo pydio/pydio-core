@@ -61,9 +61,9 @@ abstract class AbstractConfDriver extends AJXP_Plugin
         parent::parseSpecificContributions($contribNode);
         if ($contribNode->nodeName == 'client_configs' && !ConfService::getCoreConf("WEBDAV_ENABLE")) {
             $actionXpath=new DOMXPath($contribNode->ownerDocument);
-            $webdavCompNodeList = $actionXpath->query('component_config[@className="AjxpTabulator::userdashboard_main_tab"]', $contribNode);
+            $webdavCompNodeList = $actionXpath->query('component_config/additional_tab[@id="webdav_pane"]', $contribNode);
             if ($webdavCompNodeList->length) {
-                $contribNode->removeChild($webdavCompNodeList->item(0));
+                $contribNode->removeChild($webdavCompNodeList->item(0)->parentNode);
             }
         }
 
