@@ -347,6 +347,14 @@ class IMagickPreviewer extends AJXP_Plugin
             }
         }
         fclose($fp);
+        if ($max == 0 && isSet($this->pluginConf["PDFINFO"]) && !empty($this->pluginConf["PDFINFO"])) {
+            $tmpfname = tempnam("/tmp", "IMAGICK");
+            file_put_contents($tmpfname, file_get_contents($file));
+            exec($this->pluginConf["PDFINFO"] . ' '.$tmpfname.' | awk \'/Pages/ {print $2}\'', $output);
+            $max = $output[0];
+            unlink($tmpfname);
+        }
+
         return (int) $max;
     }
 
