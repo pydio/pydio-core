@@ -51,6 +51,7 @@ Ultreia many fixes
 	Prototype, Scriptaculous http://www.prototypejs.org/, http://script.aculo.us/ (MIT)
 	Modernizr 	http://modernizr.com (BSD / MIT)
 	Webfx widgets (selectable, sortable, xtree) : http://webfx.eae.net/ (Apache 2)
+	Chosen selector by Patrick Filler for Harvest (MIT): https://github.com/harvesthq/chosen
 
 [Images and Fonts]
 	Oxygen : http://www.oxygen-icons.org/ (Creative Common SA 3.0 / LGPL)

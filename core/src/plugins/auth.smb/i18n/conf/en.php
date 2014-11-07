@@ -22,7 +22,7 @@ $mess=array(
 "SMB Authentification" => "SMB Authentification",
 "Authenticate user by directly connecting to an SMB share" => "Authenticate user by directly connecting to an SMB share",
 "Repository" => "Repository",
-"Id of the repository to use for testing connexion" => "Id of the repository to use for testing connexion",
+"Id of the repository to use for testing connexion" => "Id of the repository to use for testing connection",
 "Admin user" => "Admin user",
 "The ID of an existing admin for Pydio (using conf.serial)" => "The ID of an existing admin for Pydio (using conf.serial)",
 );

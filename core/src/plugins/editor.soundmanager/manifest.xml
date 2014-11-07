@@ -30,6 +30,7 @@
         <external_file filename="plugins/editor.audio/manifest.xml" include="registry_contributions/actions[id='audio_proxy']" exclude=""/>
     </registry_contributions>
     <dependencies>
+        <activePlugin pluginName="editor.audio"/>
         <pluginClass pluginName="editor.audio"/>
     </dependencies>
 </editor>

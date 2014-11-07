@@ -535,7 +535,7 @@ Class.create("FilesList", SelectableElements, {
 			subMenu:false,
 			subMenuUpdateImage:false,
 			callback: function(){
-                oThis.slider.show($('thumb_size_button'));
+                oThis.slider.show($(oThisId+'-thumb_size_button'));
 			},
 			listeners : {
 				init:function(){

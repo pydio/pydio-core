@@ -30,8 +30,7 @@ Class.create("BrowserOpener", AbstractEditor, {
         	return;
         } 
         var repo = ajaxplorer.user.getActiveRepository();
-        var loc = document.location.href;
-        if(loc.indexOf("?") !== -1) loc = loc.substring(0, loc.indexOf("?"));
+        var loc = document.location.href.split('?').shift().split('#').shift();
         var url = loc.substring(0, loc.lastIndexOf('/'));
         if($$('base').length){
             url = $$("base")[0].getAttribute("href");

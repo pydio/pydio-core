@@ -57,8 +57,13 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         $def = $this->getMetaDefinition();
         if(!isSet($this->options["meta_visibility"])) $visibilities = array("visible");
         else $visibilities = explode(",", $this->options["meta_visibility"]);
+        $editButton = '';
+        $u = AuthService::getLoggedUser();
+        if($u != null && $u->canWrite($this->accessDriver->repository->getId())){
+            $editButton = '<span class="icon-edit" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]"></span><span class="user_meta_change" style="display: none;" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]">AJXP_MESSAGE[457]</span>';
+        }
         $cdataHead = '<div>
-                        <div class="panelHeader infoPanelGroup" colspan="2"><span class="icon-edit" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]"></span><span class="user_meta_change" style="display: none;" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]">AJXP_MESSAGE[457]</span>AJXP_MESSAGE[meta.user.1]</div>
+                        <div class="panelHeader infoPanelGroup" colspan="2">'.$editButton.'AJXP_MESSAGE[meta.user.1]</div>
                      ';
         $cdataFoot = '</div>';
         $cdataParts = "";

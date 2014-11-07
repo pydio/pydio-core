@@ -19,14 +19,14 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Text logger" => "Logger Texte",
-"Stores the logs as readable tab delimited text." => "Stockage des logs dans des fichiers textes journaliers.",
-"Logpath" => "Chemin",
-"The path to where the logs are kept." => "Où stocker les fichiers.",
-"Logfile" => "Nom de fichier",
-"The name of the log file" => "Nom des fichiers de log",
-"Files Permissions" => "Permissions",
+"Text logger" => "Journaux texte",
+"Stores the logs as readable tab delimited text." => "Stockage des journaux dans des fichiers textes délimités par tabulation.",
+"Logpath" => "Chemin des journaux",
+"The path to where the logs are kept." => "Chemin de stockage des journaux.",
+"Logfile" => "Nom de journal",
+"The name of the log file" => "Nom des fichiers journal",
+"Files Permissions" => "Permissions de fichier",
 "" => "",
-"Log Folder" => "Log Folder",
-"Files Name Pattern" => "Files Name Pattern",
+"Log Folder" => "Répertoire des journaux",
+"Files Name Pattern" => "Motif du nom des fichiers",
 );

@@ -197,7 +197,20 @@ class FileHasher extends AJXP_AbstractMetaSource
                     if (!$stat) {
                         print '{}';
                     } else {
-                        if($node->isLeaf()) $hash = $this->getFileHash($selection->getUniqueNode($this->accessDriver));
+                        if($node->isLeaf()) {
+                            if(isSet($_SERVER["HTTP_RANGE"])){
+                                $fullSize = floatval($stat['size']);
+                                $ranges = explode('=', $_SERVER["HTTP_RANGE"]);
+                                $offsets = explode('-', $ranges[1]);
+                                $offset = floatval($offsets[0]);
+                                $length = floatval($offsets[1]) - $offset;
+                                if (!$length) $length = $fullSize - $offset;
+                                if ($length + $offset > $fullSize || $length < 0) $length = $fullSize - $offset;
+                                $hash = $this->getPartialHash($node, $offset, $length);
+                            }else{
+                                $hash = $this->getFileHash($selection->getUniqueNode($this->accessDriver));
+                            }
+                        }
                         else $hash = 'directory';
                         $stat[13] = $stat["hash"] = $hash;
                         print json_encode($stat);
@@ -229,6 +242,7 @@ class FileHasher extends AJXP_AbstractMetaSource
 
     /**
      * @param AJXP_Node $node
+     * @return String md5
      */
     public function getFileHash($node)
     {
@@ -264,7 +278,31 @@ class FileHasher extends AJXP_AbstractMetaSource
             }
             $node->mergeMetadata(array("md5" => $md5));
             return $md5;
+        }else{
+            return 'directory';
         }
+    }
+
+    /**
+     * @param AJXP_Node $node
+     * @param float $offset
+     * @param float $length
+     * @return String md5
+     */
+    public function getPartialHash($node, $offset, $length){
+
+        $this->logDebug('Getting partial hash from ' . $offset . ' to ' . $length );
+        $fp = fopen($node->getUrl(), "r");
+        $ctx = hash_init('md5');
+        if($offset > 0){
+            fseek($fp, $offset);
+        }
+        hash_update_stream($ctx, $fp, $length);
+        $hash = hash_final($ctx);
+        $this->logDebug('Partial hash is ' . $hash );
+        fclose($fp);
+        return $hash;
+
     }
 
     /**

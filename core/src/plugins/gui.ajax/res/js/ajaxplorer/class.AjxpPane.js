@@ -207,7 +207,12 @@ Class.create("AjxpPane", {
     			var expr = this.options.fitMarginBottom;
     			try{marginBottom = parseInt(eval(expr));}catch(e){}
     		}
-    		fitHeightToBottom(this.htmlElement, this.options.fitParent, marginBottom);
+            var minOffsetTop = 0;
+            if(this.options.fitMinOffsetTop){
+                var expr2 = this.options.fitMinOffsetTop;
+                try{minOffsetTop = parseInt(eval(expr2));}catch(e){}
+            }
+    		fitHeightToBottom(this.htmlElement, this.options.fitParent, marginBottom, false, minOffsetTop);
             if(this.scrollbar){
                 fitHeightToBottom(this.scroller);
                 this.scrollbar.recalculateLayout();

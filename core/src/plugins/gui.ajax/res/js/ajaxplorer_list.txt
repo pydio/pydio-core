@@ -9,7 +9,6 @@ js/lib/prototype/webfx.selectable.js
 js/lib/prototype/webfx.sortable.js
 js/lib/prototype/proto.menu.js
 js/lib/prototype/splitter.js
-js/lib/prototype/proto.history.js
 js/lib/prototype/cookiejar.js
 js/lib/prototype/protopass.js
 js/lib/prototype/resizable.js
@@ -25,6 +24,8 @@ js/lib/prototype/carousel.js
 js/lib/prototype/accordion.js
 js/lib/webfx/xtree.js
 js/lib/webfx/ajxptree.js
+js/lib/chosen/event.simulate.js
+js/lib/chosen/chosen.proto.js
 js/ajaxplorer/class.User.js
 js/ajaxplorer/class.ResourcesManager.js
 js/ajaxplorer/class.RemoteNodeProvider.js

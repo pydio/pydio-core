@@ -115,22 +115,6 @@ textarea{
     background-color: #fff;
 }
 
-.titre {
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-size: 14px;
-    font-weight: bold;
-    color: black;
-    width: 100%;
-    text-align: left;
-}
-
-.titre input, .backImage{
-    margin-top: 0;
-    margin-left: 0;
-    padding: 2px;
-    border: 1px solid #5E7C90;
-}
-
 kbd {
     padding: .1em .6em;
     border: 1px solid #ccc;
@@ -193,7 +177,7 @@ kbd {
     -moz-border-radius : 2px;
     border-radius: 2px;
     padding: 4px 6px;
-    color: rgb(111, 121, 131);
+    color: #666;
 }
 
 .fl-displayMode-thumb div.thumbnail_selectable_cell{
@@ -270,7 +254,7 @@ kbd {
     font-size: 11px;
     white-space: nowrap;
     margin-top: 1px;
-    opacity: 0.9;
+    opacity: 0.7;
 }
 
 .thumbnail_selectable_cell.detailed.metadata_empty div.thumbLabel{
@@ -293,26 +277,11 @@ div.thumbnail_cell_metadata span.metadata_chunk{
 }
 
 .thumbnail_iconlike_shadow{
-    border: 0px solid white;
-    /*
-    -webkit-box-shadow: 0 0 5px #5C5C5C;
-    -moz-box-shadow: 0 0 5px #5C5C5C;
-    box-shadow: 0 0 5px #5C5C5C;
-    */
+    border: 0 solid white;
 }
 
-.selectable_div div.selected{
-    /*
-	-webkit-box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);
-	-moz-box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);
-	box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);*/
-}
-.selectable_div div.selected-focus{
-    /*
-	-webkit-box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);
-	-moz-box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);
-	box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);*/
-}
+.selectable_div div.selected{}
+.selectable_div div.selected-focus{}
 
 .thumbLabel
 {
@@ -356,7 +325,7 @@ div.thumbnail_cell_metadata span.metadata_chunk{
     font-size: 12px;
     padding-left: 27px !important;
     background-position: 5px 4px;
-    color: rgb(80, 82, 83);
+    color: #444;
     letter-spacing: 1px;
 }
 
@@ -732,8 +701,8 @@ textarea#myCode
 .SF_input.SF_inlineButton
 {
     display: inline-block;
-    font-size: 15px;
-    padding: 7px 0 !important;
+    font-size: 13px;
+    padding: 4px 13px !important;
     text-align: center;
     overflow: visible;
     color: #fff;
@@ -744,6 +713,10 @@ textarea#myCode
     float: left;
     cursor: pointer;
     border-radius: 30px;
+}
+
+div#meta_source_button_add{
+    margin-top: 20px;
 }
 
 .largeButton img{
@@ -1071,7 +1044,7 @@ input.SF_fieldCheckBox{
 }
 
 .SF_input{
-    padding: 2px 3px !important;
+    padding: 1% !important;
     margin-left: 0;
     width: 97%;
     max-width: 450px !important;
@@ -1079,7 +1052,7 @@ input.SF_fieldCheckBox{
 .SF_element textarea, .SF_element select, .SF_element div.SF_image_block{
     margin-left: 0 !important;
     background-color: white;
-    width: 98% !important;
+    width: 97% !important;
     max-width: 450px !important;
 }
 
@@ -1087,6 +1060,12 @@ div.SF_element.SF_largeLabel > input.SF_input.SF_number,
 input.SF_input.SF_number{
     width: 30px !important;
     text-align: right;
+}
+
+select.SF_input {
+    max-width: 464px !important;
+    width: 99% !important;
+    padding: 0 1% !important;
 }
 
 .SF_box{
@@ -1136,6 +1115,8 @@ input.SF_input.SF_number{
     position: relative;
     margin-bottom: 5px;
     border-radius: 5px;
+    padding-bottom: 20px;
+    margin-top: 8px;
 }
 
 .SF_replication_Add,
@@ -1660,6 +1641,9 @@ div.editor_header > span.header_label{
 
 .action_bar.floatingBar.icons_only a {
     color: white;
+}
+.action_bar.floatingBar.icons_only a.disabled {
+    opacity: 0.5;
 }
 
 .action_bar span.actionbar_button_label {
@@ -3118,7 +3102,7 @@ span.toggleHeader.toggleInactive{
 
 span.toggleHeader span[class^="icon-"],
 span.toggleHeader span[class*=" icon-"]{
-    margin-right: 4px;
+    margin-right: 9px;
     display: none;
 }
 
@@ -3612,6 +3596,10 @@ div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail
 
 div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata{
     display: none;
+}
+
+div.class-FetchedResultPane.display_metadata div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata{
+    display: inherit;
 }
 
 #search_results div.ajxpNodeProvider:hover
@@ -4202,7 +4190,7 @@ ADMIN STYLES
 .metaPane{
     margin-bottom:5px;
     margin-top:2px;
-    padding:6px 5px 8px;
+    padding:0px 5px 31px;
     width:96%;
 }
 
@@ -4778,6 +4766,10 @@ div#share_result div.macos_only
 
 #shareDialogButtons div.largeButton.destruct{
     background-color: #A00;
+}
+
+.readonly_mode div#share_update {
+    display: none !important;
 }
 
 div.user_entry span.cbContainer{
@@ -5535,9 +5527,8 @@ div.overlay.form-reset-password-ask
 }
 
 #webdav_repo_list{
-    height: 200px;
-    overflow: auto;
-    border: 1px solid #BBB;
+    height: auto !important;
+    background-color: white;
 }
 
 #webdav_repo_list div{
@@ -5550,7 +5541,8 @@ div.overlay.form-reset-password-ask
 }
 
 #webdav_repo_list input {
-    width: 73%;
+    width: 92% !important;
+    margin-top: 11px;
 }
 
 input#webdav_password{
@@ -5818,41 +5810,76 @@ div.flat_tabulator > div:not(.tabulatorContainer){
 
 .horizontal_tabulator div.tabulatorContainer {
     float: left;
-    width: 300px;
+    width: 240px;
     padding: 0;
-    background-color: rgba(51, 51, 51, 0.75) !important;
+    background-color: #30383A;
 }
 
 div#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer{
-    padding-top: 95px;
+    padding-top: 62px;
 }
 
 div#userdashboard_myparams_title{
     position: absolute;
-    color: white;
+    color: rgb(204, 204, 204);
     font-weight: normal;
-    padding: 8px 0;
-    font-size: 30px;
-    -webkit-font-smoothing: antialiased;
-    border-bottom: 1px solid #eee;
-    width: 284px;
-    left: 7px;
+    padding: 22px;
+    height: 17px;
+    font-size: 13px;
+    width: 257px;
+    left: 0;
+    background-color: #222;
+    letter-spacing: 1px;
+}
+
+div#userdashboard_myparams_title span#dash_title{
+    display: none;
+}
+
+div#userdashboard_myparams_title a#dash_back_workspace{
+    display: block;
+    cursor: pointer;
+}
+
+div#userdashboard_myparams_title a#dash_back_workspace:hover{
+    color:rgb(204, 204, 204);
+}
+
+div#userdashboard_main_tab div#team_pane,
+div#userdashboard_main_tab div#my-users-pane,
+div#userdashboard_main_tab div#account_pane,
+div#userdashboard_main_tab div#webdav_pane,
+div#userdashboard_main_tab div#shared_files_pane,
+div#userdashboard_main_tab div#shared_pane,
+div#userdashboard_main_tab div#shared_pane2,
+div#userdashboard_main_tab div#home_account_pane{
+    position: relative;
+}
+
+div#userdashboard_main_tab h3.dashboard_panel_title{
+    position: absolute;
+    top: 12px;
+    font-size: 29px;
+    margin: 0;
+    left: 19px;
+    color: #444;
 }
 
 div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer {
-    background-color: rgba(51, 51, 51, 0.55) !important;
+    background-color: #30383A;
 }
 
 .horizontal_tabulator span.toggleHeader{
     text-align: left;
-    padding: 9px 0 10px 8px;
-    background-color: #e35d52 !important;
+    padding: 10px 0 12px 22px;
+    background-color: #fb725c !important;
     color: #ffffff !important;
     border: 0;
     display: block;
-    font-size: 18px;
+    font-size: 12px;
     font-weight: lighter;
-    -webkit-font-smoothing: antialiased;
+    text-transform: uppercase;
+    margin: 5px 0;
 }
 
 .horizontal_tabulator span.toggleHeader span.tab_label{
@@ -5862,7 +5889,7 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
     width: auto !important;
     border-width: 0 !important;
     background-color: transparent !important;
-    color: #fff !important;
+    color: #BDBDBD !important;
     text-shadow: none;
 }
 

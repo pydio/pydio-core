@@ -19,10 +19,10 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Name",
-"2" => "Title",
-"3" => "Queryable",
+"1" => "Nom",
+"2" => "Titre",
+"3" => "Interrogeable",
 "4" => "Style",
-"5" => "Keywords",
+"5" => "Mots clefs",
 "6" => "Projection",
 );

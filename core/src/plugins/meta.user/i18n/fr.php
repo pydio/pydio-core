@@ -19,8 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 $mess=array(
-"1" => "Meta Données",
-"2" => "Pas d'étiquette",
+"1" => "Meta-données",
+"2" => "Pas de libellés",
 "3" => "Retirer la notation",
 "4" => "Faible",
 "5" => "A faire",

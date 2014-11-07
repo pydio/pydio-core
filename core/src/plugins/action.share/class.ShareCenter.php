@@ -363,8 +363,7 @@ class ShareCenter extends AJXP_Plugin
             case "unshare":
 
                 if(isSet($httpVars["hash"])){
-                    $mess = ConfService::getMessages();
-                    $userId = AuthService::getLoggedUser()->getId();
+
                     $res = $this->getShareStore()->deleteShare($httpVars["element_type"], $httpVars["hash"]);
                     if($res !== false){
                         AJXP_XMLWriter::header();
@@ -1481,9 +1480,11 @@ class ShareCenter extends AJXP_Plugin
                 $updateHash = null;
                 if(isSet($httpVars["minisite_hash_update"]) && !empty($httpVars["minisite_hash_update"]) && $httpVars["minisite_hash_update"] != $httpVars["hash"]){
                     // Existing already
-                    $test = $this->getShareStore()->loadShare($httpVars["minisite_hash_update"]);
+                    $value = AJXP_Utils::sanitize($httpVars["minisite_hash_update"], AJXP_SANITIZE_ALPHANUM);
+                    $value = strtolower($value);
+                    $test = $this->getShareStore()->loadShare($value);
                     if(!empty($test)) throw new Exception("Sorry hash already exists");
-                    $updateHash = $httpVars["minisite_hash_update"];
+                    $updateHash = $value;
 
                 }
                 $hash = $this->getShareStore()->storeShare($repository->getId(), $data, "minisite", $hash, $updateHash);
@@ -1943,6 +1944,7 @@ class ShareCenter extends AJXP_Plugin
                 $meta["share_data"] = $meta["copy_url"] = $this->buildPublicletLink($hash);
                 $meta["share_link"] = true;
                 $meta["shared_element_hash"] = $hash;
+                $meta["ajxp_shared_publiclet"] = $hash;
 
             }else{
 
@@ -2227,10 +2229,14 @@ class ShareCenter extends AJXP_Plugin
 
         }else if($shareData["type"] == "minisite" || $shareData["type"] == "repository"){
 
-            $minisite = ($shareData["type"] == "minisite");
             $repoId = $shareId;
+            if(strpos($repoId, "repo-") === 0){
+                // Legacy
+                $repoId = str_replace("repo-", "", $repoId);
+                $shareData["type"] = "repository";
+            }
+            $minisite = ($shareData["type"] == "minisite");
             if ($minisite) {
-
                 $minisiteData = $this->getShareStore()->loadShare($shareId);
                 $repoId = $minisiteData["REPOSITORY"];
                 $minisiteIsPublic = isSet($minisiteData["PRELOG_USER"]);
@@ -2255,7 +2261,7 @@ class ShareCenter extends AJXP_Plugin
             );
 
             $repo = ConfService::getRepositoryById($repoId);
-            if($repo == null && $node != null){
+            if($repoId == null || ($repo == null && $node != null)){
                 if($minisite){
                     $this->removeShareFromMeta($node, $shareId);
                 }

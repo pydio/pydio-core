@@ -70,16 +70,21 @@ class AJXP_JSPacker
 
         // Concat List into one big string
         $jscode = '' ;
-        $handle = @fopen($src, 'r');
-        if ($handle) {
-            while (!feof($handle)) {
-                $jsline = fgets($handle, 4096) ;
-                if (rtrim($jsline,"\n") != "") {
-                    $code = file_get_contents(AJXP_INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/".rtrim($jsline,"\n\r")) ;
-                    if ($code) $jscode .= $code ;
-                }
+        $noMiniCode = '';
+        $lines = file($src);
+        foreach($lines as $jsline){
+            if(trim($jsline) == '') continue;
+            $noMini = false;
+            if(strpos($jsline, "#NO_MINI") !== FALSE){
+                $jsline = str_replace("#NO_MINI", "", $jsline);
+                $noMini = true;
             }
-            fclose($handle);
+            $code = file_get_contents(AJXP_INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/".rtrim($jsline,"\n\r")) ;
+            if ($code) {
+                if($noMini) $noMiniCode .= $code;
+                else $jscode .= $code ;
+            }
+
         }
 
         // Pack and write to file
@@ -88,6 +93,9 @@ class AJXP_JSPacker
         $packed = $packer->pack();
         if ($mode == "None") { // css case, hack for I.E.
             $packed = str_replace("solid#", "solid #", $packed);
+        }
+        if(!empty($noMiniCode)){
+            $packed.="\n".$noMiniCode;
         }
         @file_put_contents($out, $packed);
 

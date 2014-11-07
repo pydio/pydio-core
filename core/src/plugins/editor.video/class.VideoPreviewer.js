@@ -98,7 +98,7 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
 
     getPreview : function(ajxpNode, rich){
 		if(rich){
-			var url = document.location.href;
+			var url = document.location.href.split('#').shift().split('?').shift();
 			if(url[(url.length-1)] == '/'){
 				url = url.substr(0, url.length-1);
 			}else if(url.lastIndexOf('/') > -1){

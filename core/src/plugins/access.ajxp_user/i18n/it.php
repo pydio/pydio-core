@@ -75,4 +75,7 @@ $mess=array(
 "51"=> "Teams di utenti, usati come scorciatoia durante la condivisione",
 "52"=> "Sei sicuro di voler cancellare questo team? Questa operazione non cancellerà gli utenti associati..",
     "53"=> "Back to my workspaces",
+    "54"=> "Update Members",
+    "55"=> "Add/Remove users from this team",
+    "56"=> "Add one user per line, type in the textarea to see the auto-completion list appear.",
 );

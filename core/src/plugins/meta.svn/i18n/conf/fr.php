@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Subversion Repository" => "Repository SVN",
-"Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline." => "Affichage des informations de versionning si le répertoire courant est une working-copy d'un repository SVN. La commande svn doit être accessible sur la machine locale.",
+"Subversion Repository" => "Dépôt Subversion",
+"Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline." => "Extrait les informations SVN (révision, journal de modifications, ...) si le dépôt est une 'Working-Copy' et que SVN est accessible en ligne de commande.",
 );

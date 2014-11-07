@@ -127,7 +127,7 @@ function hookToFilesList(){
         $A(fList.getItems()).each(function(row){
             if(!row.ajxpNode || (row.ajxpNode.getAjxpMime() != "mp3" && row.ajxpNode.getAjxpMime() != "wav")) return;
             addVolumeButton();
-            var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+'&get_action=audio_proxy&file=base64encoded:'+base64_encode(row.ajxpNode.getPath())+ '&fake=extension.'+row.ajxpNode.getAjxpMime();
+            var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+'&get_action=audio_proxy&file='+encodeURIComponent(base64_encode(row.ajxpNode.getPath()))+ '&fake=extension.'+row.ajxpNode.getAjxpMime();
             var player = new Element("div", {className:"ui360 ui360-micro"}).update(new Element("a", {href:url}).update(""));
             row.down("span#ajxp_label").setStyle({backgroundImage:'none'}).insert({top:player});
             threeSixtyPlayer.config.items = [player];
@@ -253,7 +253,7 @@ soundManager.setup({\n\
             return im;
         }
         addVolumeButton();
-        var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+'&get_action=audio_proxy&file=base64encoded:'+base64_encode(ajxpNode.getPath());
+        var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+'&get_action=audio_proxy&file='+encodeURIComponent(base64_encode(ajxpNode.getPath()));
         if(rich){
             url += '&rich_preview=true&fake=extension.'+ajxpNode.getAjxpMime();
         }else{

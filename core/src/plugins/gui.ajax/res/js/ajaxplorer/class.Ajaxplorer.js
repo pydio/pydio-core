@@ -110,10 +110,12 @@ Class.create("Ajaxplorer", {
 
         var WorkspaceRouter = Backbone.Router.extend({
             routes: {
-                ":workspace":"switchToWorkspace"
+                ":workspace/*path":"switchToWorkspace"
             },
-            switchToWorkspace: function(workspace) {
+            switchToWorkspace: function(workspace, path) {
                 if(!ajaxplorer.user) {return;}
+                if(path) path = '/' + path;
+                else path = '/';
                 var repos = ajaxplorer.user.getRepositoriesList();
                 workspace = workspace.replace("ws-", "");
                 var object = $H(repos).detect(function(pair){
@@ -122,7 +124,12 @@ Class.create("Ajaxplorer", {
                 if(!object) return;
                 var foundRepo = object.value;
                 if(ajaxplorer.repositoryId != foundRepo.getId()){
+                    if(path){
+                        this._initLoadRep = path;
+                    }
                     ajaxplorer.triggerRepositoryChange(foundRepo.getId());
+                }else if(path){
+                    ajaxplorer.goTo(path);
                 }
             }
 
@@ -132,24 +139,13 @@ Class.create("Ajaxplorer", {
         var appRoot = ajxpBootstrap.parameters.get('APPLICATION_ROOT');
         if(appRoot && appRoot != "/"){
             Backbone.history.start({
-                pushState: true,
+                pushState: false,
                 root:appRoot
             });
         }else{
             Backbone.history.start({
-                pushState: true
+                pushState: false
             });
-        }
-        if(this.user && this.user.getActiveRepository()){
-            var repoList = this.user.getRepositoriesList();
-            var activeRepo = repoList.get(this.user.getActiveRepository());
-            if(activeRepo){
-                var slug = activeRepo.getSlug();
-                if(!activeRepo.getAccessType().startsWith("ajxp_")){
-                    slug = "ws-" + slug;
-                }
-                this.router.navigate(slug);
-            }
         }
         var navigate = function(repList, repId){
             if(repId === false){
@@ -160,6 +156,9 @@ Class.create("Ajaxplorer", {
                     var slug = repositoryObject.getSlug();
                     if(!repositoryObject.getAccessType().startsWith("ajxp_")){
                         slug = "ws-" + slug;
+                    }
+                    if(this._contextHolder && this._contextHolder.getContextNode()){
+                        slug += this._contextHolder.getContextNode().getPath();
                     }
                     this.router.navigate(slug);
                 }
@@ -174,7 +173,19 @@ Class.create("Ajaxplorer", {
             var repId = event.memo.active;
             navigate(repList, repId);
         });
-
+        document.observe("ajaxplorer:context_changed", function(event){
+            if(!this.user) return;
+            var repoList = this.user.getRepositoriesList();
+            var activeRepo = repoList.get(this.user.getActiveRepository());
+            if(activeRepo){
+                var slug = activeRepo.getSlug();
+                if(!activeRepo.getAccessType().startsWith("ajxp_")){
+                    slug = "ws-" + slug;
+                }
+                var path = this.getContextNode().getPath();
+                this.router.navigate(slug + path);
+            }
+        }.bind(this));
     },
 
 	/**
@@ -278,23 +289,11 @@ Class.create("Ajaxplorer", {
 			this.actionBar.loadActionsFromRegistry(event.memo);
 		}.bind(this) );
 				
-		if(!Prototype.Browser.WebKit && !Prototype.Browser.IE){
-            /*
-			this.history = new Proto.History(function(hash){
-				this.goTo(this.historyHashToPath(hash));
-			}.bind(this));
-			*/
-			document.observe("ajaxplorer:context_changed", function(event){
-				this.updateHistory(this.getContextNode().getPath());
-			}.bind(this));
-		}else{
-			document.observe("ajaxplorer:context_changed", function(event){
-				var path = this.getContextNode().getPath();
-				document.title = this.appTitle + ' - '+(getBaseName(path)?getBaseName(path):'/');
-			}.bind(this));
-		}
 		document.observe("ajaxplorer:context_changed", function(event){
-			if(this.skipLsHistory || !this.user || !this.user.getActiveRepository()) return;			
+            var path = this.getContextNode().getPath();
+            document.title = this.appTitle + ' - '+(getBaseName(path)?getBaseName(path):'/');
+
+			if(this.skipLsHistory || !this.user || !this.user.getActiveRepository()) return;
 			window.setTimeout(function(){
 				var data = this.user.getPreference("ls_history", true) || {};
 				data = new Hash(data);
@@ -745,6 +744,10 @@ Class.create("Ajaxplorer", {
             }
 		}
 
+        var current = this._contextHolder.getContextNode();
+        if(current && current.getPath() == path){
+            return;
+        }
         var gotoNode;
         if(path == "" || path == "/") {
             gotoNode = new AjxpNode("/");
@@ -752,9 +755,8 @@ Class.create("Ajaxplorer", {
             return;
         }
         window.setTimeout(function(){
-
             this._contextHolder.loadPathInfoSync(path, function(foundNode){
-                if(foundNode.isLeaf()) {
+                if(foundNode.isLeaf() && foundNode.getAjxpMime()!='ajxp_browsable_archive') {
                     this._contextHolder.setPendingSelection(getBaseName(path));
                     gotoNode = new AjxpNode(getRepName(path));
                 }else{
@@ -1154,48 +1156,6 @@ Class.create("Ajaxplorer", {
 		};
 		connexion.sendSync();		
 	},
-			
-	/**
-	 * Updates the browser history
-	 * @param path String Path
-	 */
-	updateHistory: function(path){
-		if(this.history) this.history.historyLoad(this.pathToHistoryHash(path));
-	},
-	
-	/**
-	 * Translate the path to a history step. Return the count.
-	 * @param path String
-	 * @returns Integer
-	 */
-	pathToHistoryHash: function(path){
-		document.title = this.appTitle + ' - '+(getBaseName(path)?getBaseName(path):'/');
-		if(!this.pathesHash){
-			this.pathesHash = new Hash();
-			this.histCount = -1;
-		}
-		var foundKey;
-		this.pathesHash.each(function(pair){
-			if(pair.value == path) foundKey = pair.key;
-		});
-		if(foundKey != undefined) return foundKey;
-	
-		this.histCount++;
-		this.pathesHash.set(this.histCount, path);
-		return this.histCount;
-	},
-	
-	/**
-	 * Reverse operation
-	 * @param hash Integer
-	 * @returns String
-	 */
-	historyHashToPath: function(hash){
-		if(!this.pathesHash) return "/";
-		var path = this.pathesHash.get(hash);
-		if(path == undefined) return "/";
-		return path;
-	},	
 
 	/**
 	 * Accessor for updating the datamodel context

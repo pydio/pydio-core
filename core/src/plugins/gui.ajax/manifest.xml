@@ -401,7 +401,7 @@
                     <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
                     <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
                     <div id="breadcrumb" ajxpClass="Breadcrumb" ajxpOptions='{}'></div>
-                    <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                    <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["content_pane-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                     <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["minisite", "inline"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                     <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
                         <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
@@ -762,7 +762,7 @@
             <template name="minisite_bare" element="ajxp_embed_template" position="top" label="share_center.155"><![CDATA[
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
                     <div id="cpane_header" class="panelHeader">
-                        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["minisite", "inline","default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["minisite", "inline","content_pane-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                         <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":30}'></div>
                     </div>
                     <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
@@ -774,7 +774,7 @@
             <template name="minisite_dropbox" element="ajxp_dropbox_template" position="top" label="share_center.163"><![CDATA[
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
                     <div id="cpane_header" class="panelHeader">
-                        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["minisite", "inline","default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["minisite", "inline","content_pane-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                         <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":30}'></div>
                     </div>
                     <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>

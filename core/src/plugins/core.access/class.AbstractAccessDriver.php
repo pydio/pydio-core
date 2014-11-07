@@ -124,6 +124,7 @@ class AbstractAccessDriver extends AJXP_Plugin
         $destRepoObject = ConfService::getRepositoryById($destRepoId);
         $destRepoAccess = $destRepoObject->getAccessType();
         $plugin = AJXP_PluginsService::findPlugin("access", $destRepoAccess);
+        $plugin->repository = $destRepoObject;
         $destWrapperData = $plugin->detectStreamWrapper(true);
         $destStreamURL = $destWrapperData["protocol"]."://$destRepoId";
         // Check rights

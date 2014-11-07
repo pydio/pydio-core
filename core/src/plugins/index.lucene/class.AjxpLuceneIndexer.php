@@ -376,7 +376,7 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
                 $this->logDebug("Indexing Node ".$newUrl);
                 try {
                     $newNode = new AJXP_Node($newUrl);
-                    $this->updateNodeIndex(null, $newNode);
+                    $this->updateNodeIndex(null, $newNode, false, true);
                     AJXP_Controller::applyHook("node.index.add", array($newNode));
                 } catch (Exception $e) {
                     if (ConfService::currentContextIsCommandLine() && $this->verboseIndexation) {
@@ -440,7 +440,7 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
      * @param AJXP_Node $newNode
      * @param Boolean $copy
      */
-    public function updateNodeIndex($oldNode, $newNode = null, $copy = false)
+    public function updateNodeIndex($oldNode, $newNode = null, $copy = false, $recursive = false)
     {
         require_once("Zend/Search/Lucene.php");
         if (isSet($this->currentIndex)) {
@@ -478,7 +478,7 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
             }
             $doc = $this->createIndexedDocument($newNode, $index);
             //$index->addDocument($doc);
-            if ($oldNode == null && is_dir($newNode->getUrl())) {
+            if ( $recursive && $oldNode == null && is_dir($newNode->getUrl())) {
                 $this->recursiveIndexation($newNode->getUrl());
             }
         }

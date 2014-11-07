@@ -20,9 +20,9 @@
 */
 $mess=array(
 "Files MetaStore" => "MetaStore Fichiers",
-"Stores metadata inside local hidden files." => "Stockage des métadonnées dans des fichiers",
-"File location" => "Emplacement",
-"Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder." => "Où stocker le fichier : LOCAL un fichier caché sera créé dans chaque répertoire, GLOBAL un fichier global sera créé dans AJXP_DATA_PATH/plugins/action.share folder.",
+"Stores metadata inside local hidden files." => "Stockage des métadonnées dans des fichiers cachés",
+"File location" => "Emplacement du fichier",
+"Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder." => "Où stocker le fichier : 'LOCAL' => un fichier caché sera créé dans chaque répertoire, 'GLOBAL' => un fichier global sera créé dans le répertoire 'AJXP_DATA_PATH/plugins/action.share'.",
 "Meta File" => "Fichier méta",
-"Hidden file used inside folders to save meta data" => "Nom du fichier caché pour stocker les métadonnées.",
+"Hidden file used inside folders to save meta data" => "Nom du fichier caché, dans les répertoires, de stockage des méta-données.",
 );

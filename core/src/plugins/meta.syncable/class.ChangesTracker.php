@@ -243,7 +243,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource
                 $repoId = $this->computeIdentifier($oldNode->getRepository());
                 // DELETE
                 dibi::query("DELETE FROM [ajxp_index] WHERE [node_path] LIKE %like~ AND [repository_identifier] = %s", $oldNode->getPath(), $repoId);
-            } else if ($oldNode == null) {
+            } else if ($oldNode == null || $copy) {
                 // CREATE
                 $stat = stat($newNode->getUrl());
                 $res = dibi::query("INSERT INTO [ajxp_index]", array(

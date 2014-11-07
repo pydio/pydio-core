@@ -34,6 +34,18 @@ class UserDashboardDriver extends AbstractAccessDriver
         require_once AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareCenter.php";
     }
 
+    public function parseSpecificContributions(&$contribNode){
+        $disableAddressBook = $this->getFilteredOption("DASH_DISABLE_ADDRESS_BOOK") === true;
+        if($contribNode->nodeName == "client_configs" && $disableAddressBook){
+            // remove template_part for orbit_content
+            $xPath=new DOMXPath($contribNode->ownerDocument);
+            $tplNodeList = $xPath->query('component_config[@className="AjxpTabulator::userdashboard_main_tab"]', $contribNode);
+            if(!$tplNodeList->length) return ;
+            $contribNode->removeChild($tplNodeList->item(0));
+        }
+        parent::parseSpecificContributions($contribNode);
+    }
+
     public function switchAction($action, $httpVars, $fileVars)
     {
         if(!isSet($this->actions[$action])) return;
@@ -250,7 +262,7 @@ class UserDashboardDriver extends AbstractAccessDriver
     {
         $conf = ConfService::getConfStorageImpl();
         if(!method_exists($conf, "listUserTeams")) return;
-        AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist">
+        AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="detail" switchGridMode="filelist">
             <column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String"/>
             <column messageId="user_dash.10" attributeName="users" sortType="String"/>
         </columns>');
@@ -260,7 +272,7 @@ class UserDashboardDriver extends AbstractAccessDriver
             AJXP_XMLWriter::renderNode("/teams/".$teamId, $team["LABEL"], true, array(
                     "icon"      => "users-folder.png",
                     "ajxp_mime" => "ajxp_team",
-                    "users"     => "<span class='icon-groups'></span> ".implode(",", array_values($team["USERS"]))
+                    "users"     => "<span class='icon-groups'></span> ".implode(", ", array_values($team["USERS"]))
                 ), true, true);
         }
     }

@@ -71,7 +71,7 @@
                         <dialogOnCancel><![CDATA[]]></dialogOnCancel>
                     </clientCallback>
                     <clientForm id="upgrade_form"><![CDATA[
-                        <div id="upgrade_form" action="perform_upgrade" box_width="70%" box_height="85%">
+                        <div id="upgrade_form" action="perform_upgrade" box_width="70%" box_height="85%" box_resize="true">
                             <div id="upgrade_checking"></div>
                             <div id="upgrade_status" style="display:none;">
                                 <p><div id="start_upgrade_button" style="float: right;border: 1px solid #BBB;padding: 7px;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius: 5px;background-color: #EEE;color: #333;margin-left: 5px;border-image: initial;box-shadow: 1px 1px 7px #ddd;cursor: pointer;font-weight: bold;"> AJXP_MESSAGE[updater.4] </div>AJXP_MESSAGE[updater.3]</p>

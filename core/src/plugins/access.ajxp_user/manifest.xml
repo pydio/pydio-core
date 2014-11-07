@@ -10,6 +10,9 @@
 		</resources>
         <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>
 	</client_settings>
+    <server_settings>
+        <global_param name="DASH_DISABLE_ADDRESS_BOOK" type="boolean" default="false" label="Disable Address Book" description="Do not display address book in user account panel."/>
+    </server_settings>
 	<registry_contributions>
 		<client_configs>
             <template_part theme="umbra" ajxpId="sidebar_splitter" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fake":"option"}'><![CDATA[
@@ -96,33 +99,30 @@
             <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOptionUser":"true", "messageBoxReference":true}' theme="orbit"><![CDATA[
                 <style>
                 div.flat_tabulator span.toggleHeader{
-                    background-color: #e35d52;
+                    background-color: #fb725c;
                 }
                 .largeButton, .SF_input.SF_inlineButton{
-                    background-color: #e35d52;
+                    background-color: #fb725c;
                 }
                 .action_bar{
-                    background-color: #cccccc;
-                    padding: 4px;
-                    border-left:1px solid #5C5C5C;
-                }
-                #user_profile_form, div.class-FetchedResultPane{
-                    border-left:1px solid #5C5C5C;
+                    background-color: #EAEAEA;
+                    padding: 14px;
+                    min-height: 33px;
                 }
                 #account_pane .action_bar{
                     text-align: right;
                 }
                 .action_bar a{
-                    background-color: #e35d52;
+                    background-color: #ffffff;
                     margin-top:3px;
                     cursor: pointer;
-                    color: white;
+                    color: #555;
                 }
                 div.class-FetchedResultPane{
                     background-color: #f8f8f8;
                 }
                 #buttons_bar{
-                    padding-bottom: 2px;
+                    padding:14px;
                     text-align: right;
                 }
                 #buttons_bar a {
@@ -136,34 +136,36 @@
                     background-color: #30383A;
                     padding-top: 10px;
                 }
-                .flat_tabulator span.toggleHeader:first-of-type {
-                    background-color: #e35d52 !important;
-                }
-                .flat_tabulator span.toggleHeader.toggleInactive {
-                    background-color: rgba(119, 119, 119, 0.35) !important;
-                }
                 #global_toolbar{
                     display: block;
-                    background-color: rgba(43, 44, 44, 0.89);
+                    background-color: #345E79;
                 }
                 </style>
                 <div id="userdashboard_myparams_title" ajxp_message_id="user_dash.title">
-                    <a style="font-size: 0.5em;display: block;color: white;padding-bottom: 6px;cursor:pointer;"  onclick="ajaxplorer.triggerRepositoryChange('ajxp_home'); return false;"><span class="icon-chevron-left"></span> AJXP_MESSAGE[user_dash.53]</a>
-                    AJXP_MESSAGE[user_dash.title]
+                    <a id="dash_back_workspace" onclick="ajaxplorer.triggerRepositoryChange('ajxp_home'); return false;"><span class="icon-chevron-left"></span> AJXP_MESSAGE[user_dash.53]</a>
+                    <span id="dash_title">AJXP_MESSAGE[user_dash.title]</span>
                 </div>
-                <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="dashboard_main_pane horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "tabsTips":"middle right", "defaultTabId": "parameters","tabInfos" : [{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"account_pane"},{"id":"info","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"my-users-pane"}]}'>
-                    <div id="my-users-pane" ajxpClass="AjxpPane" class="tabbed_editor">
-                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                        <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
-                    </div>
+                <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="dashboard_main_pane horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "registerAsEditorOpener":false, "saveState":false,"events":{}, "tabsTips":"middle right", "defaultTabId": "parameters","tabInfos" : [{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"account_pane"}]}'>
                     <div id="account_pane" ajxpClass="UserProfileEditor" class="tabbed_editor" ajxpOptions='{"fit":"height"}'>
                         <div class="action_bar">
                             <div class="toolbarGroup"></div>
                         </div>
+                        <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.43]</h3>
                         <div id="user_profile_form"></div>
                     </div>
                 </div>
 			]]></template_part>
+            <component_config className="AjxpTabulator::userdashboard_main_tab">
+                <additional_tab id="my-users-pane"
+                                tabInfo='{"id":"info","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"my-users-pane", "position":2,"dontFocus":true}'
+                                paneInfo='{"type":"widget"}'><![CDATA[
+                    <div id="my-users-pane" ajxpClass="AjxpPane" class="tabbed_editor">
+                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                        <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.46]</h3>
+                        <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":true,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
+                    </div>
+                ]]></additional_tab>
+            </component_config>
         </client_configs>
 		<actions>
 			<action name="ls" dirDefault="true">

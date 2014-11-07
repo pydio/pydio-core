@@ -95,4 +95,5 @@ $EXTENSIONS = array(
     array("svg","image.png", "SVG"),
     array("psd","image.png", "Photoshop"),
     array("ers","horo.png", "Timestamp"),
+    array("dwg","dwg.png", "DWG"),
 );

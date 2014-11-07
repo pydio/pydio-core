@@ -21,11 +21,11 @@
 $mess=array(
 "Allowed Extensions" => "Extensions autorisées",
 "Extensions List" => "Liste d'extensions",
-"Ext. Label" => "Libellé pour la liste",
+"Ext. Label" => "Libellé de la liste",
 "Limitations" => "Limitations",
 "Files Number" => "Nombre de fichiers",
-"File Size" => "Taille par fichier",
+"File Size" => "Taille de fichier",
 "Cumul. Size" => "Taille cumulée",
-"Uploaders Options" => "Uploaders Options",
-"Options shared by all uploaders plugins" => "Options shared by all uploaders plugins",
+"Uploaders Options" => "Options des outils d'envoi",
+"Options shared by all uploaders plugins" => "Options partagées par tous les plugins d'outils d'envoi",
 );

@@ -47,9 +47,9 @@ $mess=array(
 "Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features. User Choice will allow the user to manually choose its authentification method at startup." => "Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features. User Choice will allow the user to manually choose its authentification method at startup.",
 "Separator" => "Separator",
 "This is necessary to discriminate users data loaded from various sources. Warning, use foldername compliant characters. For example :: does not work!" => "This is necessary to discriminate users data loaded from various sources. Warning, use foldername compliant characters. For example :: does not work!",
-"Master Authentifiaction Label" => "Master Authentifiaction Label",
+"Master Authentifiaction Label" => "Master Authentification Label",
 "Will be shown to the user at login" => "Will be shown to the user at login",
-"Slave Authentifiaction Label" => "Slave Authentifiaction Label",
+"Slave Authentifiaction Label" => "Slave Authentification Label",
 "Users Listing" => "Users Listing",
 "In Master_Slave mode, use this option to limit the users listing in the administration to one driver only (leave empty if you want to see all users)" => "In Master_Slave mode, use this option to limit the users listing in the administration to one driver only (leave empty if you want to see all users)",
 );

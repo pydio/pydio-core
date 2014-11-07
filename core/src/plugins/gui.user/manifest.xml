@@ -23,10 +23,14 @@
                     <context dir="true" recycle="true" selection="false"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="false" dialogOpenForm="reset-password-ask" dialogOkButtonOnly="true">
+                    <clientCallback prepareModal="false" dialogOpenForm="reset-password-ask" dialogOkButtonOnly="false">
                         <dialogOnOpen><![CDATA[
                             $(oForm).up('.dialogContent').previous('.dialogTitle').select('span').invoke('remove');
+                            $(oForm).down('.dialogButtons').insert({bottom:$(oForm).down('.dialogButtons').down('input')});
                         ]]></dialogOnOpen>
+                        <dialogOnCancel><![CDATA[
+                                ajaxplorer.actionBar.fireAction('login');
+                        ]]></dialogOnCancel>
                         <dialogOnComplete><![CDATA[
                             if(!oForm.BUTTON_CLICKED){
                                 var conn = new Connexion();
@@ -56,13 +60,16 @@
                     <context dir="true" recycle="true" selection="false"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="false" dialogOpenForm="reset-password" dialogOkButtonOnly="true">
+                    <clientCallback prepareModal="false" dialogOpenForm="reset-password" dialogOkButtonOnly="false">
                         <dialogOnOpen><![CDATA[
                             new Protopass($('user_change_ownpass1'), {
                                 barContainer:$('pwd_strength_container'),
                                 barPosition:'bottom'
                             });
                         ]]></dialogOnOpen>
+                        <dialogOnCancel><![CDATA[
+                                ajaxplorer.actionBar.fireAction('login');
+                        ]]></dialogOnCancel>
                         <dialogOnComplete><![CDATA[
 						var userPass = null;
 						var passSeed = null;

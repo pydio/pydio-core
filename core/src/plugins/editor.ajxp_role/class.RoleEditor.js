@@ -166,7 +166,7 @@ Class.create("RoleEditor", AbstractEditor, {
                 if(this.roleData.USER)response.USER = this.roleData.USER;
                 if(this.roleData.GROUP)response.GROUP = this.roleData.GROUP;
                 this.initJSONResponse(response);
-                ajaxplorer.fireNodeRefresh(this.node);
+                ajaxplorer.fireContextRefresh();
                 this.setClean();
             }else{
                 ajaxplorer.displayMessage("ERROR", response.ERROR);
@@ -319,7 +319,7 @@ Class.create("RoleEditor", AbstractEditor, {
             buttonPane.insert(b0);
             var userId = this.roleId.replace("AJXP_USR_/", "");
             b0.observe("click", function(){
-                var pane = new Element("div", {style:"width:300px;"});
+                var pane = new Element("div", {style:"width:400px;"});
                 pane.insert(new Element("div", {className:"dialogLegend"}).update(MessageHash["ajxp_role_editor.29"]));
                 var passEl1 = new Element("div", {className:"SF_element"});
                 passEl1.insert(new Element("div",{className:"SF_label"}).update(MessageHash[182]+": "));

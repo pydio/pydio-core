@@ -373,8 +373,9 @@ SortableTable = Class.create({
 
 		for (var i = 0; i < l; i++){
             if(groupColIndex){
-                var fieldValue = this.getRowValue(a[i].element, groupType, groupColIndex).trim();
+                var fieldValue = this.getRowValue(a[i].element, groupType, groupColIndex);
                 if(!fieldValue) fieldValue = "N/A";
+                fieldValue = fieldValue.trim();
                 var block;
                 if(blockType == 'tr'){
                     block = tBody.down( 'tr[data-groupbyvalue="'+fieldValue+'"]');

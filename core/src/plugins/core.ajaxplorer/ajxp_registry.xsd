@@ -538,7 +538,8 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="dialogOnCancel">
-        <xs:complexType/>
+        <xs:complexType mixed="true">
+        </xs:complexType>
     </xs:element>
     <xs:element name="dialogOnComplete">
         <xs:complexType mixed="true">

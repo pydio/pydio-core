@@ -221,6 +221,9 @@ Class.create("Modal", {
 	 * @param boxWidth String Width in pixel or in percent
 	 * @param boxHeight String Height in pixel or in percent
 	 * @param skipShadow Boolean Do not add a shadow
+     * @param boxAutoResize Boolean whether box should be resized on window resize event
+     * @param overlayStyle String additional CSS string to be applied to overlay element
+     * @param formId String If this id is not null, dialog will have the class form-formId
 	 */
 	showContent: function(elementName, boxWidth, boxHeight, skipShadow, boxAutoResize, overlayStyle, formId){
 		ajaxplorer.disableShortcuts();
@@ -268,8 +271,9 @@ Class.create("Modal", {
 				}
 				if(this.currentListensToHeight){
 					var winHeight = document.viewport.getHeight();
-					boxH = parseInt((winHeight * this.currentListensToHeight) / 100);
+					var boxH = parseInt((winHeight * this.currentListensToHeight) / 100);
 					$(elementName).setStyle({height:boxH+'px'});
+                    fitHeightToBottom($(elementName).down('.dialogContent'));
 				}
 				this.notify("modal:resize");
 			}.bind(this);
@@ -295,10 +299,13 @@ Class.create("Modal", {
 			refreshPNGImages(this.dialogContent);			
 		}
 
+        if(this.currentResizeListener) this.currentResizeListener();
+
 	},
 	/**
 	 * Find an editor using the editorData and initialize it
 	 * @param editorData Object
+     * @param editorArgument Object
 	 */
 	openEditorDialog : function(editorData, editorArgument){
 		if(!editorData.formId){
@@ -477,7 +484,7 @@ Class.create("Modal", {
                 attachMobileScroll(dContent, "vertical");
             }
             boxHeight = element.getHeight();
-        }else if(dContentScrollHeight >= dContent.getHeight()){
+        }else if(dContentScrollHeight >= dContent.getHeight() && !this.currentListensToHeight){
             dContent.setStyle({height: 'auto'});
             boxHeight = element.getHeight();
         }

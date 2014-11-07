@@ -167,24 +167,36 @@ Class.create("Diaporama", AbstractEditor, {
 			var text = getBaseName(this.currentFile);// + ' ('+this.sizes.get(this.currentFile).width+' X '+this.sizes.get(this.currentFile).height+')';
 			this.updateTitle(text);
 		}.bind(this);
-		Event.observe(this.zoomInput, "keypress", function(e){
-			if(e == null) e = window.event;
-			if(e.keyCode == Event.KEY_RETURN || e.keyCode == Event.KEY_UP || e.keyCode == Event.KEY_DOWN){
-				if(e.keyCode == Event.KEY_UP || e.keyCode == Event.KEY_DOWN)
-				{
-					var crtValue = parseInt(this.zoomInput.value);
-					var value = (e.keyCode == Event.KEY_UP?(e.shiftKey?crtValue+10:crtValue+1):(e.shiftKey?crtValue-10:crtValue-1));
-					this.zoomInput.value = value + ' %';
-				}
-				var newValue = parseInt(this.zoomInput.value);
-				newValue = Math.max(this._minZoom, newValue);
-				newValue = Math.min(this._maxZoom, newValue);
-				this.setZoomValue(newValue);
-				this.resizeImage(false);
-				Event.stop(e);
-			}
-			return true;
-		}.bind(this));
+        this.zInputObserver = function(e){
+            if(e == null) e = window.event;
+            if(e.keyCode == Event.KEY_RETURN || e.keyCode == Event.KEY_UP || e.keyCode == Event.KEY_DOWN){
+                if(e.keyCode == Event.KEY_UP || e.keyCode == Event.KEY_DOWN)
+                {
+                    var crtValue = parseInt(this.zoomInput.value);
+                    var value = (e.keyCode == Event.KEY_UP?(e.shiftKey?crtValue+10:crtValue+1):(e.shiftKey?crtValue-10:crtValue-1));
+                    this.zoomInput.value = value + ' %';
+                }
+                var newValue = parseInt(this.zoomInput.value);
+                newValue = Math.max(this._minZoom, newValue);
+                newValue = Math.min(this._maxZoom, newValue);
+                this.setZoomValue(newValue);
+                this.resizeImage(false);
+                Event.stop(e);
+            }
+            return true;
+        }.bind(this);
+		Event.observe(this.zoomInput, "keypress", this.zInputObserver);
+        this.arrowsObserver = function(e){
+            if(!this.element.visible()) return;
+            if(e.keyCode == Event.KEY_RIGHT) {
+                this.next();
+                this.updateButtons();
+            } else if(e.keyCode == Event.KEY_LEFT) {
+                this.previous();
+                this.updateButtons();
+            }
+        }.bind(this);
+        Event.observe(document, "keydown", this.arrowsObserver);
 		this.timeInput.observe('change', function(e){			
 			if(this.slideShowPlaying && this.pe){
 				this.stop();
@@ -205,6 +217,7 @@ Class.create("Diaporama", AbstractEditor, {
 		Event.observe(document, "keydown", this.zoomObs);
 		this.element.observe("editor:close", function(){
 			Event.stopObserving(document, "keydown", this.zoomObs);
+			Event.stopObserving(document, "keydown", this.arrowsObserver);
 		}.bind(this));
 
         this.autoFit = true;

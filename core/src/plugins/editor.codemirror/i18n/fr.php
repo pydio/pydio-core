@@ -19,15 +19,15 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"1" => "Source Editor",
-"2" => "CodeMirror Syntax Highlighter",
-"3" => "Wrapping",
-"3b" => "Toggle lines wrapping",
-"4" => "Numbers",
-"5" => "Toggle lines numbers",
-"6" => "Jump to line",
-"7" => "Undo",
-"8" => "Redo",
-"9" => "Text Search",
-"10" => "Indent size",
+"1" => "Editeur de source",
+"2" => "Coloration syntaxique CodeMirror",
+"3" => "Retour ligne",
+"3b" => "Retour à la ligne automatique",
+"4" => "Numéro ligne",
+"5" => "Numéros de ligne",
+"6" => "Afficher les numéros de ligne",
+"7" => "Annuler",
+"8" => "Répéter",
+"9" => "Recherche de texte",
+"10" => "Taille d'indentation",
 );
