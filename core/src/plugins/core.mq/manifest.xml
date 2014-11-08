@@ -3,7 +3,7 @@
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
-            <js className="AjxpMqObserver" file="plugins/core.mq/class.AjxpMqObserver.js" autoload="true"/>
+            <js className="AjxpMqObserver" file="plugins/core.mq/class.AjxpMqObserver.js"/>
         </resources>
     </client_settings>
     <server_settings>
@@ -31,7 +31,16 @@
                 </processing>
             </action>
             <action name="client_register_channel">
+                <rightsContext adminOnly="false" noUser="true" read="false" userLogged="true" write="false"/>
                 <processing>
+                    <clientListener name="contextChange"><![CDATA[
+                        if(!ajaxplorer.mqObserver && ajaxplorer.user && !ajaxplorer.mqObserverLoading){
+                            ajaxplorer.mqObserverLoading = true;
+                            ResourcesManager.prototype.loadJSResource('plugins/core.mq/class.AjxpMqObserver.js', 'AjxpMqObserver', function(){
+                                ajaxplorer.mqObserver = new AjxpMqObserver();
+                            }, true);
+                        }
+                    ]]></clientListener>
                     <serverCallback methodName="clientChannelMethod"/>
                 </processing>
             </action>

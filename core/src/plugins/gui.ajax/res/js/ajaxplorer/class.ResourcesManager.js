@@ -113,8 +113,10 @@ Class.create("ResourcesManager", {
 	 * Load a javascript file
 	 * @param fileName String
 	 * @param className String
+     * @param callback Function
+     * @param aSync Boolean
 	 */
-	loadJSResource : function(fileName, className){
+	loadJSResource : function(fileName, className, callback, aSync){
 		try{
 			eval('window.testTemporaryObject = '+className);
 			delete(window.testTemporaryObject);
@@ -125,7 +127,7 @@ Class.create("ResourcesManager", {
 				if(ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')){
 					conn._libUrl = ajxpBootstrap.parameters.get('SERVER_PREFIX_URI');
 				}
-				conn.loadLibrary(fileName, null, false);
+				conn.loadLibrary(fileName, callback, aSync);
 			}
 		}
 	},
