@@ -205,6 +205,10 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
             } else {
                 AJXP_XMLWriter::header();
             }
+            $index = 0;
+            if(isSet($httpVars['limit'])){
+                $limit = intval($httpVars['limit']);
+            }
             foreach ($hits as $hit) {
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
@@ -230,6 +234,8 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
                 } else {
                     AJXP_XMLWriter::renderAjxpNode($tmpNode);
                 }
+                $index++;
+                if(isSet($limit) && $index > $limit) break;
             }
             if(!isSet($returnNodes)) AJXP_XMLWriter::close();
             if ($commitIndex) {

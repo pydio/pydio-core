@@ -360,9 +360,14 @@ Class.create("SearchEngine", AjxpPane, {
                 Event.stop(e);
                 this.search();
             }
-			if(e.keyCode == Event.KEY_TAB) return false;
-			return true;		
+			return e.keyCode != Event.KEY_TAB;
 		}.bind(this));
+        this._inputBox.observe("input", function(e){
+            if(this._inputBox.getValue().length > 2){
+                bufferCallback('searchByTyping', 300, this.searchWhenTyping.bind(this));
+                bufferCallback('fullSearch', 2000, this.searchCompleteTypedResults.bind(this));
+            }
+        }.bind(this));
 
         var opener = function(e){
             ajaxplorer.disableShortcuts();
@@ -610,10 +615,30 @@ Class.create("SearchEngine", AjxpPane, {
         }
 		this.hasFocus = false;
 	},
+
+    searchWhenTyping:function(){
+        if(this._searchMode == 'remote'){
+            this.search(9);
+        }
+    },
+    searchCompleteTypedResults:function(){
+        if(this._searchMode == 'remote'){
+            var text = this._inputBox.value.toLowerCase();
+            if(text == this.crtText){
+                if(this._rootNode.getChildren().length >= 9) {
+                    // Get more
+                    this.search(50, true);
+                }
+            }else{
+                this.search(50, false);
+            }
+        }
+    },
+
 	/**
 	 * Perform search
 	 */
-	search : function(){
+	search : function(limit, skipClear){
 		var text = this._inputBox.value.toLowerCase();
         var searchQuery;
         var metadata = this.parseMetadataForm();
@@ -628,12 +653,14 @@ Class.create("SearchEngine", AjxpPane, {
         }
 		if(searchQuery == '') return;
 		this.crtText = searchQuery;
-		this.updateStateSearching();
-		this.clearResults();
+        if(!skipClear){
+		    this.updateStateSearching();
+    		this.clearResults();
+        }
 		var folder = ajaxplorer.getContextNode().getPath();
 		if(folder == "/") folder = "";
 		window.setTimeout(function(){
-			this.searchFolderContent(folder, ajaxplorer.getContextNode().getMetadata().get("remote_indexation"));
+			this.searchFolderContent(folder, ajaxplorer.getContextNode().getMetadata().get("remote_indexation"), limit);
 		}.bind(this), 0);		
 	},
 	/**
@@ -841,8 +868,10 @@ Class.create("SearchEngine", AjxpPane, {
 	 * Get a folder content and searches its children 
 	 * Should reference the IAjxpNodeProvider instead!! Still a "ls" here!
 	 * @param currentFolder String
+     * @param remote_indexation Boolean
+     * @param limit integer
 	 */
-	searchFolderContent : function(currentFolder, remote_indexation){
+	searchFolderContent : function(currentFolder, remote_indexation, limit){
 		if(this._state == 'interrupt') {
 			this.updateStateFinished();
 			return;
@@ -850,8 +879,12 @@ Class.create("SearchEngine", AjxpPane, {
         if(this._searchMode == "remote"){
             /* REMOTE INDEXER CASE */
             var connexion = new Connexion();
+            connexion.discrete = true;
             connexion.addParameter('get_action', 'search');
             connexion.addParameter('query', this.crtText);
+            if(limit){
+                connexion.addParameter('limit', limit);
+            }
             if(this.hasMetaSearch()){
                 connexion.addParameter('fields', this.getSearchColumns().join(','));
             }
@@ -939,7 +972,7 @@ Class.create("SearchEngine", AjxpPane, {
         }
 		for (var i = 0; i < nodes.length; i++) 
 		{
-			if (nodes[i].tagName == "tree") 
+			if (nodes[i].tagName == "tree")
 			{
 				var ajxpNode = this.parseAjxpNode(nodes[i]);
                 if(this.hasMetaSearch()){
@@ -1011,9 +1044,9 @@ Class.create("SearchEngine", AjxpPane, {
 		var metadata = new Hash();
 		for(var i=0;i<xmlNode.attributes.length;i++)
 		{
-			metadata.set(xmlNode.attributes[i].nodeName, xmlNode.attributes[i].nodeValue);
+			metadata.set(xmlNode.attributes[i].nodeName, xmlNode.attributes[i].value);
 			if(Prototype.Browser.IE && xmlNode.attributes[i].nodeName == "ID"){
-				metadata.set("ajxp_sql_"+xmlNode.attributes[i].nodeName, xmlNode.attributes[i].nodeValue);
+				metadata.set("ajxp_sql_"+xmlNode.attributes[i].nodeName, xmlNode.attributes[i].value);
 			}
 		}
 		node.setMetadata(metadata);
