@@ -738,16 +738,13 @@ Class.create("Modal", {
 	updateLoadingProgress: function(state){
 		this.loadingStep --;
 		var percent = (1 - (this.loadingStep / this.loadingStepsCount));
-		if(window.loaderProgress){
-			window.loaderProgress.setPercentage(parseFloat(percent)*100, true);
-		}
+        document.fire("ajaxplorer:loader_state_update", {percent:parseFloat(percent)});
 		if(state && $('progressState')){
 			$('progressState').update(state);
 		}
 		if(this.loadingStep == 0){
 			this.pageLoading = false;
 		}
-		return;
 	},
 	/**
 	 * Callback to be called on close

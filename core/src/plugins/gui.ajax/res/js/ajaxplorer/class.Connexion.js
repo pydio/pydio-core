@@ -213,8 +213,9 @@ Class.create("Connexion", {
 	 * Load a javascript library
 	 * @param fileName String
 	 * @param onLoadedCode Function Callback
+     * @param aSync Boolean load library asynchroneously
 	 */
-	loadLibrary : function(fileName, onLoadedCode){
+	loadLibrary : function(fileName, onLoadedCode, aSync){
         if(window.ajxpBootstrap && window.ajxpBootstrap.parameters.get("ajxpVersion") && fileName.indexOf("?")==-1){
             fileName += "?v="+window.ajxpBootstrap.parameters.get("ajxpVersion");
         }
@@ -222,7 +223,7 @@ Class.create("Connexion", {
 		new Ajax.Request(path,
 		{
 			method:'get',
-			asynchronous: false,
+			asynchronous: (aSync?true:false),
 			onComplete:function(transport){
 				if(transport.responseText) 
 				{

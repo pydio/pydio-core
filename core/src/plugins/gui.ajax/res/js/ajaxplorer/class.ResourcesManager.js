@@ -125,7 +125,7 @@ Class.create("ResourcesManager", {
 				if(ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')){
 					conn._libUrl = ajxpBootstrap.parameters.get('SERVER_PREFIX_URI');
 				}
-				conn.loadLibrary(fileName);
+				conn.loadLibrary(fileName, null, false);
 			}
 		}
 	},
@@ -197,17 +197,17 @@ Class.create("ResourcesManager", {
 	 * @param registry DOMDocument XML Registry
 	 */
 	loadAutoLoadResources : function(registry){
-		var jsNodes = XPathSelectNodes(registry, '//client_settings/resources/js[@autoload="true"]');
+		var jsNodes = XPathSelectNodes(registry, 'plugins/*/client_settings/resources/js[@autoload="true"]');
 		if(jsNodes.length){
 			jsNodes.each(function(node){
 				this.loadJSResource(node.getAttribute('file'), node.getAttribute('className'));
 			}.bind(this));
 		}
-		var imgNodes = XPathSelectNodes(registry, '//client_settings/resources/img_library');
+		var imgNodes = XPathSelectNodes(registry, 'plugins/*/client_settings/resources/img_library');
 		imgNodes.each(function(node){
 			addImageLibrary(node.getAttribute('alias'), node.getAttribute('path'));
 		}.bind(this));		
-		var cssNodes = XPathSelectNodes(registry, '//client_settings/resources/css[@autoload="true"]');
+		var cssNodes = XPathSelectNodes(registry, 'plugins/*/client_settings/resources/css[@autoload="true"]');
 		cssNodes.each(function(node){
 			this.loadCSSResource(node.getAttribute("file"));
 		}.bind(this));

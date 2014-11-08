@@ -175,12 +175,9 @@ Class.create("AjxpBootstrap", {
 			window.ajxpResourcesFolder = this.parameters.get('ajxpResourcesFolder') + "/themes/" + this.parameters.get("theme");
 		}
 		if(this.parameters.get('additional_js_resource')){
-			connexion.loadLibrary(this.parameters.get('additional_js_resource?v='+this.parameters.get("ajxpVersion")));
+			connexion.loadLibrary(this.parameters.get('additional_js_resource?v='+this.parameters.get("ajxpVersion")), null, true);
 		}
 		this.insertLoaderProgress();
-		if(!this.parameters.get("debugMode")){
-			connexion.loadLibrary("ajaxplorer.js?v="+this.parameters.get("ajxpVersion"));
-		}
 		window.MessageHash = this.parameters.get("i18nMessages");
         if(!Object.keys(MessageHash).length){
             alert('Ooups, this should not happen, your message file is empty!');
@@ -190,14 +187,22 @@ Class.create("AjxpBootstrap", {
 		}
 		window.zipEnabled = this.parameters.get("zipEnabled");
 		window.multipleFilesDownloadEnabled = this.parameters.get("multipleFilesDownloadEnabled");
-		document.fire("ajaxplorer:boot_loaded");
-		window.ajaxplorer = new Ajaxplorer(this.parameters.get("EXT_REP")||"", this.parameters.get("usersEnabled"), this.parameters.get("loggedUser"));
-		if(this.parameters.get("currentLanguage")){
-			window.ajaxplorer.currentLanguage = this.parameters.get("currentLanguage");
-		}
-		$('version_span').update(' - Version '+this.parameters.get("ajxpVersion") + ' - '+ this.parameters.get("ajxpVersionDate"));
-		window.ajaxplorer.init();		
-	},
+        var masterClassLoaded = function(){
+            document.fire("ajaxplorer:boot_loaded");
+            window.ajaxplorer = new Ajaxplorer(this.parameters.get("EXT_REP")||"", this.parameters.get("usersEnabled"), this.parameters.get("loggedUser"));
+            if(this.parameters.get("currentLanguage")){
+                window.ajaxplorer.currentLanguage = this.parameters.get("currentLanguage");
+            }
+            $('version_span').update(' - Version '+this.parameters.get("ajxpVersion") + ' - '+ this.parameters.get("ajxpVersionDate"));
+            window.ajaxplorer.init();
+        }.bind(this);
+        if(!this.parameters.get("debugMode")){
+            connexion.loadLibrary("ajaxplorer.js?v="+this.parameters.get("ajxpVersion"), masterClassLoaded, true);
+        }else{
+            masterClassLoaded();
+        }
+
+    },
 	
 	/**
 	 * Detect the base path of the javascripts based on the script tags
@@ -297,29 +302,45 @@ Class.create("AjxpBootstrap", {
             left:parseInt(Math.max((viewPort.width-progressBox.getWidth())/2,0))+"px",
             top:parseInt(Math.max((viewPort.height-progressBox.getHeight())/3,0))+"px"
         });
-		var options = {
-			animate		: true,										// Animate the progress? - default: true
-			showText	: false,									// show text with percentage in next to the progressbar? - default : true
-			width		: 154,										// Width of the progressbar - don't forget to adjust your image too!!!
-			boxImage	: window.ajxpResourcesFolder+'/images/progress_box.gif',			// boxImage : image around the progress bar
-			barImage	: window.ajxpResourcesFolder+'/images/progress_bar.gif',	// Image to use in the progressbar. Can be an array of images too.
-			height		: 11,										// Height of the progressbar - don't forget to adjust your image too!!!
-			onTick		: function(pbObj) {
-				if(pbObj.getPercentage() >= 80){
-                    new Effect.Parallel([
-                            new Effect.Opacity($('loader_round_progress'),{sync:true,from:1,to:0,duration:0.6}),
-                            new Effect.Opacity($('loader_dialog_footer'),{sync:true,from:1,to:0,duration:0.6})
-                        ],
-                        {afterFinish : function(){
-                            $('loading_overlay').remove();
-                            $('progressBox').hide();
-                        }});
-					return false;
-				}
-				return true ;
-			}
-		};
-		window.loaderProgress = new JS_BRAMUS.jsProgressBar($('loaderProgress'), 0, options); 
+        var loaderEndCallback = function(){
+            document.stopObserving('ajaxplorer:loader_state_update');
+            new Effect.Parallel([
+                new Effect.Opacity($('loading_overlay'),{sync:true, from:1.0, to:0.0, duration:0.5}),
+                new Effect.Opacity($('loader_round_progress'),{sync:true,from:1,to:0,duration:0.5}),
+                new Effect.Opacity($('loader_dialog_footer'),{sync:true,from:1,to:0,duration:0.5})
+            ],
+                {afterFinish : function(){
+                    if($('loading_overlay')) $('loading_overlay').remove();
+                    if($('progressBox')) $('progressBox').hide();
+                }});
+        };
+        if(!window.ajxpThemeSkipLoaderProgress){
+            var options = {
+                animate		: false,										// Animate the progress? - default: true
+                showText	: false,									// show text with percentage in next to the progressbar? - default : true
+                width		: 154,										// Width of the progressbar - don't forget to adjust your image too!!!
+                boxImage	: window.ajxpResourcesFolder+'/images/progress_box.gif',			// boxImage : image around the progress bar
+                barImage	: window.ajxpResourcesFolder+'/images/progress_bar.gif',	// Image to use in the progressbar. Can be an array of images too.
+                height		: 11,										// Height of the progressbar - don't forget to adjust your image too!!!
+                onTick		: function(pbObj) {
+                    if(pbObj.getPercentage() >= 80){
+                        loaderEndCallback();
+                        return false;
+                    }
+                    return true ;
+                }
+            };
+            this.loaderProgress = new JS_BRAMUS.jsProgressBar($('loaderProgress'), 0, options);
+        }
+        document.observe('ajaxplorer:loader_state_update', function(e){
+            var p = e.memo.percent;
+            if(this.loaderProgress){
+                this.loaderProgress.setPercentage(p*100);
+            }else if(p >= 0.8){
+                loaderEndCallback();
+            }
+        }.bind(this));
+
 	},
 	/**
 	 * Inserts Google Analytics Code
