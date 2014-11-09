@@ -175,6 +175,11 @@ Class.create("AjxpNode", {
 	replaceBy : function(ajxpNode, metaMerge){
 		this._isLeaf = ajxpNode._isLeaf;
         if(ajxpNode.getPath() && this._path != ajxpNode.getPath()){
+            var originalPath = this._path;
+            // Update parent path key!
+            var parentChildrenIndex = this.getParent()._children;
+            parentChildrenIndex.set(ajxpNode.getPath(), this);
+            parentChildrenIndex.unset(originalPath, ajxpNode);
             this._path = ajxpNode.getPath();
             var pathChanged = true;
         }
