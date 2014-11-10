@@ -216,7 +216,7 @@
   {
 
     // ----- Tests the zlib
-    if (!function_exists('gzopen'))
+    if (!function_exists('gzopen') && !function_exists('gzopen64'))
     {
       die('Abort '.basename(__FILE__).' : Missing zlib extensions');
     }
@@ -2811,7 +2811,12 @@
 
     // ----- Creates a compressed temporary file
     $v_gzip_temp_name = PCLZIP_TEMPORARY_DIR.uniqid('pclzip-').'.gz';
-    if (($v_file_compressed = @gzopen($v_gzip_temp_name, "wb")) == 0) {
+      if(function_exists('gzopen64')){
+          $v_file_compressed = @gzopen64($v_gzip_temp_name, "wb");
+      }else{
+          $v_file_compressed = @gzopen($v_gzip_temp_name, "wb");
+      }
+    if ($v_file_compressed == 0) {
       fclose($v_file);
       PclZip::privErrorLog(PCLZIP_ERR_WRITE_OPEN_FAIL, 'Unable to open temporary file \''.$v_gzip_temp_name.'\' in binary write mode');
       return PclZip::errorCode();
@@ -4005,7 +4010,12 @@
     }
 
     // ----- Open the temporary gz file
-    if (($v_src_file = @gzopen($v_gzip_temp_name, 'rb')) == 0) {
+      if(function_exists('gzopen64')){
+          $v_src_file = @gzopen64($v_gzip_temp_name, 'rb');
+      }else{
+          $v_src_file = @gzopen($v_gzip_temp_name, 'rb');
+      }
+    if ($v_src_file == 0) {
       @fclose($v_dest_file);
       $p_entry['status'] = "read_error";
       PclZip::privErrorLog(PCLZIP_ERR_READ_OPEN_FAIL, 'Unable to open temporary file \''.$v_gzip_temp_name.'\' in binary read mode');
