@@ -171,6 +171,15 @@ $mess = array(
 "160" => "You are not allowed to delete this shared item",
 "161" => "Deprecated Link",
 "162" => "You have one or more legacy link on this file. Please replace this with a new share link by stopping this share and recreating a new one. Copy the share 'hash' (the last part of the link, e.g. http://yourpydio.com/data/public/<em style='color:red;'>206a51</em>.php) and use it in the new sharing dialog to make sure the link will still be active after migration.",
-"163" => "Drop Files Here (for upload-enabled minisites)"
+"163" => "Drop Files Here (for upload-enabled minisites)",
+    "138b" => "You have shared this folder as a public link, but it is currently inactive (expired).",
+    "139b" => "You have shared this folder as a workspace with application users, but it is currently inactive (expired).",
+    "140b" => "You have shared this file via a public link, but it is currently inactive (expired).",
+    "164" => "Not allowed: script was modified!",
+    "165" => "Sorry, this link is expired!",
+    "166" => "Cannot find specified link!",
+    "167" => "Link is expired!",
+    "168" => "The number of authorized downloads have been reached. Click to reset the counter and reactivate the link.",
+    "169" => "The expiration date was reached. Change the parameters with a new date if you want to reactivate the link.",
 
 );

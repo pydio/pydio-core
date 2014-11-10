@@ -107,6 +107,7 @@
                                     <input type="text" id="share_container" style="clear:left; width: 95%; margin:15px 5px 0; font-size:13px;"/>
                                     <div class="non_macos">AJXP_MESSAGE[share_center.143]</div>
 					                <div class="macos_only" style="display:none;">AJXP_MESSAGE[share_center.144]</div>
+					                <div class="link_expired_div"><span class="icon-sign-warning"></span> AJXP_MESSAGE[share_center.167]</div>
                                     <div class="share_qrcode" style="margin-top:5px; clear:left; display:none;"></div>
                                 </div>
                             </div>

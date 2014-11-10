@@ -263,6 +263,8 @@ Class.create("ShareCenter", {
             oForm.removeClassName('share_leaf');
             oForm.removeClassName('readonly_mode');
             oForm.removeClassName('type-ws');
+            oForm.removeClassName('share_expired');
+            oForm.removeClassName("share_edit");
             var pluginConfigs = ajaxplorer.getPluginConfigs("action.share");
             if(this.currentNode.isLeaf()) oForm.addClassName('share_leaf');
             if(this.readonlyMode) oForm.addClassName('readonly_mode');
@@ -342,7 +344,6 @@ Class.create("ShareCenter", {
 
 
             var nodeMeta = this.currentNode.getMetadata();
-            oForm.removeClassName("share_edit");
             if(nodeMeta.get("ajxp_shared")) oForm.addClassName("share_edit");
             oForm.down("div#target_repository_toggle").select("a").invoke( "observe", "click", function(){
                 oForm.toggleClassName("edit_parameters");
@@ -431,6 +432,9 @@ Class.create("ShareCenter", {
                             var container = oForm.down('.layout_template_container');
                             container.insert(chooser);
                             chooser.setValue(json['minisite_layout']);
+                        }
+                        if(json['is_expired']){
+                            oForm.addClassName('share_expired');
                         }
                     }catch(e){}
                     oForm.down('#complete_indicator').hide();
@@ -638,7 +642,11 @@ Class.create("ShareCenter", {
             actions.insert({top:new Element('span', {className:'icon-key simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.85"]}).update(' '+MessageHash["share_center.84"])});
         }
         if(linkData["expire_time"]){
-            actions.insert({top:new Element('span', {className:'icon-calendar simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.87"]}).update(' '+linkData["expire_time"])});
+            if(linkData['is_expired'] && linkData['expire_after'] === 0 && (linkData['download_limit'] && linkData['download_limit'] != linkData['download_counter'])){
+                actions.insert({top:new Element('span', {className:'icon-calendar simple_tooltip_observer SF_horizontal_action_destructive',"data-tooltipTitle":MessageHash["share_center.169"]}).update(' '+linkData["expire_time"])});
+            }else{
+                actions.insert({top:new Element('span', {className:'icon-calendar simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.87"]}).update(' '+linkData["expire_time"])});
+            }
         }
         var dlC = new Element('span', {className:'icon-download-alt simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.89"]}).update(' '+MessageHash["share_center.88"]+' '+linkData['download_counter']+'/'+linkData['download_limit']);
         actions.insert({top:dlC});
@@ -833,39 +841,33 @@ Class.create("ShareCenter", {
 
                 if(node.isLeaf()){
                     // LEAF SHARE
-                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.140"]+'</div>');
+                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.140"+(jsonData['is_expired']?'b':'')]+'</div>');
                     mainCont.insert('<div class="infoPanelRow">\
                             <div class="infoPanelLabel">'+MessageHash['share_center.121']+'</div>\
-                            <div class="infoPanelValue"><input type="text" class="share_info_panel_link" readonly="true" value="'+ jsonData.minisite.public_link +'"></div>\
+                            <div class="infoPanelValue"><input type="text" class="share_info_panel_link'+(jsonData['is_expired']?' share_info_panel_link_expired':'')+'" readonly="true" value="'+ jsonData.minisite.public_link +'"></div>\
                         </div>\
                     ');
 
                 }else if(jsonData.minisite){
                     // MINISITE FOLDER SHARE
-                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.138"]+'</div>');
-                    // Label
-                    /*
-                    mainCont.insert('\
-                    <div class="infoPanelRow">\
-                        <div class="infoPanelLabel">'+MessageHash['share_center.35']+'</div>\
-                        <div class="infoPanelValue">'+ jsonData.label +'</div>\
-                    </div>');
-                    */
+                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.138"+(jsonData['is_expired']?'b':'')]+'</div>');
                     // Links textearea
                     mainCont.insert('\
                         <div class="infoPanelRow">\
                             <div class="infoPanelLabel">'+MessageHash['share_center.62']+'</div>\
-                            <div class="infoPanelValue"><input type="text" class="share_info_panel_link" readonly="true" value="'+ jsonData.minisite.public_link +'"></div>\
-                        </div>\
-                        <div class="infoPanelRow">\
+                            <div class="infoPanelValue"><input type="text" class="share_info_panel_link'+(jsonData['is_expired']?' share_info_panel_link_expired':'')+'" readonly="true" value="'+ jsonData.minisite.public_link +'"></div>\
+                        </div>');
+                    if(!jsonData['is_expired']){
+                        mainCont.insert(
+                            '<div class="infoPanelRow">\
                             <div class="infoPanelLabel">'+MessageHash['share_center.61']+'</div>\
                             <div class="infoPanelValue"><textarea style="padding: 4px;width:97%;height: 80px;" id="embed_code" readonly="true"></textarea></div>\
-                        </div>\
-                    ');
+                        </div>');
+                    }
                     mainCont.down("#embed_code").setValue("<iframe height='500' width='600' style='border:1px solid black;' src='"+jsonData.minisite.public_link+"'></iframe>");
                 }else{
                     // WORKSPACE FOLDER
-                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.139"]+'</div>');
+                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.139"+(jsonData['is_expired']?'b':'')]+'</div>');
                     mainCont.insert('<div class="infoPanelRow">\
                         <div class="infoPanelLabel">'+MessageHash['share_center.54']+'</div>\
                         <div class="infoPanelValue">'+ entries.join(', ') +'</div>\
@@ -1158,7 +1160,14 @@ Class.create("ShareCenter", {
         // DOWNLOAD COUNTER BUTTON
         if(jsonData && jsonData["download_limit"]){
 
-            var dlC = new Element('span', {className:'simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.89"]}).update('<span class="icon-download-alt"></span> '+MessageHash["share_center.88"]+' '+jsonData['download_counter']+'/'+jsonData['download_limit']);
+            var dlC;
+            if(jsonData['is_expired'] && jsonData['download_limit'] && jsonData['download_limit'] == jsonData['download_counter']){
+                dlC = new Element('span', {className:'simple_tooltip_observer SF_horizontal_action_destructive',"data-tooltipTitle":MessageHash["share_center.168"]}).update('<span class="icon-download-alt"></span> '+MessageHash["share_center.88"]+' '+jsonData['download_counter']+'/'+jsonData['download_limit']);
+            }else{
+                dlC = new Element('span', {className:'simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.89"]}).update('<span class="icon-download-alt"></span> '+MessageHash["share_center.88"]+' '+jsonData['download_counter']+'/'+jsonData['download_limit']);
+            }
+
+
             dialogButtonsOrRow.down('.SF_horizontal_actions').insert({bottom:dlC});
             dlC.observe("click", function(){
                 if(window.confirm(MessageHash['share_center.106'])){
@@ -1177,7 +1186,11 @@ Class.create("ShareCenter", {
 
         // EXPIRATION TIME
         if(jsonData && jsonData["expire_time"]){
-            dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:new Element('span', {className:'simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.87"]}).update('<span class="icon-calendar"></span> '+jsonData["expire_time"])});
+            if(jsonData['is_expired'] && jsonData['expire_after'] === 0 && (jsonData['download_limit'] && jsonData['download_limit'] != jsonData['download_counter'])){
+                dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:new Element('span', {className:'simple_tooltip_observer SF_horizontal_action_destructive',"data-tooltipTitle":MessageHash["share_center.169"]}).update('<span class="icon-calendar"></span> '+ jsonData["expire_time"])});
+            }else{
+                dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:new Element('span', {className:'simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.87"]}).update('<span class="icon-calendar"></span> '+jsonData["expire_time"])});
+            }
         }
 
         if(updateFunc){

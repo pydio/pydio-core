@@ -4597,6 +4597,11 @@ input.share_info_panel_link {
     border-color: #ccc;
 }
 
+input.share_info_panel_link_expired{
+    color: #999;
+    text-decoration: line-through;
+}
+
 #share_container{
     clear: left;
     width: 95%;
@@ -4717,11 +4722,29 @@ div#share_update{
 }
 
 div#share_result div.non_macos,
+div#share_result div.link_expired_div,
 div#share_result div.macos_only
 {
     font-size:13px;
     padding:10px 0 0;
     text-align:center;
+}
+
+div#share_result div.link_expired_div{
+    display: none;
+}
+
+form.share_expired div#share_result div.link_expired_div{
+    display: block;
+}
+form.share_expired input#share_container{
+    color: #999;
+    text-decoration: line-through;
+}
+
+form.share_expired div.non_macos,
+form.share_expired div.macos_only{
+    display: none !important;
 }
 
 .edit_parameters div#shareDialogButtons,
@@ -4753,6 +4776,10 @@ div#share_result div.macos_only
     padding: 5px 15px 7px !important;
     display: inline-block;
     float: none;
+}
+
+form.share_expired div#mailer_button{
+    display: none;
 }
 
 .share_edit.type-ws div#shareDialogButtons{

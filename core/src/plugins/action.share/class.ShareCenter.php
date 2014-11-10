@@ -950,11 +950,11 @@ class ShareCenter extends AJXP_Plugin
 
     }
 
-    public static function loadMinisite($data, $hash = '')
+    public static function loadMinisite($data, $hash = '', $error = null)
     {
         if(isset($data["SECURITY_MODIFIED"]) && $data["SECURITY_MODIFIED"] === true){
-            header("HTTP/1.0 401 Not allowed, script was modified");
-            die("Not allowed");
+            $mess = ConfService::getMessages();
+            $error = $mess['share_center.164'];
         }
         $repository = $data["REPOSITORY"];
         AJXP_PluginsService::getInstance()->initActivePlugins();
@@ -980,8 +980,11 @@ class ShareCenter extends AJXP_Plugin
         $html = str_replace("AJXP_MINISITE_LOGO", $minisiteLogo, $html);
         $html = str_replace("AJXP_APPLICATION_TITLE", ConfService::getCoreConf("APPLICATION_TITLE"), $html);
         $html = str_replace("PYDIO_APP_TITLE", ConfService::getCoreConf("APPLICATION_TITLE"), $html);
-        $html = str_replace("AJXP_START_REPOSITORY", $repository, $html);
-        $html = str_replace("AJXP_REPOSITORY_LABEL", ConfService::getRepositoryById($repository)->getDisplay(), $html);
+        if(isSet($repository)){
+            $html = str_replace("AJXP_START_REPOSITORY", $repository, $html);
+            $html = str_replace("AJXP_REPOSITORY_LABEL", ConfService::getRepositoryById($repository)->getDisplay(), $html);
+        }
+        $html = str_replace('AJXP_HASH_LOAD_ERROR', isSet($error)?$error:'', $html);
         $html = str_replace("AJXP_TEMPLATE_NAME", $templateName, $html);
         $html = str_replace("AJXP_LINK_HASH", $hash, $html);
         $guiConfigs = AJXP_PluginsService::findPluginById("gui.ajax")->getConfigs();
@@ -1015,6 +1018,7 @@ class ShareCenter extends AJXP_Plugin
             AJXP_PluginsService::deferBuildingRegistry();
             AJXP_PluginsService::getInstance()->initActivePlugins();
             AJXP_PluginsService::flushDeferredRegistryBuilding();
+            $errMessage = null;
             try {
                 $params = $_GET;
                 $ACTION = "download";
@@ -1038,9 +1042,10 @@ class ShareCenter extends AJXP_Plugin
                 AJXP_Controller::registryReset();
                 AJXP_Controller::findActionAndApply($ACTION, $params, null);
             } catch (Exception $e) {
-                die($e->getMessage());
+                $errMessage = $e->getMessage();
             }
-            return;
+            if($errMessage == null) return;
+            $html = str_replace('AJXP_HASH_LOAD_ERROR', $errMessage, $html);
         }
 
         if (isSet($_GET["lang"])) {
@@ -1074,13 +1079,16 @@ class ShareCenter extends AJXP_Plugin
         AJXP_PluginsService::getInstance()->initActivePlugins();
         $shareCenter = self::getShareCenter();
         $data = $shareCenter->loadPublicletData($hash);
+        $mess = ConfService::getMessages();
         if($shareCenter->getShareStore()->isShareExpired($hash, $data)){
-            // Remove the publiclet, it's done
+            /*
             if (strstr(realpath($_SERVER["SCRIPT_FILENAME"]),realpath(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"))) !== FALSE) {
                 $shareCenter->deleteExpiredPubliclet($hash, $data);
-                AuthService::disconnect();
             }
-            die('Link expired!');
+            */
+            AuthService::disconnect();
+            self::loadMinisite(array(), $hash, $mess["share_center.165"]);
+            return;
         }
         if(!empty($data) && is_array($data)){
             if(isSet($data["SECURITY_MODIFIED"]) && $data["SECURITY_MODIFIED"] === true){
@@ -1093,7 +1101,7 @@ class ShareCenter extends AJXP_Plugin
                 self::loadPubliclet($data);
             }
         }else{
-            echo 'Cannot find link';
+            self::loadMinisite(array(), $hash, $mess["share_center.166"]);
         }
 
     }
@@ -1123,8 +1131,8 @@ class ShareCenter extends AJXP_Plugin
     public static function loadPubliclet($data)
     {
         if(isset($data["SECURITY_MODIFIED"]) && $data["SECURITY_MODIFIED"] === true){
-            header("HTTP/1.0 401 Not allowed, script was modified");
-            die("Not allowed");
+            self::loadMinisite($data, "false");
+            return;
         }
         // create driver from $data
         $className = $data["DRIVER"]."AccessDriver";
@@ -1218,7 +1226,7 @@ class ShareCenter extends AJXP_Plugin
         }
         $filePath = AJXP_INSTALL_PATH."/plugins/access.".$data["DRIVER"]."/class.".$className.".php";
         if (!is_file($filePath)) {
-                die("Warning, cannot find driver for conf storage! ($className, $filePath)");
+            die("Warning, cannot find driver for conf storage! ($className, $filePath)");
         }
         require_once($filePath);
         $driver = new $className($data["PLUGIN_ID"], $data["BASE_DIR"]);
@@ -2304,6 +2312,7 @@ class ShareCenter extends AJXP_Plugin
                 }else{
                     $jsonData["expire_after"] = 0;
                 }
+                $jsonData["is_expired"] = $this->shareStore->isShareExpired($shareId, $minisiteData);
                 if(isSet($minisiteData["AJXP_TEMPLATE_NAME"])){
                     $jsonData["minisite_layout"] = $minisiteData["AJXP_TEMPLATE_NAME"];
                 }

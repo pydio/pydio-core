@@ -171,5 +171,15 @@ $mess = array(
 "160" => "Vous n'êtes pas autorisé à supprimer cet élément partagé",
     "161" => "Lien obsolète",
     "162" => "Ce partage a été généré par une ancienne version de l'application. Veuillez le remplacer en le stoppant puis en le recréant. Vous pouvez copier le 'hash' (la dernière partie du lien, soit par exemple http://votrepydio.com/data/public/<em style='color:red;'>206a51</em>.php) et l'utiliser pour regénérer un nouveau partage qui aura donc toujours la même addresse.",
-    "163" => "Déposer vos fichiers ici (pour les minisites permetant l'envois)"
+    "163" => "Déposer vos fichiers ici (pour les minisites permetant l'envois)",
+    "138b" => "Vous avez partagé ce dossier via un lien public, mais il est actuellement inactif (expiré).",
+    "139b" => "Vous avez partagé ce dossier comme un dépôt, , mais il est actuellement inactif (expiré).",
+    "140b" => "Vous avez partagé ce fichier via un lien public, mais il est actuellement inactif (expiré).",
+    "164" => "Accès refusé: le script a été modifié!",
+    "165" => "Désolé, ce lien a expiré!",
+    "166" => "Impossible de trouver le lien!",
+    "167" => "Le lien est expiré!",
+    "168" => "Le nombre de téléchargements autorisés a été atteint. Cliquer pour remettre à zéro et réactiver le lien.",
+    "169" => "La date d'expiration est passée. Changez les paramètres du lien pour le réactiver.",
+
 );
