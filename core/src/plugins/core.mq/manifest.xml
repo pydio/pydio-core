@@ -13,6 +13,7 @@
         <global_param group="WebSocket Server" description="WebSocket server is running" label="WebSocket" name="WS_SERVER_ACTIVE" type="boolean" expose="true"/>
         <global_param group="WebSocket Server" description="WebSocket client connect address" label="WS Client Address" name="WS_SERVER_HOST" type="string" expose="true"/>
         <global_param group="WebSocket Server" description="WebSocket client connect port" label="WS Client Port" name="WS_SERVER_PORT" type="string" expose="true" default="8090"/>
+        <global_param group="WebSocket Server" description="WebSocket client secure connection" label="WS Client SSL" name="WS_SERVER_SECURE" type="boolean" expose="true" default="false"/>
         <global_param group="WebSocket Server" description="WebSocket server bind address" label="WS Server Host" name="WS_SERVER_BIND_HOST" type="string" expose="true"/>
         <global_param group="WebSocket Server" description="WebSocket server bind port" label="WS Server Port" name="WS_SERVER_BIND_PORT" type="string" expose="true" default="8090"/>
         <global_param group="WebSocket Server" description="WebSocket handler path" label="WS Path" name="WS_SERVER_PATH" type="string" expose="true"/>
