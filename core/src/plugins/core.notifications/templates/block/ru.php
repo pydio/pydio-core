@@ -21,7 +21,7 @@
 $mess=array(
     "user_link"  => "пользователь",
     "file.add" => "создан",
-    "file.delete" => "удалён,
+    "file.delete" => "удалён",
     "file.change" => "изменён",
     "file.rename" => "переименован в AJXP_NODE_LABEL",
     "file.view" => "просмотрен",
