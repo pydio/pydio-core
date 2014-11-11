@@ -2108,7 +2108,7 @@ Class.create("FilesList", SelectableElements, {
 
 	partSizeCellRenderer : function(element, ajxpNode, type, metadataDef){
         if(!element) return;
-        if(type == 'row'){
+        if(type == "row"){
             element.setAttribute("data-sorter_value", ajxpNode.getMetadata().get("bytesize"));
         }else{
             element.setAttribute("data-"+metadataDef['attributeName']+"-sorter_value", ajxpNode.getMetadata().get("bytesize"));
@@ -2117,7 +2117,7 @@ Class.create("FilesList", SelectableElements, {
 			return;
 		}
 		var percent = parseInt( parseInt(ajxpNode.getMetadata().get("bytesize")) / parseInt(ajxpNode.getMetadata().get("target_bytesize")) * 100  );
-		var uuid = 'ajxp_'+(new Date()).getTime();		
+		var uuid = "ajxp_"+(new Date()).getTime();
 		var div = new Element('div', {style:'padding-left:3px;', className:'text_label'}).update('<span class="percent_text" style="line-height:19px;padding-left:5px;">'+percent+'%</span>');
 		var span = new Element('span', {id:uuid}).update('0%');		
 		var options = {
@@ -2129,8 +2129,8 @@ Class.create("FilesList", SelectableElements, {
 			height		: 8,										// Height of the progressbar - don't forget to adjust your image too!!!
             visualStyle : 'position:relative;'
 		};
-        if(type == 'detail' && element.down('.thumbnail_cell_metadata')){
-            element.down('.thumbnail_cell_metadata').update(div);
+        if(type == "detail" && element.down(".thumbnail_cell_metadata")){
+            element.down(".thumbnail_cell_metadata").update(div);
         }else{
     		element.update(div);
         }

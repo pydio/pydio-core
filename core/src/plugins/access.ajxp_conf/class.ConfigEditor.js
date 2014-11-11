@@ -205,7 +205,7 @@ Class.create("ConfigEditor",{
 			this.displayMessage("ERROR", MessageHash['ajxp_conf.40']);
 			return;
 		}
-		parameters = new Hash();
+		var parameters = new Hash();
 		parameters.set('user_id', this.userId);
 		this.submitForm("edit_user", 'delete_user', parameters, null);
 		chck.checked = false;

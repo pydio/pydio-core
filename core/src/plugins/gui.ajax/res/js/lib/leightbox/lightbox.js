@@ -228,7 +228,7 @@ function addLightboxMarkup() {
 
 function addLightboxMarkupToElement(element, skipElement) 
 {
-	overlay 			= document.createElement('div');
+	var overlay 		= document.createElement('div');
 	overlay.id			= 'element_overlay';
 	var top, left, height, width;
 	if (Prototype.Browser.IE){

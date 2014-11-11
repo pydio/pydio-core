@@ -518,7 +518,7 @@ Class.create("AjxpDataModel", {
 			return false;
 		}
 		var tmp = new Array(this._selectedNodes.length);
-		for(i=0;i<this._selectedNodes.length;i++)
+		for(var i=0;i<this._selectedNodes.length;i++)
 		{
 			tmp[i] = this._selectedNodes[i].getPath();
 		}

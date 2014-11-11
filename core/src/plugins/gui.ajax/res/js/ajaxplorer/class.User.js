@@ -286,7 +286,7 @@ Class.create("User", {
 			}
 			else if(userNodes[i].nodeName == "repositories")
 			{
-				for(j=0;j<userNodes[i].childNodes.length;j++)
+				for(var j=0;j<userNodes[i].childNodes.length;j++)
 				{
 					var repoChild = userNodes[i].childNodes[j];
 					if(repoChild.nodeName == "repo") {	
@@ -298,7 +298,7 @@ Class.create("User", {
 			}
 			else if(userNodes[i].nodeName == "preferences")
 			{
-				for(j=0;j<userNodes[i].childNodes.length;j++)
+				for(var j=0;j<userNodes[i].childNodes.length;j++)
 				{
 					var prefChild = userNodes[i].childNodes[j];
 					if(prefChild.nodeName == "pref") {

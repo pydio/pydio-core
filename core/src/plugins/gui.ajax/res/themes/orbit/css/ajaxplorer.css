@@ -2860,7 +2860,8 @@ div#upload_files_list span.item_relative_path{
     cursor: pointer;
 }
 #fileInputContainer input {
-    filter:alpha(opacity:0); opacity:0; moz-opacity:0;
+    moz-opacity: 0;
+    opacity: 0;
     position: absolute;
     font-size: 60px; /* causes it to fill the containing div */
     top: 0;
@@ -2868,6 +2869,7 @@ div#upload_files_list span.item_relative_path{
     z-index: 10000;
     height: 56px;
     cursor: pointer !important;
+    filter:alpha(opacity:0);
 }
 #fileInputPos {
     text-align: left;

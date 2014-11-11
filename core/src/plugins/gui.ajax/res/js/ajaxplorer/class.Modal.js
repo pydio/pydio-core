@@ -186,9 +186,10 @@ Class.create("Modal", {
                 objToFocus.focus();
             }, 500);
 		}
+        var repDisplay;
 		if($(newForm).select(".replace_rep").length)
 		{
-			var repDisplay = $(newForm).select(".replace_rep")[0];
+			repDisplay = $(newForm).select(".replace_rep")[0];
 			repDisplay.innerHTML = ajaxplorer.getContextHolder().getContextNode().getPath();
 		}
 		if($(newForm).select(".replace_file").length)

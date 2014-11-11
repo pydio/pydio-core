@@ -848,6 +848,7 @@ Class.create("FormManager", {
 	fetchValueToForm : function(form, fields, value, suffix){
 		$A(fields).each(function(fieldName){
 			if(!value[fieldName]) return;
+            var realFieldName;
 			if(suffix != null){
 				realFieldName = fieldName+'_'+suffix;
 			}else{
