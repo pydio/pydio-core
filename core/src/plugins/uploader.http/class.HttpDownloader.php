@@ -148,6 +148,7 @@ class HttpDownloader extends AJXP_Plugin
                         unlink($dlFile);
                         AJXP_Controller::applyHook("node.change", array(new AJXP_Node($dlFile), null, false));
                     }
+                    $mess = ConfService::getMessages();
                     AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($filename), false));
                     AJXP_XMLWriter::header();
                     AJXP_XMLWriter::triggerBgAction("reload_node", array(), $mess["httpdownloader.8"]);
