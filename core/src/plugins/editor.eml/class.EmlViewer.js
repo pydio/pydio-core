@@ -68,7 +68,7 @@ Class.create("EmlViewer", AbstractEditor, {
 			this.parseXmlStructure(transp);
 			this.updateTitle(getBaseName(fileName));
 		}.bind(this);
-		connexion2 = new Connexion();
+		var connexion2 = new Connexion();
 		connexion2.addParameter('get_action', 'eml_get_bodies');
 		connexion2.addParameter('file', fileName);	
 		connexion2.onComplete = function(transp){
@@ -122,7 +122,7 @@ Class.create("EmlViewer", AbstractEditor, {
 			if(user.canWrite()) this.treeSelector.appendFilterValue(activeRepository, "&lt;"+MessageHash[372]+"&gt;", 'top');
 			this.treeSelector.setFilterSelectedIndex(0);
 			this.treeSelector.setFilterChangeCallback(function(e){
-				externalRepo = this.filterSelector.getValue();
+				var externalRepo = this.filterSelector.getValue();
 				var nodeProvider = new RemoteNodeProvider();
 				nodeProvider.initProvider({tmp_repository_id:externalRepo});
 				this.resetAjxpRootNode(new AjxpNode("/", false, MessageHash[373], "folder.png", nodeProvider));

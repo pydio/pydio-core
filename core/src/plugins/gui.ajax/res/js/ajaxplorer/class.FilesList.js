@@ -85,7 +85,7 @@ Class.create("FilesList", SelectableElements, {
 
         var userLoggedObserver = function(){
 			if(!ajaxplorer || !ajaxplorer.user || !this.htmlElement) return;
-			disp = ajaxplorer.user.getPreference("display");
+			var disp = ajaxplorer.user.getPreference("display");
 			if(disp && (disp == 'thumb' || disp == 'list' || disp == 'detail')){
 				if(disp != this._displayMode) this.switchDisplayMode(disp);
 			}
@@ -1254,21 +1254,21 @@ Class.create("FilesList", SelectableElements, {
                 delete(AllAjxpDroppables[i]);
             }
         }
-        for(i = 0;i< AllAjxpDraggables.length;i++){
-            if(AllAjxpDraggables[i] && AllAjxpDraggables[i].element && this.isItem(AllAjxpDraggables[i].element)){
-                  if(AllAjxpDraggables[i].element.IMAGE_ELEMENT){
+        for(i = 0;i< window.AllAjxpDraggables.length;i++){
+            if(window.AllAjxpDraggables[i] && window.AllAjxpDraggables[i].element && this.isItem(window.AllAjxpDraggables[i].element)){
+                  if(window.AllAjxpDraggables[i].element.IMAGE_ELEMENT){
                       try{
-                          if(AllAjxpDraggables[i].element.IMAGE_ELEMENT.destroyElement){
-                              AllAjxpDraggables[i].element.IMAGE_ELEMENT.destroyElement();
+                          if(window.AllAjxpDraggables[i].element.IMAGE_ELEMENT.destroyElement){
+                              window.AllAjxpDraggables[i].element.IMAGE_ELEMENT.destroyElement();
                           }
-                          AllAjxpDraggables[i].element.IMAGE_ELEMENT = null;
-                          delete AllAjxpDraggables[i].element.IMAGE_ELEMENT;
+                          window.AllAjxpDraggables[i].element.IMAGE_ELEMENT = null;
+                          delete window.AllAjxpDraggables[i].element.IMAGE_ELEMENT;
                       }catch(e){}
                   }
-                Element.remove(AllAjxpDraggables[i].element);
+                Element.remove(window.AllAjxpDraggables[i].element);
             }
         }
-        AllAjxpDraggables = $A([]);
+        window.AllAjxpDraggables = $A([]);
 
         var items = this.getSelectedItems();
         var setItemSelected = this.setItemSelected.bind(this);
@@ -2046,7 +2046,7 @@ Class.create("FilesList", SelectableElements, {
 
         this.getFromCache("columns").each(function(pair){
             if(pair.value.modifierFunc){
-                pair.value.modifierFunc(newRow, ajxpNode, 'detail', pair.value);
+                pair.value.modifierFunc(largeRow, ajxpNode, 'detail', pair.value);
             }
         });
 
@@ -2129,7 +2129,11 @@ Class.create("FilesList", SelectableElements, {
 			height		: 8,										// Height of the progressbar - don't forget to adjust your image too!!!
             visualStyle : 'position:relative;'
 		};
-		element.update(div);
+        if(type == 'detail' && element.down('.thumbnail_cell_metadata')){
+            element.down('.thumbnail_cell_metadata').update(div);
+        }else{
+    		element.update(div);
+        }
 		div.insert({top:span});
 		if(ajxpNode.getMetadata().get("process_stoppable")){
 			var stopButton = new Element('a', {className:'pg_cancel_button'}).update("X");
@@ -2162,6 +2166,7 @@ Class.create("FilesList", SelectableElements, {
 					return;
 				}
 				var conn = new Connexion();
+                conn.discrete = true;
 				conn.setParameters({
 					action: 'update_dl_data',
 					file : ajxpNode.getPath()
@@ -2373,7 +2378,7 @@ Class.create("FilesList", SelectableElements, {
 		{
 			return; // DO NOTHING IN RECYCLE BIN
 		}
-		selRaw = this.getSelectedItems();
+		var selRaw = this.getSelectedItems();
 		if(!selRaw || !selRaw.length)
 		{
 			return; // Prevent from double clicking header!
@@ -2489,7 +2494,7 @@ Class.create("FilesList", SelectableElements, {
 		
 		
 		Event.stop(event);
-		var nextItem;
+		var nextItem, nextItemIndex;
 		var currentItem;
 		var shiftKey = event['shiftKey'];
 		currentItem = items[items.length-1];

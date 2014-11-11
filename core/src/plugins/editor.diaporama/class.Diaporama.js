@@ -376,7 +376,7 @@ Class.create("Diaporama", AbstractEditor, {
 
         if (ort>4)
         {
-            tmp=height;
+            var tmp=height;
             height=width;
             width=tmp;
         }
@@ -637,8 +637,8 @@ Class.create("Diaporama", AbstractEditor, {
 	},
 
 	computeFitToScreenFactor: function(){
-		zoomFactor1 = parseInt(this.imgContainer.getHeight() / this.crtHeight * 100);
-		zoomFactor2 = parseInt(this.imgContainer.getWidth() / this.crtWidth * 100);
+		var zoomFactor1 = parseInt(this.imgContainer.getHeight() / this.crtHeight * 100);
+		var zoomFactor2 = parseInt(this.imgContainer.getWidth() / this.crtWidth * 100);
 		var zoomFactor = Math.min(zoomFactor1, zoomFactor2)-1;
 		zoomFactor = Math.max(this._minZoom, zoomFactor);
 		zoomFactor = Math.min(this._maxZoom, zoomFactor);

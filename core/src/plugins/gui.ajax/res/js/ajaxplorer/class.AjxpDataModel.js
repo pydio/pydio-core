@@ -541,7 +541,7 @@ Class.create("AjxpDataModel", {
 			return false;
 		}
 		var names = $A([]);
-		for(i=0;i<allItems.length;i++)
+		for(var i=0;i<allItems.length;i++)
 		{
 			names.push(getBaseName(allItems[i].getPath()));
 		}

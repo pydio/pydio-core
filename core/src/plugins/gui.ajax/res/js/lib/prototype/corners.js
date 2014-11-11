@@ -46,7 +46,7 @@ Object.extend(Object.extend(Effect.Corner.prototype, Effect.Base.prototype), {
         for ( ; node && node.nodeName.toLowerCase() != 'html'; node = node.parentNode  ) {
             var v = Element.getStyle(node, 'backgroundColor');
             if ( v.indexOf('rgb') >= 0 ) { 
-                rgb = v.match(/\d+/g); 
+                var rgb = v.match(/\d+/g);
                 return '#'+ this.hex2(rgb[0]) + this.hex2(rgb[1]) + this.hex2(rgb[2]);
             }
             if ( v && v != 'transparent' )

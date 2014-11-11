@@ -345,6 +345,7 @@ Class.create("ActionsManager", {
 			(copy && (!this.defaultActions.get('ctrldragndrop')||this.getDefaultAction('ctrldragndrop').deny))){
 			return;
 		}
+        var fileNames;
 		if(fileName == null) fileNames = this._dataModel.getFileNames();
 		else fileNames = [fileName];
 		if(destNodeName != null)
@@ -592,7 +593,7 @@ Class.create("ActionsManager", {
 			{
 				if(childs[i].getAttribute("secure_token")){
                     var regex = new RegExp('.*?[&\\?]' + 'minisite_session' + '=(.*?)&.*');
-                    val = window.ajxpServerAccessPath.replace(regex, "$1");
+                    var val = window.ajxpServerAccessPath.replace(regex, "$1");
                     var minisite_session = ( val == window.ajxpServerAccessPath ? false : val );
 
 					Connexion.SECURE_TOKEN = childs[i].getAttribute("secure_token");

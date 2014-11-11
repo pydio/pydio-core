@@ -23,14 +23,12 @@ function getBaseName(fileName)
 	if(fileName == null) return null;
 	var separator = "/";
 	if(fileName.indexOf("\\") != -1) separator = "\\";
-	baseName = fileName.substr(fileName.lastIndexOf(separator)+1, fileName.length);	
-	return baseName;
+	return fileName.substr(fileName.lastIndexOf(separator)+1, fileName.length);
 }
 
 function getRepName(fileName)
 {
-	repName = fileName.substr(0, fileName.lastIndexOf("/"));
-	return repName;	
+	return fileName.substr(0, fileName.lastIndexOf("/"));
 }
 
 function getAjxpMimeType(item){
@@ -275,6 +273,7 @@ function fitRectangleToDimension(rectDim, targetDim){
     var defaultMarginTop = (targetDim.marginTop?targetDim.marginTop:(targetDim.margin?targetDim.margin:0));
     var defaultMarginBottom = (targetDim.marginBottom?targetDim.marginBottom:(targetDim.margin?targetDim.margin:0));
 	//var defaultMargin = targetDim.margin || 0;
+    var tW, tH, mT, mB;
 	if(rectDim.width >= rectDim.height)
 	{				
 		tW = targetDim.width;
@@ -297,7 +296,7 @@ function fitRectangleToDimension(rectDim, targetDim){
         mT = defaultMarginTop;
         mB = defaultMarginBottom;
 	}
-	return styleObj = {width:tW+'px', height:tH+'px', marginTop:mT+'px', marginBottom:mB+'px'};	
+	return {width:tW+'px', height:tH+'px', marginTop:mT+'px', marginBottom:mB+'px'};
 }
 
 function fitHeightToBottom(element, parentElement, addMarginBottom, listen, minOffsetTop)

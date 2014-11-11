@@ -317,9 +317,9 @@ Class.create("MultiUploader", {
 			newForm.id = 'pendingform_'+formsCount;
 			var addUserFile = false;
 			var inputs = $(this.mainForm).select("input");
-			for(j=0;j<inputs.length;j++)
+			for(var j=0;j<inputs.length;j++)
 			{
-				element = inputs[j];
+				var element = inputs[j];
 				if((element.type == 'file' && element.multi_index == i && element.value != '') || element.type=='hidden' || element.type=='submit'){
 					//var nodeCopy = element.cloneNode(true);
 					if(element.type == 'file') {
@@ -361,8 +361,7 @@ Class.create("MultiUploader", {
 			var crtValue = $(nextToSubmit).getElementsBySelector('input[type="file"]')[0].value;
             if(this.crtContext.fileNameExists(crtValue))
 			{
-				overwrite = confirm(MessageHash[124]);
-				if(!overwrite){
+				if(!confirm(MessageHash[124])){
 					this.submitNext(true);
 					return;
 				}
@@ -373,7 +372,6 @@ Class.create("MultiUploader", {
 		else
 		{
             document.fire("ajaxplorer:longtask_finished");
-			//ajaxplorer.fireContextRefresh();
 		}
 		
 	}

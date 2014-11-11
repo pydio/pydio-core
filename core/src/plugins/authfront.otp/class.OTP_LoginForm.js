@@ -26,7 +26,7 @@ Class.create("OTP_LoginForm", {
         // string
         var otpEnabled = '<span id="add_otp_notion" style=" font-size: 16px;"> * OTP enabled</span>';
 
-        obj_loginform = $("login_form");
+        var obj_loginform = $("login_form");
         if(!obj_loginform.down(("#add_otp_notion"))){
             obj_loginform.insert({bottom:otpEnabled});
         }

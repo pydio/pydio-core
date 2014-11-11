@@ -716,7 +716,7 @@ Class.create("Action", {
 			// case differ
 			accessKey = displayString.charAt(keyPos);
 		}
-		returnString = displayString.substring(0,displayString.indexOf(accessKey));
+		var returnString = displayString.substring(0,displayString.indexOf(accessKey));
 		returnString += '<u>'+accessKey+'</u>';
 		returnString += displayString.substring(displayString.indexOf(accessKey)+1, displayString.length);
 		return returnString;
@@ -739,7 +739,7 @@ Class.create("Action", {
 	attributesToObject: function(object, node){
 		Object.keys(object).each(function(key){
 			if(node.getAttribute(key)){
-				value = node.getAttribute(key);
+				var value = node.getAttribute(key);
 				if(value == 'true') value = true;
 				else if(value == 'false') value = false;
 				if(key == 'allowedMimes'){

@@ -599,10 +599,10 @@ Class.create("InfoPanel", AjxpPane, {
 			var position = panels[i].getAttribute('position') || '';
 			var htmlContent = '';
 			var panelChilds = panels[i].childNodes;
-			for(j=0;j<panelChilds.length;j++){
+			for(var j=0;j<panelChilds.length;j++){
 				if(panelChilds[j].nodeName == 'messages'){
 					var messagesList = panelChilds[j].childNodes;					
-					for(k=0;k<messagesList.length;k++){
+					for(var k=0;k<messagesList.length;k++){
 						if(messagesList[k].nodeName != 'message') continue;
 						messages.set(messagesList[k].getAttribute("key"), messagesList[k].getAttribute("id"));
 					}

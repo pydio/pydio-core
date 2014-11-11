@@ -637,9 +637,9 @@ Class.create("Ajaxplorer", {
 		document.observeOnce("ajaxplorer:registry_part_loaded", function(event){
 			if(event.memo != "user/repositories") return;
 			this.logXmlUser(this._registry, true);
-			repId = this.user.getActiveRepository();
-			repList = this.user.getRepositoriesList();
-			document.fire("ajaxplorer:repository_list_refreshed", {list:repList,active:repId});			
+			document.fire("ajaxplorer:repository_list_refreshed", {
+                list:this.user.getRepositoriesList(),
+                active:this.user.getActiveRepository()});
 		}.bind(this));
 		this.loadXmlRegistry(false, "user/repositories");
 	},
@@ -1080,9 +1080,9 @@ Class.create("Ajaxplorer", {
 		connexion.onComplete = function(transport){
 			if(transport.responseText){
 				var result = transport.responseText.evalScripts();
-				MessageHash = result[0];
-				for(var key in MessageHash){
-					MessageHash[key] = MessageHash[key].replace("\\n", "\n");
+				window.MessageHash = result[0];
+				for(var key in window.MessageHash){
+                    window.MessageHash[key] = window.MessageHash[key].replace("\\n", "\n");
 				}
 				this.updateI18nTags();
 				if(this.guiActions){
@@ -1357,7 +1357,7 @@ Class.create("Ajaxplorer", {
                 });
                 var shiftKey = e['shiftKey'];
 				var foundFocus = false;
-				for(i=0; i<objects.length;i++)
+				for(var i=0; i<objects.length;i++)
 				{
 					if(objects[i].hasFocus)
 					{

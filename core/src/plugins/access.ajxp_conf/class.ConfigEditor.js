@@ -295,7 +295,7 @@ Class.create("ConfigEditor",{
 				driverDef.set('description', XPathGetSingleNodeText(driver, "@description"));
 				driverDef.set('name', driverName);
 				var driverParamsArray = new Array();
-				for(j=0;j<driverParams.length;j++){
+				for(var j=0;j<driverParams.length;j++){
 					var paramNode = driverParams[j];
 					if(this.currentCreateRepoType == "template" && paramNode.getAttribute('no_templates') == 'true'){
 						continue;

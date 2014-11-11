@@ -364,8 +364,8 @@ Class.create("FormManager", {
                 div.insert(new Element('div', {className:"SF_label"}).update('<span>'+label+(mandatory?'*':'')+'</span>'));
                 // INSERT CHECKBOX
                 if(addFieldCheckbox){
-                    cBox = '<input type="checkbox" class="SF_fieldCheckBox" name="SFCB_'+name+'" '+(defaultValueExists?'checked':'')+'/>';
-                    cBox = new Element('input', {type:'checkbox', className:'SF_fieldCheckBox', name:'SFCB_'+name});
+                    //var cBox = '<input type="checkbox" class="SF_fieldCheckBox" name="SFCB_'+name+'" '+(defaultValueExists?'checked':'')+'/>';
+                    var cBox = new Element('input', {type:'checkbox', className:'SF_fieldCheckBox', name:'SFCB_'+name});
                     cBox.checked = defaultValueExists;
                     div.insert(cBox);
                 }

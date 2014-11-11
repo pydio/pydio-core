@@ -461,7 +461,7 @@ Class.create("ActionsToolbar", AjxpPane, {
 			if(!submenuItem.src || !action.options.subMenuUpdateImage) return;
 			var images = button.select('img[id="'+action.options.name +'_button_icon"]');
 			if(!images.length) return;
-            icSize = 22;
+            var icSize = 22;
             if(this.options.stylesImgSizes && this.style && this.options.stylesImgSizes[this.style]){
                 icSize = this.options.stylesImgSizes[this.style];
             }

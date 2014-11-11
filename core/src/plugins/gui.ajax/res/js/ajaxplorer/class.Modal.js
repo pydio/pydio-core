@@ -118,7 +118,7 @@ Class.create("Modal", {
                 autocomplete:'off'
             });
 			newForm.insert(formDiv.cloneNode(true));
-			var reloadIFrame = null;
+			var reloadIFrame, reloadIFrameSrc;
 			if($(newForm).getElementsByTagName("iframe")[0])
 			{
 				reloadIFrame = $(newForm).getElementsByTagName("iframe")[0];
@@ -181,12 +181,14 @@ Class.create("Modal", {
         );
 		if($(newForm).select(".dialogFocus").length)
 		{
-			objToFocus = $(newForm).select(".dialogFocus")[0];
-			setTimeout('objToFocus.focus()', 500);
+			var objToFocus = $(newForm).select(".dialogFocus")[0];
+			setTimeout(function(){
+                objToFocus.focus();
+            }, 500);
 		}
 		if($(newForm).select(".replace_rep").length)
 		{
-			repDisplay = $(newForm).select(".replace_rep")[0];
+			var repDisplay = $(newForm).select(".replace_rep")[0];
 			repDisplay.innerHTML = ajaxplorer.getContextHolder().getContextNode().getPath();
 		}
 		if($(newForm).select(".replace_file").length)
@@ -244,7 +246,7 @@ Class.create("Modal", {
 				boxWidth = '90%';
 			}
 			if(boxWidth.indexOf('%') > -1){
-				percentWidth = parseInt(boxWidth);
+				var percentWidth = parseInt(boxWidth);
 				boxWidth = parseInt((winWidth * percentWidth) / 100);
 				this.currentListensToWidth = percentWidth;
 			}
@@ -252,7 +254,7 @@ Class.create("Modal", {
 		}
 		if(boxHeight != null){
 			if(boxHeight.indexOf('%') > -1){
-				percentHeight = parseInt(boxHeight);
+				var percentHeight = parseInt(boxHeight);
 				boxHeight = parseInt((winHeight * percentHeight) / 100);
 				this.currentListensToHeight = percentHeight;
 			}

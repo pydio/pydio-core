@@ -282,7 +282,7 @@ Class.create("LocalAPINodeProvider", {
 					}
 					if(docs[memberKey].keywords["var"]){
 						var vDoc = docs[memberKey].keywords["var"];
-						vType = vDoc.split(" ")[0];
+						var vType = vDoc.split(" ")[0];
 						vDesc = vDoc.substring(vType.length + 1);
 						crtLabel = '<span class="jsapi_jdoc_var">'+vType+'</span> ' + crtLabel.replace("<span", '<span title="'+vDesc.replace(/"/g, '\'')+'"'); 
 					}
@@ -291,9 +291,9 @@ Class.create("LocalAPINodeProvider", {
 						var newArgs = $A();
 						$A(meta.get("argumentNames")).each(function(arg){							
 							if(docs[memberKey].keywords["param"][arg]){
-								pValue = docs[memberKey].keywords["param"][arg];
-								pType = (pValue.split(" ").length?pValue.split(" ")[0].strip():'');
-								pDesc = pValue.substring(pType.length+1).replace(/"/g, '\'');
+								var pValue = docs[memberKey].keywords["param"][arg];
+								var pType = (pValue.split(" ").length?pValue.split(" ")[0].strip():'');
+								var pDesc = pValue.substring(pType.length+1).replace(/"/g, '\'');
 								arg = '<span class="jsapi_jdoc_param">'+pType+'</span> <span title="'+pDesc+'">'+arg+'</span>';
 							}
 							newArgs.push(arg);

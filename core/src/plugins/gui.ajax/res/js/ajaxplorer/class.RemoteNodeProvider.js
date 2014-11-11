@@ -168,6 +168,7 @@ Class.create("RemoteNodeProvider", {
 		// CHECK FOR MESSAGE OR ERRORS
 		var errorNode = XPathSelectSingleNode(rootNode, "error|message");
 		if(errorNode){
+            var type;
 			if(errorNode.nodeName == "message") type = errorNode.getAttribute('type');
 			if(type == "ERROR"){
 				origNode.notify("error", errorNode.firstChild.nodeValue + '(Source:'+origNode.getPath()+')');				

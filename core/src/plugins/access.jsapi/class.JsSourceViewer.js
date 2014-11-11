@@ -137,6 +137,7 @@ Class.create("JsSourceViewer", AjxpPane, {
 	
 	applyPointer : function(){
 		if(!this.pendingPointer) return;
+        var cursor;
 		if(this.pendingPointerType == "MemberName"){
 			cursor = this.codeMirror.getSearchCursor(this.pendingPointer+':', false, false);
 			if(cursor.findNext()){

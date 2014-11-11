@@ -196,7 +196,7 @@ Class.create("SQLEditor", {
 			});
 			//addTable.select('td[edit="false"]').invoke('remove');
 			addTable.select('td[new="false"]')[0].setStyle({width:'40px'});
-			addRow = addTable.select('tbody tr')[0];
+			var addRow = addTable.select('tbody tr')[0];
 			var addButton = new Element('input', {type:'button', value:'Add', className:'dialogButton'});
 			var submitDiv = new Element('div', {className:'dialogButtons'}).insert(addButton);
 			var submitRow = new Element('tr').insert(new Element('td', {colspan:"9"}).insert(submitDiv));

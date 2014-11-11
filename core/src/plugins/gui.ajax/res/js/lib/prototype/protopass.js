@@ -79,7 +79,7 @@ var Protopass = Class.create({
         var value = this.item.value;
         var field_name = this.field_name;
 
-        strength = this.getPasswordScore(value, options);
+        var strength = this.getPasswordScore(value, options);
         this.strength = strength;
 
         if (strength == -200) {

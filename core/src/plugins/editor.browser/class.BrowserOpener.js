@@ -66,7 +66,7 @@ Class.create("BrowserOpener", AbstractEditor, {
 		connexion.onComplete = function(transp){
 			var url = transp.responseText;
             if(this.editorOptions.context.__className == 'Modal'){
-                myRef = window.open(url, "Pydio Bookmark", "location=yes,menubar=yes,resizable=yes,scrollbars=yea,toolbar=yes,status=yes");
+                window.open(url, "Pydio Bookmark", "location=yes,menubar=yes,resizable=yes,scrollbars=yea,toolbar=yes,status=yes");
                 hideLightBox();
             }else{
                 this.element.fire("editor:updateTitle", url);

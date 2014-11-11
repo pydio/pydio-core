@@ -22,7 +22,7 @@
 // TO ADD GLOBALLY
 var timerClearObserver = {
 	onEnd:function(){
-		if(WebFXtimer) clearTimeout(WebFXtimer);
+		if(window.WebFXtimer) clearTimeout(window.WebFXtimer);
 	}
 } ;
 document.observe("ajaxplorer:loaded", function(){
@@ -33,14 +33,14 @@ document.observe("ajaxplorer:loaded", function(){
 		}
 	}});	
 });
-var AllAjxpDraggables = $A([]);
+window.AllAjxpDraggables = $A([]);
 var AllAjxpDroppables = $A([]);
 Event.observe(window, "unload", function(){
 	Draggables.removeObserver(timerClearObserver);
-	AllAjxpDraggables.each(function(el){
+    window.AllAjxpDraggables.each(function(el){
 		el.destroy();
 	});
-	AllAjxpDroppables.each(function(el){
+    window.AllAjxpDroppables.each(function(el){
 		Droppables.remove(el);
 	});
 });
@@ -70,7 +70,7 @@ Class.create("AjxpDraggable", Draggable, {
 		this.options.delay = (Prototype.Browser.IE?350:200);
 		this.component = component;
 		this.componentType = componentType;
-		AllAjxpDraggables.push(this);
+        window.AllAjxpDraggables.push(this);
 	},
 	
 	/**
@@ -93,6 +93,7 @@ Class.create("AjxpDraggable", Draggable, {
 		if(Event.isLeftClick(event)) {
 			// abort on form elements, fixes a Firefox issue
 			var src = Event.element(event);
+            var tag_name;
 			if((tag_name = src.tagName.toUpperCase()) && (
 			tag_name=='INPUT' ||
 			tag_name=='SELECT' ||
@@ -417,7 +418,7 @@ var AjxpDroppables = {
 					if(draggable.ajxpNode){
 						srcName = draggable.ajxpNode.getPath();
 					}
-                    if(WebFXtimer) clearTimeout(WebFXtimer);
+                    if(window.WebFXtimer) clearTimeout(window.WebFXtimer);
                     var nodeId = null;
                     if(droppable.id && webFXTreeHandler.all[droppable.id]){
                         nodeId = droppable.id;
@@ -434,7 +435,7 @@ var AjxpDroppables = {
 				},
 		onHover:function(draggable, droppable, event)
 				{
-					if(WebFXtimer) clearTimeout(WebFXtimer);
+					if(window.WebFXtimer) clearTimeout(window.WebFXtimer);
 					if(droppable.id && webFXTreeHandler.all[droppable.id])
 					{
                         var container = droppable.up('div.show_first_level');
@@ -443,7 +444,7 @@ var AjxpDroppables = {
                             container.addClassName("reset_show_first_level");
                         }
 						var jsString = "javascript:";			
-						WebFXtimer = window.setTimeout(function(){
+						window.WebFXtimer = window.setTimeout(function(){
 							var node = webFXTreeHandler.all[droppable.id];
 							if(node &&  node.folder && !node.open) node.expand();
 						}, 500);
@@ -451,7 +452,7 @@ var AjxpDroppables = {
 				}, 
 		onOut:function(droppable)
 				{
-					if(WebFXtimer) clearTimeout(WebFXtimer);
+					if(window.WebFXtimer) clearTimeout(window.WebFXtimer);
                     var container = droppable.up('div.reset_show_first_level');
                     if(container) container.addClassName("show_first_level");
 				}

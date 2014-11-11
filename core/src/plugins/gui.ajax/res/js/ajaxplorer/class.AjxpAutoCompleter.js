@@ -109,7 +109,7 @@ Class.create("AjxpAutocompleter", Autocompleter.Base, {
   	}
   	var responseText = '<ul>';
   	dirs.each(function(dir){
-  		value = token.substring(0, token.lastIndexOf("/")+1);
+  		var value = token.substring(0, token.lastIndexOf("/")+1);
   		responseText += '<li>'+value+dir+'</li>';
   	});
   	responseText += '</ul>';

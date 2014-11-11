@@ -111,7 +111,7 @@ JS_BRAMUS.jsProgressBar = Class.create({
 		preloadImages	: function() {
 
 			// loop all barimages
-			for (i = 0; i < this.options.barImage.length; i++) {
+			for (var i = 0; i < this.options.barImage.length; i++) {
 
 				// create new image ref
 				var newImage = null;
@@ -305,9 +305,10 @@ JS_BRAMUS.jsProgressBar = Class.create({
 				// we're done!
 				return;
 			}
-			
+
+            var newPercentage, callTick;
 			// define if we need to add/subtract something to the current percentage in order to reach the target percentage
-			if (targetPercentage != curPercentage) {					
+			if (targetPercentage != curPercentage) {
 				if (curPercentage < targetPercentage) {
 					newPercentage = curPercentage + 1;
 				} else {

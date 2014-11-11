@@ -99,7 +99,7 @@ Class.create("IMagickPreviewer", Diaporama, {
             src:IMagickPreviewer.prototype.getThumbnailSource(ajxpNode)
 		});		
 		img.resizePreviewElement = function(dimensionObject){			
-			ratio = img.ratio;
+			var ratio = img.ratio;
 			if(!ratio) {
 				var fakeIm = new Image();
 				fakeIm.onload = function(){	

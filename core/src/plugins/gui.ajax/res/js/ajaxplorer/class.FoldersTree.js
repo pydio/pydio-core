@@ -263,7 +263,7 @@ Class.create("FoldersTree", AjxpPane, {
 		var splitPath = url.split("/");
 		var path = new Array();
 		var j = 0;
-		for(i=0; i<splitPath.length; i++)
+		for(var i=0; i<splitPath.length; i++)
 		{
 			if(splitPath[i] != '') 
 			{
