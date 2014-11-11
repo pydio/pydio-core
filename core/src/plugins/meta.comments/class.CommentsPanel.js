@@ -35,9 +35,11 @@
             var _results;
             _results = [];
             for (k in option) {
-                v = option[k];
-                if (k !== 'callback') {
-                    _results.push(" " + k + "='" + v + "'");
+                if(option.hasOwnProperty(k)){
+                    v = option[k];
+                    if (k !== 'callback') {
+                        _results.push(" " + k + "='" + v + "'");
+                    }
                 }
             }
             return _results;
@@ -106,13 +108,13 @@ Class.create("CommentsPanel", {
 
                 conn.sendAsync();
 
-            }
+            };
 
             CommentsPanel.prototype.loaderTimer = window.setTimeout(function(){
                 loader();
             }, 0.3);
 
-            var pe = new PeriodicalExecuter(loader, 5);
+            new PeriodicalExecuter(loader, 5);
 
         }
 

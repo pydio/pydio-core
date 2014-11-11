@@ -45,10 +45,10 @@ Class.create("LocalAPINodeProvider", {
 		var children = [];
 		var levelIcon = "folder.png";
 		if(path == "/"){
-			var levelIcon = "jsapi_images/package.png";
+			levelIcon = "jsapi_images/package.png";
 			children = ["Classes", "Interfaces"];			
 		}else if(path == "/Classes" || path == "/Interfaces"){
-			var levelIcon = (path=="/Classes"?"jsapi_images/class.png":"jsapi_images/interface.png");
+			levelIcon = (path=="/Classes"?"jsapi_images/class.png":"jsapi_images/interface.png");
 			$$OO_ObjectsRegistry[(path=="/Classes"?'classes':'interfaces')].each(function(pair){
 				children.push(pair.key);
 			});
@@ -56,7 +56,7 @@ Class.create("LocalAPINodeProvider", {
 		}else if(node.getMetadata().get("API_CLASS") || node.getMetadata().get("API_INTERFACE")){
 			var api_class = node.getMetadata().get("API_CLASS");
 			var api_interface = node.getMetadata().get("API_INTERFACE");
-			var levelIcon = "jsapi_images/method.png";
+			levelIcon = "jsapi_images/method.png";
 			var ooObject = $$OO_ObjectsRegistry[(api_class?'classes':'interfaces')].get((api_class?api_class:api_interface));
 			var proto = ooObject.prototype;
 			var properties = $A();
@@ -114,10 +114,11 @@ Class.create("LocalAPINodeProvider", {
 			for(var key in proto){
 				if(key.indexOf("_") === 0) continue;
 				if(key == "constructor") continue;
+                var child;
 				if(typeof proto[key] == 'function'){
 					var args = proto[key].argumentNames();					
 					var label = '<span class="jsapi_member">'+key+'</span>' + "(" + args.join(", ") + ")";
-					var child = {
+					child = {
 							PATH : key,
 							LABEL:label, 
 							ICON:'jsapi_images/method.png', 
@@ -142,7 +143,7 @@ Class.create("LocalAPINodeProvider", {
 						methods.push(child);
 					}
 				}else{
-					var child = {
+					child = {
 							PATH : key,
 							LABEL:'<span class="jsapi_member">'+key+'</span>', 
 							ICON:'jsapi_images/property.png', 

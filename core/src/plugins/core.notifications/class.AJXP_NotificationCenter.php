@@ -28,18 +28,13 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class AJXP_NotificationCenter extends AJXP_Plugin
 {
     /**
-     * @var AJXP_NotificationCenter
+     * @var String
      */
-    private static $instance;
     private $userId;
     /**
      * @var AJXP_FeedStore|bool
      */
     private $eventStore = false;
-    /**
-     * @var bool|AJXP_MessageExchanger
-     */
-    private $msgExchanger = false;
 
     public function init($options)
     {
@@ -373,7 +368,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
             }
             // Replace PATH
             $nodeToSend->real_path = $path;
-            $url = parse_url($nodeToSend->getUrl());
+            //$url = parse_url($nodeToSend->getUrl());
             //$nodeToSend->setUrl($url["scheme"]."://".$url["host"]."/alert_".$index);
             $index ++;
             AJXP_XMLWriter::renderAjxpNode($nodeToSend);

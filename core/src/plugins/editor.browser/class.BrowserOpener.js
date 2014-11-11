@@ -40,7 +40,7 @@ Class.create("BrowserOpener", AbstractEditor, {
         var open_file_url = url + "/" + window.ajxpServerAccessPath + "&get_action=open_file&repository_id=" + repo + "&file=" + encodeURIComponent(node.getPath());
 
         if(this.editorOptions.context.__className == 'Modal'){
-            var myRef = window.open(open_file_url);
+            window.open(open_file_url);
             if(!Modernizr.boxshadow){
                 window.setTimeout('hideLightBox()', 1500);
             }else{

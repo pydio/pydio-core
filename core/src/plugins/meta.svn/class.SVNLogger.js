@@ -58,10 +58,11 @@ initialize:function(form){
 	
 	open: function(currentRep){
 		var selection = ajaxplorer.getUserSelection();
+        var ajxpNode;
 		if(currentRep || selection.isEmpty()){
-			var ajxpNode = ajaxplorer.getContextNode();
+			ajxpNode = ajaxplorer.getContextNode();
 		}else{
-			var ajxpNode = selection.getUniqueNode();
+			ajxpNode = selection.getUniqueNode();
 		}
 		this.fileName = ajxpNode.getPath();
 		this.isFile = ajxpNode.isLeaf();
@@ -216,8 +217,9 @@ addEntry:function(index, revision,author,date,message){
 		var logEntries = XPathSelectNodes(root, "log/logentry");
 		this.currentRev = XPathSelectSingleNode(root, "current_revision");
 		this.revisionRange = XPathSelectSingleNode(root, "revision_range");
+        var i =0;
 		try{
-			for(var i=0; i<logEntries.length;i++){
+			for(i=0; i<logEntries.length;i++){
 				var entry = logEntries[i];
 				var revision = entry.getAttribute("revision");
 				var author;var date;var message;

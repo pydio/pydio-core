@@ -230,9 +230,10 @@ Class.create("SQLEditor", {
 				style:'cursor:pointer;'
 			});
 			activator.insert({before:deleteCol});
+            var row;
 			templateTable.observe('click', function(e){
 				if(e.findElement('img') && e.findElement('img').hasClassName('enableRow')){
-					var row = e.findElement('tr');
+					row = e.findElement('tr');
 					if(row.getAttribute('enabled') && row.getAttribute('enabled') == "true"){
 						row.select('input', 'textarea', 'select').invoke('disable');
 						row.setAttribute('enabled', 'false');
@@ -244,12 +245,11 @@ Class.create("SQLEditor", {
 					}
 					Event.stop(e);
 				}else if(e.findElement('img') && e.findElement('img').hasClassName('deleteRow')){
-					var row = e.findElement('tr');
+					row = e.findElement('tr');
 					var origName = '';
 					row.select('input').each(function(input){
 						if(input.name.search('field_origname') > -1){
 							origName = input.value;
-							return;
 						}
 					});
 					if(origName != ''){
@@ -322,12 +322,10 @@ Class.create("SQLEditor", {
 	},
 	
 	createFieldSet:function(legend, content){
-		var fSet = new Element('fieldset').insert(new Element('legend').update(legend)).insert(content);
-		return fSet;		
+        return new Element('fieldset').insert(new Element('legend').update(legend)).insert(content);
 	},
 	
 	parseXml : function(transport){
-		//alert(transport.responseText);
 		this.changeModifiedStatus(false);
 		this.removeOnLoad();
 	},

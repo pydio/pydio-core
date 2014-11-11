@@ -56,18 +56,16 @@ Class.create("MultiUploader", {
 		
 		this.crtContext = ajaxplorer.getUserSelection();
 		this.addElement(formObject.select('.dialogFocus')[0]);
-		var rep = new Element('input', {
-			type:'hidden', 
-			name:'dir', 
-			value:this.crtContext.getContextNode().getPath()
-		});
-		formObject.insert(rep);		
-		var rep = new Element('input', {
-			type:'hidden', 
-			name:'secure_token', 
-			value:window.Connexion.SECURE_TOKEN
-		});
-		formObject.insert(rep);		
+		formObject.insert(new Element('input', {
+            type:'hidden',
+            name:'dir',
+            value:this.crtContext.getContextNode().getPath()
+        }));
+		formObject.insert(new Element('input', {
+            type:'hidden',
+            name:'secure_token',
+            value:window.Connexion.SECURE_TOKEN
+        }));
 		
 		this.currentFileUploading = null;
 		this.nextToUpload = -1;
@@ -171,7 +169,7 @@ Class.create("MultiUploader", {
 				// Update list
 				this.multi_selector.addListRow( this );
 
-				// Hide this: we can't use display:none because Safari doesn't like it				
+				// Hide this: we can't use display:none because Safari doesn't like it
 				this.style.position = 'absolute';
 				this.style.left = '-1000px';
 				if(Prototype.Browser.IE){
@@ -190,11 +188,11 @@ Class.create("MultiUploader", {
 			this.count++;
 			// Most recent element
 			this.current_element = element;
-			
+
 		} else {
 			// This can only be applied to file input elements!
 			alert( 'Error: not a file input element' );
-		};
+		}
 
 	},
 
@@ -273,7 +271,7 @@ Class.create("MultiUploader", {
 	
 	getFileNames : function(){
 		
-		var fileNames = new Array();
+		var fileNames = $A();
 		for(var i=0; i<this.list_target.childNodes.length;i++)
 		{
 			fileNames.push(this.list_target.childNodes[i].element.value);
@@ -308,7 +306,7 @@ Class.create("MultiUploader", {
 		this.currentFileUploading = null;
 		this.nextToUpload = -1;
 		var formsCount = 0;
-		var i = 0;
+		var i;
 		for(i=0;i<this.id + 1;i++)
 		{
 

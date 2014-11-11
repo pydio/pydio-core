@@ -125,6 +125,7 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
             }
 
 			//if(mime == "mp4" || mime == "webm" || mime == "ogv"){
+            var div, content;
             if(html5proxies.keys().length){
 				// Problem : some embedded HTML5 readers do not send the cookies!
 				if(!window.crtAjxpSessid){
@@ -145,8 +146,8 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
 					ogv:'video/ogg; codecs="theora, vorbis"'
 				};
 				var poster = resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64);
-				var div = new Element("div", {className:"video-js-box"});
-				var content = '';
+				div = new Element("div", {className:"video-js-box"});
+				content = '';
 				content +='	<video class="video-js" controls preload="auto" height="200">';
                 var flashName;
                 html5proxies.each(function(pair){
@@ -210,8 +211,8 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
 				
 			}else{
                 var f = encodeURIComponent(url+'/'+ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=read_video_data&file='+ajxpNode.getPath());
-				var div = new Element('div', {id:"video_container", style:"text-align:center; margin-bottom: 5px;"});
-				var content = '<object type="application/x-shockwave-flash" data="plugins/editor.video/player_flv_maxi.swf" width="100%" height="200">';
+				div = new Element('div', {id:"video_container", style:"text-align:center; margin-bottom: 5px;"});
+				content = '<object type="application/x-shockwave-flash" data="plugins/editor.video/player_flv_maxi.swf" width="100%" height="200">';
 				content += '	<param name="movie" value="plugins/editor.video/player_flv_maxi.swf" />';
 				content += '	<param name="quality" value="high">';
 				content += '	<param name="allowFullScreen" value="true" />';

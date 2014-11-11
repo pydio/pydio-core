@@ -657,7 +657,7 @@ Class.create("FilesList", SelectableElements, {
                 this.htmlElement.removeClassName('fl-displayMode-' + f);
             }
         }.bind(this));
-        var scrollElement;
+        var scrollElement, buffer;
 		if(this._displayMode == "list")
 		{
             var data;
@@ -825,7 +825,7 @@ Class.create("FilesList", SelectableElements, {
 				this.headerMenu.destroy();
 				delete this.headerMenu;
 			}
-			var buffer = '<div class="panelHeader"><div style="float:right;padding-right:5px;font-size:1px;height:16px;"><input type="image" height="16" width="16" src="'+ajxpResourcesFolder+'/images/actions/16/zoom-in.png" id="slider-input-1" style="border:0px;width:16px;height:16px;margin-top:0px;padding:0px;" value="64"/></div>'+MessageHash[126]+'</div>';
+			buffer = '<div class="panelHeader"><div style="float:right;padding-right:5px;font-size:1px;height:16px;"><input type="image" height="16" width="16" src="'+ajxpResourcesFolder+'/images/actions/16/zoom-in.png" id="slider-input-1" style="border:0px;width:16px;height:16px;margin-top:0px;padding:0px;" value="64"/></div>'+MessageHash[126]+'</div>';
 			buffer += '<div id="selectable_div-'+this.__currentInstanceIndex+'" class="selectable_div'+(this._displayMode == "detail" ? ' detailed':'')+'" style="overflow:auto;">';
 			this.htmlElement.update(buffer);
             if(this.options.horizontalScroll){

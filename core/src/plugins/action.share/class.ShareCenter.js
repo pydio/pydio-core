@@ -606,8 +606,9 @@ Class.create("ShareCenter", {
             values[name] = element;
             chooser.insert(new Element('option', {value:element}).update(label));
         });
+        var read;
         if(linkRightsToTemplates && values["unique_preview_file"] && values["unique_preview_download"]){
-            var read = oForm.down("#simple_right_read");
+            read = oForm.down("#simple_right_read");
             var download = oForm.down("#simple_right_download");
             var observer = function(){
                 if(!read.checked && !download.checked){
@@ -623,7 +624,7 @@ Class.create("ShareCenter", {
             download.observe("click", observer);
 
         }else if(noEditorsFound){
-            var read = oForm.down("#simple_right_read");
+            read = oForm.down("#simple_right_read");
             read.checked = false;
             read.disabled = true;
             read.next("label").insert(" (no preview for this file)");
@@ -1036,7 +1037,7 @@ Class.create("ShareCenter", {
                         }
                         conn.onComplete = function(transport){
                             ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
-                        }
+                        };
                         conn.sendAsync();
                     }
                 }.bind(this));
