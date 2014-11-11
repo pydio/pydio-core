@@ -22,15 +22,15 @@
  * Singleton class that manages all actions. Can be called directly using ajaxplorer.actionBar.
  */
 Class.create("ActionsManager", {
-	
-	/**
-	 * Standard constructor
-	 * @param bUsersEnabled Boolen Whether users management is enabled or not
-	 */
+
+    /**
+     * Standard constructor
+     * @param bUsersEnabled Boolen Whether users management is enabled or not
+     * @param dataModelElementId
+     */
 	initialize: function(bUsersEnabled, dataModelElementId)
 	{
 		this._registeredKeys = new Hash();
-		this._actions = new Hash();
 		this.usersEnabled = bUsersEnabled;
 		
 		this.bgManager = new BackgroundManager(this);		
@@ -130,7 +130,7 @@ Class.create("ActionsManager", {
 	{	
 		this.oUser = oUser;
 		if(oUser != null && ajaxplorer  && oUser.id != 'guest' && oUser.getPreference('lang') != null 
-			&& oUser.getPreference('lang') != "" 
+			&& oUser.getPreference('lang') != ""
 			&& oUser.getPreference('lang') != ajaxplorer.currentLanguage
             && !oUser.lock
             )
@@ -156,7 +156,7 @@ Class.create("ActionsManager", {
 		//{
 		//	actionsSelectorAtt = 'directoryContext';
 		//}
-		var contextActions = new Array();
+		var contextActions = $A();
 		var defaultGroup;
         var contextActionsGroup = {};
 		this.actions.each(function(pair){
@@ -288,7 +288,6 @@ Class.create("ActionsManager", {
 			var args = $A(arguments);
 			args.shift();
 			action.apply(args);
-			return;
 		}
 	},
 	
@@ -329,7 +328,6 @@ Class.create("ActionsManager", {
 			}
 			Event.stop(event);
 		}
-		return;
 	},
 	
 	/**
@@ -562,11 +560,12 @@ Class.create("ActionsManager", {
                     updates.each(function(tree){
                         var newNode = dm.getAjxpNodeProvider().parseAjxpNode(tree);
                         var original = newNode.getMetadata().get("original_path");
+                        var fake, n;
                         if(original && original != newNode.getPath()
                             && getRepName(original) != getRepName(newNode.getPath())){
                             // Node was really moved to another folder
-                            var fake = new AjxpNode(original);
-                            var n = fake.findInArbo(dm.getRootNode(), undefined);
+                            fake = new AjxpNode(original);
+                            n = fake.findInArbo(dm.getRootNode(), undefined);
                             if(n){
                                 n.getParent().removeChild(n);
                             }
@@ -578,8 +577,8 @@ Class.create("ActionsManager", {
                                 parent.addChild(newNode);
                             }
                         }else{
-                            var fake = new AjxpNode(original);
-                            var n = fake.findInArbo(dm.getRootNode(), undefined);
+                            fake = new AjxpNode(original);
+                            n = fake.findInArbo(dm.getRootNode(), undefined);
                             if(n){
                                 newNode._isLoaded = n._isLoaded;
                                 n.replaceBy(newNode, "override");
@@ -624,7 +623,7 @@ Class.create("ActionsManager", {
 				}
 				else if(result == '0' || result == '-1')
 				{
-                    var errorId = 285;
+                    errorId = 285;
 				}
 				else if(result == '2')
 				{					
@@ -632,15 +631,15 @@ Class.create("ActionsManager", {
 				}
 				else if(result == '-2')
 				{
-                    var errorId = 285;
+                    errorId = 285;
 				}
 				else if(result == '-3')
 				{
-                    var errorId = 366;
+                    errorId = 366;
 				}
 				else if(result == '-4')
 				{
-                    var errorId = 386;
+                    errorId = 386;
 				}
                 if(errorId){
                     error = true;

@@ -149,10 +149,9 @@ Class.create("FoldersTree", AjxpPane, {
 		var d = (displayOptions.indexOf("d") > -1);
 		var z = (displayOptions.indexOf("z") > -1);
 		var f = (displayOptions.indexOf("f") > -1);
-		var filter = function(ajxpNode){
+		return function(ajxpNode){
 			return (((d && !ajxpNode.isLeaf()) || (f && ajxpNode.isLeaf()) || (z && (ajxpNode.getAjxpMime()=="zip" || ajxpNode.getAjxpMime()=="ajxp_browsable_archive"))) && (ajxpNode.getParent().getAjxpMime() != "ajxp_recycle"));
 		};
-		return filter;		
 	},
 	
 	/**
@@ -229,6 +228,7 @@ Class.create("FoldersTree", AjxpPane, {
 				return webFXTreeHandler.all[key];
 			}
 		}
+        return undefined;
 	},
 	
 	/**
@@ -261,7 +261,7 @@ Class.create("FoldersTree", AjxpPane, {
 	 */
 	cleanPathToArray: function(url){
 		var splitPath = url.split("/");
-		var path = new Array();
+		var path = $A();
 		var j = 0;
 		for(var i=0; i<splitPath.length; i++)
 		{
@@ -290,7 +290,7 @@ Class.create("FoldersTree", AjxpPane, {
 	 * @param newIcon String
 	 */
 	changeNodeLabel: function(nodeId, newLabel, newIcon){	
-		var node = $(nodeId+'-label').update(newLabel);
+		$(nodeId+'-label').update(newLabel);
 		if(newIcon){
 			var realNode = webFXTreeHandler.all[nodeId];
 			realNode.icon = newIcon;
@@ -309,15 +309,14 @@ Class.create("FoldersTree", AjxpPane, {
         var nodeId = webFXTreeHandler.selected.id;
    		var item = this.treeContainer.down('#' + nodeId); // We assume this action was triggered with a single-selection active.
    		var offset = {top:0,left:0};
-   		var scrollTop = 0;
+   		var scrollTop;
 
         var span = item.down('a');
-        var posSpan = item;
         offset.top=1;
         offset.left=43;
         scrollTop = this.treeContainer.scrollTop;
 
-   		var pos = posSpan.cumulativeOffset();
+   		var pos = item.cumulativeOffset();
    		var text = span.innerHTML;
    		var edit = new Element('input', {value:item.ajxpNode.getLabel('text'), id:'editbox'}).setStyle({
    			zIndex:5000,
@@ -328,7 +327,7 @@ Class.create("FoldersTree", AjxpPane, {
                padding: 0
    		});
    		$(document.getElementsByTagName('body')[0]).insert({bottom:edit});
-   		modal.showContent('editbox', (posSpan.getWidth()-offset.left)+'', '20', true, false, {opacity:0.25, backgroundColor:'#fff'});
+   		modal.showContent('editbox', (item.getWidth()-offset.left)+'', '20', true, false, {opacity:0.25, backgroundColor:'#fff'});
    		edit.setStyle({left:(pos.left+offset.left)+'px', top:(pos.top+offset.top-scrollTop)+'px'});
    		window.setTimeout(function(){
    			edit.focus();

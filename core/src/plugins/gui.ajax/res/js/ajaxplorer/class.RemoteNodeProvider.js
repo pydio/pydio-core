@@ -89,6 +89,7 @@ Class.create("RemoteNodeProvider", {
    	 * Load a node
    	 * @param node AjxpNode
    	 * @param nodeCallback Function On node loaded
+     * @param aSync bool
    	 */
    	loadLeafNodeSync : function(node, nodeCallback, aSync){
    		var conn = new Connexion();
@@ -159,7 +160,6 @@ Class.create("RemoteNodeProvider", {
 		    throw new Error('Invalid XML Document (see console)');
 		}
 		var rootNode = transport.responseXML.documentElement;
-		var children = rootNode.childNodes;
         if(!childrenOnly){
             var contextNode = this.parseAjxpNode(rootNode);
             origNode.replaceBy(contextNode, "merge");
@@ -229,7 +229,6 @@ Class.create("RemoteNodeProvider", {
 			(xmlNode.getAttribute('is_file') == "1" || xmlNode.getAttribute('is_file') == "true"), 
 			xmlNode.getAttribute('text'),
 			xmlNode.getAttribute('icon'));
-		var reserved = ['filename', 'is_file', 'text', 'icon'];
 		var metadata = new Hash();
 		for(var i=0;i<xmlNode.attributes.length;i++)
 		{

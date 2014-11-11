@@ -127,7 +127,7 @@ Class.create("RepositorySelect", {
 			repositoryList.each(function(pair){
 				var repoObject = pair.value;
 				var key = pair.key;
-				var selected = (key == repositoryId ? true:false);
+				var selected = (key == repositoryId);
 
                 if(repoObject.getAccessType().startsWith('ajxp_')){
                     return;
@@ -272,11 +272,10 @@ Class.create("RepositorySelect", {
 		}
 	},
 
-	/**
-	 * Gets the bookmark actions for a bookmark
-	 * @param bmPath String
-	 * @param bmTitle String
-	 */
+    /**
+     * Gets the bookmark actions for a bookmark
+     * @param repositoryId
+     */
 	getContextActions: function(repositoryId){
 
 		var removeAction = {

@@ -127,7 +127,7 @@ Class.create("Repository", {
 		return this.icon;
 	},
 	/**
-	 * @param label String
+	 * @param icon String
 	 */
 	setIcon : function(icon){
 		this.icon = icon;
@@ -147,7 +147,7 @@ Class.create("Repository", {
 		return this.accessType;
 	},
 	/**
-	 * @param label String
+	 * @param access String
 	 */
 	setAccessType : function(access){
 		this.accessType = access;

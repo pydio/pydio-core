@@ -67,7 +67,7 @@ Class.create("Connexion", {
 	 * @param method String
 	 */
 	setMethod : function(method){
-		this._method = 'put';
+		this._method = method;
 	},
 	
 	/**
@@ -134,7 +134,7 @@ Class.create("Connexion", {
         });
 		this.addSecureToken();
         this.showLoader();
-		var t = new Ajax.Request(this._baseUrl,
+		new Ajax.Request(this._baseUrl,
 		{
 			method:this._method,
 			asynchronous: false,
@@ -155,8 +155,8 @@ Class.create("Connexion", {
         var tok1 = "Ooops, it seems that your security token has expired! Please %s by hitting refresh or F5 in your browser!";
         var tok2 =  "reload the page";
         if(window.MessageHash && window.MessageHash[437]){
-            var tok1 = window.MessageHash[437];
-            var tok2 = window.MessageHash[438];
+            tok1 = window.MessageHash[437];
+            tok2 = window.MessageHash[438];
         }
         tokenMessage = tok1.replace("%s", "<a href='javascript:document.location.reload()' style='text-decoration: underline;'>"+tok2+"</a>");
 

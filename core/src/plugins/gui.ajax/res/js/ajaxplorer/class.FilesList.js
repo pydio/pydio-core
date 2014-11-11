@@ -162,8 +162,8 @@ Class.create("FilesList", SelectableElements, {
         }
 	
 		this._pendingFile = null;
-		this.allDraggables = new Array();
-		this.allDroppables = new Array();		
+		this.allDraggables = $A();
+		this.allDroppables = $A();
 		
 		// List mode style : file list or tableur mode ?
 		this.gridStyle = "file";
@@ -296,8 +296,7 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	getVisibleSortTypes : function(){
 		var visible = $A([]);
-		var index = 0;
-		for(var i=0;i<this.columnsDef.length;i++){			
+		for(var i=0;i<this.columnsDef.length;i++){
 			if(!this.hiddenColumns.include(this.columnsDef[i].attributeName)) visible.push(this.columnsDef[i].sortType);
 		}
 		return visible;		
@@ -365,7 +364,9 @@ Class.create("FilesList", SelectableElements, {
 	
 	applyComponentConfig : function(config){
 		for(var key in config){
-			this[key] = config[key].value;
+            if(config.hasOwnProperty(key)) {
+                this[key] = config[key].value;
+            }
 		}
 	},
 	
@@ -407,13 +408,14 @@ Class.create("FilesList", SelectableElements, {
 			// COLUMNS INFO
 			var columns = XPathSelectNodes(columnsNode, "column");
 			var addColumns = XPathSelectNodes(columnsNode, "additional_column");
+            var newCols, sortTypes;
 			if(columns.length){
-				var newCols = $A([]);
-				var sortTypes = $A([]);
+				newCols = $A([]);
+				sortTypes = $A([]);
 				columns.concat(addColumns);
 			}else{
-				var newCols = this.columnsDef;
-				var sortTypes = this._oSortTypes;
+				newCols = this.columnsDef;
+				sortTypes = this._oSortTypes;
 				columns = addColumns;
 			}
 			columns.each(function(col){
@@ -655,11 +657,12 @@ Class.create("FilesList", SelectableElements, {
                 this.htmlElement.removeClassName('fl-displayMode-' + f);
             }
         }.bind(this));
+        var scrollElement;
 		if(this._displayMode == "list")
 		{
-			var buffer = '';
+            var data;
 			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("columns_visibility", true)){
-				var data = new Hash(ajaxplorer.user.getPreference("columns_visibility", true));
+				data = new Hash(ajaxplorer.user.getPreference("columns_visibility", true));
 				if(data.get(ajaxplorer.user.getActiveRepository())){
 					this.hiddenColumns = $A(data.get(ajaxplorer.user.getActiveRepository()));
 				}else{
@@ -669,7 +672,7 @@ Class.create("FilesList", SelectableElements, {
 			var visibleColumns = this.getVisibleColumns();			
 			var userPref;
 			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("columns_size", true)){
-				var data = new Hash(ajaxplorer.user.getPreference("columns_size", true));
+				data = new Hash(ajaxplorer.user.getPreference("columns_size", true));
 				if(this.columnsTemplate && data.get(this.columnsTemplate)){
 					userPref = new Hash(data.get(this.columnsTemplate));
 				}else if(data.get(ajaxplorer.user.getActiveRepository())){
@@ -718,7 +721,7 @@ Class.create("FilesList", SelectableElements, {
             }else{
                 attachMobileScroll(contentContainer, "vertical");
             }
-            var scrollElement = contentContainer;
+            scrollElement = contentContainer;
 			var oElement = this.htmlElement.down(".selectable_div");
 			
 			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){
@@ -774,8 +777,7 @@ Class.create("FilesList", SelectableElements, {
                     this.getCurrentContextNode().reload();
 				}.bind(this), this.getVisibleColumns(), this.paginationData.get('currentOrderCol')||-1, this.paginationData.get('currentOrderDir') );
 			}
-			//this.disableTextSelection(this.htmlElement.down('div.sort-table'), true);
-			//this.disableTextSelection(contentContainer, true);
+
 			this.observer = function(e){
                 if(this.options.fit && this.options.fit == 'height') fitHeightToBottom(contentContainer, this.htmlElement);
 				if(Prototype.Browser.IE){
@@ -837,7 +839,7 @@ Class.create("FilesList", SelectableElements, {
 			}else{
                 this.htmlElement.removeClassName("paginated");
             }
-            var scrollElement = this.htmlElement.down(".selectable_div");
+            scrollElement = this.htmlElement.down(".selectable_div");
             if(this.options.horizontalScroll){
                 scrollElement.setStyle({width:'100000px'});
                 this.htmlElement.setStyle({overflowX:'auto'});
@@ -1228,13 +1230,6 @@ Class.create("FilesList", SelectableElements, {
 			this.fill(this.getCurrentContextNode());
 		}
 	},
-	/**
-	 * Attach a pending selection that will be applied after rows are populated
-	 * @param pendingFilesToSelect $A()
-	setPendingSelection: function(pendingFilesToSelect){
-		this._pendingFile = pendingFilesToSelect;
-	},
-     */
 
     empty : function(skipFireChange){
         this._previewFactory.clear();
@@ -1272,7 +1267,7 @@ Class.create("FilesList", SelectableElements, {
 
         var items = this.getSelectedItems();
         var setItemSelected = this.setItemSelected.bind(this);
-        for(var i=0; i<items.length; i++)
+        for(i=0; i<items.length; i++)
         {
             setItemSelected(items[i], false);
         }
@@ -1520,21 +1515,22 @@ Class.create("FilesList", SelectableElements, {
 		var offset = {top:0,left:0};
 		var scrollTop = 0;
         var addStyle = {fontSize: '12px'};
+        var span, posSpan;
         if(this._displayMode == "list"){
-            var span = item.select('span.text_label')[0];
-            var posSpan = item.select('span.list_selectable_span')[0];
+            span = item.select('span.text_label')[0];
+            posSpan = item.select('span.list_selectable_span')[0];
             offset.top=-3;
             offset.left=25;
             scrollTop = this.htmlElement.down('div.table_rows_container').scrollTop;
         }else if(this._displayMode == "thumb"){
-            var span = item.select('div.thumbLabel')[0];
-            var posSpan = span;
+            span = item.select('div.thumbLabel')[0];
+            posSpan = span;
             offset.top=-2;
             offset.left=3;
             scrollTop = this.htmlElement.down('.selectable_div').scrollTop;
         }else if(this._displayMode == "detail"){
-            var span = item.select('div.thumbLabel')[0];
-            var posSpan = span;
+            span = item.select('div.thumbLabel')[0];
+            posSpan = span;
             offset.top=0;
             offset.left= 0;
             scrollTop = this.htmlElement.down('.selectable_div').scrollTop;
@@ -1762,7 +1758,7 @@ Class.create("FilesList", SelectableElements, {
                         if(!this.htmlElement) return;// can be destroyed.
                         if(ajxpNode.getAjxpMime() != "ajxp_recycle"){
                             if(!this.htmlElement) return;
-                            var newDrag = new AjxpDraggable(
+                            new AjxpDraggable(
                                 innerSpan,
                                 {
                                     revert:true,
@@ -1844,8 +1840,7 @@ Class.create("FilesList", SelectableElements, {
 		var newRow = new Element('div', {
             className:"thumbnail_selectable_cell",
             id:"item-"+slugString(ajxpNode.getPath())});
-		var metadata = ajxpNode.getMetadata();
-				
+
 		var innerSpan = new Element('span', {style:"cursor:default;"});
 
         var img = this._previewFactory.generateBasePreview(ajxpNode);
@@ -1909,7 +1904,7 @@ Class.create("FilesList", SelectableElements, {
 		if(!ajxpNode.isRecycle()){
 			window.setTimeout(function(){
                 if(!this.htmlElement) return;
-				var newDrag = new AjxpDraggable(newRow, {
+				new AjxpDraggable(newRow, {
 					revert:true,
 					ghosting:true,
 					scroll:($('tree_container')?'tree_container':null),
@@ -2057,7 +2052,7 @@ Class.create("FilesList", SelectableElements, {
 		if(!ajxpNode.isRecycle()){
 			window.setTimeout(function(){
                 if(!this.htmlElement) return;
-                var newDrag = new AjxpDraggable(largeRow, {
+                new AjxpDraggable(largeRow, {
 					revert:true,
 					ghosting:true,
 					scroll:($('tree_container')?'tree_container':null),
@@ -2154,7 +2149,7 @@ Class.create("FilesList", SelectableElements, {
 					}
 				};
 				conn.sendAsync();
-			});
+            }.bind(this));
 			div.insert({bottom:stopButton});			
 		}
 		span.setAttribute('data-target_size', ajxpNode.getMetadata().get("target_bytesize"));
@@ -2202,8 +2197,7 @@ Class.create("FilesList", SelectableElements, {
         var ellipsisDetected;
         var tSize=0;
 		elList.each(function(element){
-            //if(element.up('div.thumbnail_selectable_cell.detailed')) return;
-			var node = element.ajxpNode;
+
             try{
                 var image_element = element.IMAGE_ELEMENT || element.down('img');
                 var label_element = element.LABEL_ELEMENT || element.down('.thumbLabel');
@@ -2237,7 +2231,7 @@ Class.create("FilesList", SelectableElements, {
                 var el_width = (!elementsAreSiblings ? (element.getWidth() - tSize - 10)  : (tSize + 25) ) ;
                 var charRatio = 6;
                 var nbChar = parseInt(el_width/charRatio);
-                var label = new String(label_element.getAttribute('title'));
+                var label = String(label_element.getAttribute('title'));
                 //alert(element.getAttribute('text'));
                 label_element.innerHTML = label.truncate(nbChar, '...');
             }
@@ -2423,7 +2417,6 @@ Class.create("FilesList", SelectableElements, {
 				this.setItemSelected(allItems[i], false);
 			}
 		}
-		return;
 	},
 	
 	/**
@@ -2456,7 +2449,7 @@ Class.create("FilesList", SelectableElements, {
 		$(target).addClassName("no_select_bg");
 		if(deep){
 			$(target).select("td,img,div,span").each(function(td){
-				this.disableTextSelection(td);
+				this.disableTextSelection(td, false);
 			}.bind(this));
 		}
 	},
@@ -2501,10 +2494,11 @@ Class.create("FilesList", SelectableElements, {
 		var allItems = this.getItems();
 		var currentItemIndex = this.getItemIndex(currentItem);
 		var selectLine = false;
+        var i;
 		//ENTER
 		if(event.keyCode == Event.KEY_RETURN)
 		{
-			for(var i=0; i<items.length; i++)
+			for(i=0; i<items.length; i++)
 			{
 				this.setItemSelected(items[i], false);
 			}
@@ -2563,7 +2557,7 @@ Class.create("FilesList", SelectableElements, {
 		}
 		if(!shiftKey || !this._multiple) // Unselect everything
 		{ 
-			for(var i=0; i<items.length; i++)
+			for(i=0; i<items.length; i++)
 			{
 				this.setItemSelected(items[i], false);
 			}		
@@ -2572,9 +2566,9 @@ Class.create("FilesList", SelectableElements, {
 		{
 			if(nextItemIndex >= currentItemIndex)
 			{
-				for(var i=currentItemIndex+1; i<nextItemIndex; i++) this.setItemSelected(allItems[i], !allItems[i]._selected);
+				for(i=currentItemIndex+1; i<nextItemIndex; i++) this.setItemSelected(allItems[i], !allItems[i]._selected);
 			}else{
-				for(var i=nextItemIndex+1; i<currentItemIndex; i++) this.setItemSelected(allItems[i], !allItems[i]._selected);
+				for(i=nextItemIndex+1; i<currentItemIndex; i++) this.setItemSelected(allItems[i], !allItems[i]._selected);
 			}
 		}
 		this.setItemSelected(nextItem, !nextItem._selected);
@@ -2584,7 +2578,7 @@ Class.create("FilesList", SelectableElements, {
 		var found;
 		var changed = selectedBefore.length != this._selectedItems.length;
 		if (!changed) {
-			for (var i = 0; i < selectedBefore.length; i++) {
+			for (i = 0; i < selectedBefore.length; i++) {
 				found = false;
 				for (var j = 0; j < this._selectedItems.length; j++) {
 					if (selectedBefore[i] == this._selectedItems[j]) {
@@ -2622,9 +2616,10 @@ Class.create("FilesList", SelectableElements, {
 		var pos = Position.cumulativeOffset(element);
 		var dims = Element.getDimensions(element);
 		var searchingPosX = pos[0] + parseInt(dims.width/2);
+        var searchingPosY, i;
 		if(bDown){
-			var searchingPosY = pos[1] + parseInt(dims.height*3/2);
-			for(var i=currentItemIndex+1; i<allItems.length;i++){
+			searchingPosY = pos[1] + parseInt(dims.height*3/2);
+			for(i=currentItemIndex+1; i<allItems.length;i++){
 				if(Position.within($(allItems[i]), searchingPosX, searchingPosY))
 				{
 					return i;
@@ -2632,8 +2627,8 @@ Class.create("FilesList", SelectableElements, {
 			}
 			return null;
 		}else{
-			var searchingPosY = pos[1] - parseInt(dims.height/2);
-			for(var i=currentItemIndex-1; i>-1; i--){
+			searchingPosY = pos[1] - parseInt(dims.height/2);
+			for(i=currentItemIndex-1; i>-1; i--){
 				if(Position.within($(allItems[i]), searchingPosX, searchingPosY))
 				{
 					return i;

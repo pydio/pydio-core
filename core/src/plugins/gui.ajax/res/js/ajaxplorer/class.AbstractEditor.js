@@ -53,6 +53,7 @@ Class.create("AbstractEditor" , {
 	/**
 	 * Standard contructor
 	 * @param oContainer Element dom not to attach to
+     * @param options Object
 	 */
 	initialize : function(oContainer, options){
 		this.editorOptions = Object.extend({
@@ -113,10 +114,8 @@ Class.create("AbstractEditor" , {
     },
 
     validateClose: function(){
-        if(this.isModified && !window.confirm(MessageHash[201])){
-            return false;
-        }
-        return true;
+        return !(this.isModified && !window.confirm(MessageHash[201]));
+
     },
 
 	/**
@@ -179,10 +178,8 @@ Class.create("AbstractEditor" , {
 			}.bind(this) );
             if(this.editorOptions.context.setCloseValidation){
                 this.editorOptions.context.setCloseValidation(function(){
-                    if(this.isModified && !window.confirm(MessageHash[201])){
-                        return false;
-                    }
-                    return true;
+                    return !(this.isModified && !window.confirm(MessageHash[201]));
+
                 }.bind(this) );
             }
 			if(window.ajxpMobile){
@@ -266,7 +263,7 @@ Class.create("AbstractEditor" , {
 	
 	/**
 	 * Opens the editor with the current model
-	 * @param userSelection AjxpDataModel the data model
+	 * @param nodeOrNodes AjxpDataModel the data model
 	 */
 	open : function(nodeOrNodes){
 		this.inputNode = nodeOrNodes;

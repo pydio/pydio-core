@@ -94,7 +94,7 @@ Class.create("Action", {
 			dynamicItems:null,
 			dynamicBuilderCode:null
 		}, arguments[4] || {});
-		this.elements = new Array();
+		this.elements = $A();
 		this.contextHidden = false;
 		this.deny = false;
 		if(this.context.subMenu){
@@ -158,22 +158,22 @@ Class.create("Action", {
 		}else if(this.options.callbackDialogNode){
 			var node = this.options.callbackDialogNode;
 			var dialogFormId = node.getAttribute("dialogOpenForm");
-			var okButtonOnly = (node.getAttribute("dialogOkButtonOnly") === "true")?true:false ;
-			var skipButtons = (node.getAttribute("dialogSkipButtons") === "true")?true:false ;
+			var okButtonOnly = (node.getAttribute("dialogOkButtonOnly") === "true") ;
+			var skipButtons = (node.getAttribute("dialogSkipButtons") === "true") ;
 			
 			var onOpenFunc = null; var onCompleteFunc = null; var onCancelFunc = null;
 			var onOpenNode = XPathSelectSingleNode(node, "dialogOnOpen");
-			if(onOpenNode && onOpenNode.firstChild) var onOpenFunc = new Function("oForm", onOpenNode.firstChild.nodeValue);
+			if(onOpenNode && onOpenNode.firstChild) onOpenFunc = new Function("oForm", onOpenNode.firstChild.nodeValue);
 			var onCompleteNode = XPathSelectSingleNode(node, "dialogOnComplete");
 			if(onCompleteNode && onCompleteNode.firstChild) {
 				var completeCode = onCompleteNode.firstChild.nodeValue;
 				if(onCompleteNode.getAttribute("hideDialog") === "true"){
 					completeCode += "hideLightBox(true);";
 				}
-				var onCompleteFunc = new Function("oForm", completeCode);
+				onCompleteFunc = new Function("oForm", completeCode);
 			}
 			var onCancelNode = XPathSelectSingleNode(node, "dialogOnCancel");
-			if(onCancelNode && onCancelNode.firstChild) var onCancelFunc = new Function("oForm", onCancelNode.firstChild.nodeValue);
+			if(onCancelNode && onCancelNode.firstChild) onCancelFunc = new Function("oForm", onCancelNode.firstChild.nodeValue);
 			
 			this.options.callback = function(){
 				modal.showDialogForm('Dialog', dialogFormId, onOpenFunc, onCompleteFunc, onCancelFunc, okButtonOnly, skipButtons);
@@ -375,9 +375,10 @@ Class.create("Action", {
 					this.defaults[att.key] = true;
 				}
 			}.bind(this));
+            var j;
 			if(node.nodeName == "processing"){
                 var clientFormData = {};
-				for(var j=0; j<node.childNodes.length; j++){
+				for(j=0; j<node.childNodes.length; j++){
 					var processNode = node.childNodes[j];
 					if(processNode.nodeName == "clientForm"){
                         if(!processNode.getAttribute("theme") || window.ajxpBootstrap.parameters.get('theme') == processNode.getAttribute("theme") ){
@@ -418,7 +419,7 @@ Class.create("Action", {
 				if(node.getAttribute('specialAccessKey')){
 					this.options.specialAccessKey = node.getAttribute('specialAccessKey');
 				}
-				for(var j=0; j<node.childNodes.length;j++){
+				for(j=0; j<node.childNodes.length;j++){
 					if(node.childNodes[j].nodeName == "context"){
 						this.attributesToObject(this.context, node.childNodes[j]);
 						if(this.context.ajxpWidgets){
@@ -445,7 +446,7 @@ Class.create("Action", {
 				if(node.getAttribute("updateTitleOnSelect") && node.getAttribute("updateTitleOnSelect") == "true"){
 					this.options.subMenuUpdateTitle = true;
 				}
-				for(var j=0;j<node.childNodes.length;j++){
+				for(j=0;j<node.childNodes.length;j++){
 					if(node.childNodes[j].nodeName == "staticItems" || node.childNodes[j].nodeName == "dynamicItems"){
 						this.subMenuItems[node.childNodes[j].nodeName] = [];
 						for(var k=0;k<node.childNodes[j].childNodes.length;k++){
@@ -494,7 +495,7 @@ Class.create("Action", {
 					image:resolveImageSource(item.src, '/images/actions/ICON_SIZE', 22),
                     icon_class:item.icon_class,
 					isDefault:(item.isDefault?true:false),
-					callback:function(e){this.apply([item]);}.bind(this)
+					callback:function(){this.apply([item]);}.bind(this)
 				});
 			}, this);
 		}
@@ -506,14 +507,15 @@ Class.create("Action", {
 	 */
 	prepareSubmenuDynamicBuilder : function(){		
 		this.subMenuItems.dynamicBuilder = function(protoMenu){
-			setTimeout(function(){
+            var menuItems;
+            setTimeout(function(){
 				if(this.subMenuItems.dynamicBuilderCode){
 					window.builderContext = this;
                     window.builderProtoMenu = protoMenu;
 					this.subMenuItems.dynamicBuilderCode.evalScripts();
-					var menuItems = this.builderMenuItems || [];					
+					menuItems = this.builderMenuItems || [];
 				}else{
-			  		var menuItems = [];
+			  		menuItems = [];
 			  		this.subMenuItems.dynamicItems.each(function(item){
                         if(item.separator){
                             menuItems.push(item);
@@ -526,7 +528,7 @@ Class.create("Action", {
 							alt:action.options.title,
                             icon_class:action.options.icon_class,
 							image:resolveImageSource(action.options.src, '/images/actions/ICON_SIZE', 16),						
-							callback:function(e){this.apply();}.bind(action)
+							callback:function(){this.apply();}.bind(action)
 						};
                         if(action.options.subMenu){
                             itemData.subMenu = [];
@@ -549,6 +551,7 @@ Class.create("Action", {
 	/**
 	 * Refresh icon image source
 	 * @param newSrc String The image source. Can reference an image library
+     * @param iconClass String Optional class to replace image
 	 */
 	setIconSrc : function(newSrc, iconClass){
 		this.options.src = newSrc;
@@ -601,7 +604,6 @@ Class.create("Action", {
 	 * Grab its label from the i18n MessageHash
 	 */
 	refreshFromI18NHash : function(){
-		var text; var title;
 		this.setLabel(this.options.text_id, this.options.title_id);
 	},
 	
@@ -614,7 +616,7 @@ Class.create("Action", {
 	},
 	
 	/**
-	 * Return necessary data to buid contextual menu
+	 * Return necessary data to build contextual menu
 	 * @returns Hash
 	 */
 	toContextMenu:function(){
@@ -684,7 +686,7 @@ Class.create("Action", {
 		this.elements.each(function(el){
 			$(el).remove();
 		}.bind(this));		
-		this.elements = new Array();
+		this.elements = $A();
 		if(this.options.formId && $('all_forms').select('[id="'+this.options.formId+'"]').length){
 			$('all_forms').select('[id="'+this.options.formId+'"]')[0].remove();
 		}

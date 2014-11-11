@@ -104,7 +104,9 @@ Class.create("SearchEngine", AjxpPane, {
                     this.indexedFields = $A(this.indexedFields["indexed_meta_fields"]);
                     if(!this._ajxpOptions.metaColumns) this._ajxpOptions.metaColumns = {};
                     for(var key in addColumns){
-                        this._ajxpOptions.metaColumns[key] = addColumns[key];
+                        if(addColumns.hasOwnProperty(key)){
+                            this._ajxpOptions.metaColumns[key] = addColumns[key];
+                        }
                     }
                 }else{
                     this.indexedFields = $A(this.indexedFields);
@@ -172,8 +174,10 @@ Class.create("SearchEngine", AjxpPane, {
 
         this.initMetaOption(simpleMeta, advancedMeta, 'filename', MessageHash[1], true);
         for(var key in metadataColumns){
-            if(this.indexedFields && !this.indexedFields.include(key)) continue;
-            this.initMetaOption(simpleMeta, advancedMeta, key, metadataColumns[key], false);
+            if(metadataColumns.hasOwnProperty(key)){
+                if(this.indexedFields && !this.indexedFields.include(key)) continue;
+                this.initMetaOption(simpleMeta, advancedMeta, key, metadataColumns[key], false);
+            }
         }
 
         var docPropertyTemplate =
@@ -322,8 +326,8 @@ Class.create("SearchEngine", AjxpPane, {
 		this._inputBox = this.htmlElement.down("#search_txt");
 		this._resultsBoxId = 'search_results';
 		this._searchButtonName = "search_button";
-		this._runningQueries = new Array();
-		this._queue = $A([]);
+		this._runningQueries = $A();
+		this._queue = $A();
 		
 		$('stop_'+this._searchButtonName).addClassName("disabled");
 
@@ -534,13 +538,14 @@ Class.create("SearchEngine", AjxpPane, {
             try {delete window[ajxpId];}catch(e){}
         }
 	},
-	/**
-	 * Initialise the options for search Metadata
-	 * @param element HTMLElement
-	 * @param optionValue String
-	 * @param optionLabel String
-	 * @param checked Boolean
-	 */
+    /**
+     * Initialise the options for search Metadata
+     * @param element HTMLElement
+     * @param optionValue String
+     * @param optionLabel String
+     * @param checked Boolean
+     * @param advancedPanel
+     */
 	initMetaOption : function(element, advancedPanel, optionValue, optionLabel, checked){
 		var option = new Element('span', {value:optionValue, className:'search_meta_opt'}).update('<span class="icon-ok"></span>'+ optionLabel);
 		if(checked) option.addClassName('checked');
@@ -682,7 +687,7 @@ Class.create("SearchEngine", AjxpPane, {
         if(this._ajxpOptions.toggleResultsVisibility){
             if(!$(this._ajxpOptions.toggleResultsVisibility).down("div.panelHeader.toggleResults")){
                 $(this._ajxpOptions.toggleResultsVisibility).insert({top:"<div class='panelHeader toggleResults'><span class='results_string'>Results</span><span class='close_results icon-remove-sign'></span><div id='display_toolbar'></div></div>"});
-                this.tb = new ActionsToolbar($(this._ajxpOptions.toggleResultsVisibility).down("#display_toolbar"), {submenuClassName:"panelHeaderMenu",submenuPosition:"bottom right",submenuOffsetTop:12,toolbarsList:["ajxp-search-result-bar"],skipBubbling:true, skipCarousel:true,submenuOffsetTop:2});
+                this.tb = new ActionsToolbar($(this._ajxpOptions.toggleResultsVisibility).down("#display_toolbar"), {submenuClassName:"panelHeaderMenu",submenuPosition:"bottom right",toolbarsList:["ajxp-search-result-bar"],skipBubbling:true, skipCarousel:true,submenuOffsetTop:2});
                 this.tb.actionsLoaded({memo:ajaxplorer.actionBar.actions});
                 this.tb.element.select('a').invoke('show');
                 this.resultsDraggable = new Draggable(this._ajxpOptions.toggleResultsVisibility, {
@@ -810,10 +815,11 @@ Class.create("SearchEngine", AjxpPane, {
             $(this._resultsBoxId).insert({top: new Element('div', {id:'no-results-found'}).update(MessageHash[478])});
         }
     },
-	/**
-	 * Put a folder to search in the queue
-	 * @param path String
-	 */
+    /**
+     * Put a folder to search in the queue
+     * @param path String
+     * @param remoteIndexation
+     */
 	appendFolderToQueue : function(path, remoteIndexation){
 		this._queue.push({path:path,remoteIndexation:remoteIndexation?remoteIndexation:false});
 	},
@@ -876,9 +882,10 @@ Class.create("SearchEngine", AjxpPane, {
 			this.updateStateFinished();
 			return;
 		}
+        var connexion;
         if(this._searchMode == "remote"){
             /* REMOTE INDEXER CASE */
-            var connexion = new Connexion();
+            connexion = new Connexion();
             connexion.discrete = true;
             connexion.addParameter('get_action', 'search');
             connexion.addParameter('query', this.crtText);
@@ -900,7 +907,7 @@ Class.create("SearchEngine", AjxpPane, {
 
             if(remote_indexation){
 
-                var connexion = new Connexion();
+                connexion = new Connexion();
                 connexion.addParameter('get_action', remote_indexation);
                 connexion.addParameter('query', this.crtText);
                 connexion.addParameter('dir', currentFolder);
@@ -918,7 +925,7 @@ Class.create("SearchEngine", AjxpPane, {
             }else{
 
                 /* LIST CONTENT, SEARCH CLIENT SIDE, AND RECURSE */
-                var connexion = new Connexion();
+                connexion = new Connexion();
                 connexion.addParameter('get_action', 'ls');
                 connexion.addParameter('options', 'a' + (this.hasMetaSearch()?'l':''));
                 connexion.addParameter('dir', currentFolder);
@@ -1040,7 +1047,6 @@ Class.create("SearchEngine", AjxpPane, {
 			(xmlNode.getAttribute('is_file') == "1" || xmlNode.getAttribute('is_file') == "true"), 
 			xmlNode.getAttribute('text'),
 			xmlNode.getAttribute('icon'));
-		var reserved = ['filename', 'is_file', 'text', 'icon'];
 		var metadata = new Hash();
 		for(var i=0;i<xmlNode.attributes.length;i++)
 		{
@@ -1064,7 +1070,6 @@ Class.create("SearchEngine", AjxpPane, {
         if(start == -1) return haystack;
 		var end = start + needle.length;
 		if(truncate && haystack.length > truncate){
-			var midTrunc = Math.round(truncate/2);
 			var newStart = Math.max(Math.round((end + start) / 2 - truncate / 2), 0);
 			var newEnd = Math.min(Math.round((end + start) / 2 + truncate / 2),haystack.length);
 			haystack = haystack.substring(newStart, newEnd);
@@ -1074,8 +1079,7 @@ Class.create("SearchEngine", AjxpPane, {
 			start = haystack.toLowerCase().indexOf(needle);
 			end = start + needle.length;
 		}
-		var highlight = haystack.substring(0, start)+'<em>'+haystack.substring(start, end)+'</em>'+haystack.substring(end);
-		return highlight;
+		return haystack.substring(0, start)+'<em>'+haystack.substring(start, end)+'</em>'+haystack.substring(end);
 	},
 
     /**

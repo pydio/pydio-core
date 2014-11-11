@@ -41,8 +41,7 @@ Class.create("DataModelProperty", {
                     element.update(l?l:'');
                     break;
                 case "root_label":
-                    var lab = dm.getRootNode().getLabel();
-                    element.update(label);
+                    element.update(dm.getRootNode().getLabel());
                     break;
                 case "metadata":
                     if(options.metadata_sum){

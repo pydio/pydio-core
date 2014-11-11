@@ -69,7 +69,6 @@ Class.create("AjxpDraggable", Draggable, {
 		};
 		this.options.delay = (Prototype.Browser.IE?350:200);
 		this.component = component;
-		this.componentType = componentType;
         window.AllAjxpDraggables.push(this);
 	},
 	
@@ -443,7 +442,6 @@ var AjxpDroppables = {
                             container.removeClassName("show_first_level");
                             container.addClassName("reset_show_first_level");
                         }
-						var jsString = "javascript:";			
 						window.WebFXtimer = window.setTimeout(function(){
 							var node = webFXTreeHandler.all[droppable.id];
 							if(node &&  node.folder && !node.open) node.expand();

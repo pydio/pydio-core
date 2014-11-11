@@ -62,7 +62,7 @@ function resolveImageSource(src, defaultPath, size){
 	}
 	var radic = src.substring(0,src.indexOf("/"));
 	if(window.AjxpImageLibraries[radic]){
-		var src = src.replace(radic, window.AjxpImageLibraries[radic]);
+		src = src.replace(radic, window.AjxpImageLibraries[radic]);
         if(ajxpBootstrap.parameters.get("SERVER_PREFIX_URI")){
             src = ajxpBootstrap.parameters.get("SERVER_PREFIX_URI") + src;
         }
@@ -299,6 +299,15 @@ function fitRectangleToDimension(rectDim, targetDim){
 	return {width:tW+'px', height:tH+'px', marginTop:mT+'px', marginBottom:mB+'px'};
 }
 
+/**
+ *
+ * @param element
+ * @param parentElement
+ * @param addMarginBottom
+ * @param listen
+ * @param minOffsetTop
+ * @returns Object|null
+ */
 function fitHeightToBottom(element, parentElement, addMarginBottom, listen, minOffsetTop)
 {	
 	element = $(element);
@@ -312,7 +321,7 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, listen, minO
 	}
     if(!parentElement){
         if(console) console.log('Warning, trying to fitHeightToBottom on null parent!', element.id);
-        return;
+        return null;
     }
 	if(typeof(addMarginBottom) == "undefined" || addMarginBottom == null){
 		addMarginBottom = 0;
@@ -349,8 +358,7 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, listen, minO
 			margin = parseInt(parentElement.getStyle('borderBottomWidth')||0) + parseInt(parentElement.getStyle('borderTopWidth')||0);
 		}
 		if(!Prototype.Browser.IE){
-			var childPadding = parseInt(element.getStyle('paddingBottom')||0) + parseInt(element.getStyle('paddingTop')||0);
-			margin += childPadding;
+            margin += parseInt(element.getStyle('paddingBottom') || 0) + parseInt(element.getStyle('paddingTop') || 0);
 		}
 		if(!margin) margin = 0;
 		element.setStyle({height:(Math.max(0,wh-top-mrg-brd-pad-margin-addMarginBottom))+'px'});
@@ -398,7 +406,7 @@ function loadXPathReplacer(){
 	if(ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')){
 		conn._libUrl = ajxpBootstrap.parameters.get('SERVER_PREFIX_URI');
 	}
-	conn.loadLibrary('plugins/gui.ajax/res/js/lib/xpath/javascript-xpath-cmp.js');	
+	conn.loadLibrary('plugins/gui.ajax/res/js/lib/xpath/javascript-xpath-cmp.js');
 }
 
 /**
@@ -466,26 +474,25 @@ function XPathSelectNodes(element, query){
 	      window.__xpe = xpe = new XPathEvaluator();
     	}catch(e){}
     }
-    
+    var result, nodes = [], i;
 	if(!window.__xpe){	
 		if(!document.createExpression) loadXPathReplacer();	
 		query = document.createExpression(query, null);
-		var result = query.evaluate(element, 7, null);
-	    var nodes = [];
-	    for (var i=0; i<result.snapshotLength; i++) {
+		result = query.evaluate(element, 7, null);
+	    nodes = [];
+	    for (i=0; i<result.snapshotLength; i++) {
 	      nodes[i] = Element.extend(result.snapshotItem(i));
 	    }
 	    return nodes;
 	}
 
     try {
-      var result = xpe.evaluate(query, element, xpe.createNSResolver(element), XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+        result = xpe.evaluate(query, element, xpe.createNSResolver(element), XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
     } catch(err) {
       throw new Error("selectNodes: query: " + query + ", element: " + element + ", error: " + err);
     }
 
-    var nodes = [];
-    for (var i=0; i<result.snapshotLength; i++) {
+    for (i=0; i<result.snapshotLength; i++) {
       nodes[i] = result.snapshotItem(i);
     }
 
@@ -517,7 +524,7 @@ function getDomNodeText(node){
 		var i, a=[], nodes = node.childNodes, length = nodes.length;
 		for (i=0; i<length; i++) {
 			a[i] = getDomNodeText(nodes[i]);
-		};
+		}
 
 		return a.join("");
 
@@ -533,6 +540,10 @@ function getDomNodeText(node){
 	return null;
 }
 
+/**
+ * @param xmlStr
+ * @returns {*}
+ */
 function parseXml(xmlStr){
 
     if(typeof window.ActiveXObject != "undefined" &&
@@ -564,7 +575,6 @@ window.ajaxplorerSlugTable = [
  {re:/[\xF1]/g, ch:'n'} ];
 
 function slugString(value){
-// converti les caractères accentués en leurs équivalent alpha
  for(var i=0, len=window.ajaxplorerSlugTable.length; i<len; i++)
   value=value.replace(window.ajaxplorerSlugTable[i].re, window.ajaxplorerSlugTable[i].ch);
 
@@ -584,7 +594,7 @@ function ajxpCorners(oElement, cornersString)
 	var tr, tl, bl, br;
 	if(cornersString == null)
 	{
-		tr = tl = bl = br;
+		tr = tl = bl = br = false;
 	}
 	else
 	{
@@ -635,7 +645,7 @@ function base64_encode( data ) {
     //}
         
     var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-    var o1, o2, o3, h1, h2, h3, h4, bits, i = 0, ac = 0, enc="", tmp_arr = [];
+    var o1, o2, o3, h1, h2, h3, h4, bits, i = 0, ac = 0, enc, tmp_arr = [];
  
     if (!data) {
         return data;
@@ -689,7 +699,7 @@ function utf8_encode ( string ) {
  
     var utftext = "";
     var start, end;
-    var stringl = 0;
+    var stringl;
  
     start = end = 0;
     stringl = string.length;
@@ -726,13 +736,14 @@ function scrollByTouch(event, direction, targetId){
 	if(!$(touchData.target) || ! $(touchData.target).up ) return;
 	var target = $(touchData.target).up('#'+targetId);
 	if(!target) return;
+    var eventPropName, targetPropName, delta;
 	if(direction != "both"){
 		if(direction == "vertical"){
-			var eventPropName = "clientY";
-			var targetPropName = "scrollTop";
+			eventPropName = "clientY";
+			targetPropName = "scrollTop";
 		}else{
-			var eventPropName = "clientX";
-			var targetPropName = "scrollLeft";					
+			eventPropName = "clientX";
+			targetPropName = "scrollLeft";
 		}
 		
 		if(type == "touchstart"){
@@ -746,8 +757,8 @@ function scrollByTouch(event, direction, targetId){
 			target.originalScroll = null;
 		}else if(type == "touchmove"){
 			event.preventDefault();
-			if(!target.originalTouchPos == null) return;
-			var delta = touchData[eventPropName] - target.originalTouchPos;
+			if(!target.originalTouchPos) return;
+			delta = touchData[eventPropName] - target.originalTouchPos;
 			target[targetPropName] = target.originalScroll - delta;
 		}
 	}else{
@@ -766,10 +777,10 @@ function scrollByTouch(event, direction, targetId){
 			target.originalScrollLeft = null;
 		}else if(type == "touchmove"){
 			event.preventDefault();
-			if(!target.originalTouchPosY == null) return;
-			var delta = touchData["clientY"] - target.originalTouchPosY;
+			if(!target.originalTouchPosY) return;
+			delta = touchData["clientY"] - target.originalTouchPosY;
 			target["scrollTop"] = target.originalScrollTop - delta;
-			var delta = touchData["clientX"] - target.originalTouchPosX;
+			delta = touchData["clientX"] - target.originalTouchPosX;
 			target["scrollLeft"] = target.originalScrollLeft - delta;
 		}
 	}
@@ -777,10 +788,11 @@ function scrollByTouch(event, direction, targetId){
 
 function attachMobileScroll(targetId, direction){
 	if(!window.ajxpMobile) return;
+    var target;
 	if(typeof (targetId) == "string"){
-		var target = $(targetId);
+		target = $(targetId);
 	}else{
-		var target = targetId;
+		target = targetId;
 		targetId = target.id;
         if(!target.id){
             targetId = "scroll-pane-"+Math.floor(Math.random()*1000);

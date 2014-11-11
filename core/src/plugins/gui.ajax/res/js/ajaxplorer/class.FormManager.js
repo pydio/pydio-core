@@ -75,6 +75,8 @@ Class.create("FormManager", {
 			var name = param.get('name');
 			var type = param.get('type');
 			var desc = param.get('description');
+            var conn = new Connexion();
+
             // deduplicate
             if(form.down('[name="'+name+'"]')) return;
 
@@ -123,7 +125,6 @@ Class.create("FormManager", {
                     }
                     testValues.set('get_action', firstPart);
                     this.serializeParametersInputs(form, testValues, "DRIVER_OPTION_");
-                    var conn = new Connexion();
 
                     if(choicesValue.length > 1){
                         testValues.set("action_plugin_id", choicesValue.shift());
@@ -155,7 +156,6 @@ Class.create("FormManager", {
                     element.addClassName('SF_inlineMonitoringWorking');
                     var testValues = $H();
                     this.serializeParametersInputs(form, testValues, "DRIVER_OPTION_");
-                    var conn = new Connexion();
 
                     var choicesValue = param.get("choices").split(":");
                     testValues.set('get_action', choicesValue.shift());
@@ -216,8 +216,10 @@ Class.create("FormManager", {
                     }else if(param.get("choices") == "AJXP_AVAILABLE_LANGUAGES"){
                         var object = window.ajxpBootstrap.parameters.get("availableLanguages");
                         choices = [];
-                        for(var key in object){
-                            choices.push(key + "|" + object[key]);
+                        for(key in object){
+                            if(object.hasOwnProperty(key)){
+                                choices.push(key + "|" + object[key]);
+                            }
                         }
                     }else if(param.get("choices") == "AJXP_AVAILABLE_REPOSITORIES"){
                         choices = [];
@@ -255,7 +257,6 @@ Class.create("FormManager", {
                 element += '</select>';
             }else if(type == "image" && param.get("uploadAction")){
                 if(defaultValue){
-                    var conn = new Connexion();
                     var imgSrc = conn._baseUrl + "&get_action=" +param.get("loadAction") + "&binary_id=" + defaultValue;
                     if(param.get("binary_context")){
                         imgSrc += "&" + param.get("binary_context");
@@ -410,8 +411,9 @@ Class.create("FormManager", {
                 ttSpan.writeAttribute('data-tooltipLabel', label);
                 ttSpan.writeAttribute('data-tooltipDescription', desc);
 			}
+            var key;
+            var conn = new Connexion();
             if(json_list){
-                var conn = new Connexion();
                 element = div.down("select");
                 if(defaultValue) element.defaultValue = defaultValue;
                 conn.setParameters({get_action:json_list});
@@ -419,19 +421,22 @@ Class.create("FormManager", {
                     var json = transport.responseJSON;
                     element.down("option").update(json.LEGEND ? json.LEGEND : "Select...");
                     if(json.HAS_GROUPS){
-                        for(var key in json.LIST){
-                            var opt = new Element("OPTGROUP", {label:key});
-                            element.insert(opt);
-                            for (var index=0;index<json.LIST[key].length;index++){
-                                var option = new Element("OPTION").update(json.LIST[key][index].action);
-                                element.insert(option);
+                        for(key in json.LIST){
+                            if(json.LIST.hasOwnProperty(key)){
+                                var opt = new Element("OPTGROUP", {label:key});
+                                element.insert(opt);
+                                for (var index=0;index<json.LIST[key].length;index++){
+                                    element.insert(new Element("OPTION").update(json.LIST[key][index].action));
+                                }
                             }
                         }
                     }else{
-                        for (var key in json.LIST){
-                            var option = new Element("OPTION", {value:key}).update(json.LIST[key]);
-                            if(key == defaultValue) option.setAttribute("selected", "true");
-                            element.insert(option);
+                        for (key in json.LIST){
+                            if(json.LIST.hasOwnProperty(key)){
+                                var option = new Element("OPTION", {value:key}).update(json.LIST[key]);
+                                if(key == defaultValue) option.setAttribute("selected", "true");
+                                element.insert(option);
+                            }
                         }
                     }
                     element.fire("chosen:updated");
@@ -516,7 +521,6 @@ Class.create("FormManager", {
             }.bind(this));
         }
         if(!groupDivs.size()) return;
-        var firstGroup = true;
         groupDivs.each(function(pair){
             var title = new Element('div',{className:'accordion_toggle', tabIndex:0}).update(pair.key);
             title.observe('focus', function(){
@@ -576,7 +580,6 @@ Class.create("FormManager", {
         if(!$("formManager_hidden_iframe")){
             $('hidden_frames').insert(new Element("iframe", {id:"formManager_hidden_iframe", name:"formManager_hidden_iframe"}));
         }
-        var paramName = param.get("name");
         var pane = new Element("div");
         pane.update("<form id='formManager_uploader' enctype='multipart/form-data' target='formManager_hidden_iframe' method='post' action='"+url+"'>" +
             "<div class='dialogLegend'>Select an image on your computer</div> " +
@@ -682,7 +685,7 @@ Class.create("FormManager", {
 			}
 			else if(el.type=="radio" && el.checked){
 				parametersHash.set(prefix+el.name, el.value)
-			};
+			}
 			if(el.getAttribute('data-ajxp_type')){
 				parametersHash.set(prefix+el.name+'_ajxptype', el.getAttribute('data-ajxp_type'));
 			}

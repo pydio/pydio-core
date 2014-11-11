@@ -25,6 +25,7 @@ Class.create("ActionsToolbar", AjxpPane, {
 	__implements : "IAjxpWidget",
 	/**
 	 * Constructor
+     * @param $super Function Parent constructor
 	 * @param oElement Element The dom node
 	 * @param options Object The toolbar options. Contains a buttonRenderer and a toolbarsList array.
 	 */
@@ -82,8 +83,7 @@ Class.create("ActionsToolbar", AjxpPane, {
             this.options.manager = new ActionsManager(true, this.options.dataModelElementId);
             this.options.manager.observe("actions_loaded", this.actionsLoadedObserver);
             this.options.manager.observe("actions_refreshed", this.refreshToolbarObserver);
-            // May be already loaded
-            this.actionsLoaded();
+            this.actionsLoaded(null);
         }else{
             document.observe("ajaxplorer:actions_loaded", this.actionsLoadedObserver);
             document.observe("ajaxplorer:actions_refreshed", this.refreshToolbarObserver);
@@ -113,7 +113,6 @@ Class.create("ActionsToolbar", AjxpPane, {
      * Apply the config of a component_config node
      * Returns true if the GUI needs refreshing
      * @param domNode XMLNode
-     * @returns Boolean
      */
     parseComponentConfig : function(domNode){
         var config = XPathSelectSingleNode(domNode, 'property[@name="style"]');
@@ -153,7 +152,7 @@ Class.create("ActionsToolbar", AjxpPane, {
 			if(action.context.actionBar){
                 $A(action.context.actionBarGroup.split(",")).each(function(barGroup){
                     if(this.toolbars.get(barGroup) == null){
-                        this.toolbars.set(barGroup, new Array());
+                        this.toolbars.set(barGroup, []);
                     }
                     this.toolbars.get(barGroup).push(actionName);
                 }.bind(this));
@@ -245,7 +244,7 @@ Class.create("ActionsToolbar", AjxpPane, {
 	/**
 	 * Initialize a given toolbar
 	 * @param toolbar String The name of the toolbar
-	 * @returns HTMLElement
+	 * @returns HTMLElement|String
 	 */
 	initToolbar: function(toolbar){
 		if(!this.toolbars.get(toolbar)) {
@@ -253,7 +252,7 @@ Class.create("ActionsToolbar", AjxpPane, {
 		}
 		var toolEl = this.element.down('#'+toolbar+'_toolbar');
 		if(!toolEl){ 
-			var toolEl = new Element('div', {
+			toolEl = new Element('div', {
 				id: toolbar+'_toolbar',
                 className:'toolbarGroup'
 			});
@@ -489,15 +488,14 @@ Class.create("ActionsToolbar", AjxpPane, {
 		  zIndex:2000,
           position : (this.options.submenuPosition ? this.options.submenuPosition : "bottom")
 		});	
-		var titleSpan = button.select('span')[0];	
-		subMenu.options.beforeShow = function(e){
+		subMenu.options.beforeShow = function(){
 			button.addClassName("menuAnchorSelected");
 			if(!this.options.skipBubbling) this.buttonStateHover(button, action);
 		  	if(action.subMenuItems.dynamicBuilder){
 		  		action.subMenuItems.dynamicBuilder(subMenu);
 		  	}
 		}.bind(this);		
-		subMenu.options.beforeHide = function(e){
+		subMenu.options.beforeHide = function(){
 			button.removeClassName("menuAnchorSelected");
 			if(!this.options.skipBubbling) this.buttonStateOut(button, action);
 		}.bind(this);
@@ -507,8 +505,6 @@ Class.create("ActionsToolbar", AjxpPane, {
 
     /**
      * Creates a submenu
-     * @param button HTMLElement The anchor of the submenu
-     * @param action Action The action
      */
     buildActionBarStylingMenu : function(){
         this.stylingMenu = new Proto.Menu({
@@ -659,7 +655,7 @@ Class.create("ActionsToolbar", AjxpPane, {
 		});
 		if(visibles.length){
 			var last = visibles[visibles.length-1];
-			var innerSize = last.cumulativeOffset()[0] + last.getWidth();
+			innerSize = last.cumulativeOffset()[0] + last.getWidth();
 		}
 		if(innerSize > parentWidth){
             var h = parseInt(this.element.up("div.action_bar").getHeight()) - 1;

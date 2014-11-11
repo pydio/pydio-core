@@ -138,7 +138,7 @@ Class.create("BackgroundManager", {
                         }.bind(this), delay*1000);
                         return;
                     }
-					 var dm = ajaxplorer.fireContextRefresh();
+					 ajaxplorer.fireContextRefresh();
                 }else if(name == "info_message"){
                     this.updatePanelMessage(messageId);
                 }else if(name == "javascript_instruction" && callback){
@@ -180,12 +180,10 @@ Class.create("BackgroundManager", {
 	 * Create a "Close" link
 	 */
 	makeCloseLink:function(){
-		var link = new Element('a', {href:'#'}).update('Close').observe('click', function(e){
+		return new Element('a', {href:'#'}).update('Close').observe('click', function(e){
 			Event.stop(e);
-			//this.panel.hide();
             Effect.SwitchOff(this.panel);
 		}.bind(this));
-		return link;
 	},
 	/**
 	 * Create a stub action with not parameter.

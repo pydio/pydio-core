@@ -117,10 +117,7 @@ Class.create("ResourcesManager", {
      * @param aSync Boolean
 	 */
 	loadJSResource : function(fileName, className, callback, aSync){
-		try{
-			eval('window.testTemporaryObject = '+className);
-			delete(window.testTemporaryObject);
-		}catch(e){
+		if(!window[className]){
 			if(typeof(className)!='function' || typeof(className.prototype)!='object'){
 				var conn = new Connexion();
 				conn._libUrl = false;
@@ -169,8 +166,9 @@ Class.create("ResourcesManager", {
 	 */
 	loadFromXmlNode : function(node){
         var clForm = {};
+        var k;
 		if(node.nodeName == "resources"){
-			for(var k=0;k<node.childNodes.length;k++){
+			for(k=0;k<node.childNodes.length;k++){
 				if(node.childNodes[k].nodeName == 'js'){
 					this.addJSResource(node.childNodes[k].getAttribute('file'), node.childNodes[k].getAttribute('className'));
 				}else if(node.childNodes[k].nodeName == 'css'){
@@ -180,7 +178,7 @@ Class.create("ResourcesManager", {
 				}
 			}		
 		}else if(node.nodeName == "dependencies"){
-			for(var k=0;k<node.childNodes.length;k++){
+			for(k=0;k<node.childNodes.length;k++){
 				if(node.childNodes[k].nodeName == "pluginResources"){
 					this.addDependency(node.childNodes[k].getAttribute("pluginName"));
 				}

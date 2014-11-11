@@ -36,16 +36,12 @@ Class.create("Ajaxplorer", {
 	initialize: function(loadRep, usersEnabled, loggedUser)
 	{	
 		this._initLoadRep = loadRep;
-		this._initObj = true ;
 		this.usersEnabled = usersEnabled;
-		this._initLoggedUser = loggedUser;
 		this._contextHolder = new AjxpDataModel();
 		this._contextHolder.setAjxpNodeProvider(new RemoteNodeProvider());
 		this._focusables = [];
 		this._registry = null;
 		this._resourcesRegistry = {};
-		this._initDefaultDisp = 'list';
-		this.histCount=0;
 		this._guiComponentsConfigs = new Hash();
 		this.appTitle = ajxpBootstrap.parameters.get("customWording").title || "Pydio";
 	},
@@ -57,7 +53,7 @@ Class.create("Ajaxplorer", {
 	init:function(){
 		document.observe("ajaxplorer:registry_loaded", function(){
             this.refreshExtensionsRegistry();
-			this.logXmlUser(this._registry);
+			this.logXmlUser(this._registry, false);
             if(this.user){
                 var repId = this.user.getActiveRepository();
                 var repList = this.user.getRepositoriesList();
@@ -229,8 +225,9 @@ Class.create("Ajaxplorer", {
 	refreshXmlRegistryPart : function(documentElement){
 		var xPath = documentElement.getAttribute("xPath");
 		var existingNode = XPathSelectSingleNode(this._registry, xPath);
+        var parentNode;
 		if(existingNode && existingNode.parentNode){
-			var parentNode = existingNode.parentNode;
+			parentNode = existingNode.parentNode;
 			parentNode.removeChild(existingNode);
 			if(documentElement.firstChild){
 				parentNode.appendChild(documentElement.firstChild.cloneNode(true));
@@ -238,7 +235,7 @@ Class.create("Ajaxplorer", {
 		}else if(xPath.indexOf("/") > -1){
 			// try selecting parentNode
 			var parentPath = xPath.substring(0, xPath.lastIndexOf("/"));
-			var parentNode = XPathSelectSingleNode(this._registry, parentPath);
+			parentNode = XPathSelectSingleNode(this._registry, parentPath);
 			if(parentNode && documentElement.firstChild){
 				//parentNode.ownerDocument.importNode(documentElement.firstChild);
 				parentNode.appendChild(documentElement.firstChild.cloneNode(true));
@@ -663,15 +660,16 @@ Class.create("Ajaxplorer", {
 		this.skipLsHistory = true;
 		
 		var providerDef = repository.getNodeProviderDef();
+        var rootNode;
 		if(providerDef != null){
 			var provider = eval('new '+providerDef.name+'()');
 			if(providerDef.options){
 				provider.initProvider(providerDef.options);
 			}
 			this._contextHolder.setAjxpNodeProvider(provider);
-			var rootNode = new AjxpNode("/", false, repository.getLabel(), newIcon, provider);
+			rootNode = new AjxpNode("/", false, repository.getLabel(), newIcon, provider);
 		}else{
-			var rootNode = new AjxpNode("/", false, repository.getLabel(), newIcon);
+			rootNode = new AjxpNode("/", false, repository.getLabel(), newIcon);
 			// Default
 			this._contextHolder.setAjxpNodeProvider(new RemoteNodeProvider());
 		}
@@ -726,7 +724,6 @@ Class.create("Ajaxplorer", {
 	/**
 	 * Require a context change to the given path
 	 * @param nodeOrPath AjxpNode|String A node or a path
-     * @param leaf AjxpNode|String path to the leaf item to be selected
 	 */
 	goTo: function(nodeOrPath){
         var path;
@@ -807,9 +804,9 @@ Class.create("Ajaxplorer", {
 		}
 		if(xmlNode.nodeName == 'editor'){
 			Object.extend(extensionDefinition, {
-				openable : (xmlNode.getAttribute("openable") == "true"?true:false),
-				modalOnly : (xmlNode.getAttribute("modalOnly") == "true"?true:false),
-				previewProvider: (xmlNode.getAttribute("previewProvider")=="true"?true:false),
+				openable : (xmlNode.getAttribute("openable") == "true"),
+				modalOnly : (xmlNode.getAttribute("modalOnly") == "true"),
+				previewProvider: (xmlNode.getAttribute("previewProvider") == "true"),
 				order: (xmlNode.getAttribute("order")?parseInt(xmlNode.getAttribute("order")):0),
 				formId : xmlNode.getAttribute("formId") || null,				
 				text : MessageHash[xmlNode.getAttribute("text")],
@@ -901,13 +898,14 @@ Class.create("Ajaxplorer", {
     },
 
     hasPluginOfType : function(type, name){
+        var node;
         if(name == null){
-            var node = XPathSelectSingleNode(this._registry, 'plugins/ajxp_plugin[contains(@id, "'+type+'.")] | plugins/' + type + '[@id]');
+            node = XPathSelectSingleNode(this._registry, 'plugins/ajxp_plugin[contains(@id, "'+type+'.")] | plugins/' + type + '[@id]');
         }else{
-            var node = XPathSelectSingleNode(this._registry, 'plugins/ajxp_plugin[@id="'+type+'.'+name+'"] | plugins/' + type + '[@id="'+type+'.'+name+'"]');
+            node = XPathSelectSingleNode(this._registry, 'plugins/ajxp_plugin[@id="'+type+'.'+name+'"] | plugins/' + type + '[@id="'+type+'.'+name+'"]');
         }
-        if(node) return true;
-        return false;
+        return (node != undefined);
+
     },
 
 	/**
@@ -916,7 +914,6 @@ Class.create("Ajaxplorer", {
 	 * @returns $A()
 	 */
 	getActiveExtensionByType : function(extensionType){
-		var exts = $A();
 		return this._extensionsRegistry[extensionType];
 	},
 	
@@ -928,12 +925,13 @@ Class.create("Ajaxplorer", {
 	findEditorById : function(editorId){
 		return this._extensionsRegistry.editor.detect(function(el){return(el.id == editorId);});
 	},
-	
-	/**
-	 * Find Editors that can handle a given mime type
-	 * @param mime String
-	 * @returns AbstractEditor[]
-	 */
+
+    /**
+     * Find Editors that can handle a given mime type
+     * @param mime String
+     * @returns AbstractEditor[]
+     * @param restrictToPreviewProviders
+     */
 	findEditorsForMime : function(mime, restrictToPreviewProviders){
 		var editors = $A([]);
 		var checkWrite = false;
@@ -1082,7 +1080,9 @@ Class.create("Ajaxplorer", {
 				var result = transport.responseText.evalScripts();
 				window.MessageHash = result[0];
 				for(var key in window.MessageHash){
-                    window.MessageHash[key] = window.MessageHash[key].replace("\\n", "\n");
+                    if(window.MessageHash.hasOwnProperty(key)){
+                        window.MessageHash[key] = window.MessageHash[key].replace("\\n", "\n");
+                    }
 				}
 				this.updateI18nTags();
 				if(this.guiActions){
@@ -1216,7 +1216,7 @@ Class.create("Ajaxplorer", {
 	},
 	
 	/**
-	 * @returns DOMDocument
+	 * @returns Document
 	 */
 	getXmlRegistry : function(){
 		return this._registry;
@@ -1317,7 +1317,7 @@ Class.create("Ajaxplorer", {
 	},
 
     /**
-     * @param IAjxpFocusable widget
+     * @param widget IAjxpFocusable
      */
     registerFocusable: function(widget){
         if(-1 == this._focusables.indexOf(widget) && widget.htmlElement){
@@ -1326,7 +1326,7 @@ Class.create("Ajaxplorer", {
     },
 
     /**
-     * @param IAjxpFocusable widget
+     * @param widget IAjxpFocusable
      */
     unregisterFocusable: function(widget){
         this._focusables = this._focusables.without(widget);
@@ -1384,8 +1384,9 @@ Class.create("Ajaxplorer", {
 				Event.stop(e);
 			}
 			if(this.blockShortcuts || e['ctrlKey'] || e['metaKey']) return;
-			if(e.keyCode != Event.KEY_DELETE && ( e.keyCode > 90 || e.keyCode < 65 ) ) return;
-			else return this.actionBar.fireActionByKey(e, (e.keyCode == Event.KEY_DELETE ? "key_delete":String.fromCharCode(e.keyCode).toLowerCase()));
+            if (!(e.keyCode != Event.KEY_DELETE && ( e.keyCode > 90 || e.keyCode < 65 ))) {
+                this.actionBar.fireActionByKey(e, (e.keyCode == Event.KEY_DELETE ? "key_delete" : String.fromCharCode(e.keyCode).toLowerCase()));
+            }
 		}.bind(this));
 	}
 		

@@ -140,8 +140,9 @@ Class.create("InfoPanel", AjxpPane, {
 	 */
 	update : function(objectOrEvent){
 		if(!this.htmlElement) return;
+        var passedNode;
         if(objectOrEvent.__className && objectOrEvent.__className == "AjxpNode"){
-            var passedNode = objectOrEvent;
+            passedNode = objectOrEvent;
         }
         this.insertedTemplates = $A();
         var userSelection = ajaxplorer.getUserSelection();

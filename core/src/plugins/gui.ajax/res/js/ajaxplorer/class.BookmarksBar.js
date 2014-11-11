@@ -166,7 +166,7 @@
 		
 			
 			
-		return new Array(renameAction, removeAction);
+		return $A([renameAction, removeAction]);
 	},
 	
 	/**
@@ -187,11 +187,13 @@
 	 	}.bind(this);
 		modal.showDialogForm('Rename', 'rename_bookmark', onLoad, onComplete);
 	},
-	
-	/**
-	 * Reload the bookmarks via the registry loading
-	 * @param actionsParameters Hash
-	 */
+
+     /**
+      * Reload the bookmarks via the registry loading
+      * @param actionsParameters Hash
+      * @param silently
+      * @param onComplete
+      */
 	load: function(actionsParameters, silently, onComplete){
         if(!ajaxplorer || !ajaxplorer.user) return;
 		var connexion = new Connexion();
@@ -220,12 +222,13 @@
 
 		connexion.sendAsync();
 	},
-	
-	/**
-	 * Add a bookmark
-	 * @param path String
-	 * @param title String
-	 */
+
+     /**
+      * Add a bookmark
+      * @param path String
+      * @param title String
+      * @param onComplete
+      */
 	addBookmark: function(path,title, onComplete){
 		var parameters = new Hash();
 		parameters.set('bm_action', 'add_bookmark');
@@ -235,11 +238,12 @@
 		}
 		this.load(parameters, false, onComplete);
 	},
-	
-	/**
-	 * Remove a bookmark
-	 * @param path String
-	 */
+
+     /**
+      * Remove a bookmark
+      * @param path String
+      * @param onComplete
+      */
 	removeBookmark: function(path, onComplete){
 		var parameters = new Hash();
 		parameters.set('bm_action', 'delete_bookmark');

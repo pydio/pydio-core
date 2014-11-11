@@ -168,10 +168,11 @@ Class.create("AjxpNode", {
 		this.notify("child_removed", removePath);
 	},
 
-	/**
-	 * Replaces the current node by a new one. Copy all properties deeply
-	 * @param ajxpNode AjxpNode
-	 */
+    /**
+     * Replaces the current node by a new one. Copy all properties deeply
+     * @param ajxpNode AjxpNode
+     * @param metaMerge
+     */
 	replaceBy : function(ajxpNode, metaMerge){
 		this._isLeaf = ajxpNode._isLeaf;
         if(ajxpNode.getPath() && this._path != ajxpNode.getPath()){
@@ -290,12 +291,13 @@ Class.create("AjxpNode", {
 			crt = parent;
 		}
 		return false;
-	},	
-	/**
-	 * Search the mime type in the parent branch
-	 * @param ajxpMime String
-	 * @returns Boolean
-	 */
+	},
+    /**
+     * Search the mime type in the parent branch
+     * @returns Boolean
+     * @param metadataKey
+     * @param metadataValue
+     */
 	hasMetadataInBranch: function(metadataKey, metadataValue){
 		if(this.getMetadata().get(metadataKey)) {
             if(metadataValue) {
@@ -335,11 +337,11 @@ Class.create("AjxpNode", {
 	 * Finds this node by path if it already exists in arborescence 
 	 * @param rootNode AjxpNode
 	 * @param fakeNodes AjxpNode[]
+     * @returns AjxpNode|undefined
 	 */
 	findInArbo : function(rootNode, fakeNodes){
 		if(!this.getPath()) return;
 		var pathParts = this.getPath().split("/");
-		var parentNodes = $A();
 		var crtPath = "";
 		var crtNode, crtParentNode = rootNode;
 		for(var i=0;i<pathParts.length;i++){
@@ -349,7 +351,7 @@ Class.create("AjxpNode", {
 			if(node && !Object.isString(node)){
 				crtNode = node;
 			}else{
-                if(fakeNodes === undefined) return false;
+                if(fakeNodes === undefined) return undefined;
 				crtNode = new AjxpNode(crtPath, false, getBaseName(crtPath));
 				crtNode.fake = true;
                 crtNode.getMetadata().set("text", getBaseName(crtPath));

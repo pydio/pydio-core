@@ -73,7 +73,7 @@ Class.create("AjxpAutocompleter", Autocompleter.Base, {
   onComplete: function(request) {
   	var oXmlDoc = request.responseXML;
   	var token = this.getToken();
-  	var dirs = new Array();
+  	var dirs = $A();
 	if( oXmlDoc == null || oXmlDoc.documentElement == null) 
 	{
 		this.updateChoices('');
