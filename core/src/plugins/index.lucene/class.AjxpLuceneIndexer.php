@@ -205,7 +205,7 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
             } else {
                 AJXP_XMLWriter::header();
             }
-            $index = 0;
+            $cursor = 0;
             if(isSet($httpVars['limit'])){
                 $limit = intval($httpVars['limit']);
             }
@@ -234,8 +234,8 @@ class AjxpLuceneIndexer extends AJXP_AbstractMetaSource
                 } else {
                     AJXP_XMLWriter::renderAjxpNode($tmpNode);
                 }
-                $index++;
-                if(isSet($limit) && $index > $limit) break;
+                $cursor++;
+                if(isSet($limit) && $cursor > $limit) break;
             }
             if(!isSet($returnNodes)) AJXP_XMLWriter::close();
             if ($commitIndex) {
