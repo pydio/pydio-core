@@ -249,6 +249,7 @@ Class.create("FilesList", SelectableElements, {
 	 * Implementation of the IAjxpWidget methods
 	 */
 	destroy : function($super){
+        this.empty(true);
         $super();
         this._clearObservers();
         if(window[this.htmlElement.id]){

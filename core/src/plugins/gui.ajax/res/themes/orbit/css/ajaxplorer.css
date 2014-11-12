@@ -658,9 +658,14 @@ span.ajxp-caret-up{
     top:30%;
     text-align:center;
     font-size: 16px;
-    color: #5E7C90;
     font-weight:bold;
     cursor: pointer;
+    box-shadow: none;
+}
+
+#activity_monitor_warning div.dialogContent {
+    border-radius: 10px;
+    box-shadow: 1px 1px 46px rgba(0, 0, 0, 0.67);
 }
 
 #activity_monitor_warning span.click_anywhere{
