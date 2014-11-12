@@ -1440,6 +1440,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     uksort($repoOptions, array($this,"metaSourceOrderingFunction"));
                     $repo->addOption("META_SOURCES", $repoOptions);
                     ConfService::replaceRepository($repId, $repo);
+                }else{
+                    throw new Exception("Cannot find meta source ".$metaSourceId);
                 }
                 AJXP_XMLWriter::header();
                 AJXP_XMLWriter::sendMessage($mess["ajxp_conf.57"],null);
@@ -1498,7 +1500,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 if (isSet($httpVars["repository_id"])) {
                     $repId = $httpVars["repository_id"];
-                    $res = ConfService::deleteRepository($repId);
+                    $repo = ConfService::getRepositoryById($repId);
+                    if(!is_object($repo)){
+                        $res = -1;
+                    }else{
+                        $res = ConfService::deleteRepository($repId);
+                    }
                     AJXP_XMLWriter::header();
                     if ($res == -1) {
                         AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.51"]);
