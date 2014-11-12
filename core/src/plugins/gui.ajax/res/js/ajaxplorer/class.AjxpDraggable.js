@@ -38,13 +38,16 @@ var AllAjxpDroppables = $A([]);
 Event.observe(window, "unload", function(){
 	Draggables.removeObserver(timerClearObserver);
     window.AllAjxpDraggables.each(function(el){
-		el.destroy();
+        try{
+		    el.destroy();
+        }catch(z){}
 	});
     window.AllAjxpDroppables.each(function(el){
-		Droppables.remove(el);
+        try{
+    		Droppables.remove(el);
+        }catch(z){}
 	});
 });
-
 /**
  * Pydio encapsulation of the Prototype Draggable
  */
