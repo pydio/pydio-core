@@ -344,7 +344,9 @@ Class.create("FilesList", SelectableElements, {
         if(!base){
             try{base = ajaxplorer.user.repositories.get(ajaxplorer.repositoryId).getLabel();}catch(e){}
         }
-        this.htmlElement.fire("editor:updateTitle", base);
+        if(!this.options.muteUpdateTitleEvent){
+            this.htmlElement.fire("editor:updateTitle", base);
+        }
         this.empty();
 		this.fill(this.crtContext);
 		this.removeOnLoad();
