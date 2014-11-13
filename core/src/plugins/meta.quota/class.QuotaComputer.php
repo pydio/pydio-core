@@ -164,14 +164,14 @@ class QuotaComputer extends AJXP_AbstractMetaSource
 
     public function recomputeQuotaUsage($oldNode = null, $newNode = null, $copy = false)
     {
-        $path = $this->getWorkingPath();
-        $q = $this->computeDirSpace($path);
-        $this->storeUsage($path, $q);
+        $repoOptions = $this->getWorkingRepositoryOptions();
+        $q = $this->accessDriver->directoryUsage("", $repoOptions);
+        $this->storeUsage($q);
         $t = $this->getAuthorized();
         AJXP_Controller::applyHook("msg.instant", array("<metaquota usage='{$q}' total='{$t}'/>", $this->accessDriver->repository->getId()));
     }
 
-    protected function storeUsage($dir, $quota)
+    protected function storeUsage($quota)
     {
         $data = $this->getUserData();
         $repo = $this->accessDriver->repository->getId();

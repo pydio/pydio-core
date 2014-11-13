@@ -444,10 +444,10 @@ Class.create("ShareCenter", {
                         if(json['download_limit']){
                             oForm.down('input[name="downloadlimit"]').setValue(json['download_limit']);
                         }
+                        var chooser = this.createTemplateChooser(oForm);
+                        var container = oForm.down('.layout_template_container');
+                        container.insert(chooser);
                         if(json["minisite_layout"]){
-                            var chooser = this.createTemplateChooser(oForm);
-                            var container = oForm.down('.layout_template_container');
-                            container.insert(chooser);
                             chooser.setValue(json['minisite_layout']);
                         }
                         if(json['is_expired']){
@@ -1223,7 +1223,7 @@ Class.create("ShareCenter", {
             var aSpan = new Element('span', {
                 className:'',
                 title:MessageHash['share_center.152']
-            }).update('<span class="icon-refresh"></span> '+MessageHash['share_center.152']);
+            }).update('<span class="icon-save"></span> '+MessageHash['share_center.152']);
             var editButton = new Element('div', {className:'largeButton'}).update(aSpan);
             bottomButtonsContainer.insert(editButton);
             bottomButtonsContainer.show();
