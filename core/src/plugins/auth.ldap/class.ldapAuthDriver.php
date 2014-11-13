@@ -39,7 +39,7 @@ class ldapAuthDriver extends AbstractAuthDriver
     public $dynamicExpected;
     public $ldapUserAttr;
     public $ldapGroupAttr;
-    public $enableMemberOf;
+    public $fakeAttrMemberOf;
     public $mappedRolePrefix;
     public $pageSize;
 
@@ -72,7 +72,7 @@ class ldapAuthDriver extends AbstractAuthDriver
         if ($options["LDAP_PORT"]) $this->ldapPort = $options["LDAP_PORT"];
         if ($options["LDAP_USER"]) $this->ldapAdminUsername = $options["LDAP_USER"];
         if ($options["LDAP_PASSWORD"]) $this->ldapAdminPassword = $options["LDAP_PASSWORD"];
-        if ($options["LDAP_FAKE_MEMBEROF"]) $this->enableMemberOf = $options["LDAP_FAKE_MEMBEROF"];
+        if (!empty($options["LDAP_FAKE_MEMBEROF"])) $this->fakeAttrMemberOf = $options["LDAP_FAKE_MEMBEROF"];
         if ($options["LDAP_PAGE_SIZE"]) $this->pageSize = $options["LDAP_PAGE_SIZE"];
         if ($options["LDAP_GROUP_PREFIX"]) $this->mappedRolePrefix = $options["LDAP_GROUP_PREFIX"];
         if ($options["LDAP_DN"]) $this->ldapDN = $this->parseReplicatedParams($options, array("LDAP_DN"));
@@ -328,9 +328,9 @@ class ldapAuthDriver extends AbstractAuthDriver
                         }
 
                         // fake memberOf
-                        if (in_array(strtolower("memberof"), array_map("strtolower", $expected)) && ($this->enableMemberOf) && method_exists($this, "fakeMemberOf")) {
+                        if (($this->fakeAttrMemberOf) && method_exists($this, "fakeMemberOf") && in_array(strtolower("memberof"), array_map("strtolower", $expected))) {
                             $uid = $entry["dn"];
-                            $strldap = "(&" . $this->ldapGFilter . "(member=" . $uid . "))";
+                            $strldap = "(&" . $this->ldapGFilter . "(" .$this->fakeAttrMemberOf. "=" . $uid . "))";
                             $this->fakeMemberOf($conn, $this->ldapGDN, $strldap, array("cn"), $entry);
                         }
 
