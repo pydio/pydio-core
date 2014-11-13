@@ -1063,23 +1063,33 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     $allGroups = array();
 
                     $roleOrGroup = ConfService::getCoreConf("GROUP_OR_ROLE", "conf");
+                    $rolePrefix    = $loggedUser->mergedRole->filterParameterValue("core.conf", "PREFIX", null, $roleOrGroup["PREFIX"]);
+                    $excludeString = $loggedUser->mergedRole->filterParameterValue("core.conf", "EXCLUDED", null, $roleOrGroup["EXCLUDED"]);
+                    $includeString = $loggedUser->mergedRole->filterParameterValue("core.conf", "INCLUDED", null, $roleOrGroup["EXCLUDED"]);
+
                     switch (strtolower($roleOrGroup["group_switch_value"])) {
+                        case 'user':
+                            // donothing
+                            break;
                         case 'group':
+                            $allUsers = AuthService::listUsers($baseGroup, $regexp, 0, $limit, false);
                             $authGroups = AuthService::listChildrenGroups($baseGroup);
                             foreach ($authGroups as $gId => $gName) {
                                 $allGroups["AJXP_GRP_/" . $gId] = $gName;
                             }
                             break;
                         case 'role':
-                            $allGroups = $this->getUserRoleList($loggedUser);
+                            $allUsers = AuthService::listUsers($baseGroup, $regexp, 0, $limit, false);
+                            $allGroups = $this->getUserRoleList($loggedUser, $rolePrefix, $includeString, $excludeString);
                             break;
                         case 'rolegroup';
+                            $allUsers = AuthService::listUsers($baseGroup, $regexp, 0, $limit, false);
                             $groups = array();
                             $authGroups = AuthService::listChildrenGroups($baseGroup);
                             foreach ($authGroups as $gId => $gName) {
                                 $groups["AJXP_GRP_/" . $gId] = $gName;
                             }
-                            $roles = $this->getUserRoleList($loggedUser);
+                            $roles = $this->getUserRoleList($loggedUser, $rolePrefix, $includeString, $excludeString);
 
                             empty($groups) ? $allGroups = $roles : (empty($roles) ? $allGroups = $groups : $allGroups = array_merge($groups, $roles));
                             //$allGroups = array_merge($groups, $roles);
@@ -1220,20 +1230,19 @@ abstract class AbstractConfDriver extends AJXP_Plugin
         return $xmlBuffer;
     }
 
-    public function getUserRoleList($userObject)
+    /**
+     * @param $userObject logged user
+     * @param $rolePrefix get all roles with prefix
+     * @param $includeString get roles in this string
+     * @param $excludeString eliminate roles in this string
+     * @return array
+     */
+    public function getUserRoleList($userObject, $rolePrefix, $includeString, $excludeString)
     {
         if ($userObject) {
             $allUserRoles = $userObject->getRoles();
             $allRoles = array();
-            if ($allUserRoles) {
-                $ldap_prefix = $userObject->mergedRole->filterParameterValue("core.conf", "PREFIX", null, null);
-                $excludeString = $userObject->mergedRole->filterParameterValue("core.conf", "EXCLUDED", null, null);
-                $includeString = $userObject->mergedRole->filterParameterValue("core.conf", "INCLUDED", null, null);
-
-                $coreConf = ConfService::getCoreConf("GROUP_OR_ROLE", "conf");
-                if (empty($ldap_prefix) && ($coreConf["PREFIX"])) $ldap_prefix = $coreConf["PREFIX"];
-                if (empty($excludeString) && ($coreConf["EXCLUDED"])) $excludeString = $coreConf["EXCLUDED"];
-                if (empty($includeString) && ($coreConf["INCLUDED"])) $includeString = $coreConf["INCLUDED"];
+            if (($allUserRoles) && ($rolePrefix)) {
 
                 // Exclude
                 if ($excludeString) {
@@ -1256,12 +1265,12 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 }
 
                 foreach ($allUserRoles as $roleId => $role) {
-                    if (empty($ldap_prefix) || strpos($roleId, $ldap_prefix) === false) continue;
-                    if (isSet($matchFilterExclude) && preg_match($matchFilterExclude, substr($roleId, strlen($ldap_prefix)))) continue;
-                    if (isSet($valueFiltersExclude) && in_array(strtolower(substr($roleId, strlen($ldap_prefix))), $valueFiltersExclude)) continue;
-                    if (isSet($matchFilterInclude) && !preg_match($matchFilterInclude, substr($roleId, strlen($ldap_prefix)))) continue;
-                    if (isSet($valueFiltersInclude) && !in_array(strtolower(substr($roleId, strlen($ldap_prefix))), $valueFiltersInclude)) continue;
-                    $allRoles[$roleId] = substr($roleId, strlen($ldap_prefix));
+                    if (strpos($roleId, $rolePrefix) === false) continue;
+                    if (isSet($matchFilterExclude) && preg_match($matchFilterExclude, substr($roleId, strlen($rolePrefix)))) continue;
+                    if (isSet($valueFiltersExclude) && in_array(strtolower(substr($roleId, strlen($rolePrefix))), $valueFiltersExclude)) continue;
+                    if (isSet($matchFilterInclude) && !preg_match($matchFilterInclude, substr($roleId, strlen($rolePrefix)))) continue;
+                    if (isSet($valueFiltersInclude) && !in_array(strtolower(substr($roleId, strlen($rolePrefix))), $valueFiltersInclude)) continue;
+                    $allRoles[$roleId] = substr($roleId, strlen($rolePrefix));
                 }
             }
             return $allRoles;
