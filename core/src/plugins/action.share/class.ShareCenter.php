@@ -1363,10 +1363,14 @@ class ShareCenter extends AJXP_Plugin
             if(isSet($existingData["PRELOG_USER"])) $existingU = $existingData["PRELOG_USER"];
             else if(isSet($existingData["PRESET_LOGIN"])) $existingU = $existingData["PRESET_LOGIN"];
             $uniqueUser = $httpVars["guest_user_id"];
-            if(!empty($httpVars["guest_user_pass"]) && $uniqueUser == $existingU){
+            if(isset($httpVars["guest_user_pass"]) && strlen($httpVars["guest_user_pass"]) && $uniqueUser == $existingU){
                 //$userPass = $httpVars["guest_user_pass"];
                 // UPDATE GUEST USER PASS HERE
                 AuthService::updatePassword($uniqueUser, $httpVars["guest_user_pass"]);
+            }else if(isSet($httpVars["guest_user_pass"]) && $httpVars["guest_user_pass"] == ""){
+
+            }else if(isSet($existingData["PRESET_LOGIN"])){
+                $httpVars["KEEP_PRESET_LOGIN"] = true;
             }
 
         }else if (isSet($httpVars["create_guest_user"])) {
@@ -1439,7 +1443,7 @@ class ShareCenter extends AJXP_Plugin
         if(isSet($data["PRESET_LOGIN"]))unset($data["PRESET_LOGIN"]);
         if((isSet($httpVars["create_guest_user"]) && isSet($userId)) || (isSet($httpVars["guest_user_id"]))){
             if(!isset($userId)) $userId = $httpVars["guest_user_id"];
-            if(empty($httpVars["guest_user_pass"])){
+            if(empty($httpVars["guest_user_pass"]) && !isSet($httpVars["KEEP_PRESET_LOGIN"])){
                 $data["PRELOG_USER"] = $userId;
             }else{
                 $data["PRESET_LOGIN"] = $userId;
@@ -2244,6 +2248,7 @@ class ShareCenter extends AJXP_Plugin
                 $shareData["type"] = "repository";
             }
             $minisite = ($shareData["type"] == "minisite");
+            $minisiteIsPublic = false;
             if ($minisite) {
                 $minisiteData = $this->getShareStore()->loadShare($shareId);
                 $repoId = $minisiteData["REPOSITORY"];
@@ -2315,6 +2320,9 @@ class ShareCenter extends AJXP_Plugin
                 $jsonData["is_expired"] = $this->shareStore->isShareExpired($shareId, $minisiteData);
                 if(isSet($minisiteData["AJXP_TEMPLATE_NAME"])){
                     $jsonData["minisite_layout"] = $minisiteData["AJXP_TEMPLATE_NAME"];
+                }
+                if(!$minisiteIsPublic){
+                    $jsonData["has_password"] = true;
                 }
                 $jsonData["minisite"] = array(
                     "public"            => $minisiteIsPublic?"true":"false",

@@ -181,5 +181,5 @@ $mess = array(
     "167" => "Le lien est expiré!",
     "168" => "Le nombre de téléchargements autorisés a été atteint. Cliquer pour remettre à zéro et réactiver le lien.",
     "169" => "La date d'expiration est passée. Changez les paramètres du lien pour le réactiver.",
-
+    "170" => "Ce lien est sécurisé par un mot de passe.",
 );

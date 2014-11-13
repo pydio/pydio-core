@@ -181,5 +181,6 @@ $mess = array(
     "167" => "Link is expired!",
     "168" => "The number of authorized downloads have been reached. Click to reset the counter and reactivate the link.",
     "169" => "The expiration date was reached. Change the parameters with a new date if you want to reactivate the link.",
+    "170" => "This is link is secured with a password.",
 
 );

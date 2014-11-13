@@ -4682,8 +4682,13 @@ div#target_repository_toggle{
     display: block !important;
 }
 
-.share_edit div#target_repository_toggle span{
-    display: inline;
+.share_edit div#target_repository_toggle span.simple_tooltip_observer{
+    display: inline-block;
+    padding: 2px 7px;
+    border: 1px solid;
+    color: #888;
+    border-radius: 8px;
+    margin: 2px;
 }
 
 .share_edit div#target_repository_toggle div.SF_horizontal_actions{
@@ -4810,6 +4815,15 @@ form.share_expired div#mailer_button{
 div.user_entry span.cbContainer{
 
 }
+
+#target_repository span#remove_user_pass{
+    border-bottom: 1px solid;
+    font-size: 13px;
+    display: inline-block;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
 /***********************/
 /* EDITORS & DIAPORAMA */
 /***********************/

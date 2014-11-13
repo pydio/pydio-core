@@ -134,7 +134,7 @@
                                         <div class="dialogContentMainTitle">AJXP_MESSAGE[share_center.147]</div>
                                         <div class="SF_element">
                                             <div class="SF_label" ajxp_message_id="share_center.23" style="width:130px;" title="AJXP_MESSAGE[share_center.23]">AJXP_MESSAGE[share_center.23]</div>
-                                            <input type="text" name="guest_user_pass" value="" placeholder="AJXP_MESSAGE[share_center.148]" autocomplete="off" class="SF_input" style="width:40% !important;">
+                                            <input type="text" name="guest_user_pass" value="" placeholder="AJXP_MESSAGE[share_center.148]" autocomplete="off" class="SF_input" style="width:40% !important;"> <span style="display:none;" id="remove_user_pass">Disable Password</span>
                                             <div class="SF_horizontal_labelRow">
                                                 <div class="SF_label" ajxp_message_id="share_center.21" style="width:40% !important;" title="AJXP_MESSAGE[share_center.21]">AJXP_MESSAGE[share_center.21]</div>
                                                 <div class="SF_label" ajxp_message_id="share_center.22" style="width:40% !important;" title="AJXP_MESSAGE[share_center.22]">AJXP_MESSAGE[share_center.22]</div>
@@ -426,7 +426,7 @@
                     <clientCallback dialogOpenForm="share_current_url" dialogSkipButtons="true" prepareModal="true">
                         <dialogOnOpen><![CDATA[
                             modal.getForm().down("#crt-page-url").setValue(document.location.href);
-                            if(!ajaxplorer.getContextHolder().isEmpty() && ajaxplorer.getActionBar().getActionByName("download")){
+                            if(ajxpBootstrap.parameters.get('PRESET_LOGIN') === 'ajxp_preloged_user' && !ajaxplorer.getContextHolder().isEmpty() && ajaxplorer.getActionBar().getActionByName("download")){
                                 var tpl = new Template('<div style="font-size: 16px; padding-top:15px; text-align:left;">#{title} <a href="#{link}" target="_blank" class="icon-link" style="font-size: 0.8em;"></a></div><input type="text" value="#{link}" style="width: 98%;">');
                                 var node = ajaxplorer.getContextHolder().getUniqueNode();
                                 var editors = ajaxplorer.findEditorsForMime(node.getAjxpMime(), true);

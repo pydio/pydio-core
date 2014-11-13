@@ -124,6 +124,10 @@ Class.create("ShareCenter", {
             var conn = new Connexion(publicUrl);
             conn.setMethod("POST");
             var params = modal.getForm().serialize(true);
+            var passwordField = modal.getForm().down('input[name="guest_user_pass"]');
+            if(passwordField.readAttribute('data-password-set') === 'true' && !passwordField.getValue()){
+                delete params['guest_user_pass'];
+            }
             conn.setParameters(params);
             if(this._currentRepositoryId){
                 conn.addParameter("repository_id", this._currentRepositoryId);
@@ -420,6 +424,19 @@ Class.create("ShareCenter", {
                     try{
                         if(json['password']){
                             oForm.down('input[name="guest_user_pass"]').setValue(json['password']);
+                        }
+                        if(json['has_password']){
+                            oForm.down('input[name="guest_user_pass"]').writeAttribute('placeholder', '***********');
+                            oForm.down('input[name="guest_user_pass"]').writeAttribute('data-password-set', 'true');
+                            oForm.down('#remove_user_pass').show();
+                            oForm.down('#remove_user_pass').observeOnce('click', function(){
+                                oForm.down('input[name="guest_user_pass"]').writeAttribute('data-password-set', 'false');
+                                oForm.down('input[name="guest_user_pass"]').writeAttribute('placeholder', MessageHash['share_center.148']);
+                                oForm.down('#remove_user_pass').hide();
+                            });
+                        }else{
+                            oForm.down('input[name="guest_user_pass"]').writeAttribute('data-password-set', 'false');
+                            oForm.down('#remove_user_pass').hide();
                         }
                         if(json['expire_time']){
                             oForm.down('input[name="expiration"]').setValue(json['expire_after']);
@@ -839,10 +856,13 @@ Class.create("ShareCenter", {
                 $A(jsonData.entries).each(function(entry){
                     entries.push(entry.LABEL + ' ('+ entry.RIGHT +')');
                 });
-
+                var pwdProtected = '';
+                if(jsonData['has_password']){
+                    pwdProtected = ' ' + MessageHash['share_center.170'];
+                }
                 if(node.isLeaf()){
                     // LEAF SHARE
-                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.140"+(jsonData['is_expired']?'b':'')]+'</div>');
+                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.140"+(jsonData['is_expired']?'b':'')]+ pwdProtected + '</div>');
                     mainCont.insert('<div class="infoPanelRow">\
                             <div class="infoPanelLabel">'+MessageHash['share_center.121']+'</div>\
                             <div class="infoPanelValue"><input type="text" class="share_info_panel_link'+(jsonData['is_expired']?' share_info_panel_link_expired':'')+'" readonly="true" value="'+ jsonData.minisite.public_link +'"></div>\
@@ -851,7 +871,7 @@ Class.create("ShareCenter", {
 
                 }else if(jsonData.minisite){
                     // MINISITE FOLDER SHARE
-                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.138"+(jsonData['is_expired']?'b':'')]+'</div>');
+                    mainCont.update('<div class="share_info_panel_main_legend">'+MessageHash["share_center.138"+(jsonData['is_expired']?'b':'')]+ pwdProtected + '</div>');
                     // Links textearea
                     mainCont.insert('\
                         <div class="infoPanelRow">\
@@ -1183,6 +1203,11 @@ Class.create("ShareCenter", {
                 }
             }.bind(this));
 
+        }
+
+        // PASSWORD BUTTON
+        if(jsonData['has_password']){
+            dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:new Element('span', {className:'simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.85"]}).update('<span class="icon-key"></span> '+MessageHash["share_center.84"])});
         }
 
         // EXPIRATION TIME
