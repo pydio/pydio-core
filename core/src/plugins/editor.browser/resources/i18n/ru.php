@@ -22,4 +22,7 @@ $mess=array(
 "1" => "Программы просмотра",
 "2" => "Открыть с помощью программы просмотра",
 "3" => "Открытие файла в окне просмотра, подождите, это окно автоматически закроется.",
+    "4" => "New URL Bookmark",
+    "5" => "Alternatively, you can <a>create a new bookmark to an URL</a>",
+    "6" => "Enter an URL starting with http/https"
 );

@@ -22,6 +22,9 @@ Class.create("BrowserOpener", AbstractEditor, {
 	initialize: function($super, oFormObject, options){
         this.editorOptions = options;
         this.element = oFormObject;
+        var configs = ajaxplorer.getPluginConfigs("editor.browser");
+        this.alwaysOpenLinksInBrowser = configs.get('OPEN_LINK_IN_TAB') == "browser";
+        this.alwaysOpenDocsInBrowser = configs.get('OPEN_DOCS_IN_TAB') == "browser";
     },
 	
 	open : function($super, node){
@@ -46,6 +49,11 @@ Class.create("BrowserOpener", AbstractEditor, {
             }else{
                 hideLightBox();
             }
+        }else if(this.alwaysOpenDocsInBrowser){
+            window.open(open_file_url);
+            window.setTimeout(function(){
+                this.editorOptions.context.closeTab("editor.browser:/" + node.getPath());
+            }.bind(this), 500);
         }else{
             this.element.fire("editor:updateTitle", node.getLabel());
             this.contentMainContainer = new Element('iframe', {
@@ -62,12 +70,17 @@ Class.create("BrowserOpener", AbstractEditor, {
 	openURL : function(fileName){
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'get_content');
-		connexion.addParameter('file', fileName);	
+		connexion.addParameter('file', fileName);
 		connexion.onComplete = function(transp){
 			var url = transp.responseText;
             if(this.editorOptions.context.__className == 'Modal'){
-                window.open(url, "Pydio Bookmark", "location=yes,menubar=yes,resizable=yes,scrollbars=yea,toolbar=yes,status=yes");
+                window.open(url, "Pydio Bookmark", "location=yes,menubar=yes,resizable=yes,scrollbars=yes,toolbar=yes,status=yes");
                 hideLightBox();
+            }else if(this.alwaysOpenLinksInBrowser){
+                window.open(url, "Pydio Bookmark", "location=yes,menubar=yes,resizable=yes,scrollbars=yes,toolbar=yes,status=yes");
+                window.setTimeout(function(){
+                    this.editorOptions.context.closeTab("editor.browser:/" + fileName);
+                }.bind(this), 500);
             }else{
                 this.element.fire("editor:updateTitle", url);
                 this.contentMainContainer = new Element('iframe', {

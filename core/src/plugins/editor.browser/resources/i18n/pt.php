@@ -22,4 +22,7 @@ $mess=array(
 "1" => "Janela Externa",
 "2" => "Janela Externa no Navegador",
 "3" => "A Abrir ficheiro numa janela Externa, por favor aguarde, esta janela deverá ser fechada automaticamente.",
+    "4" => "New URL Bookmark",
+    "5" => "Alternatively, you can <a>create a new bookmark to an URL</a>",
+    "6" => "Enter an URL starting with http/https"
 );

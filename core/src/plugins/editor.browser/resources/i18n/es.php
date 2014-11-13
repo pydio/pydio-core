@@ -22,4 +22,7 @@ $mess=array(
 "1" => "Nueva ventana",
 "2" => "Navegador en nueva ventana",
 "3" => "Abriendo el fichero en una ventana externa, espere por favor, esta ventana se cerrará automáticamente.",
+    "4" => "New URL Bookmark",
+    "5" => "Alternatively, you can <a>create a new bookmark to an URL</a>",
+    "6" => "Enter an URL starting with http/https"
 );
