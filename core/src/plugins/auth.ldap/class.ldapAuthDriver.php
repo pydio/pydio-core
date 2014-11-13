@@ -282,8 +282,24 @@ class ldapAuthDriver extends AbstractAuthDriver
         if (count($conn) < 1) {
             return array("count" => 0);
         }
-        $ret = ldap_search($conn,$this->ldapDN,$filter, $expected);
+        //$ret = ldap_search($conn,$this->ldapDN,$filter, $expected);
+
+        $cookie = '';
+        if(empty($this->pageSize) || !is_numeric($this->pageSize)){
+            $this->pageSize = 500;
+        }
+
+
         $allEntries = array("count" => 0);
+        $isSupportPagedResult = function_exists("ldap_control_paged_result") && function_exists("ldap_control_paged_result_response");
+
+        $gotAllEntries = false;
+        $index = 0;
+        do {
+            if ($isSupportPagedResult)
+                ldap_control_paged_result($this->ldapconn, $this->pageSize, true, $cookie);
+
+            $ret = ldap_search($conn, $this->ldapDN, $filter, $expected, 0, 0);
         foreach ($ret as $i => $resourceResult) {
             if($resourceResult === false) continue;
             if ($countOnly) {
@@ -295,27 +311,49 @@ class ldapAuthDriver extends AbstractAuthDriver
                 ldap_sort($conn[$i], $resourceResult, $this->ldapUserAttr);
             }
             $entries = ldap_get_entries($conn[$i], $resourceResult);
-            $index = 0;
-            if (!empty($entries["count"])) {
-                $allEntries["count"] += $entries["count"];
-                unset($entries["count"]);
-                foreach ($entries as $entry) {
-                    if ($offset != -1 && $index < $offset) {
-                        $index ++; continue;
+
+                // for better performance
+                if ((is_array($entries)) && ($offset != -1) && ($limit != -1) && (($index + $this->pageSize) < $offset)){
+                    $index += $this->pageSize;
+                    continue;
+                }
+
+                if (!empty($entries["count"])) {
+                    $allEntries["count"] += $entries["count"];
+                    unset($entries["count"]);
+                    foreach ($entries as $entry) {
+                        if ($offset != -1 && $index < $offset) {
+                            $index++;
+                            continue;
+                        }
+
+                        // fake memberOf
+                        if (in_array(strtolower("memberof"), array_map("strtolower", $expected)) && ($this->enableMemberOf) && method_exists($this, "fakeMemberOf")) {
+                            $uid = $entry["dn"];
+                            $strldap = "(&" . $this->ldapGFilter . "(member=" . $uid . "))";
+                            $this->fakeMemberOf($conn, $this->ldapGDN, $strldap, array("cn"), $entry);
+                        }
+
+                        $allEntries[] = $entry;
+                        $index++;
+                        if (($offset != -1) && ($limit!= -1) && $index > $offset + $limit)
+                            break;
                     }
 
-                    if (in_array(strtolower("memberof"), array_map("strtolower", $expected)) && ($this->enableMemberOf)) {
-                        $uid = $entry["dn"];
-                        $strldap = "(&" . $this->ldapGFilter . "(member=".$uid."))";
-                        $this->fakeMemberOf($conn, $this->ldapGDN, $strldap, array("cn"), $entry);
-                    }
-
-                    $allEntries[] = $entry;
-                    $index ++;
-                    if($limit!= -1 && $index >= $offset + $limit) break;
+                    if(($index > $offset + $limit) && ($limit != -1) && ($offset != -1))
+                        $gotAllEntries = true;
                 }
             }
-        }
+            if ($isSupportPagedResult)
+                foreach($ret as $element){
+                    ldap_control_paged_result_response($this->ldapconn, $element, $cookie);
+                }
+        } while (($cookie !== null && $cookie != '') && ($isSupportPagedResult) && (!$gotAllEntries));
+
+        // reset paged_result for other activities (otherwise we will experience ldap error)
+        if ($isSupportPagedResult)
+            ldap_control_paged_result($this->ldapconn, 0);
+
         return $allEntries;
     }
 
