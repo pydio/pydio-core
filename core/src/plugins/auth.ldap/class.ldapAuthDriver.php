@@ -394,6 +394,12 @@ class ldapAuthDriver extends AbstractAuthDriver
     }
     public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null, $recursive = true)
     {
+        $check_cache = $this->getCountFromCache();
+
+        if($check_cache > 0){
+            return $check_cache["count"];
+        }
+
         if (!empty($this->hasGroupsMapping)) {
             if ($baseGroup == "/") {
                 $this->dynamicFilter = "!(".$this->hasGroupsMapping."=*)";
@@ -403,6 +409,7 @@ class ldapAuthDriver extends AbstractAuthDriver
         }
 
         $res = $this->getUserEntries(AJXP_Utils::regexpToLdap($regexp), true, null);
+        $this->saveCountToCache($res);
         $this->dynamicFilter = null;
         return $res["count"];
     }
@@ -826,6 +833,30 @@ class ldapAuthDriver extends AbstractAuthDriver
                 $entry["count"]++;
             }
             $entry["memberof"] = $memberOf;
+        }
+    }
+
+    public function getCountFromCache(){
+        $fileName = "ldap.ser";
+        if (file_exists($this->getPluginCacheDir().DIRECTORY_SEPARATOR.$fileName)){
+            $fileContent = unserialize(file_get_contents($this->getPluginCacheDir().DIRECTORY_SEPARATOR.$fileName));
+            if(($fileContent) && ($fileContent["count"]) && ($fileContent["timestamp"]) && ((time() - $fileContent["timestamp"]) < 60*30)){
+                return $fileContent["count"];
+            }
+        }
+        return 0;
+    }
+
+    public function saveCountToCache($fileContent){
+        $fileName = "ldap.ser";
+        if(!is_dir($this->getPluginCacheDir(false, true))) return;
+        $this->getPluginCacheDir();
+        if(is_array($fileContent) && ($fileContent > 0)){
+            $fileContent["timestamp"] = time();
+            if (file_exists($this->getPluginCacheDir().DIRECTORY_SEPARATOR.$fileName)){
+                unlink($this->getPluginCacheDir()."/".$fileName);
+            }
+            file_put_contents($this->getPluginCacheDir().DIRECTORY_SEPARATOR.$fileName, serialize($fileContent));
         }
     }
 
