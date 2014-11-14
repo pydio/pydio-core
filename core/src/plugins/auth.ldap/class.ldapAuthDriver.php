@@ -236,12 +236,30 @@ class ldapAuthDriver extends AbstractAuthDriver
         if ($login == null) {
             $filter = $this->ldapFilter;
         } else {
-            $searchAttr = $this->ldapUserAttr;
             if ($regexpOnSearchAttr && !empty($this->options["LDAP_SEARCHUSER_ATTR"])) {
                 $searchAttr = $this->options["LDAP_SEARCHUSER_ATTR"];
+                $searchAttrArray = explode(",", $searchAttr);
             }
-            if ($this->ldapFilter == "") $filter = "(" . $searchAttr . "=" . $login . ")";
-            else  $filter = "(&" . $this->ldapFilter . "(" . $searchAttr . "=" . $login . "))";
+
+            if(isset($searchAttrArray)){
+               if(count($searchAttrArray) > 1){
+                   $searchAttrFilter = "(|";
+                   foreach($searchAttrArray as $attr){
+                       $searchAttrFilter .= "(". $attr . "=" . $login . ")";
+                    }
+                   $searchAttrFilter .= ")";
+               }
+                else{
+                    $searchAttrFilter = "(" . $searchAttrArray[0] . "=" . $login . ")";
+                }
+
+            }
+            else{
+                $searchAttrFilter = "(" . $this->ldapUserAttr . "=" . $login . ")";
+            }
+
+            if ($this->ldapFilter == "") $filter = $searchAttrFilter;
+            else  $filter = "(&" . $this->ldapFilter . $searchAttrFilter . ")";
         }
         if (empty($filter)) {
             if (!empty($this->dynamicFilter)) $filter = $this->dynamicFilter;
@@ -861,5 +879,4 @@ class ldapAuthDriver extends AbstractAuthDriver
             file_put_contents($this->getPluginCacheDir() . DIRECTORY_SEPARATOR . $fileName, serialize($fileContent));
         }
     }
-
 }
