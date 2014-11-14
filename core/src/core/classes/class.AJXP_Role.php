@@ -417,8 +417,10 @@ class AJXP_Role implements AjxpGroupPathProvider
 
     public function getLabel()
     {
-        return $this->roleLabel;
-    }
+        $test = $this->filterParameterValue("core.conf", "ROLE_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $this->roleLabel);
+        if(!empty($test)) return $test;
+        return $this->roleId;
+   }
 
     /**
      * @param array $specificRights

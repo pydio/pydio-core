@@ -370,6 +370,17 @@ class serialConfDriver extends AbstractConfDriver
     }
 
     /**
+     * @abstract
+     * @param string $repositoryId
+     * @param string $rolePrefix
+     * @param bool $countOnly
+     * @return array()
+     */
+    public function getRolesForRepository($repositoryId, $rolePrefix = '', $countOnly = false){
+        return array();
+    }
+
+    /**
      * @param string $repositoryId
      * @param boolean $details
      * @return array('internal' => count, 'external' => count)

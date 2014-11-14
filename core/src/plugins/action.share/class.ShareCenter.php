@@ -1283,8 +1283,76 @@ class ShareCenter extends AJXP_Plugin
      */
     public function computeSharedRepositoryAccessRights($repoId, $mixUsersAndGroups, $currentFileUrl = null)
     {
-        $loggedUser = AuthService::getLoggedUser();
+        $roles = AuthService::getRolesForRepository($repoId);
+        $sharedEntries = $sharedGroups = $sharedRoles = array();
+        $mess = ConfService::getMessages();
+        foreach($roles as $rId){
+            $role = AuthService::getRole($rId);
+            if ($role == null) continue;
+
+            $RIGHT = $role->getAcl($repoId);
+            if (empty($RIGHT)) continue;
+            $ID = $rId;
+            $WATCH = false;
+            if(strpos($rId, "AJXP_USR_/") === 0){
+                $userId = substr($rId, strlen('AJXP_USR_/'));
+                $role = AuthService::getRole($rId);
+                $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
+                $LABEL = $role->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
+                if(empty($LABEL)) $LABEL = $userId;
+                $TYPE = $userObject->hasParent()?"tmp_user":"user";
+                if ($this->watcher !== false && $currentFileUrl != null) {
+                    $WATCH = $this->watcher->hasWatchOnNode(
+                        new AJXP_Node($currentFileUrl),
+                        $userId,
+                        MetaWatchRegister::$META_WATCH_USERS_NAMESPACE
+                    );
+                }
+                $ID = $userId;
+            }else if(strpos($rId, "AJXP_GRP_/") === 0){
+                if(empty($loadedGroups)){
+                    $loadedGroups = AuthService::listChildrenGroups();
+                }
+                $groupId = substr($rId, strlen('AJXP_GRP_'));
+                if(isSet($loadedGroups[$groupId])) {
+                    $LABEL = $loadedGroups[$groupId];
+                }
+                if($groupId == "/"){
+                    $LABEL = $mess["447"];
+                }
+                if(empty($LABEL)) $LABEL = $groupId;
+                $TYPE = "group";
+            }else{
+                $role = AuthService::getRole($rId);
+                $LABEL = $role->getLabel();
+                $TYPE = 'group';
+            }
+
+            if(empty($LABEL)) $LABEL = $rId;
+            $entry = array(
+                "ID"    => $ID,
+                "TYPE"  => $TYPE,
+                "LABEL" => $LABEL,
+                "RIGHT" => $RIGHT
+            );
+            if($WATCH) $entry["WATCH"] = $WATCH;
+            if($TYPE == "group"){
+                $sharedGroups[$entry["ID"]] = $entry;
+            } else {
+                $sharedEntries[$entry["ID"]] = $entry;
+            }
+        }
+
+        if (!$mixUsersAndGroups) {
+            return array("USERS" => $sharedEntries, "GROUPS" => $sharedGroups);
+        }else{
+            return array_merge(array_values($sharedGroups), array_values($sharedEntries));
+
+        }
+
+        /*
         $users = AuthService::getUsersForRepository($repoId);
+        //var_dump($roles);
         $baseGroup = "/";
         $groups = AuthService::listChildrenGroups($baseGroup);
         $mess = ConfService::getMessages();
@@ -1300,12 +1368,34 @@ class ShareCenter extends AJXP_Plugin
                 $right = $r->getAcl($repoId);
                 if (!empty($right)) {
                     $entry = array(
-                        "ID"    => $gId,
+                        "ID"    => "AJXP_GRP_".AuthService::filterBaseGroup($gId),
                         "TYPE"  => "group",
                         "LABEL" => $gLabel,
                         "RIGHT" => $right);
                     if (!$mixUsersAndGroups) {
                         $sharedGroups[$gId] = $entry;
+                    } else {
+                        $sharedEntries[] = $entry;
+                    }
+                }
+            }
+        }
+
+        foreach ($roles as $rId){
+            if(strpos($rId, "AJXP_GRP_") === 0 || strpos($rId, "AJXP_USR_") === 0) continue;
+            $role = AuthService::getRole($rId);
+            if ($role != null) {
+                $right = $role->getAcl($repoId);
+                if (!empty($right)) {
+                    $label = $role->getLabel();
+                    if(empty($label)) $label = $rId;
+                    $entry = array(
+                        "ID"    => $rId,
+                        "TYPE"  => "group",
+                        "LABEL" => $label,
+                        "RIGHT" => $right);
+                    if (!$mixUsersAndGroups) {
+                        $sharedGroups[$rId] = $entry;
                     } else {
                         $sharedEntries[] = $entry;
                     }
@@ -1346,6 +1436,7 @@ class ShareCenter extends AJXP_Plugin
             return array("USERS" => $sharedEntries, "GROUPS" => $sharedGroups);
         }
         return $sharedEntries;
+        */
 
     }
 
@@ -1732,7 +1823,7 @@ class ShareCenter extends AJXP_Plugin
             $removeGroups = array_diff($originalGroups, $groups);
             if (count($removeGroups)) {
                 foreach ($removeGroups as $groupId) {
-                    $role = AuthService::getRole("AJXP_GRP_".AuthService::filterBaseGroup($groupId));
+                    $role = AuthService::getRole($groupId);
                     if ($role !== false) {
                         $role->setAcl($newRepo->getUniqueId(), "");
                         AuthService::updateRole($role);
@@ -1837,7 +1928,8 @@ class ShareCenter extends AJXP_Plugin
         }
 
         foreach ($groups as $group) {
-            $grRole = AuthService::getRole("AJXP_GRP_".AuthService::filterBaseGroup($group), true);
+            //$grRole = AuthService::getRole("AJXP_GRP_".AuthService::filterBaseGroup($group), true);
+            $grRole = AuthService::getRole($group, true);
             $grRole->setAcl($newRepo->getUniqueId(), $uRights[$group]);
             AuthService::updateRole($grRole);
         }
