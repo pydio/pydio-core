@@ -28,7 +28,7 @@ Class.create("BrowserOpener", AbstractEditor, {
     },
 	
 	open : function($super, node){
-        if(node.getAjxpMime() == "url"){
+        if(node.getAjxpMime() == "url" || node.getAjxpMime() == "website"){
         	this.openURL(node.getPath());
         	return;
         } 
@@ -73,6 +73,12 @@ Class.create("BrowserOpener", AbstractEditor, {
 		connexion.addParameter('file', fileName);
 		connexion.onComplete = function(transp){
 			var url = transp.responseText;
+            if(url.indexOf('URL=') !== -1){
+                url = url.split('URL=')[1];
+                if(url.indexOf('\n') !== -1){
+                    url = url.split('\n')[0];
+                }
+            }
             if(this.editorOptions.context.__className == 'Modal'){
                 window.open(url, "Pydio Bookmark", "location=yes,menubar=yes,resizable=yes,scrollbars=yes,toolbar=yes,status=yes");
                 hideLightBox();
