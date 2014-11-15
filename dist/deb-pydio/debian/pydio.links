@@ -4,4 +4,3 @@ etc/pydio/bootstrap_plugins.php		    usr/share/pydio/conf/bootstrap_plugins.php
 etc/pydio/bootstrap_repositories.php	usr/share/pydio/conf/bootstrap_repositories.php
 etc/pydio/extensions.conf.php		    usr/share/pydio/conf/extensions.conf.php
 var/lib/pydio/data				        usr/share/pydio/data
-usr/share/pydio/core/doc                usr/share/doc/pydio
