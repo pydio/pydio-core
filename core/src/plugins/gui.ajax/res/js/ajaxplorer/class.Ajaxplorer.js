@@ -135,12 +135,12 @@ Class.create("Ajaxplorer", {
         var appRoot = ajxpBootstrap.parameters.get('APPLICATION_ROOT');
         if(appRoot && appRoot != "/"){
             Backbone.history.start({
-                pushState: false,
+                pushState: true,
                 root:appRoot
             });
         }else{
             Backbone.history.start({
-                pushState: false
+                pushState: true
             });
         }
         var navigate = function(repList, repId){

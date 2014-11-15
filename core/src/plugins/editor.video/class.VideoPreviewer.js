@@ -106,6 +106,9 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
 			}
             if($$('base').length){
                 url = $$("base")[0].getAttribute("href");
+                if(!url.startsWith('http') && !url.startsWith('https')){
+                    url = document.location.origin + url;
+                }
             }
 
             var html5proxies = $H({});
