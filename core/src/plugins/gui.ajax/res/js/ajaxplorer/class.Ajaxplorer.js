@@ -125,7 +125,9 @@ Class.create("Ajaxplorer", {
                     }
                     ajaxplorer.triggerRepositoryChange(foundRepo.getId());
                 }else if(path){
-                    ajaxplorer.goTo(path);
+                    window.setTimeout(function(){
+                        ajaxplorer.goTo(path);
+                    }, 1000);
                 }
             }
 

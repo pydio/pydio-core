@@ -1077,15 +1077,13 @@ class ShareCenter extends AJXP_Plugin
     public static function loadShareByHash($hash){
         AJXP_Logger::debug(__CLASS__, __FUNCTION__, "Do something");
         AJXP_PluginsService::getInstance()->initActivePlugins();
+        if(isSet($_GET["lang"])){
+            ConfService::setLanguage($_GET["lang"]);
+        }
         $shareCenter = self::getShareCenter();
         $data = $shareCenter->loadPublicletData($hash);
         $mess = ConfService::getMessages();
         if($shareCenter->getShareStore()->isShareExpired($hash, $data)){
-            /*
-            if (strstr(realpath($_SERVER["SCRIPT_FILENAME"]),realpath(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"))) !== FALSE) {
-                $shareCenter->deleteExpiredPubliclet($hash, $data);
-            }
-            */
             AuthService::disconnect();
             self::loadMinisite(array(), $hash, $mess["share_center.165"]);
             return;
