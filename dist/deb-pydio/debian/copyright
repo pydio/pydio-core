@@ -1,21 +1,17 @@
-Source: http://bash-completion.alioth.debian.org/
+Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+This file is part of Pydio.
 
-Files: debian/*
-Copyright: © 2008, Luk Claes <luk@debian.org>
-           © 2008, Matthias Klose <doko@ubuntu.com>
-           © 2008, David Paleino <d.paleino@gmail.com>
-License: GPL-2+
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 2 of the License, or
- (at your option) any later version.
+Pydio is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Files: *
-Copyright: © 2008, Luk Claes <luk@debian.org>
-           © 2006-2008, Ian Macdonald <ian@caliban.org>
-           © 2008, David Paleino <d.paleino@gmail.com>
-License: GPL-2+
+Pydio is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
 
-On Debian systems, you can find the full text of the GNU General Public
-License v2 in `/usr/share/common-licenses/GPL-2'.
+You should have received a copy of the GNU Affero General Public License
+along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 
+The latest code can be found at <http://pyd.io/>.
