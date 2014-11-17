@@ -3502,7 +3502,7 @@ class CAS_Client
             $new_request_uri = preg_replace($str_pattern,'',$new_request_uri);
             if(!(strcmp($new_request_uri, "/") === 0))
                 $new_request_uri = rtrim($new_request_uri, "/");
-            $final_uri		.= $new_request_uri;
+            $final_uri		.= $new_request_uri."welcome";
             //-------------------------------------------------------------------
 
 
