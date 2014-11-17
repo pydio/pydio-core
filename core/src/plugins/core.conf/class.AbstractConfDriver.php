@@ -1078,7 +1078,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     if(isSet($roleOrGroup["PREFIX"])){
                         $rolePrefix    = $loggedUser->mergedRole->filterParameterValue("core.conf", "PREFIX", null, $roleOrGroup["PREFIX"]);
                         $excludeString = $loggedUser->mergedRole->filterParameterValue("core.conf", "EXCLUDED", null, $roleOrGroup["EXCLUDED"]);
-                        $includeString = $loggedUser->mergedRole->filterParameterValue("core.conf", "INCLUDED", null, $roleOrGroup["EXCLUDED"]);
+                        $includeString = $loggedUser->mergedRole->filterParameterValue("core.conf", "INCLUDED", null, $roleOrGroup["INCLUDED"]);
                     }
 
                     switch (strtolower($roleOrGroup["group_switch_value"])) {
