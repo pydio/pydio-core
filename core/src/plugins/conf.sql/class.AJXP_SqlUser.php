@@ -363,6 +363,13 @@ class AJXP_SqlUser extends AbstractAjxpUser
 
         $result_prefs = dibi::query('SELECT [name], [val] FROM [ajxp_user_prefs] WHERE [login] = %s', $this->getId());
         $this->prefs = $result_prefs->fetchPairs('name', 'val');
+        if ("postgre" == $this->storage->sqlDriver["driver"]) {
+            $unescaped = array();
+            foreach($this->prefs as $name => $val) {
+                $unescaped[$name] = unserialize($val);
+            }
+            $this->prefs = $unescaped;
+        }
 
         $result_bookmarks = dibi::query('SELECT [repo_uuid], [path], [title] FROM [ajxp_user_bookmarks] WHERE [login] = %s', $this->getId());
         $all_bookmarks = $result_bookmarks->fetchAll();
