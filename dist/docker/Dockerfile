@@ -1,6 +1,6 @@
 # DOCKER-VERSION 0.xx
 FROM centos:6.4
-MAINTAINER tran@pydio.com
+MAINTAINER charles@pydio.com
 
 ADD ./my.cnf /etc/my.cnf
 ADD ./supervisord.conf /etc/
