@@ -560,7 +560,7 @@
 				   var fileNames = $A(userSelection.getFileNames());
 				   var connexion = new Connexion();
 				   connexion.addParameter('get_action', 'restore');
-				   connexion.addParameter('dir', userSelection.getCurrentNode().getPath());
+				   connexion.addParameter('dir', userSelection.getContextNode().getPath());
 				   connexion.onComplete = function(transport){
 				   		ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
 				   };
