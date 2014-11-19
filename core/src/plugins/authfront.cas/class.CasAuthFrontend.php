@@ -50,6 +50,10 @@ class CasAuthFrontend extends AbstractAuthFrontend
 
     function tryToLogUser(&$httpVars, $isLast = false)
     {
+        if(isset($_SESSION["CURRENT_MINISITE"])){
+            return false;
+        }
+
         $this->loadConfig();
 
         if(isset($_SESSION['AUTHENTICATE_BY_CAS'])){

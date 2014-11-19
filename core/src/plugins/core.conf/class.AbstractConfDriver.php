@@ -1075,10 +1075,26 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     if(!is_array($roleOrGroup)){
                         $roleOrGroup = array("group_switch_value" => $roleOrGroup);
                     }
+
+                    $listRoleType = false;
+
                     if(isSet($roleOrGroup["PREFIX"])){
                         $rolePrefix    = $loggedUser->mergedRole->filterParameterValue("core.conf", "PREFIX", null, $roleOrGroup["PREFIX"]);
                         $excludeString = $loggedUser->mergedRole->filterParameterValue("core.conf", "EXCLUDED", null, $roleOrGroup["EXCLUDED"]);
-                        $includeString = $loggedUser->mergedRole->filterParameterValue("core.conf", "INCLUDED", null, $roleOrGroup["EXCLUDED"]);
+                        $includeString = $loggedUser->mergedRole->filterParameterValue("core.conf", "INCLUDED", null, $roleOrGroup["INCLUDED"]);
+                        $listUserRolesOnly = $loggedUser->mergedRole->filterParameterValue("core.conf", "LIST_ROLE_BY", null, $roleOrGroup["LIST_ROLE_BY"]);
+                        if (is_array($listUserRolesOnly) && isset($listUserRolesOnly["group_switch_value"])) {
+                            switch ($listUserRolesOnly["group_switch_value"]) {
+                                case "userroles":
+                                    $listRoleType = true;
+                                    break;
+                                case "allroles":
+                                    $listRoleType = false;
+                                    break;
+                                default;
+                                    break;
+                            }
+                        }
                     }
 
                     switch (strtolower($roleOrGroup["group_switch_value"])) {
@@ -1094,7 +1110,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                             break;
                         case 'role':
                             $allUsers = AuthService::listUsers($baseGroup, $regexp, 0, $limit, false);
-                            $allGroups = $this->getUserRoleList($loggedUser, $rolePrefix, $includeString, $excludeString);
+                            $allGroups = $this->getUserRoleList($loggedUser, $rolePrefix, $includeString, $excludeString, $listRoleType);
                             break;
                         case 'rolegroup';
                             $allUsers = AuthService::listUsers($baseGroup, $regexp, 0, $limit, false);
@@ -1103,7 +1119,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                             foreach ($authGroups as $gId => $gName) {
                                 $groups["AJXP_GRP_" . AuthService::filterBaseGroup($gId)] = $gName;
                             }
-                            $roles = $this->getUserRoleList($loggedUser, $rolePrefix, $includeString, $excludeString);
+                            $roles = $this->getUserRoleList($loggedUser, $rolePrefix, $includeString, $excludeString, $listRoleType);
 
                             empty($groups) ? $allGroups = $roles : (empty($roles) ? $allGroups = $groups : $allGroups = array_merge($groups, $roles));
                             //$allGroups = array_merge($groups, $roles);
@@ -1125,7 +1141,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 if ($regexp == null && !$usersOnly) {
                     $users .= "<li class='complete_group_entry' data-group='AJXP_GRP_/' data-label='".$mess["447"]."'><span class='user_entry_label'>".$mess["447"]."</span></li>";
                 }
-                if (!$usersOnly) {
+                if (!$usersOnly && is_array($allGroups)) {
                     foreach ($allGroups as $groupId => $groupLabel) {
                         if ($regexp == null ||  preg_match("/$regexp/i", $groupLabel)) {
                             $users .= "<li class='complete_group_entry' data-group='$groupId' data-label='$groupLabel' data-entry_id='$groupId'><span class='user_entry_label'>".$groupLabel."</span></li>";
@@ -1229,7 +1245,9 @@ abstract class AbstractConfDriver extends AJXP_Plugin
 
                 break;
 
-
+            case "cli_update_user_list":
+                AuthService::listUsers();
+                break;
             default;
             break;
         }
@@ -1251,10 +1269,14 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      * @param $excludeString eliminate roles in this string
      * @return array
      */
-    public function getUserRoleList($userObject, $rolePrefix, $includeString, $excludeString)
+    public function getUserRoleList($userObject, $rolePrefix, $includeString, $excludeString, $byUserRoles = false)
     {
         if ($userObject) {
+            if ($byUserRoles) {
             $allUserRoles = $userObject->getRoles();
+            } else {
+                $allUserRoles = AuthService::getRolesList();
+            }
             $allRoles = array();
             if (isset($allUserRoles)) {
 
@@ -1286,7 +1308,9 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     if (isSet($valueFiltersInclude) && !in_array(strtolower(substr($roleId, strlen($rolePrefix))), $valueFiltersInclude)) continue;
                     $roleObject = AuthService::getRole($roleId);
                     $label = $roleObject->getLabel();
-                    $allRoles[$roleId] = !empty($label) ? $label : substr($roleId, strlen($rolePrefix));
+                    $label = !empty($label) ? $label : $roleId;
+
+                    $allRoles[$roleId] = substr($label, strlen($rolePrefix));
                 }
             }
             return $allRoles;
