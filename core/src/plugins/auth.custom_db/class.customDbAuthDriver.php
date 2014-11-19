@@ -82,12 +82,21 @@ class customDbAuthDriver extends AbstractAuthDriver
     public function listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive = true)
     {
         $this->connect();
+        $orderBy = "ORDER BY [".$this->customTableUid."] ASC";
+        if($this->sqlDriver["driver"] == "mssql"){
+            $orderBy = "";
+            $offset = $limit = -1;
+        }
         if ($regexp != null) {
-            $res = dibi::query("SELECT [".$this->customTableUid."],[".$this->customTablePwd."] FROM [".$this->customTableName."] AS u WHERE [".$this->customTableUid."] ".AJXP_Utils::regexpToLike($regexp)." ORDER BY [".$this->customTableUid."] ASC %lmt %ofs", AJXP_Utils::cleanRegexp($regexp), $limit, $offset) ;
+            if($offset != -1 && $limit != -1){
+                $res = dibi::query("SELECT [".$this->customTableUid."],[".$this->customTablePwd."] FROM [".$this->customTableName."] WHERE [".$this->customTableUid."] ".AJXP_Utils::regexpToLike($regexp)." $orderBy %lmt %ofs", AJXP_Utils::cleanRegexp($regexp), $limit, $offset) ;
+            }else{
+                $res = dibi::query("SELECT [".$this->customTableUid."],[".$this->customTablePwd."] FROM [".$this->customTableName."] WHERE [".$this->customTableUid."] ".AJXP_Utils::regexpToLike($regexp)." $orderBy", AJXP_Utils::cleanRegexp($regexp)) ;
+            }
         } else if ($offset != -1 && $limit != -1) {
-            $res = dibi::query("SELECT [".$this->customTableUid."],[".$this->customTablePwd."] FROM [".$this->customTableName."] AS u ORDER BY [".$this->customTableUid."] ASC %lmt %ofs", $limit, $offset);
+            $res = dibi::query("SELECT [".$this->customTableUid."],[".$this->customTablePwd."] FROM [".$this->customTableName."] $orderBy %lmt %ofs", $limit, $offset);
         } else {
-            $res = dibi::query("SELECT [".$this->customTableUid."],[".$this->customTablePwd."] FROM [".$this->customTableName."] AS u ORDER BY [".$this->customTableUid."] ASC");
+            $res = dibi::query("SELECT [".$this->customTableUid."],[".$this->customTablePwd."] FROM [".$this->customTableName."] $orderBy");
         }
         $pairs = $res->fetchPairs($this->customTableUid, $this->customTablePwd);
         $this->close();
