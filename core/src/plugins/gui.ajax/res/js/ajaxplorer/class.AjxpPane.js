@@ -93,7 +93,9 @@ Class.create("AjxpPane", {
             }));
             this.htmlElement.insert(this.scroller);
             this.htmlElement.setStyle({overflow:"hidden"});
-            fitHeightToBottom(this.scroller);
+            this.scroller.setStyle({
+                height:this.htmlElement.getHeight() + 'px'
+            });
             this.scrollbar = new Control.ScrollBar(this.htmlElement,this.scroller, {fixed_scroll_distance:50});
         }
 
@@ -214,7 +216,9 @@ Class.create("AjxpPane", {
             }
     		fitHeightToBottom(this.htmlElement, this.options.fitParent, marginBottom, false, minOffsetTop);
             if(this.scrollbar){
-                fitHeightToBottom(this.scroller);
+                this.scroller.setStyle({
+                    height:this.htmlElement.getHeight() + 'px'
+                });
                 this.scrollbar.recalculateLayout();
             }
     	}

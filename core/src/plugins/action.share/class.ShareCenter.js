@@ -660,7 +660,7 @@ Class.create("ShareCenter", {
             actions.insert({top:new Element('span', {className:'icon-key simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.85"]}).update(' '+MessageHash["share_center.84"])});
         }
         if(linkData["expire_time"]){
-            if(linkData['is_expired'] && linkData['expire_after'] === 0 && (linkData['download_limit'] && linkData['download_limit'] != linkData['download_counter'])){
+            if(linkData['is_expired'] && linkData['expire_after'] <= 0 && (linkData['download_limit'] && linkData['download_limit'] != linkData['download_counter'])){
                 actions.insert({top:new Element('span', {className:'icon-calendar simple_tooltip_observer SF_horizontal_action_destructive',"data-tooltipTitle":MessageHash["share_center.169"]}).update(' '+linkData["expire_time"])});
             }else{
                 actions.insert({top:new Element('span', {className:'icon-calendar simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.87"]}).update(' '+linkData["expire_time"])});
@@ -1212,7 +1212,7 @@ Class.create("ShareCenter", {
 
         // EXPIRATION TIME
         if(jsonData && jsonData["expire_time"]){
-            if(jsonData['is_expired'] && jsonData['expire_after'] === 0 && (jsonData['download_limit'] && jsonData['download_limit'] != jsonData['download_counter'])){
+            if(jsonData['is_expired'] && jsonData['expire_after'] <= 0 && (jsonData['download_limit'] && jsonData['download_limit'] != jsonData['download_counter'])){
                 dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:new Element('span', {className:'simple_tooltip_observer SF_horizontal_action_destructive',"data-tooltipTitle":MessageHash["share_center.169"]}).update('<span class="icon-calendar"></span> '+ jsonData["expire_time"])});
             }else{
                 dialogButtonsOrRow.down('.SF_horizontal_actions').insert({top:new Element('span', {className:'simple_tooltip_observer',"data-tooltipTitle":MessageHash["share_center.87"]}).update('<span class="icon-calendar"></span> '+jsonData["expire_time"])});

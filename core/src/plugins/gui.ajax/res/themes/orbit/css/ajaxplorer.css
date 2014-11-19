@@ -4686,7 +4686,7 @@ div#target_repository_toggle{
     display: inline-block;
     padding: 2px 7px;
     border: 1px solid;
-    color: #888;
+    opacity: 0.8;
     border-radius: 8px;
     margin: 2px;
 }

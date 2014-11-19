@@ -224,13 +224,14 @@ Class.create("Connexion", {
 		{
 			method:'get',
 			asynchronous: (aSync?true:false),
+            evalJS: false,
 			onComplete:function(transport){
-				if(transport.responseText) 
+				if(transport.responseText)
 				{
 					try
 					{
-						var script = transport.responseText;				
-					    if (window.execScript){	
+						var script = transport.responseText;
+					    if (window.execScript){
 					        window.execScript( script );
 					    }
 					    else{

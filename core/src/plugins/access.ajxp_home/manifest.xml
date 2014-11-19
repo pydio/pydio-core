@@ -119,7 +119,7 @@
                 </style>
                 <div id="home_account_pane" ajxpClass="UserDashboardHome">
                     <div id="home_left_bar" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"orbit_content"}' style="width:420px;">
-                        <div id="welcome"></div>
+                        <div id="welcome" style="min-height:94px;"></div>
                         <div id="workspaces_center" ajxpClass="AjxpPane"  ajxpOptions='{"fit":"height", "fitParent":"home_left_bar"}'>
                             <div id="list_cont" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"workspaces_center", "fitMarginBottom":100}'>
                                 <ul id="workspaces_list"></ul>
