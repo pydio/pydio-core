@@ -164,6 +164,7 @@ class ShareStore {
     }
 
     public function updateShareProperty($hash, $pName, $pValue){
+        if(!$this->sqlSupported) return false;
         $relatedObjectId = $this->confStorage->simpleStoreGet("share", $hash, "serial", $data);
         if(is_array($data)){
             $data[$pName] = $pValue;
@@ -174,6 +175,7 @@ class ShareStore {
     }
 
     public function findSharesForRepo($repositoryId){
+        if(!$this->sqlSupported) return array();
         return $this->confStorage->simpleStoreList("share", null, "", "serial", '%"REPOSITORY";s:32:"'.$repositoryId.'"%');
     }
 
@@ -189,14 +191,17 @@ class ShareStore {
 
     public function listShares($limitToUser = '', $parentRepository = '', $cursor = null, $shareType = null){
 
-        // Get DB files
-        $dbLets = $this->confStorage->simpleStoreList(
-            "share",
-            $cursor,
-            "",
-            "serial",
-            (!empty($limitToUser)?'%"OWNER_ID";s:'.strlen($limitToUser).':"'.$limitToUser.'"%':''),
-            $parentRepository);
+        $dbLets = array();
+        if($this->sqlSupported){
+            // Get DB files
+            $dbLets = $this->confStorage->simpleStoreList(
+                "share",
+                $cursor,
+                "",
+                "serial",
+                (!empty($limitToUser)?'%"OWNER_ID";s:'.strlen($limitToUser).':"'.$limitToUser.'"%':''),
+                $parentRepository);
+        }
 
         // Get hardcoded files
         $files = glob(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/*.php");
