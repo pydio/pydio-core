@@ -581,6 +581,11 @@
                 ]]></clientCallback>
             </processing>
         </action>
+        <action name="cli_update_user_list">
+            <processing>
+                <serverCallback methodName="switchAction"></serverCallback>
+            </processing>
+        </action>
 	</actions>
 	<client_configs>
 		<component_config className="InfoPanel">

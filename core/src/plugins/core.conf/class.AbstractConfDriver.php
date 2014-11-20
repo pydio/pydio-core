@@ -1244,10 +1244,6 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                 }
 
                 break;
-
-            case "cli_update_user_list":
-                AuthService::listUsers();
-                break;
             default;
             break;
         }

@@ -1673,8 +1673,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             break;
 
+            case "cli_update_user_list":
+                AuthService::listUsers();
+                break;
+
             default:
-            break;
+                break;
         }
 
         return;
