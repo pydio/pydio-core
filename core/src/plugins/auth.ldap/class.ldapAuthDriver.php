@@ -742,9 +742,9 @@ class ldapAuthDriver extends AbstractAuthDriver
                                         if (isSet($matchFilter) && !preg_match($matchFilter, $uniqValueWithPrefix)) continue;
                                         if (isSet($valueFilters) && !in_array($uniqValueWithPrefix, $valueFilters)) continue;
                                         $roleToAdd = AuthService::getRole($uniqValueWithPrefix, true);
-                                        $roleToAdd->setLabel($uniqValueWithPrefix);
+                                        $roleToAdd->setLabel($uniqValue);
+                                        AuthService::updateRole($roleToAdd);
                                         $userObject->addRole($roleToAdd);
-                                        $userObject->recomputeMergedRole();
                                         $changes = true;
                                     }
                                 } else {
@@ -753,7 +753,6 @@ class ldapAuthDriver extends AbstractAuthDriver
                                         if (isSet($valueFilters) && !in_array($uniqValue, $valueFilters)) continue;
                                         if ((!in_array($uniqValue, array_keys($userObject->getRoles()))) && !empty($uniqValue)) {
                                             $userObject->addRole(AuthService::getRole($uniqValue, true));
-                                            $userObject->recomputeMergedRole();
                                             $changes = true;
                                         }
                                     }
