@@ -182,4 +182,8 @@ $mess = array(
     "168" => "Le nombre de téléchargements autorisés a été atteint. Cliquer pour remettre à zéro et réactiver le lien.",
     "169" => "La date d'expiration est passée. Changez les paramètres du lien pour le réactiver.",
     "170" => "Ce lien est sécurisé par un mot de passe.",
+    "171" => "Lien Personnalisé",
+    "172" => "Désolé ce lien est déjà utilisé, veuillez en choisir un autre.",
+    "173" => "Si vous voulez créer un lien durable, vous pouvez utiliser ce champ pour fixer la dernière partie du lien (e.g. https://.../mon-joli-lien). Laisser vide pour générer automatiquement.",
+
 );

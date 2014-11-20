@@ -179,5 +179,7 @@ $mess = array(
     "168" => "The number of authorized downloads have been reached. Click to reset the counter and reactivate the link.",
     "169" => "The expiration date was reached. Change the parameters with a new date if you want to reactivate the link.",
     "170" => "This is link is secured with a password.",
-
+    "171" => "Link Handle",
+    "172" => "Sorry this link is already used, please pick another handle.",
+    "173" => "If you want a durable and pretty link (like https://.../my-share-link), you can use this field. Link handle will be generated if left empty.",
 );

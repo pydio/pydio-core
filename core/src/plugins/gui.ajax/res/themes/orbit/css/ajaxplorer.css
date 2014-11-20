@@ -708,7 +708,7 @@ textarea#myCode
 {
     display: inline-block;
     font-size: 13px;
-    padding: 4px 13px !important;
+    padding: 7px 6px !important;
     text-align: center;
     overflow: visible;
     color: #fff;
@@ -4640,7 +4640,7 @@ input.share_info_panel_link_expired{
 
 #share_folder_form div.dialogContentMainTitle{
     clear: left;
-    margin-top: 20px;
+    margin-top: 10px;
     margin-bottom: -4px;
     padding: 10px 0 0;
     border-top: 1px dashed rgb(150,150,150);
@@ -4671,11 +4671,15 @@ span.only_share_leaf
 }
 
 input#shared_user{
-    width: 370px !important;
+    width: 374px !important;
 }
 
 div#target_repository_toggle{
     display: none !important;
+}
+
+div#target_user{
+    margin: 0 5px !important;
 }
 
 .share_edit div#target_repository_toggle{
@@ -4694,7 +4698,7 @@ div#target_repository_toggle{
 .share_edit div#target_repository_toggle div.SF_horizontal_actions{
     text-align: right;
     margin-top: 10px;
-    margin-bottom: -20px;
+    margin-bottom: -5px;
     padding-right: 0;
 }
 
@@ -4822,6 +4826,49 @@ div.user_entry span.cbContainer{
     display: inline-block;
     margin-left: 5px;
     cursor: pointer;
+}
+
+.share_dialog_toggler{
+    cursor: pointer;
+}
+
+.share_dialog_toggler span.toggler_arrow{
+    float: right;
+    margin-right: 5px;
+    margin-top: 3px;
+    transform:rotate(270deg);
+}
+
+.share_dialog_toggler_closed span.toggler_arrow{
+    transform:rotate(0deg);
+}
+
+.share_dialog_toggled{
+    overflow: hidden;
+    transition: height 0.5s ease;
+}
+
+.share_dialog_toggled_closed{
+    height: 0 !important;
+    overflow: hidden;
+}
+
+#editable_hash_link{
+    margin:4px 10px;
+    font-size:13px;
+}
+
+#description_parameters{
+    margin: 5px 0;
+}
+
+#editable_hash_parameters{
+    margin: 5px;
+}
+
+#ws_shared_users_parameters{
+    margin: 0 5px;
+    position: relative;
 }
 
 /***********************/

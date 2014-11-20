@@ -1157,17 +1157,12 @@ class ShareCenter extends AJXP_Plugin
 
         $shareCenter = self::getShareCenter();
 
+        ConfService::setLanguage($language);
+        $mess = ConfService::getMessages();
         if ($shareCenter->getShareStore()->isShareExpired($shortHash, $data))
         {
-            // Remove the publiclet, it's done
-            if (strstr(realpath($_SERVER["SCRIPT_FILENAME"]),realpath(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"))) !== FALSE) {
-                $shareCenter->deleteExpiredPubliclet($shortHash, $data);
-            }
-
-            //echo "Link is expired, sorry.";
-            header("HTTP/1.0 404 Not Found");
-            echo '404 File not found';
-            exit();
+            self::loadMinisite(array(), $shortHash, $mess["share_center.165"]);
+            return;
         }
 
 
@@ -1555,7 +1550,17 @@ class ShareCenter extends AJXP_Plugin
 
         if(!isSet($httpVars["repository_id"])){
             try{
-                $hash = $this->getShareStore()->storeShare($repository->getId(), $data);
+                $forceHash = null;
+                if(isSet($httpVars["custom_handle"]) && !empty($httpVars["custom_handle"])){
+                    // Existing already
+                    $value = AJXP_Utils::sanitize($httpVars["custom_handle"], AJXP_SANITIZE_ALPHANUM);
+                    $value = strtolower($value);
+                    $test = $this->getShareStore()->loadShare($value);
+                    $mess = ConfService::getMessages();
+                    if(!empty($test)) throw new Exception($mess["share_center.172"]);
+                    $forceHash = $value;
+                }
+                $hash = $this->getShareStore()->storeShare($repository->getId(), $data, "minisite", $forceHash);
             }catch(Exception $e){
                 return $e->getMessage();
             }
@@ -1579,14 +1584,13 @@ class ShareCenter extends AJXP_Plugin
             try{
                 $hash = $httpVars["hash"];
                 $updateHash = null;
-                if(isSet($httpVars["minisite_hash_update"]) && !empty($httpVars["minisite_hash_update"]) && $httpVars["minisite_hash_update"] != $httpVars["hash"]){
+                if(isSet($httpVars["custom_handle"]) && !empty($httpVars["custom_handle"]) && $httpVars["custom_handle"] != $httpVars["hash"]){
                     // Existing already
-                    $value = AJXP_Utils::sanitize($httpVars["minisite_hash_update"], AJXP_SANITIZE_ALPHANUM);
+                    $value = AJXP_Utils::sanitize($httpVars["custom_handle"], AJXP_SANITIZE_ALPHANUM);
                     $value = strtolower($value);
                     $test = $this->getShareStore()->loadShare($value);
                     if(!empty($test)) throw new Exception("Sorry hash already exists");
                     $updateHash = $value;
-
                 }
                 $hash = $this->getShareStore()->storeShare($repository->getId(), $data, "minisite", $hash, $updateHash);
             }catch(Exception $e){
@@ -2339,6 +2343,8 @@ class ShareCenter extends AJXP_Plugin
             }
             $minisite = ($shareData["type"] == "minisite");
             $minisiteIsPublic = false;
+            $dlDisabled = false;
+            $minisiteLink = '';
             if ($minisite) {
                 $minisiteData = $this->getShareStore()->loadShare($shareId);
                 $repoId = $minisiteData["REPOSITORY"];
@@ -2351,7 +2357,6 @@ class ShareCenter extends AJXP_Plugin
                 }
 
             }
-
             $notExistsData = array(
                 "error"         => true,
                 "repositoryId"  => $repoId,
@@ -2392,7 +2397,8 @@ class ShareCenter extends AJXP_Plugin
                 "description"   => $repo->getDescription(),
                 "entries"       => $sharedEntries,
                 "element_watch" => $elementWatch,
-                "repository_url"=> AJXP_Utils::detectServerURL(true)."?goto=". $repo->getSlug() ."/"
+                "repository_url"=> AJXP_Utils::detectServerURL(true)."?goto=". $repo->getSlug() ."/",
+                "content_filter"=> $repo->getContentFilter()
             );
             if (isSet($minisiteData)) {
                 if(!empty($minisiteData["DOWNLOAD_LIMIT"]) && !$dlDisabled){

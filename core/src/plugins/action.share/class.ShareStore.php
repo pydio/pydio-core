@@ -66,8 +66,9 @@ class ShareStore {
      * @param Array $shareData
      * @param string $type
      * @param String $existingHash
-     * @return string $hash
+     * @param null $updateHash
      * @throws Exception
+     * @return string $hash
      */
     public function storeShare($parentRepositoryId, $shareData, $type="minisite", $existingHash = null, $updateHash = null){
 
