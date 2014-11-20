@@ -80,6 +80,7 @@
 .settings_main_pane #leftPane #settings_pane{
     opacity: 1;
     transition: opacity 0.3s ease;
+    position: relative;
 }
 
 .settings_main_pane #leftPane.folded #settings_pane{

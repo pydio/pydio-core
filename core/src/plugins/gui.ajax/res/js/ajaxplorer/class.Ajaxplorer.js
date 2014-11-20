@@ -525,6 +525,13 @@ Class.create("Ajaxplorer", {
 		for(var i=0;i<nodes.length;i++){
 			this.setGuiComponentConfig(nodes[i]);
 		}
+        var element = $(window.ajxpBootstrap.parameters.get("MAIN_ELEMENT"));
+        if(element && element.ajxpPaneObject &&  element.ajxpPaneObject.resize){
+            window.setTimeout(function(){
+                // Fire top resize event once after all css are loaded.
+                element.ajxpPaneObject.resize();
+            }, 500);
+        }
 	},
 	
 	/**
