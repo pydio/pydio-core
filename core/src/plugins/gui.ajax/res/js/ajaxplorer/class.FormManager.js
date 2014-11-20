@@ -43,7 +43,7 @@ Class.create("FormManager", {
         var collectCdata = false;
         for(var i=0; i<paramsAtts.length; i++){
             var attName = paramsAtts.item(i).nodeName;
-            var value = paramsAtts.item(i).nodeValue;
+            var value = paramsAtts.item(i).value;
             if( (attName == "label" || attName == "description" || attName == "group" || attName.indexOf("group_switch_") === 0) && MessageHash[value] ){
                 value = MessageHash[value];
             }
@@ -54,7 +54,7 @@ Class.create("FormManager", {
 			paramsHash.set(attName, value);
 		}
         if(collectCdata){
-            paramsHash.set("value", paramNode.firstChild.nodeValue);
+            paramsHash.set("value", paramNode.firstChild.value);
         }
         paramsHash.set("xmlNode", paramNode);
 		return paramsHash;

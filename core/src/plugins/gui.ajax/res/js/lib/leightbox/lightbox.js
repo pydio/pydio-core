@@ -176,7 +176,7 @@ function hideLightBox(onFormSubmit)
 	if(modal.closeValidation){
 		var res = modal.closeValidation();
 		if(res === false){
-			return;
+			return false;
 		}
 		modal.closeValidation = null;
 	}
@@ -198,6 +198,7 @@ function hideLightBox(onFormSubmit)
 		modal.closeFunction();
 		modal.closeFunction = null;
 	}
+    return true;
 }
 
 function setOverlay()

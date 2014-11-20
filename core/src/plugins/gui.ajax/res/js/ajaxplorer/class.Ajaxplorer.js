@@ -123,9 +123,11 @@ Class.create("Ajaxplorer", {
                     if(path){
                         this._initLoadRep = path;
                     }
+                    hideLightBox();
                     ajaxplorer.triggerRepositoryChange(foundRepo.getId());
                 }else if(path){
                     window.setTimeout(function(){
+                        hideLightBox();
                         ajaxplorer.goTo(path);
                     }, 1000);
                 }

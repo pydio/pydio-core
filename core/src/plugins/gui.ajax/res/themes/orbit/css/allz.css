@@ -614,4 +614,8 @@ and (max-width : 420px){
     div.dialogContent div.SF_element {
         margin: 0 10px;
     }
+
+    #global_toolbar{
+        z-index: 1000;
+    }
 }

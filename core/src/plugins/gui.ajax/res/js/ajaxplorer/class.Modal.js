@@ -143,29 +143,34 @@ Class.create("Modal", {
 
 		if(this.dialogTitle.select('#modalCloseBtn')[0]){
             if(fOnCancel){
-                this.dialogTitle.select('#modalCloseBtn')[0].observe("click", function(){fOnCancel(modal.getForm());hideLightBox();});
+                this.dialogTitle.select('#modalCloseBtn')[0].observe("click", function(){
+                    fOnCancel(this.getForm());
+                    hideLightBox();
+                }.bind(this));
             }
             else{
-                this.dialogTitle.select('#modalCloseBtn')[0].observe("click", function(){hideLightBox();});
+                this.dialogTitle.select('#modalCloseBtn')[0].observe("click", function(){
+                    hideLightBox();
+                });
             }
         }
 
 		if(fOnComplete)	{
 			newForm.onsubmit = function(){
 				try{
-					fOnComplete(modal.getForm());
+					fOnComplete(this.getForm());
 				}catch(e){
 					alert('Unexpected Error : please report!\n'+e);				
 				}
 				return false;
-			};
+            }.bind(this);
 		}
 		else {
 			newForm.onsubmit = function(){
-				ajaxplorer.actionBar.submitForm(modal.getForm());
+				ajaxplorer.actionBar.submitForm(this.getForm());
 				hideLightBox();
 				return false;
-			};
+            }.bind(this);
 		}
         var overlayStyle = undefined;
         if($(sFormId).getAttribute("overlayStyle")){
@@ -316,7 +321,7 @@ Class.create("Modal", {
 			return;
 		}
 		var editorKlass = editorData.editorClass;
-		modal.prepareHeader(editorData.text, resolveImageSource(editorData.icon, '/images/actions/ICON_SIZE', 16), editorData.icon_class);
+		this.prepareHeader(editorData.text, resolveImageSource(editorData.icon, '/images/actions/ICON_SIZE', 16), editorData.icon_class);
 		var loadFunc = function(oForm){			
 			if(typeof(editorKlass) == "string"){
 				ajaxplorer.actionBar.editor = eval('new '+editorKlass+'(oForm, {editorData:editorData, context:modal})');
@@ -330,8 +335,7 @@ Class.create("Modal", {
             }
             ajaxplorer.actionBar.editor.getDomNode().observe("editor:updateTitle", function(event){
                 this.setContextTitle(event.memo);
-            }.bind(modal));
-            //ajaxplorer.actionBar.editor.resize();
+            }.bind(this));
 		};
 		this.showDialogForm('', editorData.formId, loadFunc, null, null, true, true);			
 	},
@@ -567,7 +571,12 @@ Class.create("Modal", {
 				className:"dialogButton"
 			});
 			if(fOnCancel){
-				caButton.observe("click",function(e){fOnCancel(modal.getForm());hideLightBox();Event.stop(e);return false;});
+				caButton.observe("click",function(e){
+                    fOnCancel(this.getForm());
+                    hideLightBox();
+                    Event.stop(e);
+                    return false;
+                }.bind(this));
 			}
 			else{
 				caButton.observe("click",function(e){hideLightBox();Event.stop(e);return false;});
@@ -672,7 +681,8 @@ Class.create("Modal", {
 	 */
 	tempoMessageDivClosing: function(){
 		this.messageDivOpen = true;
-		setTimeout('modal.closeMessageDiv()', 6000);
+        if(this.closeTimer) window.clearTimeout(this.closeTimer);
+		this.closeTimer = window.setTimeout(function(){this.closeMessageDiv();}.bind(this), 6000);
 	},
 	/**
 	 * Display a user message (notice or error)
@@ -691,7 +701,13 @@ Class.create("Modal", {
 		message = message.replace(new RegExp("(\\n)", "g"), "<br>");
 		if(messageType == "ERROR"){ this.messageBox.removeClassName('logMessage');  this.messageBox.addClassName('errorMessage');}
 		else { this.messageBox.removeClassName('errorMessage');  this.messageBox.addClassName('logMessage');}
-		this.messageContent.update(message);
+        if(this.messageDivOpen){
+            this.messageContent.insert('<br>' + message);
+            this.tempoMessageDivClosing();
+            return;
+        }else{
+    		this.messageContent.update(message);
+        }
 
         var container;
         if(ajaxplorer.getMessageBoxReference()){
