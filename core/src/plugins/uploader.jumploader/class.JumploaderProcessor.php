@@ -333,9 +333,11 @@ class JumploaderProcessor extends AJXP_Plugin
                         if ($dirMode & 0040) $dirMode |= 0010; // Group is allowed to read, allow to list the directory
                         if ($dirMode & 0004) $dirMode |= 0001; // Other are allowed to read, allow to list the directory
                     }
+                    $url = $destStreamURL.$curDir."/".$dirname;
                     $old = umask(0);
-                    mkdir($destStreamURL.$curDir."/".$dirname, $dirMode);
+                    mkdir($url, $dirMode);
                     umask($old);
+                    AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($url), false));
                     $curDir .= "/".$dirname;
                 }
             }
