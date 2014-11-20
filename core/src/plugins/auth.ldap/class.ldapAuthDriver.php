@@ -738,10 +738,12 @@ class ldapAuthDriver extends AbstractAuthDriver
                                     */
 
                                     foreach ($memberValues as $uniqValue => $fullDN) {
-                                        $uniqValue = $rolePrefix . $uniqValue;
-                                        if (isSet($matchFilter) && !preg_match($matchFilter, $uniqValue)) continue;
-                                        if (isSet($valueFilters) && !in_array($uniqValue, $valueFilters)) continue;
-                                        $userObject->addRole(AuthService::getRole($uniqValue, true));
+                                        $uniqValueWithPrefix = $rolePrefix . $uniqValue;
+                                        if (isSet($matchFilter) && !preg_match($matchFilter, $uniqValueWithPrefix)) continue;
+                                        if (isSet($valueFilters) && !in_array($uniqValueWithPrefix, $valueFilters)) continue;
+                                        $roleToAdd = AuthService::getRole($uniqValueWithPrefix, true);
+                                        $roleToAdd->setLabel($uniqValueWithPrefix);
+                                        $userObject->addRole($roleToAdd);
                                         $userObject->recomputeMergedRole();
                                         $changes = true;
                                     }
