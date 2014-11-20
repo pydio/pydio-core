@@ -349,3 +349,11 @@
 .settings_main_pane #search_results div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata{
     opacity: 1 !important;
 }
+
+.ajxp_theme_orbit .settings_main_pane div.tabulatorContainer div#display_toolbar {
+    padding-top: 10px;
+}
+
+.ajxp_theme_orbit .settings_main_pane div#vertical_splitter-actions_toolbar span.ajxp_icon_span{
+    font-size: 1.0em;
+}
