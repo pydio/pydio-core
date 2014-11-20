@@ -2,7 +2,7 @@
 <authdriver name="custom_db" label="CONF_MESSAGE[Custom DB Auth Backend]"
             description="CONF_MESSAGE[Authenticate users agains your custom DB and table definition.]"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:noNamespaceSchemaLocation="file:/Users/charles/Sources/ajaxplorer-core/core/src/plugins/core.ajaxplorer/ajxp_registry.xsd"
+            xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd"
             mixins="dibidriver_third_provider,authdriver_commons"
         >
 	<server_settings>
