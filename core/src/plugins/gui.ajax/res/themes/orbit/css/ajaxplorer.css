@@ -3087,6 +3087,10 @@ div.tabulatorContainer div#display_toolbar{
     margin-top: -36px;
 }
 
+#ajxp_workspace_info_panel_content{
+    line-height: 1.5em;
+}
+
 span.toggleHeader{
     display: inline-block;
     overflow: hidden;
