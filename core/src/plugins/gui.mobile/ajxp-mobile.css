@@ -109,3 +109,23 @@ a.m-2.disabled {
     background-position: 50% 50%;
     background-repeat: repeat repeat;
 }
+
+#uploadBrowseButton{
+    display: none !important;
+}
+
+#fileInputPos,
+#fileInputContainerDiv
+{
+    width: 280px;
+}
+
+#fileInputContainer input{
+    opacity: 1;
+    font-size: 12px;
+    height: 40px;
+}
+
+div#userdashboard_main_tab h3.dashboard_panel_title{
+    display: none;
+}
