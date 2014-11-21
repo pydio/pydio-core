@@ -1703,8 +1703,8 @@ class ShareCenter extends AJXP_Plugin
             $index ++;
         }
 
-        $label = AJXP_Utils::decodeSecureMagic($httpVars["repo_label"]);
-        $description = AJXP_Utils::decodeSecureMagic($httpVars["repo_description"]);
+        $label = AJXP_Utils::sanitize(AJXP_Utils::securePath($httpVars["repo_label"]), AJXP_SANITIZE_HTML);
+        $description = AJXP_Utils::sanitize(AJXP_Utils::securePath($httpVars["repo_description"]), AJXP_SANITIZE_HTML);
         if (isSet($httpVars["repository_id"])) {
             $editingRepo = ConfService::getRepositoryById($httpVars["repository_id"]);
         }
