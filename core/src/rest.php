@@ -86,4 +86,9 @@ if (!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSI
 }
 AJXP_PluginsService::getInstance()->initActivePlugins();
 
-AJXP_Controller::findRestActionAndApply($action, $path);
+$xmlResult = AJXP_Controller::findRestActionAndApply($action, $path);
+if (!empty($xmlResult) && !headers_sent()) {
+    AJXP_XMLWriter::header();
+    print($xmlResult);
+    AJXP_XMLWriter::close();
+}
