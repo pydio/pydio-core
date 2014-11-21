@@ -21,7 +21,7 @@
 $mess=array(
 "Generic Conf Features" => "Generic Conf Features",
 "Let user create repositories" => "Let user create workspaces",
-"Remember guest preferences" => "Запоминать настройки для \"гостя\"",
+"Remember guest preferences" => "Запоминать настройки для гостя",
 "Configurations Management" => "Управление конфигурациями",
 "Sets how the application core data (users,roles,etc) is stored." => "Sets how the application core data (users,roles,etc) is stored.",
 "Default start repository" => "Начальное хранилище по умолчанию",
