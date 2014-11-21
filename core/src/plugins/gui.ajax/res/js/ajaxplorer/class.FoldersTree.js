@@ -51,7 +51,6 @@ Class.create("FoldersTree", AjxpPane, {
             this.registeredObservers.set("ajaxplorer:tree_change", scrollbarLayoutObserver);
         }
 
-
 		this.options = {};
 		if(options){
 			this.options = options;

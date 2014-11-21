@@ -68,6 +68,7 @@ Control.ScrollBar = Class.create({
             if(this.auto_sliding_executer)
                 this.auto_sliding_executer.stop();
         }.bind(this));
+        attachMobileScroll(container, 'vertical');
     },
     destroy: function(){
         Event.stopObserving(window,'resize',this.boundResizeObserver);
