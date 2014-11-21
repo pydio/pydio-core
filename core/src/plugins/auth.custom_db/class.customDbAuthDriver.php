@@ -28,7 +28,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class customDbAuthDriver extends AbstractAuthDriver
 {
     public $sqlDriver;
-    public $driverName = "erasmus";
+    public $driverName = "custom_db";
 
     protected $customTableName;
     protected $customTableUid;
