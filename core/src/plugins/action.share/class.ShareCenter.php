@@ -972,6 +972,9 @@ class ShareCenter extends AJXP_Plugin
         $templateName = "ajxp_shared_folder";
         if(isSet($data["AJXP_TEMPLATE_NAME"])){
             $templateName = $data["AJXP_TEMPLATE_NAME"];
+            if($templateName == "ajxp_film_strip" && AJXP_Utils::userAgentIsMobile()){
+                $templateName = "ajxp_shared_folder";
+            }
         }
         // UPDATE TEMPLATE
         $html = file_get_contents(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/res/minisite.php");

@@ -8,7 +8,6 @@
         <link rel="icon" type="image/x-png" href="plugins/gui.ajax/res/themes/AJXP_THEME/images/html-folder.png">
         <link rel="stylesheet" type="text/css" href="plugins/gui.ajax/res/themes/AJXP_THEME/css/allz.css">
         <link rel="stylesheet" href="plugins/gui.ajax/res/themes/AJXP_THEME/css/font-awesome.css"/>
-        <link rel="stylesheet" href="plugins/gui.ajax/res/themes/AJXP_THEME/css/media.css"/>
         <link rel="stylesheet" href="plugins/gui.ajax/res/themes/AJXP_THEME/css/animate-custom.css"/>
         <style type="text/css">
             #widget_title{
@@ -104,11 +103,6 @@
             }
 
             .widget_logo {
-                /*
-                background-image: url('AJXP_MINISITE_LOGO');
-                background-position: right 5px;
-                background-size: 170px;
-                */
                 background-repeat: no-repeat;
                 margin-right: 5px;
                 position: absolute;
@@ -192,7 +186,12 @@
             body.ajxp_preloged_user a#logout_button{
                 display: none;
             }
-
+            .thumbnail_selectable_cell.detailed div.thumbLabel{
+                padding-top: 19px;
+            }
+            .thumbnail_selectable_cell.detailed:nth-child(odd) {
+                background-color: #fafafa;
+            }
             @media only screen and (max-width: 680px){
                 #ajxp_embed_template div.toolbarGroup span.ajxp_icon_span {
                     padding: inherit !important;
@@ -247,7 +246,7 @@
         <noscript><h2>AJXP_MESSAGE[share_center.77]</h2></noscript>
     </head>
 
-    <body marginheight="0" marginwidth="0" leftmargin="0" topmargin="0" style="overflow: hidden;" class="AJXP_PRELOGED_USER">
+    <body style="overflow: hidden;" class="AJXP_PRELOGED_USER">
         <div id="AJXP_TEMPLATE_NAME" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"window"}'></div>
     </body>
 </html>

@@ -140,7 +140,7 @@
                                         <div class="dialogContentMainTitle" data-toggleBlock="security_parameters">AJXP_MESSAGE[share_center.147]</div>
                                         <div class="SF_element" id="security_parameters">
                                             <div class="SF_label" ajxp_message_id="share_center.23" style="width:130px;" title="AJXP_MESSAGE[share_center.23]">AJXP_MESSAGE[share_center.23]</div>
-                                            <input type="text" name="guest_user_pass" value="" placeholder="AJXP_MESSAGE[share_center.148]" autocomplete="off" class="SF_input" style="width:40% !important;"> <span style="display:none;" id="remove_user_pass">Disable Password</span>
+                                            <input type="text" name="guest_user_pass" value="" placeholder="AJXP_MESSAGE[share_center.148]" autocomplete="off" class="SF_input" style="width:40% !important;"> <span style="display:none;" id="remove_user_pass">AJXP_MESSAGE[share_center.174]</span>
                                             <div class="SF_horizontal_labelRow">
                                                 <div class="SF_label" ajxp_message_id="share_center.21" style="width:40% !important;" title="AJXP_MESSAGE[share_center.21]">AJXP_MESSAGE[share_center.21]</div>
                                                 <div class="SF_label" ajxp_message_id="share_center.22" style="width:40% !important;" title="AJXP_MESSAGE[share_center.22]">AJXP_MESSAGE[share_center.22]</div>

@@ -181,4 +181,5 @@ $mess = array(
     "171" => "Link Handle",
     "172" => "Sorry this link is already used, please pick another handle.",
     "173" => "If you want a durable and pretty link (like https://.../my-share-link), you can use this field. Link handle will be generated if left empty.",
+    "174" => "Disable Password",
 );

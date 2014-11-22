@@ -126,7 +126,9 @@ Class.create("ResourcesManager", {
 				}
 				conn.loadLibrary(fileName, callback, aSync);
 			}
-		}
+		}else if(callback){
+            callback();
+        }
 	},
 	/**
 	 * Load a CSS file

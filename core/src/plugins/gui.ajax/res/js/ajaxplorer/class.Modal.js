@@ -269,7 +269,6 @@ Class.create("Modal", {
             $(elementName).setStyle({height:'auto'});
             $(elementName).down('.dialogContent').setStyle({height:'auto'});
 		}
-		this.refreshDialogPosition();
 		if(boxAutoResize && (this.currentListensToWidth || this.currentListensToHeight) ){
 			this.currentResizeListener = function(){
 				if(this.currentListensToWidth){
@@ -292,7 +291,8 @@ Class.create("Modal", {
             }.bind(this);
             Event.observe(window, "resize", this.currentResizeListener);
         }
-			
+        this._bufferedRefreshDialogPosition();
+
 		displayLightBoxById(elementName, overlayStyle, (formId?'form-'+formId:null));
 		
 		// FORCE ABSOLUTE FOR SAFARI
@@ -336,7 +336,7 @@ Class.create("Modal", {
             ajaxplorer.actionBar.editor.getDomNode().observe("editor:updateTitle", function(event){
                 this.setContextTitle(event.memo);
             }.bind(this));
-		};
+        }.bind(this);
 		this.showDialogForm('', editorData.formId, loadFunc, null, null, true, true);			
 	},
 

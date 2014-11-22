@@ -1400,6 +1400,12 @@ div.dialogBox.form-login_form_dynamic div.dialogButtons input.dialogButton
     height: 70px;
 }
 
+div.dialogBox.form-diaporama_box div.dialogContent{
+    background-color: rgb(85,85,85);
+    border: 0;
+    background-image: none;
+}
+
 /********************************/
 /*ACTION BARS AND MAIN LAYOUT   */
 /********************************/
@@ -4104,7 +4110,7 @@ input, textarea, .selectable{
 .vsplitbar
 {
     width: 3px;
-    z-index: 10;
+    z-index: 1014;
 }
 .vsplitbar:hover
 {
@@ -4133,6 +4139,7 @@ input, textarea, .selectable{
     background-image: url(../images/hgrabber.gif);
     background-repeat: no-repeat;
     background-position: center;
+    z-index: 1014;
 }
 .hsplitbar.active
 {

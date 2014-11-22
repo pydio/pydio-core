@@ -119,8 +119,8 @@ Class.create("Splitter", AjxpPane, {
 		this.splitbar.addClassName(this.options.splitbarClass).setStyle({
             position:'absolute',
             cursor:this.options.cursor,
-            fontSize:'1px',
-            zIndex:zIndex
+            fontSize:'1px'/*,
+            zIndex:zIndex*/
         });
 		this.paneA.insert({after:this.splitbar});
 
