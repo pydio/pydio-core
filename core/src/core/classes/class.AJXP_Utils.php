@@ -1622,9 +1622,6 @@ class AJXP_Utils
                 $options[substr($key, strlen($prefix))] = $value;
                 unset($repDef[$key]);
             } else {
-                if ($key == "DISPLAY") {
-                    $value = SystemTextEncoding::fromUTF8(AJXP_Utils::securePath($value));
-                }
                 $repDef[$key] = $value;
             }
         }
