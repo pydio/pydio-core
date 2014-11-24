@@ -45,6 +45,10 @@ class CasAuthFrontend extends AbstractAuthFrontend
     private $cas_debug_file;
     private $cas_modify_login_page;
     private $cas_additional_role;
+    private $cas_name_attribute;
+    private $cas_mail_attribute;
+    private $cas_quota_attribute;
+    private $cas_quota_multiplier;
     private $cas_setFixedCallbackURL;
 
 
@@ -203,13 +207,37 @@ class CasAuthFrontend extends AbstractAuthFrontend
                 AJXP_Safe::storeCredentials($cas_user, $_SESSION['PROXYTICKET']);
                 $_SESSION['LOGGED_IN_BY_CAS'] = true;
 
+                $userObj = ConfService::getConfStorageImpl()->createUserObject($cas_user);
+
                 if(!empty($this->cas_additional_role)){
-                    $userObj = ConfService::getConfStorageImpl()->createUserObject($cas_user);
                     $roles = $userObj->getRoles();
                     $cas_RoleID = $this->cas_additional_role;
                     $userObj->addRole(AuthService::getRole($cas_RoleID, true));
-                    AuthService::updateUser($userObj);
                 }
+
+                $userRoles = $userObj->roles;
+                if ((!empty($this->cas_name_attribute)) && (array_key_exists("AJXP_USR_/$cas_user", $userRoles)))
+                  $userRoles["AJXP_USR_/$cas_user"]->setParameterValue("core.conf", "USER_DISPLAY_NAME", phpCas::getAttribute($this->cas_name_attribute));
+
+                if ((!empty($this->cas_mail_attribute)) && (array_key_exists("AJXP_USR_/$cas_user", $userRoles)))
+                  $userRoles["AJXP_USR_/$cas_user"]->setParameterValue("core.conf", "email", phpCas::getAttribute($this->cas_mail_attribute));
+
+                if (!empty($this->cas_quota_attribute))
+                {
+                  if (!array_key_exists("AJXP_USR_/$cas_user", $userRoles))
+                    return false;
+                  $quota_val = phpCas::getAttribute($this->cas_quota_attribute);
+                  if (!ctype_digit($quota_val))
+                    return false;
+                  if (!in_array(strtoupper(trim($this->cas_quota_multiplier)), array('K', 'M', 'G', '')))
+                    return false;
+                  $userRoles["AJXP_USR_/$cas_user"]->setParameterValue("meta.quota", "DEFAULT_QUOTA", $quota_val . $this->cas_quota_multiplier);
+                }
+
+                $userObj->recomputeMergedRole();
+                AuthService::updateUser($userObj);
+                $userObj->save();
+
                 return true;
             }
         }
@@ -285,6 +313,22 @@ class CasAuthFrontend extends AbstractAuthFrontend
 
         if (!empty($this->pluginConf["ADDITIONAL_ROLE"])) {
             $this->cas_additional_role = $this->pluginConf["ADDITIONAL_ROLE"];
+        }
+
+        if (!empty($this->pluginConf["NAME_ATTRIBUTE"])) {
+            $this->cas_name_attribute = $this->pluginConf["NAME_ATTRIBUTE"];
+        }
+
+        if (!empty($this->pluginConf["MAIL_ATTRIBUTE"])) {
+            $this->cas_mail_attribute = $this->pluginConf["MAIL_ATTRIBUTE"];
+        }
+
+        if (!empty($this->pluginConf["QUOTA_ATTRIBUTE"])) {
+            $this->cas_quota_attribute = $this->pluginConf["QUOTA_ATTRIBUTE"];
+        }
+
+        if (!empty($this->pluginConf["QUOTA_MULTIPLIER"])) {
+            $this->cas_quota_multiplier = $this->pluginConf["QUOTA_MULTIPLIER"];
         }
 
         if (!empty($this->pluginConf["PHPCAS_MODE"]["casmode"])) {
