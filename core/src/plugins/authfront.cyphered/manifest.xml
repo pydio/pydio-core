@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpcore id="authfront.cyphered" label="CONF_MESSAGE[Cyphered Identifiers]" enabled="false" description="CONF_MESSAGE[Cyphered identifiers passed through GET, POST or HTTP Headers, using a private key shared by Pydio and Third-party application.]"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<class_definition filename="plugins/authfront.cyphered/class.CypheredAuthFrontend.php" classname="CypheredAuthFrontend"/>
+    <server_settings>
+        <global_param name="PRIVATE_KEY" type="string" label="Private Key"
+                      description="Key used for hashing" mandatory="true"/>
+        <global_param name="CHECK_NONCE" type="boolean" label="Replay Check"
+                      description="Pass a unique, incrementing, integer on each query to make it impossible to replay twice. Better security." mandatory="true" default="true"/>
+        <global_param name="ORDER" type="integer" label="Order"
+                      description="Order this plugin with other auth frontends" default="2"/>
+        <global_param name="PROTOCOL_TYPE" type="select"
+                      choices="session_only|Sessions Only,no_session|REST Only,both|Session-based or Rest"
+                      label="Protocol Type" description="Enable/disable automatically based on the protocol used" default="both"/>
+    </server_settings>
+</ajxpcore>
