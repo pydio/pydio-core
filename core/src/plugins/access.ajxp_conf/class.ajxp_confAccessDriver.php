@@ -1326,7 +1326,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $repo = ConfService::getRepositoryById($repId);
                 $res = 0;
                 if (isSet($httpVars["newLabel"])) {
-                    $newLabel = AJXP_Utils::decodeSecureMagic($httpVars["newLabel"]);
+                    $newLabel = AJXP_Utils::sanitize(AJXP_Utils::securePath($httpVars["newLabel"]), AJXP_SANITIZE_HTML);
                     if ($this->repositoryExists($newLabel)) {
                          AJXP_XMLWriter::header();
                         AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.50"]);
