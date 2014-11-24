@@ -1797,6 +1797,7 @@ class ShareCenter extends AJXP_Plugin
                 $newRepo->setGroupPath($gPath);
             }
             $newRepo->setDescription($description);
+			$newRepo->options["PATH"] = SystemTextEncoding::fromStorageEncoding($newRepo->options["PATH"]);
             if(isSet($httpVars["filter_nodes"])){
                 $newRepo->setContentFilter(new ContentFilter($httpVars["filter_nodes"]));
             }
