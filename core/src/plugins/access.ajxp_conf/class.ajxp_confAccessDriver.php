@@ -1673,8 +1673,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             break;
 
+
+            // Action for update all Pydio's user from ldap in CLI mode
             case "cli_update_user_list":
-                AuthService::listUsers();
+                if((php_sapi_name() == "cli")){
+                    $progressBar = new AJXP_ProgressBarCLI();
+                    $countCallback  = array($progressBar, "init");
+                    $loopCallback   = array($progressBar, "update");
+                    AuthService::listUsers("/", null, -1 , -1, true, true, $countCallback, $loopCallback);
+                }
                 break;
 
             default:

@@ -33,6 +33,7 @@ class AJXP_ProgressBarCLI {
     private $lastsecond = 0;
 
     public function init($currentValue = 0, $total, $name){
+        if(!(php_sapi_name() == "cli")) return;
         $this->total        = $total;
         $this->strName      = $name;
         $this->startPoint   = time();

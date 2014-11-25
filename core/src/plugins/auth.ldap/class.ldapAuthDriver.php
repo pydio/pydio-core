@@ -313,6 +313,14 @@ class ldapAuthDriver extends AbstractAuthDriver
 
         $gotAllEntries = false;
         $index = 0;
+
+        //Update progress bar in CLI mode
+        $isListAll = (($offset == -1) && ($limit == -1) && (is_null($login)) && $regexpOnSearchAttr && (php_sapi_name() == "cli"));
+        if($isListAll){
+            $progressBar = new AJXP_ProgressBarCLI();
+            $progressBar->init($index, $this->getCountFromCache()["count"], "Get ldap users");
+        }
+
         do {
             if ($isSupportPagedResult)
                 ldap_control_paged_result($this->ldapconn, $this->pageSize, true, $cookie);
@@ -354,6 +362,12 @@ class ldapAuthDriver extends AbstractAuthDriver
 
                         $allEntries[] = $entry;
                         $index++;
+
+                        //Update progress bar in CLI mode
+                        if(isset($progressBar))
+                            $progressBar->update($index);
+
+
                         if (($offset != -1) && ($limit != -1) && $index > $offset + $limit)
                             break;
                     }
