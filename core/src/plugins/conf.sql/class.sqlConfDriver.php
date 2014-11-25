@@ -504,15 +504,40 @@ class sqlConfDriver extends AbstractConfDriver
         foreach ($all as $item) {
             $result[$item["login"]] = $this->createUserObject($item["login"]);
         }
-        // NEW METHOD : SEARCH PERSONAL ROLE
+        $usersRoles = $this->getRolesForRepository($repositoryId, "AJXP_USR_/");
+        foreach($usersRoles as $rId){
+            $id = substr($rId, strlen("AJXP_USR/")+1);
+            $result[$id] = $this->createUserObject($id);
+        }
+        return $result;
+    }
+
+    /**
+     * @abstract
+     * @param string $repositoryId
+     * @param string $rolePrefix
+     * @param bool $countOnly
+     * @return array()
+     */
+    public function getRolesForRepository($repositoryId, $rolePrefix = '', $countOnly = false){
+        $allRoles = array();
+
         switch ($this->sqlDriver["driver"]) {
             case "sqlite":
             case "sqlite3":
             case "postgre":
-                $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
+                if(!empty($rolePrefix)){
+                    $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %~like~ AND [role_id] LIKE %like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:', $rolePrefix);
+                }else{
+                    $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [searchable_repositories] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
+                }
                 break;
             case "mysql":
-                $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [serial_role] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
+                if(!empty($rolePrefix)){
+                    $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [serial_role] LIKE %~like~ AND [role_id] LIKE %like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:', $rolePrefix);
+                }else{
+                    $children_results = dibi::query('SELECT [role_id] FROM [ajxp_roles] WHERE [serial_role] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
+                }
                 break;
             default:
                 return "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
@@ -520,14 +545,12 @@ class sqlConfDriver extends AbstractConfDriver
         $all = $children_results->fetchAll();
         foreach ($all as $item) {
             $rId = $item["role_id"];
-            if (strpos($rId, "AJXP_USR/") == 0) {
-                $id = substr($rId, strlen("AJXP_USR/")+1);
-                $result[$id] = $this->createUserObject($id);
-            }
+            $allRoles[] = $rId;
         }
 
-        return $result;
+        return $allRoles;
     }
+
 
     /**
      * @param string $repositoryId

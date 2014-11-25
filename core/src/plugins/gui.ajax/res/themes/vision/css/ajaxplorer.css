@@ -294,6 +294,7 @@ div.thumbnail_cell_metadata span.metadata_chunk{
     background-position: 5px 4px;
     color: rgb(80, 82, 83);
     letter-spacing: 1px;
+    background-size: 16px;
 }
 
 .overlay_icon_div{
@@ -374,6 +375,7 @@ div.shadow_class
     padding: 0;
     -moz-border-radius:5px;
     border-radius: 3px;
+    min-width: 260px;
 }
 
 .editBox
@@ -1159,9 +1161,7 @@ input.SF_input.SF_number{
 #global_toolbar{
     background-color: #474E50;
     height: 30px;
-    padding: 9px 0 0 5px;
-    background-image: url("../images/white_logo.png");
-    background-repeat: no-repeat;
+    padding: 12px 0 4px 5px !important;
     box-shadow: 0 0 8px rgba(0,0,0,0.4);
 }
 
@@ -3165,6 +3165,7 @@ div.infoPanelLabel{
 div.infoPanelValue{
     width: 55%;
     color: rgb(111, 121, 131);
+    min-height: 22px;
 }
 
 .infoPanelGroup
@@ -3940,6 +3941,52 @@ div#share_result div.macos_only
     background-color: #A00;
 }
 
+.share_dialog_toggler{
+    cursor: pointer;
+}
+
+.share_dialog_toggler span.toggler_arrow{
+    float: right;
+    margin-right: 5px;
+    margin-top: 3px;
+    transform:rotate(270deg);
+}
+
+.share_dialog_toggler_closed span.toggler_arrow{
+    transform:rotate(0deg);
+}
+
+.share_dialog_toggled{
+    overflow: hidden;
+    transition: height 0.5s ease;
+}
+
+.share_dialog_toggled_closed{
+    height: 0 !important;
+    overflow: hidden;
+}
+
+#editable_hash_link{
+    margin:4px 10px;
+    font-size:13px;
+}
+
+#description_parameters{
+    margin: 5px 0;
+}
+
+#editable_hash_parameters{
+    margin: 5px;
+}
+
+#ws_shared_users_parameters{
+    margin: 0 5px;
+    position: relative;
+}
+
+#share_folder_form{
+    max-width: 400px;
+}
 
 
 div.user_entry span.cbContainer{
@@ -5231,4 +5278,43 @@ span.letter_badge {
           transform: scale(1.0);
           -webkit-transform: scale(1.0);
       }
+}
+
+#ajxp_workspace_info_panel{
+    margin: 0 !important;
+}
+
+#ajxp_workspace_info_panel_content,
+#ajxp_quota_panel_content
+{
+    color: rgb(111, 121, 131);
+    padding: 10px !important;
+}
+
+tr[data-groupByValue],
+div[data-groupByValue]
+{
+    clear: left;
+    max-height: 480px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+tr[data-groupByValue]:first-child,
+div[data-groupByValue]:first-child
+{
+    margin-top: 10px;
+}
+
+div[data-groupByValue] h3,
+tr[data-groupByValue] h3
+{
+    font-size: 16px;
+    margin: 10px 0 10px 14px;
+    color: rgb(111, 121, 131);
+    font-weight: normal;
+}
+
+h3.dashboard_panel_title{
+    display: none;
 }

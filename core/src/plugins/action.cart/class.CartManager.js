@@ -82,7 +82,6 @@ Class.create("CartManager", FetchedResultPane, {
         var form = $('download_form');
         form.action = window.ajxpServerAccessPath;
         form.secure_token.value = Connexion.SECURE_TOKEN;
-        var gAction;
         form.select("input").each(function(input){
             if(input.name!='get_action' && input.name!='secure_token') input.remove();
             if(input.name == 'get_action') input.value = 'search-cart-download';
@@ -195,7 +194,7 @@ Class.create("CartManager", FetchedResultPane, {
     /**
      * Can be overriden by the children.
      * @param ajxpOptions
-     * @returns {AjxpDataModel}
+     * @returns AjxpDataModel
      */
     initDataModel: function(ajxpOptions){
 

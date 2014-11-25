@@ -68,9 +68,7 @@ class s3AccessDriver extends fsAccessDriver
             }
             $this->s3Client = S3Client::factory($options);
             $this->s3Client->registerStreamWrapper();
-            //$this->s3Client->addSubscriber(LogPlugin::getDebugPlugin());
         }
-
         return parent::detectStreamWrapper($register);
     }
 
@@ -93,11 +91,36 @@ class s3AccessDriver extends fsAccessDriver
         }
     }
 
+    /**
+     * @return Aws\Common\Client\AbstractClient
+     */
     public function getS3Service(){
         return $this->s3Client;
     }
 
     /**
+     * @param String $directoryPath
+     * @param Repository $repositoryResolvedOptions
+     * @return int
+     */
+    public function directoryUsage($directoryPath, $repositoryResolvedOptions){
+        $client = $this->getS3Service();
+        $bucket = (isSet($repositoryResolvedOptions["CONTAINER"])?$repositoryResolvedOptions["CONTAINER"]:$this->repository->getOption("CONTAINER"));
+        $path   = (isSet($repositoryResolvedOptions["PATH"])?$repositoryResolvedOptions["PATH"]:"");
+        $objects = $client->getIterator('ListObjects', array(
+            'Bucket' => $bucket,
+            'Prefix' => $path
+        ));
+
+        $usage = 0;
+        foreach ($objects as $object) {
+            $usage += (double)$object['Size'];
+        }
+        return $usage;
+
+    }
+
+        /**
      * Parse
      * @param DOMNode $contribNode
      */
@@ -130,6 +153,13 @@ class s3AccessDriver extends fsAccessDriver
     {
         $bytesize = filesize($filePath);
         return $bytesize;
+    }
+
+    public function makeSharedRepositoryOptions($httpVars, $repository)
+    {
+        $newOptions = parent::makeSharedRepositoryOptions($httpVars, $repository);
+        $newOptions["CONTAINER"] = $this->repository->getOption("CONTAINER");
+        return $newOptions;
     }
 
 }

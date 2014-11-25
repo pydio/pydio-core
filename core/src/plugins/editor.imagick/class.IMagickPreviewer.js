@@ -38,7 +38,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 			this.imgTag.src = this.jsImage.src;
             this.imgTag.setStyle({opacity:1});
 			this.resizeImage(true);
-			var i = 0;
+			var i;
 			for(i=0;i<this.items.length;i++){
 				if(this.items[i] == this.currentFile){
 					break;
@@ -63,7 +63,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 		connexion.onComplete = function(transport){
 			this.removeOnLoad();
 			var result = transport.responseJSON;
-			this.items = new Array();
+			this.items = $A();
 			this.sizes = new Hash();			
 			for(var i=0;i<result.length;i++){
 				this.items.push(result[i].file);
@@ -99,13 +99,13 @@ Class.create("IMagickPreviewer", Diaporama, {
             src:IMagickPreviewer.prototype.getThumbnailSource(ajxpNode)
 		});		
 		img.resizePreviewElement = function(dimensionObject){			
-			ratio = img.ratio;
+			var ratio = img.ratio;
 			if(!ratio) {
 				var fakeIm = new Image();
 				fakeIm.onload = function(){	
 					img.ratio = fakeIm.width/fakeIm.height;
 					img.resizePreviewElement(dimensionObject);
-				}
+				};
 				fakeIm.src = img.src;
 				//img.onload = function(){img.resizePreviewElement(dimensionObject);};
 				ratio = 1.0;
@@ -116,14 +116,14 @@ Class.create("IMagickPreviewer", Diaporama, {
 			};
 			var styleObj = fitRectangleToDimension(imgDim, dimensionObject);
 			img.setStyle(styleObj);
-		}
+        };
 		img.observe("mouseover", function(event){
 			var theImage = event.target;
 			if(theImage.up('.thumbnail_selectable_cell')) return;
 			if(!theImage.openBehaviour){
 				var opener = new Element('div').update(MessageHash[411]);
 				opener.setStyle({
-					width:styleObj.width, 
+					width:'',
 					display:'none', 
 					position:'absolute', 
 					color: 'white',

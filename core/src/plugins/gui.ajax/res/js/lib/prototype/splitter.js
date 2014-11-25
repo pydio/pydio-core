@@ -115,11 +115,12 @@ Class.create("Splitter", AjxpPane, {
         if(!this.initBorderB) this.initBorderB = 0;
 
 		this.splitbar = new Element('div', {unselectable:'on'});
+        var zIndex = (this.options.invisibleBar?parseInt(this.group.getStyle('zIndex'))+1:'inherit') || '10000';
 		this.splitbar.addClassName(this.options.splitbarClass).setStyle({
             position:'absolute',
             cursor:this.options.cursor,
-            fontSize:'1px',
-            zIndex:(this.options.invisibleBar?parseInt(this.group.getStyle('zIndex'))+1:'inherit')
+            fontSize:'1px'/*,
+            zIndex:zIndex*/
         });
 		this.paneA.insert({after:this.splitbar});
 

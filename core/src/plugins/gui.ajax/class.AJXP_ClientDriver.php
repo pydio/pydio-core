@@ -141,13 +141,21 @@ class AJXP_ClientDriver extends AJXP_Plugin
                 }
 
                 $root = $_SERVER['REQUEST_URI'];
-                if(basename($root) == "dashboard" || basename($root) == "settings" || basename($root) == "welcome" || strpos(basename($root), "ws-") === 0){
-                    $root = dirname($root);
+                $configUrl = ConfService::getCoreConf("SERVER_URL");
+                if(!empty($configUrl)){
+                    $root = '/'.ltrim(parse_url($configUrl, PHP_URL_PATH), '/');
+                }else{
+                    preg_match ('/ws-(\w)*\/|settings|dashboard|welcome/', $root, $matches, PREG_OFFSET_CAPTURE);
+                    if(count($matches)){
+                        $capture = $matches[0][1];
+                        $root = substr($root, 0, $capture);
+                    }
                 }
                 $START_PARAMETERS = array(
-                    "BOOTER_URL"=>"index.php?get_action=get_boot_conf",
-                    "MAIN_ELEMENT" => "ajxp_desktop",
-                    "APPLICATION_ROOT" => $root
+                    "BOOTER_URL"        =>"index.php?get_action=get_boot_conf",
+                    "MAIN_ELEMENT"      => "ajxp_desktop",
+                    "APPLICATION_ROOT"  => $root,
+                    "REBASE"            => $root
                 );
                 if (AuthService::usersEnabled()) {
                     AuthService::preLogUser((isSet($httpVars["remote_session"])?$httpVars["remote_session"]:""));

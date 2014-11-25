@@ -22,8 +22,7 @@ Class.create("accordion", {
 	//
 	initialize: function(container, options) {
 	  if (!$(container)) {
-	    throw(container+" doesn't exist!");
-	    return false;
+	        throw(container+" doesn't exist!");
 	  }
         this.container = $(container);
 	  
@@ -50,11 +49,11 @@ Class.create("accordion", {
 			if (this.options.onEvent == 'click') {
 			  accordion.onclick = function() {return false;};
 			}
-			
+			var options;
 			if (this.options.direction == 'horizontal') {
-				var options = $H({width: '0px'});
+				options = $H({width: '0px'});
 			} else {
-				var options = $H({height: '0px'});			
+				options = $H({height: '0px'});
 			}
 			options = options.merge({display: 'none'});
 			
@@ -77,7 +76,7 @@ Class.create("accordion", {
 	//
 	activate : function(accordion) {
 		if (this.animating) {
-			return false;
+			return;
 		}
 		
 		this.effects = [];

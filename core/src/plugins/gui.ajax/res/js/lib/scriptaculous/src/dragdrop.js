@@ -44,9 +44,9 @@ var Droppables = {
   },
   
   findDeepestChild: function(drops) {
-    deepest = drops[0];
+    var deepest = drops[0];
       
-    for (i = 1; i < drops.length; ++i)
+    for (var i = 1; i < drops.length; ++i)
       if (Element.isParent(drops[i].element, deepest.element))
         deepest = drops[i];
     
@@ -314,6 +314,7 @@ var Draggable = Class.create({
     if(Event.isLeftClick(event)) {    
       // abort on form elements, fixes a Firefox issue
       var src = Event.element(event);
+        var tag_name;
       if((tag_name = src.tagName.toUpperCase()) && (
         tag_name=='INPUT' ||
         tag_name=='SELECT' ||

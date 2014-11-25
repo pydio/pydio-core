@@ -68,6 +68,7 @@ Control.ScrollBar = Class.create({
             if(this.auto_sliding_executer)
                 this.auto_sliding_executer.stop();
         }.bind(this));
+        attachMobileScroll(container, 'vertical');
     },
     destroy: function(){
         Event.stopObserving(window,'resize',this.boundResizeObserver);
@@ -76,6 +77,7 @@ Control.ScrollBar = Class.create({
         if (this.options.custom_event) {
             this.container.stopObserving(this.options.custom_event);
         }
+        this.container.scrollerInstance = null;
     },
     scrollLength: function(){
         return (this.options.scroll_axis == 'vertical') ? this.container.scrollHeight : this.container.scrollWidth;
@@ -150,7 +152,7 @@ Control.ScrollBar = Class.create({
             try{this.container.scrollTop = scroll_pos;}catch(e){}
         else
             this.container.scrollLeft = scroll_pos;
-        if(this.notification_timeout)
+        if(this.notificationTimeout)
             window.clearTimeout(this.notificationTimeout);
         this.notificationTimeout = window.setTimeout(function(){
             this.notify('change',value);
@@ -214,11 +216,8 @@ Control.ScrollBar = Class.create({
     },
     scrollBy: function(y){
         if(!this.enabled)
-            return false;
+            return;
         this.slider.setValueBy(y / (this.getCurrentMaximumDelta() == 0 ? 1 : this.getCurrentMaximumDelta()) );
-    },
-    destroy: function(){
-        this.container.scrollerInstance = null;
     }
 });
 Object.extend(Control.ScrollBar,

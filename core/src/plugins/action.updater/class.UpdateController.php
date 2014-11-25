@@ -77,14 +77,6 @@ class UpdateController extends AJXP_Plugin
 
         switch ($action) {
 
-
-            case "import_from_324":
-
-                $dryRun = !isSet($httpVars["real_run"]);
-                AjaXplorerUpgrader::upgradeFrom324($httpVars["previous_location"], $dryRun);
-
-            break;
-
             case "migrate_metaserial":
 
                 $dryRun = !isSet($httpVars["real_run"]);

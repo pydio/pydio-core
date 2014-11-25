@@ -89,7 +89,7 @@ Class.create("AjxpSortable", SortableTable, {
 	/**
 	 * Function for handling Bytes / Binary
 	 * @param str String
-	 * @returns String
+	 * @returns Number
 	 */
 	replace8a8: function(str) {
 		str = str.toUpperCase();
@@ -97,7 +97,8 @@ Class.create("AjxpSortable", SortableTable, {
 		var ar = str.replace(
 			/(([0-9]*\.)?[0-9]+([eE][-+]?[0-9]+)?)(.*)/,
 		 "$1"+splitstr+"$4").split(splitstr);
-		var num = Number(ar[0]).valueOf();
+        var num;
+        num = Number(ar[0]).valueOf();
 		if(ar[1]){
 			var ml = ar[1].replace(/\s*([KMGB])\s*/, "$1");
 		
@@ -146,7 +147,7 @@ Class.create("AjxpSortable", SortableTable, {
 	/**
 	 * Sorting function for dates
 	 * @param s String
-	 * @returns String
+	 * @returns Number
 	 */
 	replaceDate: function(s) {
 		var parts1 = s.split(" ");
@@ -184,12 +185,12 @@ Class.create("AjxpSortable", SortableTable, {
 		return s.toUpperCase();
 	},
 
-	/**
-	 * Sort dirs and files each on their side
-	 * @param oRow HTMLElement Row
-	 * @param nColumn Integer
-	 * @returns String
-	 */
+    /**
+     * Sort dirs and files each on their side
+     * @returns String
+     * @param oNode
+     * @param attName
+     */
 	splitDirsAndFilesNodes: function(oNode, attName) {
 		var s;
         if(attName == "ajxp_label") attName = "text";
@@ -205,7 +206,7 @@ Class.create("AjxpSortable", SortableTable, {
 	 * If the cell has a sorter_value attribute, use this as sorting
 	 * @param oRow HTMLElement Row
 	 * @param nColumn Integer
-	 * @returns Integer
+	 * @returns Integer|String
 	 */
 	cellSorterValue : function(oRow, nColumn, attName){
         if(attName && (oRow.getAttribute('data-'+attName+'-sorter_value') || oRow.down('[data-'+attName+'-sorter_value]') )){
@@ -216,6 +217,7 @@ Class.create("AjxpSortable", SortableTable, {
 		if(tds[nColumn] && tds[nColumn].getAttribute('data-sorter_value')){
 			return parseInt(tds[nColumn].getAttribute('data-sorter_value'));
 		}
+        return 0;
 	},
 
 	/**
@@ -228,6 +230,7 @@ Class.create("AjxpSortable", SortableTable, {
         if(oRow.ajxpNode && oRow.ajxpNode.getMetadata().get("ajxp_modiftime")){
             return parseInt(oRow.ajxpNode.getMetadata().get("ajxp_modiftime"));
         }
+        return 0;
 	}
 
 });

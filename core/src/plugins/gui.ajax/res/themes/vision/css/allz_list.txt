@@ -1,3 +1,4 @@
 themes/vision/css/xtree.css
 themes/vision/css/screen.css
 themes/vision/css/ajaxplorer.css
+themes/orbit/css/chosen.css#NO_MINI

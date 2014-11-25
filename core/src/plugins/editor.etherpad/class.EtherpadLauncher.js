@@ -38,7 +38,7 @@ Class.create("EtherpadLauncher", AbstractEditor, {
 		}
         if(options.context.__className == "Modal"){
             this.actions.get("downloadFileButton").observe('click', function(){
-                if(!this.currentFile) return;
+                if(!this.currentFile) return false;
                 ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.currentFile);
                 return false;
             }.bind(this));
@@ -104,7 +104,7 @@ Class.create("EtherpadLauncher", AbstractEditor, {
             conn.onComplete = function(transport){
                 var data = transport.responseJSON;
                 $("etherpad_container").down("#ether_frame").src = data.url;
-            }
+            };
             conn.sendAsync();
         });
 

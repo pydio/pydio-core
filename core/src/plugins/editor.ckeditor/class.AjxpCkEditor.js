@@ -105,14 +105,14 @@ Class.create("AjxpCkEditor", TextEditor, {
 				this.textarea.value = CKEDITOR.instances[this.editorInstanceId].getData();
 				CKEDITOR.instances[this.editorInstanceId].destroy();
 			}				
-		};
+        }.bind(this);
 		var reInit  = function(){
 			CKEDITOR.replace(this.editorInstanceId, this.editorConfig);
 			window.setTimeout(function(){
 				this.resizeEditor();
 				this.bindCkEditorEvents();								
 			}.bind(this), 100);
-		}
+        }.bind(this);
 		this.element.observe("editor:enterFS", destroy.bind(this));
 		this.element.observe("editor:enterFSend", reInit.bind(this));
 		this.element.observe("editor:exitFS", destroy.bind(this));
@@ -124,8 +124,7 @@ Class.create("AjxpCkEditor", TextEditor, {
 		if(window.ajxpMobile){
 			this.setFullScreen();
 		}
-		return;
-		
+
 	},
 	
 	bindCkEditorEvents : function(){

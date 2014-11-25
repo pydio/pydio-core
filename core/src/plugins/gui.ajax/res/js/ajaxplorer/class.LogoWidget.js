@@ -102,7 +102,7 @@ Class.create("LogoWidget", AjxpPane, {
             }
             var url;
             if(configs.get(this._imageParameter)){
-                var url = window.ajxpServerAccessPath + "&get_action=get_global_binary_param&"+parameter+"=" + configs.get(this._imageParameter);
+                url = window.ajxpServerAccessPath + "&get_action=get_global_binary_param&"+parameter+"=" + configs.get(this._imageParameter);
                 if(configs.get(this._imageParameter).indexOf('plugins/') === 0){
                     // It's not a binary but directly an image.
                     url = configs.get(this._imageParameter);

@@ -150,7 +150,7 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
             $output = shell_exec($cmd1);
             $success = !empty($output);
         }else{
-            $success = ($res == 0);
+            $success = ($res == 0 || $res == 32);
         }
         if (!$success) {
             throw new Exception("Error while mounting file system!");

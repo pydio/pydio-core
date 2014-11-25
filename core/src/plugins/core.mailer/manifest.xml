@@ -14,13 +14,17 @@
     <client_settings>
         <resources>
             <i18n namespace="core.mailer" path="plugins/core.mailer/i18n"/>
-            <js className="AjxpMailer" file="plugins/core.mailer/class.AjxpMailer.js" autoload="true"/>
+            <js className="AjxpMailer" file="plugins/core.mailer/class.AjxpMailer.js"/>
         </resources>
     </client_settings>
     <registry_contributions>
         <actions>
             <action name="send_mail">
+                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
                 <processing>
+                    <clientListener name="contextChange"><![CDATA[
+                        if(!window.AjxpMailer && ajaxplorer.user) ResourcesManager.prototype.loadJSResource('plugins/core.mailer/class.AjxpMailer.js', 'AjxpMailer');
+                    ]]></clientListener>
                     <serverCallback methodName="sendMailAction"/>
                 </processing>
             </action>

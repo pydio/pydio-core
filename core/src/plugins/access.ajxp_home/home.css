@@ -35,7 +35,8 @@
 .repoInfoBadge {
     display: inline-block;
     font-size: 25px;
-    width: 190px;
+    min-width: 190px;
+    max-width: 220px;
     line-height: 30px;
     border: 1px solid rgba(255,255,255,0.7);
     border-radius: 8px;

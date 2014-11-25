@@ -2303,9 +2303,11 @@ class CAS_Client
 
             /*
             * modify for pydio
-            */
+
             $str_pattern = '/index|plugins|dashboard|settings|welcome|ws-(.*)$/';
             $request_uri = preg_replace($str_pattern,'',$request_uri);
+            $request_uri = rtrim($request_uri, "/");
+            */
 
             $final_uri .= $request_uri;
             $this->_callback_url = $final_uri;
@@ -3491,7 +3493,18 @@ class CAS_Client
 
             $final_uri .= $this->_getClientUrl();
             $request_uri	= explode('?', $_SERVER['REQUEST_URI'], 2);
-            $final_uri		.= $request_uri[0];
+
+            // modify for pydio -------------------------------------------------
+
+            //$final_uri		.= $request_uri[0];
+            $new_request_uri = $request_uri[0];
+            $str_pattern = '/index(.*)$|plugins(.*)$|dashboard(.*)$|settings(.*)$|welcome(.*)$|ws-(.*)$/';
+            $new_request_uri = preg_replace($str_pattern,'welcome',$new_request_uri);
+            if(!(strcmp($new_request_uri, "/") === 0))
+                $new_request_uri = rtrim($new_request_uri, "/");
+            $final_uri		.= $new_request_uri;
+            //-------------------------------------------------------------------
+
 
             if (isset($request_uri[1]) && $request_uri[1]) {
                 $query_string= $this->_removeParameterFromQueryString('ticket', $request_uri[1]);

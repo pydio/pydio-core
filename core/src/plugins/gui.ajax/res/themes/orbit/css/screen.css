@@ -42,11 +42,11 @@
 #loading_overlay{
     display:block;
     z-index:2000;
-    -moz-opacity:1.0 !important;
-    opacity:1.0 !important;
+    -moz-opacity:1.0 ;
+    opacity:1.0 ;
     filter: alpha(opacity=100)  !important;
-    background-color: #fff !important;
-    background-image: url('../images/grid_t.png');
+    background-color: rgba(0, 0, 0, 0.83) !important;
+    /*background-image: url('../images/grid_t.png');*/
 }
 
 #element_overlay{

@@ -97,9 +97,9 @@ Class.create("AjxpTabulator", AjxpPane, {
 	},
 
     _renderTab:function(tabInfo){
-
+        var td;
         if(tabInfo.ajxpClass && tabInfo.ajxpOptions){
-            var td = new Element('span', {className:'toggleHeader'});
+            td = new Element('span', {className:'toggleHeader'});
             var klass = Class.getByName(tabInfo.ajxpClass);
             new klass(td, tabInfo.ajxpOptions);
             tabInfo.headerElement = td;
@@ -115,11 +115,10 @@ Class.create("AjxpTabulator", AjxpPane, {
             if(tabInfo.label){
                 label = MessageHash[tabInfo.label] || tabInfo.label;
             }
-            var forceTabsTips = false;
             var title = MessageHash[tabInfo.title] || label.stripTags();
             var options = {className:'toggleHeader toggleInactive'};
             if(!this.options.tabsTips){ options.title = title; }
-            var td = new Element('span', options);
+            td = new Element('span', options);
             var short = this.shortenLabel(label);
             if(this.options.tabsTips || short!=label){
                 var horizontal = this.htmlElement.hasClassName('left_tabulator');
@@ -426,7 +425,6 @@ Class.create("AjxpTabulator", AjxpPane, {
                 fitHeightToBottom($(toShowElement), null, this.options.fitMarginBottom);
                 toShow.showElement(true);
             }
-            var reFold = false;
             if(this.htmlElement && this.htmlElement.up('div[ajxpClass="Splitter"]') && this.htmlElement.up('div[ajxpClass="Splitter"]').ajxpPaneObject){
                 var splitter = this.htmlElement.up('div[ajxpClass="Splitter"]').ajxpPaneObject;
                 if(splitter.splitbar.hasClassName('folded') && (Element.descendantOf(this.htmlElement, splitter.paneA) || this.htmlElement == splitter.paneA ) ){
@@ -466,7 +464,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             var nodeElement = $(this.htmlElement).down("#"+this.selectedTabInfo.element);
             fitHeightToBottom(nodeElement, this.htmlElement, this.options.fitMarginBottom);
             ajxpObject.resize(nodeElement?nodeElement.getHeight():this.htmlElement.getHeight());
-            var left ;
+            var left = 0 ;
             var total = 0;
             var cont = this.htmlElement.down('div.tabulatorContainer');
             var innerWidth = parseInt(this.htmlElement.getWidth()) - parseInt(cont.getStyle('paddingLeft')) - parseInt(cont.getStyle('paddingRight'));
@@ -589,6 +587,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             if(tabInfo.id == tabId) return tabInfo;
         });
         if(theInfo) return this.getAndSetAjxpObject(theInfo);
+        return null;
     },
 
     __stateLoaded : false,

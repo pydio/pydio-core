@@ -370,15 +370,13 @@ class AuthService
         if ($authDriver->isAjxpAdmin($user_id)) {
             $user->setAdmin(true);
         }
-        if ($user->isAdmin()) {
-            $user = self::updateAdminRights($user);
-        } else {
-            if (!$user->hasParent() && $user_id != "guest") {
-                //$user->setAcl("ajxp_shared", "rw");
-            }
-        }
         if(self::$useSession) $_SESSION["AJXP_USER"] = $user;
         else self::$currentUser = $user;
+
+        if ($user->isAdmin()) {
+            $user = self::updateAdminRights($user);
+            self::updateUser($user);
+        }
 
         if ($authDriver->autoCreateUser() && !$user->storageExists()) {
             $user->save("superuser"); // make sure update rights now
@@ -936,6 +934,18 @@ class AuthService
     }
 
     /**
+     * Retrieve the current users who have either read or write access to a repository
+     * @param $repositoryId
+     * @param string $rolePrefix
+     * @param bool $countOnly
+     * @return array
+     */
+    public static function getRolesForRepository($repositoryId, $rolePrefix = '', $countOnly = false)
+    {
+        return ConfService::getConfStorageImpl()->getRolesForRepository($repositoryId, $rolePrefix, $countOnly);
+    }
+
+    /**
      * Count the number of users who have either read or write access to a repository
      * @param $repositoryId
      * @param bool $details
@@ -956,7 +966,7 @@ class AuthService
      * @param bool $recursive
      * @return AbstractAjxpUser[]
      */
-    public static function listUsers($baseGroup = "/", $regexp = null, $offset = -1, $limit = -1, $cleanLosts = true, $recursive = true)
+    public static function listUsers($baseGroup = "/", $regexp = null, $offset = -1, $limit = -1, $cleanLosts = true, $recursive = true, $countCallback = null, $loopCallback = null)
     {
         $baseGroup = self::filterBaseGroup($baseGroup);
         $authDriver = ConfService::getAuthDriverImpl();
@@ -969,10 +979,24 @@ class AuthService
         } else {
             $users = $authDriver->listUsers($baseGroup);
         }
+        $index = 0;
+
+        // Callback func for display progression on cli mode
+        if($countCallback != null){
+            call_user_func($countCallback, $index, count($users), "Update users");
+        }
+
         foreach (array_keys($users) as $userId) {
             if(($userId == "guest" && !ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) || $userId == "ajxp.admin.users" || $userId == "") continue;
             if($regexp != null && !$authDriver->supportsUsersPagination() && !preg_match("/$regexp/i", $userId)) continue;
             $allUsers[$userId] = $confDriver->createUserObject($userId);
+            $index++;
+
+            // Callback func for display progression on cli mode
+            if($countCallback != null){
+                call_user_func($loopCallback, $index);
+            }
+
             if ($paginated) {
                 // Make sure to reload all children objects
                 foreach ($confDriver->getUserChildren($userId) as $childObject) {

@@ -1326,7 +1326,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $repo = ConfService::getRepositoryById($repId);
                 $res = 0;
                 if (isSet($httpVars["newLabel"])) {
-                    $newLabel = AJXP_Utils::decodeSecureMagic($httpVars["newLabel"]);
+                    $newLabel = AJXP_Utils::sanitize(AJXP_Utils::securePath($httpVars["newLabel"]), AJXP_SANITIZE_HTML);
                     if ($this->repositoryExists($newLabel)) {
                          AJXP_XMLWriter::header();
                         AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.50"]);
@@ -1440,6 +1440,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     uksort($repoOptions, array($this,"metaSourceOrderingFunction"));
                     $repo->addOption("META_SOURCES", $repoOptions);
                     ConfService::replaceRepository($repId, $repo);
+                }else{
+                    throw new Exception("Cannot find meta source ".$metaSourceId);
                 }
                 AJXP_XMLWriter::header();
                 AJXP_XMLWriter::sendMessage($mess["ajxp_conf.57"],null);
@@ -1498,7 +1500,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 if (isSet($httpVars["repository_id"])) {
                     $repId = $httpVars["repository_id"];
-                    $res = ConfService::deleteRepository($repId);
+                    $repo = ConfService::getRepositoryById($repId);
+                    if(!is_object($repo)){
+                        $res = -1;
+                    }else{
+                        $res = ConfService::deleteRepository($repId);
+                    }
                     AJXP_XMLWriter::header();
                     if ($res == -1) {
                         AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.51"]);
@@ -1666,8 +1673,19 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             break;
 
+
+            // Action for update all Pydio's user from ldap in CLI mode
+            case "cli_update_user_list":
+                if((php_sapi_name() == "cli")){
+                    $progressBar = new AJXP_ProgressBarCLI();
+                    $countCallback  = array($progressBar, "init");
+                    $loopCallback   = array($progressBar, "update");
+                    AuthService::listUsers("/", null, -1 , -1, true, true, $countCallback, $loopCallback);
+                }
+                break;
+
             default:
-            break;
+                break;
         }
 
         return;

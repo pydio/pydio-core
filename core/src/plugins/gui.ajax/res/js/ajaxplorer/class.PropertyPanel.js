@@ -77,17 +77,18 @@ Class.create("PropertyPanel", {
         var emptyLabel = new Element('td');
         headerRow.insert(emptyLabel);
 		tHead.insert(headerRow);
-		for(var j=0;j<3;j++){
+        var i,j;
+		for(j=0;j<3;j++){
 			headerRow.insert(new Element('td').update(this.rightsLabels[j]+'&nbsp;&nbsp;').setStyle({textAlign:'center'}));
 		}
 		// Boxes lines
-		for(var i=0;i<3;i++){
+		for(i=0;i<3;i++){
             var permRow = new Element('tr');
 			var label = new Element('td').setStyle({textAlign:'right',paddingRight:'2px', width:'35px'});
 			label.insert(this.accessLabels[i]);
 			tBody.insert(permRow);
             permRow.insert(label);
-			for(var j=0;j<3;j++){
+			for(j=0;j<3;j++){
 				var check = this.createCheckBox(this.accessors[i], this.rights[j]);
 				permRow.insert(check);
 			}
@@ -131,6 +132,7 @@ Class.create("PropertyPanel", {
 		var choicesDiv = new Element('div');
 		recuDiv.insert(choicesDiv);
 		for(var key in choices){
+            if(!choices.hasOwnProperty(key)) continue;
 			var choiceDiv = new Element('div', {style:'padding-left:25px'});
 			var choiceDivBox = new Element('input', {
 				type:'radio',

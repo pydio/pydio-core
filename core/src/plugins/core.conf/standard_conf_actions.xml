@@ -645,6 +645,9 @@
                                 conn.onComplete = function(transport){
                                     if(transport.responseJSON && $('ajxp_workspace_info_panel_content')){
                                         var data = transport.responseJSON;
+                                        if(!data['core.users']['external']){
+                                            data['core.users']['external'] = 0;
+                                        }
                                         $('ajxp_workspace_info_panel_content').update('#{internal_string}: ' + data['core.users']['internal'] + ' <br/> #{external_string}: ' + data['core.users']['external']);
                                     }
                                 };

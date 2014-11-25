@@ -37,7 +37,7 @@ binary-indep: build install
 	find $(d) -type f -iname "*licen*e*" -exec rm {} \;
 	dh_installchangelogs
 	dh_installdocs
-	rm $(d)/usr/share/doc/pydio/INSTALL.txt
+#	rm $(d)/usr/share/doc/pydio/INSTALL.txt
 	dh_installdebconf
 	dh_compress
 	dh_link

@@ -105,6 +105,15 @@ class AbstractAccessDriver extends AJXP_Plugin
      */
     public function makeSharedRepositoryOptions($httpVars, $repository){}
 
+    /**
+     * @param $directoryPath string
+     * @param $repositoryResolvedOptions array
+     * @return integer
+     * @throw Exception
+     */
+    public function directoryUsage($directoryPath, $repositoryResolvedOptions){
+        throw new Exception("Current driver does not support recursive directory usage!");
+    }
 
     public function crossRepositoryCopy($httpVars)
     {

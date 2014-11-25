@@ -105,9 +105,9 @@ lightbox.prototype = {
 	// WARNING : QUITE LONG IN I.E.
 	actions: function(){
 		
-		lbActions = document.getElementsByClassName('lbAction');
+		var lbActions = document.getElementsByClassName('lbAction');
 
-		for(i = 0; i < lbActions.length; i++) {
+		for(var i = 0; i < lbActions.length; i++) {
 			Event.observe(lbActions[i], 'click', this[lbActions[i].rel].bindAsEventListener(this), false);
 			lbActions[i].onclick = function(){return false;};
 		}
@@ -160,7 +160,7 @@ function initializeLightbox(){
 
 function displayLightBoxById(id, overlayStyle, overlayClass)
 {
-	valid = new lightbox(id);
+	var valid = new lightbox(id);
     if(overlayStyle) valid.overlayStyle = overlayStyle;
     if(overlayClass) valid.overlayClass = overlayClass;
 	valid.activate();
@@ -176,7 +176,7 @@ function hideLightBox(onFormSubmit)
 	if(modal.closeValidation){
 		var res = modal.closeValidation();
 		if(res === false){
-			return;
+			return false;
 		}
 		modal.closeValidation = null;
 	}
@@ -198,6 +198,7 @@ function hideLightBox(onFormSubmit)
 		modal.closeFunction();
 		modal.closeFunction = null;
 	}
+    return true;
 }
 
 function setOverlay()
@@ -220,15 +221,15 @@ function hideOverlay()
 // Lightbox is the centered square that the content is put into.
 function addLightboxMarkup() {
 
-	bod 				= document.getElementsByTagName('body')[0];
-	overlay 			= document.createElement('div');
-	overlay.id			= 'overlay';
+	var bod 				= document.getElementsByTagName('body')[0];
+	var overlay 			= document.createElement('div');
+	overlay.id			    = 'overlay';
 	bod.appendChild(overlay);
 }
 
 function addLightboxMarkupToElement(element, skipElement) 
 {
-	overlay 			= document.createElement('div');
+	var overlay 		= document.createElement('div');
 	overlay.id			= 'element_overlay';
 	var top, left, height, width;
 	if (Prototype.Browser.IE){

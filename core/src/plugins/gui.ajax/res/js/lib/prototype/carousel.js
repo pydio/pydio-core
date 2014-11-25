@@ -58,7 +58,7 @@ Carousel = Class.create(Abstract, {
         }
         
         if (this.options.wheel) {            
-            this.scroller.observe('mousewheel', this.wheel.bindAsEventListener(this)).observe('DOMMouseScroll', this.wheel.bindAsEventListener(this));;
+            this.scroller.observe('mousewheel', this.wheel.bindAsEventListener(this)).observe('DOMMouseScroll', this.wheel.bindAsEventListener(this));
         }
 
         if (this.options.auto) {
@@ -123,7 +123,7 @@ Carousel = Class.create(Abstract, {
         
 		this.previous = this.current ? this.current : this.slides[0];
 		this.current  = $(element);		
-		if(!this.current) return;
+		if(!this.current) return false;
 
 		var scrollerOffset = this.scroller.cumulativeOffset();
 		var elementOffset  = this.current.cumulativeOffset();
@@ -142,7 +142,7 @@ Carousel = Class.create(Abstract, {
                     from:   1.0,
                     to:     0,
                     duration: this.options.duration,
-                    afterFinish: (function () {
+                    afterFinish: function () {
                         this.scroller.scrollLeft = elementOffset[0] - scrollerOffset[0];
                         this.scroller.scrollTop  = elementOffset[1] - scrollerOffset[1];
 
@@ -159,8 +159,8 @@ Carousel = Class.create(Abstract, {
                                 }
                             }).bind(this)
                         });
-                    }
-                ).bind(this)});
+                    }.bind(this)
+                });
             break;
             case 'scroll':
             default:
@@ -180,7 +180,7 @@ Carousel = Class.create(Abstract, {
                     x: (elementOffset[0] - scrollerOffset[0]),
                     y: (elementOffset[1] - scrollerOffset[1]),
                     transition: transition,
-                    afterFinish: (function () {
+                    afterFinish: function () {
                         if (this.controls) {
                             this.activateControls();
                         }
@@ -188,7 +188,7 @@ Carousel = Class.create(Abstract, {
                             this.options.afterMove();
                         }                        
                         this.scrolling = false;
-                    }).bind(this)});
+                    }.bind(this)});
             break;
         }
 
@@ -196,11 +196,12 @@ Carousel = Class.create(Abstract, {
 	},
 
 	prev: function () {
+        var prevIndex;
 		if (this.current) {
 			var currentIndex = this.current._index;
-			var prevIndex = (currentIndex == 0) ? (this.options.circular ? this.slides.length - 1 : 0) : currentIndex - 1;
+			prevIndex = (currentIndex == 0) ? (this.options.circular ? this.slides.length - 1 : 0) : currentIndex - 1;
         } else {
-            var prevIndex = (this.options.circular ? this.slides.length - 1 : 0);
+            prevIndex = (this.options.circular ? this.slides.length - 1 : 0);
         }
 
 		if (prevIndex == (this.slides.length - 1) && this.options.circular && this.options.effect != 'fade') {
@@ -213,11 +214,12 @@ Carousel = Class.create(Abstract, {
 	},
 
 	next: function () {
+        var nextIndex;
 		if (this.current) {
 			var currentIndex = this.current._index;
-			var nextIndex = (this.slides.length - 1 == currentIndex) ? (this.options.circular ? 0 : currentIndex) : currentIndex + 1;
+			nextIndex = (this.slides.length - 1 == currentIndex) ? (this.options.circular ? 0 : currentIndex) : currentIndex + 1;
         } else {
-            var nextIndex = 1;
+            nextIndex = 1;
         }
 
 		if (nextIndex == 0 && this.options.circular && this.options.effect != 'fade') {
@@ -247,7 +249,7 @@ Carousel = Class.create(Abstract, {
 		if (this.previous) {
 			this.moveTo(this.slides[this.previous._index]);
         } else {
-            return false;
+            return;
         }
     },
 

@@ -215,6 +215,11 @@ class ConfService
         return AJXP_PluginsService::getInstance()->getPluginById("core.auth")->getAuthImpl();
     }
 
+    /**
+     * @param AbstractAjxpUser $loggedUser
+     * @param String|int $parameterId
+     * @return bool
+     */
     public static function switchUserToActiveRepository($loggedUser, $parameterId = -1)
     {
         if (isSet($_SESSION["PENDING_REPOSITORY_ID"]) && isSet($_SESSION["PENDING_FOLDER"])) {
@@ -869,7 +874,7 @@ class ConfService
     public static function zipEnabled()
     {
         if(ConfService::getCoreConf("DISABLE_ZIP_BROWSING") === true) return false;
-        return (function_exists("gzopen")?true:false);
+        return ((function_exists("gzopen") || function_exists("gzopen64"))?true:false);
     }
     /**
      * Get the list of all "conf" messages

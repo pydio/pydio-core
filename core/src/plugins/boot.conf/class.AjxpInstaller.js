@@ -128,6 +128,7 @@ Class.create("AjxpInstaller", AjxpPane, {
         startButton.observe("click", function(){
             if(startButton.hasClassName("disabled")) return;
             var conn = new Connexion();
+            conn.setMethod('POST');
             var params = new Hash({get_action: "apply_installer_form"});
             this.formManager.serializeParametersInputs(this.formElement, params);
             conn.setParameters(params);

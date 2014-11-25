@@ -43,66 +43,73 @@ Class.create("AjxpMqObserver", {
             var data = event.memo;
             if(data.active) repoId = data.active;
             else if(ajaxplorer.repositoryId) repoId = ajaxplorer.repositoryId;
+            this.initForRepoId(repoId);
 
-            if(window.WebSocket && this.configs.get("WS_SERVER_ACTIVE")){
+        }.bind(this));
 
-                if(this.ws) {
-                    if(!repoId){
-                        this.ws.onclose = function(){
-                            delete this.ws;
-                        }.bind(this);
-                        this.ws.close();
+        if(ajaxplorer.repositoryId){
+            this.initForRepoId(ajaxplorer.repositoryId);
+        }
 
-                    } else {
-                        try{
-                            this.ws.send("register:" + repoId);
-                        }catch(e){
-                            if(console) console.log('Error while sending WebSocket message: '+ e.message);
-                        }
-                    }
-                }else{
-                    if(repoId){
-                        var url = "ws"+(this.configs.get("WS_SERVER_SECURE")?"s":"")+"://"+this.configs.get("WS_SERVER_HOST")+":"+this.configs.get("WS_SERVER_PORT")+this.configs.get("WS_SERVER_PATH");
-                        this.ws = new WebSocket(url);
-                        this.ws.onmessage = function(event){
-                            var obj = parseXml(event.data);
-                            if(obj){
-                                ajaxplorer.actionBar.parseXmlMessage(obj);
-                                ajaxplorer.notify("server_message", obj);
-                            }
-                        };
-                        this.ws.onopen = function(){
-                            this.ws.send("register:" + repoId);
-                        }.bind(this);
+    },
+
+    initForRepoId:function(repoId){
+        if(window.WebSocket && this.configs.get("WS_SERVER_ACTIVE")){
+
+            if(this.ws) {
+                if(!repoId){
+                    this.ws.onclose = function(){
+                        delete this.ws;
+                    }.bind(this);
+                    this.ws.close();
+
+                } else {
+                    try{
+                        this.ws.send("register:" + repoId);
+                    }catch(e){
+                        if(console) console.log('Error while sending WebSocket message: '+ e.message);
                     }
                 }
-
             }else{
-
-                if(this.pe){
-                    this.pe.stop();
+                if(repoId){
+                    var url = "ws"+(this.configs.get("WS_SERVER_SECURE")?"s":"")+"://"+this.configs.get("WS_SERVER_HOST")+":"+this.configs.get("WS_SERVER_PORT")+this.configs.get("WS_SERVER_PATH");
+                    this.ws = new WebSocket(url);
+                    this.ws.onmessage = function(event){
+                        var obj = parseXml(event.data);
+                        if(obj){
+                            ajaxplorer.actionBar.parseXmlMessage(obj);
+                            ajaxplorer.notify("server_message", obj);
+                        }
+                    };
+                    this.ws.onopen = function(){
+                        this.ws.send("register:" + repoId);
+                    }.bind(this);
                 }
+            }
 
-                if(this.currentRepo && repoId){
+        }else{
 
-                    this.unregisterCurrentChannel(function(){
-                        this.registerChannel(repoId);
-                    }.bind(this));
+            if(this.pe){
+                this.pe.stop();
+            }
 
-                }else if(this.currentRepo && !repoId){
+            if(this.currentRepo && repoId){
 
-                    this.unregisterCurrentChannel();
-
-                }else if(!this.currentRepo && repoId){
-
+                this.unregisterCurrentChannel(function(){
                     this.registerChannel(repoId);
+                }.bind(this));
 
-                }
+            }else if(this.currentRepo && !repoId){
+
+                this.unregisterCurrentChannel();
+
+            }else if(!this.currentRepo && repoId){
+
+                this.registerChannel(repoId);
 
             }
 
-
-        }.bind(this));
+        }
 
     },
 
@@ -157,7 +164,3 @@ Class.create("AjxpMqObserver", {
     }
 
 });
-
-if(!ajaxplorer.mqObserver){
-    ajaxplorer.mqObserver = new AjxpMqObserver();
-}

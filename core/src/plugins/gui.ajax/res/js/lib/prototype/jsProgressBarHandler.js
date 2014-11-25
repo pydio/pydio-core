@@ -33,7 +33,7 @@
  * -------------------------------------------------------------
  */
 
-if (!JS_BRAMUS) { var JS_BRAMUS = new Object(); }
+if (!JS_BRAMUS) { var JS_BRAMUS = {}; }
 
 
 JS_BRAMUS.jsProgressBar = Class.create({
@@ -51,15 +51,15 @@ JS_BRAMUS.jsProgressBar = Class.create({
 		queue			: false,
 
 
-	/**
-	 * Constructor
-	 *
-	 * @param HTMLElement el
-	 * @param string id
-	 * @param int percentage
-	 * @return void
-	 * -------------------------------------------------------------
-	 */
+    /**
+     * Constructor
+     *
+     * @return void
+     * -------------------------------------------------------------
+     * @param el
+     * @param percentage
+     * @param options
+     */
 	 
 		initialize : function(el, percentage, options) {
 
@@ -81,7 +81,7 @@ JS_BRAMUS.jsProgressBar = Class.create({
 			this.backIndex		= 0;							// Set to 0 initially
 			this.numPreloaded	= 0;							// Set to 0 initially
 			this.running		= false;						// Set to false initially
-			this.queue			= Array();						// Set to empty Array initially
+			this.queue			= [];						// Set to empty Array initially
 			this.visualsInitialized = false;
 
 			// datamembers which are calculatef
@@ -92,7 +92,7 @@ JS_BRAMUS.jsProgressBar = Class.create({
 
 			// enfore backimage array
 			if (this.options.barImage.constructor != Array) { 	// used to be (but doesn't work in Safari): if (this.options.barImage.constructor.toString().indexOf("Array") == -1) {
-				this.options.barImage = Array(this.options.barImage);
+				this.options.barImage = [this.options.barImage];
 			}
 
 			// preload Images
@@ -111,7 +111,7 @@ JS_BRAMUS.jsProgressBar = Class.create({
 		preloadImages	: function() {
 
 			// loop all barimages
-			for (i = 0; i < this.options.barImage.length; i++) {
+			for (var i = 0; i < this.options.barImage.length; i++) {
 
 				// create new image ref
 				var newImage = null;
@@ -190,16 +190,16 @@ JS_BRAMUS.jsProgressBar = Class.create({
 			// set the percentage
 			this.setPercentage(this.initialPerc);
 		},
-	
-	
-	/**
-	 * Sets the percentage of the progressbar
-	 *
-	 * @param string targetPercentage
-	 * @param boolen clearQueue
-	 * @return void
-	 * -------------------------------------------------------------
-	 */
+
+
+    /**
+     * Sets the percentage of the progressbar
+     *
+     * @return void
+     * -------------------------------------------------------------
+     * @param targetPercentage
+     * @param clearQueue
+     */
 		setPercentage	: function(targetPercentage, clearQueue) {
 
         if(!this.visualsInitialized){
@@ -245,7 +245,6 @@ JS_BRAMUS.jsProgressBar = Class.create({
 				
 				// tell the world that we're busy
 				this.running = true;
-				
 				// process the entry
 				this.processQueueEntry(this.queue[0]);
 				
@@ -253,20 +252,19 @@ JS_BRAMUS.jsProgressBar = Class.create({
 			} else {
 					
 				// return;
-				return;
-					
+
 			}
 			
 		},
-	
-	
-	/**
-	 * Processes an entry from the queue (viz. animates it)
-	 *
-	 * @param string targetPercentage
-	 * @return void
-	 * -------------------------------------------------------------
-	 */
+
+
+    /**
+     * Processes an entry from the queue (viz. animates it)
+     *
+     * @return void
+     * -------------------------------------------------------------
+     * @param targetPercentage
+     */
 		
 		processQueueEntry	: function(targetPercentage) {
 								
@@ -305,9 +303,10 @@ JS_BRAMUS.jsProgressBar = Class.create({
 				// we're done!
 				return;
 			}
-			
+
+            var newPercentage, callTick;
 			// define if we need to add/subtract something to the current percentage in order to reach the target percentage
-			if (targetPercentage != curPercentage) {					
+			if (targetPercentage != curPercentage) {
 				if (curPercentage < targetPercentage) {
 					newPercentage = curPercentage + 1;
 				} else {
@@ -347,8 +346,6 @@ JS_BRAMUS.jsProgressBar = Class.create({
 				// process the rest of the queue
 				this.processQueue();
 				
-				// we're done!
-				return;
 			}
 			
 		},
@@ -359,7 +356,7 @@ JS_BRAMUS.jsProgressBar = Class.create({
 	 *
 	 * @return int
 	 */
-		getPercentage		: function(id) {
+		getPercentage : function(id) {
 			return this.percentage;
 		},
 	
@@ -367,7 +364,7 @@ JS_BRAMUS.jsProgressBar = Class.create({
 	/**
 	 * Set the background position
 	 *
-	 * @param int percentage
+	 * @param percentage int
 	 */
 		_setBgPosition		: function(percentage) {
 			// adjust the background position

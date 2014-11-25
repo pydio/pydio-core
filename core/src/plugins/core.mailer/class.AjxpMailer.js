@@ -73,7 +73,7 @@ Class.create("AjxpMailer", {
                 var loginLabel = el.down("span.user_entry_label").innerHTML;
                 this.selectedLoginToSpan(
                     loginLabel,
-                    el.getAttribute("data-entry_id") || selectedLi.readAttribute('data-group') ,
+                    el.getAttribute("data-entry_id") || el.getAttribute('data-group') ,
                     el.hasClassName("complete_group_entry")
                 );
             }.bind(this));

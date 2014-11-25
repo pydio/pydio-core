@@ -4,7 +4,7 @@
 
     <client_settings>
         <resources>
-            <js className="UserGuiController" file="plugins/gui.user/class.UserGuiController.js" autoload="true"/>
+            <js className="UserGuiController" file="plugins/gui.user/class.UserGuiController.js" autoload="false"/>
             <i18n namespace="gui.user" path="plugins/gui.user/i18n"/>
         </resources>
     </client_settings>
@@ -136,6 +136,13 @@
 				<div id="notifications" ajxpClass="FetchedResultPane" ajxpOptions='{"fit":"height", "fitParent": "window", "fixedDisplayMode":"thumb", "displayMode":"thumb", "selectable":"false", "nodeProviderProperties":{"get_action":"get_my_feed", "format":"xml", "connexion_discrete":true}}'></div>
 				-->
 				<script type="text/javascript">
+                    document.observe('ajaxplorer:loaded', function(){
+                        if(!ajaxplorer.UIG) {
+                            ResourcesManager.prototype.loadJSResource('plugins/gui.user/class.UserGuiController.js', 'UserGuiController', function(){
+                                ajaxplorer.UIG = new UserGuiController($('user-gui-controller'));
+                            }, true);
+                        }
+                    });
 				    ajaxplorer.disableAllKeyBindings();
 				</script>
             ]]></template>

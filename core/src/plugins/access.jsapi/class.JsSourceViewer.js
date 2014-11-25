@@ -56,8 +56,7 @@ Class.create("JsSourceViewer", AjxpPane, {
 	},
 	
 	/**
-	 * Test
-	 * @return nothing
+	 * @return void
 	 */
 	empty : function(){
 		this.setContent('');
@@ -82,7 +81,6 @@ Class.create("JsSourceViewer", AjxpPane, {
 		if(!contextNode) {
 			contextNode = userSelection.getContextNode();
 		}
-		var path = contextNode.getPath();
 		var objectNode = contextNode;
 		if(contextNode.isLeaf() && !contextNode.getMetadata().get("API_OBJECT_NODE")){
 			var metadata = contextNode.getMetadata();
@@ -137,6 +135,7 @@ Class.create("JsSourceViewer", AjxpPane, {
 	
 	applyPointer : function(){
 		if(!this.pendingPointer) return;
+        var cursor;
 		if(this.pendingPointerType == "MemberName"){
 			cursor = this.codeMirror.getSearchCursor(this.pendingPointer+':', false, false);
 			if(cursor.findNext()){
@@ -146,7 +145,6 @@ Class.create("JsSourceViewer", AjxpPane, {
 			cursor = this.codeMirror.getSearchCursor(this.pendingPointer+' :', false, false);
 			if(cursor.findNext()){
 				cursor.select();
-				return;
 			}
 		}else{
 			cursor = this.codeMirror.getSearchCursor(".create('" + this.pendingPointer+"'", false, false);
@@ -157,8 +155,7 @@ Class.create("JsSourceViewer", AjxpPane, {
 			cursor = this.codeMirror.getSearchCursor('.create("' + this.pendingPointer+'"', false, false);
 			if(cursor.findNext()){
 				this.codeMirror.jumpToLine(cursor.position().line);
-				return;
-			}			
+			}
 		}		
 	},
 	

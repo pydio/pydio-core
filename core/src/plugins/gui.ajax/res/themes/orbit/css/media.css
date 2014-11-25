@@ -81,6 +81,13 @@ and (max-width : 720px) {
         white-space: nowrap;
         text-overflow: ellipsis;
     }
+    div#dl_toolbar {
+        margin: 220px auto !important;
+        width: 300px !important;
+    }
+    #ajxp_unique_dl a#share_current_page_button{
+        padding: 10px 10px !important;
+    }
 }
 
 @media only screen
@@ -113,13 +120,12 @@ and (max-width : 420px){
     }
 
     #buttons_bar, #buttons_bar_top{
-        padding-top: 6px;
+
     }
 
     #buttons_bar a, #buttons_bar_top a{
-        padding: 0px 8px 0px 11px;
-        margin: 0 3px 0 0;
-        border-radius: 12px;
+        padding: 1px 8px;
+        border-radius: 19px;
     }
 
     .tabulatorContainer.panelHeader.icons_only {
@@ -171,5 +177,9 @@ and (max-width : 420px){
 
     div.dialogContent div.SF_element {
         margin: 0 10px;
+    }
+
+    #global_toolbar{
+        z-index: 1000;
     }
 }

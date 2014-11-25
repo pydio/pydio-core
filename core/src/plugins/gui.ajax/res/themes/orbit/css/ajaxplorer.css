@@ -94,6 +94,7 @@ body, html
 {
     margin: 0;
     padding: 0;
+    background-color: #333;
 }
 
 input, textarea, select
@@ -657,9 +658,14 @@ span.ajxp-caret-up{
     top:30%;
     text-align:center;
     font-size: 16px;
-    color: #5E7C90;
     font-weight:bold;
     cursor: pointer;
+    box-shadow: none;
+}
+
+#activity_monitor_warning div.dialogContent {
+    border-radius: 10px;
+    box-shadow: 1px 1px 46px rgba(0, 0, 0, 0.67);
 }
 
 #activity_monitor_warning span.click_anywhere{
@@ -702,7 +708,7 @@ textarea#myCode
 {
     display: inline-block;
     font-size: 13px;
-    padding: 4px 13px !important;
+    padding: 7px 6px !important;
     text-align: center;
     overflow: visible;
     color: #fff;
@@ -1392,6 +1398,12 @@ div.dialogBox.form-login_form_dynamic div.dialogButtons input.dialogButton
 {
     width: 70px;
     height: 70px;
+}
+
+div.dialogBox.form-diaporama_box div.dialogContent{
+    background-color: rgb(85,85,85);
+    border: 0;
+    background-image: none;
 }
 
 /********************************/
@@ -2859,7 +2871,8 @@ div#upload_files_list span.item_relative_path{
     cursor: pointer;
 }
 #fileInputContainer input {
-    filter:alpha(opacity:0); opacity:0; moz-opacity:0;
+    moz-opacity: 0;
+    opacity: 0;
     position: absolute;
     font-size: 60px; /* causes it to fill the containing div */
     top: 0;
@@ -2867,6 +2880,7 @@ div#upload_files_list span.item_relative_path{
     z-index: 10000;
     height: 56px;
     cursor: pointer !important;
+    filter:alpha(opacity:0);
 }
 #fileInputPos {
     text-align: left;
@@ -3077,6 +3091,10 @@ div.tabulatorContainer div#display_toolbar{
     position: absolute;
     right: 17px;
     margin-top: -36px;
+}
+
+#ajxp_workspace_info_panel_content{
+    line-height: 1.5em;
 }
 
 span.toggleHeader{
@@ -4092,7 +4110,7 @@ input, textarea, .selectable{
 .vsplitbar
 {
     width: 3px;
-    z-index: 10;
+    z-index: 1014;
 }
 .vsplitbar:hover
 {
@@ -4121,6 +4139,7 @@ input, textarea, .selectable{
     background-image: url(../images/hgrabber.gif);
     background-repeat: no-repeat;
     background-position: center;
+    z-index: 1014;
 }
 .hsplitbar.active
 {
@@ -4596,6 +4615,11 @@ input.share_info_panel_link {
     border-color: #ccc;
 }
 
+input.share_info_panel_link_expired{
+    color: #999;
+    text-decoration: line-through;
+}
+
 #share_container{
     clear: left;
     width: 95%;
@@ -4627,7 +4651,7 @@ input.share_info_panel_link {
 
 #share_folder_form div.dialogContentMainTitle{
     clear: left;
-    margin-top: 20px;
+    margin-top: 10px;
     margin-bottom: -4px;
     padding: 10px 0 0;
     border-top: 1px dashed rgb(150,150,150);
@@ -4658,25 +4682,34 @@ span.only_share_leaf
 }
 
 input#shared_user{
-    width: 370px !important;
+    width: 374px !important;
 }
 
 div#target_repository_toggle{
     display: none !important;
 }
 
+div#target_user{
+    margin: 0 5px !important;
+}
+
 .share_edit div#target_repository_toggle{
     display: block !important;
 }
 
-.share_edit div#target_repository_toggle span{
-    display: inline;
+.share_edit div#target_repository_toggle span.simple_tooltip_observer{
+    display: inline-block;
+    padding: 2px 7px;
+    border: 1px solid;
+    opacity: 0.8;
+    border-radius: 8px;
+    margin: 2px;
 }
 
 .share_edit div#target_repository_toggle div.SF_horizontal_actions{
     text-align: right;
     margin-top: 10px;
-    margin-bottom: -20px;
+    margin-bottom: -5px;
     padding-right: 0;
 }
 
@@ -4716,11 +4749,29 @@ div#share_update{
 }
 
 div#share_result div.non_macos,
+div#share_result div.link_expired_div,
 div#share_result div.macos_only
 {
     font-size:13px;
     padding:10px 0 0;
     text-align:center;
+}
+
+div#share_result div.link_expired_div{
+    display: none;
+}
+
+form.share_expired div#share_result div.link_expired_div{
+    display: block;
+}
+form.share_expired input#share_container{
+    color: #999;
+    text-decoration: line-through;
+}
+
+form.share_expired div.non_macos,
+form.share_expired div.macos_only{
+    display: none !important;
 }
 
 .edit_parameters div#shareDialogButtons,
@@ -4754,6 +4805,10 @@ div#share_result div.macos_only
     float: none;
 }
 
+form.share_expired div#mailer_button{
+    display: none;
+}
+
 .share_edit.type-ws div#shareDialogButtons{
     padding-top: 10px;
 }
@@ -4775,6 +4830,58 @@ div#share_result div.macos_only
 div.user_entry span.cbContainer{
 
 }
+
+#target_repository span#remove_user_pass{
+    border-bottom: 1px solid;
+    font-size: 13px;
+    display: inline-block;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.share_dialog_toggler{
+    cursor: pointer;
+}
+
+.share_dialog_toggler span.toggler_arrow{
+    float: right;
+    margin-right: 5px;
+    margin-top: 3px;
+    transform:rotate(270deg);
+}
+
+.share_dialog_toggler_closed span.toggler_arrow{
+    transform:rotate(0deg);
+}
+
+.share_dialog_toggled{
+    overflow: hidden;
+    transition: height 0.5s ease;
+}
+
+.share_dialog_toggled_closed{
+    height: 0 !important;
+    overflow: hidden;
+}
+
+#editable_hash_link{
+    margin:4px 10px;
+    font-size:13px;
+}
+
+#description_parameters{
+    margin: 5px 0;
+}
+
+#editable_hash_parameters{
+    margin: 5px;
+}
+
+#ws_shared_users_parameters{
+    margin: 0 5px;
+    position: relative;
+}
+
 /***********************/
 /* EDITORS & DIAPORAMA */
 /***********************/

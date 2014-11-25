@@ -54,7 +54,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             ConfService::setConf("PROBE_REAL_SIZE", $this->getFilteredOption("PROBE_REAL_SIZE", $this->repository->getId()));
         }
         $create = $this->repository->getOption("CREATE");
-        $path = $this->repository->getOption("PATH");
+        $path = SystemTextEncoding::toStorageEncoding($this->repository->getOption("PATH"));
         $recycle = $this->repository->getOption("RECYCLE_BIN");
         $chmod = $this->repository->getOption("CHMOD_VALUE");
         $wrapperData = $this->detectStreamWrapper(true);
@@ -99,6 +99,59 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     public function getWrapperClassName()
     {
         return $this->wrapperClassName;
+    }
+
+    /**
+     * @param String $directoryPath
+     * @param Repository $repositoryResolvedOptions
+     * @return int
+     */
+    public function directoryUsage($directoryPath, $repositoryResolvedOptions){
+
+        $dir = $repositoryResolvedOptions["PATH"].$directoryPath;
+        $size = -1;
+        if ( ( PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") && class_exists("COM") ) {
+            $obj = new COM ( 'scripting.filesystemobject' );
+            if ( is_object ( $obj ) ) {
+                $ref = $obj->getfolder ( $dir );
+                $size = floatval($ref->size);
+                $obj = null;
+            }
+        } else {
+            if(PHP_OS == "Darwin") $option = "-sk";
+            else $option = "-sb";
+            $cmd = '/usr/bin/du '.$option.' ' . escapeshellarg($dir);
+            $io = popen ( $cmd , 'r' );
+            $size = fgets ( $io, 4096);
+            $size = trim(str_replace($dir, "", $size));
+            $size =  floatval($size);
+            if(PHP_OS == "Darwin") $s = $s * 1024;
+            pclose ( $io );
+        }
+        if($size != -1){
+            return $size;
+        }else{
+            return $this->recursiveDirUsageByListing($directoryPath);
+        }
+
+    }
+
+    protected function recursiveDirUsageByListing($path){
+        $total_size = 0;
+        $files = scandir($path);
+
+        foreach ($files as $t) {
+            if (is_dir(rtrim($path, '/') . '/' . $t)) {
+                if ($t <> "." && $t <> "..") {
+                    $size = $this->recursiveDirUsageByListing(rtrim($path, '/') . '/' . $t);
+                    $total_size += $size;
+                }
+            } else {
+                $size = sprintf("%u", filesize(rtrim($path, '/') . '/' . $t));
+                $total_size += $size;
+            }
+        }
+        return $total_size;
     }
 
     public function redirectActionsToMethod(&$contribNode, $arrayActions, $targetMethod)
@@ -1969,7 +2022,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     public function makeSharedRepositoryOptions($httpVars, $repository)
     {
         $newOptions = array(
-            "PATH" => $repository->getOption("PATH").AJXP_Utils::decodeSecureMagic($httpVars["file"]),
+            "PATH" => SystemTextEncoding::toStorageEncoding($repository->getOption("PATH")).AJXP_Utils::decodeSecureMagic($httpVars["file"]),
             "CREATE" => isSet($httpVars["inherit_recycle"])? $repository->getOption("CREATE") : false,
             "RECYCLE_BIN" => isSet($httpVars["inherit_recycle"])? $repository->getOption("RECYCLE_BIN") : "",
             "DEFAULT_RIGHTS" => "");

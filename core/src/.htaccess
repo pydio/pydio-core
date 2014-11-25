@@ -23,3 +23,5 @@ RewriteRule (.*) index.php [L]
 #RewriteCond %{HTTP:Authorization} ^(.*)
 #RewriteRule ^(.*) - [E=HTTP_AUTHORIZATION:%1]
 </IfModule>
+
+AddType application/json .json

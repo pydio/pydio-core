@@ -107,33 +107,40 @@
                                     <input type="text" id="share_container" style="clear:left; width: 95%; margin:15px 5px 0; font-size:13px;"/>
                                     <div class="non_macos">AJXP_MESSAGE[share_center.143]</div>
 					                <div class="macos_only" style="display:none;">AJXP_MESSAGE[share_center.144]</div>
+					                <div class="link_expired_div"><span class="icon-sign-warning"></span> AJXP_MESSAGE[share_center.167]</div>
                                     <div class="share_qrcode" style="margin-top:5px; clear:left; display:none;"></div>
                                 </div>
                             </div>
                             <div id="target_repository" style="margin-bottom:15px;">
                                 <div id="public_link_parameters" style="margin:0 5px;min-height: 20px;">
                                     <!-- LABEL & DESCRIPTION -->
-                                    <div class="SF_element">
-                                        <div class="SF_label" ajxp_message_id="share_center.35" title="AJXP_MESSAGE[share_center.35]">AJXP_MESSAGE[share_center.35]</div>
-                                        <input type="text" value="" id="repo_label" name="repo_label" class="SF_input" placeholder="AJXP_MESSAGE[share_center.35]"/>
-                                    </div>
-                                    <div class="SF_element">
-                                        <div class="SF_label" title="">AJXP_MESSAGE[share_center.145]</div>
-                                        <input type="text" id="repo_description" name="repo_description" class="SF_input" placeholder="AJXP_MESSAGE[share_center.146]"/>
-                                        <br style="clear:both;">
+                                    <div class="dialogContentMainTitle mode-ws mode-minipub" data-toggleBlock="description_parameters" ajxp_message_id="share_center.145">AJXP_MESSAGE[share_center.145]</div>
+                                    <div id="description_parameters" class="share_dialog_toggled_open">
+                                        <div class="SF_element">
+                                            <div class="SF_label" ajxp_message_id="share_center.35" title="AJXP_MESSAGE[share_center.35]">AJXP_MESSAGE[share_center.35]</div>
+                                            <input type="text" value="" id="repo_label" name="repo_label" class="SF_input" placeholder="AJXP_MESSAGE[share_center.35]"/>
+                                        </div>
+                                        <div class="SF_element">
+                                            <div class="SF_label" title="">AJXP_MESSAGE[share_center.145]</div>
+                                            <input type="text" id="repo_description" name="repo_description" class="SF_input" placeholder="AJXP_MESSAGE[share_center.146]"/>
+                                            <br style="clear:both;">
+                                        </div>
                                     </div>
                                     <div class="mode-minipub">
                                         <div id="target_user_simple" class="mode-minipub" style="margin:0 5px;"></div>
                                         <!-- EDITABLE HASH -->
                                         <div id="editable_hash_container">
-                                            <div class="dialogContentMainTitle">Link</div>
-                                            <div id="editable_hash_link" style="margin:10px;font-size:13px;"><input type="text" name="minisite_hash_update" value="" style="width: 90px;padding: 0 2px;margin: 0 1px;"></div>
+                                            <div class="dialogContentMainTitle" data-toggleBlock="editable_hash_parameters" ajxp_message_id="share_center.171">AJXP_MESSAGE[share_center.171]</div>
+                                            <div id="editable_hash_parameters">
+                                                <div class="dialogContentLegend" ajxp_message_id="share_center.173">AJXP_MESSAGE[share_center.173]</div>
+                                                <div id="editable_hash_link"><input type="text" name="custom_handle" value="" style="width: 90px;padding: 0 2px;margin: 0 1px;"></div>
+                                            </div>
                                         </div>
                                         <!-- SECURITY -->
-                                        <div class="dialogContentMainTitle">AJXP_MESSAGE[share_center.147]</div>
-                                        <div class="SF_element">
+                                        <div class="dialogContentMainTitle" data-toggleBlock="security_parameters">AJXP_MESSAGE[share_center.147]</div>
+                                        <div class="SF_element" id="security_parameters">
                                             <div class="SF_label" ajxp_message_id="share_center.23" style="width:130px;" title="AJXP_MESSAGE[share_center.23]">AJXP_MESSAGE[share_center.23]</div>
-                                            <input type="text" name="guest_user_pass" value="" placeholder="AJXP_MESSAGE[share_center.148]" autocomplete="off" class="SF_input" style="width:40% !important;">
+                                            <input type="text" name="guest_user_pass" value="" placeholder="AJXP_MESSAGE[share_center.148]" autocomplete="off" class="SF_input" style="width:40% !important;"> <span style="display:none;" id="remove_user_pass">AJXP_MESSAGE[share_center.174]</span>
                                             <div class="SF_horizontal_labelRow">
                                                 <div class="SF_label" ajxp_message_id="share_center.21" style="width:40% !important;" title="AJXP_MESSAGE[share_center.21]">AJXP_MESSAGE[share_center.21]</div>
                                                 <div class="SF_label" ajxp_message_id="share_center.22" style="width:40% !important;" title="AJXP_MESSAGE[share_center.22]">AJXP_MESSAGE[share_center.22]</div>
@@ -151,8 +158,8 @@
                                             </div>
                                         </div>
                                         <!-- LAYOUT -->
-                                        <div class="dialogContentMainTitle no_share_leaf">AJXP_MESSAGE[share_center.151]</div>
-                                        <div class="no_share_leaf" style="padding-top:8px;">
+                                        <div class="dialogContentMainTitle no_share_leaf" data-toggleBlock="layout_parameters">AJXP_MESSAGE[share_center.151]</div>
+                                        <div id="layout_parameters"  class="no_share_leaf" style="padding-top:8px;">
                                             <div class="layout_template_container SF_element"></div>
                                         </div>
                                         <br style="clear: left;"/>
@@ -164,17 +171,19 @@
                                 </div>
                             </div>
                             <div id="target_user" style="margin:0 12px;position:relative;display:none;" class="mode-ws mode-minipriv">
-                                <div class="dialogContentMainTitle mode-ws" ajxp_message_id="share_center.30" style="display:none;">AJXP_MESSAGE[share_center.30]</div>
+                                <div class="dialogContentMainTitle mode-ws" ajxp_message_id="share_center.30" style="display:none;" data-toggleBlock="ws_shared_users_parameters">AJXP_MESSAGE[share_center.30]</div>
                                 <div style="clear: both; margin-top:20px;" class="mode-minipriv">&nbsp;</div>
-                                <div class="editable_users_header">
-                                    <span id="header_read" ajxp_message_id="share_center.31">AJXP_MESSAGE[share_center.31]</span>
-                                    <span id="header_write" ajxp_message_id="share_center.32">AJXP_MESSAGE[share_center.32]</span>
-                                    <span id="header_watch" ajxp_message_id="share_center.33">AJXP_MESSAGE[share_center.33]</span>
+                                <div id="ws_shared_users_parameters" class="share_dialog_toggled_open">
+                                    <div class="editable_users_header">
+                                        <span id="header_read" ajxp_message_id="share_center.31">AJXP_MESSAGE[share_center.31]</span>
+                                        <span id="header_write" ajxp_message_id="share_center.32">AJXP_MESSAGE[share_center.32]</span>
+                                        <span id="header_watch" ajxp_message_id="share_center.33">AJXP_MESSAGE[share_center.33]</span>
+                                    </div>
+                                    <input type="text" class="dialogFocus" value="" style="width:98%;" placeholder="AJXP_MESSAGE[share_center.34]" id="shared_user"/>
+                                    <div id="complete_indicator" style="position:absolute;top:25px;right:4px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
+                                    <div id="shared_users_autocomplete_choices" class="autocomplete" style="margin-top:0px !important;z-index:20000 !important;"></div>
+                                    <div class="editable_users_list grey_gradient_light_inputs" id="shared_users_summary" style="margin-bottom:7px;"></div>
                                 </div>
-                                <input type="text" class="dialogFocus" value="" style="width:98%;" placeholder="AJXP_MESSAGE[share_center.34]" id="shared_user"/>
-                                <div id="complete_indicator" style="position:absolute;top:25px;right:4px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
-                                <div id="shared_users_autocomplete_choices" class="autocomplete" style="margin-top:0px !important;z-index:20000 !important;"></div>
-                                <div class="editable_users_list grey_gradient_light_inputs" id="shared_users_summary" style="margin-bottom:7px;"></div>
                             </div>
                             <div id="share_generate" class="mode-minipub mode-minipriv" style="display:none;">
                                 <div align="center" style="margin: 15px 0 0;text-align:center;">
@@ -244,6 +253,7 @@
                         <input_param description="For a public link, set a maximum number of downloads authorized" name="downloadlimit" type="integer"/>
                         <input_param description="For a public link, set a maximum number of authorized days" name="expiration" type="integer"/>
                         <input_param description="For a public link, set a password" name="password" type="string"/>
+                        <input_param description="For a minisite on file or folder, force a custom link handle" name="custom_handle" type="string"/>
                         <input_param description="Additional plugins data that can be stored in the shared resource" name="PLUGINS_DATA" type="FORM_DATA"/>
                     </serverCallback>
                     </processing>
@@ -425,7 +435,7 @@
                     <clientCallback dialogOpenForm="share_current_url" dialogSkipButtons="true" prepareModal="true">
                         <dialogOnOpen><![CDATA[
                             modal.getForm().down("#crt-page-url").setValue(document.location.href);
-                            if(!ajaxplorer.getContextHolder().isEmpty() && ajaxplorer.getActionBar().getActionByName("download")){
+                            if(ajxpBootstrap.parameters.get('PRESET_LOGIN') === 'ajxp_preloged_user' && !ajaxplorer.getContextHolder().isEmpty() && ajaxplorer.getActionBar().getActionByName("download")){
                                 var tpl = new Template('<div style="font-size: 16px; padding-top:15px; text-align:left;">#{title} <a href="#{link}" target="_blank" class="icon-link" style="font-size: 0.8em;"></a></div><input type="text" value="#{link}" style="width: 98%;">');
                                 var node = ajaxplorer.getContextHolder().getUniqueNode();
                                 var editors = ajaxplorer.findEditorsForMime(node.getAjxpMime(), true);
@@ -439,7 +449,7 @@
                                     }
                                 }
                                 var dlLink = document.location.href.split('?').shift() + "?dl=true&file=" + encodeURIComponent(node.getPath());
-                                modal.getForm().down("#additional_links").insert(tpl.evaluate({title:"Direct Download",link:dlLink}));
+                                modal.getForm().down("#additional_links").insert(tpl.evaluate({title:MessageHash['share_center.60'],link:dlLink}));
                             }
                         ]]></dialogOnOpen>
                         <dialogOnComplete><![CDATA[

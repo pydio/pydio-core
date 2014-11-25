@@ -1,3 +1,24 @@
+/*
+ * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
+ *
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <http://pyd.io/>.
+ */
+
+
 $$OO_ObjectsRegistry = {classes: new Hash(), interfaces : new Hash()};
 
 Class.create = function () {
@@ -23,7 +44,7 @@ Class.create = function () {
 		toImplement = toImplement.concat(parent.__implements);
 	}	
 	
-	function klass() {
+	function Klass() {
 		this.__className = $$className;
 		this.initialize.apply(this, arguments);
 		if(toImplement.length){
@@ -31,32 +52,33 @@ Class.create = function () {
 		}
 	}
 
-	Object.extend(klass, Class.Methods);
-	Object.Event.extend(klass);
-	klass.superclass = parent;
-	klass.subclasses = [];
+	Object.extend(Klass, Class.Methods);
+	Object.Event.extend(Klass);
+	Klass.superclass = parent;
+	Klass.subclasses = [];
 
 	if (parent) {
 		var subclass = function() {};
 		subclass.prototype = parent.prototype;
-		klass.prototype = new subclass;
-		parent.subclasses.push(klass);
+		Klass.prototype = new subclass;
+		parent.subclasses.push(Klass);
 	}
-	for (var i = 0; i < properties.length; i++)
-	klass.addMethods(properties[i]);
+	for (i = 0; i < properties.length; i++)
+	Klass.addMethods(properties[i]);
 
 	if(toImplement.length){
-		klass.__implements = toImplement;
+		Klass.__implements = toImplement;
 		for(var j=0;j<toImplement.length;j++){
 			var interf = $$OO_ObjectsRegistry.interfaces.get(toImplement[j]);
+            var message;
 			if(!interf){
-				var message = "Reference to an unknown interface '" + toImplement[j] + "' in class '" + $$className + "'";
+				message = "Reference to an unknown interface '" + toImplement[j] + "' in class '" + $$className + "'";
 				alert(message);
 				throw new Error(message);
 			}
 			for(var methodKey in interf.prototype){
-				if(!klass.prototype[methodKey]){
-					var message = "Warning, the class '"+$$className+"' must implement all method of interface '" + toImplement[j] + "'. The method '"+methodKey+"' is missing!";
+				if(!Klass.prototype[methodKey]){
+					message = "Warning, the class '"+$$className+"' must implement all method of interface '" + toImplement[j] + "'. The method '"+methodKey+"' is missing!";
 					alert(message);
 					throw new Error(message);
 				}
@@ -64,15 +86,15 @@ Class.create = function () {
 		}
 	}
 
-	if (!klass.prototype.initialize)
-	klass.prototype.initialize = Prototype.emptyFunction;
+	if (!Klass.prototype.initialize)
+	Klass.prototype.initialize = Prototype.emptyFunction;
 
-	klass.prototype.constructor = klass;
+	Klass.prototype.constructor = Klass;
 	if($$className){
-		$$OO_ObjectsRegistry.classes.set($$className, klass);
-		window[$$className] = klass;
+		$$OO_ObjectsRegistry.classes.set($$className, Klass);
+		window[$$className] = Klass;
 	}
-	return klass;
+	return Klass;
 };
 
 
@@ -83,17 +105,17 @@ Class.getByInterface = function(interfaceName){
 	var found = [];
 	var obj = $$OO_ObjectsRegistry.classes.toObject();
 	for(var key in obj){
-		if(obj[key].__implements && $A(obj[key].__implements).find(function(value){return (value == interfaceName);})){
+		if(obj.hasOwnProperty(key) && obj[key].__implements && $A(obj[key].__implements).find(function(value){return (value == interfaceName);})){
 			found.push(key);
 		}
 	}	
 	return found;
 };
 Class.objectImplements = function(objectOrClass, interfaceName){
-	if(objectOrClass.__implements && $A(objectOrClass.__implements).find(function(value){return (value == interfaceName);})){
-		return true;
-	}
-	return false;
+	return objectOrClass.__implements && $A(objectOrClass.__implements).find(function (value) {
+        return (value == interfaceName);
+    });
+
 };
 
 var Interface = (function() {
@@ -114,28 +136,28 @@ var Interface = (function() {
 			throw new Error("You must set an interface name!");
 		}
 		
-		function interfaK() {
+		function InterfaK() {
 			throw new Error("Cannot instantiate an interface ("+$$className+")!");
 		}
 
-		Object.extend(interfaK, Class.Methods);
-		interfaK.superclass = parent;
-		interfaK.subclasses = [];
+		Object.extend(InterfaK, Class.Methods);
+		InterfaK.superclass = parent;
+		InterfaK.subclasses = [];
 
 		if (parent) {
 			var subclass = function() {};
 			subclass.prototype = parent.prototype;
-			interfaK.prototype = new subclass;
-			parent.subclasses.push(interfaK);
+			InterfaK.prototype = new subclass;
+			parent.subclasses.push(InterfaK);
 		}
-		for (var i = 0; i < properties.length; i++)
-		interfaK.addMethods(properties[i]);
+		for (i = 0; i < properties.length; i++)
+		InterfaK.addMethods(properties[i]);
 
 
-		interfaK.prototype.constructor = interfaK;
-		$$OO_ObjectsRegistry.interfaces.set($$className, interfaK);
-		window[$$className] = interfaK;
-		return interfaK;
+		InterfaK.prototype.constructor = InterfaK;
+		$$OO_ObjectsRegistry.interfaces.set($$className, InterfaK);
+		window[$$className] = InterfaK;
+		return InterfaK;
 	}
 
 

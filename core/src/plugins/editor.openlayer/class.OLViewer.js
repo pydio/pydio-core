@@ -1,4 +1,4 @@
-0/*
+/*
  * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
@@ -28,15 +28,14 @@ Class.create("OLViewer", AbstractEditor, {
 	
 	open : function($super, node){
 		$super(node);
-		var ajxpNode = node;
-		this.updateTitle(getBaseName(ajxpNode.getPath()));
+        this.updateTitle(getBaseName(node.getPath()));
 		this.mapDiv = new Element('div', {id:'openlayer_map', style:'width:100%'});
 		this.contentMainContainer = this.mapDiv;
-		this.initFilterBar((ajxpNode.getAjxpMime()=='wms_layer'?true:false));
+		this.initFilterBar((node.getAjxpMime() == 'wms_layer'));
 		this.element.insert(this.mapDiv);
 		fitHeightToBottom($(this.mapDiv), $(modal.elementName));
         
-		var result = this.createOLMap(ajxpNode, 'openlayer_map', false, true);
+		var result = this.createOLMap(node, 'openlayer_map', false, true);
 		this.olMap = result.MAP;
 		this.layers = result.LAYERS;
 		this.refreshLayersSwitcher();
@@ -71,7 +70,7 @@ Class.create("OLViewer", AbstractEditor, {
 		}.bind(this));
 		bar.down('select#layerSelector').observe('change', function(e){
 			var selected = e.findElement().getValue();
-			var baseLayer;
+			var baseLayer='';
 			this.layers.each(function(layer){
 				if(layer.name == selected){
 					baseLayer = layer;
@@ -218,7 +217,7 @@ Class.create("OLViewer", AbstractEditor, {
 		}
 		
 		
-        var options = {projection:meta_srs}
+        var options = {projection:meta_srs};
         if(meta_bound){
         	options.maxExtent = meta_bound;
         	options.maxResolution =  1245.650390625;
@@ -231,7 +230,7 @@ Class.create("OLViewer", AbstractEditor, {
         layersDefinitions.each(function(definition){
         	var layer;
         	if(definition.type == 'WMS'){
-        		var layerOpt, title;
+        		var title;
         		var layerDef = {
         			layers : definition.name,
         			styles : definition.style
@@ -246,7 +245,7 @@ Class.create("OLViewer", AbstractEditor, {
         			title = "Single Tile";
         			options = {singleTile:true, ratio:1};
         		}
-        		layer = new OpenLayers.Layer.WMS(title, layerUrl, layerDef, layerOpt);
+        		layer = new OpenLayers.Layer.WMS(title, layerUrl, layerDef, null);
         	}else if(definition.type == 'OSM'){
 	        	layer = new OpenLayers.Layer.OSM();
         	}else if(definition.type == 'Google'){
@@ -308,15 +307,13 @@ Class.create("OLViewer", AbstractEditor, {
 	getPreview : function(ajxpNode, rich){		
 		if(rich){
 			
-			var metadata = ajxpNode.getMetadata();			
 			var div = new Element('div', {id:"ol_map", style:"width:100%;height:200px;"});
 			div.resizePreviewElement = function(dimensionObject){
-				// do nothing;
 				div.setStyle({height:'200px'});
 				if(div.initialized) return;				
 				OLViewer.prototype.createOLMap(ajxpNode, 'ol_map', true);
 				div.initialized = true;
-			}
+			};
 			return div;
 		}else{
 			return new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64)});
