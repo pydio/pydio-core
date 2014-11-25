@@ -77,8 +77,8 @@
             </action>
     	</actions>
         <extensions>
-            <extension icon="openbrowser_images/earth.png" messageId="openbrowser.7" mime="url"/>
-            <extension icon="openbrowser_images/earth.png" messageId="openbrowser.7" mime="website"/>
+            <extension icon="openbrowser_images/mimes/ICON_SIZE/earth.png" messageId="openbrowser.7" mime="url"/>
+            <extension icon="openbrowser_images/mimes/ICON_SIZE/earth.png" messageId="openbrowser.7" mime="website"/>
         </extensions>
     </registry_contributions>
 </editor>
