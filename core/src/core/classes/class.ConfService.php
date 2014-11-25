@@ -215,6 +215,11 @@ class ConfService
         return AJXP_PluginsService::getInstance()->getPluginById("core.auth")->getAuthImpl();
     }
 
+    /**
+     * @param AbstractAjxpUser $loggedUser
+     * @param String|int $parameterId
+     * @return bool
+     */
     public static function switchUserToActiveRepository($loggedUser, $parameterId = -1)
     {
         if (isSet($_SESSION["PENDING_REPOSITORY_ID"]) && isSet($_SESSION["PENDING_FOLDER"])) {

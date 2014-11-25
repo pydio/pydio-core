@@ -370,15 +370,13 @@ class AuthService
         if ($authDriver->isAjxpAdmin($user_id)) {
             $user->setAdmin(true);
         }
-        if ($user->isAdmin()) {
-            $user = self::updateAdminRights($user);
-        } else {
-            if (!$user->hasParent() && $user_id != "guest") {
-                //$user->setAcl("ajxp_shared", "rw");
-            }
-        }
         if(self::$useSession) $_SESSION["AJXP_USER"] = $user;
         else self::$currentUser = $user;
+
+        if ($user->isAdmin()) {
+            $user = self::updateAdminRights($user);
+            self::updateUser($user);
+        }
 
         if ($authDriver->autoCreateUser() && !$user->storageExists()) {
             $user->save("superuser"); // make sure update rights now

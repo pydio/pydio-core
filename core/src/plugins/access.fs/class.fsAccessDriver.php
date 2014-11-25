@@ -54,7 +54,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             ConfService::setConf("PROBE_REAL_SIZE", $this->getFilteredOption("PROBE_REAL_SIZE", $this->repository->getId()));
         }
         $create = $this->repository->getOption("CREATE");
-        $path = $this->repository->getOption("PATH");
+        $path = SystemTextEncoding::toStorageEncoding($this->repository->getOption("PATH"));
         $recycle = $this->repository->getOption("RECYCLE_BIN");
         $chmod = $this->repository->getOption("CHMOD_VALUE");
         $wrapperData = $this->detectStreamWrapper(true);
@@ -2022,7 +2022,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
     public function makeSharedRepositoryOptions($httpVars, $repository)
     {
         $newOptions = array(
-            "PATH" => $repository->getOption("PATH").AJXP_Utils::decodeSecureMagic($httpVars["file"]),
+            "PATH" => SystemTextEncoding::toStorageEncoding($repository->getOption("PATH")).AJXP_Utils::decodeSecureMagic($httpVars["file"]),
             "CREATE" => isSet($httpVars["inherit_recycle"])? $repository->getOption("CREATE") : false,
             "RECYCLE_BIN" => isSet($httpVars["inherit_recycle"])? $repository->getOption("RECYCLE_BIN") : "",
             "DEFAULT_RIGHTS" => "");

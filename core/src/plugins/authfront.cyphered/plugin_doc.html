@@ -1,0 +1,47 @@
+This is plugin aims at passing credentials directly through a POST to Pydio.<br>
+User ID and PWD are expected to be passed in an encrypted token using the standard Open SSL functions (openssl extension must be enabled).
+A simple incremental "nonce" is used to make sure the token can never be replayed.<bR>
+<br>
+Here is the sample PHP code to use to cypher the password:
+<pre>
+    /**
+     * crypt AES 256
+     *
+     * @param string $password
+     * @param string $data
+     * @return string Base64 encoded encrypted data.
+     */
+    function PYDIO_crypt($password, $data) {
+        // Set a random salt
+        $salt = openssl_random_pseudo_bytes(8);
+
+        $salted = '';
+        $dx = '';
+        // Salt the key(32) and iv(16) = 48
+        while (strlen($salted) < 48) {
+            $dx = md5($dx.$password.$salt, true);
+            $salted .= $dx;
+        }
+
+        $key = substr($salted, 0, 32);
+        $iv  = substr($salted, 32,16);
+
+        $encrypted_data = openssl_encrypt($data, 'aes-256-cbc', $key, true, $iv);
+        return base64_encode('Salted__' . $salt . $encrypted_data);
+    }
+
+
+    $testUser = "USER_ID";
+    $testPwd = "USER_PASSWORD";
+    $privateKey = "YOUR_PRIVATE_KEY_AS_CONFIGURED_IN_PLUGIN";
+    // IF REPLAY CHECK OPTION IS ENABLED
+    $tokenInc = 1; // IMPORTANT: INCREMENT THIS AT EACH CALL
+
+    $serial = serialize(array("user_id" => $testUser, "user_pwd" => $testPwd));
+    $token = urlencode(PYDIO_crypt(isSet($tokenInc)?$privateKey.":".$tokenInc:$privateKey, $serial));
+
+    // BUILD AN URL WITH HIDDEN POSTS, OR GET:
+    // SKIP cyphered_token_inc if REPLAY_CHECK is not enabled.
+    $URL = "https://yourserver/path/?cyphered_token=$token&cyphered_token_inc=$tokenInc";
+
+</pre>
