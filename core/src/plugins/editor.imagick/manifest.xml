@@ -23,17 +23,25 @@
 		<actions>
 			<action name="imagick_data_proxy" contentTypedProvider="true">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction" restParams="/file+" developerComment="Serve JPG previews for a PDF or imagick-compatible file.">
+                        <input_param name="file" type="AJXP_NODE" description="Path to the file"/>
+                        <input_param name="all" type="boolean" description="Whether to pre-extract all pages or pass them one by one"/>
+                        <output type="json|jpg" description="Depending on the mode, will return either directly an image (thumbnail), or a json structure containing links to all pages."/>
+					</serverCallback>
 				</processing>
 			</action>
 			<action name="delete_imagick_data">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 			<action name="get_extracted_page">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction" restParams="/file/src_file+" developerComment="Server a prefetched thumbnail for a PDF or imagick compatible file. See imagick_data_proxy.">
+                        <input_param name="file" type="string"
+                                     description="Name of the page thumbnail, as returned by imagick_data_proxy request"/>
+                        <input_param name="src_file" type="AJXP_NODE" description="Path to the original file, if the given page was not yet generated"/>
+					</serverCallback>
 				</processing>
 			</action>
 		</actions>

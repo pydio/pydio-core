@@ -21,12 +21,14 @@
 		<actions>
 			<action name="read_video_data" contentTypedProvider="true">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction" restParams="/file+" developerComment="Server a video file as a stream">
+                        <input_param name="file" type="AJXP_NODE" description="Path to the file inside the workspace" mandatory="true"/>
+					</serverCallback>
 				</processing>
 			</action>
 			<action name="get_sess_id">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 		</actions>
