@@ -697,7 +697,7 @@ class ConfService
      * Add dynamically created repository
      *
      * @param Repository $oRepository
-     * @return void|-1 if error
+     * @return -1|null if error
      */
     public static function addRepository($oRepository)
     {
@@ -705,7 +705,7 @@ class ConfService
     }
     /**
      * @param $oRepository
-     * @return void|-1 on error
+     * @return -1|null on error
      */
     public function addRepositoryInst($oRepository)
     {
@@ -716,8 +716,13 @@ class ConfService
         }
         AJXP_Logger::info(__CLASS__,"Create Repository", array("repo_name"=>$oRepository->getDisplay()));
         $this->invalidateLoadedRepositories();
+        return null;
     }
 
+    /**
+     * @param $idOrAlias
+     * @return null|Repository
+     */
     public static function findRepositoryByIdOrAlias($idOrAlias)
     {
         $repository = ConfService::getRepositoryById($idOrAlias);

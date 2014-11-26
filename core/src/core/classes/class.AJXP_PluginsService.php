@@ -349,7 +349,7 @@ class AJXP_PluginsService
     /**
      * All the plugins of a given type
      * @param string $type
-     * @return array
+     * @return AJXP_Plugin[]
      */
     public function getPluginsByType($type)
     {

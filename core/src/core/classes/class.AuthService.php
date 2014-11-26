@@ -607,6 +607,7 @@ class AuthService
             $adminUser->save("superuser");
         }else if($adminUser->personalRole->getAcl('ajxp_conf') != "rw"){
             $adminUser->personalRole->setAcl('ajxp_conf', 'rw');
+            $adminUser->recomputeMergedRole();
             $adminUser->save("superuser");
         }
         return $adminUser;

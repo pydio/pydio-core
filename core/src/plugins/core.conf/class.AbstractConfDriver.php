@@ -239,7 +239,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
     /**
      * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
      * @param AbstractAjxpUser $user
-     * @return Array
+     * @return Repository[]
      */
     abstract public function listRepositories($user = null);
 
@@ -253,7 +253,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      *      - ORDERBY = array("KEY"=>"", "DIR"=>""), GROUPBY, CURSOR = array("OFFSET" => 0, "LIMIT", 30)
      *      - COUNT_ONLY
      *
-     * @return Array
+     * @return Repository[]
      */
     abstract public function listRepositoriesWithCriteria($criteria);
 
@@ -422,7 +422,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
     /**
      * @abstract
      * @param string $repositoryId
-     * @return array()
+     * @return AbstractAjxpUser[]
      */
     abstract public function getUsersForRepository($repositoryId);
 
@@ -431,7 +431,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      * @param string $repositoryId
      * @param string $rolePrefix
      * @param bool $countOnly
-     * @return array()
+     * @return AJXP_Role[]
      */
     abstract public function getRolesForRepository($repositoryId, $rolePrefix = '', $countOnly = false);
     /**
@@ -1266,6 +1266,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
      * @param $rolePrefix get all roles with prefix
      * @param $includeString get roles in this string
      * @param $excludeString eliminate roles in this string
+     * @param bool $byUserRoles
      * @return array
      */
     public function getUserRoleList($userObject, $rolePrefix, $includeString, $excludeString, $byUserRoles = false)
