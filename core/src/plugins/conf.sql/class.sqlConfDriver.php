@@ -701,7 +701,7 @@ class sqlConfDriver extends AbstractConfDriver
                     dibi::query("UPDATE [ajxp_roles] SET [serial_role]=%b,[searchable_repositories]=%s WHERE [role_id] like %s", serialize($role), serialize($role->listAcls()), $role->getId());
                     break;
                 case "mysql":
-                    dibi::query("UPDATE [ajxp_roles] SET [serial_role]=%s WHERE [role_id] like %s", serialize($role), $role->getId());
+                    dibi::query("UPDATE  [ajxp_roles] SET [serial_role]=%s WHERE [role_id] LIKE %s", serialize($role), $role->getId());
                     break;
                 default:
                     return "ERROR!, DB driver " . $this->sqlDriver["driver"] ." not supported yet in __FUNCTION__";
