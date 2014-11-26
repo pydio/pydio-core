@@ -10,7 +10,12 @@
            <actions>
                <action name="changes">
                    <processing>
-                       <serverCallback methodName="switchActions" restParams="/seq_id"/>
+                       <serverCallback methodName="switchActions" restParams="/seq_id" developerComment="List all changes on this workspace starting at a given sequence id">
+                           <input_param name="filter" type="path" description="Path to a directory: will return changes as if this dir was the root"/>
+                           <input_param name="flatten" type="boolen" description="Flatten results or not, i.e. send the full sequence of changes, or try to reduce the ones that cancel the others (like move a to b plus move b to c = move a to c)."/>
+                           <input_param name="stream" type="boolean" description="Return json as a stream or as a whole"/>
+                           <output type="JSON" description="Json OR Streamable JSON : json structures that are line separated, giving the ability to parse the answer as a stream by http clients."/>
+                       </serverCallback>
                    </processing>
                </action>
            </actions>

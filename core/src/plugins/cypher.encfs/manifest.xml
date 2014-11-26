@@ -65,7 +65,6 @@
                          </div>
                          </div>
                      ]]></clientForm>
-                    <serverCallback methodName="switchAction"/>
                 </processing>
             </action>
             <action name="encfs.cypher_folder">
@@ -86,7 +85,10 @@
                          conn.sendAsync();
                          hideLightBox();
                         ]]></clientCallback>
-                    <serverCallback methodName="switchAction"/>
+                    <serverCallback methodName="switchAction" restParams="/dir+" developerComment="Cypher a folder using EncFS plugin">
+                        <input_param name="dir" type="path" description="Path to the directory to encrypt"/>
+                        <input_param name="pass" type="string" description="Password for first encryption. Next calls, pass is not necessary, folder will just be unmounted."/>
+                    </serverCallback>
                 </processing>
             </action>
             <action name="encfs.uncypher_folder">
@@ -120,7 +122,10 @@
                          </div>
                          </div>
                      ]]></clientForm>
-                    <serverCallback methodName="switchAction"/>
+                    <serverCallback methodName="switchAction" restParams="/dir+" developerComment="Decrypt a folder using EncFS plugin.">
+                        <input_param name="dir" type="path" description="Path to the directory to encrypt" mandatory="true"/>
+                        <input_param name="pass" type="string" description="Password used at encrytion time" mandatory="true"/>
+                    </serverCallback>
                 </processing>
             </action>
             <action name="move">

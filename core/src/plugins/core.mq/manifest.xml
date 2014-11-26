@@ -27,6 +27,7 @@
     <registry_contributions>
         <actions>
             <action name="consume_notification_queue">
+                <rightsContext adminOnly="false" noUser="true" read="false" userLogged="true" write="false"/>
                 <processing>
                     <serverCallback methodName="consumeQueue"/>
                 </processing>
@@ -42,17 +43,29 @@
                             }, true);
                         }
                     ]]></clientListener>
-                    <serverCallback methodName="clientChannelMethod"/>
+                    <serverCallback methodName="clientChannelMethod" restParams="/channel/client_id" developerComment="Subscribe to given queue of events.">
+                        <input_param name="channel" type="string" description="Channel to connect to"/>
+                        <input_param name="client_id" type="string"
+                                     description="A unique identifier for the client connecting"/>
+                    </serverCallback>
                 </processing>
             </action>
             <action name="client_unregister_channel">
                 <processing>
-                    <serverCallback methodName="clientChannelMethod"/>
+                    <serverCallback methodName="clientChannelMethod" restParams="/channel/client_id" developerComment="Subscribe to given queue of events.">
+                        <input_param name="channel" type="string" description="Channel to connect to"/>
+                        <input_param name="client_id" type="string"
+                                     description="A unique identifier for the client connecting"/>
+                    </serverCallback>
                 </processing>
             </action>
             <action name="client_consume_channel">
                 <processing>
-                    <serverCallback methodName="clientChannelMethod"/>
+                    <serverCallback methodName="clientChannelMethod" restParams="/channel/client_id" developerComment="Subscribe to given queue of events.">
+                        <input_param name="channel" type="string" description="Channel to connect to"/>
+                        <input_param name="client_id" type="string"
+                                     description="A unique identifier for the client connecting"/>
+                    </serverCallback>
                 </processing>
             </action>
             <action name="ws_authenticate" skipSecureToken="true">

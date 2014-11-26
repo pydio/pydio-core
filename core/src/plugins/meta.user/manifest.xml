@@ -18,8 +18,8 @@
 	</server_settings>
 	<registry_contributions>
 		<hooks>
-			<serverCallback hookName="node.info" methodName="extractMeta" applyCondition="$apply=($args[2]!='minimal');"></serverCallback>
-			<serverCallback hookName="node.change" methodName="updateMetaLocation" defer="true"></serverCallback>
+			<serverCallback hookName="node.info" methodName="extractMeta" applyCondition="$apply=($args[2]!='minimal');"/>
+			<serverCallback hookName="node.change" methodName="updateMetaLocation" defer="true"/>
 		</hooks>
 		<client_configs>
 			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>
@@ -41,9 +41,9 @@
 						actionBar="true" contextMenu="true" infoPanel="false"
 						actionBarGroup="more" inZip="false">
 					</context>
-					<selectionContext dir="true" file="file" recycle="false" unique="true"></selectionContext>
+					<selectionContext dir="true" file="file" recycle="false" unique="true"/>
 					</gui>
-				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 				<processing>
 					<clientCallback prepareModal="true"><![CDATA[
 						var userSelection = ajaxplorer.getUserSelection();
@@ -83,7 +83,11 @@
 					<clientForm id="user_meta_form"><![CDATA[
 					<div id="user_meta_form" action="edit_user_meta" box_width="320"></div>
 					]]></clientForm>
-					<serverCallback methodName="editMeta"></serverCallback>
+					<serverCallback methodName="editMeta" restParams="/file+" developerComment="Edit user-defined metadata on a node">
+                        <input_param name="file" type="path" description="Path to the node to edit"/>
+                        <input_param name="ANY" type="ANY"
+                                     description="User-defined metadata key(s) and their corresponding values"/>
+					</serverCallback>
 					</processing>
 			</action>
 		</actions>
