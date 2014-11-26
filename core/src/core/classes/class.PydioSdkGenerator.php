@@ -1,14 +1,28 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: charles
- * Date: 21/11/2013
- * Time: 19:54
+/*
+ * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
+ *
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <https://pyd.io/>.
+ *
+ * Generate a Swagger file for Rest APIs documentation
  */
-
 class PydioSdkGenerator
 {
-    public static function analyzeRegistry()
+    public static function analyzeRegistry($versionString)
     {
         if(!AJXP_SERVER_DEBUG) return;
 
@@ -90,16 +104,18 @@ class PydioSdkGenerator
 
 
         $apidocs = array(
-            "apiVersion" => AJXP_VERSION,
+            "apiVersion" => $versionString,
             "swaggerVersion" => "1.2",
             "apis" => array()
         );
         foreach($swaggerAPIs as $pluginName => $apis){
 
+            var_dump("Writing file for $pluginName");
+
             $swaggerJson = array(
-                "apiVersion" => 1.0,
+                "apiVersion" => $versionString,
                 "swaggerVersion" => 1.2,
-                "basePath" => "http://localhost/api",
+                "basePath" => "https://pyd.io/resources/serverapi/$versionString/api",
                 "resourcePath" => "/api",
                 "produces" => array("application/xml"),
                 "apis" => $apis
@@ -107,7 +123,7 @@ class PydioSdkGenerator
             file_put_contents($swaggerJsonDir."/".$pluginName, json_encode($swaggerJson, JSON_PRETTY_PRINT));
             $p = $pServ->findPluginById($pluginName);
             $apidocs["apis"][] = array(
-                "path" => "http://localhost/core/doc/api/".$pluginName,
+                "path" => "https://pyd.io/resources/serverapi/$versionString/api/".$pluginName,
                 "description" => substr($p->getManifestDescription(), 0, 40)."..."
             );
 

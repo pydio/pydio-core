@@ -76,7 +76,9 @@
         </action>
         <action name="generate_api_docs">
             <processing>
-                <serverCallback methodName="switchAction" restParams="/" developerComment="Generate API docs"/>
+                <serverCallback methodName="switchAction" restParams="/version" developerComment="Generate API docs">
+                    <input_param name="version" type="string" description="A two-digits version string, like 5.4, 6.2"/>
+                </serverCallback>
             </processing>
         </action>
 		<action name="get_plugin_manifest">

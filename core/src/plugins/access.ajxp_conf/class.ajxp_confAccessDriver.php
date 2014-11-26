@@ -1669,7 +1669,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             case "generate_api_docs":
 
-                PydioSdkGenerator::analyzeRegistry();
+                PydioSdkGenerator::analyzeRegistry(isSet($httpVars["version"])?$httpVars["version"]:AJXP_VERSION);
 
             break;
 
