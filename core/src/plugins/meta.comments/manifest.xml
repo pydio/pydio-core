@@ -14,7 +14,7 @@
     </server_settings>
 	<registry_contributions>
 		<hooks>
-			<serverCallback hookName="node.info" methodName="mergeMeta" applyCondition="$apply=($args[2]!='minimal');"></serverCallback>
+			<serverCallback hookName="node.info" methodName="mergeMeta" applyCondition="$apply=($args[2]!='minimal');"/>
             <serverCallback hookName="node.change" methodName="moveMeta" defer="true"/>
 		</hooks>
 		<client_configs>
@@ -36,17 +36,30 @@
 		<actions>
 			<action name="load_comments_feed">
 				<processing>
-					<serverCallback methodName="switchActions"/>
+					<serverCallback methodName="switchActions" restParams="/file+" developerComment="Load the comments on this file or below">
+                        <input_param name="file" type="path" description="Path to file or folder"/>
+                        <input_param name="sort_by" type="string" description="Sort field" default="date"/>
+                        <input_param name="sort_dir" type="string" description="Sort direction" default="asc"/>
+                        <input_param name="offset" type="integer" description="Start at given index" default="0"/>
+                        <input_param name="limit" type="integer" description="Limit result to a number of results"/>
+                        <output type="json" description="Return comments as a JSON array"/>
+					</serverCallback>
 				</processing>
 			</action>
 			<action name="post_comment">
 				<processing>
-					<serverCallback methodName="switchActions"/>
+					<serverCallback methodName="switchActions" restParams="/file+" developerComment="Post a comment linked to a given file">
+                        <input_param name="file" type="path" description="Path to file or folder"/>
+                        <input_param name="content" type="string" description="Content of the comment"/>
+					</serverCallback>
 				</processing>
 			</action>
 			<action name="delete_comment">
 				<processing>
-					<serverCallback methodName="switchActions"/>
+					<serverCallback methodName="switchActions" restParams="/" developerComment="Delete a comment by reposting its json representation">
+                        <input_param name="comment_data" type="JSON"
+                                     description="An array containing date, author and content, as returned by load_comments_feed"/>
+					</serverCallback>
 				</processing>
 			</action>
 		</actions>

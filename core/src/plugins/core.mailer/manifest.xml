@@ -25,7 +25,13 @@
                     <clientListener name="contextChange"><![CDATA[
                         if(!window.AjxpMailer && ajaxplorer.user) ResourcesManager.prototype.loadJSResource('plugins/core.mailer/class.AjxpMailer.js', 'AjxpMailer');
                     ]]></clientListener>
-                    <serverCallback methodName="sendMailAction"/>
+                    <serverCallback methodName="sendMailAction" restParams="/" developerComment="Trigger an email to a user or external email, sent by currently logged user">
+                        <input_param name="from" type="string" description="From email"/>
+                        <input_param name="emails" type="string" description="A list of emails or user names"/>
+                        <input_param name="subject" type="string" description="Subject of the message"/>
+                        <input_param name="message" type="string" description="Body of the message"/>
+                        <input_param name="link" type="string" description="URL of an image to be used in the message body."/>
+                    </serverCallback>
                 </processing>
             </action>
         </actions>

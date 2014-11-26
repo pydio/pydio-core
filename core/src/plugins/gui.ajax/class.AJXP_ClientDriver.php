@@ -115,7 +115,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
             case "display_doc":
 
                 HTMLWriter::charsetHeader();
-                echo HTMLWriter::getDocFile(AJXP_Utils::securePath(htmlentities($_GET["doc_file"])));
+                echo HTMLWriter::getDocFile(AJXP_Utils::securePath(htmlentities($httpVars["doc_file"])));
 
             break;
 
@@ -132,7 +132,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
                     $outputArray = array();
                     $testedParams = array();
                     $passed = AJXP_Utils::runTests($outputArray, $testedParams);
-                    if (!$passed && !isset($_GET["ignore_tests"])) {
+                    if (!$passed && !isset($httpVars["ignore_tests"])) {
                         AJXP_Utils::testResultsToTable($outputArray, $testedParams);
                         die();
                     } else {

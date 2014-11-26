@@ -121,13 +121,13 @@ class AJXP_NotificationCenter extends AJXP_Plugin
 
     public function loadUserFeed($actionName, $httpVars, $fileVars)
     {
-        if(!$this->eventStore) return;
+        if(!$this->eventStore) return array();
         $u = AuthService::getLoggedUser();
         if ($u == null) {
-            if($httpVars["format"] == "html") return;
+            if($httpVars["format"] == "html") return array();
             AJXP_XMLWriter::header();
             AJXP_XMLWriter::close();
-            return;
+            return array();
         }
         $userId = $u->getId();
         $userGroup = $u->getGroupPath();

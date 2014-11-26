@@ -49,6 +49,22 @@
                     <serverCallback methodName="loadUserFeed"/>
                 </processing>
             </action>
+            <action name="feed">
+                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
+                <processing>
+                    <serverCallback methodName="loadUserFeed" restParams="/feed_type/path+" developerComment="Load an activity feed for the given node. Filtered by what the current user is authorized to see">
+                        <input_param name="path" type="path" description="Optional filter to get activity on a file or a folder"/>
+                        <input_param name="format" type="string" description="html, json, xml, array (internal value)"/>
+                        <input_param name="feed_type" type="string" description="notif, alert or all"/>
+                        <input_param name="offset" type="integer" description="Offset for pagination"/>
+                        <input_param name="limit" type="integer" description="Limit for pagination"/>
+                        <input_param name="merge_description" type="boolean" description="Wether to merge notification title and description in text"/>
+                        <input_param name="merge_description_as_label" type="boolean" description="Wether to merge notification title and description in title"/>
+                        <input_param name="current_repository" type="boolean"
+                                     description="Wether to get activity from current repository (true), or compute all from authorized repositories for user (false)"/>
+                    </serverCallback>
+                </processing>
+            </action>
             <action name="dismiss_user_alert">
                 <gui text="notification_center.7" title="notification_center.7" iconClass="icon-remove-sign" src="notification_center/ICON_SIZE/feed.png" accessKey="" hasAccessKey="false">
                     <context selection="false" dir="" recycle="true" actionBar="true" actionBarGroup="inline-notifications" contextMenu="false" infoPanel="false"/>
@@ -73,7 +89,10 @@
                         conn.sendAsync();
                     }
                     ]]></clientCallback>
-                    <serverCallback methodName="dismissUserAlert"/>
+                    <serverCallback methodName="dismissUserAlert" restParams="/alert_id/occurences" developerComment="Dismiss one or more occurences of alerts">
+                        <input_param name="alert_id" type="integer" description="Id passed in /feed action list"/>
+                        <input_param name="occurences" type="integer" description="1 or more"/>
+                    </serverCallback>
                 </processing>
             </action>
             <action name="activateDesktopNotifications">

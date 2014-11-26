@@ -88,7 +88,6 @@ class GitManager extends AJXP_AbstractMetaSource
                 $originalFile = AJXP_Utils::decodeSecureMagic($httpVars["original_file"]);
                 $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                 $commitId = $httpVars["commit_id"];
-                $attach = $httpVars["attach"];
 
                 $command = $git->getCommand("cat-file");
                 $command->setOption("s", true);

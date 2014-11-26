@@ -61,12 +61,16 @@
                             <div><input id="accept_disclaimer" name="accept_disclaimer" type="checkbox"> <label for="accept_disclaimer">AJXP_MESSAGE[disclaimer.4]</label></div>
                          </div>
                      ]]></clientForm>
-                    <serverCallback methodName="toggleDisclaimer"/>
+                    <serverCallback methodName="toggleDisclaimer" restParams="/validate" developerComment="Set disclaimer in accepted state or not">
+                        <input_param name="validate" type="boolean" description="Accept disclaimer or not"/>
+                    </serverCallback>
                 </processing>
             </action>
             <action name="load_disclaimer">
                 <processing>
-                    <serverCallback methodName="loadDisclaimer"/>
+                    <serverCallback methodName="loadDisclaimer" restParams="/" developerComment="Return HTML content of the disclaimer">
+                        <output type="HTML" description="Content of the disclaimer"/>
+                    </serverCallback>
                 </processing>
             </action>
         </actions>
