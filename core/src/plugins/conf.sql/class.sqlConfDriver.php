@@ -457,7 +457,7 @@ class sqlConfDriver extends AbstractConfDriver
                     $children_results = dibi::query('SELECT * FROM [ajxp_roles] WHERE [serial_role] LIKE %~like~ GROUP BY [role_id]', '"'.$repositoryId.'";s:');
                     break;
                 default:
-                    return "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
+                    return "ERROR!, DB driver ". $this->sqlDriver["driver"] ." not supported yet in __FUNCTION__";
             }
             $all = $children_results->fetchAll();
             foreach ($all as $item) {
@@ -540,7 +540,7 @@ class sqlConfDriver extends AbstractConfDriver
                 }
                 break;
             default:
-                return "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
+                return "ERROR!, DB driver ". $this->sqlDriver["driver"] ." not supported yet in __FUNCTION__";
         }
         $all = $children_results->fetchAll();
         foreach ($all as $item) {
@@ -584,7 +584,7 @@ class sqlConfDriver extends AbstractConfDriver
                 $q = 'SELECT count([role_id]) as c FROM [ajxp_roles] WHERE [role_id] LIKE \'AJXP_USR_/%\' AND [serial_role] LIKE %~like~';
                 break;
             default:
-                return "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
+                return "ERROR!, DB driver ". $this->sqlDriver["driver"] ." not supported yet in __FUNCTION__";
         }
         if($details){
             if($this->sqlDriver["driver"] == "sqlite" || $this->sqlDriver["driver"] == "sqlite3"){
@@ -679,7 +679,7 @@ class sqlConfDriver extends AbstractConfDriver
                     dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role]) VALUES (%s, %s)", $roleId, serialize($roleObject));
                     break;
                 default:
-                    return "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
+                    return "ERROR!, DB driver " . $this->sqlDriver["driver"] . " not supported yet in __FUNCTION__";
             }
         }
     }
@@ -692,23 +692,22 @@ class sqlConfDriver extends AbstractConfDriver
         $row = dibi::query("SELECT [role_id] FROM [ajxp_roles] WHERE [role_id] like %s", $role->getId());
         $res = $row->fetchSingle();
 
-        // If role exist => update into
         if($res != null){
+            // If role exist => update into
             switch ($this->sqlDriver["driver"]) {
                 case "sqlite":
                 case "sqlite3":
                 case "postgre":
-                    dibi::query("UPDATE  [ajxp_roles] SET [serial_role]=%b,[searchable_repositories]=%s WHERE [role_id] like %s", serialize($role), serialize($role->listAcls()), $role->getId());
+                    dibi::query("UPDATE [ajxp_roles] SET [serial_role]=%b,[searchable_repositories]=%s WHERE [role_id] like %s", serialize($role), serialize($role->listAcls()), $role->getId());
                     break;
                 case "mysql":
-                    dibi::query("UPDATE  [ajxp_roles] SET [role_id]=%s,[serial_role]=%s WHERE [role_id] like %s", serialize($role), $role->getId());
+                    dibi::query("UPDATE [ajxp_roles] SET [serial_role]=%s WHERE [role_id] like %s", serialize($role), $role->getId());
                     break;
                 default:
-                    return "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
+                    return "ERROR!, DB driver " . $this->sqlDriver["driver"] ." not supported yet in __FUNCTION__";
             }
-        }
-        // if role is not existed => insert into
-        else{
+        } else {
+            // if role is not existed => insert into
             switch ($this->sqlDriver["driver"]) {
                 case "sqlite":
                 case "sqlite3":
@@ -719,7 +718,7 @@ class sqlConfDriver extends AbstractConfDriver
                     dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role]) VALUES (%s, %s)", $role->getId(), serialize($role));
                     break;
                 default:
-                    return "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
+                    return "ERROR!, DB driver ". $this->sqlDriver["driver"] ." not supported yet in __FUNCTION__";
             }
         }
     }
