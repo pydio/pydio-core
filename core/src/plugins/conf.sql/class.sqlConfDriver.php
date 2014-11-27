@@ -552,6 +552,16 @@ class sqlConfDriver extends AbstractConfDriver
     }
 
 
+    public function getUsersForRole($roleId, $countOnly = false){
+        if($countOnly){
+            $res =  dibi::query("SELECT count([login]) FROM [ajxp_user_rights] WHERE [repo_uuid] = %s AND [rights] LIKE %~like~", "ajxp.roles", '"'.$roleId.'";b:1');
+            return $res->fetchSingle();
+        }else{
+            $res =  dibi::query("SELECT [login] FROM [ajxp_user_rights] WHERE [repo_uuid] = %s AND [rights] LIKE %~like~", "ajxp.roles", '"'.$roleId.'";b:1');
+            return $res->fetchAll();
+        }
+    }
+
     /**
      * @param string $repositoryId
      * @param boolean $details
@@ -568,6 +578,14 @@ class sqlConfDriver extends AbstractConfDriver
             if($details) return array('internal' => $groupUsers);
             else return $groupUsers;
         }
+        // Users from roles
+        $internal = 0;
+        $roles = $this->getRolesForRepository($repositoryId);
+        foreach($roles as $rId){
+            if(strpos($rId, "AJXP_USR_/") === 0) continue;
+            $internal += $this->getUsersForRole($rId, true);
+        }
+
         // NEW METHOD : SEARCH PERSONAL ROLE
         if(is_numeric($repositoryId)){
             $likeValue = "i:$repositoryId;s:";
@@ -597,12 +615,12 @@ class sqlConfDriver extends AbstractConfDriver
             $intRes = dibi::query($q.$internalClause, $likeValue);
             $extRes = dibi::query($q.$externalClause, $likeValue);
             return array(
-                'internal' => $intRes->fetchSingle(),
+                'internal' => $internal + $intRes->fetchSingle(),
                 'external' => $extRes->fetchSingle()
             );
         }else{
             $res = dibi::query($q, $likeValue);
-            return $res->fetchSingle();
+            return $internal + $res->fetchSingle();
 
         }
         //$all = $res->fetchAll();

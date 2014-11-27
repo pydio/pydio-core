@@ -1318,6 +1318,10 @@ class ShareCenter extends AJXP_Plugin
                 }
                 if(empty($LABEL)) $LABEL = $groupId;
                 $TYPE = "group";
+            }else if($rId == "ROOT_ROLE"){
+                $rId = "AJXP_GRP_/";
+                $TYPE = "group";
+                $LABEL = $mess["447"];
             }else{
                 $role = AuthService::getRole($rId);
                 $LABEL = $role->getLabel();
@@ -1934,9 +1938,12 @@ class ShareCenter extends AJXP_Plugin
         }
 
         foreach ($groups as $group) {
-            //$grRole = AuthService::getRole("AJXP_GRP_".AuthService::filterBaseGroup($group), true);
+            $r = $uRights[$group];
+            if($group == "AJXP_GRP_/") {
+                $group = "ROOT_ROLE";
+            }
             $grRole = AuthService::getRole($group, true);
-            $grRole->setAcl($newRepo->getUniqueId(), $uRights[$group]);
+            $grRole->setAcl($newRepo->getUniqueId(), $r);
             AuthService::updateRole($grRole);
         }
 

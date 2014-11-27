@@ -35,16 +35,16 @@
 .repoInfoBadge {
     display: inline-block;
     font-size: 25px;
-    min-width: 190px;
-    max-width: 220px;
+    min-width: 210px;
+    max-width: 300px;
     line-height: 30px;
     border: 1px solid rgba(255,255,255,0.7);
     border-radius: 8px;
     margin: 10px 16px;
-    min-height: 116px;
+    min-height: 106px;
     font-family: "Open sans Regular", Arial, sans-serif;
     vertical-align: top;
-    padding: 3px 8px;
+    padding: 13px 8px;
     text-align: left;
 }
 
