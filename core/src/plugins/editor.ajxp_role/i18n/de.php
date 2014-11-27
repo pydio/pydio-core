@@ -47,7 +47,7 @@ $mess=array(
 "21" => "Benutzer ID",
 "22" => "Profilart",
 "23" => "Standard Repository",
-"24" => "Rollen (drücke Ctrl/Cmd um mehrere zu markieren)",
+"24" => "Rollen",
 "25" => "Passwort ändern",
 "26" => "Benutzer sperren",
 "27" => "Benutzer aktivieren",
@@ -66,4 +66,5 @@ $mess=array(
 "40" => "Enable",
 "41" => "Remove",
 "42" => "Rollen Daten",
+"43" => "Select one or more",
 );

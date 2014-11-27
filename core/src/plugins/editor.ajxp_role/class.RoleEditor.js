@@ -314,7 +314,7 @@ Class.create("RoleEditor", AbstractEditor, {
                 this.updateRoles(rolesSelect.getValue());
                 updateRoleButton.hide();
             }.bind(this));
-            new Chosen(rolesSelect);
+            new Chosen(rolesSelect, {placeholder_text_multiple:MessageHash["ajxp_role_editor.43"]});
 
             // BUTTONS
             var buttonPane = this.element.down("#pane-infos").down("#account_actions");
@@ -414,7 +414,7 @@ Class.create("RoleEditor", AbstractEditor, {
             appliesSelect.observe("change", function(){
                 this.roleWrite.APPLIES = appliesSelect.getValue();
             }.bind(this) );
-            new Chosen(appliesSelect);
+            new Chosen(appliesSelect, {placeholder_text_multiple:MessageHash["ajxp_role_editor.43"]});
 
         }else if(scope == "group"){
             // MAIN INFO
