@@ -597,8 +597,8 @@ class AuthService
     */
     public static function updateAdminRights($adminUser)
     {
-        if(!ConfService::getCoreConf("SKIP_ADMIN_RIGHTS_ALL_REPOS")){
-            foreach (ConfService::getRepositoriesList() as $repoId => $repoObject) {
+        if(ConfService::getCoreConf("SKIP_ADMIN_RIGHTS_ALL_REPOS") !== true){
+            foreach (ConfService::getRepositoriesList("all") as $repoId => $repoObject) {
                 if(!self::allowedForCurrentGroup($repoObject, $adminUser)) continue;
                 if($repoObject->hasParent() && $repoObject->getParentId() != $adminUser->getId()) continue;
                 $adminUser->personalRole->setAcl($repoId, "rw");
