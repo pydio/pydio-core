@@ -317,8 +317,9 @@ class ldapAuthDriver extends AbstractAuthDriver
         //Update progress bar in CLI mode
         $isListAll = (($offset == -1) && ($limit == -1) && (is_null($login)) && $regexpOnSearchAttr && (php_sapi_name() == "cli"));
         if($isListAll){
+            $total = $this->getCountFromCache();
             $progressBar = new AJXP_ProgressBarCLI();
-            $progressBar->init($index, $this->getCountFromCache()["count"], "Get ldap users");
+            $progressBar->init($index, $total["count"], "Get ldap users");
         }
 
         do {
