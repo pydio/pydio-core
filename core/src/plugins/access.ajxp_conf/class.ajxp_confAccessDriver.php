@@ -262,7 +262,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         if(! AJXP_Utils::decodeSecureMagic($httpVars["dir"]) == "/data/users") return;
         $query = AJXP_Utils::decodeSecureMagic($httpVars["query"]);
         AJXP_XMLWriter::header();
-
         $this->recursiveSearchGroups("/", $query);
         AJXP_XMLWriter::close();
 

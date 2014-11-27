@@ -976,7 +976,7 @@ class AuthService
         $paginated = false;
         if (($regexp != null || $offset != -1 || $limit != -1) && $authDriver->supportsUsersPagination()) {
             $users = $authDriver->listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive);
-            $paginated = true;
+            $paginated = ($offset != -1 || $limit != -1);
         } else {
             $users = $authDriver->listUsers($baseGroup);
         }
