@@ -1005,11 +1005,12 @@ Class.create("FilesList", SelectableElements, {
 				div.insert({bottom:this.createPaginatorLink(total, '<b>&gt;&gt;</b>', 'Last')});
 			}
 		}
-		currentInput.observe("focus", function(){this.blockNavigation = true;}.bind(this));
-		currentInput.observe("blur", function(){this.blockNavigation = false;}.bind(this));
+		currentInput.observe("focus", function(){ajaxplorer.disableAllKeyBindings();}.bind(this));
+		currentInput.observe("blur", function(){ajaxplorer.enableAllKeyBindings();}.bind(this));
 		currentInput.observe("keydown", function(event){
 			if(event.keyCode == Event.KEY_RETURN){
 				Event.stop(event);
+                currentInput.blur();
 				var new_page = parseInt(currentInput.getValue());
 				if(new_page == current) return; 
 				if(new_page < 1 || new_page > total){

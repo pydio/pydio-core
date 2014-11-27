@@ -1159,6 +1159,11 @@ select.SF_input {
     max-width: 80px;
     max-height: 80px;
 }
+
+#user_profile_form img.SF_image.small {
+    border-radius: 40px;
+}
+
 .SF_image_link{
     display: inline-block;
     width: 80px;
@@ -2226,6 +2231,7 @@ img.simple_button_arrow{
     margin-top: -12px;
     float: right;
     margin-left: 10px;
+    border-radius: 22px;
 }
 .user_widget_label{
     float: left;

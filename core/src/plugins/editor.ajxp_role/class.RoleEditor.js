@@ -303,15 +303,18 @@ Class.create("RoleEditor", AbstractEditor, {
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);
             f.disableShortcutsOnForm(this.element.down("#pane-infos").down("#account_infos"));
             var rolesSelect = this.element.down("#pane-infos").down("#account_infos").down('select[name="roles"]');
+            var updateRoleButton = new Element('span', {id:'user_roles_update_button'}).update('<span class="icon-save"></span> UPDATE');
+            rolesSelect.insert({after:updateRoleButton});
+            updateRoleButton.hide();
             rolesSelect.observe("change", function(){
                 this.setDirty();
-                if(this.updateRoleAccumulator){
-                    window.clearTimeout(this.updateRoleAccumulator);
-                }
-                this.updateRoleAccumulator = window.setTimeout(function(){
-                    this.updateRoles(rolesSelect.getValue());
-                }.bind(this) , 500);
+                updateRoleButton.show();
             }.bind(this) );
+            updateRoleButton.observe("click", function(){
+                this.updateRoles(rolesSelect.getValue());
+                updateRoleButton.hide();
+            }.bind(this));
+            new Chosen(rolesSelect);
 
             // BUTTONS
             var buttonPane = this.element.down("#pane-infos").down("#account_actions");
@@ -411,6 +414,7 @@ Class.create("RoleEditor", AbstractEditor, {
             appliesSelect.observe("change", function(){
                 this.roleWrite.APPLIES = appliesSelect.getValue();
             }.bind(this) );
+            new Chosen(appliesSelect);
 
         }else if(scope == "group"){
             // MAIN INFO

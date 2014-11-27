@@ -39,10 +39,14 @@ Class.create("ExifCellRenderer", {
 		split = longiCell.innerHTML.split('--');
 		longiCell.update(split[0]);
 		longiCell.setAttribute("longiDegree", split[1]);
+        var decorator = '<img src="plugins/meta.exif/world.png" style="margin-bottom: 0;">';
+        if(ajaxplorer.currentThemeUsesIconFonts){
+            decorator = '<span class="icon-map-marker" style="font-size: 2em;"></span>';
+        }
 		var button = new Element('div', {
 			className:'fakeUploadButton',
 			style:'padding-top:6px;width:50px;margin-bottom:0px;padding-bottom:3px;text-align:center; font-size: 11px;'
-		}).update('<img src="plugins/meta.exif/world.png" style="margin-bottom: 0;"><br>'+MessageHash['meta.exif.2']);
+		}).update( decorator + '<br>'+ MessageHash['meta.exif.2']);
 		var buttonCell = new Element('div', {
 			rowspan:2,
 			align:'center',
@@ -51,6 +55,7 @@ Class.create("ExifCellRenderer", {
             className:'ip_geo_cell'
 		}).update(button);
 		latiCell.insert({after:buttonCell});
+        latiCell.up('div').setStyle({position: 'relative'});
 		// Set all other cells colspan to 2.
 		latiCell.up().nextSiblings().each(function(tr){
 			tr.down('div.infoPanelValue').setAttribute('colspan', 2);
