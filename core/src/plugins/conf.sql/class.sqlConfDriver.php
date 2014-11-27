@@ -689,7 +689,7 @@ class sqlConfDriver extends AbstractConfDriver
      */
     public function updateRole($role, $userObject = null)
     {
-        $row = dibi::query("SELECT [role_id] FROM [ajxp_roles] WHERE [role_id] like %s", $role->getId());
+        $row = dibi::query("SELECT [role_id] FROM [ajxp_roles] WHERE [role_id]=%s", $role->getId());
         $res = $row->fetchSingle();
 
         if($res != null){
@@ -698,10 +698,10 @@ class sqlConfDriver extends AbstractConfDriver
                 case "sqlite":
                 case "sqlite3":
                 case "postgre":
-                    dibi::query("UPDATE [ajxp_roles] SET [serial_role]=%b,[searchable_repositories]=%s WHERE [role_id] like %s", serialize($role), serialize($role->listAcls()), $role->getId());
+                    dibi::query("UPDATE [ajxp_roles] SET [serial_role]=%b,[searchable_repositories]=%s WHERE [role_id]=%s", serialize($role), serialize($role->listAcls()), $role->getId());
                     break;
                 case "mysql":
-                    dibi::query("UPDATE  [ajxp_roles] SET [serial_role]=%s WHERE [role_id] LIKE %s", serialize($role), $role->getId());
+                    dibi::query("UPDATE  [ajxp_roles] SET [serial_role]=%s WHERE [role_id]=%s", serialize($role), $role->getId());
                     break;
                 default:
                     return "ERROR!, DB driver " . $this->sqlDriver["driver"] ." not supported yet in __FUNCTION__";
