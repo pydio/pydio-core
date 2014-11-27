@@ -66,4 +66,5 @@ $mess=array(
 "40" => "Abilita",
 "41" => "Rimuovi",
 "42" => "Dati ruolo personalizzati",
+"43" => "Selezionane uno o più",
 );
