@@ -75,7 +75,7 @@
                             var elements = $('user_tpl_params_parameters').select("div.SF_element");
                             $('user_template_parameters').down('div.dialogLegend').insert({before:elements[elements.length-1]});
                             var targetHeight = parseInt($('user_template_parameters').getHeight());
-                             if(!targetHeight) targetHeight = params.length * 40 + 80;
+                             if(!targetHeight) targetHeight = params.length * 44 + 80;
                             new Effect.Parallel([
                                 new Effect.Morph('user_templates_selector', {style:'left:-420px;'}),
                                 new Effect.Morph('user_template_parameters', {style:'left:0px;'}),
@@ -87,7 +87,7 @@
                        conn.onComplete = function(transport){
                             conn.TPL_XML = transport.responseXML;
                             var templates = XPathSelectNodes(conn.TPL_XML, "//template");
-                            conn.ORIGINAL_HEIGHT = (templates.length*31+25);
+                            conn.ORIGINAL_HEIGHT = (templates.length*39+25);
                             $('user_tpl_container').setStyle({height:conn.ORIGINAL_HEIGHT+'px'});
                             $('user_templates_selector').update('<div class="panelHeader">'+MessageHash[420]+'</div>');
                             for(var i=0;i<templates.length;i++){
