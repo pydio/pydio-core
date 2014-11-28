@@ -165,6 +165,8 @@ Class.create("LogoWidget", AjxpPane, {
                 top         : imgTop + 'px',
                 left        : imgLeft + 'px'
             });
+            this.image.writeAttribute('width', '');
+            this.image.writeAttribute('height', '');
         }else{
             imgW = -3;
             imgH = 0;
@@ -209,7 +211,6 @@ Class.create("LogoWidget", AjxpPane, {
         if(this.htmlElement.down('div.linked')){
             this.htmlElement.down('div.linked').setStyle({height:htHeight+'px'});
         }
-
 
     }
 
