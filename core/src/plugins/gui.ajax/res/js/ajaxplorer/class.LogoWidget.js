@@ -180,18 +180,24 @@ Class.create("LogoWidget", AjxpPane, {
         }
         var htHeight = parseInt(this.htmlElement.getHeight());
 
-        if(!configs.get('SKIP_BY_LOGO')){
+        var has_by = false;
+        if(!configs.get('SKIP_BY_LOGO') && !this.imageIsDefault){
             this.htmlElement.setStyle({
                 backgroundImage : 'url(' + window.ajxpResourcesFolder + '/images/white_by.png)',
                 backgroundSize : '66px',
                 backgroundPosition : (imgW+16) + 'px '+ (htHeight - 18) +'px'
+            });
+            has_by = true;
+        }else{
+            this.htmlElement.setStyle({
+                backgroundImage : 'none'
             });
         }
         if(this.titleDiv){
             this.titleDiv.setStyle({
                 position:'absolute',
                 left : (imgW + 16) + 'px',
-                top : (htHeight - 42) + 'px',
+                top : (htHeight - (has_by?42:39)) + 'px',
                 fontSize : '19px'
             });
         }

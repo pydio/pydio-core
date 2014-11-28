@@ -692,7 +692,7 @@
                 }
                 div.widget_logo{
                     height: 90px;
-                    background-position: 86px 76px !important;
+                    background-position: 86px 76px;
                 }
                 div#widget_title{
                     color: rgba(255,255,255,0.8);
