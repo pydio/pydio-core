@@ -35,13 +35,28 @@
 			</component_config>
 		</client_configs>
 		<actions>
+            <action name="edit_user_meta_mass">
+                <gui text="meta.user.1" title="meta.user.1" src="meta_user/ICON_SIZE/tag.png" iconClass="icon-tags" hasAccessKey="false">
+                    <context selection="true" dir="" recycle="hidden"
+                             actionBar="true" contextMenu="true" infoPanel="false"
+                             actionBarGroup="info_panel" inZip="false">
+                    </context>
+                    <selectionContext dir="true" file="file" recycle="false" unique="false" multipleOnly="true"/>
+                </gui>
+                <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                        ajaxplorer.actionBar.fireAction("edit_user_meta");
+                    ]]></clientCallback>
+                </processing>
+            </action>
 			<action name="edit_user_meta">
 				<gui text="meta.user.1" title="meta.user.1" src="meta_user/ICON_SIZE/tag.png" iconClass="icon-tags" hasAccessKey="false">
 					<context selection="true" dir="" recycle="hidden"
 						actionBar="true" contextMenu="true" infoPanel="false"
 						actionBarGroup="more" inZip="false">
 					</context>
-					<selectionContext dir="true" file="file" recycle="false" unique="true"/>
+					<selectionContext dir="true" file="file" recycle="false" unique="false"/>
 					</gui>
 				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 				<processing>
@@ -49,10 +64,14 @@
 						var userSelection = ajaxplorer.getUserSelection();
 						var loadFunc = function(oForm){
 							var form = $(oForm).select('div[id="user_meta_form"]')[0];
-							var nodeMeta = userSelection.getUniqueNode().getMetadata();
-							var metaFields = nodeMeta.get('meta_fields').split(',');
-							var metaLabels = nodeMeta.get('meta_labels').split(',');
-							var metaTypes =  nodeMeta.get('meta_types').split(',');
+							var nodeMeta = $H();
+							var firstNodeMeta = userSelection.getUniqueNode().getMetadata();
+                            var metaFields = firstNodeMeta.get('meta_fields').split(',');
+                            var metaLabels = firstNodeMeta.get('meta_labels').split(',');
+                            var metaTypes =  firstNodeMeta.get('meta_types').split(',');
+							if(userSelection.isUnique()){
+							    nodeMeta = firstNodeMeta;
+                            }
 							for(var i=0;i<metaFields.length;i++){
 								var value = nodeMeta.get(metaFields[i]) || '';
 								form.insert('<div class="SF_element"><div class="SF_label">'+metaLabels[i]+' : </div><input class="SF_input" name="'+metaFields[i]+'" value="'+value.replace(/"/g, '&quot;')+'"/></div>');

@@ -226,6 +226,34 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         $selection = new UserSelection();
         $selection->initFromHttpVars($httpVars);
         $currentFile = $selection->getUniqueFile();
+
+        $nodes = $selection->buildNodes($this->accessDriver);
+        $nodesDiffs = array();
+        $def = $this->getMetaDefinition();
+        foreach($nodes as $ajxpNode){
+
+            $newValues = array();
+            //$ajxpNode->setDriver($this->accessDriver);
+            AJXP_Controller::applyHook("node.before_change", array(&$ajxpNode));
+            foreach ($def as $key => $data) {
+                if (isSet($httpVars[$key])) {
+                    $newValues[$key] = AJXP_Utils::decodeSecureMagic($httpVars[$key]);
+                } else {
+                    if (!isset($original)) {
+                        $original = $ajxpNode->retrieveMetadata("users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
+                    }
+                    if (isSet($original) && isset($original[$key])) {
+                        $newValues[$key] = $original[$key];
+                    }
+                }
+            }
+            $ajxpNode->setMetadata("users_meta", $newValues, false, AJXP_METADATA_SCOPE_GLOBAL);
+            AJXP_Controller::applyHook("node.meta_change", array($ajxpNode));
+
+            $nodesDiffs[$ajxpNode->getPath()] = $ajxpNode;
+
+        }
+        /*
         $urlBase = $this->accessDriver->getResourceUrl($currentFile);
         $ajxpNode = new AJXP_Node($urlBase);
 
@@ -247,8 +275,9 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         }
         $ajxpNode->setMetadata("users_meta", $newValues, false, AJXP_METADATA_SCOPE_GLOBAL);
         AJXP_Controller::applyHook("node.meta_change", array($ajxpNode));
+        */
         AJXP_XMLWriter::header();
-        AJXP_XMLWriter::writeNodesDiff(array("UPDATE" => array($ajxpNode->getPath() => $ajxpNode)), true);
+        AJXP_XMLWriter::writeNodesDiff(array("UPDATE" => $nodesDiffs), true);
         AJXP_XMLWriter::close();
     }
 
