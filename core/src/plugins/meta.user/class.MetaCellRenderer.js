@@ -63,7 +63,6 @@ Class.create("MetaCellRenderer", {
         }else{
             nodeMetaValue = -1;
         }
-        console.log(values);
         if(element != null){
             if(type == 'row'){
                 if(values[element.down('.text_label').innerHTML.stripTags()]){
