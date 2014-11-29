@@ -113,9 +113,12 @@ CREATE TRIGGER "LOG_UPDATE_PATH" AFTER UPDATE ON "ajxp_index" FOR EACH ROW  WHEN
 BEGIN
   INSERT INTO ajxp_changes (repository_identifer, node_id,source,target,type) VALUES (new.repository_identifer, new.node_id, old.node_path, new.node_path, "path");
 END;
-
 /* SEPARATOR */
 ALTER TABLE "ajxp_log" ADD COLUMN "source" text;
+/* SEPARATOR */
+CREATE TABLE ajxp_version (   db_build INT NOT NULL );
+/* SEPARATOR */
+INSERT INTO ajxp_version VALUES (60);
 ';
 
     $mysqlUpgrade = "
@@ -175,11 +178,19 @@ UPDATE `ajxp_log2` INNER JOIN ajxp_log ON ajxp_log2.id=ajxp_log.id SET ajxp_log2
 DROP TABLE `ajxp_log`;
 /* SEPARATOR */
 RENAME TABLE `ajxp_log2` TO `ajxp_log`;
+/* SEPARATOR */
+CREATE TABLE IF NOT EXISTS ajxp_version ( db_build INT NOT NULL );
+/* SEPARATOR */
+INSERT INTO ajxp_version SET db_build=60;
 ";
 
     $pgDbInsts = array(
 
-    "CREATE INDEX ajxp_user_rights_i ON ajxp_user_rights(repo_uuid);
+    "CREATE TABLE ajxp_version ( db_build INT NOT NULL);
+    /* SEPARATOR */
+    INSERT INTO ajxp_version VALUES (60);
+    /* SEPARATOR */
+    CREATE INDEX ajxp_user_rights_i ON ajxp_user_rights(repo_uuid);
     /* SEPARATOR */
     CREATE INDEX ajxp_user_rights_k ON ajxp_user_rights(login);
     /* SEPARATOR */
