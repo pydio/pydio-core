@@ -36,6 +36,7 @@ class AjaXplorerUpgrader
     private $debugMode = FALSE;
     private $cleanFile = "UPGRADE/CLEAN-FILES";
     private $additionalScript = "UPGRADE/PHP-SCRIPT";
+    private $stepTriggerPrefix = "UPGRADE/PHP-";
     private $releaseNote = "UPGRADE/NOTE";
     private $htmlInstructions = "UPGRADE/NOTE-HTML";
     private $dbUpgrade = "UPGRADE/DB-UPGRADE";
@@ -120,12 +121,15 @@ class AjaXplorerUpgrader
     public function execute()
     {
         $stepKeys = array_keys($this->steps);
+        $stepName = $stepKeys[$this->step];
         try {
+            $this->executeStepTrigger($stepName, "pre");
             if (method_exists($this, $stepKeys[$this->step])) {
                 $this->result = call_user_func(array($this, $stepKeys[$this->step]));
             } else {
                 $this->result = "Skipping step, method not found";
             }
+            $this->executeStepTrigger($stepName, "post");
         } catch (Exception $e) {
             $this->error = $e->getMessage();
         }
@@ -349,6 +353,16 @@ class AjaXplorerUpgrader
         include($this->workingFolder."/".$this->additionalScript);
         return "Executed specific upgrade task.";
 
+    }
+
+    protected function executeStepTrigger($stepName, $trigger = "pre")
+    {
+        $scriptName = $this->workingFolder."/".$this->stepTriggerPrefix."-".$trigger."-".$stepName.".php";
+        if(!is_file($scriptName)) return "";
+        ob_start();
+        include($scriptName);
+        $output = ob_get_flush();
+        return "Executed specific task for ".$trigger."-".$stepName.": ".$output;
     }
 
     public function updateVersion()
