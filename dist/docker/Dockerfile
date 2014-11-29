@@ -1,7 +1,7 @@
 # DOCKER-VERSION 0.xx
-# Pydio version 5.2.5
-FROM centos:centos6
-MAINTAINER charles@pydio.com
+# Pydio Version 5.2.5
+FROM centos:6.4
+MAINTAINER team@pyd.io
 
 ADD ./my.cnf /etc/my.cnf
 ADD ./supervisord.conf /etc/
@@ -20,8 +20,7 @@ RUN wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
 RUN wget -q -O – http://www.atomicorp.com/installers/atomic |sh
 RUN rpm -Uvh remi-release-6*.rpm epel-release-6*.rpm
 RUN yum -y update
-RUN yum -y install httpd php-mcrypt* ImageMagick ImageMagick-devel ImageMagick-perl gcc cc php-pecl-apc  php php-mysql php-cli php-devel php-gd php-pecl-memcache php-pspell php-snmp php-xmlrpc php-xml php-imap mod_ssl openssl mysql-server mysql php-ioncube-loader
-
+RUN yum -y install httpd php-mcrypt* ImageMagick ImageMagick-devel ImageMagick-perl gcc cc php-pecl-apc php php-mysql php-cli php-devel php-gd php-pecl-memcache php-pspell php-snmp php-xmlrpc php-xml php-imap mod_ssl openssl mysql-server mysql php-ioncube-loader
 RUN chmod 0777 /etc/create.mysql
 RUN chmod +x /etc/gencert.sh
 RUN chmod +x /etc/pre_conf_pydio.sh
@@ -29,27 +28,20 @@ RUN chmod +x /etc/configure_php_modules.sh
 
 # generate certificate for server
 RUN /etc/gencert.sh
-
 # install some php modules
 RUN /etc/configure_php_modules.sh
-
 # fix lack of network file for mysql
 RUN echo -e "NETWORKING=yes" > /etc/sysconfig/network
-
 # install pydio
-RUN yum install -y pydio
+RUN yum --disablerepo=pydio-testing -y install pydio
 # pre-configure pydio
 RUN /etc/pre_conf_pydio.sh
-
 # install supervisord
 RUN yum install -y python-pip && pip install "pip>=1.4,<1.5" --upgrade
 RUN pip install supervisor
-
 VOLUME ["/var/lib/pydio/personal"]
 EXPOSE 443
-
 CMD ["supervisord", "-n"]
 #CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
 #CMD ["/etc/init.d/pydiod"]
-
 
