@@ -55,7 +55,7 @@
             <global_param group_switch_name="LIST_ROLE_BY" group_switch_label="All roles"        group_switch_value="allroles"   name="ALL_ROLES"        type="hidden" label="" description="" default="allrolls"/>
             <global_param group_switch_name="LIST_ROLE_BY" group_switch_label="User roles only"  group_switch_value="userroles"  name="USER_ROLES_ONLY"  type="hidden" label="" description="" default="userroles"/>
         <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="Allow Role Listing" group_switch_value="Role" name="PREFIX" type="string"   label="CONF_MESSAGE[role prefix]"
-                      description="role refix" default="ldapgroup_" mandatory="false"/>
+                      description="role prefix" default="" mandatory="false"/>
         <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="Allow Role Listing" group_switch_value="Role" name="EXCLUDED" type="textarea"   label="CONF_MESSAGE[Excluded Roles]"
                       description="Some roles should be disappered in the list.  list separated by ',' or start with 'preg:' for regex."  default="" mandatory="false" />
         <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="Allow Role Listing" group_switch_value="Role" name="INCLUDED" type="textarea"   label="CONF_MESSAGE[Included Roles]"
@@ -67,7 +67,7 @@
             <global_param group_switch_name="LIST_ROLE_BY" group_switch_label="All roles"        group_switch_value="allroles"   name="ALL_ROLES"        type="hidden" label="" description="" default="allrolls"/>
             <global_param group_switch_name="LIST_ROLE_BY" group_switch_label="User roles only"  group_switch_value="userroles"  name="USER_ROLES_ONLY"  type="hidden" label="" description="" default="userroles"/>
         <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="Allow Role Listing" group_switch_value="RoleGroup" name="PREFIX" type="string"   label="CONF_MESSAGE[role prefix]"
-                      description="role refix" default="ldapgroup_" mandatory="false" />
+                      description="role prefix" default="" mandatory="false" />
         <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="Allow Role Listing" group_switch_value="RoleGroup" name="EXCLUDED" type="textarea"   label="CONF_MESSAGE[Excluded Roles]"
                       description="Some roles should be disappered in the list.  list separated by ',' or start with 'preg:' for regex."  default="" mandatory="false" />
         <global_param group_switch_name="GROUP_OR_ROLE" group_switch_label="Allow Role Listing" group_switch_value="RoleGroup" name="INCLUDED" type="textarea"   label="CONF_MESSAGE[Included Roles]"
