@@ -19,6 +19,6 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Text Editor" => "Text Editor",
-"Very basic text editor" => "Sehr einfacher Text Editor",
+"Text Editor" => "Text-Editor",
+"Very basic text editor" => "Einfacher Text-Editor",
 );
