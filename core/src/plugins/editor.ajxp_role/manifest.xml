@@ -30,12 +30,12 @@
                     <div id="account_custom"></div>
 	            </div>
                 <div id="pane-acls">
-                    <div class="innerTitle">Access Control List</div>
+                    <div class="innerTitle">AJXP_MESSAGE[ajxp_role_editor.44]</div>
                     <div class="dialogLegend">AJXP_MESSAGE[ajxp_role_editor.9]</div>
                     <div id="acls-selected" class="innerContainer"></div>
                 </div>
                 <div id="pane-actions">
-                    <div class="innerTitle">Disabled Actions</div>
+                    <div class="innerTitle">AJXP_MESSAGE[ajxp_role_editor.45]</div>
                     <div id="actions-selector">
                         <div class="dialogLegend">AJXP_MESSAGE[ajxp_role_editor.10]</div>
                         <div class="SF_element">
@@ -56,7 +56,7 @@
                     <div id="actions-selected" class="innerContainer"></div>
                 </div>
                 <div id="pane-parameters">
-                    <div class="innerTitle">Plugins Parameters Fine-tuning</div>
+                    <div class="innerTitle">AJXP_MESSAGE[ajxp_role_editor.43]</div>
                     <div id="parameters-selector">
                         <div class="dialogLegend">AJXP_MESSAGE[ajxp_role_editor.16]</div>
                         <div class="SF_element">
