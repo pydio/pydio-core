@@ -37,7 +37,7 @@ RUN /etc/configure_php_modules.sh
 RUN echo -e "NETWORKING=yes" > /etc/sysconfig/network
 
 # install pydio
-RUN yum install -y pydio
+RUN yum --disablerepo=pydio-testing -y install pydio
 # pre-configure pydio
 RUN /etc/pre_conf_pydio.sh
 
