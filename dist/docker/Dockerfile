@@ -1,6 +1,6 @@
 # DOCKER-VERSION 0.xx
 # Pydio Version 5.2.5
-FROM centos:6.4
+FROM centos:centos6
 MAINTAINER team@pyd.io
 
 ADD ./my.cnf /etc/my.cnf
@@ -37,7 +37,7 @@ RUN /etc/configure_php_modules.sh
 RUN echo -e "NETWORKING=yes" > /etc/sysconfig/network
 
 # install pydio
-RUN yum install -y pydio
+RUN yum --disablerepo=pydio-testing -y install pydio
 # pre-configure pydio
 RUN /etc/pre_conf_pydio.sh
 
