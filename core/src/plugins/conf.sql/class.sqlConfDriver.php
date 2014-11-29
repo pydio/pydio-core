@@ -1043,7 +1043,15 @@ class sqlConfDriver extends AbstractConfDriver
     public function installSQLTables($param)
     {
         $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
-        return AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+        $res = AJXP_Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+        // SET DB VERSION
+        if(defined('AJXP_VERSION_DB') && AJXP_VERSION_DB != "##DB_VERSION##"){
+            require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
+            dibi::connect($p);
+            dibi::query("UPDATE [ajxp_version] SET [db_build]=%i", intval(AJXP_VERSION_DB));
+            dibi::disconnect();
+        }
+        return $res;
     }
 
     public function supportsUserTeams()

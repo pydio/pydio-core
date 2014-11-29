@@ -88,3 +88,8 @@ CREATE TABLE IF NOT EXISTS ajxp_user_teams (
     owner_id varchar(255) NOT NULL,
     PRIMARY KEY(team_id, user_id)
 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS ajxp_version (
+  db_build INT NOT NULL
+);
+INSERT INTO ajxp_version SET db_build=0;
