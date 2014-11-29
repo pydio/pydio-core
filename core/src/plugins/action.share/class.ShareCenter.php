@@ -42,10 +42,6 @@ class ShareCenter extends AJXP_Plugin
      * @var ShareStore
      */
     private $shareStore;
-    /**
-     * @var MetaStoreProvider
-     */
-    private $metaStore;
 
     /**
      * @var MetaWatchRegister
@@ -175,7 +171,7 @@ class ShareCenter extends AJXP_Plugin
             } else {
                 print($errorMessage);
             }
-            return;
+            return null;
         }
 
 
@@ -419,7 +415,7 @@ class ShareCenter extends AJXP_Plugin
                         AJXP_METADATA_SCOPE_REPOSITORY
                     );
                     if(!isSet($metadata["shares"]) || !is_array($metadata["shares"])){
-                        return;
+                        return null;
                     }
                     if ( isSet($httpVars["element_id"]) && isSet($metadata["shares"][$httpVars["element_id"]])) {
                         $this->getShareStore()->resetDownloadCounter($httpVars["element_id"], $httpVars["owner_id"]);
@@ -437,7 +433,7 @@ class ShareCenter extends AJXP_Plugin
             case "update_shared_element_data":
 
                 if(!in_array($httpVars["p_name"], array("counter", "tags"))){
-                    return;
+                    return null;
                 }
                 $hash = AJXP_Utils::decodeSecureMagic($httpVars["element_id"]);
                 $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
@@ -518,6 +514,7 @@ class ShareCenter extends AJXP_Plugin
             break;
         }
 
+        return null;
 
     }
 
@@ -685,6 +682,7 @@ class ShareCenter extends AJXP_Plugin
 
         $fromMirrors = null;
         $toMirrors = null;
+        $fromNode = $toNode = null;
         if(!empty($httpVars["from"])){
             $fromNode = new AJXP_Node($httpVars["from"]);
             $fromMirrors = $this->findMirrorNodesInShares($fromNode, $httpVars["direction"]);
@@ -788,6 +786,11 @@ class ShareCenter extends AJXP_Plugin
         }
     }
 
+    /**
+     * @param Array $data
+     * @param AbstractAccessDriver $accessDriver
+     * @param Repository $repository
+     */
     protected function storeSafeCredentialsIfNeeded(&$data, $accessDriver, $repository){
         $storeCreds = false;
         if ($repository->getOption("META_SOURCES")) {
@@ -878,7 +881,6 @@ class ShareCenter extends AJXP_Plugin
     {
         $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
         $dlURL = ConfService::getCoreConf("PUBLIC_DOWNLOAD_URL");
-        $langSuffix = "?lang=".ConfService::getLanguage();
         if ($dlURL != "") {
             return rtrim($dlURL, "/");
         } else {
@@ -1137,7 +1139,6 @@ class ShareCenter extends AJXP_Plugin
         }
         // create driver from $data
         $className = $data["DRIVER"]."AccessDriver";
-        $hash = md5(serialize($data));
         $u = parse_url($_SERVER["REQUEST_URI"]);
         $shortHash = pathinfo(basename($u["path"]), PATHINFO_FILENAME);
 
@@ -1169,10 +1170,14 @@ class ShareCenter extends AJXP_Plugin
         }
 
 
-        $customs = array("title", "legend", "legend_pass", "background_attributes_1", "background_attributes_2", "background_attributes_3", "text_color", "background_color", "textshadow_color");
-        $images = array("button", "background_1", "background_2", "background_3");
+        $customs = array("title", "legend", "legend_pass", "background_attributes_1","text_color", "background_color", "textshadow_color");
+        $images = array("button", "background_1");
         $shareCenter = AJXP_PluginsService::findPlugin("action", "share");
         $confs = $shareCenter->getConfigs();
+        $confs["CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_1"] = "background-repeat:repeat;background-position:50% 50%;";
+        $confs["CUSTOM_SHAREPAGE_BACKGROUND_1"] = "plugins/action.share/res/hi-res/02.jpg";
+        $confs["CUSTOM_SHAREPAGE_TEXT_COLOR"] = "#ffffff";
+        $confs["CUSTOM_SHAREPAGE_TEXTSHADOW_COLOR"] = "rgba(0,0,0,5)";
         foreach ($customs as $custom) {
             $varName = "CUSTOM_SHAREPAGE_".strtoupper($custom);
             $$varName = $confs[$varName];
@@ -1451,6 +1456,7 @@ class ShareCenter extends AJXP_Plugin
         $uniqueUser = null;
         if(isSet($httpVars["repository_id"]) && isSet($httpVars["guest_user_id"])){
             $existingData = $this->getShareStore()->loadShare($httpVars["hash"]);
+            $existingU = "";
             if(isSet($existingData["PRELOG_USER"])) $existingU = $existingData["PRELOG_USER"];
             else if(isSet($existingData["PRESET_LOGIN"])) $existingU = $existingData["PRESET_LOGIN"];
             $uniqueUser = $httpVars["guest_user_id"];
@@ -1658,11 +1664,13 @@ class ShareCenter extends AJXP_Plugin
         $uRights = array();
         $uPasses = array();
         $groups = array();
+        $uWatches = array();
 
         $index = 0;
         $prefix = $this->getFilteredOption("SHARED_USERS_TMP_PREFIX", $this->repository->getId());
         while (isSet($httpVars["user_".$index])) {
             $eType = $httpVars["entry_type_".$index];
+            $uWatch = false;
             $rightString = ($httpVars["right_read_".$index]=="true"?"r":"").($httpVars["right_write_".$index]=="true"?"w":"");
             if($this->watcher !== false) $uWatch = $httpVars["right_watch_".$index] == "true" ? true : false;
             if (empty($rightString)) {
@@ -2110,8 +2118,10 @@ class ShareCenter extends AJXP_Plugin
         if($currentUser){
             $loggedUser = AuthService::getLoggedUser();
             $userId = $loggedUser->getId();
+            $originalUser = null;
         }else{
             $originalUser = AuthService::getLoggedUser()->getId();
+            $userId = null;
         }
         $deleted = array();
         $switchBackToOriginal = false;
@@ -2341,6 +2351,7 @@ class ShareCenter extends AJXP_Plugin
                 "expire_time"      => ($pData["EXPIRE_TIME"]!=0?date($messages["date_format"], $pData["EXPIRE_TIME"]):0),
                 "has_password"     => (!empty($pData["PASSWORD"])),
                 "element_watch"    => $elementWatch,
+                "is_expired"       => $this->shareStore->isShareExpired($shareId, $pData)
             ), $shareData);
 
 
