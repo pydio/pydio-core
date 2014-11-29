@@ -367,6 +367,9 @@ class AjaXplorerUpgrader
 
     public function updateVersion()
     {
+        if(is_file($this->workingFolder."/conf/VERSION.php")){
+            copy($this->workingFolder."/conf/VERSION.php", $this->installPath."/conf/VERSION.php");
+        }
         // Finally copy VERSION file
         if (!is_file($this->workingFolder."/conf/VERSION")) {
             return "<b>No VERSION file in archive</b>";
