@@ -1,6 +1,6 @@
 # DOCKER-VERSION 0.xx
 # Pydio Version 5.2.5
-FROM centos:6.4
+FROM centos:centos6
 MAINTAINER team@pyd.io
 
 ADD ./my.cnf /etc/my.cnf
