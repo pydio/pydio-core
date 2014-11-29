@@ -33,13 +33,15 @@ RUN /etc/configure_php_modules.sh
 # fix lack of network file for mysql
 RUN echo -e "NETWORKING=yes" > /etc/sysconfig/network
 # install pydio
-RUN yum --disablerepo=pydio-testing -y install pydio
+RUN yum install -y --disablerepo=pydio-testing pydio
 # pre-configure pydio
 RUN /etc/pre_conf_pydio.sh
 # install supervisord
 RUN yum install -y python-pip && pip install "pip>=1.4,<1.5" --upgrade
 RUN pip install supervisor
 VOLUME ["/var/lib/pydio/personal"]
+VOLUME ["/var/lib/pydio/files"]
+VOLUME ["/var/lib/pydio/plugins"]
 EXPOSE 443
 CMD ["supervisord", "-n"]
 #CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
