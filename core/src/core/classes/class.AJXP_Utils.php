@@ -1941,14 +1941,4 @@ class AJXP_Utils
         }
         return $left.$regexp.$right;
     }
-    /**
-     * Hide file or folder for Windows OS
-     * @static
-     * @param $path
-     * @return void
-     */
-    public static function winSetHidden($file)
-    {
-        @shell_exec('attrib +H ' . escapeshellarg($file));
-    }	
 }
