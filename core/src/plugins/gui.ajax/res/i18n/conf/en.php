@@ -79,4 +79,8 @@ $mess=array(
 "Fetch Window (repeat vertically)" => "Fetch Window (repeat vertically)",
 "Fetch Window (no repeat)" => "Fetch Window (no repeat)",
 "Tile (repeat both directions)" => "Tile (repeat both directions)",
+"Set up some application parameters. If you enable Emails, please use the Test button to check if your php is correctly configured." => "Set up some application parameters. If you enable Emails, please use the Test button to check if your php is correctly configured.",
+"Detected Encoding" => "Detected Encoding",
+"Detected Server Path" => "Detected Server Path",
+"Application Title" => "Application Title",
 );

@@ -85,4 +85,8 @@ $mess=array(
 "Fetch Window (repeat vertically)" => "Ganzes Fenster (Vertikal wiederholend)",
 "Fetch Window (no repeat)" => "Ganzes Fenster (Nicht-wiederholend)",
 "Tile (repeat both directions)" => "Nebeneinander (In beide Richtungen wiederholend)",
+"Set up some application parameters. If you enable Emails, please use the Test button to check if your php is correctly configured." => "Grundeinstellungen der Anwendung festlegen. Bei aktivem E-Mail-Versand kann die PHP-Konfiguration mit einem Klick auf 'Mailversand mit dieser Konfiguration testen' überprüft werden.",
+"Detected Encoding" => "Server-Encoding",
+"Detected Server Path" => "Server-Pfad",
+"Application Title" => "Titel der Anwendung",
 );

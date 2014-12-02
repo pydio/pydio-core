@@ -63,4 +63,8 @@ $mess=array(
 "Manually set a top offset" => "Manually set a top offset",
 "Logo Left" => "Logo Left",
 "Manually set a left offset" => "Manually set a left offset",
+"Set up some application parameters. If you enable Emails, please use the Test button to check if your php is correctly configured." => "Set up some application parameters. If you enable Emails, please use the Test button to check if your php is correctly configured.",
+"Detected Encoding" => "Detected Encoding",
+"Detected Server Path" => "Detected Server Path",
+"Application Title" => "Application Title",
 );
