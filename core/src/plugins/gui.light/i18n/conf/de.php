@@ -19,13 +19,12 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 
-/*******************************************************************************
-* German translation:
-*  	+ update: Martin Schaible <martin@martinschaible.ch>
-*******************************************************************************/ 
+/* *****************************************************************************
+* Initial translation:  Martin Schaible <martin@martinschaible.ch>
+***************************************************************************** */ 
 
 /* Do not use HTML entities! It would mess up everything */ 
 $mess=array(
-"Source Viewer" => "Quelltext-Betrachter",
-"Syntax Highlighter for all major code source files" => "Syntax-Highlighter für alle unterstützten Quelltext-Dateien",
+"Light" => "Light",
+"Simple Template for Bookmarklets" => "Einfache Vorlage für Bookmarklets",
 );
