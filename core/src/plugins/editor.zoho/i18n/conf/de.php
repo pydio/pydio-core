@@ -1,0 +1,33 @@
+<?php
+/*
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* This file is part of Pydio.
+*
+* Pydio is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Pydio is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+*
+* The latest code can be found at <http://pyd.io/>.
+*/
+$mess=array(
+"Zoho API Key, you must have registered to api.zoho.com" => "Zoho API Key, der bei api.zoho.com registriert ist",
+"API Key" => "API Key",
+"Zoho secret key, you must have registered to api.zoho.com" => "Zoho secret key, der bei api.zoho.com registriert ist",
+"Secret Key" => "Secret Key",
+"If you are working locally or behind a firewall, you can install an ajaxplorer Zoho Agent somewhere in the public zone. See the plugin folder content." => "Wenn das System lokal oder hinter einer Firewall läuft kann der Ajaxplorer Zoho Agent im öffentlichen Bereich installiert werden. (siehe Inhalt des Plugin-Ordners)",
+"Use Z-Agent" => "Benutze Z-Agent",
+"If you use the agent, enter its URL here." => "Wenn der Agent verwendet werden soll hier eine URL eingeben.",
+"Z-Agent URL" => "Z-Agent URL",
+"Uniquely generated public key, that you must copy and paste inside the save_zoho.php file (see doc)." => "Einmalig generierter Public Key. Dieser muss in die Datei save_zoho.php kopiert werden (siehe Dokumentation).",
+"Z-Agent Key" => "Z-Agent Key",
+"External Z-Agent" => "Externer Z-Agent",
+);
