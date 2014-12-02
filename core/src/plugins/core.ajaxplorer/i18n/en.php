@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -279,7 +279,7 @@ $mess=array(
 "225" => "Rename bookmark",
 "226" => "Details",
 "227" => "Switch to detailed table view",
-"228" => "Thumbnails",
+"228" => "Thumbs",
 "229" => "Switch to thumbnails view",
 "230" => "Play",
 "231" => "Play Slideshow",
@@ -506,7 +506,7 @@ $mess=array(
 "449" => "Creating %s, choose a password",
 "450" => "Sort by ...",
 "451" => "Sort thumbnails by ...",
-"452" => "Thumb. size",
+"452" => "Thumbs size",
 "453" => "Set thumbnails size",
 "454" => "Select files on your computer",
 "455" => "Workspaces",
@@ -599,21 +599,21 @@ $mess=array(
 "plugtype.title.editor" => "Editors",
 "plugtype.desc.editor" => "Viewers or editors for wide range of mime types",
 "plugtype.title.gui" => "Graphical User Interface",
-"plugtype.desc.gui" => "Main web interface and its declinations",
-"plugtype.title.index" => "Indexation",
+"plugtype.desc.gui" => "Main web interface, themes and extensions",
+"plugtype.title.index" => "Indexing",
 "plugtype.desc.index" => "Tools for indexing data and providing quick search option",
 "plugtype.title.meta" => "Workspace Meta Aspects",
-"plugtype.desc.meta" => "Additionnal features to be added to the workspaces",
+"plugtype.desc.meta" => "Additional features to be added to the workspaces",
 "plugtype.title.metastore" => "Metadata Storage",
 "plugtype.desc.metastore" => "Various implementations for storing metadata along with files and folders",
 "plugtype.title.shorten" => "URL Shortening",
 "plugtype.desc.shorten" => "Webservices bridges for shortening public links",
 "plugtype.title.uploader" => "Uploaders",
-"plugtype.desc.uploader" => "Implementation of uploaders using various technologies (html, js, java...)",
+"plugtype.desc.uploader" => "Uploaders based on various technologies like HTML, Javascript, Java and others",
 "plugtype.title.auth" => "Authentication Backends",
 "plugtype.desc.auth" => "How users data are stored in the backend",
 "plugtype.title.boot" => "Loader",
-"plugtype.desc.boot" => "Unique plugin for loading the framework.",
+"plugtype.desc.boot" => "Unique plugin for loading the framework",
 "plugtype.title.conf" => "Configuration Storage",
 "plugtype.desc.conf" => "How configuration data are stored in the backend",
 "plugtype.title.feed" => "Events Feed Storage",
@@ -624,4 +624,4 @@ $mess=array(
 "plugtype.desc.mailer" => "Tools for letting the application send emails",
 "plugtype.title.mq" => "Instant Messaging",
 "plugtype.desc.mq" => "Implementations of a simple PUB/SUB server",
-);
+); 
