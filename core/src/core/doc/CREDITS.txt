@@ -42,6 +42,13 @@ Catalon : Joan
 Other translators : see mention in translation files
 Shorten.multi plugin by Miguelon
 Ultreia many fixes
+Thomas Nicot (UX or Orbit Theme): http://resetandplay.com/
+Others bugfixes and translations:
+Tran The Cuong, Nicolas Pouliquen, Pär Strindevall, Martin Schaible, Lawrence Ho,
+Arnold van Blanken, Marco De Pardi, Anael Mobilia, Dmitri Bosenko, Florian Vogt,
+Gerrit Pannek, Max Ruman, Stefan Huber, Christian Foellmann, John Regan, Sylvain Mandon,
+Gerald Me, Matthieu Simon, Florian Huwyler, Aaron Guggisberg, Stefan Wüthrich, Teki Imai,
+Nicola Mustone, Mike Rhuner, Mike Smorul, Pablo Daniel Rey, Steve Ludovicy, Lukasz Lis.
 
 ++ Third Party Library ++
 [Amazon S3]
