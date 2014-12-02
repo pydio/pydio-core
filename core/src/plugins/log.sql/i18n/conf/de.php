@@ -19,8 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"DB Storage" => "DB Speicherung",
-"Stores the logs in an SQL database." => "Speichert die Logs in einer SQL Datenbank.",
+"DB Storage" => "DB Protokolle",
+"Stores the logs in an SQL database." => "Speichert die Protokolle in einer SQL Datenbank.",
 "Connexion" => "Verbindung",
 "The Database Connexion" => "Die Datenbank Verbindung",
 "SQL Tables" => "SQL-Tabellen",

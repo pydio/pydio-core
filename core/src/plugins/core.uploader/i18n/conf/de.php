@@ -26,6 +26,6 @@ $mess=array(
 "Files Number" => "Anzahl Dateien",
 "File Size" => "Dateigröße",
 "Cumul. Size" => "Gesamtgröße",
-"Uploaders Options" => "Uploaders Options",
-"Options shared by all uploaders plugins" => "Options shared by all uploaders plugins",
+"Uploaders Options" => "Uploader Einstellungen",
+"Options shared by all uploaders plugins" => "Einstellungen die für alle Uploader-Plugins gelten",
 );

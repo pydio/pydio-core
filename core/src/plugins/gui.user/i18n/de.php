@@ -30,5 +30,5 @@ $mess=array(
     "4" => "Ihr Benutzername",
     "5" => "F&uuml;r Ihr Konto wurde Ihnen via E-Mail ein Link zugestellt. F&uuml;r das Erstellen eines neues Passwortes klicken Sie dann auf den Link.",
     "6" => "Vielen Dank. Sie k&ouml;nnen sich jetzt anmelden.",
-    "7" => "Für das Konto mit dieser E-Mail-Adresse wurde eine Anfrage zum Zurücksetzen des Passwortes erhalten. Wenn Sie dieses Anfrage nicht gemacht haben, können Sie dieses E-Mail ignorieren. Ansonsten klicken Sie um Ihr Passwort zurückzusetzen auf diesen Link:", /* No HTML entities, might be the body of the mail */
+    "7" => "Für das Konto mit dieser E-Mail-Adresse wurde eine Anfrage zum Zurücksetzen des Passwortes angefordert. Wenn Sie dieses Anfrage nicht gemacht haben, können Sie dieses E-Mail ignorieren. Ansonsten klicken Sie um Ihr Passwort zurückzusetzen auf diesen Link:", /* No HTML entities, might be the body of the mail */
 );

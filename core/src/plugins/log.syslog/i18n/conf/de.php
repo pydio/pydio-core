@@ -19,8 +19,8 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Syslog logger" => "Syslog Logger",
-"Send the logs to the system syslog" => "Sendet die Logs zu dem Systemlogger",
+"Syslog logger" => "Syslog Protokolle",
+"Send the logs to the system syslog" => "Sendet die Protokolle zu dem Systemlogger",
 "Identifier" => "Datenbezeichnung",
-"How the logs will be identified in the system logs" => "Wie die Logs in den Systemlogs identifiziert werden",
+"How the logs will be identified in the system logs" => "Wie die Protokolle in den Systemlogs identifiziert werden",
 );

@@ -21,7 +21,7 @@
 $mess=array(
     "1" => "Office Dokumente",
     "2" => "Onlinevorschau und -bearbeitung von Dokumenten ",
-    "3" => "Word Document",
+    "3" => "Word Dokument",
     "4" => "Präsentationsdokument",
     "5" => "Tabellendokument",
 );

@@ -19,14 +19,14 @@
 * The latest code can be found at <http://pyd.io/>.
 */
 $mess=array(
-"Text logger" => "Text logger",
+"Text logger" => "Text Protokolle",
 "Stores the logs as readable tab delimited text." => "Speichert die Logs in einen durch Tabulatoren getrennten, lesbaren Text",
-"Logpath" => "Logpfad",
+"Logpath" => "Protokollpfad",
 "The path to where the logs are kept." => "Der Pfad, wo die Protokolle aufbewahrt werden.",
-"Logfile" => "Logdatei",
-"The name of the log file" => "Der Name der Logdatei",
+"Logfile" => "Protokolldatei",
+"The name of the log file" => "Der Name der Protokolldatei",
 "Files Permissions" => "Dateirechte",
 "" => "",
-"Log Folder" => "Log Ordner",
+"Log Folder" => "Protokoll Ordner",
 "Files Name Pattern" => "Namensmuster der Dateien",
 );

@@ -22,7 +22,7 @@
 defined('AJXP_EXEC') or die('Access not allowed');
 
 $mess = array(
-    "Git-based Versioning" => "Git-based Versioning",
-    "Keep tracks of all files modifications using a local Git workspace" => "Keep tracks of all files modifications using a local Git workspace",
-    "Keep tracks of all files modifications using a local Git repository" => "Keep tracks of all files modifications using a local Git repository",
+    "Git-based Versioning" => "Git Versionierung",
+    "Keep tracks of all files modifications using a local Git workspace" => "Verfolgen Sie die Unterschiede von Dateien in einer Git Arbeitsumgebung",
+    "Keep tracks of all files modifications using a local Git repository" => "Verfolgen Sie die Unterschiede von Dateien in einem Git Repository",
 );

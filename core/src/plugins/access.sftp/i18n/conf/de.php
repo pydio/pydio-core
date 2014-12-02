@@ -20,14 +20,14 @@
 */
 $mess=array(
 "FTP over SSH" => "FTP über SSH",
-"Access a remote server filesystem using FTP via SSH server. Handy for working around permissions problems." => "Access a remote server filesystem using FTP via SSH server. Handy for working around permissions problems.",
+"Access a remote server filesystem using FTP via SSH server. Handy for working around permissions problems." => "Per FTP via SSH auf ein entferntes Dateisystem zugreifen. Einfach zu benutzen um Probleme mit den Zugriffsrechten zu umgehen.",
 "Server URL" => "Server URL",
-"Path to remote sftp server" => "Path to remote sftp server",
+"Path to remote sftp server" => "Pfad zum SFTP Server",
 "Port number" => "Port Nummer",
 "Port to SSH server" => "Port zu SSH Server",
 "Path" => "Path",
-"Real path to the folder on the server" => "Real path to the folder on the server",
-"Fix Permissions" => "Fix Permissions",
+"Real path to the folder on the server" => "Absoluter Pfad zum Ordner auf dem Server",
+"Fix Permissions" => "Rechte korrigieren",
 "How to handle remote permissions to be used by PHP as local permissions. See manual." => "How to handle remote permissions to be used by PHP as local permissions. See manual.",
 "Create" => "Erstellen",
 "Create folder if it does not exists" => "Ordner erstellen wenn er nicht existiert.",
