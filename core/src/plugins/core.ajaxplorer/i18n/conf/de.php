@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -18,19 +18,28 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
+
+/*******************************************************************************
+* German translation:
+*   + update: Axel Otterstätter <axel.otterstaetter@googlemail.com>
+*   + update: Stefan Huber <sh@signalwerk.ch>
+*   + update: Martin Schaible <martin@martinschaible.ch>
+*******************************************************************************/  
+
+/* Do not use HTML entities! It would mess up everything */ 
 $mess=array(
 "Main"      => "Haupteinstellungen",
 "App Title" => "Anwendungsname",
-"Your application title" => "Dieser Title wird auf den Begrüßungsbildschirm als Fenstertitle angezeigt",
-"Main container for core Pydio settings (application title, sharing, webdav server config, etc...)" => "Main container for core Pydio settings (application title, sharing, webdav server config, etc...)",
+"Your application title" => "Dieser Title wird auf den Begrüssungsbildschirm als Fenstertitel angezeigt",
+"Main container for core Pydio settings (application title, sharing, webdav server config, etc...)" => "Haupteinstellungen für Pydio (Applikations-Titel, Freigaben, webDAV-Server Konfiguration, usw.)",
 "Default Language" => "Standardsprache",
-"Default language when a user does not have set his/her own." => "Standardsprache wenn der Benutzer keine andere gesetzt hat.",
+"Default language when a user does not have set his/her own." => "Standardsprache, wenn der Benutzer keine Sprache eingestellt hat.",
 "Sharing" => "Freigaben",
-"Download Folder" => "Download Ordner",
-"Absolute path to the public folder where temporary download links will be created. Setting this empty will disable the sharing feature." => "Absoluter Pfad zu dem Ordner wo die Download Links für temporäre Freigaben erstellt werden. Wenn diese Einstellung leer ist werden die Freigaben deaktiviert.",
-"Download URL" => "Download URL",
+"Download Folder" => "Download-Ordner",
+"Absolute path to the public folder where temporary download links will be created. Setting this empty will disable the sharing feature." => "Absoluter Pfad zu dem Ordner in welchem die Download-Links für temporäre Freigaben erstellt werden. Wenn diese Einstellung leer ist, werden die Freigaben deaktiviert.",
+"Download URL" => "Download-URL",
 "If not inferred directly from the current ajaxplorer URI plus the public download folder name, replace the public access URL here." => "If not inferred directly from the current ajaxplorer URI plus the public download folder name, replace the public access URL here.",
-"Existing users" => "Existing users",
+"Existing users" => "Bestehende Benutzer",
 "Allow the users to pick an existing user when sharing a folder" => "Erlaubt den Benutzern bei der Freigabe von Ordnern einen anderen Benutzer auszuwählen",
 "Compression Features" => "Komprimierungsfunktionen",
 "Gzip Download" => "Gzip Download",
@@ -39,8 +48,8 @@ $mess=array(
 "If activated, a default limit should be set above when files are no more compressed." => "If activated, a default limit should be set above when files are no more compressed.",
 "Zip Creation" => "Zip Creation",
 "If you encounter problems with online zip creation or multiple files downloading, you can disable the feature." => "If you encounter problems with online zip creation or multiple files downloading, you can disable the feature.",
-"WebDAV Server" => "WebDAV Server",
-"Enable WebDAV" => "Aktiviere WebDAV",
+"WebDAV Server" => "WebDAV-Server",
+"Enable WebDAV" => "WebDAV aktivieren",
 "Enable the webDAV support. Please READ THE DOC to safely use this feature." => "Enable the webDAV support. Please READ THE DOC to safely use this feature.",
 "Shares URI" => "Freigaben URI",
 "Common URI to access the shares. Please READ THE DOC to safely use this feature." => "Common URI to access the shares. Please READ THE DOC to safely use this feature.",
@@ -48,14 +57,14 @@ $mess=array(
 "Host used in webDAV protocol. Should be detected by default. Please READ THE DOC to safely use this feature." => "Host used in webDAV protocol. Should be detected by default. Please READ THE DOC to safely use this feature.",
 "Digest Realm" => "Digest Realm",
 "Default realm for authentication. Please READ THE DOC to safely use this feature." => "Default realm for authentication. Please READ THE DOC to safely use this feature.",
-"Miscellaneous" => "Miscellaneous",
-"Command-line Active" => "Command-line Active",
+"Miscellaneous" => "Verschiedenes",
+"Command-line Active" => "Kommando-Zeile aktiv",
 "Use Pydio framework via the command line, allowing CRONTAB jobs or background actions." => "Use Pydio framework via the command line, allowing CRONTAB jobs or background actions.",
-"Command-line PHP" => "Command-line PHP",
+"Command-line PHP" => "PHP-Kommando-Zeile",
 "On specific hosts, you may have to use a specific path to access the php command line" => "On specific hosts, you may have to use a specific path to access the php command line",
 "Filename length" => "Dateinamen länge",
-"Maximum characters length of new files or folders" => "Maximum der verwendbaren Zeichen für neue Ordner und Dateien",
-"Temporary Folder" => "Temporary Folder",
+"Maximum characters length of new files or folders" => "Anzahl der Zeichen für neue Ordner und Dateien",
+"Temporary Folder" => "Ordner für temporäre Daten",
 "This is necessary only if you have errors concerning the tmp dir access or writeability : most probably, they are due to PHP SAFE MODE (should disappear in php6) or various OPEN_BASEDIR restrictions. In that case, create and set writeable a tmp folder somewhere at the root of your hosting (but above the web/ or www/ or http/ if possible!!) and enter here the full path to this folder" => "This is necessary only if you have errors concerning the tmp dir access or writeability : most probably, they are due to PHP SAFE MODE (should disappear in php6) or various OPEN_BASEDIR restrictions. In that case, create and set writeable a tmp folder somewhere at the root of your hosting (but above the web/ or www/ or http/ if possible!!) and enter here the full path to this folder",
 "Admin email" => "Admin email",
 "Administrator email, not used for the moment" => "Administrator email, not used for the moment",
@@ -116,14 +125,14 @@ $mess=array(
 "Default Metasources" => "Default Metasources",
 "Comma-separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver" => "Comma-separated list of metastore and meta plugins, that will be automatically applied to all workspaces created with this driver",
 "Pydio Main Options" => "Pydio Haupteinstellungen",
-"Server URL" => "Server URL",
+"Server URL" => "Server-URL",
 "Server URL used to build share links and notifications. It will be detected if empty." => "Server URL used to build share links and notifications. It will be detected if empty.",
-"Force Basic Auth" => "Force Basic Auth",
+"Force Basic Auth" => "Basic Auth forcieren",
 "This authentication mechanism is less secure, but will avoid the users having to re-enter a password in some case." => "This authentication mechanism is less secure, but will avoid the users having to re-enter a password in some case.",
 "Browser Access" => "Browser Access",
 "Display the list of files and folder when accessing through the browser" => "Display the list of files and folder when accessing through the browser",
-"Command Line" => "Command Line",
-"Use COM class" => "Use COM class",
+"Command Line" => "Kommando-Zeile",
+"Use COM class" => " COM-Klasse benutzen",
 "On Windows running IIS, set this option to true if the COM extension is loaded, this may enable the use of the php command line." => "On Windows running IIS, set this option to true if the COM extension is loaded, this may enable the use of the php command line.",
 "Disable Zip browsing" => "Disable Zip browsing",
 "Disable Zip files inline browsing. This can be necessary if you always store huge zip archives: it can have some impact on performance." => "Disable Zip files inline browsing. This can be necessary if you always store huge zip archives: it can have some impact on performance.",
